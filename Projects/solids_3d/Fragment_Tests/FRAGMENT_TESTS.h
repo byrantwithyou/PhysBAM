@@ -21,7 +21,7 @@ template<class T_input>
 class FRAGMENT_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
 {
     typedef T_input T;
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
@@ -56,7 +56,7 @@ void Get_Initial_Data()
     
     const int strands=25,strand_segments=50;
     //const int strands=2,strand_segments=50;
-    hair_layout_grid.Initialize(strands,strands,strand_segments,-.5,.5,0,1,0,2);
+    hair_layout_grid.Initialize(TV_INT(strands,strands,strand_segments),RANGE<TV>(TV(-.5,0,0),TV(.5,1,2)));
     particles.Add_Elements(hair_layout_grid.Numbers_Of_Nodes().Product());
     
     int count=1;

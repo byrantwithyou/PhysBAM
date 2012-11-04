@@ -33,7 +33,7 @@ template<class T> T Film_Lanczos_Filter(const VECTOR<T,2>& X,const VECTOR<T,2>& 
 template<class T>
 class FILM
 {
-    typedef VECTOR<T,2> TV2;typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,2> TV2;typedef VECTOR<int,2> TV2_INT;typedef VECTOR<T,3> TV;
     
 public:
     struct SAMPLE{

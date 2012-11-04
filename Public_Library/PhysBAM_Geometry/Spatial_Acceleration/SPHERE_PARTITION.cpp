@@ -54,11 +54,11 @@ Boundary(const VECTOR<T,3>& location,const T thickness_over_two) const
 // Function Set_Up_Grid
 //#####################################################################
 template<class T> void SPHERE_PARTITION<T>::
-Set_Up_Grid(const int m,const int n,const int mn)
+Set_Up_Grid(const TV_INT& size)
 {
     box=RANGE<TV>::Empty_Box();
     for(int k=0;k<spheres.m;k++)box.Enlarge_To_Include_Box(spheres(k).Bounding_Box());
-    grid.Initialize(m,n,mn,box);
+    grid.Initialize(size,box);
     
     for(int i=0;i<voxel_sphere_list.counts.x;i++) for(int j=0;j<voxel_sphere_list.counts.y;j++) for(int ij=0;ij<voxel_sphere_list.counts.z;ij++){
         delete voxel_sphere_list(i,j,ij);voxel_sphere_list(i,j,ij)=0;}

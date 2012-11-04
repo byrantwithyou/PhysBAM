@@ -238,7 +238,7 @@ Create_Embedded_Tetrahedralized_Volume(const T_SHAPE& shape,const RIGID_GEOMETRY
     EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& embedded_tetrahedralized_volume=embedding.embedded_object;
     embedded_tetrahedralized_volume.Set_Interpolation_Fraction_Threshold((T)1e-2);
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=embedded_tetrahedralized_volume.simplicial_object;
-    GRID<TV> grid(13,13,13,RANGE<TV>::Centered_Box());tetrahedralized_volume.Initialize_Octahedron_Mesh_And_Particles(grid);
+    GRID<TV> grid(TV_INT()+13,RANGE<TV>::Centered_Box());tetrahedralized_volume.Initialize_Octahedron_Mesh_And_Particles(grid);
     ARRAY<T> phi(particles.Size());
     for(int p=0;p<phi.m;p++) phi(p)=shape.Signed_Distance(particles.X(p));
     // compute embedded surface

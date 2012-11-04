@@ -42,9 +42,10 @@ Initialize(const std::string& data_directory)
     Load_Data(data_directory+"/Muscle_Curves/passive_cubic",passive_force_grid,passive_force);
     Load_Data(data_directory+"/Muscle_Curves/active_cubic",active_force_grid,active_force);
     Load_Data(data_directory+"/Muscle_Curves/tendon_cubic",tendon_force_grid,tendon_force);
-    velocity_grid.Initialize(1001,-2,2);velocity_curve.Resize(velocity_grid.Domain_Indices());
+    velocity_grid.Initialize(VECTOR<int,1>(1001),RANGE<VECTOR<T,1> >(VECTOR<T,1>(-2),VECTOR<T,1>(2)));
+    velocity_curve.Resize(velocity_grid.Domain_Indices());
     for(int v=0;v<1001;v++){T velocity=velocity_grid.Axis_X(v,0);velocity_curve(v)=(velocity<-1)?0:(T).54*atan((T)5.69*velocity+(T).51)+(T).745;}
-    tendon_length_grid.Initialize(1001,0,3.5);tendon_length.Resize(tendon_length_grid.Domain_Indices());
+    tendon_length_grid.Initialize(VECTOR<int,1>(1001),RANGE<VECTOR<T,1> >(VECTOR<T,1>(),VECTOR<T,1>(3.5)));tendon_length.Resize(tendon_length_grid.Domain_Indices());
     Compute_Inverse_Map_Helper(tendon_force_grid,tendon_force,tendon_length_grid,tendon_length);
     Compute_Slopes(passive_force_grid,passive_force,passive_force_slope_grid,passive_force_slope);
     Compute_Slopes(active_force_grid,active_force,active_force_slope_grid,active_force_slope);
@@ -56,7 +57,7 @@ Load_Data(const std::string& prefix,GRID<VECTOR<T,1> >& grid,ARRAY<T,VECTOR<int,
 {
     {std::istream* input=FILE_UTILITIES::Safe_Open_Input(prefix+".grid",false);
     *input>>grid.counts.x>>grid.domain.min_corner.x>>grid.domain.max_corner.x;
-    grid.Initialize(grid.counts.x,grid.domain.min_corner.x,grid.domain.max_corner.x);
+    grid.Initialize(grid.counts,grid.domain);
     values.Resize(grid.Domain_Indices());
     delete input;}
     std::istream* input(FILE_UTILITIES::Safe_Open_Input(prefix+".values",false));

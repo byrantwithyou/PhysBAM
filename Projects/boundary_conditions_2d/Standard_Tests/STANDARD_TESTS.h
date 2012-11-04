@@ -502,7 +502,7 @@ void Rigid_Circle()
     rigid_body.Set_Mass((T)pi*sqr(radius)*(T)density*mass_multiplier);
     Add_Volumetric_Body_To_Fluid_Simulation(rigid_body);
 
-    fluids_parameters.grid->Initialize(resolution+1,(int)(1.5*resolution)+1,(T)0,(T)1,(T)0,(T)1.5);
+    fluids_parameters.grid->Initialize(TV_INT(resolution,(T)1.5*resolution)+1,RANGE<TV>(TV(),TV(1,(T)1.5)));
     fluids_parameters.gravity=(T)9.8;
     fluids_parameters.domain_walls[1][1]=true;
     fluids_parameters.domain_walls[1][2]=true;
@@ -517,7 +517,7 @@ void Rigid_Circle()
 //#####################################################################
 void Boundary_Conditions()
 {
-    fluids_parameters.grid->Initialize(resolution+1,resolution+1,(T)0,(T)1,(T)0,(T)1);
+    fluids_parameters.grid->Initialize(TV_INT()+resolution+1,RANGE<TV>::Unit_Box());
     domain=fluids_parameters.grid->domain;
     fluids_parameters.domain_walls[1][1]=false;
     fluids_parameters.domain_walls[2][1]=false;
@@ -540,7 +540,7 @@ void Boundary_Conditions_Offset()
     T left=extra-extra_cells;
     mass_multiplier=(left-1)/left;
 
-    fluids_parameters.grid->Initialize(resolution+1,resolution+1+extra_cells,(T)0,(T)1,-(T)extra_cells/resolution,(T)1);
+    fluids_parameters.grid->Initialize(TV_INT(resolution,resolution+extra_cells)+1,RANGE<TV>(TV(0,-(T)extra_cells/resolution),TV(1,1)));
     domain=fluids_parameters.grid->domain;
     domain.min_corner.y=-boundary_offset;
     fluids_parameters.domain_walls[1][1]=false;
@@ -613,7 +613,7 @@ void Angled_Boundary_Conditions()
 
     int extra=(int)ceil(((x+y).y-1)*resolution);
 
-    fluids_parameters.grid->Initialize(resolution+1,resolution+1+extra,0,1,0,1+(T)extra/resolution);
+    fluids_parameters.grid->Initialize(TV_INT(resolution,resolution+extra)+1,RANGE<TV>(TV(),TV(1,1+(T)extra/resolution)));
     fluids_parameters.use_levelset_viscosity=true;
     fluids_parameters.domain_walls[1][1]=false;
     fluids_parameters.domain_walls[1][2]=false;

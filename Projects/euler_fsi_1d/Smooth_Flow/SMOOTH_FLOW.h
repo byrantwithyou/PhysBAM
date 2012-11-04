@@ -28,7 +28,7 @@ template<class T_input>
 class SMOOTH_FLOW:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,1> > >
 {
 public:
-    typedef T_input T;typedef VECTOR<T,1> TV;typedef GRID<TV> T_GRID;
+    typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;typedef GRID<TV> T_GRID;
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::resolution;
@@ -80,7 +80,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     implicit_rk=implicit_rk && !exact;
 
     //grid
-    fluids_parameters.grid->Initialize(resolution,(T)0.,(T)1.);
+    fluids_parameters.grid->Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box());
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
     fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
     //time

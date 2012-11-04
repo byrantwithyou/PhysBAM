@@ -18,6 +18,7 @@ namespace PhysBAM{
 class OPENGL_WORLD;
 class OPENGL_UNIFORM_SLICE:public OPENGL_SLICE
 {
+    typedef VECTOR<float,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     OPENGL_WORLD &world;
     GRID<VECTOR<float,3> > grid;
@@ -32,7 +33,7 @@ public:
     OPENGL_UNIFORM_SLICE(OPENGL_WORLD &world_input)
         : world(world_input), clip_plane_id1(0), clip_plane_id2(0)
     {
-        Initialize(GRID<VECTOR<float,3> >(2,2,2,0,1,0,1,0,1));
+        Initialize(GRID<VECTOR<float,3> >(TV_INT()+2,RANGE<TV>::Unit_Box()));
     }
 
     bool Is_Slice_Mode() PHYSBAM_OVERRIDE

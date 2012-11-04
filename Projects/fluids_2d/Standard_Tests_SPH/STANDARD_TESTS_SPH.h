@@ -24,7 +24,7 @@ namespace PhysBAM{
 template<class T_input>
 class STANDARD_TESTS_SPH:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
 {
-    typedef T_input T;typedef VECTOR<T,2> TV;
+    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
 
@@ -89,17 +89,17 @@ void Parse_Options() PHYSBAM_OVERRIDE
     int cells=1*resolution;
     if(test_number==1){
         first_frame=0;last_frame=200;
-        grid.Initialize(15*cells+1,10*cells+1,0,(T)1.5,0,1);}
+        grid.Initialize(TV_INT(15*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV((T)1.5,1)));}
     else if(test_number==2){
         first_frame=0;last_frame=100;
-        grid.Initialize(10*cells+1,15*cells+1,0,1,0,(T)1.5);}
+        grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(0,0),TV(1,(T)1.5)));}
     else if(test_number==3){
         first_frame=0;last_frame=150;
-        grid.Initialize(10*cells+1,15*cells+1,0,1,0,(T)1.5);}
+        grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(0,0),TV(1,(T)1.5)));}
     else if(test_number==5){
-        grid.Initialize(10*cells+1,10*cells+1,0,1,0,1);}
+        grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV(1,1)));}
     else if(test_number==6){   
-        grid.Initialize(10*cells+1,10*cells+1,0,1,0,1,true);
+        grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV(1,1)),true);
         int rigid_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/square_refined",(T).1,true,true,false);
         rigid=&solid_body_collection.rigid_body_collection.Rigid_Body(rigid_id);
         //rigid->is_kinematic=true;

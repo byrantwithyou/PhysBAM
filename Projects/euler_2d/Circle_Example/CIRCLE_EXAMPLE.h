@@ -182,8 +182,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     //grid
     int cells=resolution;
     T grid_size=(T)1.;
-    if(test_number==10) fluids_parameters.grid->Initialize(2*cells+1,cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)-100,(T)0),VECTOR<T,2>((T)100,(T)100))*grid_size);
-    else fluids_parameters.grid->Initialize(cells+1,cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)-1,(T)-1),VECTOR<T,2>((T)1,(T)1))*grid_size);
+    if(test_number==10) fluids_parameters.grid->Initialize(TV_INT(2,1)*cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)-100,(T)0),VECTOR<T,2>((T)100,(T)100))*grid_size);
+    else fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)-1,(T)-1),VECTOR<T,2>((T)1,(T)1))*grid_size);
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
     fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
     fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
@@ -475,7 +475,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number==1) return;
 
     if(test_number==8){
-        TRIANGULATED_AREA<T>& triangulated_area=tests.Create_Triangulated_Object(GRID<TV>(2,2,-.1,.1,-.1,.1),RIGID_BODY_STATE<TV>(FRAME<TV>(motion_curve.Value(0))),(T)1);
+        TRIANGULATED_AREA<T>& triangulated_area=tests.Create_Triangulated_Object(GRID<TV>(TV_INT()+2,RANGE<TV>(TV()-.1,TV()+.1)),RIGID_BODY_STATE<TV>(FRAME<TV>(motion_curve.Value(0))),(T)1);
         tests.Set_Mass_Of_Particles(triangulated_area,solid_mass/triangulated_area.Total_Size(),false);
 
         // correct number nodes

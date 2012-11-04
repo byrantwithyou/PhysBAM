@@ -610,8 +610,8 @@ template<class T> void FILM<T>::
 Set_Resolution(const int pixels_width,const int pixels_height)
 {
     T width_over_two=(T).5*width,height_over_two=(T).5*height;
-    grid.Initialize(pixels_width,pixels_height,-width_over_two,width_over_two,-height_over_two,height_over_two,true);
-    subpixel_grid.Initialize(2*pixels_width,2*pixels_height,-width_over_two,width_over_two,-height_over_two,height_over_two,true);
+    grid.Initialize(TV2_INT(pixels_width,pixels_height),RANGE<TV2>(TV2(-width_over_two,-height_over_two),TV2(width_over_two,height_over_two)),true);
+    subpixel_grid.Initialize(TV2_INT(2*pixels_width,2*pixels_height),RANGE<TV2>(TV2(-width_over_two,-height_over_two),TV2(width_over_two,height_over_two)),true);
     colors.Resize(grid.Domain_Indices());
     weights.Resize(grid.Domain_Indices());
     alphas.Resize(grid.Domain_Indices());

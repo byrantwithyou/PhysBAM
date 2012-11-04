@@ -49,8 +49,7 @@ Initialize(const int test_number_input,const int resolution)
     int cells=resolution;
     if(test_number==1||test_number==2||test_number==3||test_number==4){
         example.first_frame=0;example.last_frame=3840;
-        grid.Initialize(10*cells+1,10*cells+1,25*cells+1,-10,10,-10,10,-5,45);}
-    //grid.Initialize(10*cells+1,15*cells+1,10*cells+1,0,1,0,1.5,0,1);}
+        grid.Initialize(TV_INT(10,10,25)*cells+1,RANGE<TV>(TV(-10,-10,-5),TV(10,10,45)));}
     else{LOG::cerr<<"unrecognized test number "<<test_number<<std::endl;exit(1);}
     
     example.output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests_Smoke/Test_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));

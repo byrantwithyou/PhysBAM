@@ -320,36 +320,36 @@ void Parse_Options() PHYSBAM_OVERRIDE
     switch(test_number){
         case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 57: case 77: case 80:
             if(!parameter) parameter=10;
-            mattress_grid=GRID<TV>(parameter+1,parameter+1,parameter+1,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
+            mattress_grid=GRID<TV>(TV_INT(parameter+1,parameter+1,parameter+1),RANGE<TV>(TV((T)-1,(T)-1,(T)-1),TV((T)1,(T)1,(T)1)));
             break;
         case 34:
-            mattress_grid=GRID<TV>(13,13,13,(T)-2,(T)2,(T)-2,(T)2,(T)-2,(T)2);
+            mattress_grid=GRID<TV>(TV_INT(13,13,13),RANGE<TV>(TV((T)-2,(T)-2,(T)-2),TV((T)2,(T)2,(T)2)));
             break;
         case 26:
-            mattress_grid=GRID<TV>(40,5,5,(T)-4,(T)4,(T)-.5,(T).5,(T)-.5,(T).5);
+            mattress_grid=GRID<TV>(TV_INT(40,5,5),RANGE<TV>(TV((T)-4,(T)-.5,(T)-.5),TV((T)4,(T).5,(T).5)));
             break;
         case 28:
-            mattress_grid=GRID<TV>(80,10,10,(T)-8,(T)8,(T)-.5,(T).5,(T)-.5,(T).5);
+            mattress_grid=GRID<TV>(TV_INT(80,10,10),RANGE<TV>(TV((T)-8,(T)-.5,(T)-.5),TV((T)8,(T).5,(T).5)));
             break;
         case 16:
-            mattress_grid=GRID<TV>(11,6,11,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
+            mattress_grid=GRID<TV>(TV_INT(11,6,11),RANGE<TV>(TV((T)-1,(T)-.5,(T)-1),TV((T)1,(T).5,(T)1)));
             break;
         case 35: case 36: case 41:
-            mattress_grid=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
-            mattress_grid1=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
-            mattress_grid2=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.016,(T)0.016,(T)-0.016,(T)0.016,(T)-0.016,(T)0.016);
-            mattress_grid3=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.0125,(T)0.0125,(T)-0.0125,(T)0.0125,(T)-0.0125,(T)0.0125);
+            mattress_grid=GRID<TV>(TV_INT(jello_size,jello_size,jello_size),RANGE<TV>(TV((T)-0.01,(T)-0.01,(T)-0.01),TV((T)0.01,(T)0.01,(T)0.01)));
+            mattress_grid1=GRID<TV>(TV_INT(jello_size,jello_size,jello_size),RANGE<TV>(TV((T)-0.01,(T)-0.01,(T)-0.01),TV((T)0.01,(T)0.01,(T)0.01)));
+            mattress_grid2=GRID<TV>(TV_INT(jello_size,jello_size,jello_size),RANGE<TV>(TV((T)-0.016,(T)-0.016,(T)-0.016),TV((T)0.016,(T)0.016,(T)0.016)));
+            mattress_grid3=GRID<TV>(TV_INT(jello_size,jello_size,jello_size),RANGE<TV>(TV((T)-0.0125,(T)-0.0125,(T)-0.0125),TV((T)0.0125,(T)0.0125,(T)0.0125)));
             break;
         case 37: case 39: case 40: case 38: case 44:
-            mattress_grid=GRID<TV>(10,10,10,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
+            mattress_grid=GRID<TV>(TV_INT(10,10,10),RANGE<TV>(TV((T)-0.01,(T)-0.01,(T)-0.01),TV((T)0.01,(T)0.01,(T)0.01)));
             break;
         case 42: case 52:
-            mattress_grid=GRID<TV>(20,20,20,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
+            mattress_grid=GRID<TV>(TV_INT(20,20,20),RANGE<TV>(TV((T)-0.01,(T)-0.01,(T)-0.01),TV((T)0.01,(T)0.01,(T)0.01)));
             break;
             default:{
             if(!parameter) parameter=10;
         
-            mattress_grid=GRID<TV>(2*parameter,parameter,2*parameter,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
+            mattress_grid=GRID<TV>(TV_INT(2*parameter,parameter,2*parameter),RANGE<TV>(TV((T)-1,(T)-.5,(T)-1),TV((T)1,(T).5,(T)1)));
         }
     }
 

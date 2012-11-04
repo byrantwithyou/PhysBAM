@@ -223,8 +223,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 1:
             break;
         case 2:
-            mattress_grid=GRID<TV>(8,2,2,(T)0,(T)4,(T)2,(T)3,(T)2,(T)3);
-            //mattress_grid=GRID<TV>(2,2,2,(T).5,(T).6,(T).5,(T).6,(T).5,(T).6);
+            mattress_grid=GRID<TV>(TV_INT(8,2,2),RANGE<TV>(TV((T)0,(T)2,(T)2),TV((T)4,(T)3,(T)3)));
+            //mattress_grid=GRID<TV>(TV_INT(2,2,2),RANGE<TV>(TV((T).5,(T).5,(T).5),TV((T).6,(T).6,(T).6)));
             solids_parameters.implicit_solve_parameters.cg_iterations=4000;
             break;
         case 3:

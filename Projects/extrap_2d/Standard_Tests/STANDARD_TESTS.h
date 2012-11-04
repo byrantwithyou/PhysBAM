@@ -273,16 +273,16 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     switch(test_number){
     case 20: case 21: case 26: 
-            mattress_grid=GRID<TV>(40,8,(T)-2,(T)2,(T)-.4,(T).4);
+            mattress_grid=GRID<TV>(TV_INT(40,8),RANGE<TV>(TV((T)-2,(T)-.4),TV((T)2,(T).4)));
         break;
         case 22: case 23: case 24: case 25: case 27: case 30:
-            mattress_grid=GRID<TV>(parameter?parameter+1:11,parameter?parameter+1:11,(T)-.9,(T).9,(T)-.9,(T).9);
+            mattress_grid=GRID<TV>(TV_INT(parameter?parameter+1:11,parameter?parameter+1:11),RANGE<TV>(TV((T)-.9,(T)-.9),TV((T).9,(T).9)));
         break;
         case 28: 
-            mattress_grid=GRID<TV>(80,16,(T)-2,(T)2,(T)-.4,(T).4);
+            mattress_grid=GRID<TV>(TV_INT(80,16),RANGE<TV>(TV((T)-2,(T)-.4),TV((T)2,(T).4)));
             break;
             default:
-            mattress_grid=GRID<TV>(parameter?parameter+1:11,parameter?parameter+1:11,(T)-1,(T)1,(T)-1,(T)1);
+            mattress_grid=GRID<TV>(TV_INT(parameter?parameter+1:11,parameter?parameter+1:11),RANGE<TV>(TV((T)-1,(T)-1),TV((T)1,(T)1)));
             break;
     }
 
@@ -1089,7 +1089,7 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
 //#####################################################################
 void Plot_Energy_Density(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm,T stiffness)
 {
-    TRIANGULATED_AREA<T>& ta=tests.Create_Mattress(GRID<TV>(2+image_size+1,2+image_size+1,-sigma_range,sigma_range,-sigma_range,sigma_range),true,RIGID_BODY_STATE<TV>());
+    TRIANGULATED_AREA<T>& ta=tests.Create_Mattress(GRID<TV>(TV_INT()+2+image_size+1,RANGE<TV>::Centered_Box()*sigma_range),true,RIGID_BODY_STATE<TV>());
     TRIANGULATED_SURFACE<T> ts(ta.mesh,*new DEFORMABLE_PARTICLES<VECTOR<T,3> >);
     ts.particles.Add_Elements(ta.particles.X.m);
     for(int i=0;i<ta.particles.X.m;i++){
@@ -1186,7 +1186,7 @@ void Energy_Profile_Plot(int frame)
     if(!energy_mesh){
         energy_particles.Store_Velocity(true);
         TRIANGULATED_AREA<T> ta(*new TRIANGLE_MESH,*new GEOMETRY_PARTICLES<TV>);
-        ta.Initialize_Square_Mesh_And_Particles(GRID<TV>(2+image_size+1,2+image_size+1,-sigma_range,sigma_range,-sigma_range,sigma_range),false);
+        ta.Initialize_Square_Mesh_And_Particles(GRID<TV>(TV_INT()+2+image_size+1,RANGE<TV>::Centered_Box()*sigma_range,false));
 
         energy_mesh=new TRIANGULATED_SURFACE<T>(ta.mesh,*new DEFORMABLE_PARTICLES<VECTOR<T,3> >);
         energy_mesh->particles.Add_Elements(ta.particles.X.m);

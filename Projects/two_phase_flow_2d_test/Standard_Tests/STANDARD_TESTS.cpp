@@ -138,29 +138,29 @@ Parse_Options()
 
     switch(test_number){
         case 1:
-            fluids_parameters.grid->Initialize(resolution+1,resolution+1,0*m,(T).04*m,0*m,(T).04*m);
+            fluids_parameters.grid->Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0*m,0*m),TV((T).04*m,(T).04*m)));
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
             fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
             break;
         case 2:
-            fluids_parameters.grid->Initialize(5,5,10*m,11*m,10*m,11*m);
+            fluids_parameters.grid->Initialize(TV_INT(TV_INT(5,5)),RANGE<TV>(TV(RANGE<TV>(TV(10*m,TV(11*m),TV(10*m),11*m)))));
             fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
             fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
             break;
         case 3:
-            fluids_parameters.grid->Initialize(resolution+1,resolution+1,0*m,(T).04*m,0*m,(T).04*m);
+            fluids_parameters.grid->Initialize(TV_INT(TV_INT(resolution+1,resolution+1)),RANGE<TV>(TV(RANGE<TV>(TV(0*m,TV((T).04*m),TV(0*m),(T).04*m)))));
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
             fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
             break;
         case 4:
         case 5:
-            fluids_parameters.grid->Initialize(resolution+1,resolution+1,0*m,1*m,0*m,1*m);
+            fluids_parameters.grid->Initialize(TV_INT(TV_INT(resolution+1,resolution+1)),RANGE<TV>(TV(RANGE<TV>(TV(0*m,TV(1*m),TV(0*m),1*m)))));
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
             fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
             break;
         case 6:
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
-            (*fluids_parameters.grid).Initialize(resolution+1,resolution+1,0,1,(T)0,m);
+            (*fluids_parameters.grid).Initialize(TV_INT(TV_INT(resolution+1,resolution+1)),RANGE<TV>(TV(RANGE<TV>(TV(0,TV(1),TV((T)0),m)))));
             if(!use_viscosity) fluids_parameters.viscosity=100;
             solid_density=150;
             solid_width=(T)1/3;
@@ -358,7 +358,7 @@ Kang_Circle(bool use_surface)
 template<class T> void STANDARD_TESTS<T>::
 Oscillating_Circle(bool use_surface)
 {
-    (*fluids_parameters.grid).Initialize(resolution,resolution,(T)0*m,(T)1*m,(T)0*m,(T)1*m,true);
+    (*fluids_parameters.grid).Initialize(TV_INT(resolution,resolution),RANGE<TV>(TV((T)0*m,(T)0*m),TV((T)1*m,(T)))1*m,true);
     fluids_parameters.cfl=(T).9;
 //    solids_parameters.write_static_variables_every_frame=true;
     use_massless_structure=use_surface;

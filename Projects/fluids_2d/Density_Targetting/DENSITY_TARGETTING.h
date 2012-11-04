@@ -117,11 +117,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.store_particle_ids=true;
     first_frame=0;last_frame=1000;
 
-    if(test_number==1 || test_number==4 || test_number==5 || test_number==6 || test_number==7) fluids_parameters.grid->Initialize(6*cells+1,12*cells+1,0,1.5,0,3);
+    if(test_number==1 || test_number==4 || test_number==5 || test_number==6 || test_number==7) fluids_parameters.grid->Initialize(TV_INT(6*cells+1,12*cells+1),RANGE<TV>(TV(0,0),TV(1.5,3)));
     else if(test_number==2 || test_number==3){
         frame_rate=100;
         fluids_parameters.number_particles_per_cell=16;
-        fluids_parameters.grid->Initialize(12*cells+1,6*cells+1,0,6,0,3);}
+        fluids_parameters.grid->Initialize(TV_INT(12*cells+1,6*cells+1),RANGE<TV>(TV(0,0),TV(6,3)));}
     else{
         LOG::cerr<<"unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -174,7 +174,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         fluids_parameters.gravity=(T)0;
         time_pour_end=-1;
         IMAGE<T>::Read("Density_Targetting/circle.jpg",target_image);
-        grid_image.Initialize(target_image.counts.x,target_image.counts.y,(T)1.5,(T)2.5,1,2);
+        grid_image.Initialize(TV_INT(target_image.counts.x,target_image.counts.y),RANGE<TV>(TV((T)1.5,1),TV((T)2.5,2)));
             
         target_translation=TV();
         targetting_time_start=time_pour_start;

@@ -73,7 +73,7 @@ public:
 
     void Use_Temperature_Remap(ARRAY<T,VECTOR<int,1> >& temperature_remap_input)
     {temperature_remap=temperature_remap_input;use_temperature_remap=true;
-    temperature_remap_grid.Initialize(temperature_remap.counts.x,0,3000);}
+    temperature_remap_grid.Initialize(temperature_remap.counts,RANGE<VECTOR<T,1> >(VECTOR<T,1>(0),VECTOR<T,1>((T)3000)));}
 
     void Set_Absorption_Shadow(const TV& absorption_shadow_input)
     {absorption_shadow=absorption_shadow_input;}

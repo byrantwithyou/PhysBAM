@@ -124,8 +124,8 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    if(shed) fluids_parameters.grid->Initialize((int)(2.5*resolution)+1,resolution+1,-(T)2.5,15,-(T)3.5,(T)3.5);
-    else fluids_parameters.grid->Initialize(resolution+1,resolution+1,0,4,0,4);
+    if(shed) fluids_parameters.grid->Initialize(TV_INT((int)(2.5*resolution)+1,resolution+1),RANGE<TV>(TV(-(T)2.5,-(T)3.5),TV(15,(T)3.5)));
+    else fluids_parameters.grid->Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0,0),TV(4,4)));
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
     if(opt_enlarge) circle.radius+=fluids_parameters.grid->dX.Min();
     if(shed) fluids_parameters.viscosity=(T).01;

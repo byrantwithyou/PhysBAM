@@ -103,7 +103,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     // set up the domain
     first_frame=0;last_frame=5000;
     int cells=1*resolution;
-    fluids_parameters.grid->Initialize(3*cells+1,4*cells+1,4*cells+1,1,4,0,4,0,4);
+    fluids_parameters.grid->Initialize(TV_INT(3*cells+1,4*cells+1,4*cells+1),RANGE<TV>(TV(1,0,0),TV(4,4,4)));
 
     if(test_number>2){LOG::cerr<<"unrecognized test number "<<test_number<<std::endl;exit(1);}
 

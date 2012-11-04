@@ -454,14 +454,14 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
     if(!bcc_lattice_cell_size){
         if(use_adaptive_refinement) cell_size=(T).1*min(size.x,size.y,size.z); // default is about 10 grid cells
         else cell_size=implicit_surface->Minimum_Cell_Size();} // use the cell size of the implicit surface
-    int m=(int)ceil(size.x/cell_size),n=(int)ceil(size.y/cell_size),mn=(int)ceil(size.z/cell_size);
+    TV_INT grid_size(ceil(size/cell_size));
     GRID<TV> bcc_grid;
     if(!symmetric_initial_grid)
-        bcc_grid=GRID<TV>(m+1,n+1,mn+1,box.min_corner.x,box.min_corner.x+cell_size*m,box.min_corner.y,box.min_corner.y+cell_size*n,box.min_corner.z,box.min_corner.z+cell_size*mn);
+        bcc_grid=GRID<TV>(grid_size+1,RANGE<TV>(box.min_corner,box.min_corner.x+cell_size*TV(grid_size)));
     else{
         TV center=box.Center();
-        TV shift=cell_size/2*TV((T)m,(T)n,(T)mn);
-        bcc_grid=GRID<TV>(m+1,n+1,mn+1,RANGE<TV>(center-shift,center+shift));}
+        TV shift=cell_size/2*TV(grid_size);
+        bcc_grid=GRID<TV>(grid_size+1,RANGE<TV>(center-shift,center+shift));}
     tetrahedralized_volume.Initialize_Octahedron_Mesh_And_Particles(bcc_grid);
     if(use_aggressive_tet_pruning_globally) tetrahedralized_volume.Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(*implicit_surface);
     else tetrahedralized_volume.Discard_Tetrahedrons_Outside_Implicit_Surface(*implicit_surface);

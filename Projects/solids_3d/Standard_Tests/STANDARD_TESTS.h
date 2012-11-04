@@ -116,7 +116,7 @@ template<class T_input>
 class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
 {
     typedef T_input T;
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
     typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
@@ -733,7 +733,7 @@ void Get_Initial_Data()
         case 7:
         case 8:
         case 9:
-            mattress_grid=GRID<TV>(6,10,20,(T)-.25,(T).25,(T)-.5,(T).5,(T)-1,(T)1);
+            mattress_grid=GRID<TV>(TV_INT(6,10,20),RANGE<TV>(TV((T)-.25,(T)-.5,(T)-1),TV((T).25,(T).5,(T)1)));
             tests.Create_Mattress(mattress_grid,true,0,density);
             deformable_body_rest_positions=particles.X;
             break;
@@ -1108,7 +1108,7 @@ void Get_Initial_Data()
             break;}
         case 38:
             {SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);const int strands=25,strand_segments=50;
-            hair_layout_grid.Initialize(strands,strands,strand_segments,(T)-.5,(T).5,0,1,0,2);particles.Add_Elements(hair_layout_grid.Numbers_Of_Nodes().Product());
+                hair_layout_grid.Initialize(TV_INT(strands,strands,strand_segments),RANGE<TV>(TV((T)-.5,0,0),TV((T).5,1,2)));particles.Add_Elements(hair_layout_grid.Numbers_Of_Nodes().Product());
             int count=1;
             for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
                 for(int ij=1;ij<hair_layout_grid.counts.z;ij++){
@@ -1200,7 +1200,7 @@ void Get_Initial_Data()
                 RANGE<TV> grid_domain;
                 T thickness=(T).3;int x_edge=25;
                 for(int i=0;i<particle_indices.m;i++) grid_domain.Enlarge_To_Include_Point(particles.X(particle_indices(i)));
-                GRID<TV> new_grid((T).02,grid_domain.Thickened(2*thickness));
+                GRID<TV> new_grid(TV_INT(grid_domain.Thickened(2*thickness).Edge_Lengths()/(T).02),grid_domain.Thickened(2*thickness));
                 ARRAY<T,VECTOR<int,3> > new_phi(new_grid.Domain_Indices());new_phi.Fill(1e10);
                 for(CELL_ITERATOR iterator(new_grid);iterator.Valid();iterator.Next()){const VECTOR<int,3> &cell_index=iterator.Cell_Index();
                     for(int i=0;i<particle_indices.m;i++) new_phi(cell_index)=min(new_phi(cell_index),(iterator.Location()-deformable_body_collection.deformable_geometry.particles.X(particle_indices(i))).Magnitude()-thickness);}
@@ -1249,7 +1249,7 @@ void Get_Initial_Data()
             tmp_sphere.is_static=true;
             break;}
         case 49:{
-            tests.Create_Mattress(GRID<TV>(10,10,10,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1),true,0,density);
+            tests.Create_Mattress(GRID<TV>(TV_INT()+10,RANGE<TV>::Centered_Box()),true,0,density);
             tests.Add_Ground();
             break;}
         case 50:{
@@ -1391,7 +1391,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 35:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            GRID<TV>* wind_grid=new GRID<TV>(20,20,20,RANGE<TV>::Bounding_Box(particles.X));
+            GRID<TV>* wind_grid=new GRID<TV>(TV_INT()+20,RANGE<TV>::Bounding_Box(particles.X));
             ARRAY<TV,VECTOR<int,3> >* wind_V=new ARRAY<TV,VECTOR<int,3> >(wind_grid->Domain_Indices());
             TV wind_center=wind_grid->Domain().Center();
             INTERPOLATION_CURVE<T,T> height_falloff;

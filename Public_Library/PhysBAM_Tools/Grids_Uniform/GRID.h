@@ -68,48 +68,6 @@ public:
         Initialize(TV_INT(),RANGE<TV>::Unit_Box());
     }
 
-    GRID(const int m_input,const int n_input,const int mn_input,const T xmin_input,const T xmax_input,const T ymin_input,const T ymax_input,const T zmin_input,const T zmax_input,
-        const bool MAC_grid=false)
-    {
-        STATIC_ASSERT(dimension==3);
-        Initialize(m_input,n_input,mn_input,xmin_input,xmax_input,ymin_input,ymax_input,zmin_input,zmax_input,MAC_grid);
-    }
-    
-    GRID(const int m_input,const int n_input,const T xmin_input,const T xmax_input,const T ymin_input,const T ymax_input,const bool MAC_grid=false)
-    {
-        STATIC_ASSERT(dimension==2);
-        Initialize(m_input,n_input,xmin_input,xmax_input,ymin_input,ymax_input,MAC_grid);
-    }
-
-    GRID(const int m_input,const T xmin_input,const T xmax_input,const bool MAC_grid=false)
-    {
-        STATIC_ASSERT(dimension==1);
-        Initialize(m_input,xmin_input,xmax_input,MAC_grid);
-    }
-
-    GRID(const int m_input,const int n_input,const int mn_input,const RANGE<TV>& box,const bool MAC_grid=false)
-    {
-        STATIC_ASSERT(dimension==3);
-        Initialize(m_input,n_input,mn_input,box,MAC_grid);
-    }
-
-    GRID(const int m_input,const int n_input,const RANGE<TV>& box,const bool MAC_grid=false)
-    {
-        STATIC_ASSERT(dimension==2);
-        Initialize(m_input,n_input,box,MAC_grid);
-    }
-
-    GRID(const int m_input,const RANGE<TV>& box,const bool MAC_grid=false)
-    {
-        STATIC_ASSERT(dimension==1);
-        Initialize(m_input,box,MAC_grid);
-    }
-
-    GRID(const T dx,const RANGE<TV>& box,const bool MAC_grid=false)
-    {
-        Initialize(dx,box,MAC_grid);
-    }
-
     GRID(const TV_INT& counts,const RANGE<TV>& box,const bool MAC_grid=false)
     {
         Initialize(counts,box,MAC_grid);
@@ -137,28 +95,6 @@ public:
 
     void Set_To_Double_Resolution_Grid(const GRID<TV>& grid)
     {Initialize(2*grid.numbers_of_cells+!grid.Is_MAC_Grid(),grid.domain,grid.Is_MAC_Grid());}
-
-    void Initialize(const int m_input,const int n_input,const int mn_input,const T xmin_input,const T xmax_input,const T ymin_input,const T ymax_input,const T zmin_input,
-        const T zmax_input,const bool MAC_grid=false)
-    {STATIC_ASSERT(dimension==3);Initialize(TV_INT(m_input,n_input,mn_input),RANGE<TV>(xmin_input,xmax_input,ymin_input,ymax_input,zmin_input,zmax_input),MAC_grid);}
-
-    void Initialize(const int m_input,const int n_input,const T xmin_input,const T xmax_input,const T ymin_input,const T ymax_input,const bool MAC_grid=false)
-    {STATIC_ASSERT(dimension==2);Initialize(TV_INT(m_input,n_input),RANGE<TV>(xmin_input,xmax_input,ymin_input,ymax_input),MAC_grid);}
-
-    void Initialize(const int m_input,const T xmin_input,const T xmax_input,const bool MAC_grid=false)
-    {STATIC_ASSERT(dimension==1);Initialize(TV_INT(m_input),RANGE<TV>(xmin_input,xmax_input),MAC_grid);}
-
-    void Initialize(const int m_input,const int n_input,const int mn_input,const RANGE<TV>& box,const bool MAC_grid=false)
-    {STATIC_ASSERT(dimension==3);Initialize(TV_INT(m_input,n_input,mn_input),box,MAC_grid);}
-
-    void Initialize(const int m_input,const int n_input,const RANGE<TV>& box,const bool MAC_grid=false)
-    {STATIC_ASSERT(dimension==2);Initialize(TV_INT(m_input,n_input),box,MAC_grid);}
-
-    void Initialize(const int m_input,const RANGE<TV>& box,const bool MAC_grid=false)
-    {STATIC_ASSERT(dimension==1);Initialize(TV_INT(m_input),box,MAC_grid);}
-
-    void Initialize(const T dx,const RANGE<TV>& box,const bool MAC_grid=false)
-    {Initialize(TV_INT(box.Edge_Lengths()/dx),box,MAC_grid);}
 
     bool Is_MAC_Grid() const
     {return MAC_offset==.5;}
@@ -462,7 +398,7 @@ public:
     {return Remove_Dimension(1);}
 
     GRID<VECTOR<T,1> > Get_1D_Grid(const int axis) const
-    {return GRID<VECTOR<T,1> >(counts[axis],domain.Minimum_Corner()[axis],domain.Maximum_Corner()[axis],Is_MAC_Grid());}
+    {return GRID<VECTOR<T,1> >(VECTOR<int,1>(counts[axis]),RANGE<VECTOR<T,1> >(VECTOR<T,1>(domain.Minimum_Corner()[axis]),VECTOR<T,1>(domain.Maximum_Corner()[axis])),Is_MAC_Grid());}
 
     static VECTOR<int,3> Node_Neighbor(const VECTOR<int,3>& index,const int i)
     {static const VECTOR<int,3> neighbor_offset[6]={VECTOR<int,3>(-1,0,0),VECTOR<int,3>(1,0,0),VECTOR<int,3>(0,-1,0),VECTOR<int,3>(0,1,0),VECTOR<int,3>(0,0,-1),VECTOR<int,3>(0,0,1)};

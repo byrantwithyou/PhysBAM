@@ -117,7 +117,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     int cells=1*resolution;
     first_frame=0;last_frame=10;
     GRID<TV>& grid=*fluids_parameters.grid;
-    grid.Initialize(10*cells+1,20*cells+1,10*cells+1,-(T).05,(T).05,0,(T).2,-(T).05,(T).05);
+    grid.Initialize(TV_INT(10*cells+1,20*cells+1,10*cells+1),RANGE<TV>(TV(-(T).05,0,-(T).05),TV((T).05,(T).2,(T).05)));
 
     last_frame=1000;
         

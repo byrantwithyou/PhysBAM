@@ -125,49 +125,49 @@ Parse_Options()
     VECTOR<VECTOR<bool,2>,TV::dimension>& domain_walls=fluids_parameters.domain_walls;
     switch(test_number){
         case 1:
-            grid.Initialize(resolution+1,resolution+1,0*m,(T).04*m,0*m,(T).04*m);
+            grid.Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0*m,0*m),TV((T).04*m,(T).04*m)));
             domain_walls[0][0]=false;domain_walls[0][1]=false;
             domain_walls[1][0]=false;domain_walls[1][1]=false;
             break;
         case 2:
-            grid.Initialize(resolution+1,resolution+1,0*m,1*m,0*m,1*m);
+            grid.Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0*m,0*m),TV(1*m,1*m)));
             domain_walls[0][0]=false;domain_walls[0][1]=false;
             domain_walls[1][0]=false;domain_walls[1][1]=false;
             break;
         case 3:
-            grid.Initialize(resolution+1,resolution*2+1,0*m,(T)1*m,0*m,(T)2*m);
+            grid.Initialize(TV_INT(resolution+1,resolution*2+1),RANGE<TV>(TV(0*m,0*m),TV((T)1*m,(T)2*m)));
             domain_walls[0][0]=true;domain_walls[0][1]=true;
             domain_walls[1][0]=true;domain_walls[1][1]=true;
             break;
         case 4:
-            grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            grid.Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(-m,-m),TV(m,m)));
             domain_walls[0][0]=false;domain_walls[0][1]=true;
             domain_walls[1][0]=true;domain_walls[1][1]=true;
             break;
         case 5:
-            grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            grid.Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(-m,-m),TV(m,m)));
             domain_walls[0][0]=true;domain_walls[0][1]=true;
             domain_walls[1][0]=false;domain_walls[1][1]=false;
             break;
         case 6:
-            grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            grid.Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(-m,-m),TV(m,m)));
             domain_walls[0][0]=true;domain_walls[0][1]=true;
             domain_walls[1][0]=false;domain_walls[1][1]=false;
             break;
         case 7:
-            grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            grid.Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(-m,-m),TV(m,m)));
             r_n = (T)0.2*m;
             r_I = (T)0.6*m;
             r_p = (T)1.0*m;
             break;
         case 8:
-            grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            grid.Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(-m,-m),TV(m,m)));
             r_n = (T)0.2*m;
             r_I = (T)0.6*m;
             r_p = (T)1.0*m;
             break;
         case 9:
-            grid.Initialize(resolution+1,3*resolution/2+1,-(T)0.01*m,+(T)0.01*m,-(T)0.01*m,(T)0.02*m);
+            grid.Initialize(TV_INT(resolution+1,3*resolution/2+1),RANGE<TV>(TV(-(T)0.01*m,-(T)0.01*m),TV(+(T)0.01*m,(T)0.02*m)));
             domain_walls[0][0]=true;domain_walls[0][1]=true;
             domain_walls[1][0]=true;domain_walls[1][1]=true;
             break;
@@ -470,7 +470,7 @@ Kang_Example_1()
 template<class T> void KANG<T>::
 Oscillating_Circle()
 {
-    (*fluids_parameters.grid).Initialize(resolution,resolution,(T)0*m,(T)1*m,(T)0*m,(T)1*m,true);
+    (*fluids_parameters.grid).Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
     fluids_parameters.cfl=(T).9;
 
     solid_body_collection.Set_CFL_Number(10);

@@ -198,9 +198,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=240;
             fluids_parameters.density=(T)1000;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            //mattress_grid=T_GRID(sub_test*20,sub_test*5,sub_test*20,(T).55,(T).95,(T).4,(T).52,(T).55,(T).95);
-            mattress_grid=T_GRID(sub_test*20,sub_test*5,sub_test*20,(T).3,(T).7,(T).6,(T).72,(T).3,(T).7);
-            (*fluids_parameters.grid).Initialize(10*resolution+1,10*resolution+1,10*resolution+1,(T)0,(T)1,(T)0,(T)1,(T)0,(T)1);
+            mattress_grid=T_GRID(TV_INT(sub_test*20,sub_test*5,sub_test*20),RANGE<TV>(TV((T).3,(T).6,(T).3),TV((T).7,(T).72,(T).7)));
+            (*fluids_parameters.grid).Initialize(TV_INT(10*resolution+1,10*resolution+1,10*resolution+1),RANGE<TV>(TV((T)0,(T)0,(T)0),TV((T)1,(T)1,(T)1)));
             //solids_parameters.implicit_solve_parameters.cg_iterations=1000;
             if(!opt_iterations) solids_parameters.implicit_solve_parameters.cg_iterations=500;
             solid_density=(T)300;
@@ -214,7 +213,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
                case 1: heavy ball into bowl
                case 2: light ball into bowl
             */
-            (*fluids_parameters.grid).Initialize(20*resolution+1,30*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)3,(T)-1,(T)1);
+            (*fluids_parameters.grid).Initialize(TV_INT(20*resolution+1,30*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)3,(T)1)));
             left_corner=TV((T)-.5,(T)0,(T)-.5);
             right_corner=TV((T).5,(T)1,(T).5);
             break;
@@ -222,8 +221,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.density=(T)1000;
             solid_density=(T)30000;
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
-            (*fluids_parameters.grid).Initialize(2*resolution+1,2*resolution+1,10*resolution+1,(T)0,(T).2,(T)0,(T).2,(T)0,(T)1);
-            mattress_grid=T_GRID(20,20,20,(T).05,(T).15,(T).05,(T).15,(T).9,(T)1.05);
+            (*fluids_parameters.grid).Initialize(TV_INT(2*resolution+1,2*resolution+1,10*resolution+1),RANGE<TV>(TV((T)0,(T)0,(T)0),TV((T).2,(T).2,(T)1)));
+            mattress_grid=T_GRID(TV_INT()+20,RANGE<TV>(TV((T).05,(T).05,(T).9),TV((T).15,(T).15,(T)1.05)));
             //mattress_grid=T_GRID(20,20,(T).05,(T).15,(T).8,(T).95);
             break;
         case 4:
@@ -243,13 +242,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fountain_source_velocity.Append(TV((T)0,(T)3,(T)0));
             fountain_source_velocity.Append(TV((T)0,(T)3.3,(T)0));
             fluids_parameters.reseeding_frame_rate=10;
-            (*fluids_parameters.grid).Initialize(10*resolution+1,15*resolution+1,10*resolution+1,(T)0,(T)1,(T)0,(T)1.5,(T)0,(T)1);
+            (*fluids_parameters.grid).Initialize(TV_INT(10*resolution+1,15*resolution+1,10*resolution+1),RANGE<TV>(TV((T)0,(T)0,(T)0),TV((T)1,(T)1.5,(T)1)));
             break;
         case 5:
             fluids_parameters.density=(T)1000;
             solid_density=(T)100000;
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
-            (*fluids_parameters.grid).Initialize(10*resolution+1,20*resolution+1,10*resolution+1,(T)0,(T)1,(T)0,(T)2,(T)0,(T)1);
+            (*fluids_parameters.grid).Initialize(TV_INT(10*resolution+1,20*resolution+1,10*resolution+1),RANGE<TV>(TV((T)0,(T)0,(T)0),TV((T)1,(T)2,(T)1)));
             break;
         case 6:
             fluids_parameters.density=(T)1000;
@@ -258,7 +257,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.rigid_body_collision_parameters.use_push_out=true;
             solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T).1;
             solid_density=(T)3000;
-            fluids_parameters.grid->Initialize(20*resolution+1,15*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)1.5,(T)-1,(T)1);
+            fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,15*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)1.5,(T)1)));
             fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T).6*(T)1.5;;
             break;
@@ -272,7 +271,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_projection_iterations=0;
             solids_parameters.implicit_solve_parameters.cg_iterations=500;
             solid_density=(T)8000;
-            fluids_parameters.grid->Initialize(20*resolution+1,25*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)2.5,(T)-1,(T)1);
+            fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,25*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2.5,(T)1)));
             fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T).45*(T)2.5;
             break;
@@ -289,7 +288,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_projection_iterations=0;
             solids_parameters.implicit_solve_parameters.cg_iterations=500;
             solid_density=(T)8000;
-            fluids_parameters.grid->Initialize(20*resolution+1,25*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)2.5,(T)-1,(T)1);
+            fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,25*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2.5,(T)1)));
             fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T).45*(T)2.5;
             break;
@@ -299,7 +298,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.density=(T)1000;
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
             fluids_parameters.reseeding_frame_rate=5;
-            fluids_parameters.grid->Initialize(20*resolution+1,25*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)2.5,(T)-1,(T)1);
+            fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,25*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2.5,(T)1)));
             fluids_parameters.domain_walls[1][1]=false;
             light_sphere_initial_height=(T)1.2;
             heavy_sphere_initial_height=(T)2.9;  // height of the funnel
@@ -319,14 +318,14 @@ void Parse_Options() PHYSBAM_OVERRIDE
             if(!opt_iterations) solids_parameters.implicit_solve_parameters.cg_iterations=800;
             fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T)3.5;
-            fluids_parameters.grid->Initialize(32*resolution+1,36*resolution+1,24*resolution+1,(T)-8,(T)8,(T)0,(T)18,(T)-6,(T)6);
+            fluids_parameters.grid->Initialize(TV_INT(32*resolution+1,36*resolution+1,24*resolution+1),RANGE<TV>(TV((T)-8,(T)0,(T)-6),TV((T)8,(T)18,(T)6)));
             PHYSBAM_ASSERT(fluids_parameters.grid->dX.x==fluids_parameters.grid->dX.y && fluids_parameters.grid->dX.y==fluids_parameters.grid->dX.z);
             break;
         case 10:
             last_frame=500;
             fluids_parameters.density=(T)1000;
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
-            fluids_parameters.grid->Initialize(40*resolution+1,15*resolution+1,10*resolution+1,(T)-2,(T)2,(T)0,(T)1.5,(T)-.5,(T).5);
+            fluids_parameters.grid->Initialize(TV_INT(40*resolution+1,15*resolution+1,10*resolution+1),RANGE<TV>(TV((T)-2,(T)0,(T)-.5),TV((T)2,(T)1.5,(T).5)));
             solid_density=(T)1; for(int i=1;i<sub_test;++i) solid_density*=(T)10;
             fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T)1.2;
@@ -338,7 +337,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.density=(T)1000;
             if(!opt_iterations) solids_parameters.implicit_solve_parameters.cg_iterations=50;
             fluids_parameters.reseeding_frame_rate=5;
-            fluids_parameters.grid->Initialize(20*resolution+1,30*resolution+1,20*resolution+1,(T)-1.5,(T)1.5,(T)0,(T)4,(T)-1.5,(T)1.5);
+            fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,30*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1.5,(T)0,(T)-1.5),TV((T)1.5,(T)4,(T)1.5)));
             fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T)1.35;
             balloon_initial_radius=(T).325;
@@ -353,14 +352,14 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=2000;
             fluids_parameters.reseeding_frame_rate=3;
             solids_parameters.implicit_solve_parameters.cg_iterations=200;
-            fluids_parameters.grid->Initialize(15*resolution+1,15*resolution+1,10*resolution+1,(T)0,(T)1.5,(T)0,(T)1.5,(T)0,(T)1);
+            fluids_parameters.grid->Initialize(TV_INT(15*resolution+1,15*resolution+1,10*resolution+1),RANGE<TV>(TV((T)0,(T)0,(T)0),TV((T)1.5,(T)1.5,(T)1)));
             break;
         case 13:
             solids_parameters.rigid_body_collision_parameters.use_push_out=true;
             if(solid_node) solids_parameters.use_rigid_deformable_contact=true;
             fountain_source.Append(CYLINDER<T>(TV((T)-1,(T)1.7,(T)0),TV((T)-.8,(T)1.7,(T)0),(T).2));
             fountain_source_velocity.Append(TV((T)3,(T)0,(T)0));
-            fluids_parameters.grid->Initialize(20*resolution+1,20*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)2,(T)-1,(T)1);
+            fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,20*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2,(T)1)));
             break;
         case 14:
             solids_parameters.use_rigid_deformable_contact=false;
@@ -371,7 +370,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=500;
             solid_density=(T)1200;
             frame_rate=48;
-            fluids_parameters.grid->Initialize(20*resolution+1,25*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)2.5,(T)-1,(T)1);
+            fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,25*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2.5,(T)1)));
             fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T).45*(T)2.5;
             break;
@@ -386,7 +385,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             //solid_density=(T)1200;
             solid_density=(T)1900;
             frame_rate=48;
-            fluids_parameters.grid->Initialize(20*resolution+1,25*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)2.5,(T)-1,(T)1);
+            fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,25*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2.5,(T)1)));
             fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T).45*(T)2.5;
             break;
@@ -394,7 +393,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=500;
             initial_fluid_height=(T).4;
             light_sphere_initial_height=(T).8;
-            fluids_parameters.grid->Initialize(15*resolution+1,20*resolution+1,10*resolution+1,(T)0,(T)1.5,(T)0,(T)2,(T)0,(T)1);
+            fluids_parameters.grid->Initialize(TV_INT(15*resolution+1,20*resolution+1,10*resolution+1),RANGE<TV>(TV((T)0,(T)0,(T)0),TV((T)1.5,(T)2,(T)1)));
             break;
         case 18:
             frame_rate=48;
@@ -402,7 +401,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.density=(T)100;
 //                solid_density=(T)6;                // This appears to be close to buoyancy; a little on the heavy side...
             solid_density=(T)1;
-            fluids_parameters.grid->Initialize(40*resolution+1,25*resolution+1,20*resolution+1,(T)-2,(T)2,(T)0,(T)2.5,(T)-1,(T)1);
+            fluids_parameters.grid->Initialize(TV_INT(40*resolution+1,25*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-2,(T)0,(T)-1),TV((T)2,(T)2.5,(T)1)));
             solids_parameters.use_rigid_deformable_contact=false;
             solids_parameters.triangle_collision_parameters.allow_intersections=true;
             solids_parameters.triangle_collision_parameters.check_mesh_for_self_intersection=false;
@@ -424,7 +423,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             frame_rate=48;
             last_frame=250;
             solid_density=(T)35;                // This appears to be close to buoyancy; a little on the heavy side...
-            fluids_parameters.grid->Initialize(20*resolution+1,20*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)2,(T)-1,(T)1);
+            fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,20*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2,(T)1)));
             solids_parameters.use_rigid_deformable_contact=false;
             solids_parameters.triangle_collision_parameters.allow_intersections=true;
             solids_parameters.triangle_collision_parameters.check_mesh_for_self_intersection=false;
@@ -443,7 +442,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             frame_rate=48;
             last_frame=250;
             solid_density=(T)35;                // This appears to be close to buoyancy; a little on the heavy side...
-            fluids_parameters.grid->Initialize(20*resolution+1,20*resolution+1,10*resolution+1,(T)-1,(T)1,(T)0,(T)2,(T)-.5,(T).5);
+            fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,20*resolution+1,10*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-.5),TV((T)1,(T)2,(T).5)));
             solids_parameters.use_rigid_deformable_contact=false;
             solids_parameters.triangle_collision_parameters.allow_intersections=true;
             solids_parameters.triangle_collision_parameters.check_mesh_for_self_intersection=false;

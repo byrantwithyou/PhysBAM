@@ -14,7 +14,7 @@ template<class T_input>
 class SPINNING_BAR:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
 {
     typedef T_input T;
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
     typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
@@ -57,7 +57,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    fluids_parameters.grid->Initialize(resolution*20,resolution*20,0,1,0,1);
+    fluids_parameters.grid->Initialize(TV_INT(resolution*20,resolution*20),RANGE<TV>(TV(0,0),TV(1,1)));
     first_frame=0;last_frame=2000;
     frame_rate=24;
     restart=false;restart_frame=18;

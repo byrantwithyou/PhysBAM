@@ -174,7 +174,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 1:
             fluids_parameters.density=(T)1000;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            mattress_grid=GRID<TV>(20,10,(T).4,(T).8,(T).8,(T)1.04);
+            mattress_grid=GRID<TV>(TV_INT(20,10),RANGE<TV>(TV((T).4,(T).8),TV((T).8,(T)1.04)));
             solid_density=(T)1200;
             break;
         case 2:
@@ -186,7 +186,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
             fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][0]=true;//fluids_parameters.domain_walls[1][1]=true;
 
-            (*fluids_parameters.grid).Initialize(2*resolution+1,5*resolution+1,(T)-2,(T)2,(T)0,(T)10);
+            (*fluids_parameters.grid).Initialize(TV_INT(2*resolution+1,5*resolution+1),RANGE<TV>(TV((T)-2,(T)0),TV((T)2,(T)10)));
             break;
         case 4:
             solids_parameters.rigid_body_collision_parameters.use_push_out=true;
@@ -206,20 +206,20 @@ void Parse_Options() PHYSBAM_OVERRIDE
             world_to_source=MATRIX<T,3>::Identity_Matrix();
             fluids_parameters.reseeding_frame_rate=10;
             //solid_density=(T)1100;
-            (*fluids_parameters.grid).Initialize(10*resolution+1,20*resolution+1,(T)0,(T)1,(T)0,(T)2);
+            (*fluids_parameters.grid).Initialize(TV_INT(10*resolution+1,20*resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)2)));
             break;
         case 5:
             fluids_parameters.density=(T)1000;
             solid_density=(T)5000;
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
-            (*fluids_parameters.grid).Initialize(10*resolution+1,20*resolution+1,(T)0,(T)1,(T)0,(T)2);
+            (*fluids_parameters.grid).Initialize(TV_INT(10*resolution+1,20*resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)2)));
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
             break;
         case 6:
             fluids_parameters.density=(T)1000;
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
             solid_density=(T)10000;
-            (*fluids_parameters.grid).Initialize(10*resolution+1,20*resolution+1,(T)0,(T)1,(T)0,(T)2);
+            (*fluids_parameters.grid).Initialize(TV_INT(10*resolution+1,20*resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)2)));
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;
             break;
         case 7:
@@ -227,7 +227,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.density=(T)1000;
             solid_density=(T)5000;
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
-            (*fluids_parameters.grid).Initialize(10*resolution+1,25*resolution+1,(T)0,(T)1,(T)0,(T)2.5);
+            (*fluids_parameters.grid).Initialize(TV_INT(10*resolution+1,25*resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)2.5)));
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;
             break;
         case 8:
@@ -237,25 +237,25 @@ void Parse_Options() PHYSBAM_OVERRIDE
             heavy_sphere_drop_time=(T)2;
             fluids_parameters.density=(T)10000;
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
-            (*fluids_parameters.grid).Initialize(10*resolution+1,25*resolution+1,(T)0,(T)1,(T)0,(T)2.5);
+            (*fluids_parameters.grid).Initialize(TV_INT(10*resolution+1,25*resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)2.5)));
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;
             break;
         case 9:
             last_frame=200;
-            (*fluids_parameters.grid).Initialize(15*resolution+1,10*resolution+1,0,(T)1.5,0,1);
+            (*fluids_parameters.grid).Initialize(TV_INT(15*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV((T)1.5,1)));
             heavy_sphere_drop_time=(T).05;
             light_sphere_drop_time=(T).2;
             break;
         case 10:
             last_frame=200;
             fluids_parameters.density=(T)1000;
-            (*fluids_parameters.grid).Initialize(40*resolution+1,20*resolution+1,(T)-2,(T)2,(T)0,(T)2);
+            (*fluids_parameters.grid).Initialize(TV_INT(40*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-2,(T)0),TV((T)2,(T)2)));
             fluids_parameters.domain_walls[1][1]=false;
             break;
         case 12:
             fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
-            (*fluids_parameters.grid).Initialize(4*resolution+1,resolution+1,(T)0,(T)4,(T)0,(T)1);
-            // (*fluids_parameters.grid).Initialize(4*resolution+1,2*resolution+1,(T)0,(T)4,(T)-0.5,(T)1.5);
+            (*fluids_parameters.grid).Initialize(TV_INT(4*resolution+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)4,(T)1)));
+            // (*fluids_parameters.grid).Initialize(TV_INT(4*resolution+1,2*resolution+1),RANGE<TV>(TV((T)0,(T)-0.5),TV((T)4,(T)1.5)));
             rotation_angle=-pi/16;
             solids_parameters.implicit_solve_parameters.cg_iterations=200;
             
@@ -264,7 +264,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         case 13:
             fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
-            (*fluids_parameters.grid).Initialize(2*resolution+1,resolution+1,(T)0,(T)2,(T)0,(T)1);
+            (*fluids_parameters.grid).Initialize(TV_INT(2*resolution+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)));
             velocity_angle=pi/16;
             solids_parameters.implicit_solve_parameters.cg_iterations=10000;
             fluids_parameters.density=(T)1000;

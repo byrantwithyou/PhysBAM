@@ -254,29 +254,29 @@ void Parse_Options() PHYSBAM_OVERRIDE
     int cells=resolution;
     T grid_size=(T)1.;
     if(test_number==7||test_number==17){
-        fluids_parameters.grid->Initialize(3*cells+1,2*cells+1,2*cells+1,RANGE<TV>(TV((T)-4.5,(T)-3,(T)-3),TV((T)4.5,(T)3,(T)3))*grid_size);}
+        fluids_parameters.grid->Initialize(TV_INT(3,2,2)*cells+1,RANGE<TV>(TV((T)-4.5,(T)-3,(T)-3),TV((T)4.5,(T)3,(T)3))*grid_size);}
     else if(test_number==3){
-        fluids_parameters.grid->Initialize(cells+1,cells+1,cells+1,RANGE<TV>(TV((T)-10,(T)-10,(T)-10),TV((T)10,(T)10,(T)10))*grid_size);}
+        fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<TV>(TV((T)-10,(T)-10,(T)-10),TV((T)10,(T)10,(T)10))*grid_size);}
     else if(test_number==9||test_number==10||test_number==11){
-        fluids_parameters.grid->Initialize(3*cells+1,2*cells+1,2*cells+1,RANGE<TV>(TV((T)-1.5,(T)-1,(T)-1),TV((T)1.5,(T)1,(T)1))*grid_size);}
+        fluids_parameters.grid->Initialize(TV_INT(3,2,2)*cells+1,RANGE<TV>(TV((T)-1.5,(T)-1,(T)-1),TV((T)1.5,(T)1,(T)1))*grid_size);}
     else if(test_number==12){
-        fluids_parameters.grid->Initialize(cells+1,cells+1,cells+1,RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2,(T)1))*grid_size);}
+        fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2,(T)1))*grid_size);}
     else if(test_number==13){
-        fluids_parameters.grid->Initialize(2*cells+1,3*cells+1,2*cells+1,RANGE<TV>(TV((T)-3,(T)0,(T)-3),TV((T)5,(T)12,(T)5))*grid_size);}
+        fluids_parameters.grid->Initialize(TV_INT(2,3,2)*cells+1,RANGE<TV>(TV((T)-3,(T)0,(T)-3),TV((T)5,(T)12,(T)5))*grid_size);}
     else if(test_number==16){
-        fluids_parameters.grid->Initialize(cells+1,cells+1,cells+1,RANGE<TV>(TV((T)-3,(T)0,(T)-3),TV((T)5,(T)8,(T)5))*grid_size);}
+        fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<TV>(TV((T)-3,(T)0,(T)-3),TV((T)5,(T)8,(T)5))*grid_size);}
     else if(test_number==14||test_number==15){
-        fluids_parameters.grid->Initialize(3*cells+1,2*cells+1,2*cells+1,RANGE<TV>(TV((T)-120,(T)-80,(T)-80),TV((T)120,(T)80,(T)80))*grid_size);}
+        fluids_parameters.grid->Initialize(TV_INT(3,2,2)*cells+1,RANGE<TV>(TV((T)-120,(T)-80,(T)-80),TV((T)120,(T)80,(T)80))*grid_size);}
     else if(test_number==18){
-        fluids_parameters.grid->Initialize(2*cells+1,cells+1,2*cells+1,RANGE<TV>(TV((T)-100,(T)0,(T)-100),TV((T)100,(T)100,(T)100))*grid_size);}
+        fluids_parameters.grid->Initialize(TV_INT(2,1,2)*cells+1,RANGE<TV>(TV((T)-100,(T)0,(T)-100),TV((T)100,(T)100,(T)100))*grid_size);}
     else if(test_number==19){
-        fluids_parameters.grid->Initialize(5*cells+1,2*cells+1,2*cells+1,RANGE<TV>(TV((T)-8,(T)-10,(T)-10),TV((T)42,(T)10,(T)10))*grid_size);}
+        fluids_parameters.grid->Initialize(TV_INT(5,2,2)*cells+1,RANGE<TV>(TV((T)-8,(T)-10,(T)-10),TV((T)42,(T)10,(T)10))*grid_size);}
     else if(test_number==20){
-        fluids_parameters.grid->Initialize(cells+1,2*cells+1,cells+1,RANGE<TV>(TV((T)-5,(T)-7.5,(T)-5),TV((T)5,(T)7.5,(T)5))*grid_size);}
+        fluids_parameters.grid->Initialize(TV_INT(2,2,1)*cells+1,RANGE<TV>(TV((T)-5,(T)-7.5,(T)-5),TV((T)5,(T)7.5,(T)5))*grid_size);}
     else if(test_number==21){
-        fluids_parameters.grid->Initialize(2*cells+1,cells+1,cells+1,RANGE<TV>(TV((T)-1,(T)0,(T)-.25),TV((T)1,(T)1,(T).75))*grid_size);}
+        fluids_parameters.grid->Initialize(TV_INT(2,1,1)*cells+1,RANGE<TV>(TV((T)-1,(T)0,(T)-.25),TV((T)1,(T)1,(T).75))*grid_size);}
     else{
-        fluids_parameters.grid->Initialize(cells+1,cells+1,cells+1,RANGE<TV>(TV((T)-1,(T)-1,(T)-1),TV((T)1,(T)1,(T)1))*grid_size);}
+        fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<TV>(TV((T)-1,(T)-1,(T)-1),TV((T)1,(T)1,(T)1))*grid_size);}
 
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
     fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;

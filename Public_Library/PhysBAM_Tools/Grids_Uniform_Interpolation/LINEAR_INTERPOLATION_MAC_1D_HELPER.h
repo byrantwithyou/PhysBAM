@@ -58,7 +58,7 @@ public:
     // assumes face_velocities are 0 where not valid
     static VECTOR<T,1> Interpolate_Face_Normalized(const T_BLOCK& block,const T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_BOOL& face_velocities_valid,const VECTOR<T,1>& X,
          const VECTOR<T,1>& default_value=TV())
-    {static const GRID<TV> valid_values_grid=GRID<TV>(2,0,1).Get_MAC_Grid_At_Regular_Positions();
+    {static const GRID<TV> valid_values_grid=GRID<TV>(TV_INT(2),RANGE<TV>::Unit_Box()).Get_MAC_Grid_At_Regular_Positions();
     static const BLOCK_UNIFORM<GRID<TV> > valid_values_block(valid_values_grid,VECTOR<int,1>(2));
     ARRAY<T,FACE_INDEX<1> > valid_values(valid_values_grid);Block_Transfer(block,face_velocities_valid,valid_values_block,valid_values);
     VECTOR<T,1> DX=Transformed(block,X),velocity=Interpolate_Face_Transformed(block,face_velocities,DX),weight=Interpolate_Face_Transformed(valid_values_block,valid_values,DX);

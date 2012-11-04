@@ -26,7 +26,7 @@ public:
         :slice_levelset(slice_grid,slice_phi),width(width_input),height(height_input),tolerance(tolerance_input)
     {
         ARRAY<TV,VECTOR<int,2> > slice_image;IMAGE<T>::Read(filename,slice_image);
-        slice_grid=GRID<VECTOR<T,2> >(slice_image.counts.x,slice_image.counts.y,0,width,0,height);slice_phi.Resize(slice_grid.Domain_Indices());
+        slice_grid=GRID<VECTOR<T,2> >(slice_image.counts,RANGE<VECTOR<T,2> >(VECTOR<T,2>(),VECTOR<T,2>(width,height)));slice_phi.Resize(slice_grid.Domain_Indices());
         for(typename GRID<VECTOR<T,2> >::NODE_ITERATOR iterator(slice_grid);iterator.Valid();iterator.Next()){VECTOR<int,2> node=iterator.Node_Index();
             slice_phi(node)=2*slice_image(node).Average()-1;}
         slice_levelset.Fast_Marching_Method();slice_levelset.Compute_Normals();

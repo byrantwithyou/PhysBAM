@@ -24,7 +24,7 @@ CYLINDER<T> source;VECTOR<T,3> source_velocity;
     {
         first_frame=0;last_frame=1000;frame_rate=24;
         restart=false;restart_frame=0;
-        fluids_parameters.grid.Initialize(76,51,51,0,1.5,0,1,0,1);
+        fluids_parameters.grid.Initialize(TV_INT(76,51,51),RANGE<TV>(TV(0,0,0),TV(1.5,1,1)));
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
         fluids_parameters.number_particles_per_cell=16;

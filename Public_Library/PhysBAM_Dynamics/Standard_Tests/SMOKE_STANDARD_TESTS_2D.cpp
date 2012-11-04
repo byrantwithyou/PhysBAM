@@ -49,7 +49,7 @@ Initialize(const int test_number_input,const int resolution,const T angle_fracti
     int cells=resolution;
     if(test_number==1 || test_number==2 || test_number==3){
         example.first_frame=0;example.last_frame=3840;
-        grid.Initialize(10*cells+1,15*cells+1,0,1,0,1.5);}
+        grid.Initialize(TV_INT(10,15)*cells+1,RANGE<TV>(TV(),TV(1,1.5)));}
     else if(test_number==4){
         fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,T_GRID::dimension>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(true));
         fluids_parameters.use_vorticity_confinement=false;
@@ -58,7 +58,7 @@ Initialize(const int test_number_input,const int resolution,const T angle_fracti
         // TODO: need to call use_variable_beta on the poisson solver if we ACTUALLY want to use variable beta
         fluids_parameters.second_order_cut_cell_method=false;
         example.first_frame=0;example.last_frame=1000;
-        grid.Initialize(10*cells+1,10*cells+1,(T)-1,(T)1,(T)-1,(T)1);}
+        grid.Initialize(TV_INT()+10*cells+1,RANGE<TV>::Centered_Box());}
     else{LOG::cerr<<"unrecognized test number "<<test_number<<std::endl;exit(1);}
 
     example.output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests_Smoke/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));

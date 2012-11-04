@@ -113,8 +113,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     first_frame=0;last_frame=1000;
     GRID<TV>& grid=*fluids_parameters.grid;
 
-    grid.Initialize(10*cells+1,20*cells+1,(T)-.05,(T).05,0,(T).2);
-    //grid.Initialize(15*cells+1,20*cells+1,(T)-.075,(T).075,0,(T).2);
+    grid.Initialize(TV_INT(10*cells+1,20*cells+1),RANGE<TV>(TV((T)-.05,0),TV((T).05,(T).2)));
+    //grid.Initialize(TV_INT(15*cells+1,20*cells+1),RANGE<TV>(TV((T)-.075,0),TV((T).075,(T).2)));
 
     output_directory=STRING_UTILITIES::string_sprintf("Glass/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
         

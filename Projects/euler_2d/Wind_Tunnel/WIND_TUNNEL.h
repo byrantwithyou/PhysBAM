@@ -112,10 +112,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
     timesplit=timesplit && !exact;
     //grid
     int cells=resolution;
-    if(test_number==1) fluids_parameters.grid->Initialize(3*cells,cells,0,3,0,1,true);
-    else if(test_number==7) fluids_parameters.grid->Initialize(4*cells,cells,0,4,0,1,true);
-    else if(test_number==4) fluids_parameters.grid->Initialize(3*cells,3*cells,0,3,0,3);
-    else fluids_parameters.grid->Initialize(3*cells,cells,0,3,0,1);
+    if(test_number==1) fluids_parameters.grid->Initialize(TV_INT(3,1)*cells,RANGE<TV>(TV(),TV(3,1)),true);
+    else if(test_number==7) fluids_parameters.grid->Initialize(TV_INT(4,1)*cells,RANGE<TV>(TV(),TV(4,1)),true);
+    else if(test_number==4) fluids_parameters.grid->Initialize(TV_INT(3,3)*cells,RANGE<TV>(TV(),TV(3,3)));
+    else fluids_parameters.grid->Initialize(TV_INT(3,1)*cells,RANGE<TV>(TV(),TV(3,1)));
     if(test_number!=1 && test_number!=7) *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
     fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
     if(test_number==4){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}

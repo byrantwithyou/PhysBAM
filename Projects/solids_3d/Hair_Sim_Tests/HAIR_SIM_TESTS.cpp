@@ -893,7 +893,7 @@ Write_Interpolated_Level_Set(const int frame,T_IMPLICIT_COMBINED& combined) cons
 {
     if(write_substeps_level){
         LEVELSET_IMPLICIT_OBJECT<TV> *levelset=(LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1;
-        GRID<TV> grid(levelset->levelset.grid.counts.x,levelset->levelset.grid.counts.y,levelset->levelset.grid.counts.z,combined.box);
+        GRID<TV> grid(levelset->levelset.grid.counts,combined.box);
         ARRAY<T,VECTOR<int,3> > phi(grid.Domain_Indices());
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++) phi(i,j,ij)=combined(grid.X(i,j,ij));
         LEVELSET<TV> interpolated_levelset(grid,phi);

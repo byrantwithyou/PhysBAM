@@ -53,7 +53,7 @@ void Initialize()
     std::cout << "total step = " << total_steps << " time_per_frame = " << time_per_frame << " time = " << time << std::endl;
 
     // initialize grids
-    euler.grid.Initialize(example.m,example.n,example.xmin,example.xmax,example.ymin,example.ymax);
+    euler.grid.Initialize(TV_INT(example.m,example.n),RANGE<TV>(TV(example.xmin,example.ymin),TV(example.xmax,example.ymax)));
     int m=example.m,n=example.n;
     U.Resize(1,m,1,n);
 

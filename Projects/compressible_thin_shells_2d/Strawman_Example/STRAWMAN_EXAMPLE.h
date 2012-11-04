@@ -145,7 +145,7 @@ virtual void Parse_Options() PHYSBAM_OVERRIDE
       case GFM:output_directory+="_GFM";break;
       case NEW_GFM:output_directory+="_New";break;}
 
-    grid.Initialize(resolution,resolution,RANGE<TV>(TV(0,(T)-1),TV((T)1,0)),true);
+    grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(0,(T)-1),TV((T)1,0)),true);
     rho.Resize(grid.Domain_Indices(3)); rho_tmp.Resize(grid.Domain_Indices(3));
     phi.Resize(grid.Domain_Indices(3)); phi_tmp.Resize(grid.Domain_Indices(3));
 

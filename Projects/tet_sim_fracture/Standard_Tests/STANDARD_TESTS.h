@@ -51,7 +51,7 @@ template<class T_input>
 class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
 {
     typedef T_input T;
-    typedef VECTOR<T_input,3> TV;
+    typedef VECTOR<T_input,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     SOLIDS_STANDARD_TESTS<TV> tests;
 
@@ -213,7 +213,7 @@ void Plastic_Mattress(int nx,int ny,int nz,const ROTATION<TV>& rot,const RANGE<T
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=embedded_object.simplicial_object;
 
     initial_orientation=rot;
-    mattress_grid=GRID<TV>(nx,ny,nz,box);
+    mattress_grid=GRID<TV>(TV_INT(nx,ny,nz),box);
     initial_height=height;
 
     deformable_body_collection.deformable_geometry.Add_Structure(&embedding);

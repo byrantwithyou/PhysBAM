@@ -143,14 +143,14 @@ void Parse_Options() PHYSBAM_OVERRIDE
     //grid
     int cells=resolution;
     if(test_number==1 || test_number==3 || test_number==4){
-        fluids_parameters.grid->Initialize(5*cells+1,cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)0,(T)0), VECTOR<T,2>((T)1,(T).2)));
+        fluids_parameters.grid->Initialize(TV_INT(5,1)*cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)0,(T)0), VECTOR<T,2>((T)1,(T).2)));
         *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
         fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
     
         initial_time=(T)0.;last_frame=350;frame_rate=(T)1000.;}
     else{
-        fluids_parameters.grid->Initialize(4*cells+1,3*cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)0,(T)0), VECTOR<T,2>((T)1,(T).75)));
+        fluids_parameters.grid->Initialize(TV_INT(4,3)*cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)0,(T)0), VECTOR<T,2>((T)1,(T).75)));
         *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;
         fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
@@ -265,13 +265,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;rigid_body_collection.rigid_body_particle.frame(sphere).t=TV((T).15,(T).05);
         rigid_body_collection.Rigid_Body(sphere).Set_Mass(pi*.05*.05*10.77);}
     else if(test_number==2){
-        TRIANGULATED_AREA<T>& top_boundary=tests.Create_Mattress(GRID<TV>(101,26,RANGE<TV>(TV(0,(T).5),TV((T)1,(T).75))),true,0,(T)3.1538,true);
+        TRIANGULATED_AREA<T>& top_boundary=tests.Create_Mattress(GRID<TV>(TV_INT(101,26),RANGE<TV>(TV(0,(T).5),TV((T)1,(T).75))),true,0,(T)3.1538,true);
         SEGMENTED_CURVE_2D<T>& top_boundary_curve=top_boundary.Get_Boundary_Object();
         solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&top_boundary_curve); // TODO(jontg): Necessary?
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& top_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(top_boundary_curve);
         top_collisions.object.Initialize_Hierarchy();Add_To_Fluid_Simulation(top_collisions);
 
-        TRIANGULATED_AREA<T>& bottom_boundary=tests.Create_Mattress(GRID<TV>(101,26,RANGE<TV>(TV(0,0),TV((T)1,(T).25))),true,0,(T)3.1538);
+        TRIANGULATED_AREA<T>& bottom_boundary=tests.Create_Mattress(GRID<TV>(TV_INT(101,26),RANGE<TV>(TV(0,0),TV((T)1,(T).25))),true,0,(T)3.1538);
         SEGMENTED_CURVE_2D<T>& bottom_boundary_curve=bottom_boundary.Get_Boundary_Object();
         solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&bottom_boundary_curve); // TODO(jontg): Necessary?
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& bottom_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(bottom_boundary_curve);

@@ -93,7 +93,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.use_vorticity_confinement_fuel=false;
 
     //grid
-    fluids_parameters.grid->Initialize(20*resolution+1,20*resolution+1,(T)-.5,(T).5,(T)-.5,(T).5);
+    fluids_parameters.grid->Initialize(TV_INT()+20*resolution+1,RANGE<TV>(TV()-(T).5,TV()+(T).5));
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
     fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
     //time

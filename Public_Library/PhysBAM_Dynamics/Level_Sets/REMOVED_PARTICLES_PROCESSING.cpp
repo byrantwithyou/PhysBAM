@@ -27,7 +27,7 @@ Setup_Processing()
         ellipsoids(p)=Get_Ellipsoid(p);metrics(p)=ellipsoids(p).Metric_Tensor();
         particle_boxes(p)=particle_blender->Get_Bounding_Box(ellipsoids(p));
         particle_domain.Enlarge_To_Include_Box(particle_boxes(p));}
-    particle_grid=GRID<TV>(grid_divisions,grid_divisions,grid_divisions,particle_domain);
+    particle_grid=GRID<TV>(TV_INT()+grid_divisions,particle_domain);
     ARRAY<ARRAY<int> ,VECTOR<int,3> > conservative_array(particle_grid.Domain_Indices(1));
     LOG::cout<<"Rasterizing particles to grid..."<<std::endl;
     for(int p=0;p<particles.Size();p++){

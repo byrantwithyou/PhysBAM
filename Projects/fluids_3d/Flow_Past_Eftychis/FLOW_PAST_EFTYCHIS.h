@@ -20,7 +20,8 @@ class FLOW_PAST_EFTYCHIS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_inpu
 {
     typedef T_input T;
 public:
-    typedef VECTOR<T,3> TV;typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
+    typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
@@ -67,7 +68,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    GRID<TV> full_grid=GRID<TV>(75,75,75,(T)-.3,(T).3,(T)0.35,(T).95,(T)-.3,(T).3);
+    GRID<TV> full_grid(TV_INT(75,75,75),RANGE<TV>(TV((T)-.3,(T)0.35,(T)-.3),TV((T).3,(T).95,(T).3)));
     *fluids_parameters.grid=full_grid;
     fluids_parameters.use_vorticity_confinement=true;fluids_parameters.confinement_parameter=(T).5;
     fluids_parameters.write_debug_data=true;

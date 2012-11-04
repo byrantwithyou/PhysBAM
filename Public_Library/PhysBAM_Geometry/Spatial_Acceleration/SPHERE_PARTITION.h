@@ -17,17 +17,17 @@ namespace PhysBAM{
 template<class T>
 class SPHERE_PARTITION:public NONCOPYABLE
 {
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     ARRAY<SPHERE<TV> > spheres; // list of all the spheres
     GRID<TV> grid;
     RANGE<TV> box; // box containing the spheres
-    ARRAY<ARRAY<int>*,VECTOR<int,3> > voxel_sphere_list;
+    ARRAY<ARRAY<int>*,TV_INT> voxel_sphere_list;
     
     SPHERE_PARTITION(const int number_input)
         :spheres(number_input)
     {
-        Set_Up_Grid(1,1,1);
+        Set_Up_Grid(TV_INT()+1);
     }
 
     virtual ~SPHERE_PARTITION()
@@ -38,7 +38,7 @@ public:
     bool Inside(const TV& location,const T thickness_over_two=0) const;
     bool Outside(const TV& location,const T thickness_over_two=0) const;
     bool Boundary(const TV& location,const T thickness_over_two) const;
-    void Set_Up_Grid(const int m,const int n,const int mn); // use this to initialize!
+    void Set_Up_Grid(const TV_INT& size); // use this to initialize!
     void Find_Voxel(const TV& location,int& i_left,int& j_bottom,int& ij_front) const;
 //#####################################################################
 };   

@@ -18,7 +18,7 @@ template<class T> void RENDERING_TEXTURE_IMAGE_SHADER<T>::
 Setup_Interpolation(const int m,const int n)
 {
     int ghost_cells=3;
-    grid.Initialize(m,n,RANGE<VECTOR<T,2> >::Unit_Box(),true);pixels.Resize(grid.Domain_Indices(ghost_cells));
+    grid.Initialize(VECTOR<int,2>(m,n),RANGE<VECTOR<T,2> >::Unit_Box(),true);pixels.Resize(grid.Domain_Indices(ghost_cells));
     if(wrap_s||wrap_t) BOUNDARY_MAC_GRID_PERIODIC<GRID<VECTOR<T,2> >,VECTOR<T,3> >().Fill_Ghost_Cells(grid,pixels,pixels,0,0,ghost_cells);
     else BOUNDARY_UNIFORM<GRID<VECTOR<T,2> >,VECTOR<T,3> >().Fill_Ghost_Cells(grid,pixels,pixels,0,0,ghost_cells);
 }

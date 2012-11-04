@@ -105,8 +105,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     //grid
     if(test_number==1 || test_number==4)
-        fluids_parameters.grid->Initialize(20*resolution+1,-(T)5,(T)5);
-    else fluids_parameters.grid->Initialize(20*resolution+1,(T)0,(T)1);
+        fluids_parameters.grid->Initialize(TV_INT(20*resolution+1),RANGE<TV>::Centered_Box()*5);
+    else fluids_parameters.grid->Initialize(TV_INT(20*resolution+1),RANGE<TV>::Unit_Box());
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
     fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;
     if(test_number==4) fluids_parameters.domain_walls[0][1]=false;

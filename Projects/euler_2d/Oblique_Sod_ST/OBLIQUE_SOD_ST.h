@@ -31,7 +31,7 @@ template<class T_input>
 class OBLIQUE_SOD_ST:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
 {
 public: 
-    typedef T_input T;typedef VECTOR<T,2> TV;typedef GRID<TV> T_GRID;
+    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;typedef GRID<TV> T_GRID;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::stream_type;using BASE::parse_args;
@@ -78,7 +78,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     //grid
     int cells_n=4*resolution,cells_m=scale*cells_n; //need divisibility of (n-1) by 1,2,4 . . .
     T H=(T)1.,L=scale*H;
-    fluids_parameters.grid->Initialize(cells_m+1,cells_n+1,0,L/sin(angle),0,H/sin(angle));
+    fluids_parameters.grid->Initialize(TV_INT(cells_m+1,cells_n+1),RANGE<TV>(TV(),TV(L,H)/sin(angle)));
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
     //time
     initial_time=(T)0.;last_frame=400;frame_rate=(T)80.;

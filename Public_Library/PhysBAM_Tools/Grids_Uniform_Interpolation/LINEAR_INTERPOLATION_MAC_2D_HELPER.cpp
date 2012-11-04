@@ -39,7 +39,7 @@ Interpolate_Face(const VECTOR<T,2>& X) const
 template<class T_GRID> VECTOR<typename T_GRID::VECTOR_T::SCALAR,2> LINEAR_INTERPOLATION_MAC_2D_HELPER<T_GRID>::
 Interpolate_Face_Normalized(const T_BLOCK& block,const T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_BOOL& face_velocities_valid,const VECTOR<T,2>& X,const VECTOR<T,2>& default_value)
 {
-    static const GRID<TV> valid_values_grid=GRID<TV>(2,2,0,1,0,1).Get_MAC_Grid_At_Regular_Positions();
+    static const GRID<TV> valid_values_grid=GRID<TV>(TV_INT()+2,RANGE<TV>::Unit_Box()).Get_MAC_Grid_At_Regular_Positions();
     static const BLOCK_UNIFORM<GRID<TV> > valid_values_block(valid_values_grid,VECTOR<int,2>(2,2));
     ARRAY<T,FACE_INDEX<2> > valid_values(valid_values_grid);Block_Transfer(block,face_velocities_valid,valid_values_block,valid_values);
     VECTOR<T,2> DX=Transformed(block,X),velocity=Interpolate_Face_Transformed(block,face_velocities,DX),weight=Interpolate_Face_Transformed(valid_values_block,valid_values,DX);

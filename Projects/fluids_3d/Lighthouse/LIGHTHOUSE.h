@@ -88,7 +88,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     frame_rate=36;
     restart=false;restart_frame=18;
     int cells=1*resolution;
-    fluids_parameters.grid->Initialize(14*cells+1,3*cells+1,8*cells+1,-80,60,0,30,0,80);
+    fluids_parameters.grid->Initialize(TV_INT(14*cells+1,3*cells+1,8*cells+1),RANGE<TV>(TV(-80,0,0),TV(60,30,80)));
     fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
     fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
     fluids_parameters.number_particles_per_cell=32;

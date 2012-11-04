@@ -43,9 +43,9 @@ template<class T> GRID<VECTOR<T,3> > Make_Cube_Grid(const GRID<VECTOR<T,3> >& in
     new_box.Enlarge_To_Include_Point(box_center+(T).5*new_size);
 
     if(mac_grid)
-        return GRID<VECTOR<T,3> >(number_of_cells_m,number_of_cells_n,number_of_cells_mn,new_box,true);
+        return GRID<VECTOR<T,3> >(VECTOR<int,3>(number_of_cells_m,number_of_cells_n,number_of_cells_mn),new_box,true);
     else
-        return GRID<VECTOR<T,3> >(number_of_cells_m+1,number_of_cells_n+1,number_of_cells_mn+1,new_box,false);
+        return GRID<VECTOR<T,3> >(VECTOR<int,3>(number_of_cells_m+1,number_of_cells_n+1,number_of_cells_mn+1),new_box,false);
 }
 
 template<class T> struct DEPTH_HELPER{ARRAY<PAIR<ORIENTED_BOX<VECTOR<T,3> >,int> > depths;int default_depth;};

@@ -27,7 +27,7 @@ public:
 template<class T>
 class TETRAHEDRAL_MESHING:public NONCOPYABLE
 {
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     SOLIDS_PARAMETERS<TV>& solids_parameters; 
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;

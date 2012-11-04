@@ -25,7 +25,7 @@ namespace PhysBAM{
 template<class T_input>
 class EULER_2D:public EULER<GRID<VECTOR<T_input,2> > >
 {
-    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<T,4> TV_DIMENSION;
+    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,4> TV_DIMENSION;
 protected:
     using EULER<GRID<TV> >::cut_out_grid;using EULER<GRID<TV> >::max_time_step;
 public:
@@ -48,7 +48,7 @@ public:
     {eigensystem_F.Set_Custom_Equation_Of_State(eos_input);eigensystem_G.Set_Custom_Equation_Of_State(eos_input);EULER<GRID<TV> >::Set_Custom_Equation_Of_State(eos_input);}
     
     void Initialize_Domain(const int m, const int n, const T xmin, const T xmax, const T ymin, const T ymax)
-    {grid.Initialize(m,n,xmin,xmax,ymin,ymax);}
+    {grid.Initialize(TV_INT(m,n),RANGE<TV>(TV(xmin,ymin),TV(xmax,ymax)));}
     
 //#####################################################################
     void Euler_Step(const T dt,const T time=0);

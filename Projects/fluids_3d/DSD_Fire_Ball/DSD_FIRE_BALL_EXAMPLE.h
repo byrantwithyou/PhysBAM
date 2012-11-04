@@ -37,7 +37,7 @@ public:
         :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>(stream_type,2,fluids_parameters.FIRE),source_sphere(TV(1,(T)0.5,1),(T)0.2),source_end_time((T)3),normal_velocity(4),Dn_initial((T)0.1)
     {
         frame_rate=96;
-        fluids_parameters.grid->Initialize(151,226,151,0,2,0,3,0,2);
+        fluids_parameters.grid->Initialize(TV_INT(151,226,151),RANGE<TV>(TV(),TV(2,3,2)));
         fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
         last_frame=int(T(20)*frame_rate);
         fluids_parameters.incompressible_iterations=200;

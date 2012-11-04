@@ -123,11 +123,11 @@ Read_Grid()
     if(has_valid_grid){
         if(!grid.MAC_offset){
             regular_grid=grid;
-            mac_grid.Initialize(grid.counts.x-1,grid.Domain(),true);
+            mac_grid.Initialize(grid.counts-1,grid.Domain(),true);
             node_based=true;}
         else{
             mac_grid=grid;
-            regular_grid.Initialize(grid.counts.x+1,grid.Domain(),false);
+            regular_grid.Initialize(grid.counts+1,grid.Domain(),false);
             node_based=false;}
         LOG::cout<<"regular grid "<<regular_grid<<" mac grid "<<mac_grid<<" node_based "<<node_based<<std::endl;}
 }

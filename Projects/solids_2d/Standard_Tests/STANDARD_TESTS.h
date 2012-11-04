@@ -77,7 +77,7 @@ template<class T_input>
 class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
 {
     typedef T_input T;
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
@@ -197,13 +197,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     switch(test_number){
         case 20: case 21: case 26:
-            mattress_grid=GRID<TV>(40,8,(T)-2,(T)2,(T)-.4,(T).4);
+            mattress_grid=GRID<TV>(TV_INT(40,8),RANGE<TV>(TV((T)-2,(T)-.4),TV((T)2,(T).4)));
         break;
         case 22: case 23: case 24: case 25: case 27:
-            mattress_grid=GRID<TV>(20,20,(T)-.9,(T).9,(T)-.9,(T).9);
+            mattress_grid=GRID<TV>(TV_INT(20,20),RANGE<TV>(TV((T)-.9,(T)-.9),TV((T).9,(T).9)));
         break;
             default:
-            mattress_grid=GRID<TV>(20,10,(T)-1,(T)1,(T)-.5,(T).5);
+            mattress_grid=GRID<TV>(TV_INT(20,10),RANGE<TV>(TV((T)-1,(T)-.5),TV((T)1,(T).5)));
     }
     
     processes_per_dimension=VECTOR<int,2>(2,1);

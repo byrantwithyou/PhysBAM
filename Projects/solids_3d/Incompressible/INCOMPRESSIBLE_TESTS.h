@@ -60,7 +60,7 @@ template<class T_input>
 class INCOMPRESSIBLE_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
 {
     typedef T_input T;
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
@@ -441,7 +441,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             last_frame=(int)(10*frame_rate);
             solids_parameters.cfl=(T)10.0;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            GRID<TV> mattress_grid(5,10,5,(T)-.25,(T).25,(T).8,(T)5.10,(T)-.30,(T).30);
+            GRID<TV> mattress_grid(TV_INT(5,10,5),RANGE<TV>(TV((T)-.25,(T).8,(T)-.30),TV((T).25,(T)5.10,(T).30)));
             tetrahedralized_volume.Initialize_Cube_Mesh_And_Particles(mattress_grid);
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(tetrahedralized_volume,1000,true);
             tests.Create_Mattress(mattress_grid);
@@ -569,7 +569,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             if(test_number==18) max_cg_iterations=200;
             T size=(T)3.01;
-            GRID<TV> grid(tori_m,tori_n,tori_mn,0,(tori_m-1)*size,tori_base_height,tori_base_height+(tori_n-1)*size,0,(tori_mn-1)*size);
+            GRID<TV> grid(TV_INT(tori_m,tori_n,tori_mn),RANGE<TV>(TV(0,tori_base_height,0),TV((tori_m-1)*size,tori_base_height+(tori_n-1)*size,(tori_mn-1)*size)));
             RANDOM_NUMBERS<T> random;random.Set_Seed(12321);
             tori_initial_states.Remove_All(); 
             for(int j=0;j<tori_n;j++)for(int i=0;i<tori_m;i++)for(int ij=0;ij<tori_mn;ij++){ // Note nonstandard dimension ordering to get nice layers

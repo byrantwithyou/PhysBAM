@@ -7,6 +7,7 @@
 #ifndef __PARTICLE_LEVELSET_EVOLUTION_UNIFORM__
 #define __PARTICLE_LEVELSET_EVOLUTION_UNIFORM__
 
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
 namespace PhysBAM{

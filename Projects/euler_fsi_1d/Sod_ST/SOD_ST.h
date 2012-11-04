@@ -162,8 +162,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     LOG::cout<<"use_glf="<<use_glf<<std::endl;
 
     //grid
-    if(test_number==12) fluids_parameters.grid->Initialize(resolution,(T)-1,(T)2);
-    else fluids_parameters.grid->Initialize(resolution,(T)0,(T)1);
+    if(test_number==12) fluids_parameters.grid->Initialize(TV_INT(resolution),RANGE<TV>(TV(-1),TV(2)));
+    else fluids_parameters.grid->Initialize(TV_INT(resolution),RANGE<TV>::Unit_Box());
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
     fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
     if(test_number==1 || test_number==2) fluids_parameters.domain_walls[0][1]=false;
@@ -290,7 +290,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number<11) return;
 
     if(test_number==15 || test_number==16){
-        SEGMENTED_CURVE<TV>& segmented_curve=tests.Create_Segmented_Curve(GRID<TV>(2,0,.1),RIGID_BODY_STATE<TV>(FRAME<TV>(TV(.7))),(T)1);
+        SEGMENTED_CURVE<TV>& segmented_curve=tests.Create_Segmented_Curve(GRID<TV>(TV_INT(2),RANGE<TV>::Unit_Box()),RIGID_BODY_STATE<TV>(FRAME<TV>(TV(.7))),(T)1);
 
         tests.Set_Mass_Of_Particles(segmented_curve,solid_mass/segmented_curve.Total_Size(),false);
         

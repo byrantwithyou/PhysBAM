@@ -38,7 +38,8 @@ RENDERING_VOXEL_SHADER(const TV& absorption_input,const TV& scattering_input,con
             world_xyz_to_display_xyz=lms_to_xyz*world_lms_to_display_lms*xyz_to_lms;}
         else{world_xyz_to_display_xyz=MATRIX<T,3>(T(1)/xyz_white_point.x,0,0,0,T(1)/xyz_white_point.y,0,0,0,T(1)/xyz_white_point.z);}
         if(use_blackbody_ramp){
-            blackbody_ramp_grid.Initialize(500,0,(T)3000);blackbody_ramp.Resize(blackbody_ramp_grid.Domain_Indices(ghost_cells));
+            blackbody_ramp_grid.Initialize(VECTOR<int,1>(500),RANGE<VECTOR<T,1> >(VECTOR<T,1>(0),VECTOR<T,1>((T)3000)));
+            blackbody_ramp.Resize(blackbody_ramp_grid.Domain_Indices(ghost_cells));
             for(int i=0;i<blackbody_ramp_grid.counts.x;i++) blackbody_ramp(i)=blackbody.cie.XYZ_To_RGB(world_xyz_to_display_xyz*(blackbody.Calculate_XYZ(blackbody_ramp_grid.X(VECTOR<int,1>(i)).x)));
             BOUNDARY_UNIFORM<GRID<VECTOR<T,1> >,TV>().Fill_Ghost_Cells(blackbody_ramp_grid,blackbody_ramp,blackbody_ramp,0,0,ghost_cells);}}
 

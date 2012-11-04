@@ -64,7 +64,7 @@ void Get_Initial_Data()
         RIGID_BODY_STATE<TV>(FRAME<TV>(VECTOR<T,3>(0,(T).6,0))),false,false,(T).01);
     surface.Update_Bounding_Box();RANGE<TV> box=*surface.bounding_box;int size_x=20;
     TV lengths=box.Edge_Lengths();TV aspect=lengths/lengths.x;
-    VECTOR<int,3> M((T)size_x*aspect);GRID<TV> grid(M.x,M.y,M.z,box);GRID<TV> implicit_grid((VECTOR<int,3>((T)50*aspect)),box);
+    VECTOR<int,3> M((T)size_x*aspect);GRID<TV> grid(M,box);GRID<TV> implicit_grid((VECTOR<int,3>((T)50*aspect)),box);
 
     // make level set 
     ARRAY<T,VECTOR<int,3> > phi;

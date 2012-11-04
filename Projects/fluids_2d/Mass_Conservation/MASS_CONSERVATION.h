@@ -139,19 +139,19 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(test_number==1 || test_number==2){
         initial_water_level=-1; // no initial height
         box=RANGE<TV>((T).4,(T).6,(T).4,(T).6);
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,RANGE<TV>::Unit_Box());}
+        fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());}
     else if(test_number==3){
         final_time=15;frame_rate=(T).5;
         zalesak_center=TV(50,75);
         zalesak_velocity_center=TV(50,50);
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,0,100,0,100);}
+        fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(100,100)));}
     else if(test_number==4){
         final_time=628;frame_rate=(T).5;
         zalesak_center=TV(25,25);
         zalesak_velocity_center=TV(50,75);
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,0,100,0,100);}
+        fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(100,100)));}
     else if(test_number==5 || test_number==13){
-        fluids_parameters.grid->Initialize((1<<resolution)+1,(1<<resolution)+1,RANGE<TV>::Unit_Box());
+        fluids_parameters.grid->Initialize(TV_INT()+(1<<resolution)+1,RANGE<TV>::Unit_Box());
         initial_water_level=-1;
         fluids_parameters.cfl=(T).5;
         last_frame=100;
@@ -160,7 +160,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     else if(test_number==6){
         fluids_parameters.number_particles_per_cell=128;
         period=final_time=2;
-        fluids_parameters.grid->Initialize((1<<resolution)+1,3*(1<<resolution)+1,(T)0,(T)1,(T)-1,(T)2);
+        fluids_parameters.grid->Initialize(TV_INT((1<<resolution)+1,3*(1<<resolution)+1),RANGE<TV>(TV((T)0,(T)-1),TV((T)1,(T)2)));
         initial_water_level=-2;
         fluids_parameters.cfl=(T).5;
         last_frame=100;
@@ -168,30 +168,30 @@ void Parse_Options() PHYSBAM_OVERRIDE
         source=SPHERE<TV>(TV((T).5,(T).75),(T).15);}
     else if(test_number==7){
         frame_rate=500;
-        fluids_parameters.grid->Initialize(10*resolution,(int)(7.5*resolution),(T)0,(T)2,(T)0,(T)1.5);
+        fluids_parameters.grid->Initialize(TV_INT(10*resolution,(int)(7.5*resolution)),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1.5)));
         source_velocity=TV(0,-40);
         initial_water_level=(T).02;
         source=SPHERE<TV>(TV(1,initial_water_level+(T).15),(T).05);
         fluids_parameters.surface_tension=(T)5e-6;}
     else if(test_number==8){
         frame_rate=100;
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,RANGE<TV>::Unit_Box());
+        fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());
         fluids_parameters.gravity=0;
         source=SPHERE<TV>(TV((T).1,(T).5),(T).08);
         other_source=SPHERE<TV>(TV((T).9,(T).5),(T).08);
         source_velocity=TV((T)2,(T)0);
         initial_water_level=-1;}
     else if(test_number==9){
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,RANGE<TV>::Unit_Box());
+        fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());
         fluids_parameters.gravity=0;
         fluids_parameters.surface_tension=(T)1e-5;}
     else if(test_number==10){
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,RANGE<TV>::Unit_Box());}
+        fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());}
     else if(test_number==11 || test_number==12){
         final_time=628;frame_rate=(T).5;
         zalesak_center=TV(25,25);
         zalesak_velocity_center=TV(50,50);
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,0,100,0,100);}
+        fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(100,100)));}
 
     // Debugging
     fluids_parameters.write_debug_data=true;

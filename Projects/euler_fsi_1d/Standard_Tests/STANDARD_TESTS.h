@@ -196,12 +196,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     //grid
     int cells=resolution;
-    if(test_number==1 || test_number==2 || test_number==10) fluids_parameters.grid->Initialize(cells+1,(T)-1,(T)3);
-    else if(test_number==3||test_number==4) fluids_parameters.grid->Initialize(cells+1,(T)0,(T)20);
-    else if(test_number==5) fluids_parameters.grid->Initialize(cells+1,(T)0,(T)3);
-    else if(test_number==8) fluids_parameters.grid->Initialize(cells+1,(T)-2,(T)2);
-    else if(test_number==9) fluids_parameters.grid->Initialize(cells+1,(T)-1,(T)1);
-    else fluids_parameters.grid->Initialize(cells+1,(T)0,(T)1);
+    if(test_number==1 || test_number==2 || test_number==10) fluids_parameters.grid->Initialize(TV_INT(cells+1),RANGE<TV>(TV((T)-1),TV((T)3)));
+    else if(test_number==3||test_number==4) fluids_parameters.grid->Initialize(TV_INT(cells+1),RANGE<TV>(TV((T)0),TV((T)20)));
+    else if(test_number==5) fluids_parameters.grid->Initialize(TV_INT(cells+1),RANGE<TV>(TV((T)0),TV((T)3)));
+    else if(test_number==8) fluids_parameters.grid->Initialize(TV_INT(cells+1),RANGE<TV>(TV((T)-2),TV((T)2)));
+    else if(test_number==9) fluids_parameters.grid->Initialize(TV_INT(cells+1),RANGE<TV>(TV((T)-1),TV((T)1)));
+    else fluids_parameters.grid->Initialize(TV_INT(cells+1),RANGE<TV>(TV((T)0),TV((T)1)));
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
     fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=false;
     if(test_number==5){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
@@ -384,7 +384,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(!(simulate_rigids || simulate_deformable)) return;
 
     if(simulate_deformable){
-        SEGMENTED_CURVE<TV>& segmented_curve=tests.Create_Segmented_Curve(GRID<TV>(2,0,1),RIGID_BODY_STATE<TV>(FRAME<TV>(TV(19.5))),(T)1);
+        SEGMENTED_CURVE<TV>& segmented_curve=tests.Create_Segmented_Curve(GRID<TV>(TV_INT(2),RANGE<TV>::Unit_Box()),RIGID_BODY_STATE<TV>(FRAME<TV>(TV(19.5))),(T)1);
 
         tests.Set_Mass_Of_Particles(segmented_curve,solid_mass/segmented_curve.Total_Size(),false);
         

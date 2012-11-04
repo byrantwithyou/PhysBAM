@@ -15,7 +15,7 @@ namespace PhysBAM{
 template<class T>
 class CIE_XYZ
 {
-    typedef VECTOR<T,1> TV;
+    typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
 public:
     int tablesize;
     T starting_wavelength,ending_wavelength; // in meters
@@ -29,7 +29,7 @@ public:
     
     CIE_XYZ()
         :tablesize(81),starting_wavelength((T)380e-9),ending_wavelength((T)780e-9),
-        grid(tablesize,starting_wavelength,ending_wavelength),
+        grid(TV_INT(tablesize),RANGE<TV>(TV(starting_wavelength),TV(ending_wavelength))),
         X_spectrum(1,grid.counts.x),Y_spectrum(1,grid.counts.x),Z_spectrum(1,grid.counts.x)
     {      
         Initialize_XYZ_From_CIE_Tables();

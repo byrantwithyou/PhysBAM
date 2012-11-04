@@ -24,7 +24,7 @@ public:
         first_frame=0;last_frame=1000;
         frame_rate=24;
         restart=false;restart_frame=18;
-        fluids_parameters.grid.Initialize(101,101,101,0,1,0,1,0,1);
+        fluids_parameters.grid.Initialize(TV_INT(101,101,101),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
         fluids_parameters.number_particles_per_cell=16;

@@ -98,7 +98,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     int cells=1*resolution;
     first_frame=0;last_frame=10;
     T_GRID& grid=*fluids_parameters.grid;
-    grid.Initialize(10*cells+1,10*cells+1,10*cells+1,0,8,0,8,0,8);
+    grid.Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(8,8,8)));
 
     last_frame=1000;
         
