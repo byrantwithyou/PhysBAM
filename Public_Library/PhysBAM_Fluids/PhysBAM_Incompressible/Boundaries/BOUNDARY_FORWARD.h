@@ -22,7 +22,6 @@ template<class T_GRID> class BOUNDARY_PHI_WATER;
 template<class T_GRID> class BOUNDARY_SOLID_WALL_SLIP_OUTFLOW;
 template<class T> class BOUNDARY_EULER_EQUATIONS_CYLINDRICAL;
 template<class T> class BOUNDARY_EULER_EQUATIONS_SPHERICAL;
-template<class TV> class BOUNDARY_SOLID_WALL_SLIP;
 
 }
 #endif
