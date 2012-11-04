@@ -325,7 +325,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 if(i>refine.x+j_minus_one&&i<refine.y+j_minus_one){
                     VECTOR<int,3> nodes2=mesh.elements(t+1);
                     int center_node=triangulated_area.particles.Add_Element();
-                    triangulated_area.particles.X(center_node)=mattress_grid.Center(i,j_minus_one+1);
+                    triangulated_area.particles.X(center_node)=mattress_grid.Center(TV_INT(i,j_minus_one+1));
                     deleted_elements.Append(t);deleted_elements.Append(t+1);
                     new_elements.Append(VECTOR<int,3>(nodes1[0],nodes1[1],center_node));
                     new_elements.Append(VECTOR<int,3>(nodes1[1],nodes1[2],center_node));
@@ -336,7 +336,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                     VECTOR<int,3> nodes1=mesh.elements(t);int i=nodes1[0]%mattress_grid.counts.x,j_minus_one=nodes1[0]/mattress_grid.counts.x;
                     if(i==refine.x+j_minus_one||i==refine.y+j_minus_one){
                         int center_node=triangulated_area.particles.Add_Element();
-                        triangulated_area.particles.X(center_node)=mattress_grid.Center(i,j_minus_one+1);
+                        triangulated_area.particles.X(center_node)=mattress_grid.Center(TV_INT(i,j_minus_one+1));
                         solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,center_node,VECTOR<int,2>(nodes1[0],nodes1[2]),TV((T).5,(T).5)));
                         if(i==refine.x+j_minus_one){
                             deleted_elements.Append(t);

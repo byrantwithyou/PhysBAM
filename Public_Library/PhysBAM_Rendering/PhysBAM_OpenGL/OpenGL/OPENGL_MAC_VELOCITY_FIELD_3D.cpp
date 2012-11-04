@@ -82,17 +82,17 @@ Update()
         // u velocities
         for(int i=cell_start.x;i<cell_end.x+1;i++)for(int j=cell_start.y;j<cell_end.y;j++)for(int k=cell_start.z;k<cell_end.z;k++){
             T vel=u(VECTOR<int,3>(i,j,k));
-            if(vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(vel,0,0);vector_locations(idx)=grid.X_Face(i,j,k);}}
+            if(vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(vel,0,0);vector_locations(idx)=grid.X_Face(TV_INT(i,j,k));}}
 
         // v velocities
         for (int i=cell_start.x;i<cell_end.x;i++) for (int j=cell_start.y;j<cell_end.y+1;j++) for (int k=cell_start.z;k<cell_end.z;k++){
             T vel = v(VECTOR<int,3>(i,j,k));
-            if (vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(0,vel,0);vector_locations(idx)=grid.Y_Face(i,j,k);}}
+            if (vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(0,vel,0);vector_locations(idx)=grid.Y_Face(TV_INT(i,j,k));}}
 
         // w velocities
         for (int i=cell_start.x;i<cell_end.x;i++) for (int j=cell_start.y;j<cell_end.y;j++) for (int k=cell_start.z;k<cell_end.z+1;k++){
             T vel = w(VECTOR<int,3>(i,j,k));
-            if (vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(0,0,vel);vector_locations(idx)=grid.Z_Face(i,j,k);}}
+            if (vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(0,0,vel);vector_locations(idx)=grid.Z_Face(TV_INT(i,j,k));}}
 
         vector_field.Resize(idx);
         vector_locations.Resize(idx);

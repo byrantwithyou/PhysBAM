@@ -33,7 +33,7 @@ Display(const int in_color) const
 #ifndef USE_OPENGLES
     if(mode == GL_SELECT){
         glPushAttrib(GL_ENABLE_BIT|GL_POINT_BIT);glDisable(GL_CULL_FACE);
-        VECTOR<T,2> min_corner=grid.Node(-ghost_cells,-ghost_cells),X;int i,j;
+        VECTOR<T,2> min_corner=grid.Node(TV_INT(-ghost_cells,-ghost_cells)),X;int i,j;
 
         // Draw grid cells for selection
         glPushName(1);
@@ -65,8 +65,8 @@ Display(const int in_color) const
     {
         // Draw masks
         T x,y;int i,j,i_mask=1,j_mask=1;
-        VECTOR<T,2> min_corner=grid.Node(-ghost_cells,-ghost_cells);
-        VECTOR<T,2> max_corner=grid.Node(grid.numbers_of_cells.x+ghost_cells,grid.numbers_of_cells.y+ghost_cells);
+        VECTOR<T,2> min_corner=grid.Node(TV_INT()-ghost_cells);
+        VECTOR<T,2> max_corner=grid.Node(grid.numbers_of_cells+ghost_cells);
 
         ARRAY<bool,TV_INT> *cell_mask=0;
         T_FACE_ARRAYS_BOOL *face_mask=0;
@@ -279,7 +279,7 @@ Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     const GRID<TV>& grid=((OPENGL_GRID_2D<T>*)object)->grid;
-    RANGE<VECTOR<T,2> > box(grid.Node(index),grid.Node(index.x+1,index.y+1));
+    RANGE<VECTOR<T,2> > box(grid.Node(index),grid.Node(index+1));
     return object->World_Space_Box(RANGE<VECTOR<float,2> >(box));
 }
 //#####################################################################

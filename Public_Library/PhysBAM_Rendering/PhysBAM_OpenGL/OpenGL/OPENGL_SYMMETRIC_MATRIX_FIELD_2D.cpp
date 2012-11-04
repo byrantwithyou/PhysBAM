@@ -16,7 +16,7 @@ Display(const int in_color) const
     glLineWidth(1);glDisable(GL_LIGHTING);glDisable(GL_TEXTURE_2D);
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     for(int i=lines.domain.min_corner.x;i<lines.domain.max_corner.x;i++)for(int j=lines.domain.min_corner.y;j<lines.domain.max_corner.y;j++){
-        VECTOR<T,2> node=grid.Node(i,j);MATRIX<T,2> line=size*lines(i,j);
+        VECTOR<T,2> node=grid.Node(TV_INT(i,j));MATRIX<T,2> line=size*lines(i,j);
         (positive(i,j).x?positive_color:negative_color).Send_To_GL_Pipeline();
         OpenGL_Line(node-line.Column(0),node+line.Column(0),vertices);
         (positive(i,j).y?positive_color:negative_color).Send_To_GL_Pipeline();

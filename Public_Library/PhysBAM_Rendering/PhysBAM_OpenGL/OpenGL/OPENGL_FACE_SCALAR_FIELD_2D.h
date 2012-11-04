@@ -18,7 +18,7 @@ template<class T,class T2=T>
 class OPENGL_FACE_SCALAR_FIELD_2D : public OPENGL_OBJECT
 {
 public:
-    typedef VECTOR<T,2> TV;GRID<TV> grid;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;GRID<TV> grid;
     ARRAY<T2,FACE_INDEX<2> > &face_values;
     ARRAY_VIEW<T2,VECTOR<int,2> > &x_face_values,&y_face_values;
     OPENGL_COLOR_MAP<T2> *color_map;

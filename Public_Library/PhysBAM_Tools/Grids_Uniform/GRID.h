@@ -165,26 +165,8 @@ public:
     TV X(const int i) const
     {STATIC_ASSERT(dimension==1);return X(TV_INT(i));}
 
-    TV Node(const int i,const int j,const int ij) const
-    {STATIC_ASSERT(dimension==3);return Node(TV_INT(i,j,ij));}
-
-    TV Node(const int i,const int j) const
-    {STATIC_ASSERT(dimension==2);return Node(TV_INT(i,j));}
-
-    TV Node(const int i) const
-    {STATIC_ASSERT(dimension==1);return Node(TV_INT(i));}
-
     TV Node(const TV_INT& index) const
     {return domain.min_corner+TV(index)*dX;}
-
-    TV Center(const int i,const int j,const int ij) const
-    {STATIC_ASSERT(dimension==3);return Center(TV_INT(i,j,ij));}
-
-    TV Center(const int i,const int j) const
-    {STATIC_ASSERT(dimension==2);return Center(TV_INT(i,j));}
-
-    TV Center(const int i) const
-    {STATIC_ASSERT(dimension==1);return Center(TV_INT(i));}
 
     TV Center(const TV_INT& index) const
     {return domain.min_corner+(TV(index)+(T).5)*dX;}
@@ -195,29 +177,11 @@ public:
     TV Axis_X_Face(const TV_INT& index,const int axis) const
     {TV adjusted=TV(index)+(T).5;adjusted(axis)-=(T).5;return domain.min_corner+adjusted*dX;}
 
-    TV X_Face(const int i,const int j,const int ij) const
-    {STATIC_ASSERT(dimension==3);return X_Face(TV_INT(i,j,ij));}
-
-    TV X_Face(const int i,const int j) const
-    {STATIC_ASSERT(dimension==2);return X_Face(TV_INT(i,j));}
-
-    TV X_Face(const int i) const
-    {STATIC_ASSERT(dimension==1);return X_Face(TV_INT(i));}
-
     TV X_Face(const TV_INT& index) const
     {return Axis_X_Face(index,0);}
 
-    TV Y_Face(const int i,const int j,const int ij) const
-    {STATIC_ASSERT(dimension==3);return Y_Face(TV_INT(i,j,ij));}
-
-    TV Y_Face(const int i,const int j) const
-    {STATIC_ASSERT(dimension==2);return Y_Face(TV_INT(i,j));}
-
     TV Y_Face(const TV_INT& index) const
     {return Axis_X_Face(index,1);}
-
-    TV Z_Face(const int i,const int j,const int ij) const
-    {STATIC_ASSERT(dimension==3);return Z_Face(TV_INT(i,j,ij));}
 
     TV Z_Face(const TV_INT& index) const
     {return Axis_X_Face(index,2);}

@@ -24,7 +24,7 @@ Get_State_At_Location(const GRID<VECTOR<T,1> >& grid_1d,const ARRAY<TV_DIMENSION
     T dx=grid_1d.dX.x,one_over_dx=grid_1d.one_over_dX.x;
     int lower_cell=grid_1d.Cell(VECTOR<T,1>(location),4).x; //using 4 ghost cells as thats the maximum we can have.
     int higher_cell=lower_cell+1;
-    T epsilon=location-grid_1d.Center(lower_cell).x;
+    T epsilon=location-grid_1d.Center(VECTOR<int,1>(lower_cell)).x;
     if(lower_cell>=region_boundaries.x){ //use lower_cell,lower_cell+1
         if(lower_cell>region_boundaries.y) lower_cell=higher_cell=region_boundaries.y;
         else if(higher_cell>region_boundaries.y) higher_cell=region_boundaries.y;
@@ -52,7 +52,7 @@ Fill_Ghost_Cells_Neumann(const GRID<VECTOR<T,1> >& grid_1d,ARRAY<TV_DIMENSION,VE
         for(int i=regions(side).Minimum_Corner()[0];i<regions(side).Maximum_Corner()[0];i++) if(i>=domain.x && i<domain.y){
             int reflection_face=side&1?regions(side).Minimum_Corner()[0]:regions(side).Maximum_Corner()[0]+1;
             if(use_exact_neumann_face_location){
-                T location=grid_1d.Center(i).x;
+                T location=grid_1d.Center(VECTOR<int,1>(i)).x;
                 T boundary_face_location;callbacks->Get_Neumann_Face_Location(grid_1d,reflection_face,boundary_face_location);
                 T reflected_location=2*boundary_face_location-location;
                 Get_State_At_Location(grid_1d,U_1d,reflected_location,region_boundaries,u_1d);}

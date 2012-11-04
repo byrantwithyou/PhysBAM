@@ -57,7 +57,7 @@ Generate_Vertices()
     for(int ij=0;ij<mn-1;ij++)
         if(vertices(i,j,ij)){ // generate vertices where needed
             vertices(i,j,ij)=++vertex;
-            TV position=grid.Center(i,j,ij);
+            TV position=grid.Center(TV_INT(i,j,ij));
             TV normal=levelset.Normal(position);
             T phi=levelset.Phi(position);
             int iterations=0;

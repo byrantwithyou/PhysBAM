@@ -93,7 +93,7 @@ Display(const int in_color) const
             if(slice->axis==2) { k_start=slice->index/scale;k_end=k_start+1; axis_1=x_vector; axis_2=y_vector; axis_3=z_vector; } 
             else { k_start=1-ghost_cells; k_end=grid.numbers_of_cells.z+ghost_cells; }
 
-            VECTOR<T,3> pos_start=grid.Node(i_start,j_start,k_start);
+            VECTOR<T,3> pos_start=grid.Node(TV_INT(i_start,j_start,k_start));
 
             glPushName(1);
             for (i=i_start, x=pos_start.x; i<i_end; i++, x+=grid.dX.x)

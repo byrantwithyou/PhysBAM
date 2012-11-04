@@ -26,8 +26,8 @@ Display(const int in_color) const
     int ghost_cells=draw_ghost_values?3:0;
 
     // Draw masks
-    VECTOR<T,1> min_corner(grid.Node(1-ghost_cells));
-    VECTOR<T,1> max_corner(grid.Node(grid.numbers_of_cells.x+ghost_cells+1));
+    VECTOR<T,1> min_corner(grid.Node(TV_INT(1-ghost_cells)));
+    VECTOR<T,1> max_corner(grid.Node(TV_INT(grid.numbers_of_cells.x+ghost_cells+1)));
 
     // Outline boundary of real domain
     if(ghost_cells>0){

@@ -14,8 +14,8 @@ void OPENGL_UNIFORM_SLICE::
 Print_Slice_Info(std::ostream& output_stream)
 {
     const char* axis_name[]={"","x","y","z"};
-    if(mode==CELL_SLICE){output_stream<<"Slice: cell="<<index<<", "<<axis_name[axis]<<"="<<grid.Center(index,index,index)[axis]<<std::endl;}
-    else if(mode==NODE_SLICE){output_stream<<"Slice: node="<<index<<", "<<axis_name[axis]<<"="<<grid.Node(index,index,index)[axis]<<std::endl;}
+    if(mode==CELL_SLICE){output_stream<<"Slice: cell="<<index<<", "<<axis_name[axis]<<"="<<grid.Center(TV_INT()+index)[axis]<<std::endl;}
+    else if(mode==NODE_SLICE){output_stream<<"Slice: node="<<index<<", "<<axis_name[axis]<<"="<<grid.Node(TV_INT()+index)[axis]<<std::endl;}
 }
 //#####################################################################
 // Function Update_Clip_Planes
@@ -29,7 +29,7 @@ Update_Clip_Planes()
         clip_plane_id1=clip_plane_id2=0;
     }
     else {
-        float pos=(mode==NODE_SLICE)?grid.Node(index,index,index)[axis]:grid.Center(index,index,index)[axis];
+        float pos=(mode==NODE_SLICE)?grid.Node(TV_INT()+index)[axis]:grid.Center(TV_INT()+index)[axis];
         PLANE<float> plane1(VECTOR<float,3>(0,0,0),VECTOR<float,3>(0,0,0)),plane2(VECTOR<float,3>(0,0,0),VECTOR<float,3>(0,0,0));
         plane1.normal[axis]=1;plane1.x1[axis]=pos-grid.dX[axis]/1.9;
         plane2.normal[axis]=-1;plane2.x1[axis]=pos+grid.dX[axis]/1.9;

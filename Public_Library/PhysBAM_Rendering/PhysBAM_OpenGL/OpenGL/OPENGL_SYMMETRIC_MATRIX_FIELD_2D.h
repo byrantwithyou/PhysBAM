@@ -19,7 +19,7 @@ template<class T>
 class OPENGL_SYMMETRIC_MATRIX_FIELD_2D:public OPENGL_OBJECT
 {
 public:
-    typedef VECTOR<T,2> TV;GRID<TV> grid;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;GRID<TV> grid;
     const ARRAY<SYMMETRIC_MATRIX<T,2> ,VECTOR<int,2> >& field;
     ARRAY<MATRIX<T,2> ,VECTOR<int,2> > lines;
     ARRAY<PAIR<bool,bool> ,VECTOR<int,2> > positive;
