@@ -8,6 +8,7 @@
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_MULTIPLE.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_MULTIPLE.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
@@ -307,7 +308,7 @@ Levelset(const int i)
 {
     return *particle_levelset_multiple.levelset_multiple.levelsets(i);
 }
-template<class T_GRID> FAST_LEVELSET_ADVECTION<T_GRID>& PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
+template<class T_GRID> LEVELSET_ADVECTION<typename T_GRID::VECTOR_T>& PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Levelset_Advection(const int i)
 {
     return levelset_advection_multiple.levelset_advections(i);

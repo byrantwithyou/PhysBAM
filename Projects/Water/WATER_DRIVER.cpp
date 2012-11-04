@@ -14,6 +14,7 @@
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 #include "WATER_DRIVER.h"
 #include "WATER_EXAMPLE.h"
 using namespace PhysBAM;

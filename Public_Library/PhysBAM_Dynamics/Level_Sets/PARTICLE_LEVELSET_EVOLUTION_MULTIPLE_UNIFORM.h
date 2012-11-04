@@ -7,12 +7,12 @@
 #ifndef __PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM__
 #define __PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM__
 
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_MULTIPLE.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_MULTIPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_ARRAY> class RUNGEKUTTA;
+template<class T_GRID> class LEVELSET_ADVECTION_MULTIPLE;
 
 template<class T_GRID>
 class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM:public PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>
@@ -41,7 +41,7 @@ public:
     virtual LEVELSET_MULTIPLE<T_GRID>& Levelset_Multiple();
     virtual PARTICLE_LEVELSET_UNIFORM<T_GRID>& Particle_Levelset(const int i) PHYSBAM_OVERRIDE;
     virtual LEVELSET<TV>& Levelset(const int i) PHYSBAM_OVERRIDE;
-    virtual FAST_LEVELSET_ADVECTION<T_GRID>& Levelset_Advection(const int i) PHYSBAM_OVERRIDE;
+    virtual LEVELSET_ADVECTION<TV>& Levelset_Advection(const int i) PHYSBAM_OVERRIDE;
     void Use_Semi_Lagrangian_Advection() PHYSBAM_OVERRIDE;
     void Use_Hamilton_Jacobi_Weno_Advection() PHYSBAM_OVERRIDE;
     void Use_Hamilton_Jacobi_Eno_Advection(const int order) PHYSBAM_OVERRIDE;

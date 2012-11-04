@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
-#include <PhysBAM_Dynamics/Level_Sets/FAST_LEVELSET_ADVECTION.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 
 namespace PhysBAM {
@@ -25,14 +24,14 @@ class LEVELSET_ADVECTION_MULTIPLE
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     LEVELSET_MULTIPLE<T_GRID>& levelsets;
-    ARRAY<FAST_LEVELSET_ADVECTION<GRID<TV> > > levelset_advections;
+    ARRAY<LEVELSET_ADVECTION<TV> > levelset_advections;
 
     LEVELSET_ADVECTION_MULTIPLE(LEVELSET_MULTIPLE<T_GRID>& _levelsets)
         :levelsets(_levelsets)
     {}
 
     void Initialize()
-    {for(int i=0;i<levelsets.levelsets.m;i++) levelset_advections.Append(FAST_LEVELSET_ADVECTION<GRID<TV> >(levelsets.levelsets(i)));}
+    {for(int i=0;i<levelsets.levelsets.m;i++) levelset_advections.Append(LEVELSET_ADVECTION<TV>(levelsets.levelsets(i)));}
 
     void Set_Custom_Advection(ADVECTION<T,T,T_GRID>& advection_input)
     {for(int i=0;i<levelset_advections.m;i++)levelset_advections(i).Set_Custom_Advection(advection_input);}

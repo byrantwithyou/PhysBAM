@@ -1,4 +1,5 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 #include "Strawman_Example/STRAWMAN_DRIVER.h"
 #include "Strawman_Example/STRAWMAN_EXAMPLE.h"
 

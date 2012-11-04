@@ -43,6 +43,7 @@
 #include <PhysBAM_Dynamics/Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h>
 #include <PhysBAM_Dynamics/Forces_And_Torques/EULER_FLUID_FORCES.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.h>
@@ -206,7 +207,7 @@ template<class TV> void PLS_FSI_EXAMPLE<TV>::
 Revalidate_Fluid_Scalars()
 {
     LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
-    FAST_LEVELSET_ADVECTION<GRID<TV> >& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(0);
+    LEVELSET_ADVECTION<TV>& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(0);
     if(levelset_advection.nested_semi_lagrangian_collidable)
         levelset_advection.nested_semi_lagrangian_collidable->Average_To_Invalidated_Cells(*fluids_parameters.grid,fluids_parameters.collidable_phi_replacement_value,levelset.phi);
 }
@@ -217,7 +218,7 @@ template<class TV> void PLS_FSI_EXAMPLE<TV>::
 Revalidate_Phi_After_Modify_Levelset()
 {
     LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
-    FAST_LEVELSET_ADVECTION<GRID<TV> >& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(0);
+    LEVELSET_ADVECTION<TV>& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(0);
     if(levelset_advection.nested_semi_lagrangian_collidable){
         levelset_advection.nested_semi_lagrangian_collidable->cell_valid_points_current=levelset_advection.nested_semi_lagrangian_collidable->cell_valid_points_next;
         levelset_advection.nested_semi_lagrangian_collidable->Average_To_Invalidated_Cells(*fluids_parameters.grid,fluids_parameters.collidable_phi_replacement_value,levelset.phi);}

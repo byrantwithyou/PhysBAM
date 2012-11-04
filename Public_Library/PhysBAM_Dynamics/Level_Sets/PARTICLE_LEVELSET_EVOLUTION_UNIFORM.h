@@ -7,13 +7,12 @@
 #ifndef __PARTICLE_LEVELSET_EVOLUTION_UNIFORM__
 #define __PARTICLE_LEVELSET_EVOLUTION_UNIFORM__
 
-#include <PhysBAM_Dynamics/Level_Sets/FAST_LEVELSET_ADVECTION.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
 namespace PhysBAM{
 
 template<class TV> class RUNGEKUTTA;
+template<class T_GRID> class LEVELSET_ADVECTION;
 
 template<class T_GRID>
 class PARTICLE_LEVELSET_EVOLUTION_UNIFORM:public PARTICLE_LEVELSET_EVOLUTION<typename T_GRID::SCALAR>
@@ -36,7 +35,7 @@ public:
     PARTICLE_LEVELSET_UNIFORM<T_GRID> particle_levelset;
     RUNGEKUTTA<T_ARRAYS_SCALAR>* rungekutta_phi;
 
-    FAST_LEVELSET_ADVECTION<GRID<TV> > levelset_advection;
+    LEVELSET_ADVECTION<TV>& levelset_advection;
 
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM(const T_GRID& grid_input,const int number_of_ghost_cells_input);
     virtual ~PARTICLE_LEVELSET_EVOLUTION_UNIFORM();
@@ -47,7 +46,7 @@ public:
     virtual LEVELSET<TV>& Levelset(const int i)
     {assert(i==0);return particle_levelset.levelset;}
     
-    virtual FAST_LEVELSET_ADVECTION<GRID<TV> >& Levelset_Advection(const int i)
+    virtual LEVELSET_ADVECTION<TV>& Levelset_Advection(const int i)
     {assert(i==0);return levelset_advection;}
 
     virtual void Use_Semi_Lagrangian_Advection()

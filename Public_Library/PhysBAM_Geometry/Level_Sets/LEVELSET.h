@@ -51,7 +51,6 @@ public:
     T_INTERPOLATION_SCALAR *interpolation,*curvature_interpolation,*secondary_interpolation;
     T_INTERPOLATION_VECTOR* normal_interpolation;
     T max_time_step;
-    bool curvature_motion;
     T sigma;
     bool refine_fmm_initialization_with_iterative_solver;
     int fmm_initialization_iterations;
@@ -88,9 +87,6 @@ public:
 
     void Set_Max_Time_Step(const T max_time_step_input=1e8)
     {max_time_step=max_time_step_input;}
-
-    void Set_Curvature_Motion(const T sigma_input=1) // times by the grid spacing
-    {curvature_motion=true;sigma=sigma_input;assert(sigma >= 0);}
 
     void Initialize_FMM_Initialization_Iterative_Solver(const bool refine_fmm_initialization_with_iterative_solver_input=true,const int fmm_initialization_iterations_input=10,
         const T fmm_initialization_iterative_tolerance_input=1e-2,const T fmm_initialization_iterative_drift_fraction_input=.1)

@@ -14,6 +14,7 @@
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Dynamics/Drivers/PLS_REFINEMENT_DRIVER.h>
 #include <PhysBAM_Dynamics/Drivers/PLS_REFINEMENT_EXAMPLE.h>
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 using namespace PhysBAM;
 namespace{
 template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)

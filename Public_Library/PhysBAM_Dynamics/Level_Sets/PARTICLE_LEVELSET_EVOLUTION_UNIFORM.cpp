@@ -8,6 +8,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 using namespace PhysBAM;
@@ -16,7 +17,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID> PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
 PARTICLE_LEVELSET_EVOLUTION_UNIFORM(const T_GRID& grid_input,const int number_of_ghost_cells_input)
-    :grid(grid_input),particle_levelset(grid,phi,number_of_ghost_cells_input),rungekutta_phi(0),levelset_advection(&particle_levelset.levelset)
+    :grid(grid_input),particle_levelset(grid,phi,number_of_ghost_cells_input),rungekutta_phi(0),levelset_advection(*new LEVELSET_ADVECTION<TV>(&particle_levelset.levelset))
 {
     Use_Semi_Lagrangian_Advection();
     Track_Mass(false);
@@ -28,6 +29,7 @@ template<class T_GRID> PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
 ~PARTICLE_LEVELSET_EVOLUTION_UNIFORM()
 {
     delete rungekutta_phi;
+    delete &levelset_advection;
 }
 //#####################################################################
 // Function Initialize_Runge_Kutta

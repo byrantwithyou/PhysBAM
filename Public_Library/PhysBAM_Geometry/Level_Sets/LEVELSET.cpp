@@ -11,8 +11,8 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;
 template<class TV> typename LEVELSET<TV>::T_LINEAR_INTERPOLATION_SCALAR LEVELSET<TV>::interpolation_default;
 template<class TV> typename LEVELSET<TV>::T_LINEAR_INTERPOLATION_VECTOR LEVELSET<TV>::normal_interpolation_default;
@@ -27,7 +27,6 @@ LEVELSET(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_gho
 {
     Set_Small_Number();
     Set_Max_Time_Step();
-    curvature_motion=false; // default is no curvature motion
     Initialize_FMM_Initialization_Iterative_Solver();
     boundary=&boundary_default;
     interpolation=&interpolation_default;
@@ -83,9 +82,7 @@ CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
         for(int axis=0;axis<TV::dimension;axis++)
             local_V_norm+=grid.one_over_dX[axis]*maxabs(face_velocities(axis,grid.First_Face_Index_In_Cell(axis,cell)),face_velocities(axis,grid.Second_Face_Index_In_Cell(axis,cell)));
         dt_convection=max(dt_convection,local_V_norm);}
-    T dt_curvature=(curvature_motion && TV::dimension>1)?sigma*2*grid.one_over_dX.Magnitude_Squared():0;
-    T dt_overall=dt_convection+dt_curvature;
-    return 1/max(dt_overall,1/max_time_step);
+    return 1/max(dt_convection,1/max_time_step);
 }
 //#####################################################################
 // Function CFL
@@ -96,9 +93,7 @@ CFL(const ARRAY<TV,TV_INT>& velocity) const
     T dt_convection=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         dt_convection=max(dt_convection,TV::Dot_Product(velocity(cell),grid.one_over_dX));}
-    T dt_curvature=(curvature_motion && TV::dimension>1)?sigma*2*grid.one_over_dX.Magnitude_Squared():0;
-    T dt_overall=dt_convection+dt_curvature;
-    return 1/max(dt_overall,1/max_time_step);
+    return 1/max(dt_convection,1/max_time_step);
 }
 //#####################################################################
 // Function Iterative_Find_Interface
