@@ -56,7 +56,7 @@ private:
 public:
 
     ORIENTED_BOX<TV> Oriented_Bounding_Box() const
-    {MATRIX<T,3> axes(orientation.Rotation_Matrix()*radii);return ORIENTED_BOX<TV>(center-axes.Column_Sum(),(T)2*axes.Column(0),(T)2*axes.Column(1),(T)2*axes.Column(2));}
+    {MATRIX<T,3> axes(orientation.Rotation_Matrix()*radii);return ORIENTED_BOX<TV>(center-axes.Column_Sum(),(T)2*axes);}
 
     RANGE<TV> Bounding_Box() const
     {return Oriented_Bounding_Box().Axis_Aligned_Bounding_Box();}

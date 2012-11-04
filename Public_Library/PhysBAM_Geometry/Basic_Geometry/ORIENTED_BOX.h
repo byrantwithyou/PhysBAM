@@ -32,14 +32,6 @@ public:
         :corner(TV()),edges(MATRIX<T,d>::Identity_Matrix())
     {}
 
-    ORIENTED_BOX(const TV& corner_input,const TV& edge1_input,const TV& edge2_input,const TV& edge3_input)
-        :corner(corner_input),edges(edge1_input,edge2_input,edge3_input)
-    {STATIC_ASSERT(d==3);}
-
-    ORIENTED_BOX(const TV& corner_input,const TV& edge1_input,const TV& edge2_input)
-        :corner(corner_input),edges(edge1_input,edge2_input)
-    {STATIC_ASSERT(d==2);}
-
     ORIENTED_BOX(const TV& corner_input,const MATRIX<T,d>& edges_input)
         :corner(corner_input),edges(edges_input)
     {}

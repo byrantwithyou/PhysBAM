@@ -219,12 +219,6 @@ public:
     void Scale_About_Point(const TV& pt, const TV& factor)
     {TV length_over_two=factor*(T).5*(max_corner-min_corner);min_corner=pt-length_over_two;max_corner=pt+length_over_two;}
 
-    void Scale_About_Center(const T x_factor,const T y_factor)
-    {STATIC_ASSERT(d==2);Scale_About_Center(TV(x_factor,y_factor));}
-
-    void Scale_About_Center(const T x_factor,const T y_factor,const T z_factor)
-    {STATIC_ASSERT(d==3);Scale_About_Center(TV(x_factor,y_factor,z_factor));}
-
     RANGE<TV> operator+(const TV& shift) const
     {return RANGE<TV>(min_corner+shift,max_corner+shift);}
 
@@ -264,9 +258,6 @@ public:
 
     TV Clamp(const TV& location) const
     {return clamp(location,min_corner,max_corner);}
-
-    T Clamp(const T& location) const
-    {STATIC_ASSERT(d==1);return Clamp(TV(location)).x;}
 
     void Enlarge_By_Sign(const TV& v)
     {for(int i=0;i<d;i++) if(v(i)>0) max_corner(i)+=v(i);else min_corner(i)+=v(i);}

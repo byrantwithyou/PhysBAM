@@ -118,7 +118,7 @@ Bounding_Box() const
     TV edge1=(T)2*radius*plane1.normal.Unit_Orthogonal_Vector();
     TV edge2=TV::Cross_Product(plane1.normal,edge1);
     TV corner=plane1.x1-(T).5*(edge1+edge2);
-    ORIENTED_BOX<TV> oriented_box(corner,-height*plane1.normal,edge1,edge2); // TODO(jontg): ...
+    ORIENTED_BOX<TV> oriented_box(corner,MATRIX<T,3>(-height*plane1.normal,edge1,edge2)); // TODO(jontg): ...
     return oriented_box.Axis_Aligned_Bounding_Box();
 }
 //#####################################################################

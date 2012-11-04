@@ -166,7 +166,7 @@ Thickened_Oriented_Box(const T thickness_over_two) const
     // make norm and tangent direction of thickness_over_two length
     TV segment_vector=X.y-X.x,segment_tangent=segment_vector.Normalized()*thickness_over_two,segment_normal(-segment_tangent.y,segment_tangent.x);
     // Form box point and intersect
-    return ORIENTED_BOX<TV>(X.x-segment_tangent-segment_normal,segment_vector+segment_tangent*2,segment_normal*2);
+    return ORIENTED_BOX<TV>(X.x-segment_tangent-segment_normal,MATRIX<T,2>(segment_vector+segment_tangent*2,segment_normal*2));
 }
 //#####################################################################
 // Function Inside

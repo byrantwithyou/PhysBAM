@@ -35,7 +35,7 @@ Get_Oriented_Bounding_Box(T radius_x,T radius_yz,const TV& position,const TV& ma
     TV scaled_x_axis=radius_of_influence_x*major_axis;
     TV scaled_y_axis=orthogonal_vector*radius_of_influence_yz;
     TV scaled_z_axis=TV::Cross_Product(major_axis,orthogonal_vector).Normalized()*radius_of_influence_yz;
-    return ORIENTED_BOX<TV>(position-scaled_x_axis-scaled_y_axis-scaled_z_axis,(T)2*scaled_x_axis,(T)2*scaled_y_axis,(T)2*scaled_z_axis);
+    return ORIENTED_BOX<TV>(position-scaled_x_axis-scaled_y_axis-scaled_z_axis,MATRIX<T,TV::m>(scaled_x_axis,scaled_y_axis,scaled_z_axis)*2);
 }
 //#####################################################################
 // Function Get_Bounding_Box
