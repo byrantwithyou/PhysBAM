@@ -83,27 +83,29 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         RANGE<TV> triangle_bounding_box=enlarged_triangle.Bounding_Box();
         triangle_bounding_box.Change_Size(surface_thickness_over_two);
         if(!grid_domain.Lazy_Intersection(triangle_bounding_box)) continue;
-        TV_INT min_index=grid.Clamped_Index(triangle_bounding_box.Minimum_Corner()),max_index=grid.Clamped_Index_End_Minus_One(triangle_bounding_box.Maximum_Corner())+2;
-        for(int i=min_index.x;i<max_index.x;i++) for(int j=min_index.y;j<max_index.y;j++) for(int k=min_index.z;k<max_index.z;k++){
-            TV grid_position=grid.X(TV_INT(i,j,k)),weights,closest_point=triangle.Closest_Point(grid_position,weights);
+        RANGE<TV_INT> range(grid.Clamped_Index(triangle_bounding_box.Minimum_Corner()),grid.Clamped_Index_End_Minus_One(triangle_bounding_box.Maximum_Corner())+2);
+        for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+            TV grid_position=grid.X(it.index),weights,closest_point=triangle.Closest_Point(grid_position,weights);
             T distance_squared=(grid_position-closest_point).Magnitude_Squared();
-            if(phi(i,j,k)==FLT_MAX || distance_squared<sqr(phi(i,j,k))){
-                if(store_initialized_indices && phi(i,j,k)==FLT_MAX) initialized_indices.Append(TV_INT(i,j,k));
-                phi(i,j,k)=sqrt(distance_squared);
-                if(store_closest_triangle_index) closest_triangle_index(i,j,k)=t;
+            if(phi(it.index)==FLT_MAX || distance_squared<sqr(phi(it.index))){
+                if(store_initialized_indices && phi(it.index)==FLT_MAX) initialized_indices.Append(it.index);
+                phi(it.index)=sqrt(distance_squared);
+                if(store_closest_triangle_index) closest_triangle_index(it.index)=t;
                 if(compute_velocity){
                     int node1,node2,node3;triangulated_surface.mesh.elements(t).Get(node1,node2,node3);
-                    (*velocity)(i,j,k)=weights.x*triangulated_surface.particles.V(node1)+weights.y*triangulated_surface.particles.V(node2)+weights.z*triangulated_surface.particles.V(node3);}}}
+                    (*velocity)(it.index)=weights.x*triangulated_surface.particles.V(node1)+weights.y*triangulated_surface.particles.V(node2)+weights.z*triangulated_surface.particles.V(node3);}}}
         if(need_flood_fill){
-            for(int i=min_index.x+1;i<max_index.x;i++) for(int j=min_index.y;j<max_index.y;j++) for(int k=min_index.z;k<max_index.z;k++)
-                if(!edge_is_blocked.Component(0)(i,j,k)) edge_is_blocked.Component(0)(i,j,k)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i-1,j,k))),enlarged_triangle,surface_thickness_over_two);
-            for(int i=min_index.x;i<max_index.x;i++) for(int j=min_index.y+1;j<max_index.y;j++) for(int k=min_index.z;k<max_index.z;k++)
-                if(!edge_is_blocked.Component(1)(i,j,k)) edge_is_blocked.Component(1)(i,j,k)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j-1,k))),enlarged_triangle,surface_thickness_over_two);
-            for(int i=min_index.x;i<max_index.x;i++) for(int j=min_index.y;j<max_index.y;j++) for(int k=min_index.z+1;k<max_index.z;k++)
-                if(!edge_is_blocked.Component(2)(i,j,k)) edge_is_blocked.Component(2)(i,j,k)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j,k-1))),enlarged_triangle,surface_thickness_over_two);}}
+            for(int d=0;d<TV::m;d++){
+                RANGE<TV_INT> range_d(range);
+                range_d.min_corner(d)++;
+                for(RANGE_ITERATOR<TV::m> it(range_d);it.Valid();it.Next())
+                    if(!edge_is_blocked.Component(d)(it.index)){
+                        TV_INT ind(it.index);
+                        ind(d)--;
+                        edge_is_blocked.Component(d)(it.index)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(it.index),grid.X(ind)),enlarged_triangle,surface_thickness_over_two);}}}}
 
     if((compute_signed_distance_function || compute_unsigned_distance_function) && use_fmm && fmm_stopping_distance)
-        for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) phi(i,j,k)=min(phi(i,j,k),fmm_stopping_distance);
+        for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) phi(it.index)=min(phi(it.index),fmm_stopping_distance);
     else if(compute_heaviside_function) phi.Fill(grid.dX.Max());
 
     if(write_debug_data){
@@ -119,29 +121,28 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         /*if(write_debug_data){FILE_UTILITIES::Write_To_File<T>("edge_is_blocked.debug",edge_is_blocked.Component(0),edge_is_blocked.Component(1),edge_is_blocked.Component(2));}*/
         if(verbose) LOG::Time("Computing sign using orthogonal vote");
         ARRAY<bool,TV_INT> is_inside(grid.Domain_Indices());
-        for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
-            if(closest_triangle_index(i,j,k)) is_inside(i,j,k)=triangulated_surface.Inside_Relative_To_Triangle(grid.X(TV_INT(i,j,k)),closest_triangle_index(i,j,k),surface_thickness_over_two);}
+        for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()){
+            if(closest_triangle_index(it.index)) is_inside(it.index)=triangulated_surface.Inside_Relative_To_Triangle(grid.X(it.index),closest_triangle_index(it.index),surface_thickness_over_two);}
         ARRAY<char,TV_INT> vote(grid.Domain_Indices());
         for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) Process_Segment(grid.counts.x,edge_is_blocked.Component(0),is_inside,TV_INT(1,j,k),1,vote);
         for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++) Process_Segment(grid.counts.y,edge_is_blocked.Component(1),is_inside,TV_INT(i,1,k),2,vote);
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) Process_Segment(grid.counts.z,edge_is_blocked.Component(2),is_inside,TV_INT(i,j,1),3,vote);
         is_inside.Clean_Memory();
-        for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(vote(i,j,k)>=3) phi(i,j,k)*=-1;
+        for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) if(vote(it.index)>=3) phi(it.index)*=-1;
 
         if(keep_only_largest_inside_region){
             ARRAY<int,TV_INT> colors(grid.Domain_Indices());colors.Fill(-1);ARRAY<bool,FACE_INDEX<TV::m> > null_edge_is_blocked(grid,1);
-            for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(phi(i,j,k)>0) colors(i,j,k)=-2; // make outside regions uncolorable
+            for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) if(phi(it.index)>0) colors(it.index)=-2; // make outside regions uncolorable
             FLOOD_FILL<TV::m> flood_fill;flood_fill.Optimize_Fill_For_Single_Cell_Regions(true);
             int number_of_colors=flood_fill.Flood_Fill(colors,null_edge_is_blocked);
             // TODO: put this back if you need it
             //if(write_debug_data){FILE_UTILITIES::Write_To_File<T>("colors.debug",colors);}
             ARRAY<int> region_size(number_of_colors);
-            for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(colors(i,j,k)>0) region_size(colors(i,j,k))++;
+            for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) if(colors(it.index)>0) region_size(colors(it.index))++;
             int max_region_size=region_size.Max();
             if(verbose) LOG::cout<<"Keeping only largest inside region (max region size = "<<max_region_size<<")... "<<std::flush;
             // flip smaller regions back to positive sign
-            for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(colors(i,j,k)>0 && region_size(colors(i,j,k))<max_region_size) phi(i,j,k)*=-1;}
-    }
+            for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) if(colors(it.index)>0 && region_size(colors(it.index))<max_region_size) phi(it.index)*=-1;}}
     else if(need_flood_fill){ // Need flood fill to determine sign (inside/outside)
         if(verbose) LOG::Time("Flood Fill");
         ARRAY<int,TV_INT> colors(grid.Domain_Indices());colors.Fill(-1);
@@ -186,7 +187,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
                     closest_triangle_index(color_representatives(color)),surface_thickness_over_two);}}
         if(keep_only_largest_inside_region){
             ARRAY<int> region_size(number_of_colors);
-            for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(colors(i,j,k)>0 && color_is_inside(colors(i,j,k))) region_size(colors(i,j,k))++;
+            for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) if(colors(it.index)>0 && color_is_inside(colors(it.index))) region_size(colors(it.index))++;
             int max_region_size=region_size.Max();
             if(verbose) LOG::cout<<"Keeping only largest inside region (max region size = "<<max_region_size<<")... "<<std::flush;
             for(int i=0;i<number_of_colors;i++) if(color_is_inside(i) && region_size(i)<max_region_size) color_is_inside(i)=false;}
@@ -198,7 +199,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             if(num_corners_inside>4){
                 if(verbose) LOG::cout<<"Majority of corners are inside -- flipping sign!"<<std::endl;
                 for(int i=0;i<number_of_colors;i++) color_is_inside(i)=!color_is_inside(i);}}
-        for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(color_is_inside(colors(i,j,k))) phi(i,j,k)*=-1;}
+        for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) if(color_is_inside(colors(it.index))) phi(it.index)*=-1;}
 
     if(positive_boundary_band){
         RANGE<TV> clip(grid.X_plus_half(TV_INT()+positive_boundary_band),grid.X_plus_half(grid.counts-positive_boundary_band));
@@ -215,8 +216,8 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             for(int k=grid.counts.z-positive_boundary_band;k<grid.counts.z;k++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(k,2)-clip.max_corner.z);}}
 
     if(use_fmm && (compute_unsigned_distance_function || compute_signed_distance_function)){
-        for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) 
-            phi(i,j,k)=clamp(phi(i,j,k),-10*grid.min_dX,10*grid.min_dX); // clamp away from FLT_MAX to avoid floating point exceptions
+        for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) 
+            phi(it.index)=clamp(phi(it.index),-10*grid.min_dX,10*grid.min_dX); // clamp away from FLT_MAX to avoid floating point exceptions
         if(verbose) LOG::Time(STRING_UTILITIES::string_sprintf("Fast Marching (one sided band width=%f)",fmm_one_sided_band_width));
         GRID<TV> grid_copy=grid;LEVELSET<TV> levelset(grid_copy,phi);
         if(compute_unsigned_distance_function) levelset.Fast_Marching_Method(0,fmm_stopping_distance,&initialized_indices);

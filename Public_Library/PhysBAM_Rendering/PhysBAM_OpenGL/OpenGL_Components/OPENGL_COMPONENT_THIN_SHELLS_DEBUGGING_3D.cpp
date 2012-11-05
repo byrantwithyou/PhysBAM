@@ -132,8 +132,8 @@ Reinitialize(bool force)
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(directory+"/%d/density_valid_mask",frame);
             if (FILE_UTILITIES::File_Exists(tmp_filename)){
                 FILE_UTILITIES::Read_From_File<RW>(tmp_filename,density_valid_mask);
-                for(int i=density_valid_mask.domain.min_corner.x;i<density_valid_mask.domain.max_corner.x;i++) for(int j=density_valid_mask.domain.min_corner.y;j<density_valid_mask.domain.max_corner.y;j++) for(int k=density_valid_mask.domain.min_corner.z;k<density_valid_mask.domain.max_corner.z;k++)
-                    density_valid_mask(i,j,k)=!density_valid_mask(i,j,k); // negate
+                for(RANGE_ITERATOR<TV::m> it(density_valid_mask.domain);it.Valid();it.Next())
+                    density_valid_mask(it.index)=!density_valid_mask(it.index); // negate
                 opengl_density_valid_mask.Update();}
             else density_valid_mask.Clean_Memory();
         }

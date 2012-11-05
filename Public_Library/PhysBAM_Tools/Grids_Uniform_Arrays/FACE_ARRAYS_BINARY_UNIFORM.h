@@ -127,10 +127,6 @@ public:
     static void Put(const ARRAY& old_copy,ARRAY& new_copy)
     {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put(old_copy.Component(side,i),new_copy.Component(side,i));}
 
-    template<class T_GRID>
-    static void Put_Ghost(const T constant,ARRAY& x,const T_GRID& grid,const int ghost_cells)
-    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put_Ghost(constant,x.Component(side,i),grid,ghost_cells);}
-
     TV Max_Abs() const
     {TV maxabs_values;for(int i=0;i<dimension;i++) maxabs_values(i)=max(Component(1,i).Max_Abs(),Component(2,i).Max_Abs());return maxabs_values;}
 

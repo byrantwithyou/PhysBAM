@@ -134,6 +134,12 @@ Do_Color(const int i, const int j, const int k) const
     return color_maps(current_color_map)->Lookup(Pre_Map_Value(values(i,j,k)));
 }
 
+template<class T,class T2> OPENGL_COLOR OPENGL_SCALAR_FIELD_3D<T,T2>::
+Do_Color(const TV_INT& index) const
+{
+    return color_maps(current_color_map)->Lookup(Pre_Map_Value(values(index)));
+}
+
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Display(const int in_color) const
 {
@@ -192,9 +198,9 @@ Display_3D() const
                 OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
         else{
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
-            for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
-                for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-                VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
+            for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()){
+                for(int t=0;t<4;t++) OpenGL_Color(Do_Color(it.index).rgba,colors);
+                VECTOR<T,3> pos=grid.X(it.index);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);

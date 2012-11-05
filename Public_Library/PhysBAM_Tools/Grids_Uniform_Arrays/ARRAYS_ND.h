@@ -47,6 +47,15 @@ public:
         if(initialize_using_default_constructor) array.Fill(T()); // initialize array using default constructor
     }
 
+    ARRAY(const TV_INT& size_input,const bool initialize_using_default_constructor=true)
+        :BASE(RANGE<TV_INT>(TV_INT(),size_input))
+    {
+        assert(counts.Min()>=0);int size=counts.Product();
+        {ARRAY_VIEW<T> new_array(size,new T[size]);new_array.Exchange(array);} // allocate a new array
+        Calculate_Acceleration_Constants();
+        if(initialize_using_default_constructor) array.Fill(T()); // initialize array using default constructor
+    }
+
     ARRAY(const int m_start_input,const int m_end_input,const int n_start_input,const int n_end_input,const int mn_start_input,const int mn_end_input,
         const bool initialize_using_default_constructor=true)
         :BASE(RANGE<TV_INT>(TV_INT(m_start_input,n_start_input,mn_start_input),TV_INT(m_end_input,n_end_input,mn_end_input)))

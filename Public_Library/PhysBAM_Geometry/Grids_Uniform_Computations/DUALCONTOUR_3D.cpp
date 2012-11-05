@@ -46,18 +46,15 @@ Generate_Topology()
 template<class T> void DUALCONTOUR_3D<T>::
 Generate_Vertices()
 {
-    int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;
     int count=vertices.Sum();
     geometry.Resize(count);
     normals.Resize(count);
     levelset.Compute_Normals();
     int vertex=-1;
-    for(int i=0;i<m-1;i++)
-    for(int j=0;j<n-1;j++)
-    for(int ij=0;ij<mn-1;ij++)
-        if(vertices(i,j,ij)){ // generate vertices where needed
-            vertices(i,j,ij)=++vertex;
-            TV position=grid.Center(TV_INT(i,j,ij));
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),grid.counts-1));it.Valid();it.Next())
+        if(vertices(it.index)){ // generate vertices where needed
+            vertices(it.index)=++vertex;
+            TV position=grid.Center(it.index);
             TV normal=levelset.Normal(position);
             T phi=levelset.Phi(position);
             int iterations=0;
@@ -66,7 +63,7 @@ Generate_Vertices()
                 phi=levelset.Phi(position);
                 normal=levelset.Normal(position);}
             geometry(vertex)=position;normals(vertex)=normal;}
-        else vertices(i,j,ij)=-1;
+        else vertices(it.index)=-1;
 }
 //#####################################################################
 // Function Ensure_Vertices_In_Correct_Cells

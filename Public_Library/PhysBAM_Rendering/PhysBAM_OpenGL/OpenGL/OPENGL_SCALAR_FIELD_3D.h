@@ -52,6 +52,7 @@ public:
     void Toggle_Smooth_Slice_Texture();
     void Toggle_Color_Map();
     OPENGL_COLOR Do_Color(const int i,const int j,const int k) const;
+    OPENGL_COLOR Do_Color(const TV_INT& index) const;
 
 private:
     void Display_3D() const;

@@ -52,9 +52,9 @@ public:
         grid.Cell(boxes_input(k).x.Minimum_Corner(),domain.min_corner,0);
         grid.Cell(boxes_input(k).x.Maximum_Corner(),domain.max_corner,0);
         domain.max_corner=TV_INT::Componentwise_Min(domain.max_corner,grid.numbers_of_cells);
-        for(int i=domain.min_corner.x;i<domain.max_corner.x;i++)for(int j=domain.min_corner.y;j<domain.max_corner.y;j++)for(int ij=domain.min_corner.z;ij<domain.max_corner.z;ij++){
-            if(!cells(i,j,ij))cells(i,j,ij)=new ARRAY<DATA_T>;
-            cells(i,j,ij)->Append(boxes_input(k).y);}}}
+        for(RANGE_ITERATOR<TV::m> it(domain);it.Valid();it.Next()){
+            if(!cells(it.index))cells(it.index)=new ARRAY<DATA_T>;
+            cells(it.index)->Append(boxes_input(k).y);}}}
 
 //#####################################################################
 // Function Map_Intersection

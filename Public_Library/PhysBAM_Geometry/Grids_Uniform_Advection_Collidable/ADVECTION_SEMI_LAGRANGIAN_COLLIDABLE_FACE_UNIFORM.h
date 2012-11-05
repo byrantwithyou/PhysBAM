@@ -74,7 +74,8 @@ public:
                     Z_min->Component(axis)(face)=extrema.x;Z_max->Component(axis)(face)=extrema.y;}}}}
     T_FACE_ARRAYS_BOOL::Exchange(face_velocities_valid_mask,face_velocities_valid_mask_next);
     // ghost values should always be valid
-    for(int axis=0;axis<T_GRID::dimension;axis++) grid.Get_Face_Grid(axis).Put_Ghost(true,face_velocities_valid_mask.Component(axis),3);}
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
+        face_velocities_valid_mask(iterator.Full_Index())=true;}
 
     T Compute_Revalidation_Value(const int axis,const TV& from,const TV& to,const T& current_invalid_value,const T& default_value)
     {TV point;COLLISION_GEOMETRY_ID body_id;int aggregate_id;
@@ -93,7 +94,8 @@ public:
         ARRAYS_ND_BASE<bool,TV_INT>& valid_points=face_velocities_valid_mask.Component(arrays_axis);T_ARRAYS_BASE& values=face_values.Component(arrays_axis);
         
         bool done=false;
-        grid.Put_Ghost(false,valid_points,3); // don't average from boundaries
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
+            valid_points(iterator.index)=false; // don't average from boundaries
 
         while(!done){
             done=true;
@@ -121,9 +123,10 @@ public:
                 if(count){values(invalid_indices(k).x)=sum/(T)count;invalid_indices(k).y=true;done=false;}
                 else values(invalid_indices(k).x)=T();}
             if(!done) for(int k=invalid_indices.m-1;k>=0;k--) if(invalid_indices(k).y){valid_points(invalid_indices(k).x)=true;invalid_indices.Remove_Index_Lazy(k);}}
-        grid.Put_Ghost(true,valid_points,3);}} // set valid for future advection
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
+            valid_points(iterator.index)=true;}} // set valid for future advection
 
 //#####################################################################
-};
+    };
 }
 #endif

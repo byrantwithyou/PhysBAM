@@ -10,6 +10,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_FORWARD.h>
 #include <PhysBAM_Tools/Matrices/QUATERNION.h>
+#include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/COMPLEX.h>
 namespace PhysBAM{
 

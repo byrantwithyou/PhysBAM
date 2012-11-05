@@ -22,7 +22,7 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,con
         const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();
         if(!body_list.Swept_Occupied_Cell_Center(cell)){
             TV interpolation_point=iterator.Location()-dt*velocity_averaging.Face_To_Cell_Vector(grid,cell,face_velocities.Nested());
@@ -52,9 +52,11 @@ Average_To_Invalidated_Cells(const T_GRID& grid,const T2 default_value,ARRAY<T2,
 {// average values collision aware in Gauss-Jacobi fashion
     const ARRAY<VECTOR<bool,TV::m>,TV_INT>& cell_neighbors_visible=body_list.cell_neighbors_visible;
     bool done=false;ARRAY<PAIR<TV_INT,bool> > invalid_indices; // index and bool true if entry has been validated on iteration
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next())if(!cell_valid_points_current(iterator.Cell_Index()))
-        invalid_indices.Append(PAIR<TV_INT,bool>(iterator.Cell_Index(),false));
-    grid.Put_Ghost(false,cell_valid_points_current,3); // don't average from boundaries
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next())
+        if(!cell_valid_points_current(iterator.Cell_Index()))
+            invalid_indices.Append(PAIR<TV_INT,bool>(iterator.Cell_Index(),false));
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
+        cell_valid_points_current(iterator.index)=false;
 
     while(!done){done=true;
         for(int k=0;k<invalid_indices.m;k++){
@@ -69,7 +71,8 @@ Average_To_Invalidated_Cells(const T_GRID& grid,const T2 default_value,ARRAY<T2,
     // keep a copy of currently valid cells (used for phi so we can revalidate the remaining cells again after collision aware fast marching)
     // but important to initialize ghost cells to true since currently cell_valid_points_current has them set to false
     cell_valid_points_next=cell_valid_points_current;
-    grid.Put_Ghost(true,cell_valid_points_next,3);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
+        cell_valid_points_next(iterator.index)=true;
 
     // average values collision aware in Gauss-Jacobi fashion (here we replace non-visible values with special values defined by Compute_Revalidation_Value())
     done=false;
@@ -86,7 +89,8 @@ Average_To_Invalidated_Cells(const T_GRID& grid,const T2 default_value,ARRAY<T2,
             if(count){values(invalid_indices(k).x)=sum/(T)count;invalid_indices(k).y=true;done=false;}
             else values(invalid_indices(k).x)=default_value;}
         if(!done) for(int k=invalid_indices.m-1;k>=0;k--) if(invalid_indices(k).y){cell_valid_points_current(invalid_indices(k).x)=true;invalid_indices.Remove_Index_Lazy(k);}}
-    grid.Put_Ghost(true,cell_valid_points_current,3); // set valid for future advection
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
+        cell_valid_points_current(iterator.index)=true;
 }
 template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<float,1> >,float,FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<VECTOR<float,1> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,1> > > > >;
 template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<float,2> >,float,FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<VECTOR<float,2> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,2> > > > >;

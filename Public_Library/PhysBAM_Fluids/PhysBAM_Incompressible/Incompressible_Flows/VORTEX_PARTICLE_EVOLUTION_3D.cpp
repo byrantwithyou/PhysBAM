@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Computations/VORTICITY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
@@ -38,21 +39,21 @@ Set_Radius(const T radius_input)
 // Function Compute_Body_Force
 //#####################################################################
 template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
-Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& force,const T dt,const T time)
+Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& force,const T dt,const T time)
 {
-    ARRAY<T,VECTOR<int,3> > grid_vorticity_magnitude(grid.Domain_Indices(2),false);
+    ARRAY<T,TV_INT> grid_vorticity_magnitude(grid.Domain_Indices(2),false);
     VORTICITY_UNIFORM<TV>::Vorticity(grid,FACE_LOOKUP_UNIFORM<GRID<TV> >(face_velocities_ghost),grid_vorticity,grid_vorticity_magnitude);
 
     if(apply_individual_particle_forces){
         // compute missing vorticity per particle
-        VORTICITY_PARTICLES<VECTOR<T,3> > missing_vorticity_particles;missing_vorticity_particles.Add_Elements(vorticity_particles.Size());
-        LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,VECTOR<T,3> > vorticity_interpolation;
+        VORTICITY_PARTICLES<TV> missing_vorticity_particles;missing_vorticity_particles.Add_Elements(vorticity_particles.Size());
+        LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> vorticity_interpolation;
 
         for(int p=0;p<vorticity_particles.Size();p++){
             // find missing vorticity
-            VECTOR<T,3> local_grid_vorticity=vorticity_interpolation.Clamped_To_Array(grid,grid_vorticity,vorticity_particles.X(p));
-            VECTOR<T,3> missing_vorticity=vorticity_particles.vorticity(p)-local_grid_vorticity;
-            VECTOR<T,3> sign_check=missing_vorticity*vorticity_particles.vorticity(p);
+            TV local_grid_vorticity=vorticity_interpolation.Clamped_To_Array(grid,grid_vorticity,vorticity_particles.X(p));
+            TV missing_vorticity=vorticity_particles.vorticity(p)-local_grid_vorticity;
+            TV sign_check=missing_vorticity*vorticity_particles.vorticity(p);
             for(int a=0;a<3;a++) if(sign_check[a]<0) missing_vorticity[a]=0;
             missing_vorticity_particles.X(p)=vorticity_particles.X(p);
             missing_vorticity_particles.vorticity(p)=missing_vorticity;
@@ -66,42 +67,45 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<VECTO
         T small_number=(T)1e-4*grid.min_dX;
         for(int p=0;p<missing_vorticity_particles.Size();p++){
             T radius=missing_vorticity_particles.radius(p);
-            VECTOR<int,3> box_radius((int)(radius/grid.dX.x)+1,(int)(radius/grid.dX.y)+1,(int)(radius/grid.dX.z)+1);
-            VECTOR<int,3> index=grid.Clamped_Index(missing_vorticity_particles.X(p));
-            VECTOR<int,3> lower=clamp_min(index-box_radius,VECTOR<int,3>(0,0,0)),upper=clamp_max(index+box_radius,grid.counts);
-            for(int i=lower.x;i<upper.x;i++) for(int j=lower.y;j<upper.y;j++) for(int ij=lower.z;ij<upper.z;ij++){
-                VECTOR<T,3> X_minus_Xp=grid.X(TV_INT(i,j,ij))-missing_vorticity_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
-                if(distance_squared>small_number&&distance_squared<=sqr(radius)) {
-//                    force(i,j,ij)-=(T)(force_scaling*Gaussian_Kernel(distance_squared)/sqrt(distance_squared))*VECTOR<T,3>::Cross_Product(X_minus_Xp,missing_vorticity_particles.vorticity(p));}}}
+            TV_INT box_radius((int)(radius/grid.dX.x)+1,(int)(radius/grid.dX.y)+1,(int)(radius/grid.dX.z)+1);
+            TV_INT index=grid.Clamped_Index(missing_vorticity_particles.X(p));
+            RANGE<TV_INT> range(clamp_min(index-box_radius,TV_INT()),clamp_max(index+box_radius,grid.counts));
+            for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+                TV X_minus_Xp=grid.X(it.index)-missing_vorticity_particles.X(p);
+                T distance_squared=X_minus_Xp.Magnitude_Squared();
+                if(distance_squared>small_number&&distance_squared<=sqr(radius)){
+//                    force(it.index)-=(T)(force_scaling*Gaussian_Kernel(distance_squared)/sqrt(distance_squared))*TV::Cross_Product(X_minus_Xp,missing_vorticity_particles.vorticity(p));}}}
                     T distance=sqrt(distance_squared);
-                    force(i,j,ij)-=(T)(force_scaling*Gaussian_Kernel(sqr(distance/radius))/distance)*VECTOR<T,3>::Cross_Product(X_minus_Xp,missing_vorticity_particles.vorticity(p));}}}}
+                    force(it.index)-=(T)(force_scaling*Gaussian_Kernel(sqr(distance/radius))/distance)*TV::Cross_Product(X_minus_Xp,missing_vorticity_particles.vorticity(p));}}}}
     else{
         if(mpi_grid) PHYSBAM_NOT_IMPLEMENTED(); // this has not been mpi'd yet
-        ARRAY<T,VECTOR<int,3> > grid_vorticity_particles_magnitude(grid.Domain_Indices(2),false);
+        ARRAY<T,TV_INT> grid_vorticity_particles_magnitude(grid.Domain_Indices(2),false);
     
         // form grid vorticity from vortex particles
         scattered_interpolation.Transfer_To_Grid(vorticity_particles.X,vorticity_particles.vorticity,grid,grid_vorticity_particles);
-        if(remove_grid_vorticity_from_particle_vorticity) for(int i=0;i<grid.counts.x+1;i++) for(int j=0;j<grid.counts.y+1;j++) for(int ij=0;ij<grid.counts.z+1;ij++) 
-            grid_vorticity_particles(i,j,ij)-=grid_vorticity(i,j,ij);
+        if(remove_grid_vorticity_from_particle_vorticity)
+            for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+                grid_vorticity_particles(it.index)-=grid_vorticity(it.index);
     
         // find vorticity magnitudes
-        for(int i=grid_vorticity.domain.min_corner.x;i<grid_vorticity.domain.max_corner.x;i++)for(int j=grid_vorticity.domain.min_corner.y;j<grid_vorticity.domain.max_corner.y;j++)for(int ij=grid_vorticity.domain.min_corner.z;ij<grid_vorticity.domain.max_corner.z;ij++)
-            grid_vorticity_magnitude(i,j,ij)=grid_vorticity(i,j,ij).Magnitude();
-        for(int i=0;i<grid.counts.x+1;i++) for(int j=0;j<grid.counts.y+1;j++) for(int ij=0;ij<grid.counts.z+1;ij++)
-            grid_vorticity_particles_magnitude(i,j,ij)=grid_vorticity_particles(i,j,ij).Magnitude();
+        for(RANGE_ITERATOR<TV::m> it(grid_vorticity.domain);it.Valid();it.Next())
+            grid_vorticity_magnitude(it.index)=grid_vorticity(it.index).Magnitude();
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+            grid_vorticity_particles_magnitude(it.index)=grid_vorticity_particles(it.index).Magnitude();
     
         // compute confinement force
-        T one_over_two_dx=1/(2*grid.dX.x),one_over_two_dy=1/(2*grid.dX.y),one_over_two_dz=1/(2*grid.dX.z);
-        for(int i=force.domain.min_corner.x;i<force.domain.max_corner.x;i++) for(int j=force.domain.min_corner.y;j<force.domain.max_corner.y;j++) for(int ij=force.domain.min_corner.z;ij<force.domain.max_corner.z;ij++){
-            VECTOR<T,3> vortex_normal_vector((grid_vorticity_magnitude(i+1,j,ij)-grid_vorticity_magnitude(i-1,j,ij))*one_over_two_dx,
-                                              (grid_vorticity_magnitude(i,j+1,ij)-grid_vorticity_magnitude(i,j-1,ij))*one_over_two_dy,
-                                              (grid_vorticity_magnitude(i,j,ij+1)-grid_vorticity_magnitude(i,j,ij-1))*one_over_two_dz);
-            VECTOR<T,3> particle_vortex_normal_vector((grid_vorticity_particles_magnitude(i+1,j,ij)-grid_vorticity_particles_magnitude(i-1,j,ij))*one_over_two_dx,
-                                                       (grid_vorticity_particles_magnitude(i,j+1,ij)-grid_vorticity_particles_magnitude(i,j-1,ij))*one_over_two_dy,
-                                                       (grid_vorticity_particles_magnitude(i,j,ij+1)-grid_vorticity_particles_magnitude(i,j,ij-1))*one_over_two_dz);
-            vortex_normal_vector.Normalize();particle_vortex_normal_vector.Normalize();
-            force(i,j,ij)=grid_confinement_parameter*VECTOR<T,3>::Cross_Product(vortex_normal_vector,grid_vorticity(i,j,ij))
-                        +particle_confinement_parameter*VECTOR<T,3>::Cross_Product(particle_vortex_normal_vector,grid_vorticity_particles(i,j,ij));}}
+        for(RANGE_ITERATOR<TV::m> it(force.domain);it.Valid();it.Next()){
+            TV vortex_normal_vector,particle_vortex_normal_vector;
+            for(int d=0;d<TV::m;d++){
+                TV_INT a(it.index),b(it.index);
+                a(d)++;
+                b(d)--;
+                vortex_normal_vector(d)=(grid_vorticity_magnitude(a)-grid_vorticity_magnitude(b))*(T).5*grid.one_over_dX(d);
+                particle_vortex_normal_vector(d)=(grid_vorticity_particles_magnitude(a)-grid_vorticity_particles_magnitude(b))*(T).5*grid.one_over_dX(d);}
+            vortex_normal_vector.Normalize();
+            particle_vortex_normal_vector.Normalize();
+            force(it.index)=grid_confinement_parameter*TV::Cross_Product(vortex_normal_vector,grid_vorticity(it.index))
+                        +particle_confinement_parameter*TV::Cross_Product(particle_vortex_normal_vector,grid_vorticity_particles(it.index));}}
 }
 //#####################################################################
 // Function Compute_Body_Force
@@ -109,7 +113,7 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<VECTO
 template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
 Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
 {
-    ARRAY<VECTOR<T,3> ,VECTOR<int,3> > cell_force(grid.Domain_Indices(1),false);
+    ARRAY<TV,TV_INT> cell_force(grid.Domain_Indices(1),false);
     Compute_Body_Force(face_velocities_ghost,cell_force,dt,time);
     for(T_FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
         force.Component(axis)(iterator.Face_Index())+=(T).5*(cell_force(iterator.First_Cell_Index())[axis]+cell_force(iterator.Second_Cell_Index())[axis]);}
@@ -122,14 +126,15 @@ Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T 
 {
     LOG::Time("Advancing vorticity particles");
     
-    ARRAY<VECTOR<T,3> ,VECTOR<int,3> > two_times_V_ghost(grid.Domain_Indices(2));
-    for(int i=-1;i<grid.counts.x+2;i++) for(int j=-1;j<grid.counts.y+2;j++) for(int ij=-1;ij<grid.counts.z+2;ij++){
-        two_times_V_ghost(i,j,ij).x=face_velocities_ghost.Component(0)(i,j,ij)+face_velocities_ghost.Component(0)(i+1,j,ij);
-        two_times_V_ghost(i,j,ij).y=face_velocities_ghost.Component(1)(i,j,ij)+face_velocities_ghost.Component(1)(i,j+1,ij);
-        two_times_V_ghost(i,j,ij).z=face_velocities_ghost.Component(2)(i,j,ij)+face_velocities_ghost.Component(2)(i,j,ij+1);}
-    
+    ARRAY<TV,TV_INT> two_times_V_ghost(grid.Domain_Indices(2));
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,2);it.Valid();it.Next())
+        for(int d=0;d<TV::m;d++){
+            TV_INT next(it.index);
+            next(d)++;
+            two_times_V_ghost(it.index)(d)=face_velocities_ghost.Component(d)(it.index)+face_velocities_ghost.Component(d)(next);}
+
     // vortex stretching/tilting term  - omega dot grad V
-    ARRAY<MATRIX<T,3> ,VECTOR<int,3> > VX(grid.Domain_Indices(1),false);LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,MATRIX<T,3> > VX_interpolation;
+    ARRAY<MATRIX<T,3> ,TV_INT> VX(grid.Domain_Indices(1),false);LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,MATRIX<T,3> > VX_interpolation;
     T one_over_four_dx=1/(4*grid.dX.x),one_over_four_dy=1/(4*grid.dX.y),one_over_four_dz=1/(4*grid.dX.z);
     for(int i=0;i<grid.counts.x+1;i++) for(int j=0;j<grid.counts.y+1;j++) for(int ij=0;ij<grid.counts.z+1;ij++)
         VX(TV_INT(i,j,ij))=MATRIX<T,3>(one_over_four_dx*(two_times_V_ghost(i+1,j,ij)-two_times_V_ghost(i-1,j,ij)),
