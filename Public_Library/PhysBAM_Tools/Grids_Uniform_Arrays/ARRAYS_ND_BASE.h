@@ -248,15 +248,6 @@ public:
     bool Valid_Index(const TV_INT& index) const
     {return domain.Lazy_Inside_Half_Open(index);}
 
-    bool Valid_Index(const int i,const int j,const int ij) const
-    {STATIC_ASSERT(d==3);return domain.Lazy_Inside_Half_Open(TV_INT(i,j,ij));}
-
-    bool Valid_Index(const int i,const int j) const
-    {STATIC_ASSERT(d==2);return domain.Lazy_Inside_Half_Open(TV_INT(i,j));}
-
-    bool Valid_Index(const int i) const
-    {STATIC_ASSERT(d==1);return domain.Lazy_Inside_Half_Open(TV_INT(i));}
-
     int Standard_Index(const TV_INT& index) const
     {assert(Valid_Index(index));return Compute_Index(index-domain.min_corner);}
 
@@ -280,24 +271,6 @@ public:
 
     TV_INT Clamp_Interior_End_Minus_One(const TV_INT& i) const
     {return clamp(i,domain.min_corner+1,domain.max_corner-2);}
-
-    void Clamp(int& i,int& j,int& ij) const
-    {STATIC_ASSERT(d==3);TV_INT index=Clamp(TV_INT(i,j,ij));i=index.x;j=index.y;ij=index.z;}
-
-    void Clamp_End_Minus_One(int& i,int& j,int& ij) const
-    {STATIC_ASSERT(d==3);TV_INT index=Clamp_End_Minus_One(TV_INT(i,j,ij));i=index.x;j=index.y;ij=index.z;}
-
-    void Clamp_End_Minus_Two(int& i,int& j,int& ij) const
-    {STATIC_ASSERT(d==3);TV_INT index=Clamp_End_Minus_Two(TV_INT(i,j,ij));i=index.x;j=index.y;ij=index.z;}
-
-    void Clamp_End_Minus_Three(int& i,int& j,int& ij) const
-    {STATIC_ASSERT(d==3);TV_INT index=Clamp_End_Minus_Three(TV_INT(i,j,ij));i=index.x;j=index.y;ij=index.z;}
-
-    void Clamp_Interior(int& i,int& j,int& ij) const
-    {STATIC_ASSERT(d==3);TV_INT index=Clamp_Interior(TV_INT(i,j,ij));i=index.x;j=index.y;ij=index.z;}
-
-    void Clamp_Interior_End_Minus_One(int& i,int& j,int& ij) const
-    {STATIC_ASSERT(d==3);TV_INT index=Clamp_Interior_End_Minus_One(TV_INT(i,j,ij));i=index.x;j=index.y;ij=index.z;}
 
     template<class T2>
     static bool Equal_Dimensions(const ARRAYS_ND_BASE& a,const ARRAYS_ND_BASE<T2,VECTOR<int,d> >& b)
@@ -324,32 +297,11 @@ public:
     static void Shifted_Get(ARRAYS_ND_BASE& new_copy,const ARRAYS_ND_BASE& old_copy,const TV_INT& shift)
     {Shifted_Put(old_copy,new_copy,shift);}
 
-    static void Limited_Shifted_Get(ARRAYS_ND_BASE& new_copy,const ARRAYS_ND_BASE& old_copy,const VECTOR<int,3>& shift)
-    {STATIC_ASSERT(d==3);
-    RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
+    static void Limited_Shifted_Get(ARRAYS_ND_BASE& new_copy,const ARRAYS_ND_BASE& old_copy,const TV_INT& shift)
+    {RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
     RANGE<TV_INT> box(TV_INT::Componentwise_Max(new_domain.min_corner,old_domain.min_corner-shift),TV_INT::Componentwise_Min(new_domain.max_corner,old_domain.max_corner-shift));
-    TV_INT i;
-    for(i.x=box.min_corner.x;i.x<box.max_corner.x;i.x++)
-        for(i.y=box.min_corner.y;i.y<box.max_corner.y;i.y++)
-            for(i.z=box.min_corner.z;i.z<box.max_corner.z;i.z++)
-                new_copy(i)=old_copy(i+shift);}
-
-    static void Limited_Shifted_Get(ARRAYS_ND_BASE& new_copy,const ARRAYS_ND_BASE& old_copy,const VECTOR<int,2>& shift)
-    {STATIC_ASSERT(d==2);
-    RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
-    RANGE<TV_INT> box(TV_INT::Componentwise_Max(new_domain.min_corner,old_domain.min_corner-shift),TV_INT::Componentwise_Min(new_domain.max_corner,old_domain.max_corner-shift));
-    TV_INT i;
-    for(i.x=box.min_corner.x;i.x<box.max_corner.x;i.x++)
-        for(i.y=box.min_corner.y;i.y<box.max_corner.y;i.y++)
-            new_copy(i)=old_copy(i+shift);}
-
-    static void Limited_Shifted_Get(ARRAYS_ND_BASE& new_copy,const ARRAYS_ND_BASE& old_copy,const VECTOR<int,1>& shift)
-    {STATIC_ASSERT(d==1);
-    RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
-    RANGE<TV_INT> box(TV_INT::Componentwise_Max(new_domain.min_corner,old_domain.min_corner-shift),TV_INT::Componentwise_Min(new_domain.max_corner,old_domain.max_corner-shift));
-    TV_INT i;
-    for(i.x=box.min_corner.x;i.x<box.max_corner.x;i.x++)
-        new_copy(i)=old_copy(i+shift);}
+    for(RANGE_ITERATOR<TV_INT::m> it(box);it.Valid();it.Next())
+        new_copy(it.index)=old_copy(it.index+shift);}
 
     static void Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy)
     {if(&old_copy!=&new_copy) Put(ONE(),old_copy,new_copy,RANGE<TV_INT>::Intersect(old_copy.Domain_Indices(),new_copy.Domain_Indices()));}
@@ -357,32 +309,9 @@ public:
     void Put_With_Range(RANGE<TV_INT>& range,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy)
     {if(&old_copy!=&new_copy) Put(ONE(),old_copy,new_copy,range);}
 
-    static void Shifted_Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const VECTOR<int,3>& shift)
+    static void Shifted_Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const TV_INT& shift)
     {if(shift==TV_INT()) Put(old_copy,new_copy);
-    else{
-        TV_INT i;
-        RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
-        for(i.x=new_domain.min_corner.x;i.x<new_domain.max_corner.x;i.x++)
-            for(i.y=new_domain.min_corner.y;i.y<new_domain.max_corner.y;i.y++)
-                for(i.z=new_domain.min_corner.z;i.z<new_domain.max_corner.z;i.z++)
-                    new_copy(i)=old_copy(i+shift);}}
-
-    static void Shifted_Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const VECTOR<int,2>& shift)
-    {if(shift==TV_INT()) Put(old_copy,new_copy);
-    else{
-        TV_INT i;
-        RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
-        for(i.x=new_domain.min_corner.x;i.x<new_domain.max_corner.x;i.x++)
-            for(i.y=new_domain.min_corner.y;i.y<new_domain.max_corner.y;i.y++)
-                new_copy(i)=old_copy(i+shift);}}
-
-    static void Shifted_Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const VECTOR<int,1>& shift)
-    {if(shift==TV_INT()) Put(old_copy,new_copy);
-    else{
-        TV_INT i;
-        RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
-        for(i.x=new_domain.min_corner.x;i.x<new_domain.max_corner.x;i.x++)
-            new_copy(i)=old_copy(i+shift);}}
+    else for(RANGE_ITERATOR<TV_INT::m> it(new_copy.Domain_Indices());it.Valid();it.Next()) new_copy(it.index)=old_copy(it.index+shift);}
 
     template<class T2>
     static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy)
@@ -390,38 +319,12 @@ public:
 
 private:
     template<class T2>
-    static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<VECTOR<int,3> >& box)
+    static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<TV_INT>& box)
     {assert(old_copy.Domain_Indices().Contains(box));assert(new_copy.Domain_Indices().Contains(box));
-    TV_INT i;
-    for(i.x=box.min_corner.x;i.x<box.max_corner.x;i.x++)
-        for(i.y=box.min_corner.y;i.y<box.max_corner.y;i.y++)
-            for(i.z=box.min_corner.z;i.z<box.max_corner.z;i.z++)
-                new_copy(i)=constant*old_copy(i);}
-
-    template<class T2>
-    static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<VECTOR<int,2> >& box)
-    {assert(old_copy.Domain_Indices().Contains(box));assert(new_copy.Domain_Indices().Contains(box));
-    TV_INT i;
-    for(i.x=box.min_corner.x;i.x<box.max_corner.x;i.x++)
-        for(i.y=box.min_corner.y;i.y<box.max_corner.y;i.y++)
-            new_copy(i)=constant*old_copy(i);}
-
-    template<class T2>
-    static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<VECTOR<int,1> >& box)
-    {assert(old_copy.Domain_Indices().Contains(box));assert(new_copy.Domain_Indices().Contains(box));
-    TV_INT i;
-    for(i.x=box.min_corner.x;i.x<box.max_corner.x;i.x++)
-        new_copy(i)=constant*old_copy(i);}
+    for(RANGE_ITERATOR<TV_INT::m> it(box);it.Valid();it.Next()) new_copy(it.index)=constant*old_copy(it.index);}
 
     static void Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<TV_INT>& box)
     {Put(ONE(),old_copy,new_copy,box);}
-
-    template<class T2>
-    static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const int m_start,const int m_end,const int n_start,const int n_end,const int mn_start,const int mn_end)
-    {STATIC_ASSERT(d==3);Put(constant,old_copy,new_copy,RANGE<TV_INT>(m_start,m_end,n_start,n_end,mn_start,mn_end));}
-
-    static void Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const int m_start,const int m_end,const int n_start,const int n_end,const int mn_start,const int mn_end)
-    {STATIC_ASSERT(d==3);Put(old_copy,new_copy,RANGE<TV_INT>(m_start,m_end,n_start,n_end,mn_start,mn_end));}
 public:
     // note that these functions move the *contents* of the grid, not the grid itself, being careful about the order of grid traversal.
     void Move_Contents_By_Offset(const VECTOR<int,3>& offset)
