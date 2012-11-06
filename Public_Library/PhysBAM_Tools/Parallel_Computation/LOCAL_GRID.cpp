@@ -41,7 +41,7 @@ Initialize()
     TV X=grid.Domain().Minimum_Corner();
     TV_INT local_offset=grid.Closest_Node(X),global_offset=global_grid.Closest_Node(X);
     offset=global_offset-local_offset;
-    PHYSBAM_ASSERT((grid.Node(local_offset)-global_grid.Node(global_offset)).Magnitude()<(T).01*grid.Minimum_Edge_Length(),"mismatch between global and local grids");
+    PHYSBAM_ASSERT((grid.Node(local_offset)-global_grid.Node(global_offset)).Magnitude()<(T).01*grid.dX.Min(),"mismatch between global and local grids");
     // pretend there are neighbors on all sides for use in Find_Boundary_Regions
     mpi_grid.side_neighbor_ranks.Resize(T_GRID::number_of_neighbors_per_cell);
     mpi_grid.side_neighbor_ranks.Fill(1);

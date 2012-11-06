@@ -90,16 +90,16 @@ public:
     {T_IMPLICIT_OBJECT_ON_A_RAY implicit_object_on_a_ray(levelset,ray);
     if(implicit_object_on_a_ray(0)<=0){ray.t_max=0;return true;}
     if(implicit_object_on_a_ray(ray.t_max)>0) return false;
-    ITERATIVE_SOLVER<T> solver;solver.tolerance=(T).001*grid.Minimum_Edge_Length();
+    ITERATIVE_SOLVER<T> solver;solver.tolerance=(T).001*grid.dX.Min();
     ray.t_max=solver.Bisection_Secant_Root(implicit_object_on_a_ray,0,ray.t_max);
-    ray.t_max=max((T)0,ray.t_max-(T).01*grid.Minimum_Edge_Length()); // TODO: probably make this shift a parameter, or find an entirely different cleaner way
+    ray.t_max=max((T)0,ray.t_max-(T).01*grid.dX.Min()); // TODO: probably make this shift a parameter, or find an entirely different cleaner way
     return true;}
 
     bool Simplex_Intersection(RAY<TV>& ray) const PHYSBAM_OVERRIDE
     {T_IMPLICIT_OBJECT_ON_A_RAY implicit_object_on_a_ray(levelset,ray);
     if(implicit_object_on_a_ray(0)<=0){ray.t_max=0;return true;}
     if(implicit_object_on_a_ray(ray.t_max)>0) return false;
-    ITERATIVE_SOLVER<T> solver;solver.tolerance=(T).001*grid.Minimum_Edge_Length();
+    ITERATIVE_SOLVER<T> solver;solver.tolerance=(T).001*grid.dX.Min();
     ray.t_max=solver.Bisection_Secant_Root(implicit_object_on_a_ray,0,ray.t_max);
     return true;}
 

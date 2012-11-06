@@ -27,7 +27,7 @@ template<class T> void Calculate_Heaviside_Function(TRIANGULATED_SURFACE<T>& sur
     // ensure the phi array size matches the grid
     phi.Resize(grid.Domain_Indices(),false,false);
 
-    T epsilon=(T)1e-8*grid.min_dX;
+    T epsilon=(T)1e-8*grid.dX.Min();
     int total_cells=grid.counts.x*grid.counts.y*grid.counts.z,cells_done=0,progress=-1;
     for(RANGE_ITERATOR<3> it(grid.Domain_Indices());it.Valid();it.Next()){
         phi(it.index)=surface.Inside(grid.X(it.index),epsilon)?(T)-1:(T)1;

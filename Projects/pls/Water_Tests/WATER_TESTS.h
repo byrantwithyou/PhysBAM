@@ -110,7 +110,7 @@ public:
             //static SPHERE<TV> circle(center,(T).2);
             const TV &X=iterator.Location();
             //phi(iterator.Cell_Index())=min(circle.Signed_Distance(X),X.y-(T).412134);}
-            phi(iterator.Cell_Index())=X.y-(T)mac_grid.min_dX*5;}
+            phi(iterator.Cell_Index())=X.y-(T)mac_grid.dX.Min()*5;}
             //phi(iterator.Cell_Index())=X.y-(T).412134;}
     }
 

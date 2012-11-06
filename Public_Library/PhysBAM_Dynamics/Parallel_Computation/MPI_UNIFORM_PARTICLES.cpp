@@ -131,7 +131,7 @@ ISend_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,T_PARTICLES& particles,
     ARRAY<RANGE<TV> > neighbor_domains(T_GRID::number_of_one_ring_neighbors_per_cell);
     for(int n=0;n<neighbor_domains.m;n++){
         TV neighbor_direction=TV(T_GRID::One_Ring_Neighbor(TV_INT(),n));
-        neighbor_domains(n)=(domain+neighbor_direction*domain.Edge_Lengths()).Thickened((T).01*mpi_grid.local_grid.Minimum_Edge_Length());}
+        neighbor_domains(n)=(domain+neighbor_direction*domain.Edge_Lengths()).Thickened((T).01*mpi_grid.local_grid.dX.Min());}
     if(ghost_distance){
         domain.Change_Size(-ghost_distance);
         for(int n=0;n<neighbor_domains.m;n++)neighbor_domains(n).Change_Size(ghost_distance);}
@@ -272,7 +272,7 @@ Exchange_Overlapping_Block_Particles_Threaded(const THREADED_UNIFORM_GRID<T_GRID
         exchange_particles(n).Preallocate(100);
         for(NODE_ITERATOR iterator(threaded_grid.local_grid,send_regions(n));iterator.Valid();iterator.Next())if(particles(iterator.Node_Index())){
             T_PARTICLES* cell_particles=particles(iterator.Node_Index());
-            while(cell_particles){for(int i=0;i<cell_particles->Size();i++) if(!block_domain.Thickened(3*threaded_grid.local_grid.Minimum_Edge_Length()).Lazy_Inside(cell_particles->X(i))) 
+            while(cell_particles){for(int i=0;i<cell_particles->Size();i++) if(!block_domain.Thickened(3*threaded_grid.local_grid.dX.Min()).Lazy_Inside(cell_particles->X(i))) 
                 exchange_particles(n).Append(PAIR<T_PARTICLES*,int>(cell_particles,i));cell_particles=cell_particles->next;}} // TODO: delete the particle locally?
         if(!exchange_particles(n).m) continue;
         THREAD_PACKAGE pack((sizeof(int)+sizeof(T_PARTICLES*))*exchange_particles(n).m+sizeof(int));pack.send_tid=threaded_grid.tid;pack.recv_tid=threaded_grid.all_neighbor_ranks(n);
@@ -322,7 +322,7 @@ Exchange_Overlapping_Block_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,co
         exchange_particles(n).Preallocate(100);
         for(NODE_ITERATOR iterator(mpi_grid.local_grid,send_regions(n));iterator.Valid();iterator.Next())if(particles(iterator.Node_Index())){
             T_PARTICLES* cell_particles=particles(iterator.Node_Index());
-            while(cell_particles){for(int i=0;i<cell_particles->Size();i++) if(!block_domain.Thickened(3*mpi_grid.local_grid.Minimum_Edge_Length()).Lazy_Inside(cell_particles->X(i))) 
+            while(cell_particles){for(int i=0;i<cell_particles->Size();i++) if(!block_domain.Thickened(3*mpi_grid.local_grid.dX.Min()).Lazy_Inside(cell_particles->X(i))) 
                 exchange_particles(n).Append(PAIR<T_PARTICLES*,int>(cell_particles,i));cell_particles=cell_particles->next;}} // TODO: delete the particle locally?
         requests.Append(ISend_Particles(mpi_grid,exchange_particles(n),mpi_grid.all_neighbor_ranks(n),mpi_grid.all_neighbor_directions(n),tag,buffers(n)));}
     // probe and receive

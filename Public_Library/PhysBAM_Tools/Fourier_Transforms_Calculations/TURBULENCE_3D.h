@@ -54,7 +54,7 @@ public:
     Generate_Random_Turbulence(grid,u_new,v_new,w_new);}
    
     VECTOR<T,3> Turbulent_Velocity(const VECTOR<T,3>& X,const T fraction) const
-    {VECTOR<T,3> X_new=wrap(X,grid.Xmin(),grid.Xmax());
+    {VECTOR<T,3> X_new=wrap(X,grid.min_corner,grid.max_corner);
     T u1=interpolation.Clamped_To_Array(grid,u_old,X_new),u2=interpolation.Clamped_To_Array(grid,u_new,X_new),
        v1=interpolation.Clamped_To_Array(grid,v_old,X_new),v2=interpolation.Clamped_To_Array(grid,v_new,X_new),
        w1=interpolation.Clamped_To_Array(grid,w_old,X_new),w2=interpolation.Clamped_To_Array(grid,w_new,X_new);
@@ -65,19 +65,19 @@ public:
     {assert((unsigned)axis<3);switch(axis){case 0:return Turbulent_U_Velocity(X,fraction);case 1:return Turbulent_V_Velocity(X,fraction);default:return Turbulent_W_Velocity(X,fraction);}}
     
     T Turbulent_U_Velocity(const VECTOR<T,3>& X,const T fraction) const
-    {VECTOR<T,3> X_new=wrap(X,grid.Xmin(),grid.Xmax());
+    {VECTOR<T,3> X_new=wrap(X,grid.domain.min_corner,grid.domain.max_corner);
     T u1=interpolation.Clamped_To_Array(grid,u_old,X_new),u2=interpolation.Clamped_To_Array(grid,u_new,X_new);
     T one_minus_fraction=1-fraction;
     return one_minus_fraction*u1+fraction*u2;}
 
     T Turbulent_V_Velocity(const VECTOR<T,3>& X,const T fraction) const
-    {VECTOR<T,3> X_new=wrap(X,grid.Xmin(),grid.Xmax());
+    {VECTOR<T,3> X_new=wrap(X,grid.domain.min_corner,grid.domain.max_corner);
     T v1=interpolation.Clamped_To_Array(grid,v_old,X_new),v2=interpolation.Clamped_To_Array(grid,v_new,X_new);
     T one_minus_fraction=1-fraction;
     return one_minus_fraction*v1+fraction*v2;}
 
     T Turbulent_W_Velocity(const VECTOR<T,3>& X,const T fraction) const
-    {VECTOR<T,3> X_new=wrap(X,grid.Xmin(),grid.Xmax());
+    {VECTOR<T,3> X_new=wrap(X,grid.domain.min_corner,grid.domain.max_corner);
     T w1=interpolation.Clamped_To_Array(grid,w_old,X_new),w2=interpolation.Clamped_To_Array(grid,w_new,X_new);
     T one_minus_fraction=1-fraction;
     return one_minus_fraction*w1+fraction*w2;}

@@ -23,7 +23,7 @@ template<class T> void Calculate(SEGMENTED_CURVE_2D<T>& curve,const GRID<VECTOR<
 
     phi.Resize(0,grid.counts.x,0,grid.counts.y);
 
-    T epsilon=(T)1e-8*grid.min_dX;
+    T epsilon=(T)1e-8*grid.dX.Min();
     int total_cells=grid.counts.x*grid.counts.y,cells_done=0,progress=-1;
     for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
         phi(i,j)=curve.Calculate_Signed_Distance(grid.X(VECTOR<int,2>(i,j)),epsilon);

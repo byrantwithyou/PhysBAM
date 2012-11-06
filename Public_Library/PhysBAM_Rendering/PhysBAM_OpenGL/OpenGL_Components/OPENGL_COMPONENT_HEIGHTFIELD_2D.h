@@ -22,7 +22,7 @@ namespace PhysBAM
 template<class T,class RW=T>
 class OPENGL_COMPONENT_HEIGHTFIELD_2D : public OPENGL_COMPONENT
 {
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     OPENGL_COMPONENT_HEIGHTFIELD_2D(const GRID<TV> &grid, 
                                     const std::string& height_filename,

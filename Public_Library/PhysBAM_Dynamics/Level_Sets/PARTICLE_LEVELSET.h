@@ -56,7 +56,7 @@ public:
     virtual ~PARTICLE_LEVELSET();
 
     void Set_Band_Width(const T number_of_cells=6)
-    {half_band_width=number_of_cells*(T).5*levelset.grid.Minimum_Edge_Length();
+    {half_band_width=number_of_cells*(T).5*levelset.grid.dX.Min();
     levelset.Set_Band_Width(max((T)8,number_of_cells+2));}
 
     void Set_Number_Particles_Per_Cell(const int number,const int particle_pool_size=0)
@@ -100,7 +100,7 @@ public:
     max_minus_min_collision_distance_factor_over_max_short=(max_collision_distance_factor-min_collision_distance_factor)/USHRT_MAX;}
 
     T Particle_Collision_Distance(const unsigned short quantized_collision_distance)
-    {return (min_collision_distance_factor+(T)quantized_collision_distance*max_minus_min_collision_distance_factor_over_max_short)*levelset.grid.Minimum_Edge_Length();}
+    {return (min_collision_distance_factor+(T)quantized_collision_distance*max_minus_min_collision_distance_factor_over_max_short)*levelset.grid.dX.Min();}
 
     void Set_Velocity_Interpolation_Collidable(const T contour_value_input=0)
     {velocity_interpolation_collidable_contour_value=contour_value_input;}

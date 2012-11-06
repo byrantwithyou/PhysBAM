@@ -66,7 +66,7 @@ CFL() const
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*particle_levelset_evolution->particle_levelset.removed_negative_particles(block);
             for(int p=0;p<particles.Size();p++) max_particle_velocity=max(max_particle_velocity,particles.V(p).Max_Abs());}}
     else for(int i=0;i<sph_particles.Size();i++)max_particle_velocity=max(max_particle_velocity,sph_particles.V(i).Max_Abs());
-    if(max_particle_velocity) return 3*grid.Minimum_Edge_Length()/max_particle_velocity;
+    if(max_particle_velocity) return 3*grid.dX.Min()/max_particle_velocity;
     else return 1e8;
 }
 //#####################################################################
@@ -118,10 +118,10 @@ Make_Incompressible(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T tim
 template<class T_GRID> void SPH_EVOLUTION_UNIFORM<T_GRID>::
 Calculate_SPH_Constants()
 {
-    radius=particle_radius*grid.Minimum_Edge_Length();
-    radius_plus_half_dx_squared=sqr(radius+(T)root_three/(T)2*grid.Maximum_Edge_Length());
+    radius=particle_radius*grid.dX.Min();
+    radius_plus_half_dx_squared=sqr(radius+(T)root_three/(T)2*grid.dX.Max());
     one_over_radius_squared=1/sqr(radius);
-    radius_vector=(radius+grid.Minimum_Edge_Length())*TV::All_Ones_Vector();
+    radius_vector=(radius+grid.dX.Min())*TV::All_Ones_Vector();
     target_particles_per_cell=target_particles_per_unit_volume*grid.Cell_Size();
     target_minus_ballistic_particles_per_cell=(target_particles_per_unit_volume-ballistic_particles_per_unit_volume)*grid.Cell_Size();
     one_over_target_particles_per_cell=1/target_particles_per_cell;
@@ -295,7 +295,7 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
     if(attraction_strength){
         int skip_number=1+attraction_skip_number;
         LOG::Time(STRING_UTILITIES::string_sprintf("attracting particles with skip %d",skip_number));
-        T attraction_restlength=attraction_restlength_cells*grid.Minimum_Edge_Length();
+        T attraction_restlength=attraction_restlength_cells*grid.dX.Min();
         T halfway_between_restlength_and_radius=(T).5*(attraction_restlength+radius);
         const RANGE<TV>& domain=grid.domain;
         ARRAY<TV> forces(sph_particles.Size());
@@ -442,7 +442,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
         ARRAYS_UTILITIES<T_GRID,T>::Make_Ghost_Mask_From_Active_Mask(grid.Get_Regular_Grid_At_MAC_Positions(),converting_cells,converting_cells_neighborhood,2,1);
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();converting_cells(cell)=converting_cells(cell)||converting_cells_neighborhood(cell);}
         
-        T blending_particle_radius=(T).5*grid.Minimum_Edge_Length();
+        T blending_particle_radius=(T).5*grid.dX.Min();
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){ 
             TV_INT cell=iterator.Cell_Index();
             if(converting_cells(cell)){ // TODO: Use smooth density function to determine if a particle contributes to the levelset

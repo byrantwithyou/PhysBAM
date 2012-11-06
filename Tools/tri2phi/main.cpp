@@ -18,7 +18,7 @@ template<class T> GRID<VECTOR<T,3> > Make_Cube_Grid(const GRID<VECTOR<T,3> >& in
     RANGE<TV> input_box=input_grid.Domain();
 
     // Want to make voxels into cubes
-    T voxel_size=input_grid.Minimum_Edge_Length();
+    T voxel_size=input_grid.dX.Min();
     int number_of_cells_m,number_of_cells_n,number_of_cells_mn;
 
     TV box_size=input_box.Edge_Lengths();
@@ -132,7 +132,7 @@ template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_arg
     std::cout<<"Use octree: "<<use_octree<<", octree depth: "<<depth<<std::endl;
     std::cout<<"Adjusted to make cube voxels and added boundary cells ("<<boundary_cells<<")..."<<std::endl;
     std::cout<<"New number of nodes: m = "<<grid.counts.x<<", n = "<<grid.counts.y<<", mn = "<<grid.counts.z<<std::endl;
-    std::cout<<"Voxel size: "<<grid.Minimum_Edge_Length()<<std::endl;
+    std::cout<<"Voxel size: "<<grid.dX.Min()<<std::endl;
     if(opt_heaviside)
         std::cout<<"Compute heaviside function"<<std::endl;
     else
@@ -171,7 +171,7 @@ template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_arg
             ARRAY<T,VECTOR<int,3> > phi(grid.Domain_Indices());
             levelset_maker.Compute_Level_Set(*triangulated_surface,grid,phi);
             LEVELSET_IMPLICIT_OBJECT<TV> levelset_implicit_surface(grid,phi);
-            //phi+=(T)1*grid.Maximum_Edge_Length();
+            //phi+=(T)1*grid.dX.Max();
         FILE_UTILITIES::Write_To_File<RW>(output_filename,levelset_implicit_surface);}
 }
 

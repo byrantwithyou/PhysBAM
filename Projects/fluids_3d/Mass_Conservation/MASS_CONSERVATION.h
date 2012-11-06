@@ -248,7 +248,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     if(test_number==7)
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
-            if(iterator.Location().y>initial_water_level+grid.Minimum_Edge_Length()*2) face_velocities(axis,face)=source_velocity[axis];}
+            if(iterator.Location().y>initial_water_level+grid.dX.Min()*2) face_velocities(axis,face)=source_velocity[axis];}
     else if(test_number==8){
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             TV location=iterator.Location();

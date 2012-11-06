@@ -88,7 +88,7 @@ Update_Box()
 template<class TV> void LEVELSET_IMPLICIT_OBJECT<TV>::
 Update_Minimum_Cell_Size(const int maximum_depth)
 {
-    minimum_cell_size=levelset.grid.Minimum_Edge_Length();
+    minimum_cell_size=levelset.grid.dX.Min();
 }
 //#####################################################################
 // Function Minimum_Cell_Size_Within_Box
@@ -96,7 +96,7 @@ Update_Minimum_Cell_Size(const int maximum_depth)
 template<class TV> typename TV::SCALAR LEVELSET_IMPLICIT_OBJECT<TV>::
 Minimum_Cell_Size_Within_Box(const RANGE<TV>& box) const
 {
-    return levelset.grid.Minimum_Edge_Length();
+    return levelset.grid.dX.Min();
 }
 //#####################################################################
 // Function operator()

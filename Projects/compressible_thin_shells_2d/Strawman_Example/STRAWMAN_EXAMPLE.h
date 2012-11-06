@@ -185,7 +185,7 @@ void Initialize()
 
         collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
         collision_bodies_affecting_fluid.Rasterize_Objects();
-        collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.Minimum_Edge_Length(),5);
+        collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);
         collision_bodies_affecting_fluid.Compute_Grid_Visibility();
     }
 

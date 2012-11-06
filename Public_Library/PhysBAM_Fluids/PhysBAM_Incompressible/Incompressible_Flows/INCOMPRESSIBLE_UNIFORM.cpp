@@ -231,7 +231,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
                 if(surface_tension_coefficient){
                     T curvature=LEVELSET_UTILITIES<T>::Average(phi_1,(*levelset.curvature)(cell_1),phi_2,(*levelset.curvature)(cell_2));
                     kappa_cfl=max(kappa_cfl,abs(curvature*surface_tension_coefficient/projection.density));}}}
-        dt_surface_tension=sqrt(kappa_cfl)/grid.Minimum_Edge_Length();}
+        dt_surface_tension=sqrt(kappa_cfl)/grid.dX.Min();}
     T dt_viscosity=0;
     /*if(!inviscid && nonzero_viscosity){
         T norm_2_over_sqr_DX=2*Inverse(sqr_DX).Sum_Abs();

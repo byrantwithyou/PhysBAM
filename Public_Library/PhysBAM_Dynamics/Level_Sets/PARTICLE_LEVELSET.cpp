@@ -28,7 +28,7 @@ PARTICLE_LEVELSET(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input,const int number
     Set_Collision_Distance_Factors();
     Set_Velocity_Interpolation_Collidable();
 
-    Set_Minimum_Particle_Radius((T).1*levelset.grid.Minimum_Edge_Length());Set_Maximum_Particle_Radius((T).5*levelset.grid.Minimum_Edge_Length());
+    Set_Minimum_Particle_Radius((T).1*levelset.grid.dX.Min());Set_Maximum_Particle_Radius((T).5*levelset.grid.dX.Min());
     Set_Band_Width();
     Use_Removed_Positive_Particles(false);
     Use_Removed_Negative_Particles(false);
@@ -55,9 +55,9 @@ Initialize_Particle_Levelset_Grid_Values()
     negative_particles.Resize(levelset.grid.Block_Indices(number_of_ghost_cells));
     Use_Removed_Positive_Particles(use_removed_positive_particles);
     Use_Removed_Negative_Particles(use_removed_negative_particles);
-    Set_Minimum_Particle_Radius((T).1*levelset.grid.Minimum_Edge_Length());
-    Set_Maximum_Particle_Radius((T).5*levelset.grid.Minimum_Edge_Length());
-    if(half_band_width && levelset.grid.Minimum_Edge_Length()) Set_Band_Width(half_band_width/((T).5*levelset.grid.Minimum_Edge_Length()));
+    Set_Minimum_Particle_Radius((T).1*levelset.grid.dX.Min());
+    Set_Maximum_Particle_Radius((T).5*levelset.grid.dX.Min());
+    if(half_band_width && levelset.grid.dX.Min()) Set_Band_Width(half_band_width/((T).5*levelset.grid.dX.Min()));
     else Set_Band_Width();
     levelset.Initialize_Levelset_Grid_Values();
 }

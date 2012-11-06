@@ -138,7 +138,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
         RANGE<TV> seed_box(TV((T)0.7,0),TV(1,1));
         number_of_particles=(int)(seed_box.Size()*(T)fluids_parameters.sph_evolution->target_particles_per_unit_volume);
         while(particles_added<number_of_particles){
-            TV X=random.Get_Uniform_Vector(grid.Xmin(),grid.Xmax());
+            TV X=random.Get_Uniform_Vector(grid.domain.min_corner,grid.domain.max_corner);
             T phi=seed_box.Signed_Distance(X);
             if(phi<=0){
                 particles_added++;
@@ -149,11 +149,11 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
         int left_particles_number=(int)(one_third*number_of_particles),right_particles_number=(int)(two_thirds*number_of_particles);
         fluids_parameters.sph_evolution->target_particles_per_unit_volume=number_of_particles*(T).5;
         for(int i=0;i<left_particles_number;i++){
-            TV X=random.Get_Uniform_Vector(grid.Xmin(),TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.max_corner.y));
+            TV X=random.Get_Uniform_Vector(grid.domain.min_corner,TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.max_corner.y));
             int id=sph_particles.Add_Element();
             sph_particles.X(id)=X;}
         for(int i=0;i<right_particles_number;i++){
-            TV X=random.Get_Uniform_Vector(TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.min_corner.y),grid.Xmax());
+            TV X=random.Get_Uniform_Vector(TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.min_corner.y),grid.domain.max_corner);
             int id=sph_particles.Add_Element();
             sph_particles.X(id)=X;}}
     else if(test_number==3){
@@ -163,7 +163,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
         // assume they don't overlap to compute total area
         number_of_particles=(int)((seed_box.Size()+seed_sphere.Size())*(T)fluids_parameters.sph_evolution->target_particles_per_unit_volume);
         while(particles_added<number_of_particles){
-            TV X=random.Get_Uniform_Vector(grid.Xmin(),grid.Xmax());
+            TV X=random.Get_Uniform_Vector(grid.domain.min_corner,grid.domain.max_corner);
             T phi=min(seed_sphere.Signed_Distance(X),seed_box.Signed_Distance(X));
             if(phi<=0){
                 particles_added++;
@@ -175,7 +175,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
         number_of_particles=(int)(initial_seed_box.Size()*(T)fluids_parameters.sph_evolution->target_particles_per_unit_volume);
         int particles_added=0;
         while(particles_added<number_of_particles){
-            TV X=random.Get_Uniform_Vector(grid.Xmin(),grid.Xmax());
+            TV X=random.Get_Uniform_Vector(grid.domain.min_corner,grid.domain.max_corner);
             T phi=initial_seed_box.Signed_Distance(X);
             if(phi<=0){
                 particles_added++;

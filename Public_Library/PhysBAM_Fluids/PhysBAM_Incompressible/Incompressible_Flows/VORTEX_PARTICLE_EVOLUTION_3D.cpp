@@ -64,7 +64,7 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV
             if(vorticity_particles.Size()>=1) max_radius=vorticity_particles.radius.Max();
             Exchange_Boundary_Particles_Flat(*mpi_grid,missing_vorticity_particles,max_radius);}
 
-        T small_number=(T)1e-4*grid.min_dX;
+        T small_number=(T)1e-4*grid.dX.Min();
         for(int p=0;p<missing_vorticity_particles.Size();p++){
             T radius=missing_vorticity_particles.radius(p);
             TV_INT box_radius((int)(radius/grid.dX.x)+1,(int)(radius/grid.dX.y)+1,(int)(radius/grid.dX.z)+1);

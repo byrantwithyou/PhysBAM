@@ -364,7 +364,7 @@ Update_Np1_Collision_Data(const T dt)
 {
     collision_bodies_affecting_fluid->Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE);
     collision_bodies_affecting_fluid->Rasterize_Objects(); // non-swept
-    collision_bodies_affecting_fluid->Compute_Occupied_Blocks(false,(T)2*euler.grid.Minimum_Edge_Length(),5);  // static occupied blocks
+    collision_bodies_affecting_fluid->Compute_Occupied_Blocks(false,(T)2*euler.grid.dX.Min(),5);  // static occupied blocks
 
     cut_cells_n.Delete_Pointers_And_Clean_Memory();cut_cells_n.Resize(euler.grid.Domain_Indices(1)); // TODO(jontg): Swap instead of Deleting, Resizing and Putting
     T_ARRAYS_CUT_CELLS::Put(cut_cells_np1,cut_cells_n);
@@ -410,7 +410,7 @@ Compute_Intermediate_Solid_Position_Data(const T dt)
     collision_bodies_affecting_fluid->Average_States(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_SAVED_NEW_STATE,COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE, (T).5);
     collision_bodies_affecting_fluid->Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE);
     collision_bodies_affecting_fluid->Rasterize_Objects(); // non-swept
-    collision_bodies_affecting_fluid->Compute_Occupied_Blocks(false,(T)2*euler.grid.Minimum_Edge_Length(),5);  // static occupied blocks
+    collision_bodies_affecting_fluid->Compute_Occupied_Blocks(false,(T)2*euler.grid.dX.Min(),5);  // static occupied blocks
 
     cut_cells_n_p_half.Delete_Pointers_And_Clean_Memory(); cut_cells_n_p_half.Resize(euler.grid.Domain_Indices(1));
     CUT_CELL_COMPUTATIONS::Compute_Cut_Geometries(euler.grid,1,*collision_bodies_affecting_fluid,cut_cells_n_p_half);

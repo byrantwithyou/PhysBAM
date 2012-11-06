@@ -98,7 +98,7 @@ public:
 
     // TODO: these are not the typical parameters to Inside functions
     bool Inside(const TV& X,const T thickness_multiplier=-(T)1e-3) const
-    {return Bounding_Box().Inside(X,thickness_multiplier*grid.Minimum_Edge_Length());}
+    {return Bounding_Box().Inside(X,thickness_multiplier*grid.dX.Min());}
 
     bool Lazy_Inside(const TV& X) const
     {return Bounding_Box().Lazy_Inside(X);}

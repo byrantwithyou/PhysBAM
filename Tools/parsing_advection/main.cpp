@@ -25,7 +25,7 @@ Print_Mass(std::string& input_directory,GRID<TV>& grid,int frame)
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     T total_density=0;ARRAY<T,TV_INT> density;FILE_UTILITIES::Read_From_File<T>(input_directory+"/"+f+"/density",density);
     for(typename GRID<TV>::CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
-        total_density+=density(iterator.Cell_Index())*grid.min_dX;}
+        total_density+=density(iterator.Cell_Index())*grid.dX.Min();}
     LOG::cout<<total_density<<std::endl;
 }
 //#####################################################################

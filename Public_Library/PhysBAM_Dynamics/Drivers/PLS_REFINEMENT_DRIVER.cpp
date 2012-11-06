@@ -149,11 +149,11 @@ Initialize()
     if(example.restart){
         example.Read_Output_Files(example.restart);
         example.collision_bodies_affecting_fluid.Rasterize_Objects();
-        example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.fine_mac_grid.Minimum_Edge_Length(),5);} // compute grid visibility (for advection later)
+        example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.fine_mac_grid.dX.Min(),5);} // compute grid visibility (for advection later)
     else{
         example.collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
         example.collision_bodies_affecting_fluid.Rasterize_Objects();
-        example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.fine_mac_grid.Minimum_Edge_Length(),5);
+        example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.fine_mac_grid.dX.Min(),5);
         example.Initialize_Phi();
         example.Adjust_Phi_With_Sources(time);
         example.particle_levelset_evolution.Make_Signed_Distance();
@@ -222,7 +222,7 @@ Advance_To_Target_Time(const T target_time)
             example.collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(true,COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,
                 COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
             example.collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
-            example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.fine_mac_grid.Minimum_Edge_Length(),5);  // static occupied blocks
+            example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.fine_mac_grid.dX.Min(),5);  // static occupied blocks
             T maximum_particle_speed=0,max_particle_collision_distance=pls.max_collision_distance_factor*example.fine_mac_grid.dX.Max();
             if(pls.use_removed_negative_particles) for(typename GRID<TV>::CELL_ITERATOR iterator(pls.levelset.grid);iterator.Valid();iterator.Next()){
                 PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=pls.removed_negative_particles(iterator.Cell_Index());
@@ -285,7 +285,7 @@ Advance_To_Target_Time(const T target_time)
             example.collision_bodies_affecting_fluid.Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE);
             example.collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false); // NON-swept acceleration structures
             example.collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
-            example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.fine_mac_grid.Minimum_Edge_Length(),5);  // static occupied blocks
+            example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.fine_mac_grid.dX.Min(),5);  // static occupied blocks
             example.collision_bodies_affecting_fluid.Compute_Grid_Visibility(); // used in fast marching and extrapolation too... NOTE: this requires that objects_in_cell be current!
             if(example.particle_levelset_evolution.Levelset_Advection(1).nested_semi_lagrangian_collidable)  
                 example.particle_levelset_evolution.Levelset_Advection(1).nested_semi_lagrangian_collidable->Average_To_Invalidated_Cells(example.fine_mac_grid,(T)1e-5,example.particle_levelset_evolution.Levelset(0).phi);

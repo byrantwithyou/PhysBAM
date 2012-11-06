@@ -362,7 +362,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(incompressible){
         if(vorticity_confinement>0){
             fluids_parameters.use_vorticity_confinement=true;
-            fluids_parameters.confinement_parameter=vorticity_confinement*fluids_parameters.grid->Minimum_Edge_Length();}
+            fluids_parameters.confinement_parameter=vorticity_confinement*fluids_parameters.grid->dX.Min();}
         else fluids_parameters.use_vorticity_confinement=false;
         solids_fluids_parameters.use_leakproof_solve=false;
         fluids_parameters.use_body_force=false;

@@ -236,7 +236,7 @@ Initialize()
         example.Read_Output_Files_Fluids(current_frame);
         Initialize_Fluids_Grids();
         collision_bodies_affecting_fluid.Rasterize_Objects();
-        collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.Minimum_Edge_Length(),5);
+        collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);
 
         collision_bodies_affecting_fluid.Compute_Grid_Visibility(); // compute grid visibility (for advection later)
         if(number_of_regions>=1){
@@ -256,7 +256,7 @@ Initialize()
         Initialize_Fluids_Grids();
         collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
         collision_bodies_affecting_fluid.Rasterize_Objects();
-        collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.Minimum_Edge_Length(),5);
+        collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);
         if(example.fluids_parameters.water || example.fluids_parameters.fire || (example.fluids_parameters.compressible && number_of_regions)){
             example.Initialize_Phi();
             example.Adjust_Phi_With_Sources(time);
@@ -638,7 +638,7 @@ Solid_Position_Update(const T dt,const int substep)
         else if(Simulate_Incompressible_Fluids()) example.Initialize_Swept_Occupied_Blocks_For_Advection(dt,time,example.fluid_collection.incompressible_fluid_collection.face_velocities.Max_Abs().Max(),true);
         // MELTING BROKEN !!! if(example.use_melting && number_of_regions){ // re-rasterize changed bodies
         // MELTING BROKEN !!!    collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
-        // MELTING BROKEN !!!    collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.Minimum_Edge_Length(),5);}  // static occupied blocks
+        // MELTING BROKEN !!!    collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);}  // static occupied blocks
         
         if(euler && euler->timesplit && euler->thinshell){
             fluids_parameters.euler_solid_fluid_coupling_utilities->Update_Np1_Collision_Data(dt);
@@ -646,7 +646,7 @@ Solid_Position_Update(const T dt,const int substep)
             collision_bodies_affecting_fluid.Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);}
 
         collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
-        collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.Minimum_Edge_Length(),5);  // static occupied blocks
+        collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);  // static occupied blocks
         Write_Substep("body update",substep,1);}
 }
 //#####################################################################
@@ -1071,7 +1071,7 @@ Advect_Fluid(const T dt,const int substep)
     collision_bodies_affecting_fluid.Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE);
     collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false); // NON-swept acceleration structures
     collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
-    collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.Minimum_Edge_Length(),5);  // static occupied blocks
+    collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);  // static occupied blocks
     collision_bodies_affecting_fluid.Compute_Grid_Visibility(); // used in fast marching and extrapolation too... NOTE: this requires that objects_in_cell be current!
     example.Revalidate_Fluid_Scalars(); // uses visibility
 

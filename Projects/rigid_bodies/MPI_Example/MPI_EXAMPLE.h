@@ -367,7 +367,7 @@ void Break_Levelset()
         particles.mass(rigid_body.particle_index)=1;
         particles.inertia_tensor(rigid_body.particle_index)=T_INERTIA_TENSOR();particles.inertia_tensor(rigid_body.particle_index)+=1;
         RANGE<TV> box(body_grid.dX*-.5,body_grid.dX*.5);
-        //SPHERE<TV> box(TV(),body_grid.min_dX*.5);
+        //SPHERE<TV> box(TV(),body_grid.dX.Min()*.5);
         rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(box));
         //rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(box));
         if(!surface) surface=TESSELLATION::Generate_Triangles(box);

@@ -73,9 +73,9 @@ public:
 
     T Integration_Step(const T phi) const
     {T distance=abs(phi);
-    if(distance > 3*levelset_multiple.grid.min_dX) return (T).5*distance;    
-    else if(distance > levelset_multiple.grid.min_dX) return (T).25*distance;
-    return (T).1*levelset_multiple.grid.min_dX;}
+    if(distance > 3*levelset_multiple.grid.dX.Min()) return (T).5*distance;    
+    else if(distance > levelset_multiple.grid.dX.Min()) return (T).25*distance;
+    return (T).1*levelset_multiple.grid.dX.Min();}
 
     TRIANGULATED_SURFACE<T>* Generate_Triangles()const PHYSBAM_OVERRIDE {return TRIANGULATED_SURFACE<T>::Create();};
 

@@ -309,7 +309,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBA
 //#####################################################################
 void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
 {
-    for(int s=0;s<sources.m;s++) dt=min(dt,fluids_parameters.cfl*fluids_parameters.grid->min_dX/sources_velocity(s).Magnitude());
+    for(int s=0;s<sources.m;s++) dt=min(dt,fluids_parameters.cfl*fluids_parameters.grid->dX.Min()/sources_velocity(s).Magnitude());
 }
 //#####################################################################
 // Function Initialize_SPH_Particles
@@ -363,7 +363,7 @@ void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sph_sources,c
                     int id=removed_negative_particles(block)->Add_Element();
                     (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
                     removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->V(id)=sources_velocity(s);
-                    removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}}}}
+                    removed_negative_particles(block)->radius(id)=(T).1*grid.dX.Min();}}}}
 }
 //#####################################################################
 };

@@ -185,7 +185,7 @@ Adjust_Phi_With_Source(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& wor
 template<class TV> template<class GEOMETRY> void PLS_FSI_EXAMPLE<TV>::
 Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORMATION_MATRIX& world_to_source)
 {
-    T bandwidth=3*fluids_parameters.grid->Minimum_Edge_Length();
+    T bandwidth=3*fluids_parameters.grid->dX.Min();
     ARRAY<ARRAY<T,TV_INT> >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         TV source_X=world_to_source.Homogeneous_Times(iterator.Location());

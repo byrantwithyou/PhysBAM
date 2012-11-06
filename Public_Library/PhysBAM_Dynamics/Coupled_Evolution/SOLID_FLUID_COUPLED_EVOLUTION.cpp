@@ -725,7 +725,7 @@ Compute_W(const T current_position_time)
     const T one_over_number_nodes_thin_shell=(T)1/TV::dimension;
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
         const TV axis_vector=TV::Axis_Vector(axis);const TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
-        const RANGE<TV> dual_cell=iterator.Dual_Cell().Thickened(grid.Minimum_Edge_Length()*(T)1e-2);
+        const RANGE<TV> dual_cell=iterator.Dual_Cell().Thickened(grid.dX.Min()*(T)1e-2);
         if(!using_levelset || Negative(grid,axis,face_index,fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi)){
             // compute solid volume in dual cell
             RANGE<TV> clamped_dual_cell=RANGE<TV>::Intersect(dual_cell,grid.domain);

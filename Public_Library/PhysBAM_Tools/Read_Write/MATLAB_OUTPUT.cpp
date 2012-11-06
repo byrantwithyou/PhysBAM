@@ -48,7 +48,7 @@ template<class T> void MATLAB_OUTPUT::
 Write_Header_File(const std::string& file_name,const GRID<VECTOR<T,1> >& grid,const int stepnumber)
 {
     int m=grid.counts.x;
-    ARRAY<T,VECTOR<int,1> > x(0,m);for(int i=0;i<m;i++) x(i)=grid.Axis_X(i,0);
+    ARRAY<T,VECTOR<int,1> > x(0,m);for(int i=0;i<m;i++) x(i)=grid.X(VECTOR<int,1>(i)).x;
     Write_Header_File(file_name,x,stepnumber);
 }
 //#####################################################################

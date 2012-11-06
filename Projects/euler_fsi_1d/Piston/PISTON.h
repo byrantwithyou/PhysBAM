@@ -179,7 +179,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     if(test_number==1)
         for(int i=0;i<grid.counts.x;i++) {
             T rho=(T)0.,u=(T)0.,p=(T)0.;
-            if(grid.Axis_X(i,0)<0) {rho=(T)1.;p=(T)1.;} else {rho=(T).125;p=(T).1;}
+            if(grid.X(VECTOR<int,1>(i)).x<0) {rho=(T)1.;p=(T)1.;} else {rho=(T).125;p=(T).1;}
             U(i)(0)=rho; U(i)(1)=rho*u; U(i)(2)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}
     else if(test_number==2 || test_number==3)
         for(int i=0;i<grid.counts.x;i++){

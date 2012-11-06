@@ -101,7 +101,7 @@ Initialize_Grid_Structures_Helper(OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>&
 {
     collision_bodies.collision_geometry_collection.Update_Bounding_Boxes();
     // phi and velocity
-    phi.Resize(grid.Cell_Indices(3),false,false);phi.Fill(10*grid.Minimum_Edge_Length());
+    phi.Resize(grid.Cell_Indices(3),false,false);phi.Fill(10*grid.dX.Min());
     face_velocities.Resize(grid,3,false,false);face_velocities.Fill((T)0);
     face_velocities_set.Resize(grid,3,false,false);face_velocities_set.Fill(false);
     T_FACE_ARRAYS_INT face_velocities_count(grid,3);

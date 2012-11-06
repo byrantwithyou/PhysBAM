@@ -60,7 +60,6 @@ public:
     TV dX;
     TV one_over_dX;
     TV_INT numbers_of_cells; // not saved to file
-    T min_dX;
     T MAC_offset; // 0 for a regular grid and .5 for a MAC grid
 
     GRID()
@@ -114,12 +113,6 @@ public:
     TV_INT Numbers_Of_Nodes() const
     {return numbers_of_cells+1;}
 
-    T Minimum_Edge_Length() const
-    {return min_dX;}
-
-    T Maximum_Edge_Length() const
-    {return dX.Max();}
-
     T One_Over_Cell_Size() const
     {return one_over_dX.Product();}
 
@@ -131,27 +124,6 @@ public:
 
     T Face_Size(const int axis) const
     {return Cell_Size()*one_over_dX(axis);}
-
-    TV Xmin() const
-    {return domain.min_corner;}
-
-    TV Xmax() const
-    {return domain.max_corner;}
-
-    T Axis_X(const int i,const int axis) const // axis component of position at the i=1 to i=counts(axis) grid points
-    {return domain.min_corner(axis)+(i+MAC_offset)*dX(axis);}
-
-    T Axis_X_plus_half(const int i,const int axis) const
-    {return domain.min_corner(axis)+(i+(T).5+MAC_offset)*dX(axis);}
-
-    T Axis_X_minus_half(const int i,const int axis) const
-    {return domain.min_corner(axis)+(i-(T).5+MAC_offset)*dX(axis);}
-
-    TV X_plus_half(const TV_INT& index) const
-    {return domain.min_corner+(TV(index)-(-(T).5+MAC_offset))*dX;}
-
-    TV X_minus_half(const TV_INT& index) const
-    {return domain.min_corner+(TV(index)-((T).5+MAC_offset))*dX;}
 
     TV X(const TV_INT& index) const
     {return domain.min_corner+(TV(index)+MAC_offset)*dX;}

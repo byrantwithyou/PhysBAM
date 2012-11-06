@@ -40,7 +40,7 @@ template<class T_GRID> GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
 template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
 Initialize_Grids()
 {
-    collision_thickness=(T)1e-3*grid.Minimum_Edge_Length();
+    collision_thickness=(T)1e-3*grid.dX.Min();
     collision_geometry_collection.Set_Collision_Body_Thickness(collision_thickness);
 
     assert(grid.Is_MAC_Grid());

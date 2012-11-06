@@ -204,7 +204,7 @@ Update_Streamlines()
     
     GRID<TV>& grid=opengl_mac_velocity_field->grid;
     int number_of_streamlines=100;
-    T step_length=(T).5*grid.Minimum_Edge_Length();
+    T step_length=(T).5*grid.dX.Min();
 
     RANDOM_NUMBERS<T> random;
     if(use_seed_for_streamlines) random.Set_Seed(streamline_seed);

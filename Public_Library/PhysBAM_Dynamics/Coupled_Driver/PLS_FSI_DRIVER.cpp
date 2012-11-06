@@ -213,7 +213,7 @@ Initialize()
         example.Read_Output_Files_Fluids(current_frame);
         Initialize_Fluids_Grids();
         collision_bodies_affecting_fluid.Rasterize_Objects();
-        collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.Minimum_Edge_Length(),5);
+        collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);
 
         collision_bodies_affecting_fluid.Compute_Grid_Visibility(); // compute grid visibility (for advection later)
         particle_levelset_evolution->Set_Seed(2606);
@@ -225,7 +225,7 @@ Initialize()
         Initialize_Fluids_Grids();
         collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
         collision_bodies_affecting_fluid.Rasterize_Objects();
-        collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.Minimum_Edge_Length(),5);
+        collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);
         example.Initialize_Phi();
         example.Adjust_Phi_With_Sources(time);
         particle_levelset_evolution->Make_Signed_Distance();
@@ -290,7 +290,7 @@ First_Order_Time_Step(int substep,T dt)
 
     example.solid_body_collection.Print_Energy(time,1);
     collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
-    collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.Minimum_Edge_Length(),5);  // static occupied blocks
+    collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);  // static occupied blocks
     // swept occupied blocks
     example.Initialize_Swept_Occupied_Blocks_For_Advection(dt,time,example.fluid_collection.incompressible_fluid_collection.face_velocities);
 
@@ -512,7 +512,7 @@ Advect_Fluid(const T dt,const int substep)
     Write_Substep("before scalar revalidation",0,1);
     collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false); // NON-swept acceleration structures
     collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
-    collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.Minimum_Edge_Length(),5);  // static occupied blocks
+    collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);  // static occupied blocks
     collision_bodies_affecting_fluid.Compute_Grid_Visibility(); // used in fast marching and extrapolation too... NOTE: this requires that objects_in_cell be current!
     example.Revalidate_Fluid_Scalars(); // uses visibility
 

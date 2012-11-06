@@ -29,7 +29,7 @@ template<class T> void Calculate(TRIANGULATED_SURFACE<T>& surface,const GRID<VEC
     // ensure the phi array size matches the grid
     phi.Resize(grid.Domain_Indices(),false,false);
 
-    T epsilon=(T)1e-8*grid.min_dX;
+    T epsilon=(T)1e-8*grid.dX.Min();
     int total_cells=grid.counts.x*grid.counts.y*grid.counts.z,cells_done=0,progress=-1;
     for(RANGE_ITERATOR<3> it(grid.Domain_Indices());it.Valid();it.Next()){
         phi(it.index)=surface.Calculate_Signed_Distance(grid.X(it.index),epsilon);

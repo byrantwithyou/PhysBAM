@@ -111,7 +111,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
     if(write_debug_data){
         GRID<TV> output_grid=grid;
         if(!grid.Is_MAC_Grid())
-            output_grid=GRID<TV>(grid.counts,RANGE<TV>(grid.Xmin()-grid.dX/2,grid.Xmax()+grid.dX/2),true);
+            output_grid=GRID<TV>(grid.counts,RANGE<TV>(grid.domain.min_corner-grid.dX/2,grid.domain.max_corner+grid.dX/2),true);
         // TODO: put this back if you need it
         /*FILE_UTILITIES::Write_To_File<T>("grid.debug",output_grid);
           FILE_UTILITIES::Write_To_File<T>("triangulated_surface.debug",triangulated_surface);*/}
@@ -202,22 +202,25 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) if(color_is_inside(colors(it.index))) phi(it.index)*=-1;}
 
     if(positive_boundary_band){
-        RANGE<TV> clip(grid.X_plus_half(TV_INT()+positive_boundary_band),grid.X_plus_half(grid.counts-positive_boundary_band));
-        for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
-            for(int i=0;i<positive_boundary_band+1;i++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.x-grid.Axis_X(i,0));
-            for(int i=grid.counts.x-positive_boundary_band;i<grid.counts.x;i++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(i,0)-clip.max_corner.x);}
+        RANGE<TV> clip(grid.X(TV_INT()+positive_boundary_band)+(T).5*grid.dX,grid.X(grid.counts-positive_boundary_band)+(T).5*grid.dX);
+        for(int j=0;j<grid.counts.y;j++)
+            for(int k=0;k<grid.counts.z;k++){
+                for(int i=0;i<positive_boundary_band+1;i++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.x-grid.X(TV_INT(i,j,k)).x);
+                for(int i=grid.counts.x-positive_boundary_band;i<grid.counts.x;i++) phi(i,j,k)=max(phi(i,j,k),grid.X(TV_INT(i,j,k)).x-clip.max_corner.x);}
 
-        for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
-            for(int j=0;j<positive_boundary_band+1;j++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.y-grid.Axis_X(j,1));
-            for(int j=grid.counts.y-positive_boundary_band;j<grid.counts.y;j++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(j,1)-clip.max_corner.y);}
+        for(int i=0;i<grid.counts.x;i++)
+            for(int k=0;k<grid.counts.z;k++){
+                for(int j=0;j<positive_boundary_band+1;j++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.y-grid.X(TV_INT(i,j,k)).y);
+                for(int j=grid.counts.y-positive_boundary_band;j<grid.counts.y;j++) phi(i,j,k)=max(phi(i,j,k),grid.X(TV_INT(i,j,k)).y-clip.max_corner.y);}
 
-        for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
-            for(int k=0;k<positive_boundary_band+1;k++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.z-grid.Axis_X(k,2));
-            for(int k=grid.counts.z-positive_boundary_band;k<grid.counts.z;k++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(k,2)-clip.max_corner.z);}}
+        for(int i=0;i<grid.counts.x;i++)
+            for(int j=0;j<grid.counts.y;j++){
+                for(int k=0;k<positive_boundary_band+1;k++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.z-grid.X(TV_INT(i,j,k)).z);
+                for(int k=grid.counts.z-positive_boundary_band;k<grid.counts.z;k++) phi(i,j,k)=max(phi(i,j,k),grid.X(TV_INT(i,j,k)).z-clip.max_corner.z);}}
 
     if(use_fmm && (compute_unsigned_distance_function || compute_signed_distance_function)){
         for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) 
-            phi(it.index)=clamp(phi(it.index),-10*grid.min_dX,10*grid.min_dX); // clamp away from FLT_MAX to avoid floating point exceptions
+            phi(it.index)=clamp(phi(it.index),-10*grid.dX.Min(),10*grid.dX.Min()); // clamp away from FLT_MAX to avoid floating point exceptions
         if(verbose) LOG::Time(STRING_UTILITIES::string_sprintf("Fast Marching (one sided band width=%f)",fmm_one_sided_band_width));
         GRID<TV> grid_copy=grid;LEVELSET<TV> levelset(grid_copy,phi);
         if(compute_unsigned_distance_function) levelset.Fast_Marching_Method(0,fmm_stopping_distance,&initialized_indices);

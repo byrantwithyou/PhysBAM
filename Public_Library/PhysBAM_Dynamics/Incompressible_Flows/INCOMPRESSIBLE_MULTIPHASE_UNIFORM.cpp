@@ -102,7 +102,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
         Discretize_Explicit_Viscous_Terms(dt);
 
     if(!GFM && nonzero_surface_tension){
-        T half_width=(T).5*number_of_interface_cells*grid.Minimum_Edge_Length();T dt_over_four=(T).25*dt;
+        T half_width=(T).5*number_of_interface_cells*grid.dX.Min();T dt_over_four=(T).25*dt;
         LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
         levelset_multiple.Compute_Normals();levelset_multiple.Compute_Curvature();
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT index=iterator.Face_Index();
@@ -239,7 +239,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
                     -phi_2,LEVELSET_MULTIPLE<T_GRID>::Sign(region_1,region_2)*(*levelset_multiple.levelsets(region_2)->curvature)(cell_2));
                 kappa_cfl=max(kappa_cfl,abs(curvature*surface_tensions(region_1,region_2)/
                           LEVELSET_UTILITIES<T>::Heaviside((T).5*(phi_1-phi_2),projection.densities(region_1),projection.densities(region_2))));}}
-        dt_surface_tension=sqrt(kappa_cfl)/grid.Minimum_Edge_Length();}
+        dt_surface_tension=sqrt(kappa_cfl)/grid.dX.Min();}
     TV max_force;
     if(use_force) max_force=force.Max_Abs();
     T dt_force=0;

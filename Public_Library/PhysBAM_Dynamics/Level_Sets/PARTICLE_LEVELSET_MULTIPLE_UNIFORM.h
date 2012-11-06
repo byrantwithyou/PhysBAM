@@ -64,7 +64,7 @@ public:
     max_minus_min_collision_distance_factor_over_max_short=(max_collision_distance_factor-min_collision_distance_factor)/USHRT_MAX;}
 
     T Particle_Collision_Distance(const unsigned short quantized_collision_distance)
-    {return (min_collision_distance_factor+(T)quantized_collision_distance*max_minus_min_collision_distance_factor_over_max_short)*levelset_multiple.grid.Minimum_Edge_Length();}
+    {return (min_collision_distance_factor+(T)quantized_collision_distance*max_minus_min_collision_distance_factor_over_max_short)*levelset_multiple.grid.dX.Min();}
 
     void Seed_Particles(const T time,const bool verbose=true)
     {for(int i=0;i<particle_levelsets.m;i++) particle_levelsets(i)->Seed_Particles(time,verbose);}

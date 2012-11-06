@@ -509,7 +509,7 @@ Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX
 {
     assert(!smoke && !fire);
     if(adhesion_coefficient==1 && !adhesion_normal_strain) return;
-    T epsilon=adhesion_half_bandwidth*grid->Minimum_Edge_Length();
+    T epsilon=adhesion_half_bandwidth*grid->dX.Min();
     for(CELL_ITERATOR iterator(*grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         T heaviside=LEVELSET_UTILITIES<T>::Heaviside(levelset_object.phi(cell),epsilon);
         e_ghost(cell)*=adhesion_coefficient+(1-adhesion_coefficient)*heaviside;

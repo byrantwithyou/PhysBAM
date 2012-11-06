@@ -23,7 +23,6 @@ Initialize(const TV_INT& counts_input,const RANGE<TV>& box,const bool MAC_grid)
         dX=domain.Edge_Lengths()/TV(effective_counts);
         one_over_dX=(T)1/dX;}
     else{dX=TV();one_over_dX=TV();}
-    min_dX=dX.Min();
 }
 //#####################################################################
 // Function Create_Grid_Given_Cell_Size

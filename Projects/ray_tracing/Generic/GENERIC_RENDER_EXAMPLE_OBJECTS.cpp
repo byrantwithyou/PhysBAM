@@ -351,7 +351,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV>,TV>(*fluid_collision_body_list,cell_valid_mask,TV());
             GRID<TV> occupied_grid=grid->Get_MAC_Grid();
             fluid_collision_body_list->Rasterize_Objects();
-            fluid_collision_body_list->Compute_Occupied_Blocks(false,(T)2*grid->Minimum_Edge_Length(),5);
+            fluid_collision_body_list->Compute_Occupied_Blocks(false,(T)2*grid->dX.Min(),5);
             voxels->Set_Custom_Source_Interpolation(linear);
             voxels->Set_Custom_Light_Interpolation(linear_vector);}
         voxels->number_of_smoothing_steps=parameters.Get_Parameter("Number_Of_Smoothing_Steps",(int)3);
@@ -487,14 +487,14 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 implicit_surface->levelset.collidable_phi_replacement_value);
             GRID<TV> occupied_grid=grid->Get_MAC_Grid();
             fluid_collision_body_list->Rasterize_Objects();
-            fluid_collision_body_list->Compute_Occupied_Blocks(false,(T)2*grid->Minimum_Edge_Length(),5);
+            fluid_collision_body_list->Compute_Occupied_Blocks(false,(T)2*grid->dX.Min(),5);
             implicit_surface->Set_Custom_Secondary_Interpolation(*linear);
             implicit_surface->Use_Secondary_Interpolation(true);}
 
         bool reinitialize=parameters.Get_Parameter("Reinitialize",false);
         if(reinitialize){
             LOG::cout<<"Reinitializing levelset"<<std::endl;
-            implicit_surface->levelset.Fast_Marching_Method(0,reinitialization_band*grid->min_dX);}
+            implicit_surface->levelset.Fast_Marching_Method(0,reinitialization_band*grid->dX.Min());}
 
         object=rendering_implicit_surface;}
     else if(type=="Levelset_Multiple"){

@@ -114,10 +114,10 @@ public:
 
 protected:
     template<class T_GRID> T Surface_Thickness_Over_Two(const T_GRID& grid) const
-    {return (T).5*(surface_thickness_or_zero?surface_thickness_or_zero:grid.Minimum_Edge_Length()/100);}
+    {return (T).5*(surface_thickness_or_zero?surface_thickness_or_zero:grid.dX.Min()/100);}
 
     template<class T_GRID> T Surface_Padding_For_Flood_Fill(const T_GRID& grid) const
-    {return surface_padding_for_flood_fill_or_negative>=0?surface_padding_for_flood_fill_or_negative:grid.Minimum_Edge_Length()/100;}
+    {return surface_padding_for_flood_fill_or_negative>=0?surface_padding_for_flood_fill_or_negative:grid.dX.Min()/100;}
 };
 }
 #endif

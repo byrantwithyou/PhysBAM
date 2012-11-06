@@ -47,13 +47,13 @@ Phi(const TV& position) const
 {
     T phi=0,lipschitz=0;
     TV_INT cell=particle_grid.Clamp_To_Cell(position);
-    if(particle_array(cell).m==0) return particle_grid.min_dX;
+    if(particle_array(cell).m==0) return particle_grid.dX.Min();
     for(int p=0;p<particle_array(cell).m;p++){
         int index=particle_array(cell)(p);
         T distance=REMOVED_PARTICLES_BLENDER_3D<T>::Get_Distance(ellipsoids(index).center,metrics(index),position);
         phi-=particle_blender->C(distance);lipschitz+=ellipsoids(index).Lipschitz_Constant();} 
     T distance=(T)2/3*(blending_parameter+phi)*particle_blender->R/lipschitz;
-    return sign(distance)*min(abs(distance),particle_grid.min_dX);
+    return sign(distance)*min(abs(distance),particle_grid.dX.Min());
 }
 //#####################################################################
 // Function Normal

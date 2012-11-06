@@ -282,9 +282,9 @@ Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
     SYMMETRIC_MATRIX<T,TV::m> ddphi=Hessian(phi_input,index);
 
     T norm_squared=dphi.Magnitude_Squared(),norm=sqrt(norm_squared);
-    if(norm<small_number) return LEVELSET_UTILITIES<T>::Sign(phi_input(index))/grid.min_dX;
+    if(norm<small_number) return LEVELSET_UTILITIES<T>::Sign(phi_input(index))/grid.dX.Min();
     T curvature=(dphi.Dot(ddphi*dphi)-norm_squared*ddphi.Trace())/(norm*norm_squared);
-    return minmag(curvature,LEVELSET_UTILITIES<T>::Sign(curvature)/grid.min_dX);
+    return minmag(curvature,LEVELSET_UTILITIES<T>::Sign(curvature)/grid.dX.Min());
 }
 //#####################################################################
 // Function Compute_Curvature

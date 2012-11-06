@@ -248,7 +248,7 @@ Update_Particles_To_Reflect_Mass_Conservation(const LEVELSET<TV>& levelset_old,T
     const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const bool update_particle_cells,const bool verbose)
 {
     const int maximum_iterations=5;
-    const T epsilon=levelset_old.grid.Minimum_Edge_Length()*(T)1e-2;
+    const T epsilon=levelset_old.grid.dX.Min()*(T)1e-2;
     for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=particles(block_index);
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
@@ -920,7 +920,7 @@ template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Delete_Particles_In_Local_Maximum_Phi_Cells(const int sign)
 {
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices());domain.max_corner+=TV_INT::All_Ones_Vector();
-    T tolerance=levelset.small_number*levelset.grid.Minimum_Edge_Length();
+    T tolerance=levelset.small_number*levelset.grid.dX.Min();
     Consistency_Check(domain,positive_particles);
     Consistency_Check(domain,negative_particles);
     DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<T_GRID>,TV>(levelset.grid.Domain_Indices(1),thread_queue).template Run<int,T>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Delete_Particles_In_Local_Maximum_Phi_Cells_Threaded,sign,tolerance);

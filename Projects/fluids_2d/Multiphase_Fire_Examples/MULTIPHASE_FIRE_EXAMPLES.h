@@ -144,14 +144,14 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
             if(face_temperature>ignition_temperature) flame_speed_multiplier.Component(iterator.Axis())(iterator.Face_Index())=clamp((T).01*(face_temperature-ignition_temperature),(T)0,(T)1);}}
     if(test_number==2){
         ARRAY<ARRAY<T,VECTOR<int,2> > >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
-        T reaction_bandwidth_times_edge_length=reaction_bandwidth*fluids_parameters.grid->Minimum_Edge_Length();
+        T reaction_bandwidth_times_edge_length=reaction_bandwidth*fluids_parameters.grid->dX.Min();
 
         T_ARRAYS_SCALAR& phi1=phis(1);
         //T_FAST_LEVELSET levelset1(fluids_parameters.grid,phi1);
-        //levelset1.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.Minimum_Edge_Length());levelset1.Fast_Marching_Method();
+        //levelset1.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.dX.Min());levelset1.Fast_Marching_Method();
         T_ARRAYS_SCALAR& phi2=phis(2);
         //T_FAST_LEVELSET levelset2(fluids_parameters.grid,phi2);
-        //levelset2.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.Minimum_Edge_Length());levelset2.Fast_Marching_Method();
+        //levelset2.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.dX.Min());levelset2.Fast_Marching_Method();
         for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<int,2> cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
             T face_phi1=(T).5*(phi1(cell1)+phi1(cell2)),face_phi2=(T).5*(phi2(cell1)+phi2(cell2));
@@ -183,7 +183,7 @@ void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
                 cell_flame_speed_multiplier+=flame_speed_multiplier.Component(i)(iterator.First_Face_Index(i))+flame_speed_multiplier.Component(i)(iterator.Second_Face_Index(i));
             cell_flame_speed_multiplier*=.25;
             if(-phi(iterator.Cell_Index())<0){
-                if(-2*fluids_parameters.grid->min_dX<-phi(iterator.Cell_Index()))
+                if(-2*fluids_parameters.grid->dX.Min()<-phi(iterator.Cell_Index()))
                     fluids_parameters.temperature_container.temperature(iterator.Cell_Index())=
                         cell_flame_speed_multiplier*fluids_parameters.temperature_container.hot_point+(1-cell_flame_speed_multiplier)*fluids_parameters.temperature_container.ambient_temperature;
                 else fluids_parameters.temperature_container.temperature(iterator.Cell_Index())=fluids_parameters.temperature_container.ambient_temperature;}}}
@@ -221,13 +221,13 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
         Adjust_Phi_With_Source(RANGE<TV>(TV(0,(T).1),TV((T).1,(T).3)),1,MATRIX<T,3>::Identity_Matrix());
         Adjust_Phi_With_Source(RANGE<TV>(TV((T).9,(T).1),TV(1,(T).3)),2,MATRIX<T,3>::Identity_Matrix());
         ARRAY<ARRAY<T,VECTOR<int,2> > >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
-        T reaction_seed_bandwidth=(T).5*reaction_bandwidth*fluids_parameters.grid->Minimum_Edge_Length();
+        T reaction_seed_bandwidth=(T).5*reaction_bandwidth*fluids_parameters.grid->dX.Min();
         for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<int,2> cell=iterator.Cell_Index();
             T band=max(fabs(phis(1)(cell)),fabs(phis(2)(cell)))-reaction_seed_bandwidth;
             int region1,region2;T min_phi1,min_phi2;
             fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Two_Minimum_Regions(cell,region1,region2,min_phi1,min_phi2);
-            if(min_phi1<-3*fluids_parameters.grid->Minimum_Edge_Length())continue;
+            if(min_phi1<-3*fluids_parameters.grid->dX.Min())continue;
             //if(!(region1==1&&region2==2||region1==2&&region2==1))continue;
             phis(1)(cell)=max(phis(1)(cell),-band);
             phis(2)(cell)=max(phis(2)(cell),-band);

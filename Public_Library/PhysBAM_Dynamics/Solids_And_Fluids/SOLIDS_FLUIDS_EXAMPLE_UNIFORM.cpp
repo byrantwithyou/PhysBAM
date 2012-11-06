@@ -299,7 +299,7 @@ Adjust_Phi_With_Source(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& wor
 template<class T_GRID> template<class GEOMETRY> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORMATION_MATRIX& world_to_source)
 {
-    T bandwidth=3*fluids_parameters.grid->Minimum_Edge_Length();
+    T bandwidth=3*fluids_parameters.grid->dX.Min();
     ARRAY<T_ARRAYS_SCALAR>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
     for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         TV source_X=world_to_source.Homogeneous_Times(iterator.Location());
@@ -481,7 +481,7 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum
                     fluids_parameters.maccormack_face_mask(axis,index)=true;}}
         // don't use maccormack near the interface
         if(fluids_parameters.bandwidth_without_maccormack_near_interface){
-            T dx_times_band=grid.Maximum_Edge_Length()*fluids_parameters.bandwidth_without_maccormack_near_interface;
+            T dx_times_band=grid.dX.Max()*fluids_parameters.bandwidth_without_maccormack_near_interface;
             for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next())if(fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())>-dx_times_band){
                 fluids_parameters.maccormack_cell_mask(iterator.Cell_Index())=false;
                 for(int axis=0;axis<T_GRID::dimension;axis++){

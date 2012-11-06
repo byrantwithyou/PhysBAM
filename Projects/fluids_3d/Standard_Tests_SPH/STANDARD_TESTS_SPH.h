@@ -105,11 +105,11 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
         int left_particles_number=(int)(one_third*number_of_particles),right_particles_number=(int)(two_thirds*number_of_particles);
         fluids_parameters.sph_evolution->target_particles_per_unit_volume=number_of_particles*(T).5;
         for(int i=0;i<left_particles_number;i++){
-            TV X=random.Get_Uniform_Vector(grid.Xmin(),TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.max_corner.y,grid.domain.max_corner.z));
+            TV X=random.Get_Uniform_Vector(grid.domain.min_corner,TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.max_corner.y,grid.domain.max_corner.z));
             int id=sph_particles.Add_Element();
             sph_particles.X(id)=X;}
         for(int i=0;i<right_particles_number;i++){
-            TV X=random.Get_Uniform_Vector(TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.min_corner.y,grid.domain.min_corner.z),grid.Xmax());
+            TV X=random.Get_Uniform_Vector(TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.min_corner.y,grid.domain.min_corner.z),grid.domain.max_corner);
             int id=sph_particles.Add_Element();
             sph_particles.X(id)=X;}}
 }

@@ -191,7 +191,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
 { 
     LEVELSET<TV> levelset_ghost(cell_grid,phi_ghost);
 
-    T fmm_initialization_iterative_tolerance_absolute=levelset.fmm_initialization_iterative_tolerance*cell_grid.Minimum_Edge_Length();    
+    T fmm_initialization_iterative_tolerance_absolute=levelset.fmm_initialization_iterative_tolerance*cell_grid.dX.Min();    
  
     if(levelset.collision_body_list){
         COLLISION_GEOMETRY_ID body_id;
@@ -239,7 +239,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
             if(levelset.refine_fmm_initialization_with_iterative_solver){
                 TV vertex=location;T phi_value=phi_ghost(index);
                 for(int iterations=0;iterations<levelset.fmm_initialization_iterations;iterations++){
-                    if(abs(phi_value)>10*cell_grid.Minimum_Edge_Length())break; // stop if it looks like it's blowing up
+                    if(abs(phi_value)>10*cell_grid.dX.Min())break; // stop if it looks like it's blowing up
                     vertex-=phi_value*levelset_ghost.Normal(vertex);phi_value=levelset_ghost.Phi(vertex);
                     if(abs(phi_value)<=fmm_initialization_iterative_tolerance_absolute){
                         T new_phi_value=(vertex-location).Magnitude();
@@ -276,7 +276,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
             if(levelset.refine_fmm_initialization_with_iterative_solver){TV location=iterator.Location();
                 TV vertex=location;T phi_value=phi_ghost(index);
                 for(int iterations=0;iterations<levelset.fmm_initialization_iterations;iterations++){
-                    if(abs(phi_value)>10*cell_grid.Minimum_Edge_Length())break; // stop if it looks like it's blowing up
+                    if(abs(phi_value)>10*cell_grid.dX.Min())break; // stop if it looks like it's blowing up
                     vertex-=phi_value*levelset_ghost.Normal(vertex);phi_value=levelset_ghost.Phi(vertex);
                     if(abs(phi_value)<=fmm_initialization_iterative_tolerance_absolute){
                         T new_phi_value=(vertex-location).Magnitude();

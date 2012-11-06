@@ -187,14 +187,14 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
                 flame_speed_multiplier.Component(iterator.Axis())(iterator.Face_Index())=1;}
     else if(test_number==3){
         ARRAY<ARRAY<T,VECTOR<int,3> > >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
-        T reaction_bandwidth_times_edge_length=reaction_bandwidth*fluids_parameters.grid->Minimum_Edge_Length();
+        T reaction_bandwidth_times_edge_length=reaction_bandwidth*fluids_parameters.grid->dX.Min();
 
         T_ARRAYS_SCALAR& phi1=phis(1);
         //LEVELSET<TV> levelset1(fluids_parameters.grid,phi1);
-        //levelset1.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.Minimum_Edge_Length());levelset1.Fast_Marching_Method();
+        //levelset1.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.dX.Min());levelset1.Fast_Marching_Method();
         T_ARRAYS_SCALAR& phi2=phis(2);
         //LEVELSET<TV> levelset2(fluids_parameters.grid,phi2);
-        //levelset2.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.Minimum_Edge_Length());levelset2.Fast_Marching_Method();
+        //levelset2.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.dX.Min());levelset2.Fast_Marching_Method();
         for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<int,3> cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
             T face_phi1=(T).5*(phi1(cell1)+phi1(cell2)),face_phi2=(T).5*(phi2(cell1)+phi2(cell2));
@@ -226,7 +226,7 @@ void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
 
     fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Get_Single_Levelset(fluids_parameters.fuel_region,levelset,false);
 
-    T bandwidth=2*fluids_parameters.grid->Minimum_Edge_Length();
+    T bandwidth=2*fluids_parameters.grid->dX.Min();
     for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
         T cell_flame_speed_multiplier=0;
         for(int i=0;i<T_GRID::dimension;i++)
@@ -284,13 +284,13 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
         Adjust_Phi_With_Source(inner_cylinder1,1,MATRIX<T,4>::Identity_Matrix());
         Adjust_Phi_With_Source(inner_cylinder2,2,MATRIX<T,4>::Identity_Matrix());
         ARRAY<ARRAY<T,VECTOR<int,3> > >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
-        T reaction_seed_bandwidth=(T).5*reaction_bandwidth*fluids_parameters.grid->Minimum_Edge_Length();
+        T reaction_seed_bandwidth=(T).5*reaction_bandwidth*fluids_parameters.grid->dX.Min();
         for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<int,3> cell=iterator.Cell_Index();
             T band=max(fabs(phis(1)(cell)),fabs(phis(2)(cell)))-reaction_seed_bandwidth;
             int region1,region2;T min_phi1,min_phi2;
             fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Two_Minimum_Regions(cell,region1,region2,min_phi1,min_phi2);
-            if(min_phi1<-3*fluids_parameters.grid->Minimum_Edge_Length()) continue;
+            if(min_phi1<-3*fluids_parameters.grid->dX.Min()) continue;
             //if(!(region1==1 && region2==2 || region1==2 && region2==1)) continue;
             phis(1)(cell)=max(phis(1)(cell),-band);
             phis(2)(cell)=max(phis(2)(cell),-band);

@@ -132,11 +132,11 @@ Initialize()
     if(example.restart){
         example.Read_Output_Files(example.restart);
         example.collision_bodies_affecting_fluid.Rasterize_Objects();
-        example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.grid.Minimum_Edge_Length(),5);} // compute grid visibility (for advection later)
+        example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.grid.dX.Min(),5);} // compute grid visibility (for advection later)
     else{
         example.collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
         example.collision_bodies_affecting_fluid.Rasterize_Objects();
-        example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.grid.Minimum_Edge_Length(),5);
+        example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.grid.dX.Min(),5);
         example.Initialize();
         example.Rebuild_Levelset_Color();
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells);it.Valid();it.Next())

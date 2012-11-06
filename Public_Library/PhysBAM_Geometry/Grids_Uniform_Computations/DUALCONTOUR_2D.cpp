@@ -57,13 +57,13 @@ Generate_Vertices()
         T dx=grid.dX.Min();
         bool failed_in_positive_normal=false;
         int iterations=0;
-        if(is_distance_field) while(abs(phi-contour_value)>1e-5*grid.min_dX && (iterations++)<10){
+        if(is_distance_field) while(abs(phi-contour_value)>1e-5*grid.dX.Min() && (iterations++)<10){
             position-=(phi-contour_value)*normal;
             phi=levelset.Phi(position);
             normal=levelset.Normal(position);}
-        else while(abs(phi-contour_value)>1e-5*grid.min_dX && (iterations++)<10){
+        else while(abs(phi-contour_value)>1e-5*grid.dX.Min() && (iterations++)<10){
             delta_phi=levelset.Phi(position+normal*dx)-phi;
-            if(abs(delta_phi)>1e-8*grid.min_dX) position_guess=position-dx*((phi-contour_value)/delta_phi)*normal; // Newton-Raphson
+            if(abs(delta_phi)>1e-8*grid.dX.Min()) position_guess=position-dx*((phi-contour_value)/delta_phi)*normal; // Newton-Raphson
             if(abs(levelset.Phi(position_guess)-contour_value)>abs(phi-contour_value)){
                 if(!failed_in_positive_normal){failed_in_positive_normal=true;normal=-normal;} // Look away from a shock
                 else break;}

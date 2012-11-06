@@ -488,7 +488,7 @@ Update_Slice()
     int tex_width=0,tex_height=0; // texture width and height
     switch (slice->axis){
         case 0:
-            opengl_textured_rect->frame->t.x=grid.Axis_X(slice->index,slice->axis);
+            opengl_textured_rect->frame->t.x=grid.X(TV_INT()+slice->index)(slice->axis);
             opengl_textured_rect->frame->r=ROTATION<VECTOR<float,3> >(0.5*pi,VECTOR<float,3>(0,1,0));
             opengl_textured_rect->width=domain.Edge_Lengths().z;
             opengl_textured_rect->height=domain.Edge_Lengths().y;
@@ -497,7 +497,7 @@ Update_Slice()
             break;
 
         case 1:
-            opengl_textured_rect->frame->t.y=grid.Axis_X(slice->index,slice->axis);
+            opengl_textured_rect->frame->t.y=grid.X(TV_INT()+slice->index)(slice->axis);
             opengl_textured_rect->frame->r=ROTATION<VECTOR<float,3> >(-0.5*pi,VECTOR<float,3>(1,0,0));
             opengl_textured_rect->width=domain.Edge_Lengths().x;
             opengl_textured_rect->height=domain.Edge_Lengths().z;
@@ -506,7 +506,7 @@ Update_Slice()
             break;
 
         case 2:
-            opengl_textured_rect->frame->t.z=grid.Axis_X(slice->index,slice->axis);
+            opengl_textured_rect->frame->t.z=grid.X(TV_INT()+slice->index)(slice->axis);
             opengl_textured_rect->frame->r=ROTATION<VECTOR<float,3> >();
             opengl_textured_rect->width=domain.Edge_Lengths().x;
             opengl_textured_rect->height=domain.Edge_Lengths().y;

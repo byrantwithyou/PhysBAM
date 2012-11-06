@@ -106,7 +106,11 @@ Initialize_Equilateral_Mesh_And_Particles(const GRID<TV>& grid)
 {
     int m=grid.counts.x,n=grid.counts.y,particle=0;
     particles.Delete_All_Elements();mesh.Initialize_Equilateral_Mesh(m,n);particles.Add_Elements(m*n);
-    for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=VECTOR<T,2>((j%2)?grid.Axis_X_minus_half(i,0):grid.Axis_X(i,0),grid.Axis_X(j,1));
+    for(int j=0;j<n;j++)
+        for(int i=0;i<m;i++){
+            TV X=grid.X(TV_INT(i,j));
+            if(j%2) X.x+=(T).5*grid.dX.x;
+            particles.X(particle++)=X;}
 }
 //#####################################################################
 // Function Inside

@@ -58,7 +58,7 @@ Generate_Vertices()
             TV normal=levelset.Normal(position);
             T phi=levelset.Phi(position);
             int iterations=0;
-            while(abs(phi)>1e-5*grid.min_dX && (iterations++)<10){
+            while(abs(phi)>1e-5*grid.dX.Min() && (iterations++)<10){
                 position-=phi*normal;
                 phi=levelset.Phi(position);
                 normal=levelset.Normal(position);}

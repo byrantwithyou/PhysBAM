@@ -14,7 +14,7 @@ namespace PhysBAM{
 template<class T,class T2=T>
 class OPENGL_SCALAR_FIELD_1D:public OPENGL_OBJECT
 {
-    typedef VECTOR<T,1> TV;
+    typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
 public:
     const GRID<TV>& grid;
     ARRAY<T2,VECTOR<int,1> > &values;

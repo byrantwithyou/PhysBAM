@@ -363,7 +363,7 @@ Initialize_SPH_Particles()
             if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
             int id=removed_negative_particles(block)->Add_Element();
             (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
-            removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}}
+            removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.dX.Min();}}
     else if(test_number==9){
         ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=particle_levelset.removed_negative_particles;
         RANDOM_NUMBERS<T> random;
@@ -378,7 +378,7 @@ Initialize_SPH_Particles()
                 if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
                 int id=removed_negative_particles(block)->Add_Element();
                 (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
-                removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}
+                removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.dX.Min();}
             particle_region+=TV(1,0);number_of_sph_particles=int(particle_multiplier*number_of_sph_particles);}}
     else if(test_number==10){
         sph_evolution.target_particles_per_unit_volume=target_particles_per_unit_volume;
@@ -395,7 +395,7 @@ Initialize_SPH_Particles()
             if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
             int id=removed_negative_particles(block)->Add_Element();
             (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
-            removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}}
+            removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.dX.Min();}}
 }
 //#####################################################################
 // Function Limit_Dt

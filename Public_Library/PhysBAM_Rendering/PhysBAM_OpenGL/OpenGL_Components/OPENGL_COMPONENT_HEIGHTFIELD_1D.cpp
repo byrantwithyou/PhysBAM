@@ -94,7 +94,7 @@ Display(const int in_color) const
             {
                 glLoadName(i);
                 vertices.Resize(0);
-                OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,0), scale*height(i)),vertices);
+                OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)),vertices);
                 OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
             }
             glPopAttrib();
@@ -115,7 +115,7 @@ Display(const int in_color) const
                 else
                 {
                     for(int i=0;i<x->counts.x;i++)
-                        OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,0) + displacement_scale*((*x)(i)-grid.Axis_X(i,0)),
+                        OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x + displacement_scale*((*x)(i)-grid.X(TV_INT(i)).x),
                                 scale*height(i)),vertices);       
                 }
                 OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
@@ -125,7 +125,7 @@ Display(const int in_color) const
             water_color.Send_To_GL_Pipeline();
             vertices.Resize(0);
             for(int i=0;i<grid.counts.x;i++)
-                OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,0), scale*height(i)),vertices);
+                OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)),vertices);
             OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
 
             if(draw_points)
@@ -135,22 +135,22 @@ Display(const int in_color) const
                 points_color.Send_To_GL_Pipeline();
                 vertices.Resize(0);
                 for(int i=0;i<grid.counts.x;i++)
-                    OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,0), scale*height(i)),vertices);
+                    OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)),vertices);
                 OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
 
 #ifndef USE_OPENGLES
                 for(int i=0;i<grid.counts.x;i++)
-                    OpenGL_String(VECTOR<T,2>(grid.Axis_X(i,0),scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
+                    OpenGL_String(VECTOR<T,2>(grid.X(TV_INT(i)).x,scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
 #endif
 
                 if(selected_index>=0){
                     selected_point_color.Send_To_GL_Pipeline();
                     int i=selected_index;
                     vertices.Resize(0);
-                    OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,0), scale*height(i)),vertices);
+                    OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)),vertices);
                     OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
 #ifndef USE_OPENGLES
-                    OpenGL_String(VECTOR<T,2>(grid.Axis_X(i,0),scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
+                    OpenGL_String(VECTOR<T,2>(grid.X(TV_INT(i)).x,scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
 #endif
                 }
 
@@ -163,14 +163,14 @@ Display(const int in_color) const
             {
                 vertices.Resize(0);
                 for(int i=0;i<grid.counts.x;i++)
-                    OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,0), scale*(*ground)(i)),vertices);      
+                    OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*(*ground)(i)),vertices);      
                 OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
             }
             else
             {
                 vertices.Resize(0);
-                OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(0,0), 0),vertices);
-                OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(grid.counts.x-1,0), 0),vertices);
+                OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT()).x, 0),vertices);
+                OpenGL_Vertex(VECTOR<T,2>(grid.X(grid.counts-1).x, 0),vertices);
                 OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
             }
         }
@@ -242,7 +242,7 @@ Reinitialize(bool force)
                     if(height.counts.x != u->counts.x) success=false;
                     else for(int i=0;i<grid.counts.x;i++){
                             vector_field(i)=VECTOR<T,2>((*u)(i),0);
-                            vector_locations(i)=VECTOR<T,2>(grid.Axis_X(i,0), scale*height(i));}}
+                            vector_locations(i)=VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i));}}
                 else success=false;}
 
             if(success){

@@ -48,7 +48,7 @@ Negative_Material_In_Cell(const GRID<TV>& grid,const TV_INT& cell_index,const bo
         if(phi<minimum_phi) minimum_phi=phi;
         if(phi>maximum_phi) maximum_phi=phi;}
 
-    if(minimum_phi*maximum_phi>0 && min(abs(minimum_phi),abs(maximum_phi))>grid.Minimum_Edge_Length()) return minimum_phi<=0?full_cell_size:0;
+    if(minimum_phi*maximum_phi>0 && min(abs(minimum_phi),abs(maximum_phi))>grid.dX.Min()) return minimum_phi<=0?full_cell_size:0;
 
     int unrefined_point_count=last_node;
     int last_parent_simplex=0,first_parent_simplex=1;

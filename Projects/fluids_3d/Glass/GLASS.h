@@ -245,7 +245,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
 {
-    for(int s=0;s<sources.m;s++) dt=min(dt,fluids_parameters.cfl*fluids_parameters.grid->min_dX/sources_velocity(s).Magnitude());
+    for(int s=0;s<sources.m;s++) dt=min(dt,fluids_parameters.cfl*fluids_parameters.grid->dX.Min()/sources_velocity(s).Magnitude());
 }
 //#####################################################################
 // Function Update_Fluid_Parameters
@@ -314,7 +314,7 @@ void Add_SPH_Particles_For_Sources(const T dt,const T time) PHYSBAM_OVERRIDE
                     int id=removed_negative_particles(block)->Add_Element();
                     id_attr(id)=particle_id++;
                     removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->V(id)=sph_sources_velocity(s);
-                    removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}}}}
+                    removed_negative_particles(block)->radius(id)=(T).1*grid.dX.Min();}}}}
 }
 //#####################################################################
 };

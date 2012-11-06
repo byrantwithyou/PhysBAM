@@ -289,7 +289,7 @@ Initial_Phi(const TV& X) const
         if(phi<0) phi=X.y-(T).400235234;}
     else if(test_number==21) phi=X.y-(T).32424;
     else if(test_number==22){
-        T height=height_noise_random.Get_Uniform_Number(grid.Axis_X(20,1),grid.Axis_X(21,1));
+        T height=height_noise_random.Get_Uniform_Number(grid.X(TV_INT(0,20,0)).y,grid.X(TV_INT(0,21,0)).y);
         phi=X.y-height;}
     else if(test_number==23){
         static SPHERE<TV> sphere((TV((T).7,(T).7,(T).7)),(T).1);
@@ -430,7 +430,7 @@ Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<GRID<VEC
             if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
             int id=removed_negative_particles(block)->Add_Element();
             (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
-            removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}}
+            removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.dX.Min();}}
     else if(test_number==9){
         sph_evolution.target_particles_per_unit_volume=200000;
         ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& removed_negative_particles=particle_levelset.removed_negative_particles;
@@ -446,7 +446,7 @@ Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<GRID<VEC
                 if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
                 int id=removed_negative_particles(block)->Add_Element();
                 (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
-                removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}
+                removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.dX.Min();}
             particle_region+=TV(1,0,0);number_of_sph_particles=int(particle_multiplier*number_of_sph_particles);}}
     else if(test_number==10){
         sph_evolution.target_particles_per_unit_volume=tests.target_particles_per_unit_volume;
@@ -467,7 +467,7 @@ Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<GRID<VEC
             if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
             int id=removed_negative_particles(block)->Add_Element();
             (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
-            removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}}
+            removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.dX.Min();}}
 }
 template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::
 Initialize_SPH_Particles()
