@@ -144,18 +144,8 @@ public:
     TV Maximum_Corner() const
     {return max_corner;}
 
-    void Corners(ARRAY<TV,VECTOR<int,1> >& corners) const
-    {STATIC_ASSERT(d==1);corners.Resize(0,1);corners(0)=min_corner;corners(1)=max_corner;}
-
-    void Corners(ARRAY<TV,VECTOR<int,2> >& corners) const
-    {STATIC_ASSERT(d==2);corners.Resize(0,1,0,1);
-    for(int i=0;i<2;i++) for(int j=0;j<2;j++)
-        corners(i,j)=TV(i?max_corner.x:min_corner.x,j?max_corner.y:min_corner.y);}
-
-    void Corners(ARRAY<TV,VECTOR<int,3> >& corners) const
-    {STATIC_ASSERT(d==3);corners.Resize(0,1,0,1,0,1);
-    for(int i=0;i<2;i++) for(int j=0;j<2;j++) for(int k=0;k<2;k++)
-        corners(i,j,k)=TV(i?max_corner.x:min_corner.x,j?max_corner.y:min_corner.y,k?max_corner.z:min_corner.z);}
+    void Corners(VECTOR<TV,1<<TV::m>& corners) const
+    {TV s[2]={min_corner,max_corner};for(int i=0;i<(1<<TV::m);i++) for(int d=0;d<TV::m;d++) corners(i)(d)=s[(i>>d)&1](d);}
 
     T Size() const // assumes nonnegative entries
     {return Edge_Lengths().Product();}
