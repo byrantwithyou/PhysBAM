@@ -27,11 +27,11 @@ public:
     static T Sign(const T phi)
     {if(phi <= 0) return -1;else return 1;}
 
-    static int Interface(const T phi_1,const T phi_2)
-    {if((phi_1 > 0 && phi_2 <=0) || (phi_1 <= 0 && phi_2 > 0)) return 1;else return 0;}
+    static bool Interface(const T phi_1,const T phi_2)
+    {return (phi_1 > 0 && phi_2 <=0) || (phi_1 <= 0 && phi_2 > 0);}
 
-    static int Thin_Shells_Interface(const T phi_1,const T phi_2)
-    {if(phi_1==FLT_MAX||phi_2==FLT_MAX) return 0;else return Interface(phi_1,phi_2);}
+    static bool Thin_Shells_Interface(const T phi_1,const T phi_2)
+    {if(phi_1==FLT_MAX || phi_2==FLT_MAX) return false;return Interface(phi_1,phi_2);}
 
     static T Heaviside(const T phi,const T half_width=0)
     {if(phi <= -half_width) return 0;if(phi >= half_width) return 1;
