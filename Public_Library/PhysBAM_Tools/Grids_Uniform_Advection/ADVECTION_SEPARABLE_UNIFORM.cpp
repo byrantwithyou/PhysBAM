@@ -92,7 +92,7 @@ template<> struct UPDATE_ADVECTION_EQUATION_HELPER<3>
             advection.Advection_Solver(mn,dz,Z_1d_z,w_1d,w_Zz_1d);
             for(ij=0;ij<mn;ij++) rhs(i,j,ij)+=w_Zz_1d(ij);}}
 
-        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++) Z(i,j,ij)-=dt*rhs(i,j,ij);
+        for(RANGE_ITERATOR<3> it(grid.Domain_Indices());it.Valid();it.Next()) Z(it.index)-=dt*rhs(it.index);
     }
 };
 }

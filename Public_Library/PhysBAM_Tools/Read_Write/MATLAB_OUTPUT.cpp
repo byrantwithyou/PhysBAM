@@ -97,8 +97,8 @@ Write_Header_File(const std::string& file_name,const GRID<VECTOR<T,3> >& grid,co
 {
     int m=grid.Counts().x,n=grid.Counts().y,mn=grid.Counts().z;
     ARRAY<T,VECTOR<int,3> > x(0,m,0,n,0,mn),y(0,m,0,n,0,mn),z(0,m,0,n,0,mn);
-    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){x(i,j,ij)=grid.X(VECTOR<int,3>(i,j,ij)).x;y(i,j,ij)=grid.X(VECTOR<int,3>(i,j,ij)).y;z(i,j,ij)=grid.X(VECTOR<int,3>(i,j,ij)).z;}
-    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){x(i,j,ij)=grid.X(VECTOR<int,3>(i,j,ij)).x;y(i,j,ij)=grid.X(VECTOR<int,3>(i,j,ij)).y;z(i,j,ij)=grid.X(VECTOR<int,3>(i,j,ij)).z;}
+    for(RANGE_ITERATOR<3> it(grid.Domain_Indices());it.Valid();it.Next()){x(it.index)=grid.X(it.index).x;y(it.index)=grid.X(it.index).y;z(it.index)=grid.X(it.index).z;}
+    for(RANGE_ITERATOR<3> it(grid.Domain_Indices());it.Valid();it.Next()){x(it.index)=grid.X(it.index).x;y(it.index)=grid.X(it.index).y;z(it.index)=grid.X(it.index).z;}
     Write_Header_File(file_name,x,y,z,stepnumber);
 }
 //#####################################################################
@@ -148,10 +148,10 @@ Write_Output_File(const std::string& file_name,const ARRAY<T,VECTOR<int,2> >& ou
 template<class T> void MATLAB_OUTPUT::
 Write_Output_File(const std::string& file_name,const ARRAY<T,VECTOR<int,3> >& output,const int stepnumber)
 {
-    int m=output.domain.max_corner.x,n=output.domain.max_corner.y,mn=output.domain.max_corner.z;double data_double;
+    double data_double;
     std::ofstream Matlab_Output;Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
-    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
-        data_double=output(i,j,ij);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
+    for(RANGE_ITERATOR<3> it(output.domain);it.Valid();it.Next()){
+        data_double=output(it.index);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }
 //#####################################################################
