@@ -154,16 +154,6 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
     projection.poisson->Set_Constant_beta(one_over_densities);
     if(!GFM){projection.poisson->Use_Delta_Function_Method(number_of_interface_cells);projection.poisson->Smear_One_Over_beta();}
 
-// SAVE THIS HERE...
-//    if(viscosity_minus || viscosity_plus){ // update velocity to include viscosity on the interior
-//        int ghost_cells=3;
-//        ARRAY<T,VECTOR<int,3> > phi_ghost(grid.Domain_Indices(3));levelset.boundary->Fill_Ghost_Cells(grid,levelset.phi,phi_ghost,dt,time,ghost_cells);
-//        projection.poisson->Find_Constant_beta(phi_ghost);
-//        for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
-//            T dt_over_rho=.125*dt*(projection.poisson->beta_right(i-1,j,ij)+projection.poisson->beta_right(i,j,ij)+projection.poisson->beta_top(i,j-1,ij)+projection.poisson->beta_top(i,j,ij)
-//                +projection.poisson->beta_back(i,j,ij-1)+projection.poisson->beta_back(i,j,ij));
-//            V(i,j,ij).x+=dt_over_rho*u_viscosity(i,j,ij);V(i,j,ij).y+=dt_over_rho*v_viscosity(i,j,ij);V(i,j,ij).z+=dt_over_rho*w_viscosity(i,j,ij);}
-
     if((GFM&&nonzero_surface_tension)||projection.flame) projection.poisson_collidable->Set_Jump_Multiphase();
     
     if(GFM && nonzero_surface_tension){
