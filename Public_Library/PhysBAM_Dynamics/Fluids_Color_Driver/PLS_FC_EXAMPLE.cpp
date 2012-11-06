@@ -17,14 +17,13 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> PLS_FC_EXAMPLE<TV>::
 PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
-    :stream_type(stream_type_input),initial_time(0),last_frame(100),
-    write_substeps_level(-1),write_output_files(true),output_directory("output"),restart(0),
-    number_of_ghost_cells(3),dt(1),time_steps_per_frame(1),use_preconditioner(true),max_iter(100000),
-    dump_matrix(false),wrap(true),use_advection(true),use_reduced_advection(false),omit_solve(false),
-    number_of_colors(1),use_discontinuous_velocity(false),use_p_null_mode(false),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
-    particle_levelset_evolution_multiple(*new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >(grid,number_of_ghost_cells)),
-    advection_scalar(*new ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T>),boundary(0),
-    levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),collision_bodies_affecting_fluid(*new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >(grid)),debug_particles(*new DEBUG_PARTICLES<TV>)
+    :stream_type(stream_type_input),initial_time(0),last_frame(100),write_substeps_level(-1),write_output_files(true),
+    output_directory("output"),restart(0),number_of_ghost_cells(3),dt(1),time(0),time_steps_per_frame(1),use_preconditioner(true),
+    max_iter(100000),dump_matrix(false),wrap(true),use_advection(true),use_reduced_advection(false),omit_solve(false),
+    number_of_colors(1),use_discontinuous_velocity(false),use_p_null_mode(false),use_level_set_method(false),use_pls(false),
+    grid(TV_INT(),RANGE<TV>::Unit_Box(),true),particle_levelset_evolution_multiple(*new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >(grid,number_of_ghost_cells)),
+    advection_scalar(*new ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T>),boundary(0),levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),
+    collision_bodies_affecting_fluid(*new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >(grid)),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     domain_boundary(1)(1)=false;
@@ -186,6 +185,27 @@ Fill_Levelsets_From_Levelset_Color()
         Reinitialize(fl,number_of_ghost_cells*2,(T)0,number_of_ghost_cells*grid.dX.Max(),(T)0,(T).9,3,5,1);}
     for(int i=0;i<phis.m;i++)
         Reinitialize(*particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(i),number_of_ghost_cells*2,(T)0,number_of_ghost_cells*grid.dX.Max(),(T)0,(T).9,3,5,1);
+}
+//#####################################################################
+// Function Get_Levelset_Velocity
+//#####################################################################
+template<class TV> void PLS_FC_EXAMPLE<TV>::
+Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const
+{
+    PHYSBAM_FATAL_ERROR();
+}
+//#####################################################################
+// Function Get_Levelset_Velocity
+//#####################################################################
+template<class TV> void PLS_FC_EXAMPLE<TV>::
+Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const
+{
+    ARRAY<T,FACE_INDEX<TV::dimension> > n(grid,number_of_ghost_cells),m(grid,number_of_ghost_cells);
+    Merge_Velocities(n,face_velocities,face_color);
+    Merge_Velocities(m,prev_face_velocities,prev_face_color);
+    T alpha=(time-this->time)/dt;
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
+        V_levelset(it.Full_Index())=(1-alpha)*n(it.Full_Index())+alpha*m(it.Full_Index());
 }
 //#####################################################################
 template class PLS_FC_EXAMPLE<VECTOR<float,2> >;

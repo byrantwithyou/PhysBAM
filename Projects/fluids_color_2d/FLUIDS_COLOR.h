@@ -68,7 +68,7 @@ class FLUIDS_COLOR:public PLS_FC_EXAMPLE<TV>
 
 public:
     using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
-    using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
+    using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;using BASE::use_level_set_method;
     using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::number_of_colors;
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
     using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
@@ -317,6 +317,16 @@ public:
                     analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE(new ANALYTIC_LEVELSET_ROTATE(new ANALYTIC_LEVELSET_SCALE(new ANALYTIC_LEVELSET_VORTEX((T).2),-2),4),TV(9,.4));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),TV(.5,-.2)));
                     if(bc_type!=NEUMANN) use_p_null_mode=true;
+                }
+                break;
+            case 20:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                {
+                    TV vel((T).2,(T).5);
+                    analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),vel);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(vel));
+                    if(bc_type!=NEUMANN) use_p_null_mode=true;
+                    use_level_set_method=true;
                 }
                 break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}

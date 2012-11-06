@@ -72,7 +72,7 @@ Initialize()
     // setup time
     current_frame=example.restart;
     output_number=current_frame;
-    time=example.time_steps_per_frame*current_frame*example.dt;
+    example.time=time=example.time_steps_per_frame*current_frame*example.dt;
 
     example.levelset_color.phi.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
     example.levelset_color.color.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
@@ -228,15 +228,16 @@ Advance_One_Time_Step(bool first_step)
     example.Begin_Time_Step(time);
     T dt=example.dt;
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before levelset evolution",0,1);
-//    Update_Pls(dt);
-    Update_Level_Set(dt,first_step);
+
+    if(example.use_level_set_method) Update_Level_Set(dt,first_step);
+    else if(example.use_pls) Update_Pls(dt);
 
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
     Advection_And_BDF(dt,first_step);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before solve",0,1);
     Apply_Pressure_And_Viscosity(dt,first_step);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after solve",0,1);
-    time+=dt;
+    example.time=time+=dt;
     Extrapolate_Velocity(example.face_velocities,example.face_color);
     example.End_Time_Step(time);
 }
