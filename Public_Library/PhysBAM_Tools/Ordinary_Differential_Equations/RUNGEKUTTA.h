@@ -91,9 +91,29 @@ public:
     void Pseudo_Time()
     {pseudo_time=1;}
 
-//#####################################################################
-    void Start(const T dt_input);
-    T Main();
+    void Start(const T dt_input)
+    {
+        dt=dt_input;substep=0;
+        if(order>1)
+            u_copy=u;
+    }
+
+    T Main()
+    {
+        substep+=1;
+        if(substep==1){if(!pseudo_time) time+=dt;}
+        else{
+            if(substep==2 && order==2)
+                u=(T).5*(u_copy+u);
+            else if(substep==2 && order==3){
+                if(!pseudo_time) time-=dt/2;
+                u=(T).75*u_copy+(T).25*u;}
+            else if(substep==3){
+                if(!pseudo_time) time+=dt/2;
+                u=(T)1./3*u_copy+(T)2./3*u;}
+            if(enforce_boundary_condition) (*enforce_boundary_condition)(u,time);}
+        return time;
+    }
 //#####################################################################
 };
 
@@ -114,9 +134,15 @@ public:
         STATIC_ASSERT(SCALAR_VIEW_IS_VECTOR_SPACE<TV>::value);
     }
 
-    static RUNGEKUTTA* Create(TV& u,const int order,const T dt,const T time)
-    {RUNGEKUTTA* runge_kutta=new RUNGEKUTTA(u);runge_kutta->Set_Order(order);runge_kutta->Set_Time(time);
-    runge_kutta->dt=dt;runge_kutta->substep=0;return runge_kutta;}
+    RUNGEKUTTA(TV& u,const int order,const T dt,const T time)
+        :RUNGEKUTTA_CORE<T>(u),u(u)
+    {
+        STATIC_ASSERT(SCALAR_VIEW_IS_VECTOR_SPACE<TV>::value);
+        this->order=order;
+        this->time=time;
+        this->dt=dt;
+        this->substep=0;
+    }
 
     template<class T_GRID,class T_BOUNDARY>
     void Set_Grid_And_Boundary_Condition(T_GRID& grid,T_BOUNDARY& boundary)
@@ -126,7 +152,6 @@ public:
         this->enforce_boundary_condition=new RUNGEKUTTA_BOUNDARY_CONDITION_HELPER<TV,T_GRID,T_BOUNDARY>(*this,grid,boundary);
     }
 
-// private:
     template<class T_GRID,class T_BOUNDARY> void
     Enforce_Boundary_Condition(const T_GRID& grid,T_BOUNDARY& boundary,ARRAY_VIEW<T> u_view,const T time)
     {ARRAY_VIEW<T> real_u_view(Scalar_View(u));PHYSBAM_ASSERT(real_u_view.Size()==u_view.Size() && real_u_view.Get_Array_Pointer()==u_view.Get_Array_Pointer());
@@ -143,9 +168,14 @@ public:
         :RUNGEKUTTA_CORE<T>(u),u(u)
     {}
 
-    static RUNGEKUTTA* Create(ARRAY<T,FACE_INDEX<d> >& u,const int order,const T dt,const T time)
-    {RUNGEKUTTA* runge_kutta=new RUNGEKUTTA(u);runge_kutta->Set_Order(order);runge_kutta->Set_Time(time);
-    runge_kutta->dt=dt;runge_kutta->substep=0;return runge_kutta;}
+    RUNGEKUTTA(ARRAY<T,FACE_INDEX<d> >& u,const int order,const T dt,const T time)
+        :RUNGEKUTTA_CORE<T>(u),u(u)
+    {
+        this->order=order;
+        this->time=time;
+        this->dt=dt;
+        this->substep=0;
+    }
 
     template<class T_GRID,class T_BOUNDARY>
     void Set_Grid_And_Boundary_Condition(T_GRID& grid,T_BOUNDARY& boundary)
@@ -155,7 +185,6 @@ public:
         this->enforce_boundary_condition=new RUNGEKUTTA_BOUNDARY_CONDITION_HELPER<ARRAY<T,FACE_INDEX<d> >,T_GRID,T_BOUNDARY>(*this,grid,boundary);
     }
 
-// private:
     template<class T_GRID,class T_BOUNDARY> void
     Enforce_Boundary_Condition(const T_GRID& grid,T_BOUNDARY& boundary,ARRAY_VIEW<T> u_view,const T time)
     {ARRAY_VIEW<T> real_u_view(Scalar_View(u));PHYSBAM_ASSERT(real_u_view.Size()==u_view.Size() && real_u_view.Get_Array_Pointer()==u_view.Get_Array_Pointer());

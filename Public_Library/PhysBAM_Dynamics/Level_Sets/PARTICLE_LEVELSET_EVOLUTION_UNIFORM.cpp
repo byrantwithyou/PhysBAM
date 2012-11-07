@@ -138,7 +138,7 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const PARTICLE
     T current_time=input_time;
     T_ARRAYS_RUNGEKUTTA rungekutta_particles;rungekutta_particles.Resize(mac_grid.Domain_Indices(1));
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index()))
-        rungekutta_particles(iterator.Cell_Index())=RUNGEKUTTA<ARRAY_VIEW<TV> >::Create(particles(iterator.Cell_Index())->X,runge_kutta_order_particles,dt,current_time);
+        rungekutta_particles(iterator.Cell_Index())=new RUNGEKUTTA<ARRAY_VIEW<TV> >(particles(iterator.Cell_Index())->X,runge_kutta_order_particles,dt,current_time);
     for(int k=0;k<runge_kutta_order_particles;k++){
         if(k == 1 || !use_frozen_velocity) particle_levelset.levelset.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset.levelset,V,current_time);
         particle_levelset.Euler_Step_Particles_Wrapper(V,particles,particle_type,dt,current_time,false,k==0,false);
@@ -163,7 +163,7 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const 
     T current_time=input_time;
     T_ARRAYS_RUNGEKUTTA rungekutta_particles;rungekutta_particles.Resize(mac_grid.Domain_Indices(1));
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index()))
-        rungekutta_particles(iterator.Cell_Index())=RUNGEKUTTA<ARRAY_VIEW<TV> >::Create(particles(iterator.Cell_Index())->X,runge_kutta_order_particles,dt,current_time);
+        rungekutta_particles(iterator.Cell_Index())=new RUNGEKUTTA<ARRAY_VIEW<TV> >(particles(iterator.Cell_Index())->X,runge_kutta_order_particles,dt,current_time);
     for(int k=0;k<runge_kutta_order_particles;k++){
         if(k == 1 || !use_frozen_velocity) particle_levelset.levelset.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset.levelset,V,current_time);
         particle_levelset.Euler_Step_Particles_Wrapper(V,particles,particle_type,dt,current_time,false,k==0,false);
