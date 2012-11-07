@@ -119,10 +119,10 @@ Compute_Entries(bool double_fine)
                 subcell_phi_colors(b)=color;
                 material_subcell(s)|=color>=0;}
             if(material_subcell(s)){
-                const PAIR<HASH_INTERFACE,HASH_BOUNDARY>& elements=cdi.cell_to_element.Get(subcell_base);
-                const HASH_INTERFACE& surface_elements=elements.x;
-                const HASH_BOUNDARY& sides_elements=elements.y;
-                for(typename HASH_INTERFACE::CONST_ITERATOR it(surface_elements);it.Valid();it.Next()){
+                const PAIR<HASH_CELL_INTERFACE,HASH_CELL_BOUNDARY>& elements=cdi.cell_to_element.Get(subcell_base);
+                const HASH_CELL_INTERFACE& surface_elements=elements.x;
+                const HASH_CELL_BOUNDARY& sides_elements=elements.y;
+                for(typename HASH_CELL_INTERFACE::CONST_ITERATOR it(surface_elements);it.Valid();it.Next()){
                     const VECTOR<int,2>& color_pair=it.Key();
                     const INTERVAL<int>& interval=it.Data();
                     const T_SURFACE& surf=*cdi.interface.Get(color_pair);
@@ -130,7 +130,7 @@ Compute_Entries(bool double_fine)
                         T_FACE x=surf.Get_Element(i);
                         for(int j=0;j<TV::m;j++) x.X(j)-=cell_center;
                         surface(s).Append(SURFACE_ELEMENT(x,color_pair.x,color_pair.y));}}
-                for(typename HASH_BOUNDARY::CONST_ITERATOR it(sides_elements);it.Valid();it.Next()){
+                for(typename HASH_CELL_BOUNDARY::CONST_ITERATOR it(sides_elements);it.Valid();it.Next()){
                     const int color=it.Key();
                     const INTERVAL<int>& interval=it.Data();
                     const T_SURFACE& surf=*cdi.boundary.Get(color);

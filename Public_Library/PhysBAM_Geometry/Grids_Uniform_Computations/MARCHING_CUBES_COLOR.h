@@ -8,6 +8,7 @@
 #define __MARCHING_CUBES_COLOR__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
@@ -38,11 +39,14 @@ public:
 
 //#####################################################################
 
-    typedef HASHTABLE<VECTOR<int,2>,INTERVAL<int> > HASH_INTERFACE;
-    typedef HASHTABLE<int,INTERVAL<int> > HASH_BOUNDARY;
+    typedef HASHTABLE<int,T_SURFACE*> HASH_BOUNDARY;
+    typedef HASHTABLE<int,INTERVAL<int> > HASH_CELL_BOUNDARY;
+    typedef HASHTABLE<VECTOR<int,2>,T_SURFACE*> HASH_INTERFACE;
+    typedef HASHTABLE<VECTOR<int,2>,INTERVAL<int> > HASH_CELL_INTERFACE;
+    typedef HASHTABLE<TV_INT,PAIR<HASH_CELL_INTERFACE,HASH_CELL_BOUNDARY> > HASH_CELL_TO_ELEMENT;
 
-    static void Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,HASHTABLE<int,T_SURFACE*>& boundary,
-        HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> >& cell_to_element,const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
+    static void Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& boundary,
+        HASH_CELL_TO_ELEMENT& cell_to_element,const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
         const int newton_steps=20,const bool verbose=false);
 
 //#####################################################################

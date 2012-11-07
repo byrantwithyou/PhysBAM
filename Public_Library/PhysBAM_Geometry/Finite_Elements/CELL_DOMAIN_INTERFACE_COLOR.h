@@ -37,6 +37,9 @@ class CELL_DOMAIN_INTERFACE_COLOR:public NONCOPYABLE
 
 public:
 
+    typedef typename MARCHING_CUBES_COLOR<TV>::HASH_CELL_TO_ELEMENT HASH_CELL_TO_ELEMENT;
+    typedef typename MARCHING_CUBES_COLOR<TV>::HASH_CELL_INTERFACE HASH_CELL_INTERFACE;
+    typedef typename MARCHING_CUBES_COLOR<TV>::HASH_CELL_BOUNDARY HASH_CELL_BOUNDARY;
     typedef typename MARCHING_CUBES_COLOR<TV>::HASH_INTERFACE HASH_INTERFACE;
     typedef typename MARCHING_CUBES_COLOR<TV>::HASH_BOUNDARY HASH_BOUNDARY;
     typedef typename MARCHING_CUBES_COLOR<TV>::T_SURFACE T_SURFACE;
@@ -75,9 +78,9 @@ public:
 
     ARRAY<SURFACE_ELEMENT> surface_mesh;
 
-    HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> > cell_to_element;
-    HASHTABLE<VECTOR<int,2>,T_SURFACE*> interface;
-    HASHTABLE<int,T_SURFACE*> boundary;
+    HASH_CELL_TO_ELEMENT cell_to_element;
+    HASH_INTERFACE interface;
+    HASH_BOUNDARY boundary;
     
     CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int colors_input,bool wrap_input);
 

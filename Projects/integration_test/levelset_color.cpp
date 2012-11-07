@@ -186,7 +186,7 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
         HASHTABLE<int,T_SURFACE*> boundary;
         MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,cell_to_element,phi_color,phi_value,i,verbose);
         Dump_Interface<T,TV,T_SURFACE,T_FACE>(surface);
-        // Dump_Boundary<T,TV,T_SURFACE,T_FACE>(boundary);
+        Dump_Boundary<T,TV,T_SURFACE,T_FACE>(boundary);
         char buffer[100];
         sprintf(buffer, "newton step %i",i);
         Flush_Frame<T,TV>(buffer);}
