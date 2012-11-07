@@ -7,11 +7,11 @@
 #ifndef __SOLIDS_FLUIDS_EXAMPLE_UNIFORM__
 #define __SOLIDS_FLUIDS_EXAMPLE_UNIFORM__
 
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_CALLBACKS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/SOLIDS_COLLISIONS_FORWARD.h>
 #include <PhysBAM_Fluids/PhysBAM_Fluids/Fluids/FLUID_COLLECTION.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/INCOMPRESSIBLE_COLLISIONS_FORWARD.h>
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE.h>

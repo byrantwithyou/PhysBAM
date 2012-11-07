@@ -15,6 +15,7 @@ namespace PhysBAM{
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template<class T_GRID> class LEVELSET_MULTIPLE;
 template<class TV> class LEVELSET;
+template<class TV> class PARTICLE_LEVELSET_PARTICLES;
 
 template<class T_GRID>
 class LEVELSET_CALLBACKS

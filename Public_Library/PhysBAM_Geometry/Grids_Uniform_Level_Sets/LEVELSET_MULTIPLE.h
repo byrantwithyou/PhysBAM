@@ -15,7 +15,7 @@ namespace PhysBAM{
 
 template<class T,class T2> class BOUNDARY;
 
-template<class T_GRID> class LEVELSET_CALLBACKS;
+template<class T_GRID> class LEVELSET_CALLBACKS; // TODO: invalid dependency
 template<class T_GRID>
 class LEVELSET_MULTIPLE:public NONCOPYABLE
 {

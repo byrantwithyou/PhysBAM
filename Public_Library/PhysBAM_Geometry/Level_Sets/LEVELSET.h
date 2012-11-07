@@ -27,7 +27,7 @@ namespace PhysBAM{
 
 template<class T_GRID> struct COLLISION_GEOMETRY_COLLECTION_POLICY;
 template<class T_GRID> struct INTERPOLATION_POLICY;
-template<class T_GRID> class LEVELSET_CALLBACKS;
+template<class T_GRID> class LEVELSET_CALLBACKS; // TODO: invalid dependency
 template<class T_GRID> struct BOUNDARY_POLICY;
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template<class TV> class GRID;
