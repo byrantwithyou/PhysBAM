@@ -254,6 +254,12 @@ public:
     TV_INT Strides() const
     {TV_INT strides;strides(TV_INT::m-1)=1;for(int i=TV_INT::m-1;i>0;i--) strides(i-1)=strides(i)*counts(i);return strides;}
 
+    T* Get_Array_Pointer()
+    {return base_pointer;}
+
+    const T* Get_Array_Pointer() const
+    {return base_pointer;}
+
     TV_INT Clamp(const TV_INT& i) const
     {return domain.Clamp(i);}
 

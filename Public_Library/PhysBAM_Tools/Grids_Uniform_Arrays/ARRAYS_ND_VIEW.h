@@ -63,12 +63,6 @@ public:
     ARRAY_VIEW& operator=(const T_ARRAY2& source)
     {assert(Equal_Dimensions(*this,source));array=source.array;return *this;}
 
-    T* Get_Array_Pointer()
-    {return base_pointer;}
-
-    const T* Get_Array_Pointer() const
-    {return base_pointer;}
-
     void Exchange(ARRAY_VIEW& other)
     {STATIC_ASSERT(!IS_CONST<T>::value);this->Exchange(other);} // make ARRAY_VIEW<const T> equivalent to const ARRAY_VIEW<const T>
 
