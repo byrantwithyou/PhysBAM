@@ -34,7 +34,6 @@ public:
     T_ARRAYS_SCALAR phi;
     T_FACE_ARRAYS_SCALAR V;
     PARTICLE_LEVELSET_UNIFORM<T_GRID> particle_levelset;
-    RUNGEKUTTA<T_ARRAYS_SCALAR>* rungekutta_phi;
 
     LEVELSET_ADVECTION<TV>& levelset_advection;
 
@@ -102,7 +101,6 @@ public:
     particle_levelset.cfl_number=cfl_number_input;}
 
 //#####################################################################
-    virtual void Initialize_Runge_Kutta();
     virtual void Advance_To_Time(T_FACE_ARRAYS_SCALAR* face_velocities,const T stopping_time,const bool verbose=true);
     virtual T Time_Step(const T stopping_time,bool& limited_by_stopping_time);
     virtual T CFL(const bool need_to_get_velocity=true,const bool analytic_test=false);

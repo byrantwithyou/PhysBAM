@@ -194,28 +194,18 @@ Advance_To_Target_Time(const T target_time)
             rigid_geometry.Frame().r=ROTATION<TV>::From_Rotation_Vector(dt*rigid_geometry.Twist().angular)*rigid_geometry.Frame().r;rigid_geometry.Frame().r.Normalize();}
         kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time+dt);
 
-        if(example.order>1){
-            RUNGEKUTTA<ARRAY<T,FACE_INDEX<TV::dimension> > > rungekutta_u(example.face_velocities);
-            RUNGEKUTTA<ARRAY<T,TV_INT> > rungekutta_scalar(example.density);
-            rungekutta_u.Set_Grid_And_Boundary_Condition(example.mac_grid,*example.boundary);
-            rungekutta_u.Set_Order(example.order);rungekutta_u.Set_Time(time);rungekutta_u.Start(dt);
-            rungekutta_scalar.Set_Grid_And_Boundary_Condition(example.mac_grid,*example.boundary);
-            rungekutta_scalar.Set_Order(example.order);rungekutta_scalar.Set_Time(time);rungekutta_scalar.Start(dt);T rk_time=time;
-            for(int rk_substep=0;rk_substep<rungekutta_u.order;rk_substep++){
-                Scalar_Advance(dt,rk_time);
-                // velocity update
-                if(!example.analytic_test){
-                    Convect(dt,rk_time);
-                    Add_Forces(dt,rk_time);
-                    Project(dt,rk_time);}
-                rungekutta_scalar.Main();rk_time=rungekutta_u.Main();}}
-        else{
-            Scalar_Advance(dt,time);
+        RUNGEKUTTA<ARRAY<T,TV_INT> > rungekutta_scalar(example.density,example.order,dt,time);
+        for(RUNGEKUTTA<ARRAY<T,FACE_INDEX<TV::dimension> > > rungekutta_u(example.face_velocities,example.order,dt,time);rungekutta_u.Valid();){
+            Scalar_Advance(dt,rungekutta_u.time);
             // velocity update
             if(!example.analytic_test){
-                Convect(dt,time);
-                Add_Forces(dt,time);
-                Project(dt,time);}}
+                Convect(dt,rungekutta_u.time);
+                Add_Forces(dt,rungekutta_u.time);
+                Project(dt,rungekutta_u.time);}
+            rungekutta_u.Next();
+            rungekutta_scalar.Next();
+            example.boundary->Apply_Boundary_Condition_Face(example.mac_grid,example.face_velocities,rungekutta_u.time);
+            example.boundary->Apply_Boundary_Condition(example.mac_grid,example.density,rungekutta_u.time);}
         time+=dt;
     }
 }

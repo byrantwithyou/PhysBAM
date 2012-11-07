@@ -384,10 +384,9 @@ Advance_Particles_With_PLS(T dt)
     ARRAY_VIEW<TV> X=example.solid_body_collection.deformable_body_collection.particles.X;
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=example.fluid_collection.incompressible_fluid_collection.face_velocities;
     LINEAR_INTERPOLATION_MAC<TV,T> interp(*example.fluids_parameters.grid);
-    RUNGEKUTTA<ARRAY_VIEW<TV> > rk(X,example.fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles,dt,0);
-    for(int k=0;k<example.fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles;k++){
-        for(int p=0;p<X.m;p++) X(p)+=dt*interp.Clamped_To_Array(face_velocities,X(p));
-        rk.Main();}
+    for(RUNGEKUTTA<ARRAY_VIEW<TV> > rk(X,example.fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles,dt,0);rk.Valid();rk.Next())
+        for(int p=0;p<X.m;p++)
+            X(p)+=dt*interp.Clamped_To_Array(face_velocities,X(p));
 }
 //#####################################################################
 // Function Advance_To_Target_Time
@@ -478,18 +477,12 @@ Advect_Fluid(const T dt,const int substep)
     T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
     particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time+dt,extrapolation_ghost_cells);
     if(example.convection_order>1){
-        T rk_time=time;
-        RUNGEKUTTA<ARRAY<T,FACE_INDEX<TV::dimension> > > rk(face_velocities);
-        rk.Set_Order(example.convection_order);
-        rk.Set_Time(time);
-        rk.Start(dt);
-        for(int i=0;i<rk.order;i++){
+        for(RUNGEKUTTA<ARRAY<T,FACE_INDEX<TV::dimension> > > rk(face_velocities,example.convection_order,dt,time);rk.Valid();rk.Next()){
 //            Extrapolate_Velocity_Across_Interface(face_velocities,particle_levelset_evolution->Particle_Levelset(0).levelset,extrapolation_bandwidth);
             if(!example.two_phase)
                 incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,
                     fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
-            incompressible->Advance_One_Time_Step_Convection(dt,rk_time,face_velocities,face_velocities,fluids_parameters.number_of_ghost_cells);
-            rk_time=rk.Main();}}
+            incompressible->Advance_One_Time_Step_Convection(dt,rk.time,face_velocities,face_velocities,fluids_parameters.number_of_ghost_cells);}}
     else incompressible->Advance_One_Time_Step_Convection(dt,time,face_velocities_ghost,face_velocities,fluids_parameters.number_of_ghost_cells);
     Write_Substep("after advection",substep,1);
 

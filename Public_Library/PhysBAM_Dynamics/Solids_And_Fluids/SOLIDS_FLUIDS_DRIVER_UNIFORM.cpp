@@ -867,7 +867,7 @@ Calculate_Maximum_Allowable_dt(const T dt,T& min_dt,const int substep,RUNGEKUTTA
     else if((substep==3)&&(rungekutta_u.order==3)) val=4;
 
     EULER_UNIFORM<T_GRID>* euler=example.fluids_parameters.euler;
-    ARRAY_VIEW<TV_DIMENSION,TV_INT> U_n(euler->grid.Domain_Indices(),reinterpret_cast<TV_DIMENSION*>(rungekutta_u.u_copy.Get_Array_Pointer()));
+    ARRAY_VIEW<TV_DIMENSION,TV_INT> U_n(rungekutta_u.u_copy);
     for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T clamp_rho_cell=euler->conservation->clamp_rho*U_n(cell_index)(0);
         T clamp_e_cell=euler->conservation->clamp_e*EULER<T_GRID>::e(U_n,cell_index);
@@ -877,9 +877,9 @@ Calculate_Maximum_Allowable_dt(const T dt,T& min_dt,const int substep,RUNGEKUTTA
         if((EULER<T_GRID>::e(euler->U,cell_index)<EULER<T_GRID>::e(U_n,cell_index))&&(abs(EULER<T_GRID>::e(euler->U,cell_index)-EULER<T_GRID>::e(U_n,cell_index))>1e-5))
             min_dt=min(min_dt,((T)val*dt*(clamp_e_cell-EULER<T_GRID>::e(U_n,cell_index)))/(EULER<T_GRID>::e(euler->U,cell_index)-EULER<T_GRID>::e(U_n,cell_index)));
         assert(min_dt>0);}
-    if(min_dt!=dt){rungekutta_u.RUNGEKUTTA_CORE<T>::u-=rungekutta_u.RUNGEKUTTA_CORE<T>::u_copy;
-        rungekutta_u.RUNGEKUTTA_CORE<T>::u=min_dt*(rungekutta_u.RUNGEKUTTA_CORE<T>::u/(val*dt));
-        rungekutta_u.RUNGEKUTTA_CORE<T>::u+=rungekutta_u.RUNGEKUTTA_CORE<T>::u_copy;}
+    if(min_dt!=dt){
+        T alpha=min_dt/(val*dt);
+        rungekutta_u.u.Copy(alpha,rungekutta_u.u,1-alpha,rungekutta_u.u_copy);}
 }
 //#####################################################################
 // Function Advect_Fluid
@@ -1028,36 +1028,34 @@ Advect_Fluid(const T dt,const int substep)
         Write_Substep("before compressible explicit solve",substep,1);
         euler_solid_fluid_coupling_utilities->Extract_Time_N_Data_For_Explicit_Fluid_Forces();
         LOG::Time("compressible explicit update");
-        RUNGEKUTTA<T_ARRAYS_DIMENSION_SCALAR> rungekutta_u(euler->U);
-        rungekutta_u.Set_Grid_And_Boundary_Condition(euler->grid,*euler->boundary);
-        rungekutta_u.Set_Order(fluids_parameters.compressible_rungekutta_order);rungekutta_u.Set_Time(time);rungekutta_u.Start(dt);T rk_time=time;
-        for(int rk_substep=0;rk_substep<rungekutta_u.order;rk_substep++){
-            if(euler->timesplit && euler->thinshell) euler_solid_fluid_coupling_utilities->Revert_Cells_Near_Interface(rk_substep);
+        for(RUNGEKUTTA<T_ARRAYS_DIMENSION_SCALAR> rk(euler->U,fluids_parameters.compressible_rungekutta_order,dt,time);rk.Valid();){
+            if(euler->timesplit && euler->thinshell) euler_solid_fluid_coupling_utilities->Revert_Cells_Near_Interface(rk.substep);
             euler->Fill_Ghost_Cells(dt,time,3);
             if(fluids_parameters.compressible_apply_cavitation_correction){
-                fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_cavitation_density.elliptic_solver,euler->euler_projection.face_velocities,dt,rk_time+dt);
-                fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_cavitation_internal_energy.elliptic_solver,euler->euler_projection.face_velocities,dt,rk_time+dt);}
+                fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_cavitation_density.elliptic_solver,euler->euler_projection.face_velocities,dt,rk.time+dt);
+                fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_cavitation_internal_energy.elliptic_solver,euler->euler_projection.face_velocities,dt,rk.time+dt);}
             euler->conservation->adaptive_time_step=fluids_parameters.compressible_adaptive_time_step;
-            euler->Advance_One_Time_Step_Explicit_Part(dt,rk_time,rk_substep,rungekutta_u.order);
+            euler->Advance_One_Time_Step_Explicit_Part(dt,rk.time,rk.substep,rk.order);
             if((euler->conservation->min_dt<dt)&&(fluids_parameters.compressible_adaptive_time_step)){
-                if(rk_substep==0){restart_dt=euler->conservation->min_dt;reset_with_restart=true;return;}
-                else if((rk_substep==1)&&(rungekutta_u.order==2)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk_substep,rungekutta_u);restart_dt=min_dt;break;}
-                else if((rk_substep==1)&&(rungekutta_u.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk_substep,rungekutta_u);*const_cast<T*>(&dt)=min_dt;rk_time-=dt/2;continue;}
-                else if((rk_substep==2)&&(rungekutta_u.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk_substep,rungekutta_u);restart_dt=min_dt;break;}}
+                if(rk.substep==0){restart_dt=euler->conservation->min_dt;reset_with_restart=true;return;}
+                else if((rk.substep==1)&&(rk.order==2)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);restart_dt=min_dt;break;}
+                else if((rk.substep==1)&&(rk.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);*const_cast<T*>(&dt)=min_dt;rk.time-=dt/2;continue;}
+                else if((rk.substep==2)&&(rk.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);restart_dt=min_dt;break;}}
             for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
                 assert(euler->U(cell_index)(0)>0);assert(EULER<T_GRID>::e(euler->U,cell_index)>0);}
             if(euler->timesplit && euler->perform_rungekutta_for_implicit_part){assert(!euler->thinshell);
-                euler->Get_Dirichlet_Boundary_Conditions(dt,rk_time);
-                fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_projection.elliptic_solver,euler->euler_projection.face_velocities,dt,rk_time+dt);
-                euler->Advance_One_Time_Step_Implicit_Part(dt,rk_time);}
-            if(!euler->timesplit || euler->perform_rungekutta_for_implicit_part) example.Apply_Isobaric_Fix(dt,rk_time);
-            euler->Remove_Added_Internal_Energy(dt,rk_time);
-            rk_time=rungekutta_u.Main();
-            if(rk_substep!=rungekutta_u.order-1) euler->Clamp_Internal_Energy(dt,rk_time);
+                euler->Get_Dirichlet_Boundary_Conditions(dt,rk.time);
+                fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_projection.elliptic_solver,euler->euler_projection.face_velocities,dt,rk.time+dt);
+                euler->Advance_One_Time_Step_Implicit_Part(dt,rk.time);}
+            if(!euler->timesplit || euler->perform_rungekutta_for_implicit_part) example.Apply_Isobaric_Fix(dt,rk.time);
+            euler->Remove_Added_Internal_Energy(dt,rk.time);
+            rk.Next();
+            euler->boundary->Apply_Boundary_Condition(euler->grid,euler->U,time);
+            if(rk.substep!=rk.order-1) euler->Clamp_Internal_Energy(dt,rk.time);
 
             if(euler->timesplit && euler->thinshell){
                 Write_Substep("before applying FSI update for near-interface cells",substep,1);
-                euler_solid_fluid_coupling_utilities->Update_Cells_Near_Interface(dt,rungekutta_u.order,rk_substep);}
+                euler_solid_fluid_coupling_utilities->Update_Cells_Near_Interface(dt,rk.order,rk.substep);}
             Write_Substep("after compressible explicit rk substep",substep,1);}
 
         if(euler->timesplit && !euler->perform_rungekutta_for_implicit_part) euler->Get_Dirichlet_Boundary_Conditions(dt,time);

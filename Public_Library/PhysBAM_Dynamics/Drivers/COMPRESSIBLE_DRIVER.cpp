@@ -169,24 +169,20 @@ Advect_Fluid(const T dt,const int substep)
         for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             euler.euler_projection.p_advected(cell_index)=euler.eos->p(compressible_fluid_collection.U(cell_index)(1),EULER<GRID<TV> >::e(compressible_fluid_collection.U,cell_index));}}
 
-    RUNGEKUTTA<T_ARRAYS_DIMENSION_SCALAR> rungekutta_u(compressible_fluid_collection.U);RUNGEKUTTA<T_ARRAYS_SCALAR> rungekutta_p_advected(euler.euler_projection.p_advected);
-    rungekutta_u.Set_Grid_And_Boundary_Condition(euler.grid,*euler.boundary);
-    rungekutta_u.Set_Order(example.rungekutta_order);rungekutta_u.Set_Time(time);rungekutta_u.Start(dt);T rk_time=time;
-    if(euler.timesplit && !euler.perform_rungekutta_for_implicit_part){
-        rungekutta_p_advected.Set_Order(example.rungekutta_order);
-        rungekutta_p_advected.Set_Time(time);
-        rungekutta_p_advected.Start(dt);}
+    RUNGEKUTTA<T_ARRAYS_DIMENSION_SCALAR> rungekutta_u(compressible_fluid_collection.U,example.rungekutta_order,dt,time);
+    RUNGEKUTTA<T_ARRAYS_SCALAR> rungekutta_p_advected(euler.euler_projection.p_advected,example.rungekutta_order,dt,time);
     for(int rk_substep=0;rk_substep<rungekutta_u.order;rk_substep++){
-        euler.Advance_One_Time_Step_Explicit_Part(dt,rk_time,rk_substep,rungekutta_u.order);
+        euler.Advance_One_Time_Step_Explicit_Part(dt,rungekutta_u.time,rk_substep,rungekutta_u.order);
         if(euler.timesplit && euler.perform_rungekutta_for_implicit_part){
             euler.Get_Dirichlet_Boundary_Conditions(dt,time);
-            example.Set_Boundary_Conditions(rk_time+dt);
-            euler.Advance_One_Time_Step_Implicit_Part(dt,rk_time);}
-        if(!euler.timesplit || euler.perform_rungekutta_for_implicit_part) example.Apply_Isobaric_Fix(dt,rk_time);
-        euler.Remove_Added_Internal_Energy(dt,rk_time);
-        rk_time=rungekutta_u.Main();
-        if(euler.timesplit && !euler.perform_rungekutta_for_implicit_part) rungekutta_p_advected.Main();
-        if(rk_substep!=rungekutta_u.order) euler.Clamp_Internal_Energy(dt,rk_time);}
+            example.Set_Boundary_Conditions(rungekutta_u.time+dt);
+            euler.Advance_One_Time_Step_Implicit_Part(dt,rungekutta_u.time);}
+        if(!euler.timesplit || euler.perform_rungekutta_for_implicit_part) example.Apply_Isobaric_Fix(dt,rungekutta_u.time);
+        euler.Remove_Added_Internal_Energy(dt,rungekutta_u.time);
+        rungekutta_u.Next();
+        euler.boundary->Apply_Boundary_Condition(euler.grid,compressible_fluid_collection.U,rungekutta_u.time);
+        if(euler.timesplit && !euler.perform_rungekutta_for_implicit_part) rungekutta_p_advected.Next();
+        if(rk_substep!=rungekutta_u.order) euler.Clamp_Internal_Energy(dt,rungekutta_u.time);}
     if(euler.timesplit && !euler.perform_rungekutta_for_implicit_part) euler.Get_Dirichlet_Boundary_Conditions(dt,time);
     LOG::Stop_Time();
     Write_Substep("after compressible explicit solve",substep,1);

@@ -108,17 +108,11 @@ Reinitialize(LEVELSET<TV>& levelset,int time_steps,T time,T half_band_width,T ex
         sign_phi(cell)=phi(cell)/sqrt(sqr(phi(cell))+epsilon);}
 
     T dt=cfl*grid.dX.Min();
-    RUNGEKUTTA<ARRAY<T,TV_INT> > rungekutta(phi);
-    rungekutta.Set_Grid_And_Boundary_Condition(grid,*levelset.boundary);
-    rungekutta.Set_Order(temporal_order);
-    rungekutta.Set_Time(time);
-    rungekutta.Pseudo_Time();
-    for(int k=0;k<time_steps;k++){
-        rungekutta.Start(dt);
-        for(int kk=0;kk<rungekutta.order;kk++){
+    for(int k=0;k<time_steps;k++)
+        for(RUNGEKUTTA<ARRAY<T,TV_INT> > rk(phi,temporal_order,0,time);rk.Valid();){
             Euler_Step_Of_Reinitialization(levelset,signed_distance,sign_phi,dt,time,half_band_width,spatial_order);
-            rungekutta.Main();}
-        }
+            rk.Next();
+            levelset.boundary->Apply_Boundary_Condition(grid,phi,time);}
 
     T min_DX=grid.dX.Min();
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(signed_distance(cell)) <= large_band){

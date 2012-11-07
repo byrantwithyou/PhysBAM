@@ -31,23 +31,8 @@ PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM(const T_GRID& grid_input,const int 
 template<class T_GRID> PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 ~PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM()
 {
-    rungekutta_phis.Delete_Pointers_And_Clean_Memory();
     delete &particle_levelset_multiple;
     delete &levelset_advection_multiple;
-}
-//#####################################################################
-// Function Initialize_Runge_Kutta
-//#####################################################################
-template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
-Initialize_Runge_Kutta()
-{
-    if(runge_kutta_order_levelset>1)
-        for(int i=0;i<phis.m;i++){
-            delete rungekutta_phis(i);
-            rungekutta_phis(i)=new RUNGEKUTTA<T_ARRAYS_SCALAR>(phis(i));
-            rungekutta_phis(i)->Set_Order(runge_kutta_order_levelset);
-            rungekutta_phis(i)->Set_Time(time);
-            rungekutta_phis(i)->Set_Grid_And_Boundary_Condition(grid,*particle_levelset_multiple.particle_levelsets(i)->levelset.boundary);}
 }
 //#####################################################################
 // Function Time_Step
@@ -105,15 +90,16 @@ Advance_One_Time_Step(T_FACE_ARRAYS_SCALAR* face_velocities,const T dt)
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Advance_Levelset(const T dt)
 {
-    if(runge_kutta_order_levelset==1){
-        particle_levelset_multiple.levelset_multiple.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset_multiple.levelset_multiple,V,time);
-        levelset_advection_multiple.Euler_Step(V,dt,time,particle_levelset_multiple.number_of_ghost_cells);time+=dt;}
-    else{
-        for(int i=0;i<rungekutta_phis.m;i++)rungekutta_phis(i)->Start(dt);
-        for(int k=0;k<runge_kutta_order_levelset;k++){
-            if(k==1 || !use_frozen_velocity) particle_levelset_multiple.levelset_multiple.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset_multiple.levelset_multiple,V,time);
-            levelset_advection_multiple.Euler_Step(V,dt,time,particle_levelset_multiple.number_of_ghost_cells);
-            for(int i=0;i<rungekutta_phis.m;i++)time=rungekutta_phis(i)->Main();}}
+    ARRAY<RUNGEKUTTA<T_ARRAYS_SCALAR>*> rungekutta_phis(phis.m);
+    for(int i=0;i<phis.m;i++) rungekutta_phis(i)=new RUNGEKUTTA<T_ARRAYS_SCALAR>(phis(i),runge_kutta_order_levelset,0,time);
+    for(int k=0;k<runge_kutta_order_levelset;k++){
+        if(k==1 || !use_frozen_velocity) particle_levelset_multiple.levelset_multiple.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset_multiple.levelset_multiple,V,time);
+        levelset_advection_multiple.Euler_Step(V,dt,time,particle_levelset_multiple.number_of_ghost_cells);
+        for(int i=0;i<rungekutta_phis.m;i++){
+            rungekutta_phis(i)->Next();
+            time=rungekutta_phis(i)->time;
+            particle_levelset_multiple.particle_levelsets(i)->levelset.boundary->Apply_Boundary_Condition(grid,phis(i),time);}}
+    rungekutta_phis.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Advance_Particles
@@ -178,8 +164,7 @@ Reseed_Particles(const T time,const int time_step,ARRAY<bool,TV_INT>* cell_cente
 {
     if((use_particle_levelset && cell_centered_mask) || (!time_step || (reseeding_frequency && time_step%reseeding_frequency==0))){
         int new_particles=particle_levelset_multiple.Reseed_Particles(time,cell_centered_mask);
-        if(verbose) LOG::cout<<"Reseeding... "<<new_particles<<" new particles"<<std::endl;
-        Initialize_Runge_Kutta();} // need to reset based on new number of particles
+        if(verbose) LOG::cout<<"Reseeding... "<<new_particles<<" new particles"<<std::endl;} // need to reset based on new number of particles
 }
 //#####################################################################
 // Function Fill_Levelset_Ghost_Cells
@@ -227,7 +212,6 @@ Initialize_Domain(const T_GRID& grid_input,const int number_of_regions)  // don'
         if(levelset_advection_multiple.levelset_advections(i).semi_lagrangian_collidable)
             particle_levelset_multiple.particle_levelsets(i)->levelset.Initialize_Valid_Masks(grid);
     initial_mass.Resize(number_of_regions);
-    rungekutta_phis.Resize(number_of_regions);
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Initialize_Domain(const T_GRID& grid_input)

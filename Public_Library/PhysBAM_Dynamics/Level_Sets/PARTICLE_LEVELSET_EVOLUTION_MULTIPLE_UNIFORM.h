@@ -11,7 +11,6 @@
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_MULTIPLE_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_ARRAY> class RUNGEKUTTA;
 template<class T_GRID> class LEVELSET_ADVECTION_MULTIPLE;
 
 template<class T_GRID>
@@ -29,7 +28,6 @@ public:
     ARRAY<T_ARRAYS_SCALAR> phis;
     PARTICLE_LEVELSET_MULTIPLE_UNIFORM<T_GRID>& particle_levelset_multiple;
     ARRAY<T> initial_mass;
-    ARRAY<RUNGEKUTTA<T_ARRAYS_SCALAR>*> rungekutta_phis;
 
     LEVELSET_ADVECTION_MULTIPLE<T_GRID>& levelset_advection_multiple;
 
@@ -58,7 +56,6 @@ public:
     void Seed_Particles(const T time) PHYSBAM_OVERRIDE;
     void Delete_Particles_Outside_Grid() PHYSBAM_OVERRIDE;
     void Set_CFL_Number(const T cfl_number_input) PHYSBAM_OVERRIDE;
-    void Initialize_Runge_Kutta() PHYSBAM_OVERRIDE;
     void Advance_To_Time(T_FACE_ARRAYS_SCALAR* face_velocities,const T stopping_time,const bool verbose=true) PHYSBAM_OVERRIDE;
     T Time_Step(const T stopping_time,bool& limited_by_stopping_time) PHYSBAM_OVERRIDE;
     T CFL(const bool need_to_get_velocity=true,const bool analytic_test=false) PHYSBAM_OVERRIDE;
