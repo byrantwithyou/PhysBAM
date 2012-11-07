@@ -10,7 +10,6 @@
 namespace PhysBAM{
 
 template<class TV,int d> class EMBEDDED_OBJECT;
-template<class TV,int d> class EMBEDDED_MATERIAL_SURFACE;
 template<class TV> class EMBEDDED_TRIANGULATED_OBJECT;
 template<class TV> class TRIANGLES_OF_MATERIAL;
 template<class T> class EMBEDDED_TETRAHEDRALIZED_VOLUME;

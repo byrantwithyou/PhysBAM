@@ -8,9 +8,9 @@
 #define __HYPOTHETICAL_CUT__
 
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TRIANGULATED_OBJECT.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDING_POLICY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TRIANGULATED_OBJECT.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDING_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/HYPOTHETICAL_NODE.h>
 namespace PhysBAM{
 

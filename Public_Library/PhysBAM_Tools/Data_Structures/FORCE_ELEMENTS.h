@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 
 namespace PhysBAM{
-template<class TV> class MPI_SOLIDS;
 class FORCE_ELEMENTS
 {
 public:

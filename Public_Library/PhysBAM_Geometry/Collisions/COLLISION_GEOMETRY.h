@@ -19,8 +19,6 @@
 #include <PhysBAM_Geometry/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 
-template<class TV> class BINDING_LIST;
-template<class TV> class SOFT_BINDINGS;
 template<class TV> class FRAME;
 template<class TV> class RANGE;
 template<class TV> class COLLISION_PARTICLE_STATE;

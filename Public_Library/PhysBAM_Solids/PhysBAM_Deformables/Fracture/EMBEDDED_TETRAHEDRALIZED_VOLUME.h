@@ -7,8 +7,8 @@
 #ifndef __EMBEDDED_TETRAHEDRALIZED_VOLUME__
 #define __EMBEDDED_TETRAHEDRALIZED_VOLUME__
 
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_OBJECT.h>
 namespace PhysBAM{
 
 template<class T_input>

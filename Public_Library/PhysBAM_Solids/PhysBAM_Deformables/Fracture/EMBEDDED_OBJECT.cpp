@@ -10,13 +10,13 @@
 #include <PhysBAM_Tools/Math_Tools/permutation.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_OBJECT.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TRIANGULATED_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_OBJECT.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TRIANGULATED_OBJECT.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

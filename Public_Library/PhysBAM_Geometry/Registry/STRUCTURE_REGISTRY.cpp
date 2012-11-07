@@ -17,7 +17,6 @@
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Registry/STRUCTURE_REGISTRY.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TRIANGULATED_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
@@ -25,6 +24,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 using namespace PhysBAM;
 namespace PhysBAM{
 bool Register_Structures(){
@@ -39,7 +39,6 @@ bool Register_Structures(){
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<float,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<float,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<float,2> > > >();
-    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<float,2> > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<FREE_PARTICLES<VECTOR<float,2> > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<float,2>,FRAME<VECTOR<float,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<LEVELSET_IMPLICIT_OBJECT<VECTOR<float,2> > >();
@@ -56,7 +55,6 @@ bool Register_Structures(){
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<float,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<float,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<TORUS<float> > >();
-    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<float,3> > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<FREE_PARTICLES<VECTOR<float,3> > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<float,3>,FRAME<VECTOR<float,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<LEVELSET_IMPLICIT_OBJECT<VECTOR<float,3> > >();
@@ -76,7 +74,6 @@ bool Register_Structures(){
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<double,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<double,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<double,2> > > >();
-    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<double,2> > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<FREE_PARTICLES<VECTOR<double,2> > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<double,2>,FRAME<VECTOR<double,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<LEVELSET_IMPLICIT_OBJECT<VECTOR<double,2> > >();
@@ -93,7 +90,6 @@ bool Register_Structures(){
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<double,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<double,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<TORUS<double> > >();
-    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<double,3> > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<FREE_PARTICLES<VECTOR<double,3> > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<double,3>,FRAME<VECTOR<double,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<LEVELSET_IMPLICIT_OBJECT<VECTOR<double,3> > >();

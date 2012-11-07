@@ -4,7 +4,7 @@
 //#####################################################################
 // Class HYPOTHETICAL_CUT_TRIANGLES
 //##################################################################### 
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TRIANGULATED_OBJECT.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TRIANGULATED_OBJECT.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/HYPOTHETICAL_CUT_TRIANGLES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/HYPOTHETICAL_NODE.h>
 using namespace PhysBAM;

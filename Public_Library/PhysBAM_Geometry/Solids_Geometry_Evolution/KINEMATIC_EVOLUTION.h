@@ -12,7 +12,6 @@
 namespace PhysBAM{
 
 template<class TV> class RIGID_GEOMETRY_COLLECTION;
-template<class TV> class RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES;
 template<class TV> class RIGID_GEOMETRY_STATE;
 
 template<class TV>

@@ -16,12 +16,12 @@
 #include <PhysBAM_Geometry/Topology/TETRAHEDRON_MESH.h>
 #include <PhysBAM_Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDING_POLICY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDING_POLICY.h>
 namespace PhysBAM{
 
 static VECTOR<int,2> endpoints_temp;

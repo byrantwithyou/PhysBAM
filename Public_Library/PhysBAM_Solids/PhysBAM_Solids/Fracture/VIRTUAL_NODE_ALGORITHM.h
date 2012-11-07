@@ -8,7 +8,7 @@
 #define __VIRTUAL_NODE_ALGORITHM__
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDING_POLICY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDING_POLICY.h>
 namespace PhysBAM{
 namespace VIRTUAL_NODE_ALGORITHM{
 

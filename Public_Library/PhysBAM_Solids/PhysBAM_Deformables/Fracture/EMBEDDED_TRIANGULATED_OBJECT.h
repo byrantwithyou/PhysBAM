@@ -7,11 +7,11 @@
 #ifndef __EMBEDDED_TRIANGULATED_OBJECT__
 #define __EMBEDDED_TRIANGULATED_OBJECT__
 
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_POLICY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_OBJECT.h>
 namespace PhysBAM{
 
 template<class TV>

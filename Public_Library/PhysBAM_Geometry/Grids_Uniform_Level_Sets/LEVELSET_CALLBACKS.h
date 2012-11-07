@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
-#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
 template<class T_GRID> struct GRID_ARRAYS_POLICY;

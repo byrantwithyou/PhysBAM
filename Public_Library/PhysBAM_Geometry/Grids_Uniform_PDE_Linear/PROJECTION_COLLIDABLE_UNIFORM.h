@@ -13,8 +13,6 @@
 #include <PhysBAM_Geometry/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
 namespace PhysBAM{
 
-template<class T_GRID> class DETONATION_SHOCK_DYNAMICS;
-
 template<class T_GRID>
 class PROJECTION_COLLIDABLE_UNIFORM:public PROJECTION_UNIFORM<T_GRID>
 {

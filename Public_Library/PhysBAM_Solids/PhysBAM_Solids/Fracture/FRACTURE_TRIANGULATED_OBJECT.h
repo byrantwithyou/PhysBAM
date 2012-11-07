@@ -12,7 +12,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDING_POLICY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDING_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/FRACTURE_OBJECT.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/VIRTUAL_NODES.h>
 namespace PhysBAM{

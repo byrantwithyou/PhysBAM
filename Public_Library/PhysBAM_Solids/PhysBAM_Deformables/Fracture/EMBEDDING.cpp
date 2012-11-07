@@ -6,6 +6,7 @@
 //#####################################################################
 #include <PhysBAM_Geometry/Registry/STRUCTURE_REGISTRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TRIANGULATED_OBJECT.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/TRIANGLES_OF_MATERIAL.h>
 using namespace PhysBAM;
@@ -17,6 +18,8 @@ bool Register_Solids_Structures(){
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<EMBEDDING<VECTOR<float,3> > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<TRIANGLES_OF_MATERIAL<VECTOR<float,2> > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<TRIANGLES_OF_MATERIAL<VECTOR<float,3> > >();
+    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<float,2> > >();
+    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<float,3> > >();
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<EMBEDDING<VECTOR<double,2> > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<EMBEDDED_TETRAHEDRALIZED_VOLUME<double> >();
@@ -24,6 +27,8 @@ bool Register_Solids_Structures(){
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<EMBEDDING<VECTOR<double,3> > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<TRIANGLES_OF_MATERIAL<VECTOR<double,2> > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<TRIANGLES_OF_MATERIAL<VECTOR<double,3> > >();
+    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<double,2> > >();
+    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<double,3> > >();
 #endif
     return true;
 }

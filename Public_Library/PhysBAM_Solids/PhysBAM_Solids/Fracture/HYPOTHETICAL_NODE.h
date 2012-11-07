@@ -8,7 +8,7 @@
 #define __HYPOTHETICAL_NODE__
 
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_OBJECT.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_OBJECT.h>
 namespace PhysBAM{
 
 template<class TV,int d>

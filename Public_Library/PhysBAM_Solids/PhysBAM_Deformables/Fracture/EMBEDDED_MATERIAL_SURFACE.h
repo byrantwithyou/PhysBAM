@@ -7,10 +7,10 @@
 #ifndef __EMBEDDED_MATERIAL_SURFACE__
 #define __EMBEDDED_MATERIAL_SURFACE__
 
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TRIANGULATED_OBJECT.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDING_POLICY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TRIANGULATED_OBJECT.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDING.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDING_POLICY.h>
 namespace PhysBAM{
 
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
