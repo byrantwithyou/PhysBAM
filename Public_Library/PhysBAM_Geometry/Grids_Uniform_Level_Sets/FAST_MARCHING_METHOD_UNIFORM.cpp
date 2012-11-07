@@ -200,7 +200,6 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
             if(!done(index)) continue;
             T value[3]={0}; // the phi value to use in the given direction
             int number_of_axis=0; // the number of axis that we want to use later
-            int missing_axis=2; // used in number_of_axis==2 case only, so it gives you which axis is missing (==2 for 2d)
             bool really_clamp_phi_with_collision_bodies=levelset.clamp_phi_with_collision_bodies&&phi_ghost(index)<=0;
             T abs_phi=abs(phi_ghost(index));
             TV location=iterator.Location();
@@ -224,7 +223,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
                         use_high=true;if(really_clamp_phi_with_collision_bodies) value_high=min(abs_phi,phi_object);else value_high=phi_object;}
                     else if(done(high)&&LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(high))){
                         use_high=true;value_high=LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(high))*dx;}}
-                if(!use_low){if(use_high) value[number_of_axis]=value_high;else{missing_axis=axis;number_of_axis--;}}
+                if(!use_low){if(use_high) value[number_of_axis]=value_high;else number_of_axis--;}
                 else if(!use_high) value[number_of_axis]=value_low;
                 else value[number_of_axis]=min(value_low,value_high);
                 number_of_axis++;}
@@ -253,7 +252,6 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
             if(!done(index)) continue;
             T value[3]={0}; // the phi value to use in the given direction
             int number_of_axis=0; // the number of axis that we want to use later
-            int missing_axis=2; // used in number_of_axis==2 case only, so it gives you which axis is missing (==2 for 2d)
             TV location=iterator.Location();
             for(int axis=0;axis<T_GRID::dimension;axis++){
                 TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
@@ -261,7 +259,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
                 bool use_low=(done(low) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(low))),use_high=(done(high) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(high)));
                 if(!use_low){
                     if(use_high) value[number_of_axis]=LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(high))*dx;
-                    else{missing_axis=axis;number_of_axis--;}}
+                    else number_of_axis--;}
                 else if(!use_high) value[number_of_axis]=LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(low))*dx;
                 else value[number_of_axis]=min(LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(high)),LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(low)))*dx;
                 number_of_axis++;}
