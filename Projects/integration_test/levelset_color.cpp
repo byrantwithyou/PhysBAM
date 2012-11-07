@@ -22,8 +22,8 @@
 using namespace PhysBAM;
 
 typedef float RW;
-typedef HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > HASH_INTERFACE;
-typedef HASHTABLE<int,VECTOR<int,2> > HASH_BOUNDARY;
+typedef HASHTABLE<VECTOR<int,2>,INTERVAL<int> > HASH_INTERFACE;
+typedef HASHTABLE<int,INTERVAL<int> > HASH_BOUNDARY;
 
 std::string output_directory="levelset";
 
@@ -120,13 +120,11 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
     int iterations=100;
     int test_number=0;
     bool opt_arg=false;
-    bool dampen=false;
     bool verbose=false;
     parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-resolution",&resolution,"res","resolution");
     parse_args.Add("-iterations",&iterations,"iter","iterations");
-    parse_args.Add("-dampen",&dampen,"dampen");
     parse_args.Add("-verbose",&verbose,"verbose");
     parse_args.Parse();
 
@@ -166,7 +164,6 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
                 void Initialize(){
                     for(int i=0;i<TV::m;i++)
                         n1(i)=i+M_PI/(i+M_PI);
-                    // n1.x=1;
                     n1.Normalize();
                     n2=n1.Orthogonal_Vector();}
                 T Phi_Value(const TV& X) const {TV x=X-0.5223;return n1.Dot(x)>0?n1.Dot(x):(min(abs(n1.Dot(x)),abs(n2.Dot(x))));}
@@ -183,13 +180,13 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
 
-    for(int i=0;i<iterations;i++){
+    for(int i=0;i<=iterations;i++){
         HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> > cell_to_element;
         HASHTABLE<VECTOR<int,2>,T_SURFACE*> surface;
         HASHTABLE<int,T_SURFACE*> boundary;
-        MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,cell_to_element,phi_color,phi_value,i,dampen,verbose);
+        MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,cell_to_element,phi_color,phi_value,i,verbose);
         Dump_Interface<T,TV,T_SURFACE,T_FACE>(surface);
-        Dump_Boundary<T,TV,T_SURFACE,T_FACE>(boundary);
+        // Dump_Boundary<T,TV,T_SURFACE,T_FACE>(boundary);
         char buffer[100];
         sprintf(buffer, "newton step %i",i);
         Flush_Frame<T,TV>(buffer);}

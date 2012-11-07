@@ -640,8 +640,8 @@ template<class T,class TV_INT,class TV,class T_SURFACE> void
 Get_Hashed_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,HASHTABLE<int,T_SURFACE*>& boundary,
     const VECTOR<int,8>& re_color,const VECTOR<int,8>& colors,const VECTOR<T,8>& phi,const int* color_list,HASHTABLE<FACE_INDEX<3>,int>& edge_vertices,
     HASHTABLE<FACE_INDEX<3>,int>& face_vertices,HASHTABLE<TV_INT,int>& cell_vertices,HASHTABLE<TV_INT,int>& node_vertices,
-    const TV_INT& cell_index,GEOMETRY_PARTICLES<TV>& particles,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& interface_cell_elements,
-    HASHTABLE<int,VECTOR<int,2> >& boundary_cell_elements)
+    const TV_INT& cell_index,GEOMETRY_PARTICLES<TV>& particles,HASHTABLE<VECTOR<int,2>,INTERVAL<int> >& interface_cell_elements,
+    HASHTABLE<int,INTERVAL<int> >& boundary_cell_elements)
 {
     // RENAME COLORS
 
@@ -743,7 +743,7 @@ Get_Hashed_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SU
             s=T_SURFACE::Create(particles);
             interface.Set(c,s);}
         s->mesh.elements.Append(v);
-        interface_cell_elements.Get_Or_Insert(c,VECTOR<int,2>(s->mesh.elements.m-1,s->mesh.elements.m)).y=s->mesh.elements.m;
+        interface_cell_elements.Get_Or_Insert(c,INTERVAL<int>(s->mesh.elements.m-1,s->mesh.elements.m)).max_corner=s->mesh.elements.m;
     }while(!(pat&last_tri_bit));}
     
     // GET BOUNDARY ELEMENTS
@@ -837,7 +837,7 @@ Get_Hashed_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SU
                 surf=T_SURFACE::Create(particles);
                 boundary.Set(c,surf);}
             surf->mesh.elements.Append(v);
-            boundary_cell_elements.Get_Or_Insert(c,VECTOR<int,2>(surf->mesh.elements.m-1,surf->mesh.elements.m)).y=surf->mesh.elements.m;
+            boundary_cell_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;
         } while(!(pat&last_tri_bit));}
 }
 //#####################################################################
@@ -847,8 +847,8 @@ template<class T,class TV_INT,class TV,class T_SURFACE> void
 Get_Hashed_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,HASHTABLE<int,T_SURFACE*>& boundary,
     const VECTOR<int,4>& re_color,const VECTOR<int,4>& colors,const VECTOR<T,4>& phi,const int* color_list,HASHTABLE<FACE_INDEX<2>,int>& edge_vertices,
     HASHTABLE<FACE_INDEX<2>,int>& face_vertices,HASHTABLE<TV_INT,int>& cell_vertices,HASHTABLE<TV_INT,int>& node_vertices,
-    const TV_INT& cell_index,GEOMETRY_PARTICLES<TV>& particles,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& interface_cell_elements,
-    HASHTABLE<int,VECTOR<int,2> >& boundary_cell_elements)
+    const TV_INT& cell_index,GEOMETRY_PARTICLES<TV>& particles,HASHTABLE<VECTOR<int,2>,INTERVAL<int> >& interface_cell_elements,
+    HASHTABLE<int,INTERVAL<int> >& boundary_cell_elements)
 {
     // RENAME COLORS
 
@@ -909,7 +909,7 @@ Get_Hashed_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SU
             s=T_SURFACE::Create(particles);
             interface.Set(c,s);}
         s->mesh.elements.Append(v);
-        interface_cell_elements.Get_Or_Insert(c,VECTOR<int,2>(s->mesh.elements.m-1,s->mesh.elements.m)).y=s->mesh.elements.m;
+        interface_cell_elements.Get_Or_Insert(c,INTERVAL<int>(s->mesh.elements.m-1,s->mesh.elements.m)).max_corner=s->mesh.elements.m;
     } while(!(pat&last_tri_bit));}
 
     // GET BOUNDARY ELEMENTS
@@ -938,7 +938,7 @@ Get_Hashed_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SU
                 surf=T_SURFACE::Create(particles);
                 boundary.Set(c,surf);}
             surf->mesh.elements.Append(v);
-            boundary_cell_elements.Get_Or_Insert(c,VECTOR<int,2>(surf->mesh.elements.m-1,surf->mesh.elements.m)).y=surf->mesh.elements.m;}
+            boundary_cell_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}
         else{
             int points_m=-1;
             T theta=phi[offset]/(phi[offset]+phi[offset+1]);
@@ -962,7 +962,7 @@ Get_Hashed_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SU
                 surf=T_SURFACE::Create(particles);
                 boundary.Set(c,surf);}
             surf->mesh.elements.Append(v);
-            boundary_cell_elements.Get_Or_Insert(c,VECTOR<int,2>(surf->mesh.elements.m-1,surf->mesh.elements.m)).y=surf->mesh.elements.m;}
+            boundary_cell_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}
 
             {VECTOR<int,2> v(points[s],points_m);
             int c=colors[offset+s];
@@ -972,127 +972,74 @@ Get_Hashed_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SU
                 surf=T_SURFACE::Create(particles);
                 boundary.Set(c,surf);}
             surf->mesh.elements.Append(v);
-            boundary_cell_elements.Get_Or_Insert(c,VECTOR<int,2>(surf->mesh.elements.m-1,surf->mesh.elements.m)).y=surf->mesh.elements.m;}}}
+            boundary_cell_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}}}
 }
-//#####################################################################
-// Class LEAST_SQUARES_VECTOR
-//#####################################################################
-template<class TV>
-class LEAST_SQUARES_VECTOR:public KRYLOV_VECTOR_BASE<typename TV::SCALAR>
-{
-    typedef typename TV::SCALAR T;
-    typedef KRYLOV_VECTOR_BASE<T> BASE;
-
-public:
-    
-    TV x;
-    
-    LEAST_SQUARES_VECTOR(){}
-    virtual ~LEAST_SQUARES_VECTOR(){}
-
-    BASE& operator+=(const BASE& bv) PHYSBAM_OVERRIDE{x+=debug_cast<const LEAST_SQUARES_VECTOR&>(bv).x;return *this;}
-    BASE& operator-=(const BASE& bv) PHYSBAM_OVERRIDE{x-=debug_cast<const LEAST_SQUARES_VECTOR&>(bv).x;return *this;}
-    BASE& operator*=(const T a) PHYSBAM_OVERRIDE{x*=a; return *this;}
-    void Copy(const T c1,const BASE& bv1) PHYSBAM_OVERRIDE{x=debug_cast<const LEAST_SQUARES_VECTOR&>(bv1).x*c1;}
-    void Copy(const T c1,const BASE& bv1,const BASE& bv2) PHYSBAM_OVERRIDE
-    {x=debug_cast<const LEAST_SQUARES_VECTOR&>(bv1).x*c1+debug_cast<const LEAST_SQUARES_VECTOR&>(bv2).x;}
-    int Raw_Size() const PHYSBAM_OVERRIDE{return TV::m;}
-    T& Raw_Get(int i) PHYSBAM_OVERRIDE{return x(i);}
-    KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE
-    {LEAST_SQUARES_VECTOR* V=new LEAST_SQUARES_VECTOR;return V;}
-    void Resize(const KRYLOV_VECTOR_BASE<T>& bv) PHYSBAM_OVERRIDE{}
-};
-//#####################################################################
-// Class LEAST_SQUARES_SYSTEM
-//#####################################################################
-template<class TV>
-class LEAST_SQUARES_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
-{
-    typedef typename TV::SCALAR T;
-    typedef LEAST_SQUARES_VECTOR<TV> VECTOR_T;
-    typedef KRYLOV_SYSTEM_BASE<T> BASE;
-
-public:
-
-    SYMMETRIC_MATRIX<T,TV::m> matrix;
-    int project_flags;
-
-    LEAST_SQUARES_SYSTEM():BASE(false,false){}
-    virtual ~LEAST_SQUARES_SYSTEM(){}
-
-//#####################################################################
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& bv_input,KRYLOV_VECTOR_BASE<T>& bv_result) const PHYSBAM_OVERRIDE{
-        const TV& x_input=debug_cast<const VECTOR_T&>(bv_input).x;
-        TV& x_result=debug_cast<VECTOR_T&>(bv_result).x;
-        x_result=matrix*x_input;}
-
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2) const PHYSBAM_OVERRIDE{
-        const VECTOR_T& v1=debug_cast<const LEAST_SQUARES_VECTOR<TV>&>(bv1);
-        const VECTOR_T& v2=debug_cast<const LEAST_SQUARES_VECTOR<TV>&>(bv2);
-        return v1.x.Dot(v2.x);}
-
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE
-    {return debug_cast<const VECTOR_T&>(bv).x.Max_Abs();}
-
-    void Project(KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE{
-        TV& x=debug_cast<VECTOR_T&>(bv).x;
-        for(int j=0;j<TV::m;j++) if(!(project_flags&(1<<j))) x(j)=0;}
-
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE {}
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE {Project(bv);}
-    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& br,KRYLOV_VECTOR_BASE<T>& bz) const PHYSBAM_OVERRIDE {}
-};
 //#####################################################################
 // Function Get_Elements
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,HASHTABLE<int,T_SURFACE*>& boundary,
-    HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> >& cell_to_element,const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,
-    const int iterations,const bool dampen,const bool verbose)
+    HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> >& cell_to_element,const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
+    const int iterations,const bool verbose)
 {
+    // CELL CONSTANTS
+
     const int num_corners=1<<TV::m;
     const VECTOR<VECTOR<int,TV::m>,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
+
+    // HASHTABLES FOR DIFFERENTLY CONSTRAINED PARTICLES
 
     HASHTABLE<FACE_INDEX<TV::m>,int> edge_vertices;
     HASHTABLE<FACE_INDEX<TV::m>,int> face_vertices;
     HASHTABLE<TV_INT,int> cell_vertices;
     HASHTABLE<TV_INT,int> node_vertices;
 
+    // GLOBAL PARTICLES ARRAY AND JUNCTION CELL FLAGS
+
     GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
     ARRAY<bool,TV_INT> junction_cell(grid.Domain_Indices());
-    ARRAY<TV_INT> junction_cells;
+    ARRAY<TV_INT> junction_cells_list;
     
+    // INITIALIZE MESHES
+
     int fit_count=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        VECTOR<int,num_corners> cell_color;
-        VECTOR<T,num_corners> cell_phi;
-        for(int i=0;i<num_corners;i++) cell_color(i)=color(it.index+bits(i));
-        for(int i=0;i<num_corners;i++) cell_phi(i)=phi(it.index+bits(i));
+
+        VECTOR<int,num_corners> cell_phi_color;
+        VECTOR<T,num_corners> cell_phi_value;
+        for(int i=0;i<num_corners;i++) cell_phi_color(i)=phi_color(it.index+bits(i));
+        for(int i=0;i<num_corners;i++) cell_phi_value(i)=phi_value(it.index+bits(i));
+
         int next_color=0;
         HASHTABLE<int,int> color_map;        // maps original colors to renamed ones
         VECTOR<int,num_corners> re_color;    // renamed colors of cell corners
         int color_list[num_corners];         // maps renamed colors to original ones
         for(int i=0;i<num_corners;i++)
-            if(!color_map.Get(cell_color(i),re_color(i))){
+            if(!color_map.Get(cell_phi_color(i),re_color(i))){
                 re_color(i)=next_color;
-                color_list[next_color]=cell_color(i);
-                color_map.Set(cell_color(i),next_color++);}
+                color_list[next_color]=cell_phi_color(i);
+                color_map.Set(cell_phi_color(i),next_color++);}
+
         assert(!cell_to_element.Contains(it.index));
         PAIR<HASH_INTERFACE,HASH_BOUNDARY>& cell_elements=cell_to_element.Get_Or_Insert(it.index);
         HASH_INTERFACE& interface_cell_elements=cell_elements.x;
         HASH_BOUNDARY& boundary_cell_elements=cell_elements.y;
-        Get_Hashed_Elements_For_Cell(grid.Cell_Domain(it.index),interface,boundary,re_color,cell_color,cell_phi,color_list,edge_vertices,
+        Get_Hashed_Elements_For_Cell(grid.Cell_Domain(it.index),interface,boundary,re_color,cell_phi_color,cell_phi_value,color_list,edge_vertices,
             face_vertices,cell_vertices,node_vertices,it.index,particles,interface_cell_elements,boundary_cell_elements);
-        if(next_color>=3){
-            junction_cell(it.index)=true;
-            junction_cells.Append(it.index);
-            for(typename HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >::CONST_ITERATOR it(interface_cell_elements);it.Valid();it.Next())
-                fit_count++;}}
+
+        if(next_color<3) continue; // not a t-junction
+        junction_cell(it.index)=true;
+        junction_cells_list.Append(it.index);
+        for(typename HASH_INTERFACE::CONST_ITERATOR it(interface_cell_elements);it.Valid();it.Next()) fit_count++;}
+
+    // DOFS AND NORMALS
 
     ARRAY<int> particle_dofs(particles.number);
     ARRAY<TV> normals(fit_count);
     ARRAY<TV> midpoints(fit_count);
     
+    // INITIALIZE DOFS
+
     for(typename HASHTABLE<TV_INT,int>::ITERATOR it(cell_vertices);it.Valid();it.Next()){
         particle_dofs(it.Data())=(1<<TV::m)-1;}
 
@@ -1102,28 +1049,34 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface
     for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(edge_vertices);it.Valid();it.Next()){
         RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box());
         range.max_corner(it.Key().axis)=2;
-        bool ok=true;
+        bool trusted=true;
         for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
             TV_INT index=it2.index+it.Key().index;
             if(junction_cell.Valid_Index(index)&&junction_cell(index)){
-                ok=false;
-                break;}}
-        if(!ok) particle_dofs(it.Data())=1<<it.Key().axis;}
+                trusted=false;break;}}
+        if(!trusted) particle_dofs(it.Data())=1<<it.Key().axis;}
 
-    ARRAY<int> index_map,reverse_index_map(particle_dofs.m);
+    // PARTICLES TO DOFS CORRESPONDENCE
+
+    ARRAY<int> index_map;                          // maps dofs to particles
+    ARRAY<int> reverse_index_map(particle_dofs.m); // maps particles to dofs
     for(int i=0;i<particle_dofs.m;i++){
         reverse_index_map(i)=-1;
         if(particle_dofs(i))
             reverse_index_map(i)=index_map.Append(i);}
 
+    // NORMALS TO PARTICLES CORRESPONDENCE
+
     ARRAY<ARRAY<int> > particle_to_fit(index_map.m);
     ARRAY<ARRAY<int> > fit_to_particle(fit_count);
 
+    // INITIALIZE NORMALS TO PARTICLES CORRESPONDENCE
+
     int fit_index=-1;
-    for(int jc=0;jc<junction_cells.m;jc++){
-        const TV_INT& junction_cell_index=junction_cells(jc);
-        const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& junction_interface_cell_elements=cell_to_element.Get(junction_cell_index).x;
-        for(typename HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >::CONST_ITERATOR it(junction_interface_cell_elements);it.Valid();it.Next()){
+    for(int c=0;c<junction_cells_list.m;c++){
+        const TV_INT& junction_cell_index=junction_cells_list(c);
+        const HASH_INTERFACE& junction_interface_cell_elements=cell_to_element.Get(junction_cell_index).x;
+        for(typename HASH_INTERFACE::CONST_ITERATOR it(junction_interface_cell_elements);it.Valid();it.Next()){
             fit_index++;
             HASHTABLE<int> particle_indices_ht;
             const VECTOR<int,2>& color_pair=it.Key();
@@ -1132,10 +1085,10 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface
             for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
                 const TV_INT& cell_index=junction_cell_index+it2.index;
                 if(cell_to_element.Contains(cell_index)){
-                    const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& interface_cell_elements=cell_to_element.Get(cell_index).x;
-                    VECTOR<int,2> elements_range;
-                    if(interface_cell_elements.Get(color_pair,elements_range))
-                        for(int i=elements_range.x;i<elements_range.y;i++){
+                    const HASH_INTERFACE& interface_cell_elements=cell_to_element.Get(cell_index).x;
+                    INTERVAL<int> interval;
+                    if(interface_cell_elements.Get(color_pair,interval))
+                        for(int i=interval.min_corner;i<interval.max_corner;i++){
                             TV_INT element=color_pair_interface.mesh.elements(i);
                             for(int j=0;j<TV::m;j++)
                                 if(!particle_indices_ht.Contains(element(j)))
@@ -1145,57 +1098,78 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface
                 fit_to_particle(fit_index).Append(it.Key());
                 const int reduced_index=reverse_index_map(it.Key());
                 if(reduced_index>=0) particle_to_fit(reduced_index).Append(fit_index);}}}
-    assert(fit_index==fit_count-1);
+    PHYSBAM_ASSERT(fit_index==fit_count-1); // make sure all normals got processed 
 
-    LEAST_SQUARES_SYSTEM<TV> system;
-    LEAST_SQUARES_VECTOR<TV> rhs,sol;
-    
-    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
-    CONJUGATE_RESIDUAL<T> cr;
-    cr.print_diagnostics=false;
-    cr.Ensure_Size(vectors,rhs,3);
-    cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,TV::m);
+    // INITIALIZE PARTICLE ADJACENCY MAP
+
+    ARRAY<ARRAY<int> > adjacency_map(index_map.m);    
+    for(typename HASHTABLE<VECTOR<int,2>,T_SURFACE*>::ITERATOR it(interface);it.Valid();it.Next()){
+        T_SURFACE& surf=*it.Data();
+        surf.Update_Number_Nodes();
+        surf.mesh.Initialize_Adjacent_Elements();
+        const ARRAY<ARRAY<int> >& adjacent_elements=*surf.mesh.adjacent_elements;
+        for(int i=0;i<adjacent_elements.m;i++){
+            for(int j=0;j<adjacent_elements(i).m;j++){
+                int k=adjacent_elements(i)(j);
+                if(i<k){
+                    VECTOR<int,TV::m+1> nodes;
+                    TV_INT ei=surf.mesh.elements(i);
+                    TV_INT ek=surf.mesh.elements(k);
+                    int u=-1;
+                    for(int m=0;m<TV::m;m++)if(!ek.Contains(ei(m))){u=m;break;}
+                    for(int m=0;m<TV::m;m++){nodes(m)=ei(u++);if(u==TV::m) u=0;}
+                    nodes(TV::m)=ek.Sum()-ei.Sum()+nodes(0);
+                    if(TV::m==2){
+                        int p=reverse_index_map(nodes(1));
+                        if(p!=-1){
+                            adjacency_map(p).Append(nodes(0));
+                            adjacency_map(p).Append(nodes(2));}}
+                    else if(TV::m==3){
+                        int p1=reverse_index_map(nodes(1));
+                        int p2=reverse_index_map(nodes(2));
+                        if(p1!=-1) adjacency_map(p1).Append(nodes(2));
+                        if(p2!=-1) adjacency_map(p2).Append(nodes(1));}
+                    else PHYSBAM_FATAL_ERROR();}}}}
+
+    // ADJUST THE MESH
 
     if(verbose) LOG::cout<<"Adjusting mesh...";
-    for(int i=0;i<iterations;i++){
+    for(int i=0;i<iterations*2;i++){
         if(i&1){ // update positions
             for(int p=0;p<index_map.m;p++){
-                const ARRAY<int>& f_array=particle_to_fit(p);
-                const int p_index=index_map(p);
-                TV& p_position=particles.X(p_index);
-                system.matrix=SYMMETRIC_MATRIX<T,TV::m>();
-                rhs.x=TV();sol.x=TV();
-                system.project_flags=particle_dofs(p_index);
-                for(int j=0;j<f_array.m;j++){
-                    const int f_index=f_array(j);
-                    const TV& n=normals(f_index);
-                    if(!dampen) system.matrix+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(n);
-                    rhs.x+=n.Dot(p_position-midpoints(f_index))*n;}
-                if(dampen){
-                    rhs.x/=f_array.m;
-                    system.Project(rhs);
-                    p_position-=rhs.x;}
-                else{
-                    cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,TV::m);
-                    p_position-=sol.x;}}}
+                const ARRAY<int>& fit_array=particle_to_fit(p);
+                const int index=index_map(p);
+                TV dx; TV& x=particles.X(index);
+                for(int f=0;f<fit_array.m;f++){
+                    const int fit=fit_array(f);
+                    const TV& n=normals(fit);
+                    dx+=n.Dot(x-midpoints(fit))*n;}
+                    dx/=fit_array.m; x-=dx;}
+            for(int p=0;p<index_map.m;p++){
+                const int index=index_map(p);
+                ARRAY<int>& adj=adjacency_map(p);
+                const int dof=particle_dofs(index);
+                if(adj.m&&(dof==1||dof==2||dof==4)){
+                    TV dx; TV& x=particles.X(index);
+                    for(int i=0;i<adj.m;i++)
+                        dx+=particles.X(adj(i));
+                    dx/=adj.m; dx-=x; dx*=0.0; x+=dx;}}}
         else{ // update best fit manifolds
             for(int f=0;f<fit_count;f++){
-                const ARRAY<int>& p_array=fit_to_particle(f);
-                midpoints(f)=particles.X.Subset(p_array).Average();
+                const ARRAY<int>& particle_array=fit_to_particle(f);
+                midpoints(f)=particles.X.Subset(particle_array).Average();
                 SYMMETRIC_MATRIX<T,TV::m> fit_matrix;
-                for(int j=0;j<p_array.m;j++) fit_matrix+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(particles.X(p_array(j))-midpoints(f));
+                for(int j=0;j<particle_array.m;j++)
+                    fit_matrix+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(particles.X(particle_array(j))-midpoints(f));
                 DIAGONAL_MATRIX<T,TV::m> eigenvalues;
                 MATRIX<T,TV::m> eigenvectors;
                 fit_matrix.Solve_Eigenproblem(eigenvalues,eigenvectors);
                 normals(f)=eigenvectors.Column(eigenvalues.To_Vector().Arg_Min());}}
         if(verbose) LOG::cout<<".";}
     if(verbose) LOG::cout<<std::endl;
-    for(int f=0;f<fit_count;f++){
-        const TV& normal_vector=normals(f);
-        Add_Debug_Particle(midpoints(f),VECTOR<T,3>(1,0,1));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,normal_vector);
-        Add_Debug_Particle(midpoints(f),VECTOR<T,3>(1,0,1));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-normal_vector);}
+
+    // DRAW DEBUG PARTICLES
+
     for(int p=0;p<particle_dofs.m;p++){
         switch(particle_dofs(p)){
             case 0: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(.5,.5,.5)); break;
@@ -1203,6 +1177,12 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface
             case 3: case 5: case 6: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(1,1,0)); break;
             case 7: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(1,0,0)); break;
             default: PHYSBAM_FATAL_ERROR();}}
+    for(int f=0;f<fit_count;f++){
+        const TV& normal_vector=normals(f);
+        Add_Debug_Particle(midpoints(f),VECTOR<T,3>(1,0,1));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,normal_vector);
+        Add_Debug_Particle(midpoints(f),VECTOR<T,3>(1,0,1));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-normal_vector);}
 }
 template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<float,3> >;

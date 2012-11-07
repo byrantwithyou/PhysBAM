@@ -124,17 +124,17 @@ Compute_Entries(bool double_fine)
                 const HASH_BOUNDARY& sides_elements=elements.y;
                 for(typename HASH_INTERFACE::CONST_ITERATOR it(surface_elements);it.Valid();it.Next()){
                     const VECTOR<int,2>& color_pair=it.Key();
-                    const VECTOR<int,2>& interval=it.Data();
+                    const INTERVAL<int>& interval=it.Data();
                     const T_SURFACE& surf=*cdi.interface.Get(color_pair);
-                    for(int i=interval.x;i<interval.y;i++){
+                    for(int i=interval.min_corner;i<interval.max_corner;i++){
                         T_FACE x=surf.Get_Element(i);
                         for(int j=0;j<TV::m;j++) x.X(j)-=cell_center;
                         surface(s).Append(SURFACE_ELEMENT(x,color_pair.x,color_pair.y));}}
                 for(typename HASH_BOUNDARY::CONST_ITERATOR it(sides_elements);it.Valid();it.Next()){
                     const int color=it.Key();
-                    const VECTOR<int,2>& interval=it.Data();
+                    const INTERVAL<int>& interval=it.Data();
                     const T_SURFACE& surf=*cdi.boundary.Get(color);
-                    for(int i=interval.x;i<interval.y;i++){
+                    for(int i=interval.min_corner;i<interval.max_corner;i++){
                         T_FACE x=surf.Get_Element(i);
                         for(int j=0;j<TV::m;j++) x.X(j)-=cell_center;
                         sides(s).Append(SIDES_ELEMENT(x,color));}}}}

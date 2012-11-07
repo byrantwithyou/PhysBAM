@@ -22,13 +22,11 @@ template<class TV>
 class MARCHING_CUBES_COLOR
 {
 public:
+
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
-    typedef HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > HASH_INTERFACE;
-    typedef HASHTABLE<int,VECTOR<int,2> > HASH_BOUNDARY;
-
     enum WORKAROUND {num_corners=1<<TV::m,num_edges=TV::m<<(TV::m-1),num_pts=num_corners+num_edges};
 
     MARCHING_CUBES_COLOR() {}
@@ -37,9 +35,16 @@ public:
     static void Initialize_Case_Table();
     static void Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& interface,ARRAY<PAIR<T_FACE,int> >& boundary,
         const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi);
+
+//#####################################################################
+
+    typedef HASHTABLE<VECTOR<int,2>,INTERVAL<int> > HASH_INTERFACE;
+    typedef HASHTABLE<int,INTERVAL<int> > HASH_BOUNDARY;
+
     static void Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,HASHTABLE<int,T_SURFACE*>& boundary,
-        HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> >& cell_to_element,const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,
-        const int newton_steps=20,const bool dampen=false,const bool verbose=false);
+        HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> >& cell_to_element,const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
+        const int newton_steps=20,const bool verbose=false);
+
 //#####################################################################
 };
 }
