@@ -82,12 +82,11 @@ private:
         const HASHTABLE<TV_INT,int>& cell_vertices,const HASHTABLE<TV_INT,int>& node_vertices,
         const HASHTABLE<TV_INT>& junction_cells,const int fit_count,const int iterations,const bool verbose);
 
-    static void Recut_Cells(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,const HASHTABLE<TV_INT>& variable_cells,
-        const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASH_INDEX_TO_CELL_DATA& index_to_cell_data,
-        HASH_INDEX_TO_CELL_ELEMENTS& index_to_cell_elements);
+    static void Save_Mesh(HASH_INDEX_TO_CELL_ELEMENTS& index_to_cell_elements,const HASH_INTERFACE& interface,
+        const HASH_BOUNDARY& boundary,const HASH_INDEX_TO_CELL_DATA& index_to_cell_data,const GEOMETRY_PARTICLES<TV>& particles,
+        const bool recut_cells=false,const ARRAY<int>* const particle_dofs=0,const HASHTABLE<TV_INT>* const variable_cells=0);
 
 //#####################################################################
 };
 }
 #endif
-;

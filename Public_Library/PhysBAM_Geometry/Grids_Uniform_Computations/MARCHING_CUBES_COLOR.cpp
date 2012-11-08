@@ -1053,27 +1053,58 @@ Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& bound
         junction_cells.Insert(it.index);
         for(typename HASH_CELL_INTERFACE::CONST_ITERATOR it(interface_cell_elements);it.Valid();it.Next()) fit_count++;}
 
-    // PERFORM SURFACE RECONSTRUCTION
+    // FIX AND SAVE MESHES
 
     if(fit_count){
         ARRAY<int> particle_dofs(particles.number);
         HASHTABLE<TV_INT> variable_cells;
-
-        Fix_Mesh(particles,particle_dofs,variable_cells,interface,boundary,index_to_cell_data,edge_vertices,
-            face_vertices,cell_vertices,node_vertices,junction_cells,fit_count,iterations,verbose);
-
-        
-    }
+        Fix_Mesh(particles,particle_dofs,variable_cells,interface,boundary,index_to_cell_data,
+            edge_vertices,face_vertices,cell_vertices,node_vertices,junction_cells,fit_count,iterations,verbose);
+        Save_Mesh(index_to_cell_elements,interface,boundary,index_to_cell_data,particles);} // FOR NOW JUST SAVE (NO RECUTTING)
+    else Save_Mesh(index_to_cell_elements,interface,boundary,index_to_cell_data,particles);
 }
 //#####################################################################
 // Function Recut_Cells
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
-Recut_Cells(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,const HASHTABLE<TV_INT>& variable_cells,
-    const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASH_INDEX_TO_CELL_DATA& index_to_cell_data,
-    HASH_INDEX_TO_CELL_ELEMENTS& index_to_cell_elements)
+Save_Mesh(HASH_INDEX_TO_CELL_ELEMENTS& index_to_cell_elements,const HASH_INTERFACE& interface,
+    const HASH_BOUNDARY& boundary,const HASH_INDEX_TO_CELL_DATA& index_to_cell_data,const GEOMETRY_PARTICLES<TV>& particles,
+    const bool recut,const ARRAY<int>* const particle_dofs,const HASHTABLE<TV_INT>* const variable_cells)
 {
+    for(typename HASH_INDEX_TO_CELL_DATA::CONST_ITERATOR it(index_to_cell_data);it.Valid();it.Next()){
+        const TV_INT& cell_index=it.Key();
+        const HASH_CELL_DATA& hash_cell_data=it.Data();
+        const HASH_CELL_INTERFACE hash_cell_interface=hash_cell_data.interface;
+        const VECTOR<HASH_CELL_BOUNDARY,TV::m> hash_cell_boundary=hash_cell_data.boundary;
+        CELL_ELEMENTS& cell_elements=index_to_cell_elements.Get_Or_Insert(cell_index);
+        ARRAY<INTERFACE_ELEMENT>& cell_interface=cell_elements.interface;
+        ARRAY<BOUNDARY_ELEMENT>& cell_boundary=cell_elements.boundary;
 
+        if(recut && variable_cells->Contains(cell_index)) PHYSBAM_FATAL_ERROR(); // NEED TO DO RECUTTING HERE
+        else{
+            for(typename HASH_CELL_INTERFACE::CONST_ITERATOR it(hash_cell_interface);it.Valid();it.Next()){
+                const VECTOR<int,2> color_pair=it.Key();
+                const INTERVAL<int> interval=it.Data();
+                const T_SURFACE& color_pair_interface=*interface.Get(color_pair);
+                for(int e=interval.min_corner;e<interval.max_corner;e++){
+                    const TV_INT& e_index=color_pair_interface.mesh.elements(e);
+                    cell_interface.Add_End();
+                    INTERFACE_ELEMENT& element=cell_interface.Last();
+                    for(int i=0;i<TV::m;i++)
+                        element.x.X(i)=particles.X(e_index(i));
+                    element.y=color_pair.x;
+                    element.z=color_pair.y;}}
+            for(typename HASH_CELL_BOUNDARY::CONST_ITERATOR it(hash_cell_boundary(TV::m-1));it.Valid();it.Next()){
+                const int color=it.Key();
+                const INTERVAL<int> interval=it.Data();
+                const T_SURFACE& color_boundary=*boundary.Get(color);
+                for(int e=interval.min_corner;e<interval.max_corner;e++){
+                    const TV_INT& e_index=color_boundary.mesh.elements(e);
+                    cell_boundary.Add_End();
+                    BOUNDARY_ELEMENT& element=cell_boundary.Last();
+                    for(int i=0;i<TV::m;i++)
+                        element.x.X(i)=particles.X(e_index(i));
+                    element.y=color;}}}}
 }
 //#####################################################################
 // Function Fix_Mesh
