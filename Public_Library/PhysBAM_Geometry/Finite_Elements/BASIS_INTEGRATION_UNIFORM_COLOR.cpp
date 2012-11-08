@@ -93,15 +93,15 @@ Compute_Entries(bool double_fine)
         TV_INT cell_base=it.index*2;
         if(!double_fine){
             int base_color=phi_color(cell_base);
-            int cell_corners=0;
+            bool cell_cut=false;
             bool material_cell=false;
             for(int b=0;b<(1<<TV::m);b++){
                 int color=phi_color(cell_base+bits(b)*2);
                 assert(color<cdi.colors);
-                cell_corners|=(color!=base_color)<<b;
+                cell_cut|=(color!=base_color);
                 material_cell|=(color>=0);}
             if(!material_cell) continue;
-            if(cell_corners==0){Add_Uncut_Cell(it.index,base_color);continue;}}
+            if(!cell_cut){Add_Uncut_Cell(it.index,base_color);continue;}}
 
         TV cell_center(grid.Center(it.index));
         VECTOR<bool,(1<<TV::m)> material_subcell;
@@ -111,14 +111,17 @@ Compute_Entries(bool double_fine)
             TV_INT subcell_base=cell_base+bits(s);
             VECTOR<int,1<<TV::m> subcell_phi_colors;
             VECTOR<T,1<<TV::m> subcell_phi_values;
+            int base_color=phi_color(subcell_base);
+            bool subcell_cut=false;
             for(int b=0;b<(1<<TV::m);b++){
                 TV_INT subcell_vertex=subcell_base+bits(b);
-                subcell_phi_values(b)=phi_value(subcell_vertex);
                 int color=phi_color(subcell_vertex);
+                subcell_phi_values(b)=phi_value(subcell_vertex);
                 assert(color<cdi.colors);
                 subcell_phi_colors(b)=color;
-                material_subcell(s)|=color>=0;}
-            if(material_subcell(s)){
+                subcell_cut|=(color!=base_color);
+                material_subcell(s)|=(color>=0);}
+            if(material_subcell(s) && subcell_cut){
                 const HASH_CELL_DATA& elements=cdi.index_to_cell_data.Get(subcell_base);
                 const HASH_CELL_INTERFACE& surface_elements=elements.interface;
                 const HASH_CELL_BOUNDARY& sides_elements=elements.boundary(TV::m-1);
