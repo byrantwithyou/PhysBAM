@@ -814,67 +814,67 @@ Get_Hashed_Interface_Elements_For_Cell(const TV_INT& cell_index,const VECTOR<TV,
 template<class T,class TV_INT,class TV,class T_SURFACE,class HASH_BOUNDARY,class HASH_CELL_BOUNDARY> void
 Get_Hashed_Boundary_Elements_For_Cell(const TV_INT& cell_index,const VECTOR<TV,4>& corners,const VECTOR<int,4>& phi_color,const VECTOR<T,4>& phi_value,
     HASHTABLE<FACE_INDEX<2>,int>& edge_vertices,HASHTABLE<FACE_INDEX<2>,int>& face_vertices,HASHTABLE<TV_INT,int>& node_vertices,
-    HASH_BOUNDARY& boundary,GEOMETRY_PARTICLES<TV>& particles,HASH_CELL_BOUNDARY& boundary_cell_elements)
+    HASH_BOUNDARY& boundary,GEOMETRY_PARTICLES<TV>& particles,VECTOR<HASH_CELL_BOUNDARY,2>& boundary_elements_vector)
 {
-    for(int s=0;s<2;s++){
-        const int offset=s<<1;
-        int points[2]={-1,-1};
-        TV pts[2]={corners[offset],corners[offset+1]};
-        int tmp;
-        for(int e=0;e<2;e++){
-            TV_INT node_index=cell_index+TV_INT(e,s);
-            if(!node_vertices.Get(node_index,tmp)){
-                int index=particles.Add_Element();
-                points[e]=index;
-                node_vertices.Set(node_index,index);
-                particles.X(index)=pts[e];}
-            else{
-                assert(points[e]==tmp || points[e]==-1);
-                points[e]=tmp;}}
-        if(phi_color[offset]==phi_color[offset+1]){
-            VECTOR<int,2> v(points[s],points[1-s]);
-            int c=phi_color[offset];
+    // for(int s=0;s<2;s++){
+        // const int offset=s<<1;
+        // int points[2]={-1,-1};
+        // TV pts[2]={corners[offset],corners[offset+1]};
+        // int tmp;
+        // for(int e=0;e<2;e++){
+            // TV_INT node_index=cell_index+TV_INT(e,s);
+            // if(!node_vertices.Get(node_index,tmp)){
+                // int index=particles.Add_Element();
+                // points[e]=index;
+                // node_vertices.Set(node_index,index);
+                // particles.X(index)=pts[e];}
+            // else{
+                // assert(points[e]==tmp || points[e]==-1);
+                // points[e]=tmp;}}
+        // if(phi_color[offset]==phi_color[offset+1]){
+            // VECTOR<int,2> v(points[s],points[1-s]);
+            // int c=phi_color[offset];
             
-            T_SURFACE* surf=0;
-            if(!boundary.Get(c,surf)){
-                surf=T_SURFACE::Create(particles);
-                boundary.Set(c,surf);}
-            surf->mesh.elements.Append(v);
-            boundary_cell_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}
-        else{
-            int points_m=-1;
-            T theta=phi_value[offset]/(phi_value[offset]+phi_value[offset+1]);
-            TV pts_m=pts[1]*theta+pts[0]*(1-theta);
-            int tmp;
-            FACE_INDEX<TV::m> fi(0,cell_index+TV_INT(0,s));
-            if(!edge_vertices.Get(fi,tmp)){
-                int index=particles.Add_Element();
-                points_m=index;
-                edge_vertices.Set(fi,index);
-                particles.X(index)=pts_m;}
-            else{
-                assert(points_m==tmp || points_m==-1);
-                points_m=tmp;}
+            // T_SURFACE* surf=0;
+            // if(!boundary.Get(c,surf)){
+                // surf=T_SURFACE::Create(particles);
+                // boundary.Set(c,surf);}
+            // surf->mesh.elements.Append(v);
+            // boundary_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}
+        // else{
+            // int points_m=-1;
+            // T theta=phi_value[offset]/(phi_value[offset]+phi_value[offset+1]);
+            // TV pts_m=pts[1]*theta+pts[0]*(1-theta);
+            // int tmp;
+            // FACE_INDEX<TV::m> fi(0,cell_index+TV_INT(0,s));
+            // if(!edge_vertices.Get(fi,tmp)){
+                // int index=particles.Add_Element();
+                // points_m=index;
+                // edge_vertices.Set(fi,index);
+                // particles.X(index)=pts_m;}
+            // else{
+                // assert(points_m==tmp || points_m==-1);
+                // points_m=tmp;}
             
-            {VECTOR<int,2> v(points_m,points[1-s]);
-            int c=phi_color[offset+1-s];
+            // {VECTOR<int,2> v(points_m,points[1-s]);
+            // int c=phi_color[offset+1-s];
             
-            T_SURFACE* surf=0;
-            if(!boundary.Get(c,surf)){
-                surf=T_SURFACE::Create(particles);
-                boundary.Set(c,surf);}
-            surf->mesh.elements.Append(v);
-            boundary_cell_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}
+            // T_SURFACE* surf=0;
+            // if(!boundary.Get(c,surf)){
+                // surf=T_SURFACE::Create(particles);
+                // boundary.Set(c,surf);}
+            // surf->mesh.elements.Append(v);
+            // boundary_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}
 
-            {VECTOR<int,2> v(points[s],points_m);
-            int c=phi_color[offset+s];
+            // {VECTOR<int,2> v(points[s],points_m);
+            // int c=phi_color[offset+s];
             
-            T_SURFACE* surf=0;
-            if(!boundary.Get(c,surf)){
-                surf=T_SURFACE::Create(particles);
-                boundary.Set(c,surf);}
-            surf->mesh.elements.Append(v);
-            boundary_cell_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}}}
+            // T_SURFACE* surf=0;
+            // if(!boundary.Get(c,surf)){
+                // surf=T_SURFACE::Create(particles);
+                // boundary.Set(c,surf);}
+            // surf->mesh.elements.Append(v);
+            // boundary_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}}}
 }
 //#####################################################################
 // Function Get_Hashed_Boundary_Elements_For_Cell
@@ -882,99 +882,117 @@ Get_Hashed_Boundary_Elements_For_Cell(const TV_INT& cell_index,const VECTOR<TV,4
 template<class T,class TV_INT,class TV,class T_SURFACE,class HASH_BOUNDARY,class HASH_CELL_BOUNDARY> void
 Get_Hashed_Boundary_Elements_For_Cell(const TV_INT& cell_index,const VECTOR<TV,8>& corners,const VECTOR<int,8>& phi_color,const VECTOR<T,8>& phi_value,
     HASHTABLE<FACE_INDEX<3>,int>& edge_vertices,HASHTABLE<FACE_INDEX<3>,int>& face_vertices,HASHTABLE<TV_INT,int>& node_vertices,
-    HASH_BOUNDARY& boundary,GEOMETRY_PARTICLES<TV>& particles,HASH_CELL_BOUNDARY& boundary_cell_elements)
+    HASH_BOUNDARY& boundary,GEOMETRY_PARTICLES<TV>& particles,VECTOR<HASH_CELL_BOUNDARY,3>& boundary_elements_vector)
 {
-    for(int s=0;s<2;s++){
-        const int offset=s<<2;
-        
-        int next_color=0;
-        HASHTABLE<int,int> color_map;
-        int color_list[8];
-        int re_color2[4];
-        
-        for(int i=0;i<4;i++)
-            if(!color_map.Get(phi_color(i+offset),re_color2[i])){
-                re_color2[i]=next_color;
-                color_list[next_color]=phi_color(i+offset);
-                color_map.Set(phi_color(i+offset),next_color++);}
-        
-        int cs=0;
-        for(int i=0;i<4;i++)
-            cs=cs*(i+1)+re_color2[i];
-        
-        int tri=boundary_case_table(cs);
-        if(boundary_triangle_table(tri)&comparison_bit){
-            int pat=boundary_triangle_table(tri);
-            int amb0=(pat>>24)&7,amb1=(pat>>27)&7;
-            if(color_list[amb1]<color_list[amb0])
-                tri+=(pat>>12)&0x3f;
-            else tri++;}
-        
-        const int num_pts=9;
-        int points[num_pts]={-1,-1,-1,-1,-1,-1,-1,-1,-1};
-        TV pts[num_pts]={corners[offset],corners[offset+1],corners[offset+2],corners[offset+3]};
-        if(phi_color[offset+0]!=phi_color[offset+1]){T theta=phi_value[offset+0]/(phi_value[offset+0]+phi_value[offset+1]);pts[4]=(1-theta)*pts[0]+theta*pts[1];}
-        if(phi_color[offset+2]!=phi_color[offset+3]){T theta=phi_value[offset+2]/(phi_value[offset+2]+phi_value[offset+3]);pts[5]=(1-theta)*pts[2]+theta*pts[3];}
-        if(phi_color[offset+0]!=phi_color[offset+2]){T theta=phi_value[offset+0]/(phi_value[offset+0]+phi_value[offset+2]);pts[6]=(1-theta)*pts[0]+theta*pts[2];}
-        if(phi_color[offset+1]!=phi_color[offset+3]){T theta=phi_value[offset+1]/(phi_value[offset+1]+phi_value[offset+3]);pts[7]=(1-theta)*pts[1]+theta*pts[3];}
-        T total=0;
-        for(int v=0;v<4;v++){
-            total+=1/phi_value[offset+v];
-            pts[8]+=pts[v]/phi_value[offset+v];}
-        pts[8]/=total;
-        
-        int pat;
-        do{
-            pat=boundary_triangle_table(tri++);
-            TV_INT triangle(GET_V(pat,0),GET_V(pat,1),GET_V(pat,2));
-            int tmp;
-            for(int p=0;p<TV::m;p++){
-                const int e=triangle(p);
-                if(e<4){
-                    const int x_shift=e&1;
-                    const int y_shift=(e>>1)&1;
-                    TV_INT node_index=cell_index+TV_INT(x_shift,y_shift,s);
-                    if(!node_vertices.Get(node_index,tmp)){
-                        int index=particles.Add_Element();
-                        points[e]=index;
-                        node_vertices.Set(node_index,index);
-                        particles.X(index)=pts[e];}
-                    else{
-                        assert(points[e]==tmp || points[e]==-1);
-                        points[e]=tmp;}}
-                else if(e<8){
-                    const int axis=(e>>1)&1;
-                    FACE_INDEX<TV::m> fi(axis,cell_index+TV_INT(e==7,e==5,s));
-                    if(!edge_vertices.Get(fi,tmp)){
-                        int index=particles.Add_Element();
-                        points[e]=index;
-                        edge_vertices.Set(fi,index);
-                        particles.X(index)=pts[e];}
-                    else{
-                        assert(points[e]==tmp || points[e]==-1);
-                        points[e]=tmp;}}
-                else{
-                    FACE_INDEX<TV::m> fi(TV::m-1,cell_index+TV_INT(0,0,s));
-                    if(!face_vertices.Get(fi,tmp)){
-                        int index=particles.Add_Element();
-                        points[e]=index;
-                        face_vertices.Set(fi,index);
-                        particles.X(index)=pts[e];}
-                    else{
-                        assert(points[e]==tmp || points[e]==-1);
-                        points[e]=tmp;}}}
-
-            TV_INT v(points[triangle(0)],points[triangle(2)],points[triangle(1)]);
-            int c=color_list[GET_C(pat,0)];
-            if(s) exchange(v.y,v.z);
+    for(int a=0;a<3;a++)
+    for(int b=a+1;b<3;b++){
+        const int c=3-a-b;
+        const int oa=1<<a;
+        const int ob=1<<b;
+        const int oc=1<<c;
+        HASH_CELL_BOUNDARY& boundary_elements=boundary_elements_vector(c);
+        for(int sc=0;sc<2;sc++){
             
-            T_SURFACE* surf=0;
-            if(!boundary.Get(c,surf)){
-                surf=T_SURFACE::Create(particles);
-                boundary.Set(c,surf);}
-            surf->mesh.elements.Append(v);
-            boundary_cell_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;
-        } while(!(pat&last_tri_bit));}
+            // RENAME COLORS
+
+            int count=-1;
+            int next_color=0;
+            VECTOR<int,4> re_color;
+            VECTOR<int,8> color_list;
+            HASHTABLE<int,int> color_map;
+
+            for(int sb=0;sb<2;sb++)
+            for(int sa=0;sa<2;sa++){
+                count++;
+                const int index=sa*oa+sb*ob+sc*oc;
+                if(!color_map.Get(phi_color(index),re_color[count])){
+                    re_color[count]=next_color;
+                    color_list[next_color]=phi_color(index);
+                    color_map.Set(phi_color(index),next_color++);}}
+
+            // RETRIEVE CASE FROM THE MC TABLE
+            
+            int cs=0;
+            for(int i=0;i<4;i++)
+                cs=cs*(i+1)+re_color[i];
+            int tri=boundary_case_table(cs);
+            if(boundary_triangle_table(tri)&comparison_bit){
+                int pat=boundary_triangle_table(tri);
+                int amb0=(pat>>24)&7,amb1=(pat>>27)&7;
+                if(color_list[amb1]<color_list[amb0])
+                    tri+=(pat>>12)&0x3f;
+                else tri++;}
+
+            // CALCULATE POINTS POSITIONS
+
+            VECTOR<TV,9> pts;
+            VECTOR<int,9> p_index;
+            p_index.Fill(-1);
+            for(int sb=0;sb<2;sb++)
+            for(int sa=0;sa<2;sa++)
+                pts[sa+(sb<<1)]=corners[sa*oa+sb*ob+sc*oc];
+            
+            static const int side_pair[4][2][2]={{{0,0},{0,1}},{{1,0},{1,1}},{{0,0},{1,0}},{{0,1},{1,1}}};
+
+            for(int i=0;i<4;i++){
+                int sa[2]={side_pair[i][0][1],side_pair[i][1][1]};
+                int sb[2]={side_pair[i][0][0],side_pair[i][1][0]};
+                if(phi_color[sa[0]*oa+sb[0]*ob+sc*oc]!=phi_color[sa[1]*oa+sb[1]*ob+sc*oc]){
+                    T theta=phi_value[sa[0]*oa+sb[0]*ob+sc*oc]/(phi_value[sa[0]*oa+sb[0]*ob+sc*oc]+phi_value[sa[1]*oa+sb[1]*ob+sc*oc]);
+                    pts[4+i]=(1-theta)*pts[sa[0]+(sb[0]<<1)]+theta*pts[sa[1]+(sb[1]<<1)];}}
+
+            T total=0;
+            for(int sb=0;sb<2;sb++)
+            for(int sa=0;sa<2;sa++){
+                const int index=sa*oa+sb*ob+sc*oc;
+                total+=1/phi_value[index];
+                pts[8]+=pts[sa+(sb<<1)]/phi_value[index];}
+            pts[8]/=total;
+
+            // FILL IN PARTICLE HASH TABLES
+            
+            int pat;
+            do{
+                pat=boundary_triangle_table(tri++);
+                TV_INT triangle(GET_V(pat,0),GET_V(pat,1),GET_V(pat,2));
+                for(int p=0;p<TV::m;p++){
+                    const int e=triangle(p);
+                    if(e<4){
+                        const int sa=e&1;
+                        const int sb=(e>>1)&1;
+                        TV_INT node_index=cell_index+VECTOR<int,2>(sa,sb).Insert(sc,c);
+                        if(!node_vertices.Get(node_index,p_index[e])){
+                            int index=particles.Add_Element();
+                            p_index[e]=index;
+                            node_vertices.Set(node_index,index);
+                            particles.X(index)=pts[e];}}
+                    else if(e<8){
+                        const int axis=((e>>1)&1)?b:a;
+                        FACE_INDEX<TV::m> fi(axis,cell_index+VECTOR<int,2>(e==7,e==5).Insert(sc,c));
+                        if(!edge_vertices.Get(fi,p_index[e])){
+                            int index=particles.Add_Element();
+                            p_index[e]=index;
+                            edge_vertices.Set(fi,index);
+                            particles.X(index)=pts[e];}}
+                    else{
+                        FACE_INDEX<TV::m> fi(c,cell_index+TV_INT::Axis_Vector(c)*sc);
+                        if(!face_vertices.Get(fi,p_index[e])){
+                            int index=particles.Add_Element();
+                            p_index[e]=index;
+                            face_vertices.Set(fi,index);
+                            particles.X(index)=pts[e];}}}
+                
+                TV_INT v(p_index[triangle(0)],p_index[triangle(2)],p_index[triangle(1)]);
+                int color=color_list[GET_C(pat,0)];
+                if(sc^(b-a==2)) exchange(v.y,v.z);
+                
+                T_SURFACE* surf=0;
+                if(!boundary.Get(color,surf)){
+                    surf=T_SURFACE::Create(particles);
+                    boundary.Set(color,surf);}
+                surf->mesh.elements.Append(v);
+                boundary_elements.Get_Or_Insert(color,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;
+            }while(!(pat&last_tri_bit));}}
 }
 //#####################################################################
 // Function Get_Elements
@@ -1027,7 +1045,7 @@ Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& bound
                 cell_vertices,interface,particles,interface_cell_elements,junction);
         Get_Hashed_Boundary_Elements_For_Cell<T,TV_INT,TV,T_SURFACE,HASH_BOUNDARY,HASH_CELL_BOUNDARY>
             (it.index,corners,cell_phi_color,cell_phi_value,edge_vertices,face_vertices,
-                node_vertices,boundary,particles,boundary_cell_elements(TV::m-1));
+                node_vertices,boundary,particles,boundary_cell_elements);
 
         if(!junction) continue; // not a junction
         junction_cell(it.index)=true;
@@ -1036,9 +1054,9 @@ Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& bound
 
     // PERFORM SURFACE RECONSTRUCTION
 
-    if(junction_cells_list.m) Perform_Surface_Reconstruction(particles,interface,boundary,cell_to_element,
-        junction_cell,junction_cells_list,edge_vertices,face_vertices,cell_vertices,node_vertices,
-        fit_count,iterations,verbose);
+    // if(junction_cells_list.m) Perform_Surface_Reconstruction(particles,interface,boundary,cell_to_element,
+        // junction_cell,junction_cells_list,edge_vertices,face_vertices,cell_vertices,node_vertices,
+        // fit_count,iterations,verbose);
 }
 //#####################################################################
 // Function Perform_Surface_Reconstruction

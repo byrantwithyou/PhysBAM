@@ -76,6 +76,8 @@ template<class T,class TV>
 void Dump_Element(const VECTOR<int,2>& color_pair,TRIANGLE_3D<T>& x)
 {
     Add_Debug_Object(x.X,color_map[color_pair.x],color_map[color_pair.y]);
+    Add_Debug_Particle(x.X.Sum()/3,VECTOR<T,3>(1,0,1));
+    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-TV::Cross_Product(x.X(1)-x.X(0),x.X(2)-x.X(0)).Normalized());
 }
 
 template<class T,class TV,class T_SURFACE,class T_FACE>
