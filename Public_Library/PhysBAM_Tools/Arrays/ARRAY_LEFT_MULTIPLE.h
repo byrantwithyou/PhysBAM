@@ -36,7 +36,7 @@ public:
     INDEX Size() const
     {return array.Size();}
 
-    INTERVAL<INDEX> Domain_Indices() const
+    typename DOMAIN_INDEX_TYPE<INDEX>::TYPE Domain_Indices() const
     {return array.Domain_Indices();}
 
     const T_PRODUCT operator()(const INDEX i) const

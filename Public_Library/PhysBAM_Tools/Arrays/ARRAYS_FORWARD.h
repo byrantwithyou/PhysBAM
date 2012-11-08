@@ -9,6 +9,7 @@
 
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
+#include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
 template<class T,class ID=int> class ARRAY_VIEW;
@@ -45,5 +46,11 @@ template<class T_ARRAY1,class T_ARRAY2> class ARRAY_QUOTIENT;
 template<class T_ARRAY> class ARRAY_NEGATION;
 template<class T1,class T_ARRAY2> class ARRAY_PLUS_SCALAR;
 template<class T1,class T_ARRAY2> class ARRAY_LEFT_MULTIPLE;
+
+template<class TV> class RANGE;
+template<int d> class FACE_INDEX;
+template<class T> struct DOMAIN_INDEX_TYPE {typedef INTERVAL<T> TYPE;};
+template<int d> struct DOMAIN_INDEX_TYPE<VECTOR<int,d> > {typedef RANGE<VECTOR<int,d> > TYPE;};
+template<int d> struct DOMAIN_INDEX_TYPE<FACE_INDEX<d> > {typedef RANGE<VECTOR<int,d> > TYPE;};
 }
 #endif

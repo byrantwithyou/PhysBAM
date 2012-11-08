@@ -40,8 +40,8 @@ public:
     INDEX Size() const
     {INDEX size=array1.Size();assert(size==array2.Size());return size;}
 
-    INTERVAL<INDEX> Domain_Indices() const
-    {INTERVAL<INDEX> domain_indices=array1.Domain_Indices();assert(domain_indices==array2.Domain_Indices());return domain_indices;}
+    typename DOMAIN_INDEX_TYPE<INDEX>::TYPE Domain_Indices() const
+    {typename DOMAIN_INDEX_TYPE<INDEX>::TYPE domain_indices=array1.Domain_Indices();assert(domain_indices==array2.Domain_Indices());return domain_indices;}
 
     const T_DIFFERENCE operator()(const INDEX i) const
     {return array1(i)-array2(i);}
