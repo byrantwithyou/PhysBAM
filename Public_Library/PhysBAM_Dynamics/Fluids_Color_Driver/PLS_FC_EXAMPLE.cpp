@@ -216,14 +216,13 @@ Make_Levelsets_Consistent()
 {
     ARRAY<ARRAY<T,TV_INT> >& phis=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
-        int index1,index2;
         T min1=FLT_MAX,min2=FLT_MAX,bc_min=FLT_MAX;
         for(int i=0;i<bc_phis.m;i++)
             bc_min=min(bc_min,bc_phis(i)(it.index));
         for(int i=0;i<phis.m;i++){
             T p=phis(i)(it.index);
-            if(p<min1){min2=min1;index2=index1;min1=p;index1=i;}
-            else if(p<min2){min2=p;index2=i;}}
+            if(p<min1){min2=min1;min1=p;}
+            else if(p<min2) min2=p;}
         T shift=(bc_min<min2)?-bc_min-min1:-(T).5*(min2+min1);
         for(int i=0;i<phis.m;i++)
             phis(i)(it.index)+=shift;}
