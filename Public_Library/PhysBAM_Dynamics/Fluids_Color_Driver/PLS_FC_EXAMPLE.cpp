@@ -162,6 +162,7 @@ Color_At_Cell(const TV_INT& index,T& phi) const
 template<class TV> void PLS_FC_EXAMPLE<TV>::
 Rebuild_Levelset_Color()
 {
+    Make_Levelsets_Consistent();
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next())
         levelset_color.color(it.index)=Color_At_Cell(it.index,levelset_color.phi(it.index));
 }
@@ -206,6 +207,26 @@ Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelse
     T alpha=(time-this->time)/dt;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
         V_levelset(it.Full_Index())=(1-alpha)*n(it.Full_Index())+alpha*m(it.Full_Index());
+}
+//#####################################################################
+// Function Make_Levelsets_Consistent
+//#####################################################################
+template<class TV> void PLS_FC_EXAMPLE<TV>::
+Make_Levelsets_Consistent()
+{
+    ARRAY<ARRAY<T,TV_INT> >& phis=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis;
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
+        int index1,index2;
+        T min1=FLT_MAX,min2=FLT_MAX,bc_min=FLT_MAX;
+        for(int i=0;i<bc_phis.m;i++)
+            bc_min=min(bc_min,bc_phis(i)(it.index));
+        for(int i=0;i<phis.m;i++){
+            T p=phis(i)(it.index);
+            if(p<min1){min2=min1;index2=index1;min1=p;index1=i;}
+            else if(p<min2){min2=p;index2=i;}}
+        T shift=(bc_min<min2)?-bc_min-min1:-(T).5*(min2+min1);
+        for(int i=0;i<phis.m;i++)
+            phis(i)(it.index)+=shift;}
 }
 //#####################################################################
 template class PLS_FC_EXAMPLE<VECTOR<float,2> >;

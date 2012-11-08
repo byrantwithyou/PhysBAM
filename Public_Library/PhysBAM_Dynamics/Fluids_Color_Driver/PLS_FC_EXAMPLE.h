@@ -91,6 +91,7 @@ public:
     int Color_At_Cell(const TV_INT& index) const;
     int Color_At_Cell(const TV_INT& index,T& phi) const;
     void Rebuild_Levelset_Color();
+    void Make_Levelsets_Consistent();
     void Fill_Levelsets_From_Levelset_Color();
 //#####################################################################
 };

@@ -5,12 +5,14 @@
 #include <PhysBAM_Tools/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <PhysBAM_Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_UTILITIES.h>
@@ -27,6 +29,7 @@
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_DRIVER.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_MULTIPLE.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 using namespace PhysBAM;
 namespace{
@@ -116,6 +119,7 @@ Initialize()
     example.particle_levelset_evolution_multiple.Initialize_FMM_Initialization_Iterative_Solver(true);
     example.particle_levelset_evolution_multiple.runge_kutta_order_levelset=3;
     example.particle_levelset_evolution_multiple.runge_kutta_order_particles=3;
+    example.particle_levelset_evolution_multiple.Use_Hamilton_Jacobi_Weno_Advection();
 
     example.particle_levelset_evolution_multiple.particle_levelset.levelset.Set_Custom_Boundary(*example.phi_boundary);
     example.particle_levelset_evolution_multiple.Bias_Towards_Negative_Particles(false);
@@ -130,6 +134,7 @@ Initialize()
         example.particle_levelset_evolution_multiple.particle_levelset.Set_Band_Width(6);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
+    example.particle_levelset_evolution_multiple.levelset_advection_multiple.Set_Custom_Advection(*new ADVECTION_HAMILTON_JACOBI_ENO<GRID<TV>,T>);
 
     if(example.restart){
         example.Read_Output_Files(example.restart);
@@ -254,6 +259,7 @@ Update_Level_Set(T dt,bool first_step)
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before reinitialization",0,1);
     example.particle_levelset_evolution_multiple.Make_Signed_Distance();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after level set update",0,1);
+    example.Rebuild_Levelset_Color();
 }
 //#####################################################################
 // Function Advection_And_BDF
@@ -361,7 +367,6 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     bccl.dt=dt;
     bccl.use_discontinuous_velocity=example.use_discontinuous_velocity;
 
-    example.Rebuild_Levelset_Color();
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color,true);
     iss.use_preconditioner=example.use_preconditioner;
     iss.use_p_null_mode=example.use_p_null_mode;
