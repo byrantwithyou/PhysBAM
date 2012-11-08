@@ -1000,7 +1000,7 @@ Get_Hashed_Boundary_Elements_For_Cell(const TV_INT& cell_index,const VECTOR<TV,8
 // Function Get_Elements
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
-Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& boundary,HASH_INDEX_TO_CELL_DATA& cell_to_element,
+Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& boundary,HASH_INDEX_TO_CELL_DATA& index_to_cell_data,
     const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,const int iterations,const bool verbose)
 {
     // CELL CONSTANTS
@@ -1016,10 +1016,10 @@ Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& bound
 
     // GLOBAL PARTICLES ARRAY AND JUNCTION CELL FLAGS
 
+    HASH_INDEX_TO_CELL_ELEMENTS index_to_cell_elements;
     GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
-    ARRAY<bool,TV_INT> junction_cell(grid.Domain_Indices());
-    ARRAY<TV_INT> junction_cells_list;
-    
+    HASHTABLE<TV_INT> junction_cells;
+
     // INITIALIZE MESHES
 
     int fit_count=0;
@@ -1035,8 +1035,8 @@ Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& bound
         for(int b=0;b<num_corners;b++) cut_cell|=(cell_phi_color(b)!=base_color);
         if(!cut_cell) continue; // uncut cell
 
-        assert(!cell_to_element.Contains(it.index));
-        HASH_CELL_DATA& cell_data=cell_to_element.Get_Or_Insert(it.index);
+        assert(!index_to_cell_data.Contains(it.index));
+        HASH_CELL_DATA& cell_data=index_to_cell_data.Get_Or_Insert(it.index);
         HASH_CELL_INTERFACE& interface_cell_elements=cell_data.interface;
         VECTOR<HASH_CELL_BOUNDARY,TV::m>& boundary_cell_elements=cell_data.boundary;
 
@@ -1050,29 +1050,43 @@ Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& bound
                 node_vertices,boundary,particles,boundary_cell_elements);
 
         if(!junction) continue; // not a junction
-        junction_cell(it.index)=true;
-        junction_cells_list.Append(it.index);
+        junction_cells.Insert(it.index);
         for(typename HASH_CELL_INTERFACE::CONST_ITERATOR it(interface_cell_elements);it.Valid();it.Next()) fit_count++;}
 
     // PERFORM SURFACE RECONSTRUCTION
 
-    if(junction_cells_list.m) Perform_Surface_Reconstruction(particles,interface,boundary,cell_to_element,
-        junction_cell,junction_cells_list,edge_vertices,face_vertices,cell_vertices,node_vertices,
-        fit_count,iterations,verbose);
+    if(fit_count){
+        ARRAY<int> particle_dofs(particles.number);
+        HASHTABLE<TV_INT> variable_cells;
+
+        Fix_Mesh(particles,particle_dofs,variable_cells,interface,boundary,index_to_cell_data,edge_vertices,
+            face_vertices,cell_vertices,node_vertices,junction_cells,fit_count,iterations,verbose);
+
+        
+    }
 }
 //#####################################################################
-// Function Perform_Surface_Reconstruction
+// Function Recut_Cells
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
-Perform_Surface_Reconstruction(GEOMETRY_PARTICLES<TV>& particles,const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,
-    const HASH_INDEX_TO_CELL_DATA& cell_to_element,const ARRAY<bool,TV_INT>& junction_cell,const ARRAY<TV_INT>& junction_cells_list,
+Recut_Cells(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,const HASHTABLE<TV_INT>& variable_cells,
+    const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASH_INDEX_TO_CELL_DATA& index_to_cell_data,
+    HASH_INDEX_TO_CELL_ELEMENTS& index_to_cell_elements)
+{
+
+}
+//#####################################################################
+// Function Fix_Mesh
+//#####################################################################
+template<class TV> void MARCHING_CUBES_COLOR<TV>::
+Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<TV_INT>& variable_cells,
+    const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASH_INDEX_TO_CELL_DATA& index_to_cell_data,
     const HASHTABLE<FACE_INDEX<TV::m>,int>& edge_vertices,const HASHTABLE<FACE_INDEX<TV::m>,int>& face_vertices,
     const HASHTABLE<TV_INT,int>& cell_vertices,const HASHTABLE<TV_INT,int>& node_vertices,
-    const int fit_count,const int iterations,const bool verbose)
+    const HASHTABLE<TV_INT>& junction_cells,const int fit_count,const int iterations,const bool verbose)
 {
     // DOFS AND NORMALS
 
-    ARRAY<int> particle_dofs(particles.number);
     ARRAY<TV> normals(fit_count);
     ARRAY<TV> midpoints(fit_count);
     
@@ -1090,7 +1104,7 @@ Perform_Surface_Reconstruction(GEOMETRY_PARTICLES<TV>& particles,const HASH_INTE
         bool trusted=true;
         for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
             TV_INT index=it2.index+it.Key().index;
-            if(junction_cell.Valid_Index(index)&&junction_cell(index)){
+            if(junction_cells.Contains(index)){
                 trusted=false;break;}}
         if(!trusted) particle_dofs(it.Data())=1<<it.Key().axis;}
 
@@ -1111,9 +1125,9 @@ Perform_Surface_Reconstruction(GEOMETRY_PARTICLES<TV>& particles,const HASH_INTE
     // INITIALIZE NORMALS TO PARTICLES CORRESPONDENCE
 
     int fit_index=-1;
-    for(int c=0;c<junction_cells_list.m;c++){
-        const TV_INT& junction_cell_index=junction_cells_list(c);
-        const HASH_CELL_INTERFACE& junction_interface_cell_elements=cell_to_element.Get(junction_cell_index).interface;
+    for(typename HASHTABLE<TV_INT>::ITERATOR it(junction_cells);it.Valid();it.Next()){
+        const TV_INT& junction_cell_index=it.Key();
+        const HASH_CELL_INTERFACE& junction_interface_cell_elements=index_to_cell_data.Get(junction_cell_index).interface;
         for(typename HASH_CELL_INTERFACE::CONST_ITERATOR it(junction_interface_cell_elements);it.Valid();it.Next()){
             fit_index++;
             HASHTABLE<int> particle_indices_ht;
@@ -1122,8 +1136,8 @@ Perform_Surface_Reconstruction(GEOMETRY_PARTICLES<TV>& particles,const HASH_INTE
             RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box()*2);range.max_corner+=1;
             for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
                 const TV_INT& cell_index=junction_cell_index+it2.index;
-                if(cell_to_element.Contains(cell_index)){
-                    const HASH_CELL_INTERFACE& interface_cell_elements=cell_to_element.Get(cell_index).interface;
+                if(index_to_cell_data.Contains(cell_index)){
+                    const HASH_CELL_INTERFACE& interface_cell_elements=index_to_cell_data.Get(cell_index).interface;
                     INTERVAL<int> interval;
                     if(interface_cell_elements.Get(color_pair,interval))
                         for(int i=interval.min_corner;i<interval.max_corner;i++){

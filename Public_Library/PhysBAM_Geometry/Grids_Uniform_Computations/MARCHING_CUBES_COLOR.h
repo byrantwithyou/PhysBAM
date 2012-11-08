@@ -28,6 +28,7 @@ public:
     typedef VECTOR<int,TV::m> TV_INT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
+
     enum WORKAROUND {num_corners=1<<TV::m,num_edges=TV::m<<(TV::m-1),num_pts=num_corners+num_edges};
 
     MARCHING_CUBES_COLOR(){}
@@ -38,6 +39,8 @@ public:
         const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi);
 
 //#####################################################################
+
+// TODO: make this section private
 
     typedef HASHTABLE<int,T_SURFACE*> HASH_BOUNDARY;
     typedef HASHTABLE<int,INTERVAL<int> > HASH_CELL_BOUNDARY;
@@ -52,17 +55,36 @@ public:
 
     typedef HASHTABLE<TV_INT,HASH_CELL_DATA> HASH_INDEX_TO_CELL_DATA;
 
+//#####################################################################
+
+    typedef TRIPLE<T_FACE,int,int> INTERFACE_ELEMENT;
+    typedef PAIR<T_FACE,int> BOUNDARY_ELEMENT;
+
+    struct CELL_ELEMENTS
+    {
+        ARRAY<INTERFACE_ELEMENT> interface;
+        ARRAY<BOUNDARY_ELEMENT> boundary;
+    };
+    
+    typedef HASHTABLE<TV_INT,CELL_ELEMENTS> HASH_INDEX_TO_CELL_ELEMENTS;
+
     static void Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& boundary,
-        HASH_INDEX_TO_CELL_DATA& cell_to_element,const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
+        HASH_INDEX_TO_CELL_DATA& index_to_cell_data,const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
         const int newton_steps=20,const bool verbose=false);
+
+//#####################################################################
 
 private:
 
-    static void Perform_Surface_Reconstruction(GEOMETRY_PARTICLES<TV>& particles,const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,
-        const HASH_INDEX_TO_CELL_DATA& cell_to_element,const ARRAY<bool,TV_INT>& junction_cell,const ARRAY<TV_INT>& junction_cells_list,
+    static void Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<TV_INT>& variable_cells,
+        const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASH_INDEX_TO_CELL_DATA& index_to_cell_data,
         const HASHTABLE<FACE_INDEX<TV::m>,int>& edge_vertices,const HASHTABLE<FACE_INDEX<TV::m>,int>& face_vertices,
         const HASHTABLE<TV_INT,int>& cell_vertices,const HASHTABLE<TV_INT,int>& node_vertices,
-        const int fit_count,const int iterations,const bool verbose);
+        const HASHTABLE<TV_INT>& junction_cells,const int fit_count,const int iterations,const bool verbose);
+
+    static void Recut_Cells(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,const HASHTABLE<TV_INT>& variable_cells,
+        const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASH_INDEX_TO_CELL_DATA& index_to_cell_data,
+        HASH_INDEX_TO_CELL_ELEMENTS& index_to_cell_elements);
 
 //#####################################################################
 };
