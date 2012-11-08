@@ -816,65 +816,65 @@ Get_Hashed_Boundary_Elements_For_Cell(const TV_INT& cell_index,const VECTOR<TV,4
     HASHTABLE<FACE_INDEX<2>,int>& edge_vertices,HASHTABLE<FACE_INDEX<2>,int>& face_vertices,HASHTABLE<TV_INT,int>& node_vertices,
     HASH_BOUNDARY& boundary,GEOMETRY_PARTICLES<TV>& particles,VECTOR<HASH_CELL_BOUNDARY,2>& boundary_elements_vector)
 {
-    // for(int s=0;s<2;s++){
-        // const int offset=s<<1;
-        // int points[2]={-1,-1};
-        // TV pts[2]={corners[offset],corners[offset+1]};
-        // int tmp;
-        // for(int e=0;e<2;e++){
-            // TV_INT node_index=cell_index+TV_INT(e,s);
-            // if(!node_vertices.Get(node_index,tmp)){
-                // int index=particles.Add_Element();
-                // points[e]=index;
-                // node_vertices.Set(node_index,index);
-                // particles.X(index)=pts[e];}
-            // else{
-                // assert(points[e]==tmp || points[e]==-1);
-                // points[e]=tmp;}}
-        // if(phi_color[offset]==phi_color[offset+1]){
-            // VECTOR<int,2> v(points[s],points[1-s]);
-            // int c=phi_color[offset];
+    for(int a=0;a<2;a++){
+        const int b=1-a;
+        const int oa=1<<a;
+        const int ob=1<<b;
+        HASH_CELL_BOUNDARY& boundary_elements=boundary_elements_vector(b);
+        for(int sb=0;sb<2;sb++){
             
-            // T_SURFACE* surf=0;
-            // if(!boundary.Get(c,surf)){
-                // surf=T_SURFACE::Create(particles);
-                // boundary.Set(c,surf);}
-            // surf->mesh.elements.Append(v);
-            // boundary_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}
-        // else{
-            // int points_m=-1;
-            // T theta=phi_value[offset]/(phi_value[offset]+phi_value[offset+1]);
-            // TV pts_m=pts[1]*theta+pts[0]*(1-theta);
-            // int tmp;
-            // FACE_INDEX<TV::m> fi(0,cell_index+TV_INT(0,s));
-            // if(!edge_vertices.Get(fi,tmp)){
-                // int index=particles.Add_Element();
-                // points_m=index;
-                // edge_vertices.Set(fi,index);
-                // particles.X(index)=pts_m;}
-            // else{
-                // assert(points_m==tmp || points_m==-1);
-                // points_m=tmp;}
+            // INITIALIZE CORNER POINTS
             
-            // {VECTOR<int,2> v(points_m,points[1-s]);
-            // int c=phi_color[offset+1-s];
-            
-            // T_SURFACE* surf=0;
-            // if(!boundary.Get(c,surf)){
-                // surf=T_SURFACE::Create(particles);
-                // boundary.Set(c,surf);}
-            // surf->mesh.elements.Append(v);
-            // boundary_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}
+            VECTOR<TV,2> pts;
+            VECTOR<int,2> p_index;
+            p_index.Fill(-1);
 
-            // {VECTOR<int,2> v(points[s],points_m);
-            // int c=phi_color[offset+s];
+            for(int sa=0;sa<2;sa++)
+                pts[sa]=corners[sa*oa+sb*ob];
+
+            for(int sa=0;sa<2;sa++){
+                TV_INT node_index=cell_index+VECTOR<int,1>(sa).Insert(sb,b);
+                if(!node_vertices.Get(node_index,p_index[sa])){
+                    int index=particles.Add_Element();
+                    p_index[sa]=index;
+                    node_vertices.Set(node_index,index);
+                    particles.X(index)=pts[sa];}
+                else{
+                    assert(p_index[sa]==p_index[sa] || p_index[sa]==-1);
+                    p_index[sa]=p_index[sa];}}
+
+        if(phi_color[sb*ob]==phi_color[oa+sb*ob]){
+            VECTOR<int,2> v(p_index[sb],p_index[1-sb]);
+            if(a) exchange(v.x,v.y);
+            int color=phi_color[sb*ob];
+            T_SURFACE* surf=0;
+            if(!boundary.Get(color,surf)){
+                surf=T_SURFACE::Create(particles);
+                boundary.Set(color,surf);}
+            surf->mesh.elements.Append(v);
+            boundary_elements.Get_Or_Insert(color,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}
+        else{
+            int p_index_m=-1;
+            T theta=phi_value[sb*ob]/(phi_value[sb*ob]+phi_value[oa+sb*ob]);
+            TV pts_m=pts[1]*theta+pts[0]*(1-theta);
+            FACE_INDEX<TV::m> fi(a,cell_index+TV_INT::Axis_Vector(b)*sb);
+            if(!edge_vertices.Get(fi,p_index_m)){
+                int index=particles.Add_Element();
+                p_index_m=index;
+                edge_vertices.Set(fi,index);
+                particles.X(index)=pts_m;}
             
-            // T_SURFACE* surf=0;
-            // if(!boundary.Get(c,surf)){
-                // surf=T_SURFACE::Create(particles);
-                // boundary.Set(c,surf);}
-            // surf->mesh.elements.Append(v);
-            // boundary_elements.Get_Or_Insert(c,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}}}
+            for(int t=0;t<2;t++){
+                VECTOR<int,2> v(p_index[t^sb],p_index_m);
+                if(a^t) exchange(v.x,v.y);
+                int color=phi_color[sb*ob+(t^sb)*oa];
+                
+                T_SURFACE* surf=0;
+                if(!boundary.Get(color,surf)){
+                    surf=T_SURFACE::Create(particles);
+                    boundary.Set(color,surf);}
+                surf->mesh.elements.Append(v);
+                boundary_elements.Get_Or_Insert(color,INTERVAL<int>(surf->mesh.elements.m-1,surf->mesh.elements.m)).max_corner=surf->mesh.elements.m;}}}}
 }
 //#####################################################################
 // Function Get_Hashed_Boundary_Elements_For_Cell
@@ -1054,9 +1054,9 @@ Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& bound
 
     // PERFORM SURFACE RECONSTRUCTION
 
-    // if(junction_cells_list.m) Perform_Surface_Reconstruction(particles,interface,boundary,cell_to_element,
-        // junction_cell,junction_cells_list,edge_vertices,face_vertices,cell_vertices,node_vertices,
-        // fit_count,iterations,verbose);
+    if(junction_cells_list.m) Perform_Surface_Reconstruction(particles,interface,boundary,cell_to_element,
+        junction_cell,junction_cells_list,edge_vertices,face_vertices,cell_vertices,node_vertices,
+        fit_count,iterations,verbose);
 }
 //#####################################################################
 // Function Perform_Surface_Reconstruction

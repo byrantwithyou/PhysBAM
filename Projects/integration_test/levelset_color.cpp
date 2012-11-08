@@ -70,6 +70,10 @@ void Dump_Element(const VECTOR<int,2>& color_pair,SEGMENT_2D<T>& x)
 {
     Add_Debug_Object(x.X+x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.x]);
     Add_Debug_Object(x.X-x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.y]);
+    Add_Debug_Particle(x.X.Sum()/2+x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.x]);
+    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,x.Normal());
+    Add_Debug_Particle(x.X.Sum()/2-x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.y]);
+    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,x.Normal());
 }
 
 template<class T,class TV>
