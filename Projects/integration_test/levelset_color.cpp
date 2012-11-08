@@ -181,10 +181,10 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
 
     for(int i=0;i<=iterations;i++){
-        HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> > cell_to_element;
-        HASHTABLE<VECTOR<int,2>,T_SURFACE*> surface;
         HASHTABLE<int,T_SURFACE*> boundary;
-        MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,cell_to_element,phi_color,phi_value,i,verbose);
+        HASHTABLE<VECTOR<int,2>,T_SURFACE*> surface;
+        typename MARCHING_CUBES_COLOR<TV>::HASH_INDEX_TO_CELL_DATA index_to_cell_data;
+        MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,index_to_cell_data,phi_color,phi_value,i,verbose);
         Dump_Interface<T,TV,T_SURFACE,T_FACE>(surface);
         Dump_Boundary<T,TV,T_SURFACE,T_FACE>(boundary);
         char buffer[100];

@@ -119,9 +119,9 @@ Compute_Entries(bool double_fine)
                 subcell_phi_colors(b)=color;
                 material_subcell(s)|=color>=0;}
             if(material_subcell(s)){
-                const PAIR<HASH_CELL_INTERFACE,HASH_CELL_BOUNDARY>& elements=cdi.cell_to_element.Get(subcell_base);
-                const HASH_CELL_INTERFACE& surface_elements=elements.x;
-                const HASH_CELL_BOUNDARY& sides_elements=elements.y;
+                const HASH_CELL_DATA& elements=cdi.index_to_cell_data.Get(subcell_base);
+                const HASH_CELL_INTERFACE& surface_elements=elements.interface;
+                const HASH_CELL_BOUNDARY& sides_elements=elements.boundary(TV::m-1);
                 for(typename HASH_CELL_INTERFACE::CONST_ITERATOR it(surface_elements);it.Valid();it.Next()){
                     const VECTOR<int,2>& color_pair=it.Key();
                     const INTERVAL<int>& interval=it.Data();

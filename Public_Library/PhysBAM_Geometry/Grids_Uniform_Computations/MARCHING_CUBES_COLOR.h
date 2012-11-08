@@ -43,16 +43,23 @@ public:
     typedef HASHTABLE<int,INTERVAL<int> > HASH_CELL_BOUNDARY;
     typedef HASHTABLE<VECTOR<int,2>,T_SURFACE*> HASH_INTERFACE;
     typedef HASHTABLE<VECTOR<int,2>,INTERVAL<int> > HASH_CELL_INTERFACE;
-    typedef HASHTABLE<TV_INT,PAIR<HASH_CELL_INTERFACE,HASH_CELL_BOUNDARY> > HASH_CELL_TO_ELEMENT;
+
+    struct HASH_CELL_DATA
+    {
+        HASH_CELL_INTERFACE interface;
+        VECTOR<HASH_CELL_BOUNDARY,TV::m> boundary;
+    };
+
+    typedef HASHTABLE<TV_INT,HASH_CELL_DATA> HASH_INDEX_TO_CELL_DATA;
 
     static void Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& boundary,
-        HASH_CELL_TO_ELEMENT& cell_to_element,const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
+        HASH_INDEX_TO_CELL_DATA& cell_to_element,const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
         const int newton_steps=20,const bool verbose=false);
 
 private:
 
     static void Perform_Surface_Reconstruction(GEOMETRY_PARTICLES<TV>& particles,const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,
-        const HASH_CELL_TO_ELEMENT& cell_to_element,const ARRAY<bool,TV_INT>& junction_cell,const ARRAY<TV_INT>& junction_cells_list,
+        const HASH_INDEX_TO_CELL_DATA& cell_to_element,const ARRAY<bool,TV_INT>& junction_cell,const ARRAY<TV_INT>& junction_cells_list,
         const HASHTABLE<FACE_INDEX<TV::m>,int>& edge_vertices,const HASHTABLE<FACE_INDEX<TV::m>,int>& face_vertices,
         const HASHTABLE<TV_INT,int>& cell_vertices,const HASHTABLE<TV_INT,int>& node_vertices,
         const int fit_count,const int iterations,const bool verbose);
