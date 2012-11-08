@@ -31,9 +31,9 @@ public:
     {}
 
     void Initialize()
-    {for(int i=0;i<levelsets.levelsets.m;i++) levelset_advections.Append(LEVELSET_ADVECTION<TV>(levelsets.levelsets(i)));}
+    {levelset_advections.Remove_All();for(int i=0;i<levelsets.levelsets.m;i++) levelset_advections.Append(LEVELSET_ADVECTION<TV>(levelsets.levelsets(i)));}
 
-    void Set_Custom_Advection(ADVECTION<T,T,T_GRID>& advection_input)
+    void Set_Custom_Advection(ADVECTION<GRID<TV>,T>& advection_input)
     {for(int i=0;i<levelset_advections.m;i++)levelset_advections(i).Set_Custom_Advection(advection_input);}
     
     void Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const int number_of_ghost_cells)

@@ -93,7 +93,7 @@ Advance_Levelset(const T dt)
     ARRAY<RUNGEKUTTA<T_ARRAYS_SCALAR>*> rungekutta_phis(phis.m);
     for(int i=0;i<phis.m;i++) rungekutta_phis(i)=new RUNGEKUTTA<T_ARRAYS_SCALAR>(phis(i),runge_kutta_order_levelset,0,time);
     for(int k=0;k<runge_kutta_order_levelset;k++){
-        if(k==1 || !use_frozen_velocity) particle_levelset_multiple.levelset_multiple.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset_multiple.levelset_multiple,V,time);
+        if(k==0 || !use_frozen_velocity) particle_levelset_multiple.levelset_multiple.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset_multiple.levelset_multiple,V,time);
         levelset_advection_multiple.Euler_Step(V,dt,time,particle_levelset_multiple.number_of_ghost_cells);
         for(int i=0;i<rungekutta_phis.m;i++){
             rungekutta_phis(i)->Next();
