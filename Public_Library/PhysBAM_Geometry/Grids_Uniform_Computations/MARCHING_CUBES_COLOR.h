@@ -30,8 +30,8 @@ public:
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
     enum WORKAROUND {num_corners=1<<TV::m,num_edges=TV::m<<(TV::m-1),num_pts=num_corners+num_edges};
 
-    MARCHING_CUBES_COLOR() {}
-    ~MARCHING_CUBES_COLOR() {}
+    MARCHING_CUBES_COLOR(){}
+    ~MARCHING_CUBES_COLOR(){}
 
     static void Initialize_Case_Table();
     static void Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& interface,ARRAY<PAIR<T_FACE,int> >& boundary,
@@ -48,6 +48,14 @@ public:
     static void Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& boundary,
         HASH_CELL_TO_ELEMENT& cell_to_element,const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
         const int newton_steps=20,const bool verbose=false);
+
+private:
+
+    static void Perform_Surface_Reconstruction(GEOMETRY_PARTICLES<TV>& particles,const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,
+        const HASH_CELL_TO_ELEMENT& cell_to_element,const ARRAY<bool,TV_INT>& junction_cell,const ARRAY<TV_INT>& junction_cells_list,
+        const HASHTABLE<FACE_INDEX<TV::m>,int>& edge_vertices,const HASHTABLE<FACE_INDEX<TV::m>,int>& face_vertices,
+        const HASHTABLE<TV_INT,int>& cell_vertices,const HASHTABLE<TV_INT,int>& node_vertices,
+        const int fit_count,const int iterations,const bool verbose);
 
 //#####################################################################
 };

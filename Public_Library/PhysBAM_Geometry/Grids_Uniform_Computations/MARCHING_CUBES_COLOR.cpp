@@ -1376,6 +1376,22 @@ Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& bound
         junction_cells_list.Append(it.index);
         for(typename HASH_CELL_INTERFACE::CONST_ITERATOR it(interface_cell_elements);it.Valid();it.Next()) fit_count++;}
 
+    // PERFORM SURFACE RECONSTRUCTION
+
+    if(junction_cells_list.m) Perform_Surface_Reconstruction(particles,interface,boundary,cell_to_element,
+        junction_cell,junction_cells_list,edge_vertices,face_vertices,cell_vertices,node_vertices,
+        fit_count,iterations,verbose);
+}
+//#####################################################################
+// Function Perform_Surface_Reconstruction
+//#####################################################################
+template<class TV> void MARCHING_CUBES_COLOR<TV>::
+Perform_Surface_Reconstruction(GEOMETRY_PARTICLES<TV>& particles,const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,
+    const HASH_CELL_TO_ELEMENT& cell_to_element,const ARRAY<bool,TV_INT>& junction_cell,const ARRAY<TV_INT>& junction_cells_list,
+    const HASHTABLE<FACE_INDEX<TV::m>,int>& edge_vertices,const HASHTABLE<FACE_INDEX<TV::m>,int>& face_vertices,
+    const HASHTABLE<TV_INT,int>& cell_vertices,const HASHTABLE<TV_INT,int>& node_vertices,
+    const int fit_count,const int iterations,const bool verbose)
+{
     // DOFS AND NORMALS
 
     ARRAY<int> particle_dofs(particles.number);
@@ -1384,13 +1400,13 @@ Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& bound
     
     // INITIALIZE DOFS
 
-    for(typename HASHTABLE<TV_INT,int>::ITERATOR it(cell_vertices);it.Valid();it.Next()){
+    for(typename HASHTABLE<TV_INT,int>::CONST_ITERATOR it(cell_vertices);it.Valid();it.Next()){
         particle_dofs(it.Data())=(1<<TV::m)-1;}
 
-    for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(face_vertices);it.Valid();it.Next()){
+    for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::CONST_ITERATOR it(face_vertices);it.Valid();it.Next()){
         particle_dofs(it.Data())=(1<<TV::m)-1-(1<<it.Key().axis);}
 
-    for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(edge_vertices);it.Valid();it.Next()){
+    for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::CONST_ITERATOR it(edge_vertices);it.Valid();it.Next()){
         RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box());
         range.max_corner(it.Key().axis)=2;
         bool trusted=true;
@@ -1447,7 +1463,7 @@ Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& bound
     // INITIALIZE PARTICLE ADJACENCY MAP
 
     ARRAY<ARRAY<int> > adjacency_map(index_map.m);    
-    for(typename HASH_INTERFACE::ITERATOR it(interface);it.Valid();it.Next()){
+    for(typename HASH_INTERFACE::CONST_ITERATOR it(interface);it.Valid();it.Next()){
         T_SURFACE& surf=*it.Data();
         surf.Update_Number_Nodes();
         surf.mesh.Initialize_Adjacent_Elements();
