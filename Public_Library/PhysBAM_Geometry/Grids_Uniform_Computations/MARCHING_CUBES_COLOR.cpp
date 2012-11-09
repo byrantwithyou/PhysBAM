@@ -12,6 +12,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Math_Tools/clamp.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
@@ -19,6 +20,8 @@
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
+#include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
+#include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -1062,28 +1065,115 @@ Get_Elements(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<
         HASHTABLE<TV_INT> variable_cells;
         Fix_Mesh(particles,particle_dofs,variable_cells,interface,boundary,index_to_cell_data,
             edge_vertices,face_vertices,cell_vertices,node_vertices,junction_cells,fit_count,iterations,verbose);
-        Save_Mesh(index_to_cell_elements,interface,boundary,index_to_cell_data,particles);} // FOR NOW JUST SAVE (NO RECUTTING)
-    else Save_Mesh(index_to_cell_elements,interface,boundary,index_to_cell_data,particles);
+        Save_Mesh(index_to_cell_elements,grid,interface,boundary,index_to_cell_data,particles);} // FOR NOW JUST SAVE (NO RECUTTING)
+    else Save_Mesh(index_to_cell_elements,grid,interface,boundary,index_to_cell_data,particles);
 }
 //#####################################################################
-// Function Recut_Cells
+// Function Cut_Elements
+//#####################################################################
+template<class TV_INT,class TV,class T_FACE,class T_ELEMENT> void
+Cut_Elements(ARRAY<ARRAY<T_ELEMENT>,TV_INT>& cut_elements,const ARRAY<T_ELEMENT>& elements,
+    const RANGE<TV_INT>& range,const RANGE<TV>& domain)
+{
+    TV_INT size=range.Edge_Lengths();
+    for(int a=0;a<TV::m;a++)
+        if(size(a)>1){
+            TV_INT new_size=size;
+            new_size(a)/=2;
+            ARRAY<T_FACE> t[2];
+            ARRAY<T_ELEMENT> array[2];
+            TV pt=domain.min_corner+domain.Edge_Lengths()*TV(new_size)/TV(size);
+            typename BASIC_GEOMETRY_POLICY<TV>::HYPERPLANE plane(TV::Axis_Vector(a),pt);
+            for(int i=0;i<elements.m;i++){
+                for(int s=0;s<2;s++) t[s].Remove_All();
+                T_FACE::Cut_With_Hyperplane(elements(i).face,plane,t[0],t[1],1e-14);
+                for(int s=0;s<2;s++)
+                    for(int j=0;j<t[s].m;j++){
+                        array[s].Append(elements(i));
+                        array[s].Last().face=t[s](j);}}
+            RANGE<TV> domain0(domain),domain1(domain);
+            RANGE<TV_INT> range0(range),range1(range);
+            domain0.max_corner(a)=domain1.min_corner(a)=pt(a);
+            range0.max_corner(a)=range1.min_corner(a)=range.min_corner(a)+new_size(a);
+            Cut_Elements<TV_INT,TV,T_FACE,T_ELEMENT>(cut_elements,array[0],range0,domain0);
+            Cut_Elements<TV_INT,TV,T_FACE,T_ELEMENT>(cut_elements,array[1],range1,domain1);
+            return;}
+    const TV_INT cell=range.min_corner;
+    for(int i=0;i<elements.m;i++) cut_elements(cell).Append(elements(i));
+}
+//#####################################################################
+// Function Save_Mesh
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
-Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const HASH_INTERFACE& interface,
+Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<TV>& grid,const HASH_INTERFACE& interface,
     const HASH_BOUNDARY& boundary,const HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,const GEOMETRY_PARTICLES<TV>& particles,
     const bool recut,const ARRAY<int>* const particle_dofs,const HASHTABLE<TV_INT>* const variable_cells)
 {
     for(typename HASHTABLE<TV_INT,HASH_CELL_DATA>::CONST_ITERATOR it(index_to_cell_data);it.Valid();it.Next()){
+
+        // HASH CELL DATA
+
         const TV_INT& cell_index=it.Key();
         const HASH_CELL_DATA& hash_cell_data=it.Data();
         const HASH_CELL_INTERFACE hash_cell_interface=hash_cell_data.interface;
         const VECTOR<HASH_CELL_BOUNDARY,TV::m> hash_cell_boundary=hash_cell_data.boundary;
-        CELL_ELEMENTS& cell_elements=index_to_cell_elements.Get_Or_Insert(cell_index);
-        ARRAY<INTERFACE_ELEMENT>& cell_interface=cell_elements.interface;
-        ARRAY<BOUNDARY_ELEMENT>& cell_boundary=cell_elements.boundary;
 
-        if(recut && variable_cells->Contains(cell_index)) PHYSBAM_FATAL_ERROR(); // NEED TO DO RECUTTING HERE
+        // IF CELL HAS VARIABLE PARTICLES THEN DO RECUTTING
+
+        if(recut && variable_cells->Contains(cell_index)){
+
+            ARRAY<INTERFACE_ELEMENT> interface_elements;
+            ARRAY<BOUNDARY_ELEMENT> boundary_elements;
+            HASHTABLE<int> variable_indices;
+
+            for(typename HASH_CELL_INTERFACE::CONST_ITERATOR it(hash_cell_interface);it.Valid();it.Next()){
+                const VECTOR<int,2> color_pair=it.Key();
+                const INTERVAL<int> interval=it.Data();
+                const T_SURFACE& color_pair_interface=*interface.Get(color_pair);
+                for(int e=interval.min_corner;e<interval.max_corner;e++){
+                    const TV_INT& e_index=color_pair_interface.mesh.elements(e);
+                    interface_elements.Add_End();
+                    INTERFACE_ELEMENT& element=interface_elements.Last();
+                    for(int i=0;i<TV::m;i++){
+                        const int p_index=e_index(i);
+                        element.face.X(i)=particles.X(p_index);
+                        if((*particle_dofs)(p_index) && !variable_indices.Contains(p_index))
+                            variable_indices.Insert(p_index);}
+                    element.color_pair=color_pair;}}
+
+            for(int v=0;v<TV::m;v++)
+            for(typename HASH_CELL_BOUNDARY::CONST_ITERATOR it(hash_cell_boundary(v));it.Valid();it.Next()){
+                const int color=it.Key();
+                const INTERVAL<int> interval=it.Data();
+                const T_SURFACE& color_boundary=*boundary.Get(color);
+                for(int e=interval.min_corner;e<interval.max_corner;e++){
+                    const TV_INT& e_index=color_boundary.mesh.elements(e);
+                    boundary_elements.Add_End();
+                    BOUNDARY_ELEMENT& element=boundary_elements.Last();
+                    for(int i=0;i<TV::m;i++) element.face.X(i)=particles.X(e_index(i));
+                    element.color=color;}}
+
+            ARRAY<TV> variable_particles;
+            for(typename HASHTABLE<int>::ITERATOR it(variable_indices);it.Valid();it.Next())
+                variable_particles.Append(particles.X(it.Key()));
+            const RANGE<TV_INT> cell_range(grid.Clamp_To_Cell(RANGE<TV>::Bounding_Box(variable_particles)));
+            const RANGE<TV> cell_domain(grid.Cell_Domain(cell_range));
+
+            ARRAY<ARRAY<INTERFACE_ELEMENT>,TV_INT> cut_interface(cell_range);
+            ARRAY<ARRAY<BOUNDARY_ELEMENT>,TV_INT> cut_boundary(cell_range);
+            
+            Cut_Elements<TV_INT,TV,T_FACE,INTERFACE_ELEMENT>(cut_interface,interface_elements,cell_range,cell_domain);
+            Cut_Elements<TV_INT,TV,T_FACE,BOUNDARY_ELEMENT>(cut_boundary,boundary_elements,cell_range,cell_domain);
+        }
+
+        // IF NO MOVING PARTICLES THEN JUST COPY OVER TO NEW STRUCTURES
+
         else{
+
+            CELL_ELEMENTS& cell_elements=index_to_cell_elements.Get_Or_Insert(cell_index);
+            ARRAY<INTERFACE_ELEMENT>& cell_interface=cell_elements.interface;
+            ARRAY<BOUNDARY_ELEMENT>& cell_boundary=cell_elements.boundary;
+
             for(typename HASH_CELL_INTERFACE::CONST_ITERATOR it(hash_cell_interface);it.Valid();it.Next()){
                 const VECTOR<int,2> color_pair=it.Key();
                 const INTERVAL<int> interval=it.Data();
@@ -1092,9 +1182,9 @@ Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const HASH_INT
                     const TV_INT& e_index=color_pair_interface.mesh.elements(e);
                     cell_interface.Add_End();
                     INTERFACE_ELEMENT& element=cell_interface.Last();
-                    for(int i=0;i<TV::m;i++)
-                        element.face.X(i)=particles.X(e_index(i));
+                    for(int i=0;i<TV::m;i++) element.face.X(i)=particles.X(e_index(i));
                     element.color_pair=color_pair;}}
+
             for(typename HASH_CELL_BOUNDARY::CONST_ITERATOR it(hash_cell_boundary(TV::m-1));it.Valid();it.Next()){
                 const int color=it.Key();
                 const INTERVAL<int> interval=it.Data();
@@ -1103,8 +1193,7 @@ Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const HASH_INT
                     const TV_INT& e_index=color_boundary.mesh.elements(e);
                     cell_boundary.Add_End();
                     BOUNDARY_ELEMENT& element=cell_boundary.Last();
-                    for(int i=0;i<TV::m;i++)
-                        element.face.X(i)=particles.X(e_index(i));
+                    for(int i=0;i<TV::m;i++) element.face.X(i)=particles.X(e_index(i));
                     element.color=color;}}}}
 }
 //#####################################################################

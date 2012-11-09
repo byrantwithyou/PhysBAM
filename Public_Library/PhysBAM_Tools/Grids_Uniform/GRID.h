@@ -221,6 +221,9 @@ public:
     RANGE<TV> Cell_Domain(const TV_INT& index) const
     {TV corner=domain.min_corner+TV(index+1)*dX;return RANGE<TV>(corner-dX,corner);}
 
+    RANGE<TV> Cell_Domain(const RANGE<TV_INT>& cell_range) const
+    {return RANGE<TV>(Node(cell_range.min_corner),Node(cell_range.max_corner));}
+
     static void Cells_Touching_Face(const int axis,const TV_INT& face_index,TV_INT& cell1,TV_INT& cell2)
     {cell2=face_index;cell1=face_index;cell1[axis]--;}
 

@@ -85,7 +85,10 @@ private:
         const HASHTABLE<TV_INT,int>& cell_vertices,const HASHTABLE<TV_INT,int>& node_vertices,
         const HASHTABLE<TV_INT>& junction_cells,const int fit_count,const int iterations,const bool verbose);
 
-    static void Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const HASH_INTERFACE& interface,
+    static void Cut_Boundary_Elements(ARRAY<ARRAY<BOUNDARY_ELEMENT>,TV_INT>& cut_elements,const ARRAY<BOUNDARY_ELEMENT>& elements,
+        const RANGE<TV_INT>& range,const RANGE<TV>& domain);
+
+    static void Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<TV>& grid,const HASH_INTERFACE& interface,
         const HASH_BOUNDARY& boundary,const HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,const GEOMETRY_PARTICLES<TV>& particles,
         const bool recut_cells=false,const ARRAY<int>* const particle_dofs=0,const HASHTABLE<TV_INT>* const variable_cells=0);
 
