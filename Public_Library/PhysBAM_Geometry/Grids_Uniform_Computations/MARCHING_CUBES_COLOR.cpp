@@ -1065,7 +1065,7 @@ Get_Elements(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<
         HASHTABLE<TV_INT> variable_cells;
         Fix_Mesh(particles,particle_dofs,variable_cells,interface,boundary,index_to_cell_data,
             edge_vertices,face_vertices,cell_vertices,node_vertices,junction_cells,fit_count,iterations,verbose);
-        Save_Mesh(index_to_cell_elements,grid,interface,boundary,index_to_cell_data,particles);} // FOR NOW JUST SAVE (NO RECUTTING)
+        Save_Mesh(index_to_cell_elements,grid,interface,boundary,index_to_cell_data,particles,true,&particle_dofs,&variable_cells);}
     else Save_Mesh(index_to_cell_elements,grid,interface,boundary,index_to_cell_data,particles);
 }
 //#####################################################################
@@ -1122,6 +1122,8 @@ Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<TV>
 
         if(recut && variable_cells->Contains(cell_index)){
 
+            // GET BOUNDARY AND INTERFACE ELEMENTS FORM HASHTABLES
+
             ARRAY<INTERFACE_ELEMENT> interface_elements;
             ARRAY<BOUNDARY_ELEMENT> boundary_elements;
             HASHTABLE<int> variable_indices;
@@ -1153,18 +1155,67 @@ Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<TV>
                     for(int i=0;i<TV::m;i++) element.face.X(i)=particles.X(e_index(i));
                     element.color=color;}}
 
+            // DETERMINE THE RECUTTING RANGE
+
             ARRAY<TV> variable_particles;
             for(typename HASHTABLE<int>::ITERATOR it(variable_indices);it.Valid();it.Next())
                 variable_particles.Append(particles.X(it.Key()));
             const RANGE<TV_INT> cell_range(grid.Clamp_To_Cell(RANGE<TV>::Bounding_Box(variable_particles)));
             const RANGE<TV> cell_domain(grid.Cell_Domain(cell_range));
 
+            // CUT ELEMENTS
+
             ARRAY<ARRAY<INTERFACE_ELEMENT>,TV_INT> cut_interface(cell_range);
             ARRAY<ARRAY<BOUNDARY_ELEMENT>,TV_INT> cut_boundary(cell_range);
             
             Cut_Elements<TV_INT,TV,T_FACE,INTERFACE_ELEMENT>(cut_interface,interface_elements,cell_range,cell_domain);
             Cut_Elements<TV_INT,TV,T_FACE,BOUNDARY_ELEMENT>(cut_boundary,boundary_elements,cell_range,cell_domain);
-        }
+
+            // COPY WITH CLAMPING
+
+            const int h_min=cell_range.min_corner(TV::m-1);
+            const int h_max=cell_range.min_corner(TV::m-1);
+            for(RANGE_ITERATOR<TV::m> it(cell_range);it.Valid();it.Next()){
+
+                // COPY ELEMENTS FOR CURRENT CELL
+
+                const TV_INT& current_cell=it.index;
+                const int current_h=it.index(TV::m-1); 
+
+                CELL_ELEMENTS& cell_elements=index_to_cell_elements.Get_Or_Insert(current_cell);
+                ARRAY<INTERFACE_ELEMENT>& cell_interface=cell_elements.interface;
+                ARRAY<BOUNDARY_ELEMENT>& cell_boundary=cell_elements.boundary;
+                
+                const ARRAY<INTERFACE_ELEMENT>& current_cell_cut_interface=cut_interface(current_cell);
+                const ARRAY<BOUNDARY_ELEMENT>& current_cell_cut_boundary=cut_boundary(current_cell);
+                for(int i=0;i<current_cell_cut_boundary.m;i++) cell_boundary.Append(current_cell_cut_boundary(i));
+                for(int i=0;i<current_cell_cut_interface.m;i++) cell_interface.Append(current_cell_cut_interface(i));
+
+                // CLAMP ELEMENTS FROM OTHER CELLS
+
+                const RANGE<TV> current_domain=grid.Cell_Domain(current_cell);
+                for(int h=h_min;h<h_max;h++){
+
+                    if(h==current_h) continue;
+                    TV_INT other_cell(current_cell);
+                    other_cell(TV::m-1)=h;
+
+                    const ARRAY<INTERFACE_ELEMENT>& other_cell_cut_interface=cut_interface(other_cell);
+                    const ARRAY<BOUNDARY_ELEMENT>& other_cell_cut_boundary=cut_boundary(other_cell);
+
+                    for(int i=0;i<other_cell_cut_boundary.m;i++){
+                        BOUNDARY_ELEMENT be=other_cell_cut_boundary(i);
+                        for(int v=0;v<TV::m;v++) be.face.X(v)=current_domain.Clamp(be.face.X(v));
+                        cell_boundary.Append(be);}
+                    
+                    for(int i=0;i<other_cell_cut_interface.m;i++){
+                        INTERFACE_ELEMENT ie=other_cell_cut_interface(i);
+                        for(int v=0;v<TV::m;v++) ie.face.X(v)=current_domain.Clamp(ie.face.X(v));
+                        BOUNDARY_ELEMENT be0={ie.face,ie.color_pair(0)};
+                        BOUNDARY_ELEMENT be1={ie.face,ie.color_pair(1)};
+                        exchange(be1.face.X.x,be1.face.X.y);
+                        cell_boundary.Append(be0);
+                        cell_boundary.Append(be1);}}}}
 
         // IF NO MOVING PARTICLES THEN JUST COPY OVER TO NEW STRUCTURES
 
