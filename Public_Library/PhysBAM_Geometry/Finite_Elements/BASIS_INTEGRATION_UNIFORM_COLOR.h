@@ -28,11 +28,9 @@ public:
     typedef SYSTEM_VOLUME_BLOCK_COLOR<TV,static_degree> VOLUME_BLOCK;
     typedef SYSTEM_SURFACE_BLOCK_COLOR<TV,static_degree> SURFACE_BLOCK;
     typedef SYSTEM_SURFACE_BLOCK_SCALAR_COLOR<TV,static_degree> SURFACE_BLOCK_SCALAR;
-    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::HASH_CELL_INTERFACE HASH_CELL_INTERFACE;
-    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::HASH_CELL_BOUNDARY HASH_CELL_BOUNDARY;
-    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::HASH_CELL_DATA HASH_CELL_DATA;
-    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT SURFACE_ELEMENT;
-    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SIDES_ELEMENT SIDES_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::CELL_ELEMENTS CELL_ELEMENTS;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_CONDITIONS BC;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_SURFACE T_SURFACE;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_FACE T_FACE;
@@ -62,7 +60,7 @@ public:
     void Compute_Open_Entries();
     void Add_Uncut_Cell(const TV_INT& cell,int color);
     void Add_Uncut_Fine_Cell(const TV_INT& cell,int subcell,int color);
-    void Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<SURFACE_ELEMENT>& surface,ARRAY<SIDES_ELEMENT>& sides,
+    void Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<INTERFACE_ELEMENT>& surface,ARRAY<BOUNDARY_ELEMENT>& sides,
         const ARRAY<MATRIX<T,TV::m> >& base_orientation,const ARRAY<int>& constraint_offsets,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs);
     template<int d0,int d1>
     void Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,

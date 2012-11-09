@@ -76,10 +76,10 @@ void Flush_Frame(const char* title)
 template<class T,class TV>
 void Dump_Interface(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss)
 {
-    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT SURFACE_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
 
     for(int i=0;i<iss.cdi->surface_mesh.m;i++){
-        SURFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
+        INTERFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
         Add_Debug_Object(V.x.X-V.x.Normal()*(T).03*iss.grid.dX.Min(),V.z>=0?color_map[V.z]:(TV3::Axis_Vector(-V.z-1)+3)/4);
         Add_Debug_Object(V.x.X+V.x.Normal()*(T).03*iss.grid.dX.Min(),V.y>=0?color_map[V.y]:(TV3::Axis_Vector(-V.y-1)+3)/4);}
 }
@@ -97,7 +97,7 @@ void Dump_Interface(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss)
 template<class T,class TV>
 void Dump_System(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ANALYTIC_TEST<TV>& at)
 {
-    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT SURFACE_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
 
     Dump_Interface<T,TV>(iss);
     Flush_Frame<T,TV>("interface");
@@ -128,7 +128,7 @@ void Dump_System(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ANALYTIC_TEST<TV>&
 
     Dump_Interface<T,TV>(iss);
     for(int i=0;i<iss.cdi->surface_mesh.m;i++){
-        SURFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
+        INTERFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
         if(V.y<0) continue;
         Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.j_surface(V.x.Center(),V.y,V.z));}
@@ -136,7 +136,7 @@ void Dump_System(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ANALYTIC_TEST<TV>&
 
     Dump_Interface<T,TV>(iss);
     for(int i=0;i<iss.cdi->surface_mesh.m;i++){
-        SURFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
+        INTERFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
         if(V.y!=-2 && V.y!=-3) continue;
         Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.d_surface(V.x.Center(),V.y,V.z));}
@@ -144,7 +144,7 @@ void Dump_System(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ANALYTIC_TEST<TV>&
 
     Dump_Interface<T,TV>(iss);
     for(int i=0;i<iss.cdi->surface_mesh.m;i++){
-        SURFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
+        INTERFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
         if(V.y!=-1 && V.y!=-3) continue;
         Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.n_surface(V.x.Center(),V.y,V.z));}

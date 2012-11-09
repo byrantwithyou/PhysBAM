@@ -643,7 +643,6 @@ int Rename_Colors(const VECTOR<int,n> &phi_color,VECTOR<int,n>& re_color,VECTOR<
             re_color(i)=next_color;
             color_list[next_color]=phi_color(i);
             color_map.Set(phi_color(i),next_color++);}
-
     junction=(next_color>=3);
 
     int cs=0;
@@ -722,7 +721,7 @@ Get_Hashed_Interface_Elements_For_Cell(const TV_INT& cell_index,const VECTOR<TV,
 template<class T,class TV_INT,class TV,class T_SURFACE,class HASH_INTERFACE,class HASH_CELL_INTERFACE> void
 Get_Hashed_Interface_Elements_For_Cell(const TV_INT& cell_index,const VECTOR<TV,8>& corners,const VECTOR<int,8>& phi_color,const VECTOR<T,8>& phi_value,
     HASHTABLE<FACE_INDEX<3>,int>& edge_vertices,HASHTABLE<FACE_INDEX<3>,int>& face_vertices,HASHTABLE<TV_INT,int>& cell_vertices,
-    HASH_INTERFACE& interface,GEOMETRY_PARTICLES<TV>& particles,HASH_CELL_INTERFACE& interface_cell_elements,bool junction)
+    HASH_INTERFACE& interface,GEOMETRY_PARTICLES<TV>& particles,HASH_CELL_INTERFACE& interface_cell_elements,bool& junction)
 {
     VECTOR<int,8> re_color;    // renamed colors of cell corners
     VECTOR<int,8> color_list;  // maps renamed colors to original ones
@@ -1000,8 +999,9 @@ Get_Hashed_Boundary_Elements_For_Cell(const TV_INT& cell_index,const VECTOR<TV,8
 // Function Get_Elements
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
-Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& boundary,HASH_INDEX_TO_CELL_DATA& index_to_cell_data,
-    const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,const int iterations,const bool verbose)
+Get_Elements(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<TV>& grid,
+    const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
+    const int iterations,const bool verbose)
 {
     // CELL CONSTANTS
 
@@ -1014,9 +1014,11 @@ Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& bound
     HASHTABLE<TV_INT,int> cell_vertices;
     HASHTABLE<TV_INT,int> node_vertices;
 
-    // GLOBAL PARTICLES ARRAY AND JUNCTION CELL FLAGS
+    // TEMPORARY STRUCTURES FOR THE MESH
 
-    HASH_INDEX_TO_CELL_ELEMENTS index_to_cell_elements;
+    HASH_BOUNDARY boundary;
+    HASH_INTERFACE interface;
+    HASHTABLE<TV_INT,HASH_CELL_DATA> index_to_cell_data;
     GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
     HASHTABLE<TV_INT> junction_cells;
 
@@ -1067,11 +1069,11 @@ Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& bound
 // Function Recut_Cells
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
-Save_Mesh(HASH_INDEX_TO_CELL_ELEMENTS& index_to_cell_elements,const HASH_INTERFACE& interface,
-    const HASH_BOUNDARY& boundary,const HASH_INDEX_TO_CELL_DATA& index_to_cell_data,const GEOMETRY_PARTICLES<TV>& particles,
+Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const HASH_INTERFACE& interface,
+    const HASH_BOUNDARY& boundary,const HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,const GEOMETRY_PARTICLES<TV>& particles,
     const bool recut,const ARRAY<int>* const particle_dofs,const HASHTABLE<TV_INT>* const variable_cells)
 {
-    for(typename HASH_INDEX_TO_CELL_DATA::CONST_ITERATOR it(index_to_cell_data);it.Valid();it.Next()){
+    for(typename HASHTABLE<TV_INT,HASH_CELL_DATA>::CONST_ITERATOR it(index_to_cell_data);it.Valid();it.Next()){
         const TV_INT& cell_index=it.Key();
         const HASH_CELL_DATA& hash_cell_data=it.Data();
         const HASH_CELL_INTERFACE hash_cell_interface=hash_cell_data.interface;
@@ -1111,7 +1113,7 @@ Save_Mesh(HASH_INDEX_TO_CELL_ELEMENTS& index_to_cell_elements,const HASH_INTERFA
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<TV_INT>& variable_cells,
-    const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASH_INDEX_TO_CELL_DATA& index_to_cell_data,
+    const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,
     const HASHTABLE<FACE_INDEX<TV::m>,int>& edge_vertices,const HASHTABLE<FACE_INDEX<TV::m>,int>& face_vertices,
     const HASHTABLE<TV_INT,int>& cell_vertices,const HASHTABLE<TV_INT,int>& node_vertices,
     const HASHTABLE<TV_INT>& junction_cells,const int fit_count,const int iterations,const bool verbose)

@@ -37,14 +37,9 @@ class CELL_DOMAIN_INTERFACE_COLOR:public NONCOPYABLE
 
 public:
 
-    typedef typename MARCHING_CUBES_COLOR<TV>::HASH_INDEX_TO_CELL_DATA HASH_INDEX_TO_CELL_DATA;
-    typedef typename MARCHING_CUBES_COLOR<TV>::HASH_CELL_INTERFACE HASH_CELL_INTERFACE;
-    typedef typename MARCHING_CUBES_COLOR<TV>::HASH_CELL_BOUNDARY HASH_CELL_BOUNDARY;
-    typedef typename MARCHING_CUBES_COLOR<TV>::INTERFACE_ELEMENT SURFACE_ELEMENT;
-    typedef typename MARCHING_CUBES_COLOR<TV>::BOUNDARY_ELEMENT SIDES_ELEMENT;
-    typedef typename MARCHING_CUBES_COLOR<TV>::HASH_CELL_DATA HASH_CELL_DATA;
-    typedef typename MARCHING_CUBES_COLOR<TV>::HASH_INTERFACE HASH_INTERFACE;
-    typedef typename MARCHING_CUBES_COLOR<TV>::HASH_BOUNDARY HASH_BOUNDARY;
+    typedef typename MARCHING_CUBES_COLOR<TV>::CELL_ELEMENTS CELL_ELEMENTS;
+    typedef typename MARCHING_CUBES_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
+    typedef typename MARCHING_CUBES_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
     typedef typename MARCHING_CUBES_COLOR<TV>::T_SURFACE T_SURFACE;
     typedef typename MARCHING_CUBES_COLOR<TV>::T_FACE T_FACE;
 
@@ -77,11 +72,8 @@ public:
     int constraint_base_scalar;
     ARRAY<int> flat_base_scalar;
 
-    ARRAY<SURFACE_ELEMENT> surface_mesh;
-
-    HASH_INDEX_TO_CELL_DATA index_to_cell_data;
-    HASH_INTERFACE interface;
-    HASH_BOUNDARY boundary;
+    ARRAY<INTERFACE_ELEMENT> surface_mesh;
+    HASHTABLE<TV_INT,CELL_ELEMENTS> index_to_cell_elements;
     
     CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int colors_input,bool wrap_input);
 

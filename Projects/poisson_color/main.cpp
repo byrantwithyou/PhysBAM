@@ -76,10 +76,10 @@ void Flush_Frame(const char* title)
 template<class T,class TV>
 void Dump_Interface(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips)
 {
-    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT SURFACE_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
 
     for(int i=0;i<ips.cdi->surface_mesh.m;i++){
-        SURFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
+        INTERFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
         if(V.z>=0){
             if(V.z>=0) Add_Debug_Object(V.x.X-V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.z]);
             if("$#*!") Add_Debug_Object(V.x.X+V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.y]);}
@@ -89,7 +89,7 @@ void Dump_Interface(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips)
 template<class T,class TV>
 void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_TEST<TV>& at)
 {
-    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT SURFACE_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_FACE T_FACE;
     
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next())
@@ -115,7 +115,7 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_TEST<TV>
         Flush_Frame<T,TV>(buff);}
 
     for(int i=0;i<ips.cdi->surface_mesh.m;i++){
-        SURFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
+        INTERFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
         Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
         T k=0;
         if(V.y>=0) k=at.j_surface(V.x.Center(),V.y,V.z);
@@ -271,7 +271,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         for(int i=0;i<TV::m;i++) fout<<grid.domain.min_corner(i)<<((i==TV::m-1)?"\n":" ");
         for(int i=0;i<TV::m;i++) fout<<grid.domain.max_corner(i)<<((i==TV::m-1)?"\n":" ");
         for(int k=0;k<ips.cdi->surface_mesh.m;k++){
-            typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT& se=ips.cdi->surface_mesh(k);
+            typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT& se=ips.cdi->surface_mesh(k);
             for(int i=0;i<TV::m;i++) for(int j=0;j<TV::m;j++) fout<<se.x.X(i)(j)<<" ";
             fout<<se.y<<" "<<se.z<<std::endl;}
         fout.close();}

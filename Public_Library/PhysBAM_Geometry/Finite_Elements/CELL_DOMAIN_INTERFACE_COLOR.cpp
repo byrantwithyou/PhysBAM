@@ -88,7 +88,7 @@ template<class TV> void CELL_DOMAIN_INTERFACE_COLOR<TV>::
 Construct_Surface_Meshes(const GRID<TV>& phi_grid,const ARRAY<T,TV_INT>& phi_value,const ARRAY<int,TV_INT>& phi_color)
 {
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
-    MARCHING_CUBES_COLOR<TV>::Get_Elements(phi_grid,interface,boundary,index_to_cell_data,phi_color,phi_value,phi_grid.counts.Product()*100);
+    MARCHING_CUBES_COLOR<TV>::Get_Elements(index_to_cell_elements,phi_grid,phi_color,phi_value,phi_grid.counts.Product()*100);
 }
 //#####################################################################
 // Function Interpolate_Level_Set_To_Double_Fine_Grid

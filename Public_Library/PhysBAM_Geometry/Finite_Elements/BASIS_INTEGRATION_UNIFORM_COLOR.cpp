@@ -49,22 +49,22 @@ Precomputed_Integral(const STATIC_TENSOR<T,rank,sdp1>& precompute,const STATIC_P
 //#####################################################################
 // Function Compute_Averaged_Orientation_Helper
 //#####################################################################
-template<class T,class SURFACE_ELEMENT> static void
-Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<SURFACE_ELEMENT>,4>& surface,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs,ARRAY<MATRIX<T,2> >& base_orientation)
+template<class T,class INTERFACE_ELEMENT> static void
+Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<INTERFACE_ELEMENT>,4>& surface,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs,ARRAY<MATRIX<T,2> >& base_orientation)
 {
 }
 //#####################################################################
 // Function Compute_Averaged_Orientation_Helper
 //#####################################################################
-template<class T, class SURFACE_ELEMENT> static void
-Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<SURFACE_ELEMENT>,8>& surface,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs,ARRAY<MATRIX<T,3> >& base_orientation)
+template<class T, class INTERFACE_ELEMENT> static void
+Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<INTERFACE_ELEMENT>,8>& surface,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs,ARRAY<MATRIX<T,3> >& base_orientation)
 {
     ARRAY<VECTOR<T,3> > normal(base_orientation.m);
     VECTOR<T,3> tangent;
     for(int s=0;s<8;s++){
-        const ARRAY<SURFACE_ELEMENT>& subcell_surface=surface(s);
+        const ARRAY<INTERFACE_ELEMENT>& subcell_surface=surface(s);
         for(int i=0;i<subcell_surface.m;i++){
-            const SURFACE_ELEMENT& V=subcell_surface(i);
+            const INTERFACE_ELEMENT& V=subcell_surface(i);
             if(V.z<0) continue;
             int color_pair_index=-1;
             bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
@@ -84,8 +84,8 @@ Compute_Entries(bool double_fine)
 {
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
 
-    VECTOR<ARRAY<SURFACE_ELEMENT>,(1<<TV::m)> surface;
-    VECTOR<ARRAY<SIDES_ELEMENT>,(1<<TV::m)> sides;
+    VECTOR<ARRAY<INTERFACE_ELEMENT>,(1<<TV::m)> surface;
+    VECTOR<ARRAY<BOUNDARY_ELEMENT>,(1<<TV::m)> sides;
 
     Compute_Open_Entries();
 
@@ -122,33 +122,17 @@ Compute_Entries(bool double_fine)
                 subcell_cut|=(color!=base_color);
                 material_subcell(s)|=(color>=0);}
             if(material_subcell(s) && subcell_cut){
-                const HASH_CELL_DATA& elements=cdi.index_to_cell_data.Get(subcell_base);
-                const HASH_CELL_INTERFACE& surface_elements=elements.interface;
-                const HASH_CELL_BOUNDARY& sides_elements=elements.boundary(TV::m-1);
-                for(typename HASH_CELL_INTERFACE::CONST_ITERATOR it(surface_elements);it.Valid();it.Next()){
-                    const VECTOR<int,2>& color_pair=it.Key();
-                    const INTERVAL<int>& interval=it.Data();
-                    const T_SURFACE& surf=*cdi.interface.Get(color_pair);
-                    for(int i=interval.min_corner;i<interval.max_corner;i++){
-                        T_FACE x=surf.Get_Element(i);
-                        for(int j=0;j<TV::m;j++) x.X(j)-=cell_center;
-                        surface(s).Append(SURFACE_ELEMENT(x,color_pair.x,color_pair.y));}}
-                for(typename HASH_CELL_BOUNDARY::CONST_ITERATOR it(sides_elements);it.Valid();it.Next()){
-                    const int color=it.Key();
-                    const INTERVAL<int>& interval=it.Data();
-                    const T_SURFACE& surf=*cdi.boundary.Get(color);
-                    for(int i=interval.min_corner;i<interval.max_corner;i++){
-                        T_FACE x=surf.Get_Element(i);
-                        for(int j=0;j<TV::m;j++) x.X(j)-=cell_center;
-                        sides(s).Append(SIDES_ELEMENT(x,color));}}}}
+                const CELL_ELEMENTS& elements=cdi.index_to_cell_elements.Get(subcell_base);
+                surface(s)=elements.interface;
+                sides(s)=elements.boundary;}}
 
         HASHTABLE<VECTOR<int,2>,int> ht_color_pairs;
         ARRAY<VECTOR<int,2> > color_pairs;
         
         for(int s=0;s<(1<<TV::m);s++){
-            const ARRAY<SURFACE_ELEMENT>& subcell_surface=surface(s);
+            const ARRAY<INTERFACE_ELEMENT>& subcell_surface=surface(s);
             for(int i=0;i<subcell_surface.m;i++){
-                const SURFACE_ELEMENT& V=subcell_surface(i);
+                const INTERFACE_ELEMENT& V=subcell_surface(i);
                 if(V.z>=0){
                     VECTOR<int,2> color_pair(V.y,V.z);
                     if(!ht_color_pairs.Contains(color_pair))
@@ -273,7 +257,7 @@ Compute_Consistent_Orientation_Helper(const T_FACE& triangle,MATRIX<T,3>& orient
 // Function Add_Cut_Fine_Cell
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
-Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<SURFACE_ELEMENT>& surface,ARRAY<SIDES_ELEMENT>& sides,
+Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<INTERFACE_ELEMENT>& surface,ARRAY<BOUNDARY_ELEMENT>& sides,
     const ARRAY<MATRIX<T,TV::m> >& base_orientation,const ARRAY<int>& constraint_offsets,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs)
 {
     assert(sides.m);
@@ -282,7 +266,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
     TV cell_center(grid.Center(cell));
     
     for(int i=0;i<surface.m;i++){
-        SURFACE_ELEMENT element(surface(i));
+        INTERFACE_ELEMENT element(surface(i));
         for(int j=0;j<TV::m;j++) element.x.X(j)+=cell_center;
         cdi.surface_mesh.Append(element);}
 
@@ -296,10 +280,10 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
             monomial=monomial.Integrate(TV::m-1);
             integrals.Fill(0);
             for(int i=0;i<sides.m;i++){
-                const SIDES_ELEMENT& V=sides(i);
+                const BOUNDARY_ELEMENT& V=sides(i);
                 if(V.y>=0) integrals(V.y)+=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);}
             for(int i=0;i<surface.m;i++){
-                const SURFACE_ELEMENT& V=surface(i);
+                const INTERFACE_ELEMENT& V=surface(i);
                 if(V.z<0) continue;
                 T integral=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);
                 if(V.y>=0) integrals(V.y)-=integral;
@@ -326,7 +310,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
     if(surface_blocks.m){
         ARRAY<MATRIX<T,TV::m> > orientations(surface.m);
         for(int i=0;i<surface.m;i++){
-            const SURFACE_ELEMENT& V=surface(i);
+            const INTERFACE_ELEMENT& V=surface(i);
             if(V.z<0) continue;
             int color_pair_index=-1;
             bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
@@ -339,7 +323,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                 typename SURFACE_BLOCK::OVERLAP_POLYNOMIAL& op=sb->overlap_polynomials(j);
                 if(op.subcell&(1<<subcell))
                     for(int k=0;k<surface.m;k++){
-                        const SURFACE_ELEMENT& V=surface(k);
+                        const INTERFACE_ELEMENT& V=surface(k);
                         if(V.z<0) continue;
                         int color_pair_index=-1;
                         bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
@@ -398,7 +382,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                 typename SURFACE_BLOCK_SCALAR::OVERLAP_POLYNOMIAL& op=sbs->overlap_polynomials(j);
                 if(op.subcell&(1<<subcell))
                     for(int k=0;k<surface.m;k++){
-                        const SURFACE_ELEMENT& V=surface(k);
+                        const INTERFACE_ELEMENT& V=surface(k);
                         if(V.z<0) continue;
                         int color_pair_index=-1;
                         bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);

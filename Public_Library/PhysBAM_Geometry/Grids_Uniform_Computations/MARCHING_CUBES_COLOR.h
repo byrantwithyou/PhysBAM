@@ -40,8 +40,6 @@ public:
 
 //#####################################################################
 
-// TODO: make this section private
-
     typedef HASHTABLE<int,T_SURFACE*> HASH_BOUNDARY;
     typedef HASHTABLE<int,INTERVAL<int> > HASH_CELL_BOUNDARY;
     typedef HASHTABLE<VECTOR<int,2>,T_SURFACE*> HASH_INTERFACE;
@@ -52,8 +50,6 @@ public:
         HASH_CELL_INTERFACE interface;
         VECTOR<HASH_CELL_BOUNDARY,TV::m> boundary;
     };
-
-    typedef HASHTABLE<TV_INT,HASH_CELL_DATA> HASH_INDEX_TO_CELL_DATA;
 
 //#####################################################################
 
@@ -66,10 +62,8 @@ public:
         ARRAY<BOUNDARY_ELEMENT> boundary;
     };
     
-    typedef HASHTABLE<TV_INT,CELL_ELEMENTS> HASH_INDEX_TO_CELL_ELEMENTS;
-
-    static void Get_Elements(const GRID<TV>& grid,HASH_INTERFACE& interface,HASH_BOUNDARY& boundary,
-        HASH_INDEX_TO_CELL_DATA& index_to_cell_data,const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
+    static void Get_Elements(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<TV>& grid,
+        const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
         const int newton_steps=20,const bool verbose=false);
 
 //#####################################################################
@@ -77,13 +71,13 @@ public:
 private:
 
     static void Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<TV_INT>& variable_cells,
-        const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASH_INDEX_TO_CELL_DATA& index_to_cell_data,
+        const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,
         const HASHTABLE<FACE_INDEX<TV::m>,int>& edge_vertices,const HASHTABLE<FACE_INDEX<TV::m>,int>& face_vertices,
         const HASHTABLE<TV_INT,int>& cell_vertices,const HASHTABLE<TV_INT,int>& node_vertices,
         const HASHTABLE<TV_INT>& junction_cells,const int fit_count,const int iterations,const bool verbose);
 
-    static void Save_Mesh(HASH_INDEX_TO_CELL_ELEMENTS& index_to_cell_elements,const HASH_INTERFACE& interface,
-        const HASH_BOUNDARY& boundary,const HASH_INDEX_TO_CELL_DATA& index_to_cell_data,const GEOMETRY_PARTICLES<TV>& particles,
+    static void Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const HASH_INTERFACE& interface,
+        const HASH_BOUNDARY& boundary,const HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,const GEOMETRY_PARTICLES<TV>& particles,
         const bool recut_cells=false,const ARRAY<int>* const particle_dofs=0,const HASHTABLE<TV_INT>* const variable_cells=0);
 
 //#####################################################################

@@ -6,6 +6,8 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
+#include <PhysBAM_Tools/Data_Structures/PAIR.h>
+#include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
@@ -22,8 +24,6 @@
 using namespace PhysBAM;
 
 typedef float RW;
-typedef HASHTABLE<VECTOR<int,2>,INTERVAL<int> > HASH_INTERFACE;
-typedef HASHTABLE<int,INTERVAL<int> > HASH_BOUNDARY;
 
 std::string output_directory="levelset";
 
@@ -66,44 +66,30 @@ void Flush_Frame(const char* title)
 }
 
 template<class T,class TV>
-void Dump_Element(const VECTOR<int,2>& color_pair,SEGMENT_2D<T>& x)
+void Dump_Element(const SEGMENT_2D<T>& x,const int& color0,const int& color1)
 {
-    Add_Debug_Object(x.X+x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.x]);
-    Add_Debug_Object(x.X-x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.y]);
-    // Add_Debug_Particle(x.X.Sum()/2+x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.x]);
-    // Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,x.Normal());
-    // Add_Debug_Particle(x.X.Sum()/2-x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.y]);
-    // Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,x.Normal());
+    Add_Debug_Object(x.X+x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color0]);
+    Add_Debug_Object(x.X-x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color1]);
 }
 
 template<class T,class TV>
-void Dump_Element(const VECTOR<int,2>& color_pair,TRIANGLE_3D<T>& x)
+void Dump_Element(const TRIANGLE_3D<T>& x,const int& color0,const int& color1)
 {
-    Add_Debug_Object(x.X,color_map[color_pair.x],color_map[color_pair.y]);
-    // Add_Debug_Particle(x.X.Sum()/3,VECTOR<T,3>(1,0,1));
-    // Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-TV::Cross_Product(x.X(1)-x.X(0),x.X(2)-x.X(0)).Normalized());
+    Add_Debug_Object(x.X,color_map[color0],color_map[color1]);
 }
 
-template<class T,class TV,class T_SURFACE,class T_FACE>
-void Dump_Interface(const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface)
+template<class T,class TV,class T_FACE>
+void Dump_Interface(const ARRAY<TRIPLE<T_FACE,int,int> >& interface)
 {
-    for(typename HASHTABLE<VECTOR<int,2>,T_SURFACE*>::CONST_ITERATOR it(interface);it.Valid();it.Next()){
-        const VECTOR<int,2>& color_pair=it.Key();
-        const T_SURFACE& surf=*it.Data();
-        for(int i=0;i<surf.mesh.elements.m;i++){
-            T_FACE x=surf.Get_Element(i);
-            Dump_Element<T,TV>(color_pair,x);}}
+    for(int e=0;e<interface.m;e++)
+        Dump_Element<T,TV>(interface(e).x,interface(e).y,interface(e).z);
 }
 
-template<class T,class TV,class T_SURFACE,class T_FACE>
-void Dump_Boundary(const HASHTABLE<int,T_SURFACE*>& boundary)
+template<class T,class TV,class T_FACE>
+void Dump_Boundary(const ARRAY<PAIR<T_FACE,int> >& boundary)
 {
-    for(typename HASHTABLE<int,T_SURFACE*>::CONST_ITERATOR it(boundary);it.Valid();it.Next()){
-        VECTOR<int,2> color_pair(it.Key(),it.Key());
-        const T_SURFACE& surf=*it.Data();
-        for(int i=0;i<surf.mesh.elements.m;i++){
-            T_FACE x=surf.Get_Element(i);
-            Dump_Element<T,TV>(color_pair,x);}}
+    for(int e=0;e<boundary.m;e++)
+        Dump_Element<T,TV>(boundary(e).x,boundary(e).y,boundary(e).y);
 }
 
 template<class T,class TV>
@@ -120,7 +106,7 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
 {
     typedef VECTOR<int,TV::m> TV_INT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
-    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
+    typedef typename MARCHING_CUBES_COLOR<TV>::CELL_ELEMENTS CELL_ELEMENTS;
 
     int resolution=32;
     int iterations=100;
@@ -187,12 +173,13 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
 
     for(int i=0;i<=iterations;i++){
-        HASHTABLE<int,T_SURFACE*> boundary;
-        HASHTABLE<VECTOR<int,2>,T_SURFACE*> surface;
-        typename MARCHING_CUBES_COLOR<TV>::HASH_INDEX_TO_CELL_DATA index_to_cell_data;
-        MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,index_to_cell_data,phi_color,phi_value,i,verbose);
-        Dump_Interface<T,TV,T_SURFACE,T_FACE>(surface);
-        Dump_Boundary<T,TV,T_SURFACE,T_FACE>(boundary);
+        HASHTABLE<TV_INT,CELL_ELEMENTS> index_to_cell_elements;
+        MARCHING_CUBES_COLOR<TV>::Get_Elements(index_to_cell_elements,grid,phi_color,phi_value,i,verbose);
+        for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(index_to_cell_elements);it.Valid();it.Next()){
+            const CELL_ELEMENTS& cell_elements=it.Data();
+            Dump_Interface<T,TV,T_FACE>(cell_elements.interface);
+            Dump_Boundary<T,TV,T_FACE>(cell_elements.boundary);}
+        
         char buffer[100];
         sprintf(buffer, "newton step %i",i);
         Flush_Frame<T,TV>(buffer);}
