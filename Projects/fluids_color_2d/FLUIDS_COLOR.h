@@ -367,7 +367,7 @@ public:
                     analytic_levelset=(new ANALYTIC_LEVELSET_NEST(new ANALYTIC_LEVELSET_TRANSLATE(new ANALYTIC_LEVELSET_LINE(TV(x1,0),TV(1,0),0,1),vel)))->Add(ab)->Add(cd);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(vel));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(vel));
-//                    use_p_null_mode=true;
+                    use_p_null_mode=true;
                     use_level_set_method=true;
                 }
                 break;
