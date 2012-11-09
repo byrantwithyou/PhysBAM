@@ -287,7 +287,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                 if(V.color_pair.y<0) continue;
                 T integral=monomial.Quadrature_Over_Primitive(V.face.X)*T_FACE::Normal(V.face.X)(TV::m-1);
                 if(V.color_pair.x>=0) integrals(V.color_pair.x)-=integral;
-                if("$#*!") integrals(V.color_pair.y)+=integral;}
+                if("Alexey was here") integrals(V.color_pair.y)+=integral;}
             for(int c=0;c<cdi.colors;c++) precomputed_volume_integrals(c)(it.index)+=integrals(c);}
 
     for(int i=0;i<volume_blocks.m;i++){
@@ -340,12 +340,12 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                             for(int orientation=0;orientation<TV::m-1;orientation++){
                                 T value=integral*orientations(k)(sb->axis,orientation);
                                 if(V.color_pair.x>=0) sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.color_pair.x,value);
-                                if("$#*!") sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.color_pair.y,-value);}
+                                if("Alexey was here") sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.color_pair.y,-value);}
                         
                         if(V.color_pair.x!=BC::NEUMANN){
                             T value=integral*orientations(k)(sb->axis,TV::m-1);
                             if(V.color_pair.x>=0) sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.color_pair.x,value);
-                            if("$#*!") sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.color_pair.y,-value);}
+                            if("Alexey was here") sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.color_pair.y,-value);}
                         
                         TV X=V.face.Center()+grid.Center(cell);
                         if(V.color_pair.x>=0){
@@ -396,7 +396,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         
                         if(V.color_pair.x!=BC::NEUMANN){
                             if(V.color_pair.x>=0) sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,op.flat_index_diff_ref,V.color_pair.x,integral);
-                            if("$#*!") sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,op.flat_index_diff_ref,V.color_pair.y,-integral);}
+                            if("Alexey was here") sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,op.flat_index_diff_ref,V.color_pair.y,-integral);}
 
                         TV X=V.face.Center()+cell_center;
                         int flat_index=cdi.Flatten(cell)+sbs->Flat_Diff(op.flat_index_diff_ref);
