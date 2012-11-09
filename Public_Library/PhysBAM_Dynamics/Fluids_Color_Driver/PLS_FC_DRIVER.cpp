@@ -298,7 +298,7 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Assert_Advection_CFL(const ARRAY<T,FACE_INDEX<TV::m> >& u,const ARRAY<int,FACE_INDEX<TV::m> >& color,int c,T dt) const
 {
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next())
-        if(color(it.Full_Index())>=0){
+        if(color(it.Full_Index())==c){
             PHYSBAM_ASSERT(u(it.Full_Index())*dt<example.grid.dX(it.Axis())*example.number_of_ghost_cells);}
 }
 //#####################################################################
@@ -416,7 +416,6 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         iss.Multiply(*iss.null_modes(i),*vectors(0));
         LOG::cout<<"null mode["<<i<<"] "<<iss.Convergence_Norm(*vectors(0))<<std::endl;}
 
-    // TODO: Handle ghost region
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){
         int c=example.levelset_color.Color(it.Location());
         example.face_color(it.Full_Index())=c;
@@ -424,6 +423,8 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         int k=iss.cm_u(it.Axis())->Get_Index(it.index,c);
         assert(k>=0);
         example.face_velocities(c)(it.Full_Index())=sol.u(it.Axis())(c)(k);}
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+        example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
     vectors.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
