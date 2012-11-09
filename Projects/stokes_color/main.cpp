@@ -72,7 +72,6 @@ void Flush_Frame(const char* title)
     Dump_Frame(ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),title);
 }
 
-
 template<class T,class TV>
 void Dump_Interface(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss)
 {
@@ -80,19 +79,9 @@ void Dump_Interface(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss)
 
     for(int i=0;i<iss.cdi->surface_mesh.m;i++){
         INTERFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
-        Add_Debug_Object(V.x.X-V.x.Normal()*(T).03*iss.grid.dX.Min(),V.z>=0?color_map[V.z]:(TV3::Axis_Vector(-V.z-1)+3)/4);
-        Add_Debug_Object(V.x.X+V.x.Normal()*(T).03*iss.grid.dX.Min(),V.y>=0?color_map[V.y]:(TV3::Axis_Vector(-V.y-1)+3)/4);}
+        Add_Debug_Object(V.face.X-V.face.Normal()*(T).03*iss.grid.dX.Min(),V.color_pair.y>=0?color_map[V.color_pair.y]:(TV3::Axis_Vector(-V.color_pair.y-1)+3)/4);
+        Add_Debug_Object(V.face.X+V.face.Normal()*(T).03*iss.grid.dX.Min(),V.color_pair.x>=0?color_map[V.color_pair.x]:(TV3::Axis_Vector(-V.color_pair.x-1)+3)/4);}
 }
-// template<class T,class TV>
-// void Dump_Interface(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const bool arrows)
-// {
-//     for(int i=0;i<iss.object.mesh.elements.m;i++){
-//         Add_Debug_Particle(iss.object.Get_Element(i).X(0),VECTOR<T,3>(0,0.5,0));
-//         if(arrows) Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,(iss.object.Get_Element(i).X(1)-iss.object.Get_Element(i).X(0))/iss.grid.dX);
-//         Add_Debug_Particle(iss.object.Get_Element(i).X(1),VECTOR<T,3>(0,0.5,0));
-//         if(arrows) Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,(iss.object.Get_Element(i).X(0)-iss.object.Get_Element(i).X(1))/iss.grid.dX);
-//         Add_Debug_Particle(iss.object.Get_Element(i).Center(),VECTOR<T,3>(0,0.3,1));}
-// }
 
 template<class T,class TV>
 void Dump_System(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ANALYTIC_TEST<TV>& at)
@@ -121,33 +110,28 @@ void Dump_System(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ANALYTIC_TEST<TV>&
             if(index>=0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));}
         Flush_Frame<T,TV>(buff);}
 
-    // for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
-    //     if(at.phi(it.Location())<0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,0.3,1));
-    //     else Add_Debug_Particle(it.Location(),VECTOR<T,3>(0.9,0.2,0.2));}
-    // Flush_Frame<T,TV>("analytic level set");
-
     Dump_Interface<T,TV>(iss);
     for(int i=0;i<iss.cdi->surface_mesh.m;i++){
         INTERFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
-        if(V.y<0) continue;
-        Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.j_surface(V.x.Center(),V.y,V.z));}
+        if(V.color_pair.x<0) continue;
+        Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.j_surface(V.face.Center(),V.color_pair.x,V.color_pair.y));}
     Flush_Frame<T,TV>("analytic interfacial forces");
 
     Dump_Interface<T,TV>(iss);
     for(int i=0;i<iss.cdi->surface_mesh.m;i++){
         INTERFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
-        if(V.y!=-2 && V.y!=-3) continue;
-        Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.d_surface(V.x.Center(),V.y,V.z));}
+        if(V.color_pair.x!=-2 && V.color_pair.x!=-3) continue;
+        Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.d_surface(V.face.Center(),V.color_pair.x,V.color_pair.y));}
     Flush_Frame<T,TV>("analytic dirichlet conditions");
 
     Dump_Interface<T,TV>(iss);
     for(int i=0;i<iss.cdi->surface_mesh.m;i++){
         INTERFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
-        if(V.y!=-1 && V.y!=-3) continue;
-        Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.n_surface(V.x.Center(),V.y,V.z));}
+        if(V.color_pair.x!=-1 && V.color_pair.x!=-3) continue;
+        Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.n_surface(V.face.Center(),V.color_pair.x,V.color_pair.y));}
     Flush_Frame<T,TV>("analytic neumann forces");
 }
 

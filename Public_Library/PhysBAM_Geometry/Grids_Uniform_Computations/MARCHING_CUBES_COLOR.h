@@ -53,8 +53,17 @@ public:
 
 //#####################################################################
 
-    typedef TRIPLE<T_FACE,int,int> INTERFACE_ELEMENT;
-    typedef PAIR<T_FACE,int> BOUNDARY_ELEMENT;
+    struct INTERFACE_ELEMENT
+    {
+        T_FACE face;
+        VECTOR<int,2> color_pair;
+    };
+
+    struct BOUNDARY_ELEMENT
+    {
+        T_FACE face;
+        int color;
+    };
 
     struct CELL_ELEMENTS
     {

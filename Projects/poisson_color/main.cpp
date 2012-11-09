@@ -80,10 +80,10 @@ void Dump_Interface(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips)
 
     for(int i=0;i<ips.cdi->surface_mesh.m;i++){
         INTERFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
-        if(V.z>=0){
-            if(V.z>=0) Add_Debug_Object(V.x.X-V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.z]);
-            if("$#*!") Add_Debug_Object(V.x.X+V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.y]);}
-        else if(V.y>=0) Add_Debug_Object(V.x.X-V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.y]);}
+        if(V.color_pair.y>=0){
+            if(V.color_pair.y>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.color_pair.y]);
+            if("$#*!") Add_Debug_Object(V.face.X+V.face.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.color_pair.x]);}
+        else if(V.color_pair.x>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.color_pair.x]);}
 }
 
 template<class T,class TV>
@@ -116,12 +116,12 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_TEST<TV>
 
     for(int i=0;i<ips.cdi->surface_mesh.m;i++){
         INTERFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
-        Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
+        Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
         T k=0;
-        if(V.y>=0) k=at.j_surface(V.x.Center(),V.y,V.z);
-        else if(V.y==-1) k=at.n_surface(V.x.Center(),V.y,V.z);
-        else if(V.y==-2) k=at.d_surface(V.x.Center(),V.y,V.z);
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*T_FACE::Normal(V.x.X));}
+        if(V.color_pair.x>=0) k=at.j_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
+        else if(V.color_pair.x==-1) k=at.n_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
+        else if(V.color_pair.x==-2) k=at.d_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*T_FACE::Normal(V.face.X));}
     Flush_Frame<T,TV>("surface forces");
     
     Dump_Interface<T,TV>(ips);
@@ -272,8 +272,8 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         for(int i=0;i<TV::m;i++) fout<<grid.domain.max_corner(i)<<((i==TV::m-1)?"\n":" ");
         for(int k=0;k<ips.cdi->surface_mesh.m;k++){
             typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT& se=ips.cdi->surface_mesh(k);
-            for(int i=0;i<TV::m;i++) for(int j=0;j<TV::m;j++) fout<<se.x.X(i)(j)<<" ";
-            fout<<se.y<<" "<<se.z<<std::endl;}
+            for(int i=0;i<TV::m;i++) for(int j=0;j<TV::m;j++) fout<<se.face.X(i)(j)<<" ";
+            fout<<se.color_pair.x<<" "<<se.color_pair.y<<std::endl;}
         fout.close();}
         
     if(dump_matrix) OCTAVE_OUTPUT<T>("M.txt").Write("M",ips,*vectors(0),*vectors(1));

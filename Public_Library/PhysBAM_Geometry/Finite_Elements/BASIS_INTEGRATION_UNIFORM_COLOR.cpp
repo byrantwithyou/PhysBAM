@@ -65,11 +65,11 @@ Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<INTERFACE_ELEMENT>,8>& in
         const ARRAY<INTERFACE_ELEMENT>& subcell_interface=interface_elements(s);
         for(int i=0;i<subcell_interface.m;i++){
             const INTERFACE_ELEMENT& V=subcell_interface(i);
-            if(V.z<0) continue;
+            if(V.color_pair.y<0) continue;
             int color_pair_index=-1;
-            bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
+            bool found=ht_color_pairs.Get(VECTOR<int,2>(V.color_pair.x,V.color_pair.y),color_pair_index);
             PHYSBAM_ASSERT(found);
-            normal(color_pair_index)+=V.x.Raw_Normal();}}
+            normal(color_pair_index)+=V.face.Raw_Normal();}}
 
     for(int i=0;i<normal.m;i++){
         normal(i).Normalize();
@@ -133,8 +133,8 @@ Compute_Entries(bool double_fine)
             const ARRAY<INTERFACE_ELEMENT>& subcell_interface=interface_elements(s);
             for(int i=0;i<subcell_interface.m;i++){
                 const INTERFACE_ELEMENT& V=subcell_interface(i);
-                if(V.z>=0){
-                    VECTOR<int,2> color_pair(V.y,V.z);
+                if(V.color_pair.y>=0){
+                    VECTOR<int,2> color_pair(V.color_pair.x,V.color_pair.y);
                     if(!ht_color_pairs.Contains(color_pair))
                         ht_color_pairs.Insert(color_pair,color_pairs.Append(color_pair));}}}
 
@@ -267,7 +267,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
     
     for(int i=0;i<interface_elements.m;i++){
         INTERFACE_ELEMENT element(interface_elements(i));
-        for(int j=0;j<TV::m;j++) element.x.X(j)+=cell_center;
+        for(int j=0;j<TV::m;j++) element.face.X(j)+=cell_center;
         cdi.surface_mesh.Append(element);}
 
     ARRAY<STATIC_TENSOR<T,TV::m,static_degree+1> > precomputed_volume_integrals(cdi.colors);
@@ -281,13 +281,13 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
             integrals.Fill(0);
             for(int i=0;i<boundary_elements.m;i++){
                 const BOUNDARY_ELEMENT& V=boundary_elements(i);
-                if(V.y>=0) integrals(V.y)+=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);}
+                if(V.color>=0) integrals(V.color)+=monomial.Quadrature_Over_Primitive(V.face.X)*T_FACE::Normal(V.face.X)(TV::m-1);}
             for(int i=0;i<interface_elements.m;i++){
                 const INTERFACE_ELEMENT& V=interface_elements(i);
-                if(V.z<0) continue;
-                T integral=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);
-                if(V.y>=0) integrals(V.y)-=integral;
-                if("$#*!") integrals(V.z)+=integral;}
+                if(V.color_pair.y<0) continue;
+                T integral=monomial.Quadrature_Over_Primitive(V.face.X)*T_FACE::Normal(V.face.X)(TV::m-1);
+                if(V.color_pair.x>=0) integrals(V.color_pair.x)-=integral;
+                if("$#*!") integrals(V.color_pair.y)+=integral;}
             for(int c=0;c<cdi.colors;c++) precomputed_volume_integrals(c)(it.index)+=integrals(c);}
 
     for(int i=0;i<volume_blocks.m;i++){
@@ -305,17 +305,17 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
         if(surface_monomials_needed(it.index)){
             STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
             monomial.Set_Term(it.index,1);
-            for(int k=0;k<interface_elements.m;k++) precomputed_surface_integrals(k)(it.index)=monomial.Quadrature_Over_Primitive(interface_elements(k).x.X);}
+            for(int k=0;k<interface_elements.m;k++) precomputed_surface_integrals(k)(it.index)=monomial.Quadrature_Over_Primitive(interface_elements(k).face.X);}
 
     if(surface_blocks.m){
         ARRAY<MATRIX<T,TV::m> > orientations(interface_elements.m);
         for(int i=0;i<interface_elements.m;i++){
             const INTERFACE_ELEMENT& V=interface_elements(i);
-            if(V.z<0) continue;
+            if(V.color_pair.y<0) continue;
             int color_pair_index=-1;
-            bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
+            bool found=ht_color_pairs.Get(VECTOR<int,2>(V.color_pair.x,V.color_pair.y),color_pair_index);
             PHYSBAM_ASSERT(found);
-            Compute_Consistent_Orientation_Helper(interface_elements(i).x,orientations(i),base_orientation(color_pair_index));}
+            Compute_Consistent_Orientation_Helper(interface_elements(i).face,orientations(i),base_orientation(color_pair_index));}
 
         for(int i=0;i<surface_blocks.m;i++){
             SURFACE_BLOCK* sb=surface_blocks(i);
@@ -324,56 +324,56 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                 if(op.subcell&(1<<subcell))
                     for(int k=0;k<interface_elements.m;k++){
                         const INTERFACE_ELEMENT& V=interface_elements(k);
-                        if(V.z<0) continue;
+                        if(V.color_pair.y<0) continue;
                         int color_pair_index=-1;
-                        bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
+                        bool found=ht_color_pairs.Get(VECTOR<int,2>(V.color_pair.x,V.color_pair.y),color_pair_index);
                         PHYSBAM_ASSERT(found);
                         const int constraint_offset=constraint_offsets(color_pair_index);
                         const T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
                         int flat_index=cdi.Flatten(cell)+sb->Flat_Diff(op.flat_index_diff_ref);
 
-                        cdi.nc_present|=(V.y==BC::NEUMANN);
-                        cdi.dc_present|=(V.y==BC::DIRICHLET);
-                        cdi.sc_present|=(V.y==BC::SLIP);
+                        cdi.nc_present|=(V.color_pair.x==BC::NEUMANN);
+                        cdi.dc_present|=(V.color_pair.x==BC::DIRICHLET);
+                        cdi.sc_present|=(V.color_pair.x==BC::SLIP);
 
-                        if(V.y!=BC::SLIP && V.y!=BC::NEUMANN)
+                        if(V.color_pair.x!=BC::SLIP && V.color_pair.x!=BC::NEUMANN)
                             for(int orientation=0;orientation<TV::m-1;orientation++){
                                 T value=integral*orientations(k)(sb->axis,orientation);
-                                if(V.y>=0) sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.y,value);
-                                if("$#*!") sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.z,-value);}
+                                if(V.color_pair.x>=0) sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.color_pair.x,value);
+                                if("$#*!") sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.color_pair.y,-value);}
                         
-                        if(V.y!=BC::NEUMANN){
+                        if(V.color_pair.x!=BC::NEUMANN){
                             T value=integral*orientations(k)(sb->axis,TV::m-1);
-                            if(V.y>=0) sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.y,value);
-                            if("$#*!") sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.z,-value);}
+                            if(V.color_pair.x>=0) sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.color_pair.x,value);
+                            if("$#*!") sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.color_pair.y,-value);}
                         
-                        TV X=V.x.Center()+grid.Center(cell);
-                        if(V.y>=0){
-                            T value=-integral*sb->bc->j_surface(X,V.y,V.z)(sb->axis);
+                        TV X=V.face.Center()+grid.Center(cell);
+                        if(V.color_pair.x>=0){
+                            T value=-integral*sb->bc->j_surface(X,V.color_pair.x,V.color_pair.y)(sb->axis);
                             value*=(T)0.5;
-                            (*sb->rhs)(V.y)(flat_index)+=value;
-                            (*sb->rhs)(V.z)(flat_index)+=value;
+                            (*sb->rhs)(V.color_pair.x)(flat_index)+=value;
+                            (*sb->rhs)(V.color_pair.y)(flat_index)+=value;
 
                             if(sb->bc->use_discontinuous_velocity)
                                 if(sb->axis==0){ // This code should not be repeated for each block
-                                    TV value=-integral*orientations(k).Transpose_Times(sb->bc->u_jump(X,V.y,V.z));
+                                    TV value=-integral*orientations(k).Transpose_Times(sb->bc->u_jump(X,V.color_pair.x,V.color_pair.y));
                                     for(int d=0;d<TV::m;d++)
-                                        sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,V.z,value(d));}}
-                        else if(V.y==BC::NEUMANN){
-                            T value=integral*sb->bc->n_surface(X,V.y,V.z)(sb->axis);
-                            (*sb->rhs)(V.z)(flat_index)+=value;}
-                        else if(V.y==BC::DIRICHLET){
+                                        sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,V.color_pair.y,value(d));}}
+                        else if(V.color_pair.x==BC::NEUMANN){
+                            T value=integral*sb->bc->n_surface(X,V.color_pair.x,V.color_pair.y)(sb->axis);
+                            (*sb->rhs)(V.color_pair.y)(flat_index)+=value;}
+                        else if(V.color_pair.x==BC::DIRICHLET){
                             if(sb->axis==0){ // This code should not be repeated for each block
-                                TV value=-integral*orientations(k).Transpose_Times(sb->bc->d_surface(X,V.y,V.z));
+                                TV value=-integral*orientations(k).Transpose_Times(sb->bc->d_surface(X,V.color_pair.x,V.color_pair.y));
                                 for(int d=0;d<TV::m;d++)
-                                    sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,V.z,value(d));}}
+                                    sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,V.color_pair.y,value(d));}}
                         else{
                             TV N=orientations(k).Column(TV::m-1);
-                            T n_value=integral*sb->bc->n_surface(X,V.y,V.z).Projected_Orthogonal_To_Unit_Direction(N)(sb->axis);
-                            (*sb->rhs)(V.z)(flat_index)+=n_value;
+                            T n_value=integral*sb->bc->n_surface(X,V.color_pair.x,V.color_pair.y).Projected_Orthogonal_To_Unit_Direction(N)(sb->axis);
+                            (*sb->rhs)(V.color_pair.y)(flat_index)+=n_value;
                             if(sb->axis==0){ // This code should not be repeated for each block
-                                T d_value=-integral*sb->bc->d_surface(X,V.y,V.z).Dot(N);
-                                sb->Add_Constraint_Rhs_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,V.z,d_value);}}}}}}
+                                T d_value=-integral*sb->bc->d_surface(X,V.color_pair.x,V.color_pair.y).Dot(N);
+                                sb->Add_Constraint_Rhs_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,V.color_pair.y,d_value);}}}}}}
 
     if(surface_blocks_scalar.m){
         for(int i=0;i<surface_blocks_scalar.m;i++){
@@ -383,38 +383,38 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                 if(op.subcell&(1<<subcell))
                     for(int k=0;k<interface_elements.m;k++){
                         const INTERFACE_ELEMENT& V=interface_elements(k);
-                        if(V.z<0) continue;
+                        if(V.color_pair.y<0) continue;
                         int color_pair_index=-1;
-                        bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
+                        bool found=ht_color_pairs.Get(VECTOR<int,2>(V.color_pair.x,V.color_pair.y),color_pair_index);
                         PHYSBAM_ASSERT(found);
                         const int constraint_offset=constraint_offsets(color_pair_index);
                         const T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
-                        PHYSBAM_ASSERT(V.z!=BC::SLIP && "Slip constraint is not allowed for scalar varialbes!");
+                        PHYSBAM_ASSERT(V.color_pair.y!=BC::SLIP && "Slip constraint is not allowed for scalar varialbes!");
 
-                        cdi.nc_present|=(V.y==BC::NEUMANN);
-                        cdi.dc_present|=(V.y==BC::DIRICHLET);
+                        cdi.nc_present|=(V.color_pair.x==BC::NEUMANN);
+                        cdi.dc_present|=(V.color_pair.x==BC::DIRICHLET);
                         
-                        if(V.y!=BC::NEUMANN){
-                            if(V.y>=0) sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,op.flat_index_diff_ref,V.y,integral);
-                            if("$#*!") sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,op.flat_index_diff_ref,V.z,-integral);}
+                        if(V.color_pair.x!=BC::NEUMANN){
+                            if(V.color_pair.x>=0) sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,op.flat_index_diff_ref,V.color_pair.x,integral);
+                            if("$#*!") sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,op.flat_index_diff_ref,V.color_pair.y,-integral);}
 
-                        TV X=V.x.Center()+cell_center;
+                        TV X=V.face.Center()+cell_center;
                         int flat_index=cdi.Flatten(cell)+sbs->Flat_Diff(op.flat_index_diff_ref);
-                        if(V.y>=0){
-                            T value=-integral*sbs->bc->j_surface(X,V.y,V.z);
+                        if(V.color_pair.x>=0){
+                            T value=-integral*sbs->bc->j_surface(X,V.color_pair.x,V.color_pair.y);
                             value*=(T)0.5;
-                            (*sbs->rhs)(V.y)(flat_index)+=value;
-                            (*sbs->rhs)(V.z)(flat_index)+=value;
+                            (*sbs->rhs)(V.color_pair.x)(flat_index)+=value;
+                            (*sbs->rhs)(V.color_pair.y)(flat_index)+=value;
                             
                             if(sbs->bc->use_discontinuous_scalar_field){
-                                T value=-integral*sbs->bc->u_jump(X,V.y,V.z);
-                                sbs->Add_Constraint_Rhs_Entry(cdi.constraint_base_scalar+constraint_offset,V.z,value);}}
-                        else if(V.y==BC::NEUMANN){
-                            T value=-integral*sbs->bc->n_surface(X,V.y,V.z);
-                            (*sbs->rhs)(V.z)(flat_index)+=value;}
+                                T value=-integral*sbs->bc->u_jump(X,V.color_pair.x,V.color_pair.y);
+                                sbs->Add_Constraint_Rhs_Entry(cdi.constraint_base_scalar+constraint_offset,V.color_pair.y,value);}}
+                        else if(V.color_pair.x==BC::NEUMANN){
+                            T value=-integral*sbs->bc->n_surface(X,V.color_pair.x,V.color_pair.y);
+                            (*sbs->rhs)(V.color_pair.y)(flat_index)+=value;}
                         else{
-                            T value=-integral*sbs->bc->d_surface(X,V.y,V.z);
-                            sbs->Add_Constraint_Rhs_Entry(cdi.constraint_base_scalar+constraint_offset,V.z,value);}}}}}
+                            T value=-integral*sbs->bc->d_surface(X,V.color_pair.x,V.color_pair.y);
+                            sbs->Add_Constraint_Rhs_Entry(cdi.constraint_base_scalar+constraint_offset,V.color_pair.y,value);}}}}}
 }
 //#####################################################################
 // Function Add_Volume_Block

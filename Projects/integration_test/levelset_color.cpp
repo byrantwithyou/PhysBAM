@@ -78,18 +78,18 @@ void Dump_Element(const TRIANGLE_3D<T>& x,const int& color0,const int& color1)
     Add_Debug_Object(x.X,color_map[color0],color_map[color1]);
 }
 
-template<class T,class TV,class T_FACE>
-void Dump_Interface(const ARRAY<TRIPLE<T_FACE,int,int> >& interface)
+template<class T,class TV,class T_FACE,class T_ELEMENT>
+void Dump_Interface(const ARRAY<T_ELEMENT>& interface)
 {
     for(int e=0;e<interface.m;e++)
-        Dump_Element<T,TV>(interface(e).x,interface(e).y,interface(e).z);
+        Dump_Element<T,TV>(interface(e).face,interface(e).color_pair.x,interface(e).color_pair.y);
 }
 
-template<class T,class TV,class T_FACE>
-void Dump_Boundary(const ARRAY<PAIR<T_FACE,int> >& boundary)
+template<class T,class TV,class T_FACE,class T_ELEMENT>
+void Dump_Boundary(const ARRAY<T_ELEMENT>& boundary)
 {
     for(int e=0;e<boundary.m;e++)
-        Dump_Element<T,TV>(boundary(e).x,boundary(e).y,boundary(e).y);
+        Dump_Element<T,TV>(boundary(e).face,boundary(e).color,boundary(e).color);
 }
 
 template<class T,class TV>

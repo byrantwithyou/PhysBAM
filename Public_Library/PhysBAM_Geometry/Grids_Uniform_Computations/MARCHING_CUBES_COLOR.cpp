@@ -1093,9 +1093,8 @@ Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const HASH_INT
                     cell_interface.Add_End();
                     INTERFACE_ELEMENT& element=cell_interface.Last();
                     for(int i=0;i<TV::m;i++)
-                        element.x.X(i)=particles.X(e_index(i));
-                    element.y=color_pair.x;
-                    element.z=color_pair.y;}}
+                        element.face.X(i)=particles.X(e_index(i));
+                    element.color_pair=color_pair;}}
             for(typename HASH_CELL_BOUNDARY::CONST_ITERATOR it(hash_cell_boundary(TV::m-1));it.Valid();it.Next()){
                 const int color=it.Key();
                 const INTERVAL<int> interval=it.Data();
@@ -1105,8 +1104,8 @@ Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const HASH_INT
                     cell_boundary.Add_End();
                     BOUNDARY_ELEMENT& element=cell_boundary.Last();
                     for(int i=0;i<TV::m;i++)
-                        element.x.X(i)=particles.X(e_index(i));
-                    element.y=color;}}}}
+                        element.face.X(i)=particles.X(e_index(i));
+                    element.color=color;}}}}
 }
 //#####################################################################
 // Function Fix_Mesh
