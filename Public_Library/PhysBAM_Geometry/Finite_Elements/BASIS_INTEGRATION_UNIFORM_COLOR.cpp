@@ -123,8 +123,14 @@ Compute_Entries(bool double_fine)
                 material_subcell(s)|=(color>=0);}
             if(material_subcell(s) && subcell_cut){
                 const CELL_ELEMENTS& elements=cdi.index_to_cell_elements.Get(subcell_base);
-                interface_elements(s)=elements.interface;
-                boundary_elements(s)=elements.boundary;}}
+                for(int i=0;i<elements.interface.m;i++){
+                    INTERFACE_ELEMENT e(elements.interface(i));
+                    for(int j=0;j<TV::m;j++) e.face.X(j)-=cell_center;
+                    interface_elements(s).Append(e);}
+                for(int i=0;i<elements.boundary.m;i++){
+                    BOUNDARY_ELEMENT e(elements.boundary(i));
+                    for(int j=0;j<TV::m;j++) e.face.X(j)-=cell_center;
+                    boundary_elements(s).Append(e);}}}
 
         HASHTABLE<VECTOR<int,2>,int> ht_color_pairs;
         ARRAY<VECTOR<int,2> > color_pairs;

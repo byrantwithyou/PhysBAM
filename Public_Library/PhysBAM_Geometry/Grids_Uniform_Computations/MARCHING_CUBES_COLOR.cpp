@@ -1174,7 +1174,7 @@ Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<TV>
             // COPY WITH CLAMPING
 
             const int h_min=cell_range.min_corner(TV::m-1);
-            const int h_max=cell_range.min_corner(TV::m-1);
+            const int h_max=cell_range.max_corner(TV::m-1);
             for(RANGE_ITERATOR<TV::m> it(cell_range);it.Valid();it.Next()){
 
                 // COPY ELEMENTS FOR CURRENT CELL
@@ -1213,7 +1213,7 @@ Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<TV>
                         for(int v=0;v<TV::m;v++) ie.face.X(v)=current_domain.Clamp(ie.face.X(v));
                         BOUNDARY_ELEMENT be0={ie.face,ie.color_pair(0)};
                         BOUNDARY_ELEMENT be1={ie.face,ie.color_pair(1)};
-                        exchange(be1.face.X.x,be1.face.X.y);
+                        exchange(be0.face.X.x,be0.face.X.y);
                         cell_boundary.Append(be0);
                         cell_boundary.Append(be1);}}}}
 
@@ -1317,6 +1317,11 @@ Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<T
                             for(int j=0;j<TV::m;j++)
                                 if(!particle_indices_ht.Contains(element(j)))
                                     particle_indices_ht.Insert(element(j));}}}
+            range.min_corner+=1;range.max_corner-=1;
+            for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
+                const TV_INT& cell_index=junction_cell_index+it2.index;
+                if(index_to_cell_data.Contains(cell_index) && !variable_cells.Contains(cell_index)){
+                    variable_cells.Insert(cell_index);}}
             ARRAY<int> particle_indices;
             for(typename HASHTABLE<int>::ITERATOR it(particle_indices_ht);it.Valid();it.Next()){
                 fit_to_particle(fit_index).Append(it.Key());

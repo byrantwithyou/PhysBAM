@@ -81,9 +81,9 @@ void Dump_Interface(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips)
     for(int i=0;i<ips.cdi->surface_mesh.m;i++){
         INTERFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
         if(V.color_pair.y>=0){
-            if(V.color_pair.y>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.color_pair.y]);
-            if("$#*!") Add_Debug_Object(V.face.X+V.face.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.color_pair.x]);}
-        else if(V.color_pair.x>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.color_pair.x]);}
+            if(V.color_pair.y>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.y]);
+            if("Alexey was here") Add_Debug_Object(V.face.X+V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.x]);}
+        else if(V.color_pair.x>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.x]);}
 }
 
 template<class T,class TV>

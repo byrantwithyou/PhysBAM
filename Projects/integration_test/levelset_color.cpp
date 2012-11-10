@@ -14,6 +14,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -68,14 +69,28 @@ void Flush_Frame(const char* title)
 template<class T,class TV>
 void Dump_Element(const SEGMENT_2D<T>& x,const int& color0,const int& color1)
 {
-    Add_Debug_Object(x.X+x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color0]);
-    Add_Debug_Object(x.X-x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color1]);
+    static RANDOM_NUMBERS<T> rand;
+    Add_Debug_Object(x.X+x.Normal()*(T).01*rand.Get_Uniform_Number(0,1)*Global_Grid<TV>()->dX.Min(),color_map[color0]);
+    Add_Debug_Object(x.X-x.Normal()*(T).01*rand.Get_Uniform_Number(0,1)*Global_Grid<TV>()->dX.Min(),color_map[color1]);
+}
+
+template<class T,class TV>
+void Dump_Element(const SEGMENT_2D<T>& x,const int& color0)
+{
+    static RANDOM_NUMBERS<T> rand;
+    Add_Debug_Object(x.X+x.Normal()*(T).005*rand.Get_Uniform_Number(-1,1)*Global_Grid<TV>()->dX.Min(),color_map[color0]);
 }
 
 template<class T,class TV>
 void Dump_Element(const TRIANGLE_3D<T>& x,const int& color0,const int& color1)
 {
     Add_Debug_Object(x.X,color_map[color0],color_map[color1]);
+}
+
+template<class T,class TV>
+void Dump_Element(const TRIANGLE_3D<T>& x,const int& color0)
+{
+    Add_Debug_Object(x.X,color_map[color0],color_map[color0]);
 }
 
 template<class T,class TV,class T_FACE,class T_ELEMENT>
@@ -89,7 +104,7 @@ template<class T,class TV,class T_FACE,class T_ELEMENT>
 void Dump_Boundary(const ARRAY<T_ELEMENT>& boundary)
 {
     for(int e=0;e<boundary.m;e++)
-        Dump_Element<T,TV>(boundary(e).face,boundary(e).color,boundary(e).color);
+        Dump_Element<T,TV>(boundary(e).face,boundary(e).color);
 }
 
 template<class T,class TV>
@@ -179,7 +194,6 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
             const CELL_ELEMENTS& cell_elements=it.Data();
             Dump_Interface<T,TV,T_FACE>(cell_elements.interface);
             Dump_Boundary<T,TV,T_FACE>(cell_elements.boundary);}
-        
         char buffer[100];
         sprintf(buffer, "newton step %i",i);
         Flush_Frame<T,TV>(buffer);}

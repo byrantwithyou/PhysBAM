@@ -1,12 +1,12 @@
 #!/bin/bash
-for t in {1..11}; do
+for t in {10..10}; do
     (
         T="o-$t"
         L=""
         for r in {40..160}; do
             (
                 echo -n $r
-                nice ./poisson_color -resolution $r $t -use_preconditioner | grep error | tail -n 1
+                nice ./poisson_color -resolution $r $t -use_preconditioner -double_fine | grep error | tail -n 1
             ) > $T-$r &
             L="$L $T-$r"
         done
