@@ -1160,6 +1160,7 @@ Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<TV>
             ARRAY<TV> variable_particles;
             for(typename HASHTABLE<int>::ITERATOR it(variable_indices);it.Valid();it.Next())
                 variable_particles.Append(particles.X(it.Key()));
+            variable_particles.Append(grid.Center(cell_index));
             const RANGE<TV_INT> cell_range(grid.Clamp_To_Cell(RANGE<TV>::Bounding_Box(variable_particles)));
             const RANGE<TV> cell_domain(grid.Cell_Domain(cell_range));
 
@@ -1308,20 +1309,19 @@ Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<T
             RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box()*2);range.max_corner+=1;
             for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
                 const TV_INT& cell_index=junction_cell_index+it2.index;
+                bool contains_variable_nodes=false;
                 if(index_to_cell_data.Contains(cell_index)){
                     const HASH_CELL_INTERFACE& interface_cell_elements=index_to_cell_data.Get(cell_index).interface;
                     INTERVAL<int> interval;
                     if(interface_cell_elements.Get(color_pair,interval))
                         for(int i=interval.min_corner;i<interval.max_corner;i++){
                             TV_INT element=color_pair_interface.mesh.elements(i);
-                            for(int j=0;j<TV::m;j++)
+                            for(int j=0;j<TV::m;j++){
                                 if(!particle_indices_ht.Contains(element(j)))
-                                    particle_indices_ht.Insert(element(j));}}}
-            range.min_corner+=1;range.max_corner-=1;
-            for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
-                const TV_INT& cell_index=junction_cell_index+it2.index;
-                if(index_to_cell_data.Contains(cell_index) && !variable_cells.Contains(cell_index)){
-                    variable_cells.Insert(cell_index);}}
+                                    particle_indices_ht.Insert(element(j));
+                                if(particle_dofs(element(j))) contains_variable_nodes=true;}}}
+                if(contains_variable_nodes && !variable_cells.Contains(cell_index))
+                    variable_cells.Insert(cell_index);}
             ARRAY<int> particle_indices;
             for(typename HASHTABLE<int>::ITERATOR it(particle_indices_ht);it.Valid();it.Next()){
                 fit_to_particle(fit_index).Append(it.Key());

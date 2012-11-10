@@ -77,27 +77,37 @@ template<class T,class TV>
 void Dump_Interface(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips)
 {
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::CELL_ELEMENTS CELL_ELEMENTS;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_FACE T_FACE;
+    typedef VECTOR<int,TV::m> TV_INT;
 
-    for(int i=0;i<ips.cdi->surface_mesh.m;i++){
-        INTERFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
-        if(V.color_pair.y>=0){
-            if(V.color_pair.y>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.y]);
-            if("Alexey was here") Add_Debug_Object(V.face.X+V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.x]);}
-        else if(V.color_pair.x>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.x]);}
+    for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(ips.cdi->index_to_cell_elements);it.Valid();it.Next()){
+        const CELL_ELEMENTS& cell_elements=it.Data();
+        const ARRAY<INTERFACE_ELEMENT>& interface_elements=cell_elements.interface;
+        for(int i=0;i<interface_elements.m;i++){
+            const INTERFACE_ELEMENT& V=interface_elements(i);
+            if(V.color_pair.y>=0){
+                if(V.color_pair.y>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.y]);
+                if("Alexey was here") Add_Debug_Object(V.face.X+V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.x]);}
+            else if(V.color_pair.x>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.x]);}}
 }
 
 template<class T,class TV>
 void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_TEST<TV>& at)
 {
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::CELL_ELEMENTS CELL_ELEMENTS;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_FACE T_FACE;
-    
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next())
-        Add_Debug_Particle(it.Location(),color_map[at.phi_color(it.Location())]);
-    Flush_Frame<T,TV>("level set");
+    typedef VECTOR<int,TV::m> TV_INT;
 
     Dump_Interface<T,TV>(ips);
     Flush_Frame<T,TV>("surfaces");
+
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next())
+        Add_Debug_Particle(it.Location(),color_map[at.phi_color(it.Location())]);
+    Flush_Frame<T,TV>("level set");
     
     char buff[100];
     for(int c=0;c<ips.cdi->colors;c++){
@@ -114,15 +124,17 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_TEST<TV>
                 else Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));}}                        
         Flush_Frame<T,TV>(buff);}
 
-    for(int i=0;i<ips.cdi->surface_mesh.m;i++){
-        INTERFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
-        Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
-        T k=0;
-        if(V.color_pair.x>=0) k=at.j_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
-        else if(V.color_pair.x==-1) k=at.n_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
-        else if(V.color_pair.x==-2) k=at.d_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*T_FACE::Normal(V.face.X));}
-    Flush_Frame<T,TV>("surface forces");
+    for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(ips.cdi->index_to_cell_elements);it.Valid();it.Next()){
+        const CELL_ELEMENTS& cell_elements=it.Data();
+        const ARRAY<INTERFACE_ELEMENT>& interface_elements=cell_elements.interface;
+        for(int i=0;i<interface_elements.m;i++){
+            const INTERFACE_ELEMENT& V=interface_elements(i);
+            Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
+            T k=0;
+            if(V.color_pair.x>=0) k=at.j_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
+            else if(V.color_pair.x==-1) k=at.n_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
+            else if(V.color_pair.x==-2) k=at.d_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*T_FACE::Normal(V.face.X));}}
     
     Dump_Interface<T,TV>(ips);
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
@@ -169,7 +181,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const ARRAY<T,VEC
 //#################################################################################################################################################
 
 template<class TV>
-void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool dump_geometry,bool debug_particles,bool double_fine)
+void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles,bool double_fine)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -264,18 +276,6 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
             rhs*=1/rhs.Max_Abs();
             Dump_Vector<T,TV>(ips,rhs,"extra null mode");}}
     
-    if(dump_geometry){
-        std::ofstream fout("geometry.txt");
-        fout<<TV::m<<std::endl;
-        for(int i=0;i<TV::m;i++) fout<<grid.counts(i)<<((i==TV::m-1)?"\n":" ");
-        for(int i=0;i<TV::m;i++) fout<<grid.domain.min_corner(i)<<((i==TV::m-1)?"\n":" ");
-        for(int i=0;i<TV::m;i++) fout<<grid.domain.max_corner(i)<<((i==TV::m-1)?"\n":" ");
-        for(int k=0;k<ips.cdi->surface_mesh.m;k++){
-            typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT& se=ips.cdi->surface_mesh(k);
-            for(int i=0;i<TV::m;i++) for(int j=0;j<TV::m;j++) fout<<se.face.X(i)(j)<<" ";
-            fout<<se.color_pair.x<<" "<<se.color_pair.y<<std::endl;}
-        fout.close();}
-        
     if(dump_matrix) OCTAVE_OUTPUT<T>("M.txt").Write("M",ips,*vectors(0),*vectors(1));
     vectors.Delete_Pointers_And_Clean_Memory();
 }
@@ -295,7 +295,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     T m=1,s=1,kg=1;
     int threads=1;
     int test_number=1,resolution=4,max_iter=1000000;
-    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,double_fine=false,dump_geometry=false,opt_arg=false;
+    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,double_fine=false,opt_arg=false;
     parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-m",&m,"unit","meter scale");
@@ -310,7 +310,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-dump_matrix",&dump_matrix,"dump system matrix");
     parse_args.Add("-debug_particles",&debug_particles,"dump debug particles");
     parse_args.Add("-double_fine",&double_fine,"set level set exactly on double fine grid");
-    parse_args.Add("-dump_geometry",&dump_geometry,"dump grid info and interface");
     parse_args.Parse();
 
 #ifdef USE_OPENMP
@@ -721,7 +720,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,dump_geometry,debug_particles,double_fine);
+    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles,double_fine);
     LOG::Finish_Logging();
     delete test;
 }

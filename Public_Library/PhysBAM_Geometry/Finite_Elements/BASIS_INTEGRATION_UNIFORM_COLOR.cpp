@@ -271,11 +271,6 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
 
     TV cell_center(grid.Center(cell));
     
-    for(int i=0;i<interface_elements.m;i++){
-        INTERFACE_ELEMENT element(interface_elements(i));
-        for(int j=0;j<TV::m;j++) element.face.X(j)+=cell_center;
-        cdi.surface_mesh.Append(element);}
-
     ARRAY<STATIC_TENSOR<T,TV::m,static_degree+1> > precomputed_volume_integrals(cdi.colors);
     RANGE<TV_INT> range(TV_INT(),TV_INT()+static_degree+1);
     ARRAY<T> integrals(cdi.colors);

@@ -72,7 +72,6 @@ public:
     int constraint_base_scalar;
     ARRAY<int> flat_base_scalar;
 
-    ARRAY<INTERFACE_ELEMENT> surface_mesh;
     HASHTABLE<TV_INT,CELL_ELEMENTS> index_to_cell_elements;
     
     CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int colors_input,bool wrap_input);
