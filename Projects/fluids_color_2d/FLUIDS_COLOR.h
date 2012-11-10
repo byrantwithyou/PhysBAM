@@ -114,12 +114,12 @@ public:
     {
         int color_i,color_o;
         ANALYTIC_LEVELSET_SIGNED(int color_i,int color_o): color_i(color_i),color_o(color_o) {}
-        virtual T phi(const TV& X,T t,int& c) const {T p=phi(X,t);c=p>0?color_o:color_i;return abs(p);}
-        virtual TV N(const TV& X,T t,int c) const {TV n=N(X,t);return c==color_i?n:-n;}
-        virtual T dist(const TV& X,T t,int c) const {if(c!=color_i && c!=color_o) return Large_Phi();T p=phi(X,t);return c==color_i?p:-p;}
+        virtual T phi(const TV& X,T t,int& c) const {T p=phi2(X,t);c=p>0?color_o:color_i;return abs(p);}
+        virtual TV N(const TV& X,T t,int c) const {TV n=N2(X,t);return c==color_i?n:-n;}
+        virtual T dist(const TV& X,T t,int c) const {if(c!=color_i && c!=color_o) return Large_Phi();T p=phi2(X,t);return c==color_i?p:-p;}
 
-        virtual T phi(const TV& X,T t) const=0;
-        virtual TV N(const TV& X,T t) const=0;
+        virtual T phi2(const TV& X,T t) const=0;
+        virtual TV N2(const TV& X,T t) const=0;
     };
 
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
@@ -583,16 +583,16 @@ public:
     {
         T value;
         ANALYTIC_LEVELSET_CONST(T value=-Large_Phi(),int c_i=0,int c_o=-4): ANALYTIC_LEVELSET_SIGNED(c_i,c_o),value(value) {}
-        virtual T phi(const TV& X,T t) const {return value;}
-        virtual TV N(const TV& X,T t) const {return TV(1,0);}
+        virtual T phi2(const TV& X,T t) const {return value;}
+        virtual TV N2(const TV& X,T t) const {return TV(1,0);}
     };
 
     struct ANALYTIC_LEVELSET_LINE:public ANALYTIC_LEVELSET_SIGNED
     {
         typename BASIC_GEOMETRY_POLICY<TV>::HYPERPLANE plane; // N points outward
         ANALYTIC_LEVELSET_LINE(const TV& X,const TV& N,int c_i=0,int c_o=-4): ANALYTIC_LEVELSET_SIGNED(c_i,c_o),plane(N.Normalized(),X) {}
-        virtual T phi(const TV& X,T t) const {return plane.Signed_Distance(X);}
-        virtual TV N(const TV& X,T t) const {return plane.normal;}
+        virtual T phi2(const TV& X,T t) const {return plane.Signed_Distance(X);}
+        virtual TV N2(const TV& X,T t) const {return plane.normal;}
     };
 
     struct ANALYTIC_LEVELSET_CIRCLE:public ANALYTIC_LEVELSET_SIGNED
@@ -600,8 +600,8 @@ public:
         TV cen;
         T r;
         ANALYTIC_LEVELSET_CIRCLE(TV cc,T rr,int c_i=0,int c_o=-4): ANALYTIC_LEVELSET_SIGNED(c_i,c_o),cen(cc),r(rr) {}
-        virtual T phi(const TV& X,T t) const {return (X-cen).Magnitude()-r;}
-        virtual TV N(const TV& X,T t) const {return (X-cen).Normalized();}
+        virtual T phi2(const TV& X,T t) const {return (X-cen).Magnitude()-r;}
+        virtual TV N2(const TV& X,T t) const {return (X-cen).Normalized();}
     };
 
     struct ANALYTIC_LEVELSET_VORTEX:public ANALYTIC_LEVELSET_SIGNED
@@ -619,8 +619,8 @@ public:
 
         ANALYTIC_LEVELSET_VORTEX(T kk,int c_i=0,int c_o=-4): ANALYTIC_LEVELSET_SIGNED(c_i,c_o),k(kk) {vis.k=k;}
 
-        virtual T phi(const TV& X,T t) const {return vis.Phi(X);}
-        virtual TV N(const TV& X,T t) const {return vis.Normal(X)*sign(vis.f(X));}
+        virtual T phi2(const TV& X,T t) const {return vis.Phi(X);}
+        virtual TV N2(const TV& X,T t) const {return vis.Normal(X)*sign(vis.f(X));}
     };
 
     struct ANALYTIC_LEVELSET_NEST:public ANALYTIC_LEVELSET
