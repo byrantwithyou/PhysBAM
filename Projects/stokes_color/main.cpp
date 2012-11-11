@@ -76,17 +76,30 @@ template<class T,class TV>
 void Dump_Interface(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss)
 {
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::CELL_ELEMENTS CELL_ELEMENTS;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_FACE T_FACE;
+    typedef VECTOR<int,TV::m> TV_INT;
 
-    for(int i=0;i<iss.cdi->surface_mesh.m;i++){
-        INTERFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
-        Add_Debug_Object(V.face.X-V.face.Normal()*(T).03*iss.grid.dX.Min(),V.color_pair.y>=0?color_map[V.color_pair.y]:(TV3::Axis_Vector(-V.color_pair.y-1)+3)/4);
-        Add_Debug_Object(V.face.X+V.face.Normal()*(T).03*iss.grid.dX.Min(),V.color_pair.x>=0?color_map[V.color_pair.x]:(TV3::Axis_Vector(-V.color_pair.x-1)+3)/4);}
+    for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(iss.cdi->index_to_cell_elements);it.Valid();it.Next()){
+        const CELL_ELEMENTS& cell_elements=it.Data();
+        const ARRAY<INTERFACE_ELEMENT>& interface_elements=cell_elements.interface;
+        for(int i=0;i<interface_elements.m;i++){
+            const INTERFACE_ELEMENT& V=interface_elements(i);
+            if(V.color_pair.y>=0){
+                if(V.color_pair.y>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).003*iss.grid.dX.Min(),color_map[V.color_pair.y]);
+                if("Alexey was here") Add_Debug_Object(V.face.X+V.face.Normal()*(T).003*iss.grid.dX.Min(),color_map[V.color_pair.x]);}
+            else if(V.color_pair.x>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).003*iss.grid.dX.Min(),color_map[V.color_pair.x]);}}
 }
 
 template<class T,class TV>
 void Dump_System(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ANALYTIC_TEST<TV>& at)
 {
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::CELL_ELEMENTS CELL_ELEMENTS;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_FACE T_FACE;
+    typedef VECTOR<int,TV::m> TV_INT;
 
     Dump_Interface<T,TV>(iss);
     Flush_Frame<T,TV>("interface");
@@ -111,27 +124,36 @@ void Dump_System(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ANALYTIC_TEST<TV>&
         Flush_Frame<T,TV>(buff);}
 
     Dump_Interface<T,TV>(iss);
-    for(int i=0;i<iss.cdi->surface_mesh.m;i++){
-        INTERFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
-        if(V.color_pair.x<0) continue;
-        Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.j_surface(V.face.Center(),V.color_pair.x,V.color_pair.y));}
+    for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(iss.cdi->index_to_cell_elements);it.Valid();it.Next()){
+        const CELL_ELEMENTS& cell_elements=it.Data();
+        const ARRAY<INTERFACE_ELEMENT>& interface_elements=cell_elements.interface;
+        for(int i=0;i<interface_elements.m;i++){
+            const INTERFACE_ELEMENT& V=interface_elements(i);
+            if(V.color_pair.x<0) continue;
+            Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.j_surface(V.face.Center(),V.color_pair.x,V.color_pair.y));}}
     Flush_Frame<T,TV>("analytic interfacial forces");
 
     Dump_Interface<T,TV>(iss);
-    for(int i=0;i<iss.cdi->surface_mesh.m;i++){
-        INTERFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
-        if(V.color_pair.x!=-2 && V.color_pair.x!=-3) continue;
-        Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.d_surface(V.face.Center(),V.color_pair.x,V.color_pair.y));}
+    for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(iss.cdi->index_to_cell_elements);it.Valid();it.Next()){
+        const CELL_ELEMENTS& cell_elements=it.Data();
+        const ARRAY<INTERFACE_ELEMENT>& interface_elements=cell_elements.interface;
+        for(int i=0;i<interface_elements.m;i++){
+            const INTERFACE_ELEMENT& V=interface_elements(i);
+            if(V.color_pair.x!=-2 && V.color_pair.x!=-3) continue;
+            Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.d_surface(V.face.Center(),V.color_pair.x,V.color_pair.y));}}
     Flush_Frame<T,TV>("analytic dirichlet conditions");
 
     Dump_Interface<T,TV>(iss);
-    for(int i=0;i<iss.cdi->surface_mesh.m;i++){
-        INTERFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
-        if(V.color_pair.x!=-1 && V.color_pair.x!=-3) continue;
-        Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.n_surface(V.face.Center(),V.color_pair.x,V.color_pair.y));}
+    for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(iss.cdi->index_to_cell_elements);it.Valid();it.Next()){
+        const CELL_ELEMENTS& cell_elements=it.Data();
+        const ARRAY<INTERFACE_ELEMENT>& interface_elements=cell_elements.interface;
+        for(int i=0;i<interface_elements.m;i++){
+            const INTERFACE_ELEMENT& V=interface_elements(i);
+            if(V.color_pair.x!=-1 && V.color_pair.x!=-3) continue;
+            Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.n_surface(V.face.Center(),V.color_pair.x,V.color_pair.y));}}
     Flush_Frame<T,TV>("analytic neumann forces");
 }
 
