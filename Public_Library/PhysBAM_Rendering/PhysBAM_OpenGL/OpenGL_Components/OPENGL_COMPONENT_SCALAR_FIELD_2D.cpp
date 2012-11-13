@@ -114,8 +114,6 @@ Toggle_Color_Map()
 template class OPENGL_COMPONENT_SCALAR_FIELD_2D<float,int,float>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_2D<float,bool,float>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_2D<float,float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_SCALAR_FIELD_2D<double,int,double>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_2D<double,bool,double>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_2D<double,double,double>;
-#endif

@@ -80,9 +80,7 @@ template<class T> void Exchange_Solid_Positions_And_Velocities_Helper(const MPI_
 }
 };
 template<> void MPI_SOLID_FLUID<VECTOR<float,1> >::Exchange_Solid_Positions_And_Velocities(SOLID_BODY_COLLECTION<VECTOR<float,1> >& solid_body_collection) const {Exchange_Solid_Positions_And_Velocities_Helper(*this,solid_body_collection);}
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template<> void MPI_SOLID_FLUID<VECTOR<double,1> >::Exchange_Solid_Positions_And_Velocities(SOLID_BODY_COLLECTION<VECTOR<double,1> >& solid_body_collection) const {Exchange_Solid_Positions_And_Velocities_Helper(*this,solid_body_collection);}
-#endif
 template<class TV> void MPI_SOLID_FLUID<TV>::
 Exchange_Solid_Positions_And_Velocities(SOLID_BODY_COLLECTION<TV>& solid_body_collection) const
 {
@@ -302,7 +300,5 @@ template void MPI_SOLID_FLUID<VECTOR<float,3> >::Reduce_Add(const double&,double
 #define INSTANTIATION_HELPER(T) \
     INSTANTIATION_HELPER_UNIFORM(T,1);INSTANTIATION_HELPER_UNIFORM(T,2);INSTANTIATION_HELPER_UNIFORM(T,3);
 INSTANTIATION_HELPER(float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double);
-#endif
 }

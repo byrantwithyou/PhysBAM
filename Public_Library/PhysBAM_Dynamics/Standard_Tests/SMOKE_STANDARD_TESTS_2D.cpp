@@ -160,6 +160,4 @@ Get_Object_Velocities(PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection,const T dt
                  projection.elliptic_solver->psi_N(axis,face_index)=true;incompressible_fluid_collection.face_velocities(axis,face_index)=0;}}}
 }
 template class SMOKE_STANDARD_TESTS_2D<GRID<VECTOR<float,2> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SMOKE_STANDARD_TESTS_2D<GRID<VECTOR<double,2> > >;
-#endif

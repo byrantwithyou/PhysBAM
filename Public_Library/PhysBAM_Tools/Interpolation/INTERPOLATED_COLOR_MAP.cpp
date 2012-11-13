@@ -62,6 +62,4 @@ operator()(T x) const
     return colors.Value(x);
 }
 template class INTERPOLATED_COLOR_MAP<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class INTERPOLATED_COLOR_MAP<double>;
-#endif

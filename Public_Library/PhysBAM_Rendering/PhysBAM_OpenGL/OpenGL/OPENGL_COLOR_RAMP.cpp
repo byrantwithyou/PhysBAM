@@ -91,6 +91,4 @@ Levelset_Color_Linear_Ramp(const OPENGL_COLOR& negative_color,const OPENGL_COLOR
     return ramp;
 }
 template class OPENGL_COLOR_RAMP<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COLOR_RAMP<double>;
-#endif

@@ -33,9 +33,7 @@ int initialize_vorticity_particles=Initialize_Vorticity_Particles();
 template class VORTICITY_PARTICLES<VECTOR<float,1> >;
 template class VORTICITY_PARTICLES<VECTOR<float,2> >;
 template class VORTICITY_PARTICLES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class VORTICITY_PARTICLES<VECTOR<double,1> >;
 template class VORTICITY_PARTICLES<VECTOR<double,2> >;
 template class VORTICITY_PARTICLES<VECTOR<double,3> >;
-#endif
 }

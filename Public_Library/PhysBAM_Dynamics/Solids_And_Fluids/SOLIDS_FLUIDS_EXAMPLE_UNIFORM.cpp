@@ -677,7 +677,6 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,3> > >::Adjust_Phi
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,3> > >::Adjust_Phi_With_Source<SPHERE<VECTOR<float,3> > >(SPHERE<VECTOR<float,3> > const&,int,MATRIX<float,4,4> const&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,3> > >::Get_Source_Reseed_Mask<CYLINDER<float> >(CYLINDER<float> const&,MATRIX<float,4,4> const&,ARRAY<bool,VECTOR<int,3> >*&,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,3> > >::Get_Source_Reseed_Mask<SPHERE<VECTOR<float,3> > >(SPHERE<VECTOR<float,3> > const&,MATRIX<float,4,4> const&,ARRAY<bool,VECTOR<int,3> >*&,bool);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,2> > >::~SOLIDS_FLUIDS_EXAMPLE_UNIFORM();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,1> > >::Initialize_Swept_Occupied_Blocks_For_Advection(double,double,double,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,1> > >::Revalidate_Fluid_Scalars();
@@ -757,4 +756,3 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Adjust_Ph
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Adjust_Phi_With_Source<SPHERE<VECTOR<double,3> > >(SPHERE<VECTOR<double,3> > const&,int,MATRIX<double,4,4> const&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Get_Source_Reseed_Mask<CYLINDER<double> >(CYLINDER<double> const&,MATRIX<double,4,4> const&,ARRAY<bool,VECTOR<int,3> >*&,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Get_Source_Reseed_Mask<SPHERE<VECTOR<double,3> > >(SPHERE<VECTOR<double,3> > const&,MATRIX<double,4,4> const&,ARRAY<bool,VECTOR<int,3> >*&,bool);
-#endif

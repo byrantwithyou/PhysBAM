@@ -136,8 +136,6 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<float,1> >;
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<float,2> >;
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<double,1> >;
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<double,2> >;
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<double,3> >;
-#endif

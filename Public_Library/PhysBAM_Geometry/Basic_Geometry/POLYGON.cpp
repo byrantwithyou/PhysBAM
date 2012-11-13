@@ -172,8 +172,6 @@ Signed_Distance(const TV& location) const
 template class POLYGON<VECTOR<float,1> >;
 template class POLYGON<VECTOR<float,2> >;
 template class POLYGON<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class POLYGON<VECTOR<double,1> >;
 template class POLYGON<VECTOR<double,2> >;
 template class POLYGON<VECTOR<double,3> >;
-#endif

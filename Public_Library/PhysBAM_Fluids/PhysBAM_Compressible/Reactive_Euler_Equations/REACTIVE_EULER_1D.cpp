@@ -51,7 +51,5 @@ CFL()
 //#####################################################################
 #if 0 // broken
 template class REACTIVE_EULER_1D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class REACTIVE_EULER_1D<double>;
-#endif
 #endif

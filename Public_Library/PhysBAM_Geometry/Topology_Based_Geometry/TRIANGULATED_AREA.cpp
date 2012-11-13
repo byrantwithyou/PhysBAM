@@ -466,6 +466,4 @@ Fix_Pair_For_Delaunay(const int triangle1,const int triangle2)
 }
 //#####################################################################
 template class TRIANGULATED_AREA<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TRIANGULATED_AREA<double>;
-#endif

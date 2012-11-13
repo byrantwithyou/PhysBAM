@@ -60,8 +60,6 @@ Set_External_Positions(FRAME<TV>& frame,const T time,const int id)
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<float,1> >;
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<float,2> >;
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<double,1> >;
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<double,2> >;
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<double,3> >;
-#endif

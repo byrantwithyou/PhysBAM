@@ -108,6 +108,4 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TW
     template class RIGID_WIND_DRAG<VECTOR<T,3> >; \
     template class RIGID_WIND_DRAG<VECTOR<T,2> >;
 INSTANTIATION_HELPER(float)
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double)
-#endif

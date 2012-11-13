@@ -256,8 +256,6 @@ Add_J_Rigid_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const ARRAY<
 template class SOLID_FLUID_SYSTEM<VECTOR<float,1>,SPARSE_MATRIX_FLAT_NXN<float> >;
 template class SOLID_FLUID_SYSTEM<VECTOR<float,2>,SPARSE_MATRIX_FLAT_NXN<float> >;
 template class SOLID_FLUID_SYSTEM<VECTOR<float,3>,SPARSE_MATRIX_FLAT_NXN<float> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SOLID_FLUID_SYSTEM<VECTOR<double,1>,SPARSE_MATRIX_FLAT_NXN<double> >;
 template class SOLID_FLUID_SYSTEM<VECTOR<double,2>,SPARSE_MATRIX_FLAT_NXN<double> >;
 template class SOLID_FLUID_SYSTEM<VECTOR<double,3>,SPARSE_MATRIX_FLAT_NXN<double> >;
-#endif

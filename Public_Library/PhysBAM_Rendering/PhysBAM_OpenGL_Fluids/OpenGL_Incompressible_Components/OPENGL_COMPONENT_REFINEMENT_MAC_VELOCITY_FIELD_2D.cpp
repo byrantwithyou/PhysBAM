@@ -176,6 +176,4 @@ Previous_Level(){
 }
 
 template class OPENGL_COMPONENT_REFINEMENT_MAC_VELOCITY_FIELD_2D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_REFINEMENT_MAC_VELOCITY_FIELD_2D<double,double>;
-#endif

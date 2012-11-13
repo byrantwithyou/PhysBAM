@@ -117,6 +117,4 @@ Toggle_Arrowhead_Mode()
 }
 //#####################################################################
 template class OPENGL_VECTOR_FIELD_3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_VECTOR_FIELD_3D<double>;
-#endif

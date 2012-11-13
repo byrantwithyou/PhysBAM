@@ -82,8 +82,6 @@ Euler_Step(const T dt,const T time,const int number_of_ghost_cells)
 template class DENSITY_CONTAINER<GRID<VECTOR<float,1> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<float,2> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DENSITY_CONTAINER<GRID<VECTOR<double,1> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<double,2> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<double,3> > >;
-#endif

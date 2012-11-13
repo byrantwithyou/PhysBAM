@@ -72,7 +72,6 @@ template void Rasterize_Object<VECTOR<double,2>,GRID<VECTOR<double,2> > >(COLLIS
     OBJECTS_IN_CELL<GRID<VECTOR<double,2> >,COLLISION_GEOMETRY_ID>&,COLLISION_GEOMETRY_ID const&);
 template void Rasterize_Object<VECTOR<double,3>,GRID<VECTOR<double,3> > >(COLLISION_GEOMETRY<VECTOR<double,3> > const&,GRID<VECTOR<double,3> > const&,
     OBJECTS_IN_CELL<GRID<VECTOR<double,3> >,COLLISION_GEOMETRY_ID>&,COLLISION_GEOMETRY_ID const&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void Compute_Occupied_Blocks<double,VECTOR<double,1>,GRID<VECTOR<double,1> > >(COLLISION_GEOMETRY<VECTOR<double,1> > const&,GRID<VECTOR<double,1> > const&,
     ARRAY<bool,VECTOR<int,VECTOR<double,1>::m> >&,bool,double const&,double const&);
 template void Compute_Occupied_Blocks<double,VECTOR<double,2>,GRID<VECTOR<double,2> > >(COLLISION_GEOMETRY<VECTOR<double,2> > const&,GRID<VECTOR<double,2> > const&,
@@ -85,6 +84,5 @@ template void Rasterize_Object<VECTOR<float,2>,GRID<VECTOR<float,2> > >(COLLISIO
     OBJECTS_IN_CELL<GRID<VECTOR<float,2> >,COLLISION_GEOMETRY_ID>&,COLLISION_GEOMETRY_ID const&);
 template void Rasterize_Object<VECTOR<float,3>,GRID<VECTOR<float,3> > >(COLLISION_GEOMETRY<VECTOR<float,3> > const&,GRID<VECTOR<float,3> > const&,
     OBJECTS_IN_CELL<GRID<VECTOR<float,3> >,COLLISION_GEOMETRY_ID>&,COLLISION_GEOMETRY_ID const&);
-#endif
 };
 };

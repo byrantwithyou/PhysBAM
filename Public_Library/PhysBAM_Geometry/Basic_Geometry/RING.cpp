@@ -167,7 +167,5 @@ Name()
 }
 //#####################################################################
 template class RING<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RING<double>;
-#endif
 }

@@ -379,11 +379,9 @@ Apply_Vorticity_Confinement_Force_Helper(const T_GRID& grid,ARRAY<T,FACE_INDEX<T
 static void
 Apply_Vorticity_Confinement_Force_Helper(const GRID<VECTOR<float,1> >&,ARRAY<float,FACE_INDEX<1> >&,ARRAY<VECTOR<float,1> ,VECTOR<int,1> >&,const INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<float,1> > >&)
 {PHYSBAM_NOT_IMPLEMENTED();}
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 static void
 Apply_Vorticity_Confinement_Force_Helper(const GRID<VECTOR<double,1> >&,ARRAY<double,FACE_INDEX<1> >&,ARRAY<VECTOR<double,1> ,VECTOR<int,1> >&,const INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<double,1> > >&)
 {PHYSBAM_NOT_IMPLEMENTED();}
-#endif
 template<class T_GRID> void INCOMPRESSIBLE_UNIFORM<T_GRID>::
 Apply_Vorticity_Confinement_Force(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<TV,TV_INT>& F)
 {
@@ -520,8 +518,6 @@ Use_Strain()
 template class INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<float,1> > >;
 template class INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<float,2> > >;
 template class INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<double,1> > >;
 template class INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<double,2> > >;
 template class INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<double,3> > >;
-#endif

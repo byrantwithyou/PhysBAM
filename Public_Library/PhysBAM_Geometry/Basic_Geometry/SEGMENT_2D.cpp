@@ -370,9 +370,4 @@ Clip_To_Box(const RANGE<TV>& box,T& a,T& b) const
 }
 //#####################################################################
 template class SEGMENT_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SEGMENT_2D<double>;
-#else
-template bool SEGMENT_2D<double>::Point_Face_Interaction(VECTOR<double,2> const&,VECTOR<double,2> const&,VECTOR<double,2> const&,VECTOR<double,2> const&,double,double&,VECTOR<double,2>&,
-    VECTOR<double,2>&,double&,bool,bool) const;
-#endif

@@ -48,7 +48,5 @@ CFL()
 //#####################################################################
 #if 0 // broken
 template class SHALLOW_WATER_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SHALLOW_WATER_2D<double>;
-#endif
 #endif

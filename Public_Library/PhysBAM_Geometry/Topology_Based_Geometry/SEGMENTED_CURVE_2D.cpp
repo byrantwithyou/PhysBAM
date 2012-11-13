@@ -157,6 +157,4 @@ Get_Segments_Near_Segments(ARRAY<ARRAY<int> >& segments_near_segments,const SEGM
 }
 //####################################################################
 template class SEGMENTED_CURVE_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SEGMENTED_CURVE_2D<double>;
-#endif

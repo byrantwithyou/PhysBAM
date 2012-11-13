@@ -209,6 +209,4 @@ Initialize_Particle_Partition()
 }
 //#####################################################################
 template class FRACTURE_REGION<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FRACTURE_REGION<double>;
-#endif

@@ -77,7 +77,5 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const
 //#####################################################################
 template class ETHER_DRAG<GRID<VECTOR<float,2> > >;
 template class ETHER_DRAG<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ETHER_DRAG<GRID<VECTOR<double,2> > >;
 template class ETHER_DRAG<GRID<VECTOR<double,3> > >;
-#endif

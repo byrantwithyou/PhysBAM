@@ -250,6 +250,4 @@ Static_Name()
 }
 //#####################################################################
 template class ANALYTIC_SURFACE_MUSCLE_SEGMENT<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ANALYTIC_SURFACE_MUSCLE_SEGMENT<double>;
-#endif

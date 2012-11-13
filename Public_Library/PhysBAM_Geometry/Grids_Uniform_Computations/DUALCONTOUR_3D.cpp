@@ -103,6 +103,4 @@ Get_Triangulated_Surface()
 }
 //#####################################################################
 template class DUALCONTOUR_3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DUALCONTOUR_3D<double>;
-#endif

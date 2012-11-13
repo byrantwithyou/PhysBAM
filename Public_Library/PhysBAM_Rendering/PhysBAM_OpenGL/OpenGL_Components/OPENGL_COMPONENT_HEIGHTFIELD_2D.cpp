@@ -347,6 +347,4 @@ Bounding_Box() const
 }
 
 template class OPENGL_COMPONENT_HEIGHTFIELD_2D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_HEIGHTFIELD_2D<double,double>;
-#endif

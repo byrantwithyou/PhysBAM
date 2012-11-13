@@ -133,8 +133,6 @@ CFL(const T density) const
 template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<float,1> > >;
 template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<float,2> > >;
 template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<double,1> > >;
 template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<double,2> > >;
 template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<double,3> > >;
-#endif

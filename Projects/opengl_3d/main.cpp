@@ -919,11 +919,7 @@ int main(int argc,char* argv[])
     parse_args->Parse(true);
 
     if(!type_double) visualization=new VISUALIZATION<float>();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else visualization=new VISUALIZATION<double>();
-#else
-    else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
-#endif
     atexit(cleanup_function);
     visualization->Initialize_And_Run(*parse_args);
     return 0;

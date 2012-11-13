@@ -206,6 +206,4 @@ Substitute_Joint_Child_Body(JOINT_ID joint_id,int new_child)
 }
 //####################################################################################
 template class ARTICULATED_RIGID_BODY<VECTOR<float,1> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ARTICULATED_RIGID_BODY<VECTOR<double,1> >;
-#endif

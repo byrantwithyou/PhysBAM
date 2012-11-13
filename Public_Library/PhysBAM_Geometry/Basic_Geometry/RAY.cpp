@@ -25,7 +25,5 @@ Compute_Lazy_Box_Intersection_Acceleration_Data()
 }
 //#####################################################################
 template void RAY<VECTOR<float,3> >::Compute_Lazy_Box_Intersection_Acceleration_Data();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void RAY<VECTOR<double,3> >::Compute_Lazy_Box_Intersection_Acceleration_Data();
-#endif
 }

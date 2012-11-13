@@ -20,7 +20,6 @@ bool Register_Solids_Structures(){
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<TRIANGLES_OF_MATERIAL<VECTOR<float,3> > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<float,2> > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<float,3> > >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<EMBEDDING<VECTOR<double,2> > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<EMBEDDED_TETRAHEDRALIZED_VOLUME<double> >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<double> >();
@@ -29,7 +28,6 @@ bool Register_Solids_Structures(){
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<TRIANGLES_OF_MATERIAL<VECTOR<double,3> > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<double,2> > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<double,3> > >();
-#endif
     return true;
 }
 bool registered_solids_structures_asdf=Register_Solids_Structures();
@@ -45,8 +43,6 @@ EMBEDDING(GEOMETRY_PARTICLES<TV>& particles_input)
 //#####################################################################
 template class EMBEDDING<VECTOR<float,2> >;
 template class EMBEDDING<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EMBEDDING<VECTOR<double,2> >;
 template class EMBEDDING<VECTOR<double,3> >;
-#endif
 }

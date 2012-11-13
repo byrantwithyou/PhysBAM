@@ -370,8 +370,6 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
 template class KANG_POISSON_VISCOSITY<VECTOR<float,1> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<float,2> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class KANG_POISSON_VISCOSITY<VECTOR<double,1> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<double,2> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<double,3> >;
-#endif

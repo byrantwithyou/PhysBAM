@@ -265,7 +265,6 @@ template class MESH_OBJECT<VECTOR<float,2>,TRIANGLE_MESH>;
 template class MESH_OBJECT<VECTOR<float,3>,TRIANGLE_MESH>;
 template class MESH_OBJECT<VECTOR<float,3>,TETRAHEDRON_MESH>;
 template class MESH_OBJECT<VECTOR<float,3>,HEXAHEDRON_MESH>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MESH_OBJECT<VECTOR<double,1>,POINT_SIMPLEX_MESH>;
 template class MESH_OBJECT<VECTOR<double,1>,SEGMENT_MESH>;
 template class MESH_OBJECT<VECTOR<double,2>,SEGMENT_MESH>;
@@ -274,4 +273,3 @@ template class MESH_OBJECT<VECTOR<double,2>,TRIANGLE_MESH>;
 template class MESH_OBJECT<VECTOR<double,3>,TRIANGLE_MESH>;
 template class MESH_OBJECT<VECTOR<double,3>,TETRAHEDRON_MESH>;
 template class MESH_OBJECT<VECTOR<double,3>,HEXAHEDRON_MESH>;
-#endif

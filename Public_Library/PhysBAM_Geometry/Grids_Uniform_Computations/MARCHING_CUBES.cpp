@@ -315,7 +315,6 @@ Create_Double_Fine_Surface(T_SURFACE& surface,const GRID<TV>& grid,const GRID<TV
     surface.Update_Number_Nodes();
     return cut_cells;
 }
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void MARCHING_CUBES<VECTOR<float,2> >::Get_Elements_For_Cell(ARRAY<SEGMENT_2D<float>,int>&,ARRAY<SEGMENT_2D<float>,int>&,int&,bool&,ARRAY<float,VECTOR<int,2> > const&,VECTOR<int,2> const&);
 template const ARRAY<MARCHING_CUBES_CASE<2> >& MARCHING_CUBES<VECTOR<float,2> >::Case_Table();
 template const ARRAY<MARCHING_CUBES_CASE<3> >& MARCHING_CUBES<VECTOR<float,3> >::Case_Table();
@@ -324,7 +323,6 @@ template int MARCHING_CUBES<VECTOR<float,3> >::Create_Surface(TRIANGULATED_SURFA
 template int MARCHING_CUBES<VECTOR<float,2> >::Create_Surface(SEGMENTED_CURVE_2D<float>&,GRID<VECTOR<float,2> > const&,ARRAY<float,VECTOR<int,2> > const&);
 template int MARCHING_CUBES<VECTOR<float,3> >::Create_Double_Fine_Surface(TRIANGULATED_SURFACE<float>&,GRID<VECTOR<float,3> > const&,GRID<VECTOR<float,3> > const&,ARRAY<float,VECTOR<int,3> > const&);
 template int MARCHING_CUBES<VECTOR<float,2> >::Create_Double_Fine_Surface(SEGMENTED_CURVE_2D<float>&,GRID<VECTOR<float,2> > const&,GRID<VECTOR<float,2> > const&,ARRAY<float,VECTOR<int,2> > const&);
-#endif
 template void MARCHING_CUBES<VECTOR<double,2> >::Get_Elements_For_Cell(ARRAY<SEGMENT_2D<double>,int>&,ARRAY<SEGMENT_2D<double>,int>&,int&,bool&,ARRAY<double,VECTOR<int,2> > const&,VECTOR<int,2> const&);
 template const ARRAY<MARCHING_CUBES_CASE<2> >& MARCHING_CUBES<VECTOR<double,2> >::Case_Table();
 template const ARRAY<MARCHING_CUBES_CASE<3> >& MARCHING_CUBES<VECTOR<double,3> >::Case_Table();

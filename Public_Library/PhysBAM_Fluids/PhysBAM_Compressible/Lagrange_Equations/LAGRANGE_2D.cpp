@@ -198,6 +198,4 @@ CFL()
 }
 //#####################################################################
 template class LAGRANGE_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LAGRANGE_2D<double>;
-#endif

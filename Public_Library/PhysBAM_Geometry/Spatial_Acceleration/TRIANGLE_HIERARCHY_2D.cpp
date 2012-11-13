@@ -52,6 +52,4 @@ Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& r
 }
 //#####################################################################
 template class TRIANGLE_HIERARCHY_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TRIANGLE_HIERARCHY_2D<double>;
-#endif

@@ -628,7 +628,5 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 }
 //#####################################################################
 template void GENERIC_RENDER_EXAMPLE<float,float>::Object(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void GENERIC_RENDER_EXAMPLE<double,float>::Object(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
 template void GENERIC_RENDER_EXAMPLE<double,double>::Object(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
-#endif

@@ -219,7 +219,5 @@ Intersection_Test(const VECTOR<TV,3>& triangle,const VECTOR<TV,1>& point)
 //####################################################################
 template class ROBUST_SIMPLEX_INTERACTIONS<VECTOR<float,2> >;
 template class ROBUST_SIMPLEX_INTERACTIONS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ROBUST_SIMPLEX_INTERACTIONS<VECTOR<double,2> >;
 template class ROBUST_SIMPLEX_INTERACTIONS<VECTOR<double,3> >;
-#endif

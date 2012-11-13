@@ -59,7 +59,5 @@ Scale_Vector_Size(const T scale)
 //#####################################################################
 template class OPENGL_VECTOR_FIELD_2D<ARRAY<VECTOR<float,2> > >;
 template class OPENGL_VECTOR_FIELD_2D<ARRAY_VIEW<VECTOR<float,2> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_VECTOR_FIELD_2D<ARRAY<VECTOR<double,2> > >;
 template class OPENGL_VECTOR_FIELD_2D<ARRAY_VIEW<VECTOR<double,2> > >;
-#endif

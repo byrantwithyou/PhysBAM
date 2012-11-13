@@ -147,6 +147,4 @@ Get_Sub_Zone_Normals(ARRAY<T,VECTOR<int,2> >& NN1_x,ARRAY<T,VECTOR<int,2> >& NN1
 }
 //#####################################################################
 template class GRID_LAGRANGE_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GRID_LAGRANGE_2D<double>;
-#endif

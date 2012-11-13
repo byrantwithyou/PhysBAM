@@ -181,6 +181,4 @@ Write_Configuration(const STREAM_TYPE& stream_type,std::ostream& output_stream) 
     Write_Binary(typed_output,activation_names);
 }
 template class ACTIVATION_CONTROL_SET<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ACTIVATION_CONTROL_SET<double>;
-#endif

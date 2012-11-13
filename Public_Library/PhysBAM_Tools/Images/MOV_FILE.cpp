@@ -302,7 +302,5 @@ Enabled()
 }
 //#####################################################################
 template class MOV_WRITER<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MOV_WRITER<double>;
-#endif
 }

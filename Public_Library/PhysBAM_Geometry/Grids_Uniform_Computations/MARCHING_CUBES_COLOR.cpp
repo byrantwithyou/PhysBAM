@@ -1415,7 +1415,5 @@ Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<T
 }
 template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MARCHING_CUBES_COLOR<VECTOR<double,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<double,3> >;
-#endif

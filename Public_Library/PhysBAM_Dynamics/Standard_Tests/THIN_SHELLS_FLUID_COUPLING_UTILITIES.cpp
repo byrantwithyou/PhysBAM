@@ -403,6 +403,4 @@ template<class TV> static void Set_Parameters_From_Parameter_List(FLUIDS_PARAMET
 }
 //#####################################################################
 template class THIN_SHELLS_FLUID_COUPLING_UTILITIES<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class THIN_SHELLS_FLUID_COUPLING_UTILITIES<double>;
-#endif

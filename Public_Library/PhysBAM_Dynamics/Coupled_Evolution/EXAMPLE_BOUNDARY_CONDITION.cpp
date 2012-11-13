@@ -32,8 +32,6 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
 template class EXAMPLE_BOUNDARY_CONDITION<VECTOR<float,1> >;
 template class EXAMPLE_BOUNDARY_CONDITION<VECTOR<float,2> >;
 template class EXAMPLE_BOUNDARY_CONDITION<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EXAMPLE_BOUNDARY_CONDITION<VECTOR<double,1> >;
 template class EXAMPLE_BOUNDARY_CONDITION<VECTOR<double,2> >;
 template class EXAMPLE_BOUNDARY_CONDITION<VECTOR<double,3> >;
-#endif

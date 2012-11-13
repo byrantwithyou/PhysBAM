@@ -111,10 +111,8 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,3> >& grid,const int num_ghost_c
 template void Compute_Cut_Geometries(const GRID<VECTOR<float,1> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<float,1> > >&,ARRAY<CUT_CELLS<float,1>*,VECTOR<int,1> >&);
 template void Compute_Cut_Geometries(const GRID<VECTOR<float,2> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<float,2> > >&,ARRAY<CUT_CELLS<float,2>*,VECTOR<int,2> >&);
 template void Compute_Cut_Geometries(const GRID<VECTOR<float,3> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<float,3> > >&,ARRAY<CUT_CELLS<float,3>*,VECTOR<int,3> >&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void Compute_Cut_Geometries(const GRID<VECTOR<double,1> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<double,1> > >&,ARRAY<CUT_CELLS<double,1>*,VECTOR<int,1> >&);
 template void Compute_Cut_Geometries(const GRID<VECTOR<double,2> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<double,2> > >&,ARRAY<CUT_CELLS<double,2>*,VECTOR<int,2> >&);
 template void Compute_Cut_Geometries(const GRID<VECTOR<double,3> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<double,3> > >&,ARRAY<CUT_CELLS<double,3>*,VECTOR<int,3> >&);
-#endif
 }
 }

@@ -184,6 +184,4 @@ Write_Output_File(const std::string& file_name,const ARRAY_VIEW<VECTOR<T,d> >& X
     template void MATLAB_OUTPUT::Write_Output_File(const std::string& file_name,const ARRAY_VIEW<VECTOR<T,3> >& X,const int stepnumber);
 
 INSTANTIATION_HELPER(float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double);
-#endif

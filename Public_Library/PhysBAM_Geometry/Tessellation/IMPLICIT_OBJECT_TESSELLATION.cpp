@@ -127,8 +127,6 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(IMPLICIT_OBJECT<VE
     template TRIANGULATED_SURFACE<T>* Generate_Triangles(const IMPLICIT_OBJECT<VECTOR<T,3> >&); 
 
 INSTANTIATION_HELPER(float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double);
-#endif
 }
 }

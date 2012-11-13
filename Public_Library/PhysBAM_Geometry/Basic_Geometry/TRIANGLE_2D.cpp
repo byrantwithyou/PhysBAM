@@ -190,7 +190,5 @@ Intersects(const TRIANGLE_2D& tri) const
 
 INSTANTIATION_HELPER(float)
 template bool TRIANGLE_2D<float>::Intersects(TRIANGLE_2D<float> const&) const;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double)
 template bool TRIANGLE_2D<double>::Intersects(TRIANGLE_2D<double> const&) const;
-#endif

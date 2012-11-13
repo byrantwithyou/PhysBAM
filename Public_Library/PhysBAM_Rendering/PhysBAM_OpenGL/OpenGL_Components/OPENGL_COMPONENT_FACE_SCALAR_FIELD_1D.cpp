@@ -123,8 +123,6 @@ Reinitialize()
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<float,int,float>;
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<float,bool,float>;
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<float,float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<double,int,double>;
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<double,bool,double>;
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<double,double,double>;
-#endif

@@ -94,6 +94,4 @@ Scale_Height(const T scale)
 }
 //#####################################################################
 template class OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D<double>;
-#endif

@@ -429,8 +429,4 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
 }
 //#####################################################################
 template class TETRAHEDRON<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TETRAHEDRON<double>;
-#else
-template double TETRAHEDRON<double>::Minimum_Altitude() const; // used by MATRIX<double,3>
-#endif

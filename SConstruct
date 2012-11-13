@@ -12,58 +12,47 @@ default_cxx='g++'
 
 ### variables and base environment
 variables=Variables('SConstruct.options')
-variables.AddVariables(('CXX','C++ compiler',default_cxx),
-                       EnumVariable('ARCH','Architecture (e.g. pentium4, opteron, nocona, powerpc)','',allowed_values=('pentium3','pentium4','opteron','nocona','powerpc','test','wine','')),
-                       EnumVariable('TYPE','Type of build (e.g. release, debug, profile)','release',allowed_values=('release','debug','profile','optdebug')),
-                       ('DEFAULT_ARCH','Architecture that doesn\'t need a suffix',''),
-                       ('cache','Cache directory to use',''),
-                       BoolVariable('shared','Build shared libraries',1),
-                       BoolVariable('wrapper','Build wrapper executable file',1),
-                       BoolVariable('shared_objects','Build shareable objects when without shared libraries',1),
-                       BoolVariable('autodetect','Automatically detect existence of libraries',0),
-                       BoolVariable('USE_RENDERING','Use Rendering',0),
-                       BoolVariable('compile_with_read_one_based_data','Compile with read one based data',0),
-                       BoolVariable('compile_without_read_write_support','Do not compile read_write support into the library',0),
-                       BoolVariable('compile_without_double_support','Do not compile double support into the library',0),
-                       BoolVariable('compile_without_dyadic_support','Do not compile dyadic support into the library',0),
-                       BoolVariable('compile_with_bintree_support','Force compilation of bintree support',0),
-                       BoolVariable('compile_without_rle_support','Do not compile rle support into the library',0),
-                       BoolVariable('compile_id_types_as_int','Treat ID types as int to avoid possible performance consequences',0),
-                       BoolVariable('fast_math','compile with -ffast-math',0),
-                       BoolVariable('install_programs','install programs into source directories',1),
-                       BoolVariable('compile_headers','compile headers without .cpp files',1),
-                       BoolVariable('install_headers','install Public_Library headers into $INSTALL_DIR/include/physbam',1),
-                       BoolVariable('warnings_are_errors','turn any warning into an error',1),
-                       BoolVariable('use_rpath','use rpaths for dynamic libraries',1),
-                       BoolVariable('single_so','generate only one global shared library',0),
-                       ('CXXFLAGS_EXTRA','',[]),
-                       ('LINKFLAGS_EXTRA','',[]),
-                       ('CPPPATH_EXTRA','',[]),
-                       ('LIBPATH_EXTRA','',[]),
-                       ('RPATH_EXTRA','',[]),
-                       ('LIBS_EXTRA','',[]),
-                       ('INSTALL_PATH','Path to install libraries, binaries, and scripts',''))
+variables.AddVariables(
+    ('CXX','C++ compiler',default_cxx),
+    EnumVariable('ARCH','Architecture (e.g. pentium4, opteron, nocona, powerpc)','',allowed_values=('pentium3','pentium4','opteron','nocona','powerpc','test','wine','')),
+    EnumVariable('DEFAULT_ARCH','Architecture that doesn\'t need a suffix','',allowed_values=('pentium3','pentium4','opteron','nocona','powerpc','test','wine','')),
+    EnumVariable('TYPE','Type of build (release, debug, profile, optdebug)','release',allowed_values=('release','debug','profile','optdebug')),
+    ('cache','Cache directory to use',''),
+    BoolVariable('shared','Build shared libraries',1),
+    BoolVariable('wrapper','Build wrapper executable file',1),
+    BoolVariable('shared_objects','Build shareable objects when without shared libraries',1),
+    BoolVariable('USE_RENDERING','Use Rendering',0),
+    BoolVariable('compile_id_types_as_int','Treat ID types as int to avoid possible performance consequences',0),
+    BoolVariable('fast_math','compile with -ffast-math',0),
+    BoolVariable('install_programs','install programs into source directories',1),
+    BoolVariable('compile_headers','compile headers without .cpp files',1),
+    BoolVariable('install_headers','install Public_Library headers into $INSTALL_DIR/include/physbam',1),
+    BoolVariable('use_rpath','use rpaths for dynamic libraries',1),
+    BoolVariable('single_so','generate only one global shared library',0),
+    ('CXXFLAGS_EXTRA','',[]),
+    ('LINKFLAGS_EXTRA','',[]),
+    ('CPPPATH_EXTRA','',[]),
+    ('LIBPATH_EXTRA','',[]),
+    ('RPATH_EXTRA','',[]),
+    ('LIBS_EXTRA','',[]),
+    ('INSTALL_PATH','Path to install libraries, binaries, and scripts',''))
 
 ### external libraries
 arch=os.popen("uname -m").read()[:-1]
-openexr_dir="/usr/local/compilers/libs/%s/OpenEXR"%arch
 
 ### Choose libraries
 external_libraries={
-    'boost':      {'default':1,'libs':[''],'cvs':1},
+    'boost':      {'default':1,'libs':['']},
     'boostregex': {'libs':['boost_regex']},
-    'zlib':       {'default':1,'libs':['z'],'cvs':1},
+    'zlib':       {'default':1,'libs':['z']},
     'ffmpeg':     {'default':0,'flags':['USE_FFMPEG'],'libs':['libavformat','libavcodec','libavutil'],'filter':'VIDEO'},
     'boost_geometry':     {'default':0,'flags':['USE_BOOST_GEOMETRY'],'libs':[],'filter':''},
     'boost_serialization':     {'default':0,'flags':['USE_BOOST_SERIALIZATION'],'libs':['libboost_serialization'],'filter':''},
     'libjpeg':    {'default':1,'flags':['USE_LIBJPEG'],'libs':['jpeg'],'filter':'(MOV_FILE)|(JPG_FILE)'},
     'libpng':     {'default':1,'flags':['USE_LIBPNG'],'libs':['png'],'filter':'PNG_FILE'},
-    'OpenEXR':    {'default':0,'flags':['USE_OPENEXR'],'cpppath':[openexr_dir+'/include/OpenEXR'],'libpath':[openexr_dir+'/lib'],
-                       'libs':['IlmImf','IlmThread','Imath','Half','Iex','z'],'linkflags':' -pthread','filter':'EXR_FILE'},
     'fftw':       {'default':0,'flags':['USE_FFTW'],'libs':['fftw3f','fftw3'],'filter':'FFT'},
-    'gl2ps':      {'libs':['gl2ps'],'cvs':1},
+    'gl2ps':      {'libs':['gl2ps']},
     'OpenGL':     {'libs':['GL','GLU','glut'],'libpath':['/usr/X11R6/lib','/usr/X11R6/lib64']},
-    'fltk':       {'flags':['USE_FLTK'],'cpppath':['/usr/X11R6/include'],'libs':['fltk','Xft'],'libpath':['/usr/X11R6/lib','/usr/X11R6/lib64']},
     'boostpython':{'flags':['USE_BOOSTPYTHON'],'cpppath':['/usr/include/python2.4'],'libs':['boost_python','python2.4'],'filter':''},
     'numpy':      {'flags':['USE_NUMPY'],'cpppath':[],'libs':[],'filter':''},
     'lam':        {'flags':['USE_MPI'],'libs':['lammpio','lammpi++','mpi','lam','util','dl'],'linkflags':' -pthread','filter':''},
@@ -73,7 +62,7 @@ external_libraries={
     'openmp':    {'default':0,'flags':['USE_OPENMP'],'libs':[],'linkflags':' -fopenmp','filter':''},
     'renderman':  {'default':0,'flags':['USE_RENDERMAN'],'cpppath':[],'libs':[],'filter':'renderman'}}
 for name,lib in external_libraries.items():
-    defaults={'default':0,'cvs':0,'flags':'','linkflags':'','cpppath':[],'libpath':[],'filter':''}
+    defaults={'default':0,'flags':'','linkflags':'','cpppath':[],'libpath':[],'filter':''}
     for f in defaults.keys(): lib.setdefault(f,defaults[f])
     lib['filter']=re.compile(lib['filter'])
     variables.AddVariables(BoolVariable('USE_'+name.upper(),'Use '+name,lib['default']),
@@ -115,16 +104,12 @@ if 'AddMethod' in dir(env) and 'Clone' in dir(env):
 if env['PLATFORM'].startswith('win32'):
     external_libraries['OpenGL']['libs']=['opengl32','glu32','glaux']
     external_libraries['ffmpeg']['libs']=['avcodec','avformat']
-    external_libraries['fltk']['libs']=['fltkdll','fltk','wsock32','comctl32','gdi32','user32','kernel32','winspool.lib','comdlg32.lib','ole32','comdlg32','advapi32','shell32']
-    if env['boost_libs']==env['boost_libpath']==0:
-        env.Replace(boost_libs=[],boost_libpath=['#External_Libraries/boost/lib/win32'])
     env.Replace(compile_headers=0)
 elif env['PLATFORM']=='darwin':
     opengl=external_libraries['OpenGL']
     opengl['linkflags']='-framework OpenGL -framework GLUT'
     opengl['libpath']=[]
     opengl['libs']=[]
-    external_libraries['fltk']['linkflags']='-framework Carbon -framework AGL'
     external_libraries['boostpython']['linkflags']='-framework Python'
 
 ### platform
@@ -149,14 +134,7 @@ if not env['shared']: library_suffix='_static'
 ### process external library related options
 for key,lib in external_libraries.items():
     name=key
-    if lib['cvs']:
-        lib['cpppath']=['#External_Libraries/'+name]
-        if not env['INSTALL_PATH']:
-            lib['libpath']=['#'+variant_build+'/External_Libraries/'+name]
-            lib['rpath']=Dir(lib['libpath'][0]).abspath
-        for i in range(len(lib['libs'])):
-            if type(lib['libs'][i])==tuple: lib['libs'][i]=lib['libs'][i][0]+library_suffix
-    else: lib['rpath']=[]
+    lib['rpath']=[]
     if env[name+'_include']!=0: lib['cpppath']=env[name+'_include']
     if env[name+'_libpath']!=0: lib['libpath']=env[name+'_libpath']
     if env[name+'_rpath']!=0: lib['rpath']=env[name+'_rpath']
@@ -207,21 +185,14 @@ else: # assume g++...
         elif env['ARCH']=='nocona': optimization_flags+=' -O3 -funroll-loops'
         elif env['ARCH']=='powerpc': optimization_flags+=' -O2'
         if env['fast_math']:optimization_flags+=' -ffast-math'
+        optimization_flags+=' -fno-math-errno -funsafe-math-optimizations -ffinite-math-only -fno-signed-zeros'
         env.Append(CXXFLAGS=optimization_flags)
         if env['TYPE']=='profile': env.Append(CXXFLAGS=' -pg',LINKFLAGS=' -pg')
     elif env['TYPE']=='debug': env.Append(CXXFLAGS=' -g',LINKFLAGS=' -g')
-    env.Append(CXXFLAGS=' -Wall -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -fno-strict-aliasing -Wno-unused-local-typedefs -Wno-unknown-pragmas -Wno-c++11-compat')
-#    env.Append(CXXFLAGS=' -Wall -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2')
-    if env["warnings_are_errors"]: env.Append(CXXFLAGS=" -Werror")
+    env.Append(CXXFLAGS=' -Wall -Werror -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -fno-strict-aliasing -Wno-unused-local-typedefs -Wno-unknown-pragmas -Wno-c++11-compat')
 
 if env['TYPE']=='release' or env['TYPE']=='profile' or env['TYPE']=='optdebug': env.Append(CPPDEFINES=['NDEBUG'])
-if env['compile_with_read_one_based_data']: env.Append(CPPDEFINES=['COMPILE_WITH_READ_ONE_BASED_DATA'])
-if env['compile_without_read_write_support']: env.Append(CPPDEFINES=['COMPILE_WITHOUT_READ_WRITE_SUPPORT'])
 else: env['USE_BOOSTIO']=1
-if env['compile_without_double_support']: env.Append(CPPDEFINES=['COMPILE_WITHOUT_DOUBLE_SUPPORT'])
-if env['compile_without_dyadic_support']: env.Append(CPPDEFINES=['COMPILE_WITHOUT_DYADIC_SUPPORT'])
-if env['compile_with_bintree_support']: env.Append(CPPDEFINES=['COMPILE_WITH_BINTREE_SUPPORT'])
-if env['compile_without_rle_support']: env.Append(CPPDEFINES=['COMPILE_WITHOUT_RLE_SUPPORT'])
 if env['compile_id_types_as_int']: env.Append(CPPDEFINES=['COMPILE_ID_TYPES_AS_INT'])
 
 ### teach scons about icecream environment variables
@@ -255,9 +226,6 @@ def Link_Flags(env):
             env.Append(LINKFLAGS=lib['linkflags'],LIBS=lib['libs'])
             env.PrependUnique(LIBPATH=lib['libpath'])
             if lib.has_key('rpath'): env.PrependUnique(RPATH=lib['rpath'])
-            if name=='fltk' and env['USE_OPENGL']:
-                if env['PLATFORM']=="win32": env.Append(LIBS=['fltkgl'])
-                else: env.Append(LIBS=['fltk_gl'])
 
 ### find SConscript files two levels down (for Projects and Tools)
 def Find_SConscripts(env,dir):	
@@ -396,7 +364,6 @@ def Name_From_Library(env,library):
     else:
         assert(len(library)==1)
         name=os.path.splitext(os.path.basename(library[0].path))[0]
-        #assert(name.startswith('lib'),name)
         return name[3:]
 
 # Generate a wrapper on Posix 
@@ -512,17 +479,8 @@ exported_objects={} # dictionary to allow sharing object files between directori
 ### build everything
 Export('env Automatic_Library Automatic_Program Automatic_Circular_DLLs Automatic_Global_Library Automatic_Objects Find_Directories Find_Sources variant_build common_libraries exported_objects Name_From_Library')
 env.SConscript(variant_build+'/Public_Library/SConscript')
-Find_SConscripts(env,'External_Libraries')
 Find_SConscripts_In_Subdirectories(env,'Projects')
-Find_SConscripts_In_Subdirectories(env,'Private_Projects')
 Find_SConscripts(env,'Tests')
 Find_SConscripts(env,'Tools')
 if os.path.exists('Scripts/SConscript'):
     env.SConscript(variant_build+'/Scripts/SConscript')
-if os.path.exists('Personal_Libraries/Andy_Library'):
-    env.SConscript(variant_build+'/Personal_Libraries/Andy_Library/modeling/SConscript')
-    env.SConscript(variant_build+'/Personal_Libraries/Andy_Library/hair_modeling/SConscript')
-    env.SConscript(variant_build+'/Personal_Libraries/Andy_Library/rendering/SConscript')
-if os.path.exists('Personal_Libraries/Craig_Library'):
-    env.SConscript(variant_build+'/Personal_Libraries/Craig_Library/Utilities/Rendering/SConscript')
-    env.SConscript(variant_build+'/Personal_Libraries/Craig_Library/Utilities/Mesh_Manipulation/SConscript')

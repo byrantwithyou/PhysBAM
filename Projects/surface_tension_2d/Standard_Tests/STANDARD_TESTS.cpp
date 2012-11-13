@@ -797,6 +797,4 @@ Postprocess_Substep(const T dt,const T time)
 {
 }
 template class STANDARD_TESTS<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class STANDARD_TESTS<double>;
-#endif

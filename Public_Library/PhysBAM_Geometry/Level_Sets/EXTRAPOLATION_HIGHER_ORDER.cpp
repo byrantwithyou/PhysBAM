@@ -222,8 +222,6 @@ Extrapolate_Face(const GRID<TV>& grid,const LEVELSET<TV>& phi,const ARRAY<bool,F
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,1>,float>;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,2>,float>;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,3>,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,1>,double>;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,2>,double>;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,3>,double>;
-#endif

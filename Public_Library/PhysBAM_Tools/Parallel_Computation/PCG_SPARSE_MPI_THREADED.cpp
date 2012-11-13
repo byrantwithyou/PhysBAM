@@ -105,9 +105,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
 template class PCG_SPARSE_MPI_THREADED<VECTOR<float,1> >;
 template class PCG_SPARSE_MPI_THREADED<VECTOR<float,2> >;
 template class PCG_SPARSE_MPI_THREADED<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class PCG_SPARSE_MPI_THREADED<VECTOR<double,1> >;
 template class PCG_SPARSE_MPI_THREADED<VECTOR<double,2> >;
 template class PCG_SPARSE_MPI_THREADED<VECTOR<double,3> >;
-#endif
 #endif

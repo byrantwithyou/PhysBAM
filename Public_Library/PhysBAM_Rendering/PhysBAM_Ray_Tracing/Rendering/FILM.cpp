@@ -678,6 +678,4 @@ Add_Sample(const SAMPLE& sample)
         colors(i,j)+=weight*sample.radiance;weights(i,j)+=weight;alphas(i,j)+=weight*sample.alpha;}
 }
 template class FILM<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FILM<double>;
-#endif

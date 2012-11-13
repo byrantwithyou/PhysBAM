@@ -84,7 +84,5 @@ Inside_Any_Simplex(const TV& point,int& point_simplex_id,const T thickness_over_
 }
 //#####################################################################
 template class POINT_SIMPLICES_1D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class POINT_SIMPLICES_1D<double>;
-#endif 
 }

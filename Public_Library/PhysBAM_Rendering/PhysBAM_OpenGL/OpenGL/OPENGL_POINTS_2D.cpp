@@ -255,8 +255,6 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
 template class OPENGL_POINTS_2D<float,ARRAY<VECTOR<float,2> > >;
 template class OPENGL_POINTS_2D<float,INDIRECT_ARRAY<ARRAY<VECTOR<float,2> > > >;
 template class OPENGL_POINTS_2D<float,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<float,2> > > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_POINTS_2D<double,ARRAY<VECTOR<double,2> > >;
 template class OPENGL_POINTS_2D<double,INDIRECT_ARRAY<ARRAY<VECTOR<double,2> > > >;
 template class OPENGL_POINTS_2D<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,2> > > >;
-#endif

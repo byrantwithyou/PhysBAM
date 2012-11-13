@@ -161,7 +161,5 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 }
 template class NEO_HOOKEAN<float,2>;
 template class NEO_HOOKEAN<float,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class NEO_HOOKEAN<double,2>;
 template class NEO_HOOKEAN<double,3>;
-#endif

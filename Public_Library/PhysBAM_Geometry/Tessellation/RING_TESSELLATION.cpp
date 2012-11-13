@@ -34,8 +34,6 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const RING<T>& rin
 }
 //#####################################################################
 template TRIANGULATED_SURFACE<float>* Generate_Triangles(const RING<float>&,const int);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template TRIANGULATED_SURFACE<double>* Generate_Triangles(const RING<double>&,const int);
-#endif
 }
 }

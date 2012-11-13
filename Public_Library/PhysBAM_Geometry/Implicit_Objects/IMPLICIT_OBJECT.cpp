@@ -199,9 +199,7 @@ INSTANTIATION_HELPER(float,1)
 INSTANTIATION_HELPER(float,2)
 INSTANTIATION_HELPER(float,3)
 template bool IMPLICIT_OBJECT<VECTOR<float,3> >::Intersection(RAY<VECTOR<float,3> >&,const float) const;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double,1)
 INSTANTIATION_HELPER(double,2)
 INSTANTIATION_HELPER(double,3)
 template bool IMPLICIT_OBJECT<VECTOR<double,3> >::Intersection(RAY<VECTOR<double,3> >&,const double) const;
-#endif

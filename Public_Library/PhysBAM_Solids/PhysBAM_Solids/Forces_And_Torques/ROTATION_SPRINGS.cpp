@@ -77,7 +77,5 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TW
 }
 //#####################################################################
 template class ROTATION_SPRINGS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ROTATION_SPRINGS<VECTOR<double,3> >;
-#endif
 }

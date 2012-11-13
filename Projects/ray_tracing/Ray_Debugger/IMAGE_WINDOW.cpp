@@ -209,6 +209,4 @@ Save_PhysBAM(const char *filename)
 //    output.open(filename,std::ios::binary);image.template Write<float>(output);output.close();
 }
 template class IMAGE_WINDOW<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class IMAGE_WINDOW<double>;
-#endif

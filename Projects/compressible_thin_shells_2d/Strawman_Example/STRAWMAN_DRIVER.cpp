@@ -50,7 +50,5 @@ Advance_To_Target_Time(const T target_time) PHYSBAM_OVERRIDE
 }
 //#####################################################################
 template class STRAWMAN_DRIVER<VECTOR<float,2> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class STRAWMAN_DRIVER<VECTOR<double,2> >;
-#endif
 }

@@ -116,9 +116,7 @@ Transfer_Correction_To_Fine_Grid()
 template class MULTIGRID_POISSON_REFINEMENT<float,2>;
 #endif
 template class MULTIGRID_POISSON_REFINEMENT<float,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 #ifdef MGPCG_UNOPTIMIZED
 template class MULTIGRID_POISSON_REFINEMENT<double,2>;
 #endif
 template class MULTIGRID_POISSON_REFINEMENT<double,3>;
-#endif

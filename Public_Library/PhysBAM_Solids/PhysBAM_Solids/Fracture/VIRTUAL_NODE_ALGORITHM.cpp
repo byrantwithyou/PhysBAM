@@ -255,10 +255,8 @@ Rebuild_Embedded_Object(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
 template void Rebuild_Embedded_Object(EMBEDDED_OBJECT<VECTOR<float,2>,2>&,ARRAY<int>&,ARRAY<int>&,ARRAY<int>&,const bool);
 template void Rebuild_Embedded_Object(EMBEDDED_OBJECT<VECTOR<float,3>,2>&,ARRAY<int>&,ARRAY<int>&,ARRAY<int>&,const bool);
 template void Rebuild_Embedded_Object(EMBEDDED_OBJECT<VECTOR<float,3>,3>&,ARRAY<int>&,ARRAY<int>&,ARRAY<int>&,const bool);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void Rebuild_Embedded_Object(EMBEDDED_OBJECT<VECTOR<double,2>,2>&,ARRAY<int>&,ARRAY<int>&,ARRAY<int>&,const bool);
 template void Rebuild_Embedded_Object(EMBEDDED_OBJECT<VECTOR<double,3>,2>&,ARRAY<int>&,ARRAY<int>&,ARRAY<int>&,const bool);
 template void Rebuild_Embedded_Object(EMBEDDED_OBJECT<VECTOR<double,3>,3>&,ARRAY<int>&,ARRAY<int>&,ARRAY<int>&,const bool);
-#endif
 }
 }

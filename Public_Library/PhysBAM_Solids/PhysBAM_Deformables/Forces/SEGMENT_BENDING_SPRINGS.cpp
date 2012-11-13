@@ -81,11 +81,9 @@ template SEGMENT_BENDING_SPRINGS<VECTOR<float,2> >* PhysBAM::Create_Segment_Bend
     float,bool,bool);
 template SEGMENT_BENDING_SPRINGS<VECTOR<float,3> >* PhysBAM::Create_Segment_Bending_Springs<VECTOR<float,3> >(SEGMENTED_CURVE<VECTOR<float,3> >&,float,float,bool,float,bool,
     float,bool,bool);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SEGMENT_BENDING_SPRINGS<VECTOR<double,2> >;
 template class SEGMENT_BENDING_SPRINGS<VECTOR<double,3> >;
 template SEGMENT_BENDING_SPRINGS<VECTOR<double,2> >* PhysBAM::Create_Segment_Bending_Springs<VECTOR<double,2> >(SEGMENTED_CURVE<VECTOR<double,2> >&,double,double,bool,double,bool,
     double,bool,bool);
 template SEGMENT_BENDING_SPRINGS<VECTOR<double,3> >* PhysBAM::Create_Segment_Bending_Springs<VECTOR<double,3> >(SEGMENTED_CURVE<VECTOR<double,3> >&,double,double,bool,double,bool,
     double,bool,bool);
-#endif

@@ -212,6 +212,4 @@ Potential_Energy(const T time) const
 }
 //#####################################################################
 template class LINEAR_ALTITUDE_SPRINGS_S3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LINEAR_ALTITUDE_SPRINGS_S3D<double>;
-#endif

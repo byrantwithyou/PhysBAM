@@ -209,8 +209,6 @@ Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,
 template class CONSERVATION_ENO_LLF<GRID<VECTOR<float,1> >,3>;
 template class CONSERVATION_ENO_LLF<GRID<VECTOR<float,2> >,4>;
 template class CONSERVATION_ENO_LLF<GRID<VECTOR<float,3> >,5>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class CONSERVATION_ENO_LLF<GRID<VECTOR<double,1> >,3>;
 template class CONSERVATION_ENO_LLF<GRID<VECTOR<double,2> >,4>;
 template class CONSERVATION_ENO_LLF<GRID<VECTOR<double,3> >,5>;
-#endif

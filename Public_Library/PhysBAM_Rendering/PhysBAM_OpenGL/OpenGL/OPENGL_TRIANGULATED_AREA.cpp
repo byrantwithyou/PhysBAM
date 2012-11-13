@@ -336,6 +336,4 @@ Bounding_Box() const
 }
 //#####################################################################
 template class OPENGL_TRIANGULATED_AREA<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_TRIANGULATED_AREA<double>;
-#endif

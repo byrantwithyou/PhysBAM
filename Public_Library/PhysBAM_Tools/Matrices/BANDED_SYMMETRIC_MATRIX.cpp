@@ -132,7 +132,5 @@ Print_Spectral_Information() const
 }
 //#####################################################################
 template class BANDED_SYMMETRIC_MATRIX<float,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BANDED_SYMMETRIC_MATRIX<double,3>;
-#endif
 }

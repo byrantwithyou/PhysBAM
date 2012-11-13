@@ -25,7 +25,6 @@ template<class T> class IMAGE;
 template<class T> class GENERIC_PARSER;
 
 template<class T> class BMP_FILE;
-template<class T> class EXR_FILE;
 template<class T> class JPG_FILE;
 template<class T> class PNG_FILE;
 template<class T> class PPM_FILE;

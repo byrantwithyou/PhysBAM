@@ -47,6 +47,4 @@ Euler_Step(const T dt,const T time)
 }
 //#####################################################################
 template class SPHERICAL<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SPHERICAL<double>;
-#endif

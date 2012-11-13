@@ -1161,8 +1161,6 @@ Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_
 template class SOLID_FLUID_COUPLED_EVOLUTION<VECTOR<float,1> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION<VECTOR<float,2> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SOLID_FLUID_COUPLED_EVOLUTION<VECTOR<double,1> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION<VECTOR<double,2> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION<VECTOR<double,3> >;
-#endif

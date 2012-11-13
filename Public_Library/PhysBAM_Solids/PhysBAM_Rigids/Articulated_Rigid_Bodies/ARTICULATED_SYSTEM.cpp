@@ -199,7 +199,5 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
 }
 template class ARTICULATED_SYSTEM<VECTOR<float,2> >;
 template class ARTICULATED_SYSTEM<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ARTICULATED_SYSTEM<VECTOR<double,2> >;
 template class ARTICULATED_SYSTEM<VECTOR<double,3> >;
-#endif

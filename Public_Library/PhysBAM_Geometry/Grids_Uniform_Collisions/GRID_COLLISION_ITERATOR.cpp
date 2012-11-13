@@ -195,6 +195,4 @@ Next_Helper()
     if(!grid.Inside_Domain(index,ghost) || last<index(TV::m)) Next_Helper();
 }
 template class GRID_COLLISION_ITERATOR<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GRID_COLLISION_ITERATOR<VECTOR<double,3> >;
-#endif

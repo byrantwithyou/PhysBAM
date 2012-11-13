@@ -141,8 +141,6 @@ Maximum_Error(const std::string& prefix,const T_FACE_ARRAYS& local_data,const T_
 INSTANTIATION_HELPER(float,1);
 INSTANTIATION_HELPER(float,2);
 INSTANTIATION_HELPER(float,3);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double,1);
 INSTANTIATION_HELPER(double,2);
 INSTANTIATION_HELPER(double,3);
-#endif

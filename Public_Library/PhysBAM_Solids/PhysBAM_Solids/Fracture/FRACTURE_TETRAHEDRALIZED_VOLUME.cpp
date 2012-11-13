@@ -399,6 +399,4 @@ Add_Cut_Based_On_Phi(const int tetrahedron,const VECTOR<T,4>& tetrahedron_phi)
 }
 //#####################################################################
 template class FRACTURE_TETRAHEDRALIZED_VOLUME<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FRACTURE_TETRAHEDRALIZED_VOLUME<double>;
-#endif

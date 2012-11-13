@@ -344,8 +344,6 @@ Write(TYPED_OSTREAM& output) const
 template class EMBEDDED_OBJECT<VECTOR<float,2>,2>;
 template class EMBEDDED_OBJECT<VECTOR<float,3>,2>;
 template class EMBEDDED_OBJECT<VECTOR<float,3>,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EMBEDDED_OBJECT<VECTOR<double,2>,2>;
 template class EMBEDDED_OBJECT<VECTOR<double,3>,2>;
 template class EMBEDDED_OBJECT<VECTOR<double,3>,3>;
-#endif

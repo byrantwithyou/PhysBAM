@@ -25,7 +25,5 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) co
 //#####################################################################
 template class OPENGL_FREE_PARTICLES<VECTOR<float,2> >;
 template class OPENGL_FREE_PARTICLES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_FREE_PARTICLES<VECTOR<double,2> >;
 template class OPENGL_FREE_PARTICLES<VECTOR<double,3> >;
-#endif

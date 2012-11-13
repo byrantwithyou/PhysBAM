@@ -125,7 +125,5 @@ Break_Component(DIRECTED_GRAPH<>& graph,ARRAY<int>& node_map)
     Break_Graph(new_graph,node_map);
 }
 template class HIDDEN_SURFACE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class HIDDEN_SURFACE<double>;
-#endif
 #endif

@@ -452,6 +452,4 @@ Print_Diagnostics(std::ostream& output) const
     output<<"Jaw constraint penalty at current configuration : "<<Jaw_Constraint_Penalty()<<std::endl;
 }
 template class ATTACHMENT_FRAME_CONTROL_SET<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ATTACHMENT_FRAME_CONTROL_SET<double>;
-#endif

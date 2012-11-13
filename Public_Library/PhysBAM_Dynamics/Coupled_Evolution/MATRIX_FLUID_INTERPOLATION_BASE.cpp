@@ -82,8 +82,6 @@ Test_Matrix() const
 template class MATRIX_FLUID_INTERPOLATION_BASE<VECTOR<float,1> >;
 template class MATRIX_FLUID_INTERPOLATION_BASE<VECTOR<float,2> >;
 template class MATRIX_FLUID_INTERPOLATION_BASE<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MATRIX_FLUID_INTERPOLATION_BASE<VECTOR<double,1> >;
 template class MATRIX_FLUID_INTERPOLATION_BASE<VECTOR<double,2> >;
 template class MATRIX_FLUID_INTERPOLATION_BASE<VECTOR<double,3> >;
-#endif

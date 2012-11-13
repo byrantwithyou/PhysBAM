@@ -56,7 +56,5 @@ Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input
 }
 template class CONSTITUTIVE_MODEL<float,2>;
 template class CONSTITUTIVE_MODEL<float,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class CONSTITUTIVE_MODEL<double,2>;
 template class CONSTITUTIVE_MODEL<double,3>;
-#endif

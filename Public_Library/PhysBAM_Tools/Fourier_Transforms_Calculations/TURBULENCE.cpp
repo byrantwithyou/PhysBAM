@@ -87,6 +87,4 @@ Generate_Random_Turbulence(const GRID<VECTOR<T,3> >& grid,ARRAY<T,VECTOR<int,3> 
 }
 //#####################################################################
 template class TURBULENCE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TURBULENCE<double>;
-#endif

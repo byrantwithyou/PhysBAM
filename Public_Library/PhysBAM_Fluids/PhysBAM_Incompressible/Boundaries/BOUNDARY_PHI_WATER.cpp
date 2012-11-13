@@ -69,8 +69,6 @@ Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const T_GRID& grid,T_ARR
 INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,1> >));
 INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,2> >));
 INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,3> >));
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,1> >));
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,2> >));
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,3> >));
-#endif

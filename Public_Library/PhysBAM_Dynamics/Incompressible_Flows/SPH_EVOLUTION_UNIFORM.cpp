@@ -530,7 +530,6 @@ template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >::Make_Incompressibl
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,ARRAY<float,FACE_INDEX<3> >&,float,float);
 template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,float) const;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >;
 template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >;
 template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >;
@@ -558,4 +557,3 @@ template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >::Make_Incompressib
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,ARRAY<double,FACE_INDEX<3> >&,double,double);
 template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,double) const;
-#endif

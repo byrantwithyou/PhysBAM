@@ -36,9 +36,7 @@ template<class T> bool Closest_Non_Intersecting_Point(RAY<VECTOR<T,1> >& ray,con
 //#####################################################################
 template bool Intersects(RAY<VECTOR<float,1> >&,const POINT_SIMPLICES_1D<float>&, const float);
 template bool Closest_Non_Intersecting_Point(RAY<VECTOR<float,1> >&,const POINT_SIMPLICES_1D<float>&,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(RAY<VECTOR<double,1> >&,const POINT_SIMPLICES_1D<double>&, const double);
 template bool Closest_Non_Intersecting_Point(RAY<VECTOR<double,1> >&,const POINT_SIMPLICES_1D<double>&,const double);
-#endif
 };
 };

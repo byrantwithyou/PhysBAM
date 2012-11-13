@@ -140,6 +140,4 @@ Base_To_Matrix(int m,int n,const SYSTEM_MATRIX_BASE<T>& base,SPARSE_MATRIX_FLAT_
     helper.Set_Matrix(m,n,M);
 }
 template struct SYSTEM_MATRIX_HELPER<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template struct SYSTEM_MATRIX_HELPER<double>;
-#endif

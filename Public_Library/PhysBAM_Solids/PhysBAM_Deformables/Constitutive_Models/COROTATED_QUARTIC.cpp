@@ -197,7 +197,5 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 }
 template class COROTATED_QUARTIC<float,2>;
 template class COROTATED_QUARTIC<float,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class COROTATED_QUARTIC<double,2>;
 template class COROTATED_QUARTIC<double,3>;
-#endif

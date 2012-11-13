@@ -334,7 +334,5 @@ Principal_Curvatures(const TV& X) const
     return VECTOR<T,2>(t-d,t+d);
 }
 template class DYNAMIC_IMPLICIT_SURFACE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DYNAMIC_IMPLICIT_SURFACE<double>;
-#endif
 }

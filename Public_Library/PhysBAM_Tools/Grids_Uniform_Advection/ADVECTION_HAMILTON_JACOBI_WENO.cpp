@@ -28,8 +28,6 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
 template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<float,1> >,float>;
 template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<float,2> >,float>;
 template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<float,3> >,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<double,1> >,double>;
 template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<double,2> >,double>;
 template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<double,3> >,double>;
-#endif

@@ -151,8 +151,6 @@ Name()
 INSTANTIATION_HELPER(float,2)
 INSTANTIATION_HELPER(float,3)
 template float SPHERE<VECTOR<float,3> >::Octant_Volume(const VECTOR<float,3>& min_corner) const;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double,2)
 INSTANTIATION_HELPER(double,3)
 template double SPHERE<VECTOR<double,3> >::Octant_Volume(const VECTOR<double,3>& min_corner) const;
-#endif

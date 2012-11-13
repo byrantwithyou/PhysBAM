@@ -18,7 +18,5 @@ template<class TV,class T_GRID,class T_ARRAY> void Calculate_Approximate(const E
 }
 //#####################################################################
 
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-#endif
 }
 }

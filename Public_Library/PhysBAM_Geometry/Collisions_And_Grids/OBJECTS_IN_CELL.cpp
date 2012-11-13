@@ -117,8 +117,6 @@ Get_Objects_For_Cells_Start(const ID number_of_collision_bodies) const
 template class OBJECTS_IN_CELL<GRID<VECTOR<float,1> >,COLLISION_GEOMETRY_ID>;
 template class OBJECTS_IN_CELL<GRID<VECTOR<float,2> >,COLLISION_GEOMETRY_ID>;
 template class OBJECTS_IN_CELL<GRID<VECTOR<float,3> >,COLLISION_GEOMETRY_ID>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OBJECTS_IN_CELL<GRID<VECTOR<double,1> >,COLLISION_GEOMETRY_ID>;
 template class OBJECTS_IN_CELL<GRID<VECTOR<double,2> >,COLLISION_GEOMETRY_ID>;
 template class OBJECTS_IN_CELL<GRID<VECTOR<double,3> >,COLLISION_GEOMETRY_ID>;
-#endif

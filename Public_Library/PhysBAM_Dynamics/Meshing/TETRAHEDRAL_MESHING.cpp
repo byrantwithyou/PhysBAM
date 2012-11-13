@@ -727,6 +727,4 @@ Write_Output_Files(const int frame)
 }
 //#####################################################################
 template class TETRAHEDRAL_MESHING<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TETRAHEDRAL_MESHING<double>;
-#endif

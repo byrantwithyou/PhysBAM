@@ -24,6 +24,4 @@ Postprocess_Light_Field()
 }
 //#####################################################################
 template class RENDERING_UNIFORM_VOXELS<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RENDERING_UNIFORM_VOXELS<double>;
-#endif

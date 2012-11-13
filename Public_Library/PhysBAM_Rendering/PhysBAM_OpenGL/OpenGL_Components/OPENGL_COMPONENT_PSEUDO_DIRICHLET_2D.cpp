@@ -131,6 +131,4 @@ Decrease_Vector_Size()
     velocity_scale/=(T)1.1;
 }
 template class OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D<double,double>;
-#endif

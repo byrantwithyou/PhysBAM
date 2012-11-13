@@ -660,8 +660,6 @@ Fast_Sparse_Multiply(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,ARRAY<SPARSE_MATRIX_ENTRY
 //#####################################################################
 template class SPARSE_MATRIX_FLAT_MXN<float>;
 template std::ostream& operator<<(std::ostream&,const SPARSE_MATRIX_FLAT_MXN<float>&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SPARSE_MATRIX_FLAT_MXN<double>;
 template std::ostream& operator<<(std::ostream&,const SPARSE_MATRIX_FLAT_MXN<double>&);
-#endif
 }

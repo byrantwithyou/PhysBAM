@@ -431,6 +431,4 @@ Add_To_Material_Surface_Subtetrahedron_And_Wedge_And_Half_Oct_Plus_Tet(const int
 }
 //#####################################################################
 template class EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<double>;
-#endif

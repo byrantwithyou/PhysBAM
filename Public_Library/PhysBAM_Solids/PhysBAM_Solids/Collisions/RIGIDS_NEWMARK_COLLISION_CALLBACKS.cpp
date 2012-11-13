@@ -230,8 +230,6 @@ End_Asymmetric_Collisions(const int body_1,const int body_2,VECTOR<ARRAY<int>,2>
 template class RIGIDS_NEWMARK_COLLISION_CALLBACKS<VECTOR<float,1> >;
 template class RIGIDS_NEWMARK_COLLISION_CALLBACKS<VECTOR<float,2> >;
 template class RIGIDS_NEWMARK_COLLISION_CALLBACKS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGIDS_NEWMARK_COLLISION_CALLBACKS<VECTOR<double,1> >;
 template class RIGIDS_NEWMARK_COLLISION_CALLBACKS<VECTOR<double,2> >;
 template class RIGIDS_NEWMARK_COLLISION_CALLBACKS<VECTOR<double,3> >;
-#endif

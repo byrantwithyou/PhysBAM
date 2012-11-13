@@ -98,6 +98,4 @@ Reinitialize()
     }
 }
 template class OPENGL_COMPONENT_TRIANGULATED_AREA<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_TRIANGULATED_AREA<double,double>;
-#endif

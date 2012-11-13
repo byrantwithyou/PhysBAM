@@ -30,8 +30,6 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const ORIENTED_BOX
 }
 //#####################################################################
 template TRIANGULATED_SURFACE<float>* Generate_Triangles(const ORIENTED_BOX<VECTOR<float,3> >&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template TRIANGULATED_SURFACE<double>* Generate_Triangles(const ORIENTED_BOX<VECTOR<double,3> >&);
-#endif
 }
 }

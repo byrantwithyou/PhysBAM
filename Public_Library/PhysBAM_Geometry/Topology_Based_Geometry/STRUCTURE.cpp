@@ -74,8 +74,6 @@ Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>* p
 template class STRUCTURE<VECTOR<float,1> >;
 template class STRUCTURE<VECTOR<float,2> >;
 template class STRUCTURE<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class STRUCTURE<VECTOR<double,1> >;
 template class STRUCTURE<VECTOR<double,2> >;
 template class STRUCTURE<VECTOR<double,3> >;
-#endif

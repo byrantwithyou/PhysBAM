@@ -191,8 +191,6 @@ Write_State(TYPED_OSTREAM& output,const int state_index) const
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,1> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,2> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,1> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,2> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,3> > >;
-#endif

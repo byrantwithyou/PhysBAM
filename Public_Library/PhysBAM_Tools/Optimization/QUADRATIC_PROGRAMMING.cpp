@@ -210,6 +210,4 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,ARRAY<T
 }
 //####################################################################################
 template class QUADRATIC_PROGRAMMING<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class QUADRATIC_PROGRAMMING<double>;
-#endif

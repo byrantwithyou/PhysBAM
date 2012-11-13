@@ -44,8 +44,6 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const ELLIPSOID<T>& ell
 }
 //#####################################################################
 template bool Intersects(RAY<VECTOR<float,3> >&,const ELLIPSOID<float>&,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(RAY<VECTOR<double,3> >&,const ELLIPSOID<double>&,const double);
-#endif
 };
 };

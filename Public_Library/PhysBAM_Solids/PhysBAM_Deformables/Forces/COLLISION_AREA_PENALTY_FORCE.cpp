@@ -193,7 +193,5 @@ Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_
 }
 template class COLLISION_AREA_PENALTY_FORCE<VECTOR<float,2> >;
 template class COLLISION_AREA_PENALTY_FORCE<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class COLLISION_AREA_PENALTY_FORCE<VECTOR<double,2> >;
 template class COLLISION_AREA_PENALTY_FORCE<VECTOR<double,3> >;
-#endif

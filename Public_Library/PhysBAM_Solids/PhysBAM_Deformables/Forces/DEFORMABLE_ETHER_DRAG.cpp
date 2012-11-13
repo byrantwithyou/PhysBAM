@@ -32,7 +32,5 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 //#####################################################################
 template class DEFORMABLE_ETHER_DRAG<VECTOR<float,2> >;
 template class DEFORMABLE_ETHER_DRAG<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DEFORMABLE_ETHER_DRAG<VECTOR<double,2> >;
 template class DEFORMABLE_ETHER_DRAG<VECTOR<double,3> >;
-#endif

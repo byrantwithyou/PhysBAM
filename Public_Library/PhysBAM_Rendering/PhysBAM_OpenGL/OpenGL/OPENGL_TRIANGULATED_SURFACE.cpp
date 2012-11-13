@@ -616,6 +616,4 @@ Bounding_Box() const
 }
 //#####################################################################
 template class OPENGL_TRIANGULATED_SURFACE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_TRIANGULATED_SURFACE<double>;
-#endif

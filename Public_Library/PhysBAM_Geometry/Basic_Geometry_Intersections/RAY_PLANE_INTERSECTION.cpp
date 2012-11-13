@@ -85,11 +85,9 @@ template bool Intersects(RAY<VECTOR<float,3> >&,const PLANE<float>&,const float,
 template bool Intersects(RAY<VECTOR<float,3> >&,const PLANE<float>&,const float);
 template bool Lazy_Intersects(RAY<VECTOR<float,3> >&,const PLANE<float>&);
 template bool Rectangle_Intersects(RAY<VECTOR<float,3> >&,const PLANE<float>&,const PLANE<float>&,const PLANE<float>&,const PLANE<float>&,const PLANE<float>&,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(RAY<VECTOR<double,3> >&,const PLANE<double>&,const double,const double,const double);
 template bool Intersects(RAY<VECTOR<double,3> >&,const PLANE<double>&,const double);
 template bool Lazy_Intersects(RAY<VECTOR<double,3> >&,const PLANE<double>&);
 template bool Rectangle_Intersects(RAY<VECTOR<double,3> >&,const PLANE<double>&,const PLANE<double>&,const PLANE<double>&,const PLANE<double>&,const PLANE<double>&,const double);
-#endif
 };
 };

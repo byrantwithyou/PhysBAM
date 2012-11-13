@@ -405,6 +405,4 @@ Would_Orphan_Half_Oct()
 }
 //##################################################################### 
 template class HYPOTHETICAL_CUT_TETRAHEDRONS<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class HYPOTHETICAL_CUT_TETRAHEDRONS<double>;
-#endif

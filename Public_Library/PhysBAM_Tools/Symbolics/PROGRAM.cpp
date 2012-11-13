@@ -420,7 +420,5 @@ Optimize()
     
 }
 template struct PROGRAM<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template struct PROGRAM<double>;
-#endif
 }

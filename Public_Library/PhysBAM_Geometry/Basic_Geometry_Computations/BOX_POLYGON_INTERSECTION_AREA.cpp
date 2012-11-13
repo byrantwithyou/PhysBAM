@@ -79,10 +79,8 @@ template<class TV> typename TV::SCALAR Intersection_Area(const RANGE<TV>& box, c
 template float Intersection_Area(const RANGE<VECTOR<float,1> >&,const POLYGON<VECTOR<float,1> >&);
 template float Intersection_Area(const RANGE<VECTOR<float,2> >&,const POLYGON<VECTOR<float,2> >&);
 template float Intersection_Area(const RANGE<VECTOR<float,3> >&,const POLYGON<VECTOR<float,3> >&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template double Intersection_Area(const RANGE<VECTOR<double,1> >&,const POLYGON<VECTOR<double,1> >&);
 template double Intersection_Area(const RANGE<VECTOR<double,2> >&,const POLYGON<VECTOR<double,2> >&);
 template double Intersection_Area(const RANGE<VECTOR<double,3> >&,const POLYGON<VECTOR<double,3> >&);
-#endif
 };
 };

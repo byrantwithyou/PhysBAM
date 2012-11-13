@@ -41,8 +41,6 @@ Compute(const ARRAY<bool,FACE_INDEX<d> >& psi_N_domain_boundary)
 template class MATRIX_FLUID_GRADIENT_CUT<VECTOR<float,1> >;
 template class MATRIX_FLUID_GRADIENT_CUT<VECTOR<float,2> >;
 template class MATRIX_FLUID_GRADIENT_CUT<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MATRIX_FLUID_GRADIENT_CUT<VECTOR<double,1> >;
 template class MATRIX_FLUID_GRADIENT_CUT<VECTOR<double,2> >;
 template class MATRIX_FLUID_GRADIENT_CUT<VECTOR<double,3> >;
-#endif

@@ -60,11 +60,9 @@ void Register_Muscle_Segment()
     MUSCLE_SEGMENT_REGISTRY<VECTOR<float,2> >::Register<MUSCLE_SEGMENT<VECTOR<float,2> > >();
     MUSCLE_SEGMENT_REGISTRY<VECTOR<float,3> >::Register<MUSCLE_SEGMENT<VECTOR<float,3> > >();
     MUSCLE_SEGMENT_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_SURFACE_MUSCLE_SEGMENT<float> >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     MUSCLE_SEGMENT_REGISTRY<VECTOR<double,2> >::Register<MUSCLE_SEGMENT<VECTOR<double,2> > >();
     MUSCLE_SEGMENT_REGISTRY<VECTOR<double,3> >::Register<MUSCLE_SEGMENT<VECTOR<double,3> > >();
     MUSCLE_SEGMENT_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_SURFACE_MUSCLE_SEGMENT<double> >();
-#endif
 }
 }
 //#####################################################################
@@ -188,8 +186,6 @@ Length() const
 template class MUSCLE_SEGMENT<VECTOR<float,1> >;
 template class MUSCLE_SEGMENT<VECTOR<float,2> >;
 template class MUSCLE_SEGMENT<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MUSCLE_SEGMENT<VECTOR<double,1> >;
 template class MUSCLE_SEGMENT<VECTOR<double,2> >;
 template class MUSCLE_SEGMENT<VECTOR<double,3> >;
-#endif

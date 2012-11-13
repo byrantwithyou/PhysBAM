@@ -109,8 +109,6 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 template class GENERALIZED_FLUID_MASS<VECTOR<float,1> >;
 template class GENERALIZED_FLUID_MASS<VECTOR<float,2> >;
 template class GENERALIZED_FLUID_MASS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GENERALIZED_FLUID_MASS<VECTOR<double,1> >;
 template class GENERALIZED_FLUID_MASS<VECTOR<double,2> >;
 template class GENERALIZED_FLUID_MASS<VECTOR<double,3> >;
-#endif

@@ -351,6 +351,4 @@ Turn_Smooth_Shading_Off()
 }
 //#####################################################################
 template class OPENGL_LEVELSET_MULTIVIEW<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_LEVELSET_MULTIVIEW<double>;
-#endif

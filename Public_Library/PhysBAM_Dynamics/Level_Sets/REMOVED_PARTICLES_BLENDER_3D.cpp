@@ -55,6 +55,4 @@ Get_Bounding_Box(const ELLIPSOID<T>& ellipsoid) const
 }
 //#####################################################################
 template class REMOVED_PARTICLES_BLENDER_3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class REMOVED_PARTICLES_BLENDER_3D<double>;
-#endif

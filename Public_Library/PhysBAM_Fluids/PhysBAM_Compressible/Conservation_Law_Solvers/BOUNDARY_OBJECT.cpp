@@ -88,7 +88,6 @@ template class BOUNDARY_OBJECT<VECTOR<float,3>,VECTOR<float,4> >;
 template class BOUNDARY_OBJECT<VECTOR<float,3>,VECTOR<float,5> >;
 template class BOUNDARY_OBJECT<VECTOR<float,3>,VECTOR<float,6> >;
 template class BOUNDARY_OBJECT<VECTOR<float,3>,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BOUNDARY_OBJECT<VECTOR<double,1>,VECTOR<double,1> >;
 template class BOUNDARY_OBJECT<VECTOR<double,1>,VECTOR<double,2> >;
 template class BOUNDARY_OBJECT<VECTOR<double,1>,VECTOR<double,3> >;
@@ -110,4 +109,3 @@ template class BOUNDARY_OBJECT<VECTOR<double,3>,VECTOR<double,4> >;
 template class BOUNDARY_OBJECT<VECTOR<double,3>,VECTOR<double,5> >;
 template class BOUNDARY_OBJECT<VECTOR<double,3>,VECTOR<double,6> >;
 template class BOUNDARY_OBJECT<VECTOR<double,3>,double>;
-#endif

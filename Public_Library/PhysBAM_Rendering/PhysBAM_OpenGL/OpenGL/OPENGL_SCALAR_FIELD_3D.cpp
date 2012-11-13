@@ -595,9 +595,7 @@ Toggle_Color_Map()
 template class OPENGL_SCALAR_FIELD_3D<float,int>;
 template class OPENGL_SCALAR_FIELD_3D<float,bool>;
 template class OPENGL_SCALAR_FIELD_3D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_SCALAR_FIELD_3D<double,int>;
 template class OPENGL_SCALAR_FIELD_3D<double,bool>;
 template class OPENGL_SCALAR_FIELD_3D<double,double>;
-#endif
 }

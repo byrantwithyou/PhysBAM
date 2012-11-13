@@ -30,8 +30,6 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const PLANE<T>& pl
 }
 //#####################################################################
 template TRIANGULATED_SURFACE<float>* Generate_Triangles(const PLANE<float>&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template TRIANGULATED_SURFACE<double>* Generate_Triangles(const PLANE<double>&);
-#endif
 }
 }

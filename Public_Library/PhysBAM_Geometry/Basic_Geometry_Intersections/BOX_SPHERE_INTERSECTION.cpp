@@ -24,10 +24,8 @@ template<class T,class TV> bool Intersects(const RANGE<TV>& box,const SPHERE<TV>
 template bool Intersects(const RANGE<VECTOR<float,1> >&,const SPHERE<VECTOR<float,1> >&,const float&);
 template bool Intersects(const RANGE<VECTOR<float,2> >&,const SPHERE<VECTOR<float,2> >&,const float&);
 template bool Intersects(const RANGE<VECTOR<float,3> >&,const SPHERE<VECTOR<float,3> >&,const float&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(const RANGE<VECTOR<double,1> >&,const SPHERE<VECTOR<double,1> >&,const double&);
 template bool Intersects(const RANGE<VECTOR<double,2> >&,const SPHERE<VECTOR<double,2> >&,const double&);
 template bool Intersects(const RANGE<VECTOR<double,3> >&,const SPHERE<VECTOR<double,3> >&,const double&);
-#endif
 };
 };

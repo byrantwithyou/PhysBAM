@@ -154,6 +154,4 @@ Print_Diagnostics(std::ostream& output) const
     output<<"Rigidity penalty at current configuration : "<<Rigidity_Penalty()<<std::endl;
 }
 template class QUASI_RIGID_TRANSFORM_3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class QUASI_RIGID_TRANSFORM_3D<double>;
-#endif

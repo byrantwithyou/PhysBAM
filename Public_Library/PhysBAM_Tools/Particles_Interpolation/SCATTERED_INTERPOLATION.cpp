@@ -112,7 +112,5 @@ Instantiate()
     template class SCATTERED_INTERPOLATION<GRID<VECTOR<T,3> > >;
 INSTANTIATION_HELPER(float)
 template void SCATTERED_INTERPOLATION<GRID<VECTOR<float,3> > >::Transfer_To_Grid_Helper<ARRAY<VECTOR<float,3>,VECTOR<int,3> > >(ARRAY_VIEW<VECTOR<float,3> const,int>,ARRAY_VIEW<ARRAY<VECTOR<float,3>,VECTOR<int,3> >::ELEMENT const,int>,GRID<VECTOR<float,3> > const&,ARRAY<VECTOR<float,3>,VECTOR<int,3> >&) const;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double)
 template void SCATTERED_INTERPOLATION<GRID<VECTOR<double,3> > >::Transfer_To_Grid_Helper<ARRAY<VECTOR<double,3>,VECTOR<int,3> > >(ARRAY_VIEW<VECTOR<double,3> const,int>,ARRAY_VIEW<ARRAY<VECTOR<double,3>,VECTOR<int,3> >::ELEMENT const,int>,GRID<VECTOR<double,3> > const&,ARRAY<VECTOR<double,3>,VECTOR<int,3> >&) const;
-#endif

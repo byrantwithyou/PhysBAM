@@ -319,7 +319,5 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
 }
 template class RC_EXTRAPOLATED<float,2>;
 template class RC_EXTRAPOLATED<float,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RC_EXTRAPOLATED<double,2>;
 template class RC_EXTRAPOLATED<double,3>;
-#endif

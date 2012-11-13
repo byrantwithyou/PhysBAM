@@ -231,7 +231,5 @@ Add_Solid_Texture(RENDERING_OBJECT<T>* object,PARAMETER_LIST& parameters)
     template void GENERIC_RENDER_EXAMPLE<T,RW>::Add_Solid_Texture(RENDERING_OBJECT<T>* object,PARAMETER_LIST& parameters);
 
 INSTANTIATE_HELPER(float,float)
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATE_HELPER(double,float)
 INSTANTIATE_HELPER(double,double)
-#endif

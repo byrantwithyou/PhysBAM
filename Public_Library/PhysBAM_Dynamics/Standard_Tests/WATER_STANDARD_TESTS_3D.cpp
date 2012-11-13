@@ -486,6 +486,4 @@ Analytic_Velocity(const T time,const TV& location) const
 }
 //#####################################################################
 template class WATER_STANDARD_TESTS_3D<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class WATER_STANDARD_TESTS_3D<GRID<VECTOR<double,3> > >;
-#endif

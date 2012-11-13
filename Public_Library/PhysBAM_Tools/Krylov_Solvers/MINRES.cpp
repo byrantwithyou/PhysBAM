@@ -141,6 +141,4 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
 }
 //#####################################################################
 template class MINRES<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MINRES<double>;
-#endif

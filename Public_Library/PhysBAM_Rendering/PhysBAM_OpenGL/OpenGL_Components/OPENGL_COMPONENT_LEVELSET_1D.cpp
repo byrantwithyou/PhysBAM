@@ -87,7 +87,5 @@ Reinitialize()
 }
 //##################################################################### 
 template class OPENGL_COMPONENT_LEVELSET_1D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_LEVELSET_1D<float,double>;
 template class OPENGL_COMPONENT_LEVELSET_1D<double,double>;
-#endif

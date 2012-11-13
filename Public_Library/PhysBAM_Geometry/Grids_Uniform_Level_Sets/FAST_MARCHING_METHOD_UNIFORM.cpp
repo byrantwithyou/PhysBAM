@@ -354,8 +354,6 @@ Add_To_Initial(ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,const TV_INT&
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<float,1> > >;
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<float,2> > >;
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<double,1> > >;
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<double,2> > >;
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<double,3> > >;
-#endif

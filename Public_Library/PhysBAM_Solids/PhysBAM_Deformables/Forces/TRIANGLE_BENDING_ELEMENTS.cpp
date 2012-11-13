@@ -258,6 +258,4 @@ Copy_Back_Save_Quantities(const ARRAY<int>& node_map_to_saved)
 }
 //#####################################################################
 template class TRIANGLE_BENDING_ELEMENTS<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TRIANGLE_BENDING_ELEMENTS<double>;
-#endif

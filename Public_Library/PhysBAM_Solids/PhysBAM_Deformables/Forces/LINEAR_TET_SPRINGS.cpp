@@ -393,7 +393,5 @@ Create_Tet_Springs(TETRAHEDRALIZED_VOLUME<T>& volume,const T stiffness,
 //#####################################################################
 template LINEAR_TET_SPRINGS<float>* PhysBAM::Create_Tet_Springs<float>(TETRAHEDRALIZED_VOLUME<float>&,float,float,bool,float,bool,float,bool,float,bool,bool);
 template class LINEAR_TET_SPRINGS<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template LINEAR_TET_SPRINGS<double>* PhysBAM::Create_Tet_Springs<double>(TETRAHEDRALIZED_VOLUME<double>&,double,double,bool,double,bool,double,bool,double,bool,bool);
 template class LINEAR_TET_SPRINGS<double>;
-#endif

@@ -409,6 +409,4 @@ Toggle_Draw_Ghost_Values()
     draw_ghost_values=!draw_ghost_values;
 }
 template class OPENGL_GRID_3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_GRID_3D<double>;
-#endif

@@ -20,8 +20,6 @@ template<class T> bool Intersects(const RANGE<VECTOR<T,2> >& box,const SEGMENT_2
 }
 //#####################################################################
 template bool Intersects(const RANGE<VECTOR<float,2> >&,const SEGMENT_2D<float>&,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(const RANGE<VECTOR<double,2> >&,const SEGMENT_2D<double>&,const double);
-#endif
 };
 };

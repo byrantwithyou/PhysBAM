@@ -53,10 +53,8 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const SPHERE<VECTOR<T,3
 template bool Intersects(RAY<VECTOR<float,1> >&,const SPHERE<VECTOR<float,1> >&,const float);
 template bool Intersects(RAY<VECTOR<float,2> >&,const SPHERE<VECTOR<float,2> >&,const float);
 template bool Intersects(RAY<VECTOR<float,3> >&,const SPHERE<VECTOR<float,3> >&,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(RAY<VECTOR<double,1> >&,const SPHERE<VECTOR<double,1> >&,const double);
 template bool Intersects(RAY<VECTOR<double,2> >&,const SPHERE<VECTOR<double,2> >&,const double);
 template bool Intersects(RAY<VECTOR<double,3> >&,const SPHERE<VECTOR<double,3> >&,const double);
-#endif
 }
 }

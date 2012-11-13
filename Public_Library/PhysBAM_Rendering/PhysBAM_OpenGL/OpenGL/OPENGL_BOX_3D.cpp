@@ -49,6 +49,4 @@ Bounding_Box() const
 }
 
 template class OPENGL_BOX_3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_BOX_3D<double>;
-#endif

@@ -112,7 +112,6 @@ template void INTERSECTION_REGISTRY<float,2>::Register_Intersection<VECTOR<int,2
 template void INTERSECTION_REGISTRY<float,3>::Register_Intersection<ARRAY<int,int> >(ARRAY<int,int> const&,REBIND<ARRAY<int,int>,VECTOR<float,2> >::TYPE const&,int);
 template void INTERSECTION_REGISTRY<float,3>::Register_Intersection<VECTOR<int,1> >(VECTOR<int,1> const&,REBIND<VECTOR<int,1>,VECTOR<float,2> >::TYPE const&,int);
 template void INTERSECTION_REGISTRY<float,3>::Register_Intersection<VECTOR<int,3> >(VECTOR<int,3> const&,REBIND<VECTOR<int,3>,VECTOR<float,2> >::TYPE const&,int);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double)
 template bool INTERSECTION_REGISTRY<double,2>::Intersection_List<2>(VECTOR<int,2> const&,ARRAY<int,int>&,ENABLE_IF<(2)<=(2),INTERSECTION_REGISTRY<double,2>::UNUSABLE>::TYPE);
 template bool INTERSECTION_REGISTRY<double,2>::Intersection_List_For_Cuts<2>(VECTOR<int,2> const&,VECTOR<int,3> const&,ARRAY<int,int>&,INTERSECTION_REGISTRY<double,2>::UNUSABLE);
@@ -124,4 +123,3 @@ template void INTERSECTION_REGISTRY<double,2>::Register_Intersection<VECTOR<int,
 template void INTERSECTION_REGISTRY<double,3>::Register_Intersection<ARRAY<int,int> >(ARRAY<int,int> const&,REBIND<ARRAY<int,int>,VECTOR<double,2> >::TYPE const&,int);
 template void INTERSECTION_REGISTRY<double,3>::Register_Intersection<VECTOR<int,1> >(VECTOR<int,1> const&,REBIND<VECTOR<int,1>,VECTOR<double,2> >::TYPE const&,int);
 template void INTERSECTION_REGISTRY<double,3>::Register_Intersection<VECTOR<int,3> >(VECTOR<int,3> const&,REBIND<VECTOR<int,3>,VECTOR<double,2> >::TYPE const&,int);
-#endif

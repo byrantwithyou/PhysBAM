@@ -42,8 +42,6 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 template class BW_GRAVITY<VECTOR<float,1> >;
 template class BW_GRAVITY<VECTOR<float,2> >;
 template class BW_GRAVITY<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BW_GRAVITY<VECTOR<double,1> >;
 template class BW_GRAVITY<VECTOR<double,2> >;
 template class BW_GRAVITY<VECTOR<double,3> >;
-#endif

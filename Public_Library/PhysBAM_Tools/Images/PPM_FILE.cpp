@@ -50,8 +50,6 @@ Is_Supported()
 template class PPM_FILE<float>;
 template void PPM_FILE<float>::Write(const std::string&,const ARRAY<VECTOR<float,3> ,VECTOR<int,2> >&);
 template void PPM_FILE<float>::Write(const std::string&,const ARRAY<VECTOR<float,4> ,VECTOR<int,2> >&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class PPM_FILE<double>;
 template void PPM_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,3> ,VECTOR<int,2> >&);
 template void PPM_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&);
-#endif

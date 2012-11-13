@@ -185,6 +185,4 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,const ARRAY<bool>& rigid_par
     template class WIND_DRAG<VECTOR<T,2> >; \
     template WIND_DRAG<VECTOR<T,2> >::WIND_DRAG(SEGMENTED_CURVE_2D<T>&,RIGID_BODY_COLLECTION<VECTOR<T,2> >&);
 INSTANTIATION_HELPER(float)
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double)
-#endif

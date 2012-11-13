@@ -40,7 +40,5 @@ Initialize_Grids(const T_GRID& grid)
 //#####################################################################
 template class INCOMPRESSIBILITY<GRID<VECTOR<float,2> > >;
 template class INCOMPRESSIBILITY<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class INCOMPRESSIBILITY<GRID<VECTOR<double,2> > >;
 template class INCOMPRESSIBILITY<GRID<VECTOR<double,3> > >;
-#endif

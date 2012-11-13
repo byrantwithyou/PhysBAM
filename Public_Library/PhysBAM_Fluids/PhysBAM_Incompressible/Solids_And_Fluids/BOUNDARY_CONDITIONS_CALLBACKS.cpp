@@ -55,8 +55,6 @@ Get_Boundary_Along_Ray(const TV_INT& c1,const TV_INT& c2,T& theta,T& value)
 template class BOUNDARY_CONDITIONS_CALLBACKS<VECTOR<float,1> >;
 template class BOUNDARY_CONDITIONS_CALLBACKS<VECTOR<float,2> >;
 template class BOUNDARY_CONDITIONS_CALLBACKS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BOUNDARY_CONDITIONS_CALLBACKS<VECTOR<double,1> >;
 template class BOUNDARY_CONDITIONS_CALLBACKS<VECTOR<double,2> >;
 template class BOUNDARY_CONDITIONS_CALLBACKS<VECTOR<double,3> >;
-#endif

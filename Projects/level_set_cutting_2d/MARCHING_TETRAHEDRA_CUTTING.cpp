@@ -266,7 +266,6 @@ template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,2> >::Fracture_Cutting(AR
     ARRAY<float,int>&,ARRAY<VECTOR<int,3>,int>*,ARRAY<MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,2> >::DATA,int>*,ARRAY<VECTOR<int,2>,int>*,ARRAY<int,int>&);
 template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,3> >::Fracture_Cutting(ARRAY<VECTOR<int,4>,int> const&,ARRAY<VECTOR<float,3>,int>&,ARRAY<float,int>&,
     ARRAY<float,int>&,ARRAY<VECTOR<int,4>,int>*,ARRAY<MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,3> >::DATA,int>*,ARRAY<VECTOR<int,3>,int>*,ARRAY<int,int>&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template const ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,2> >::Case_Table();
 template const ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,3> >::Case_Table();
 template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,2> >::Query_Case(ARRAY<VECTOR<int,3>,int> const&,ARRAY<VECTOR<int,3>,int> const&,
@@ -277,4 +276,3 @@ template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,2> >::Fracture_Cutting(A
     ARRAY<double,int>&,ARRAY<VECTOR<int,3>,int>*,ARRAY<MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,2> >::DATA,int>*,ARRAY<VECTOR<int,2>,int>*,ARRAY<int,int>&);
 template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,3> >::Fracture_Cutting(ARRAY<VECTOR<int,4>,int> const&,ARRAY<VECTOR<double,3>,int>&,ARRAY<double,int>&,
     ARRAY<double,int>&,ARRAY<VECTOR<int,4>,int>*,ARRAY<MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,3> >::DATA,int>*,ARRAY<VECTOR<int,3>,int>*,ARRAY<int,int>&);
-#endif

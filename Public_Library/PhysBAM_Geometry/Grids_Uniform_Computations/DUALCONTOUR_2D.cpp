@@ -136,6 +136,4 @@ Get_Triangulated_Area(const int sign)
 }
 //#####################################################################
 template class DUALCONTOUR_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DUALCONTOUR_2D<double>;
-#endif

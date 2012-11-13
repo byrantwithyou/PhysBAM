@@ -244,8 +244,6 @@ Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_
 template class SCALED_DEFORMABLES_FORCES<VECTOR<float,1> >;
 template class SCALED_DEFORMABLES_FORCES<VECTOR<float,2> >;
 template class SCALED_DEFORMABLES_FORCES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SCALED_DEFORMABLES_FORCES<VECTOR<double,1> >;
 template class SCALED_DEFORMABLES_FORCES<VECTOR<double,2> >;
 template class SCALED_DEFORMABLES_FORCES<VECTOR<double,3> >;
-#endif

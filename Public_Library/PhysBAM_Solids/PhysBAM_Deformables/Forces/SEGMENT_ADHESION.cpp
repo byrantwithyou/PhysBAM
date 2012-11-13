@@ -415,6 +415,4 @@ Read_State(STREAM_TYPE stream_type,const std::string& filename)
 }
 //#####################################################################
 template class SEGMENT_ADHESION<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SEGMENT_ADHESION<VECTOR<double,3> >;
-#endif

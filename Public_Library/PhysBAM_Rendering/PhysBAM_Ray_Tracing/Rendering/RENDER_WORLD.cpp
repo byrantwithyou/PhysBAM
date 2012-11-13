@@ -428,6 +428,4 @@ Use_Adaptive_Supersampling(const bool use_adaptive_supersampling_input,const T a
 }
 //#####################################################################
 template class RENDER_WORLD<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RENDER_WORLD<double>;
-#endif

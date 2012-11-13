@@ -58,11 +58,9 @@ static bool Initialize_Bindings()
     HELPER(float,1)
     HELPER(float,2)
     HELPER(float,3)
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     HELPER(double,1)
     HELPER(double,2)
     HELPER(double,3)
-#endif
     return true;
 }
 static bool initialize_bindings=Initialize_Bindings();
@@ -81,8 +79,6 @@ Create_From_Name(const int name,DEFORMABLE_PARTICLES<TV>& particles)
 template class BINDING<VECTOR<float,1> >;
 template class BINDING<VECTOR<float,2> >;
 template class BINDING<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BINDING<VECTOR<double,1> >;
 template class BINDING<VECTOR<double,2> >;
 template class BINDING<VECTOR<double,3> >;
-#endif

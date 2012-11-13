@@ -242,6 +242,4 @@ Reorder_Pairs(ARRAY<VECTOR<int,4> >& edge_edge_pairs,ARRAY<VECTOR<int,4> >& poin
 }
 //#####################################################################
 template class MASS_WEIGHTED_SELF_COLLISIONS<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MASS_WEIGHTED_SELF_COLLISIONS<double>;
-#endif

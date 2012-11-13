@@ -43,9 +43,7 @@ int initialize_compressible_particles=Initialize_Compressible_Particles();
 template class COMPRESSIBLE_FLUID_PARTICLES<VECTOR<float,1> >;
 template class COMPRESSIBLE_FLUID_PARTICLES<VECTOR<float,2> >;
 template class COMPRESSIBLE_FLUID_PARTICLES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class COMPRESSIBLE_FLUID_PARTICLES<VECTOR<double,1> >;
 template class COMPRESSIBLE_FLUID_PARTICLES<VECTOR<double,2> >;
 template class COMPRESSIBLE_FLUID_PARTICLES<VECTOR<double,3> >;
-#endif
 }

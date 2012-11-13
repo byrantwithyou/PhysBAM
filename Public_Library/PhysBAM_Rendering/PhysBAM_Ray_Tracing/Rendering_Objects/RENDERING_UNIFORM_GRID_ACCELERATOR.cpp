@@ -45,6 +45,4 @@ Intersection(RAY<VECTOR<T,3> >& ray,const int lowest_priority,const RENDERING_OB
 }
 //#####################################################################
 template class RENDERING_UNIFORM_GRID_ACCELERATOR<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RENDERING_UNIFORM_GRID_ACCELERATOR<double>;
-#endif

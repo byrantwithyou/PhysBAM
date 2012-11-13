@@ -425,6 +425,4 @@ Initial_Phi_Object(const TV& X) const
 }
 //#####################################################################
 template class WATER_STANDARD_TESTS_2D<GRID<VECTOR<float,2> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class WATER_STANDARD_TESTS_2D<GRID<VECTOR<double,2> > >;
-#endif

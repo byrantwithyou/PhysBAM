@@ -405,8 +405,6 @@ Threaded_Part_Four(ARRAY<T>& x,ARRAY<T>& b,T alpha,int start_index,int end_index
 template class PCG_SPARSE_THREADED<VECTOR<float,1> >;
 template class PCG_SPARSE_THREADED<VECTOR<float,2> >;
 template class PCG_SPARSE_THREADED<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class PCG_SPARSE_THREADED<VECTOR<double,1> >;
 template class PCG_SPARSE_THREADED<VECTOR<double,2> >;
 template class PCG_SPARSE_THREADED<VECTOR<double,3> >;
-#endif

@@ -218,11 +218,9 @@ template class GENERALIZED_MASS<VECTOR<float,3> >;
 template class BACKWARD_EULER_SYSTEM<VECTOR<float,1> >;
 template class BACKWARD_EULER_SYSTEM<VECTOR<float,2> >;
 template class BACKWARD_EULER_SYSTEM<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GENERALIZED_MASS<VECTOR<double,1> >;
 template class GENERALIZED_MASS<VECTOR<double,2> >;
 template class GENERALIZED_MASS<VECTOR<double,3> >;
 template class BACKWARD_EULER_SYSTEM<VECTOR<double,1> >;
 template class BACKWARD_EULER_SYSTEM<VECTOR<double,2> >;
 template class BACKWARD_EULER_SYSTEM<VECTOR<double,3> >;
-#endif

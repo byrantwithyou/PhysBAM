@@ -205,6 +205,4 @@ CFL_Strain_Rate() const
 }
 //#####################################################################
 template class LINEAR_ALTITUDE_SPRINGS_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LINEAR_ALTITUDE_SPRINGS_2D<double>;
-#endif

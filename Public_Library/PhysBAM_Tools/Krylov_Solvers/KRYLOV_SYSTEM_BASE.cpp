@@ -207,6 +207,4 @@ Nullspace_Check(KRYLOV_VECTOR_BASE<T>& null) const
     return mg>1e-10;
 }
 template class KRYLOV_SYSTEM_BASE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class KRYLOV_SYSTEM_BASE<double>;
-#endif

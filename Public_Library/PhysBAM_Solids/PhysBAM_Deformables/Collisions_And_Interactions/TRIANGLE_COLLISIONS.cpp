@@ -750,9 +750,7 @@ Apply_Rigid_Body_Motions(const T dt,const SPARSE_UNION_FIND<>& union_find)
 template class TRIANGLE_COLLISIONS<VECTOR<float,1> >;
 template class TRIANGLE_COLLISIONS<VECTOR<float,2> >;
 template class TRIANGLE_COLLISIONS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TRIANGLE_COLLISIONS<VECTOR<double,1> >;
 template class TRIANGLE_COLLISIONS<VECTOR<double,2> >;
 template class TRIANGLE_COLLISIONS<VECTOR<double,3> >;
-#endif
 }

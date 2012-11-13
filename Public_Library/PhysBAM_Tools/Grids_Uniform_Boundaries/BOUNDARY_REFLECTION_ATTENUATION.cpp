@@ -45,8 +45,6 @@ Attenuate_To_Far_Field_Value(const T2 boundary_value,const T dt) const
 template class BOUNDARY_REFLECTION_ATTENUATION<GRID<VECTOR<float,1> >,float>;
 template class BOUNDARY_REFLECTION_ATTENUATION<GRID<VECTOR<float,2> >,float>;
 template class BOUNDARY_REFLECTION_ATTENUATION<GRID<VECTOR<float,3> >,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BOUNDARY_REFLECTION_ATTENUATION<GRID<VECTOR<double,1> >,double>;
 template class BOUNDARY_REFLECTION_ATTENUATION<GRID<VECTOR<double,2> >,double>;
 template class BOUNDARY_REFLECTION_ATTENUATION<GRID<VECTOR<double,3> >,double>;
-#endif

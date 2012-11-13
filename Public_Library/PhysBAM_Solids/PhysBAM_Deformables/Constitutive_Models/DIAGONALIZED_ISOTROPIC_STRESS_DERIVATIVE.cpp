@@ -96,7 +96,5 @@ Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,3>& F,const VECT
 //#####################################################################
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<float,2>;
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<float,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<double,2>;
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<double,3>;
-#endif

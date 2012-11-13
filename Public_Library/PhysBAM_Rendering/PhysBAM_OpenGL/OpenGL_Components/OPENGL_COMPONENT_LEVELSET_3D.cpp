@@ -229,6 +229,4 @@ Toggle_Draw_Multiple_Levelsets()
 }
 
 template class OPENGL_COMPONENT_LEVELSET_3D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_LEVELSET_3D<double,double>;
-#endif

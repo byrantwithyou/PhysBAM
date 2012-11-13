@@ -27,13 +27,8 @@ using namespace PhysBAM;
 
 int main(int argc,char* argv[])
 {
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     typedef double T;
     typedef double RW;
-#else
-    typedef float T;
-    typedef float RW;
-#endif
     typedef VECTOR<T,1> TV;
 
     STREAM_TYPE stream_type((RW()));

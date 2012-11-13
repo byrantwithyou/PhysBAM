@@ -111,8 +111,6 @@ Initialize_Grid(const T_GRID& grid_input)
 template class POISSON_UNIFORM<GRID<VECTOR<float,1> > >;
 template class POISSON_UNIFORM<GRID<VECTOR<float,2> > >;
 template class POISSON_UNIFORM<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class POISSON_UNIFORM<GRID<VECTOR<double,1> > >;
 template class POISSON_UNIFORM<GRID<VECTOR<double,2> > >;
 template class POISSON_UNIFORM<GRID<VECTOR<double,3> > >;
-#endif

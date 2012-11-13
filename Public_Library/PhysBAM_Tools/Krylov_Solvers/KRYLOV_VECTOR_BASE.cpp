@@ -28,6 +28,4 @@ Raw_Get(int i) const
     return const_cast<KRYLOV_VECTOR_BASE<T>*>(this)->Raw_Get(i);
 }
 template class KRYLOV_VECTOR_BASE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class KRYLOV_VECTOR_BASE<double>;
-#endif

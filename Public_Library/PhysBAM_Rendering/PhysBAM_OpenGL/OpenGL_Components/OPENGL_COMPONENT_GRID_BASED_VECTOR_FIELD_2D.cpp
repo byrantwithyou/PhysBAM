@@ -106,6 +106,4 @@ Toggle_Arrowhead()
     opengl_grid_based_vector_field.draw_arrowhead = !opengl_grid_based_vector_field.draw_arrowhead;
 }
 template class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<double,double>;
-#endif

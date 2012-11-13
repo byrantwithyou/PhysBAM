@@ -111,8 +111,6 @@ Resize(const KRYLOV_VECTOR_BASE<T>& w)
 template class ARTICULATED_VECTOR<VECTOR<float,1> >;
 template class ARTICULATED_VECTOR<VECTOR<float,2> >;
 template class ARTICULATED_VECTOR<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ARTICULATED_VECTOR<VECTOR<double,1> >;
 template class ARTICULATED_VECTOR<VECTOR<double,2> >;
 template class ARTICULATED_VECTOR<VECTOR<double,3> >;
-#endif

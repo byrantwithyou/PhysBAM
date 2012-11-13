@@ -187,9 +187,7 @@ Normal_Flame_Speed(const int axis,const TV_INT& face_index) const
 template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<float,1> > >;
 template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<float,2> > >;
 template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<double,1> > >;
 template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<double,2> > >;
 template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<double,3> > >;
-#endif
 

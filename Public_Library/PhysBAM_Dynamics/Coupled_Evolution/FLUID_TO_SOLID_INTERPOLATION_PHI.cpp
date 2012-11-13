@@ -194,6 +194,4 @@ Setup_Before_Compute(ARRAY<bool,TV_INT>& outside_fluid_input,const ARRAY<bool,FA
 }
 //#####################################################################
 template class FLUID_TO_SOLID_INTERPOLATION_PHI<VECTOR<float,2> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FLUID_TO_SOLID_INTERPOLATION_PHI<VECTOR<double,2> >;
-#endif

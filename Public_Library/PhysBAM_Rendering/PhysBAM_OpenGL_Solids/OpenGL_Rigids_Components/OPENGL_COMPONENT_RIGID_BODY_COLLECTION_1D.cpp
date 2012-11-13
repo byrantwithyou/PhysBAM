@@ -73,6 +73,4 @@ Update_Object_Labels()
 }
 //#####################################################################
 template class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<double,double>;
-#endif

@@ -210,10 +210,8 @@ template void TRIANGLE_HIERARCHY<float>::Calculate_Bounding_Boxes_Helper(ARRAY<R
 template void TRIANGLE_HIERARCHY<float>::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >&,INDIRECT_ARRAY<ARRAY_VIEW<const TV> >);
 template void TRIANGLE_HIERARCHY<float>::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >&,ARRAY_VIEW<const TV>,ARRAY_VIEW<const TV>);
 template void TRIANGLE_HIERARCHY<float>::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >&,INDIRECT_ARRAY<ARRAY_VIEW<const TV> >,INDIRECT_ARRAY<ARRAY_VIEW<const TV> >);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TRIANGLE_HIERARCHY<double>;
 template void TRIANGLE_HIERARCHY<double>::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >&,ARRAY_VIEW<const TV>);
 template void TRIANGLE_HIERARCHY<double>::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >&,INDIRECT_ARRAY<ARRAY_VIEW<const TV> >);
 template void TRIANGLE_HIERARCHY<double>::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >&,ARRAY_VIEW<const TV>,ARRAY_VIEW<const TV>);
 template void TRIANGLE_HIERARCHY<double>::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >&,INDIRECT_ARRAY<ARRAY_VIEW<const TV> >,INDIRECT_ARRAY<ARRAY_VIEW<const TV> >);
-#endif

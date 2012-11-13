@@ -5,7 +5,6 @@
 // Class IMAGE
 //#####################################################################
 #include <PhysBAM_Tools/Images/BMP_FILE.h>
-#include <PhysBAM_Tools/Images/EXR_FILE.h>
 #include <PhysBAM_Tools/Images/IMAGE.h>
 #include <PhysBAM_Tools/Images/JPG_FILE.h>
 #include <PhysBAM_Tools/Images/PNG_FILE.h>
@@ -27,7 +26,6 @@ Read(const std::string& filename,ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
     else if(extension=="ppm") PPM_FILE<T>::Read(filename,image);
     else if(extension=="rgb") RGB_FILE<T>::Read(filename,image);
     else if(extension=="png") PNG_FILE<T>::Read(filename,image);
-    else if(extension=="exr") EXR_FILE<T>::Read(filename,image);
     else if(extension=="pbi") FILE_UTILITIES::Read_From_File<float>(filename,image);
     else PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unknown image file extension  from filename '%s' extension '%s'",filename.c_str(),extension.c_str()));
 }
@@ -62,7 +60,6 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     else if(extension=="ppm") PPM_FILE<T>::Write(filename,image_to_write);
     else if(extension=="png") PNG_FILE<T>::Write(filename,image_to_write);
     else if(extension=="rgb") RGB_FILE<T>::Write(filename,image_to_write);
-    else if(extension=="exr") EXR_FILE<T>::Write(filename,image_to_write);
     else if(extension=="pbi") FILE_UTILITIES::Write_To_File<float>(filename,image_to_write);
     else PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unknown image file extension from filename '%s' extension '%s'",filename.c_str(),extension.c_str()));
     delete corrected_image;
@@ -79,7 +76,6 @@ Is_Supported(const std::string& filename)
     else if(extension=="ppm") return PPM_FILE<T>::Is_Supported();
     else if(extension=="png") return PNG_FILE<T>::Is_Supported();
     else if(extension=="rgb") return RGB_FILE<T>::Is_Supported();
-    else if(extension=="exr") return EXR_FILE<T>::Is_Supported();
     else if(extension=="pbi") return true;
     else return false;
 }
@@ -89,10 +85,8 @@ template void IMAGE<float>::Read(const std::string&,ARRAY<VECTOR<float,3> ,VECTO
 template void IMAGE<float>::Read(const std::string&,ARRAY<VECTOR<float,4> ,VECTOR<int,2> >&);
 template void IMAGE<float>::Write(const std::string&,const ARRAY<VECTOR<float,3> ,VECTOR<int,2> >&,const float,const float);
 template void IMAGE<float>::Write(const std::string&,const ARRAY<VECTOR<float,4> ,VECTOR<int,2> >&,const float,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class IMAGE<double>;
 template void IMAGE<double>::Read(const std::string&,ARRAY<VECTOR<double,3> ,VECTOR<int,2> >&);
 template void IMAGE<double>::Read(const std::string&,ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&);
 template void IMAGE<double>::Write(const std::string&,const ARRAY<VECTOR<double,3> ,VECTOR<int,2> >&,const double,const double);
 template void IMAGE<double>::Write(const std::string&,const ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&,const double,const double);
-#endif

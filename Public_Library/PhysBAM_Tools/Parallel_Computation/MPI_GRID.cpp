@@ -1070,7 +1070,6 @@ template void MPI_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Face_Data<MPI
 template void MPI_GRID<GRID<VECTOR<float,3> > >::Reduce_Add<ARRAY<float,int> >(ARRAY<float,int> const&,ARRAY<float,int>&) const;
 template void MPI_GRID<GRID<VECTOR<float,3> > >::Union_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,ARRAY<bool,FACE_INDEX<3> > >(
     MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAY<bool,FACE_INDEX<3> >&) const;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MPI_GRID<GRID<VECTOR<double,1> > >;
 template class MPI_GRID<GRID<VECTOR<double,2> > >;
 template class MPI_GRID<GRID<VECTOR<double,3> > >;
@@ -1179,4 +1178,3 @@ template void MPI_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Face_Data<MP
 template void MPI_GRID<GRID<VECTOR<double,3> > >::Reduce_Add<ARRAY<double,int> >(ARRAY<double,int> const&,ARRAY<double,int>&) const;
 template void MPI_GRID<GRID<VECTOR<double,3> > >::Union_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<bool,FACE_INDEX<3> > >(
     MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<bool,FACE_INDEX<3> >&) const;
-#endif

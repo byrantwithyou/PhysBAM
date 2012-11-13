@@ -92,7 +92,5 @@ Target_Angular_Velocity(const T time) const
 //#####################################################################
 template class JOINT_FUNCTION<VECTOR<float,2> >;
 template class JOINT_FUNCTION<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class JOINT_FUNCTION<VECTOR<double,2> >;
 template class JOINT_FUNCTION<VECTOR<double,3> >;
-#endif

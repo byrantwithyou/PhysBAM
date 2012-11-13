@@ -66,8 +66,6 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
 template class MUSCLE_LIST<VECTOR<float,1> >;
 template class MUSCLE_LIST<VECTOR<float,2> >;
 template class MUSCLE_LIST<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MUSCLE_LIST<VECTOR<double,1> >;
 template class MUSCLE_LIST<VECTOR<double,2> >;
 template class MUSCLE_LIST<VECTOR<double,3> >;
-#endif

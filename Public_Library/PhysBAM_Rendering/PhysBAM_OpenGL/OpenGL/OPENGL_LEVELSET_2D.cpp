@@ -67,6 +67,4 @@ Update()
 }
 //#####################################################################
 template class OPENGL_LEVELSET_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_LEVELSET_2D<double>;
-#endif

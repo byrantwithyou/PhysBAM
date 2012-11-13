@@ -83,6 +83,4 @@ Covariance_Ellipsoid(const T_ARRAY_TV& points)
     template class ELLIPSOID<T>; \
     template ELLIPSOID<T> ELLIPSOID<T>::Covariance_Ellipsoid(const ARRAY<VECTOR<T,3> >& points);
 INSTANTIATION_HELPER(float)
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double)
-#endif

@@ -35,6 +35,4 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_1D<T>& grid,const ARRAY<T,VEC
 }
 //#####################################################################
 template class ARTIFICIAL_VISCOSITY_WILKINS_1D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ARTIFICIAL_VISCOSITY_WILKINS_1D<double>;
-#endif

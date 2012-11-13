@@ -67,8 +67,6 @@ Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt)
 template class EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<float,1> >;
 template class EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<float,2> >;
 template class EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<double,1> >;
 template class EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<double,2> >;
 template class EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<double,3> >;
-#endif

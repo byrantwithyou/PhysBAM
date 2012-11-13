@@ -387,8 +387,6 @@ Principal_Curvatures(const TV& X) const
 template class LEVELSET<VECTOR<float,1> >;
 template class LEVELSET<VECTOR<float,2> >;
 template class LEVELSET<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LEVELSET<VECTOR<double,1> >;
 template class LEVELSET<VECTOR<double,2> >;
 template class LEVELSET<VECTOR<double,3> >;
-#endif

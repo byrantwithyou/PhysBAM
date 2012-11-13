@@ -305,9 +305,7 @@ Interpolate_Between_States(const RIGID_GEOMETRY_STATE<TV>& state1,const RIGID_GE
 template class RIGID_GEOMETRY<VECTOR<float,1> >;
 template class RIGID_GEOMETRY<VECTOR<float,2> >;
 template class RIGID_GEOMETRY<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGID_GEOMETRY<VECTOR<double,1> >;
 template class RIGID_GEOMETRY<VECTOR<double,2> >;
 template class RIGID_GEOMETRY<VECTOR<double,3> >;
-#endif
 }

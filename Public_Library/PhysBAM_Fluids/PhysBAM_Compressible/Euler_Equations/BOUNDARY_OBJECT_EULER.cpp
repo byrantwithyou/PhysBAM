@@ -34,8 +34,6 @@ Apply_Neumann_Boundary_Condition(T_ARRAYS_ELEMENT& u_1d,const TV& normal,const T
 template class BOUNDARY_OBJECT_EULER<GRID<VECTOR<float,1> > >;
 template class BOUNDARY_OBJECT_EULER<GRID<VECTOR<float,2> > >;
 template class BOUNDARY_OBJECT_EULER<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BOUNDARY_OBJECT_EULER<GRID<VECTOR<double,1> > >;
 template class BOUNDARY_OBJECT_EULER<GRID<VECTOR<double,2> > >;
 template class BOUNDARY_OBJECT_EULER<GRID<VECTOR<double,3> > >;
-#endif

@@ -52,6 +52,4 @@ Precompute_Light_Data(bool use_fast_precomputation,RENDER_WORLD<T>& world)
 }
 //#####################################################################
 template class RENDERING_VOXELS<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RENDERING_VOXELS<double>;
-#endif

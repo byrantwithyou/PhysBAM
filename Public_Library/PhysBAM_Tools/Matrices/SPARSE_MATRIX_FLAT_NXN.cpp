@@ -418,7 +418,5 @@ return output_stream;}
 //#####################################################################
 template class SPARSE_MATRIX_FLAT_NXN<float>;
 template std::ostream& PhysBAM::operator<<(std::ostream&,const SPARSE_MATRIX_FLAT_NXN<float>&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SPARSE_MATRIX_FLAT_NXN<double>;
 template std::ostream& PhysBAM::operator<<(std::ostream&,const SPARSE_MATRIX_FLAT_NXN<double>&);
-#endif

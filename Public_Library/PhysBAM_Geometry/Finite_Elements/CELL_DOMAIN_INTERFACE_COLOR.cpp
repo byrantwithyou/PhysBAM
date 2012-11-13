@@ -155,7 +155,5 @@ Interpolate_Mac_Level_Set_To_Double_Fine_Grid(const GRID<TV>& phi_grid_input,
 }
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<float,2> >;
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<double,2> >;
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<double,3> >;
-#endif

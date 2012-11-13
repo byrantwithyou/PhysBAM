@@ -119,8 +119,6 @@ Write_Output_Files(const int frame)
 template class DRIVER<VECTOR<float,1> >;
 template class DRIVER<VECTOR<float,2> >;
 template class DRIVER<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DRIVER<VECTOR<double,1> >;
 template class DRIVER<VECTOR<double,2> >;
 template class DRIVER<VECTOR<double,3> >;
-#endif

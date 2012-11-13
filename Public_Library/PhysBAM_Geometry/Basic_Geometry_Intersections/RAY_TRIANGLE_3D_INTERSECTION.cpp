@@ -98,10 +98,8 @@ template<class T,class TV> bool Closest_Non_Intersecting_Point(RAY<TV>& ray,cons
 template bool Intersects(RAY<VECTOR<float,3> >&,const TRIANGLE_3D<float>&,const float);
 template bool Lazy_Intersects(RAY<VECTOR<float,3> >&,const TRIANGLE_3D<float>&,const float);
 template bool Closest_Non_Intersecting_Point(RAY<VECTOR<float,3> >&,const TRIANGLE_3D<float>&, const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(RAY<VECTOR<double,3> >&,const TRIANGLE_3D<double>&,const double);
 template bool Lazy_Intersects(RAY<VECTOR<double,3> >&,const TRIANGLE_3D<double>&,const double);
 template bool Closest_Non_Intersecting_Point(RAY<VECTOR<double,3> >&,const TRIANGLE_3D<double>&, const double);
-#endif
 };
 };

@@ -178,7 +178,6 @@ template int BASIS_STENCIL_UNIFORM<VECTOR<float,3>,0>::Overlap_Padding<0>(BASIS_
 template int BASIS_STENCIL_UNIFORM<VECTOR<float,3>,0>::Overlap_Padding<1>(BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&) const;
 template int BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1>::Overlap_Padding<0>(BASIS_STENCIL_UNIFORM<VECTOR<float,3>,0> const&) const;
 template int BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1>::Overlap_Padding<1>(BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&) const;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template struct BASIS_STENCIL_UNIFORM<VECTOR<double,1>,0>;
 template struct BASIS_STENCIL_UNIFORM<VECTOR<double,1>,1>;
 template int BASIS_STENCIL_UNIFORM<VECTOR<double,1>,0>::Overlap_Padding<0>(BASIS_STENCIL_UNIFORM<VECTOR<double,1>,0> const&) const;
@@ -197,4 +196,3 @@ template int BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0>::Overlap_Padding<0>(BASIS
 template int BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0>::Overlap_Padding<1>(BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&) const;
 template int BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1>::Overlap_Padding<0>(BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0> const&) const;
 template int BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1>::Overlap_Padding<1>(BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&) const;
-#endif

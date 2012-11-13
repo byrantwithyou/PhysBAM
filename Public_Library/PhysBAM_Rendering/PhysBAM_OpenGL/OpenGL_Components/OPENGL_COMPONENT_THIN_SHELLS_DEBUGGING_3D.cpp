@@ -190,6 +190,4 @@ Slice_Has_Changed()
     opengl_density_valid_mask.Slice_Has_Changed();
 }
 template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<double,double>;
-#endif

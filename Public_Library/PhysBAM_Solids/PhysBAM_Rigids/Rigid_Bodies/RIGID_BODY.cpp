@@ -521,11 +521,9 @@ template class RIGID_BODY<VECTOR<float,2> >;
 template class RIGID_BODY<VECTOR<float,3> >;
 template void RIGID_BODY<VECTOR<float,3> >::Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface<float>(TETRAHEDRALIZED_VOLUME<float>&,
     TRIANGULATED_SURFACE<float>&,float,int,bool const (*)(TETRAHEDRALIZED_VOLUME<float>&),bool,int,float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGID_BODY<VECTOR<double,1> >;
 template class RIGID_BODY<VECTOR<double,2> >;
 template class RIGID_BODY<VECTOR<double,3> >;
 template void RIGID_BODY<VECTOR<double,3> >::Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface<double>(TETRAHEDRALIZED_VOLUME<double>&,
     TRIANGULATED_SURFACE<double>&,double,int,bool const (*)(TETRAHEDRALIZED_VOLUME<double>&),bool,int,double);
-#endif
 }

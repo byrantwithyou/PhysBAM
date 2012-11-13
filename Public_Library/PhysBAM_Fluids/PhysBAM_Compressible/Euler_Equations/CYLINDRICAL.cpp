@@ -48,6 +48,4 @@ Euler_Step(const T dt,const T time)
 }
 //#####################################################################
 template class CYLINDRICAL<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class CYLINDRICAL<double>;
-#endif

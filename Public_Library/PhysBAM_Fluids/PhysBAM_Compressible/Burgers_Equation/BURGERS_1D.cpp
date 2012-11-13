@@ -46,7 +46,5 @@ CFL()
 //#####################################################################
 #if 0 // broken
 template class BURGERS_1D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BURGERS_1D<double>;
-#endif
 #endif

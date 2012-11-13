@@ -151,6 +151,4 @@ Filter_High_Frequencies(ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat,T scale) const
 }
 //#####################################################################
 template class FFT_1D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FFT_1D<double>;
-#endif

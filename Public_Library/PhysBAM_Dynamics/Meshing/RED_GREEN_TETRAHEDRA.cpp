@@ -704,6 +704,4 @@ Print() const
 }
 //#####################################################################
 template class RED_GREEN_TETRAHEDRA<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RED_GREEN_TETRAHEDRA<double>;
-#endif

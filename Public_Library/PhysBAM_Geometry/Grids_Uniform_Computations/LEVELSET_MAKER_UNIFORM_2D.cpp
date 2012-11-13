@@ -77,6 +77,4 @@ Compute_Level_Set_Helper(const TV_INT& index,T next,ARRAY<TV_INT>& next_todo,ARR
     next_todo.Append(index);
 }
 template class LEVELSET_MAKER_UNIFORM_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LEVELSET_MAKER_UNIFORM_2D<double>;
-#endif

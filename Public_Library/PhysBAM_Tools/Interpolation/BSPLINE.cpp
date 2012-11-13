@@ -103,6 +103,4 @@ Print_Control_Points_And_Times()
     for(int i=0;i<control_points.m;i++) LOG::cout<<"Time: "<<control_points_times(i)<<", Control Point: "<<control_points(i)<<std::endl;
 }
 template class BSPLINE<float,VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BSPLINE<double,VECTOR<double,3> >;
-#endif

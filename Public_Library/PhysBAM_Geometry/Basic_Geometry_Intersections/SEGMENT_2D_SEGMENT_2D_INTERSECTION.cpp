@@ -21,8 +21,6 @@ template<class T> bool Intersects(const SEGMENT_2D<T>& segment1,const SEGMENT_2D
 }
 //#####################################################################
 template bool Intersects(const SEGMENT_2D<float>&,const SEGMENT_2D<float>&,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(const SEGMENT_2D<double>&,const SEGMENT_2D<double>&,const double);
-#endif
 };
 };

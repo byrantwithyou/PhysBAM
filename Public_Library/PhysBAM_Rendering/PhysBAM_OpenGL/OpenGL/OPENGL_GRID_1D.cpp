@@ -86,6 +86,4 @@ Bounding_Box() const
 }
 //#####################################################################
 template class OPENGL_GRID_1D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_GRID_1D<double>;
-#endif

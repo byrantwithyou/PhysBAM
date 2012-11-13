@@ -41,6 +41,4 @@ Bounding_Box() const
 }
 //#####################################################################
 template class OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD<double>;
-#endif

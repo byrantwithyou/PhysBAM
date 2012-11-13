@@ -19,8 +19,6 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const BOUNDED_HORI
 }
 //#####################################################################
 template TRIANGULATED_SURFACE<float>* Generate_Triangles(const BOUNDED_HORIZONTAL_PLANE<VECTOR<float,3> >&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template TRIANGULATED_SURFACE<double>* Generate_Triangles(const BOUNDED_HORIZONTAL_PLANE<VECTOR<double,3> >&);
-#endif
 }
 }

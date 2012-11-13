@@ -75,8 +75,6 @@ Zero_Single_Boundary_Side(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& u,const int s
 template class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<GRID<VECTOR<float,1> > >;
 template class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<GRID<VECTOR<float,2> > >;
 template class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<GRID<VECTOR<double,1> > >;
 template class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<GRID<VECTOR<double,2> > >;
 template class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<GRID<VECTOR<double,3> > >;
-#endif

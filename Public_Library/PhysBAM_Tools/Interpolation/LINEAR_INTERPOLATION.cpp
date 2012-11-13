@@ -62,7 +62,6 @@ template class LINEAR_INTERPOLATION<float,VECTOR<float,3> >;
 template class LINEAR_INTERPOLATION<float,VECTOR<float,4> >;
 template class LINEAR_INTERPOLATION<float,VECTOR<float,5> >;
 template class LINEAR_INTERPOLATION<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LINEAR_INTERPOLATION<double,MATRIX<double,3,3> >;
 template class LINEAR_INTERPOLATION<double,SYMMETRIC_MATRIX<double,2> >;
 template class LINEAR_INTERPOLATION<double,SYMMETRIC_MATRIX<double,3> >;
@@ -71,4 +70,3 @@ template class LINEAR_INTERPOLATION<double,VECTOR<double,3> >;
 template class LINEAR_INTERPOLATION<double,VECTOR<double,4> >;
 template class LINEAR_INTERPOLATION<double,VECTOR<double,5> >;
 template class LINEAR_INTERPOLATION<double,double>;
-#endif

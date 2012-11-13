@@ -88,6 +88,4 @@ Reinitialize(const bool force_even_if_not_drawn)
 }
 
 template class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<double,double>;
-#endif

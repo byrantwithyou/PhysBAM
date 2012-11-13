@@ -75,9 +75,7 @@ int initialize_deformables_particles=Initialize_Deformables_Particles();
 template class DEFORMABLE_PARTICLES<VECTOR<float,1> >;
 template class DEFORMABLE_PARTICLES<VECTOR<float,2> >;
 template class DEFORMABLE_PARTICLES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DEFORMABLE_PARTICLES<VECTOR<double,1> >;
 template class DEFORMABLE_PARTICLES<VECTOR<double,2> >;
 template class DEFORMABLE_PARTICLES<VECTOR<double,3> >;
-#endif
 }

@@ -34,8 +34,6 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated)
 template class RIGID_POINTWISE_FORCE<VECTOR<float,1> >;
 template class RIGID_POINTWISE_FORCE<VECTOR<float,2> >;
 template class RIGID_POINTWISE_FORCE<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGID_POINTWISE_FORCE<VECTOR<double,1> >;
 template class RIGID_POINTWISE_FORCE<VECTOR<double,2> >;
 template class RIGID_POINTWISE_FORCE<VECTOR<double,3> >;
-#endif

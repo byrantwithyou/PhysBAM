@@ -25,6 +25,4 @@ Reinitialize(bool force)
             opengl_vector_field.vector_field(idx++)=vorticity(i);}
 }
 template class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<double,double>;
-#endif

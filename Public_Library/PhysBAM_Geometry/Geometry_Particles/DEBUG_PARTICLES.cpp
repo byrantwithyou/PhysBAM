@@ -108,7 +108,6 @@ template void PhysBAM::Add_Debug_Object<VECTOR<float,3> >(const VECTOR<VECTOR<fl
 template void PhysBAM::Add_Debug_Object<VECTOR<float,3> >(const VECTOR<VECTOR<float,3>,3>&,const VECTOR<float,3>&,const VECTOR<float,3>&);
 template void PhysBAM::Add_Debug_Object<VECTOR<float,2> >(const VECTOR<VECTOR<float,2>,2>&,const VECTOR<float,3>&);
 template void PhysBAM::Add_Debug_Object<VECTOR<float,2> >(const VECTOR<VECTOR<float,2>,3>&,const VECTOR<float,3>&,const VECTOR<float,3>&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DEBUG_PARTICLES<VECTOR<double,1> >;
 template class DEBUG_PARTICLES<VECTOR<double,2> >;
 template class DEBUG_PARTICLES<VECTOR<double,3> >;
@@ -125,5 +124,4 @@ template void PhysBAM::Add_Debug_Object<VECTOR<double,3> >(const VECTOR<VECTOR<d
 template void PhysBAM::Add_Debug_Object<VECTOR<double,3> >(const VECTOR<VECTOR<double,3>,3>&,const VECTOR<double,3>&,const VECTOR<double,3>&);
 template void PhysBAM::Add_Debug_Object<VECTOR<double,2> >(const VECTOR<VECTOR<double,2>,2>&,const VECTOR<double,3>&);
 template void PhysBAM::Add_Debug_Object<VECTOR<double,2> >(const VECTOR<VECTOR<double,2>,3>&,const VECTOR<double,3>&,const VECTOR<double,3>&);
-#endif
 

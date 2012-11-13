@@ -107,11 +107,9 @@ INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,3> >),3);
 template class INCOMPRESSIBLE<GRID<VECTOR<float,1> > >;
 template class INCOMPRESSIBLE<GRID<VECTOR<float,2> > >;
 template class INCOMPRESSIBLE<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,1> >),2);
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,2> >),2);
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,3> >),3);
 template class INCOMPRESSIBLE<GRID<VECTOR<double,1> > >;
 template class INCOMPRESSIBLE<GRID<VECTOR<double,2> > >;
 template class INCOMPRESSIBLE<GRID<VECTOR<double,3> > >;
-#endif

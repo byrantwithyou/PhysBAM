@@ -361,6 +361,4 @@ Triangle_Segment_Intersection_Barycentric_Coordinates(const VECTOR<VECTOR<T,3>,3
 }
 //####################################################################
 template class SIMPLEX_INTERACTIONS<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SIMPLEX_INTERACTIONS<double>;
-#endif

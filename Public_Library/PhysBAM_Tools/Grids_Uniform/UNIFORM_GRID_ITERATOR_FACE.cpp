@@ -92,8 +92,6 @@ Reset_Axis(const int axis_input)
 template class UNIFORM_GRID_ITERATOR_FACE<VECTOR<float,1> >;
 template class UNIFORM_GRID_ITERATOR_FACE<VECTOR<float,2> >;
 template class UNIFORM_GRID_ITERATOR_FACE<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class UNIFORM_GRID_ITERATOR_FACE<VECTOR<double,1> >;
 template class UNIFORM_GRID_ITERATOR_FACE<VECTOR<double,2> >;
 template class UNIFORM_GRID_ITERATOR_FACE<VECTOR<double,3> >;
-#endif

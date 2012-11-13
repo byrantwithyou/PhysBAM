@@ -384,6 +384,4 @@ Bounding_Box() const
     return object->World_Space_Box(box);
 }
 template class OPENGL_COMPONENT_CURVE_2D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_CURVE_2D<double,double>;
-#endif

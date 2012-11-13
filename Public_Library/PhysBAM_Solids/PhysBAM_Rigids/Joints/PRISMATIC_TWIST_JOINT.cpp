@@ -61,8 +61,6 @@ Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constra
 INSTANTIATION_HELPER(float,2,1)
 INSTANTIATION_HELPER(float,3,3)
 template class PRISMATIC_TWIST_JOINT<VECTOR<float,1> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double,2,1)
 INSTANTIATION_HELPER(double,3,3)
 template class PRISMATIC_TWIST_JOINT<VECTOR<double,1> >;
-#endif

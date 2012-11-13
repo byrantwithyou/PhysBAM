@@ -343,8 +343,6 @@ void PhysBAM::Register_Attribute_Sample(ARRAY_COLLECTION_ELEMENT_BASE* element)
 template class PARTICLES<VECTOR<float,1> >;
 template class PARTICLES<VECTOR<float,2> >;
 template class PARTICLES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class PARTICLES<VECTOR<double,1> >;
 template class PARTICLES<VECTOR<double,2> >;
 template class PARTICLES<VECTOR<double,3> >;
-#endif

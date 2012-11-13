@@ -71,6 +71,4 @@ Preprocess_File(std::string raw_filename,const int frame)
 }
 //#####################################################################
 template class GENERIC_PARSER<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GENERIC_PARSER<double>;
-#endif

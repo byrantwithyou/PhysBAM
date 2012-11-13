@@ -600,10 +600,8 @@ template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,1> >::Dump_Extra_Vel
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,1> >::Fill_Extra_Velocities(ARRAY<float>&) const;
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,3> >::Dump_Extra_Velocities(const ARRAY<float>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,3> >::Fill_Extra_Velocities(ARRAY<float>&) const;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,2> >;
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,1> >::Dump_Extra_Velocities(const ARRAY<double>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,1> >::Fill_Extra_Velocities(ARRAY<double>&) const;
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,3> >::Dump_Extra_Velocities(const ARRAY<double>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,3> >::Fill_Extra_Velocities(ARRAY<double>&) const;
-#endif

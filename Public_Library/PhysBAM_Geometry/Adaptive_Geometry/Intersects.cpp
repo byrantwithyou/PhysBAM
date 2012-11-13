@@ -244,13 +244,11 @@ template ENABLE_IF<(((3) <= (3)) && ((3) <= (3))) && (((3) + (3)) >= ((3) + (3))
 template bool Intersects<EXACT_FLOAT<float>,float,2>(VECTOR<VECTOR<float,2>,(2) + (1)> const&,VECTOR<float,2> const&,bool*);
 template bool Intersects<EXACT_FLOAT<float>,float,3,2>(VECTOR<VECTOR<float,3>,(3) + (1)> const&,VECTOR<VECTOR<float,3>,2> const&,bool*);
 template bool Intersects<EXACT_FLOAT<float>,float,3,3>(VECTOR<VECTOR<float,3>,(3) + (1)> const&,VECTOR<VECTOR<float,3>,3> const&,bool*);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template ENABLE_IF<(((2) <= (2)) && ((2) <= (2))) && (((2) + (2)) <= ((2) + (2))),bool>::TYPE Intersects<EXACT_FLOAT<double>,double,2,2,2>(VECTOR<VECTOR<double,2>,2> const&,VECTOR<VECTOR<double,2>,2> const&,bool*);
 template ENABLE_IF<(((2) <= (3)) && ((3) <= (3))) && (((3) + (2)) <= ((3) + (2))),bool>::TYPE Intersects<void,CUTTING_SIMPLEX_COORDINATE<double,3>,3,3,2>(VECTOR<VECTOR<CUTTING_SIMPLEX_COORDINATE<double,3>,3>,3> const&,VECTOR<VECTOR<CUTTING_SIMPLEX_COORDINATE<double,3>,3>,2> const&,bool*);
 template ENABLE_IF<(((3) <= (3)) && ((3) <= (3))) && (((3) + (3)) >= ((3) + (3))),bool>::TYPE Intersects<void,CUTTING_SIMPLEX_COORDINATE<double,3>,3,3,3>(VECTOR<VECTOR<CUTTING_SIMPLEX_COORDINATE<double,3>,3>,3> const&,VECTOR<VECTOR<CUTTING_SIMPLEX_COORDINATE<double,3>,3>,3> const&,bool*);
 template bool Intersects<EXACT_FLOAT<double>,double,2>(VECTOR<VECTOR<double,2>,(2) + (1)> const&,VECTOR<double,2> const&,bool*);
 template bool Intersects<EXACT_FLOAT<double>,double,3,2>(VECTOR<VECTOR<double,3>,(3) + (1)> const&,VECTOR<VECTOR<double,3>,2> const&,bool*);
 template bool Intersects<EXACT_FLOAT<double>,double,3,3>(VECTOR<VECTOR<double,3>,(3) + (1)> const&,VECTOR<VECTOR<double,3>,3> const&,bool*);
-#endif
 }
 }

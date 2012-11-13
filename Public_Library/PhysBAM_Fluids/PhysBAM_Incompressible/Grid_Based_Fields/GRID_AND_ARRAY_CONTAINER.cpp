@@ -47,8 +47,6 @@ Euler_Step(const T dt,const T time,const int number_of_ghost_cells)
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<float,1> >,float>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<float,2> >,float>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<float,3> >,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<double,1> >,double>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<double,2> >,double>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<double,3> >,double>;
-#endif

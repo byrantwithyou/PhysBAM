@@ -157,7 +157,6 @@ template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,3> >,VECTOR<float,3> >;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,3> >,VECTOR<float,5> >;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,2> >,SYMMETRIC_MATRIX<float,2> >;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,3> >,SYMMETRIC_MATRIX<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,1> >,double>;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,2> >,double>;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,3> >,double>;
@@ -169,4 +168,3 @@ template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,3> >,VECTOR<double,3> >;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,3> >,VECTOR<double,5> >;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,2> >,SYMMETRIC_MATRIX<double,2> >;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,3> >,SYMMETRIC_MATRIX<double,3> >;
-#endif

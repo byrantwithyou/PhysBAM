@@ -150,7 +150,5 @@ Divide_Polygon_Particles_With_New_Segments(ARRAY<VECTOR<int,2> >& all_segments,c
 //#####################################################################
 template class CUTTING_GEOMETRY_2D<VECTOR<float,2>,2>;
 template class CUTTING_GEOMETRY_2D<VECTOR<float,3>,2>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class CUTTING_GEOMETRY_2D<VECTOR<double,2>,2>;
 template class CUTTING_GEOMETRY_2D<VECTOR<double,3>,2>;
-#endif

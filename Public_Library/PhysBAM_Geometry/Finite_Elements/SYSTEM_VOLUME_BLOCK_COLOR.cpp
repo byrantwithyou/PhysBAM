@@ -48,7 +48,6 @@ template void SYSTEM_VOLUME_BLOCK_COLOR<VECTOR<float,3>,2>::Initialize<0,1>(SYST
     BASIS_STENCIL_UNIFORM<VECTOR<float,3>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ARRAY<float> const&);
 template void SYSTEM_VOLUME_BLOCK_COLOR<VECTOR<float,3>,2>::Initialize<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ARRAY<float> const&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SYSTEM_VOLUME_BLOCK_COLOR<VECTOR<double,2>,2>;
 template class SYSTEM_VOLUME_BLOCK_COLOR<VECTOR<double,3>,2>;
 template void SYSTEM_VOLUME_BLOCK_COLOR<VECTOR<double,2>,2>::Initialize<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,
@@ -59,4 +58,3 @@ template void SYSTEM_VOLUME_BLOCK_COLOR<VECTOR<double,3>,2>::Initialize<0,1>(SYS
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ARRAY<double> const&);
 template void SYSTEM_VOLUME_BLOCK_COLOR<VECTOR<double,3>,2>::Initialize<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ARRAY<double> const&);
-#endif

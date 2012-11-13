@@ -1295,10 +1295,8 @@ Create_Contact_Joint(const RIGID_BODY<TV>& parent,const RIGID_BODY<TV>& child,co
 template class RIGID_BODY_COLLISIONS<VECTOR<float,1> >;
 template class RIGID_BODY_COLLISIONS<VECTOR<float,2> >;
 template class RIGID_BODY_COLLISIONS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGID_BODY_COLLISIONS<VECTOR<double,1> >;
 template class RIGID_BODY_COLLISIONS<VECTOR<double,2> >;
 template class RIGID_BODY_COLLISIONS<VECTOR<double,3> >;
-#endif
 }
 

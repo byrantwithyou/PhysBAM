@@ -76,10 +76,8 @@ template<class T> SEGMENTED_CURVE_2D<T>* Tessellate_Boundary(const SPHERE<VECTOR
 template TRIANGULATED_SURFACE<float>* Generate_Triangles(const SPHERE<VECTOR<float,3> >&,int);
 template TRIANGULATED_AREA<float>* Generate_Triangles(const SPHERE<VECTOR<float,2> >&,int);
 template SEGMENTED_CURVE_2D<float>* Tessellate_Boundary(const SPHERE<VECTOR<float,2> >& sphere,int levels);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template TRIANGULATED_SURFACE<double>* Generate_Triangles(const SPHERE<VECTOR<double,3> >&,int);
 template TRIANGULATED_AREA<double>* Generate_Triangles(const SPHERE<VECTOR<double,2> >&,int);
 template SEGMENTED_CURVE_2D<double>* Tessellate_Boundary(const SPHERE<VECTOR<double,2> >& sphere,int levels);
-#endif
 }
 }

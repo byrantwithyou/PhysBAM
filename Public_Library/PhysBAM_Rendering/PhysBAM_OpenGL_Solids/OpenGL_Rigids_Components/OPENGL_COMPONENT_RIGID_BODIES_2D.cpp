@@ -740,6 +740,4 @@ Bounding_Box() const
 }
 //#####################################################################
 template class OPENGL_COMPONENT_RIGID_BODIES_2D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_RIGID_BODIES_2D<double,double>;
-#endif

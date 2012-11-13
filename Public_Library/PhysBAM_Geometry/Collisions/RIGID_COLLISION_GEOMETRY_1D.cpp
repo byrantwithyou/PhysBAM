@@ -116,6 +116,4 @@ Update_Intersection_Acceleration_Structures(const bool use_swept_triangle_hierar
 {}
 //##################################################################### 
 template class RIGID_COLLISION_GEOMETRY<VECTOR<float,1> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGID_COLLISION_GEOMETRY<VECTOR<double,1> >;
-#endif

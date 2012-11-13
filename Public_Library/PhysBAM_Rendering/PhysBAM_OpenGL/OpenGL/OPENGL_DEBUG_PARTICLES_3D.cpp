@@ -223,6 +223,4 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
 }
 
 template class OPENGL_DEBUG_PARTICLES_3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_DEBUG_PARTICLES_3D<double>;
-#endif

@@ -207,6 +207,4 @@ Create_Quasistatic_Finite_Volume(HEXAHEDRALIZED_VOLUME<T>& hexahedralized_volume
 }
 //#####################################################################
 template class FINITE_VOLUME_HEXAHEDRONS<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FINITE_VOLUME_HEXAHEDRONS<double>;
-#endif

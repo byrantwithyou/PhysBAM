@@ -251,6 +251,4 @@ Inside(const TV& point,const T thickness_over_two) const
 }
 //#####################################################################
 template class SEGMENT_3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SEGMENT_3D<double>;
-#endif

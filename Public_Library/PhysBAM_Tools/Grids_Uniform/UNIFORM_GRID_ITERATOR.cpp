@@ -42,9 +42,7 @@ template class UNIFORM_GRID_ITERATOR<VECTOR<float,0> >;
 template class UNIFORM_GRID_ITERATOR<VECTOR<float,1> >;
 template class UNIFORM_GRID_ITERATOR<VECTOR<float,2> >;
 template class UNIFORM_GRID_ITERATOR<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class UNIFORM_GRID_ITERATOR<VECTOR<double,0> >;
 template class UNIFORM_GRID_ITERATOR<VECTOR<double,1> >;
 template class UNIFORM_GRID_ITERATOR<VECTOR<double,2> >;
 template class UNIFORM_GRID_ITERATOR<VECTOR<double,3> >;
-#endif

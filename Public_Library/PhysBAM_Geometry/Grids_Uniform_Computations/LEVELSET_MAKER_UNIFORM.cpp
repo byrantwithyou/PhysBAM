@@ -262,6 +262,4 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
 }
 //#####################################################################
 template class LEVELSET_MAKER_UNIFORM<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LEVELSET_MAKER_UNIFORM<double>;
-#endif

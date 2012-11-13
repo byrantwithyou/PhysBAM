@@ -106,8 +106,6 @@ Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const
 template class FLUID_TO_SOLID_INTERPOLATION<VECTOR<float,1> >;
 template class FLUID_TO_SOLID_INTERPOLATION<VECTOR<float,2> >;
 template class FLUID_TO_SOLID_INTERPOLATION<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FLUID_TO_SOLID_INTERPOLATION<VECTOR<double,1> >;
 template class FLUID_TO_SOLID_INTERPOLATION<VECTOR<double,2> >;
 template class FLUID_TO_SOLID_INTERPOLATION<VECTOR<double,3> >;
-#endif

@@ -170,7 +170,5 @@ Eigenvectors(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int i,MATRIX<T,d,
 //#####################################################################
 #if 0 // broken
 template class REACTIVE_EULER_2D_EIGENSYSTEM_F<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class REACTIVE_EULER_2D_EIGENSYSTEM_F<double>;
-#endif
 #endif

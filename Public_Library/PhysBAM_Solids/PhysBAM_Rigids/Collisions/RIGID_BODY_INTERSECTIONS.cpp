@@ -165,8 +165,6 @@ Initialize_Transformation_From_Body1_To_Body2_Coordinates(const RIGID_BODY<TV>& 
 template class RIGID_BODY_INTERSECTIONS<VECTOR<float,1> >;
 template class RIGID_BODY_INTERSECTIONS<VECTOR<float,2> >;
 template class RIGID_BODY_INTERSECTIONS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGID_BODY_INTERSECTIONS<VECTOR<double,1> >;
 template class RIGID_BODY_INTERSECTIONS<VECTOR<double,2> >;
 template class RIGID_BODY_INTERSECTIONS<VECTOR<double,3> >;
-#endif

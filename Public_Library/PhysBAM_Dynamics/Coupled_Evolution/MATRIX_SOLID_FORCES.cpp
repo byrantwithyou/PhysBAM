@@ -221,8 +221,6 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 template class MATRIX_SOLID_FORCES<VECTOR<float,1> >;
 template class MATRIX_SOLID_FORCES<VECTOR<float,2> >;
 template class MATRIX_SOLID_FORCES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MATRIX_SOLID_FORCES<VECTOR<double,1> >;
 template class MATRIX_SOLID_FORCES<VECTOR<double,2> >;
 template class MATRIX_SOLID_FORCES<VECTOR<double,3> >;
-#endif

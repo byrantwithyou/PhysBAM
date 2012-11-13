@@ -152,7 +152,5 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
 }
 template class QUASISTATIC_EVOLUTION<VECTOR<float,2> >;
 template class QUASISTATIC_EVOLUTION<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class QUASISTATIC_EVOLUTION<VECTOR<double,2> >;
 template class QUASISTATIC_EVOLUTION<VECTOR<double,3> >;
-#endif

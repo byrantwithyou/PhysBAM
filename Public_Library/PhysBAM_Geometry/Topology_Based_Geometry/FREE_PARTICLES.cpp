@@ -42,8 +42,6 @@ Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const
 template class FREE_PARTICLES<VECTOR<float,1> >;
 template class FREE_PARTICLES<VECTOR<float,2> >;
 template class FREE_PARTICLES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FREE_PARTICLES<VECTOR<double,1> >;
 template class FREE_PARTICLES<VECTOR<double,2> >;
 template class FREE_PARTICLES<VECTOR<double,3> >;
-#endif

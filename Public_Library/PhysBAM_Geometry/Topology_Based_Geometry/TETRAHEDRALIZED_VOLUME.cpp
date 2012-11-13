@@ -855,6 +855,4 @@ Print_Statistics(std::ostream& output)
 }
 //#####################################################################
 template class TETRAHEDRALIZED_VOLUME<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TETRAHEDRALIZED_VOLUME<double>;
-#endif

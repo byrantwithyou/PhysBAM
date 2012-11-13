@@ -136,8 +136,6 @@ template<class TV> void COLLISION_GEOMETRY<TV>::Write_State(TYPED_OSTREAM& outpu
 template class COLLISION_GEOMETRY<VECTOR<float,1> >;
 template class COLLISION_GEOMETRY<VECTOR<float,2> >;
 template class COLLISION_GEOMETRY<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class COLLISION_GEOMETRY<VECTOR<double,1> >;
 template class COLLISION_GEOMETRY<VECTOR<double,2> >;
 template class COLLISION_GEOMETRY<VECTOR<double,3> >;
-#endif

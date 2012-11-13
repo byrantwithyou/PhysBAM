@@ -196,6 +196,4 @@ Scatter_Photon_Ray(const RENDERING_OBJECT<T>& object,RENDERING_RAY<T>& ray,TV& p
 }
 //#####################################################################
 template class RENDERING_VOXEL_SHADER<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RENDERING_VOXEL_SHADER<double>;
-#endif

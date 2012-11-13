@@ -460,6 +460,4 @@ Clamped_Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,con
 }
 //#####################################################################
 template class TRIANGLE_3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TRIANGLE_3D<double>;
-#endif

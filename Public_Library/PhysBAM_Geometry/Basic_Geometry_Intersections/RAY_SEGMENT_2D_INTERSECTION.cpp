@@ -106,12 +106,10 @@ template bool Fuzzy_Intersects(RAY<VECTOR<float,2> >&,const SEGMENT_2D<float>&,c
 template bool Closest_Non_Intersecting_Point(RAY<VECTOR<float,2> >&,const SEGMENT_2D<float>&,const float);
 template bool Intersection_X_Segment(RAY<VECTOR<float,2> >&,const float,const float,const float,const float);
 template bool Intersection_Y_Segment(RAY<VECTOR<float,2> >&,const float,const float,const float,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(RAY<VECTOR<double,2> >&,const SEGMENT_2D<double>&,const double);
 template bool Fuzzy_Intersects(RAY<VECTOR<double,2> >&,const SEGMENT_2D<double>&,const double);
 template bool Closest_Non_Intersecting_Point(RAY<VECTOR<double,2> >&,const SEGMENT_2D<double>&,const double);
 template bool Intersection_X_Segment(RAY<VECTOR<double,2> >&,const double,const double,const double,const double);
 template bool Intersection_Y_Segment(RAY<VECTOR<double,2> >&,const double,const double,const double,const double);
-#endif
 };
 };

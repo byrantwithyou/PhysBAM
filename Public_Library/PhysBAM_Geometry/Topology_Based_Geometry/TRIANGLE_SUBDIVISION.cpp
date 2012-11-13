@@ -218,10 +218,8 @@ template void TRIANGLE_SUBDIVISION::Apply_Linear_Subdivision(ARRAY_VIEW<const VE
 template void TRIANGLE_SUBDIVISION::Apply_Fractal_Subdivision(ARRAY_VIEW<const VECTOR<float,3> > base_values,ARRAY_VIEW<VECTOR<float,3> > subdivided_values,const float power);
 template void TRIANGLE_SUBDIVISION::Apply_Loop_Subdivision(ARRAY_VIEW<const VECTOR<float,3> > base_values,ARRAY_VIEW<VECTOR<float,3> > subdivided_values);
 template void TRIANGLE_SUBDIVISION::Apply_Root_Three_Subdivision(ARRAY_VIEW<const VECTOR<float,3> > base_values,ARRAY_VIEW<VECTOR<float,3> > subdivided_values);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void TRIANGLE_SUBDIVISION::Apply_Linear_Subdivision(ARRAY_VIEW<const VECTOR<double,3> > base_values,ARRAY_VIEW<VECTOR<double,3> > subdivided_values);
 template void TRIANGLE_SUBDIVISION::Apply_Fractal_Subdivision(ARRAY_VIEW<const VECTOR<double,3> > base_values,ARRAY_VIEW<VECTOR<double,3> > subdivided_values,const float power);
 template void TRIANGLE_SUBDIVISION::Apply_Loop_Subdivision(ARRAY_VIEW<const VECTOR<double,3> > base_values,ARRAY_VIEW<VECTOR<double,3> > subdivided_values);
 template void TRIANGLE_SUBDIVISION::Apply_Root_Three_Subdivision(ARRAY_VIEW<const VECTOR<double,3> > base_values,ARRAY_VIEW<VECTOR<double,3> > subdivided_values);
-#endif
 }

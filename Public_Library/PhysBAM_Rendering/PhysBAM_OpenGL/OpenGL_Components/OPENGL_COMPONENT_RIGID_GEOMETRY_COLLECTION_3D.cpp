@@ -891,6 +891,5 @@ Bounding_Box() const
 }
 //#####################################################################
 template class OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<double,double>;
-#endif
+

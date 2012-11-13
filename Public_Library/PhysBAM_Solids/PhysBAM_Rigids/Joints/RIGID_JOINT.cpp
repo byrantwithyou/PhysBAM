@@ -90,8 +90,6 @@ Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_c
 template class RIGID_JOINT<VECTOR<float,1> >;
 template class RIGID_JOINT<VECTOR<float,2> >;
 template class RIGID_JOINT<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGID_JOINT<VECTOR<double,1> >;
 template class RIGID_JOINT<VECTOR<double,2> >;
 template class RIGID_JOINT<VECTOR<double,3> >;
-#endif

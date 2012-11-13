@@ -235,6 +235,4 @@ Preprocess_Frame(const int frame)
 }
 //#####################################################################
 template class BRIDGE_EXAMPLE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BRIDGE_EXAMPLE<double>;
-#endif

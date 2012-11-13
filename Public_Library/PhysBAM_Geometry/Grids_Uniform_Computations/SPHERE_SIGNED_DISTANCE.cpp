@@ -13,7 +13,5 @@ namespace PhysBAM{
 template<class TV> class GRID;
 
 namespace SIGNED_DISTANCE{
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-#endif
 }
 }

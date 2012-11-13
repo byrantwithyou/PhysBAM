@@ -200,7 +200,5 @@ Compute_Energy() const
 //#####################################################################
 template class LINEAR_BENDING_ELEMENTS<VECTOR<float,2> >;
 template class LINEAR_BENDING_ELEMENTS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LINEAR_BENDING_ELEMENTS<VECTOR<double,2> >;
 template class LINEAR_BENDING_ELEMENTS<VECTOR<double,3> >;
-#endif

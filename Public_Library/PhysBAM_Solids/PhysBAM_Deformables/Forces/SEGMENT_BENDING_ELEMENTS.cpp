@@ -126,6 +126,4 @@ CFL_Strain_Rate() const
 }
 //#####################################################################
 template class SEGMENT_BENDING_ELEMENTS<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SEGMENT_BENDING_ELEMENTS<double>;
-#endif

@@ -219,6 +219,4 @@ Lt(const TV &pt)
     Emit("lineto");
 }
 template class EPS_FILE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EPS_FILE<double>;
-#endif

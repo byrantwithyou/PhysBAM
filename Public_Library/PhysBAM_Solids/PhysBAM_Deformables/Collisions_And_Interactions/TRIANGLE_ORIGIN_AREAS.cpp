@@ -311,6 +311,4 @@ template<class T,class TV> void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(VOL
 }
 
 template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<float,VECTOR<float,3> >(VOL_DATA<float,3,6>&,VECTOR<float,3> const &,VECTOR<float,3> const [6]);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<double,VECTOR<double,3> >(VOL_DATA<double,3,6>&,VECTOR<double,3> const &,VECTOR<double,3> const [6]);
-#endif

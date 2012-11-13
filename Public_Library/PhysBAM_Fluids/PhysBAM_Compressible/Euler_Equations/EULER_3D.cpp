@@ -52,6 +52,4 @@ CFL()
 }              
 //#####################################################################
 template class EULER_3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EULER_3D<double>;
-#endif

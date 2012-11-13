@@ -537,9 +537,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template class INCOMPRESSIBLE_FINITE_VOLUME<VECTOR<float,2>,2>;
 template class INCOMPRESSIBLE_FINITE_VOLUME<VECTOR<float,3>,2>;
 template class INCOMPRESSIBLE_FINITE_VOLUME<VECTOR<float,3>,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class INCOMPRESSIBLE_FINITE_VOLUME<VECTOR<double,2>,2>;
 template class INCOMPRESSIBLE_FINITE_VOLUME<VECTOR<double,3>,2>;
 template class INCOMPRESSIBLE_FINITE_VOLUME<VECTOR<double,3>,3>;
-#endif
 }

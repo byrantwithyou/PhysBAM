@@ -38,8 +38,6 @@ template<class T> void Calculate(SEGMENTED_CURVE_2D<T>& curve,const GRID<VECTOR<
 }
 //####################################################################
 template void Calculate(SEGMENTED_CURVE_2D<float>&,const GRID<VECTOR<float,2> >&,ARRAY<float,VECTOR<int,2> >&,bool);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void Calculate(SEGMENTED_CURVE_2D<double>&,const GRID<VECTOR<double,2> >&,ARRAY<double,VECTOR<int,2> >&,bool);
-#endif
 };
 };

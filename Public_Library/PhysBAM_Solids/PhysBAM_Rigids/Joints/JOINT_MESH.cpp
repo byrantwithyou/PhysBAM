@@ -86,8 +86,6 @@ Write(TYPED_OSTREAM& output,const std::string& directory,const int frame) const
 template class JOINT_MESH<VECTOR<float,1> >;
 template class JOINT_MESH<VECTOR<float,2> >;
 template class JOINT_MESH<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class JOINT_MESH<VECTOR<double,1> >;
 template class JOINT_MESH<VECTOR<double,2> >;
 template class JOINT_MESH<VECTOR<double,3> >;
-#endif

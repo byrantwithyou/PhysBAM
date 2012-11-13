@@ -50,8 +50,6 @@ template<class T> void Calculate(TRIANGULATED_SURFACE<T>& surface,const GRID<VEC
 }
 //##################################################################### 
 template void Calculate(TRIANGULATED_SURFACE<float>&,const GRID<VECTOR<float,3> >&,ARRAY<float,VECTOR<int,3> >&,bool);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void Calculate(TRIANGULATED_SURFACE<double>&,const GRID<VECTOR<double,3> >&,ARRAY<double,VECTOR<int,3> >&,bool);
-#endif
 };
 };

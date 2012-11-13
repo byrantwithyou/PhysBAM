@@ -230,7 +230,5 @@ Make_Levelsets_Consistent()
 //#####################################################################
 template class PLS_FC_EXAMPLE<VECTOR<float,2> >;
 template class PLS_FC_EXAMPLE<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class PLS_FC_EXAMPLE<VECTOR<double,2> >;
 template class PLS_FC_EXAMPLE<VECTOR<double,3> >;
-#endif

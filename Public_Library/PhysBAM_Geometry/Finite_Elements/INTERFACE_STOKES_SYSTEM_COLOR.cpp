@@ -440,7 +440,5 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
 }
 template class INTERFACE_STOKES_SYSTEM_COLOR<VECTOR<float,2> >;
 template class INTERFACE_STOKES_SYSTEM_COLOR<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class INTERFACE_STOKES_SYSTEM_COLOR<VECTOR<double,2> >;
 template class INTERFACE_STOKES_SYSTEM_COLOR<VECTOR<double,3> >;
-#endif

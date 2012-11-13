@@ -94,6 +94,4 @@ Print_Spectral_Information(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BAS
 }
 //#####################################################################
 template class LANCZOS_ITERATION<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LANCZOS_ITERATION<double>;
-#endif

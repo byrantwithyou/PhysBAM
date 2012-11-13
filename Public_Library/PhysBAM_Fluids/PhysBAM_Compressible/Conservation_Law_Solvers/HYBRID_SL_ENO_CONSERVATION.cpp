@@ -139,8 +139,6 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
 template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<float,1> >,3>;
 template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<float,2> >,4>;
 template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<float,3> >,5>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<double,1> >,3>;
 template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<double,2> >,4>;
 template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<double,3> >,5>;
-#endif

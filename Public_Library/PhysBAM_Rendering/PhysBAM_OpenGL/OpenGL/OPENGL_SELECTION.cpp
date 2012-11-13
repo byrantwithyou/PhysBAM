@@ -187,7 +187,6 @@ template void OPENGL_SELECTION::Draw_Highlighted_Curve<VECTOR<float,3> >(ARRAY<V
 template void OPENGL_SELECTION::Draw_Highlighted_Tetrahedron_Boundary<float>(VECTOR<float,3> const&,VECTOR<float,3> const&,VECTOR<float,3> const&,VECTOR<float,3> const&,int,OPENGL_COLOR const&);
 template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<float,3>,1>(SIMPLEX_MESH<1> const&,GEOMETRY_PARTICLES<VECTOR<float,3> > const&);
 template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<float,3>,3>(SIMPLEX_MESH<3> const&,GEOMETRY_PARTICLES<VECTOR<float,3> > const&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void OPENGL_SELECTION::Draw_Highlighted_Segment<VECTOR<double,3> >(VECTOR<double,3> const&,VECTOR<double,3> const&,int,OPENGL_COLOR const&);
 template void OPENGL_SELECTION::Draw_Highlighted_Triangle_Boundary<VECTOR<double,3> >(VECTOR<double,3> const&,VECTOR<double,3> const&,VECTOR<double,3> const&,int,OPENGL_COLOR const&);
 template void OPENGL_SELECTION::Draw_Highlighted_Vertex<VECTOR<double,3> >(VECTOR<double,3> const&,int,OPENGL_COLOR const&);
@@ -204,4 +203,3 @@ template void OPENGL_SELECTION::Draw_Highlighted_Curve<VECTOR<double,3> >(ARRAY<
 template void OPENGL_SELECTION::Draw_Highlighted_Tetrahedron_Boundary<double>(VECTOR<double,3> const&,VECTOR<double,3> const&,VECTOR<double,3> const&,VECTOR<double,3> const&,int,OPENGL_COLOR const&);
 template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<double,3>,1>(SIMPLEX_MESH<1> const&,GEOMETRY_PARTICLES<VECTOR<double,3> > const&);
 template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<double,3>,3>(SIMPLEX_MESH<3> const&,GEOMETRY_PARTICLES<VECTOR<double,3> > const&);
-#endif

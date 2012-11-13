@@ -260,7 +260,6 @@ template RIGID_BODY<VECTOR<float,3> >* SOLIDS_STANDARD_TESTS<VECTOR<float,3> >::
     RIGID_BODY_COLLECTION<VECTOR<float,3> >&,float);
 template RIGID_BODY<VECTOR<float,3> >* SOLIDS_STANDARD_TESTS<VECTOR<float,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<float>&,
     RIGID_BODY_COLLECTION<VECTOR<float,3> >&,float,int);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER2(double);
 template SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::SOLIDS_STANDARD_TESTS(EXAMPLE<VECTOR<double,2> >&,SOLID_BODY_COLLECTION<VECTOR<double,2> >&);
 template void SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Gravity();
@@ -269,4 +268,3 @@ template RIGID_BODY<VECTOR<double,3> >* SOLIDS_STANDARD_TESTS<VECTOR<double,3> >
     RIGID_BODY_COLLECTION<VECTOR<double,3> >&,double);
 template RIGID_BODY<VECTOR<double,3> >* SOLIDS_STANDARD_TESTS<VECTOR<double,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<double>&,
     RIGID_BODY_COLLECTION<VECTOR<double,3> >&,double,int);
-#endif

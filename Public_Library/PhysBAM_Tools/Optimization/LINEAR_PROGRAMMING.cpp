@@ -183,6 +183,4 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,ARRAY<T>& x_B,ARRAY<T>&
 }
 //####################################################################################
 template class LINEAR_PROGRAMMING<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LINEAR_PROGRAMMING<double>;
-#endif

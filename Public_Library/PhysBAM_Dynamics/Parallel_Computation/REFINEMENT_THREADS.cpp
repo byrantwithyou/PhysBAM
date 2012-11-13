@@ -21,8 +21,6 @@ template<class TV> void REFINEMENT_TASK<TV>::Run()
 template class REFINEMENT_TASK<VECTOR<float,1> >;
 template class REFINEMENT_TASK<VECTOR<float,2> >;
 template class REFINEMENT_TASK<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class REFINEMENT_TASK<VECTOR<double,1> >;
 template class REFINEMENT_TASK<VECTOR<double,2> >;
 template class REFINEMENT_TASK<VECTOR<double,3> >;
-#endif

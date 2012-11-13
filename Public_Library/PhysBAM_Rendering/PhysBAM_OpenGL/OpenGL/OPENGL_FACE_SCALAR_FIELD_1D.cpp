@@ -65,13 +65,11 @@ Display(const int in_color) const
 {
     Display_Bool_Helper(*this,in_color);
 }
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template<> void OPENGL_FACE_SCALAR_FIELD_1D<double,bool>::
 Display(const int in_color) const
 {
     Display_Bool_Helper(*this,in_color);
 }
-#endif
 //#####################################################################
 // Bounding_Box
 //#####################################################################
@@ -97,9 +95,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
 template class OPENGL_FACE_SCALAR_FIELD_1D<float,int>;
 template class OPENGL_FACE_SCALAR_FIELD_1D<float,bool>;
 template class OPENGL_FACE_SCALAR_FIELD_1D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_FACE_SCALAR_FIELD_1D<double,int>;
 template class OPENGL_FACE_SCALAR_FIELD_1D<double,bool>;
 template class OPENGL_FACE_SCALAR_FIELD_1D<double,double>;
-#endif
 }

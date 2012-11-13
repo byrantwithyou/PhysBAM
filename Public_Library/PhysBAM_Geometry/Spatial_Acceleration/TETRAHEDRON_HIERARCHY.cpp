@@ -90,6 +90,4 @@ Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& r
 }
 //#####################################################################
 template class TETRAHEDRON_HIERARCHY<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TETRAHEDRON_HIERARCHY<double>;
-#endif

@@ -25,8 +25,6 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const TETRAHEDRON<T>& t
 }
 //#####################################################################
 template bool Intersects(RAY<VECTOR<float,3> >&,const TETRAHEDRON<float>&,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(RAY<VECTOR<double,3> >&,const TETRAHEDRON<double>&,const double);
-#endif
 };
 };

@@ -104,6 +104,4 @@ Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* current_selection) c
 }
 //#####################################################################
 template class OPENGL_GRID_BASED_VECTOR_FIELD_3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_GRID_BASED_VECTOR_FIELD_3D<double>;
-#endif

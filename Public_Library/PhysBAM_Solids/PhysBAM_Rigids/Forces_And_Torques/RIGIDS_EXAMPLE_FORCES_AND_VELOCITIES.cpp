@@ -41,8 +41,6 @@ Set_Rigid_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated)
 template class RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<float,1> >;
 template class RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<float,2> >;
 template class RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<double,1> >;
 template class RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<double,2> >;
 template class RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<double,3> >;
-#endif

@@ -134,6 +134,4 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VEC
 }
 //#####################################################################
 template class ARTIFICIAL_VISCOSITY_VNR_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ARTIFICIAL_VISCOSITY_VNR_2D<double>;
-#endif

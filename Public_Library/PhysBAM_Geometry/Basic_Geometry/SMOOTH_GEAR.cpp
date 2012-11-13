@@ -328,7 +328,5 @@ Name()
 }
 template class SMOOTH_GEAR<VECTOR<float,2> >;
 template class SMOOTH_GEAR<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SMOOTH_GEAR<VECTOR<double,2> >;
 template class SMOOTH_GEAR<VECTOR<double,3> >;
-#endif

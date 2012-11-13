@@ -100,6 +100,4 @@ Blend_Phi(ARRAY<T,VECTOR<int,3> >& result,const T blend_cells) const
 }
 //#####################################################################
 template class UNIFORM_REMOVED_PARTICLES_PROCESSING<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class UNIFORM_REMOVED_PARTICLES_PROCESSING<double>;
-#endif

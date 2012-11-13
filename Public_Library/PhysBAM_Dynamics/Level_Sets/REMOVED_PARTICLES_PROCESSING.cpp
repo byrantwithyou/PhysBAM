@@ -98,6 +98,4 @@ Get_Ellipsoid(const int p) const
 }
 //#####################################################################
 template class REMOVED_PARTICLES_PROCESSING<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class REMOVED_PARTICLES_PROCESSING<double>;
-#endif

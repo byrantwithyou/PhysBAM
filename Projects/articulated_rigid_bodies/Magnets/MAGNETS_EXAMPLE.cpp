@@ -171,6 +171,4 @@ Drop_Letter(std::string letter,int parent_id,TV start,ROTATION<TV> orient,bool s
 }
 //#####################################################################
 template class MAGNETS_EXAMPLE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MAGNETS_EXAMPLE<double>;
-#endif

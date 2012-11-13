@@ -88,6 +88,4 @@ Find_Voxel(const VECTOR<T,3>& location,int& i_left,int& j_bottom,int& ij_front) 
 }
 //#####################################################################
 template class SPHERE_PARTITION<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SPHERE_PARTITION<double>;
-#endif

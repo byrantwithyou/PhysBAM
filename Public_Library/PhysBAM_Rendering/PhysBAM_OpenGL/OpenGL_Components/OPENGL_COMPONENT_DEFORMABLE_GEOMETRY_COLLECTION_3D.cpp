@@ -665,6 +665,4 @@ Toggle_Differentiate_Inverted()
 }
 //#####################################################################
 template class OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<double,double>;
-#endif

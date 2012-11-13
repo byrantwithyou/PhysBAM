@@ -45,6 +45,4 @@ Shade_Surface_Using_Direct_Illumination(const RENDERING_RAY<T>& ray,const RENDER
 }
 //#####################################################################
 template class RENDERING_TEXTURE_IMAGE_SHADER<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RENDERING_TEXTURE_IMAGE_SHADER<double>;
-#endif

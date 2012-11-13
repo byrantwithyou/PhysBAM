@@ -46,8 +46,6 @@ template<class T> void Calculate_Heaviside_Function(TRIANGULATED_SURFACE<T>& sur
 }
 //#####################################################################
 template void Calculate_Heaviside_Function(TRIANGULATED_SURFACE<float>&,const GRID<VECTOR<float,3> >&,ARRAY<float,VECTOR<int,3> >&,bool);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void Calculate_Heaviside_Function(TRIANGULATED_SURFACE<double>&,const GRID<VECTOR<double,3> >&,ARRAY<double,VECTOR<int,3> >&,bool);
-#endif
 };
 };

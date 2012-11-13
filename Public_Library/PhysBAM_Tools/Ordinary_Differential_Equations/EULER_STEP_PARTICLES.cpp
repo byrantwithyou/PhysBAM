@@ -50,8 +50,6 @@ Second_Order_Runge_Kutta_Step(ARRAY_VIEW<TV> X,const T_GRID& grid,const ARRAY<TV
 
 template class EULER_STEP_PARTICLES<GRID<VECTOR<float,2> > >;
 template class EULER_STEP_PARTICLES<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EULER_STEP_PARTICLES<GRID<VECTOR<double,2> > >;
 template class EULER_STEP_PARTICLES<GRID<VECTOR<double,3> > >;
-#endif
 }

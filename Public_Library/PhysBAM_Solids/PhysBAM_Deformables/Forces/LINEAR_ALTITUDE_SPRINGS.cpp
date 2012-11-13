@@ -216,7 +216,6 @@ template SOLIDS_FORCES_POLICY<VECTOR<float,3>,TRIANGLE_MESH::dimension>::LINEAR_
     TRIANGLE_MESH>(DEFORMABLE_PARTICLES<VECTOR<float,3> >&,TRIANGLE_MESH&,float,float,bool,float,bool,float,bool,float,bool);
 template SOLIDS_FORCES_POLICY<VECTOR<float,2>,TRIANGLE_MESH::dimension>::LINEAR_ALTITUDE_SPRINGS* PhysBAM::Create_Altitude_Springs_Base<float,VECTOR<float,2>,
     TRIANGLE_MESH>(DEFORMABLE_PARTICLES<VECTOR<float,2> >&,TRIANGLE_MESH&,float,float,bool,float,bool,float,bool,float,bool);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LINEAR_ALTITUDE_SPRINGS<VECTOR<double,2>,2>;
 template class LINEAR_ALTITUDE_SPRINGS<VECTOR<double,3>,2>;
 template class LINEAR_ALTITUDE_SPRINGS<VECTOR<double,3>,3>;
@@ -226,4 +225,3 @@ template SOLIDS_FORCES_POLICY<VECTOR<double,3>,TRIANGLE_MESH::dimension>::LINEAR
     TRIANGLE_MESH>(DEFORMABLE_PARTICLES<VECTOR<double,3> >&,TRIANGLE_MESH&,double,double,bool,double,bool,double,bool,double,bool);
 template SOLIDS_FORCES_POLICY<VECTOR<double,2>,TRIANGLE_MESH::dimension>::LINEAR_ALTITUDE_SPRINGS* PhysBAM::Create_Altitude_Springs_Base<double,VECTOR<double,2>,
     TRIANGLE_MESH>(DEFORMABLE_PARTICLES<VECTOR<double,2> >&,TRIANGLE_MESH&,double,double,bool,double,bool,double,bool,double,bool);
-#endif

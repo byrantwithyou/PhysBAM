@@ -377,8 +377,6 @@ Get_Polygon_Edges(const int polygon_element_index,ARRAY<VECTOR<int,2> >& polygon
 template class CUTTING_GEOMETRY<VECTOR<float,2>,2>;
 template class CUTTING_GEOMETRY<VECTOR<float,3>,2>;
 template class CUTTING_GEOMETRY<VECTOR<float,3>,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class CUTTING_GEOMETRY<VECTOR<double,2>,2>;
 template class CUTTING_GEOMETRY<VECTOR<double,3>,2>;
 template class CUTTING_GEOMETRY<VECTOR<double,3>,3>;
-#endif

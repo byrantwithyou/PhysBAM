@@ -92,6 +92,4 @@ Compute_Divergence_At_Cells_From_Face_Data(const T_GRID& face_grid,T_ARRAYS_DIME
     template class ARRAYS_UTILITIES<GRID<VECTOR<T,3> >,VECTOR<T,5> >; \
     template class ARRAYS_UTILITIES<GRID<VECTOR<T,3> >,VECTOR<T,6> >;
 INSTANTIATION_HELPER(float)
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double)
-#endif

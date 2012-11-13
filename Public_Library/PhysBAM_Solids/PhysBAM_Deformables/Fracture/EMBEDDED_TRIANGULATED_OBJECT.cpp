@@ -18,8 +18,6 @@ EMBEDDED_TRIANGULATED_OBJECT(T_TRIANGULATED_OBJECT& simplicial_object_input)
 //#####################################################################
 template class EMBEDDED_TRIANGULATED_OBJECT<VECTOR<float,2> >;
 template class EMBEDDED_TRIANGULATED_OBJECT<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EMBEDDED_TRIANGULATED_OBJECT<VECTOR<double,2> >;
 template class EMBEDDED_TRIANGULATED_OBJECT<VECTOR<double,3> >;
-#endif
 }

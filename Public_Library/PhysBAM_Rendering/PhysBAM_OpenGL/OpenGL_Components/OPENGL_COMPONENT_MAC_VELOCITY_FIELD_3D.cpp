@@ -178,6 +178,4 @@ Update_Vorticity()
         max_vorticity=max(max_vorticity,vorticity_magnitude);}
 }
 template class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<double,double>;
-#endif

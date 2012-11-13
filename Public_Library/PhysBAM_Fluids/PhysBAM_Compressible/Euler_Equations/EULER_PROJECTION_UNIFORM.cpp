@@ -453,11 +453,9 @@ template class EULER_PROJECTION_UNIFORM<GRID<VECTOR<float,3> > >;
 template void EULER_PROJECTION_UNIFORM<GRID<VECTOR<float,1> > >::Compute_Divergence(const FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,1> > > &face_lookup);
 template void EULER_PROJECTION_UNIFORM<GRID<VECTOR<float,2> > >::Compute_Divergence(const FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,2> > > &face_lookup);
 template void EULER_PROJECTION_UNIFORM<GRID<VECTOR<float,3> > >::Compute_Divergence(const FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > &face_lookup);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EULER_PROJECTION_UNIFORM<GRID<VECTOR<double,1> > >;
 template class EULER_PROJECTION_UNIFORM<GRID<VECTOR<double,2> > >;
 template class EULER_PROJECTION_UNIFORM<GRID<VECTOR<double,3> > >;
 template void EULER_PROJECTION_UNIFORM<GRID<VECTOR<double,1> > >::Compute_Divergence(const FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,1> > > &face_lookup);
 template void EULER_PROJECTION_UNIFORM<GRID<VECTOR<double,2> > >::Compute_Divergence(const FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,2> > > &face_lookup);
 template void EULER_PROJECTION_UNIFORM<GRID<VECTOR<double,3> > >::Compute_Divergence(const FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > &face_lookup);
-#endif

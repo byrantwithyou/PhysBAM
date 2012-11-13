@@ -79,8 +79,6 @@ Is_Supported()
 template class RGB_FILE<float>;
 template void RGB_FILE<float>::Write(const std::string&,const ARRAY<VECTOR<float,3> ,VECTOR<int,2> >&);
 template void RGB_FILE<float>::Write(const std::string&,const ARRAY<VECTOR<float,4> ,VECTOR<int,2> >&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RGB_FILE<double>;
 template void RGB_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,3> ,VECTOR<int,2> >&);
 template void RGB_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&);
-#endif

@@ -250,10 +250,8 @@ template class JOINT<VECTOR<float,2> >;
 template class JOINT<VECTOR<float,3> >;
 template void JOINT<VECTOR<float,2> >::Constraint_Matrix_Helper<2>(ROTATION<VECTOR<float,2> > const&,MATRIX_MXN<float>&,MATRIX_MXN<float>*,VECTOR<bool,2> const&) const;
 template void JOINT<VECTOR<float,3> >::Constraint_Matrix_Helper<3>(ROTATION<VECTOR<float,3> > const&,MATRIX_MXN<float>&,MATRIX_MXN<float>*,VECTOR<bool,3> const&) const;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class JOINT<VECTOR<double,1> >;
 template class JOINT<VECTOR<double,2> >;
 template class JOINT<VECTOR<double,3> >;
 template void JOINT<VECTOR<double,2> >::Constraint_Matrix_Helper<2>(ROTATION<VECTOR<double,2> > const&,MATRIX_MXN<double>&,MATRIX_MXN<double>*,VECTOR<bool,2> const&) const;
 template void JOINT<VECTOR<double,3> >::Constraint_Matrix_Helper<3>(ROTATION<VECTOR<double,3> > const&,MATRIX_MXN<double>&,MATRIX_MXN<double>*,VECTOR<bool,3> const&) const;
-#endif

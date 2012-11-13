@@ -35,7 +35,5 @@ Store(const int segment1_local_index,const int segment2_local_index)
 
 //template void EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<float,2> >::Store(int,int);
 INSTANTIATION_HELPER(float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 //template void EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<double,2> >::Store(int,int);
 INSTANTIATION_HELPER(double);
-#endif

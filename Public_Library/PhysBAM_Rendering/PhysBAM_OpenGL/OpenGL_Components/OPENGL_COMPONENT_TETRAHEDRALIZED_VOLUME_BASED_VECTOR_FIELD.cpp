@@ -117,6 +117,4 @@ Toggle_Arrowhead()
     opengl_vector_field.draw_arrowhead = !opengl_vector_field.draw_arrowhead;
 }
 template class OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<double,double>;
-#endif

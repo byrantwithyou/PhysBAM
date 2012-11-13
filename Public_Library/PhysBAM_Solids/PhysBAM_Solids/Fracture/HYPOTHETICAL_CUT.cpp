@@ -39,8 +39,6 @@ Add_Hypothetical_Nodes_To_Embedded_Object(EMBEDDED_OBJECT<TV,d>& embedded_object
 template class HYPOTHETICAL_CUT<VECTOR<float,2>,2>;
 template class HYPOTHETICAL_CUT<VECTOR<float,3>,2>;
 template class HYPOTHETICAL_CUT<VECTOR<float,3>,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class HYPOTHETICAL_CUT<VECTOR<double,2>,2>;
 template class HYPOTHETICAL_CUT<VECTOR<double,3>,2>;
 template class HYPOTHETICAL_CUT<VECTOR<double,3>,3>;
-#endif

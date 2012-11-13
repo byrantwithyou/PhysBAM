@@ -222,6 +222,4 @@ Eigenvectors(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int ij,MATRIX<T,d
 }  
 //#####################################################################
 template class EULER_3D_EIGENSYSTEM_H<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EULER_3D_EIGENSYSTEM_H<double>;
-#endif

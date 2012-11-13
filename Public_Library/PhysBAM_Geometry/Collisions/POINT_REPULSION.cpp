@@ -120,6 +120,4 @@ Update_Stats()
 }
 //#####################################################################
 template class POINT_REPULSION<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class POINT_REPULSION<double>;
-#endif

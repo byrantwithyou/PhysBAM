@@ -24,8 +24,6 @@ template<class T> bool Fuzzy_Intersects(RAY<VECTOR<T,2> >& ray,const ORIENTED_BO
 }
 //#####################################################################
 template bool Fuzzy_Intersects(RAY<VECTOR<float,2> >&,const ORIENTED_BOX<VECTOR<float,2> >&,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Fuzzy_Intersects(RAY<VECTOR<double,2> >&,const ORIENTED_BOX<VECTOR<double,2> >&,const double);
-#endif
 };
 };

@@ -149,6 +149,4 @@ Potential_Energy(const T time) const
     return pe;
 }
 template class LINEAR_POINT_ATTRACTION<VECTOR<float,2> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LINEAR_POINT_ATTRACTION<VECTOR<double,2> >;
-#endif

@@ -93,6 +93,4 @@ Draw_Object(const RANGE<TV>& box)
     Emit_Object(box);
 }
 template class VECTOR_IMAGE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class VECTOR_IMAGE<double>;
-#endif

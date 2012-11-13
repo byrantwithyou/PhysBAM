@@ -34,7 +34,5 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const RANGE<VECTOR
 //#####################################################################
 }
 template TRIANGULATED_SURFACE<float>* TESSELLATION::Generate_Triangles(const RANGE<VECTOR<float,3> >&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template TRIANGULATED_SURFACE<double>* TESSELLATION::Generate_Triangles(const RANGE<VECTOR<double,3> >&);
-#endif
 }

@@ -111,8 +111,6 @@ Reset_Kinematic_Rigid_Bodies(const T time)
 template class KINEMATIC_EVOLUTION<VECTOR<float,1> >;
 template class KINEMATIC_EVOLUTION<VECTOR<float,2> >;
 template class KINEMATIC_EVOLUTION<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class KINEMATIC_EVOLUTION<VECTOR<double,1> >;
 template class KINEMATIC_EVOLUTION<VECTOR<double,2> >;
 template class KINEMATIC_EVOLUTION<VECTOR<double,3> >;
-#endif

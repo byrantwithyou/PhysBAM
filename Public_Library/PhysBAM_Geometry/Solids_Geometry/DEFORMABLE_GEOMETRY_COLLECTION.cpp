@@ -105,9 +105,7 @@ Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<float,1> >;
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<float,2> >;
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<double,1> >;
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<double,2> >;
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<double,3> >;
-#endif
 

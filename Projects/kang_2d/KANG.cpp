@@ -831,7 +831,6 @@ template void PhysBAM::Add_Debug_Particle<VECTOR<float,3> >(VECTOR<float,3> cons
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,1>,VECTOR<float,1> >(ATTRIBUTE_ID,VECTOR<float,1> const&);
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<float,2> >(ATTRIBUTE_ID,VECTOR<float,2> const&);
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<float,3> >(ATTRIBUTE_ID,VECTOR<float,3> const&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class KANG<double>;
 template void PhysBAM::Add_Debug_Particle<VECTOR<double,1> >(VECTOR<double,1> const&,VECTOR<double,3> const&);
 template void PhysBAM::Add_Debug_Particle<VECTOR<double,2> >(VECTOR<double,2> const&,VECTOR<double,3> const&);
@@ -839,4 +838,3 @@ template void PhysBAM::Add_Debug_Particle<VECTOR<double,3> >(VECTOR<double,3> co
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,1>,VECTOR<double,1> >(ATTRIBUTE_ID,VECTOR<double,1> const&);
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,2>,VECTOR<double,2> >(ATTRIBUTE_ID,VECTOR<double,2> const&);
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,3>,VECTOR<double,3> >(ATTRIBUTE_ID,VECTOR<double,3> const&);
-#endif

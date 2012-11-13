@@ -24,9 +24,7 @@ template<class TV> SPH_PARTICLES<TV>::
 template class SPH_PARTICLES<VECTOR<float,1> >;
 template class SPH_PARTICLES<VECTOR<float,2> >;
 template class SPH_PARTICLES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SPH_PARTICLES<VECTOR<double,1> >;
 template class SPH_PARTICLES<VECTOR<double,2> >;
 template class SPH_PARTICLES<VECTOR<double,3> >;
-#endif
 }

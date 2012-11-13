@@ -295,9 +295,7 @@ List_Object_Compute_Acceleration_Structures()
 //#####################################################################
 template void GENERIC_RENDER_EXAMPLE<float,float>::List_Object(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
 template void GENERIC_RENDER_EXAMPLE<float,float>::List_Object_Compute_Acceleration_Structures();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void GENERIC_RENDER_EXAMPLE<double,float>::List_Object(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
 template void GENERIC_RENDER_EXAMPLE<double,double>::List_Object(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
 template void GENERIC_RENDER_EXAMPLE<double,float>::List_Object_Compute_Acceleration_Structures();
 template void GENERIC_RENDER_EXAMPLE<double,double>::List_Object_Compute_Acceleration_Structures();
-#endif

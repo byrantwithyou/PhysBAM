@@ -208,7 +208,5 @@ Name()
 }
 //#####################################################################
 template class BOWL<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BOWL<double>;
-#endif
 }

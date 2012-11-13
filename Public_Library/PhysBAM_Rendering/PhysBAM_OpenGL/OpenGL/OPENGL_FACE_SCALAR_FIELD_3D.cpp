@@ -155,9 +155,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
 template class OPENGL_FACE_SCALAR_FIELD_3D<float,int>;
 template class OPENGL_FACE_SCALAR_FIELD_3D<float,bool>;
 template class OPENGL_FACE_SCALAR_FIELD_3D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_FACE_SCALAR_FIELD_3D<double,int>;
 template class OPENGL_FACE_SCALAR_FIELD_3D<double,bool>;
 template class OPENGL_FACE_SCALAR_FIELD_3D<double,double>;
-#endif
 }

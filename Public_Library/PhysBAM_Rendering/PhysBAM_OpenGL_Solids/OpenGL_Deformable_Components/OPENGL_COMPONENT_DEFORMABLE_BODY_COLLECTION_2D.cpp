@@ -174,6 +174,4 @@ Clear_Highlight()
 }
 //#####################################################################
 template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<double,double>;
-#endif

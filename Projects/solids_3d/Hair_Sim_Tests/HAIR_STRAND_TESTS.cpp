@@ -556,6 +556,4 @@ Write_Output_Files(const int frame) const
 }
 //#####################################################################
 template class HAIR_STRAND_TESTS<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class HAIR_STRAND_TESTS<double>;
-#endif

@@ -433,8 +433,6 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
 template class POLYGONAL_TRIANGULATION<float>;
 template int POLYGONAL_TRIANGULATION<float>::Triangulate_Nonconvex_Nonsimple_Polygon<ARRAY<VECTOR<float,2>,int>,ARRAY<ARRAY<int,int>,int> >(
     ARRAY<VECTOR<float,2>,int> const&,ARRAY<ARRAY<int,int>,int> const&,ARRAY<VECTOR<int,3>,int>&,bool);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class POLYGONAL_TRIANGULATION<double>;
 template int POLYGONAL_TRIANGULATION<double>::Triangulate_Nonconvex_Nonsimple_Polygon<ARRAY<VECTOR<double,2>,int>,ARRAY<ARRAY<int,int>,int> >(
     ARRAY<VECTOR<double,2>,int> const&,ARRAY<ARRAY<int,int>,int> const&,ARRAY<VECTOR<int,3>,int>&,bool);
-#endif

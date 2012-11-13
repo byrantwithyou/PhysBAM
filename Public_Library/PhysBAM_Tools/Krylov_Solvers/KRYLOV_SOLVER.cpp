@@ -36,6 +36,4 @@ Ensure_Size(ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const KRYLOV_VECTOR_BASE<T>& v,int
         av(i)=v.Clone_Default();
 }
 template class KRYLOV_SOLVER<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class KRYLOV_SOLVER<double>;
-#endif

@@ -122,6 +122,4 @@ Write(TYPED_OSTREAM& output) const
 }
 //#####################################################################
 template class FRACTURE_PATTERN<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FRACTURE_PATTERN<double>;
-#endif

@@ -37,6 +37,4 @@ Maxabs_H2(const T phi_x_1,const T phi_x_2,const T phi_y_1,const T phi_y_2,const 
 }
 //#####################################################################
 template class HAMILTONIAN_NORMAL_ADVECTION_2D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class HAMILTONIAN_NORMAL_ADVECTION_2D<double>;
-#endif

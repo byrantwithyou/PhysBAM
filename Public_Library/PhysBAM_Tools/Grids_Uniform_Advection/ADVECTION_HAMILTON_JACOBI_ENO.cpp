@@ -35,8 +35,6 @@ Advection_Solver(const int m_start,const int m_end,const T dx,const ARRAY<T2,VEC
 template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<float,1> >,float>;
 template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<float,2> >,float>;
 template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<float,3> >,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<double,1> >,double>;
 template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<double,2> >,double>;
 template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<double,3> >,double>;
-#endif

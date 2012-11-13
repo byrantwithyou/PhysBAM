@@ -71,7 +71,5 @@ Number_Of_Nodes_Shared_With_Existing_Embedded_Curve()
 //##################################################################### 
 template class HYPOTHETICAL_CUT_TRIANGLES<VECTOR<float,2> >;
 template class HYPOTHETICAL_CUT_TRIANGLES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class HYPOTHETICAL_CUT_TRIANGLES<VECTOR<double,2> >;
 template class HYPOTHETICAL_CUT_TRIANGLES<VECTOR<double,3> >;
-#endif

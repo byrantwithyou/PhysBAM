@@ -83,9 +83,7 @@ Use_Semi_Lagrangian_Collidable_Advection(const T_GRID_BASED_COLLISION_GEOMETRY& 
 template class TEMPERATURE_CONTAINER<GRID<VECTOR<float,1> > >;
 template class TEMPERATURE_CONTAINER<GRID<VECTOR<float,2> > >;
 template class TEMPERATURE_CONTAINER<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TEMPERATURE_CONTAINER<GRID<VECTOR<double,1> > >;
 template class TEMPERATURE_CONTAINER<GRID<VECTOR<double,2> > >;
 template class TEMPERATURE_CONTAINER<GRID<VECTOR<double,3> > >;
-#endif
 }

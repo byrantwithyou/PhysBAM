@@ -33,9 +33,7 @@ template<class T> bool Intersects(const SEGMENT_3D<T>& segment,const TRIANGLE_3D
 //#####################################################################
 template bool Intersects(const SEGMENT_3D<float>&,const TRIANGLE_3D<float>&,const float);
 template bool Intersects(const SEGMENT_3D<float>&,const TRIANGLE_3D<float>&,float&,VECTOR<float,3>&,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(const SEGMENT_3D<double>&,const TRIANGLE_3D<double>&,const double);
 template bool Intersects(const SEGMENT_3D<double>&,const TRIANGLE_3D<double>&,double&,VECTOR<double,3>&,const double);
-#endif
 };
 };

@@ -215,7 +215,5 @@ Process_Primitives()
 //#####################################################################
 template class DISPLAY_PRIMITIVE<float>;
 template class DEPTH_BUFFERING<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DISPLAY_PRIMITIVE<double>;
 template class DEPTH_BUFFERING<double>;
-#endif

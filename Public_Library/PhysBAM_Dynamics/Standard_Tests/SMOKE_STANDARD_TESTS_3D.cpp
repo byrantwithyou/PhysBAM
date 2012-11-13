@@ -129,6 +129,4 @@ Initial_Velocity(const TV& X) const
     return TV();
 }
 template class SMOKE_STANDARD_TESTS_3D<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SMOKE_STANDARD_TESTS_3D<GRID<VECTOR<double,3> > >;
-#endif

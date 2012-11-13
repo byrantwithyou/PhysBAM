@@ -908,6 +908,4 @@ Print_Statistics(std::ostream& output,const T thickness_over_2)
 }
 //#####################################################################
 template class TRIANGULATED_SURFACE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TRIANGULATED_SURFACE<double>;
-#endif

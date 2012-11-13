@@ -464,7 +464,6 @@ template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Sync_Face_Scalar<b
 template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Sync_Face_Scalar<float>(ARRAY<float,FACE_INDEX<3> > const&,ARRAY<float,FACE_INDEX<3> >&) const;
 template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Sync_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,3> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,3> >&) const;
 template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Sync_Scalar<float>(ARRAYS_ND_BASE<float,VECTOR<int,3> > const&,ARRAYS_ND_BASE<float,VECTOR<int,3> >&) const;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >;
 template class THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >;
 template class THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >;
@@ -534,4 +533,3 @@ template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Sync_Face_Scalar<
 template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Sync_Face_Scalar<double>(ARRAY<double,FACE_INDEX<3> > const&,ARRAY<double,FACE_INDEX<3> >&) const;
 template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Sync_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,3> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,3> >&) const;
 template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Sync_Scalar<double>(ARRAYS_ND_BASE<double,VECTOR<int,3> > const&,ARRAYS_ND_BASE<double,VECTOR<int,3> >&) const;
-#endif

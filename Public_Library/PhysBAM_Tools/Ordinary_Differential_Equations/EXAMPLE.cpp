@@ -177,8 +177,6 @@ Parse(PARSE_ARGS& parse_args_input)
 template class EXAMPLE<VECTOR<float,1> >;
 template class EXAMPLE<VECTOR<float,2> >;
 template class EXAMPLE<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EXAMPLE<VECTOR<double,1> >;
 template class EXAMPLE<VECTOR<double,2> >;
 template class EXAMPLE<VECTOR<double,3> >;
-#endif

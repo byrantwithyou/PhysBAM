@@ -268,10 +268,8 @@ INSTANTIATION_HELPER(float);
 template void RANDOM_NUMBERS<float,MT19937<float> >::Fill_Uniform<VECTOR<float,4> >(ARRAY_BASE<float,VECTOR<float,4> >&,float,float);
 template void RANDOM_NUMBERS<float,MT19937<float> >::Fill_Uniform<VECTOR<float,8> >(ARRAY_BASE<float,VECTOR<float,8> >&,float,float);
 template void RANDOM_NUMBERS<float,MT19937<float> >::Fill_Uniform<ARRAY_VIEW<float> >(ARRAY_BASE<float, ARRAY_VIEW<float> >&, float, float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double);
 template void RANDOM_NUMBERS<double,MT19937<double> >::Fill_Uniform<VECTOR<double,4> >(ARRAY_BASE<double,VECTOR<double,4> >&,double,double);
 template void RANDOM_NUMBERS<double,MT19937<double> >::Fill_Uniform<VECTOR<double,8> >(ARRAY_BASE<double,VECTOR<double,8> >&,double,double);
 template void RANDOM_NUMBERS<double,MT19937<double> >::Fill_Uniform<ARRAY_VIEW<double> >(ARRAY_BASE<double, ARRAY_VIEW<double> >&, double, double);
-#endif
 }

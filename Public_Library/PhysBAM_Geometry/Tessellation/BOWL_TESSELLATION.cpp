@@ -39,8 +39,6 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const BOWL<T>& bow
 }
 //#####################################################################
 template TRIANGULATED_SURFACE<float>* Generate_Triangles(const BOWL<float>&,const int,const int);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template TRIANGULATED_SURFACE<double>* Generate_Triangles(const BOWL<double>&,const int,const int);
-#endif
 }
 }

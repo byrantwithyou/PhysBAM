@@ -41,7 +41,5 @@ Compress_Indices()
 }
 template class CELL_MANAGER_COLOR<VECTOR<float,2> >;
 template class CELL_MANAGER_COLOR<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class CELL_MANAGER_COLOR<VECTOR<double,2> >;
 template class CELL_MANAGER_COLOR<VECTOR<double,3> >;
-#endif

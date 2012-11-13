@@ -135,8 +135,6 @@ Raw_Get(int i)
 template class DEFORMABLES_VELOCITY<VECTOR<float,1> >;
 template class DEFORMABLES_VELOCITY<VECTOR<float,2> >;
 template class DEFORMABLES_VELOCITY<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DEFORMABLES_VELOCITY<VECTOR<double,1> >;
 template class DEFORMABLES_VELOCITY<VECTOR<double,2> >;
 template class DEFORMABLES_VELOCITY<VECTOR<double,3> >;
-#endif

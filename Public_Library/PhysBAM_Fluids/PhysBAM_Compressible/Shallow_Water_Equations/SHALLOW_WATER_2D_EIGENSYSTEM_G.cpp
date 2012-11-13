@@ -87,6 +87,4 @@ Eigenvectors(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int i,MATRIX<T,d,
 }  
 //#####################################################################
 template class SHALLOW_WATER_2D_EIGENSYSTEM_G<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SHALLOW_WATER_2D_EIGENSYSTEM_G<double>;
-#endif

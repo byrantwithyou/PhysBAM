@@ -222,8 +222,6 @@ Euler_Step(const ARRAY<TV,TV_INT>& V,const T dt,const T time,const int number_of
 template class LEVELSET_ADVECTION<VECTOR<float,1> >;
 template class LEVELSET_ADVECTION<VECTOR<float,2> >;
 template class LEVELSET_ADVECTION<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LEVELSET_ADVECTION<VECTOR<double,1> >;
 template class LEVELSET_ADVECTION<VECTOR<double,2> >;
 template class LEVELSET_ADVECTION<VECTOR<double,3> >;
-#endif

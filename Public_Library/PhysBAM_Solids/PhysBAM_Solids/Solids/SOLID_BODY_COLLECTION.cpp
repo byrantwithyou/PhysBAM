@@ -393,9 +393,7 @@ Add_Force(RIGIDS_FORCES<TV>* force)
 template class SOLID_BODY_COLLECTION<VECTOR<float,1> >;
 template class SOLID_BODY_COLLECTION<VECTOR<float,2> >;
 template class SOLID_BODY_COLLECTION<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SOLID_BODY_COLLECTION<VECTOR<double,1> >;
 template class SOLID_BODY_COLLECTION<VECTOR<double,2> >;
 template class SOLID_BODY_COLLECTION<VECTOR<double,3> >;
-#endif
 

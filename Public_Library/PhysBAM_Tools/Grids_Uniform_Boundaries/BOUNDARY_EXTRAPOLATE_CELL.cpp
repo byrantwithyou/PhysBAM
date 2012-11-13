@@ -37,8 +37,6 @@ Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<float,1>,float>;
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<float,2>,float>;
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<float,3>,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<double,1>,double>;
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<double,2>,double>;
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<double,3>,double>;
-#endif

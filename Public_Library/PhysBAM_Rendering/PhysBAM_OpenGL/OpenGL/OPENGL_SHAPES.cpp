@@ -67,7 +67,5 @@ void OPENGL_SHAPES::Draw_Vector(const VECTOR<T,3>& from,const VECTOR<T,3>& v,OPE
 
 template void OPENGL_SHAPES::Draw_Vector<float>(const VECTOR<float,2>&,const VECTOR<float,2>&,OPENGL_COLOR,const float);
 template void OPENGL_SHAPES::Draw_Vector<float>(const VECTOR<float,3>&,const VECTOR<float,3>&,OPENGL_COLOR,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void OPENGL_SHAPES::Draw_Vector<double>(const VECTOR<double,2>&,const VECTOR<double,2>&,OPENGL_COLOR,const float);
 template void OPENGL_SHAPES::Draw_Vector<double>(const VECTOR<double,3>&,const VECTOR<double,3>&,OPENGL_COLOR,const float);
-#endif

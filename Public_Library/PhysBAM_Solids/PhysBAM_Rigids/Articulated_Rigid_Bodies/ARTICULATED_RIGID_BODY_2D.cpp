@@ -142,6 +142,4 @@ Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& outp
 }
 //#####################################################################
 template class ARTICULATED_RIGID_BODY<VECTOR<float,2> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ARTICULATED_RIGID_BODY<VECTOR<double,2> >;
-#endif

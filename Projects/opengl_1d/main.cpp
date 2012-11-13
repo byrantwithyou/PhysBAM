@@ -349,11 +349,7 @@ int main(int argc,char *argv[])
 
     ANIMATED_VISUALIZATION* visualization=0;
     if(!type_double) visualization=new OPENGL_1D_VISUALIZATION<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else visualization=new OPENGL_1D_VISUALIZATION<double>;
-#else
-    else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
-#endif
     visualization->Initialize_And_Run(parse_args);
 
     return 0;

@@ -50,8 +50,6 @@ Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 template class RIGID_GEOMETRY_EXAMPLE_VELOCITIES<VECTOR<float,1> >;
 template class RIGID_GEOMETRY_EXAMPLE_VELOCITIES<VECTOR<float,2> >;
 template class RIGID_GEOMETRY_EXAMPLE_VELOCITIES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGID_GEOMETRY_EXAMPLE_VELOCITIES<VECTOR<double,1> >;
 template class RIGID_GEOMETRY_EXAMPLE_VELOCITIES<VECTOR<double,2> >;
 template class RIGID_GEOMETRY_EXAMPLE_VELOCITIES<VECTOR<double,3> >;
-#endif

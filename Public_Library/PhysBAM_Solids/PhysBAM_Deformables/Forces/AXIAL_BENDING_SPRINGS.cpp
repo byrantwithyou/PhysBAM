@@ -361,8 +361,6 @@ Create_Axial_Bending_Springs(TRIANGULATED_SURFACE<T>& triangulated_surface,
 template class AXIAL_BENDING_SPRINGS<float>;
 template AXIAL_BENDING_SPRINGS<float>* PhysBAM::Create_Axial_Bending_Springs<float>(TRIANGULATED_SURFACE<float>&,float,float,float,bool,float,bool,bool);
 template AXIAL_BENDING_SPRINGS<float>* PhysBAM::Create_Axial_Bending_Springs<float>(DEFORMABLE_PARTICLES<VECTOR<float,3> >&,TRIANGLE_MESH&,float,float,float,bool,float,bool,bool);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class AXIAL_BENDING_SPRINGS<double>;
 template AXIAL_BENDING_SPRINGS<double>* PhysBAM::Create_Axial_Bending_Springs<double>(TRIANGULATED_SURFACE<double>&,double,double,double,bool,double,bool,bool);
 template AXIAL_BENDING_SPRINGS<double>* PhysBAM::Create_Axial_Bending_Springs<double>(DEFORMABLE_PARTICLES<VECTOR<double,3> >&,TRIANGLE_MESH&,double,double,double,bool,double,bool,bool);
-#endif

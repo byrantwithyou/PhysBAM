@@ -110,7 +110,6 @@ Update()
         if(y_face_values(i,j)) opengl_points.points(index++)=grid.Y_Face(TV_INT(i,j));
     opengl_points.points.Resize(index);
 }
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 //#####################################################################
 // Update
 //#####################################################################
@@ -132,13 +131,10 @@ Update()
     opengl_points.points.Resize(index);
 }
 //#####################################################################
-#endif
 template class OPENGL_FACE_SCALAR_FIELD_2D<float,int>;
 template class OPENGL_FACE_SCALAR_FIELD_2D<float,bool>;
 template class OPENGL_FACE_SCALAR_FIELD_2D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_FACE_SCALAR_FIELD_2D<double,int>;
 template class OPENGL_FACE_SCALAR_FIELD_2D<double,bool>;
 template class OPENGL_FACE_SCALAR_FIELD_2D<double,double>;
-#endif
 }

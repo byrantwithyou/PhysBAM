@@ -308,8 +308,6 @@ Minimum_Cell_Size() const
 template class LEVELSET_IMPLICIT_OBJECT<VECTOR<float,1> >;
 template class LEVELSET_IMPLICIT_OBJECT<VECTOR<float,2> >;
 template class LEVELSET_IMPLICIT_OBJECT<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LEVELSET_IMPLICIT_OBJECT<VECTOR<double,1> >;
 template class LEVELSET_IMPLICIT_OBJECT<VECTOR<double,2> >;
 template class LEVELSET_IMPLICIT_OBJECT<VECTOR<double,3> >;
-#endif

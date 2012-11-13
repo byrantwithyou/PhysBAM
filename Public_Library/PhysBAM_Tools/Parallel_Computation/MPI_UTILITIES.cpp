@@ -157,9 +157,7 @@ template MPI::Datatype Scalar_Block_Datatype<int,5>();
 template MPI::Datatype Scalar_Block_Datatype<int,6>();
 template MPI::Datatype Scalar_Block_Datatype<int,7>();
 INSTANTIATION_HELPER(float)
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double)
-#endif
 }
 }
 #endif

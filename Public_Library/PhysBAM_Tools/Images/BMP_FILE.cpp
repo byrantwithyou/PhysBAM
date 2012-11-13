@@ -59,8 +59,6 @@ Is_Supported()
 template class BMP_FILE<float>;
 template void BMP_FILE<float>::Write(const std::string&,const ARRAY<VECTOR<float,3> ,VECTOR<int,2> >&);
 template void BMP_FILE<float>::Write(const std::string&,const ARRAY<VECTOR<float,4> ,VECTOR<int,2> >&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BMP_FILE<double>;
 template void BMP_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,3> ,VECTOR<int,2> >&);
 template void BMP_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&);
-#endif

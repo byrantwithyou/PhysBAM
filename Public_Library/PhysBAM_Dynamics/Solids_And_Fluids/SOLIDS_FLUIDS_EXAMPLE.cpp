@@ -121,7 +121,6 @@ template void SOLIDS_FLUIDS_EXAMPLE<VECTOR<float,3> >::Adjust_Output_Directory_F
 template void SOLIDS_FLUIDS_EXAMPLE<VECTOR<float,1> >::Adjust_Output_Directory_For_MPI<MPI_SOLID_FLUID<VECTOR<float,1> >*>(MPI_SOLID_FLUID<VECTOR<float,1> >* const);
 template void SOLIDS_FLUIDS_EXAMPLE<VECTOR<float,2> >::Adjust_Output_Directory_For_MPI<MPI_SOLID_FLUID<VECTOR<float,2> >*>(MPI_SOLID_FLUID<VECTOR<float,2> >* const);
 template void SOLIDS_FLUIDS_EXAMPLE<VECTOR<float,3> >::Adjust_Output_Directory_For_MPI<MPI_SOLID_FLUID<VECTOR<float,3> >*>(MPI_SOLID_FLUID<VECTOR<float,3> >* const);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SOLIDS_FLUIDS_EXAMPLE<VECTOR<double,1> >;
 template class SOLIDS_FLUIDS_EXAMPLE<VECTOR<double,2> >;
 template class SOLIDS_FLUIDS_EXAMPLE<VECTOR<double,3> >;
@@ -134,4 +133,3 @@ template void SOLIDS_FLUIDS_EXAMPLE<VECTOR<double,3> >::Adjust_Output_Directory_
 template void SOLIDS_FLUIDS_EXAMPLE<VECTOR<double,1> >::Adjust_Output_Directory_For_MPI<MPI_SOLID_FLUID<VECTOR<double,1> >*>(MPI_SOLID_FLUID<VECTOR<double,1> >* const);
 template void SOLIDS_FLUIDS_EXAMPLE<VECTOR<double,2> >::Adjust_Output_Directory_For_MPI<MPI_SOLID_FLUID<VECTOR<double,2> >*>(MPI_SOLID_FLUID<VECTOR<double,2> >* const);
 template void SOLIDS_FLUIDS_EXAMPLE<VECTOR<double,3> >::Adjust_Output_Directory_For_MPI<MPI_SOLID_FLUID<VECTOR<double,3> >*>(MPI_SOLID_FLUID<VECTOR<double,3> >* const);
-#endif

@@ -29,9 +29,7 @@ template<class TV> IMPLICIT_SOLVE_PARAMETERS<TV>::
 template class IMPLICIT_SOLVE_PARAMETERS<VECTOR<float,1> >;
 template class IMPLICIT_SOLVE_PARAMETERS<VECTOR<float,2> >;
 template class IMPLICIT_SOLVE_PARAMETERS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class IMPLICIT_SOLVE_PARAMETERS<VECTOR<double,1> >;
 template class IMPLICIT_SOLVE_PARAMETERS<VECTOR<double,2> >;
 template class IMPLICIT_SOLVE_PARAMETERS<VECTOR<double,3> >;
-#endif
 }

@@ -33,6 +33,4 @@ Get_Midpoints(ARRAY<T,VECTOR<int,1> >& M)
 }
 //#####################################################################
 template class GRID_LAGRANGE_1D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GRID_LAGRANGE_1D<double>;
-#endif

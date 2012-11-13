@@ -46,11 +46,9 @@ Apply_Vorticity_Confinement_Force_Helper(const GRID<TV>& grid,ARRAY<T,FACE_INDEX
 static void
 Apply_Vorticity_Confinement_Force_Helper(const GRID<VECTOR<float,1> >&,ARRAY<float,FACE_INDEX<1> >&,ARRAY<VECTOR<float,1> ,VECTOR<int,1> >&,const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<float,1> > >*)
 {PHYSBAM_NOT_IMPLEMENTED();}
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 static void
 Apply_Vorticity_Confinement_Force_Helper(const GRID<VECTOR<double,1> >&,ARRAY<double,FACE_INDEX<1> >&,ARRAY<VECTOR<double,1> ,VECTOR<int,1> >&,const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<double,1> > >*)
 {PHYSBAM_NOT_IMPLEMENTED();}
-#endif
 template<class T_GRID> void VORTICITY_CONFINEMENT<T_GRID>::
 Apply_Vorticity_Confinement_Force(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<TV,TV_INT>& F)
 {
@@ -121,8 +119,6 @@ Initialize_Grids(const T_GRID& grid)
 template class VORTICITY_CONFINEMENT<GRID<VECTOR<float,1> > >;
 template class VORTICITY_CONFINEMENT<GRID<VECTOR<float,2> > >;
 template class VORTICITY_CONFINEMENT<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class VORTICITY_CONFINEMENT<GRID<VECTOR<double,1> > >;
 template class VORTICITY_CONFINEMENT<GRID<VECTOR<double,2> > >;
 template class VORTICITY_CONFINEMENT<GRID<VECTOR<double,3> > >;
-#endif

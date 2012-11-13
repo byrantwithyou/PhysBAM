@@ -8,6 +8,4 @@
 using namespace PhysBAM;
 //#####################################################################
 template class BOUNDED_HORIZONTAL_PLANE<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BOUNDED_HORIZONTAL_PLANE<VECTOR<double,3> >;
-#endif

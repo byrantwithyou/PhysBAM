@@ -155,6 +155,4 @@ Toggle_Velocity_Mode()
 }
 //#####################################################################
 template class OPENGL_MAC_VELOCITY_FIELD_3D<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_MAC_VELOCITY_FIELD_3D<double>;
-#endif

@@ -131,8 +131,6 @@ Use_Parallel_Solve()
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<float,1> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<float,2> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<double,1> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<double,2> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<double,3> > >;
-#endif

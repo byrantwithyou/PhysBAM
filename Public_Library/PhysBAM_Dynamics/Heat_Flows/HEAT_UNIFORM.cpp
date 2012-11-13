@@ -115,8 +115,6 @@ Implicit_Solve(const T coefficient,const T dt,const T time)
 template class HEAT_UNIFORM<GRID<VECTOR<float,1> > >;
 template class HEAT_UNIFORM<GRID<VECTOR<float,2> > >;
 template class HEAT_UNIFORM<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class HEAT_UNIFORM<GRID<VECTOR<double,1> > >;
 template class HEAT_UNIFORM<GRID<VECTOR<double,2> > >;
 template class HEAT_UNIFORM<GRID<VECTOR<double,3> > >;
-#endif

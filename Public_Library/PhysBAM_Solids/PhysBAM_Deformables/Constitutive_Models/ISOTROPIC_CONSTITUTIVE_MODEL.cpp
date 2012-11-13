@@ -134,7 +134,5 @@ Test(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 }
 template class ISOTROPIC_CONSTITUTIVE_MODEL<float,2>;
 template class ISOTROPIC_CONSTITUTIVE_MODEL<float,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class ISOTROPIC_CONSTITUTIVE_MODEL<double,2>;
 template class ISOTROPIC_CONSTITUTIVE_MODEL<double,3>;
-#endif

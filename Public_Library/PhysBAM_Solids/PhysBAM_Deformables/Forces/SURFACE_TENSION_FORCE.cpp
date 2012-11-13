@@ -212,6 +212,4 @@ Dump_Curvatures() const
     if(coefficients.m) LOG::cout<<"length estimates  "<<coefficients.Max()/coefficients.Min()<<std::endl;
 }
 template class SURFACE_TENSION_FORCE<VECTOR<float,2> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SURFACE_TENSION_FORCE<VECTOR<double,2> >;
-#endif

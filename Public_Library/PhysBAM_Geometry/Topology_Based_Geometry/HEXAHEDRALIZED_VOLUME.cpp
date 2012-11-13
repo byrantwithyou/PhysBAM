@@ -134,6 +134,4 @@ Initialize_Triangulated_Surface()
 }
 //#####################################################################
 template class HEXAHEDRALIZED_VOLUME<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class HEXAHEDRALIZED_VOLUME<double>;
-#endif

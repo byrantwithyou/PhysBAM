@@ -34,6 +34,4 @@ Calculate_XYZ(const T temperature) const
 }
 //#####################################################################
 template class BLACKBODY<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BLACKBODY<double>;
-#endif

@@ -186,6 +186,4 @@ Negative_Cell_Fraction(const T phi_lower_left,const T phi_lower_right,const T ph
 }
 //#####################################################################
 template class LEVELSET_UTILITIES<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LEVELSET_UTILITIES<double>;
-#endif

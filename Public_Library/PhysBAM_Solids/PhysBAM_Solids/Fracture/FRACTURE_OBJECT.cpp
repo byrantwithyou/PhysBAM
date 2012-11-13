@@ -233,8 +233,6 @@ Initiation_Point(const int element)
 template class FRACTURE_OBJECT<VECTOR<float,2>,2>;
 template class FRACTURE_OBJECT<VECTOR<float,3>,2>;
 template class FRACTURE_OBJECT<VECTOR<float,3>,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FRACTURE_OBJECT<VECTOR<double,2>,2>;
 template class FRACTURE_OBJECT<VECTOR<double,3>,2>;
 template class FRACTURE_OBJECT<VECTOR<double,3>,3>;
-#endif

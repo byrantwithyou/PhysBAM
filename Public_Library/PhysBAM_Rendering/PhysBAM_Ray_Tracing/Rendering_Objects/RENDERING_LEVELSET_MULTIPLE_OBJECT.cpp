@@ -82,6 +82,4 @@ Intersection(RAY<VECTOR<T,3> >& ray,int &region_start,int &region_end,const T th
 }
 //#####################################################################
 template class RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<GRID<VECTOR<float,3> > > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<GRID<VECTOR<double,3> > > >;
-#endif

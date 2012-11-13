@@ -361,8 +361,6 @@ Org_Display(const int in_color) const
 
 
 template class OPENGL_VBO_TRIANGULATED_SURFACE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_VBO_TRIANGULATED_SURFACE<double>;
 #endif
 
-#endif

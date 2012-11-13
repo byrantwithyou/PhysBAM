@@ -1960,6 +1960,4 @@ Draw_Polygon(const int simplex,const bool flipped,const ARRAY<ARRAY<VECTOR<int,2
 }
 //#####################################################################
 template class CUTTING_TETRAHEDRALIZED_VOLUME<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class CUTTING_TETRAHEDRALIZED_VOLUME<double>;
-#endif

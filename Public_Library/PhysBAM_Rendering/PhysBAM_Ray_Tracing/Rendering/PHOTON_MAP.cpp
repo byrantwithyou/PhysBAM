@@ -274,6 +274,4 @@ Light_Emission_Quota_Remains()
 }
 //#####################################################################
 template class PHOTON_MAP<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class PHOTON_MAP<double>;
-#endif

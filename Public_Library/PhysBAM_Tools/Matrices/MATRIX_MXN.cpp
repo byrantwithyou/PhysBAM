@@ -64,6 +64,4 @@ Jacobi_Singular_Value_Decomposition(ARRAY<VECTOR<int,2> >& left_givens_pairs,ARR
 }
 //#####################################################################
 template class MATRIX_MXN<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MATRIX_MXN<double>;
-#endif

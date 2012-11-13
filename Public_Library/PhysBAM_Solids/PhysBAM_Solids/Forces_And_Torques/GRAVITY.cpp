@@ -37,8 +37,6 @@ Potential_Energy(const T time) const
 template class GRAVITY<VECTOR<float,1> >;
 template class GRAVITY<VECTOR<float,2> >;
 template class GRAVITY<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GRAVITY<VECTOR<double,1> >;
 template class GRAVITY<VECTOR<double,2> >;
 template class GRAVITY<VECTOR<double,3> >;
-#endif

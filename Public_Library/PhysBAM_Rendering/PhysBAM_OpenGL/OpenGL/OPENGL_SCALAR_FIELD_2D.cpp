@@ -331,7 +331,6 @@ Update_Contour_Curves()
     else contour_curves.Clean_Memory();
 }
 
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template<> void OPENGL_SCALAR_FIELD_2D<double,double>::
 Update_Contour_Curves()
 {
@@ -344,7 +343,6 @@ Update_Contour_Curves()
             contour_curves(i)=new OPENGL_SEGMENTED_CURVE_2D<double>(*DUALCONTOUR_2D<double>::Create_Segmented_Curve_From_Levelset(scalar_field_as_levelset,contour_values(i),false),color_map->Lookup(Pre_Map_Value(contour_values(i))));}}
     else contour_curves.Clean_Memory();
 }
-#endif
 
 //#####################################################################
 // Specialization for bool scalars: only draw point if value is "true"
@@ -414,9 +412,7 @@ Toggle_Color_Map()
 template class OPENGL_SCALAR_FIELD_2D<float,int>;
 template class OPENGL_SCALAR_FIELD_2D<float,bool>;
 template class OPENGL_SCALAR_FIELD_2D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_SCALAR_FIELD_2D<double,int>;
 template class OPENGL_SCALAR_FIELD_2D<double,bool>;
 template class OPENGL_SCALAR_FIELD_2D<double,double>;
-#endif
 }

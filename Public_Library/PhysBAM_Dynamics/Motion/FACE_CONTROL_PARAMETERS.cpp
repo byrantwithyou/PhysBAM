@@ -358,7 +358,5 @@ Write_Control_Set_Types(const STREAM_TYPE& stream_type,std::ostream& output_stre
 }
 template class FACE_CONTROL_PARAMETERS<float>;
 template void FACE_CONTROL_PARAMETERS<float>::Read<float>(std::basic_istream<char,std::char_traits<char> >&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FACE_CONTROL_PARAMETERS<double>;
 template void FACE_CONTROL_PARAMETERS<double>::Read<double>(std::basic_istream<char,std::char_traits<char> >&);
-#endif

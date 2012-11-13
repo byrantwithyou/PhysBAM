@@ -530,9 +530,7 @@ CLUSTER()
 template class RIGID_BODY_CLUSTER_BINDINGS<VECTOR<float,1> >;
 template class RIGID_BODY_CLUSTER_BINDINGS<VECTOR<float,2> >;
 template class RIGID_BODY_CLUSTER_BINDINGS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGID_BODY_CLUSTER_BINDINGS<VECTOR<double,1> >;
 template class RIGID_BODY_CLUSTER_BINDINGS<VECTOR<double,2> >;
 template class RIGID_BODY_CLUSTER_BINDINGS<VECTOR<double,3> >;
-#endif
 

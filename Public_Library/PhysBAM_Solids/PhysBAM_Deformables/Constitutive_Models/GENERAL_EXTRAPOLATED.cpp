@@ -319,7 +319,5 @@ P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T>
 }
 template class GENERAL_EXTRAPOLATED<float,2>;
 template class GENERAL_EXTRAPOLATED<float,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GENERAL_EXTRAPOLATED<double,2>;
 template class GENERAL_EXTRAPOLATED<double,3>;
-#endif

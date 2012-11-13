@@ -133,6 +133,4 @@ Bounding_Box() const
 }
 //#####################################################################
 template class OPENGL_HEXAHEDRALIZED_VOLUME<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_HEXAHEDRALIZED_VOLUME<double>;
-#endif

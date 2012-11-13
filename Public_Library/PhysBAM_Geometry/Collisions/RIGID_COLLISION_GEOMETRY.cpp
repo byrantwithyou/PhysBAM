@@ -321,9 +321,7 @@ Write_State(TYPED_OSTREAM& output,const int state_index) const
 template class RIGID_COLLISION_GEOMETRY_BASE<VECTOR<float,1> >;
 template class RIGID_COLLISION_GEOMETRY_BASE<VECTOR<float,2> >;
 template class RIGID_COLLISION_GEOMETRY_BASE<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGID_COLLISION_GEOMETRY_BASE<VECTOR<double,1> >;
 template class RIGID_COLLISION_GEOMETRY_BASE<VECTOR<double,2> >;
 template class RIGID_COLLISION_GEOMETRY_BASE<VECTOR<double,3> >;
-#endif
 }

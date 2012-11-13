@@ -64,11 +64,9 @@ int main(int argc,char* argv[])
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Parse(true);
 
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     if(type_double)
         main_program<double>(parse_args);
     else
-#endif
         main_program<float>(parse_args);
     return 0;
 }

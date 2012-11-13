@@ -101,10 +101,8 @@ INSTANTIATION_HELPER(float,2)
 INSTANTIATION_HELPER(float,3)
 template void SEGMENT_HIERARCHY<VECTOR<float,2> >::Calculate_Bounding_Boxes_Helper<ARRAY_VIEW<VECTOR<float,2> const,int> >(ARRAY<RANGE<VECTOR<float,2> >,int>&,
     ARRAY_VIEW<VECTOR<float,2> const,int>,ARRAY_VIEW<VECTOR<float,2> const,int>);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double,1)
 INSTANTIATION_HELPER(double,2)
 INSTANTIATION_HELPER(double,3)
 template void SEGMENT_HIERARCHY<VECTOR<double,2> >::Calculate_Bounding_Boxes_Helper<ARRAY_VIEW<VECTOR<double,2> const,int> >(ARRAY<RANGE<VECTOR<double,2> >,int>&,
     ARRAY_VIEW<VECTOR<double,2> const,int>,ARRAY_VIEW<VECTOR<double,2> const,int>);
-#endif

@@ -17,12 +17,7 @@ using namespace PhysBAM;
 
 int main(int argc,char* argv[])
 {
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     typedef double T;
-#else
-    typedef float T;
-#endif
-
     typedef float RW;
     typedef VECTOR<T,2> TV;
     typedef GRID<TV> T_GRID;

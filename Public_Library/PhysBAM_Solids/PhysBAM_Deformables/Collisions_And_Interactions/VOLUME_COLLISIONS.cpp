@@ -131,7 +131,5 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
 }
 template class VOLUME_COLLISIONS<VECTOR<float,2> >;
 template class VOLUME_COLLISIONS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class VOLUME_COLLISIONS<VECTOR<double,2> >;
 template class VOLUME_COLLISIONS<VECTOR<double,3> >;
-#endif

@@ -11,7 +11,5 @@
 
 namespace PhysBAM{
 namespace SIGNED_DISTANCE{
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-#endif
 }
 }

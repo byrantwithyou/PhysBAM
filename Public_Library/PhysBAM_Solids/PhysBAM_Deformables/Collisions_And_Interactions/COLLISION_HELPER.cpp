@@ -41,8 +41,6 @@ template<class TV,class T,int d> TV PhysBAM::Compute_Collision_Impulse(const TV&
 template VECTOR<float,1> PhysBAM::Compute_Collision_Impulse<VECTOR<float,1>,float,1>(VECTOR<float,1> const&,SYMMETRIC_MATRIX<float,1> const&,VECTOR<float,1> const&,float,float,bool*);
 template VECTOR<float,2> PhysBAM::Compute_Collision_Impulse<VECTOR<float,2>,float,2>(VECTOR<float,2> const&,SYMMETRIC_MATRIX<float,2> const&,VECTOR<float,2> const&,float,float,bool*);
 template VECTOR<float,3> PhysBAM::Compute_Collision_Impulse<VECTOR<float,3>,float,3>(VECTOR<float,3> const&,SYMMETRIC_MATRIX<float,3> const&,VECTOR<float,3> const&,float,float,bool*);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template VECTOR<double,1> PhysBAM::Compute_Collision_Impulse<VECTOR<double,1>,double,1>(VECTOR<double,1> const&,SYMMETRIC_MATRIX<double,1> const&,VECTOR<double,1> const&,double,double,bool*);
 template VECTOR<double,2> PhysBAM::Compute_Collision_Impulse<VECTOR<double,2>,double,2>(VECTOR<double,2> const&,SYMMETRIC_MATRIX<double,2> const&,VECTOR<double,2> const&,double,double,bool*);
 template VECTOR<double,3> PhysBAM::Compute_Collision_Impulse<VECTOR<double,3>,double,3>(VECTOR<double,3> const&,SYMMETRIC_MATRIX<double,3> const&,VECTOR<double,3> const&,double,double,bool*);
-#endif

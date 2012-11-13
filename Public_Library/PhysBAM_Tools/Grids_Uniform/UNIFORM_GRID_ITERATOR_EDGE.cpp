@@ -70,8 +70,6 @@ Reset_Axis(const int axis_input)
 template class UNIFORM_GRID_ITERATOR_EDGE<VECTOR<float,1> >;
 template class UNIFORM_GRID_ITERATOR_EDGE<VECTOR<float,2> >;
 template class UNIFORM_GRID_ITERATOR_EDGE<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class UNIFORM_GRID_ITERATOR_EDGE<VECTOR<double,1> >;
 template class UNIFORM_GRID_ITERATOR_EDGE<VECTOR<double,2> >;
 template class UNIFORM_GRID_ITERATOR_EDGE<VECTOR<double,3> >;
-#endif

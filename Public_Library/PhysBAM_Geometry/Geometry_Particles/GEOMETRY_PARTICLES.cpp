@@ -64,9 +64,7 @@ static int Initialize_Geometry_Particle()
     Register_Attribute_Sample<unsigned short>();
 
     READ_WRITE_SCALAR_HELPER(float);
-    #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     READ_WRITE_SCALAR_HELPER(double);
-    #endif
 
     return 1;
 }
@@ -75,9 +73,7 @@ int initialize_geometry_particle=Initialize_Geometry_Particle();
 template class GEOMETRY_PARTICLES<VECTOR<float,1> >;
 template class GEOMETRY_PARTICLES<VECTOR<float,2> >;
 template class GEOMETRY_PARTICLES<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GEOMETRY_PARTICLES<VECTOR<double,1> >;
 template class GEOMETRY_PARTICLES<VECTOR<double,2> >;
 template class GEOMETRY_PARTICLES<VECTOR<double,3> >;
-#endif 
 }

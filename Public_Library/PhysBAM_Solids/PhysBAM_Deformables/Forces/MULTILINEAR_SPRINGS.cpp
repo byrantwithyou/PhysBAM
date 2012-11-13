@@ -139,7 +139,5 @@ Set_All_Springs_To_Phase(const int phase_index) // 1 is critically damped
 //#####################################################################
 template class MULTILINEAR_SPRINGS<VECTOR<float,2> >;
 template class MULTILINEAR_SPRINGS<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MULTILINEAR_SPRINGS<VECTOR<double,2> >;
 template class MULTILINEAR_SPRINGS<VECTOR<double,3> >;
-#endif

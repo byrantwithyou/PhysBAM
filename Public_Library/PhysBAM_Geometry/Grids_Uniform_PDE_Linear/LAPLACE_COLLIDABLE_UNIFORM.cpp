@@ -99,9 +99,7 @@ Set_Up_Second_Order_Cut_Cell_Method(const bool use_second_order_cut_cell_method_
 template class LAPLACE_COLLIDABLE_UNIFORM<GRID<VECTOR<float,1> > >;
 template class LAPLACE_COLLIDABLE_UNIFORM<GRID<VECTOR<float,2> > >;
 template class LAPLACE_COLLIDABLE_UNIFORM<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LAPLACE_COLLIDABLE_UNIFORM<GRID<VECTOR<double,1> > >;
 template class LAPLACE_COLLIDABLE_UNIFORM<GRID<VECTOR<double,2> > >;
 template class LAPLACE_COLLIDABLE_UNIFORM<GRID<VECTOR<double,3> > >;
-#endif
 }

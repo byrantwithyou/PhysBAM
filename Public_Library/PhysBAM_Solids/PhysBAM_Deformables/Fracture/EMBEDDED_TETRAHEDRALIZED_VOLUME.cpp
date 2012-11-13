@@ -17,7 +17,5 @@ EMBEDDED_TETRAHEDRALIZED_VOLUME(TETRAHEDRALIZED_VOLUME<T>& simplicial_object_inp
 }
 //#####################################################################
 template class EMBEDDED_TETRAHEDRALIZED_VOLUME<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class EMBEDDED_TETRAHEDRALIZED_VOLUME<double>;
-#endif
 }

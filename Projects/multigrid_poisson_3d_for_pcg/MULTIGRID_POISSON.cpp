@@ -859,9 +859,7 @@ Initialize_Test_Initial_Guess()
 template class MULTIGRID_POISSON<float,2>;
 #endif
 template class MULTIGRID_POISSON<float,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 #ifdef MGPCG_UNOPTIMIZED
 template class MULTIGRID_POISSON<double,2>;
 #endif
 template class MULTIGRID_POISSON<double,3>;
-#endif

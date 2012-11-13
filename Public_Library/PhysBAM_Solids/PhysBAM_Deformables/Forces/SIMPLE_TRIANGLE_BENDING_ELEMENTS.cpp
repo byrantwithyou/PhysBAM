@@ -197,8 +197,6 @@ Create_Simple_Bending_Elements(TRIANGULATED_SURFACE<T>& triangulated_surface,BIN
 template class SIMPLE_TRIANGLE_BENDING_ELEMENTS<float>;
 template SIMPLE_TRIANGLE_BENDING_ELEMENTS<float>* PhysBAM::Create_Simple_Bending_Elements<float>(TRIANGULATED_SURFACE<float>&,BINDING_LIST<VECTOR<float,3> >&,float,float,bool,float,bool,
     float,float,float,float,bool,bool);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SIMPLE_TRIANGLE_BENDING_ELEMENTS<double>;
 template SIMPLE_TRIANGLE_BENDING_ELEMENTS<double>* PhysBAM::Create_Simple_Bending_Elements<double>(TRIANGULATED_SURFACE<double>&,BINDING_LIST<VECTOR<double,3> >&,double,double,bool,double,bool,
     double,double,double,double,bool,bool);
-#endif

@@ -113,6 +113,4 @@ World_Space_Simplex(const int segment_id,const FRAME<TV>& frame) const
 }
 //##################################################################### 
 template class RIGID_COLLISION_GEOMETRY<VECTOR<float,2> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGID_COLLISION_GEOMETRY<VECTOR<double,2> >;
-#endif

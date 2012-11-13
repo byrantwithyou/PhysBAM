@@ -657,12 +657,10 @@ template class TRIANGLE_REPULSIONS<VECTOR<float,3> >;
 template void TRIANGLE_REPULSIONS<VECTOR<float,3> >::Set_Collision_Pairs<VECTOR<float,3> >(ARRAY<PRECOMPUTE_PROJECT<VECTOR<float,3> >,int>&,
     ARRAY<PRECOMPUTE_PROJECT<VECTOR<float,3> >,int>&,ARRAY<REPULSION_PAIR<VECTOR<float,3> >,int>&,
     ARRAY<REPULSION_PAIR<VECTOR<float,3> >,int>&,float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TRIANGLE_REPULSIONS<VECTOR<double,1> >;
 template class TRIANGLE_REPULSIONS<VECTOR<double,2> >;
 template class TRIANGLE_REPULSIONS<VECTOR<double,3> >;
 template void TRIANGLE_REPULSIONS<VECTOR<double,3> >::Set_Collision_Pairs<VECTOR<double,3> >(ARRAY<PRECOMPUTE_PROJECT<VECTOR<double,3> >,int>&,
     ARRAY<PRECOMPUTE_PROJECT<VECTOR<double,3> >,int>&,ARRAY<REPULSION_PAIR<VECTOR<double,3> >,int>&,
     ARRAY<REPULSION_PAIR<VECTOR<double,3> >,int>&,double);
-#endif
 }

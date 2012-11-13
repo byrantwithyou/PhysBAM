@@ -131,7 +131,6 @@ template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_PLU_Factorization<
 template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_LU_Factorization<MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> >&);
 template int MATRIX_BASE<float,MATRIX_MXN<float> >::Number_Of_Nonzero_Rows(const float threshold) const;
 template void MATRIX_BASE<float,MATRIX_MXN<float> >::Householder_QR_Factorization<MATRIX_MXN<float>,MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> >&,MATRIX_BASE<float,MATRIX_MXN<float> >&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_Robust_Householder_QR_Solve<ARRAY<double>,ARRAY<int> >(ARRAY_BASE<double,ARRAY<double> >&,ARRAY_BASE<int,ARRAY<int> >&);
 template void MATRIX_BASE<double,MATRIX<double,6,6> >::In_Place_Gram_Schmidt_QR_Factorization<MATRIX<double,6,6> >(MATRIX_BASE<double,MATRIX<double,6,6> >&);
 template void MATRIX_BASE<double,MATRIX<double,1,1> >::In_Place_Cholesky_Factorization();
@@ -144,4 +143,3 @@ template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_PLU_Factorizatio
 template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_LU_Factorization<MATRIX_MXN<double> >(MATRIX_BASE<double,MATRIX_MXN<double> >&);
 template int MATRIX_BASE<double,MATRIX_MXN<double> >::Number_Of_Nonzero_Rows(const double threshold) const;
 template void MATRIX_BASE<double,MATRIX_MXN<double> >::Householder_QR_Factorization<MATRIX_MXN<double>,MATRIX_MXN<double> >(MATRIX_BASE<double,MATRIX_MXN<double> >&,MATRIX_BASE<double,MATRIX_MXN<double> >&);
-#endif

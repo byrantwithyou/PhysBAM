@@ -160,9 +160,7 @@ template class MASS_PROPERTIES<VECTOR<float,1>,0>;
 template class MASS_PROPERTIES<VECTOR<float,2>,1>;
 template class MASS_PROPERTIES<VECTOR<float,3>,1>;
 template class MASS_PROPERTIES<VECTOR<float,3>,2>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class MASS_PROPERTIES<VECTOR<double,1>,0>;
 template class MASS_PROPERTIES<VECTOR<double,2>,1>;
 template class MASS_PROPERTIES<VECTOR<double,3>,1>;
 template class MASS_PROPERTIES<VECTOR<double,3>,2>;
-#endif

@@ -37,7 +37,5 @@ Apply_Boundary_Condition(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T
 }
 template class BOUNDARY_UNIFORM_PERIODIC<GRID<VECTOR<float,2> >,float>;
 template class BOUNDARY_UNIFORM_PERIODIC<GRID<VECTOR<float,3> >,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BOUNDARY_UNIFORM_PERIODIC<GRID<VECTOR<double,2> >,double>;
 template class BOUNDARY_UNIFORM_PERIODIC<GRID<VECTOR<double,3> >,double>;
-#endif

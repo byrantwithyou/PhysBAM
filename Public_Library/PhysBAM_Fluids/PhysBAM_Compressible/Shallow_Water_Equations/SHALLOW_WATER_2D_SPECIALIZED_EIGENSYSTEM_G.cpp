@@ -20,6 +20,4 @@ Flux(const int m,const ARRAY<VECTOR<T,2> ,VECTOR<int,1> >& U,ARRAY<VECTOR<T,2> ,
 }
 //#####################################################################
 template class SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_G<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_G<double>;
-#endif

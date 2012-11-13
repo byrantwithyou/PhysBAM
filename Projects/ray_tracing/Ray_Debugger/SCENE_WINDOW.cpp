@@ -357,6 +357,4 @@ Translate_In_Camera_Plane(VECTOR<GLfloat,2> old_mouse_vector,VECTOR<GLfloat,2> n
     return VECTOR<GLfloat,3>(wx,wy,wz);
 }
 template class SCENE_WINDOW<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SCENE_WINDOW<double>;
-#endif

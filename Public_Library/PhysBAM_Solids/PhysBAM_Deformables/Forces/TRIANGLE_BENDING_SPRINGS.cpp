@@ -80,7 +80,5 @@ Create_Bending_Springs(TRIANGULATED_SURFACE<T>& triangulated_surface,const T sti
 //#####################################################################
 template class TRIANGLE_BENDING_SPRINGS<float>;
 template TRIANGLE_BENDING_SPRINGS<float>* PhysBAM::Create_Bending_Springs<float>(TRIANGULATED_SURFACE<float>&,float,float,bool,float,bool,float,bool,bool);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TRIANGLE_BENDING_SPRINGS<double>;
 template TRIANGLE_BENDING_SPRINGS<double>* PhysBAM::Create_Bending_Springs<double>(TRIANGULATED_SURFACE<double>&,double,double,bool,double,bool,double,bool,bool);
-#endif

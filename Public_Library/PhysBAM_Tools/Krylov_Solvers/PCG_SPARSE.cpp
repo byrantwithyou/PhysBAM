@@ -42,6 +42,4 @@ Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,ARRAY<T>& x,ARRAY<T>& b,ARRAY<KRYLOV_V
 }
 //#####################################################################
 template class PCG_SPARSE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class PCG_SPARSE<double>;
-#endif

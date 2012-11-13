@@ -72,8 +72,6 @@ Store(const int point_index,const int face_index)
 template struct TRIANGLE_COLLISIONS_POINT_FACE_VISITOR<VECTOR<float,1> >;
 INSTANTIATION_HELPER(float,2);
 INSTANTIATION_HELPER(float,3);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template struct TRIANGLE_COLLISIONS_POINT_FACE_VISITOR<VECTOR<double,1> >;
 INSTANTIATION_HELPER(double,2);
 INSTANTIATION_HELPER(double,3);
-#endif

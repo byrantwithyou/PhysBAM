@@ -170,6 +170,4 @@ Bounding_Box() const
     else return RANGE<VECTOR<float,3> >::Centered_Box();
 }
 template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<double,double>;
-#endif

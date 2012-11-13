@@ -62,13 +62,11 @@ Display(const int in_color) const
 {
     Display_Bool_Helper(*this,in_color);
 }
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template<> void OPENGL_SCALAR_FIELD_1D<double,bool>::
 Display(const int in_color) const
 {
     Display_Bool_Helper(*this,in_color);
 }
-#endif
 }
 //#####################################################################
 // Function Bounding_Box
@@ -86,7 +84,5 @@ Bounding_Box() const
 //#####################################################################
 template class OPENGL_SCALAR_FIELD_1D<float,float>;
 template class OPENGL_SCALAR_FIELD_1D<float,bool>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_SCALAR_FIELD_1D<double,double>;
 template class OPENGL_SCALAR_FIELD_1D<double,bool>;
-#endif

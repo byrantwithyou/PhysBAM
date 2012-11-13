@@ -33,8 +33,6 @@ template<class T> bool Intersects(const RANGE<VECTOR<T,3> >& box,const TRIANGLE_
 }
 //#####################################################################
 template bool Intersects(const RANGE<VECTOR<float,3> >&,const TRIANGLE_3D<float>&,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(const RANGE<VECTOR<double,3> >&,const TRIANGLE_3D<double>&,const double);
-#endif
 };
 };

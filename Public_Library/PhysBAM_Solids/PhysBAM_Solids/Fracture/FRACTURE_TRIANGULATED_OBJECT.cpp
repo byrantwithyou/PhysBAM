@@ -138,7 +138,5 @@ Add_Cut(const int triangle,const TV& fracture_normal)
 //#####################################################################
 template class FRACTURE_TRIANGULATED_OBJECT<VECTOR<float,2> >;
 template class FRACTURE_TRIANGULATED_OBJECT<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FRACTURE_TRIANGULATED_OBJECT<VECTOR<double,2> >;
 template class FRACTURE_TRIANGULATED_OBJECT<VECTOR<double,3> >;
-#endif

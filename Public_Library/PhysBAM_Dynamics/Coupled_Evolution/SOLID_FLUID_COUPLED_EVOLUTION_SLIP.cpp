@@ -690,8 +690,6 @@ Setup_Boundary_Condition_Collection()
 template class SOLID_FLUID_COUPLED_EVOLUTION_SLIP<VECTOR<float,1> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION_SLIP<VECTOR<float,2> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION_SLIP<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SOLID_FLUID_COUPLED_EVOLUTION_SLIP<VECTOR<double,1> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION_SLIP<VECTOR<double,2> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION_SLIP<VECTOR<double,3> >;
-#endif

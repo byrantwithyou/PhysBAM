@@ -84,7 +84,5 @@ Read_Output_Files(const int frame)
 //#####################################################################
 template class PLS_EXAMPLE<VECTOR<float,2> >;
 template class PLS_EXAMPLE<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class PLS_EXAMPLE<VECTOR<double,2> >;
 template class PLS_EXAMPLE<VECTOR<double,3> >;
-#endif

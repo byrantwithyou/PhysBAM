@@ -84,9 +84,7 @@ public:
     SPECIALIZE_FFTW_d(T_FFTW,T,3)
 
 SPECIALIZE_FFTW(fftwf,float)
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 SPECIALIZE_FFTW(fftw,double)
-#endif
 
 #undef SPECIALIZE_FFTW_d
 #undef SPECIALIZE_FFTW

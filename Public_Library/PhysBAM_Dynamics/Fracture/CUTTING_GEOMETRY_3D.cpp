@@ -513,6 +513,4 @@ Draw_Polygon(const int simplex,const bool flipped,const ARRAY<ARRAY<VECTOR<int,2
 }
 //#####################################################################
 template class CUTTING_GEOMETRY_3D<VECTOR<float,3>,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class CUTTING_GEOMETRY_3D<VECTOR<double,3>,3>;
-#endif

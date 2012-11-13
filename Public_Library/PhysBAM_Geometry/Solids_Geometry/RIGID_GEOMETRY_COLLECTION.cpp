@@ -169,10 +169,8 @@ Find_Or_Read_Structure(const STREAM_TYPE stream_type,ARRAY<int>& structure_ids,c
         STRUCTURE<TV>* structure=0;
         if(!stream_type.use_doubles)
             structure=STRUCTURE<TV>::template Create_From_File<float>(filename);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
         else
             structure=STRUCTURE<TV>::template Create_From_File<double>(filename);
-#endif
         if(scaling_factor!=1){
             Wrap_Structure_Helper(structure,center);
             structure->Rescale(scaling_factor);}
@@ -302,9 +300,7 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
 template class RIGID_GEOMETRY_COLLECTION<VECTOR<float,1> >;
 template class RIGID_GEOMETRY_COLLECTION<VECTOR<float,2> >;
 template class RIGID_GEOMETRY_COLLECTION<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class RIGID_GEOMETRY_COLLECTION<VECTOR<double,1> >;
 template class RIGID_GEOMETRY_COLLECTION<VECTOR<double,2> >;
 template class RIGID_GEOMETRY_COLLECTION<VECTOR<double,3> >;
-#endif
 }

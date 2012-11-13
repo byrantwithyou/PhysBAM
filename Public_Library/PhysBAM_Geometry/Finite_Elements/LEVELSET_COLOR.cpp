@@ -75,7 +75,5 @@ Get_Levelset_For_Color(ARRAY<T,TV_INT>& color_phi,int c,int ghost) const
 }
 template class LEVELSET_COLOR<VECTOR<float,2> >;
 template class LEVELSET_COLOR<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LEVELSET_COLOR<VECTOR<double,2> >;
 template class LEVELSET_COLOR<VECTOR<double,3> >;
-#endif

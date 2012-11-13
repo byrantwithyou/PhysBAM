@@ -364,7 +364,6 @@ template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Smooth_Gear(VECTOR<float,3> const&,int,int);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Shell(float,float,float,int);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Bowl(float,float,float,int,int);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double);
 template JOINT_ID RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Connect_With_Point_Joint(RIGID_BODY<VECTOR<double,3> >&,RIGID_BODY<VECTOR<double,3> >&,VECTOR<double,3> const&);
 template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Sphere(double,double,int);
@@ -373,4 +372,3 @@ template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Smooth_Gear(VECTOR<double,3> const&,int,int);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Shell(double,double,double,int);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Bowl(double,double,double,int,int);
-#endif

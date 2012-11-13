@@ -226,6 +226,4 @@ Emit_Object(ARRAY_VIEW<TV> pts,ARRAY_VIEW<ARRAY_VIEW<TV> > holes)
         stream<<std::endl;}
 }
 template class TEX_FILE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TEX_FILE<double>;
-#endif

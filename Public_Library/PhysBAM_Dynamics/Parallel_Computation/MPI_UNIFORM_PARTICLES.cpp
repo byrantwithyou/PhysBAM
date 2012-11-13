@@ -443,7 +443,6 @@ template void Exchange_Overlapping_Block_Particles<GRID<VECTOR<double,2> >,PARTI
 template void Exchange_Overlapping_Block_Particles<GRID<VECTOR<double,3> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
     MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,int,
     PARTICLE_LEVELSET<GRID<VECTOR<double,3> > >&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void Exchange_Boundary_Particles<GRID<VECTOR<double,1> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
     MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,int,
     PARTICLE_LEVELSET<GRID<VECTOR<double,1> > >&);
@@ -480,5 +479,4 @@ template void Exchange_Overlapping_Block_Particles<GRID<VECTOR<float,2> >,PARTIC
 template void Exchange_Overlapping_Block_Particles<GRID<VECTOR<float,3> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
     MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,int,
     PARTICLE_LEVELSET<GRID<VECTOR<float,3> > >&);
-#endif
 }

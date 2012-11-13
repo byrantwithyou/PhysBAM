@@ -221,8 +221,6 @@ Compute_Dt(const T time,const T target_time,bool& done)
 template class COMPRESSIBLE_DRIVER<VECTOR<float,1> >;
 template class COMPRESSIBLE_DRIVER<VECTOR<float,2> >;
 template class COMPRESSIBLE_DRIVER<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class COMPRESSIBLE_DRIVER<VECTOR<double,1> >;
 template class COMPRESSIBLE_DRIVER<VECTOR<double,2> >;
 template class COMPRESSIBLE_DRIVER<VECTOR<double,3> >;
-#endif

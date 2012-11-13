@@ -116,6 +116,4 @@ Test(T x, T y, T z, int simplex) const
     TEST3D(Ezzz,z);
 }
 template class GENERAL_ENERGY<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GENERAL_ENERGY<double>;
-#endif

@@ -473,9 +473,7 @@ Volume_Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameter
 //#####################################################################
 template void GENERIC_RENDER_EXAMPLE<float,float>::Material(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
 template void GENERIC_RENDER_EXAMPLE<float,float>::Volume_Material(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void GENERIC_RENDER_EXAMPLE<double,float>::Material(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
 template void GENERIC_RENDER_EXAMPLE<double,float>::Volume_Material(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
 template void GENERIC_RENDER_EXAMPLE<double,double>::Material(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
 template void GENERIC_RENDER_EXAMPLE<double,double>::Volume_Material(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
-#endif

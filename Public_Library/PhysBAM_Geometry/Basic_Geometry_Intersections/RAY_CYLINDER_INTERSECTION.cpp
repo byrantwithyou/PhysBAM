@@ -75,8 +75,6 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const CYLINDER<T>& cyli
 }
 //#####################################################################
 template bool Intersects(RAY<VECTOR<float,3> >&,const CYLINDER<float>&,const float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(RAY<VECTOR<double,3> >&,const CYLINDER<double>&,const double);
-#endif
 };
 };

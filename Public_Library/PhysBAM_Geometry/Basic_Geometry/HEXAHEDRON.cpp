@@ -22,6 +22,4 @@ Signed_Volume() const
 }
 //#####################################################################
 template class HEXAHEDRON<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class HEXAHEDRON<double>;
-#endif

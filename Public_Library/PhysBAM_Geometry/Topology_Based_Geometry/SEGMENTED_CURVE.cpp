@@ -199,9 +199,7 @@ Inside_Any_Simplex(const TV& location,int& segment_id,const T thickness_over_two
 template class SEGMENTED_CURVE<VECTOR<float,1> >;
 template class SEGMENTED_CURVE<VECTOR<float,2> >;
 template class SEGMENTED_CURVE<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SEGMENTED_CURVE<VECTOR<double,1> >;
 template class SEGMENTED_CURVE<VECTOR<double,2> >;
 template class SEGMENTED_CURVE<VECTOR<double,3> >;
-#endif
 }

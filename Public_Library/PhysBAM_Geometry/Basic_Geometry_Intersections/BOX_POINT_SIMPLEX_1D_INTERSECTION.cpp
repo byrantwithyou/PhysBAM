@@ -26,9 +26,7 @@ template<class T> T Halfspace_Intersection_Size(const RANGE<VECTOR<T,1> >& box,c
 //#####################################################################
 template bool Intersects(const RANGE<VECTOR<float,1> >&,const POINT_SIMPLEX_1D<float>&,const float);
 template float Halfspace_Intersection_Size(const RANGE<VECTOR<float,1> >&,const POINT_SIMPLEX_1D<float>&,VECTOR<float,1>*);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(const RANGE<VECTOR<double,1> >&,const POINT_SIMPLEX_1D<double>&,const double);
 template double Halfspace_Intersection_Size(const RANGE<VECTOR<double,1> >&,const POINT_SIMPLEX_1D<double>&,VECTOR<double,1>*);
-#endif
 };
 };

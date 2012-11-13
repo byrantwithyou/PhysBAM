@@ -88,10 +88,8 @@ template<class T> SEGMENTED_CURVE_2D<T>* Tessellate_Boundary(const SMOOTH_GEAR<V
 template TRIANGULATED_SURFACE<float>* Generate_Triangles(const SMOOTH_GEAR<VECTOR<float,3> >&,int);
 template TRIANGULATED_AREA<float>* Generate_Triangles(const SMOOTH_GEAR<VECTOR<float,2> >&,int);
 template SEGMENTED_CURVE_2D<float>* Tessellate_Boundary(const SMOOTH_GEAR<VECTOR<float,2> >& gear,int levels);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template TRIANGULATED_SURFACE<double>* Generate_Triangles(const SMOOTH_GEAR<VECTOR<double,3> >&,int);
 template TRIANGULATED_AREA<double>* Generate_Triangles(const SMOOTH_GEAR<VECTOR<double,2> >&,int);
 template SEGMENTED_CURVE_2D<double>* Tessellate_Boundary(const SMOOTH_GEAR<VECTOR<double,2> >& gear,int levels);
-#endif
 }
 }

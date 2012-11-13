@@ -127,6 +127,4 @@ RGB_To_XYZ(const VECTOR<T,3>& RGB) const
 }
 //#####################################################################
 template class CIE_XYZ<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class CIE_XYZ<double>;
-#endif

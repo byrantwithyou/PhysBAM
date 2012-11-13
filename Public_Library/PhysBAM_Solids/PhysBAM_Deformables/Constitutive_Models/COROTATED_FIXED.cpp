@@ -150,7 +150,5 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 }
 template class COROTATED_FIXED<float,2>;
 template class COROTATED_FIXED<float,3>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class COROTATED_FIXED<double,2>;
 template class COROTATED_FIXED<double,3>;
-#endif

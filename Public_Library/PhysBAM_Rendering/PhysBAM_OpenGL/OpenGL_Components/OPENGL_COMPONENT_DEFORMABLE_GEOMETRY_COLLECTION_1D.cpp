@@ -383,6 +383,4 @@ Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,b
 }
 //#####################################################################
 template class OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_1D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_1D<double,double>;
-#endif

@@ -21,6 +21,4 @@ Segment_Plane_Intersection(const TV& endpoint1,const TV& endpoint2,T& interpolat
 }
 //#####################################################################
 template class PLANE<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class PLANE<double>;
-#endif

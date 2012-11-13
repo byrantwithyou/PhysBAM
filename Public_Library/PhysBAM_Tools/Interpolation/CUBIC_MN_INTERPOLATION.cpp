@@ -62,7 +62,5 @@ Cubic_MN_Weights(const T alpha) const
 
 template class CUBIC_MN_INTERPOLATION<float,float>;
 template class CUBIC_MN_INTERPOLATION<float,VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class CUBIC_MN_INTERPOLATION<double,double>;
 template class CUBIC_MN_INTERPOLATION<double,VECTOR<double,3> >;
-#endif

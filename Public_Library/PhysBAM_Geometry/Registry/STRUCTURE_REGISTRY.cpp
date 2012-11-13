@@ -62,7 +62,6 @@ bool Register_Structures(){
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<SEGMENTED_CURVE<VECTOR<float,3> > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<TETRAHEDRALIZED_VOLUME<float> >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<TRIANGULATED_SURFACE<float> >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     STRUCTURE_REGISTRY<VECTOR<double,1> >::Register<ANALYTIC_IMPLICIT_OBJECT<POINT_SIMPLEX_1D<double> > >();
     STRUCTURE_REGISTRY<VECTOR<double,1> >::Register<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<double,1> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,1> >::Register<LEVELSET_IMPLICIT_OBJECT<VECTOR<double,1> > >();
@@ -97,7 +96,6 @@ bool Register_Structures(){
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<SEGMENTED_CURVE<VECTOR<double,3> > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<TETRAHEDRALIZED_VOLUME<double> >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<TRIANGULATED_SURFACE<double> >();
-#endif
     return true;
 }
 bool registered_structures_asdf=Register_Structures();
@@ -120,8 +118,6 @@ template<class TV> STRUCTURE_REGISTRY<TV>::
 template class STRUCTURE_REGISTRY<VECTOR<float,1> >;
 template class STRUCTURE_REGISTRY<VECTOR<float,2> >;
 template class STRUCTURE_REGISTRY<VECTOR<float,3> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class STRUCTURE_REGISTRY<VECTOR<double,1> >;
 template class STRUCTURE_REGISTRY<VECTOR<double,2> >;
 template class STRUCTURE_REGISTRY<VECTOR<double,3> >;
-#endif

@@ -320,6 +320,4 @@ Write_State(TYPED_OSTREAM& output,const int state_index) const
 {PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
 template class TETRAHEDRON_COLLISION_BODY<float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TETRAHEDRON_COLLISION_BODY<double>;
-#endif

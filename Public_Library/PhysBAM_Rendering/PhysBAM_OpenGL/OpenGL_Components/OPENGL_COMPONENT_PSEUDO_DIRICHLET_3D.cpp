@@ -149,6 +149,4 @@ Decrease_Vector_Size()
 }
 //#####################################################################
 template class OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<float,float>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<double,double>;
-#endif

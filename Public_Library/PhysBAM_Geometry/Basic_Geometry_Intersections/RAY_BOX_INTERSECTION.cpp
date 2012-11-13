@@ -148,7 +148,6 @@ template bool Lazy_Intersects(RAY<VECTOR<float,3> >&,const RANGE<VECTOR<float,3>
 template bool Get_Intersection_Range(const RAY<VECTOR<float,1> >&,const RANGE<VECTOR<float,1> >&,float&,float&);
 template bool Get_Intersection_Range(const RAY<VECTOR<float,2> >&,const RANGE<VECTOR<float,2> >&,float&,float&);
 template bool Get_Intersection_Range(const RAY<VECTOR<float,3> >&,const RANGE<VECTOR<float,3> >&,float&,float&);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template bool Intersects(RAY<VECTOR<double,1> >&,const RANGE<VECTOR<double,1> >&,const double);
 template bool Intersects(RAY<VECTOR<double,2> >&,const RANGE<VECTOR<double,2> >&,const double,const double);
 template bool Intersects(RAY<VECTOR<double,3> >&,const RANGE<VECTOR<double,3> >&,const double);
@@ -157,6 +156,5 @@ template bool Lazy_Intersects(RAY<VECTOR<double,3> >&,const RANGE<VECTOR<double,
 template bool Get_Intersection_Range(const RAY<VECTOR<double,1> >&,const RANGE<VECTOR<double,1> >&,double&,double&);
 template bool Get_Intersection_Range(const RAY<VECTOR<double,2> >&,const RANGE<VECTOR<double,2> >&,double&,double&);
 template bool Get_Intersection_Range(const RAY<VECTOR<double,3> >&,const RANGE<VECTOR<double,3> >&,double&,double&);
-#endif
 };
 };

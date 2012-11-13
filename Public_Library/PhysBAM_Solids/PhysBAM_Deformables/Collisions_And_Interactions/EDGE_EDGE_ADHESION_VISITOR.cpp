@@ -91,6 +91,4 @@ Store(const int segment1_local_index,const int segment2_local_index)
         EDGE_EDGE_ADHESION_VISITOR<VECTOR<T,3> >&,ZERO) const;
 
 INSTANTIATION_HELPER(float);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double);
-#endif
