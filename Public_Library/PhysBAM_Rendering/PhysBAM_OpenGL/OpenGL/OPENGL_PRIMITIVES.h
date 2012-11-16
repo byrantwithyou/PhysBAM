@@ -8,6 +8,7 @@
 #define __OPENGL_PRIMITIVES__
 #include <cstdio>
 #ifdef _WIN32
+#define NOMINMAX
 #include <windows.h>
 #endif
 

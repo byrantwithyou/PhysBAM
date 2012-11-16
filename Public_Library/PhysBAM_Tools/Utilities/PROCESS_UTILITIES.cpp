@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <iostream>
 #if defined(_WIN32)
+#define NOMINMAX
 #include <windows.h>
 // next line must be included after windows.h
 #include <psapi.h>

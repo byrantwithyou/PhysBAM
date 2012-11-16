@@ -16,6 +16,7 @@
 #include <GL/gl.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/glATI.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/wglATI.h>
+#define NOMINMAX
 #include <windows.h>
 
 namespace PhysBAM

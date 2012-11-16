@@ -7,6 +7,7 @@
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_EPS_OUTPUT.h>
 #ifdef _WIN32
+#define NOMINMAX
 #include <windows.h>
 #endif
 

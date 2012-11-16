@@ -14,6 +14,7 @@
 #include <cstdio>
 #include <fstream>
 #ifdef _WIN32
+#define NOMINMAX
 #include <windows.h>
 #endif
 #if defined(__linux__) || defined(__CYGWIN__) || defined(__APPLE__)

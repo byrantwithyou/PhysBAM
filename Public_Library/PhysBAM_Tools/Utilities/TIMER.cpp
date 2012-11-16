@@ -12,6 +12,7 @@ namespace PhysBAM{
 
 #ifdef _WIN32 // we are running on windows
 #pragma comment(lib, "winmm.lib")
+#define NOMINMAX
 #include <windows.h>
 double Get_Current_Time(){__int64 time;QueryPerformanceCounter((LARGE_INTEGER*)&time);return (double)time;}
 double Initialize_Timer(){__int64 frequency;QueryPerformanceFrequency((LARGE_INTEGER*)&frequency);return 1000./(double)frequency;}
