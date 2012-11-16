@@ -1,8 +1,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 using namespace PhysBAM;

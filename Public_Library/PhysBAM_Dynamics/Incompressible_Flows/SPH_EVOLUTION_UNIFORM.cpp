@@ -20,6 +20,7 @@
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SPH_CALLBACKS.h>
+#include <cmath>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -241,8 +242,8 @@ Set_Divergence_And_Multiplier(const TV_INT cell,const ARRAY<bool,TV_INT>& cells_
             projection.divergence_multiplier(cell)=1; 
             if(cell_weight(cell)){ // TODO: This divergence may be missing an advection term
                 if(use_analytic_divergence_for_expansion_only)
-                    projection.divergence(cell)=max((T)0,(T)log(cell_weight(cell)*one_over_target_minus_ballistic_particles_per_cell/target_density_factor)/particle_targeting_time);
-                else projection.divergence(cell)=log(cell_weight(cell)*one_over_target_minus_ballistic_particles_per_cell/target_density_factor)/particle_targeting_time;}}}
+                    projection.divergence(cell)=max((T)0,(T)std::log(cell_weight(cell)*one_over_target_minus_ballistic_particles_per_cell/target_density_factor)/particle_targeting_time);
+                else projection.divergence(cell)=std::log(cell_weight(cell)*one_over_target_minus_ballistic_particles_per_cell/target_density_factor)/particle_targeting_time;}}}
 }
 //#####################################################################
 // Function Postprocess_Particles

@@ -7,13 +7,13 @@
 // See Bratley and Fox. 1988. Algorithm 659: Implementing Sobol's quasirandom sequence generator. ACM Trans. Math. Softw. 14, 88-100.
 //#####################################################################
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Matrices/ROTATION.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_0X0.h>
+#include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_1X1.h>
 #include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
@@ -120,7 +120,7 @@ Fill_Uniform(DIAGONAL_MATRIX<T,d>& m,const T a,const T b)
 template<class T,class GENERATOR> template<int d> void RANDOM_NUMBERS<T,GENERATOR>::
 Fill_Uniform(SYMMETRIC_MATRIX<T,d>& m,const T a,const T b)
 {
-    for(int i=0;i<m.Rows();i++) for(int j=0;j<i;j++) m(i,j)=Get_Uniform_Number(a,b);
+    for(int i=0;i<m.Rows();i++) for(int j=0;j<=i;j++) m(i,j)=Get_Uniform_Number(a,b);
 }
 //#####################################################################
 // Function Fill_Uniform_Matrix
@@ -128,7 +128,7 @@ Fill_Uniform(SYMMETRIC_MATRIX<T,d>& m,const T a,const T b)
 template<class T,class GENERATOR> template<int d> void RANDOM_NUMBERS<T,GENERATOR>::
 Fill_Uniform(UPPER_TRIANGULAR_MATRIX<T,d>& m,const T a,const T b)
 {
-    for(int j=0;j<d;j++) for(int i=0;i<j;i++) m(i,j)=Get_Uniform_Number(a,b);
+    for(int j=0;j<d;j++) for(int i=0;i<=j;i++) m(i,j)=Get_Uniform_Number(a,b);
 }
 //#####################################################################
 // Function Fill_Uniform
@@ -252,6 +252,8 @@ Get_Twist(const T& a)
     INSTANTIATION_HELPER_V(T,1); \
     INSTANTIATION_HELPER_V(T,2); \
     INSTANTIATION_HELPER_V(T,3); \
+    INSTANTIATION_HELPER_V23(T,0); \
+    INSTANTIATION_HELPER_V23(T,1); \
     INSTANTIATION_HELPER_V23(T,2); \
     INSTANTIATION_HELPER_V23(T,3); \
     IH(T);                                                              \

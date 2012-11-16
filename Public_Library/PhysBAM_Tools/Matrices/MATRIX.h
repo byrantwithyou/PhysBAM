@@ -168,8 +168,8 @@ public:
     static MATRIX<T,1,2> Cross_Product_Matrix(const VECTOR<T,2>& v)
     {STATIC_ASSERT(m==1 && n==2);MATRIX<T,1,2> M;M(0,0)=-v.y;M(0,1)=v.x;return M;}
 
-    MATRIX<T,1> Times_Cross_Product_Matrix_Transpose_With_Symmetric_Result(const VECTOR<T,2>& v) const
-    {STATIC_ASSERT((m==1 && n==2));return Times_Cross_Product_Matrix_Transpose(v);}
+    SYMMETRIC_MATRIX<T,1> Times_Cross_Product_Matrix_Transpose_With_Symmetric_Result(const VECTOR<T,2>& v) const
+    {STATIC_ASSERT((m==1 && n==2));return SYMMETRIC_MATRIX<T,1>(Times_Cross_Product_Matrix_Transpose(v));}
 
     MATRIX<T,m,1> Times_Cross_Product_Matrix(const VECTOR<T,1>& v) const
     {STATIC_ASSERT(n==0);return MATRIX<T,m,1>();}

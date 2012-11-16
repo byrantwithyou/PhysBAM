@@ -8,7 +8,6 @@
 #define __SOLID_FLUID_SYSTEM__
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_POLICY.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/PRESSURE_VELOCITY_VECTOR.h>
 namespace PhysBAM{
 
@@ -25,7 +24,7 @@ class SOLID_FLUID_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
     typedef ARRAY<PAIR<int,T> > FACE_WEIGHT_ELEMENTS;typedef ARRAY<FACE_WEIGHT_ELEMENTS*,FACE_INDEX<TV::m> > T_FACE_ARRAYS_FACE_WEIGHT_ELEMENTS;
     typedef typename TV::SPIN T_SPIN;
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_INERTIA_TENSOR;typedef KRYLOV_SYSTEM_BASE<typename TV::SCALAR> BASE;
+    typedef KRYLOV_SYSTEM_BASE<typename TV::SCALAR> BASE;
 public:
     typedef PRESSURE_VELOCITY_VECTOR<TV> VECTOR_T;
     static const int rows_per_rigid_body=TV::dimension+T_SPIN::dimension;
@@ -38,15 +37,15 @@ public:
     const ARRAY<DIAGONAL_MATRIX<T,TV::m> >& rigid_body_fluid_mass;
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > modified_mass,one_over_modified_mass;
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > modified_world_space_rigid_mass,modified_world_space_rigid_mass_inverse;
-    const ARRAY<T_INERTIA_TENSOR>& modified_world_space_rigid_inertia_tensor;
-    ARRAY<T_INERTIA_TENSOR> modified_world_space_rigid_inertia_tensor_inverse;
+    const ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> >& modified_world_space_rigid_inertia_tensor;
+    ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> > modified_world_space_rigid_inertia_tensor_inverse;
     const T fluid_tolerance,solid_tolerance;
     const ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array;
     mutable ARRAY<ARRAY<T> > temp_array;
 
     SOLID_FLUID_SYSTEM(BACKWARD_EULER_SYSTEM<TV>& solid_system_input,const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_deformable_array_input,
         const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_rigid_array_input,const ARRAY<DIAGONAL_MATRIX<T,TV::m> >& fluid_mass_input,
-        const ARRAY<DIAGONAL_MATRIX<T,TV::m> >& rigid_body_fluid_mass_input,const ARRAY<T_INERTIA_TENSOR>& modified_world_space_rigid_inertia_tensor_input,
+        const ARRAY<DIAGONAL_MATRIX<T,TV::m> >& rigid_body_fluid_mass_input,const ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> >& modified_world_space_rigid_inertia_tensor_input,
         const T fluid_tolerance_input,const T solid_tolerance_input,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array_input);
 
     virtual ~SOLID_FLUID_SYSTEM();

@@ -7,11 +7,11 @@
 #ifndef __MASS_PROPERTIES__
 #define __MASS_PROPERTIES__
 
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Tools/Particles/PARTICLES.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 namespace PhysBAM{
 
 template <class TV> class FRAME;
@@ -21,8 +21,6 @@ class MASS_PROPERTIES:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d>::OBJECT T_SIMPLICIAL_OBJECT;
-    typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_WORLD_SPACE_INERTIA_TENSOR;
     struct DUMMY_IMPLEMENTATION{};struct NORMAL_IMPLEMENTATION{};
     typedef typename IF<INTS_EQUAL<d,0>::value,DUMMY_IMPLEMENTATION,NORMAL_IMPLEMENTATION>::TYPE ACCESS_IMPLEMENTATION;
 private:
@@ -31,7 +29,7 @@ private:
     bool use_mass;
     T volume;
     TV center;
-    T_WORLD_SPACE_INERTIA_TENSOR inertia_tensor_over_density;
+    SYMMETRIC_MATRIX<T,TV::SPIN::m> inertia_tensor_over_density;
 public:
 
     MASS_PROPERTIES(const T_SIMPLICIAL_OBJECT& object,const bool thin_shell);
@@ -54,13 +52,13 @@ public:
     T Density() const
     {return use_mass?mass/volume:density;}
 
-    T_WORLD_SPACE_INERTIA_TENSOR Inertia_Tensor() const
+    SYMMETRIC_MATRIX<T,TV::SPIN::m> Inertia_Tensor() const
     {return Density()*inertia_tensor_over_density;}
 
 //#####################################################################
     static T Thin_Shell_Volume(const T_SIMPLICIAL_OBJECT& object);
-    void Transform_To_Object_Frame(FRAME<TV>& frame,T_INERTIA_TENSOR& object_space_inertia_tensor) const;
-    void Transform_To_Object_Frame(FRAME<TV>& frame,T_INERTIA_TENSOR& object_space_inertia_tensor,GEOMETRY_PARTICLES<TV>& point_cloud) const;
+    void Transform_To_Object_Frame(FRAME<TV>& frame,DIAGONAL_MATRIX<T,TV::SPIN::m>& object_space_inertia_tensor) const;
+    void Transform_To_Object_Frame(FRAME<TV>& frame,DIAGONAL_MATRIX<T,TV::SPIN::m>& object_space_inertia_tensor,GEOMETRY_PARTICLES<TV>& point_cloud) const;
 private:
     template<bool thin_shell> void Compute_Properties(MASS_PROPERTIES<TV,d>&,NORMAL_IMPLEMENTATION);
     template<bool thin_shell> void Compute_Properties(MASS_PROPERTIES<TV,d>&,DUMMY_IMPLEMENTATION);

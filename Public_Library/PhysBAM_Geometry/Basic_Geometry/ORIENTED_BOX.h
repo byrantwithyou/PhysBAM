@@ -9,6 +9,7 @@
 
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_1X1.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>

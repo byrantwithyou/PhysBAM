@@ -9,6 +9,7 @@
 
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_FORWARD.h>
+#include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_1X1.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 #include <cassert>
 #include <cmath>
@@ -123,12 +124,41 @@ public:
     UPPER_TRIANGULAR_MATRIX operator*(const DIAGONAL_MATRIX<T,2>& A) const // 3 mults
     {return UPPER_TRIANGULAR_MATRIX(x11*A.x11,x12*A.x22,x22*A.x22);}
 
-    MATRIX_MXN<T> operator*(const MATRIX_MXN<T>& A) const
-    {assert(A.Rows()==2);MATRIX_MXN<T> M(2,A.Columns());
-    for(int j=0;j<A.Columns();j++) for(int k=0;k<2;k++) for(int i=0;i<k;i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
+    template<class T_MATRIX>
+    T_MATRIX operator*(const MATRIX_BASE<T,T_MATRIX>& A) const
+    {assert(A.Rows()==2);T_MATRIX M(INITIAL_SIZE(2),INITIAL_SIZE(A.Columns()));
+    for(int j=0;j<A.Columns();j++) for(int k=0;k<2;k++) for(int i=0;i<=k;i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
+
+    template<class T_MATRIX>
+    typename TRANSPOSE<T_MATRIX>::TYPE Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
+    {assert(A.Columns()==2);typename TRANSPOSE<T_MATRIX>::TYPE M(INITIAL_SIZE(2),INITIAL_SIZE(A.Rows()));
+    for(int j=0;j<A.Rows();j++) for(int k=0;k<2;k++) for(int i=0;i<=k;i++) M(i,j)+=(*this)(i,k)*A(j,k);return M;}
+
+    template<class T_MATRIX>
+    T_MATRIX Transpose_Times(const MATRIX_BASE<T,T_MATRIX>& A) const
+    {assert(A.Rows()==2);T_MATRIX M(INITIAL_SIZE(2),INITIAL_SIZE(A.Columns()));
+    for(int j=0;j<A.Columns();j++) for(int k=0;k<2;k++) for(int i=0;i<=k;i++) M(k,j)+=(*this)(i,k)*A(i,j);return M;}
 
     MATRIX<T,2,3> Times_Transpose(const MATRIX<T,3,2>& A) const
     {return MATRIX<T,2,3>(x11*A.x[0]+x12*A.x[3],x22*A.x[3],x11*A.x[1]+x12*A.x[4],x22*A.x[4],x11*A.x[2]+x12*A.x[5],x22*A.x[5]);}
+
+    UPPER_TRIANGULAR_MATRIX Times_Transpose(const DIAGONAL_MATRIX<T,2>& A) const
+    {return *this*A;}
+
+    MATRIX<T,2> Times_Transpose(const UPPER_TRIANGULAR_MATRIX& A) const
+    {return MATRIX<T,2>(x11*A.x11+x12*A.x12,x22*A.x12,x12*A.x22,x22*A.x22);}
+
+    MATRIX<T,2> Times_Transpose(const SYMMETRIC_MATRIX<T,2>& A) const
+    {return *this*A;}
+
+    MATRIX<T,2> Transpose_Times(const UPPER_TRIANGULAR_MATRIX& A) const
+    {return MATRIX<T,2>(x11*A.x11,x12*A.x11,x11*A.x12,x12*A.x12+x22*A.x22);}
+
+    MATRIX<T,2> Transpose_Times(const SYMMETRIC_MATRIX<T,2>& A) const
+    {return MATRIX<T,2>(x11*A.x11,x12*A.x11+x22*A.x21,x11*A.x21,x12*A.x21+x22*A.x22);}
+
+    MATRIX<T,2> Transpose_Times(const DIAGONAL_MATRIX<T,2>& A) const
+    {return MATRIX<T,2>(x11*A.x11,x12*A.x11,0,x22*A.x22);}
 
     SYMMETRIC_MATRIX<T,2> Outer_Product_Matrix() const // 4 mults, 1 add
     {return SYMMETRIC_MATRIX<T,2>(x11*x11+x12*x12,x12*x22,x22*x22);}
@@ -164,32 +194,16 @@ public:
     T Simplex_Minimum_Altitude() const
     {return Determinant()/max(abs(x11),sqrt(sqr(x22)+max(sqr(x12),sqr(x12-x11))));}
 
+    MATRIX<T,2> Transposed() const
+    {return MATRIX<T,2>(*this).Transposed();}
+
 //#####################################################################
 };
 // global functions
-template<class T>
-inline UPPER_TRIANGULAR_MATRIX<T,2> operator*(const T a,const UPPER_TRIANGULAR_MATRIX<T,2>& A) // 3 mults
-{return A*a;}
-
-template<class T>
-inline UPPER_TRIANGULAR_MATRIX<T,2> operator+(const T a,const UPPER_TRIANGULAR_MATRIX<T,2>& A)
-{return A+a;}
-
-template<class T>
-inline UPPER_TRIANGULAR_MATRIX<T,2> operator-(const T a,const UPPER_TRIANGULAR_MATRIX<T,2>& A)
-{return -A+a;}
 
 template<class T>
 inline UPPER_TRIANGULAR_MATRIX<T,2> operator*(const DIAGONAL_MATRIX<T,2>& A,const UPPER_TRIANGULAR_MATRIX<T,2>& B) // 3 mults
 {return UPPER_TRIANGULAR_MATRIX<T,2>(A.x11*B.x11,A.x11*B.x12,A.x22*B.x22);}
-
-template<class T>
-inline UPPER_TRIANGULAR_MATRIX<T,2> operator+(const DIAGONAL_MATRIX<T,2>& A,const UPPER_TRIANGULAR_MATRIX<T,2>& B)
-{return B+A;}
-
-template<class T>
-inline UPPER_TRIANGULAR_MATRIX<T,2> operator-(const DIAGONAL_MATRIX<T,2>& A,const UPPER_TRIANGULAR_MATRIX<T,2>& B)
-{return -B+A;}
 
 template<class T>
 inline std::ostream& operator<<(std::ostream& output_stream,const UPPER_TRIANGULAR_MATRIX<T,2>& A)

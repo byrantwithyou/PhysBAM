@@ -10,9 +10,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Computations/VORTICITY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <PhysBAM_Geometry/Advection_Collidable/ADVECTION_WRAPPER_COLLIDABLE_CELL.h>

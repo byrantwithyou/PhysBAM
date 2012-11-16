@@ -16,7 +16,6 @@
 #include <PhysBAM_Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_ID.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_FORWARD.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/SOLIDS_COLLISIONS_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 namespace PhysBAM{
@@ -30,7 +29,6 @@ class RIGID_DEFORMABLE_COLLISIONS:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;
     typedef VECTOR<int,TV::dimension> ELEMENT;typedef typename MESH_POLICY<TV::dimension>::MESH T_MESH;
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_WORLD_SPACE_INERTIA_TENSOR;
 public:
     struct PRECOMPUTE_CONTACT_PROJECTION
     {

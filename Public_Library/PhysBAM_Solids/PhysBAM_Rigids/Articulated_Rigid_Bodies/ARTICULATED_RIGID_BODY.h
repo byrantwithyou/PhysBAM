@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_1D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 namespace PhysBAM{
 template<class TV> class JOINT_MESH;
 template<class TV> class RIGID_BODY_COLLECTION;
@@ -20,7 +19,6 @@ template<class TV>
 class ARTICULATED_RIGID_BODY_BASE:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_WORLD_SPACE_INERTIA_TENSOR;
 public:
     enum WORKAROUND {d=TV::m,s=T_SPIN::m};
 

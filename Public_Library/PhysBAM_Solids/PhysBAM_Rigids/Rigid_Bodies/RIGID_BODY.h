@@ -8,7 +8,7 @@
 #define __RIGID_BODY__
 
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_0X0.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_MASS.h>
@@ -20,8 +20,6 @@ class RIGID_BODY:public RIGID_GEOMETRY<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
-    typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_WORLD_SPACE_INERTIA_TENSOR;
 public:
     typedef RIGID_GEOMETRY<TV> BASE;
     typedef int HAS_TYPED_READ_WRITE;
@@ -52,7 +50,7 @@ public:
     void Set_Rigid_Mass(const RIGID_BODY_MASS<TV>& rigid_mass_input)
     {Inertia_Tensor()=rigid_mass_input.inertia_tensor;Mass()=rigid_mass_input.mass;}
 
-    void Set_Inertia_Tensor(const T_INERTIA_TENSOR& inertia_tensor_input) // already scaled by the mass of the object
+    void Set_Inertia_Tensor(const DIAGONAL_MATRIX<T,TV::SPIN::m>& inertia_tensor_input) // already scaled by the mass of the object
     {Inertia_Tensor()=inertia_tensor_input;}
 
     void Rescale(const T scaling_factor,const bool rescale_mass=true)
@@ -85,13 +83,13 @@ public:
     bool Is_Simulated() const
     {return !is_static && !rigid_body_collection.rigid_body_particle.kinematic(particle_index);}
 
-    T_WORLD_SPACE_INERTIA_TENSOR World_Space_Inertia_Tensor() const // relative to the center of mass
+    SYMMETRIC_MATRIX<T,TV::SPIN::m> World_Space_Inertia_Tensor() const // relative to the center of mass
     {return Rigid_Mass().World_Space_Inertia_Tensor(Frame().r);}
 
-    T_WORLD_SPACE_INERTIA_TENSOR World_Space_Inertia_Tensor_Inverse() const // relative to the center of mass
+    SYMMETRIC_MATRIX<T,TV::SPIN::m> World_Space_Inertia_Tensor_Inverse() const // relative to the center of mass
     {return Rigid_Mass().World_Space_Inertia_Tensor_Inverse(Frame().r);};
 
-    T_WORLD_SPACE_INERTIA_TENSOR World_Space_Inertia_Tensor(const TV& reference_point) const // relative to a reference point
+    SYMMETRIC_MATRIX<T,TV::SPIN::m> World_Space_Inertia_Tensor(const TV& reference_point) const // relative to a reference point
     {return Rigid_Mass().World_Space_Inertia_Tensor(Frame(),reference_point);}
 
     T_SPIN World_Space_Inertia_Tensor_Times(const T_SPIN& angular_velocity) const
@@ -127,10 +125,10 @@ public:
     const T& Mass() const PHYSBAM_ALWAYS_INLINE
     {return rigid_body_collection.rigid_body_particle.mass(particle_index);}
 
-    T_INERTIA_TENSOR& Inertia_Tensor() PHYSBAM_ALWAYS_INLINE
+    DIAGONAL_MATRIX<T,TV::SPIN::m>& Inertia_Tensor() PHYSBAM_ALWAYS_INLINE
     {return rigid_body_collection.rigid_body_particle.inertia_tensor(particle_index);}
 
-    const T_INERTIA_TENSOR& Inertia_Tensor() const PHYSBAM_ALWAYS_INLINE
+    const DIAGONAL_MATRIX<T,TV::SPIN::m>& Inertia_Tensor() const PHYSBAM_ALWAYS_INLINE
     {return rigid_body_collection.rigid_body_particle.inertia_tensor(particle_index);}
 
     const RIGID_BODY_MASS<TV> Rigid_Mass() const PHYSBAM_ALWAYS_INLINE
@@ -232,7 +230,7 @@ public:
     static void Apply_Push(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const T distance);
     void Apply_Push_To_Body(const TV& location,const TV& impulse,const T_SPIN& angular_impulse=T_SPIN());
     T Volumetric_Density() const;
-    void Diagonalize_Inertia_Tensor(const T_WORLD_SPACE_INERTIA_TENSOR& inertia_tensor_at_center_of_mass);
+    void Diagonalize_Inertia_Tensor(const SYMMETRIC_MATRIX<T,TV::SPIN::m>& inertia_tensor_at_center_of_mass);
     template<class T2> void Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(TETRAHEDRALIZED_VOLUME<T2>& tetrahedralized_volume,
         TRIANGULATED_SURFACE<T>& triangulated_surface,const T cell_size,const int subdivision_loops=0,const bool (*create_levelset_test)(TETRAHEDRALIZED_VOLUME<T>&)=0,
         const bool use_implicit_surface_maker=true,const int levels_of_octree=0,const T shrink_levelset_amount=0);

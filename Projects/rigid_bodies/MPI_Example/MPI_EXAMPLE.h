@@ -316,7 +316,6 @@ void Pushout_Test() {
 void Many_Sphere_Test()
 {
     last_frame=300;
-    typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;    
      VECTOR<T,3> num_bodies=TV(40,200,40);
      for(int i=0;i<num_bodies.x;i++) for(int j=0;j<num_bodies.y;j++) for(int k=0;k<num_bodies.z;k++){
         RIGID_BODY_PARTICLES<TV>& particles=solid_body_collection.rigid_body_collection.rigid_body_particle;    
@@ -327,7 +326,7 @@ void Many_Sphere_Test()
         particles.frame(rigid_body.particle_index)=FRAME<TV>(center);
         particles.twist(rigid_body.particle_index)=TWIST<TV>();
         particles.mass(rigid_body.particle_index)=1;
-        particles.inertia_tensor(rigid_body.particle_index)=T_INERTIA_TENSOR();particles.inertia_tensor(rigid_body.particle_index)+=1;
+        particles.inertia_tensor(rigid_body.particle_index)=DIAGONAL_MATRIX<T,TV::SPIN::m>();particles.inertia_tensor(rigid_body.particle_index)+=1;
         SPHERE<TV> sphere(TV(0,0,0),radius);
         rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(sphere));
         solid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
@@ -343,7 +342,6 @@ void Many_Sphere_Test()
 void Break_Levelset()
 {
     typedef VECTOR<int,TV::dimension> TV_INT;
-    typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;
     ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> children;
     ARRAY<int>* referenced_rigid_particles=new ARRAY<int>;
     RIGID_BODY_PARTICLES<TV>& particles=solid_body_collection.rigid_body_collection.rigid_body_particle;    
@@ -365,7 +363,7 @@ void Break_Levelset()
         particles.frame(rigid_body.particle_index)=FRAME<TV>(iterator.Location());
         particles.twist(rigid_body.particle_index)=TWIST<TV>();
         particles.mass(rigid_body.particle_index)=1;
-        particles.inertia_tensor(rigid_body.particle_index)=T_INERTIA_TENSOR();particles.inertia_tensor(rigid_body.particle_index)+=1;
+        particles.inertia_tensor(rigid_body.particle_index)=DIAGONAL_MATRIX<T,TV::SPIN::m>();particles.inertia_tensor(rigid_body.particle_index)+=1;
         RANGE<TV> box(body_grid.dX*-.5,body_grid.dX*.5);
         //SPHERE<TV> box(TV(),body_grid.dX.Min()*.5);
         rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(box));

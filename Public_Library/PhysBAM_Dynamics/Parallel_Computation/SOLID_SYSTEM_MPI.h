@@ -16,7 +16,7 @@ template<class TV> class NEWMARK_EVOLUTION;
 template<class TV>
 class SOLID_SYSTEM_MPI:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 {
-    typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_INERTIA_TENSOR;
+    typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;
 
 public:
     typedef GENERALIZED_VELOCITY<TV> VECTOR_T;
@@ -26,8 +26,8 @@ public:
     ARRAY<DIAGONAL_MATRIX<T,TV::m> >& rigid_body_fluid_mass;
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > modified_mass,one_over_modified_mass;
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > modified_world_space_rigid_mass,modified_world_space_rigid_mass_inverse;
-    ARRAY<T_INERTIA_TENSOR> modified_world_space_rigid_inertia_tensor;
-    ARRAY<T_INERTIA_TENSOR> modified_world_space_rigid_inertia_tensor_inverse;
+    ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> > modified_world_space_rigid_inertia_tensor;
+    ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> > modified_world_space_rigid_inertia_tensor_inverse;
     MPI_SOLID_FLUID<TV>* mpi_solid_fluid;
     ARRAY<ARRAY<int> >& coupled_deformable_particle_indices;
     mutable ARRAY<ARRAY<TV> > recv_fluid_V_boundary_arrays;
@@ -36,7 +36,7 @@ public:
     NEWMARK_EVOLUTION<TV>& newmark_evolution;
 
     SOLID_SYSTEM_MPI(BACKWARD_EULER_SYSTEM<TV>& solid_system_input,ARRAY<DIAGONAL_MATRIX<T,TV::m> >& fluid_mass_input,ARRAY<DIAGONAL_MATRIX<T,TV::m> >& rigid_body_fluid_mass_input,
-        ARRAY<T_INERTIA_TENSOR>& modified_world_space_rigid_inertia_tensor_input,MPI_SOLID_FLUID<TV>* mpi_solid_fluid_input,
+        ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> >& modified_world_space_rigid_inertia_tensor_input,MPI_SOLID_FLUID<TV>* mpi_solid_fluid_input,
         ARRAY<ARRAY<int> >& coupled_deformable_particle_indices_input,NEWMARK_EVOLUTION<TV>& newmark_evolution_input,const int rigid_V_size,bool precondition=true);
 
     ~SOLID_SYSTEM_MPI();

@@ -82,7 +82,7 @@ Test_Matrix(int number_particles,int number_rigid_particles) const
     Times(solids,constraints2);
     Transpose_Times(constraints,solids2);
 
-    CONSTANT_ARRAY<RIGID_BODY_MASS<TV,true> > rigid_mass(twist.m,RIGID_BODY_MASS<TV,true>(1,typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR()+1));
+    CONSTANT_ARRAY<RIGID_BODY_MASS<TV,true> > rigid_mass(twist.m,RIGID_BODY_MASS<TV,true>(1,DIAGONAL_MATRIX<T,TV::SPIN::m>()+1));
     T inner_solids=V.Dot(V2)+twist.Inner_Product(rigid_mass,twist2);
     T inner_constraints=constraints.Dot(constraints2);
 

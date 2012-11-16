@@ -9,9 +9,9 @@
 
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
+#include <PhysBAM_Tools/Matrices/MATRIX_FORWARD.h>
 #include <PhysBAM_Tools/Particles/PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/RIGID_GEOMETRY_PARTICLES.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 namespace PhysBAM{
 
 template<class TV>
@@ -19,13 +19,12 @@ class RIGID_BODY_PARTICLES:public CLONEABLE<RIGID_BODY_PARTICLES<TV>,RIGID_GEOME
 {
     typedef typename TV::SCALAR T;
     typedef CLONEABLE<RIGID_BODY_PARTICLES<TV>,RIGID_GEOMETRY_PARTICLES<TV> > BASE;
-    typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;
 public:
     using BASE::rigid_geometry;using BASE::Delete_All_Particles;using BASE::Add_Array;
 
     ARRAY_VIEW<typename TV::SPIN> angular_momentum;
     ARRAY_VIEW<T> mass;
-    ARRAY_VIEW<T_INERTIA_TENSOR> inertia_tensor;
+    ARRAY_VIEW<DIAGONAL_MATRIX<T,TV::SPIN::m> > inertia_tensor;
     ARRAY_VIEW<bool> kinematic;
 
     RIGID_BODY_PARTICLES();

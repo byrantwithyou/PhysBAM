@@ -5,11 +5,15 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_0X0.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_1X1.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_0X0.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_1X1.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -381,6 +385,8 @@ Write_Entry(const VECTOR<T2,d>& x)
 template class OCTAVE_OUTPUT<float>;
 template void OCTAVE_OUTPUT<float>::Append_Sparse_Column<float,ARRAY_VIEW<float const,int> >(ARRAY_BASE<float,ARRAY_VIEW<float const,int>,int> const&);
 template void OCTAVE_OUTPUT<float>::Append_Sparse_Column<float,ARRAY_VIEW<float,int> >(ARRAY_BASE<float,ARRAY_VIEW<float,int>,int> const&);
+template void OCTAVE_OUTPUT<float>::Append_Sparse_Diagonal_Block<0>(SYMMETRIC_MATRIX<float,0> const&);
+template void OCTAVE_OUTPUT<float>::Append_Sparse_Diagonal_Block<1>(SYMMETRIC_MATRIX<float,1> const&);
 template void OCTAVE_OUTPUT<float>::Append_Sparse_Diagonal_Block<3>(SYMMETRIC_MATRIX<float,3> const&);
 template void OCTAVE_OUTPUT<float>::Append_Sparse_Diagonal_Block<float,MATRIX<float,0,0> >(MATRIX_BASE<float,MATRIX<float,0,0> > const&);
 template void OCTAVE_OUTPUT<float>::Append_Sparse_Diagonal_Block<float,MATRIX<float,1,1> >(MATRIX_BASE<float,MATRIX<float,1,1> > const&);
@@ -396,6 +402,8 @@ template void OCTAVE_OUTPUT<float>::Write<float,ARRAY_VIEW<float,int> >(char con
 template class OCTAVE_OUTPUT<double>;
 template void OCTAVE_OUTPUT<double>::Append_Sparse_Column<double,ARRAY_VIEW<double const,int> >(ARRAY_BASE<double,ARRAY_VIEW<double const,int>,int> const&);
 template void OCTAVE_OUTPUT<double>::Append_Sparse_Column<double,ARRAY_VIEW<double,int> >(ARRAY_BASE<double,ARRAY_VIEW<double,int>,int> const&);
+template void OCTAVE_OUTPUT<double>::Append_Sparse_Diagonal_Block<0>(SYMMETRIC_MATRIX<double,0> const&);
+template void OCTAVE_OUTPUT<double>::Append_Sparse_Diagonal_Block<1>(SYMMETRIC_MATRIX<double,1> const&);
 template void OCTAVE_OUTPUT<double>::Append_Sparse_Diagonal_Block<3>(SYMMETRIC_MATRIX<double,3> const&);
 template void OCTAVE_OUTPUT<double>::Append_Sparse_Diagonal_Block<double,MATRIX<double,0,0> >(MATRIX_BASE<double,MATRIX<double,0,0> > const&);
 template void OCTAVE_OUTPUT<double>::Append_Sparse_Diagonal_Block<double,MATRIX<double,1,1> >(MATRIX_BASE<double,MATRIX<double,1,1> > const&);

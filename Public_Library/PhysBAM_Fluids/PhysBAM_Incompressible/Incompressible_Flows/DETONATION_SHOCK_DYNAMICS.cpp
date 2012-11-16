@@ -8,6 +8,7 @@
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
+#include <cmath>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -80,7 +81,7 @@ Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,cons
         else{
             T inside_log=dtheta*curvature.array(index)*exp(-mutheta*delta);
             inside_log=max((T)-0.999999,inside_log);
-            Lcj=log((T)1+inside_log);}//nonlinear curvature relationship //Lcj(cell)=-(T)0.1*curvature(cell);//linear curvature relationship
+            Lcj=std::log((T)1+inside_log);}//nonlinear curvature relationship //Lcj(cell)=-(T)0.1*curvature(cell);//linear curvature relationship
         // Euler step of Dn and Dn_dot by Dn_ddot
         T Dn_ddot=-A*delta-B*Dn_dot.array(index)-C*Lcj-D*curvature_dot;        
         Dn_dot.array(index)+=Dn_ddot*dt;

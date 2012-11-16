@@ -358,7 +358,7 @@ namespace{
         typedef typename TV::SPIN T_SPIN;
         RIGID_BODY<TV>& parent_body=rigid_body_collection.Rigid_Body(parent);
         // compute aggregate inertia tensor and angular momentum
-        typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR inertia_tensor;
+        SYMMETRIC_MATRIX<T,TV::SPIN::m> inertia_tensor;
         parent_body.Angular_Momentum()=T_SPIN();
         for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
             int child=cluster.children(i);RIGID_BODY<TV>& child_body=rigid_body_collection.Rigid_Body(child);
@@ -384,7 +384,7 @@ Distribute_Mass_To_Parent(const int parent)
         rbp.frame(parent)=FRAME<TV>();
         rbp.twist(parent)=TWIST<TV>();
         rbp.mass(parent)=T();
-        rbp.inertia_tensor(parent)=typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR();
+        rbp.inertia_tensor(parent)=DIAGONAL_MATRIX<T,TV::SPIN::m>();
         // Find center of mass
         for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
             int child=cluster.children(i);

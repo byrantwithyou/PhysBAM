@@ -28,7 +28,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SOLID_SYSTEM_MPI<TV>::
 SOLID_SYSTEM_MPI(BACKWARD_EULER_SYSTEM<TV>& solid_system_input,ARRAY<DIAGONAL_MATRIX<T,TV::m> >& fluid_mass_input,ARRAY<DIAGONAL_MATRIX<T,TV::m> >& rigid_body_fluid_mass_input,
-    ARRAY<T_INERTIA_TENSOR>& modified_world_space_rigid_inertia_tensor_input,MPI_SOLID_FLUID<TV>* mpi_solid_fluid_input,
+    ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> >& modified_world_space_rigid_inertia_tensor_input,MPI_SOLID_FLUID<TV>* mpi_solid_fluid_input,
     ARRAY<ARRAY<int> >& coupled_deformable_particle_indices_input,NEWMARK_EVOLUTION<TV>& newmark_evolution_input,const int rigid_V_size,bool precondition)
     :KRYLOV_SYSTEM_BASE<typename TV::SCALAR>(precondition,!precondition),
     solid_system(solid_system_input),fluid_mass(fluid_mass_input),rigid_body_fluid_mass(rigid_body_fluid_mass_input),

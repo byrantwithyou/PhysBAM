@@ -14,6 +14,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
 #include <PhysBAM_Tools/Krylov_Solvers/SYMMQMR.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>

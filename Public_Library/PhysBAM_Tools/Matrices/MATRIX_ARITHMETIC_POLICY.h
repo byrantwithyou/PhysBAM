@@ -56,6 +56,18 @@ template<class T,int d> struct PRODUCT<MATRIX_MXN<T>,SYMMETRIC_MATRIX<T,d> >{typ
 template<class T,int d> struct PRODUCT<MATRIX_MXN<T>,UPPER_TRIANGULAR_MATRIX<T,d> >{typedef MATRIX_MXN<T> TYPE;};
 template<class T> struct PRODUCT<MATRIX_MXN<T>,MATRIX_MXN<T> >{typedef MATRIX_MXN<T> TYPE;};
 
+template<class T,int m,int n> struct PRODUCT<T,MATRIX<T,m,n> >{typedef MATRIX<T,m,n> TYPE;};
+template<class T,int d> struct PRODUCT<T,DIAGONAL_MATRIX<T,d> >{typedef DIAGONAL_MATRIX<T,d> TYPE;};
+template<class T,int d> struct PRODUCT<T,SYMMETRIC_MATRIX<T,d> >{typedef SYMMETRIC_MATRIX<T,d> TYPE;};
+template<class T,int d> struct PRODUCT<T,UPPER_TRIANGULAR_MATRIX<T,d> >{typedef UPPER_TRIANGULAR_MATRIX<T,d> TYPE;};
+template<class T> struct PRODUCT<T,MATRIX_MXN<T> >{typedef MATRIX_MXN<T> TYPE;};
+
+template<class T,int m,int n> struct PRODUCT<MATRIX<T,m,n>,T>{typedef MATRIX<T,m,n> TYPE;};
+template<class T,int d> struct PRODUCT<DIAGONAL_MATRIX<T,d>,T>{typedef DIAGONAL_MATRIX<T,d> TYPE;};
+template<class T,int d> struct PRODUCT<SYMMETRIC_MATRIX<T,d>,T>{typedef SYMMETRIC_MATRIX<T,d> TYPE;};
+template<class T,int d> struct PRODUCT<UPPER_TRIANGULAR_MATRIX<T,d>,T>{typedef UPPER_TRIANGULAR_MATRIX<T,d> TYPE;};
+template<class T> struct PRODUCT<MATRIX_MXN<T>,T>{typedef MATRIX_MXN<T> TYPE;};
+
 template<class TV> struct PRODUCT<FRAME<TV>,TV>{typedef TV TYPE;};
 
 template<class TM> struct TRANSPOSE;

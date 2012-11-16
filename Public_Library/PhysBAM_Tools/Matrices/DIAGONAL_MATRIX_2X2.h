@@ -230,6 +230,12 @@ public:
     DIAGONAL_MATRIX Times_Transpose(const DIAGONAL_MATRIX& M) const
     {return *this*M;}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,x11,x22);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,x11,x22);}
+
 //#####################################################################
     MATRIX<T,2> Times_Transpose(const MATRIX<T,2>& A) const;
     MATRIX<T,2,3> Times_Transpose(const MATRIX<T,3,2>& A) const;

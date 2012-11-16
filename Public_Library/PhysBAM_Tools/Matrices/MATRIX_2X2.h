@@ -47,6 +47,11 @@ public:
         x[0]=matrix_input.x11;x[1]=x[2]=matrix_input.x21;x[3]=matrix_input.x22;
     }
 
+    MATRIX(const DIAGONAL_MATRIX<T,2>& matrix_input)
+    {
+        x[0]=matrix_input.x11;x[3]=matrix_input.x22;
+    }
+
     MATRIX(const UPPER_TRIANGULAR_MATRIX<T,2>& matrix_input)
     {
         x[0]=matrix_input.x11;x[2]=matrix_input.x12;x[3]=matrix_input.x22;x[1]=0;

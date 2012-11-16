@@ -7,8 +7,10 @@ template<class T> template<class T_MATRIX> bool MATRIX_TESTS<T>::
 Arbitrary_Test_One_Size(T_MATRIX A,int count) const
 {
     T_MATRIX B((INITIAL_SIZE)A.Rows(),(INITIAL_SIZE)A.Columns()),C(A);bool ok=true;T tolerance=std::numeric_limits<T>::epsilon();
-    Test(B.Columns()==A.Columns() && B.Rows()==A.Rows(),"Dimension tests (B).",ok,A);
-    Test(C.Columns()==A.Columns() && C.Rows()==A.Rows(),"Dimension tests (C).",ok,A);
+    Test(B.Columns()==A.Columns(),"Dimension tests (1A).",ok,B,A);
+    Test(B.Rows()==A.Rows(),"Dimension tests (1B).",ok,B,A);
+    Test(C.Columns()==A.Columns(),"Dimension tests (1C).",ok,C,A);
+    Test(C.Rows()==A.Rows(),"Dimension tests (1D).",ok,C,A);
 
     for(int i=0;i<count;i++){
         MATRIX_MXN<T> D(A.Rows(),A.Columns()),E(A.Rows(),A.Columns()),F;rand.Fill_Uniform(A,-1,1);rand.Fill_Uniform(B,-1,1);D=A;E=B;
@@ -41,15 +43,43 @@ template<class T> template<class T_MATRIX1,class T_MATRIX2> bool MATRIX_TESTS<T>
 Arbitrary_Test_Two_Sizes(T_MATRIX1 A,T_MATRIX2 B,int count) const
 {
     T tolerance=std::numeric_limits<T>::epsilon()*2;bool ok=true;
-    Test(A.Columns()==B.Rows(),"Dimension tests (A).",ok,A);
+    Test(A.Columns()==B.Rows(),"Dimension tests (2A).",ok,A,B);
 
     for(int i=0;i<count && ok;i++){
         MATRIX_MXN<T> D(A.Rows(),A.Columns()),E(B.Rows(),B.Columns());rand.Fill_Uniform(A,-1,1);rand.Fill_Uniform(B,-1,1);D=MATRIX_MXN<T>(A);E=MATRIX_MXN<T>(B);
-
         Test(Assert_Equal(MATRIX_MXN<T>(A*B),D*E,tolerance),"Multiplication matches.",ok,A,B);
-        Test(Assert_Equal(MATRIX_MXN<T>(A.Transposed().Transpose_Times(B)),D*E,tolerance),"Transpose_Times matches.",ok,A,B);
-        Test(Assert_Equal(MATRIX_MXN<T>(A.Times_Transpose(B.Transposed())),D*E,tolerance),"Times_Transpose matches.",ok,A,B);
+        Test(Assert_Equal(MATRIX_MXN<T>(A),D),"Inputs not changed.",ok,A,B);
+        Test(Assert_Equal(MATRIX_MXN<T>(B),E),"Inputs not changed.",ok,A,B);}
+    return ok;
+}
+//#####################################################################
+// Function Arbitrary_Test_Two_Sizes
+//#####################################################################
+template<class T> template<class T_MATRIX1,class T_MATRIX2> bool MATRIX_TESTS<T>::
+Arbitrary_Test_Two_Sizes_TX(T_MATRIX1 A,T_MATRIX2 B,int count) const
+{
+    T tolerance=std::numeric_limits<T>::epsilon()*2;bool ok=true;
+    Test(A.Rows()==B.Rows(),"Dimension tests (TX).",ok,A,B);
 
+    for(int i=0;i<count && ok;i++){
+        MATRIX_MXN<T> D(A.Rows(),A.Columns()),E(B.Rows(),B.Columns());rand.Fill_Uniform(A,-1,1);rand.Fill_Uniform(B,-1,1);D=MATRIX_MXN<T>(A);E=MATRIX_MXN<T>(B);
+        Test(Assert_Equal(MATRIX_MXN<T>(A.Transpose_Times(B)),D.Transposed()*E,tolerance),"Transpose_Times matches.",ok,A,B);
+        Test(Assert_Equal(MATRIX_MXN<T>(A),D),"Inputs not changed.",ok,A,B);
+        Test(Assert_Equal(MATRIX_MXN<T>(B),E),"Inputs not changed.",ok,A,B);}
+    return ok;
+}
+//#####################################################################
+// Function Arbitrary_Test_Two_Sizes
+//#####################################################################
+template<class T> template<class T_MATRIX1,class T_MATRIX2> bool MATRIX_TESTS<T>::
+Arbitrary_Test_Two_Sizes_XT(T_MATRIX1 A,T_MATRIX2 B,int count) const
+{
+    T tolerance=std::numeric_limits<T>::epsilon()*2;bool ok=true;
+    Test(A.Columns()==B.Columns(),"Dimension tests (XT).",ok,A,B);
+
+    for(int i=0;i<count && ok;i++){
+        MATRIX_MXN<T> D(A.Rows(),A.Columns()),E(B.Rows(),B.Columns());rand.Fill_Uniform(A,-1,1);rand.Fill_Uniform(B,-1,1);D=MATRIX_MXN<T>(A);E=MATRIX_MXN<T>(B);
+        Test(Assert_Equal(MATRIX_MXN<T>(A.Times_Transpose(B)),D*E.Transposed(),tolerance),"Times_Transpose matches.",ok,A,B);
         Test(Assert_Equal(MATRIX_MXN<T>(A),D),"Inputs not changed.",ok,A,B);
         Test(Assert_Equal(MATRIX_MXN<T>(B),E),"Inputs not changed.",ok,A,B);}
     return ok;
@@ -115,6 +145,13 @@ Conversion_Test(DIAGONAL_MATRIX<T,d>& A,MATRIX_MXN<T>& B,bool& ok) const
 //#####################################################################
 template<class T> template<int d> void MATRIX_TESTS<T>::
 Conversion_Test(SYMMETRIC_MATRIX<T,d>& A,MATRIX_MXN<T>& B,bool& ok) const
+{
+}
+//#####################################################################
+// Function Conversion_Test
+//#####################################################################
+template<class T> template<int d> void MATRIX_TESTS<T>::
+Conversion_Test(UPPER_TRIANGULAR_MATRIX<T,d>& A,MATRIX_MXN<T>& B,bool& ok) const
 {
 }
 //#####################################################################

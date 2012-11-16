@@ -27,7 +27,6 @@ template<class TV>
 class RIGID_BODY_CLUSTER_BINDINGS:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
-    typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;
 public:
 
     struct INTERNAL_JOINT
@@ -53,7 +52,7 @@ public:
         int infinite_body;
         int parent; // TODO: Make sure this is set up...
         T saved_mass;
-        T_INERTIA_TENSOR saved_inertia_tensor;
+        DIAGONAL_MATRIX<T,TV::SPIN::m> saved_inertia_tensor;
         ARRAY<INTERNAL_JOINT> internal_joints; // joint, parent, child
         ARRAY<BOUNDARY_JOINT> boundary_joints; // joint, body, is_parent
         ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> children;

@@ -35,6 +35,12 @@ public:
         assert(A.Rows()==0 && A.Columns()==0);
     }
 
+    MATRIX(const SYMMETRIC_MATRIX<T,0>& matrix_input)
+    {}
+
+    MATRIX(const DIAGONAL_MATRIX<T,0>& matrix_input)
+    {}
+
     MATRIX& operator=(const MATRIX& matrix)
     {return *this;}
 
@@ -219,43 +225,6 @@ public:
 };
 
 template<class T>
-class DIAGONAL_MATRIX<T,0>:public MATRIX<T,0>
-{
-public:
-    DIAGONAL_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(),INITIAL_SIZE nn=INITIAL_SIZE())
-        :MATRIX<T,0>(mm,nn)
-    {
-    }
-
-    template<class T2>
-    DIAGONAL_MATRIX(const MATRIX<T2,0>& matrix_input)
-        :MATRIX<T,0>(matrix_input)
-    {}
-
-    explicit DIAGONAL_MATRIX(const VECTOR<T,0>& v)
-        :MATRIX<T,0>(v.x)
-    {}
-};
-
-template<class T>
-class SYMMETRIC_MATRIX<T,0>:public MATRIX<T,0>
-{
-public:
-    SYMMETRIC_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(),INITIAL_SIZE nn=INITIAL_SIZE())
-        :MATRIX<T,0>(mm,nn)
-    {
-    }
-
-    template<class T2>
-    SYMMETRIC_MATRIX(const MATRIX<T2,0>& matrix_input)
-        :MATRIX<T,0>(matrix_input)
-    {}
-
-    explicit SYMMETRIC_MATRIX(const VECTOR<T,0>& v)
-    {}
-};
-
-template<class T>
 inline MATRIX<T,0> operator*(const T a,const MATRIX<T,0>& A)
 {return A;}
 
@@ -266,6 +235,14 @@ inline MATRIX<T,0> operator+(const T a,const MATRIX<T,0>& A)
 template<class T>
 inline MATRIX<T,0> operator-(const T a,const MATRIX<T,0>& A)
 {return A;}
+
+template<class T>
+inline MATRIX<T,0> operator+(const SYMMETRIC_MATRIX<T,0>& A,const MATRIX<T,0>& B)
+{return MATRIX<T,0>();}
+
+template<class T>
+inline MATRIX<T,0> operator-(const SYMMETRIC_MATRIX<T,0>& A,const MATRIX<T,0>& B)
+{return MATRIX<T,0>();}
 
 template<class T>
 inline MATRIX<T,0> log(const MATRIX<T,0>& A)

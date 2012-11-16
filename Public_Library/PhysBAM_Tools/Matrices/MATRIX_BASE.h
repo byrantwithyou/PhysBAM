@@ -223,7 +223,17 @@ public:
     T_MATRIX operator*(const UPPER_TRIANGULAR_MATRIX<T,d>& A) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);assert(Columns()==d);
     T_MATRIX M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)d);
-    for(int j=0;j<d;j++) for(int k=0;k<j;k++) for(int i=0;i<Rows();i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
+    for(int j=0;j<d;j++) for(int k=0;k<=j;k++) for(int i=0;i<Rows();i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
+
+    template<int d>
+    T_MATRIX Times_Transpose(const UPPER_TRIANGULAR_MATRIX<T,d>& A) const
+    {assert(Columns()==d);T_MATRIX M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)d);
+    for(int j=0;j<Rows();j++) for(int k=0;k<d;k++) for(int i=0;i<=k;i++) M(j,i)+=(*this)(j,k)*A(i,k);return M;}
+
+    template<int d>
+    typename TRANSPOSE<T_MATRIX>::TYPE Transpose_Times(const UPPER_TRIANGULAR_MATRIX<T,d>& A) const
+    {assert(Rows()==d);typename TRANSPOSE<T_MATRIX>::TYPE M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);
+    for(int j=0;j<Columns();j++) for(int k=0;k<d;k++) for(int i=0;i<=k;i++) M(j,k)+=(*this)(i,j)*A(i,k);return M;}
 
     T_MATRIX& operator*=(const T a)
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) (*this)(i,j)*=a;return Derived();}
@@ -294,15 +304,30 @@ public:
     {(*this)(istart,jstart)=a.x11;(*this)(istart,jstart+1)=a.x21;(*this)(istart+1,jstart)=a.x21;(*this)(istart,jstart+2)=a.x31;(*this)(istart+2,jstart)=a.x31;
     (*this)(istart+1,jstart+1)=a.x22;(*this)(istart+1,jstart+2)=a.x32;(*this)(istart+2,jstart+1)=a.x32;(*this)(istart+2,jstart+2)=a.x33;}
 
+    void Set_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,2>& a)
+    {(*this)(istart,jstart)=a.x11;(*this)(istart,jstart+1)=a.x21;(*this)(istart+1,jstart)=a.x21;(*this)(istart+1,jstart+1)=a.x22;}
+
+    void Set_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,1>& a)
+    {(*this)(istart,jstart)=a.x11;}
+
+    void Set_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,0>& a)
+    {}
+
     void Set_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,3>& a)
     {(*this)(istart,jstart)=a.x11;(*this)(istart+1,jstart+1)=a.x22;(*this)(istart+2,jstart+2)=a.x33;}
+
+    void Set_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,2>& a)
+    {(*this)(istart,jstart)=a.x11;(*this)(istart+1,jstart+1)=a.x22;}
+
+    void Set_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,1>& a)
+    {(*this)(istart,jstart)=a.x11;}
+
+    void Set_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,0>& a)
+    {}
 
     template<class T_VECTOR>
     void Set_Submatrix(const int istart,const int jstart,const ARRAY_BASE<T,T_VECTOR>& a)
     {for(int i=0;i<a.Size();i++) (*this)(istart+i,jstart)=a(i);}
-
-    void Set_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,2>& a)
-    {(*this)(istart,jstart)=a.x11;(*this)(istart,jstart+1)=a.x21;(*this)(istart+1,jstart)=a.x21;(*this)(istart+1,jstart+1)=a.x22;}
 
     template<class T_MATRIX2>
     void Add_To_Submatrix(const int istart,const int jstart,const MATRIX_BASE<T,T_MATRIX2>& a)
@@ -312,11 +337,26 @@ public:
     {(*this)(istart,jstart)+=a.x11;(*this)(istart,jstart+1)+=a.x21;(*this)(istart+1,jstart)+=a.x21;(*this)(istart,jstart+2)+=a.x31;(*this)(istart+2,jstart)+=a.x31;
     (*this)(istart+1,jstart+1)+=a.x22;(*this)(istart+1,jstart+2)+=a.x32;(*this)(istart+2,jstart+1)+=a.x32;(*this)(istart+2,jstart+2)+=a.x33;}
 
+    void Add_To_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,2>& a)
+    {(*this)(istart,jstart)+=a.x11;(*this)(istart,jstart+1)+=a.x21;(*this)(istart+1,jstart)+=a.x21;(*this)(istart+1,jstart+1)+=a.x22;}
+
+    void Add_To_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,1>& a)
+    {(*this)(istart,jstart)+=a.x11;}
+
+    void Add_To_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,0>& a)
+    {}
+
     void Add_To_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,3>& a)
     {(*this)(istart,jstart)+=a.x11;(*this)(istart+1,jstart+1)+=a.x22;(*this)(istart+2,jstart+2)+=a.x33;}
 
     void Add_To_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,2>& a)
     {(*this)(istart,jstart)+=a.x11;(*this)(istart+1,jstart+1)+=a.x22;}
+
+    void Add_To_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,1>& a)
+    {(*this)(istart,jstart)+=a.x11;}
+
+    void Add_To_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,0>& a)
+    {}
 
     template<class T_VECTOR>
     void Add_To_Submatrix(const int istart,const int jstart,const ARRAY_BASE<T,T_VECTOR>& a)

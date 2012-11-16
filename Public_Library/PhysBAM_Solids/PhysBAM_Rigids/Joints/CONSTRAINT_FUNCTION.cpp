@@ -77,7 +77,7 @@ Initialize()
     for(int i=0;i<2;i++){
         r[i]=ap[i]-p[i];
         if(!rigid_body[i]->Has_Infinite_Inertia()){
-            MATRIX<T,1> inverse_inertia=rigid_body[i]->World_Space_Inertia_Tensor_Inverse();TV rhat=location-p[i];
+            SYMMETRIC_MATRIX<T,1> inverse_inertia=rigid_body[i]->World_Space_Inertia_Tensor_Inverse();TV rhat=location-p[i];
             one_over_m+=(T)1/rigid_body[i]->Mass();inverse_inertia_rhat_star[i]=inverse_inertia.Times_Cross_Product_Matrix(rhat);
             metric_tensor+=inverse_inertia.Conjugate_With_Cross_Product_Matrix(rhat);}}
     metric_tensor+=one_over_m;

@@ -5,12 +5,14 @@
 #ifndef __MATRIX_TESTS__
 #define __MATRIX_TESTS__
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_0X0.h>
+#include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_1X1.h>
+#include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
+#include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Utilities/TEST_BASE.h>
 #include <limits>
@@ -65,8 +67,11 @@ public:
     template<class T_MATRIX> void Conversion_Test(T_MATRIX& A,MATRIX_MXN<T>& B,bool& ok) const;
     template<int d> void Conversion_Test(DIAGONAL_MATRIX<T,d>& A,MATRIX_MXN<T>& B,bool& ok) const;
     template<int d> void Conversion_Test(SYMMETRIC_MATRIX<T,d>& A,MATRIX_MXN<T>& B,bool& ok) const;
+    template<int d> void Conversion_Test(UPPER_TRIANGULAR_MATRIX<T,d>& A,MATRIX_MXN<T>& B,bool& ok) const;
     template<class T_MATRIX1> bool Arbitrary_Test_One_Size(T_MATRIX1 A,int count) const;
     template<class T_MATRIX1,class T_MATRIX2> bool Arbitrary_Test_Two_Sizes(T_MATRIX1 A,T_MATRIX2 B,int count) const;
+    template<class T_MATRIX1,class T_MATRIX2> bool Arbitrary_Test_Two_Sizes_XT(T_MATRIX1 A,T_MATRIX2 B,int count) const;
+    template<class T_MATRIX1,class T_MATRIX2> bool Arbitrary_Test_Two_Sizes_TX(T_MATRIX1 A,T_MATRIX2 B,int count) const;
 //#####################################################################
 };
 }

@@ -127,6 +127,10 @@ public:
     MATRIX_MXN<T>& operator=(const SYMMETRIC_MATRIX<T,d>& A)
     {x.Resize(A.Rows()*A.Columns());m=n=d;for(int i=0;i<m;i++) for(int j=0;j<=i;j++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(i,j);return *this;}
 
+    template<int d>
+    MATRIX_MXN<T>& operator=(const UPPER_TRIANGULAR_MATRIX<T,d>& A)
+    {x.Resize(d*d);m=n=d;for(int j=0;j<d;j++) for(int i=0;i<=j;i++) (*this)(i,j)=A(i,j);return *this;}
+
     T Trace() const
     {assert(m==n);T trace=0;for(int i=0;i<n;i++) trace+=(*this)(i,i);return trace;}
 

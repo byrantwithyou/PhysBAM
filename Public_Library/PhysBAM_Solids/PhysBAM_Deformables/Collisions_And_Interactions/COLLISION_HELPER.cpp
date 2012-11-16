@@ -2,6 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COLLISION_HELPER.h>
 using namespace PhysBAM;
 //#####################################################################

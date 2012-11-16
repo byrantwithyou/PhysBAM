@@ -9,6 +9,7 @@
 
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_FORWARD.h>
+#include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 #include <cassert>
 #include <ostream>
@@ -120,9 +121,38 @@ public:
     UPPER_TRIANGULAR_MATRIX operator*(const DIAGONAL_MATRIX<T,3>& A) const
     {return UPPER_TRIANGULAR_MATRIX(x11*A.x11,x12*A.x22,x22*A.x22,x13*A.x33,x23*A.x33,x33*A.x33);}
 
-    MATRIX_MXN<T> operator*(const MATRIX_MXN<T>& A) const
-    {assert(A.Rows()==3);MATRIX_MXN<T> M(3,A.Columns());
-    for(int j=0;j<A.Columns();j++) for(int k=0;k<3;k++) for(int i=0;i<k;i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
+    template<class T_MATRIX>
+    T_MATRIX operator*(const MATRIX_BASE<T,T_MATRIX>& A) const
+    {assert(A.Rows()==3);T_MATRIX M(INITIAL_SIZE(3),INITIAL_SIZE(A.Columns()));
+    for(int j=0;j<A.Columns();j++) for(int k=0;k<3;k++) for(int i=0;i<=k;i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
+
+    template<class T_MATRIX>
+    typename TRANSPOSE<T_MATRIX>::TYPE Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
+    {assert(A.Columns()==3);typename TRANSPOSE<T_MATRIX>::TYPE M(INITIAL_SIZE(3),INITIAL_SIZE(A.Rows()));
+    for(int j=0;j<A.Rows();j++) for(int k=0;k<3;k++) for(int i=0;i<=k;i++) M(i,j)+=(*this)(i,k)*A(j,k);return M;}
+
+    UPPER_TRIANGULAR_MATRIX Times_Transpose(const DIAGONAL_MATRIX<T,3>& A) const
+    {return *this*A;}
+
+    MATRIX<T,3> Times_Transpose(const SYMMETRIC_MATRIX<T,3>& A) const
+    {return *this*A;}
+
+    template<class T_MATRIX>
+    T_MATRIX Transpose_Times(const MATRIX_BASE<T,T_MATRIX>& A) const
+    {assert(A.Rows()==3);T_MATRIX M(INITIAL_SIZE(3),INITIAL_SIZE(A.Columns()));
+    for(int j=0;j<A.Columns();j++) for(int k=0;k<3;k++) for(int i=0;i<=k;i++) M(k,j)+=(*this)(i,k)*A(i,j);return M;}
+
+    MATRIX<T,3> Transpose_Times(const DIAGONAL_MATRIX<T,3>& A) const
+    {return MATRIX<T,3>(x11*A.x11,x12*A.x11,x13*A.x11,0,x22*A.x22,x23*A.x22,0,0,x33*A.x33);}
+
+    MATRIX<T,3> Transpose_Times(const SYMMETRIC_MATRIX<T,3>& A) const
+    {return MATRIX<T,3>(x11*A.x11,x12*A.x11+x22*A.x21,x13*A.x11+x23*A.x21+x33*A.x31,x11*A.x21,x12*A.x21+x22*A.x22,x13*A.x21+x23*A.x22+x33*A.x32,x11*A.x31,x12*A.x31+x22*A.x32,x13*A.x31+x23*A.x32+x33*A.x33);}
+
+    MATRIX<T,3> Transpose_Times(const UPPER_TRIANGULAR_MATRIX<T,3>& A) const
+    {return MATRIX<T,3>(x11*A.x11,x12*A.x11,x13*A.x11,x11*A.x12,x12*A.x12+x22*A.x22,x13*A.x12+x23*A.x22,x11*A.x13,x12*A.x13+x22*A.x23,x13*A.x13+x23*A.x23+x33*A.x33);}
+
+    MATRIX<T,3> Times_Transpose(const UPPER_TRIANGULAR_MATRIX<T,3>& A) const
+    {return MATRIX<T,3>(x11*A.x11+x12*A.x12+x13*A.x13,x22*A.x12+x23*A.x13,x33*A.x13,x12*A.x22+x13*A.x23,x22*A.x22+x23*A.x23,x33*A.x23,x13*A.x33,x23*A.x33,x33*A.x33);}
 
     T Determinant() const
     {return x11*x22*x33;}
@@ -155,32 +185,16 @@ public:
     T Simplex_Minimum_Altitude() const
     {return MATRIX<T,3>(*this).Simplex_Minimum_Altitude();}
 
+    MATRIX<T,3> Transposed() const
+    {return MATRIX<T,3>(*this).Transposed();}
+
 //#####################################################################
 };
 // global functions
-template<class T>
-inline UPPER_TRIANGULAR_MATRIX<T,3> operator*(const T a,const UPPER_TRIANGULAR_MATRIX<T,3>& A)
-{return A*a;}
-
-template<class T>
-inline UPPER_TRIANGULAR_MATRIX<T,3> operator+(const T a,const UPPER_TRIANGULAR_MATRIX<T,3>& A)
-{return A+a;}
-
-template<class T>
-inline UPPER_TRIANGULAR_MATRIX<T,3> operator-(const T a,const UPPER_TRIANGULAR_MATRIX<T,3>& A)
-{return -A+a;}
 
 template<class T>
 inline UPPER_TRIANGULAR_MATRIX<T,3> operator*(const DIAGONAL_MATRIX<T,3>& A,const UPPER_TRIANGULAR_MATRIX<T,3>& B)
 {return UPPER_TRIANGULAR_MATRIX<T,3>(A.x11*B.x11,A.x11*B.x12,A.x22*B.x22,A.x11*B.x13,A.x22*B.x23,A.x33*B.x33);}
-
-template<class T>
-inline UPPER_TRIANGULAR_MATRIX<T,3> operator+(const DIAGONAL_MATRIX<T,3>& A,const UPPER_TRIANGULAR_MATRIX<T,3>& B)
-{return B+A;}
-
-template<class T>
-inline UPPER_TRIANGULAR_MATRIX<T,3> operator-(const DIAGONAL_MATRIX<T,3>& A,const UPPER_TRIANGULAR_MATRIX<T,3>& B)
-{return -B+A;}
 
 template<class T>
 inline std::ostream& operator<<(std::ostream& output_stream,const UPPER_TRIANGULAR_MATRIX<T,3>& A)

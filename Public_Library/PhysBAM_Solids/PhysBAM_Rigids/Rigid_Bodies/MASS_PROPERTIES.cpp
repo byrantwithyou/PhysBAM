@@ -4,10 +4,10 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/FACTORIAL.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <PhysBAM_Tools/Matrices/FRAME.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
 #include <PhysBAM_Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
@@ -19,10 +19,10 @@ using namespace PhysBAM;
 // Function Compute_Properties
 //#####################################################################
 namespace{
-template<class T,int d> inline MATRIX<T,1> Scaled_Element_Covariance(const T scaled_element_volume,const MATRIX<T,2,d>& DX) // actually returns only the trace of the covariance matrix
+template<class T,int d> inline SYMMETRIC_MATRIX<T,1> Scaled_Element_Covariance(const T scaled_element_volume,const MATRIX<T,2,d>& DX) // actually returns only the trace of the covariance matrix
 {
     static const SYMMETRIC_MATRIX<T,d> canonical=(T)1+SYMMETRIC_MATRIX<T,d>::Unit_Matrix();
-    return MATRIX<T,1>(scaled_element_volume*MATRIX<T,2,d>::Inner_Product(DX*canonical,DX));
+    return SYMMETRIC_MATRIX<T,1>(scaled_element_volume*MATRIX<T,2,d>::Inner_Product(DX*canonical,DX));
 }
 template<class T,int d> inline SYMMETRIC_MATRIX<T,3> Scaled_Element_Covariance(const T scaled_element_volume,const MATRIX<T,3,d>& DX)
 {
@@ -41,8 +41,6 @@ template<class TV,int d> template<bool thin_shell> void MASS_PROPERTIES<TV,d>::
 Compute_Properties(MASS_PROPERTIES<TV,d>&,NORMAL_IMPLEMENTATION)
 {
     typedef typename TV::SCALAR T;
-    typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_WORLD_SPACE_INERTIA_TENSOR;
 
     static const bool filled=!thin_shell;
     if(!object.mesh.elements.m) PHYSBAM_FATAL_ERROR("mesh has no elements");
@@ -68,7 +66,7 @@ Compute_Properties(MASS_PROPERTIES<TV,d>&,NORMAL_IMPLEMENTATION)
     center=base+(T)1/(d+1+filled)*scaled_center_times_volume/scaled_volume;
 
     // compute inertia tensor (see http://number-none.com/blow/inertia for explanation of filled case)
-    T_WORLD_SPACE_INERTIA_TENSOR scaled_covariance=T_WORLD_SPACE_INERTIA_TENSOR(); // (d+2+filled)!*covariance (or trace(covariance) in 2d)
+    SYMMETRIC_MATRIX<T,TV::SPIN::m> scaled_covariance=SYMMETRIC_MATRIX<T,TV::SPIN::m>(); // (d+2+filled)!*covariance (or trace(covariance) in 2d)
     for(int t=0;t<object.mesh.elements.m;t++){const VECTOR<int,d+1>& nodes=object.mesh.elements(t);
         MATRIX<T,TV::m,d+1> DX;
         for(int i=0;i<nodes.m;i++) particle_X[i]=object.particles.X(nodes(i)); // THIS NEEDS TO BE HERE BECAUSE OF A COMPILER BUG IN GCC 4.0.2
@@ -122,13 +120,13 @@ Thin_Shell_Volume(const T_SIMPLICIAL_OBJECT& object)
 // Function Transform_To_Object_Frame
 //#####################################################################
 namespace{
-template<class T> ROTATION<VECTOR<T,1> > Diagonalize_Inertia_Tensor(MATRIX<T,0>& object_space_inertia_tensor,const MATRIX<T,0> inertia_tensor)
+template<class T> ROTATION<VECTOR<T,1> > Diagonalize_Inertia_Tensor(DIAGONAL_MATRIX<T,0>& object_space_inertia_tensor,const SYMMETRIC_MATRIX<T,0> inertia_tensor)
 {
     return ROTATION<VECTOR<T,1> >();
 }
-template<class T> ROTATION<VECTOR<T,2> > Diagonalize_Inertia_Tensor(MATRIX<T,1>& object_space_inertia_tensor,const MATRIX<T,1>& inertia_tensor)
+template<class T> ROTATION<VECTOR<T,2> > Diagonalize_Inertia_Tensor(DIAGONAL_MATRIX<T,1>& object_space_inertia_tensor,const SYMMETRIC_MATRIX<T,1>& inertia_tensor)
 {
-    object_space_inertia_tensor=inertia_tensor;
+    object_space_inertia_tensor=DIAGONAL_MATRIX<T,1>(inertia_tensor);
     return ROTATION<VECTOR<T,2> >();
 }
 template<class T> ROTATION<VECTOR<T,3> > Diagonalize_Inertia_Tensor(DIAGONAL_MATRIX<T,3>& object_space_inertia_tensor,const SYMMETRIC_MATRIX<T,3>& inertia_tensor)
@@ -137,7 +135,7 @@ template<class T> ROTATION<VECTOR<T,3> > Diagonalize_Inertia_Tensor(DIAGONAL_MAT
     return ROTATION<VECTOR<T,3> >(rotation);
 }}
 template<class TV,int d> void MASS_PROPERTIES<TV,d>::
-Transform_To_Object_Frame(FRAME<TV>& frame,T_INERTIA_TENSOR& object_space_inertia_tensor) const
+Transform_To_Object_Frame(FRAME<TV>& frame,DIAGONAL_MATRIX<T,TV::SPIN::m>& object_space_inertia_tensor) const
 {
     frame.t=center;
     frame.r=Diagonalize_Inertia_Tensor<T>(object_space_inertia_tensor,Inertia_Tensor());
@@ -146,7 +144,7 @@ Transform_To_Object_Frame(FRAME<TV>& frame,T_INERTIA_TENSOR& object_space_inerti
 // Function Transform_To_Object_Frame
 //#####################################################################
 template<class TV,int d> void MASS_PROPERTIES<TV,d>::
-Transform_To_Object_Frame(FRAME<TV>& frame,T_INERTIA_TENSOR& object_space_inertia_tensor,GEOMETRY_PARTICLES<TV>& point_cloud) const
+Transform_To_Object_Frame(FRAME<TV>& frame,DIAGONAL_MATRIX<T,TV::SPIN::m>& object_space_inertia_tensor,GEOMETRY_PARTICLES<TV>& point_cloud) const
 {
     Transform_To_Object_Frame(frame,object_space_inertia_tensor);
     if(frame.r==ROTATION<TV>()) point_cloud.X-=frame.t;

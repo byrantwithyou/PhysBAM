@@ -2,9 +2,7 @@
 // Copyright 2006-2009, Craig Schroeder, Eftychios Sifakis, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_0X0.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Particles/RIGID_BODY_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Particles/RIGIDS_PARTICLES_FORWARD.h>

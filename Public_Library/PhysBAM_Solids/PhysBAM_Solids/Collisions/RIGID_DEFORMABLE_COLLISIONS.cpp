@@ -632,7 +632,7 @@ Set_Collision_Velocities(ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > twist,ARRAY<TV>
     ARRAY<PRECOMPUTE_CONTACT_PROJECTION*> precompute_boundary_list;
     for(int body=0;body<precompute_contact_projections.m;body++){
         PRECOMPUTE_CONTACT_PROJECTION& precompute=*precompute_contact_projections(body),*precompute_boundary=0;const int rigid_p=precompute.rigid_body.particle_index;
-        T_WORLD_SPACE_INERTIA_TENSOR inverse_inertia;
+        SYMMETRIC_MATRIX<T,TV::SPIN::m> inverse_inertia;
         if(solids_parameters.use_trapezoidal_rule_for_velocities) inverse_inertia=precompute.rigid_body.World_Space_Inertia_Tensor_Inverse();
         for(int i=0;i<precompute.particles.m;i++){const int p=precompute.particles(i);
             TV V_rel=RIGID_BODY<TV>::Pointwise_Object_Velocity(twist(rigid_p),rigid_frame(rigid_p).t,X(p))-V(p);

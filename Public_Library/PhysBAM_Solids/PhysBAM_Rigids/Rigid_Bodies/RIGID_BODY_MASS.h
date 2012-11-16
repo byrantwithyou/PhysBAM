@@ -7,24 +7,21 @@
 #ifndef __RIGID_BODY_MASS__
 #define __RIGID_BODY_MASS__
 
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_0X0.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_FORWARD.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_FORWARD.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 namespace PhysBAM{
 
 template<class TV,bool world_space> // world_space=false
 class RIGID_BODY_MASS
 {
     typedef typename TV::SCALAR T;
-    typedef typename IF<world_space,typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR,typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR>::TYPE T_INERTIA_TENSOR;
+    typedef typename IF<world_space,SYMMETRIC_MATRIX<T,TV::SPIN::m>,DIAGONAL_MATRIX<T,TV::SPIN::m> >::TYPE T_INERTIA_TENSOR;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
@@ -73,16 +70,16 @@ public:
     T Inner_Product(const TWIST<TV>& v1,const TWIST<TV>& v2) const
     {STATIC_ASSERT(world_space);return mass*TV::Dot_Product(v1.linear,v2.linear)+TV::SPIN::Dot_Product(v1.angular,inertia_tensor*v2.angular);}
 
-    MATRIX<T,0> World_Space_Inertia_Tensor(const ROTATION<VECTOR<T,1> > orientation) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return MATRIX<T,0>();}
+    SYMMETRIC_MATRIX<T,0> World_Space_Inertia_Tensor(const ROTATION<VECTOR<T,1> > orientation) const
+    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return SYMMETRIC_MATRIX<T,0>();}
 
-    MATRIX<T,0> World_Space_Inertia_Tensor_Inverse(const ROTATION<VECTOR<T,1> > orientation) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return MATRIX<T,0>();}
+    SYMMETRIC_MATRIX<T,0> World_Space_Inertia_Tensor_Inverse(const ROTATION<VECTOR<T,1> > orientation) const
+    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return SYMMETRIC_MATRIX<T,0>();}
 
-    MATRIX<T,1> World_Space_Inertia_Tensor(const ROTATION<VECTOR<T,2> >& orientation) const
+    SYMMETRIC_MATRIX<T,1> World_Space_Inertia_Tensor(const ROTATION<VECTOR<T,2> >& orientation) const
     {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==2>::value));return inertia_tensor;}
 
-    MATRIX<T,1> World_Space_Inertia_Tensor_Inverse(const ROTATION<VECTOR<T,2> >& orientation) const
+    SYMMETRIC_MATRIX<T,1> World_Space_Inertia_Tensor_Inverse(const ROTATION<VECTOR<T,2> >& orientation) const
     {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==2>::value));return inertia_tensor.Inverse();}
 
     SYMMETRIC_MATRIX<T,3> World_Space_Inertia_Tensor(const ROTATION<VECTOR<T,3> >& orientation) const
@@ -95,10 +92,10 @@ public:
     MATRIX<T,3> object_to_world_transformation=orientation.Rotation_Matrix();
     return SYMMETRIC_MATRIX<T,3>::Conjugate(object_to_world_transformation,inertia_tensor.Inverse());}
 
-    MATRIX<T,0> World_Space_Inertia_Tensor(const FRAME<TV>& frame,const VECTOR<T,1>& reference_point) const // relative to a reference point
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return MATRIX<T,0>();}
+    SYMMETRIC_MATRIX<T,0> World_Space_Inertia_Tensor(const FRAME<TV>& frame,const VECTOR<T,1>& reference_point) const // relative to a reference point
+    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return SYMMETRIC_MATRIX<T,0>();}
 
-    MATRIX<T,1> World_Space_Inertia_Tensor(const FRAME<TV>& frame,const VECTOR<T,2>& reference_point) const // relative to a reference point
+    SYMMETRIC_MATRIX<T,1> World_Space_Inertia_Tensor(const FRAME<TV>& frame,const VECTOR<T,2>& reference_point) const // relative to a reference point
     {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==2>::value));TV offset=reference_point-frame.t;
     return inertia_tensor+mass*offset.Magnitude_Squared();}
 
@@ -107,10 +104,10 @@ public:
     return World_Space_Inertia_Tensor(frame.r)+mass*(offset.Magnitude_Squared()-SYMMETRIC_MATRIX<T,3>::Outer_Product(offset));}
 
     VECTOR<T,0> World_Space_Inertia_Tensor_Times(const ROTATION<VECTOR<T,1> > orientation,const VECTOR<T,0> angular_velocity) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return VECTOR<T,0>();}
+    {return VECTOR<T,0>();}
 
     VECTOR<T,0> World_Space_Inertia_Tensor_Inverse_Times(const ROTATION<VECTOR<T,1> > orientation,const VECTOR<T,0> angular_velocity) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return inertia_tensor.Solve_Linear_System(angular_velocity);}
+    {return VECTOR<T,0>();}
 
     VECTOR<T,1> World_Space_Inertia_Tensor_Times(const ROTATION<VECTOR<T,2> >& orientation,const VECTOR<T,1> angular_velocity) const
     {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==2>::value));return inertia_tensor*angular_velocity;}

@@ -168,7 +168,6 @@ bool Solve(
 
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_WORLD_SPACE_INERTIA_TENSOR;
     typedef TWIST<TV> T_TWIST;
     const int d=TV::dimension;
 
@@ -257,7 +256,6 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
 
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_WORLD_SPACE_INERTIA_TENSOR;
     typedef TWIST<TV> T_TWIST;
     const int d=TV::dimension;
 

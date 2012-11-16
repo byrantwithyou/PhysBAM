@@ -377,7 +377,7 @@ Apply_Poststabilization_To_Joint(const JOINT_ID joint_id,const bool target_pd)
             joint.Angular_Constraint_Matrix(parent.Frame(),angular_constraint_matrix);joint.Prismatic_Constraint_Matrix(parent.Frame(),prismatic_constraint_matrix);}
         RIGID_BODY<TV>::Apply_Sticking_And_Angular_Sticking_Impulse(parent,child,location,delta_relative_twist,angular_constraint_matrix,prismatic_constraint_matrix);}
     else{
-        T_WORLD_SPACE_INERTIA_TENSOR I1_inv_plus_I2_inv;
+        SYMMETRIC_MATRIX<T,TV::SPIN::m> I1_inv_plus_I2_inv;
         if(!parent.Has_Infinite_Inertia()) I1_inv_plus_I2_inv+=parent.World_Space_Inertia_Tensor_Inverse();
         if(!child.Has_Infinite_Inertia()) I1_inv_plus_I2_inv+=child.World_Space_Inertia_Tensor_Inverse();
         RIGID_BODY<TV>::Apply_Impulse(parent,child,TV(),TV(),I1_inv_plus_I2_inv.Inverse()*delta_relative_twist.angular);}
@@ -442,7 +442,7 @@ Initialize_Poststabilization_Projection()
             M_inverse_R_D[j].Resize(d+s,p+a);
             if(!rigid_bodies[j]->Has_Infinite_Inertia()){
                 M_inverse_R_D[j].Set_Submatrix(0,0,prismatic_constraints/rigid_bodies[j]->Mass());
-                T_WORLD_SPACE_INERTIA_TENSOR inverse_inertia=rigid_bodies[j]->World_Space_Inertia_Tensor_Inverse();
+                SYMMETRIC_MATRIX<T,TV::SPIN::m> inverse_inertia=rigid_bodies[j]->World_Space_Inertia_Tensor_Inverse();
                 M_inverse_R_D[j].Set_Submatrix(d,0,inverse_inertia*r_star_p);
                 M_inverse_R_D[j].Set_Submatrix(d,p,inverse_inertia*angular_constraints);}}
 
@@ -536,8 +536,8 @@ Effective_Inertia_Inverse(MATRIX<T,d+s>& inertia_inverse,JOINT_ID joint_id) cons
     inertia_inverse=MATRIX<T,d+s>();
     const RIGID_BODY<TV>& parent_body=*Parent(joint_id);
     const RIGID_BODY<TV>& child_body=*Child(joint_id);
-    T_WORLD_SPACE_INERTIA_TENSOR inertia_inverse_parent=parent_body.World_Space_Inertia_Tensor_Inverse();
-    T_WORLD_SPACE_INERTIA_TENSOR inertia_inverse_child=child_body.World_Space_Inertia_Tensor_Inverse();
+    SYMMETRIC_MATRIX<T,TV::SPIN::m> inertia_inverse_parent=parent_body.World_Space_Inertia_Tensor_Inverse();
+    SYMMETRIC_MATRIX<T,TV::SPIN::m> inertia_inverse_child=child_body.World_Space_Inertia_Tensor_Inverse();
     TV location=(T).5*(parent_body.World_Space_Point(joint_mesh(joint_id)->frame_pj.t)+child_body.World_Space_Point(joint_mesh(joint_id)->frame_cj.t));
     MATRIX<T,s,d> cross_term=inertia_inverse_parent*MATRIX<T,s,d>::Cross_Product_Matrix(location-parent_body.Frame().t)+inertia_inverse_child*MATRIX<T,s,d>::Cross_Product_Matrix(location-child_body.Frame().t);
     inertia_inverse.Add_To_Submatrix(0,0,MATRIX<T,d>(parent_body.Impulse_Factor(location)+child_body.Impulse_Factor(location)));

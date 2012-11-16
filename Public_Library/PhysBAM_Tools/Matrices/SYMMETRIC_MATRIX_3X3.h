@@ -8,6 +8,7 @@
 #define __SYMMETRIC_MATRIX_3X3__
 
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
+#include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_ARITHMETIC_POLICY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
@@ -152,6 +153,9 @@ public:
 
     MATRIX<T,3> Times_Transpose(const SYMMETRIC_MATRIX& M) const // 27 mults, 18 adds
     {return *this*M;}
+
+    MATRIX<T,3> Times_Transpose(const UPPER_TRIANGULAR_MATRIX<T,3>& M) const
+    {return MATRIX<T,3>(x11*M.x11+x21*M.x12+x31*M.x13,x21*M.x11+x22*M.x12+x32*M.x13,x31*M.x11+x32*M.x12+x33*M.x13,x21*M.x22+x31*M.x23,x22*M.x22+x32*M.x23,x32*M.x22+x33*M.x23,x31*M.x33,x32*M.x33,x33*M.x33);}
 
     MATRIX<T,3> Cross_Product_Matrix_Times(const VECTOR<T,3>& v) const // (v*) * (*this)
     {return MATRIX<T,3>(-v.z*x21+v.y*x31,v.z*x11-v.x*x31,-v.y*x11+v.x*x21,-v.z*x22+v.y*x32,v.z*x21-v.x*x32,-v.y*x21+v.x*x22,-v.z*x32+v.y*x33,v.z*x31-v.x*x33,-v.y*x31+v.x*x32);}

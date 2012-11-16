@@ -14,7 +14,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
@@ -41,7 +40,6 @@ class SOLID_FLUID_COUPLED_EVOLUTION:public NEWMARK_EVOLUTION<TV_input>
     typedef typename INTERPOLATION_POLICY<GRID<TV> >::FACE_LOOKUP T_FACE_LOOKUP;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename TV::SPIN T_SPIN;
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_INERTIA_TENSOR;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT T_THIN_SHELL;typedef typename T_THIN_SHELL::MESH T_THIN_SHELL_MESH;
     typedef VECTOR<int,TV::dimension> T_THIN_SHELL_ELEMENT;typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_THIN_SHELL_SIMPLEX;
     typedef FIELD_PROJECTOR<SPARSE_MATRIX_ENTRY<T>,int,&SPARSE_MATRIX_ENTRY<T>::j> T_PROJECTED_INDEX;
@@ -71,7 +69,7 @@ protected:
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > nodal_fluid_mass;
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > rigid_body_fluid_mass;
     ARRAY<TV> rigid_body_updated_center_of_mass;
-    ARRAY<T_INERTIA_TENSOR> rigid_body_fluid_inertia;
+    ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> > rigid_body_fluid_inertia;
     ARRAY<TV> ar_full,z_full,zaq_full;ARRAY<TWIST<TV> > rigid_ar_full,rigid_z_full,rigid_zaq_full; // extra vectors for conjugate residual
     T_FACE_ARRAYS_SCALAR solid_projected_face_velocities_star;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> coupled_vectors;

@@ -19,7 +19,7 @@ using namespace PhysBAM;
 template<class TV,class T_MATRIX> SOLID_FLUID_SYSTEM<TV,T_MATRIX>::
 SOLID_FLUID_SYSTEM(BACKWARD_EULER_SYSTEM<TV>& solid_system_input,const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_deformable_array_input,
     const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_rigid_array_input,const ARRAY<DIAGONAL_MATRIX<T,TV::m> >& fluid_mass_input,
-    const ARRAY<DIAGONAL_MATRIX<T,TV::m> >& rigid_body_fluid_mass_input,const ARRAY<T_INERTIA_TENSOR>& modified_world_space_rigid_inertia_tensor_input,
+    const ARRAY<DIAGONAL_MATRIX<T,TV::m> >& rigid_body_fluid_mass_input,const ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> >& modified_world_space_rigid_inertia_tensor_input,
     const T fluid_tolerance_input,const T solid_tolerance_input,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array_input)
     :BASE(false,true),solid_system(solid_system_input),J_deformable_array(J_deformable_array_input),
     J_rigid_array(J_rigid_array_input),fluid_mass(fluid_mass_input),rigid_body_fluid_mass(rigid_body_fluid_mass_input),

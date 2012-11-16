@@ -373,7 +373,7 @@ void Cluster()
     }
     MASS_PROPERTIES<TV> mp(*rigid_body_cluster->simplicial_object,false);mp.Set_Mass(rigid_body_cluster->Mass());
     rigid_body_cluster_test->Mass()=mp.Mass();
-    rigid_body_cluster_test->Inertia_Tensor()=mp.Inertia_Tensor();
+    rigid_body_cluster_test->Inertia_Tensor()=DIAGONAL_MATRIX<T,1>(mp.Inertia_Tensor());
     LOG::cout<<"tensor sucks "<<rigid_body_cluster_test->Mass()<<std::endl;
     LOG::cout<<"old mass "<<rigid_body_cluster->Mass()<<std::endl;
     PHYSBAM_ASSERT(rigid_body_cluster_test->Rigid_Mass().Valid());

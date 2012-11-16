@@ -985,7 +985,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
             if(fluids_parameters.compressible) rigid_body_updated_center_of_mass(i)=rigid_body.Frame().t;
             else rigid_body_updated_center_of_mass(i)=(rigid_body_fluid_mass(i)+rigid_body.Mass()).Solve_Linear_System(
                     rigid_body_updated_center_of_mass(i)+rigid_body.Frame().t*rigid_body.Mass());}
-        rigid_body_fluid_inertia.Fill(T_INERTIA_TENSOR());}
+        rigid_body_fluid_inertia.Fill(SYMMETRIC_MATRIX<T,TV::SPIN::m>());}
 
     // populate the entries of J_rigid
     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
@@ -1028,7 +1028,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
                 else{
                     if(!fluids_parameters.compressible){
                         const T dual_cell_fluid_mass_on_body=Get_Density_At_Face(axis,face_index)*dual_cell_fluid_volume(axis,face_index)*weight;
-                        rigid_body_fluid_inertia(rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_id))+=dual_cell_fluid_mass_on_body*T_INERTIA_TENSOR::Outer_Product(cross_product);}
+                        rigid_body_fluid_inertia(rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_id))+=dual_cell_fluid_mass_on_body*SYMMETRIC_MATRIX<T,TV::SPIN::m>::Outer_Product(cross_product);}
                     if(left_column_index>=0){
                         J_rigid(left_column_color).Add_Element(base_row+axis,left_column_index,weight*left_column_weight);
                         for(int j=0;j<T_SPIN::dimension;j++) J_rigid(left_column_color).Add_Element(base_row+TV::dimension+j,left_column_index,weight*left_column_weight*cross_product(j));}
@@ -1037,17 +1037,17 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
                         for(int j=0;j<T_SPIN::dimension;j++) J_rigid(right_column_color).Add_Element(base_row+TV::dimension+j,right_column_index,weight*right_column_weight*cross_product(j));}}}}}
 
     if(!fluids_parameters.compressible && solids_fluids_parameters.mpi_solid_fluid){ // TODO see if we can change this to a single direction send
-        int inertia_tensor_size=T_INERTIA_TENSOR::m*T_INERTIA_TENSOR::n;
+        int inertia_tensor_size=TV::SPIN::m*TV::SPIN::m;
         ARRAY<T> serial_rigid_body_fluid_inertia(rigid_body_fluid_inertia.m*inertia_tensor_size),global_rigid_body_fluid_inertia(rigid_body_fluid_inertia.m*inertia_tensor_size);
         for(int rigid_body=0;rigid_body<rigid_body_fluid_inertia.m;rigid_body++)
-            for(int row=0;row<T_INERTIA_TENSOR::m;row++)
-                for(int col=0;col<T_INERTIA_TENSOR::n;col++)
-                    serial_rigid_body_fluid_inertia(rigid_body*inertia_tensor_size+row*T_INERTIA_TENSOR::m+col)=rigid_body_fluid_inertia(rigid_body)(row,col);
+            for(int row=0;row<TV::SPIN::m;row++)
+                for(int col=0;col<TV::SPIN::m;col++)
+                    serial_rigid_body_fluid_inertia(rigid_body*inertia_tensor_size+row*TV::SPIN::m+col)=rigid_body_fluid_inertia(rigid_body)(row,col);
         solids_fluids_parameters.mpi_solid_fluid->Reduce_Add(serial_rigid_body_fluid_inertia,global_rigid_body_fluid_inertia);
         for(int rigid_body=0;rigid_body<rigid_body_fluid_inertia.m;rigid_body++)
-            for(int row=0;row<T_INERTIA_TENSOR::m;row++)
-                for(int col=0;col<T_INERTIA_TENSOR::n;col++)
-                    rigid_body_fluid_inertia(rigid_body)(row,col)=global_rigid_body_fluid_inertia(rigid_body*inertia_tensor_size+row*T_INERTIA_TENSOR::m+col);}
+            for(int row=0;row<TV::SPIN::m;row++)
+                for(int col=0;col<TV::SPIN::m;col++)
+                    rigid_body_fluid_inertia(rigid_body)(row,col)=global_rigid_body_fluid_inertia(rigid_body*inertia_tensor_size+row*TV::SPIN::m+col);}
     if(fluids_parameters.fluid_affects_solid){
         for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i));

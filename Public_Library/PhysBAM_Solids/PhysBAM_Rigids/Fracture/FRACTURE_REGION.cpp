@@ -167,7 +167,7 @@ Compute_Volume() const
 // Function Compute_Inertial_Properties
 //#####################################################################
 template<class T> void FRACTURE_REGION<T>::
-Compute_Inertial_Properties(const T density,TV& com,T& mass,T_WORLD_SPACE_INERTIA_TENSOR& inertia) const
+Compute_Inertial_Properties(const T density,TV& com,T& mass,SYMMETRIC_MATRIX<T,TV::SPIN::m>& inertia) const
 {
     int num_inside=0;
     com=TV();

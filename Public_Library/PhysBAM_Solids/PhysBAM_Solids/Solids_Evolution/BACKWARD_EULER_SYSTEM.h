@@ -29,7 +29,7 @@ public:
     INDIRECT_ARRAY<ARRAY_VIEW<T> > mass;
     INDIRECT_ARRAY<ARRAY_VIEW<T> > one_over_mass;
     INDIRECT_ARRAY<ARRAY_VIEW<T> > rigid_mass;
-    INDIRECT_ARRAY<ARRAY_VIEW<typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR> > rigid_inertia_tensor;
+    INDIRECT_ARRAY<ARRAY_VIEW<DIAGONAL_MATRIX<T,TV::SPIN::m> > > rigid_inertia_tensor;
     ARRAY<RIGID_BODY_MASS<TV,true> > world_space_rigid_mass;
     ARRAY<RIGID_BODY_MASS<TV,true> > world_space_rigid_mass_inverse_full;
     INDIRECT_ARRAY<ARRAY<RIGID_BODY_MASS<TV,true> > > world_space_rigid_mass_inverse;

@@ -20,7 +20,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/SOLVE_CONTACT.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 
 namespace PhysBAM{
 
@@ -32,11 +31,10 @@ class PRECONDITIONER_RIGID_BODY
 {
 public:
     typedef typename TV::SCALAR T;
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_INERTIA_TENSOR;
     FRAME<TV> frame;
     //TWIST<TV> twist;
     T mass;
-    T_INERTIA_TENSOR inertia_tensor;
+    SYMMETRIC_MATRIX<T,TV::SPIN::m> inertia_tensor;
     
     //bool has_infinite_inertia;
 
@@ -105,24 +103,22 @@ typename SOLVE_CONTACT::CONTACT<TV> Build_Contact(
 }
 
 template<class T>
-typename RIGID_BODY_POLICY<VECTOR<T,1> >::WORLD_SPACE_INERTIA_TENSOR Transform_Inertia_Tensor(const typename RIGID_BODY_POLICY<VECTOR<T,1> >::WORLD_SPACE_INERTIA_TENSOR& inertia_tensor,const T mass,const VECTOR<T,1>& t,const ROTATION<VECTOR<T,1> >& r)
+SYMMETRIC_MATRIX<T,0> Transform_Inertia_Tensor(const SYMMETRIC_MATRIX<T,0>& inertia_tensor,const T mass,const VECTOR<T,1>& t,const ROTATION<VECTOR<T,1> >& r)
 {
     return inertia_tensor;
 }
 
 template<class T>
-typename RIGID_BODY_POLICY<VECTOR<T,2> >::WORLD_SPACE_INERTIA_TENSOR Transform_Inertia_Tensor(const typename RIGID_BODY_POLICY<VECTOR<T,2> >::WORLD_SPACE_INERTIA_TENSOR& inertia_tensor,const T mass,const VECTOR<T,2>& t,const ROTATION<VECTOR<T,2> >& r)
+SYMMETRIC_MATRIX<T,1> Transform_Inertia_Tensor(const SYMMETRIC_MATRIX<T,1>& inertia_tensor,const T mass,const VECTOR<T,2>& t,const ROTATION<VECTOR<T,2> >& r)
 {
     return inertia_tensor+mass*t.Magnitude_Squared();
 }
 
 template<class T>
-typename RIGID_BODY_POLICY<VECTOR<T,3> >::WORLD_SPACE_INERTIA_TENSOR Transform_Inertia_Tensor(const typename RIGID_BODY_POLICY<VECTOR<T,3> >::WORLD_SPACE_INERTIA_TENSOR& inertia_tensor,const T mass,const VECTOR<T,3>& t,const ROTATION<VECTOR<T,3> >& r)
+SYMMETRIC_MATRIX<T,3> Transform_Inertia_Tensor(const SYMMETRIC_MATRIX<T,3>& inertia_tensor,const T mass,const VECTOR<T,3>& t,const ROTATION<VECTOR<T,3> >& r)
 {
-    typedef typename RIGID_BODY_POLICY<VECTOR<T,3> >::WORLD_SPACE_INERTIA_TENSOR T_INERTIA_TENSOR;
-    T_INERTIA_TENSOR transformed_inertia_tensor;
-    transformed_inertia_tensor.From_Matrix(r.Rotation_Matrix()*inertia_tensor*r.Inverse().Rotation_Matrix() + mass*(VECTOR<T,3>::Dot_Product(t,t)*T_INERTIA_TENSOR::Identity_Matrix()-T_INERTIA_TENSOR::Outer_Product(t)));
-    //LOG::cout << (VECTOR<T,3>::Dot_Product(t,t)*T_INERTIA_TENSOR::Identity_Matrix()+T_INERTIA_TENSOR::Outer_Product(t)) << std::endl;
+    SYMMETRIC_MATRIX<T,3> transformed_inertia_tensor;
+    transformed_inertia_tensor.From_Matrix(r.Rotation_Matrix()*inertia_tensor*r.Inverse().Rotation_Matrix() + mass*(VECTOR<T,3>::Dot_Product(t,t)*SYMMETRIC_MATRIX<T,3>::Identity_Matrix()-SYMMETRIC_MATRIX<T,3>::Outer_Product(t)));
     return transformed_inertia_tensor;
 }
 
@@ -130,7 +126,6 @@ template<class TV>
 PRECONDITIONER_RIGID_BODY<TV> Merge_Bodies(const PRECONDITIONER_RIGID_BODY<TV>& body0,const PRECONDITIONER_RIGID_BODY<TV>& body1)
 {
     typedef typename TV::SCALAR T;
-    typedef typename RIGID_BODY_POLICY<VECTOR<T,TV::dimension> >::WORLD_SPACE_INERTIA_TENSOR T_INERTIA_TENSOR;
     PRECONDITIONER_RIGID_BODY<TV> merged_body;
 
     T mass=body0.mass+body1.mass;
@@ -139,16 +134,9 @@ PRECONDITIONER_RIGID_BODY<TV> Merge_Bodies(const PRECONDITIONER_RIGID_BODY<TV>& 
     TV translation0=center-body0.frame.t;
     TV translation1=center-body1.frame.t;
 
-    T_INERTIA_TENSOR inertia_tensor=
+    SYMMETRIC_MATRIX<T,TV::SPIN::m> inertia_tensor=
         Transform_Inertia_Tensor(body0.inertia_tensor,body0.mass,translation0,body0.frame.r) + 
         Transform_Inertia_Tensor(body1.inertia_tensor,body1.mass,translation1,body1.frame.r);
-
-    //LOG::cout << "body0 " << body0.mass << " " << translation0 << " " << body0.frame.r.Rotation_Matrix() << std::endl;
-    //LOG::cout << (VECTOR<T,3>::Dot_Product(translation0,translation0)*T_INERTIA_TENSOR::Identity_Matrix()+T_INERTIA_TENSOR::Outer_Product(translation0)) << std::endl;
-
-    //LOG::cout << "inertia tensor 0 " << body0.inertia_tensor << " transformed " << Transform_Inertia_Tensor(body0.inertia_tensor,body0.mass,translation0,body0.frame.r) << std::endl;
-    //LOG::cout << "inertia tensor 1 " << body1.inertia_tensor << " transformed " << Transform_Inertia_Tensor(body1.inertia_tensor,body1.mass,translation1,body1.frame.r) << std::endl;
-    //LOG::cout << "inertia tensor " << inertia_tensor << std::endl;
 
     merged_body.frame.t=center;
     merged_body.frame.r=ROTATION<TV>();

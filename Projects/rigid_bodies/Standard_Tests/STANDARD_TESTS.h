@@ -1144,7 +1144,6 @@ void Deforming_Sphere()
 //#####################################################################
 void Cluster_Fracture()
 {
-    typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;    
     int num_bodies=24;
     std::ifstream istream("Standard_Tests/bodies_cluster.txt");
     TRIANGULATED_SURFACE<T>* surface=0;    
@@ -1163,7 +1162,7 @@ void Cluster_Fracture()
         particles.frame(rigid_body.particle_index)=FRAME<TV>(center);
         particles.twist(rigid_body.particle_index)=TWIST<TV>();
         particles.mass(rigid_body.particle_index)=1;
-        particles.inertia_tensor(rigid_body.particle_index)=T_INERTIA_TENSOR();particles.inertia_tensor(rigid_body.particle_index)+=1;
+        particles.inertia_tensor(rigid_body.particle_index)=DIAGONAL_MATRIX<T,TV::SPIN::m>();particles.inertia_tensor(rigid_body.particle_index)+=1;
         SPHERE<TV> sphere(TV(0,0,0),radius);
         rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(sphere));
         if(!surface) surface=TESSELLATION::Generate_Triangles(sphere);

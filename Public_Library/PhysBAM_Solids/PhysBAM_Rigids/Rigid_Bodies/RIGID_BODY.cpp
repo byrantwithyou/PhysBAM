@@ -262,8 +262,7 @@ Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<TV>& body1,const RIGID_
     const MATRIX_MXN<T>& angular_constraint_matrix,const MATRIX_MXN<T>& prismatic_constraint_matrix)
 {
     // compute blocks of constrained matrix
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_WORLD_SPACE_INERTIA_TENSOR;
-    T_WORLD_SPACE_INERTIA_TENSOR I_inverse_1,I_inverse_2;T m1_inv_plus_m2_inv=0;
+    SYMMETRIC_MATRIX<T,TV::SPIN::m> I_inverse_1,I_inverse_2;T m1_inv_plus_m2_inv=0;
     if(!body1.Has_Infinite_Inertia()){I_inverse_1=body1.World_Space_Inertia_Tensor_Inverse();m1_inv_plus_m2_inv=1/body1.Mass();}
     if(!body2.Has_Infinite_Inertia()){I_inverse_2=body2.World_Space_Inertia_Tensor_Inverse();m1_inv_plus_m2_inv+=1/body2.Mass();}
 
@@ -308,11 +307,11 @@ template<class T,class TV> static TWIST<TV> Find_Impulse_And_Angular_Impulse_Hel
 template<class T,class TV> static TWIST<TV> Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<VECTOR<T,2> >& body1,const RIGID_BODY<TV>& body2,const TV& location,
     const TWIST<TV>& delta_relative_twist_at_location)
 {
-    MATRIX<T,1> I_inverse_1=body1.World_Space_Inertia_Tensor_Inverse(),I_inverse_2=body2.World_Space_Inertia_Tensor_Inverse();
+    SYMMETRIC_MATRIX<T,1> I_inverse_1=body1.World_Space_Inertia_Tensor_Inverse(),I_inverse_2=body2.World_Space_Inertia_Tensor_Inverse();
     SYMMETRIC_MATRIX<T,2> c11=I_inverse_1.Conjugate_With_Cross_Product_Matrix(location-body1.Frame().t)+
         I_inverse_2.Conjugate_With_Cross_Product_Matrix(location-body2.Frame().t)+1/body1.Mass()+1/body2.Mass();
     MATRIX<T,1,2> c12=I_inverse_1.Times_Cross_Product_Matrix(location-body1.Frame().t)+I_inverse_2.Times_Cross_Product_Matrix(location-body2.Frame().t);
-    MATRIX<T,1> c22=I_inverse_1+I_inverse_2;
+    SYMMETRIC_MATRIX<T,1> c22=I_inverse_1+I_inverse_2;
     SYMMETRIC_MATRIX<T,3> A(c11.x11,c11.x21,c12(0,0),c11.x22,c12(0,1),c22.x11);
 
     VECTOR<T,3> b(delta_relative_twist_at_location.linear.x,delta_relative_twist_at_location.linear.y,delta_relative_twist_at_location.angular.x);
@@ -395,16 +394,16 @@ Volumetric_Density() const
 //#####################################################################
 // Function Diagonalize_Inertia_Tensor
 //#####################################################################
-template<class TV,class T_INERTIA> void
-Diagonalize_Inertia_Tensor_Helper(const T_INERTIA& inertia_input,T_INERTIA& inertia,ROTATION<TV>& rotation)
+template<class T,int s,int d> void
+Diagonalize_Inertia_Tensor_Helper(const SYMMETRIC_MATRIX<T,s>& inertia_input,DIAGONAL_MATRIX<T,s>& inertia,ROTATION<VECTOR<T,d> >& rotation)
 {
-    inertia=inertia_input;
+    inertia=DIAGONAL_MATRIX<T,s>(inertia_input);
 }
 //#####################################################################
 // Function Diagonalize_Inertia_Tensor
 //#####################################################################
-template<class T,class T_WORLD_INERTIA,class T_INERTIA> void
-Diagonalize_Inertia_Tensor_Helper(const T_WORLD_INERTIA& inertia_input,T_INERTIA& inertia,ROTATION<VECTOR<T,3> >& rotation)
+template<class T> void
+Diagonalize_Inertia_Tensor_Helper(const SYMMETRIC_MATRIX<T,3>& inertia_input,DIAGONAL_MATRIX<T,3>& inertia,ROTATION<VECTOR<T,3> >& rotation)
 {
     MATRIX<T,3> rotation_matrix;
     inertia_input.Solve_Eigenproblem(inertia,rotation_matrix);
@@ -414,7 +413,7 @@ Diagonalize_Inertia_Tensor_Helper(const T_WORLD_INERTIA& inertia_input,T_INERTIA
 // Function Diagonalize_Inertia_Tensor
 //#####################################################################
 template<class TV> void RIGID_BODY<TV>::
-Diagonalize_Inertia_Tensor(const T_WORLD_SPACE_INERTIA_TENSOR& inertia_tensor_at_center_of_mass)
+Diagonalize_Inertia_Tensor(const SYMMETRIC_MATRIX<T,TV::SPIN::m>& inertia_tensor_at_center_of_mass)
 {
     Diagonalize_Inertia_Tensor_Helper(inertia_tensor_at_center_of_mass,Inertia_Tensor(),Frame().r);
     Update_Angular_Velocity();

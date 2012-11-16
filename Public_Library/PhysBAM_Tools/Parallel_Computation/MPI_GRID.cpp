@@ -5,9 +5,7 @@
 // Class MPI_GRID
 //#####################################################################
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID.h>
 #ifdef USE_MPI
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>

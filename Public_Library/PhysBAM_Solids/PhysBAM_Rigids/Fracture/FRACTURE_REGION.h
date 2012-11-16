@@ -19,7 +19,6 @@
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/PARTICLE_PARTITION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 
 namespace PhysBAM{
 
@@ -29,7 +28,6 @@ class FRACTURE_REGION
     typedef VECTOR<T,3> TV;
     typedef VECTOR<int,3> TV_INT;
     typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_WORLD_SPACE_INERTIA_TENSOR;
 public:
     typedef int HAS_TYPED_READ_WRITE;
 
@@ -49,7 +47,7 @@ public:
 //#####################################################################
     ARRAY<FRACTURE_REGION<T>*> Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle_optimization,const bool tessellate_region=false);
     T Compute_Volume() const;
-    void Compute_Inertial_Properties(const T density,TV& com,T& mass,T_WORLD_SPACE_INERTIA_TENSOR& inertia) const; 
+    void Compute_Inertial_Properties(const T density,TV& com,T& mass,SYMMETRIC_MATRIX<T,TV::SPIN::m>& inertia) const; 
     void Read(TYPED_ISTREAM& input);
     void Write(TYPED_OSTREAM& output) const;
     void Initialize_Particle_Partition();

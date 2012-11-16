@@ -8,7 +8,6 @@
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_ID.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 namespace PhysBAM{
 
 template<class TV> class LINEAR_CONSTRAINT_FUNCTION;
@@ -68,7 +67,7 @@ private:
 template<class T>
 class ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,2> >
 {
-    typedef VECTOR<T,2> TV;typedef typename TV::SPIN T_SPIN;typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;
+    typedef VECTOR<T,2> TV;typedef typename TV::SPIN T_SPIN;
 
     const JOINT<TV>& joint;
     const RIGID_BODY<TV>* rigid_body[2];
@@ -78,7 +77,7 @@ public:
     typedef VECTOR<T,1> T_CONSTRAINT_ERROR;
 
     const T dt,epsilon_scale;
-    T_INERTIA_TENSOR inverse_inertia[2],metric_tensor;
+    SYMMETRIC_MATRIX<T,TV::SPIN::m> inverse_inertia[2],metric_tensor;
     T_SPIN dt_angular_velocity[2],q_w_old[2]; // ={q_wp_old_q_pj_q_t,q_wc_old_q_cj}
     T length_scale_squared;
 
@@ -94,7 +93,7 @@ public:
     {return T_IMPULSE::Dot_Product(j1,metric_tensor*j2);}
 
     T Magnitude_Squared(const T_IMPULSE& j) const
-    {return metric_tensor.Symmetric_Conjugate(j);}
+    {return j.Dot(metric_tensor*j);}
 
     T Magnitude(const T_IMPULSE& j) const
     {return sqrt(Magnitude_Squared(j));}

@@ -28,7 +28,6 @@ template<class T> FRACTURE_PATTERN<T>::
 template<class T> void FRACTURE_PATTERN<T>::
 Intersect_With_Rigid_Body(const RIGID_BODY<TV>& body,const TV& point_of_impact,ARRAY<int>& added_bodies,const bool allow_refracture,const bool use_particle_optimization,const bool generate_object_tessellation)
 {
-    typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_WORLD_SPACE_INERTIA_TENSOR;
     // Construct body region
     FRAME<TV> levelset_frame=FRAME<TV>();
     IMPLICIT_OBJECT<TV>* implicit_object=body.implicit_object->object_space_implicit_object;
@@ -60,7 +59,7 @@ Intersect_With_Rigid_Body(const RIGID_BODY<TV>& body,const TV& point_of_impact,A
             // Initialize frame, mass, and inertia. coefficient of friction, coefficient of restitution
             new_body->coefficient_of_friction=body.coefficient_of_friction;
             new_body->Set_Coefficient_Of_Restitution(body.coefficient_of_restitution);
-            T_WORLD_SPACE_INERTIA_TENSOR inertia;
+            SYMMETRIC_MATRIX<T,TV::SPIN::m> inertia;
             new_regions(i)->extra_levelset_frame=levelset_frame;
             new_regions(i)->Compute_Inertial_Properties(density,new_body->Frame().t,new_body->Mass(),inertia);
             new_body->Diagonalize_Inertia_Tensor(inertia);
