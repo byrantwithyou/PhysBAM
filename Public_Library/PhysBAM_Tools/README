@@ -2,7 +2,7 @@
 // Copyright 2008.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file Documentation/PHYSBAM_COPYRIGHT.txt
 //#####################################################################
-
+	
 This Repository contains the data structures and linear algebra tools used by PhysBAM.  It should not depend on any other components of PhysBAM.
 
 From Ron:
