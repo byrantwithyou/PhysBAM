@@ -38,7 +38,7 @@ public:
 
     void Next()
     {
-        if(T a=rk_table[order][substep][0]) u.Copy(a,u_copy,1-a,u);
+        if(T a=(T)rk_table[order][substep][0]) u.Copy(a,u_copy,1-a,u);
         time+=(T)rk_table[order][substep++][1]*dt;
     }
 
