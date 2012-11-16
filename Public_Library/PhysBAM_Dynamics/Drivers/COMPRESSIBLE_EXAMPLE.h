@@ -15,9 +15,10 @@
 #include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>
 namespace PhysBAM{
 
-template<class TV>
-class COMPRESSIBLE_EXAMPLE:public EXAMPLE<TV>
+template<class TV_input>
+class COMPRESSIBLE_EXAMPLE:public EXAMPLE<TV_input>
 {
+    typedef TV_input TV;
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;typedef VECTOR<T,GRID<TV>::dimension+2> TV_DIMENSION;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;

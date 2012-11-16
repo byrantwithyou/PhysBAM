@@ -15,7 +15,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class TV> PLS_FC_EXAMPLE<TV>::
+template<class TV_input> PLS_FC_EXAMPLE<TV_input>::
 PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),last_frame(100),write_substeps_level(-1),write_output_files(true),
     output_directory("output"),restart(0),number_of_ghost_cells(3),dt(1),time(0),time_steps_per_frame(1),use_preconditioner(true),
@@ -33,7 +33,7 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class TV> PLS_FC_EXAMPLE<TV>::
+template<class TV_input> PLS_FC_EXAMPLE<TV_input>::
 ~PLS_FC_EXAMPLE()
 {
     delete &debug_particles;
@@ -46,7 +46,7 @@ template<class TV> PLS_FC_EXAMPLE<TV>::
 //#####################################################################
 // Function Merge_Velocities
 //#####################################################################
-template<class TV> void PLS_FC_EXAMPLE<TV>::
+template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Merge_Velocities(ARRAY<T,FACE_INDEX<TV::dimension> >& V,const ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color) const
 {
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
@@ -59,7 +59,7 @@ Merge_Velocities(ARRAY<T,FACE_INDEX<TV::dimension> >& V,const ARRAY<ARRAY<T,FACE
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
-template<class TV> void PLS_FC_EXAMPLE<TV>::
+template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Write_Output_Files(const int frame)
 {
     if(!write_output_files) return;
@@ -84,7 +84,7 @@ Write_Output_Files(const int frame)
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
-template<class TV> void PLS_FC_EXAMPLE<TV>::
+template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Read_Output_Files(const int frame)
 {
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
@@ -106,7 +106,7 @@ Read_Output_Files(const int frame)
 //#####################################################################
 // Function Adjust_Particle_For_Domain_Boundaries
 //#####################################################################
-template<class TV> void PLS_FC_EXAMPLE<TV>::
+template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time)
 {
     if(particle_type==PARTICLE_LEVELSET_POSITIVE || particle_type==PARTICLE_LEVELSET_REMOVED_POSITIVE) return;
@@ -134,7 +134,7 @@ Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles
 //#####################################################################
 // Function Color_At_Cell
 //#####################################################################
-template<class TV> int PLS_FC_EXAMPLE<TV>::
+template<class TV_input> int PLS_FC_EXAMPLE<TV_input>::
 Color_At_Cell(const TV_INT& index) const
 {
     for(int i=0;i<bc_phis.m;i++)
@@ -145,7 +145,7 @@ Color_At_Cell(const TV_INT& index) const
 //#####################################################################
 // Function Color_At_Cell
 //#####################################################################
-template<class TV> int PLS_FC_EXAMPLE<TV>::
+template<class TV_input> int PLS_FC_EXAMPLE<TV_input>::
 Color_At_Cell(const TV_INT& index,T& phi) const
 {
     for(int i=0;i<bc_phis.m;i++)
@@ -159,7 +159,7 @@ Color_At_Cell(const TV_INT& index,T& phi) const
 //#####################################################################
 // Function Rebuild_Levelset_Color
 //#####################################################################
-template<class TV> void PLS_FC_EXAMPLE<TV>::
+template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Rebuild_Levelset_Color()
 {
     Make_Levelsets_Consistent();
@@ -169,7 +169,7 @@ Rebuild_Levelset_Color()
 //#####################################################################
 // Function Fill_Levelsets_From_Levelset_Color
 //#####################################################################
-template<class TV> void PLS_FC_EXAMPLE<TV>::
+template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Fill_Levelsets_From_Levelset_Color()
 {
     ARRAY<ARRAY<T,TV_INT> >& phis=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis;
@@ -190,7 +190,7 @@ Fill_Levelsets_From_Levelset_Color()
 //#####################################################################
 // Function Get_Levelset_Velocity
 //#####################################################################
-template<class TV> void PLS_FC_EXAMPLE<TV>::
+template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const
 {
     PHYSBAM_FATAL_ERROR();
@@ -198,7 +198,7 @@ Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_I
 //#####################################################################
 // Function Get_Levelset_Velocity
 //#####################################################################
-template<class TV> void PLS_FC_EXAMPLE<TV>::
+template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const
 {
     ARRAY<T,FACE_INDEX<TV::dimension> > n(grid,number_of_ghost_cells),m(grid,number_of_ghost_cells);
@@ -211,7 +211,7 @@ Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelse
 //#####################################################################
 // Function Make_Levelsets_Consistent
 //#####################################################################
-template<class TV> void PLS_FC_EXAMPLE<TV>::
+template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Make_Levelsets_Consistent()
 {
     ARRAY<ARRAY<T,TV_INT> >& phis=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis;

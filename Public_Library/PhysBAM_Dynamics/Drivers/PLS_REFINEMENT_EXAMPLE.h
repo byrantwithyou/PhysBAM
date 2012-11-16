@@ -23,10 +23,10 @@ namespace PhysBAM{
 
 template<class T_GRID> class LEVELSET_MULTIPLE;
 
-template<class TV>
-class PLS_REFINEMENT_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >,public RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV>
+template<class TV_input>
+class PLS_REFINEMENT_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV_input> >,public RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV_input>
 {
-    typedef typename TV::SCALAR T;
+    typedef TV_input TV;typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
     typedef BOUNDARY_PHI_WATER<GRID<TV> > T_BOUNDARY_PHI_WATER;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<GRID<TV> >::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;

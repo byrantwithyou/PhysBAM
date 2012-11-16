@@ -23,9 +23,10 @@ template<class T_GRID> class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM;
 template<class T_GRID> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
 template<class TV> class DEBUG_PARTICLES;
 
-template<class TV>
-class PLS_FC_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >
+template<class TV_input>
+class PLS_FC_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV_input> >
 {
+    typedef TV_input TV;
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
 public:

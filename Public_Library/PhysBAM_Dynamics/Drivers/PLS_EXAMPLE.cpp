@@ -10,7 +10,7 @@ using namespace PhysBAM;
 //#####################################################################
 // PLS_EXAMPLE
 //#####################################################################
-template<class TV> PLS_EXAMPLE<TV>::
+template<class TV_input> PLS_EXAMPLE<TV_input>::
 PLS_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
     write_substeps_level(-1),write_output_files(true),output_directory("output"),restart(0),
@@ -25,7 +25,7 @@ PLS_EXAMPLE(const STREAM_TYPE stream_type_input)
 //#####################################################################
 // ~PLS_EXAMPLE
 //#####################################################################
-template<class TV> PLS_EXAMPLE<TV>::
+template<class TV_input> PLS_EXAMPLE<TV_input>::
 ~PLS_EXAMPLE()
 {
     if(mpi_grid){
@@ -35,7 +35,7 @@ template<class TV> PLS_EXAMPLE<TV>::
 //#####################################################################
 // 
 //#####################################################################
-template<class TV> void PLS_EXAMPLE<TV>::
+template<class TV_input> void PLS_EXAMPLE<TV_input>::
 Write_Output_Files(const int frame)
 {
     if(!write_output_files) return;
@@ -64,7 +64,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
 }
-template<class TV> void PLS_EXAMPLE<TV>::
+template<class TV_input> void PLS_EXAMPLE<TV_input>::
 Read_Output_Files(const int frame)
 {
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);

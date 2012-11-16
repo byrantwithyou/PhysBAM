@@ -57,7 +57,7 @@ namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const 
 #pragma warning(push)
 #pragma warning(disable:4355) // 'this' : used in base member initializer list
 #endif
-template<class TV> PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> PLS_FSI_EXAMPLE<TV_input>::
 PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions)
     :BASE(stream_type),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
     solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this)),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection)),
@@ -74,7 +74,7 @@ PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions)
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class TV> PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> PLS_FSI_EXAMPLE<TV_input>::
 ~PLS_FSI_EXAMPLE()
 {
     fluids_parameters.projection=0;
@@ -86,7 +86,7 @@ template<class TV> PLS_FSI_EXAMPLE<TV>::
 //#####################################################################
 // Function Register_Options
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Register_Options()
 {
     if(!parse_args) return;
@@ -105,7 +105,7 @@ Register_Options()
 //#####################################################################
 // Function Parse_Options
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Parse_Options()
 {
     BASE::Parse_Options();
@@ -114,7 +114,7 @@ Parse_Options()
 //#####################################################################
 // Function Add_Volumetric_Body_To_Fluid_Simulation
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Add_Volumetric_Body_To_Fluid_Simulation(RIGID_BODY<TV>& rigid_body,bool add_collision,bool add_coupling)
 {
     RIGID_COLLISION_GEOMETRY<TV>* collision_geometry=new RIGID_COLLISION_GEOMETRY<TV>(rigid_body);
@@ -127,7 +127,7 @@ Add_Volumetric_Body_To_Fluid_Simulation(RIGID_BODY<TV>& rigid_body,bool add_coll
 //#####################################################################
 // Function Add_Thin_Shell_To_Fluid_Simulation
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Add_Thin_Shell_To_Fluid_Simulation(RIGID_BODY<TV>& rigid_body,bool add_collision,bool add_coupling)
 {
     RIGID_COLLISION_GEOMETRY<TV>* collision_geometry=new RIGID_COLLISION_GEOMETRY<TV>(rigid_body);
@@ -142,7 +142,7 @@ Add_Thin_Shell_To_Fluid_Simulation(RIGID_BODY<TV>& rigid_body,bool add_collision
 //#####################################################################
 // Function Add_To_Fluid_Simulation
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Add_To_Fluid_Simulation(DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions,bool add_collision,bool add_coupling)
 {
     if(add_collision) fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(&deformable_collisions,0,false);
@@ -155,7 +155,7 @@ Add_To_Fluid_Simulation(DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_colli
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-template<class TV> template<class GEOMETRY> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> template<class GEOMETRY> void PLS_FSI_EXAMPLE<TV_input>::
 Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity)
 {
     for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(source.Lazy_Inside(world_to_source.Homogeneous_Times(iterator.Location()))){
@@ -165,7 +165,7 @@ Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& worl
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-template<class TV> template<class GEOMETRY> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> template<class GEOMETRY> void PLS_FSI_EXAMPLE<TV_input>::
 Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity,const ARRAY<bool,FACE_INDEX<TV::m> >& invalid_mask)
 {
     for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
@@ -176,7 +176,7 @@ Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& worl
 //#####################################################################
 // Function Adjust_Phi_With_Source
 //#####################################################################
-template<class TV> template<class GEOMETRY> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> template<class GEOMETRY> void PLS_FSI_EXAMPLE<TV_input>::
 Adjust_Phi_With_Source(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source)
 {
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){TV source_X=world_to_source.Homogeneous_Times(iterator.Location());
@@ -187,7 +187,7 @@ Adjust_Phi_With_Source(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& wor
 //#####################################################################
 // Function Adjust_Phi_With_Source
 //#####################################################################
-template<class TV> template<class GEOMETRY> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> template<class GEOMETRY> void PLS_FSI_EXAMPLE<TV_input>::
 Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORMATION_MATRIX& world_to_source)
 {
     T bandwidth=3*fluids_parameters.grid->Minimum_Edge_Length();
@@ -203,7 +203,7 @@ Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORM
 //#####################################################################
 // Function Revalidate_Fluid_Scalars
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Revalidate_Fluid_Scalars()
 {
     LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
@@ -214,7 +214,7 @@ Revalidate_Fluid_Scalars()
 //#####################################################################
 // Function Revalidate_Phi_After_Modify_Levelset
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Revalidate_Phi_After_Modify_Levelset()
 {
     LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
@@ -226,7 +226,7 @@ Revalidate_Phi_After_Modify_Levelset()
 //#####################################################################
 // Function Revalidate_Fluid_Velocity
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Revalidate_Fluid_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     if(fluids_parameters.incompressible->nested_semi_lagrangian_collidable) 
@@ -235,7 +235,7 @@ Revalidate_Fluid_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 //#####################################################################
 // Function Get_Object_Velocities
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Get_Object_Velocities(LAPLACE_UNIFORM<GRID<TV> >* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     if(fluids_parameters.solid_affects_fluid && (fluids_parameters.fluid_affects_solid || fluids_parameters.use_slip)){
@@ -250,7 +250,7 @@ Get_Object_Velocities(LAPLACE_UNIFORM<GRID<TV> >* elliptic_solver,ARRAY<T,FACE_I
 //#####################################################################
 // Function Get_Levelset_Velocity
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const
 {
     ARRAY<T,FACE_INDEX<TV::m> >::Put(fluid_collection.incompressible_fluid_collection.face_velocities,V_levelset);
@@ -258,7 +258,7 @@ Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelse
 //#####################################################################
 // Function Initialize_Swept_Occupied_Blocks_For_Advection
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     GRID<TV>& grid=*fluids_parameters.grid;
@@ -278,13 +278,13 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,const ARR
 //#####################################################################
 // Function Delete_Particles_Inside_Objects
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time)
 {}
 //#####################################################################
 // Function Read_Output_Files_Fluids
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Read_Output_Files_Fluids(const int frame)
 {
     fluids_parameters.Read_Output_Files(stream_type,output_directory,frame);
@@ -294,7 +294,7 @@ Read_Output_Files_Fluids(const int frame)
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Write_Output_Files(const int frame) const
 {
     if(this->use_test_output){
@@ -332,7 +332,7 @@ Write_Output_Files(const int frame) const
 //#####################################################################
 // Function Log_Parameters 
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Log_Parameters() const
 {       
     LOG::SCOPE scope("PLS_FSI_EXAMPLE parameters");
@@ -343,7 +343,7 @@ Log_Parameters() const
 //#####################################################################
 // Function Read_Output_Files_Solids
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Read_Output_Files_Solids(const int frame)
 {
     solid_body_collection.Read(stream_type,output_directory,frame,frame,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
@@ -355,7 +355,7 @@ Read_Output_Files_Solids(const int frame)
 //#####################################################################
 // Function Parse_Late_Options
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Parse_Late_Options()
 {
     if(!parse_args) return;
@@ -367,7 +367,7 @@ Parse_Late_Options()
 //#####################################################################
 // Function Adjust_Particle_For_Domain_Boundaries
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time)
 {
     // remove this for speed - don't call the function for the other particles
@@ -394,7 +394,7 @@ Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Update_Fluid_Parameters(const T dt,const T time)
 {
     fluids_parameters.incompressible->Set_Gravity(fluids_parameters.gravity,fluids_parameters.gravity_direction);
@@ -415,7 +415,7 @@ Update_Fluid_Parameters(const T dt,const T time)
 //#####################################################################
 // Function Set_Boundary_Conditions
 //#####################################################################
-template<class TV> void PLS_FSI_EXAMPLE<TV>::
+template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
     ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const
 {

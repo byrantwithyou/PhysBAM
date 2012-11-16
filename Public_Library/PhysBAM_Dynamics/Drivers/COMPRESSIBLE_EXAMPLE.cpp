@@ -14,7 +14,7 @@ using namespace PhysBAM;
 //#####################################################################
 // COMPRESSIBLE_EXAMPLE
 //#####################################################################
-template<class TV> COMPRESSIBLE_EXAMPLE<TV>::
+template<class TV_input> COMPRESSIBLE_EXAMPLE<TV_input>::
 COMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input)
     :EXAMPLE<TV>(stream_type_input),
     number_of_ghost_cells(3),cfl((T).9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
@@ -31,13 +31,13 @@ COMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input)
 //#####################################################################
 // ~COMPRESSIBLE_EXAMPLE
 //#####################################################################
-template<class TV> COMPRESSIBLE_EXAMPLE<TV>::
+template<class TV_input> COMPRESSIBLE_EXAMPLE<TV_input>::
 ~COMPRESSIBLE_EXAMPLE()
 {}
 //#####################################################################
 // Function Apply_Isobaric_Fix
 //#####################################################################
-template<class TV> void COMPRESSIBLE_EXAMPLE<TV>::
+template<class TV_input> void COMPRESSIBLE_EXAMPLE<TV_input>::
 Apply_Isobaric_Fix(const T dt,const T time)
 {
     if(apply_isobaric_fix) euler_solid_fluid_coupling_utilities.Apply_Isobaric_Fix(dt,time);
@@ -45,13 +45,13 @@ Apply_Isobaric_Fix(const T dt,const T time)
 //#####################################################################
 // Set_Dirichlet_Boundary_Conditions
 //#####################################################################
-template<class TV> void COMPRESSIBLE_EXAMPLE<TV>::
+template<class TV_input> void COMPRESSIBLE_EXAMPLE<TV_input>::
 Set_Domain_Boundary_Conditions()
 {}
 //#####################################################################
 // Set_Dirichlet_Boundary_Conditions
 //#####################################################################
-template<class TV> void COMPRESSIBLE_EXAMPLE<TV>::
+template<class TV_input> void COMPRESSIBLE_EXAMPLE<TV_input>::
 Set_Dirichlet_Boundary_Conditions(const T time)
 {
     euler.euler_projection.Set_Dirichlet_Boundary_Conditions(time);
@@ -59,7 +59,7 @@ Set_Dirichlet_Boundary_Conditions(const T time)
 //#####################################################################
 // Set_Neumann_Boundary_Conditions
 //#####################################################################
-template<class TV> void COMPRESSIBLE_EXAMPLE<TV>::
+template<class TV_input> void COMPRESSIBLE_EXAMPLE<TV_input>::
 Set_Neumann_Boundary_Conditions()
 {
     collision_bodies_affecting_fluid->Compute_Psi_N(euler.euler_projection.elliptic_solver->psi_N,&face_velocities);
@@ -67,7 +67,7 @@ Set_Neumann_Boundary_Conditions()
 //#####################################################################
 // Set_Boundary_Conditions
 //#####################################################################
-template<class TV> void COMPRESSIBLE_EXAMPLE<TV>::
+template<class TV_input> void COMPRESSIBLE_EXAMPLE<TV_input>::
 Set_Boundary_Conditions(const T time)
 {
     euler.euler_projection.elliptic_solver->psi_N.Fill(false);euler.euler_projection.elliptic_solver->psi_D.Fill(false);
@@ -78,7 +78,7 @@ Set_Boundary_Conditions(const T time)
 //#####################################################################
 // Initialize_Solid_Fluid_Coupling
 //#####################################################################
-template<class TV> void COMPRESSIBLE_EXAMPLE<TV>::
+template<class TV_input> void COMPRESSIBLE_EXAMPLE<TV_input>::
 Initialize_Solid_Fluid_Coupling()
 {
     euler_solid_fluid_coupling_utilities.Initialize_Solid_Fluid_Coupling(collision_bodies_affecting_fluid);
@@ -86,7 +86,7 @@ Initialize_Solid_Fluid_Coupling()
 //#####################################################################
 // Write_Output_Files
 //#####################################################################
-template<class TV> void COMPRESSIBLE_EXAMPLE<TV>::
+template<class TV_input> void COMPRESSIBLE_EXAMPLE<TV_input>::
 Write_Output_Files(const int frame) const
 {
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
