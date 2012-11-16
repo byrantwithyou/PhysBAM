@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 #include <PhysBAM_Tools/Particles/PARTICLES.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 using namespace PhysBAM;

@@ -7,7 +7,7 @@
 #ifndef __DEBUG_PRINT__
 #define __DEBUG_PRINT__
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>

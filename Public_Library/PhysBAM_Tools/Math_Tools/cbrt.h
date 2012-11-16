@@ -14,7 +14,7 @@
 #include <cmath>
 namespace PhysBAM{
 
-#ifdef WIN32
+#ifdef _WIN32
 inline float cbrt(const float a){return std::pow(a,(float)(1/3.));}
 inline double cbrt(const double a){return std::pow(a,(double)(1/3.));}
 #else

@@ -52,7 +52,7 @@ template<int line,class A,class B=void> struct ASSERT_EFFICIENT
 #ifdef NDEBUG
 #define WARN_IF_NOT_EFFICIENT(...)
 #else
-#ifdef WIN32
+#ifdef _WIN32
 #define WARN_IF_NOT_EFFICIENT(...) ASSERT_EFFICIENT<__LINE__,__VA_ARGS__>(__FUNCTION__)
 #else
 #define WARN_IF_NOT_EFFICIENT(...) ASSERT_EFFICIENT<__LINE__,__VA_ARGS__>(__PRETTY_FUNCTION__)

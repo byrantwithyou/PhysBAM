@@ -12,7 +12,7 @@
 #include <cstring>
 #include <iomanip>
 #include <iostream>
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <windows.h>
 // next line must be included after windows.h
 #include <psapi.h>
@@ -36,7 +36,7 @@ namespace PROCESS_UTILITIES{
 //###################################################################
 // Win32 Specific Function Definitions
 //###################################################################
-#if defined(WIN32)
+#if defined(_WIN32)
 
 unsigned int Memory_Usage()
 {

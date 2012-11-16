@@ -5,7 +5,7 @@
 #ifndef __PHYSBAM_OVERRIDE__
 #define __PHYSBAM_OVERRIDE__
 
-#ifdef WIN32
+#ifdef _WIN32
 #  define PHYSBAM_OVERRIDE override
 #  define PHYSBAM_SEALED sealed
 #  define PHYSBAM_UNUSED

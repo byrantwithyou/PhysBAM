@@ -13,7 +13,7 @@ namespace PhysBAM{
 template<class T>
 inline bool Is_NaN(const T& scalar)
 {
-#ifdef WIN32
+#ifdef _WIN32
     return _isnan(scalar);
 #elif defined(__linux__) || defined(__CYGWIN__) || defined(__APPLE__)
     return isnan(scalar);

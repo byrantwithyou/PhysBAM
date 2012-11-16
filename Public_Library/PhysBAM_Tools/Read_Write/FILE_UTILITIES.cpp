@@ -13,7 +13,7 @@
 #include <climits>
 #include <cstdio>
 #include <fstream>
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 #if defined(__linux__) || defined(__CYGWIN__) || defined(__APPLE__)
@@ -27,7 +27,7 @@ static const char *file_extensions[]={"rgd","rgd2d","tri","phi","phi2d","oct","p
 //###################################################################
 // Win32 Specific Function Definitions
 //###################################################################
-#if defined(WIN32)
+#if defined(_WIN32)
 
 bool Directory_Exists(const std::string& dirname)
 {DWORD attr=GetFileAttributes(dirname.c_str());return((attr!=-1)&&(attr&FILE_ATTRIBUTE_DIRECTORY));}

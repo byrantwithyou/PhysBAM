@@ -4,7 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WINDOW_PBUFFER.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WORLD.h>
-#ifdef WIN32
+#ifdef _WIN32
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WGL_PBUFFER.h>
 //#elif defined(__APPLE__)
 //#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_AGL_PBUFFER.h>

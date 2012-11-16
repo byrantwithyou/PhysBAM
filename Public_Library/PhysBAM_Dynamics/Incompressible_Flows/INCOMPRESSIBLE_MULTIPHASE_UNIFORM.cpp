@@ -20,7 +20,7 @@
 #include <PhysBAM_Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Interpolation/FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM.h>
 using namespace PhysBAM;
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable:4723)
 #endif
 //#####################################################################
