@@ -104,7 +104,6 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         if(!deleted){
             //solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Set_Binding_Active(4,false);
             //solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Delete_Binding(4,solids_parameters.collision_body_list);
-            //solid_body_collection.Update_Fragments();
             deleted=true;}}
 }
 //#####################################################################

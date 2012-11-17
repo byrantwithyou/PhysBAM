@@ -659,7 +659,6 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     else if(test_number==20) Test_System_Poststabilization();
 //    else if((test_number==8 && frame==35) || (test_number==23 && frame==10)){
 //        rigid_body_particles.Remove_Cluster_Body(cluster_id);
-//        solid_body_collection.Update_Fragments();}
 //    if(test_number==24 && frame==10){
 //        ((RIGID_BODY_CLUSTER_3D<T>*)rigid_body_list(cluster_id))->Initialize_Allowable_Strain((T)0);}
 }

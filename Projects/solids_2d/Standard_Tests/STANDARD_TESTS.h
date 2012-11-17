@@ -127,7 +127,6 @@ public:
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
-    //void Update_Fragments() PHYSBAM_OVERRIDE {}
     void Post_Initialization() PHYSBAM_OVERRIDE {}
     void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     {

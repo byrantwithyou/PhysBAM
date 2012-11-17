@@ -91,7 +91,6 @@ public:
 
     void Update_Collision_Body_Positions_And_Velocities(const T time) PHYSBAM_OVERRIDE {PYTHON_CALL_OVERRIDE(time);}
 
-    void Update_Fragments() PHYSBAM_OVERRIDE {PYTHON_CALL_OVERRIDE();}
     void Postprocess_Fragments() PHYSBAM_OVERRIDE {PYTHON_CALL_OVERRIDE();}
     void Postprocess_Super_Fragments(const ARRAY<PAIR<SUPER_FRAGMENT_ID,SUPER_FRAGMENT_ID> >& swap_pairs,const ARRAY<SUPER_FRAGMENT_ID>& rebuild,
         SUPER_FRAGMENT_ID old_max) PHYSBAM_OVERRIDE {PYTHON_CALL_OVERRIDE(boost::ref(swap_pairs),boost::ref(rebuild),old_max);}
