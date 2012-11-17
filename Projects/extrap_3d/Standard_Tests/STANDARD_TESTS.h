@@ -220,7 +220,6 @@ public:
     //void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Self_Collisions_Begin_Callback(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
-    void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
     //void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
     // void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     // void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}

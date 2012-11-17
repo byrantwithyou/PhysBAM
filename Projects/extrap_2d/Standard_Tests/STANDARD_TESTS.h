@@ -657,12 +657,6 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
     return false;
 }
 //#####################################################################
-// Function Set_Particle_Is_Simulated
-//#####################################################################
-void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE
-{
-}
-//#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE

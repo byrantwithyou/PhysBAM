@@ -129,7 +129,6 @@ public:
 
     virtual ~CIRCLE_EXAMPLE() {}
 
-    void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
 
 //#####################################################################

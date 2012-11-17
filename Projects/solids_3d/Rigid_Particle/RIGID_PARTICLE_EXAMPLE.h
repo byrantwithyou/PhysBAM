@@ -136,13 +136,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
 }
 //#####################################################################
-// Function Set_Particle_Is_Simulated
-//#####################################################################
-void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE
-{
-//    particle_is_simulated.Fill(true);
-}
-//#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE

@@ -458,28 +458,6 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBA
     return true;
 }
 //#####################################################################
-// Function Set_Particle_Is_Simulated
-//#####################################################################
-void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated)
-{
-    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-//    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
-    SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
-
-    if(dynamic_subsampling){
-        static bool first_time=true;
-        if(restart && first_time){ // rebuild the particle deletion list
-            PHYSBAM_ASSERT(old_number_particles); // ensure Initialize_Dynamic_Subsampling was called 
-            LOG::cout<<"DEBUG rebuilding particle deletion list, particles.Size()="<<particles.Size()<<", old_number_particles="<<old_number_particles<<std::endl; 
-            for(int p=old_number_particles+1;p<=particles.Size();p++) particles.Add_To_Deletion_List(p);
-            binding_list.Clean_Memory();soft_bindings.Clean_Memory(); // clear bindings: assumes all bindings are for dynamic samples
-            LOG::cout<<"DEBUG number of particles in the deletion list="<<particles.deletion_list.m<<std::endl;
-            first_time=false;}
-        particle_is_simulated.Subset(particles.deletion_list).Fill(false);}
-}
-//#####################################################################
 // Function Push_Out_Test
 //#####################################################################
 void Push_Out_Test()

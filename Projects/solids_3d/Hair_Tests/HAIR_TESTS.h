@@ -44,7 +44,6 @@ public:
 
     // Unused callbacks
     void Update_Fragments(){}
-    void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated){}
 
 //#####################################################################
 // Function Register_Options

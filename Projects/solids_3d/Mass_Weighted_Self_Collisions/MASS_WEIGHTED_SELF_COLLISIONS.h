@@ -51,7 +51,6 @@ public:
 
 //#####################################################################
     MASS_WEIGHTED_SELF_COLLISIONS(const STREAM_TYPE stream_type);
-    void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
     void Initialize_Bodies() PHYSBAM_OVERRIDE;
     // overrides from MASS_MODIFIER
     void Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,3>& weights,VECTOR<T,4>& one_over_mass);

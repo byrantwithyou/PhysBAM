@@ -40,7 +40,6 @@ public:
     }
 
     // Unused callbacks
-    void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) {}
 
 //#####################################################################
 // Function Get_Initial_Data

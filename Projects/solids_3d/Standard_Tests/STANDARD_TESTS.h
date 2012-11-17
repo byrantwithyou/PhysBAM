@@ -1676,17 +1676,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(fully_implicit) for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 }
 //#####################################################################
-// Function Set_Particle_Is_Simulated
-//#####################################################################
-void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE
-{
-    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    if(test_number==25 || test_number==28 || test_number==33){
-        // make free particles simulated
-        FREE_PARTICLES<TV>& free_particles=deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
-        for(int i=0;i<free_particles.nodes.Size();i++) particle_is_simulated(free_particles.nodes(i))=true;}
-}
-//#####################################################################
 // Function Read_Output_Files_Solids
 //#####################################################################
 void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE

@@ -138,7 +138,6 @@ public:
     void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     void Extrapolate_Phi_Into_Objects(const T time) PHYSBAM_OVERRIDE {}
     void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
-    void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
 
 //#####################################################################
 // Function Register_Options

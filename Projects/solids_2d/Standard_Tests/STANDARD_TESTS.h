@@ -625,17 +625,6 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
     return false;
 }
 //#####################################################################
-// Function Set_Particle_Is_Simulated
-//#####################################################################
-void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated)
-{
-    if(test_number==10){
-        // make free particles simulated
-        DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-        FREE_PARTICLES<TV>& free_particles=deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
-        for(int i=0;i<free_particles.nodes.Size();i++) particle_is_simulated(free_particles.nodes(i))=true;}
-}
-//#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE

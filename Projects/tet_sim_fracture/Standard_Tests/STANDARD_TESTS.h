@@ -105,7 +105,6 @@ public:
     void Advance_One_Time_Step_End_Callback(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE {}
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return true;}
-    void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) {}
 
 //#####################################################################
 // Function Register_Options
