@@ -13,4 +13,5 @@ Automatic_Program(env,"topology_test",["topology_test.cpp"])
 Automatic_Program(env,"levelset_color",["levelset_color.cpp"])
 Automatic_Program(env,"test",["test.cpp"])
 Automatic_Program(env,"mc2tex",["mc2tex.cpp"])
+Automatic_Program(env,"bending",["bending.cpp"])
 
