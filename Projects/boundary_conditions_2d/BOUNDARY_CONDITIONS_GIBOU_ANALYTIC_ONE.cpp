@@ -30,7 +30,7 @@ Theta(const TV& X) const
         if(G.Magnitude_Squared()<1e-25) break;}
     T sign=((T).2-sin(X.x)*sin(X.y))>0?1:-1;
     if(!bounding_box.Lazy_Inside(X)) sign=1;
-    return (z.Remove_Index(3)-X).Magnitude()*sign;
+    return (z.Remove_Index(2)-X).Magnitude()*sign;
 }
 
 template<class TV> int BOUNDARY_CONDITIONS_GIBOU_ANALYTIC_ONE<TV>::

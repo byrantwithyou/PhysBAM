@@ -65,7 +65,7 @@ void Project_Incompressibility_Slip(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >
         VECTOR<TV,2> X;
         T dxi=grid.one_over_dX(it.Axis());
         for(int i=0;i<2;i++) X(i)=grid.X(face.Cell_Index(i));
-        T fraction=Face_Fraction(grid,X(1),X(2),callback);
+        T fraction=Face_Fraction(grid,X(0),X(1),callback);
         if(fraction<1e-8) continue;
         index_to_face.Append(face);
         fractions.Append(fraction);
