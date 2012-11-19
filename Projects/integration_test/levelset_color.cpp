@@ -169,9 +169,10 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
             {
                 TV n1,n2;
                 void Initialize(){
-                    for(int i=0;i<TV::m;i++)
-                        n1(i)=i+M_PI/(i+M_PI);
-                    n1.Normalize();
+                    // for(int i=0;i<TV::m;i++)
+                        // n1(i)=i+M_PI/(i+M_PI);
+                    // n1.Normalize();
+                    n1(0)=1;
                     n2=n1.Orthogonal_Vector();}
                 T Phi_Value(const TV& X) const {TV x=X-0.5223;return n1.Dot(x)>0?n1.Dot(x):(min(abs(n1.Dot(x)),abs(n2.Dot(x))));}
                 int Phi_Color(const TV& X) const {TV x=X-0.5223;return n1.Dot(x)>0?0:(n2.Dot(x)>0?1:2);}
@@ -192,8 +193,8 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
         MARCHING_CUBES_COLOR<TV>::Get_Elements(index_to_cell_elements,grid,phi_color,phi_value,i,verbose);
         for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(index_to_cell_elements);it.Valid();it.Next()){
             const CELL_ELEMENTS& cell_elements=it.Data();
-            Dump_Interface<T,TV,T_FACE>(cell_elements.interface);
-            Dump_Boundary<T,TV,T_FACE>(cell_elements.boundary);}
+            Dump_Interface<T,TV,T_FACE>(cell_elements.interface);}
+            // Dump_Boundary<T,TV,T_FACE>(cell_elements.boundary);}
         char buffer[100];
         sprintf(buffer, "newton step %i",i);
         Flush_Frame<T,TV>(buffer);}

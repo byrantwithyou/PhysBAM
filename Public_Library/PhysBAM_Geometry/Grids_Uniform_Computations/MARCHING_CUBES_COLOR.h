@@ -83,7 +83,7 @@ private:
         const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,
         const HASHTABLE<FACE_INDEX<TV::m>,int>& edge_vertices,const HASHTABLE<FACE_INDEX<TV::m>,int>& face_vertices,
         const HASHTABLE<TV_INT,int>& cell_vertices,const HASHTABLE<TV_INT,int>& node_vertices,
-        const HASHTABLE<TV_INT>& junction_cells,const int fit_count,const int iterations,const bool verbose);
+        const HASHTABLE<TV_INT>& junction_cells,const int iterations,const bool verbose);
 
     static void Cut_Boundary_Elements(ARRAY<ARRAY<BOUNDARY_ELEMENT>,TV_INT>& cut_elements,const ARRAY<BOUNDARY_ELEMENT>& elements,
         const RANGE<TV_INT>& range,const RANGE<TV>& domain);

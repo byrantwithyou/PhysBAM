@@ -27,6 +27,7 @@
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_SYSTEM.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 
@@ -1027,7 +1028,7 @@ Get_Elements(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<
 
     // INITIALIZE MESHES
 
-    int fit_count=0;
+    bool junctions_present=false;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
 
         VECTOR<T,num_corners> cell_phi_value;
@@ -1055,16 +1056,16 @@ Get_Elements(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<
                 node_vertices,boundary,particles,boundary_cell_elements);
 
         if(!junction) continue; // not a junction
-        junction_cells.Insert(it.index);
-        for(typename HASH_CELL_INTERFACE::CONST_ITERATOR it(interface_cell_elements);it.Valid();it.Next()) fit_count++;}
+        junctions_present=true;
+        junction_cells.Insert(it.index);}
 
     // FIX AND SAVE MESHES
 
-    if(fit_count){
+    if(junctions_present){
         ARRAY<int> particle_dofs(particles.number);
         HASHTABLE<TV_INT> variable_cells;
         Fix_Mesh(particles,particle_dofs,variable_cells,interface,boundary,index_to_cell_data,
-            edge_vertices,face_vertices,cell_vertices,node_vertices,junction_cells,fit_count,iterations,verbose);
+            edge_vertices,face_vertices,cell_vertices,node_vertices,junction_cells,iterations,verbose);
         Save_Mesh(index_to_cell_elements,grid,interface,boundary,index_to_cell_data,particles,true,&particle_dofs,&variable_cells);}
     else Save_Mesh(index_to_cell_elements,grid,interface,boundary,index_to_cell_data,particles);
 }
@@ -1256,13 +1257,8 @@ Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<T
     const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,
     const HASHTABLE<FACE_INDEX<TV::m>,int>& edge_vertices,const HASHTABLE<FACE_INDEX<TV::m>,int>& face_vertices,
     const HASHTABLE<TV_INT,int>& cell_vertices,const HASHTABLE<TV_INT,int>& node_vertices,
-    const HASHTABLE<TV_INT>& junction_cells,const int fit_count,const int iterations,const bool verbose)
+    const HASHTABLE<TV_INT>& junction_cells,const int iterations,const bool verbose)
 {
-    // DOFS AND NORMALS
-
-    ARRAY<TV> normals(fit_count);
-    ARRAY<TV> midpoints(fit_count);
-    
     // INITIALIZE DOFS
 
     for(typename HASHTABLE<TV_INT,int>::CONST_ITERATOR it(cell_vertices);it.Valid();it.Next()){
@@ -1290,113 +1286,54 @@ Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<T
         if(particle_dofs(i))
             reverse_index_map(i)=index_map.Append(i);}
 
-    // NORMALS TO PARTICLES CORRESPONDENCE
+    // NEWTON ITERATION
 
-    ARRAY<ARRAY<int> > particle_to_fit(index_map.m);
-    ARRAY<ARRAY<int> > fit_to_particle(fit_count);
-
-    // INITIALIZE NORMALS TO PARTICLES CORRESPONDENCE
-
-    int fit_index=-1;
-    for(typename HASHTABLE<TV_INT>::ITERATOR it(junction_cells);it.Valid();it.Next()){
-        const TV_INT& junction_cell_index=it.Key();
-        const HASH_CELL_INTERFACE& junction_interface_cell_elements=index_to_cell_data.Get(junction_cell_index).interface;
-        for(typename HASH_CELL_INTERFACE::CONST_ITERATOR it(junction_interface_cell_elements);it.Valid();it.Next()){
-            fit_index++;
-            HASHTABLE<int> particle_indices_ht;
-            const VECTOR<int,2>& color_pair=it.Key();
-            const T_SURFACE& color_pair_interface=*interface.Get(color_pair);
-            RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box()*2);range.max_corner+=1;
-            for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
-                const TV_INT& cell_index=junction_cell_index+it2.index;
-                bool contains_variable_nodes=false;
-                if(index_to_cell_data.Contains(cell_index)){
-                    const HASH_CELL_INTERFACE& interface_cell_elements=index_to_cell_data.Get(cell_index).interface;
-                    INTERVAL<int> interval;
-                    if(interface_cell_elements.Get(color_pair,interval))
-                        for(int i=interval.min_corner;i<interval.max_corner;i++){
-                            TV_INT element=color_pair_interface.mesh.elements(i);
-                            for(int j=0;j<TV::m;j++){
-                                if(!particle_indices_ht.Contains(element(j)))
-                                    particle_indices_ht.Insert(element(j));
-                                if(particle_dofs(element(j))) contains_variable_nodes=true;}}}
-                if(contains_variable_nodes && !variable_cells.Contains(cell_index))
-                    variable_cells.Insert(cell_index);}
-            ARRAY<int> particle_indices;
-            for(typename HASHTABLE<int>::ITERATOR it(particle_indices_ht);it.Valid();it.Next()){
-                fit_to_particle(fit_index).Append(it.Key());
-                const int reduced_index=reverse_index_map(it.Key());
-                if(reduced_index>=0) particle_to_fit(reduced_index).Append(fit_index);}}}
-    PHYSBAM_ASSERT(fit_index==fit_count-1); // make sure all normals got processed 
-
-    // INITIALIZE PARTICLE ADJACENCY MAP
-
-    ARRAY<ARRAY<int> > adjacency_map(index_map.m);    
-    for(typename HASH_INTERFACE::CONST_ITERATOR it(interface);it.Valid();it.Next()){
-        T_SURFACE& surf=*it.Data();
-        surf.Update_Number_Nodes();
-        surf.mesh.Initialize_Adjacent_Elements();
-        const ARRAY<ARRAY<int> >& adjacent_elements=*surf.mesh.adjacent_elements;
-        for(int i=0;i<adjacent_elements.m;i++){
-            for(int j=0;j<adjacent_elements(i).m;j++){
-                int k=adjacent_elements(i)(j);
-                if(i<k){
-                    VECTOR<int,TV::m+1> nodes;
-                    TV_INT ei=surf.mesh.elements(i);
-                    TV_INT ek=surf.mesh.elements(k);
-                    int u=-1;
-                    for(int m=0;m<TV::m;m++)if(!ek.Contains(ei(m))){u=m;break;}
-                    for(int m=0;m<TV::m;m++){nodes(m)=ei(u++);if(u==TV::m) u=0;}
-                    nodes(TV::m)=ek.Sum()-ei.Sum()+nodes(0);
-                    if(TV::m==2){
-                        int p=reverse_index_map(nodes(1));
-                        if(p!=-1){
-                            adjacency_map(p).Append(nodes(0));
-                            adjacency_map(p).Append(nodes(2));}}
-                    else if(TV::m==3){
-                        int p1=reverse_index_map(nodes(1));
-                        int p2=reverse_index_map(nodes(2));
-                        if(p1!=-1) adjacency_map(p1).Append(nodes(2));
-                        if(p2!=-1) adjacency_map(p2).Append(nodes(1));}
-                    else PHYSBAM_FATAL_ERROR();}}}}
-
-    // ADJUST THE MESH
-
-    if(verbose) LOG::cout<<"Adjusting mesh...";
-    for(int i=0;i<iterations*2;i++){
-        if(i&1){ // update positions
-            for(int p=0;p<index_map.m;p++){
-                const ARRAY<int>& fit_array=particle_to_fit(p);
-                const int index=index_map(p);
-                TV dx; TV& x=particles.X(index);
-                for(int f=0;f<fit_array.m;f++){
-                    const int fit=fit_array(f);
-                    const TV& n=normals(fit);
-                    dx+=n.Dot(x-midpoints(fit))*n;}
-                    dx/=fit_array.m; x-=dx;}
-            for(int p=0;p<index_map.m;p++){
-                const int index=index_map(p);
-                ARRAY<int>& adj=adjacency_map(p);
-                const int dof=particle_dofs(index);
-                if(adj.m&&(dof==1||dof==2||dof==4)){
-                    TV dx; TV& x=particles.X(index);
-                    for(int i=0;i<adj.m;i++)
-                        dx+=particles.X(adj(i));
-                    dx/=adj.m; dx-=x; dx*=0.1; x+=dx;}}}
-        else{ // update best fit manifolds
-            for(int f=0;f<fit_count;f++){
-                const ARRAY<int>& particle_array=fit_to_particle(f);
-                midpoints(f)=particles.X.Subset(particle_array).Average();
-                SYMMETRIC_MATRIX<T,TV::m> fit_matrix;
-                for(int j=0;j<particle_array.m;j++)
-                    fit_matrix+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(particles.X(particle_array(j))-midpoints(f));
-                DIAGONAL_MATRIX<T,TV::m> eigenvalues;
-                MATRIX<T,TV::m> eigenvectors;
-                fit_matrix.Solve_Eigenproblem(eigenvalues,eigenvectors);
-                normals(f)=eigenvectors.Column(eigenvalues.To_Vector().Arg_Min());}}
+    T E;
+    if(verbose) LOG::cout<<"Adjusting...";
+    for(int iter=0;iter<iterations;iter++){
+        ARRAY<TV> rhs_full(particles.number);
+        MARCHING_CUBES_VECTOR<TV> rhs,sol;
+        MARCHING_CUBES_SYSTEM<TV> system;
+        E=0;
+        for(typename HASHTABLE<VECTOR<int,2>,T_SURFACE*>::CONST_ITERATOR it(interface);it.Valid();it.Next()){
+            T_SURFACE& surf=*it.Data();
+            surf.Update_Number_Nodes();
+            surf.mesh.Initialize_Adjacent_Elements();
+            const ARRAY<ARRAY<int> >& adjacent_elements=*surf.mesh.adjacent_elements;
+            for(int i=0;i<adjacent_elements.m;i++){
+                for(int j=0;j<adjacent_elements(i).m;j++){
+                    int k=adjacent_elements(i)(j);
+                    if(i<k){
+                        VECTOR<int,TV::m+1> nodes;
+                        TV_INT ei=surf.mesh.elements(i);
+                        TV_INT ek=surf.mesh.elements(k);
+                        int u=-1;
+                        for(int m=0;m<TV::m;m++)
+                            if(!ek.Contains(ei(m))){
+                                u=m;
+                                break;}
+                        for(int m=0;m<TV::m;m++){
+                            nodes(m)=ei(u++);
+                            if(u==TV::m) u=0;}
+                        nodes(TV::m)=ek.Sum()-ei.Sum()+nodes(0);
+                        E+=system.Set_Matrix_Block_And_Rhs((VECTOR<int,TV::m+1>)reverse_index_map.Subset(nodes),
+                            (VECTOR<TV,TV::m+1>)particles.X.Subset(nodes),rhs_full.Subset(nodes));}}}}
+        
+        rhs.x=rhs_full.Subset(index_map);
+        sol.Resize(rhs);
+        
+        ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
+        CONJUGATE_RESIDUAL<T> cr;
+        cr.Ensure_Size(vectors,rhs,3);
+        cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,1000);
+        
+        for(int i=0;i<index_map.m;i++)
+            for(int j=0;j<TV::m;j++)
+                particles.X(index_map(i))(j)-=sol.x(i)(j);
         if(verbose) LOG::cout<<".";}
     if(verbose) LOG::cout<<std::endl;
-
+    if(verbose) LOG::cout<<"E = "<<E<<std::endl;
+    
     // DRAW DEBUG PARTICLES
 
     for(int p=0;p<particle_dofs.m;p++){
@@ -1406,12 +1343,6 @@ Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<T
             case 3: case 5: case 6: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(1,1,0)); break;
             case 7: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(1,0,0)); break;
             default: PHYSBAM_FATAL_ERROR();}}
-    for(int f=0;f<fit_count;f++){
-        const TV& normal_vector=normals(f);
-        Add_Debug_Particle(midpoints(f),VECTOR<T,3>(1,0,1));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,normal_vector);
-        Add_Debug_Particle(midpoints(f),VECTOR<T,3>(1,0,1));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-normal_vector);}
 }
 template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<float,3> >;
