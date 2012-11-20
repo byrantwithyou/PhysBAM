@@ -1290,38 +1290,21 @@ Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<T
 
     T E;
     if(verbose) LOG::cout<<"Adjusting...";
+
+    for(typename HASHTABLE<VECTOR<int,2>,T_SURFACE*>::CONST_ITERATOR it(interface);it.Valid();it.Next()){
+        it.Data()->Update_Number_Nodes();
+        it.Data()->mesh.Initialize_Adjacent_Elements();}
+
+    if(0) MARCHING_CUBES_SYSTEM<TV>::Test_System(interface,index_map,reverse_index_map);
+
     for(int iter=0;iter<iterations;iter++){
         ARRAY<TV> rhs_full(particles.number);
         MARCHING_CUBES_VECTOR<TV> rhs,sol;
         MARCHING_CUBES_SYSTEM<TV> system;
-        E=0;
-        for(typename HASHTABLE<VECTOR<int,2>,T_SURFACE*>::CONST_ITERATOR it(interface);it.Valid();it.Next()){
-            T_SURFACE& surf=*it.Data();
-            surf.Update_Number_Nodes();
-            surf.mesh.Initialize_Adjacent_Elements();
-            const ARRAY<ARRAY<int> >& adjacent_elements=*surf.mesh.adjacent_elements;
-            for(int i=0;i<adjacent_elements.m;i++){
-                for(int j=0;j<adjacent_elements(i).m;j++){
-                    int k=adjacent_elements(i)(j);
-                    if(i<k){
-                        VECTOR<int,TV::m+1> nodes;
-                        TV_INT ei=surf.mesh.elements(i);
-                        TV_INT ek=surf.mesh.elements(k);
-                        int u=-1;
-                        for(int m=0;m<TV::m;m++)
-                            if(!ek.Contains(ei(m))){
-                                u=m;
-                                break;}
-                        for(int m=0;m<TV::m;m++){
-                            nodes(m)=ei(u++);
-                            if(u==TV::m) u=0;}
-                        nodes(TV::m)=ek.Sum()-ei.Sum()+nodes(0);
-                        E+=system.Set_Matrix_Block_And_Rhs((VECTOR<int,TV::m+1>)reverse_index_map.Subset(nodes),
-                            (VECTOR<TV,TV::m+1>)particles.X.Subset(nodes),rhs_full.Subset(nodes));}}}}
-        
-        rhs.x=rhs_full.Subset(index_map);
+        E=system.Set_Matrix_And_Rhs(rhs,interface,index_map,reverse_index_map,particles.X);
+
         sol.Resize(rhs);
-        
+
         ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
         CONJUGATE_RESIDUAL<T> cr;
         cr.Ensure_Size(vectors,rhs,3);

@@ -2,11 +2,15 @@
 // Copyright 2012, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_SYSTEM.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_SYSTEM.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 
 using namespace PhysBAM;
 
@@ -200,7 +204,65 @@ Set_Matrix_Block_And_Rhs(const VECTOR<int,TV::m+1> index,const VECTOR<TV,TV::m+1
     for(int i=0;i<TV::m+1;i++) rhs(i)+=DE(i);
     return E;
 }
+//#####################################################################
+// Function Set_Matrix_And_Rhs
+//#####################################################################
+template<class TV> typename TV::SCALAR MARCHING_CUBES_SYSTEM<TV>::
+Set_Matrix_And_Rhs(MARCHING_CUBES_VECTOR<TV>& rhs,const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map,ARRAY_VIEW<const TV> X)
+{
+    ARRAY<TV> rhs_full(X.m);
+    T E=0;
+    for(typename HASHTABLE<VECTOR<int,2>,T_SURFACE*>::CONST_ITERATOR it(interface);it.Valid();it.Next()){
+        const T_SURFACE& surf=*it.Data();
+        const ARRAY<ARRAY<int> >& adjacent_elements=*surf.mesh.adjacent_elements;
+        for(int i=0;i<adjacent_elements.m;i++){
+            for(int j=0;j<adjacent_elements(i).m;j++){
+                int k=adjacent_elements(i)(j);
+                if(i<k){
+                    VECTOR<int,TV::m+1> nodes;
+                    TV_INT ei=surf.mesh.elements(i);
+                    TV_INT ek=surf.mesh.elements(k);
+                    int u=-1;
+                    for(int m=0;m<TV::m;m++)
+                        if(!ek.Contains(ei(m))){
+                            u=m;
+                            break;}
+                    for(int m=0;m<TV::m;m++){
+                        nodes(m)=ei(u++);
+                        if(u==TV::m) u=0;}
+                    nodes(TV::m)=ek.Sum()-ei.Sum()+nodes(0);
+                    E+=Set_Matrix_Block_And_Rhs((VECTOR<int,TV::m+1>)reverse_index_map.Subset(nodes),
+                        (VECTOR<TV,TV::m+1>)X.Subset(nodes),rhs_full.Subset(nodes));}}}}
+    rhs.x=rhs_full.Subset(index_map);
+    return E;
+}
+//#####################################################################
+// Function Set_Matrix_Block_And_Rhs
+//#####################################################################
+template<class TV> void MARCHING_CUBES_SYSTEM<TV>::
+Test_System(const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map)
+{
+    T e=(T)1e-6;
+    MARCHING_CUBES_SYSTEM<TV> system0,system1;
+    MARCHING_CUBES_VECTOR<TV> rhs0,rhs1,vec,s,t;
+    RANDOM_NUMBERS<T> random;
+    ARRAY<TV> X0(reverse_index_map.m),dX(reverse_index_map.m);
+    vec.x.Resize(index_map.m);
+    s.x.Resize(index_map.m);
+    t.x.Resize(index_map.m);
+    random.Fill_Uniform(X0,-(T)1,(T)1);
+    random.Fill_Uniform(vec.x,-(T)e,(T)e);
+    dX.Subset(index_map)=vec.x;
+    ARRAY<TV> X1(X0+dX);
+    T E0=system0.Set_Matrix_And_Rhs(rhs0,interface,index_map,reverse_index_map,X0);
+    T E1=system1.Set_Matrix_And_Rhs(rhs1,interface,index_map,reverse_index_map,X1);
+    LOG::cout<<"E "<<((E1-E0)-(rhs1.x.Dot(vec.x)+rhs0.x.Dot(vec.x))/2)/e/maxabs(E0,E1,(T)1e-30)<<std::endl;
 
+    system0.Multiply(vec,s);
+    system1.Multiply(vec,t);
+    T dif=(rhs1.x-rhs0.x-(T).5*s.x-(T).5*t.x).Magnitude();
+    LOG::cout<<"dE "<<dif/e/max(rhs1.x.Magnitude(),rhs0.x.Magnitude(),(T)1e-30)<<std::endl;
+}
 template class MARCHING_CUBES_SYSTEM<VECTOR<float,2> >;
 template class MARCHING_CUBES_SYSTEM<VECTOR<float,3> >;
 template class MARCHING_CUBES_SYSTEM<VECTOR<double,2> >;
