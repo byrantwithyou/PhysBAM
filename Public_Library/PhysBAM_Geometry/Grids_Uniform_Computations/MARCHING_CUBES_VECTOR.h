@@ -28,35 +28,32 @@ public:
     MARCHING_CUBES_VECTOR(){}
     virtual ~MARCHING_CUBES_VECTOR(){}
 
-    BASE& operator+=(const BASE& bv) PHYSBAM_OVERRIDE{
-        x+=debug_cast<const MARCHING_CUBES_VECTOR&>(bv).x;
-        return *this;}
+    BASE& operator+=(const BASE& bv) PHYSBAM_OVERRIDE
+    {x+=debug_cast<const MARCHING_CUBES_VECTOR&>(bv).x;return *this;}
 
-    BASE& operator-=(const BASE& bv) PHYSBAM_OVERRIDE{
-        x-=debug_cast<const MARCHING_CUBES_VECTOR&>(bv).x;
-        return *this;}
+    BASE& operator-=(const BASE& bv) PHYSBAM_OVERRIDE
+    {x-=debug_cast<const MARCHING_CUBES_VECTOR&>(bv).x;return *this;}
 
-    BASE& operator*=(const T a) PHYSBAM_OVERRIDE{
-        x*=a; return *this;}
+    BASE& operator*=(const T a) PHYSBAM_OVERRIDE
+    {x*=a;return *this;}
 
-    void Copy(const T c1,const BASE& bv1) PHYSBAM_OVERRIDE{
-        x=debug_cast<const MARCHING_CUBES_VECTOR&>(bv1).x*c1;}
+    void Copy(const T c1,const BASE& bv1) PHYSBAM_OVERRIDE
+    {x=debug_cast<const MARCHING_CUBES_VECTOR&>(bv1).x*c1;}
 
-    void Copy(const T c1,const BASE& bv1,const BASE& bv2) PHYSBAM_OVERRIDE{
-        x=debug_cast<const MARCHING_CUBES_VECTOR&>(bv1).x*c1+debug_cast<const MARCHING_CUBES_VECTOR&>(bv2).x;}
+    void Copy(const T c1,const BASE& bv1,const BASE& bv2) PHYSBAM_OVERRIDE
+    {x=debug_cast<const MARCHING_CUBES_VECTOR&>(bv1).x*c1+debug_cast<const MARCHING_CUBES_VECTOR&>(bv2).x;}
 
     int Raw_Size() const PHYSBAM_OVERRIDE
     {return x.m*TV::m;}
 
-    T& Raw_Get(int i) PHYSBAM_OVERRIDE{
-        return x(i/TV::m)(i%TV::m);}
+    T& Raw_Get(int i) PHYSBAM_OVERRIDE
+    {return x(i/TV::m)(i%TV::m);}
 
-    KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE{
-        MARCHING_CUBES_VECTOR* V=new MARCHING_CUBES_VECTOR;
-        V->x.Resize(x.m); return V;}
+    KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE
+    {MARCHING_CUBES_VECTOR* V=new MARCHING_CUBES_VECTOR;V->x.Resize(x.m);return V;}
 
-    void Resize(const KRYLOV_VECTOR_BASE<T>& bv) PHYSBAM_OVERRIDE{
-        x.Resize(debug_cast<const MARCHING_CUBES_VECTOR&>(bv).x.m);}
+    void Resize(const KRYLOV_VECTOR_BASE<T>& bv) PHYSBAM_OVERRIDE
+    {x.Resize(debug_cast<const MARCHING_CUBES_VECTOR&>(bv).x.m);}
 };
 }
 #endif
