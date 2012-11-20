@@ -15,7 +15,6 @@
 #include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
-#include <PhysBAM_Tools/Nonlinear_Equations/LINE_SEARCH.h>
 #include <PhysBAM_Tools/Polynomials/QUADRATIC.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
