@@ -154,6 +154,7 @@ int main()
     T E,E_old,E_new;
     VECTOR<TV,4> DE,DE_old,DE_new;
     VECTOR<VECTOR<TM,4>,4> DDE,DDE_old,DDE_new;
+    VECTOR<TV,4> delta_DE;
     Compute(x,E,DE,DDE);
     Compute(x_old,E_old,DE_old,DDE_old);
     Compute(x_new,E_new,DE_new,DDE_new);
@@ -162,7 +163,6 @@ int main()
     for(int i=0;i<4;i++) delta_E+=TV::Dot_Product(DE(i),dx(i));
     LOG::cout<<(E_new-E_old-delta_E*2)/e<<std::endl;
 
-    VECTOR<TV,4> delta_DE;
     for(int mi=0;mi<4;mi++)
     for(int ni=0;ni<4;ni++)
         delta_DE(mi)+=DDE(mi)(ni)*dx(ni);
