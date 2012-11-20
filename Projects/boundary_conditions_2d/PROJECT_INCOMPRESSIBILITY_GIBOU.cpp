@@ -190,6 +190,7 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
     T_VECTOR x,b,q,s,r,k,z;
     x.v.Resize(index_to_cell.m);
     b.v.Resize(index_to_cell.m);
+    s.v.Resize(index_to_cell.m);
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
     ARRAY<T> temp(index_to_face.m);
