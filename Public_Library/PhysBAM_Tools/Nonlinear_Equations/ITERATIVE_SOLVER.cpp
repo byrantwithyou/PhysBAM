@@ -255,9 +255,8 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>&)>& F,PARAMETER_SPACE
 
             s.Op(beta,s,-1,grad);
             PARAMETRIC_LINE<T,T(TV&)> line(F,x,s,tmp);
-            LINE_SEARCH<T> ls;
             T alpha;
-            ls.Line_Search_Quadratic_Golden_Section(line,0,10/sqrt(grad_dot_grad),alpha,100,(T)1e-6,(T)1e-10*0);
+            LINE_SEARCH<T>::Line_Search_Quadratic_Golden_Section(line,0,10/sqrt(grad_dot_grad),alpha,100,(T)1e-6,(T)1e-10*0);
             x.Op(1,x,alpha,s);
             grad_old.Copy(grad);
             F.Gradient(x,grad);

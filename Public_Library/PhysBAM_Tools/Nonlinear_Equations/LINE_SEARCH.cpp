@@ -13,7 +13,7 @@ using namespace PhysBAM;
 // Function Update_Interval
 //#####################################################################
 template<class T> void LINE_SEARCH<T>::
-Update_Interval(BRACKET& s,T d,T Fd) const
+Update_Interval(BRACKET& s,T d,T Fd)
 {
     if(s.m>d){exchange(s.m,d);exchange(s.Fm,Fd);} // a < m < d < b
     T am=min(s.Fa,s.Fm),bd=min(s.Fb,Fd);
@@ -24,7 +24,7 @@ Update_Interval(BRACKET& s,T d,T Fd) const
 // Function Compute_Quadratic_Minimum
 //#####################################################################
 template<class T> int LINE_SEARCH<T>::
-Compute_Quadratic_Minimum(const BRACKET& s,T& x,T tolerance) const // 0=terminate, 1=fail, 2=good
+Compute_Quadratic_Minimum(const BRACKET& s,T& x,T tolerance) // 0=terminate, 1=fail, 2=good
 {
     T m=(s.Fa-s.Fm)*(s.m-s.b),n=(s.Fm-s.Fb)*(s.a-s.m),p=2*(n-m);
     if(p<0) return 1;
@@ -38,7 +38,7 @@ Compute_Quadratic_Minimum(const BRACKET& s,T& x,T tolerance) const // 0=terminat
 // Function Best_Value
 //#####################################################################
 template<class T> T LINE_SEARCH<T>::
-Best_Value(const BRACKET& s) const
+Best_Value(const BRACKET& s)
 {
     if(s.Fa<=s.Fm) return (s.Fa<=s.Fb)?s.a:s.b;
     return (s.Fm<=s.Fb)?s.m:s.b;
@@ -47,7 +47,7 @@ Best_Value(const BRACKET& s) const
 // Function Line_Search_Quadratic_Golden_Section
 //#####################################################################
 template<class T> bool LINE_SEARCH<T>::
-Line_Search_Quadratic_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,int max_iterations,T interval_tolerance,T quadratic_tolerance) const
+Line_Search_Quadratic_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,int max_iterations,T interval_tolerance,T quadratic_tolerance)
 {
     T m=(T).5*(a+b),t;
     BRACKET s={a,m,b,F(a),F(m),F(b)};
@@ -67,7 +67,7 @@ Line_Search_Quadratic_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,in
 // Function Line_Search_Quadratic_Golden_Section
 //#####################################################################
 template<class T> bool LINE_SEARCH<T>::
-Line_Search_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,int max_iterations,T interval_tolerance) const
+Line_Search_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,int max_iterations,T interval_tolerance)
 {
     PHYSBAM_ASSERT(a<=b);
     T tau=(T).5*(sqrt((T)5)-1),m=a+tau*(b-a),t;
