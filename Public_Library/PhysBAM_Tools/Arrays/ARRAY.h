@@ -174,8 +174,8 @@ public:
     {STATIC_ASSERT_SAME(T,typename T_ARRAY::ELEMENT);
     typename T_ARRAY::INDEX append_m=append_array.Size();for(typename T_ARRAY::INDEX i(0);i<append_m;i++) Append_Unique(append_array(i));}
 
-    void Add_End()
-    {Resize(m+1);}
+    ID Add_End() PHYSBAM_ALWAYS_INLINE
+    {Ensure_Enough_Space(m+1);return m++;}
 
     void Remove_End()
     {assert(m>ID());m--;}
