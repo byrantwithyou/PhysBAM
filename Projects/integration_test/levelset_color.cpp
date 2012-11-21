@@ -15,12 +15,14 @@
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <iomanip>
 
 using namespace PhysBAM;
 
@@ -208,6 +210,9 @@ int main(int argc, char* argv[])
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-3d",&use_3d,"Use 3D");
     parse_args.Parse(true);
+    PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
+    PROCESS_UTILITIES::Set_Backtrace(true);
+    LOG::cout<<std::setprecision(16);
 
     if(use_3d) Build_Surface<double,VECTOR<double,3> >(argc,argv,parse_args);
     else       Build_Surface<double,VECTOR<double,2> >(argc,argv,parse_args);
