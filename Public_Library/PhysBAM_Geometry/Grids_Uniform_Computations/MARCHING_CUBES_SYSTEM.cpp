@@ -54,8 +54,8 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Bending_Energy
 //#####################################################################
-template<class TV,class TM> typename TV::SCALAR
-Bending_Energy(const VECTOR<TV,3>& x,VECTOR<TV,3>& DE,VECTOR<VECTOR<TM,3>,3>& DDE)
+template<class TV,class T_ARRAY> typename TV::SCALAR
+Bending_Energy(const VECTOR<TV,3>& x,ARRAY_BASE<TV,T_ARRAY>* DE,VECTOR<VECTOR<MATRIX<typename TV::SCALAR,2>,3>,3>* DDE)
 {
     PHYSBAM_FATAL_ERROR();
 }
@@ -63,12 +63,13 @@ Bending_Energy(const VECTOR<TV,3>& x,VECTOR<TV,3>& DE,VECTOR<VECTOR<TM,3>,3>& DD
 //#####################################################################
 // Function Bending_Energy
 //#####################################################################
-template<class TV,class TM> typename TV::SCALAR
-Bending_Energy(const VECTOR<TV,4>& x,VECTOR<TV,4>& DE,VECTOR<VECTOR<TM,4>,4>& DDE)
+template<class TV,class T_ARRAY> typename TV::SCALAR
+Bending_Energy(const VECTOR<TV,4>& x,ARRAY_BASE<TV,T_ARRAY>* DE,VECTOR<VECTOR<MATRIX<typename TV::SCALAR,3>,4>,4>* DDE)
 {
     typedef typename TV::SCALAR T;
     typedef DIAGONAL_MATRIX<T,TV::m> TDM;
     typedef SYMMETRIC_MATRIX<T,TV::m> TSM;
+    typedef MATRIX<T,TV::m> TM;
 
     // ENERGY
 
@@ -93,6 +94,7 @@ Bending_Energy(const VECTOR<TV,4>& x,VECTOR<TV,4>& DE,VECTOR<VECTOR<TM,4>,4>& DD
     const T theta=atan2(s,c);
     const T E=(T).5*sqr(theta);
 
+    if(!DE && !DDE) return E;
     // GRADIENT
 
     VECTOR<VECTOR<TV,3>,4> Da,Db,Dd;
@@ -106,8 +108,7 @@ Bending_Energy(const VECTOR<TV,4>& x,VECTOR<TV,4>& DE,VECTOR<VECTOR<TM,4>,4>& DD
         Dd(2)(i)(i)=1;Dd(1)(i)(i)=-1;}
 
     for(int mi=0;mi<4;mi++)
-    for(int mj=0;mj<3;mj++)
-    {
+    for(int mj=0;mj<3;mj++){
         Dmu(mi)(mj)=TV::Cross_Product(Dd(mi)(mj),b)+TV::Cross_Product(d,Db(mi)(mj));
         Dnu(mi)(mj)=TV::Cross_Product(Da(mi)(mj),d)+TV::Cross_Product(a,Dd(mi)(mj));
         
@@ -125,9 +126,9 @@ Bending_Energy(const VECTOR<TV,4>& x,VECTOR<TV,4>& DE,VECTOR<VECTOR<TM,4>,4>& DD
             TV::Dot_Product(nu_hat,Dmu_hat(mi)(mj));
 
         Dtheta(mi)(mj)=c*Ds(mi)(mj)-s*Dc(mi)(mj);
-        DE(mi)(mj)=theta*Dtheta(mi)(mj);
-    }
+        if(DE) (*DE)(mi)(mj)+=theta*Dtheta(mi)(mj);}
 
+    if(!DDE) return E;
     // HESSIAN
     
     VECTOR<VECTOR<VECTOR<VECTOR<TV,3>,3>,4>,4> DDmu,DDnu;
@@ -181,39 +182,83 @@ Bending_Energy(const VECTOR<TV,4>& x,VECTOR<TV,4>& DE,VECTOR<VECTOR<TM,4>,4>& DD
             Dc(ni)(nj)*Ds(mi)(mj)+c*DDs(mi)(ni)(mj,nj)-
             Ds(ni)(nj)*Dc(mi)(mj)-s*DDc(mi)(ni)(mj,nj);
 
-        DDE(mi)(ni)(mj,nj)=
+        (*DDE)(mi)(ni)(mj,nj)=
             Dtheta(ni)(nj)*Dtheta(mi)(mj)+
             theta*DDtheta(mi)(ni)(mj,nj);
     }
     
     return E;
 }
-
 //#####################################################################
 // Function Set_Matrix_Block_And_Rhs
 //#####################################################################
 template<class TV> typename TV::SCALAR MARCHING_CUBES_SYSTEM<TV>::
-Set_Matrix_Block_And_Rhs(const VECTOR<int,TV::m+1> index,const VECTOR<TV,TV::m+1> particles,INDIRECT_ARRAY<ARRAY<TV>,VECTOR<int,TV::m+1>&> rhs)
+Set_Matrix_Block_And_Rhs(const VECTOR<int,TV::m+1> index,const VECTOR<TV,TV::m+1> particles,INDIRECT_ARRAY<ARRAY<TV>,VECTOR<int,TV::m+1>&>* rhs)
 {
-    if(index.Sum()==-index.m) return 0;
     blocks.Add_End();
     BLOCK& block=blocks.Last();
     block.index=index;
-    VECTOR<TV,TV::m+1> DE;
-    T E=Bending_Energy(particles,DE,block.matrix);
-    for(int i=0;i<TV::m+1;i++) rhs(i)+=DE(i);
+    T E=Bending_Energy(particles,rhs,&block.matrix);
     return E;
 }
 //#####################################################################
 // Function Set_Matrix_And_Rhs
 //#####################################################################
 template<class TV> typename TV::SCALAR MARCHING_CUBES_SYSTEM<TV>::
-Set_Matrix_And_Rhs(MARCHING_CUBES_VECTOR<TV>& rhs,const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map,ARRAY_VIEW<const TV> X)
+Set_Matrix_And_Rhs(MARCHING_CUBES_VECTOR<TV>& rhs,const ARRAY<VECTOR<int,TV::m+1> >& active_list,const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map,ARRAY_VIEW<const TV> X)
 {
+    blocks.Remove_All();
+    rhs.x.Fill(TV());
     ARRAY<TV> rhs_full(X.m);
     T E=0;
+    for(int i=0;i<active_list.m;i++){
+        const VECTOR<int,TV::m+1>& nodes=active_list(i);
+        INDIRECT_ARRAY<ARRAY<TV>,VECTOR<int,TV::m+1>&> ia(rhs_full.Subset(nodes));
+        E+=Set_Matrix_Block_And_Rhs((VECTOR<int,TV::m+1>)reverse_index_map.Subset(nodes),
+            (VECTOR<TV,TV::m+1>)X.Subset(nodes),&ia);}
+    rhs.x=rhs_full.Subset(index_map);
+    return E;
+}
+//#####################################################################
+// Function Set_Matrix_And_Rhs
+//#####################################################################
+template<class TV> typename TV::SCALAR MARCHING_CUBES_SYSTEM<TV>::
+Set_Rhs(MARCHING_CUBES_VECTOR<TV>& rhs,const ARRAY<VECTOR<int,TV::m+1> >& active_list,const ARRAY<int>& index_map,ARRAY_VIEW<const TV> X)
+{
+    rhs.x.Fill(TV());
+    ARRAY<TV> rhs_full(X.m);
+    T E=0;
+    for(int i=0;i<active_list.m;i++){
+        const VECTOR<int,TV::m+1>& nodes=active_list(i);
+        INDIRECT_ARRAY<ARRAY<TV>,VECTOR<int,TV::m+1>&> ia(rhs_full.Subset(nodes));
+        VECTOR<TV,TV::m+1> X(X.Subset(nodes));
+        E+=Bending_Energy(X,&ia,(VECTOR<VECTOR<TM,TV::m+1>,TV::m+1>*)0);}
+    rhs.x=rhs_full.Subset(index_map);
+    return E;
+}
+//#####################################################################
+// Function Compute_Energy
+//#####################################################################
+template<class TV> typename TV::SCALAR MARCHING_CUBES_SYSTEM<TV>::
+Compute_Energy(const ARRAY<VECTOR<int,TV::m+1> >& active_list,ARRAY_VIEW<const TV> X)
+{
+    T E=0;
+    for(int i=0;i<active_list.m;i++){
+        const VECTOR<int,TV::m+1>& nodes=active_list(i);
+        VECTOR<TV,TV::m+1> VX(X.Subset(nodes));
+        E+=Bending_Energy(VX,(INDIRECT_ARRAY<ARRAY<TV>,VECTOR<int,TV::m+1>&>*)0,(VECTOR<VECTOR<TM,TV::m+1>,TV::m+1>*)0);}
+    return E;
+}
+//#####################################################################
+// Function Compute_Active_List
+//#####################################################################
+template<class TV> void MARCHING_CUBES_SYSTEM<TV>::
+Compute_Active_List(ARRAY<VECTOR<int,TV::m+1> >& active_list,const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,const ARRAY<int>& reverse_index_map)
+{
     for(typename HASHTABLE<VECTOR<int,2>,T_SURFACE*>::CONST_ITERATOR it(interface);it.Valid();it.Next()){
-        const T_SURFACE& surf=*it.Data();
+        T_SURFACE& surf=*it.Data();
+        surf.Update_Number_Nodes();
+        surf.mesh.Initialize_Adjacent_Elements();
         const ARRAY<ARRAY<int> >& adjacent_elements=*surf.mesh.adjacent_elements;
         for(int i=0;i<adjacent_elements.m;i++){
             for(int j=0;j<adjacent_elements(i).m;j++){
@@ -231,16 +276,14 @@ Set_Matrix_And_Rhs(MARCHING_CUBES_VECTOR<TV>& rhs,const HASHTABLE<VECTOR<int,2>,
                         nodes(m)=ei(u++);
                         if(u==TV::m) u=0;}
                     nodes(TV::m)=ek.Sum()-ei.Sum()+nodes(0);
-                    E+=Set_Matrix_Block_And_Rhs((VECTOR<int,TV::m+1>)reverse_index_map.Subset(nodes),
-                        (VECTOR<TV,TV::m+1>)X.Subset(nodes),rhs_full.Subset(nodes));}}}}
-    rhs.x=rhs_full.Subset(index_map);
-    return E;
+                    if(reverse_index_map.Subset(nodes).Count_Matches(-1)!=TV::m+1)
+                        active_list.Append(nodes);}}}}
 }
 //#####################################################################
 // Function Set_Matrix_Block_And_Rhs
 //#####################################################################
 template<class TV> void MARCHING_CUBES_SYSTEM<TV>::
-Test_System(const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map)
+Test_System(const ARRAY<VECTOR<int,TV::m+1> >& active_list,const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map)
 {
     T e=(T)1e-6;
     MARCHING_CUBES_SYSTEM<TV> system0,system1;
@@ -254,8 +297,8 @@ Test_System(const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,const ARRAY<int
     random.Fill_Uniform(vec.x,-(T)e,(T)e);
     dX.Subset(index_map)=vec.x;
     ARRAY<TV> X1(X0+dX);
-    T E0=system0.Set_Matrix_And_Rhs(rhs0,interface,index_map,reverse_index_map,X0);
-    T E1=system1.Set_Matrix_And_Rhs(rhs1,interface,index_map,reverse_index_map,X1);
+    T E0=system0.Set_Matrix_And_Rhs(rhs0,active_list,index_map,reverse_index_map,X0);
+    T E1=system1.Set_Matrix_And_Rhs(rhs1,active_list,index_map,reverse_index_map,X1);
     LOG::cout<<"E "<<((E1-E0)-(rhs1.x.Dot(vec.x)+rhs0.x.Dot(vec.x))/2)/e/maxabs(E0,E1,(T)1e-30)<<std::endl;
 
     system0.Multiply(vec,s);

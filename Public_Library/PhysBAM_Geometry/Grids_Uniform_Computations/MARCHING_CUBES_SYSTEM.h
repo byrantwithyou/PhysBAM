@@ -54,9 +54,13 @@ public:
 
 //#####################################################################
 
-    T Set_Matrix_And_Rhs(MARCHING_CUBES_VECTOR<TV>& rhs,const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map,ARRAY_VIEW<const TV> X);
-    T Set_Matrix_Block_And_Rhs(const VECTOR<int,TV::m+1> index,const VECTOR<TV,TV::m+1> particles,INDIRECT_ARRAY<ARRAY<TV>,VECTOR<int,TV::m+1>&> rhs);
-    static void Test_System(const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map);
+    static void Compute_Active_List(ARRAY<VECTOR<int,TV::m+1> >& active_list,const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,const ARRAY<int>& reverse_index_map);
+    T Set_Matrix_And_Rhs(MARCHING_CUBES_VECTOR<TV>& rhs,const ARRAY<VECTOR<int,TV::m+1> >& active_list,const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map,ARRAY_VIEW<const TV> X);
+    T Set_Matrix_Block_And_Rhs(const VECTOR<int,TV::m+1> index,const VECTOR<TV,TV::m+1> particles,INDIRECT_ARRAY<ARRAY<TV>,VECTOR<int,TV::m+1>&>* rhs);
+    static T Set_Rhs(MARCHING_CUBES_VECTOR<TV>& rhs,const ARRAY<VECTOR<int,TV::m+1> >& active_list,const ARRAY<int>& index_map,ARRAY_VIEW<const TV> X);
+    static T Compute_Energy(const ARRAY<VECTOR<int,TV::m+1> >& active_list,ARRAY_VIEW<const TV> X);
+    static void Test_System(const ARRAY<VECTOR<int,TV::m+1> >& active_list,const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map);
+
 };
 }
 #endif

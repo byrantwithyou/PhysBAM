@@ -18,6 +18,8 @@
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
+#include <PhysBAM_Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
@@ -1249,6 +1251,38 @@ Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<TV>
                     for(int i=0;i<TV::m;i++) element.face.X(i)=particles.X(e_index(i));
                     element.color=color;}}}}
 }
+template<class TV>
+class FIX_MESH_ENERGY:public NONLINEAR_FUNCTION<typename TV::SCALAR(KRYLOV_VECTOR_BASE<typename TV::SCALAR>&)>
+{
+public:
+    typedef typename TV::SCALAR T;
+
+    mutable ARRAY<TV> X;
+    const ARRAY<VECTOR<int,TV::m+1> >& active_list;
+    const ARRAY<int>& index_map;
+    const ARRAY<int>& reverse_index_map;
+
+    FIX_MESH_ENERGY(ARRAY_VIEW<const TV> X,const ARRAY<VECTOR<int,TV::m+1> >& active_list,const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map)
+        :X(X),active_list(active_list),index_map(index_map),reverse_index_map(reverse_index_map)
+    {}
+
+    virtual ~FIX_MESH_ENERGY(){}
+
+    void Compute(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const PHYSBAM_OVERRIDE
+    {
+        PHYSBAM_ASSERT(g || !h);
+        MARCHING_CUBES_SYSTEM<TV>* mcs=static_cast<MARCHING_CUBES_SYSTEM<TV>*>(h);
+        MARCHING_CUBES_VECTOR<TV>* mcv=static_cast<MARCHING_CUBES_VECTOR<TV>*>(g);
+        const MARCHING_CUBES_VECTOR<TV>& mcvx=static_cast<const MARCHING_CUBES_VECTOR<TV>&>(x);
+        X.Subset(index_map)=mcvx.x;
+        T E=0;
+        if(mcs) E=mcs->Set_Matrix_And_Rhs(*mcv,active_list,index_map,reverse_index_map,X);
+        else if(mcv) E=MARCHING_CUBES_SYSTEM<TV>::Set_Rhs(*mcv,active_list,index_map,X);
+        else E=MARCHING_CUBES_SYSTEM<TV>::Compute_Energy(active_list,X);
+
+        if(e) *e=E;
+    }
+};
 //#####################################################################
 // Function Fix_Mesh
 //#####################################################################
@@ -1286,37 +1320,24 @@ Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<T
         if(particle_dofs(i))
             reverse_index_map(i)=index_map.Append(i);}
 
-    // NEWTON ITERATION
+    ARRAY<VECTOR<int,TV::m+1> > active_list;
+    MARCHING_CUBES_SYSTEM<TV>::Compute_Active_List(active_list,interface,reverse_index_map);
 
-    T E;
-    if(verbose) LOG::cout<<"Adjusting...";
+    if(0) MARCHING_CUBES_SYSTEM<TV>::Test_System(active_list,index_map,reverse_index_map);
 
-    for(typename HASHTABLE<VECTOR<int,2>,T_SURFACE*>::CONST_ITERATOR it(interface);it.Valid();it.Next()){
-        it.Data()->Update_Number_Nodes();
-        it.Data()->mesh.Initialize_Adjacent_Elements();}
-
-    if(0) MARCHING_CUBES_SYSTEM<TV>::Test_System(interface,index_map,reverse_index_map);
-
-    ARRAY<TV> rhs_full(particles.number);
-    MARCHING_CUBES_VECTOR<TV> rhs,sol;
-    rhs.x.Resize(index_map.m);
-    sol.x.Resize(index_map.m);
     MARCHING_CUBES_SYSTEM<TV> system;
-    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
-    CONJUGATE_RESIDUAL<T> cr;
-    cr.Ensure_Size(vectors,rhs,3);
-    for(int iter=0;iter<iterations;iter++){
-        sol.x.Fill(TV());
-        system.blocks.Remove_All();
-        E=system.Set_Matrix_And_Rhs(rhs,interface,index_map,reverse_index_map,particles.X);
-        cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,1000);
-        for(int i=0;i<index_map.m;i++)
-            for(int j=0;j<TV::m;j++)
-                particles.X(index_map(i))(j)-=sol.x(i)(j);
-        if(verbose) LOG::cout<<".";}
-    if(verbose) LOG::cout<<std::endl;
-    if(verbose) LOG::cout<<"E = "<<E<<std::endl;
-    
+    MARCHING_CUBES_VECTOR<TV> rhs,sol;
+    sol.x=particles.X.Subset(index_map);
+
+    NEWTONS_METHOD<T> newton;
+    newton.progress_tolerance=1e-20;
+    newton.angle_tolerance=(T)1e-6;
+    newton.max_iterations=iterations;
+
+    FIX_MESH_ENERGY<TV> fme(particles.X,active_list,index_map,reverse_index_map);
+    newton.Newtons_Method(fme,system,sol);
+    particles.X.Subset(index_map)=sol.x;
+
     // DRAW DEBUG PARTICLES
 
     for(int p=0;p<particle_dofs.m;p++){
