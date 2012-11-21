@@ -13,6 +13,8 @@ namespace PhysBAM{
 
 template<class F> class NONLINEAR_FUNCTION; // F must be a function type (e.g., T(T) or T(T1,T2))
 template<class T,class F> class PARAMETRIC_LINE; // F must be a two argument function type
+template<class T> class KRYLOV_SYSTEM_BASE;
+template<class T> class KRYLOV_VECTOR_BASE;
 
 template<class R,class T1>
 class NONLINEAR_FUNCTION<R(T1)>
@@ -98,6 +100,35 @@ public:
 
     T operator()(const T t) const PHYSBAM_OVERRIDE
     {tmp.Op(1,x,t,dx);return f(tmp);}
+//#####################################################################
+};
+
+template<class T>
+class NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>
+{
+public:
+    virtual ~NONLINEAR_FUNCTION(){}
+//#####################################################################
+    virtual void Compute(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const=0;
+    virtual T operator()(const KRYLOV_VECTOR_BASE<T>& x) const {T E=0;Compute(x,0,0,&E);return E;}
+//#####################################################################
+};
+
+template<class T>
+class PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)>:public NONLINEAR_FUNCTION<T(T)>
+{
+public:
+    typedef NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)> F;
+    const F& f;
+    const KRYLOV_VECTOR_BASE<T> &x,&dx;
+    KRYLOV_VECTOR_BASE<T>& tmp;
+
+    PARAMETRIC_LINE(const F& f,const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& dx,KRYLOV_VECTOR_BASE<T>& tmp)
+        :f(f),x(x),dx(dx),tmp(tmp)
+    {}
+
+    T operator()(const T t) const PHYSBAM_OVERRIDE
+    {tmp.Copy(t,dx,x);return f(tmp);}
 //#####################################################################
 };
 
