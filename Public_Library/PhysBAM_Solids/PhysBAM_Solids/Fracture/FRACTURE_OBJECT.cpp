@@ -13,7 +13,6 @@
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/FRACTURE_OBJECT.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Fracture/LEVELSET_GRAIN_BOUNDARIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/VIRTUAL_NODE_ALGORITHM.h>
 using namespace PhysBAM;
 //#####################################################################

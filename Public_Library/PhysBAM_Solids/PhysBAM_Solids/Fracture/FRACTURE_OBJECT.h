@@ -20,8 +20,6 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
 
-template<class TV,int d> class LEVELSET_GRAIN_BOUNDARIES;
-
 template<class TV,int d>
 class FRACTURE_OBJECT:public NONCOPYABLE
 {
