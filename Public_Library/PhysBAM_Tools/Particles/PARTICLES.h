@@ -29,7 +29,7 @@ void Register_Attribute_Sample(ARRAY_COLLECTION_ELEMENT_BASE* element);
 template<class E> void Register_Attribute_Sample() {Register_Attribute_Sample(new ARRAY_COLLECTION_ELEMENT<E>);}
 
 template<class TV>
-class PARTICLES:public CLONEABLE<PARTICLES<TV> >
+class PARTICLES:public CLONEABLE<PARTICLES<TV> >,public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
 public:
