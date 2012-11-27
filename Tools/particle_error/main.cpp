@@ -13,22 +13,24 @@ template<class T,class RW> void Compute_Errors(const std::string& input_base,con
 {
     typedef VECTOR<T,2> TV;
 
-    ARRAY<DEFORMABLE_PARTICLES<TV> > particles(resolutions.m);
+    ARRAY<DEFORMABLE_PARTICLES<TV>*> particles(resolutions.m);
     ARRAY<ARRAY<T> > errors(resolutions.m);
     for(int i=particles.m;i>=1;i--) errors(i).Resize(last_frame);
 
     for(int frame=0;frame<last_frame;frame++){
         for(int i=particles.m;i>=1;i--){
+            particles(i)=new DEFORMABLE_PARTICLES<TV>;
             FILE_UTILITIES::Read_From_File<RW>(input_base+STRING_UTILITIES::string_sprintf("%d/%d/deformable_object_particles",resolutions(i),frame),particles(i));
             errors(i)(frame)=0;
-            for(int p=0;p<particles(i).Size();p++)
-                errors(i)(frame)+=(particles(particles.m).X(p)-particles(i).X(p)).Magnitude_Squared();}}
+            for(int p=0;p<particles(i)->Size();p++)
+                errors(i)(frame)+=(particles(particles.m)->X(p)-particles(i)->X(p)).Magnitude_Squared();}}
 
     for(int i=particles.m;i>=1;i--){
         std::ostream* output=FILE_UTILITIES::Safe_Open_Output(input_base+STRING_UTILITIES::string_sprintf("%d/errors.txt",resolutions(i)),false);
         for(int frame=0;frame<last_frame;frame++)
             (*output)<<errors(i)(frame)<<std::endl;
         delete output;}
+    particles.Delete_Pointers_And_Clean_Memory();
 }
 
 int main(int argc,char *argv[])
