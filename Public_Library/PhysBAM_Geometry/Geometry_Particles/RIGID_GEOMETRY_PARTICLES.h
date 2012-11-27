@@ -41,6 +41,7 @@ public:
     void Remove_Geometry(const int p);
     void Clean_Memory();
     void Delete_All_Particles();
+    void Clone_Helper(const RIGID_GEOMETRY_PARTICLES& particles);
 //#####################################################################
 };
 }

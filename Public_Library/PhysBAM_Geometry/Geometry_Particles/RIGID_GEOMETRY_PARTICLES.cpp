@@ -58,6 +58,14 @@ Delete_All_Particles()
     rigid_geometry.Remove_All();
     BASE::Delete_All_Elements();
 }
+//#####################################################################
+// Function Clone_Helper
+//#####################################################################
+template<class TV> void RIGID_GEOMETRY_PARTICLES<TV>::
+Clone_Helper(const RIGID_GEOMETRY_PARTICLES& particles)
+{
+    PHYSBAM_FATAL_ERROR();
+}
 template class RIGID_GEOMETRY_PARTICLES<VECTOR<float,1> >;
 template class RIGID_GEOMETRY_PARTICLES<VECTOR<float,2> >;
 template class RIGID_GEOMETRY_PARTICLES<VECTOR<float,3> >;
