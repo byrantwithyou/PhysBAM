@@ -37,6 +37,9 @@ public:
     void Euler_Step(const T_INDICES& indices,const ARRAY<TV>& F,const ARRAY<T>& mass,const T dt)
     {V.Subset(indices)+=dt/mass.Subset(indices)*F.Subset(indices);}
 
+    void Clone_Helper(const GEOMETRY_PARTICLES& particles)
+    {Store_Velocity(particles.store_velocity);BASE::Clone_Helper(particles);}
+
 //#####################################################################
 };
 }

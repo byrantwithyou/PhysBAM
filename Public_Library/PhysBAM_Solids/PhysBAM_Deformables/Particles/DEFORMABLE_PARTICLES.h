@@ -50,6 +50,9 @@ public:
     void Euler_Step_Position(const T_INDICES& indices,const T dt)
     {X.Subset(indices)+=dt*V.Subset(indices);}
 
+    void Clone_Helper(const DEFORMABLE_PARTICLES& particles)
+    {Store_Mass(particles.store_mass);BASE::Clone_Helper(particles);}
+
 //#####################################################################
     TV Center_Of_Mass() const;
     void Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings);
