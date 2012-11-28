@@ -84,15 +84,15 @@ void Dump_Interface(const ARRAY<T,TV_INT>& p,const ARRAY<VECTOR<TV_INT,3> >& ste
     const GRID<TV>& grid=*Global_Grid<TV>();
     for(int i=0;i<stencils.m;i++){
         VECTOR<T,3> phi(p.Subset(stencils(i)));
-        for(int k=0;k<3;k++)
-            for(int m=k+1;m<3;m++){
-                int j=3-k-m;
-                if((phi(j)>0)!=(phi(k)>0)){
-                    if((phi(j)>0)!=(phi(m)>0)){
-                        TV Xj=grid.Node(stencils(i)(j)),Xk=grid.Node(stencils(i)(k)),Xm=grid.Node(stencils(i)(m));
-                        TV X=Xj+phi(j)/(phi(j)-phi(k))*(Xk-Xj);
-                        TV Y=Xj+phi(j)/(phi(j)-phi(m))*(Xm-Xj);
-                        Add_Debug_Object(VECTOR<TV,2>(X,Y),col);}}}}
+        for(int j=0;j<3;j++){
+            int k=(j+1)&1;
+            int m=3-k-j;
+            if((phi(j)>0)==(phi(k)>0)) continue;
+            if((phi(j)>0)==(phi(m)>0)) continue;
+            TV Xj=grid.Node(stencils(i)(j)),Xk=grid.Node(stencils(i)(k)),Xm=grid.Node(stencils(i)(m));
+            TV X=Xj+phi(j)/(phi(j)-phi(k))*(Xk-Xj);
+            TV Y=Xj+phi(j)/(phi(j)-phi(m))*(Xm-Xj);
+            Add_Debug_Object(VECTOR<TV,2>(X,Y),col);}}
 }
 
 template<class T,class TV_INT>
