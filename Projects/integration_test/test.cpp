@@ -102,38 +102,38 @@ void Dump_Interface(const ARRAY<T,TV_INT>& p,const ARRAY<VECTOR<TV_INT,4> >& ste
     const GRID<TV>& grid=*Global_Grid<TV>();
     for(int i=0;i<stencils.m;i++){
         VECTOR<T,4> phi(p.Subset(stencils(i)));
-        for(int k=0;k<4;k++)
-            for(int m=k+1;m<4;m++)
-                for(int n=m+1;n<4;n++){
-                    int o=6-k-m-n;
-                    if((phi(o)>0)==(phi(k)>0)) continue;
-                    if((phi(o)>0)==(phi(m)>0)) continue;
-                    if((phi(o)>0)==(phi(n)>0)) continue;
-                    TV Xo=grid.Node(stencils(i)(o)),Xk=grid.Node(stencils(i)(k));
-                    TV Xm=grid.Node(stencils(i)(m)),Xn=grid.Node(stencils(i)(n));
-                    TV X=Xo+phi(o)/(phi(o)-phi(k))*(Xk-Xo);
-                    TV Y=Xo+phi(o)/(phi(o)-phi(m))*(Xm-Xo);
-                    TV Z=Xo+phi(o)/(phi(o)-phi(n))*(Xn-Xo);
-                    if((phi(o)>0)^(TETRAHEDRON<T>::Signed_Volume(Xo,Xk,Xm,Xn)>0))
-                        exchange(X,Y);
-                    Add_Debug_Object(VECTOR<TV,3>(Y,X,Z),col,col);}
-        for(int k=0;k<4;k++)
-            for(int m=k+1;m<4;m++)
-                for(int n=k+1;n<4;n++){
-                    int o=6-k-m-n;
-                    if(m==n || o<=n) continue;
-                    if((phi(k)>0)==(phi(n)>0)) continue;
-                    if((phi(k)>0)==(phi(o)>0)) continue;
-                    if((phi(m)>0)==(phi(n)>0)) continue;
-                    if((phi(m)>0)==(phi(o)>0)) continue;
-                    TV Xo=grid.Node(stencils(i)(o)),Xk=grid.Node(stencils(i)(k));
-                    TV Xm=grid.Node(stencils(i)(m)),Xn=grid.Node(stencils(i)(n));
-                    TV W=Xk+phi(k)/(phi(k)-phi(n))*(Xn-Xk);
-                    TV X=Xk+phi(k)/(phi(k)-phi(o))*(Xo-Xk);
-                    TV Y=Xm+phi(m)/(phi(m)-phi(n))*(Xn-Xm);
-                    TV Z=Xm+phi(m)/(phi(m)-phi(o))*(Xo-Xm);
-                    if((phi(o)>0)^(TETRAHEDRON<T>::Signed_Volume(Xo,Xk,Xm,Xn)>0))
-                        exchange(X,Y);
+        for(int o=0;o<4;o++){
+            int k=(o+1)&3;
+            int m=(o+2)&3;
+            int n=(o+3)&3;
+            if((phi(o)>0)==(phi(k)>0)) continue;
+            if((phi(o)>0)==(phi(m)>0)) continue;
+            if((phi(o)>0)==(phi(n)>0)) continue;
+            TV Xo=grid.Node(stencils(i)(o)),Xk=grid.Node(stencils(i)(k));
+            TV Xm=grid.Node(stencils(i)(m)),Xn=grid.Node(stencils(i)(n));
+            TV X=Xo+phi(o)/(phi(o)-phi(k))*(Xk-Xo);
+            TV Y=Xo+phi(o)/(phi(o)-phi(m))*(Xm-Xo);
+            TV Z=Xo+phi(o)/(phi(o)-phi(n))*(Xn-Xo);
+            if((phi(o)>0)^(TETRAHEDRON<T>::Signed_Volume(Xo,Xk,Xm,Xn)>0))
+                exchange(X,Y);
+            Add_Debug_Object(VECTOR<TV,3>(Y,X,Z),col,col);}
+        int k=0;
+        for(int m=1;m<4;m++)
+            for(int n=1;n<4;n++){
+                int o=6-k-m-n;
+                if(m==n || o<=n) continue;
+                if((phi(k)>0)==(phi(n)>0)) continue;
+                if((phi(k)>0)==(phi(o)>0)) continue;
+                if((phi(m)>0)==(phi(n)>0)) continue;
+                if((phi(m)>0)==(phi(o)>0)) continue;
+                TV Xo=grid.Node(stencils(i)(o)),Xk=grid.Node(stencils(i)(k));
+                TV Xm=grid.Node(stencils(i)(m)),Xn=grid.Node(stencils(i)(n));
+                TV W=Xk+phi(k)/(phi(k)-phi(n))*(Xn-Xk);
+                TV X=Xk+phi(k)/(phi(k)-phi(o))*(Xo-Xk);
+                TV Y=Xm+phi(m)/(phi(m)-phi(n))*(Xn-Xm);
+                TV Z=Xm+phi(m)/(phi(m)-phi(o))*(Xo-Xm);
+                if((phi(o)>0)^(TETRAHEDRON<T>::Signed_Volume(Xo,Xk,Xm,Xn)>0))
+                    exchange(X,Y);
                     Add_Debug_Object(VECTOR<TV,3>(X,W,Y),col,col);
                     Add_Debug_Object(VECTOR<TV,3>(X,Y,Z),col,col);}}
 }
