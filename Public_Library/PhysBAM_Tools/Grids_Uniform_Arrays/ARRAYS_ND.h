@@ -175,10 +175,13 @@ public:
     if(array.Size()>=counts_new.Product()){domain=box;counts=counts_new;Calculate_Acceleration_Constants();}
     else Resize(box,false,false);}
 
+    void Exchange(ARRAY& b)
+    {array.Exchange(b.array);
+    exchange(domain,b.domain);exchange(counts,b.counts);
+    Calculate_Acceleration_Constants();b.Calculate_Acceleration_Constants();}
+
     static void Exchange(ARRAY& a,ARRAY& b)
-    {a.array.Exchange(b.array);
-    exchange(a.domain,b.domain);exchange(a.counts,b.counts);
-    a.Calculate_Acceleration_Constants();b.Calculate_Acceleration_Constants();}
+    {a.Exchange(b);}
 
     template<class RW>
     void Read(std::istream& input)
