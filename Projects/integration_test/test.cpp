@@ -14,18 +14,21 @@
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
+#include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
+#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 
 using namespace PhysBAM;
 
-const int d=2;
 typedef double T;
-typedef VECTOR<T,d> TV;
-typedef VECTOR<int,d> TV_INT;
+//typedef VECTOR<T,d> TV;
+//typedef VECTOR<int,d> TV_INT;
 std::string output_directory="output";
 typedef float RW;
 VECTOR<T,3> colors[3]={VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,1,0),VECTOR<T,3>(0,0,1)};
@@ -48,9 +51,10 @@ template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles()
     return debug_particles;
 }
 
-template<class T, class TV>
-void Dump_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& u,const char* title)
+template<class T, int d>
+void Dump_Frame(const ARRAY<T,FACE_INDEX<d> >& u,const char* title)
 {
+    typedef VECTOR<T,d> TV;
     static int frame=0;
     if(frame==0){
         FILE_UTILITIES::Create_Directory(output_directory);
@@ -70,12 +74,13 @@ void Dump_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& u,const char* title)
 template<class T,class TV>
 void Flush_Frame(const char* title)
 {
-    Dump_Frame<T,TV>(ARRAY<T,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),title);
+    Dump_Frame(ARRAY<T,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),title);
 }
 
 template<class T,class TV_INT>
 void Dump_Interface(const ARRAY<T,TV_INT>& p,const ARRAY<VECTOR<TV_INT,3> >& stencils,const VECTOR<T,3>& col)
 {
+    typedef VECTOR<T,TV_INT::m> TV;
     const GRID<TV>& grid=*Global_Grid<TV>();
     for(int i=0;i<stencils.m;i++){
         VECTOR<T,3> phi(p.Subset(stencils(i)));
@@ -90,6 +95,49 @@ void Dump_Interface(const ARRAY<T,TV_INT>& p,const ARRAY<VECTOR<TV_INT,3> >& ste
                         Add_Debug_Object(VECTOR<TV,2>(X,Y),col);}}}}
 }
 
+template<class T,class TV_INT>
+void Dump_Interface(const ARRAY<T,TV_INT>& p,const ARRAY<VECTOR<TV_INT,4> >& stencils,const VECTOR<T,3>& col)
+{
+    typedef VECTOR<T,TV_INT::m> TV;
+    const GRID<TV>& grid=*Global_Grid<TV>();
+    for(int i=0;i<stencils.m;i++){
+        VECTOR<T,4> phi(p.Subset(stencils(i)));
+        for(int k=0;k<4;k++)
+            for(int m=k+1;m<4;m++)
+                for(int n=m+1;n<4;n++){
+                    int o=6-k-m-n;
+                    if((phi(o)>0)==(phi(k)>0)) continue;
+                    if((phi(o)>0)==(phi(m)>0)) continue;
+                    if((phi(o)>0)==(phi(n)>0)) continue;
+                    TV Xo=grid.Node(stencils(i)(o)),Xk=grid.Node(stencils(i)(k));
+                    TV Xm=grid.Node(stencils(i)(m)),Xn=grid.Node(stencils(i)(n));
+                    TV X=Xo+phi(o)/(phi(o)-phi(k))*(Xk-Xo);
+                    TV Y=Xo+phi(o)/(phi(o)-phi(m))*(Xm-Xo);
+                    TV Z=Xo+phi(o)/(phi(o)-phi(n))*(Xn-Xo);
+                    if(phi(o)>0)
+                        exchange(X,Y);
+                    Add_Debug_Object(VECTOR<TV,3>(Y,X,Z),col,col);}
+        for(int k=0;k<4;k++)
+            for(int m=k+1;m<4;m++)
+                for(int n=k+1;n<4;n++){
+                    int o=6-k-m-n;
+                    if(m==n || o<=n) continue;
+                    if((phi(k)>0)==(phi(n)>0)) continue;
+                    if((phi(k)>0)==(phi(o)>0)) continue;
+                    if((phi(m)>0)==(phi(n)>0)) continue;
+                    if((phi(m)>0)==(phi(o)>0)) continue;
+                    TV Xo=grid.Node(stencils(i)(o)),Xk=grid.Node(stencils(i)(k));
+                    TV Xm=grid.Node(stencils(i)(m)),Xn=grid.Node(stencils(i)(n));
+                    TV W=Xk+phi(k)/(phi(k)-phi(n))*(Xn-Xk);
+                    TV X=Xk+phi(k)/(phi(k)-phi(o))*(Xo-Xk);
+                    TV Y=Xm+phi(m)/(phi(m)-phi(n))*(Xn-Xm);
+                    TV Z=Xm+phi(m)/(phi(m)-phi(o))*(Xo-Xm);
+                    if(phi(o)>0)
+                        exchange(X,Y);
+                    Add_Debug_Object(VECTOR<TV,3>(X,W,Y),col,col);
+                    Add_Debug_Object(VECTOR<TV,3>(X,Y,Z),col,col);}}
+}
+
 template<class T,int dp1>
 T Bad_Fraction(const VECTOR<VECTOR<T,dp1>,3>& phi)
 {
@@ -98,8 +146,6 @@ T Bad_Fraction(const VECTOR<VECTOR<T,dp1>,3>& phi)
         for(int j=0;j<dp1;j++){
             if(phi(c)(j)>0) pos_mask|=1<<c;
             else if(phi(c)(j)<0) neg_mask|=1<<c;}
-
-//    printf("%i %i\n", neg_mask, pos_mask);
 
     if(pos_mask==7){
         if(neg_mask==0) return 1;}
@@ -136,14 +182,14 @@ void Evolve(VECTOR<VECTOR<T,3>,3> phi)
         phi-=(T).9*Weight_Function(A)+VECTOR<T,3>();}
 }
 
-template<class TV,class T>
-void Evolve_Step(GRID<TV>& grid,ARRAY<T,TV_INT> q[3],const ARRAY<T,TV_INT> p[3],const ARRAY<VECTOR<TV_INT,3> >& stencils)
+template<class TV,class T,class TV_INT>
+void Evolve_Step(GRID<TV>& grid,ARRAY<T,TV_INT> q[3],const ARRAY<T,TV_INT> p[3],const ARRAY<VECTOR<TV_INT,TV_INT::m+1> >& stencils)
 {
     for(int i=0;i<3;i++) q[i].Fill(0);
     for(int i=0;i<stencils.m;i++){
-        VECTOR<VECTOR<T,3>,3> phi;
+        VECTOR<VECTOR<T,TV::m+1>,3> phi;
         for(int c=0;c<3;c++)
-            phi(c)=VECTOR<T,3>(p[c].Subset(stencils(i)));
+            phi(c)=VECTOR<T,TV::m+1>(p[c].Subset(stencils(i)));
         T A=Bad_Fraction(phi);
         for(int c=0;c<3;c++)
             q[c].Subset(stencils(i))+=A;}
@@ -153,30 +199,14 @@ void Evolve_Step(GRID<TV>& grid,ARRAY<T,TV_INT> q[3],const ARRAY<T,TV_INT> p[3],
             q[c](it.index)=p[c](it.index)-(T).25*Weight_Function(q[c](it.index)*grid.dX.Product());
 }
 
-int main(int argc, char* argv[])
+template<class TV,class TV_INT>
+void Initialize(const GRID<TV>& grid,ARRAY<VECTOR<TV_INT,3> >& stencils,ARRAY<T,TV_INT> p[3],int resolution)
 {
-    Get_Debug_Particles<TV>();
-
-    LOG::cout<<"A"<<std::endl;
-//    VECTOR<T,3> a(2,-1,-1),b(-1,2,-1),c(-1,-1,2);
-    VECTOR<T,3> a(-2,-1,2),b(-2,1,-3),c(1,-2.5,-1);
-
-    VECTOR<VECTOR<T,3>,3> phi(a,b,c);
-    int res=50;
-
-    T frac=Bad_Fraction(phi);
-
-    LOG::cout<<frac<<std::endl;
-
-    GRID<TV> grid(TV_INT()+res,RANGE<TV>::Unit_Box(),true);
-    Global_Grid(&grid);
-
-    ARRAY<T,TV_INT> p[3],q[3];
-
-    GRID<TV> grid_ta(TV_INT()+res,RANGE<TV>::Unit_Box()*res,false);
+    GRID<TV> grid_ta(TV_INT()+resolution,RANGE<TV>::Unit_Box()*resolution,false);
     TRIANGULATED_AREA<T> ta;
     ta.Initialize_Square_Mesh_And_Particles(grid_ta,true);
-    ARRAY<VECTOR<TV_INT,3> > stencils(ta.mesh.elements.m);
+
+    stencils.Resize(ta.mesh.elements.m);
     for(int i=0;i<ta.mesh.elements.m;i++)
         for(int v=0;v<TV::m+1;v++)
             stencils(i)(v)=TV_INT(rint(ta.particles.X(ta.mesh.elements(i)(v))));
@@ -187,16 +217,60 @@ int main(int argc, char* argv[])
     lines[2]=LINE_2D<T>(-TV(.11,.41).Normalized(),TV(.41,.61));
 
     for(int c=0;c<3;c++){
-        p[c].Resize(grid.Node_Indices(3));
-        q[c].Resize(grid.Node_Indices(3));
         for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next())
             p[c](it.index)=lines[c].Signed_Distance(it.Location());}
+    
+}
+
+template<class TV,class TV_INT>
+void Initialize(const GRID<TV>& grid,ARRAY<VECTOR<TV_INT,4> >& stencils,ARRAY<T,TV_INT> p[3],int resolution)
+{
+    GRID<TV> grid_tv(TV_INT()+resolution,RANGE<TV>::Unit_Box()*resolution,false);
+    TETRAHEDRALIZED_VOLUME<T> tv;
+    tv.Initialize_Cube_Mesh_And_Particles(grid_tv);
+
+    stencils.Resize(tv.mesh.elements.m);
+    for(int i=0;i<tv.mesh.elements.m;i++)
+        for(int v=0;v<TV::m+1;v++)
+            stencils(i)(v)=TV_INT(rint(tv.particles.X(tv.mesh.elements(i)(v))));
+
+    PLANE<T> planes[3];
+    planes[0]=PLANE<T>(TV(.31,.31,0).Normalized(),TV(.51,.51,.5));
+    planes[1]=PLANE<T>(-TV(.31,.11,.1).Normalized(),TV(.51,.41,.5));
+    planes[2]=PLANE<T>(-TV(.11,.41,0).Normalized(),TV(.41,.61,.5));
+
+    for(int c=0;c<3;c++){
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next())
+            p[c](it.index)=planes[c].Signed_Distance(it.Location());}
+}
+
+template<class TV>
+void Compute(PARSE_ARGS& parse_args)
+{
+    int resolution=8;
+    parse_args.Add("-resolution",&resolution,"res","grid resolution");
+    parse_args.Parse();
+
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
+    Get_Debug_Particles<TV>();
+
+    GRID<TV> grid(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+    Global_Grid(&grid);
+
+    ARRAY<T,TV_INT> p[3],q[3];
+    for(int c=0;c<3;c++){
+        p[c].Resize(grid.Node_Indices(3));
+        q[c].Resize(grid.Node_Indices(3));}
+
+    ARRAY<VECTOR<TV_INT,TV::m+1> > stencils;
+    Initialize(grid,stencils,p,resolution);
 
     for(int c=0;c<3;c++)
         Dump_Interface(p[c],stencils,colors[c]);
     Flush_Frame<T,TV>("Initial");
 
-    for(int i=0;i<5;i++){
+    for(int i=0;i<500;i++){
         Evolve_Step(grid,q,p,stencils);
 
         for(int c=0;c<3;c++)
@@ -208,5 +282,16 @@ int main(int argc, char* argv[])
     Flush_Frame<T,TV>("Phew");
 
     LOG::Finish_Logging();
-    return 0;
 }
+
+int main(int argc, char* argv[])
+{
+    bool use_3d=false;
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-3d",&use_3d,"use 3d");
+    parse_args.Parse(true);
+
+    if(use_3d) Compute<VECTOR<T,3> >(parse_args);
+    else Compute<VECTOR<T,2> >(parse_args);
+}
+
