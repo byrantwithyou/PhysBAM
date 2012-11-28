@@ -114,7 +114,7 @@ void Dump_Interface(const ARRAY<T,TV_INT>& p,const ARRAY<VECTOR<TV_INT,4> >& ste
                     TV X=Xo+phi(o)/(phi(o)-phi(k))*(Xk-Xo);
                     TV Y=Xo+phi(o)/(phi(o)-phi(m))*(Xm-Xo);
                     TV Z=Xo+phi(o)/(phi(o)-phi(n))*(Xn-Xo);
-                    if(phi(o)>0)
+                    if((phi(o)>0)^(TETRAHEDRON<T>::Signed_Volume(Xo,Xk,Xm,Xn)>0))
                         exchange(X,Y);
                     Add_Debug_Object(VECTOR<TV,3>(Y,X,Z),col,col);}
         for(int k=0;k<4;k++)
@@ -132,7 +132,7 @@ void Dump_Interface(const ARRAY<T,TV_INT>& p,const ARRAY<VECTOR<TV_INT,4> >& ste
                     TV X=Xk+phi(k)/(phi(k)-phi(o))*(Xo-Xk);
                     TV Y=Xm+phi(m)/(phi(m)-phi(n))*(Xn-Xm);
                     TV Z=Xm+phi(m)/(phi(m)-phi(o))*(Xo-Xm);
-                    if(phi(o)>0)
+                    if((phi(o)>0)^(TETRAHEDRON<T>::Signed_Volume(Xo,Xk,Xm,Xn)>0))
                         exchange(X,Y);
                     Add_Debug_Object(VECTOR<TV,3>(X,W,Y),col,col);
                     Add_Debug_Object(VECTOR<TV,3>(X,Y,Z),col,col);}}
