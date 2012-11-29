@@ -39,8 +39,8 @@ Update()
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
     if(slice && slice->mode!=OPENGL_SLICE::NO_SLICE){
         VECTOR<int,3> domain_start(m_start,n_start,mn_start),domain_end(m_end,n_end,mn_end);
-        if((slice->mode == OPENGL_SLICE::CELL_SLICE && (grid.MAC_offset==0 || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis])) ||
-           (slice->mode == OPENGL_SLICE::NODE_SLICE && (grid.MAC_offset==0.5 || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis]))) return;
+        if((slice->mode == OPENGL_SLICE::CELL_SLICE && (!grid.Is_MAC_Grid() || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis])) ||
+           (slice->mode == OPENGL_SLICE::NODE_SLICE && (grid.Is_MAC_Grid() || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis]))) return;
         switch(slice->axis){
             case 0:m_start=slice->index;m_end=m_start+1;break;
             case 1:n_start=slice->index;m_end=m_start+1;break;

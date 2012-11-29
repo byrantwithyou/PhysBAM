@@ -20,7 +20,7 @@ OPENGL_MAC_VELOCITY_FIELD_3D(GRID<TV> &grid)
     face_velocities(*new ARRAY<T,FACE_INDEX<3> >),u(face_velocities.Component(0)),v(face_velocities.Component(1)),w(face_velocities.Component(2))
 {
     max_vectors_3d = 10000;
-    PHYSBAM_ASSERT(grid.MAC_offset == 0.5);
+    PHYSBAM_ASSERT(grid.Is_MAC_Grid());
     Set_Velocity_Mode(CELL_CENTERED);
 }
 
@@ -48,7 +48,7 @@ Bounding_Box() const
 template<class T> void OPENGL_MAC_VELOCITY_FIELD_3D<T>::
 Update()
 {
-    PHYSBAM_ASSERT(grid.MAC_offset == 0.5);
+    PHYSBAM_ASSERT(grid.Is_MAC_Grid());
 
     vector_field.Resize(0);
     vector_locations.Resize(0);

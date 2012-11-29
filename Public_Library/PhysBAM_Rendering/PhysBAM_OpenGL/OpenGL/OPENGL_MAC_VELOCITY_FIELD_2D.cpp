@@ -18,7 +18,7 @@ OPENGL_MAC_VELOCITY_FIELD_2D(GRID<TV> &grid, ARRAY<T,FACE_INDEX<2> > &face_veloc
     : OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(vector_field,vector_locations),
      grid(grid),face_velocities(face_velocities_input),u(face_velocities.Component(0)),v(face_velocities.Component(1)),active_cells(active_cells_input),active_faces(active_faces_input)
 {
-    PHYSBAM_ASSERT(grid.MAC_offset == 0.5);
+    PHYSBAM_ASSERT(grid.Is_MAC_Grid());
     Set_Velocity_Mode(CELL_CENTERED);
 }
 
@@ -42,7 +42,7 @@ Bounding_Box() const
 template<class T> void OPENGL_MAC_VELOCITY_FIELD_2D<T>::
 Update()
 {
-    PHYSBAM_ASSERT(grid.MAC_offset == 0.5);
+    PHYSBAM_ASSERT(grid.Is_MAC_Grid());
 
     vector_field.Resize(0);
     vector_locations.Resize(0);

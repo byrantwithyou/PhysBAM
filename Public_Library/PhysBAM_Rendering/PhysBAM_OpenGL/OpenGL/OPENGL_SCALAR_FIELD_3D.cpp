@@ -470,8 +470,8 @@ Update_Slice()
     PHYSBAM_ASSERT(this->slice);
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
     VECTOR<int,3> domain_start(values.domain.min_corner.x,values.domain.min_corner.y,values.domain.min_corner.z),domain_end(values.domain.max_corner.x,values.domain.max_corner.y,values.domain.max_corner.z);
-    if((slice->mode==OPENGL_SLICE::CELL_SLICE && (grid.MAC_offset==0 || slice->index<domain_start[slice->axis] || slice->index>=domain_end[slice->axis])) ||
-        (slice->mode==OPENGL_SLICE::NODE_SLICE && (grid.MAC_offset==0.5 || slice->index<domain_start[slice->axis] || slice->index>=domain_end[slice->axis]))){
+    if((slice->mode==OPENGL_SLICE::CELL_SLICE && (!grid.Is_MAC_Grid() || slice->index<domain_start[slice->axis] || slice->index>=domain_end[slice->axis])) ||
+        (slice->mode==OPENGL_SLICE::NODE_SLICE && (grid.Is_MAC_Grid() || slice->index<domain_start[slice->axis] || slice->index>=domain_end[slice->axis]))){
         // Currently we don't draw anything ifthe slice doesn't match where the scalar field lives
         Delete_Textured_Rect();
         return;}

@@ -40,7 +40,7 @@ Phi_And_Color(const TV& X,int& c) const
     const VECTOR<TV_INT,1<<TV::m>& bits=GRID<TV>::Binary_Counts(TV_INT());
     VECTOR<T,1<<TV::m> phi_vector;
     VECTOR<int,1<<TV::m> color_vector;
-    TV grid_space_X=(X-grid.domain.min_corner)*grid.one_over_dX-grid.MAC_offset;
+    TV grid_space_X=(X-grid.domain.min_corner)*grid.one_over_dX-(T).5;
     TV_INT clamped_index=clamp(TV_INT(floor(grid_space_X)),TV_INT(),grid.counts-2);
     TV interp_frac_raw=grid_space_X-TV(clamped_index),interp_frac=clamp(interp_frac_raw,TV(),TV()+1);
     for(int i=0;i<1<<TV::m;i++){
