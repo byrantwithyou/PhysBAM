@@ -27,6 +27,7 @@ template<class TV,class T2> EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T2>::
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T2>::
 Extrapolate_Node(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int order,int fill_width,T order_reduction_penalty)
 {
+    PHYSBAM_ASSERT(!grid.Is_MAC_Grid());
     PHYSBAM_ASSERT(fill_width<=ghost);
     ARRAY<int,TV_INT> distance(grid.Domain_Indices(ghost+1));
     ARRAY<TV_INT,TV_INT> nearest(grid.Domain_Indices(ghost+1));
