@@ -197,6 +197,12 @@ public:
     static RANGE<TV> Intersect(const RANGE<TV>& box1,const RANGE<TV>& box2) // assumes nonnegative entries
     {return RANGE<TV>(TV::Componentwise_Max(box1.min_corner,box2.min_corner),TV::Componentwise_Min(box1.max_corner,box2.max_corner));}
 
+    RANGE<TV> Unite(const RANGE<TV>& box)
+    {return Combine(*this,box);}
+
+    RANGE<TV> Intersect(const RANGE<TV>& box) // assumes nonnegative entries
+    {return Intersect(*this,box);}
+
     void Scale_About_Center(const T factor)
     {Scale_About_Point(Center(),factor);}
 
