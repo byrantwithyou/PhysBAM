@@ -43,7 +43,7 @@ Update()
     vector_field.Resize(0);
     vector_locations.Resize(0);
 
-    if(V.counts.Contains(0)) return;
+    if(V.domain.Empty()) return;
 
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
     if(!slice || slice->mode==OPENGL_SLICE::NO_SLICE){

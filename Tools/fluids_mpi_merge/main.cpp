@@ -309,7 +309,7 @@ Merge_Particles(const std::string& filename)
         FILE_UTILITIES::Read_From_File<RW>(name,local_data(p));}
     // check for zero size
     if(process_without_particles){
-        for(int p=0;p<number_of_fluid_processes;p++)if(local_data(p).counts.x){
+        for(int p=0;p<number_of_fluid_processes;p++)if(local_data(p).Size().x){
             LOG::cerr<<filename<<": process "<<p<<" has particles but process "<<process_without_particles<<" does not."<<std::endl;exit(1);}
         FILE_UTILITIES::Write_To_File<RW>(output_directory+"/"+filename,typename T_ARRAYS_SCALAR::template REBIND<T_PARTICLES*>::TYPE());return true;}
     // merge

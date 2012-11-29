@@ -18,7 +18,7 @@ Generate_Topology()
     int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;
     topology.Preallocate(5000);
     vertices.Resize(0,m-1,0,n-1,0,mn-1);
-    int z=vertices.counts.z,yz=vertices.counts.y*z;
+    int z=vertices.stride.y,yz=vertices.stride.x;
     TV_INT i;
     for(i.x=0;i.x<m-1;i.x++)for(i.y=1;i.y<n-1;i.y++)for(i.z=1;i.z<mn-1;i.z++){ // generate one triangle pair per x edge
         T phi1=levelset.phi(i),phi2=levelset.phi(i.x+1,i.y,i.z);

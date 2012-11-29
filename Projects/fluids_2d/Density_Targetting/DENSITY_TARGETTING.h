@@ -155,7 +155,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         IMAGE<T>::Read("Density_Targetting/siggraphlogobw.jpg",target_image);
         IMAGE<T>::Invert(target_image);
         IMAGE<T>::Threshold(target_image,(T).1,VECTOR<T,3>(0,0,0),VECTOR<T,3>(1,1,1));
-        grid_image.Initialize(target_image.counts,grid.domain);
+        grid_image.Initialize(target_image.Size(),grid.domain);
 
         target_translation=TV();
         targetting_time_start=time_pour_start;
@@ -174,7 +174,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         fluids_parameters.gravity=(T)0;
         time_pour_end=-1;
         IMAGE<T>::Read("Density_Targetting/circle.jpg",target_image);
-        grid_image.Initialize(TV_INT(target_image.counts.x,target_image.counts.y),RANGE<TV>(TV((T)1.5,1),TV((T)2.5,2)));
+        grid_image.Initialize(target_image.Size(),RANGE<TV>(TV((T)1.5,1),TV((T)2.5,2)));
             
         target_translation=TV();
         targetting_time_start=time_pour_start;
@@ -191,12 +191,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
         IMAGE<T>::Read("Density_Targetting/siggraphlogobw.jpg",target_image);
         IMAGE<T>::Invert(target_image);
         IMAGE<T>::Threshold(target_image,(T).1,VECTOR<T,3>(0,0,0),VECTOR<T,3>(1,1,1));
-        grid_image.Initialize(target_image.counts,grid.domain);
+        grid_image.Initialize(target_image.Size(),grid.domain);
 
         IMAGE<T>::Read("Density_Targetting/eg.jpg",target_image2);
         IMAGE<T>::Invert(target_image2);
         IMAGE<T>::Threshold(target_image2,(T).1,VECTOR<T,3>(0,0,0),VECTOR<T,3>(1,1,1));
-        grid_image2.Initialize(target_image2.counts,grid.domain);
+        grid_image2.Initialize(target_image2.Size(),grid.domain);
 
         target_translation=TV();
         targetting_time_start=time_pour_start;
@@ -213,12 +213,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
         IMAGE<T>::Read("Density_Targetting/ieee.jpg",target_image);
         IMAGE<T>::Invert(target_image);
         IMAGE<T>::Threshold(target_image,(T).1,VECTOR<T,3>(0,0,0),VECTOR<T,3>(1,1,1));
-        grid_image.Initialize(target_image.counts,grid.domain);
+        grid_image.Initialize(target_image.Size(),grid.domain);
 
         IMAGE<T>::Read("Density_Targetting/tvcg.jpg",target_image2);
         IMAGE<T>::Invert(target_image2);
         IMAGE<T>::Threshold(target_image2,(T).1,VECTOR<T,3>(0,0,0),VECTOR<T,3>(1,1,1));
-        grid_image2.Initialize(target_image2.counts,grid.domain);
+        grid_image2.Initialize(target_image2.Size(),grid.domain);
 
         target_translation=TV();
         targetting_time_start=time_pour_start;

@@ -60,8 +60,9 @@ Set_Up_Grid(const TV_INT& size)
     for(int k=0;k<spheres.m;k++)box.Enlarge_To_Include_Box(spheres(k).Bounding_Box());
     grid.Initialize(size,box);
     
-    for(int i=0;i<voxel_sphere_list.counts.x;i++) for(int j=0;j<voxel_sphere_list.counts.y;j++) for(int ij=0;ij<voxel_sphere_list.counts.z;ij++){
-        delete voxel_sphere_list(i,j,ij);voxel_sphere_list(i,j,ij)=0;}
+    for(int i=0;i<voxel_sphere_list.array.m;i++){
+        delete voxel_sphere_list.array(i);
+        voxel_sphere_list.array(i)=0;}
     voxel_sphere_list.Resize(0,grid.counts.x-1,0,grid.counts.y-1,0,grid.counts.z-1);
     for(int k=0;k<spheres.m;k++){
         // find the grid cell that contains the sphere - left borders

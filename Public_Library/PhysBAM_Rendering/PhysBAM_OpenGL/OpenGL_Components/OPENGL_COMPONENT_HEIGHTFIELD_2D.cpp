@@ -163,21 +163,21 @@ Reinitialize(bool force)
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(height_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
                     FILE_UTILITIES::Read_From_File<RW>(filename,height);
-                    if(height.counts.x < counts.x || height.counts.y < counts.y) success = false;}
+                    if(!height.Size().All_Greater_Equal(counts)) success = false;}
                 else success=false;}
 
             if(success && xz){
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(xz_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
                     FILE_UTILITIES::Read_From_File<RW>(filename,*xz);
-                    if(xz->counts.x < counts.x || xz->counts.y < counts.y) success = false;}
+                    if(!xz->Size().All_Greater_Equal(counts)) success = false;}
                 else success=false;}
 
             if(success && draw_velocities && uv_filename.length()){
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(uv_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
                     FILE_UTILITIES::Read_From_File<RW>(filename,*uv);
-                    if(uv->counts.x < counts.x || uv->counts.y < counts.y)
+                    if(!uv->Size().All_Greater_Equal(counts))
                         success = false;
                     else{
                         int idx = 1;

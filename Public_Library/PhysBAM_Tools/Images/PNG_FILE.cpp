@@ -89,13 +89,14 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     int color_type;
     switch(d){case 3:color_type=PNG_COLOR_TYPE_RGB;break;case 4:color_type=PNG_COLOR_TYPE_RGBA;break;
         default:PHYSBAM_FATAL_ERROR("Invalid number of channels for png write");break;}
-    png_set_IHDR(png_ptr,info_ptr,image.counts.x,image.counts.y,8,color_type,PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_DEFAULT,PNG_FILTER_TYPE_DEFAULT);
+    VECTOR<int,2> counts=image.domain.Edge_Lengths();
+    png_set_IHDR(png_ptr,info_ptr,counts.x,counts.y,8,color_type,PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_DEFAULT,PNG_FILTER_TYPE_DEFAULT);
 
-    VECTOR<unsigned char,d>* byte_data=new VECTOR<unsigned char,d>[image.counts.y*image.counts.x];
-    VECTOR<unsigned char,d>** row_pointers=new VECTOR<unsigned char,d>*[image.counts.y];
-    for(int j=0;j<image.counts.y;j++){
-        row_pointers[image.counts.y-j-1]=byte_data+image.counts.x*(image.counts.y-j-1);
-        for(int i=0;i<image.counts.x;i++) row_pointers[image.counts.y-j-1][i]=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j));}
+    VECTOR<unsigned char,d>* byte_data=new VECTOR<unsigned char,d>[counts.y*counts.x];
+    VECTOR<unsigned char,d>** row_pointers=new VECTOR<unsigned char,d>*[counts.y];
+    for(int j=0;j<counts.y;j++){
+        row_pointers[counts.y-j-1]=byte_data+counts.x*(counts.y-j-1);
+        for(int i=0;i<counts.x;i++) row_pointers[counts.y-j-1][i]=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j));}
     png_set_rows(png_ptr,info_ptr,(png_byte**)row_pointers);
     png_write_png(png_ptr,info_ptr,PNG_TRANSFORM_IDENTITY,0);
     delete[] row_pointers;delete[] byte_data;

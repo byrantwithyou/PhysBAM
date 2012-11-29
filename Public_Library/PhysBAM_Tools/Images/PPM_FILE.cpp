@@ -29,13 +29,14 @@ Read(const std::string& filename,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& image)
 template<class T> template<int d> void PPM_FILE<T>::
 Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
 {  
+    VECTOR<int,2> counts=image.domain.Edge_Lengths();
     assert(image.domain.min_corner.x==0 && image.domain.min_corner.y==0);
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(filename,true,false); // no compression
     *output<<"P6"<<std::endl;
     *output<<"# Generated using PPM_FILE::Write"<<std::endl;
-    *output<<image.counts.x<<" "<<image.counts.y<<std::endl;
+    *output<<counts.x<<" "<<counts.y<<std::endl;
     *output<<255<<std::endl;
-    for(int j=image.counts.y-1;j>=0;j--)for(int i=0;i<image.counts.x;i++){VECTOR<unsigned char,d> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j));Write_Binary<T>(*output,pixel[0],pixel[1],pixel[2]);}
+    for(int j=counts.y-1;j>=0;j--)for(int i=0;i<counts.x;i++){VECTOR<unsigned char,d> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j));Write_Binary<T>(*output,pixel[0],pixel[1],pixel[2]);}
     delete output;
 }
 //#####################################################################

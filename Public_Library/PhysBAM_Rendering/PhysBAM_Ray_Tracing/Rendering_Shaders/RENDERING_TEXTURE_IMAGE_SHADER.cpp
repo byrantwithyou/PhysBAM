@@ -29,7 +29,7 @@ template<class T> void RENDERING_TEXTURE_IMAGE_SHADER<T>::
 Initialize(const std::string& filename)
 {
     IMAGE<T>::Read(filename,pixels);
-    Setup_Interpolation(pixels.counts.x,pixels.counts.y);
+    Setup_Interpolation(pixels.Size().x,pixels.Size().y);
 }
 //#####################################################################
 // Function Shade_Surface_Using_Direct_Illumination

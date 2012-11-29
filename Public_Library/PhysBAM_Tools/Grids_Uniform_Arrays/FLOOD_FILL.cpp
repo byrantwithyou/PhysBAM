@@ -24,7 +24,7 @@ Flood_Fill(ARRAY<int,TV_INT>& colors,const VECTOR<ARRAY_VIEW<bool,TV_INT>,TV_INT
     if(optimize_fill_for_single_cell_regions){
         Fill_Single_Cell_Regions(colors,edge_is_blocked,fill_color);
         if(color_touches_uncolorable_node) color_touches_uncolorable_node->Resize(fill_color);} // Resize sets new elements to false for us
-    flood_fill_stack.Preallocate(colors.counts.Product());
+    flood_fill_stack.Preallocate(colors.domain.Size());
     last_uncolored_node=colors.domain.min_corner;
     while(Find_Uncolored_Node(colors,seed_node)){
         bool touches_uncolorable_node;
@@ -135,7 +135,7 @@ Path_Between_Nodes(const RANGE<TV_INT>& domain,const TV_INT& start_node,const TV
     ARRAY<TV_INT,TV_INT> parents(domain,false);
     parents.Fill(TV_INT()+INT_MAX);
     flood_fill_stack.Remove_All();
-    flood_fill_stack.Preallocate(parents.counts.Product());
+    flood_fill_stack.Preallocate(parents.domain.Size());
     flood_fill_stack.Push(end_node);
     bool success=false;
     parents(end_node)=end_node;

@@ -62,8 +62,8 @@ From_Base_Node_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<T2,VEC
 template<class T,class T2> T2
 From_Base_Node_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index)
 {
-    const T2 *base=&u(index),*basep1=base+u.counts.y*u.counts.z;
-    return LINEAR_INTERPOLATION<T,T2>::Trilinear(*base,*basep1,base[u.counts.z],basep1[u.counts.z],base[1],basep1[1],base[u.counts.z+1],basep1[u.counts.z+1],(X-grid.X(index))*grid.one_over_dX);
+    const T2 *base=&u(index),*basep1=base+u.stride.x;
+    return LINEAR_INTERPOLATION<T,T2>::Trilinear(*base,*basep1,base[u.stride.y],basep1[u.stride.y],base[1],basep1[1],base[u.stride.y+1],basep1[u.stride.y+1],(X-grid.X(index))*grid.one_over_dX);
 }
 }
 namespace{
@@ -144,10 +144,10 @@ Extrema_From_Base_Node_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BAS
 template<class T,class T2> VECTOR<T2,2>
 Extrema_From_Base_Node_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u_min,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u_max,const VECTOR<T,3>& X,const VECTOR<int,3>& index)
 {
-    const T2 *min_base=&u_min(index),*max_base=&u_max(index),*min_basep1=min_base+u_min.counts.y*u_min.counts.z,*max_basep1=max_base+u_max.counts.y*u_max.counts.z;
+    const T2 *min_base=&u_min(index),*max_base=&u_max(index),*min_basep1=min_base+u_min.stride.x,*max_basep1=max_base+u_max.stride.x;
     return VECTOR<T2,2>(
-        Componentwise_Min(*min_base,*min_basep1,min_base[u_min.counts.z],min_basep1[u_min.counts.z],min_base[1],min_basep1[1],min_base[u_min.counts.z+1],min_basep1[u_min.counts.z+1]),
-        Componentwise_Max(*max_base,*max_basep1,max_base[u_max.counts.z],max_basep1[u_max.counts.z],max_base[1],max_basep1[1],max_base[u_max.counts.z+1],max_basep1[u_max.counts.z+1]));
+        Componentwise_Min(*min_base,*min_basep1,min_base[u_min.stride.y],min_basep1[u_min.stride.y],min_base[1],min_basep1[1],min_base[u_min.stride.y+1],min_basep1[u_min.stride.y+1]),
+        Componentwise_Max(*max_base,*max_basep1,max_base[u_max.stride.y],max_basep1[u_max.stride.y],max_base[1],max_basep1[1],max_base[u_max.stride.y+1],max_basep1[u_max.stride.y+1]));
 }
 }
 //#####################################################################

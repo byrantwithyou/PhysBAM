@@ -108,7 +108,7 @@ Display(const int in_color) const
             glPopAttrib();
         }
 
-        if(draw_density_valid_mask && density_valid_mask.counts.x) 
+        if(draw_density_valid_mask && density_valid_mask.Size().x) 
             opengl_density_valid_mask.Display(in_color);
     }
 }

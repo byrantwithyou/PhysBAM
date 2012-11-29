@@ -30,7 +30,7 @@ public:
     {rotation=wrap(rotation_input,(T)-pi,(T)pi);}
 
     void Initialize(const std::string& filename,const T scale=1)
-    {IMAGE<T>::Read(filename,pixels);grid.Initialize(pixels.counts,RANGE<VECTOR<T,2> >::Unit_Box());pixels*=scale;}
+    {IMAGE<T>::Read(filename,pixels);grid.Initialize(pixels.Size(),RANGE<VECTOR<T,2> >::Unit_Box());pixels*=scale;}
 
     VECTOR<T,3> Shade_Surface_Using_Direct_Illumination(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,
         const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3>& intersection_point,const VECTOR<T,3>& same_side_normal) const

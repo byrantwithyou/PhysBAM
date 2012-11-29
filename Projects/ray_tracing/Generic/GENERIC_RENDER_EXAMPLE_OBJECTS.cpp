@@ -438,7 +438,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         bool revalidate_for_subdivision=parameters.Get_Parameter("Revalidate_For_Subdivision",false);
         if(collision_aware){
             // remove ghost values (will get crash otherwise)
-            if(phi->counts != grid->counts){
+            if(phi->Size() != grid->counts){
                 LOG::cout<<"Removing phi ghost values"<<std::endl;
                 phi->Resize(1,grid->counts.x,1,grid->counts.y,1,grid->counts.z);}
             LOG::cout<<"Using collidable thin shell interpolation..."<<std::endl;

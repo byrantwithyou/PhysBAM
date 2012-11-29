@@ -37,7 +37,7 @@ public:
     bool Initialize(const std::string& filename,const T max_phi=.01)
     {ARRAY<VECTOR<T,3> ,VECTOR<int,2> > pixels;IMAGE<T>::Read(filename,pixels);
     int i,j;//for(i=pixels.domain.min_corner.x;i<pixels.domain.max_corner.x;i++)for(j=pixels.domain.min_corner.y;j<pixels.domain.min_corner.y+pixels.domain.max_corner.y-j;j++) exchange(pixels(i,j),pixels(i,pixels.domain.max_corner.y+pixels.domain.min_corner.y-j));
-    grid.Initialize(pixels.counts,RANGE<VECTOR<T,2> >::Unit_Box()); 
+    grid.Initialize(pixels.Size(),RANGE<VECTOR<T,2> >::Unit_Box()); 
     phi.Resize(pixels.domain);
     for(i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;++i)for(j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;++j)phi(i,j)=VECTOR<T,3>::Dot_Product(VECTOR<T,3>((T).299,(T).587,(T).114),pixels(i,j));
     phi*=max_phi/phi.Max();

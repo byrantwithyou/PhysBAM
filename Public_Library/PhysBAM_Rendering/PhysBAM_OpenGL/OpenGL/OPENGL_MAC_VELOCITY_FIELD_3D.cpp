@@ -53,7 +53,7 @@ Update()
     vector_field.Resize(0);
     vector_locations.Resize(0);
 
-    if(u.counts+TV_INT(-1,1,0)!=v.counts) return; // not a complete check that they match but good enough
+    if(u.Size()+TV_INT(-1,1,0)!=v.Size()) return; // not a complete check that they match but good enough
 
     // Make sure the slice is good
     VECTOR<int,3> domain_start(1,1,1),domain_end(grid.counts);

@@ -33,7 +33,7 @@ Display(const int in_color) const
 template<class T> void OPENGL_SYMMETRIC_MATRIX_FIELD_3D<T>::
 Update()
 {
-    if(!field.counts.x || !field.counts.y || !field.counts.z){entries.Clean_Memory();return;}
+    if(field.domain.Empty()){entries.Clean_Memory();return;}
 
     int m_start=0,m_end=grid.counts.x,n_start=0,n_end=grid.counts.y,mn_start=0,mn_end=grid.counts.z;
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;

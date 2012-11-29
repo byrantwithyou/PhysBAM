@@ -33,7 +33,7 @@ template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_2D<T,T2>::
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_2D<T,T2>::
 Display(const int in_color) const
 {
-    if (x_face_values.counts.x == 0 || y_face_values.counts.x == 0) return;
+    if(x_face_values.domain.Empty()) return;
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -55,7 +55,7 @@ Bounding_Box() const
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_2D<T,T2>::
 Update()
 {
-    opengl_points.points.Resize(x_face_values.counts.Product()+y_face_values.counts.Product());
+    opengl_points.points.Resize(x_face_values.Size().Product()+y_face_values.Size().Product());
     int index=0;
     VECTOR<int,2> index_start,index_end;
     index_start=VECTOR<int,2>(x_face_values.domain.min_corner.x,x_face_values.domain.min_corner.y);
@@ -96,7 +96,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
 template<> void OPENGL_FACE_SCALAR_FIELD_2D<float,bool>::
 Update()
 {
-    opengl_points.points.Resize(x_face_values.counts.Product()+y_face_values.counts.Product());
+    opengl_points.points.Resize(x_face_values.Size().Product()+y_face_values.Size().Product());
     opengl_points.color=color_map->Lookup(true);
     int index=0;
     VECTOR<int,2> index_start,index_end;
@@ -116,7 +116,7 @@ Update()
 template<> void OPENGL_FACE_SCALAR_FIELD_2D<double,bool>::
 Update()
 {
-    opengl_points.points.Resize(x_face_values.counts.Product()+y_face_values.counts.Product());
+    opengl_points.points.Resize(x_face_values.Size().Product()+y_face_values.Size().Product());
     opengl_points.color=color_map->Lookup(true);
     int index=0;
     VECTOR<int,2> index_start,index_end;

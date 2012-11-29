@@ -37,7 +37,7 @@ template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 Display(const int in_color) const
 {
-    if (x_face_values.counts.x == 0 || y_face_values.counts.y == 0 || z_face_values.counts.z == 0) return;
+    if(x_face_values.domain.Empty()) return;
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -59,7 +59,7 @@ Bounding_Box() const
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 Update()
 {
-    opengl_points.points.Resize(x_face_values.counts.Product()+y_face_values.counts.Product()+z_face_values.counts.Product());
+    opengl_points.points.Resize(x_face_values.Size().Product()+y_face_values.Size().Product()+z_face_values.Size().Product());
     int index=0;
     VECTOR<int,3> index_start,index_end;
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
@@ -90,7 +90,7 @@ template<> void OPENGL_FACE_SCALAR_FIELD_3D<float,bool>::
 Update()
 {
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
-    opengl_points.points.Resize(x_face_values.counts.Product()+y_face_values.counts.Product()+z_face_values.counts.Product());
+    opengl_points.points.Resize(x_face_values.Size().Product()+y_face_values.Size().Product()+z_face_values.Size().Product());
     opengl_points.color=color_map->Lookup(true);
     int index=0;
     VECTOR<int,3> index_start,index_end;
@@ -112,7 +112,7 @@ template<> void OPENGL_FACE_SCALAR_FIELD_3D<double,bool>::
 Update()
 {
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
-    opengl_points.points.Resize(x_face_values.counts.Product()+y_face_values.counts.Product()+z_face_values.counts.Product());
+    opengl_points.points.Resize(x_face_values.Size().Product()+y_face_values.Size().Product()+z_face_values.Size().Product());
     opengl_points.color=color_map->Lookup(true);
     int index=0;
     VECTOR<int,3> index_start,index_end;

@@ -46,13 +46,13 @@ Update()
 
     vector_field.Resize(0);
     vector_locations.Resize(0);
-
-    if(u.counts.x-1!=v.counts.x || u.counts.y!=v.counts.y-1) return;
+    TV_INT ucounts=u.Size(),vcounts=v.Size();
+    if(ucounts.x-1!=vcounts.x || ucounts.y!=vcounts.y-1) return;
 
     int idx=0;
     if(velocity_mode == FACE_CENTERED){
-        vector_field.Resize(u.counts.x*u.counts.y + v.counts.x*v.counts.y);
-        vector_locations.Resize(u.counts.x*u.counts.y + v.counts.x*v.counts.y);
+        vector_field.Resize(ucounts.x*ucounts.y + vcounts.x*vcounts.y);
+        vector_locations.Resize(ucounts.x*ucounts.y + vcounts.x*vcounts.y);
         for(int i=u.domain.min_corner.x;i<u.domain.max_corner.x;i++) for(int j=u.domain.min_corner.y;j<u.domain.max_corner.y;j++) if(!active_faces||(active_faces->Component(0))(i,j)){
             vector_field(idx)=VECTOR<T,2>(u(i,j),0);vector_locations(idx)=grid.X_Face(TV_INT(i,j));idx++;}
         for(int i=v.domain.min_corner.x;i<v.domain.max_corner.x;i++) for(int j=v.domain.min_corner.y;j<v.domain.max_corner.y;j++) if(!active_faces||(active_faces->Component(1))(i,j)){
@@ -60,7 +60,7 @@ Update()
         vector_field.Resize(idx);
         vector_locations.Resize(idx);}
     else{
-        int number_of_cells=(u.counts.x-1)*(v.counts.y-1);
+        int number_of_cells=(ucounts.x-1)*(vcounts.y-1);
         vector_field.Resize(number_of_cells);
         vector_locations.Resize(number_of_cells);
         for(int i=u.domain.min_corner.x;i<u.domain.max_corner.x-1;i++) for(int j=v.domain.min_corner.y;j<v.domain.max_corner.y-1;j++) if(!active_cells||(*active_cells)(i,j)){

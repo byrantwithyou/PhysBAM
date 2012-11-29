@@ -27,8 +27,8 @@ template<class T> void OPENGL_GRID_BASED_VECTOR_FIELD_2D<T>::
 Update()
 {
     int idx=1;
-    vector_field.Resize(V.counts.Product());
-    vector_locations.Resize(V.counts.Product());
+    vector_field.Resize(V.Size().Product());
+    vector_locations.Resize(V.Size().Product());
     for(int i=V.domain.min_corner.x;i<V.domain.max_corner.x;i++)for(int j=V.domain.min_corner.y;j<V.domain.max_corner.y;j++){
         vector_field(idx)=V(i,j);vector_locations(idx)=grid.X(TV_INT(i,j));idx++;}
 }

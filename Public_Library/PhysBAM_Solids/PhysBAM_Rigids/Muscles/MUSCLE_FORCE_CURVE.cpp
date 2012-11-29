@@ -63,7 +63,7 @@ Load_Data(const std::string& prefix,GRID<VECTOR<T,1> >& grid,ARRAY<T,VECTOR<int,
     values.Resize(grid.Domain_Indices());
     delete input;}
     std::istream* input(FILE_UTILITIES::Safe_Open_Input(prefix+".values",false));
-    for(int i=0;i<values.counts.x;i++) *input>>values(i);
+    for(int i=0;i<values.array.m;i++) *input>>values.array(i);
     delete input;
 }
 template<class T> void MUSCLE_FORCE_CURVE<T>::
@@ -72,7 +72,7 @@ Compute_Slopes(const GRID<VECTOR<T,1> >& grid,const ARRAY<T,VECTOR<int,1> >& val
     assert(!grid.Is_MAC_Grid());
     slope_grid=grid.Get_MAC_Grid();
     slopes.Resize(0,slope_grid.counts.x);
-    for(int i=0;i<slopes.counts.x;i++) slopes(i)=(values(i+1)-values(i))*grid.one_over_dX.x;
+    for(int i=0;i<slopes.array.m;i++) slopes.array(i)=(values.array(i+1)-values.array(i))*grid.one_over_dX.x;
 }
 template class MUSCLE_FORCE_CURVE<float>;
 template class MUSCLE_FORCE_CURVE<double>;

@@ -324,7 +324,7 @@ Update_Contour_Curves()
     LEVELSET<TV> scalar_field_as_levelset(grid,values);
     OPENGL_COLOR_MAP<float>* color_map=color_maps(current_color_map);
     for(int i=0;i<contour_curves.m;i++) delete contour_curves(i);
-    if(!values.counts.Contains(0)){
+    if(!values.domain.Empty()){
         contour_curves.Resize(contour_values.m);
         for(int i=0;i<contour_values.m;i++){
             contour_curves(i)=new OPENGL_SEGMENTED_CURVE_2D<float>(*DUALCONTOUR_2D<float>::Create_Segmented_Curve_From_Levelset(scalar_field_as_levelset,contour_values(i),false),color_map->Lookup(Pre_Map_Value(contour_values(i))));}}
@@ -337,7 +337,7 @@ Update_Contour_Curves()
     LEVELSET<TV> scalar_field_as_levelset(grid,values);
     OPENGL_COLOR_MAP<double>* color_map=color_maps(current_color_map);
     for(int i=0;i<contour_curves.m;i++) delete contour_curves(i);
-    if(!values.counts.Contains(0)){
+    if(!values.domain.Empty()){
         contour_curves.Resize(contour_values.m);
         for(int i=0;i<contour_values.m;i++){
             contour_curves(i)=new OPENGL_SEGMENTED_CURVE_2D<double>(*DUALCONTOUR_2D<double>::Create_Segmented_Curve_From_Levelset(scalar_field_as_levelset,contour_values(i),false),color_map->Lookup(Pre_Map_Value(contour_values(i))));}}

@@ -130,14 +130,15 @@ Add_Frame(ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
 #ifdef USE_LIBJPEG
     struct jpeg_compress_struct cinfo;
     struct jpeg_error_mgr jerr;
-    if(width==0 && height==0){width=image.counts.x;height=image.counts.y;}
-    if(width!=image.counts.x || height!=image.counts.y) throw std::runtime_error("Frame does not have same size as previous frame(s)");
+    VECTOR<int,2> counts=image.domain.Edge_Lengths();
+    if(width==0 && height==0){width=counts.x;height=counts.y;}
+    if(width!=counts.x || height!=counts.y) throw std::runtime_error("Frame does not have same size as previous frame(s)");
     
     cinfo.err=jpeg_std_error(&jerr);
     jpeg_create_compress(&cinfo);
     long frame_begin=ftell(fp);
     jpeg_stdio_dest(&cinfo,fp     );
-    cinfo.image_width=image.counts.x;cinfo.image_height=image.counts.y;cinfo.input_components=3;
+    cinfo.image_width=counts.x;cinfo.image_height=counts.y;cinfo.input_components=3;
     cinfo.in_color_space=JCS_RGB; // colorspace of input image
     jpeg_set_defaults(&cinfo);jpeg_set_quality(&cinfo,95,TRUE); // limit to baseline-JPEG values
     jpeg_start_compress(&cinfo,TRUE);
@@ -145,7 +146,7 @@ Add_Frame(ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
     int row_stride=cinfo.image_width*3; // JSAMPLEs per row in image_buffer
     JSAMPLE* row=new unsigned char[row_stride];JSAMPROW row_pointer[]={row};
     while(cinfo.next_scanline < cinfo.image_height){
-        int index=0;for(int i=0;i<image.counts.x;i++){VECTOR<unsigned char,3> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,image.counts.y-cinfo.next_scanline-1));row[index++]=pixel.x;row[index++]=pixel.y;row[index++]=pixel.z;} // copy row
+        int index=0;for(int i=0;i<counts.x;i++){VECTOR<unsigned char,3> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,counts.y-cinfo.next_scanline-1));row[index++]=pixel.x;row[index++]=pixel.y;row[index++]=pixel.z;} // copy row
         jpeg_write_scanlines(&cinfo,row_pointer,1);}
     delete[] row;
     jpeg_finish_compress(&cinfo);

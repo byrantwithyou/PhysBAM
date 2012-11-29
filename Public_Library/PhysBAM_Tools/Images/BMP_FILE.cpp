@@ -40,7 +40,8 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
 {  
     PHYSBAM_ASSERT(image.domain.min_corner.x==0 && image.domain.min_corner.y==0);
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(filename,true,false); // no compression
-    BMP_HEADER header;header.Initialize(image.counts.x,image.counts.y);Write_Binary<T>(*output,header);
+    VECTOR<int,2> counts=image.domain.Edge_Lengths();
+    BMP_HEADER header;header.Initialize(counts.x,counts.y);Write_Binary<T>(*output,header);
     int line_width=header.w*3,line_padding=((line_width+3)&~3)-line_width;
     for(int j=0;j<header.h;j++){
         for(int i=0;i<header.w;i++){VECTOR<unsigned char,d> byte=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j));Write_Binary<T>(*output,VECTOR<unsigned char,3>(byte[2],byte[1],byte[0]));}

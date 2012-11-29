@@ -143,7 +143,7 @@ Do_Color(const TV_INT& index) const
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Display(const int in_color) const
 {
-    if(values.counts.x==0 || values.counts.y==0) return;
+    if(values.domain.Empty()) return;
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
 
     glMatrixMode(GL_MODELVIEW);
@@ -492,8 +492,8 @@ Update_Slice()
             opengl_textured_rect->frame->r=ROTATION<VECTOR<float,3> >(0.5*pi,VECTOR<float,3>(0,1,0));
             opengl_textured_rect->width=domain.Edge_Lengths().z;
             opengl_textured_rect->height=domain.Edge_Lengths().y;
-            tex_width=values.counts.z;
-            tex_height=values.counts.y;
+            tex_width=values.Size().z;
+            tex_height=values.Size().y;
             break;
 
         case 1:
@@ -501,8 +501,8 @@ Update_Slice()
             opengl_textured_rect->frame->r=ROTATION<VECTOR<float,3> >(-0.5*pi,VECTOR<float,3>(1,0,0));
             opengl_textured_rect->width=domain.Edge_Lengths().x;
             opengl_textured_rect->height=domain.Edge_Lengths().z;
-            tex_width=values.counts.x;
-            tex_height=values.counts.z;
+            tex_width=values.Size().x;
+            tex_height=values.Size().z;
             break;
 
         case 2:
@@ -510,8 +510,8 @@ Update_Slice()
             opengl_textured_rect->frame->r=ROTATION<VECTOR<float,3> >();
             opengl_textured_rect->width=domain.Edge_Lengths().x;
             opengl_textured_rect->height=domain.Edge_Lengths().y;
-            tex_width=values.counts.x;
-            tex_height=values.counts.y;
+            tex_width=values.Size().x;
+            tex_height=values.Size().y;
             break;}
 
     Update_Slice_Helper(this,tex_width,tex_height);
@@ -530,7 +530,7 @@ template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Update_Points()
 {
     PHYSBAM_ASSERT(opengl_points);
-    opengl_points->points.Resize(values.counts.Product());
+    opengl_points->points.Resize(values.Size().Product());
     int index=0;
     for(int i=values.domain.min_corner.x;i<values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<values.domain.max_corner.z;k++){
         opengl_points->points(index)=grid.X(TV_INT(i,j,k));
@@ -546,7 +546,7 @@ Update_Points()
 {
     PHYSBAM_ASSERT(opengl_points);
     opengl_points->color=color_maps(current_color_map)->Lookup(true);
-    opengl_points->points.Resize(values.counts.Product());
+    opengl_points->points.Resize(values.Size().Product());
     int index=0;
     for(int i=values.domain.min_corner.x;i<values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<values.domain.max_corner.z;k++)
         if(values(i,j,k)) opengl_points->points(index++)=grid.X(TV_INT(i,j,k));
@@ -558,7 +558,7 @@ Update_Points()
 {
     PHYSBAM_ASSERT(opengl_points);
     opengl_points->color=color_maps(current_color_map)->Lookup(true);
-    opengl_points->points.Resize(values.counts.Product());
+    opengl_points->points.Resize(values.Size().Product());
     int index=0;
     for(int i=values.domain.min_corner.x;i<values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<values.domain.max_corner.z;k++)
         if(values(i,j,k)) opengl_points->points(index++)=grid.X(TV_INT(i,j,k));

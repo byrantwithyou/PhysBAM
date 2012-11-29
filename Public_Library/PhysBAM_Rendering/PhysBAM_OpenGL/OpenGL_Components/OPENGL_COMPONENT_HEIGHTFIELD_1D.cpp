@@ -109,12 +109,12 @@ Display(const int in_color) const
                 vertices.Resize(0);
                 if(displacement_scale == 1)
                 {
-                    for(int i=0;i<x->counts.x;i++)
+                    for(int i=0;i<x->Size().x;i++)
                         OpenGL_Vertex(VECTOR<T,2>((*x)(i), scale*height(i)),vertices);       
                 }
                 else
                 {
-                    for(int i=0;i<x->counts.x;i++)
+                    for(int i=0;i<x->Size().x;i++)
                         OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x + displacement_scale*((*x)(i)-grid.X(TV_INT(i)).x),
                                 scale*height(i)),vertices);       
                 }
@@ -217,21 +217,21 @@ Reinitialize(bool force)
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(height_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
                     FILE_UTILITIES::Read_From_File<RW>(filename,height);
-                    if(height.counts.x != grid.counts.x) success=false;}
+                    if(height.Size().x != grid.counts.x) success=false;}
                 else success=false;}
 
             if(success && x){
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(x_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
                     FILE_UTILITIES::Read_From_File<RW>(filename,*x);
-                    if(height.counts.x != x->counts.x) success=false;}
+                    if(height.Size().x != x->Size().x) success=false;}
                 else success=false;}
     
             if(success && ground){
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(ground_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
                     FILE_UTILITIES::Read_From_File<RW>(filename,*ground);
-                    if(height.counts.x != ground->counts.x) success=false;
+                    if(height.Size().x != ground->Size().x) success=false;
                     else height += (*ground);}
                 else success=false;}
 
@@ -239,7 +239,7 @@ Reinitialize(bool force)
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(u_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
                     FILE_UTILITIES::Read_From_File<RW>(filename,*u);
-                    if(height.counts.x != u->counts.x) success=false;
+                    if(height.Size().x != u->Size().x) success=false;
                     else for(int i=0;i<grid.counts.x;i++){
                             vector_field(i)=VECTOR<T,2>((*u)(i),0);
                             vector_locations(i)=VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i));}}

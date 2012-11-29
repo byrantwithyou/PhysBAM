@@ -69,25 +69,27 @@ public:
     typedef TV_INT INDEX;
 
     RANGE<TV_INT> domain;
-    TV_INT counts;
+    TV_INT stride;
+    int offset;
     ARRAY_VIEW<T> array; // one-dimensional data storage
 
 protected:
-    T* base_pointer;
-
     ARRAYS_ND_BASE()
-        :domain(TV_INT(),TV_INT()),array(0,0),base_pointer(0)
+        :domain(TV_INT(),TV_INT()),offset(0),array(0,0)
     {}
 
-    ARRAYS_ND_BASE(const RANGE<TV_INT>& domain_input)
-        :domain(domain_input),counts(domain.Edge_Lengths()),array(0,0),base_pointer(0)
-    {}
+    ARRAYS_ND_BASE(const RANGE<TV_INT>& range)
+        :domain(TV_INT(),TV_INT()),array(0,0)
+    {Calculate_Acceleration_Constants(range);}
+
+    void Calculate_Acceleration_Constants(const RANGE<TV_INT>& range)
+    {domain=range;
+    TV_INT counts(domain.Edge_Lengths());
+    stride(TV_INT::m-1)=1;
+    for(int i=TV_INT::m-1;i>0;i--) stride(i-1)=stride(i)*counts(i);
+    offset=-domain.min_corner.Dot(stride);}
 
 public:
-    void Calculate_Acceleration_Constants()
-    {T* array_pointer=array.Get_Array_Pointer();
-    base_pointer=array_pointer?array_pointer-Compute_Index(domain.min_corner):0;}
-
     template<class T_ARRAY2>
     ARRAYS_ND_BASE& operator=(const T_ARRAY2& source)
     {assert(Equal_Dimensions(*this,source));array=source.array;return *this;}
@@ -96,7 +98,7 @@ public:
     {return domain;}
 
     const TV_INT Size() const
-    {return counts;}
+    {return domain.Edge_Lengths();}
 
     bool operator==(const ARRAYS_ND_BASE& v) const
     {return Equal_Dimensions(*this,v) && array==v.array;}
@@ -210,55 +212,41 @@ public:
     {STATIC_ASSERT(IS_SAME<T,TV2>::value);typedef typename TV2::SCALAR TS;
     return ARRAY_VIEW<T>::Maximum_Magnitude(a.array);}
 
-private:
-    int Compute_Index(const VECTOR<int,3>& index) const
-    {return (index.x*counts.y+index.y)*counts.z+index.z;}
+    T& operator()(const int i,const int j,const int k)
+    {STATIC_ASSERT(d==3);return (*this)(VECTOR<int,3>(i,j,k));}
 
-    int Compute_Index(const VECTOR<int,2>& index) const
-    {return index.x*counts.y+index.y;}
-
-    int Compute_Index(const VECTOR<int,1>& index) const
-    {return index.x;}
-public:
-
-    T& operator()(const int i,const int j,const int ij)
-    {STATIC_ASSERT(d==3);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,3>(i,j,ij)));return base_pointer[(i*counts.y+j)*counts.z+ij];}
-
-    const T& operator()(const int i,const int j,const int ij) const
-    {STATIC_ASSERT(d==3);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,3>(i,j,ij)));return base_pointer[(i*counts.y+j)*counts.z+ij];}
+    const T& operator()(const int i,const int j,const int k) const
+    {STATIC_ASSERT(d==3);return (*this)(VECTOR<int,3>(i,j,k));}
 
     T& operator()(const int i,const int j)
-    {STATIC_ASSERT(d==2);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,2>(i,j)));return base_pointer[i*counts.y+j];}
+    {STATIC_ASSERT(d==2);return (*this)(VECTOR<int,2>(i,j));}
 
     const T& operator()(const int i,const int j) const
-    {STATIC_ASSERT(d==2);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,2>(i,j)));return base_pointer[i*counts.y+j];}
+    {STATIC_ASSERT(d==2);return (*this)(VECTOR<int,2>(i,j));}
 
     T& operator()(const int i)
-    {STATIC_ASSERT(d==1);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,1>(i)));return base_pointer[i];}
+    {STATIC_ASSERT(d==1);return (*this)(VECTOR<int,1>(i));}
 
     const T& operator()(const int i) const
-    {STATIC_ASSERT(d==1);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,1>(i)));return base_pointer[i];}
+    {STATIC_ASSERT(d==1);return (*this)(VECTOR<int,1>(i));}
 
     T& operator()(const TV_INT& index)
-    {assert(domain.Lazy_Inside_Half_Open(index));return base_pointer[Compute_Index(index)];}
+    {assert(domain.Lazy_Inside_Half_Open(index));return array(index.Dot(stride)+offset);}
 
     const T& operator()(const TV_INT& index) const
-    {assert(domain.Lazy_Inside_Half_Open(index));return base_pointer[Compute_Index(index)];}
+    {assert(domain.Lazy_Inside_Half_Open(index));return array(index.Dot(stride)+offset);}
 
     bool Valid_Index(const TV_INT& index) const
     {return domain.Lazy_Inside_Half_Open(index);}
 
     int Standard_Index(const TV_INT& index) const
-    {assert(Valid_Index(index));return Compute_Index(index-domain.min_corner);}
+    {assert(Valid_Index(index));return index.Dot(stride)+offset;}
 
-    TV_INT Strides() const
-    {TV_INT strides;strides(TV_INT::m-1)=1;for(int i=TV_INT::m-1;i>0;i--) strides(i-1)=strides(i)*counts(i);return strides;}
+    void Exchange(ARRAYS_ND_BASE& a)
+    {exchange(domain,a.domain);exchange(stride,a.stride);exchange(offset,a.offset);array.Exchange(a.array);}
 
-    T* Get_Array_Pointer()
-    {return base_pointer;}
-
-    const T* Get_Array_Pointer() const
-    {return base_pointer;}
+    static void Exchange(ARRAYS_ND_BASE& a,ARRAYS_ND_BASE& b)
+    {a.Exchange(b);}
 
     TV_INT Clamp(const TV_INT& i) const
     {return domain.Clamp(i);}
@@ -323,7 +311,7 @@ public:
     static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy)
     {Put(constant,old_copy,new_copy,old_copy.Domain_Indices());}
 
-private:
+protected:
     template<class T2>
     static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<TV_INT>& box)
     {assert(old_copy.Domain_Indices().Contains(box));assert(new_copy.Domain_Indices().Contains(box));

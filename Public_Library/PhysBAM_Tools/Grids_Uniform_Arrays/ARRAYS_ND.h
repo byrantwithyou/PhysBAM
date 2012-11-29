@@ -26,74 +26,45 @@ public:
     typedef ARRAYS_ND_BASE<T,VECTOR<int,d> > BASE;
 
     using BASE::array; // one-dimensional data storage
-    using BASE::domain;using BASE::counts;
+    using BASE::domain;
     using BASE::Calculate_Acceleration_Constants;
-private:
-    using BASE::base_pointer;
 public:
 
     ARRAY()
         :BASE()
-    {
-        Calculate_Acceleration_Constants();
-    }
+    {}
 
-    ARRAY(const RANGE<TV_INT>& domain_input,const bool initialize_using_default_constructor=true)
-        :BASE(domain_input)
-    {
-        assert(counts.Min()>=0);int size=counts.Product();
-        {ARRAY_VIEW<T> new_array(size,new T[size]);new_array.Exchange(array);} // allocate a new array
-        Calculate_Acceleration_Constants();
-        if(initialize_using_default_constructor) array.Fill(T()); // initialize array using default constructor
-    }
+    ARRAY(const RANGE<TV_INT>& domain_input,const bool initialize_using_initialization_value=true,const T& initialization_value=T())
+    {Initialize(domain_input,initialize_using_initialization_value,initialization_value);}
 
-    ARRAY(const TV_INT& size_input,const bool initialize_using_default_constructor=true)
-        :BASE(RANGE<TV_INT>(TV_INT(),size_input))
-    {
-        assert(counts.Min()>=0);int size=counts.Product();
-        {ARRAY_VIEW<T> new_array(size,new T[size]);new_array.Exchange(array);} // allocate a new array
-        Calculate_Acceleration_Constants();
-        if(initialize_using_default_constructor) array.Fill(T()); // initialize array using default constructor
-    }
+    ARRAY(const TV_INT& size_input,const bool initialize_using_initialization_value=true,const T& initialization_value=T())
+    {Initialize(RANGE<TV_INT>(TV_INT(),size_input),initialize_using_initialization_value,initialization_value);}
 
-    ARRAY(const int m_start_input,const int m_end_input,const int n_start_input,const int n_end_input,const int mn_start_input,const int mn_end_input,
-        const bool initialize_using_default_constructor=true)
-        :BASE(RANGE<TV_INT>(TV_INT(m_start_input,n_start_input,mn_start_input),TV_INT(m_end_input,n_end_input,mn_end_input)))
-    {
-        assert(counts.Min()>=0);int size=counts.Product();
-        {ARRAY_VIEW<T> new_array(size,new T[size]);new_array.Exchange(array);} // allocate a new array
-        Calculate_Acceleration_Constants();
-        if(initialize_using_default_constructor) array.Fill(T()); // initialize array using default constructor
-    }
+    ARRAY(const int m_start_input,const int m_end_input,const int n_start_input,const int n_end_input,const int p_start_input,const int p_end_input,
+        const bool initialize_using_initialization_value=true,const T& initialization_value=T())
+    {Initialize(RANGE<TV_INT>(TV_INT(m_start_input,n_start_input,p_start_input),TV_INT(m_end_input,n_end_input,p_end_input)),initialize_using_initialization_value,initialization_value);}
 
-    ARRAY(const int m_start_input,const int m_end_input,const int n_start_input,const int n_end_input,const bool initialize_using_default_constructor=true)
-        :BASE(RANGE<TV_INT>(TV_INT(m_start_input,n_start_input),TV_INT(m_end_input,n_end_input)))
-    {
-        assert(counts.Min()>=0);int size=counts.Product();
-        {ARRAY_VIEW<T> new_array(size,new T[size]);new_array.Exchange(array);} // allocate a new array
-        Calculate_Acceleration_Constants();
-        if(initialize_using_default_constructor) array.Fill(T()); // initialize array using default constructor
-    }
+    ARRAY(const int m_start_input,const int m_end_input,const int n_start_input,const int n_end_input,const bool initialize_using_initialization_value=true,const T& initialization_value=T())
+    {Initialize(RANGE<TV_INT>(TV_INT(m_start_input,n_start_input),TV_INT(m_end_input,n_end_input)),initialize_using_initialization_value,initialization_value);}
 
-    ARRAY(const int m_start_input,const int m_end_input,const bool initialize_using_default_constructor=true)
-        :BASE(RANGE<TV_INT>(TV_INT(m_start_input),TV_INT(m_end_input)))
-    {
-        assert(counts.Min()>=0);int size=counts.Product();
-        {ARRAY_VIEW<T> new_array(size,new T[size]);new_array.Exchange(array);} // allocate a new array
-        Calculate_Acceleration_Constants();
-        if(initialize_using_default_constructor) array.Fill(T()); // initialize array using default constructor
-    }
+    ARRAY(const int m_start_input,const int m_end_input,const bool initialize_using_initialization_value=true,const T& initialization_value=T())
+    {Initialize(RANGE<TV_INT>(TV_INT(m_start_input),TV_INT(m_end_input)),initialize_using_initialization_value,initialization_value);}
 
     ARRAY(const ARRAY& old_array,const bool initialize_with_old_array=true)
-        :BASE(old_array.domain)
-    {
-        {int size=old_array.array.Size();ARRAY_VIEW<T> new_array(size,new T[size]);new_array.Exchange(array);} // allocate a new array        
-        Calculate_Acceleration_Constants();
-        if(initialize_with_old_array) array=old_array.array;
-    }
+    {Initialize(old_array.domain,false,T());if(initialize_with_old_array) array=old_array.array;}
 
     ~ARRAY()
     {delete[] array.Get_Array_Pointer();}
+
+protected:
+    void Initialize(const RANGE<TV_INT>& box,const bool initialize_using_initialization_value,const T& initialization_value)
+    {TV_INT counts_new=box.Edge_Lengths();
+    assert(counts_new.Min()>=0);
+    int size_new=counts_new.Product();
+    Calculate_Acceleration_Constants(box);
+    array.Set(size_new,new T[size_new]);
+    if(initialize_using_initialization_value) array.Fill(initialization_value);}
+public:
 
     void Clean_Memory()
     {Resize(RANGE<TV_INT>::Empty_Box(),false,false);}
@@ -102,29 +73,19 @@ public:
     {for(int i=0;i<array.Size();i++) delete array(i);Clean_Memory();}
 
     ARRAY& operator=(const ARRAY& source)
-    {if(array.Size()!=source.array.Size()){
-        delete[] array.Get_Array_Pointer();
-        ARRAY_VIEW<T> new_array(source.array.Size(),new T[source.array.Size()]);new_array.Exchange(array);}
-    else if(this==&source) return *this;
-    counts=source.counts;domain=source.domain;
-    Calculate_Acceleration_Constants();
+    {if(this==&source) return *this;
+    Resize_In_Place(source.Domain_Indices());
     array=source.array;return *this;}
 
     template<class T_ARRAY2>
     ARRAY& operator=(const T_ARRAY2& source)
     {STATIC_ASSERT(IS_SAME<ELEMENT,typename T_ARRAY2::ELEMENT>::value);
-    if(counts!=source.Size()){
-        delete[] array.Get_Array_Pointer();
-        int source_array_size=source.Size().Product();
-        ARRAY_VIEW<T> new_array(source_array_size,new T[source_array_size]);new_array.Exchange(array);}
-    counts=source.Size();domain=source.Domain_Indices();
-    Calculate_Acceleration_Constants();
+    Resize_In_Place(source.Domain_Indices());
     ARRAY_BASE<T,BASE,TV_INT>::operator=(source);return *this;}
-    //array=source.array;return *this;}
 
-    void Resize(int m_start_new,int m_end_new,int n_start_new,int n_end_new,int mn_start_new,int mn_end_new,const bool initialize_new_elements=true,
+    void Resize(int m_start_new,int m_end_new,int n_start_new,int n_end_new,int p_start_new,int p_end_new,const bool initialize_new_elements=true,
         const bool copy_existing_elements=true,const T& initialization_value=T())
-    {STATIC_ASSERT(d==3);RANGE<TV_INT> box(TV_INT(m_start_new,n_start_new,mn_start_new),TV_INT(m_end_new,n_end_new,mn_end_new));
+    {STATIC_ASSERT(d==3);RANGE<TV_INT> box(TV_INT(m_start_new,n_start_new,p_start_new),TV_INT(m_end_new,n_end_new,p_end_new));
     Resize(box,initialize_new_elements,copy_existing_elements,initialization_value);}
 
     void Resize(int m_start_new,int m_end_new,int n_start_new,int n_end_new,const bool initialize_new_elements=true,
@@ -135,53 +96,19 @@ public:
         const bool copy_existing_elements=true,const T& initialization_value=T())
     {STATIC_ASSERT(d==1);RANGE<TV_INT> box((TV_INT(m_start_new)),TV_INT(m_end_new));Resize(box,initialize_new_elements,copy_existing_elements,initialization_value);}
 
-private:
-    void Resize_Helper(const RANGE<VECTOR<int,3> >& box,ARRAY_VIEW<T> array_new,const TV_INT& counts_new)
-    {TV_INT m1=TV_INT::Componentwise_Max(domain.min_corner,box.min_corner),m2=TV_INT::Componentwise_Min(domain.max_corner,box.max_corner),i;
-    for(i.x=m1.x;i.x<m2.x;i.x++) for(i.y=m1.y;i.y<m2.y;i.y++) for(i.z=m1.z;i.z<m2.z;i.z++){
-        TV_INT diff_old(i-domain.min_corner),diff_new(i-box.min_corner);
-        array_new(((diff_new.x*counts_new.y+diff_new.y)*counts_new.z+diff_new.z))=array(((diff_old.x*counts.y+diff_old.y)*counts.z+diff_old.z));}}
-
-    void Resize_Helper(const RANGE<VECTOR<int,2> >& box,ARRAY_VIEW<T> array_new,const TV_INT& counts_new)
-    {TV_INT m1=TV_INT::Componentwise_Max(domain.min_corner,box.min_corner),m2=TV_INT::Componentwise_Min(domain.max_corner,box.max_corner),i;
-    for(i.x=m1.x;i.x<m2.x;i.x++) for(i.y=m1.y;i.y<m2.y;i.y++){
-        TV_INT diff_old(i-domain.min_corner),diff_new(i-box.min_corner);
-        array_new((diff_new.x*counts_new.y+diff_new.y))=array((diff_old.x*counts.y+diff_old.y));}}
-
-    void Resize_Helper(const RANGE<VECTOR<int,1> >& box,ARRAY_VIEW<T> array_new,const TV_INT& counts_new)
-    {TV_INT m1=TV_INT::Componentwise_Max(domain.min_corner,box.min_corner),m2=TV_INT::Componentwise_Min(domain.max_corner,box.max_corner),i;
-    for(i.x=m1.x;i.x<m2.x;i.x++){
-        TV_INT diff_old(i-domain.min_corner),diff_new(i-box.min_corner);
-        array_new(diff_new.x)=array(diff_old.x);}}
-public:
-
     void Resize(const RANGE<TV_INT>& box,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
     {if(box==domain) return;
-    TV_INT counts_new(box.Edge_Lengths());
-    assert(counts_new.Min()>=0);
-    int size_new=counts_new.Product();
-    ARRAY_VIEW<T> array_new(size_new,new T[size_new]);
-    if(initialize_new_elements) array_new.Fill(initialization_value);
-    if(copy_existing_elements) Resize_Helper(box,array_new,counts_new);
-    domain=box;counts=counts_new;
-    delete[] array.Get_Array_Pointer();array.Exchange(array_new);Calculate_Acceleration_Constants();}
+    ARRAY new_array(box,initialize_new_elements,initialization_value);
+    if(copy_existing_elements) Put(*this,new_array,domain.Intersect(box));
+    Exchange(new_array);}
 
-    // TODO: this function is extremely broken, since all the functions in the class depends on size being correct
-    void Resize_In_Place(const int m_start_new,const int m_end_new,const int n_start_new,const int n_end_new,const int mn_start_new,const int mn_end_new)
-    {RANGE<TV_INT> box(m_start_new,m_end_new,n_start_new,n_end_new,mn_start_new,mn_end_new);Resize_In_Place(box);}
+    void Reallocate_In_Place(const RANGE<TV_INT>& box)
+    {TV_INT counts_new(box.Edge_Lengths());int size_new=counts_new.Product();Calculate_Acceleration_Constants(box);delete [] array.Get_Array_Pointer();array.Set(size_new,new T[size_new]);}
 
     void Resize_In_Place(const RANGE<TV_INT>& box)
     {TV_INT counts_new(box.Edge_Lengths());
-    if(array.Size()>=counts_new.Product()){domain=box;counts=counts_new;Calculate_Acceleration_Constants();}
-    else Resize(box,false,false);}
-
-    void Exchange(ARRAY& b)
-    {array.Exchange(b.array);
-    exchange(domain,b.domain);exchange(counts,b.counts);
-    Calculate_Acceleration_Constants();b.Calculate_Acceleration_Constants();}
-
-    static void Exchange(ARRAY& a,ARRAY& b)
-    {a.Exchange(b);}
+    if(array.Size()>=counts_new.Product()) Calculate_Acceleration_Constants(box);
+    else Reallocate_In_Place(box);}
 
     template<class RW>
     void Read(std::istream& input)
@@ -194,20 +121,9 @@ public:
 protected:
     template<class RW>
     void Read_With_Length(std::istream& input,const int length2)
-    {int read_length;Read_Binary<RW>(input,read_length,domain);
-    if(read_length!=length2) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Read length %d not equal to %d",read_length,length2));
-    if(counts.Min()<0) throw READ_ERROR("Invalid negative array size");
-#ifdef COMPILE_WITH_READ_ONE_BASED_DATA
-    domain.min_corner-=1;
-#endif
-    counts=domain.Edge_Lengths();
-    int size=counts.Product();
-    if(size!=array.Size()){
-        delete[] array.Get_Array_Pointer();
-        ARRAY_VIEW<T> new_array(size,new T[size]);
-        array.Exchange(new_array);
-    }
-    Read_Binary_Array<RW>(input,array.Get_Array_Pointer(),array.Size());Calculate_Acceleration_Constants();}
+    {int read_length;RANGE<TV_INT> domain_temp;Read_Binary<RW>(input,read_length,domain_temp);
+    Resize(domain_temp,false);
+    Read_Binary_Array<RW>(input,array.Get_Array_Pointer(),array.Size());}
 
     template<class RW>
     void Write_With_Length(std::ostream& output,const int length2) const

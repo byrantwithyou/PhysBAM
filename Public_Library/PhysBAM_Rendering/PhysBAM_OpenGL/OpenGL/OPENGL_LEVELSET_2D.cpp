@@ -54,7 +54,7 @@ template<class T> void OPENGL_LEVELSET_2D<T>::
 Update()
 {
     OPENGL_SCALAR_FIELD_2D<T,T>::Update();
-    if(levelset.phi.counts.x>1&&levelset.phi.counts.y>1){
+    if(levelset.phi.Size().Min()>1){
         if(opengl_triangulated_area){
             delete &(opengl_triangulated_area->triangulated_area);delete opengl_triangulated_area;opengl_triangulated_area=0;}
         if(opengl_segmented_curve_2d){

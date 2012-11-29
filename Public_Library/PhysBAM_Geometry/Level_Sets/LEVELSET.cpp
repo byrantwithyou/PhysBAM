@@ -179,10 +179,6 @@ Compute_Normals(const T time)
     int ghost_cells=3;
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));
     boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    TV_INT offset;
-    offset(TV::m-1)=1;
-    for(int d=TV::m-1;d>=1;d--)
-        offset(d-1)=offset(d)*phi_ghost.counts(d);
 
     if(!normals) normals=new ARRAY<TV,TV_INT>(grid.Domain_Indices(ghost_cells-1));
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next()){
@@ -190,7 +186,7 @@ Compute_Normals(const T time)
         int index=phi_ghost.Standard_Index(iterator.Cell_Index());
         TV& N((*normals)(cell));
         for(int d=0;d<TV::m;d++)
-            N(d)=(T).5*(phi_ghost.array(index+offset(d))-phi_ghost.array(index-offset(d)))*grid.one_over_dX(d);
+            N(d)=(T).5*(phi_ghost.array(index+phi_ghost.stride(d))-phi_ghost.array(index-phi_ghost.stride(d)))*grid.one_over_dX(d);
         N.Normalize();}
 }
 //#####################################################################
@@ -227,7 +223,6 @@ template<class TV> void LEVELSET<TV>::
 Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
 {
     if(!recompute_if_exists && cell_range) return;
-    TV_INT strides=phi.Strides();
     RANGE<TV_INT> pruned_range(phi.domain);
     pruned_range.max_corner-=1;
     if(!cell_range) cell_range=new ARRAY<INTERVAL<T>,TV_INT>(pruned_range);
@@ -237,7 +232,7 @@ Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
         for(int i=1;i<(1<<TV::m);i++){
             int ind=index;
             for(int d=0;d<TV::m;d++)
-                ind+=((i>>d)&1)*strides(d);
+                ind+=((i>>d)&1)*phi.stride(d);
             interval.Enlarge_To_Include_Point(phi.array(ind));}
         (*cell_range)(it.index)=interval;}
 }
@@ -247,16 +242,15 @@ Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
 template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> LEVELSET<TV>::
 Hessian(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
 {
-    TV_INT stride=phi_input.Strides();
     int s_index=phi_input.Standard_Index(index);
     SYMMETRIC_MATRIX<T,TV::m> ddphi;
     for(int a=0;a<TV::m;a++)
         for(int b=0;b<a;b++)
-            ddphi(a,b)=(T).25*(phi_input.array(s_index+stride(a)+stride(b))-phi_input.array(s_index+stride(a)-stride(b))
-                -phi_input.array(s_index-stride(a)+stride(b))+phi_input.array(s_index-stride(a)-stride(b)))*grid.one_over_dX(a)*grid.one_over_dX(b);
+            ddphi(a,b)=(T).25*(phi_input.array(s_index+phi_input.stride(a)+phi_input.stride(b))-phi_input.array(s_index+phi_input.stride(a)-phi_input.stride(b))
+                -phi_input.array(s_index-phi_input.stride(a)+phi_input.stride(b))+phi_input.array(s_index-phi_input.stride(a)-phi_input.stride(b)))*grid.one_over_dX(a)*grid.one_over_dX(b);
 
     for(int a=0;a<TV::m;a++)
-        ddphi(a,a)=(phi_input.array(s_index+stride(a))-2*phi_input.array(s_index)+phi_input.array(s_index-stride(a)))*sqr(grid.one_over_dX(a));
+        ddphi(a,a)=(phi_input.array(s_index+phi_input.stride(a))-2*phi_input.array(s_index)+phi_input.array(s_index-phi_input.stride(a)))*sqr(grid.one_over_dX(a));
     return ddphi;
 }
 //#####################################################################
@@ -265,11 +259,10 @@ Hessian(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
 template<class TV> TV LEVELSET<TV>::
 Gradient(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
 {
-    TV_INT stride=phi_input.Strides();
     int s_index=phi_input.Standard_Index(index);
     TV dphi;
     for(int a=0;a<TV::m;a++)
-        dphi(a)=(T).5*(phi_input.array(s_index+stride(a))-phi_input.array(s_index-stride(a)))*grid.one_over_dX(a);
+        dphi(a)=(T).5*(phi_input.array(s_index+phi_input.stride(a))-phi_input.array(s_index-phi_input.stride(a)))*grid.one_over_dX(a);
     return dphi;
 }
 //#####################################################################

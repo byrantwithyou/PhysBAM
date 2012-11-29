@@ -74,7 +74,7 @@ From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2>
     TV w=(X-grid.Node(index))*grid.one_over_dX;
     const T2* b=&u(index-1);
     T2 x[3];
-    for(int i=0;i<3;i++,b+=u.counts.y)
+    for(int i=0;i<3;i++,b+=u.stride.x)
         x[i]=Quadratic_Interpolation(b,w.y);
     return Quadratic_Interpolation(x,w.x);
 }
@@ -85,11 +85,11 @@ template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_U
 From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index) const
 {
     TV w=(X-grid.Node(index))*grid.one_over_dX;
-    int dx=u.counts.y*u.counts.z;
+    int dx=u.stride.x;
     const T2* b=&u(index-1),*c=b;
     T2 x[3],y[3];
     for(int i=0;i<3;i++,b+=dx,c=b){
-        for(int j=0;j<3;j++,c+=u.counts.z)
+        for(int j=0;j<3;j++,c+=u.stride.y)
             y[j]=Quadratic_Interpolation(c,w.z);
         x[i]=Quadratic_Interpolation(y,w.y);}
     return Quadratic_Interpolation(x,w.x);

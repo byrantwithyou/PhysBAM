@@ -163,7 +163,7 @@ public:
     (*texture_coordinates)(i).y=y_rescaled-floor(y_rescaled);}}
 
     void Initialize_Bump_Map(const std::string& filename)
-    {IMAGE<T>::Read(filename,bump_map_pixels);grid.Initialize(bump_map_pixels.counts,RANGE<VECTOR<T,2> >::Unit_Box());} 
+    {IMAGE<T>::Read(filename,bump_map_pixels);grid.Initialize(bump_map_pixels.Size(),RANGE<VECTOR<T,2> >::Unit_Box());} 
      
     void Do_Displacement_Map_Per_Vertex(const T perturb_factor,const T perturb_power)
     {LOG::cerr<<"Doing per vertex displacement..." << std::endl;

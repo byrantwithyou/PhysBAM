@@ -123,7 +123,7 @@ Display(const int in_color) const
                 OpenGL_Vertex(VECTOR<T,2>(x(i),u(i)),vertices);}
             OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
 
-            if(draw_flux && flux.counts.x){
+            if(draw_flux && flux.Size().x){
                 flux_color.Send_To_GL_Pipeline();
                 vertices.Resize(0);
                 for(int i=x.domain.min_corner.x;i<x.domain.max_corner.x-1;i++){
@@ -166,7 +166,7 @@ Display(const int in_color) const
             }
             OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
 
-            if(draw_flux && flux.counts.x){
+            if(draw_flux && flux.Size().x){
                 flux_color.Send_To_GL_Pipeline();
                 vertices.Resize(0);
                 for(int i=x.domain.min_corner.x;i<x.domain.max_corner.x-1;i++){
@@ -191,7 +191,7 @@ Display(const int in_color) const
                 glPopAttrib();
             }
 
-            if(draw_du && flux.counts.x){
+            if(draw_du && flux.Size().x){
                 du_color.Send_To_GL_Pipeline();
                 vertices.Resize(0);
                 for(int i=x.domain.min_corner.x+1;i<x.domain.max_corner.x-1;i++){
@@ -275,7 +275,7 @@ Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) c
         output_stream << "dx=" << x(index+1)-x(index) << std::endl;
         if(index>x.domain.min_corner.x) output_stream << "dx left node=" << (T).5*(x(index+1)-x(index-1)) << std::endl;
         if(index<x.domain.max_corner.x) output_stream << "dx right node=" << (T).5*(x(index+2)-x(index)) << std::endl;
-        if(flux.counts.x) output_stream << "flux=" << flux(index) << std::endl;
+        if(flux.Size().x) output_stream << "flux=" << flux(index) << std::endl;
     }
 }
 //#####################################################################
@@ -315,7 +315,7 @@ Reinitialize(bool force)
             FILE_UTILITIES::Read_From_File<RW>(FILE_UTILITIES::Get_Frame_Filename(u_filename,frame),u);
             if(FILE_UTILITIES::Frame_File_Exists(flux_filename,frame)) FILE_UTILITIES::Read_From_File<RW>(FILE_UTILITIES::Get_Frame_Filename(flux_filename,frame),flux);
             else flux.Clean_Memory();
-            valid=(x.counts.x && ARRAY<T,VECTOR<int,1> >::Equal_Dimensions(x,u));
+            valid=(x.Size().x && ARRAY<T,VECTOR<int,1> >::Equal_Dimensions(x,u));
             frame_loaded=frame;}}
 }
 //#####################################################################

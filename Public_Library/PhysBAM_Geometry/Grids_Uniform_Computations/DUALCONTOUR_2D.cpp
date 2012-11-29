@@ -27,7 +27,7 @@ Generate_Topology()
         if(phi1>contour_value&&phi2<=contour_value) topology.Append(VECTOR<int,2>(index,index_j));}
     for(i.x=1;i.x<m-1;i.x++)for(i.y=0;i.y<n-1;i.y++){ // generate one segment per y edge
         T phi1=levelset.phi(i),phi2=levelset.phi(i.x,i.y+1);
-        int index=vertices.Standard_Index(i),index_i=index-vertices.counts.y;
+        int index=vertices.Standard_Index(i),index_i=index-vertices.stride.x;
         if(phi1<=contour_value&&phi2>contour_value) topology.Append(VECTOR<int,2>(index_i,index));
         if(phi1>contour_value && phi2<=contour_value) topology.Append(VECTOR<int,2>(index,index_i));}
     topology.Compact();

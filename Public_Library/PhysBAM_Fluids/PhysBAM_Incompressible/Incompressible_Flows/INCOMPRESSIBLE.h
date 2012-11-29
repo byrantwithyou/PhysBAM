@@ -127,7 +127,7 @@ public:
 
     void Set_Surface_Tension(const ARRAY<T,VECTOR<int,2> >& surface_tensions_input)
     {surface_tensions=surface_tensions_input;
-    nonzero_surface_tension=false;for(int j=0;j<surface_tensions.counts.x;j++) if(surface_tensions(1,j)!=0){nonzero_surface_tension=true;break;}}
+    nonzero_surface_tension=surface_tensions.array.Count_Matches(0)!=surface_tensions.array.m;}
 
     void Set_Vorticity_Confinement(const ARRAY<T> vorticity_confinements_input)
     {vorticity_confinements=vorticity_confinements_input;}

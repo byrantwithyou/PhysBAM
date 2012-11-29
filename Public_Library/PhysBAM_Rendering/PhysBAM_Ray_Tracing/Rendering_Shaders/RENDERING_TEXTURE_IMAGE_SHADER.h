@@ -32,7 +32,7 @@ public:
     }
 
     bool Valid() const
-    {return grid.counts.x>0 && grid.counts.y>0 && grid.counts==pixels.counts;}
+    {return !grid.domain.Empty() && grid.counts==pixels.Size();}
 
 //#####################################################################
     void Setup_Interpolation(const int m,const int n);

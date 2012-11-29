@@ -20,23 +20,24 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
     std::istream* input(FILE_UTILITIES::Safe_Open_Input(filename,true));
     RGB_HEADER header;Read_Binary<T>(*input,header);
     image.Resize(0,header.width,0,header.height);unsigned char byte;
+    VECTOR<int,2> counts=image.domain.Edge_Lengths();
     if(!header.compression){
         VECTOR<unsigned char,3> color_byte;
-        for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++){Read_Binary<T>(*input,byte);image(i,j).x=IMAGE<T>::Byte_Color_To_Scalar_Color(byte);}
-        for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++){Read_Binary<T>(*input,byte);image(i,j).y=IMAGE<T>::Byte_Color_To_Scalar_Color(byte);}
-        for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++){Read_Binary<T>(*input,byte);image(i,j).z=IMAGE<T>::Byte_Color_To_Scalar_Color(byte);}}
+        for(int j=0;j<counts.y;j++) for(int i=0;i<counts.x;i++){Read_Binary<T>(*input,byte);image(i,j).x=IMAGE<T>::Byte_Color_To_Scalar_Color(byte);}
+        for(int j=0;j<counts.y;j++) for(int i=0;i<counts.x;i++){Read_Binary<T>(*input,byte);image(i,j).y=IMAGE<T>::Byte_Color_To_Scalar_Color(byte);}
+        for(int j=0;j<counts.y;j++) for(int i=0;i<counts.x;i++){Read_Binary<T>(*input,byte);image(i,j).z=IMAGE<T>::Byte_Color_To_Scalar_Color(byte);}}
     else{
         unsigned char pixel,count;ARRAY<unsigned int> offset(header.height*header.channels),length(header.height*header.channels);
         unsigned int max_offset=-1,max_offset_index=-1;
-        for(int k=0;k<image.counts.y*header.channels;k++){Read_Binary<T>(*input,offset(k));Swap_Endianity(offset(k));if(offset(k)>max_offset){max_offset=offset(k);max_offset_index=k;}}
-        for(int k=0;k<image.counts.y*header.channels;k++){Read_Binary<T>(*input,length(k));Swap_Endianity(length(k));}
+        for(int k=0;k<counts.y*header.channels;k++){Read_Binary<T>(*input,offset(k));Swap_Endianity(offset(k));if(offset(k)>max_offset){max_offset=offset(k);max_offset_index=k;}}
+        for(int k=0;k<counts.y*header.channels;k++){Read_Binary<T>(*input,length(k));Swap_Endianity(length(k));}
         // read the rest of the file into memory...
-        ARRAY<unsigned char> data(offset(max_offset_index)+image.counts.y*2);
-        int current_byte=512+image.counts.y*header.channels*2*4;
+        ARRAY<unsigned char> data(offset(max_offset_index)+counts.y*2);
+        int current_byte=512+counts.y*header.channels*2*4;
         while(current_byte<data.m) Read_Binary<T>(*input,data(current_byte++));
         // unpack runs
-        for(int band=0;band<3;band++)for(int j=0;j<image.counts.y;j++){
-            int index=offset(j+image.counts.y*band),end_index=index+length(j+image.counts.y*band);int column=1;
+        for(int band=0;band<3;band++)for(int j=0;j<counts.y;j++){
+            int index=offset(j+counts.y*band),end_index=index+length(j+counts.y*band);int column=1;
             for(int i=0;index<end_index;i++){
                 pixel=data(index++);count=pixel & 0x7f;if(count==0) break;
                 if(pixel & 0x80){for(int k=0;k<count;k++){Read_Binary<T>(*input,byte);image(column,j)[band]=IMAGE<T>::Byte_Color_To_Scalar_Color(data(index++));column++;}}
@@ -58,13 +59,14 @@ template<class T> template<int d> void RGB_FILE<T>::
 Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
 {  
     PHYSBAM_ASSERT(image.domain.min_corner.x==0 && image.domain.min_corner.y==0);
+    VECTOR<int,2> counts=image.domain.Edge_Lengths();
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(filename,true,false); // no compression
-    RGB_HEADER header;header.Initialize(image.counts.x,image.counts.y);header.channels=d;
+    RGB_HEADER header;header.Initialize(counts.x,counts.y);header.channels=d;
     Write_Binary<T>(*output,header);
-    for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[0]));
-    for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[1]));
-    for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[2]));
-    if(d==4) for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[3]));
+    for(int j=0;j<counts.y;j++) for(int i=0;i<counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[0]));
+    for(int j=0;j<counts.y;j++) for(int i=0;i<counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[1]));
+    for(int j=0;j<counts.y;j++) for(int i=0;i<counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[2]));
+    if(d==4) for(int j=0;j<counts.y;j++) for(int i=0;i<counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[3]));
     delete output;
 }
 //#####################################################################

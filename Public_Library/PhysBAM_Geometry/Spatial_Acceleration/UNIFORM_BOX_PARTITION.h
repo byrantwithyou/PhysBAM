@@ -30,7 +30,7 @@ public:
     {}
 
     ~UNIFORM_BOX_PARTITION()
-    {for(int i=0;i<cells.counts.x;i++) for(int j=0;j<cells.counts.y;j++) for(int ij=0;ij<cells.counts.z;ij++) delete cells(i,j,ij);}
+    {for(int i=0;i<cells.array.m;i++) delete cells.array(i);}
 
     void Initialize(ARRAY<PAIR<RANGE<TV>,DATA_T> >& boxes_input,const T thickness_over_two=1e-6)
     {if(boxes_input.m==0){grid.Initialize(TV_INT()+2,RANGE<TV>::Unit_Box());cells.Resize(grid.Domain_Indices());return;}
@@ -45,7 +45,7 @@ public:
     dimensions[other_axis_2]=(int)(max_dimension*T(lengths[other_axis_2])/T(lengths[max_axis]));
     dimensions=clamp_min(dimensions,VECTOR<int,3>(1,1,1));
     grid.Initialize(dimensions+1,bounding_box);
-    if(initialized) for(int i=0;i<cells.counts.x;i++) for(int j=0;j<cells.counts.y;j++) for(int ij=0;ij<cells.counts.z;ij++) delete cells(i,j,ij);
+    if(initialized) for(int i=0;i<cells.array.m;i++) delete cells.array(i);
     cells.Resize(grid.Get_MAC_Grid().Domain_Indices(),false,false);cells.Fill(0);initialized=true;
     for(int k=0;k<boxes_input.m;k++){
         RANGE<TV_INT> domain;
