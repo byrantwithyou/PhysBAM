@@ -119,6 +119,23 @@ public:
     {STATIC_ASSERT(!IS_CONST<T>::value); // make ARRAY_VIEW<const T> equivalent to const ARRAY_VIEW<const T>
     exchange(m,other.m);exchange(base_pointer,other.base_pointer);}
 
+    void Set(const ID m_input,typename COPY_CONST<T*>::TYPE raw_data)
+    {m=m_input;base_pointer=raw_data;}
+
+    void Set(const ARRAY_VIEW<T,ID>& array)
+    {Set(array.m,array.base_pointer);}
+
+    void Set(const ARRAY_VIEW<typename IF<IS_CONST<T>::value,typename REMOVE_CONST<T>::TYPE,UNUSABLE>::TYPE,ID>& array)
+    {Set(array.m,array.base_pointer);}
+
+    template<class T_ARRAY>
+    void Set(T_ARRAY& array,typename ENABLE_IF<IS_SAME<ELEMENT,typename T_ARRAY::ELEMENT>::value && !IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::TYPE unusable=UNUSABLE())
+    {Set(array.m,array.Get_Array_Pointer());}
+
+    template<class T_ARRAY>
+    void Set(T_ARRAY array,typename ENABLE_IF<IS_SAME<ELEMENT,typename T_ARRAY::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::TYPE unusable=UNUSABLE())
+    {Set(array.m,array.Get_Array_Pointer());}
+
     template<class RW>
     void Read(std::istream& input)
     {ID read_size;Read_Binary<RW>(input,read_size);
