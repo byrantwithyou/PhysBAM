@@ -45,18 +45,8 @@ template<class TV> INTERFACE_POISSON_SYSTEM_COLOR<TV>::
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR<TV>::
-Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool double_fine)
+Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc)
 {
-    // SET LEVELSET EXACTLY ON DOUBLE FINE GRID
-
-    if(double_fine){
-        T tol=1e-2;
-        T panic_threshold=phi_grid.dX.Min()*tol;
-        ANALYTIC_TEST<TV> *at=debug_cast<ANALYTIC_TEST<TV>*>(abc);
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(phi_grid);it.Valid();it.Next()){
-            phi_value(it.index)=max(at->phi_value(it.Location()),panic_threshold);
-            phi_color(it.index)=at->phi_color(it.Location());}}
-
     // SET UP STENCILS
 
     BASIS_STENCIL_UNIFORM<TV,1> u_stencil(grid.dX);
@@ -98,7 +88,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
     biu.Add_Surface_Block_Scalar(helper_qu,u_stencil,abc,rhs_surface,1);
     biu.Add_Volume_Block(helper_rhs_uu,u_stencil,u_stencil,ARRAY<T>(CONSTANT_ARRAY<T>(mu.m,(T)1)));
 
-    biu.Compute_Entries(double_fine);
+    biu.Compute_Entries();
         
     // BUILD SYSTEM MATRIX BLOCKS
     

@@ -80,7 +80,7 @@ Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<INTERFACE_ELEMENT>,8>& in
 // Function Compute_Entries
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
-Compute_Entries(bool double_fine)
+Compute_Entries()
 {
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
 
@@ -91,17 +91,6 @@ Compute_Entries(bool double_fine)
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         TV_INT cell_base=it.index*2;
-        if(!double_fine){
-            int base_color=phi_color(cell_base);
-            bool cell_cut=false;
-            bool material_cell=false;
-            for(int b=0;b<(1<<TV::m);b++){
-                int color=phi_color(cell_base+bits(b)*2);
-                assert(color<cdi.colors);
-                cell_cut|=(color!=base_color);
-                material_cell|=(color>=0);}
-            if(!material_cell) continue;
-            if(!cell_cut){Add_Uncut_Cell(it.index,base_color);continue;}}
 
         TV cell_center(grid.Center(it.index));
         VECTOR<bool,(1<<TV::m)> material_subcell;

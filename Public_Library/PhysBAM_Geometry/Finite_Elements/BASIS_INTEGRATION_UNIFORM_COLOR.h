@@ -56,7 +56,7 @@ public:
         const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,CELL_DOMAIN_INTERFACE_COLOR<TV>& cdi_input);
     ~BASIS_INTEGRATION_UNIFORM_COLOR();
 
-    void Compute_Entries(bool double_fine=false);
+    void Compute_Entries();
     void Compute_Open_Entries();
     void Add_Uncut_Cell(const TV_INT& cell,int color);
     void Add_Uncut_Fine_Cell(const TV_INT& cell,int subcell,int color);
