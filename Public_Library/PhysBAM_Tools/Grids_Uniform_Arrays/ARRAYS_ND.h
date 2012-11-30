@@ -26,7 +26,7 @@ public:
     typedef ARRAYS_ND_BASE<T,VECTOR<int,d> > BASE;
 
     using BASE::array; // one-dimensional data storage
-    using BASE::domain;
+    using BASE::domain;using BASE::Exchange;
     using BASE::Calculate_Acceleration_Constants;
 public:
 
@@ -99,7 +99,7 @@ public:
     void Resize(const RANGE<TV_INT>& box,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
     {if(box==domain) return;
     ARRAY new_array(box,initialize_new_elements,initialization_value);
-    if(copy_existing_elements) Put(*this,new_array,domain.Intersect(box));
+    if(copy_existing_elements) this->Put(*this,new_array,domain.Intersect(box));
     Exchange(new_array);}
 
     void Reallocate_In_Place(const RANGE<TV_INT>& box)
