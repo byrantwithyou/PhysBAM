@@ -218,7 +218,7 @@ void Evolve_Step(GRID<TV>& grid,ARRAY_VIEW<T,TV_INT> q[3],const ARRAY_VIEW<T,TV_
 }
 
 template<class T,class TV,class TV_INT>
-void Compute_Pairwise_Level_Set_Data(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV_INT> >& phi,int ghost,const ARRAY<VECTOR<TV_INT,TV::m+1> >& stencils,ARRAY<ARRAY<ARRAY<T,TV_INT> > >& pairwise_phi)
+void Compute_Pairwise_Level_Set_Data(const GRID<TV>& grid,ARRAY<ARRAY<T,TV_INT> >& phi,int ghost,const ARRAY<VECTOR<TV_INT,TV::m+1> >& stencils,ARRAY<ARRAY<ARRAY<T,TV_INT> > >& pairwise_phi)
 {
     T trust_buffer=grid.dX.Max(),valid_width=ghost*grid.dX.Max(),extent=3*valid_width;
     int extrap_width=2*ghost+3;
@@ -336,6 +336,44 @@ void Compute_Pairwise_Level_Set_Data(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV
         Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
         Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
         Flush_Frame<T,TV>("After triple junction correction");}
+
+    ARRAY<T> min_phi(phi.m);
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+        min_phi.Fill(FLT_MAX);
+        int mask=pairwise_data(it.index).valid_flags,color=-1,color_mask=0,not_color_mask=0;
+        if(count_bits(mask)<3) continue;
+        for(int a=0;a<phi.m;a++)
+            if(mask&(1<<a))
+                for(int b=a+1;b<phi.m;b++)
+                    if(mask&(1<<b))
+                        for(int c=b+1;c<phi.m;c++)
+                            if(mask&(1<<c)){
+                                int new_color=-1;
+                                T pab=pairwise_phi(a)(b)(it.index),pac=pairwise_phi(a)(c)(it.index),pbc=pairwise_phi(b)(c)(it.index),new_phi=0;
+                                if(pab<=0 && pac<=0){
+                                    new_phi=max(pab,pac);
+                                    new_color=a;}
+                                else if(pab>0 && pbc<=0){
+                                    new_phi=max(-pab,pbc);
+                                    new_color=b;}
+                                else if(pbc>0 && pac>0){
+                                    new_phi=max(-pbc,-pac);
+                                    new_color=c;}
+                                else continue;
+                                min_phi(new_color)=max(min_phi(new_color),new_phi);
+                                color_mask|=1<<new_color;
+                                not_color_mask|=((1<<a)|(1<<b)|(1<<c))&~(1<<new_color);}
+        color_mask&=~not_color_mask;
+        PHYSBAM_ASSERT(power_of_two(color_mask));
+        color=integer_log(color_mask);
+
+        for(int a=0;a<color;a++)
+            phi(a)(it.index)=pairwise_phi(a)(color)(it.index);
+        for(int a=color+1;a<phi.m;a++)
+            phi(a)(it.index)=-pairwise_phi(color)(a)(it.index);
+        phi(color)(it.index)=min_phi(color);}
+
+    
 
 }
 
