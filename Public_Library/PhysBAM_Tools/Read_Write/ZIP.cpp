@@ -166,7 +166,6 @@ class ZIP_STREAMBUF_DECOMPRESS:public std::streambuf
     GZIP_FILE_HEADER gzip_header;
     int total_read,total_uncompressed;
     bool part_of_zip_file;
-    bool own_istream;
     bool valid;
     bool compressed_data;
 

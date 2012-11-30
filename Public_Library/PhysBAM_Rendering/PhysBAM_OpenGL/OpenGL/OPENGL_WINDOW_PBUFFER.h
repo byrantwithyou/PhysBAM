@@ -13,7 +13,6 @@ class OPENGL_PBUFFER;
 class OPENGL_WINDOW_PBUFFER:public OPENGL_WINDOW
 {
     using OPENGL_WINDOW::opengl_world;
-    int main_window;
     int width,height;
     OPENGL_PBUFFER* pbuffer;
 

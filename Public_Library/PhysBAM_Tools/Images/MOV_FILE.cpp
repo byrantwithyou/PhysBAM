@@ -74,10 +74,9 @@ class QT_ATOM
 {
     FILE *fp;
     long start_offset;
-    const char* type;
 public:
     QT_ATOM(FILE* fp,const char* type)
-        :fp(fp),type(type)
+        :fp(fp)
     {
         start_offset=ftell(fp);
         uint dummy;
