@@ -62,7 +62,7 @@ template<class T> void Sector_Volumes_Helper(const SPHERE<VECTOR<T,3> >& sphere,
     typedef VECTOR<T,3> TV;
     // TODO: this is temporary; gives box sectors, not sphere sectors
     const RANGE<TV> box=sphere.Bounding_Box();
-    TV positive_lengths=TV(0,0,0),max_corner=box.Maximum_Corner(),edge_lengths=box.Edge_Lengths();
+    TV positive_lengths,max_corner=box.Maximum_Corner(),edge_lengths=box.Edge_Lengths();
     for(int i=0;i<3;i++) positive_lengths(i)=clamp(max_corner(i)-origin(i),(T)0,edge_lengths(i));
     for(int i=0;i<8;i++){volumes[i]=1;for(int j=0;j<3;j++) volumes[i]*=(i&(1<<j))?positive_lengths(j):edge_lengths(j)-positive_lengths(j);}
 }
