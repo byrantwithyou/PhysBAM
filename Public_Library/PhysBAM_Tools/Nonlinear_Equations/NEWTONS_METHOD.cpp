@@ -52,5 +52,5 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
 
     return result;
 }
-template class NEWTONS_METHOD<float>;
-template class NEWTONS_METHOD<double>;
+template struct NEWTONS_METHOD<float>;
+template struct NEWTONS_METHOD<double>;
