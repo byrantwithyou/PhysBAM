@@ -88,6 +88,7 @@ void Dump_Interface(ARRAY_VIEW<T,TV_INT> p,const ARRAY<VECTOR<TV_INT,3> >& stenc
     const GRID<TV>& grid=*Global_Grid<TV>();
     for(int i=0;i<stencils.m;i++){
         VECTOR<T,3> phi(p.Subset(stencils(i)));
+        if(phi.Contains((T)pi/1024)) continue;
         for(int j=0;j<3;j++){
             int k=(j+1)&1;
             int m=3-k-j;
@@ -248,12 +249,19 @@ void Compute_Pairwise_Level_Set_Data(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV
         pairwise_phi(i).Resize(phi.m);
         for(int j=i+1;j<phi.m;j++){
             pairwise_phi(i)(j).Resize(grid.Node_Indices(extrap_width),false);
-            pairwise_phi(i)(j).Fill(FLT_MAX);}}
+            pairwise_phi(i)(j).Fill((T)pi/1024);}}
 
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
         PAIRWISE_LEVEL_SET_DATA<T>& data=pairwise_data(it.index);
-        if(data.trust.x>=0)
-            pairwise_phi(data.trust.x)(data.trust.y)(it.index)=data.phi;}
+        if(data.trust.x>=0){
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(data.trust.y==1,data.trust.Sum()==2,data.trust.x==1)/(1+(data.phi<0)));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(data.phi));
+            pairwise_phi(data.trust.x)(data.trust.y)(it.index)=data.phi;}}
+
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
+    Flush_Frame<T,TV>("Initial pairwise level sets");
 
     for(int i=0;i<phi.m;i++)
         for(int j=i+1;j<phi.m;j++){
@@ -267,7 +275,18 @@ void Compute_Pairwise_Level_Set_Data(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV
                 bool Inside(const TV_INT& index) PHYSBAM_OVERRIDE
                 {return pairwise_data(index).trust==current_pair;}
             } inside_mask(pairwise_data,VECTOR<short,2>(i,j));
-            EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Node(grid,inside_mask,extrap_width,pairwise_phi(i)(j),3,extrap_width,3*grid.dX.Max());}
+            EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Node(grid,inside_mask,extrap_width,pairwise_phi(i)(j),3,extrap_width);}
+
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+        T p=pairwise_phi(0)(1)(it.index);
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+    Flush_Frame<T,TV>("level set 01");
+
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
+    Flush_Frame<T,TV>("Extrapolated pairwise level sets");
 
     for(int t=0;t<20;t++){
         HASHTABLE<TRIPLE<int,int,TV_INT>,T> total_size;
@@ -346,7 +365,7 @@ Levelset(TV X)
     typedef typename TV::SCALAR T;
     T angle=atan2(X.y,X.x);
     if(angle>=-2*(T)pi/3 && angle<=-(T)pi/2) return X.Magnitude();
-    return max(-X.y,-rot.Rotate(X).y);
+    return max(-X.y,rot.Rotate(X).y);
 }
 
 template<class TV>
@@ -361,7 +380,7 @@ void Compute(PARSE_ARGS& parse_args)
     Get_Debug_Particles<TV>();
     Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
 
-    GRID<TV> grid(TV_INT()+resolution,RANGE<TV>::Centered_Box(),true);
+    GRID<TV> grid(TV_INT()+resolution,RANGE<TV>::Centered_Box());
     Global_Grid(&grid);
 
     ARRAY<T,TV_INT> p[3],q[3];
