@@ -31,9 +31,9 @@ public:
         virtual bool Inside(const FACE_INDEX<TV::m>& index)=0;
     };
 
-    static void Extrapolate_Node(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,T order_reduction_penalty=3);
-    static void Extrapolate_Cell(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,T order_reduction_penalty=3);
-    static void Extrapolate_Face(const GRID<TV>& grid,MASK_FACE& inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int order,int fill_width,T order_reduction_penalty=3);
+    static void Extrapolate_Node(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,int order_reduction_penalty=3);
+    static void Extrapolate_Cell(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,int order_reduction_penalty=3);
+    static void Extrapolate_Face(const GRID<TV>& grid,MASK_FACE& inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int order,int fill_width,int order_reduction_penalty=3);
 //#####################################################################
 };
 }
