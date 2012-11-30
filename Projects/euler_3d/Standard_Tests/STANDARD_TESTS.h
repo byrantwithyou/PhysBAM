@@ -1188,7 +1188,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     if(test_number==17) Finalize_Deformable_Bodies();
 
-    if(test_number!=3 && test_number!=11 && test_number!=12 && test_number!=13 && test_number!=14 && test_number!=15 && !test_number==16 && test_number!=19)
+    if(test_number!=3 && test_number!=11 && test_number!=12 && test_number!=13 && test_number!=14 && test_number!=15 && test_number!=16 && test_number!=19)
         THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
     else Add_Ground(true);
 
