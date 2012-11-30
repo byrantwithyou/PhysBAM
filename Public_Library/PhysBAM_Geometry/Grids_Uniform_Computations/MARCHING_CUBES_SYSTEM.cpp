@@ -231,8 +231,8 @@ Set_Rhs(MARCHING_CUBES_VECTOR<TV>& rhs,const ARRAY<VECTOR<int,TV::m+1> >& active
     for(int i=0;i<active_list.m;i++){
         const VECTOR<int,TV::m+1>& nodes=active_list(i);
         INDIRECT_ARRAY<ARRAY<TV>,VECTOR<int,TV::m+1>&> ia(rhs_full.Subset(nodes));
-        VECTOR<TV,TV::m+1> X(X.Subset(nodes));
-        E+=Bending_Energy(X,&ia,(VECTOR<VECTOR<TM,TV::m+1>,TV::m+1>*)0);}
+        VECTOR<TV,TV::m+1> XV(X.Subset(nodes));
+        E+=Bending_Energy(XV,&ia,(VECTOR<VECTOR<TM,TV::m+1>,TV::m+1>*)0);}
     rhs.x=rhs_full.Subset(index_map);
     return E;
 }
