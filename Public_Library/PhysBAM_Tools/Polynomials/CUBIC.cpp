@@ -132,7 +132,7 @@ Compute_Roots_In_Interval(const T xmin,const T xmax)
         return;}
 
     INTERVAL<T> i1,i2,i3;
-    int intervals;
+    int intervals(0);
     Compute_Intervals(xmin,xmax,intervals,i1,i2,i3);
     if(intervals==0){roots=0;return;}
     Insert_Root_In_Extrema_Interval(i1.min_corner,i1.max_corner);
