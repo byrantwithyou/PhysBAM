@@ -294,7 +294,6 @@ void Compute_Pairwise_Level_Set_Data(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
     Flush_Frame<T,TV>("level set 01");
 
-
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
         T p=pairwise_phi(0)(1)(it.index);
         if((pairwise_data(it.index).valid_flags&3)==3)
@@ -308,7 +307,7 @@ void Compute_Pairwise_Level_Set_Data(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV
     Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
     Flush_Frame<T,TV>("Extrapolated pairwise level sets");
 
-    for(int t=0;t<20;t++){
+    for(int t=0;t<1;t++){
         HASHTABLE<TRIPLE<int,int,TV_INT>,T> total_size;
         for(int i=0;i<stencils.m;i++){
             int mask=~0;
@@ -328,13 +327,16 @@ void Compute_Pairwise_Level_Set_Data(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV
                                         total_size.Get_Or_Insert(TRIPLE<int,int,TV_INT>(a,b,stencils(i)(j)))+=A;
                                         total_size.Get_Or_Insert(TRIPLE<int,int,TV_INT>(b,c,stencils(i)(j)))+=A;
                                         total_size.Get_Or_Insert(TRIPLE<int,int,TV_INT>(a,c,stencils(i)(j)))-=A;}}}
-        for(typename HASHTABLE<TRIPLE<int,int,TV_INT>,T>::ITERATOR it(total_size);it.Valid();it.Next())
-            pairwise_phi(it.Key().x)(it.Key().y)(it.Key().z)-=(T).25*Weight_Function(it.Data()*grid.dX.Product());}
+        for(typename HASHTABLE<TRIPLE<int,int,TV_INT>,T>::ITERATOR it(total_size);it.Valid();it.Next()){
+            pairwise_phi(it.Key().x)(it.Key().y)(it.Key().z)-=(T).1*/*Weight_Function*/(it.Data()*grid.dX.Max());
+            LOG::cout<<it.Data()<<" "<<grid.dX<<" "<<(T).1*/*Weight_Function*/(it.Data()*grid.dX.Max())<<std::endl;
+        }
 
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
-    Flush_Frame<T,TV>("After triple junction correction");
+        Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
+        Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
+        Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
+        Flush_Frame<T,TV>("After triple junction correction");}
+
 }
 
 template<class TV,class TV_INT>
@@ -383,6 +385,30 @@ Levelset(TV X)
     return max(-X.y,rot.Rotate(X).y);
 }
 
+template <class TV> typename TV::SCALAR
+Levelset(TV X,int i)
+{
+    typedef typename TV::SCALAR T;
+    const T R=0.35;
+    T r=X.Magnitude();
+    switch(i){
+        case 0:{
+            if(X.y>=0){
+                if(r<=R) return max(-X.y,r-R);
+                else return r-R;}
+            else{
+                if(X.x<=-R) return (X-TV(-R,0)).Magnitude();
+                if(X.x>=R) return (X-TV(R,0)).Magnitude();
+                return -X.y;}
+        } break;
+        case 1:{
+            return R-r;
+        } break;
+        default: PHYSBAM_FATAL_ERROR();
+    }
+}
+
+
 template<class TV>
 void Compute(PARSE_ARGS& parse_args)
 {
@@ -405,11 +431,18 @@ void Compute(PARSE_ARGS& parse_args)
     for(int i=0;i<3;i++)
         color_phi(i).Resize(grid.Node_Indices(3));
 
+    if(0) // triple
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next()){
         TV X=it.Location()+(T).0001;
         color_phi(0)(it.index)=Levelset(X);
         color_phi(1)(it.index)=Levelset(rot.Rotate(X));
         color_phi(2)(it.index)=Levelset(rot.Rotate(rot.Rotate(X)));}
+    else // circle
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next()){
+        TV X=it.Location();
+        color_phi(0)(it.index)=Levelset(X,0);
+        color_phi(1)(it.index)=Levelset(-X,0);
+        color_phi(2)(it.index)=Levelset(X,1);}
 
     for(int i=0;i<3;i++){
         for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next()){
