@@ -260,75 +260,15 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
     surface.Update_Number_Nodes();
     return cut_cells;
 }
-//#####################################################################
-// Function Create_Double_Fine_Surface
-//#####################################################################
-template<class TV> int MARCHING_CUBES<TV>::
-Create_Double_Fine_Surface(T_SURFACE& surface,const GRID<TV>& grid,const GRID<TV>& phi_grid,const ARRAY<T,TV_INT>& phi)
-{
-    const ARRAY<MARCHING_CUBES_CASE<TV::m> >& table=Case_Table();
-    const VECTOR<TV_INT,num_corners> bits=GRID<TV>::Binary_Counts(TV_INT());
-    const int all_negative=(1<<(1<<TV::m))-1;
-    const int all_positive=0;
-    HASHTABLE<FACE_INDEX<TV::m>,int> ht;
-    VECTOR<T,num_corners> phis;
-    TV pts[num_pts];
-
-    int cut_cells=0;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        TV_INT base=it.index*2;
-        int cell_corners=0;
-        for(int b=0;b<(1<<TV::m);b++) cell_corners|=(phi(base+bits(b)*2)<0)<<b;
-        if((cell_corners==all_negative)||(cell_corners==all_positive)) continue;
-        
-        cut_cells++;
-        for(int b=0;b<(1<<TV::m);b++){
-            TV_INT cell=base+bits(b);
-            int c=0;
-            for(int i=0;i<bits.m;i++){
-                TV_INT index=cell+bits(i);
-                pts[i+num_edges]=phi_grid.Node(index);
-                phis(i)=phi(index);
-                c|=(phis(i)<0)<<i;}
-            for(int i=0;i<num_edges;i++){
-                int v0=MARCHING_CUBES_CASE<TV::m>::vertex_lookup[i][0];
-                int v1=MARCHING_CUBES_CASE<TV::m>::vertex_lookup[i][1];
-                if(((c>>v0)^(c>>v1))&1){
-                    T t=phis(v0)/(phis(v0)-phis(v1));
-                    pts[i]=pts[v0+num_edges]+t*(pts[v1+num_edges]-pts[v0+num_edges]);}}
-
-            const MARCHING_CUBES_CASE<TV::m>& cs=table(c);
-
-            for(int i=0;i<MARCHING_CUBES_CASE<TV::m>::max_surface && cs.surface[i];i++){
-                TV_INT face;
-                for(int j=0;j<TV::m;j++){
-                    int e=(cs.surface[i]>>5*j)&31;
-                    FACE_INDEX<TV::m> fi(e/(1<<(TV::m-1)),cell+bits(MARCHING_CUBES_CASE<TV::m>::vertex_lookup[e][0]));
-                    if(!ht.Get(fi,face(j))){
-                        int index=surface.particles.Add_Element();
-                        face(j)=index;
-                        ht.Set(fi,index);
-                        surface.particles.X(index)=pts[e];}}
-                if(!cs.enclose_inside) exchange(face.x,face.y);
-                surface.mesh.elements.Append(face);}}}
-
-    surface.Update_Number_Nodes();
-    return cut_cells;
-}
 template void MARCHING_CUBES<VECTOR<float,2> >::Get_Elements_For_Cell(ARRAY<SEGMENT_2D<float>,int>&,ARRAY<SEGMENT_2D<float>,int>&,int&,bool&,ARRAY<float,VECTOR<int,2> > const&,VECTOR<int,2> const&);
 template const ARRAY<MARCHING_CUBES_CASE<2> >& MARCHING_CUBES<VECTOR<float,2> >::Case_Table();
 template const ARRAY<MARCHING_CUBES_CASE<3> >& MARCHING_CUBES<VECTOR<float,3> >::Case_Table();
 template void MARCHING_CUBES<VECTOR<float,3> >::Get_Elements_For_Cell(ARRAY<TRIANGLE_3D<float>,int>&,ARRAY<TRIANGLE_3D<float>,int>&,int&,bool&,ARRAY<float,VECTOR<int,3> > const&,VECTOR<int,3> const&);
 template int MARCHING_CUBES<VECTOR<float,3> >::Create_Surface(TRIANGULATED_SURFACE<float>&,GRID<VECTOR<float,3> > const&,ARRAY<float,VECTOR<int,3> > const&);
 template int MARCHING_CUBES<VECTOR<float,2> >::Create_Surface(SEGMENTED_CURVE_2D<float>&,GRID<VECTOR<float,2> > const&,ARRAY<float,VECTOR<int,2> > const&);
-template int MARCHING_CUBES<VECTOR<float,3> >::Create_Double_Fine_Surface(TRIANGULATED_SURFACE<float>&,GRID<VECTOR<float,3> > const&,GRID<VECTOR<float,3> > const&,ARRAY<float,VECTOR<int,3> > const&);
-template int MARCHING_CUBES<VECTOR<float,2> >::Create_Double_Fine_Surface(SEGMENTED_CURVE_2D<float>&,GRID<VECTOR<float,2> > const&,GRID<VECTOR<float,2> > const&,ARRAY<float,VECTOR<int,2> > const&);
 template void MARCHING_CUBES<VECTOR<double,2> >::Get_Elements_For_Cell(ARRAY<SEGMENT_2D<double>,int>&,ARRAY<SEGMENT_2D<double>,int>&,int&,bool&,ARRAY<double,VECTOR<int,2> > const&,VECTOR<int,2> const&);
 template const ARRAY<MARCHING_CUBES_CASE<2> >& MARCHING_CUBES<VECTOR<double,2> >::Case_Table();
 template const ARRAY<MARCHING_CUBES_CASE<3> >& MARCHING_CUBES<VECTOR<double,3> >::Case_Table();
 template void MARCHING_CUBES<VECTOR<double,3> >::Get_Elements_For_Cell(ARRAY<TRIANGLE_3D<double>,int>&,ARRAY<TRIANGLE_3D<double>,int>&,int&,bool&,ARRAY<double,VECTOR<int,3> > const&,VECTOR<int,3> const&);
 template int MARCHING_CUBES<VECTOR<double,3> >::Create_Surface(TRIANGULATED_SURFACE<double>&,GRID<VECTOR<double,3> > const&,ARRAY<double,VECTOR<int,3> > const&);
 template int MARCHING_CUBES<VECTOR<double,2> >::Create_Surface(SEGMENTED_CURVE_2D<double>&,GRID<VECTOR<double,2> > const&,ARRAY<double,VECTOR<int,2> > const&);
-template int MARCHING_CUBES<VECTOR<double,3> >::Create_Double_Fine_Surface(TRIANGULATED_SURFACE<double>&,GRID<VECTOR<double,3> > const&,GRID<VECTOR<double,3> > const&,ARRAY<double,VECTOR<int,3> > const&);
-template int MARCHING_CUBES<VECTOR<double,2> >::Create_Double_Fine_Surface(SEGMENTED_CURVE_2D<double>&,GRID<VECTOR<double,2> > const&,GRID<VECTOR<double,2> > const&,ARRAY<double,VECTOR<int,2> > const&);
-
