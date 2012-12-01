@@ -181,7 +181,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const ARRAY<T,VEC
 //#################################################################################################################################################
 
 template<class TV>
-void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles,bool double_fine)
+void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -195,7 +195,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     
     INTERFACE_POISSON_SYSTEM_COLOR<TV> ips(grid,phi_value,phi_color);
     ips.use_preconditioner=use_preconditioner;
-    ips.Set_Matrix(at.mu,at.wrap,&at,double_fine);
+    ips.Set_Matrix(at.mu,at.wrap,&at);
 
     printf("\n");
     for(int c=0;c<ips.cdi->colors;c++) printf("u%d [%i]\t",c,ips.cm_u->dofs(c));printf("\n");
@@ -295,7 +295,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     T m=1,s=1,kg=1;
     int threads=1;
     int test_number=1,resolution=4,max_iter=1000000;
-    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,double_fine=false,opt_arg=false;
+    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,opt_arg=false;
     parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-m",&m,"unit","meter scale");
@@ -309,7 +309,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-null",&null,"find extra null modes of the matrix");
     parse_args.Add("-dump_matrix",&dump_matrix,"dump system matrix");
     parse_args.Add("-debug_particles",&debug_particles,"dump debug particles");
-    parse_args.Add("-double_fine",&double_fine,"set level set exactly on double fine grid");
     parse_args.Parse();
 
 #ifdef USE_OPENMP
@@ -720,7 +719,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles,double_fine);
+    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
     LOG::Finish_Logging();
     delete test;
 }
