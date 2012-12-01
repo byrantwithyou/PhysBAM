@@ -27,6 +27,7 @@
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include "TRIPLE_JUNCTION_CORRECTION.h"
 
 using namespace PhysBAM;
 
@@ -144,53 +145,6 @@ void Dump_Interface(ARRAY_VIEW<T,TV_INT> p,const ARRAY<VECTOR<TV_INT,4> >& stenc
                     Add_Debug_Object(VECTOR<TV,3>(X,Y,Z),col,col);}}
 }
 
-template<class T,int dp1>
-T Bad_Fraction(const VECTOR<VECTOR<T,dp1>,3>& phi)
-{
-    int pos_mask=0,neg_mask=0;
-    for(int c=0;c<3;c++)
-        for(int j=0;j<dp1;j++){
-            if(phi(c)(j)>0) pos_mask|=1<<c;
-            else if(phi(c)(j)<0) neg_mask|=1<<c;}
-
-    if(pos_mask==7){
-        if(neg_mask==0) return 1;}
-    else if(neg_mask==7){
-        if(pos_mask==0) return -1;}
-    else return 0;
-
-    for(int c=0;c<3;c++)
-        for(int j=0;j<dp1;j++)
-            if(T pj=phi(c)(j))
-                for(int k=j+1;k<dp1;k++)
-                    if(T pk=phi(c)(k))
-                        if((pj>0)!=(pk>0)){
-                            VECTOR<VECTOR<T,dp1>,3> phi0=phi,phi1=phi;
-                            T th=pj/(pj-pk);
-                            for(int e=0;e<3;e++){
-                                T ej=phi(e)(j),ek=phi(e)(k),el=ej+th*(ek-ej);
-                                phi0(e)(j)=ej;
-                                phi0(e)(k)=el;
-                                phi1(e)(j)=el;
-                                phi1(e)(k)=ek;}
-                            phi0(c)(k)=phi1(c)(j)=0;
-                            return th*Bad_Fraction(phi0)+(1-th)*Bad_Fraction(phi1);}
-
-    PHYSBAM_FATAL_ERROR();
-}
-
-template<class T>
-struct PAIRWISE_LEVEL_SET_DATA
-{
-    T phi;
-    int valid_flags;
-    VECTOR<short,2> trust;
-
-    PAIRWISE_LEVEL_SET_DATA()
-        :phi(FLT_MAX),valid_flags(0),trust(-1,-1)
-    {}
-};
-
 template<class T>
 void Evolve(VECTOR<VECTOR<T,3>,3> phi)
 {
@@ -220,161 +174,47 @@ void Evolve_Step(GRID<TV>& grid,ARRAY_VIEW<T,TV_INT> q[3],const ARRAY_VIEW<T,TV_
 template<class T,class TV,class TV_INT>
 void Compute_Pairwise_Level_Set_Data(const GRID<TV>& grid,ARRAY<ARRAY<T,TV_INT> >& phi,int ghost,const ARRAY<VECTOR<TV_INT,TV::m+1> >& stencils,ARRAY<ARRAY<ARRAY<T,TV_INT> > >& pairwise_phi)
 {
-    T trust_buffer=grid.dX.Max(),valid_width=ghost*grid.dX.Max(),extent=3*valid_width;
-    int extrap_width=2*ghost+3;
-    ARRAY<PAIRWISE_LEVEL_SET_DATA<T>,TV_INT> pairwise_data(grid.Node_Indices(ghost));
-
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
-        PAIRWISE_LEVEL_SET_DATA<T>& data=pairwise_data(it.index);
-        VECTOR<T,3> min(FLT_MAX,FLT_MAX,FLT_MAX);
-        for(int i=0;i<phi.m;i++){
-            T p=phi(i)(it.index);
-            if(p<min(0)){min=min.Remove_Index(2).Insert(p,0);data.trust=data.trust.Remove_Index(1).Insert(i,0);}
-            else if(p<min(1)){min=min.Remove_Index(2).Insert(p,1);data.trust(1)=i;}
-            else if(p<min(2)) min(2)=p;
-            if(p<=valid_width) data.valid_flags|=1<<i;}
-        min-=(min(0)+min(1))/2; // In case of boundary conditions
-        if(min(1)>valid_width || min(2)>extent){
-            data=PAIRWISE_LEVEL_SET_DATA<T>();
-            continue;}
-        if(min(1)>min(2)-trust_buffer){
-            data.trust=VECTOR<short,2>(-1,-1);
-            continue;}
-        data.phi=min.x;
-        if(data.trust.y<data.trust.x){
-            exchange(data.trust.x,data.trust.y);
-            data.phi=min.y;}}
-
-    T default_phi=(T)1.12349871352389e-10;
-
-    pairwise_phi.Resize(phi.m);
-    for(int i=0;i<phi.m;i++){
-        pairwise_phi(i).Resize(phi.m);
-        for(int j=i+1;j<phi.m;j++){
-            pairwise_phi(i)(j).Resize(grid.Node_Indices(extrap_width),false);
-            pairwise_phi(i)(j).Fill(default_phi);}}
-
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
-        PAIRWISE_LEVEL_SET_DATA<T>& data=pairwise_data(it.index);
-        if(data.trust.x>=0){
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(data.trust.y==1,data.trust.Sum()==2,data.trust.x==1)/(1+(data.phi<0)));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(data.phi));
-            pairwise_phi(data.trust.x)(data.trust.y)(it.index)=data.phi;}}
+    TRIPLE_JUNCTION_CORRECTION<TV> tjc(grid,phi,ghost);
+    tjc.Initialize_Stencils();
+    tjc.Compute_Pairwise_Data();
+    tjc.Initialize_Pairwise_Level_Set();
 
     Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
     Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
     Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
     Flush_Frame<T,TV>("Initial pairwise level sets");
 
-    for(int i=0;i<phi.m;i++)
-        for(int j=i+1;j<phi.m;j++){
-            struct LOCAL_MASK:public EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::MASK
-            {
-                const ARRAY<PAIRWISE_LEVEL_SET_DATA<T>,TV_INT>& pairwise_data;
-                VECTOR<short,2> current_pair;
-                LOCAL_MASK(const ARRAY<PAIRWISE_LEVEL_SET_DATA<T>,TV_INT>& pairwise_data,const VECTOR<short,2>& current_pair)
-                    :pairwise_data(pairwise_data),current_pair(current_pair)
-                {}
-                bool Inside(const TV_INT& index) PHYSBAM_OVERRIDE
-                {return pairwise_data(index).trust==current_pair;}
-            } inside_mask(pairwise_data,VECTOR<short,2>(i,j));
-            EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Node(grid,inside_mask,extrap_width,pairwise_phi(i)(j),3,extrap_width);
-            for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
-                int mask=(1<<i)|(1<<j);
-                T& p=pairwise_phi(i)(j)(it.index);
-                if((pairwise_data(it.index).valid_flags&mask)==mask){
-                    PHYSBAM_ASSERT(p!=default_phi);}
-                else p=default_phi;}}
+    tjc.Fill_Valid_Region_With_Exprapolation();
 
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
-        T p=pairwise_phi(0)(1)(it.index);
-        if((pairwise_data(it.index).valid_flags&3)==3)
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
+        T p=tjc.pairwise_phi(0)(1)(it.index);
+        if((tjc.pairwise_data(it.index).valid_flags&3)==3)
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(tjc.pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
     Flush_Frame<T,TV>("level set 01");
 
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
-        T p=pairwise_phi(0)(1)(it.index);
-        if((pairwise_data(it.index).valid_flags&3)==3)
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
+        T p=tjc.pairwise_phi(0)(1)(it.index);
+        if((tjc.pairwise_data(it.index).valid_flags&3)==3)
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(tjc.pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
     Flush_Frame<T,TV>("level set 01");
 
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
+    Dump_Interface<T,TV_INT>(tjc.pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
+    Dump_Interface<T,TV_INT>(tjc.pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
+    Dump_Interface<T,TV_INT>(tjc.pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
     Flush_Frame<T,TV>("Extrapolated pairwise level sets");
 
     for(int t=0;t<1;t++){
-        HASHTABLE<TRIPLE<int,int,TV_INT>,T> total_size;
-        for(int i=0;i<stencils.m;i++){
-            int mask=~0;
-            for(int j=0;j<stencils(i).m;j++)
-                mask&=pairwise_data(stencils(i)(j)).valid_flags;
-            for(int a=0;a<phi.m;a++)
-                if(mask&(1<<a))
-                    for(int b=a+1;b<phi.m;b++)
-                        if(mask&(1<<b))
-                            for(int c=b+1;c<phi.m;c++)
-                                if(mask&(1<<c)){
-                                    VECTOR<T,TV::m+1> ab(pairwise_phi(a)(b).Subset(stencils(i)));
-                                    VECTOR<T,TV::m+1> bc(pairwise_phi(b)(c).Subset(stencils(i)));
-                                    VECTOR<T,TV::m+1> ca(-pairwise_phi(a)(c).Subset(stencils(i)));
-                                    T A=Bad_Fraction(VECTOR<VECTOR<T,TV::m+1>,3>(ab,bc,ca));
-                                    for(int j=0;j<stencils(i).m;j++){
-                                        total_size.Get_Or_Insert(TRIPLE<int,int,TV_INT>(a,b,stencils(i)(j)))+=A;
-                                        total_size.Get_Or_Insert(TRIPLE<int,int,TV_INT>(b,c,stencils(i)(j)))+=A;
-                                        total_size.Get_Or_Insert(TRIPLE<int,int,TV_INT>(a,c,stencils(i)(j)))-=A;}}}
-        for(typename HASHTABLE<TRIPLE<int,int,TV_INT>,T>::ITERATOR it(total_size);it.Valid();it.Next()){
-            pairwise_phi(it.Key().x)(it.Key().y)(it.Key().z)-=(T).1*/*Weight_Function*/(it.Data()*grid.dX.Max());
-            LOG::cout<<it.Data()<<" "<<grid.dX<<" "<<(T).1*/*Weight_Function*/(it.Data()*grid.dX.Max())<<std::endl;
-        }
-
-        Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
-        Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
-        Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
+        tjc.One_Step_Triple_Junction_Correction();
+        Dump_Interface<T,TV_INT>(tjc.pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
+        Dump_Interface<T,TV_INT>(tjc.pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
+        Dump_Interface<T,TV_INT>(tjc.pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
         Flush_Frame<T,TV>("After triple junction correction");}
 
-    ARRAY<T> min_phi(phi.m);
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
-        min_phi.Fill(FLT_MAX);
-        int mask=pairwise_data(it.index).valid_flags,color=-1,color_mask=0,not_color_mask=0;
-        if(count_bits(mask)<3) continue;
-        for(int a=0;a<phi.m;a++)
-            if(mask&(1<<a))
-                for(int b=a+1;b<phi.m;b++)
-                    if(mask&(1<<b))
-                        for(int c=b+1;c<phi.m;c++)
-                            if(mask&(1<<c)){
-                                int new_color=-1;
-                                T pab=pairwise_phi(a)(b)(it.index),pac=pairwise_phi(a)(c)(it.index),pbc=pairwise_phi(b)(c)(it.index),new_phi=0;
-                                if(pab<=0 && pac<=0){
-                                    new_phi=max(pab,pac);
-                                    new_color=a;}
-                                else if(pab>0 && pbc<=0){
-                                    new_phi=max(-pab,pbc);
-                                    new_color=b;}
-                                else if(pbc>0 && pac>0){
-                                    new_phi=max(-pbc,-pac);
-                                    new_color=c;}
-                                else continue;
-                                min_phi(new_color)=max(min_phi(new_color),new_phi);
-                                color_mask|=1<<new_color;
-                                not_color_mask|=((1<<a)|(1<<b)|(1<<c))&~(1<<new_color);}
-        color_mask&=~not_color_mask;
-        PHYSBAM_ASSERT(power_of_two(color_mask));
-        color=integer_log(color_mask);
-
-        for(int a=0;a<color;a++)
-            phi(a)(it.index)=pairwise_phi(a)(color)(it.index);
-        for(int a=color+1;a<phi.m;a++)
-            phi(a)(it.index)=-pairwise_phi(color)(a)(it.index);
-        phi(color)(it.index)=min_phi(color);}
-
-    
-
+    tjc.Update_Color_Level_Sets();
 }
 
 template<class TV,class TV_INT>
@@ -506,4 +346,8 @@ int main(int argc, char* argv[])
 //    else 
     Compute<VECTOR<T,2> >(parse_args);
 }
+
+
+
+
 
