@@ -1,6 +1,8 @@
 import os
+use_clang=0
 
 CXX='g++'
+if use_clang: CXX='clang++'
 
 USE_FFMPEG=1
 USE_LIBJPEG=1
@@ -10,13 +12,19 @@ USE_LAM=0
 lam_libpath=['/solver/adm/lam/lib']
 lam_include=['/solver/adm/lam/include']
 DEFAULT_ARCH='nocona'
+LIBS_EXTRA=['z']
 shared=1
 shared_objects=1
+USE_PTHREADS=0
 single_so=0
-CXXFLAGS_EXTRA=['-fopenmp']
-LINKFLAGS_EXTRA=['-fopenmp']
-
-import os
+RPATH_EXTRA="/usr/local/lib"
+if use_clang:
+#    CXXFLAGS_EXTRA.append('-Wno-unused-local-typedefs')
+    pass
+else:
+    CXXFLAGS_EXTRA.append('-fopenmp')
+    CXXFLAGS_EXTRA.append('-ffinite-math-only')
+    LINKFLAGS_EXTRA.append('-fopenmp')
 
 if os.environ.has_key("PLATFORM") and (os.environ["PLATFORM"]=="wine" or os.environ["PLATFORM"]=="win32"):
     if os.environ["PLATFORM"]=="win32": CXX="cl"
