@@ -60,7 +60,7 @@ Case_Table()
 // Function Get_Triangles_For_Tetrahedron
 //#####################################################################
 template<class TV> void MARCHING_TETRAHEDRA<TV>::
-Get_Elements_For_Tetrahedron(ARRAY<T_FACE>& surface,VECTOR<VECTOR<ARRAY<T_FACE>*,2>,TV::m+1>& boundary,const VECTOR<T,TV::m+1>& phi,const VECTOR<TV,TV::m+1>& X)
+Get_Elements_For_Tetrahedron(ARRAY<T_FACE>& surface,const VECTOR<VECTOR<ARRAY<T_FACE>*,2>,TV::m+1>& boundary,const VECTOR<T,TV::m+1>& phi,const VECTOR<TV,TV::m+1>& X)
 {
     TV pts[num_pts];
     const MARCHING_TETRAHEDRA_CASE<TV::m>* table=Case_Table();

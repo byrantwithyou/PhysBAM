@@ -45,7 +45,7 @@ public:
     ~MARCHING_TETRAHEDRA() {}
 
     static const MARCHING_TETRAHEDRA_CASE<TV::m>* Case_Table();
-    static void Get_Elements_For_Tetrahedron(ARRAY<T_FACE>& surface,VECTOR<VECTOR<ARRAY<T_FACE>*,2>,TV::m+1>& boundary,const VECTOR<T,TV::m+1>& phi,const VECTOR<TV,TV::m+1>& X);
+    static void Get_Elements_For_Tetrahedron(ARRAY<T_FACE>& surface,const VECTOR<VECTOR<ARRAY<T_FACE>*,2>,TV::m+1>& boundary,const VECTOR<T,TV::m+1>& phi,const VECTOR<TV,TV::m+1>& X);
     static void Fill_Faces(ARRAY<T_FACE>& faces,const unsigned short* face_encoding,const TV* pts);
 //#####################################################################
 };
