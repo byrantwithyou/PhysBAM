@@ -29,6 +29,7 @@ public:
     const CELL_DOMAIN_INTERFACE_COLOR<TV>& cdi;
     ARRAY<ARRAY<int> > compressed;  // [-1] - inactive; [-2] - active (temporary); [non-negative] - dof number (for active)
     ARRAY<int> dofs; // number of dofs for every color
+    ARRAY<VECTOR<int,2> > uncompressed;
 
     CELL_MANAGER_COLOR(const CELL_DOMAIN_INTERFACE_COLOR<TV>& cdi_input);
 

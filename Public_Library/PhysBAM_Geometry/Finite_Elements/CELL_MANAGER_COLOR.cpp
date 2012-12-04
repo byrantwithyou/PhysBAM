@@ -38,6 +38,11 @@ Compress_Indices()
             for(UNIFORM_GRID_ITERATOR_CELL<TV> it(cdi.grid,cdi.padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
                 int i=cdi.Flatten(it.index);
                 if(compressed(c)(i)==-2) compressed(c)(i)=dofs(c)++;}
+    int total_dofs(0);for(int c=0;c<cdi.colors;c++)total_dofs+=dofs(c);
+    uncompressed.Resize(total_dofs);
+    for(int c=0;c<cdi.colors;c++)
+        for(int i=0;i<compressed(c).m;i++)
+            if(compressed(c)(i)>=0) uncompressed(compressed(c)(i))=VECTOR<int,2>(c,i);
 }
 template class CELL_MANAGER_COLOR<VECTOR<float,2> >;
 template class CELL_MANAGER_COLOR<VECTOR<float,3> >;
