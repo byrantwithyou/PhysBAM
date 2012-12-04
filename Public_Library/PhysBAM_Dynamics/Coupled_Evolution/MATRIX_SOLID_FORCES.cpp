@@ -218,9 +218,11 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
     PHYSBAM_ASSERT(solid_body_collection.deformable_body_collection.dynamic_particles.m==solid_body_collection.deformable_body_collection.particles.V.m);
 }
 //#####################################################################
+namespace PhysBAM{
 template class MATRIX_SOLID_FORCES<VECTOR<float,1> >;
 template class MATRIX_SOLID_FORCES<VECTOR<float,2> >;
 template class MATRIX_SOLID_FORCES<VECTOR<float,3> >;
 template class MATRIX_SOLID_FORCES<VECTOR<double,1> >;
 template class MATRIX_SOLID_FORCES<VECTOR<double,2> >;
 template class MATRIX_SOLID_FORCES<VECTOR<double,3> >;
+}

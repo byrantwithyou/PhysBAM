@@ -61,5 +61,7 @@ operator()(T x) const
     if(use_log){if(x==0) x=mn;else x=std::log(std::abs(x));}
     return colors.Value(x);
 }
+namespace PhysBAM{
 template class INTERPOLATED_COLOR_MAP<float>;
 template class INTERPOLATED_COLOR_MAP<double>;
+}

@@ -428,5 +428,7 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
         break;}
 }
 //#####################################################################
+namespace PhysBAM{
 template class TETRAHEDRON<float>;
 template class TETRAHEDRON<double>;
+}

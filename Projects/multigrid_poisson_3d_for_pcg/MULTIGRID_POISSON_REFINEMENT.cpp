@@ -112,6 +112,7 @@ Transfer_Correction_To_Fine_Grid()
 
 
 //#####################################################################
+namespace PhysBAM{
 #ifdef MGPCG_UNOPTIMIZED
 template class MULTIGRID_POISSON_REFINEMENT<float,2>;
 #endif
@@ -120,3 +121,4 @@ template class MULTIGRID_POISSON_REFINEMENT<float,3>;
 template class MULTIGRID_POISSON_REFINEMENT<double,2>;
 #endif
 template class MULTIGRID_POISSON_REFINEMENT<double,3>;
+}

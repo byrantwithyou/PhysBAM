@@ -19,9 +19,11 @@ UNIFORM_INTERIOR_ITERATOR_CELL(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<
 {
 }
 //#####################################################################
+namespace PhysBAM{
 template class UNIFORM_INTERIOR_ITERATOR_CELL<VECTOR<float,1> >;
 template class UNIFORM_INTERIOR_ITERATOR_CELL<VECTOR<float,2> >;
 template class UNIFORM_INTERIOR_ITERATOR_CELL<VECTOR<float,3> >;
 template class UNIFORM_INTERIOR_ITERATOR_CELL<VECTOR<double,1> >;
 template class UNIFORM_INTERIOR_ITERATOR_CELL<VECTOR<double,2> >;
 template class UNIFORM_INTERIOR_ITERATOR_CELL<VECTOR<double,3> >;
+}

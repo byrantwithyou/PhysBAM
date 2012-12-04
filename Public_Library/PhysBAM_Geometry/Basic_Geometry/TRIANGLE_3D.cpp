@@ -459,5 +459,7 @@ Clamped_Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,con
         return TV(1-a-b,a,b);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class TRIANGLE_3D<float>;
 template class TRIANGLE_3D<double>;
+}

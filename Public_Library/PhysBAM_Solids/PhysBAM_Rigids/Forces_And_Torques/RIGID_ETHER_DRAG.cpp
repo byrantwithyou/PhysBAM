@@ -62,7 +62,9 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,AR
 {
 }
 //#####################################################################
+namespace PhysBAM{
 template class RIGID_ETHER_DRAG<GRID<VECTOR<float,2> > >;
 template class RIGID_ETHER_DRAG<GRID<VECTOR<float,3> > >;
 template class RIGID_ETHER_DRAG<GRID<VECTOR<double,2> > >;
 template class RIGID_ETHER_DRAG<GRID<VECTOR<double,3> > >;
+}

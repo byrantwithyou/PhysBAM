@@ -63,5 +63,7 @@ Jacobi_Singular_Value_Decomposition(ARRAY<VECTOR<int,2> >& left_givens_pairs,ARR
             Update_Max_Off_Diagonal_Element_Of_Row_After_Column_Change(*this,max_off_diagonal_element_of_row,j);}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class MATRIX_MXN<float>;
 template class MATRIX_MXN<double>;
+}

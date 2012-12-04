@@ -25,9 +25,11 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
         else u_Zx(i)=u(i)*WENO(D1(i+2),D1(i+1),D1(i),D1(i-1),D1(i-2),epsilon);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<float,1> >,float>;
 template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<float,2> >,float>;
 template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<float,3> >,float>;
 template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<double,1> >,double>;
 template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<double,2> >,double>;
 template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<double,3> >,double>;
+}

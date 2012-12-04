@@ -73,7 +73,9 @@ Get_Levelset_For_Color(ARRAY<T,TV_INT>& color_phi,int c,int ghost) const
     LEVELSET<TV> fl(grid,color_phi,ghost);
     Reinitialize(fl,10*ghost,(T)0,(T)ghost,(T)0,(T).5,3,3,1);
 }
+namespace PhysBAM{
 template class LEVELSET_COLOR<VECTOR<float,2> >;
 template class LEVELSET_COLOR<VECTOR<float,3> >;
 template class LEVELSET_COLOR<VECTOR<double,2> >;
 template class LEVELSET_COLOR<VECTOR<double,3> >;
+}

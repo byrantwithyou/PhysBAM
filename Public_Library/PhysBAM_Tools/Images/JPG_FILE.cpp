@@ -135,10 +135,11 @@ Is_Supported()
 }
 //#####################################################################
 #endif
-
+namespace PhysBAM{
 template class JPG_FILE<float>;
 template void JPG_FILE<float>::Write(const std::string&,const ARRAY<VECTOR<float,3> ,VECTOR<int,2> >&);
 template void JPG_FILE<float>::Write(const std::string&,const ARRAY<VECTOR<float,4> ,VECTOR<int,2> >&);
 template class JPG_FILE<double>;
 template void JPG_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,3> ,VECTOR<int,2> >&);
 template void JPG_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&);
+}

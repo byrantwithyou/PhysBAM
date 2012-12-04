@@ -67,6 +67,7 @@ Fill_Ghost_Cells_Neumann(const GRID<VECTOR<T,1> >& grid_1d,ARRAY<TV_DIMENSION,VE
             U_1d(i)=u_1d;}
 }
 
+namespace PhysBAM{
 template class BOUNDARY_OBJECT<VECTOR<float,1>,VECTOR<float,1> >;
 template class BOUNDARY_OBJECT<VECTOR<float,1>,VECTOR<float,2> >;
 template class BOUNDARY_OBJECT<VECTOR<float,1>,VECTOR<float,3> >;
@@ -109,3 +110,4 @@ template class BOUNDARY_OBJECT<VECTOR<double,3>,VECTOR<double,4> >;
 template class BOUNDARY_OBJECT<VECTOR<double,3>,VECTOR<double,5> >;
 template class BOUNDARY_OBJECT<VECTOR<double,3>,VECTOR<double,6> >;
 template class BOUNDARY_OBJECT<VECTOR<double,3>,double>;
+}

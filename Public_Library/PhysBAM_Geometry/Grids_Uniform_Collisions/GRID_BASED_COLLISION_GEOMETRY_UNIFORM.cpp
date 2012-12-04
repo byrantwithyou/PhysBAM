@@ -139,9 +139,11 @@ Compute_Simplices_In_Cell(ARRAY<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV_INT>&
                 simplices_in_cell(iterator.Cell_Index()).Append(PAIR<COLLISION_GEOMETRY_ID,int>(i,e));}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<float,1> > >;
 template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<float,2> > >;
 template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<float,3> > >;
 template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<double,1> > >;
 template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<double,2> > >;
 template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<double,3> > >;
+}

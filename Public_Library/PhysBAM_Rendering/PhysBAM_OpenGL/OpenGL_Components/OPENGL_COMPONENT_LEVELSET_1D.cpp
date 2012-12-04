@@ -86,6 +86,8 @@ Reinitialize()
             frame_loaded=frame;valid=true;}}
 }
 //##################################################################### 
+namespace PhysBAM{
 template class OPENGL_COMPONENT_LEVELSET_1D<float,float>;
 template class OPENGL_COMPONENT_LEVELSET_1D<float,double>;
 template class OPENGL_COMPONENT_LEVELSET_1D<double,double>;
+}

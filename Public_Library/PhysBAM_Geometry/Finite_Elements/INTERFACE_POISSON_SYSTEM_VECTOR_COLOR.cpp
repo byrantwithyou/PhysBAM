@@ -301,9 +301,11 @@ Scale(const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v,const INTERFACE_POISSON
         q(k)=v.q(k)*s.q(k);
 }
 //#####################################################################
+namespace PhysBAM{
 template class INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<VECTOR<float,1> >;
 template class INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<VECTOR<float,2> >;
 template class INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<VECTOR<float,3> >;
 template class INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<VECTOR<double,1> >;
 template class INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<VECTOR<double,2> >;
 template class INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<VECTOR<double,3> >;
+}

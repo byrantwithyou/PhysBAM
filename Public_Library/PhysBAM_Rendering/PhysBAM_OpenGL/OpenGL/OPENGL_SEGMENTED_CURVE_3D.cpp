@@ -346,5 +346,7 @@ Bounding_Box() const
     return curve->Bounding_Box();
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_SEGMENTED_CURVE_3D<float>;
 template class OPENGL_SEGMENTED_CURVE_3D<double>;
+}

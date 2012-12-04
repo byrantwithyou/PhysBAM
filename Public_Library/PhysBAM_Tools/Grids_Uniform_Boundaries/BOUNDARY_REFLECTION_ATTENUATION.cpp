@@ -42,9 +42,11 @@ Attenuate_To_Far_Field_Value(const T2 boundary_value,const T dt) const
     return boundary_value+linear_attenuation*(fixed_boundary_value-boundary_value);
 }
 //#####################################################################
+namespace PhysBAM{
 template class BOUNDARY_REFLECTION_ATTENUATION<GRID<VECTOR<float,1> >,float>;
 template class BOUNDARY_REFLECTION_ATTENUATION<GRID<VECTOR<float,2> >,float>;
 template class BOUNDARY_REFLECTION_ATTENUATION<GRID<VECTOR<float,3> >,float>;
 template class BOUNDARY_REFLECTION_ATTENUATION<GRID<VECTOR<double,1> >,double>;
 template class BOUNDARY_REFLECTION_ATTENUATION<GRID<VECTOR<double,2> >,double>;
 template class BOUNDARY_REFLECTION_ATTENUATION<GRID<VECTOR<double,3> >,double>;
+}

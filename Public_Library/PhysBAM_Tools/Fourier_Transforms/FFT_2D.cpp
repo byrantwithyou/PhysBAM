@@ -167,5 +167,7 @@ Filter_High_Frequencies(ARRAY<COMPLEX<T> ,VECTOR<int,2> >& u_hat,T scale) const
     Enforce_Real_Valued_Symmetry(u_hat);
 }
 //#####################################################################
+namespace PhysBAM{
 template class FFT_2D<float>;
 template class FFT_2D<double>;
+}

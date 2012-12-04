@@ -180,5 +180,7 @@ Write_Configuration(const STREAM_TYPE& stream_type,std::ostream& output_stream) 
     TYPED_OSTREAM typed_output(output_stream,stream_type);
     Write_Binary(typed_output,activation_names);
 }
+namespace PhysBAM{
 template class ACTIVATION_CONTROL_SET<float>;
 template class ACTIVATION_CONTROL_SET<double>;
+}

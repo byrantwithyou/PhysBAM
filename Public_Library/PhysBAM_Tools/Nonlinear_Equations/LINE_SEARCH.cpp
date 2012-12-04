@@ -81,5 +81,7 @@ Line_Search_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,int max_iter
     x=Best_Value(s);
     return i<=max_iterations;
 }
+namespace PhysBAM{
 template struct LINE_SEARCH<float>;
 template struct LINE_SEARCH<double>;
+}

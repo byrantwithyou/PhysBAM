@@ -208,5 +208,7 @@ Initialize_Particle_Partition()
     particle_partition=new PARTICLE_PARTITION<TV>(implicit_object->levelset.grid.domain,implicit_object->levelset.grid.counts,triangulated_surface->particles,false,false);
 }
 //#####################################################################
+namespace PhysBAM{
 template class FRACTURE_REGION<float>;
 template class FRACTURE_REGION<double>;
+}

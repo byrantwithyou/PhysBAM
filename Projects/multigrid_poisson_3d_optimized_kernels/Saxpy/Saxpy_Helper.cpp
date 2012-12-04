@@ -59,6 +59,8 @@ Run_X_Range(const int xmin,const int xmax)
         }
 }
 //#####################################################################
+namespace PhysBAM{
 template class Saxpy_Helper<float>;
 template class Saxpy_Helper<double>;
+}
 

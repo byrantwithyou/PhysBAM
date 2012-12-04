@@ -326,7 +326,9 @@ Name()
 {
     return "SMOOTH_GEAR<VECTOR<T,3> >";
 }
+namespace PhysBAM{
 template class SMOOTH_GEAR<VECTOR<float,2> >;
 template class SMOOTH_GEAR<VECTOR<float,3> >;
 template class SMOOTH_GEAR<VECTOR<double,2> >;
 template class SMOOTH_GEAR<VECTOR<double,3> >;
+}

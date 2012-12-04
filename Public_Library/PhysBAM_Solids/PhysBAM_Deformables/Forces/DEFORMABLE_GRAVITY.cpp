@@ -44,9 +44,11 @@ Update_Position_Based_State(const T time,const bool is_position_update)
 {
 }
 //#####################################################################
+namespace PhysBAM{
 template class DEFORMABLE_GRAVITY<VECTOR<float,1> >;
 template class DEFORMABLE_GRAVITY<VECTOR<float,2> >;
 template class DEFORMABLE_GRAVITY<VECTOR<float,3> >;
 template class DEFORMABLE_GRAVITY<VECTOR<double,1> >;
 template class DEFORMABLE_GRAVITY<VECTOR<double,2> >;
 template class DEFORMABLE_GRAVITY<VECTOR<double,3> >;
+}

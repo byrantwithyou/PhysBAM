@@ -48,5 +48,7 @@ Compress() const
     return *this;
 }
 //#####################################################################
+namespace PhysBAM{
 template class EXACT_FLOAT<float>;
 template class EXACT_FLOAT<double>;
+}

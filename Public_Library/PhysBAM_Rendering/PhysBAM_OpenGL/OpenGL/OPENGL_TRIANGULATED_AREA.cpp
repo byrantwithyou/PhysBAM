@@ -335,5 +335,7 @@ Bounding_Box() const
     return object->World_Space_Box(RANGE<VECTOR<T,2> >::Bounding_Box(triangulated_area.particles.X.Subset(triangulated_area.mesh.elements(index))));
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_TRIANGULATED_AREA<float>;
 template class OPENGL_TRIANGULATED_AREA<double>;
+}

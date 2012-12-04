@@ -115,9 +115,11 @@ Reinitialize()
         }
     }
 }
+namespace PhysBAM{
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<float,int,float>;
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<float,bool,float>;
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<float,float,float>;
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<double,int,double>;
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<double,bool,double>;
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<double,double,double>;
+}

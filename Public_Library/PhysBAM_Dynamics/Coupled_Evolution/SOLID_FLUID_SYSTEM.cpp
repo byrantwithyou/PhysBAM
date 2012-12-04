@@ -253,9 +253,11 @@ Add_J_Rigid_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const ARRAY<
             else V.rigid_V(rigid_particle_index).angular(component-TV::dimension)+=J_rigid.A(index).a*pressure(J_rigid.A(index).j);}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class SOLID_FLUID_SYSTEM<VECTOR<float,1>,SPARSE_MATRIX_FLAT_NXN<float> >;
 template class SOLID_FLUID_SYSTEM<VECTOR<float,2>,SPARSE_MATRIX_FLAT_NXN<float> >;
 template class SOLID_FLUID_SYSTEM<VECTOR<float,3>,SPARSE_MATRIX_FLAT_NXN<float> >;
 template class SOLID_FLUID_SYSTEM<VECTOR<double,1>,SPARSE_MATRIX_FLAT_NXN<double> >;
 template class SOLID_FLUID_SYSTEM<VECTOR<double,2>,SPARSE_MATRIX_FLAT_NXN<double> >;
 template class SOLID_FLUID_SYSTEM<VECTOR<double,3>,SPARSE_MATRIX_FLAT_NXN<double> >;
+}

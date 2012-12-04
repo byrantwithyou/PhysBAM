@@ -204,9 +204,11 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     Resize_Helper(kinematic_and_static_rigid_V.array,gv.kinematic_and_static_rigid_V.array);
 }
 //#####################################################################
+namespace PhysBAM{
 template class GENERALIZED_VELOCITY<VECTOR<float,1> >;
 template class GENERALIZED_VELOCITY<VECTOR<float,2> >;
 template class GENERALIZED_VELOCITY<VECTOR<float,3> >;
 template class GENERALIZED_VELOCITY<VECTOR<double,1> >;
 template class GENERALIZED_VELOCITY<VECTOR<double,2> >;
 template class GENERALIZED_VELOCITY<VECTOR<double,3> >;
+}

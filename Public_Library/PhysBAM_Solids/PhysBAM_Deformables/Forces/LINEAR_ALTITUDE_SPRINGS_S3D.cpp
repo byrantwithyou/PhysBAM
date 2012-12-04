@@ -211,5 +211,7 @@ Potential_Energy(const T time) const
     return potential_energy;
 }
 //#####################################################################
+namespace PhysBAM{
 template class LINEAR_ALTITUDE_SPRINGS_S3D<float>;
 template class LINEAR_ALTITUDE_SPRINGS_S3D<double>;
+}

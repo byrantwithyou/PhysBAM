@@ -221,6 +221,7 @@ Draw_Arrays(int mode,int dimension,int length,const void* vertices)
     else if(dimension==3) for(int i=0;i<3*length;i+=3) buffer.Append(VECTOR<T,3>(p[i],p[i+1],p[i+2]));
     End();
 }
+namespace PhysBAM{
 template class OPENGL_EPS_OUTPUT<float>;
 template void OPENGL_EPS_OUTPUT<float>::Vertex<float>(VECTOR<float,2> const&);
 template void OPENGL_EPS_OUTPUT<float>::Vertex<float>(VECTOR<float,3> const&);
@@ -235,3 +236,4 @@ template void OPENGL_EPS_OUTPUT<double>::Vertex<double>(VECTOR<double,2> const&)
 template void OPENGL_EPS_OUTPUT<double>::Vertex<double>(VECTOR<double,3> const&);
 template void OPENGL_EPS_OUTPUT<double>::Vertex<double>(VECTOR<double,1> const&);
 template void OPENGL_EPS_OUTPUT<double>::Vertex<float>(VECTOR<float,1> const&);
+}

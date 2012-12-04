@@ -279,9 +279,11 @@ Log_Parameters() const
 }
 
 //#####################################################################
+namespace PhysBAM{
 template class EULER_CAVITATION_UNIFORM<VECTOR<float,1> >;
 template class EULER_CAVITATION_UNIFORM<VECTOR<float,2> >;
 template class EULER_CAVITATION_UNIFORM<VECTOR<float,3> >;
 template class EULER_CAVITATION_UNIFORM<VECTOR<double,1> >;
 template class EULER_CAVITATION_UNIFORM<VECTOR<double,2> >;
 template class EULER_CAVITATION_UNIFORM<VECTOR<double,3> >;
+}

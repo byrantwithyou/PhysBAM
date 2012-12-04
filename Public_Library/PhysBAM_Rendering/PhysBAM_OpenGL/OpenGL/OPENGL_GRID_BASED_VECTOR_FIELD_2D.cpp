@@ -56,5 +56,7 @@ Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* current_selection) c
     stream<<std::endl;
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_GRID_BASED_VECTOR_FIELD_2D<float>;
 template class OPENGL_GRID_BASED_VECTOR_FIELD_2D<double>;
+}

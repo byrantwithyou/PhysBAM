@@ -65,9 +65,11 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
     for(int i=0;i<m;i++) u_Zx(i)=(flux(i)-flux(i-1))*one_over_dx;
 }
 //#####################################################################
+namespace PhysBAM{
 template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<float,1> >,float>;
 template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<float,2> >,float>;
 template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<float,3> >,float>;
 template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<double,1> >,double>;
 template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<double,2> >,double>;
 template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<double,3> >,double>;
+}

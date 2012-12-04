@@ -54,5 +54,7 @@ Get_Bounding_Box(const ELLIPSOID<T>& ellipsoid) const
     return ellipsoid.Oriented_Bounding_Box().Scaled_About_Center(R).Axis_Aligned_Bounding_Box();
 }
 //#####################################################################
+namespace PhysBAM{
 template class REMOVED_PARTICLES_BLENDER_3D<float>;
 template class REMOVED_PARTICLES_BLENDER_3D<double>;
+}

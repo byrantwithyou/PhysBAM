@@ -116,5 +116,7 @@ Toggle_Arrowhead()
 {
     opengl_vector_field.draw_arrowhead = !opengl_vector_field.draw_arrowhead;
 }
+namespace PhysBAM{
 template class OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<float,float>;
 template class OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<double,double>;
+}

@@ -94,7 +94,9 @@ Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,3>& F,const VECT
     x3232=(-dE_ds.z*F.x33+dE_ds.y*F.x22)*s23;
 }
 //#####################################################################
+namespace PhysBAM{
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<float,2>;
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<float,3>;
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<double,2>;
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<double,3>;
+}

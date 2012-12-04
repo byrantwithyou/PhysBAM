@@ -145,6 +145,7 @@ Get_Generalized_Velocity_From_Fluid(GENERALIZED_VELOCITY<TV>& V) const
 template<class TV> void SOLID_SYSTEM_MPI<TV>::Send_Generalized_Velocity_To_Fluid(const GENERALIZED_VELOCITY<TV>& V) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void SOLID_SYSTEM_MPI<TV>::Get_Generalized_Velocity_From_Fluid(GENERALIZED_VELOCITY<TV>& V) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 #endif
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template class SOLID_SYSTEM_MPI<VECTOR<T,d> >;
 
@@ -154,3 +155,4 @@ INSTANTIATION_HELPER(float,3);
 INSTANTIATION_HELPER(double,1);
 INSTANTIATION_HELPER(double,2);
 INSTANTIATION_HELPER(double,3);
+}

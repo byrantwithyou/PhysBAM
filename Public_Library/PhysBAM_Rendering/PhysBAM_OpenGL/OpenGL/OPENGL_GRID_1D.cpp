@@ -85,5 +85,7 @@ Bounding_Box() const
     return object->World_Space_Box(RANGE<VECTOR<float,1> >(box));
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_GRID_1D<float>;
 template class OPENGL_GRID_1D<double>;
+}

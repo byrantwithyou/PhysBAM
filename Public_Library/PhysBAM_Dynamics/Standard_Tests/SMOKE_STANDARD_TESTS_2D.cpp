@@ -159,5 +159,7 @@ Get_Object_Velocities(PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection,const T dt
              if(divergence_face_weights(axis,face_index)<=1e-3 || beta_face(axis,face_index)<=1e-3){
                  projection.elliptic_solver->psi_N(axis,face_index)=true;incompressible_fluid_collection.face_velocities(axis,face_index)=0;}}}
 }
+namespace PhysBAM{
 template class SMOKE_STANDARD_TESTS_2D<GRID<VECTOR<float,2> > >;
 template class SMOKE_STANDARD_TESTS_2D<GRID<VECTOR<double,2> > >;
+}

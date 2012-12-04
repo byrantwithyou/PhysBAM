@@ -322,9 +322,11 @@ Compute_Vorticity_Confinement_Force(const T_GRID& grid,const T_FACE_ARRAYS_SCALA
         F(iterator.Cell_Index())=TV::Cross_Product(vortex_normal_vector,vorticity(iterator.Cell_Index()));}
 }
 //#####################################################################
+namespace PhysBAM{
 template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<GRID<VECTOR<float,1> > >;
 template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<GRID<VECTOR<float,2> > >;
 template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<GRID<VECTOR<float,3> > >;
 template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<GRID<VECTOR<double,1> > >;
 template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<GRID<VECTOR<double,2> > >;
 template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<GRID<VECTOR<double,3> > >;
+}

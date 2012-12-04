@@ -79,9 +79,11 @@ Euler_Step(const T dt,const T time,const int number_of_ghost_cells)
     array.Clamp_Below(0); // density needs to be non-negative
 }
 //#####################################################################
+namespace PhysBAM{
 template class DENSITY_CONTAINER<GRID<VECTOR<float,1> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<float,2> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<float,3> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<double,1> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<double,2> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<double,3> > >;
+}

@@ -147,7 +147,9 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
     DIAGONAL_MATRIX<T,d> Fm1=F-1;
     return constant_mu*(Fm1*Fm1).Trace()+(T).5*constant_lambda*sqr(Fm1.Trace());
 }
+namespace PhysBAM{
 template class COROTATED<float,2>;
 template class COROTATED<float,3>;
 template class COROTATED<double,2>;
 template class COROTATED<double,3>;
+}

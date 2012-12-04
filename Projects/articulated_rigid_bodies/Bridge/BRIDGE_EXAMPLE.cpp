@@ -234,5 +234,7 @@ Preprocess_Frame(const int frame)
         box2->Frame().t-=TV((T).1/num_rolling_frames,0,0);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class BRIDGE_EXAMPLE<float>;
 template class BRIDGE_EXAMPLE<double>;
+}

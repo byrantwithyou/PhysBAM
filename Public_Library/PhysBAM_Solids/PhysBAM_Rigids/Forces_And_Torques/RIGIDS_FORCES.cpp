@@ -75,6 +75,7 @@ Potential_Energy(const T time) const
     return 0;
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template class RIGIDS_FORCES<VECTOR<T,d> >;
 
@@ -84,3 +85,4 @@ INSTANTIATION_HELPER(float,3);
 INSTANTIATION_HELPER(double,1);
 INSTANTIATION_HELPER(double,2);
 INSTANTIATION_HELPER(double,3);
+}

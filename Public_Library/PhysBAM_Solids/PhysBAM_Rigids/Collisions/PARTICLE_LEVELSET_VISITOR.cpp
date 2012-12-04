@@ -46,6 +46,7 @@ Store(const int box) const
                 particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(X(p),p,particle_body_id,levelset_body_id));}}
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template struct PARTICLE_LEVELSET_VISITOR<VECTOR<T,d> >; \
     template void BOX_HIERARCHY<VECTOR<T,d> >::Intersection_List<PARTICLE_LEVELSET_VISITOR<VECTOR<T,d> > >(PARTICLE_LEVELSET_VISITOR<VECTOR<T,d> >&) const;
@@ -56,3 +57,4 @@ INSTANTIATION_HELPER(float,3);
 INSTANTIATION_HELPER(double,1);
 INSTANTIATION_HELPER(double,2);
 INSTANTIATION_HELPER(double,3);
+}

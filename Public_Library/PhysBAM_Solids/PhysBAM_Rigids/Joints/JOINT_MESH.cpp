@@ -83,9 +83,11 @@ Write(TYPED_OSTREAM& output,const std::string& directory,const int frame) const
     Write_Binary(output,undirected_graph);
 }
 //#####################################################################
+namespace PhysBAM{
 template class JOINT_MESH<VECTOR<float,1> >;
 template class JOINT_MESH<VECTOR<float,2> >;
 template class JOINT_MESH<VECTOR<float,3> >;
 template class JOINT_MESH<VECTOR<double,1> >;
 template class JOINT_MESH<VECTOR<double,2> >;
 template class JOINT_MESH<VECTOR<double,3> >;
+}

@@ -217,6 +217,7 @@ Write(TYPED_OSTREAM& output_stream) const
     Write_Binary(output_stream,muscle_segments.m);for(int i=0;i<muscle_segments.m;i++){muscle_segments(i)->Write(output_stream);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class MUSCLE<VECTOR<float,3> >;
 template MUSCLE<VECTOR<float,1> >::MUSCLE(MUSCLE_FORCE_CURVE<float> const&);
 template void MUSCLE<VECTOR<float,1> >::Set_Segment_Activations(float);
@@ -233,3 +234,4 @@ template void MUSCLE<VECTOR<double,2> >::Apply_Fixed_Impulse_At_All_Points(doubl
 template MUSCLE<VECTOR<double,2> >::MUSCLE(MUSCLE_FORCE_CURVE<double> const&);
 template void MUSCLE<VECTOR<double,2> >::Set_Segment_Activations(double);
 template void MUSCLE<VECTOR<double,2> >::Update_Segments();
+}

@@ -32,5 +32,7 @@ Get_Midpoints(ARRAY<T,VECTOR<int,1> >& M)
     for(int i=0;i<m-1;i++) M(i)=(x(i)+x(i+1))/2; 
 }
 //#####################################################################
+namespace PhysBAM{
 template class GRID_LAGRANGE_1D<float>;
 template class GRID_LAGRANGE_1D<double>;
+}

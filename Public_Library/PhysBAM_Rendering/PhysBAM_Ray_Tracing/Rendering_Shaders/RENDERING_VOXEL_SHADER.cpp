@@ -195,5 +195,7 @@ Scatter_Photon_Ray(const RENDERING_OBJECT<T>& object,RENDERING_RAY<T>& ray,TV& p
     else{ray.ray.endpoint=ray.ray.Point(fixed_step_size);ray.ray.semi_infinite=true;return true;}
 }
 //#####################################################################
+namespace PhysBAM{
 template class RENDERING_VOXEL_SHADER<float>;
 template class RENDERING_VOXEL_SHADER<double>;
+}

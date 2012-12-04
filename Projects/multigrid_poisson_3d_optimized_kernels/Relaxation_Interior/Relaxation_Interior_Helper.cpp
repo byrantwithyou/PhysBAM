@@ -300,6 +300,8 @@ Run_Minor_X_Range(const int xmin,const int xmax)
     }
 }
 //#####################################################################
+namespace PhysBAM{
 template class Relaxation_Interior_Helper<float>;
 template class Relaxation_Interior_Helper<double>;
+}
 

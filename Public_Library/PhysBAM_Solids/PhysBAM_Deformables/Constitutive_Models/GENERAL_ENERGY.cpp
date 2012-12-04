@@ -115,5 +115,7 @@ Test(T x, T y, T z, int simplex) const
     TEST3D(Eyzz,z);
     TEST3D(Ezzz,z);
 }
+namespace PhysBAM{
 template class GENERAL_ENERGY<float>;
 template class GENERAL_ENERGY<double>;
+}

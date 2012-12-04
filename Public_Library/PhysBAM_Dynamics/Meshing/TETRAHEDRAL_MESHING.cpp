@@ -726,5 +726,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/last_frame",frame,"\n");
 }
 //#####################################################################
+namespace PhysBAM{
 template class TETRAHEDRAL_MESHING<float>;
 template class TETRAHEDRAL_MESHING<double>;
+}

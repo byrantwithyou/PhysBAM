@@ -44,7 +44,9 @@ Compress_Indices()
         for(int i=0;i<compressed(c).m;i++)
             if(compressed(c)(i)>=0) uncompressed(compressed(c)(i))=VECTOR<int,2>(c,i);
 }
+namespace PhysBAM{
 template class CELL_MANAGER_COLOR<VECTOR<float,2> >;
 template class CELL_MANAGER_COLOR<VECTOR<float,3> >;
 template class CELL_MANAGER_COLOR<VECTOR<double,2> >;
 template class CELL_MANAGER_COLOR<VECTOR<double,3> >;
+}

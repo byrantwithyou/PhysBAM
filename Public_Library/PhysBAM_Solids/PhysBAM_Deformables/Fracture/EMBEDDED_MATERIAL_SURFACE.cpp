@@ -120,9 +120,11 @@ Update_Binding_List_From_Embedding(DEFORMABLE_BODY_COLLECTION<TV>& deformable_bo
         soft_bindings.Set_Mass_From_Effective_Mass();}
 }
 //#####################################################################
+namespace PhysBAM{
 template class EMBEDDED_MATERIAL_SURFACE<VECTOR<float,2>,2>;
 template class EMBEDDED_MATERIAL_SURFACE<VECTOR<float,3>,2>;
 template class EMBEDDED_MATERIAL_SURFACE<VECTOR<float,3>,3>;
 template class EMBEDDED_MATERIAL_SURFACE<VECTOR<double,2>,2>;
 template class EMBEDDED_MATERIAL_SURFACE<VECTOR<double,3>,2>;
 template class EMBEDDED_MATERIAL_SURFACE<VECTOR<double,3>,3>;
+}

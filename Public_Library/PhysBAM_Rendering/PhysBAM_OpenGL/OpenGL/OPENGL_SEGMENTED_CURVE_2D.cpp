@@ -247,6 +247,7 @@ Bounding_Box() const
     return object->World_Space_Box(RANGE<VECTOR<T,2> >::Bounding_Box(curve.particles.X.Subset(curve.mesh.elements(index))));
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_SEGMENTED_CURVE_2D<float>;
 template class OPENGL_SEGMENTED_CURVE_2D<double>;
-
+}

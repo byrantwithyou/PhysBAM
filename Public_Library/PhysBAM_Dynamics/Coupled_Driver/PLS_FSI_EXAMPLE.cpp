@@ -444,9 +444,11 @@ Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dime
     Set_Boundary_Conditions_Callback(psi_D,psi_N,psi_D_value,psi_N_value);
 }
 //#####################################################################
+namespace PhysBAM{
 template class PLS_FSI_EXAMPLE<VECTOR<float,1> >;
 template class PLS_FSI_EXAMPLE<VECTOR<float,2> >;
 template class PLS_FSI_EXAMPLE<VECTOR<float,3> >;
 template class PLS_FSI_EXAMPLE<VECTOR<double,1> >;
 template class PLS_FSI_EXAMPLE<VECTOR<double,2> >;
 template class PLS_FSI_EXAMPLE<VECTOR<double,3> >;
+}

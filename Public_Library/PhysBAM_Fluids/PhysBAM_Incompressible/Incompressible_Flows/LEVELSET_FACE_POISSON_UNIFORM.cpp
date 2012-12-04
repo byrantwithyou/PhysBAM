@@ -50,9 +50,11 @@ Compute(int axis)
         P.Finish_Row();}
     P.Sort_Entries();
 }
+namespace PhysBAM{
 template class LEVELSET_FACE_POISSON_UNIFORM<VECTOR<float,1> >;
 template class LEVELSET_FACE_POISSON_UNIFORM<VECTOR<float,2> >;
 template class LEVELSET_FACE_POISSON_UNIFORM<VECTOR<float,3> >;
 template class LEVELSET_FACE_POISSON_UNIFORM<VECTOR<double,1> >;
 template class LEVELSET_FACE_POISSON_UNIFORM<VECTOR<double,2> >;
 template class LEVELSET_FACE_POISSON_UNIFORM<VECTOR<double,3> >;
+}

@@ -402,9 +402,11 @@ Threaded_Part_Four(ARRAY<T>& x,ARRAY<T>& b,T alpha,int start_index,int end_index
     for(int i=start_index;i<end_index;i++){x(i)+=alpha*p(i);b(i)-=alpha*temp(i);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class PCG_SPARSE_THREADED<VECTOR<float,1> >;
 template class PCG_SPARSE_THREADED<VECTOR<float,2> >;
 template class PCG_SPARSE_THREADED<VECTOR<float,3> >;
 template class PCG_SPARSE_THREADED<VECTOR<double,1> >;
 template class PCG_SPARSE_THREADED<VECTOR<double,2> >;
 template class PCG_SPARSE_THREADED<VECTOR<double,3> >;
+}

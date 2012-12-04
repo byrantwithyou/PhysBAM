@@ -112,9 +112,11 @@ Implicit_Solve(const T coefficient,const T dt,const T time)
     laplace.Solve(time);
 }
 //#####################################################################
+namespace PhysBAM{
 template class HEAT_UNIFORM<GRID<VECTOR<float,1> > >;
 template class HEAT_UNIFORM<GRID<VECTOR<float,2> > >;
 template class HEAT_UNIFORM<GRID<VECTOR<float,3> > >;
 template class HEAT_UNIFORM<GRID<VECTOR<double,1> > >;
 template class HEAT_UNIFORM<GRID<VECTOR<double,2> > >;
 template class HEAT_UNIFORM<GRID<VECTOR<double,3> > >;
+}

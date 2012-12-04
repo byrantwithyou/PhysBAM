@@ -51,5 +51,7 @@ Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& r
         radius(k)=sqrt(max((particles.X(node1)-center).Magnitude_Squared(),(particles.X(node2)-center).Magnitude_Squared(),(particles.X(node3)-center).Magnitude_Squared()));}
 }
 //#####################################################################
+namespace PhysBAM{
 template class TRIANGLE_HIERARCHY_2D<float>;
 template class TRIANGLE_HIERARCHY_2D<double>;
+}

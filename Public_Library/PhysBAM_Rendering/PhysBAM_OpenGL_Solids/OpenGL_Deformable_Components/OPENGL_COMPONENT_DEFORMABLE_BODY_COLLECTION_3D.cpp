@@ -332,5 +332,7 @@ Clear_Highlight()
     for(int i=0;i<hard_bound_boundary_surface_objects.m;i++) if(hard_bound_boundary_surface_objects(i) && active_list(i))hard_bound_boundary_surface_objects(i)->Clear_Highlight();
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<float,float>;
 template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<double,double>;
+}

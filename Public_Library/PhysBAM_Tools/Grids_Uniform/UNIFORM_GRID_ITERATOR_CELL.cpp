@@ -43,6 +43,7 @@ UNIFORM_GRID_ITERATOR_CELL(const GRID<TV>& grid_input,const int number_of_ghost_
     Reset();
 }
 //#####################################################################
+namespace PhysBAM{
 template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<float,0> >;
 template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<float,1> >;
 template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<float,2> >;
@@ -51,3 +52,4 @@ template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<double,0> >;
 template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<double,1> >;
 template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<double,2> >;
 template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<double,3> >;
+}

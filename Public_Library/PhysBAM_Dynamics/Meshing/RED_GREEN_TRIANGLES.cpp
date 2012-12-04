@@ -400,6 +400,7 @@ Print() const
         LOG::cout << "      and meshes(level)->incident_elements->m="  << meshes(level)->incident_elements->m << std::endl;}
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template class RED_GREEN_TRIANGLES<VECTOR<T,d> >; \
     template void RED_GREEN_TRIANGLES<VECTOR<T,d> >::Refine_Simplex_List(const ARRAY<int>&); \
@@ -408,3 +409,4 @@ INSTANTIATION_HELPER(float,2)
 INSTANTIATION_HELPER(float,3)
 INSTANTIATION_HELPER(double,2)
 INSTANTIATION_HELPER(double,3)
+}

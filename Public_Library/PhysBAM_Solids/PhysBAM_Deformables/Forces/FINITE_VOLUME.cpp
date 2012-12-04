@@ -528,9 +528,11 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> VV,ARRAY_VIEW<TV> 
             strain_measure.Distribute_Force(F,t,dG);}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class FINITE_VOLUME<VECTOR<float,2>,2>;
 template class FINITE_VOLUME<VECTOR<float,3>,2>;
 template class FINITE_VOLUME<VECTOR<float,3>,3>;
 template class FINITE_VOLUME<VECTOR<double,2>,2>;
 template class FINITE_VOLUME<VECTOR<double,3>,2>;
 template class FINITE_VOLUME<VECTOR<double,3>,3>;
+}

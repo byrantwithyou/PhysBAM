@@ -677,9 +677,11 @@ Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velociti
     EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Face(grid,phi,inside,(int)ceil(band_width)+1,face_velocities,20,example.fluids_parameters.number_of_ghost_cells,(int)ceil(band_width));
 }
 //#####################################################################
+namespace PhysBAM{
 template class PLS_FSI_DRIVER<VECTOR<float,1> >;
 template class PLS_FSI_DRIVER<VECTOR<float,2> >;
 template class PLS_FSI_DRIVER<VECTOR<float,3> >;
 template class PLS_FSI_DRIVER<VECTOR<double,1> >;
 template class PLS_FSI_DRIVER<VECTOR<double,2> >;
 template class PLS_FSI_DRIVER<VECTOR<double,3> >;
+}

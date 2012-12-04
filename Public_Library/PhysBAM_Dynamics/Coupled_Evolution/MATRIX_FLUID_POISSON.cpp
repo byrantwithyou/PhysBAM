@@ -153,9 +153,11 @@ Print_Each_Matrix(int n) const
     OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("Poiss-%i.txt",n).c_str()).Write("Poiss",poisson);
 }
 //#####################################################################
+namespace PhysBAM{
 template class MATRIX_FLUID_POISSON<VECTOR<float,1> >;
 template class MATRIX_FLUID_POISSON<VECTOR<float,2> >;
 template class MATRIX_FLUID_POISSON<VECTOR<float,3> >;
 template class MATRIX_FLUID_POISSON<VECTOR<double,1> >;
 template class MATRIX_FLUID_POISSON<VECTOR<double,2> >;
 template class MATRIX_FLUID_POISSON<VECTOR<double,3> >;
+}

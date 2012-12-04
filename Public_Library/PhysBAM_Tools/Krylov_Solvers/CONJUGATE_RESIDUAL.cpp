@@ -73,5 +73,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
     return false;
 }
 //#####################################################################
+namespace PhysBAM{
 template class CONJUGATE_RESIDUAL<float>;
 template class CONJUGATE_RESIDUAL<double>;
+}

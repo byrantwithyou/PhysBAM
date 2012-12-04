@@ -102,5 +102,7 @@ Toggle_Velocity_Mode()
     Set_Velocity_Mode(new_velocity_mode);
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_MAC_VELOCITY_FIELD_2D<float>;
 template class OPENGL_MAC_VELOCITY_FIELD_2D<double>;
+}

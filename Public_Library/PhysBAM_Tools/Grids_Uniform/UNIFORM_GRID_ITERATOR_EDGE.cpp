@@ -67,9 +67,11 @@ Reset_Axis(const int axis_input)
     Reset();
 }
 //#####################################################################
+namespace PhysBAM{
 template class UNIFORM_GRID_ITERATOR_EDGE<VECTOR<float,1> >;
 template class UNIFORM_GRID_ITERATOR_EDGE<VECTOR<float,2> >;
 template class UNIFORM_GRID_ITERATOR_EDGE<VECTOR<float,3> >;
 template class UNIFORM_GRID_ITERATOR_EDGE<VECTOR<double,1> >;
 template class UNIFORM_GRID_ITERATOR_EDGE<VECTOR<double,2> >;
 template class UNIFORM_GRID_ITERATOR_EDGE<VECTOR<double,3> >;
+}

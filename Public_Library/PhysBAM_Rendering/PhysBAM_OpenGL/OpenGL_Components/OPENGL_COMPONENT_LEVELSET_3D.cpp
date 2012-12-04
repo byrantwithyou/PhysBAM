@@ -227,6 +227,7 @@ Toggle_Draw_Multiple_Levelsets()
 {
     draw_multiple_levelsets=!draw_multiple_levelsets;
 }
-
+namespace PhysBAM{
 template class OPENGL_COMPONENT_LEVELSET_3D<float,float>;
 template class OPENGL_COMPONENT_LEVELSET_3D<double,double>;
+}

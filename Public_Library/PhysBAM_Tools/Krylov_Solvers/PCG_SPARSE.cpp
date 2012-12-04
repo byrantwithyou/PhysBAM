@@ -41,5 +41,7 @@ Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,ARRAY<T>& x,ARRAY<T>& b,ARRAY<KRYLOV_V
     solver->Solve(system,kx,kb,vectors,tolerance,0,desired_iterations);
 }
 //#####################################################################
+namespace PhysBAM{
 template class PCG_SPARSE<float>;
 template class PCG_SPARSE<double>;
+}

@@ -75,15 +75,17 @@ Create_Segment_Bending_Springs(SEGMENTED_CURVE<TV>& segmented_curve,const typena
         use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose,implicit);
 }
 //#####################################################################
+namespace PhysBAM{
 template class SEGMENT_BENDING_SPRINGS<VECTOR<float,2> >;
 template class SEGMENT_BENDING_SPRINGS<VECTOR<float,3> >;
-template SEGMENT_BENDING_SPRINGS<VECTOR<float,2> >* PhysBAM::Create_Segment_Bending_Springs<VECTOR<float,2> >(SEGMENTED_CURVE<VECTOR<float,2> >&,float,float,bool,float,bool,
+template SEGMENT_BENDING_SPRINGS<VECTOR<float,2> >* Create_Segment_Bending_Springs<VECTOR<float,2> >(SEGMENTED_CURVE<VECTOR<float,2> >&,float,float,bool,float,bool,
     float,bool,bool);
-template SEGMENT_BENDING_SPRINGS<VECTOR<float,3> >* PhysBAM::Create_Segment_Bending_Springs<VECTOR<float,3> >(SEGMENTED_CURVE<VECTOR<float,3> >&,float,float,bool,float,bool,
+template SEGMENT_BENDING_SPRINGS<VECTOR<float,3> >* Create_Segment_Bending_Springs<VECTOR<float,3> >(SEGMENTED_CURVE<VECTOR<float,3> >&,float,float,bool,float,bool,
     float,bool,bool);
 template class SEGMENT_BENDING_SPRINGS<VECTOR<double,2> >;
 template class SEGMENT_BENDING_SPRINGS<VECTOR<double,3> >;
-template SEGMENT_BENDING_SPRINGS<VECTOR<double,2> >* PhysBAM::Create_Segment_Bending_Springs<VECTOR<double,2> >(SEGMENTED_CURVE<VECTOR<double,2> >&,double,double,bool,double,bool,
+template SEGMENT_BENDING_SPRINGS<VECTOR<double,2> >* Create_Segment_Bending_Springs<VECTOR<double,2> >(SEGMENTED_CURVE<VECTOR<double,2> >&,double,double,bool,double,bool,
     double,bool,bool);
-template SEGMENT_BENDING_SPRINGS<VECTOR<double,3> >* PhysBAM::Create_Segment_Bending_Springs<VECTOR<double,3> >(SEGMENTED_CURVE<VECTOR<double,3> >&,double,double,bool,double,bool,
+template SEGMENT_BENDING_SPRINGS<VECTOR<double,3> >* Create_Segment_Bending_Springs<VECTOR<double,3> >(SEGMENTED_CURVE<VECTOR<double,3> >&,double,double,bool,double,bool,
     double,bool,bool);
+}

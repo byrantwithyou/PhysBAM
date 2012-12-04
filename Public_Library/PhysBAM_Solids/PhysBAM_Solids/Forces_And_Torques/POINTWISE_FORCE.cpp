@@ -67,6 +67,7 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,const ARRAY<bool>& rigid_par
     else if(influenced_rigid_body_particles) force_rigid_body_particles.Update(*influenced_rigid_body_particles,rigid_particle_is_simulated);
 }
 //#####################################################################
+namespace PhysBAM{
 template class POINTWISE_FORCE<VECTOR<float,1> >;
 template class POINTWISE_FORCE<VECTOR<float,2> >;
 template class POINTWISE_FORCE<VECTOR<float,3> >;
@@ -77,3 +78,4 @@ template class POINTWISE_FORCE<VECTOR<double,2> >;
 template class POINTWISE_FORCE<VECTOR<double,3> >;
 template POINTWISE_FORCE<VECTOR<double,3> >::POINTWISE_FORCE(DEFORMABLE_PARTICLES<VECTOR<double,3> >&,RIGID_BODY_COLLECTION<VECTOR<double,3> >&,TETRAHEDRON_MESH const&,ARRAY<int,int>*);
 template POINTWISE_FORCE<VECTOR<double,3> >::POINTWISE_FORCE(DEFORMABLE_PARTICLES<VECTOR<double,3> >&,RIGID_BODY_COLLECTION<VECTOR<double,3> >&,TRIANGLE_MESH const&,ARRAY<int,int>*);
+}

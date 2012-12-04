@@ -27,5 +27,7 @@ Raw_Get(int i) const
 {
     return const_cast<KRYLOV_VECTOR_BASE<T>*>(this)->Raw_Get(i);
 }
+namespace PhysBAM{
 template class KRYLOV_VECTOR_BASE<float>;
 template class KRYLOV_VECTOR_BASE<double>;
+}

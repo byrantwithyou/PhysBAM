@@ -81,5 +81,7 @@ Intersection(RAY<VECTOR<T,3> >& ray,int &region_start,int &region_end,const T th
     else  return false;// exiting ray
 }
 //#####################################################################
+namespace PhysBAM{
 template class RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<GRID<VECTOR<float,3> > > >;
 template class RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<GRID<VECTOR<double,3> > > >;
+}

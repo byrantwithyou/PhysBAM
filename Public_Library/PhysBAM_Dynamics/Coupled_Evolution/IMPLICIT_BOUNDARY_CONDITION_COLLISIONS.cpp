@@ -72,9 +72,11 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
         else PHYSBAM_FATAL_ERROR("Unrecognized collision body type");}
 }
 //#####################################################################
+namespace PhysBAM{
 template class IMPLICIT_BOUNDARY_CONDITION_COLLISIONS<VECTOR<float,1> >;
 template class IMPLICIT_BOUNDARY_CONDITION_COLLISIONS<VECTOR<float,2> >;
 template class IMPLICIT_BOUNDARY_CONDITION_COLLISIONS<VECTOR<float,3> >;
 template class IMPLICIT_BOUNDARY_CONDITION_COLLISIONS<VECTOR<double,1> >;
 template class IMPLICIT_BOUNDARY_CONDITION_COLLISIONS<VECTOR<double,2> >;
 template class IMPLICIT_BOUNDARY_CONDITION_COLLISIONS<VECTOR<double,3> >;
+}

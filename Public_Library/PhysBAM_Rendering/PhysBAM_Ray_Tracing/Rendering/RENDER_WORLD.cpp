@@ -427,5 +427,7 @@ Use_Adaptive_Supersampling(const bool use_adaptive_supersampling_input,const T a
     adaptive_supersampling_depth_limit=adaptive_supersampling_depth_limit_input;
 }
 //#####################################################################
+namespace PhysBAM{
 template class RENDER_WORLD<float>;
 template class RENDER_WORLD<double>;
+}

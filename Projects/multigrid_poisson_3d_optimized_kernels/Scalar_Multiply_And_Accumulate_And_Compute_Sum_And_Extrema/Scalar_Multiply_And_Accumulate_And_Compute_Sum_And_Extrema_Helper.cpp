@@ -83,5 +83,7 @@ Run_X_Range(const int xmin,const int xmax,const int partition_number)
     maximum_partial_results[partition_number]=local_maximum;
 }
 //#####################################################################
+namespace PhysBAM{
 template class Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Helper<float>;
 template class Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Helper<double>;
+}

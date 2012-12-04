@@ -197,5 +197,7 @@ CFL()
     return 1/dt_convect;
 }
 //#####################################################################
+namespace PhysBAM{
 template class LAGRANGE_2D<float>;
 template class LAGRANGE_2D<double>;
+}

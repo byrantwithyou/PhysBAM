@@ -133,6 +133,8 @@ Normalize() const
 #endif
 }
 //#####################################################################
+namespace PhysBAM{
 template class EXACT_RATIONAL<float>;
 template class EXACT_RATIONAL<double>;
+}
 

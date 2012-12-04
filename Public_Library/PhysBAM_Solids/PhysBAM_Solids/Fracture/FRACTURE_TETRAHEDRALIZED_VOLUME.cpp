@@ -398,5 +398,7 @@ Add_Cut_Based_On_Phi(const int tetrahedron,const VECTOR<T,4>& tetrahedron_phi)
     //else PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
+namespace PhysBAM{
 template class FRACTURE_TETRAHEDRALIZED_VOLUME<float>;
 template class FRACTURE_TETRAHEDRALIZED_VOLUME<double>;
+}

@@ -64,5 +64,7 @@ Maxabs_H3(const T phi_x_1,const T phi_x_2,const T phi_y_1,const T phi_y_2,const 
     return abs(speed)*phi_z/sqrt(sqr(phi_x)+sqr(phi_y)+sqr(phi_z));
 }
 //#####################################################################
+namespace PhysBAM{
 template class HAMILTONIAN_NORMAL_ADVECTION_3D<float>;
 template class HAMILTONIAN_NORMAL_ADVECTION_3D<double>;
+}

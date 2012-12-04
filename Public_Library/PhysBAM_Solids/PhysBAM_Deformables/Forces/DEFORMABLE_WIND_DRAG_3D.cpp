@@ -147,9 +147,11 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
             F(p)-=particles.mass(p)*linear_normal_viscosity*TV::Dot_Product(V(p),vertex_normals(p))*vertex_normals(p);}}
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T) \
     template class DEFORMABLE_WIND_DRAG_3D<T>; \
     template DEFORMABLE_WIND_DRAG_3D<T>::DEFORMABLE_WIND_DRAG_3D(TRIANGULATED_SURFACE<T>&); \
     template DEFORMABLE_WIND_DRAG_3D<T>::DEFORMABLE_WIND_DRAG_3D(TETRAHEDRALIZED_VOLUME<T>&);
 INSTANTIATION_HELPER(float)
 INSTANTIATION_HELPER(double)
+}

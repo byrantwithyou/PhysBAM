@@ -151,5 +151,7 @@ World_Space_Simplex(const int triangle_id,const FRAME<TV>& frame) const
         frame*rigid_geometry.simplicial_object->particles.X(rigid_geometry.simplicial_object->mesh.elements(triangle_id)(2)));
 }
 //#####################################################################
+namespace PhysBAM{
 template class RIGID_COLLISION_GEOMETRY<VECTOR<float,3> >;
 template class RIGID_COLLISION_GEOMETRY<VECTOR<double,3> >;
+}

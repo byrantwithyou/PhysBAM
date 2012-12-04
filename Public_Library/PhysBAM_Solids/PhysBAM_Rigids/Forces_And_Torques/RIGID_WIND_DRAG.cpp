@@ -104,8 +104,10 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TW
             wrench.linear+=simplex_force;wrench.angular+=TV::Cross_Product(optimization(t).center-rigid_body->Frame().t,simplex_force);}}
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T) \
     template class RIGID_WIND_DRAG<VECTOR<T,3> >; \
     template class RIGID_WIND_DRAG<VECTOR<T,2> >;
 INSTANTIATION_HELPER(float)
 INSTANTIATION_HELPER(double)
+}

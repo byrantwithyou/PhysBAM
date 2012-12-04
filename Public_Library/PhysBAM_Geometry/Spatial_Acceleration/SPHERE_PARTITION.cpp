@@ -88,5 +88,7 @@ Find_Voxel(const VECTOR<T,3>& location,int& i_left,int& j_bottom,int& ij_front) 
     i_left=index.x;j_bottom=index.y;ij_front=index.z;
 }
 //#####################################################################
+namespace PhysBAM{
 template class SPHERE_PARTITION<float>;
 template class SPHERE_PARTITION<double>;
+}

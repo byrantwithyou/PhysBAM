@@ -136,9 +136,11 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
         if(cell_near_interface(cell_index)) U(cell_index) *= one_over_cell_volume;
         else if(psi(cell_index)) U(cell_index) = U_ghost(cell_index) - dt*rhs(cell_index);}
 }
+namespace PhysBAM{
 template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<float,1> >,3>;
 template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<float,2> >,4>;
 template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<float,3> >,5>;
 template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<double,1> >,3>;
 template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<double,2> >,4>;
 template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<double,3> >,5>;
+}

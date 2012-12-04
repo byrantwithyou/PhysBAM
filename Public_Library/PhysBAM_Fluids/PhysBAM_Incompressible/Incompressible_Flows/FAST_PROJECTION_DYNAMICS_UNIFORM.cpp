@@ -83,9 +83,11 @@ Make_Divergence_Free_Fast(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const
     A.Negate();
 }
 //#####################################################################
+namespace PhysBAM{
 template class FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<VECTOR<float,1> > >;
 template class FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<VECTOR<float,2> > >;
 template class FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<VECTOR<float,3> > >;
 template class FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<VECTOR<double,1> > >;
 template class FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<VECTOR<double,2> > >;
 template class FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<VECTOR<double,3> > >;
+}

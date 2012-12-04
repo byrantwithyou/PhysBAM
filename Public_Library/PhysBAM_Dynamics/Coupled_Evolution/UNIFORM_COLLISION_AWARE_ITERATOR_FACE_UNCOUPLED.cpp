@@ -57,9 +57,11 @@ Compare_Collision_Index() const
     return 0;
 }
 //#####################################################################
+namespace PhysBAM{
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED<VECTOR<float,1> >;
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED<VECTOR<float,2> >;
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED<VECTOR<float,3> >;
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED<VECTOR<double,1> >;
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED<VECTOR<double,2> >;
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED<VECTOR<double,3> >;
+}

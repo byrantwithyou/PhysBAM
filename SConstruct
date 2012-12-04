@@ -185,7 +185,7 @@ else: # assume g++...
         elif env['ARCH']=='nocona': optimization_flags+=' -O3 -funroll-loops'
         elif env['ARCH']=='powerpc': optimization_flags+=' -O2'
         if env['fast_math']:optimization_flags+=' -ffast-math'
-        optimization_flags+=' -fno-math-errno -funsafe-math-optimizations -ffinite-math-only -fno-signed-zeros'
+        optimization_flags+=' -fno-math-errno -funsafe-math-optimizations -fno-signed-zeros'
         env.Append(CXXFLAGS=optimization_flags)
         if env['TYPE']=='profile': env.Append(CXXFLAGS=' -pg',LINKFLAGS=' -pg')
     elif env['TYPE']=='debug': env.Append(CXXFLAGS=' -g',LINKFLAGS=' -g')

@@ -1313,6 +1313,7 @@ Exchange_Overlap_Particles()
         Exchange_Overlapping_Block_Particles(*mpi_grid,template_particles,positive_particles,(int)(cfl_number+(T)3.5),*this);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<float,1> > >;
 template class PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<float,2> > >;
 template class PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<float,3> > >;
@@ -1343,3 +1344,4 @@ template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<double,3> > >::Euler_Step_Pa
     ARRAY<double,FACE_INDEX<3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double,double,bool,bool,bool);
 template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<double,3> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
     ARRAY<double,FACE_INDEX<3> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double,double,bool,bool,bool);
+}

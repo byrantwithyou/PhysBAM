@@ -228,7 +228,9 @@ Make_Levelsets_Consistent()
             phis(i)(it.index)+=shift;}
 }
 //#####################################################################
+namespace PhysBAM{
 template class PLS_FC_EXAMPLE<VECTOR<float,2> >;
 template class PLS_FC_EXAMPLE<VECTOR<float,3> >;
 template class PLS_FC_EXAMPLE<VECTOR<double,2> >;
 template class PLS_FC_EXAMPLE<VECTOR<double,3> >;
+}

@@ -20,5 +20,7 @@ Segment_Plane_Intersection(const TV& endpoint1,const TV& endpoint2,T& interpolat
     return (interpolation_fraction>=0 && interpolation_fraction<=1);
 }
 //#####################################################################
+namespace PhysBAM{
 template class PLANE<float>;
 template class PLANE<double>;
+}

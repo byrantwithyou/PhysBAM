@@ -160,6 +160,7 @@ Get_Generalized_Velocity_From_Solid(INDIRECT_ARRAY<ARRAY_VIEW<TV> > V_boundary,I
 template<class TV> void FLUID_SYSTEM_MPI_SLIP<TV>::Send_Generalized_Velocity_To_Solid(const INDIRECT_ARRAY<const ARRAY_VIEW<TV> > V_boundary,const INDIRECT_ARRAY<const ARRAY_VIEW<TWIST<TV> > > rigid_V_boundary) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void FLUID_SYSTEM_MPI_SLIP<TV>::Get_Generalized_Velocity_From_Solid(INDIRECT_ARRAY<ARRAY_VIEW<TV> > V_boundary,INDIRECT_ARRAY<ARRAY_VIEW<TWIST<TV> > > rigid_V_boundary) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 #endif
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template class FLUID_SYSTEM_MPI_SLIP<VECTOR<T,d> >;
 
@@ -169,3 +170,4 @@ INSTANTIATION_HELPER(float,3);
 INSTANTIATION_HELPER(double,1);
 INSTANTIATION_HELPER(double,2);
 INSTANTIATION_HELPER(double,3);
+}

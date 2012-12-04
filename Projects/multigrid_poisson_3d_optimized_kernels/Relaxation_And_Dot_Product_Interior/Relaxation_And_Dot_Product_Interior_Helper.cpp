@@ -156,5 +156,7 @@ Apply_Delta_X_Range(const int xmin,const int xmax,const int partition_number)
     u_dot_b_partial_results[partition_number]=local_u_dot_b;
 }
 //#####################################################################
+namespace PhysBAM{
 template class Relaxation_And_Dot_Product_Interior_Helper<float>;
 template class Relaxation_And_Dot_Product_Interior_Helper<double>;
+}

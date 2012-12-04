@@ -442,10 +442,12 @@ Test_Force_Derivatives(const T time)
     }
 }
 //#####################################################################
+namespace PhysBAM{
 template class DEFORMABLE_BODY_COLLECTION<VECTOR<float,1> >;
 template class DEFORMABLE_BODY_COLLECTION<VECTOR<float,2> >;
 template class DEFORMABLE_BODY_COLLECTION<VECTOR<float,3> >;
 template class DEFORMABLE_BODY_COLLECTION<VECTOR<double,1> >;
 template class DEFORMABLE_BODY_COLLECTION<VECTOR<double,2> >;
 template class DEFORMABLE_BODY_COLLECTION<VECTOR<double,3> >;
+}
 

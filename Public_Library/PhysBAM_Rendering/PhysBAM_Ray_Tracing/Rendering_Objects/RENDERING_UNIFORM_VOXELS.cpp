@@ -23,5 +23,7 @@ Postprocess_Light_Field()
         SMOOTH::Smooth<T,3>(*precomputed_light(light),number_of_smoothing_steps,0);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class RENDERING_UNIFORM_VOXELS<float>;
 template class RENDERING_UNIFORM_VOXELS<double>;
+}

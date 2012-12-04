@@ -250,5 +250,7 @@ Inside(const TV& point,const T thickness_over_two) const
     return Distance_From_Point_To_Segment(point)<thickness_over_two;
 }
 //#####################################################################
+namespace PhysBAM{
 template class SEGMENT_3D<float>;
 template class SEGMENT_3D<double>;
+}

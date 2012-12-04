@@ -76,5 +76,7 @@ Compute_Level_Set_Helper(const TV_INT& index,T next,ARRAY<TV_INT>& next_todo,ARR
     p=next;
     next_todo.Append(index);
 }
+namespace PhysBAM{
 template class LEVELSET_MAKER_UNIFORM_2D<float>;
 template class LEVELSET_MAKER_UNIFORM_2D<double>;
+}

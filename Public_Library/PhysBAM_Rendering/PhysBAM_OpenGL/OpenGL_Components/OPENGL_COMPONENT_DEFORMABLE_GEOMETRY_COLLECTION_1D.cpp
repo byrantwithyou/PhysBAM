@@ -382,5 +382,7 @@ Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,b
     return 0;
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_1D<float,float>;
 template class OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_1D<double,double>;
+}

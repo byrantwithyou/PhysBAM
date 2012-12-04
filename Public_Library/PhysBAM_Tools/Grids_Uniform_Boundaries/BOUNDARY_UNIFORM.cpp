@@ -131,6 +131,7 @@ Fill_Single_Ghost_Region(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,c
     PHYSBAM_NOT_IMPLEMENTED();
 }
 //#####################################################################
+namespace PhysBAM{
 template class BOUNDARY_UNIFORM<GRID<VECTOR<float,1> >,float>;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<float,1> >,VECTOR<float,1> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<float,1> >,VECTOR<float,2> >;
@@ -167,3 +168,4 @@ template class BOUNDARY_UNIFORM<GRID<VECTOR<double,3> >,bool>;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<double,1> >,SYMMETRIC_MATRIX<double,1> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<double,2> >,SYMMETRIC_MATRIX<double,2> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<double,3> >,SYMMETRIC_MATRIX<double,3> >;
+}

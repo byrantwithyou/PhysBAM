@@ -34,5 +34,7 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_1D<T>& grid,const ARRAY<T,VEC
                 Q(i)=(1-psi)*Q(i);}}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class ARTIFICIAL_VISCOSITY_VNR_1D<float>;
 template class ARTIFICIAL_VISCOSITY_VNR_1D<double>;
+}

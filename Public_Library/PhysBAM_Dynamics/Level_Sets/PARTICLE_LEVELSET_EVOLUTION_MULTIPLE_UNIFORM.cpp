@@ -298,9 +298,11 @@ Levelset_Advection(const int i)
     return levelset_advection_multiple.levelset_advections(i);
 }
 //#####################################################################
+namespace PhysBAM{
 template class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<VECTOR<float,1> > >;
 template class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<VECTOR<float,2> > >;
 template class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<VECTOR<float,3> > >;
 template class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<VECTOR<double,1> > >;
 template class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<VECTOR<double,2> > >;
 template class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<VECTOR<double,3> > >;
+}

@@ -145,9 +145,11 @@ Create_Edge_Zero_Length_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH
     return zls;
 }
 //#####################################################################
+namespace PhysBAM{
 template class IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<float,2> >;
 template class IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<float,3> >;
-template IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<float,3> >* PhysBAM::Create_Edge_Zero_Length_Springs<float,VECTOR<float,3> >(DEFORMABLE_PARTICLES<VECTOR<float,3> >&,SEGMENT_MESH&,float,float,bool);
+template IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<float,3> >* Create_Edge_Zero_Length_Springs<float,VECTOR<float,3> >(DEFORMABLE_PARTICLES<VECTOR<float,3> >&,SEGMENT_MESH&,float,float,bool);
 template class IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<double,2> >;
 template class IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<double,3> >;
-template IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<double,3> >* PhysBAM::Create_Edge_Zero_Length_Springs<double,VECTOR<double,3> >(DEFORMABLE_PARTICLES<VECTOR<double,3> >&,SEGMENT_MESH&,double,double,bool);
+template IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<double,3> >* Create_Edge_Zero_Length_Springs<double,VECTOR<double,3> >(DEFORMABLE_PARTICLES<VECTOR<double,3> >&,SEGMENT_MESH&,double,double,bool);
+}

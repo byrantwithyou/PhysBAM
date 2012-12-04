@@ -236,9 +236,11 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
     output_stream<<"Free particle "<<particle_index<<std::endl;
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_POINTS_3D<float,ARRAY<VECTOR<float,3> > >;
 template class OPENGL_POINTS_3D<float,INDIRECT_ARRAY<ARRAY<VECTOR<float,3> > > >;
 template class OPENGL_POINTS_3D<float,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<float,3> > > >;
 template class OPENGL_POINTS_3D<double,ARRAY<VECTOR<double,3> > >;
 template class OPENGL_POINTS_3D<double,INDIRECT_ARRAY<ARRAY<VECTOR<double,3> > > >;
 template class OPENGL_POINTS_3D<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,3> > > >;
+}

@@ -113,5 +113,7 @@ Toggle_Arrowhead()
 {
     opengl_grid_based_vector_field.Toggle_Arrowhead_Mode();
 }
+namespace PhysBAM{
 template class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<float,float>;
 template class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<double,double>;
+}

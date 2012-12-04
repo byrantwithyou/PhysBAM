@@ -172,5 +172,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& input_directo
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/vorticity_particles",input_directory.c_str(),frame),vorticity_particles);
 }
 //#####################################################################
+namespace PhysBAM{
 template class VORTEX_PARTICLE_EVOLUTION_3D<float>;
 template class VORTEX_PARTICLE_EVOLUTION_3D<double>;
+}

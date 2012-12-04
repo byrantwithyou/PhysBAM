@@ -70,9 +70,11 @@ Scatter(const ARRAY<T>& u,ARRAY<T,FACE_INDEX<d> >& v) const
             FACE_INDEX<d> matching_index(index);matching_index.index(a)=1;
             v(matching_index)=v(index);}
 }
+namespace PhysBAM{
 template class LEVELSET_INDEX_MAP_UNIFORM<VECTOR<float,1> >;
 template class LEVELSET_INDEX_MAP_UNIFORM<VECTOR<float,2> >;
 template class LEVELSET_INDEX_MAP_UNIFORM<VECTOR<float,3> >;
 template class LEVELSET_INDEX_MAP_UNIFORM<VECTOR<double,1> >;
 template class LEVELSET_INDEX_MAP_UNIFORM<VECTOR<double,2> >;
 template class LEVELSET_INDEX_MAP_UNIFORM<VECTOR<double,3> >;
+}

@@ -24,5 +24,7 @@ Reinitialize(bool force)
         for(int i=0;i<particles->Size();i++)
             opengl_vector_field.vector_field(idx++)=vorticity(i);}
 }
+namespace PhysBAM{
 template class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<float,float>;
 template class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<double,double>;
+}

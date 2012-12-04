@@ -857,9 +857,11 @@ Use_CFL() const
     return true;
 }
 //#####################################################################
+namespace PhysBAM{
 template class NEWMARK_EVOLUTION<VECTOR<float,1> >;
 template class NEWMARK_EVOLUTION<VECTOR<float,2> >;
 template class NEWMARK_EVOLUTION<VECTOR<float,3> >;
 template class NEWMARK_EVOLUTION<VECTOR<double,1> >;
 template class NEWMARK_EVOLUTION<VECTOR<double,2> >;
 template class NEWMARK_EVOLUTION<VECTOR<double,3> >;
+}

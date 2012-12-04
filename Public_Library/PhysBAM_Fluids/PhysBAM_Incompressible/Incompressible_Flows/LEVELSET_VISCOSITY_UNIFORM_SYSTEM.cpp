@@ -88,9 +88,11 @@ Add_Constant_Part(KRYLOV_VECTOR_BASE<T>& x) const
     VECTOR_T& vx=debug_cast<VECTOR_T&>(x);
     vx.v+=poisson.b*scale;
 }
+namespace PhysBAM{
 template class LEVELSET_VISCOSITY_UNIFORM_SYSTEM<VECTOR<float,1> >;
 template class LEVELSET_VISCOSITY_UNIFORM_SYSTEM<VECTOR<float,2> >;
 template class LEVELSET_VISCOSITY_UNIFORM_SYSTEM<VECTOR<float,3> >;
 template class LEVELSET_VISCOSITY_UNIFORM_SYSTEM<VECTOR<double,1> >;
 template class LEVELSET_VISCOSITY_UNIFORM_SYSTEM<VECTOR<double,2> >;
 template class LEVELSET_VISCOSITY_UNIFORM_SYSTEM<VECTOR<double,3> >;
+}

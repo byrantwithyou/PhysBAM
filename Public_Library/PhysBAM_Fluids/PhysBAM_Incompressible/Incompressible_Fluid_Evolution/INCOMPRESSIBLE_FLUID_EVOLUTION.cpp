@@ -112,9 +112,11 @@ Add_Force(INCOMPRESSIBLE_FLUIDS_FORCES<T_GRID>* force)
     return fluids_forces.Size();
 }
 //#####################################################################
+namespace PhysBAM{
 template class INCOMPRESSIBLE_FLUID_EVOLUTION<GRID<VECTOR<float,1> > >;
 template class INCOMPRESSIBLE_FLUID_EVOLUTION<GRID<VECTOR<float,2> > >;
 template class INCOMPRESSIBLE_FLUID_EVOLUTION<GRID<VECTOR<float,3> > >;
 template class INCOMPRESSIBLE_FLUID_EVOLUTION<GRID<VECTOR<double,1> > >;
 template class INCOMPRESSIBLE_FLUID_EVOLUTION<GRID<VECTOR<double,2> > >;
 template class INCOMPRESSIBLE_FLUID_EVOLUTION<GRID<VECTOR<double,3> > >;
+}

@@ -89,6 +89,7 @@ Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_
 {
 };
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template class DEFORMABLES_FORCES<VECTOR<T,d> >;
 
@@ -98,3 +99,4 @@ INSTANTIATION_HELPER(float,3);
 INSTANTIATION_HELPER(double,1);
 INSTANTIATION_HELPER(double,2);
 INSTANTIATION_HELPER(double,3);
+}

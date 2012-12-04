@@ -102,5 +102,7 @@ Get_Triangulated_Surface()
     return surface;
 }
 //#####################################################################
+namespace PhysBAM{
 template class DUALCONTOUR_3D<float>;
 template class DUALCONTOUR_3D<double>;
+}

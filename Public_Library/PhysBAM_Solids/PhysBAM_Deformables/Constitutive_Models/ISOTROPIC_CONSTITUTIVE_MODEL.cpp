@@ -132,7 +132,9 @@ Test(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
         Isotropic_Stress_Derivative(Fd,dPi_dF[i],simplex);}
     Report_Diagnostics(F,E0,E,P0,P,dPi_dF0,dPi_dF,e);
 }
+namespace PhysBAM{
 template class ISOTROPIC_CONSTITUTIVE_MODEL<float,2>;
 template class ISOTROPIC_CONSTITUTIVE_MODEL<float,3>;
 template class ISOTROPIC_CONSTITUTIVE_MODEL<double,2>;
 template class ISOTROPIC_CONSTITUTIVE_MODEL<double,3>;
+}

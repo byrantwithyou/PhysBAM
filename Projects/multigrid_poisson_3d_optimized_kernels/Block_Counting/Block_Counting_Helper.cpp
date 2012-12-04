@@ -127,5 +127,7 @@ Run_X_Range(const int xmin,const int xmax,const int partition)
     extended_boundary_indices_partial_results[partition]=local_ebi;
 }
 //#####################################################################
+namespace PhysBAM{
 template class Block_Counting_Helper<void>;
+}
 

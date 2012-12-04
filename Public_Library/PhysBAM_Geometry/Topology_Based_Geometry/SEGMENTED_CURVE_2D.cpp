@@ -156,5 +156,7 @@ Get_Segments_Near_Segments(ARRAY<ARRAY<int> >& segments_near_segments,const SEGM
     if(!hierarchy_defined){delete hierarchy;hierarchy=0;}
 }
 //####################################################################
+namespace PhysBAM{
 template class SEGMENTED_CURVE_2D<float>;
 template class SEGMENTED_CURVE_2D<double>;
+}

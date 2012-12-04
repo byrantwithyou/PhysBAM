@@ -70,5 +70,7 @@ Preprocess_File(std::string raw_filename,const int frame)
     input_stream.close();
 }
 //#####################################################################
+namespace PhysBAM{
 template class GENERIC_PARSER<float>;
 template class GENERIC_PARSER<double>;
+}

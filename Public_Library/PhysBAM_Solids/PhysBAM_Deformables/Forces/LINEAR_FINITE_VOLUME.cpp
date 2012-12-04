@@ -186,9 +186,11 @@ CFL_Strain_Rate() const
     return Robust_Divide(max_strain_per_time_step,max_strain_rate);
 }
 //#####################################################################
+namespace PhysBAM{
 template class LINEAR_FINITE_VOLUME<VECTOR<float,2>,2>;
 template class LINEAR_FINITE_VOLUME<VECTOR<float,3>,2>;
 template class LINEAR_FINITE_VOLUME<VECTOR<float,3>,3>;
 template class LINEAR_FINITE_VOLUME<VECTOR<double,2>,2>;
 template class LINEAR_FINITE_VOLUME<VECTOR<double,3>,2>;
 template class LINEAR_FINITE_VOLUME<VECTOR<double,3>,3>;
+}

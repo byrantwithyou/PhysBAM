@@ -148,5 +148,7 @@ Decrease_Vector_Size()
     velocity_scale/=(T)1.1;
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<float,float>;
 template class OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<double,double>;
+}

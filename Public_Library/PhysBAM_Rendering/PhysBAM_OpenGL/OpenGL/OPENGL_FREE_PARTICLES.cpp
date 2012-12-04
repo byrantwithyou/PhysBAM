@@ -23,7 +23,9 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) co
     deformable_geometry_collection.particles.Print(output_stream,particle_index);
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_FREE_PARTICLES<VECTOR<float,2> >;
 template class OPENGL_FREE_PARTICLES<VECTOR<float,3> >;
 template class OPENGL_FREE_PARTICLES<VECTOR<double,2> >;
 template class OPENGL_FREE_PARTICLES<VECTOR<double,3> >;
+}

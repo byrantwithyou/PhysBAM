@@ -739,5 +739,7 @@ Bounding_Box() const
     return RANGE<VECTOR<float,3> >::Empty_Box();
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_COMPONENT_RIGID_BODIES_2D<float,float>;
 template class OPENGL_COMPONENT_RIGID_BODIES_2D<double,double>;
+}

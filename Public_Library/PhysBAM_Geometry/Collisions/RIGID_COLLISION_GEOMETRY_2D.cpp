@@ -112,5 +112,7 @@ World_Space_Simplex(const int segment_id,const FRAME<TV>& frame) const
     return SEGMENT_2D<T>(frame*object_space_segment.X.x,frame*object_space_segment.X.y);
 }
 //##################################################################### 
+namespace PhysBAM{
 template class RIGID_COLLISION_GEOMETRY<VECTOR<float,2> >;
 template class RIGID_COLLISION_GEOMETRY<VECTOR<double,2> >;
+}

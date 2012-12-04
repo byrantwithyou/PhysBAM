@@ -84,5 +84,7 @@ Frobenius_Norm_Squared() const
     return sum;
 }
 //#####################################################################
+namespace PhysBAM{
 template class MATRIX<float,4>;
 template class MATRIX<double,4>;
+}

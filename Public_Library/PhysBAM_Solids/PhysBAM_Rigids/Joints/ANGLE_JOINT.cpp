@@ -75,6 +75,7 @@ Update_State_From_Joint_Frame(const bool enforce_constraints)
     J_inverse=J.Inverse();
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d,s) \
     template ANGLE_JOINT<VECTOR<T,d> >::~ANGLE_JOINT(); \
     template bool ANGLE_JOINT<VECTOR<T,d> >::Has_Angular_Constraint() const; \
@@ -91,3 +92,4 @@ template class ANGLE_JOINT<VECTOR<float,1> >;
 INSTANTIATION_HELPER(double,2,1)
 INSTANTIATION_HELPER(double,3,3)
 template class ANGLE_JOINT<VECTOR<double,1> >;
+}

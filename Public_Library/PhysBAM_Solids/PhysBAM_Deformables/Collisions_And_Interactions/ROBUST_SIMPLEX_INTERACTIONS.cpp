@@ -217,7 +217,9 @@ Intersection_Test(const VECTOR<TV,3>& triangle,const VECTOR<TV,1>& point)
     return VECTOR<bool,2>(value,robust);
 }
 //####################################################################
+namespace PhysBAM{
 template class ROBUST_SIMPLEX_INTERACTIONS<VECTOR<float,2> >;
 template class ROBUST_SIMPLEX_INTERACTIONS<VECTOR<float,3> >;
 template class ROBUST_SIMPLEX_INTERACTIONS<VECTOR<double,2> >;
 template class ROBUST_SIMPLEX_INTERACTIONS<VECTOR<double,3> >;
+}

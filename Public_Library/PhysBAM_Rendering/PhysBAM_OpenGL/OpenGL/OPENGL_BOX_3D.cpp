@@ -47,6 +47,7 @@ Bounding_Box() const
 {
     return RANGE<VECTOR<float,3> >(box);
 }
-
+namespace PhysBAM{
 template class OPENGL_BOX_3D<float>;
 template class OPENGL_BOX_3D<double>;
+}

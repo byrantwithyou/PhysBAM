@@ -45,5 +45,7 @@ Bounding_Box() const
         return RANGE<VECTOR<float,3> >::Centered_Box();
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<float>;
 template class OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<double>;
+}

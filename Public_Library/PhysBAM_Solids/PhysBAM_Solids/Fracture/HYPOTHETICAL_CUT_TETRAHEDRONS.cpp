@@ -404,5 +404,7 @@ Would_Orphan_Half_Oct()
     return false;
 }
 //##################################################################### 
+namespace PhysBAM{
 template class HYPOTHETICAL_CUT_TETRAHEDRONS<float>;
 template class HYPOTHETICAL_CUT_TETRAHEDRONS<double>;
+}

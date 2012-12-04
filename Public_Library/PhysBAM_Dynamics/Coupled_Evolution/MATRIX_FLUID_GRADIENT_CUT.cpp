@@ -38,9 +38,11 @@ Compute(const ARRAY<bool,FACE_INDEX<d> >& psi_N_domain_boundary)
 {
     // Will be set up by FLUID_TO_SOLID_INTERPOLATION_CUT or FLUID_TO_SOLID_INTERPOLATION_PHI
 }
+namespace PhysBAM{
 template class MATRIX_FLUID_GRADIENT_CUT<VECTOR<float,1> >;
 template class MATRIX_FLUID_GRADIENT_CUT<VECTOR<float,2> >;
 template class MATRIX_FLUID_GRADIENT_CUT<VECTOR<float,3> >;
 template class MATRIX_FLUID_GRADIENT_CUT<VECTOR<double,1> >;
 template class MATRIX_FLUID_GRADIENT_CUT<VECTOR<double,2> >;
 template class MATRIX_FLUID_GRADIENT_CUT<VECTOR<double,3> >;
+}

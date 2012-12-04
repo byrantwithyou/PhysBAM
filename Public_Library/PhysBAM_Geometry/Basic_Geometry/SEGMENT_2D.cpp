@@ -369,5 +369,7 @@ Clip_To_Box(const RANGE<TV>& box,T& a,T& b) const
     return Clip_To_Box_Helper(z1.x,z2.x,a,b) && Clip_To_Box_Helper(z1.y,z2.y,a,b) && a<b;
 }
 //#####################################################################
+namespace PhysBAM{
 template class SEGMENT_2D<float>;
 template class SEGMENT_2D<double>;
+}

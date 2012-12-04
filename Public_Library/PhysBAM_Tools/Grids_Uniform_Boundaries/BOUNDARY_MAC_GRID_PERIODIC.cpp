@@ -47,9 +47,11 @@ Fill_Ghost_Cells_Face(const T_GRID& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS
                 u_ghost_axis(node)=u_ghost_axis(node+period);}}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class BOUNDARY_MAC_GRID_PERIODIC<GRID<VECTOR<float,2> >,VECTOR<float,3> >;
 template class BOUNDARY_MAC_GRID_PERIODIC<GRID<VECTOR<float,2> >,float>;
 template class BOUNDARY_MAC_GRID_PERIODIC<GRID<VECTOR<float,3> >,float>;
 template class BOUNDARY_MAC_GRID_PERIODIC<GRID<VECTOR<double,2> >,VECTOR<double,3> >;
 template class BOUNDARY_MAC_GRID_PERIODIC<GRID<VECTOR<double,2> >,double>;
 template class BOUNDARY_MAC_GRID_PERIODIC<GRID<VECTOR<double,3> >,double>;
+}

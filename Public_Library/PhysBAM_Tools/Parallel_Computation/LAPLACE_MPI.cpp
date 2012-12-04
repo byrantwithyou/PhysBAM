@@ -160,9 +160,11 @@ Use_Parallel_Solve()
 }
 
 //#####################################################################
+namespace PhysBAM{
 template class LAPLACE_MPI<GRID<VECTOR<float,1> > >;
 template class LAPLACE_MPI<GRID<VECTOR<float,2> > >;
 template class LAPLACE_MPI<GRID<VECTOR<float,3> > >;
 template class LAPLACE_MPI<GRID<VECTOR<double,1> > >;
 template class LAPLACE_MPI<GRID<VECTOR<double,2> > >;
 template class LAPLACE_MPI<GRID<VECTOR<double,3> > >;
+}

@@ -94,5 +94,7 @@ Run_Block_Range(const int first_block,const int last_block)
                         *one_over_diagonal_part[i];}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class Relaxation_Boundary_Helper<float>;
 template class Relaxation_Boundary_Helper<double>;
+}

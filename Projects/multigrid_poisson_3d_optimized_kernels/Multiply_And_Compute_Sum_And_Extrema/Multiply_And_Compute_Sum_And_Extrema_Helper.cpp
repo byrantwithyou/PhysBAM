@@ -103,6 +103,8 @@ Run_X_Range(const int xmin,const int xmax,const int partition_number)
     maximum_partial_results[partition_number]=local_maximum;
 }
 //#####################################################################
+namespace PhysBAM{
 template class Multiply_And_Compute_Sum_And_Extrema_Helper<float>;
 template class Multiply_And_Compute_Sum_And_Extrema_Helper<double>;
+}
 

@@ -47,5 +47,7 @@ Euler_Step(const T dt,const T time)
     boundary->Apply_Boundary_Condition(grid,U,time+dt); 
 }
 //#####################################################################
+namespace PhysBAM{
 template class CYLINDRICAL<float>;
 template class CYLINDRICAL<double>;
+}

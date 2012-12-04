@@ -132,5 +132,7 @@ Bounding_Box() const
     return World_Space_Box(RANGE<VECTOR<float,3> >(RANGE<VECTOR<T,3> >::Bounding_Box(particles->X)));
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_HEXAHEDRALIZED_VOLUME<float>;
 template class OPENGL_HEXAHEDRALIZED_VOLUME<double>;
+}

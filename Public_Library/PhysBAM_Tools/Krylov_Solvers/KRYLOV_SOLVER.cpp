@@ -35,5 +35,7 @@ Ensure_Size(ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const KRYLOV_VECTOR_BASE<T>& v,int
     for(int i=old;i<av.m;i++)
         av(i)=v.Clone_Default();
 }
+namespace PhysBAM{
 template class KRYLOV_SOLVER<float>;
 template class KRYLOV_SOLVER<double>;
+}

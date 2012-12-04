@@ -119,9 +119,11 @@ Add_Interface(int face_lookup,const SIDED_FACE_INDEX<d>& face_index,T weight)
     typename BASE::INTERFACE_ENTRY ie={face_lookup,weight};
     interface_gradient.Append(ie);
 }
+namespace PhysBAM{
 template class MATRIX_FLUID_GRADIENT<VECTOR<float,1> >;
 template class MATRIX_FLUID_GRADIENT<VECTOR<float,2> >;
 template class MATRIX_FLUID_GRADIENT<VECTOR<float,3> >;
 template class MATRIX_FLUID_GRADIENT<VECTOR<double,1> >;
 template class MATRIX_FLUID_GRADIENT<VECTOR<double,2> >;
 template class MATRIX_FLUID_GRADIENT<VECTOR<double,3> >;
+}

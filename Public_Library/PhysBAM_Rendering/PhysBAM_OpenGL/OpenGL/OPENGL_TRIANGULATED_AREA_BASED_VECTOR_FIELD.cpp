@@ -40,5 +40,7 @@ Bounding_Box() const
     return RANGE<VECTOR<float,3> >(Convert_2d_To_3d(triangulated_area.bounding_box?*triangulated_area.bounding_box:RANGE<TV>::Centered_Box()));
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD<float>;
 template class OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD<double>;
+}

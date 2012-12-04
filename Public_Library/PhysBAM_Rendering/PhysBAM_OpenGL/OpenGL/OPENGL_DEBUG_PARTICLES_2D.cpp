@@ -213,7 +213,8 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
     if(selection->type!=OPENGL_SELECTION::DEBUG_PARTICLES_2D) return;
     output_stream<<"Particle "<<dynamic_cast<OPENGL_SELECTION_DEBUG_PARTICLES_2D<T>&>(*selection).index<<std::endl;
 }
-
+namespace PhysBAM{
 template class OPENGL_DEBUG_PARTICLES_2D<float>;
 template class OPENGL_DEBUG_PARTICLES_2D<double>;
+}
 

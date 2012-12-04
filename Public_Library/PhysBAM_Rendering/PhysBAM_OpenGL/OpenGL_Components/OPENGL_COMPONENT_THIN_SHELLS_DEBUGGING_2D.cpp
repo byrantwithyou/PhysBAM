@@ -169,5 +169,7 @@ Bounding_Box() const
     if(valid && draw) return RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.x,0,grid.domain.max_corner.y),VECTOR<float,3>(grid.domain.min_corner.y,grid.domain.max_corner.x,0));
     else return RANGE<VECTOR<float,3> >::Centered_Box();
 }
+namespace PhysBAM{
 template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<float,float>;
 template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<double,double>;
+}

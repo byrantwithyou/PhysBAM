@@ -198,6 +198,8 @@ Identify_Colors_Touching_Boundary(const int number_of_colors,const ARRAYS_ND_BAS
     if(left_color>0)color_touches_boundary(left_color)=true;
     if(right_color>0)color_touches_boundary(right_color)=true;
 }
+namespace PhysBAM{
 template class FLOOD_FILL<1>;
 template class FLOOD_FILL<2>;
 template class FLOOD_FILL<3>;
+}

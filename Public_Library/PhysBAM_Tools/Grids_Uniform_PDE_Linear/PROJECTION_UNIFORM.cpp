@@ -206,9 +206,11 @@ Exchange_Pressures_For_Projection()
     T_ARRAYS_SCALAR::Exchange(p,p_save_for_projection);
 }
 //#####################################################################
+namespace PhysBAM{
 template class PROJECTION_UNIFORM<GRID<VECTOR<float,1> > >;
 template class PROJECTION_UNIFORM<GRID<VECTOR<float,2> > >;
 template class PROJECTION_UNIFORM<GRID<VECTOR<float,3> > >;
 template class PROJECTION_UNIFORM<GRID<VECTOR<double,1> > >;
 template class PROJECTION_UNIFORM<GRID<VECTOR<double,2> > >;
 template class PROJECTION_UNIFORM<GRID<VECTOR<double,3> > >;
+}

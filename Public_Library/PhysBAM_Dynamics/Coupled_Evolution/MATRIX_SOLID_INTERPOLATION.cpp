@@ -221,9 +221,11 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
                 for(int k=0;k<TV::SPIN::m;k++) data.Append(TRIPLE<int,int,T>(Value(i),base+TV::m+k,cpm(k)));}}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class MATRIX_SOLID_INTERPOLATION<VECTOR<float,1> >;
 template class MATRIX_SOLID_INTERPOLATION<VECTOR<float,2> >;
 template class MATRIX_SOLID_INTERPOLATION<VECTOR<float,3> >;
 template class MATRIX_SOLID_INTERPOLATION<VECTOR<double,1> >;
 template class MATRIX_SOLID_INTERPOLATION<VECTOR<double,2> >;
 template class MATRIX_SOLID_INTERPOLATION<VECTOR<double,3> >;
+}

@@ -91,9 +91,11 @@ Resize_Vectors(bool minimal)
     b.v.Resize(index_map.index_to_face.m);
     if(print_matrix) KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,2);
 }
+namespace PhysBAM{
 template class LEVELSET_VISCOSITY_UNIFORM<VECTOR<float,1> >;
 template class LEVELSET_VISCOSITY_UNIFORM<VECTOR<float,2> >;
 template class LEVELSET_VISCOSITY_UNIFORM<VECTOR<float,3> >;
 template class LEVELSET_VISCOSITY_UNIFORM<VECTOR<double,1> >;
 template class LEVELSET_VISCOSITY_UNIFORM<VECTOR<double,2> >;
 template class LEVELSET_VISCOSITY_UNIFORM<VECTOR<double,3> >;
+}

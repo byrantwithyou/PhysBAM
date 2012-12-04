@@ -555,5 +555,7 @@ Write_Output_Files(const int frame) const
     if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+STRING_UTILITIES::string_sprintf("/adhesion.%d",frame));
 }
 //#####################################################################
+namespace PhysBAM{
 template class HAIR_STRAND_TESTS<float>;
 template class HAIR_STRAND_TESTS<double>;
+}

@@ -340,9 +340,11 @@ void PhysBAM::Register_Attribute_Sample(ARRAY_COLLECTION_ELEMENT_BASE* element)
     sample_helper.samples.Append(element);
 }
 //#####################################################################
+namespace PhysBAM{
 template class PARTICLES<VECTOR<float,1> >;
 template class PARTICLES<VECTOR<float,2> >;
 template class PARTICLES<VECTOR<float,3> >;
 template class PARTICLES<VECTOR<double,1> >;
 template class PARTICLES<VECTOR<double,2> >;
 template class PARTICLES<VECTOR<double,3> >;
+}

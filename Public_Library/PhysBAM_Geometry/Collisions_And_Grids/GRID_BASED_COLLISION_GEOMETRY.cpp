@@ -188,9 +188,11 @@ Write_State(TYPED_OSTREAM& output,const int state_index) const
     for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Write_State(output,state_index);
 }
 //#####################################################################
+namespace PhysBAM{
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,1> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,2> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,3> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,1> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,2> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,3> > >;
+}

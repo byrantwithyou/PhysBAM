@@ -283,7 +283,9 @@ PAIRWISE_LEVEL_SET_DATA()
     :phi(FLT_MAX),valid_flags(0),trust(-1,-1)
 {
 }
+namespace PhysBAM{
 template class TRIPLE_JUNCTION_CORRECTION<VECTOR<float,2> >;
 template class TRIPLE_JUNCTION_CORRECTION<VECTOR<float,3> >;
 template class TRIPLE_JUNCTION_CORRECTION<VECTOR<double,2> >;
 template class TRIPLE_JUNCTION_CORRECTION<VECTOR<double,3> >;
+}

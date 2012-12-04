@@ -225,5 +225,7 @@ Emit_Object(ARRAY_VIEW<TV> pts,ARRAY_VIEW<ARRAY_VIEW<TV> > holes)
         for(int i=0;i<pts.Size();i++) Emit(pts(i));
         stream<<std::endl;}
 }
+namespace PhysBAM{
 template class TEX_FILE<float>;
 template class TEX_FILE<double>;
+}

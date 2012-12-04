@@ -278,5 +278,7 @@ Toggle_Draw_Mode()
     draw_point_simplices=!draw_point_simplices;
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_COMPONENT_RIGID_BODIES_1D<float,float>;
 template class OPENGL_COMPONENT_RIGID_BODIES_1D<double,double>;
+}

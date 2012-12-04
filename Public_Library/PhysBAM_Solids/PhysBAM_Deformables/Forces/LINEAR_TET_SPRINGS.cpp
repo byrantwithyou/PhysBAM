@@ -391,7 +391,9 @@ Create_Tet_Springs(TETRAHEDRALIZED_VOLUME<T>& volume,const T stiffness,
         max_strain_per_time_step,use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose,implicit);
 }
 //#####################################################################
-template LINEAR_TET_SPRINGS<float>* PhysBAM::Create_Tet_Springs<float>(TETRAHEDRALIZED_VOLUME<float>&,float,float,bool,float,bool,float,bool,float,bool,bool);
+namespace PhysBAM{
+template LINEAR_TET_SPRINGS<float>* Create_Tet_Springs<float>(TETRAHEDRALIZED_VOLUME<float>&,float,float,bool,float,bool,float,bool,float,bool,bool);
 template class LINEAR_TET_SPRINGS<float>;
-template LINEAR_TET_SPRINGS<double>* PhysBAM::Create_Tet_Springs<double>(TETRAHEDRALIZED_VOLUME<double>&,double,double,bool,double,bool,double,bool,double,bool,bool);
+template LINEAR_TET_SPRINGS<double>* Create_Tet_Springs<double>(TETRAHEDRALIZED_VOLUME<double>&,double,double,bool,double,bool,double,bool,double,bool,bool);
 template class LINEAR_TET_SPRINGS<double>;
+}

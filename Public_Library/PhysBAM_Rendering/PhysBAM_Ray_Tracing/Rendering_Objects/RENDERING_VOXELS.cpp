@@ -51,5 +51,7 @@ Precompute_Light_Data(bool use_fast_precomputation,RENDER_WORLD<T>& world)
     if(!use_fast_precomputation)for(int light=0;light<lights.m;light++)for(int i=0;i<location_list.m;i++)Set_Precomputed_Light_Valid(i,light,true);
 }
 //#####################################################################
+namespace PhysBAM{
 template class RENDERING_VOXELS<float>;
 template class RENDERING_VOXELS<double>;
+}

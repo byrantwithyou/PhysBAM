@@ -33,5 +33,7 @@ Calculate_XYZ(const T temperature) const
     return cie.Calculate_XYZ(radiance_spectrum);
 }
 //#####################################################################
+namespace PhysBAM{
 template class BLACKBODY<float>;
 template class BLACKBODY<double>;
+}

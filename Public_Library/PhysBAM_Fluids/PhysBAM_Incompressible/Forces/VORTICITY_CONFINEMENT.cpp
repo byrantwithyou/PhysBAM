@@ -116,9 +116,11 @@ Initialize_Grids(const T_GRID& grid)
     else variable_vorticity_confinement.Clean_Memory();
 }
 //#####################################################################
+namespace PhysBAM{
 template class VORTICITY_CONFINEMENT<GRID<VECTOR<float,1> > >;
 template class VORTICITY_CONFINEMENT<GRID<VECTOR<float,2> > >;
 template class VORTICITY_CONFINEMENT<GRID<VECTOR<float,3> > >;
 template class VORTICITY_CONFINEMENT<GRID<VECTOR<double,1> > >;
 template class VORTICITY_CONFINEMENT<GRID<VECTOR<double,2> > >;
 template class VORTICITY_CONFINEMENT<GRID<VECTOR<double,3> > >;
+}

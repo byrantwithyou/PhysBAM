@@ -319,5 +319,7 @@ template<class T> void TETRAHEDRON_COLLISION_BODY<T>::
 Write_State(TYPED_OSTREAM& output,const int state_index) const
 {PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
+namespace PhysBAM{
 template class TETRAHEDRON_COLLISION_BODY<float>;
 template class TETRAHEDRON_COLLISION_BODY<double>;
+}

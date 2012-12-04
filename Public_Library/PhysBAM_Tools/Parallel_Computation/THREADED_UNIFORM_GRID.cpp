@@ -393,6 +393,7 @@ Allgather(ARRAY<int>& data) const
     pthread_barrier_wait(barr);
 #endif
 }
+namespace PhysBAM{
 template class THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >;
 template class THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >;
 template class THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >;
@@ -531,3 +532,4 @@ template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Sync_Face_Scalar<
 template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Sync_Face_Scalar<double>(ARRAY<double,FACE_INDEX<3> > const&,ARRAY<double,FACE_INDEX<3> >&) const;
 template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Sync_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,3> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,3> >&) const;
 template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Sync_Scalar<double>(ARRAYS_ND_BASE<double,VECTOR<int,3> > const&,ARRAYS_ND_BASE<double,VECTOR<int,3> >&) const;
+}

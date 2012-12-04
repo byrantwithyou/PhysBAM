@@ -1158,9 +1158,11 @@ Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_
     Transfer_Momentum_And_Set_Boundary_Conditions(time,0);
 }
 //#####################################################################
+namespace PhysBAM{
 template class SOLID_FLUID_COUPLED_EVOLUTION<VECTOR<float,1> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION<VECTOR<float,2> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION<VECTOR<float,3> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION<VECTOR<double,1> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION<VECTOR<double,2> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION<VECTOR<double,3> >;
+}

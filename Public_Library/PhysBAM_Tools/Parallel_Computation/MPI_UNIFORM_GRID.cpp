@@ -173,6 +173,7 @@ template<class T_GRID> template<class T_ARRAYS> void MPI_UNIFORM_GRID<T_GRID>::S
 #endif
 
 //#####################################################################
+namespace PhysBAM{
 #define P(...) __VA_ARGS__
 #ifdef USE_MPI
 #define INSTANTIATION_HELPER_LENGTH(T_GRID,length) \
@@ -215,3 +216,4 @@ INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,3> >),3);
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,1> >),1);
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,2> >),2);
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,3> >),3);
+}

@@ -139,5 +139,7 @@ Base_To_Matrix(int m,int n,const SYSTEM_MATRIX_BASE<T>& base,SPARSE_MATRIX_FLAT_
     if(tranpose) helper.Transpose();
     helper.Set_Matrix(m,n,M);
 }
+namespace PhysBAM{
 template struct SYSTEM_MATRIX_HELPER<float>;
 template struct SYSTEM_MATRIX_HELPER<double>;
+}

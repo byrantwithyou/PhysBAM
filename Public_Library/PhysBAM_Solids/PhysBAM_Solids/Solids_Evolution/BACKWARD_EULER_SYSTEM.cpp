@@ -212,6 +212,7 @@ Inverse_Multiply(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,b
     if(include_static) F.kinematic_and_static_rigid_V*=0;
 }
 //#####################################################################
+namespace PhysBAM{
 template class GENERALIZED_MASS<VECTOR<float,1> >;
 template class GENERALIZED_MASS<VECTOR<float,2> >;
 template class GENERALIZED_MASS<VECTOR<float,3> >;
@@ -224,3 +225,4 @@ template class GENERALIZED_MASS<VECTOR<double,3> >;
 template class BACKWARD_EULER_SYSTEM<VECTOR<double,1> >;
 template class BACKWARD_EULER_SYSTEM<VECTOR<double,2> >;
 template class BACKWARD_EULER_SYSTEM<VECTOR<double,3> >;
+}

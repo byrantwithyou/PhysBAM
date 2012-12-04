@@ -23,5 +23,7 @@ Maxabs_H1(const T phi_x_1,const T phi_x_2,const int i,const T t)
     return abs(speed);
 }
 //#####################################################################
+namespace PhysBAM{
 template class HAMILTONIAN_NORMAL_ADVECTION_1D<float>;
 template class HAMILTONIAN_NORMAL_ADVECTION_1D<double>;
+}

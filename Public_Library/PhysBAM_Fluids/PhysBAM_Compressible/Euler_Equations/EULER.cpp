@@ -44,9 +44,11 @@ Log_Parameters() const
     LOG::cout<<"max_time_step="<<max_time_step<<std::endl;
     conservation->Log_Parameters();
 }
+namespace PhysBAM{
 template class EULER<GRID<VECTOR<float,1> > >;
 template class EULER<GRID<VECTOR<float,2> > >;
 template class EULER<GRID<VECTOR<float,3> > >;
 template class EULER<GRID<VECTOR<double,1> > >;
 template class EULER<GRID<VECTOR<double,2> > >;
 template class EULER<GRID<VECTOR<double,3> > >;
+}

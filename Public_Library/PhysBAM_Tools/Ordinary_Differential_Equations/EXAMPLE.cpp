@@ -174,9 +174,11 @@ Parse(PARSE_ARGS& parse_args_input)
     Override_Options();
 }
 //#####################################################################
+namespace PhysBAM{
 template class EXAMPLE<VECTOR<float,1> >;
 template class EXAMPLE<VECTOR<float,2> >;
 template class EXAMPLE<VECTOR<float,3> >;
 template class EXAMPLE<VECTOR<double,1> >;
 template class EXAMPLE<VECTOR<double,2> >;
 template class EXAMPLE<VECTOR<double,3> >;
+}

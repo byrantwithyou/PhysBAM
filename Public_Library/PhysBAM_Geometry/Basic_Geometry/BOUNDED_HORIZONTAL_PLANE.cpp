@@ -7,5 +7,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
 using namespace PhysBAM;
 //#####################################################################
+namespace PhysBAM{
 template class BOUNDED_HORIZONTAL_PLANE<VECTOR<float,3> >;
 template class BOUNDED_HORIZONTAL_PLANE<VECTOR<double,3> >;
+}

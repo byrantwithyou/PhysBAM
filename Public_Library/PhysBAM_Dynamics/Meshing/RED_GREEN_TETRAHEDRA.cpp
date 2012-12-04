@@ -703,5 +703,7 @@ Print() const
         LOG::cout << "      and meshes(level)->incident_elements->m="  << meshes(level)->incident_elements->m << std::endl;}
 }
 //#####################################################################
+namespace PhysBAM{
 template class RED_GREEN_TETRAHEDRA<float>;
 template class RED_GREEN_TETRAHEDRA<double>;
+}

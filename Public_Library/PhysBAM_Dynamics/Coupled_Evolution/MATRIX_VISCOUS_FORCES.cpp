@@ -150,9 +150,11 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
         data.Append(TRIPLE<int,int,T>(Value(entry.viscous_id),entry.face_index,entry.weight));}
 }
 //#####################################################################
+namespace PhysBAM{
 template class MATRIX_VISCOUS_FORCES<VECTOR<float,1> >;
 template class MATRIX_VISCOUS_FORCES<VECTOR<float,2> >;
 template class MATRIX_VISCOUS_FORCES<VECTOR<float,3> >;
 template class MATRIX_VISCOUS_FORCES<VECTOR<double,1> >;
 template class MATRIX_VISCOUS_FORCES<VECTOR<double,2> >;
 template class MATRIX_VISCOUS_FORCES<VECTOR<double,3> >;
+}

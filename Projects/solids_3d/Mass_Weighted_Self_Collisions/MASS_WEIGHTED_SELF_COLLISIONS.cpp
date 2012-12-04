@@ -241,5 +241,7 @@ Reorder_Pairs(ARRAY<VECTOR<int,4> >& edge_edge_pairs,ARRAY<VECTOR<int,4> >& poin
     point_face_pairs.Sort(*comparator);
 }
 //#####################################################################
+namespace PhysBAM{
 template class MASS_WEIGHTED_SELF_COLLISIONS<float>;
 template class MASS_WEIGHTED_SELF_COLLISIONS<double>;
+}

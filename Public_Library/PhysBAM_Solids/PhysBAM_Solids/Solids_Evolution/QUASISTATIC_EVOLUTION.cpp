@@ -150,7 +150,9 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
         LOG::cout<<"Newton iteration did not converge in "<<solids_parameters.newton_iterations<<", error = "<<supnorm<<" > "
                  <<solids_parameters.newton_tolerance<<std::endl;
 }
+namespace PhysBAM{
 template class QUASISTATIC_EVOLUTION<VECTOR<float,2> >;
 template class QUASISTATIC_EVOLUTION<VECTOR<float,3> >;
 template class QUASISTATIC_EVOLUTION<VECTOR<double,2> >;
 template class QUASISTATIC_EVOLUTION<VECTOR<double,3> >;
+}

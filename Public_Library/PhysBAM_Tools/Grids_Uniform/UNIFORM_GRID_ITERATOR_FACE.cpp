@@ -89,9 +89,11 @@ Reset_Axis(const int axis_input)
     face_size=grid.Face_Size(axis);Reset();
 }
 //#####################################################################
+namespace PhysBAM{
 template class UNIFORM_GRID_ITERATOR_FACE<VECTOR<float,1> >;
 template class UNIFORM_GRID_ITERATOR_FACE<VECTOR<float,2> >;
 template class UNIFORM_GRID_ITERATOR_FACE<VECTOR<float,3> >;
 template class UNIFORM_GRID_ITERATOR_FACE<VECTOR<double,1> >;
 template class UNIFORM_GRID_ITERATOR_FACE<VECTOR<double,2> >;
 template class UNIFORM_GRID_ITERATOR_FACE<VECTOR<double,3> >;
+}

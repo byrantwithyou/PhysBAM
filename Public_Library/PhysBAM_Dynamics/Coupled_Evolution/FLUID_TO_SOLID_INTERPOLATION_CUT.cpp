@@ -595,6 +595,7 @@ Dump_Extra_Velocities(const ARRAY<T>& fluid_velocity_vector)
         Debug_Particle_Set_Attribute<VECTOR<T,2>,VECTOR<T,2> >(ATTRIBUTE_ID_V,V);}*/
 }
 //#####################################################################
+namespace PhysBAM{
 template class FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,2> >;
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,1> >::Dump_Extra_Velocities(const ARRAY<float>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,1> >::Fill_Extra_Velocities(ARRAY<float>&) const;
@@ -605,3 +606,4 @@ template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,1> >::Dump_Extra_Ve
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,1> >::Fill_Extra_Velocities(ARRAY<double>&) const;
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,3> >::Dump_Extra_Velocities(const ARRAY<double>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,3> >::Fill_Extra_Velocities(ARRAY<double>&) const;
+}

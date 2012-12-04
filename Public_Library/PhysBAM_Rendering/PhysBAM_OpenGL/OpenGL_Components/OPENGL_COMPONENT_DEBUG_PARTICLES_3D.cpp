@@ -264,5 +264,7 @@ Bounding_Box() const
     return object->Selection_Bounding_Box((OPENGL_SELECTION*)this);
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_COMPONENT_DEBUG_PARTICLES_3D<float,float>;
 template class OPENGL_COMPONENT_DEBUG_PARTICLES_3D<double,double>;
+}

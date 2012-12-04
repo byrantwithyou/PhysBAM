@@ -303,9 +303,11 @@ Minimum_Cell_Size() const
     return minimum_cell_size;
 }
 //#####################################################################
+namespace PhysBAM{
 template class LEVELSET_IMPLICIT_OBJECT<VECTOR<float,1> >;
 template class LEVELSET_IMPLICIT_OBJECT<VECTOR<float,2> >;
 template class LEVELSET_IMPLICIT_OBJECT<VECTOR<float,3> >;
 template class LEVELSET_IMPLICIT_OBJECT<VECTOR<double,1> >;
 template class LEVELSET_IMPLICIT_OBJECT<VECTOR<double,2> >;
 template class LEVELSET_IMPLICIT_OBJECT<VECTOR<double,3> >;
+}

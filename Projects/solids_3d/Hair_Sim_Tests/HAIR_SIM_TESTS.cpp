@@ -999,5 +999,7 @@ Reorder_Pairs(ARRAY<VECTOR<int,4> >& edge_edge_pairs,ARRAY<VECTOR<int,4> >& poin
     point_face_pairs.Sort(*comparator);
 }
 //#####################################################################
+namespace PhysBAM{
 template class HAIR_SIM_TESTS<float>;
 template class HAIR_SIM_TESTS<double>;
+}

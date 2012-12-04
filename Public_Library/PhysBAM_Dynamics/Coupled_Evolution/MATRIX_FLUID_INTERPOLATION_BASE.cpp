@@ -79,9 +79,11 @@ Test_Matrix() const
         abs(inner_faces-inner_constraints)/maxabs((T)1e-30,inner_faces,inner_constraints)<<std::endl;
 }
 //#####################################################################
+namespace PhysBAM{
 template class MATRIX_FLUID_INTERPOLATION_BASE<VECTOR<float,1> >;
 template class MATRIX_FLUID_INTERPOLATION_BASE<VECTOR<float,2> >;
 template class MATRIX_FLUID_INTERPOLATION_BASE<VECTOR<float,3> >;
 template class MATRIX_FLUID_INTERPOLATION_BASE<VECTOR<double,1> >;
 template class MATRIX_FLUID_INTERPOLATION_BASE<VECTOR<double,2> >;
 template class MATRIX_FLUID_INTERPOLATION_BASE<VECTOR<double,3> >;
+}

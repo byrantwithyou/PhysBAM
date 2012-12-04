@@ -92,5 +92,7 @@ Draw_Object(const RANGE<TV>& box)
     Bound(box.max_corner);
     Emit_Object(box);
 }
+namespace PhysBAM{
 template class VECTOR_IMAGE<float>;
 template class VECTOR_IMAGE<double>;
+}

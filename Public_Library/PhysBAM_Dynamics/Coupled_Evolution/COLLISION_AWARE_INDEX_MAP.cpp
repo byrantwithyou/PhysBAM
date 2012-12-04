@@ -224,9 +224,11 @@ Register_Dirichlet_Cell(const TV_INT& index)
 */
 }
 //#####################################################################
+namespace PhysBAM{
 template class COLLISION_AWARE_INDEX_MAP<VECTOR<float,1> >;
 template class COLLISION_AWARE_INDEX_MAP<VECTOR<float,2> >;
 template class COLLISION_AWARE_INDEX_MAP<VECTOR<float,3> >;
 template class COLLISION_AWARE_INDEX_MAP<VECTOR<double,1> >;
 template class COLLISION_AWARE_INDEX_MAP<VECTOR<double,2> >;
 template class COLLISION_AWARE_INDEX_MAP<VECTOR<double,3> >;
+}

@@ -34,9 +34,11 @@ template<class TV,class T2> void BOUNDARY_EXTRAPOLATE_CELL<TV,T2>::
 Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time)
 {
 }
+namespace PhysBAM{
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<float,1>,float>;
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<float,2>,float>;
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<float,3>,float>;
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<double,1>,double>;
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<double,2>,double>;
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<double,3>,double>;
+}

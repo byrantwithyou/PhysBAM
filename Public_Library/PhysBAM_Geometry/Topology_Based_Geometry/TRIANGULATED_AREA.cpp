@@ -465,5 +465,7 @@ Fix_Pair_For_Delaunay(const int triangle1,const int triangle2)
     return true;
 }
 //#####################################################################
+namespace PhysBAM{
 template class TRIANGULATED_AREA<float>;
 template class TRIANGULATED_AREA<double>;
+}

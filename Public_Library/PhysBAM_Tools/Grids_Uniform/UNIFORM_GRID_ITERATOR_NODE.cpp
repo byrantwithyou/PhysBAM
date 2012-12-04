@@ -56,9 +56,11 @@ UNIFORM_GRID_ITERATOR_NODE(const GRID<TV>& grid_input,const RANGE<TV_INT>& regio
 {
 }
 //#####################################################################
+namespace PhysBAM{
 template class UNIFORM_GRID_ITERATOR_NODE<VECTOR<float,1> >;
 template class UNIFORM_GRID_ITERATOR_NODE<VECTOR<float,2> >;
 template class UNIFORM_GRID_ITERATOR_NODE<VECTOR<float,3> >;
 template class UNIFORM_GRID_ITERATOR_NODE<VECTOR<double,1> >;
 template class UNIFORM_GRID_ITERATOR_NODE<VECTOR<double,2> >;
 template class UNIFORM_GRID_ITERATOR_NODE<VECTOR<double,3> >;
+}

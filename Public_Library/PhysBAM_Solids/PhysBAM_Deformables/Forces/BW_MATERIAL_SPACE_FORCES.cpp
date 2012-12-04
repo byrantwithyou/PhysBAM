@@ -88,6 +88,7 @@ Compute_UV_Deformation(const int c)
         -material_force_state.delta_u(1)/material_force_state.denom,material_force_state.delta_u(0)/material_force_state.denom);
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template class BW_MATERIAL_SPACE_FORCES<VECTOR<T,3>,d>;
 
@@ -95,3 +96,4 @@ INSTANTIATION_HELPER(float,1)
 INSTANTIATION_HELPER(float,2)
 INSTANTIATION_HELPER(double,1)
 INSTANTIATION_HELPER(double,2)
+}

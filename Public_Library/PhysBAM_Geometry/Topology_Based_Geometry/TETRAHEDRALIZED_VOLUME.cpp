@@ -854,5 +854,7 @@ Print_Statistics(std::ostream& output)
     output<<nonmanifold_nodes.m<<" nonmanifold nodes = "<<nonmanifold_nodes;
 }
 //#####################################################################
+namespace PhysBAM{
 template class TETRAHEDRALIZED_VOLUME<float>;
 template class TETRAHEDRALIZED_VOLUME<double>;
+}

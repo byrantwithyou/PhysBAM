@@ -350,5 +350,7 @@ Turn_Smooth_Shading_Off()
     if(opengl_triangulated_surface) opengl_triangulated_surface->Turn_Smooth_Shading_Off();
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_LEVELSET_MULTIVIEW<float>;
 template class OPENGL_LEVELSET_MULTIVIEW<double>;
+}

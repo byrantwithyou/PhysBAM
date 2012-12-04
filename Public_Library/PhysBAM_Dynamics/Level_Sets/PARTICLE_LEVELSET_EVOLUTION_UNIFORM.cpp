@@ -197,9 +197,11 @@ Reseed_Particles(const T time,const int time_step,ARRAY<bool,TV_INT>* cell_cente
         if(verbose) LOG::cout << "Reseeding... " << new_particles << " new particles" << std::endl;} // need to reset based on new number of particles
 }
 //#####################################################################
+namespace PhysBAM{
 template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >;
 template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >;
 template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >;
 template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >;
 template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >;
 template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >;
+}

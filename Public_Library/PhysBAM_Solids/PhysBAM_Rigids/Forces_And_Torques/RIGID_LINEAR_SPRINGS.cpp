@@ -368,9 +368,11 @@ Body(int s,int b)
     return rigid_body_collection.Rigid_Body(segment_mesh.elements(s)(b));
 }
 //#####################################################################
+namespace PhysBAM{
 template class RIGID_LINEAR_SPRINGS<VECTOR<float,1> >;
 template class RIGID_LINEAR_SPRINGS<VECTOR<float,2> >;
 template class RIGID_LINEAR_SPRINGS<VECTOR<float,3> >;
 template class RIGID_LINEAR_SPRINGS<VECTOR<double,1> >;
 template class RIGID_LINEAR_SPRINGS<VECTOR<double,2> >;
 template class RIGID_LINEAR_SPRINGS<VECTOR<double,3> >;
+}

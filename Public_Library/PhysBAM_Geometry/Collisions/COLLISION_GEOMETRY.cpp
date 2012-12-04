@@ -133,9 +133,11 @@ template<class TV> void COLLISION_GEOMETRY<TV>::Delete_State(const int state_ind
 template<class TV> void COLLISION_GEOMETRY<TV>::Read_State(TYPED_ISTREAM& input,const int state_index){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void COLLISION_GEOMETRY<TV>::Write_State(TYPED_OSTREAM& output,const int state_index) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 //#####################################################################
+namespace PhysBAM{
 template class COLLISION_GEOMETRY<VECTOR<float,1> >;
 template class COLLISION_GEOMETRY<VECTOR<float,2> >;
 template class COLLISION_GEOMETRY<VECTOR<float,3> >;
 template class COLLISION_GEOMETRY<VECTOR<double,1> >;
 template class COLLISION_GEOMETRY<VECTOR<double,2> >;
 template class COLLISION_GEOMETRY<VECTOR<double,3> >;
+}

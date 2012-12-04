@@ -37,5 +37,7 @@ Maxabs_H2(const T phi_x_1,const T phi_x_2,const T phi_y_1,const T phi_y_2,const 
     return abs(speed(i,j))*phi_y/sqrt(sqr(phi_x)+sqr(phi_y));
 }
 //#####################################################################
+namespace PhysBAM{
 template class HAMILTONIAN_NORMAL_VELOCITY_2D<float>;
 template class HAMILTONIAN_NORMAL_VELOCITY_2D<double>;
+}

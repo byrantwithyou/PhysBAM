@@ -31,9 +31,11 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated)
     else if(influenced_rigid_body_particles) force_rigid_body_particles.Update(*influenced_rigid_body_particles,particle_is_simulated);
 }
 //#####################################################################
+namespace PhysBAM{
 template class RIGID_POINTWISE_FORCE<VECTOR<float,1> >;
 template class RIGID_POINTWISE_FORCE<VECTOR<float,2> >;
 template class RIGID_POINTWISE_FORCE<VECTOR<float,3> >;
 template class RIGID_POINTWISE_FORCE<VECTOR<double,1> >;
 template class RIGID_POINTWISE_FORCE<VECTOR<double,2> >;
 template class RIGID_POINTWISE_FORCE<VECTOR<double,3> >;
+}

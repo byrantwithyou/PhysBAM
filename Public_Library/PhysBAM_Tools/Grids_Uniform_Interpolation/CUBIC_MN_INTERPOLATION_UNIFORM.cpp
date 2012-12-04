@@ -145,6 +145,7 @@ Periodic(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) cons
 {
     return ::From_Base_Node_Periodic(*this,grid,u,X,grid.Cell(X,0)-TV_INT::All_Ones_Vector());
 }
+namespace PhysBAM{
 template class CUBIC_MN_INTERPOLATION_UNIFORM<GRID<VECTOR<float,1> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,1> > > >;
 template class CUBIC_MN_INTERPOLATION_UNIFORM<GRID<VECTOR<float,2> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,2> > > >;
 template class CUBIC_MN_INTERPOLATION_UNIFORM<GRID<VECTOR<float,3> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >;
@@ -153,3 +154,4 @@ template class CUBIC_MN_INTERPOLATION_UNIFORM<GRID<VECTOR<double,1> >,double,FAC
 template class CUBIC_MN_INTERPOLATION_UNIFORM<GRID<VECTOR<double,2> >,double,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,2> > > >;
 template class CUBIC_MN_INTERPOLATION_UNIFORM<GRID<VECTOR<double,3> >,double,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >;
 template class CUBIC_MN_INTERPOLATION_UNIFORM<GRID<VECTOR<double,2> >,VECTOR<double,3>,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,2> > > >;
+}

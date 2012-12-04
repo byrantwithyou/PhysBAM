@@ -141,5 +141,7 @@ Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& outp
     delete output;
 }
 //#####################################################################
+namespace PhysBAM{
 template class ARTICULATED_RIGID_BODY<VECTOR<float,2> >;
 template class ARTICULATED_RIGID_BODY<VECTOR<double,2> >;
+}

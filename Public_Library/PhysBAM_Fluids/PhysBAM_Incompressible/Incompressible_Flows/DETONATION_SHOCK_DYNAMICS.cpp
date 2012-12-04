@@ -185,10 +185,12 @@ Normal_Flame_Speed(const int axis,const TV_INT& face_index) const
     return (T).5*(Dn.array(cell1)+Dn.array(cell2));
 }
 //#####################################################################
+namespace PhysBAM{
 template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<float,1> > >;
 template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<float,2> > >;
 template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<float,3> > >;
 template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<double,1> > >;
 template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<double,2> > >;
 template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<double,3> > >;
+}
 

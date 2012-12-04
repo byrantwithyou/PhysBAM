@@ -221,5 +221,7 @@ Eigenvectors(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int ij,MATRIX<T,d
     R(4,4)=h+w_times_c;
 }  
 //#####################################################################
+namespace PhysBAM{
 template class EULER_3D_EIGENSYSTEM_H<float>;
 template class EULER_3D_EIGENSYSTEM_H<double>;
+}

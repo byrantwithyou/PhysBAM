@@ -116,9 +116,11 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_Text_File(example.output_directory+STRING_UTILITIES::string_sprintf("/%d/frame_title",frame),example.frame_title);
 }
 //#####################################################################
+namespace PhysBAM{
 template class DRIVER<VECTOR<float,1> >;
 template class DRIVER<VECTOR<float,2> >;
 template class DRIVER<VECTOR<float,3> >;
 template class DRIVER<VECTOR<double,1> >;
 template class DRIVER<VECTOR<double,2> >;
 template class DRIVER<VECTOR<double,3> >;
+}

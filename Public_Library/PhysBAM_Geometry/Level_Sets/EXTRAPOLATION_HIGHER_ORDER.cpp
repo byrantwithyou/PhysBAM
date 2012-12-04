@@ -219,9 +219,11 @@ Extrapolate_Face(const GRID<TV>& grid,const LEVELSET<TV>& phi,const ARRAY<bool,F
         GRID<TV> node_grid(grid.Get_Face_Grid(i));
         Extrapolate_Node(node_grid,phi,inside_mask.Component(i),ghost,u.Component(i),iterations,order,fill_width);}
 }
+namespace PhysBAM{
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,1>,float>;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,2>,float>;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,3>,float>;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,1>,double>;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,2>,double>;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,3>,double>;
+}

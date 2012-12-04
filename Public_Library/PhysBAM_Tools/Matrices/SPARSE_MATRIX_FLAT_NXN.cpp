@@ -416,7 +416,9 @@ operator<<(std::ostream& output_stream,const SPARSE_MATRIX_FLAT_NXN<T>& A)
     output_stream<<std::endl;}
 return output_stream;}
 //#####################################################################
+namespace PhysBAM{
 template class SPARSE_MATRIX_FLAT_NXN<float>;
-template std::ostream& PhysBAM::operator<<(std::ostream&,const SPARSE_MATRIX_FLAT_NXN<float>&);
+template std::ostream& operator<<(std::ostream&,const SPARSE_MATRIX_FLAT_NXN<float>&);
 template class SPARSE_MATRIX_FLAT_NXN<double>;
-template std::ostream& PhysBAM::operator<<(std::ostream&,const SPARSE_MATRIX_FLAT_NXN<double>&);
+template std::ostream& operator<<(std::ostream&,const SPARSE_MATRIX_FLAT_NXN<double>&);
+}

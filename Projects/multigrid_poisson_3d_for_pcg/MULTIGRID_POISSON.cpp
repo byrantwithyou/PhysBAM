@@ -855,6 +855,7 @@ Initialize_Test_Initial_Guess()
     Initialize_Test_Initial_Guess(u);
 }
 //#####################################################################
+namespace PhysBAM{
 #ifdef MGPCG_UNOPTIMIZED
 template class MULTIGRID_POISSON<float,2>;
 #endif
@@ -863,3 +864,4 @@ template class MULTIGRID_POISSON<float,3>;
 template class MULTIGRID_POISSON<double,2>;
 #endif
 template class MULTIGRID_POISSON<double,3>;
+}

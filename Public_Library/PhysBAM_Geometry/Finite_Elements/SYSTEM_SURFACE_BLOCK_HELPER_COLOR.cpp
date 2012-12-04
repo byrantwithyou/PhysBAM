@@ -94,6 +94,7 @@ Resize()
             data(i)(c).Resize(cdi->flat_base(i)->m,flat_diff.m);
             rhs_data(i)(c).Resize(cdi->flat_base(i)->m);}
 }
+namespace PhysBAM{
 template class SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,2> >;
 template class SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,3> >;
 template void SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,2> >::Initialize<1>(BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,
@@ -106,3 +107,4 @@ template void SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,2> >::Initialize<1
     CELL_MANAGER_COLOR<VECTOR<double,2> >&,CELL_DOMAIN_INTERFACE_COLOR<VECTOR<double,2> >&);
 template void SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,3> >::Initialize<1>(BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,
     CELL_MANAGER_COLOR<VECTOR<double,3> >&,CELL_DOMAIN_INTERFACE_COLOR<VECTOR<double,3> >&);
+}

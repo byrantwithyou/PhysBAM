@@ -178,6 +178,7 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,const ARRAY<bool>& rigid_par
     force_particles.Update(deformable_simplicial_object->mesh.elements.Flattened(),particle_is_simulated);
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T) \
     template class WIND_DRAG<VECTOR<T,3> >; \
     template WIND_DRAG<VECTOR<T,3> >::WIND_DRAG(TRIANGULATED_SURFACE<T>&,RIGID_BODY_COLLECTION<VECTOR<T,3> >&); \
@@ -186,3 +187,4 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,const ARRAY<bool>& rigid_par
     template WIND_DRAG<VECTOR<T,2> >::WIND_DRAG(SEGMENTED_CURVE_2D<T>&,RIGID_BODY_COLLECTION<VECTOR<T,2> >&);
 INSTANTIATION_HELPER(float)
 INSTANTIATION_HELPER(double)
+}

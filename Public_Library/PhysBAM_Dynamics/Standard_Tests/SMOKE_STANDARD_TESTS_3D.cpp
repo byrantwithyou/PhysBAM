@@ -128,5 +128,7 @@ Initial_Velocity(const TV& X) const
 {
     return TV();
 }
+namespace PhysBAM{
 template class SMOKE_STANDARD_TESTS_3D<GRID<VECTOR<float,3> > >;
 template class SMOKE_STANDARD_TESTS_3D<GRID<VECTOR<double,3> > >;
+}

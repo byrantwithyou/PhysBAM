@@ -305,9 +305,11 @@ Use_Psi_R()
     psi_R.Resize(psi_N.Domain_Indices());
 }
 //#####################################################################
+namespace PhysBAM{
 template class LAPLACE_UNIFORM<GRID<VECTOR<float,1> > >;
 template class LAPLACE_UNIFORM<GRID<VECTOR<float,2> > >;
 template class LAPLACE_UNIFORM<GRID<VECTOR<float,3> > >;
 template class LAPLACE_UNIFORM<GRID<VECTOR<double,1> > >;
 template class LAPLACE_UNIFORM<GRID<VECTOR<double,2> > >;
 template class LAPLACE_UNIFORM<GRID<VECTOR<double,3> > >;
+}

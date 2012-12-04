@@ -193,6 +193,8 @@ Run_X_Range(const int xmin,const int xmax)
         }
 }
 //#####################################################################
+namespace PhysBAM{
 template class Prolongation_Helper<float>;
 template class Prolongation_Helper<double>;
+}
 

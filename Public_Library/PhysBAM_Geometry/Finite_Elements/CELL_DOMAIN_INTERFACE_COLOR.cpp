@@ -153,7 +153,9 @@ Interpolate_Mac_Level_Set_To_Double_Fine_Grid(const GRID<TV>& phi_grid_input,
     Interpolate_Level_Set_To_Double_Fine_Grid_Helper(phi_grid_input.Domain_Indices(1),phi_value_input,
         phi_color_input,phi_grid.Node_Indices(1),phi_value,phi_color,(phi_grid.dX.Min()/phi_grid.counts.Max())*tol);
 }
+namespace PhysBAM{
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<float,2> >;
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<float,3> >;
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<double,2> >;
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<double,3> >;
+}

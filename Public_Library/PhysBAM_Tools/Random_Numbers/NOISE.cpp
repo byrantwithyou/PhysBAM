@@ -147,5 +147,7 @@ Turbulence_3D(const VECTOR<T,3>& p,const int octaves,const T lacunarity,const T 
     return (T).5*(sum+1);
 }
 //#####################################################################
+namespace PhysBAM{
 template class NOISE<float>;
 template class NOISE<double>;
+}

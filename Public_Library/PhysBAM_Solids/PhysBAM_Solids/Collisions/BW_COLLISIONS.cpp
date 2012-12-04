@@ -64,9 +64,11 @@ Remove_Separating_Cloth_Body_Contacts(BW_BACKWARD_EULER_SYSTEM<TV>& system,KRYLO
             cloth_body_constraints.Remove_Index_Lazy(i);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class BW_COLLISIONS<VECTOR<float,1> >;
 template class BW_COLLISIONS<VECTOR<float,2> >;
 template class BW_COLLISIONS<VECTOR<float,3> >;
 template class BW_COLLISIONS<VECTOR<double,1> >;
 template class BW_COLLISIONS<VECTOR<double,2> >;
 template class BW_COLLISIONS<VECTOR<double,3> >;
+}

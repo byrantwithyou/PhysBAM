@@ -34,9 +34,11 @@ Potential_Energy(const T time) const
     return potential_energy;
 }
 //#####################################################################
+namespace PhysBAM{
 template class GRAVITY<VECTOR<float,1> >;
 template class GRAVITY<VECTOR<float,2> >;
 template class GRAVITY<VECTOR<float,3> >;
 template class GRAVITY<VECTOR<double,1> >;
 template class GRAVITY<VECTOR<double,2> >;
 template class GRAVITY<VECTOR<double,3> >;
+}

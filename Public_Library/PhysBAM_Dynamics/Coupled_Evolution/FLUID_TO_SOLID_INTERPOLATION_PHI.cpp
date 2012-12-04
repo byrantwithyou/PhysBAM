@@ -193,5 +193,7 @@ Setup_Before_Compute(ARRAY<bool,TV_INT>& outside_fluid_input,const ARRAY<bool,FA
     const_cast<COLLISION_AWARE_INDEX_MAP<TV>&>(index_map).number_extra_cells=cut_cells.Size();
 }
 //#####################################################################
+namespace PhysBAM{
 template class FLUID_TO_SOLID_INTERPOLATION_PHI<VECTOR<float,2> >;
 template class FLUID_TO_SOLID_INTERPOLATION_PHI<VECTOR<double,2> >;
+}

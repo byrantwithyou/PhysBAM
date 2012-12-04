@@ -354,5 +354,7 @@ Update_Vorticity()
         min_vorticity=min(min_vorticity,vorticity_magnitude);
         max_vorticity=max(max_vorticity,vorticity_magnitude);}
 }
+namespace PhysBAM{
 template class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<float,float>;
 template class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<double,double>;
+}

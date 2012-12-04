@@ -372,9 +372,11 @@ Initialize_World_Space_Masses()
         world_space_rigid_mass_inverse(p)=solid_body_collection.rigid_body_collection.State(p).World_Space_Rigid_Mass_Inverse(RIGID_BODY_MASS<TV>(solid_body_collection.rigid_body_collection.rigid_body_particle.mass(p),solid_body_collection.rigid_body_collection.rigid_body_particle.inertia_tensor(p)));}
 }
 //#####################################################################
+namespace PhysBAM{
 template class SOLIDS_EVOLUTION<VECTOR<float,1> >;
 template class SOLIDS_EVOLUTION<VECTOR<float,2> >;
 template class SOLIDS_EVOLUTION<VECTOR<float,3> >;
 template class SOLIDS_EVOLUTION<VECTOR<double,1> >;
 template class SOLIDS_EVOLUTION<VECTOR<double,2> >;
 template class SOLIDS_EVOLUTION<VECTOR<double,3> >;
+}

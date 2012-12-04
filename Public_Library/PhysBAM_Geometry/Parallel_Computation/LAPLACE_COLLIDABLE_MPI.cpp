@@ -126,11 +126,12 @@ Use_Parallel_Solve()
     static bool use_parallel_solve=true;
     return use_parallel_solve;
 }
-
 //#####################################################################
+namespace PhysBAM{
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<float,1> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<float,2> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<float,3> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<double,1> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<double,2> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<double,3> > >;
+}

@@ -32,9 +32,11 @@ Advection_Solver(const int m_start,const int m_end,const T dx,const ARRAY<T2,VEC
         u_Zx(i)=u(i)*ENO(dx,D1(i-1),D2(i-2),D2(i-1),D3(i-3),D3(i-2),D3(i-1));else u_Zx(i)=u(i)*ENO(dx,D1(i),-D2(i),-D2(i-1),D3(i),D3(i-1),D3(i-2));}
 }
 //#####################################################################
+namespace PhysBAM{
 template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<float,1> >,float>;
 template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<float,2> >,float>;
 template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<float,3> >,float>;
 template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<double,1> >,double>;
 template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<double,2> >,double>;
 template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<double,3> >,double>;
+}

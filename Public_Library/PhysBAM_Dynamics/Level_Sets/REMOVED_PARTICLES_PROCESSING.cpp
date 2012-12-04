@@ -97,5 +97,7 @@ Get_Ellipsoid(const int p) const
     covariance.radii=DIAGONAL_MATRIX<T,3>(clamped_radius,clamped_radius,(T).5*radius);return covariance;}
 }
 //#####################################################################
+namespace PhysBAM{
 template class REMOVED_PARTICLES_PROCESSING<float>;
 template class REMOVED_PARTICLES_PROCESSING<double>;
+}

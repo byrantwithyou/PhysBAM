@@ -29,9 +29,11 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
 {
     callbacks.Get_Source_Velocities(face_velocities,psi_N,time);
 }
+namespace PhysBAM{
 template class IMPLICIT_BOUNDARY_CONDITION_SOURCES<VECTOR<float,1> >;
 template class IMPLICIT_BOUNDARY_CONDITION_SOURCES<VECTOR<float,2> >;
 template class IMPLICIT_BOUNDARY_CONDITION_SOURCES<VECTOR<float,3> >;
 template class IMPLICIT_BOUNDARY_CONDITION_SOURCES<VECTOR<double,1> >;
 template class IMPLICIT_BOUNDARY_CONDITION_SOURCES<VECTOR<double,2> >;
 template class IMPLICIT_BOUNDARY_CONDITION_SOURCES<VECTOR<double,3> >;
+}

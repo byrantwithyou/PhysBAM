@@ -85,9 +85,11 @@ Create_BW_Stretch_Force(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& trian
     return sf;
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T) \
     template class BW_STRETCH_FORCES<VECTOR<T,3> >; \
-    template BW_STRETCH_FORCES<VECTOR<T,3> >* PhysBAM::Create_BW_Stretch_Force<VECTOR<T,3> >(DEFORMABLE_PARTICLES<VECTOR<T,3> >&,TRIANGLE_MESH&,const T,const T);
+    template BW_STRETCH_FORCES<VECTOR<T,3> >* Create_BW_Stretch_Force<VECTOR<T,3> >(DEFORMABLE_PARTICLES<VECTOR<T,3> >&,TRIANGLE_MESH&,const T,const T);
 
 INSTANTIATION_HELPER(float)
 INSTANTIATION_HELPER(double)
+}

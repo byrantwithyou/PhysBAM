@@ -366,6 +366,7 @@ Adjust_Particle_For_Objects(TV& X,TV& V,const T r, const T collision_distance,co
     return true;
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T_GRID) \
     template class PARTICLE_LEVELSET<T_GRID >; \
     template PARTICLE_LEVELSET_PARTICLES<T_GRID::VECTOR_T>* PARTICLE_LEVELSET<T_GRID >::Allocate_Particle<PARTICLE_LEVELSET_PARTICLES<T_GRID::VECTOR_T> >(); \
@@ -379,3 +380,4 @@ INSTANTIATION_HELPER(P(GRID<VECTOR<float,3> >));
 INSTANTIATION_HELPER(P(GRID<VECTOR<double,1> >));
 INSTANTIATION_HELPER(P(GRID<VECTOR<double,2> >));
 INSTANTIATION_HELPER(P(GRID<VECTOR<double,3> >));
+}

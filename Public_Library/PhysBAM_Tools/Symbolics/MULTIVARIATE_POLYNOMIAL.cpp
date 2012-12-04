@@ -351,15 +351,17 @@ operator<< (std::ostream& o, const MULTIVARIATE_POLYNOMIAL<TV>& p)
                     o<<'^'<<p.terms(i).power(j);}}
     return o<<")";
 }
+namespace PhysBAM{
 template struct MULTIVARIATE_POLYNOMIAL<VECTOR<float,1> >;
 template struct MULTIVARIATE_POLYNOMIAL<VECTOR<float,2> >;
 template struct MULTIVARIATE_POLYNOMIAL<VECTOR<float,3> >;
-template std::ostream& PhysBAM::operator<< <VECTOR<float,1> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<float,1> > const&);
-template std::ostream& PhysBAM::operator<< <VECTOR<float,2> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<float,2> > const&);
-template std::ostream& PhysBAM::operator<< <VECTOR<float,3> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<float,3> > const&);
+template std::ostream& operator<< <VECTOR<float,1> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<float,1> > const&);
+template std::ostream& operator<< <VECTOR<float,2> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<float,2> > const&);
+template std::ostream& operator<< <VECTOR<float,3> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<float,3> > const&);
 template struct MULTIVARIATE_POLYNOMIAL<VECTOR<double,1> >;
 template struct MULTIVARIATE_POLYNOMIAL<VECTOR<double,2> >;
 template struct MULTIVARIATE_POLYNOMIAL<VECTOR<double,3> >;
-template std::ostream& PhysBAM::operator<< <VECTOR<double,1> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<double,1> > const&);
-template std::ostream& PhysBAM::operator<< <VECTOR<double,2> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<double,2> > const&);
-template std::ostream& PhysBAM::operator<< <VECTOR<double,3> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<double,3> > const&);
+template std::ostream& operator<< <VECTOR<double,1> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<double,1> > const&);
+template std::ostream& operator<< <VECTOR<double,2> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<double,2> > const&);
+template std::ostream& operator<< <VECTOR<double,3> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<double,3> > const&);
+}

@@ -66,5 +66,7 @@ Update()
             opengl_segmented_curve_2d=new OPENGL_SEGMENTED_CURVE_2D<T>(*dualcontour.Get_Segmented_Curve());}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_LEVELSET_2D<float>;
 template class OPENGL_LEVELSET_2D<double>;
+}

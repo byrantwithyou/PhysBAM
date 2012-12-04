@@ -75,7 +75,9 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const
 {
 }
 //#####################################################################
+namespace PhysBAM{
 template class ETHER_DRAG<GRID<VECTOR<float,2> > >;
 template class ETHER_DRAG<GRID<VECTOR<float,3> > >;
 template class ETHER_DRAG<GRID<VECTOR<double,2> > >;
 template class ETHER_DRAG<GRID<VECTOR<double,3> > >;
+}

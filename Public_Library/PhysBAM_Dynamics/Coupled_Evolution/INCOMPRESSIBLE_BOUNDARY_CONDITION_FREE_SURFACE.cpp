@@ -32,9 +32,11 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
             psi_D(iterator.Cell_Index())=true;
             p(iterator.Cell_Index())=0;}
 }
+namespace PhysBAM{
 template class INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE<VECTOR<float,1> >;
 template class INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE<VECTOR<float,2> >;
 template class INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE<VECTOR<float,3> >;
 template class INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE<VECTOR<double,1> >;
 template class INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE<VECTOR<double,2> >;
 template class INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE<VECTOR<double,3> >;
+}

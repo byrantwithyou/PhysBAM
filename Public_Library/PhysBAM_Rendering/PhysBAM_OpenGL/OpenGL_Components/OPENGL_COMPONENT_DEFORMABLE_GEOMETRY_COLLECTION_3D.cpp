@@ -664,5 +664,7 @@ Toggle_Differentiate_Inverted()
     for(int i=0;i<hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i)) hexahedralized_volume_objects(i)->Toggle_Differentiate_Inverted();
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<float,float>;
 template class OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<double,double>;
+}

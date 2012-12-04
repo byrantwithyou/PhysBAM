@@ -35,7 +35,9 @@ Apply_Boundary_Condition(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T
             TV_INT opposite_node=node;opposite_node[axis]=1;
             u(node)=u(opposite_node);}
 }
+namespace PhysBAM{
 template class BOUNDARY_UNIFORM_PERIODIC<GRID<VECTOR<float,2> >,float>;
 template class BOUNDARY_UNIFORM_PERIODIC<GRID<VECTOR<float,3> >,float>;
 template class BOUNDARY_UNIFORM_PERIODIC<GRID<VECTOR<double,2> >,double>;
 template class BOUNDARY_UNIFORM_PERIODIC<GRID<VECTOR<double,3> >,double>;
+}

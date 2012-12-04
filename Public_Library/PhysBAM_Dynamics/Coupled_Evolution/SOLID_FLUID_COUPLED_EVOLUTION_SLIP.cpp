@@ -687,9 +687,11 @@ Setup_Boundary_Condition_Collection()
     boundary_condition_collection.Add_Boundary_Condition(new EXAMPLE_BOUNDARY_CONDITION<TV>(fluids_parameters.callbacks));
 }
 //#####################################################################
+namespace PhysBAM{
 template class SOLID_FLUID_COUPLED_EVOLUTION_SLIP<VECTOR<float,1> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION_SLIP<VECTOR<float,2> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION_SLIP<VECTOR<float,3> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION_SLIP<VECTOR<double,1> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION_SLIP<VECTOR<double,2> >;
 template class SOLID_FLUID_COUPLED_EVOLUTION_SLIP<VECTOR<double,3> >;
+}

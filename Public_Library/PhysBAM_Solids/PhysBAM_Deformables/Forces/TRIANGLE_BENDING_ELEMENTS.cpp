@@ -257,5 +257,7 @@ Copy_Back_Save_Quantities(const ARRAY<int>& node_map_to_saved)
         (*sine_half_elastic_angle)(q)=(*sine_half_elastic_angle_save)(q_save);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class TRIANGLE_BENDING_ELEMENTS<float>;
 template class TRIANGLE_BENDING_ELEMENTS<double>;
+}

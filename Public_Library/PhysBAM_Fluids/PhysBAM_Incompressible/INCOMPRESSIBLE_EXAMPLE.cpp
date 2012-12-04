@@ -72,9 +72,11 @@ Read_Output_Files(const int frame)
     rigid_geometry_collection.Read(stream_type,output_directory,frame);
 }
 //#####################################################################
+namespace PhysBAM{
 template class INCOMPRESSIBLE_EXAMPLE<VECTOR<float,1> >;
 template class INCOMPRESSIBLE_EXAMPLE<VECTOR<float,2> >;
 template class INCOMPRESSIBLE_EXAMPLE<VECTOR<float,3> >;
 template class INCOMPRESSIBLE_EXAMPLE<VECTOR<double,1> >;
 template class INCOMPRESSIBLE_EXAMPLE<VECTOR<double,2> >;
 template class INCOMPRESSIBLE_EXAMPLE<VECTOR<double,3> >;
+}

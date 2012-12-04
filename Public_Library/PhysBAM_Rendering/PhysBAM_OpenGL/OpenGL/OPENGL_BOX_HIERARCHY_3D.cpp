@@ -56,5 +56,7 @@ Increment_Height()
     min_height++;max_height++;
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_BOX_HIERARCHY_3D<float>;
 template class OPENGL_BOX_HIERARCHY_3D<double>;
+}

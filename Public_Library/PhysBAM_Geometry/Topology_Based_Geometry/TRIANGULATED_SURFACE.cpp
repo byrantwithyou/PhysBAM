@@ -907,5 +907,7 @@ Print_Statistics(std::ostream& output,const T thickness_over_2)
     if(Check_For_Self_Intersection(thickness_over_2)) output<<"found self intersections"<<std::endl;else output<<"no self intersections"<<std::endl;
 }
 //#####################################################################
+namespace PhysBAM{
 template class TRIANGULATED_SURFACE<float>;
 template class TRIANGULATED_SURFACE<double>;
+}

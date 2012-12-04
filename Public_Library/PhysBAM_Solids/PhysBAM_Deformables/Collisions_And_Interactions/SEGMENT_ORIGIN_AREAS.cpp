@@ -618,10 +618,11 @@ template<class T,class TV> void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(VOL
     for(int i=0;i<4;i++) data.G[index[i]]=sign*tdata.G[i];
     for(int i=0;i<4;i++) for(int k=0;k<4;k++) data.H[index[i]][index[k]]=sign*tdata.H[i][k];
 }
-
-template void PhysBAM::ORIGIN_AREAS::Clear<float,3,6>(VOL_DATA<float,3,6>&);
-template void PhysBAM::ORIGIN_AREAS::Clear<float,2,4>(VOL_DATA<float,2,4>&);
-template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<float,VECTOR<float,2> >(VOL_DATA<float,2,4>&,VECTOR<float,2> const &,VECTOR<float,2> const (&)[4]);
-template void PhysBAM::ORIGIN_AREAS::Clear<double,3,6>(VOL_DATA<double,3,6>&);
-template void PhysBAM::ORIGIN_AREAS::Clear<double,2,4>(VOL_DATA<double,2,4>&);
-template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<double,VECTOR<double,2> >(VOL_DATA<double,2,4>&,VECTOR<double,2> const &,VECTOR<double,2> const (&)[4]);
+namespace PhysBAM{
+template void ORIGIN_AREAS::Clear<float,3,6>(VOL_DATA<float,3,6>&);
+template void ORIGIN_AREAS::Clear<float,2,4>(VOL_DATA<float,2,4>&);
+template void ORIGIN_AREAS::Volume_From_Simplices<float,VECTOR<float,2> >(VOL_DATA<float,2,4>&,VECTOR<float,2> const &,VECTOR<float,2> const (&)[4]);
+template void ORIGIN_AREAS::Clear<double,3,6>(VOL_DATA<double,3,6>&);
+template void ORIGIN_AREAS::Clear<double,2,4>(VOL_DATA<double,2,4>&);
+template void ORIGIN_AREAS::Volume_From_Simplices<double,VECTOR<double,2> >(VOL_DATA<double,2,4>&,VECTOR<double,2> const &,VECTOR<double,2> const (&)[4]);
+}

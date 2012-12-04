@@ -130,5 +130,7 @@ Compress_Expansion(ARRAY<T>& e)
   e.Exchange(h);
 }
 //#####################################################################
+namespace PhysBAM{
 template class EXPANSION_ARITHMETIC<float>;
 template class EXPANSION_ARITHMETIC<double>;
+}

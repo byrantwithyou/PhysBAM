@@ -187,6 +187,7 @@ Intersection_List(const int box,const IMPLICIT_OBJECT<TV>& implicit_object,const
         if(Leaf(current)) intersection_list.Append(current);else{int box1,box2;children(current-leaves).Get(box1,box2);traversal_stack.Push(box1);traversal_stack.Push(box2);}}
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template class BOX_HIERARCHY<VECTOR<T,d> >;
 
@@ -196,4 +197,5 @@ INSTANTIATION_HELPER(float,3)
 INSTANTIATION_HELPER(double,1)
 INSTANTIATION_HELPER(double,2)
 INSTANTIATION_HELPER(double,3)
+}
 

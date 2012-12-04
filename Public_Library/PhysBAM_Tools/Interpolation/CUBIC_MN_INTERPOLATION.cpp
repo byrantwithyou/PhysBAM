@@ -59,8 +59,9 @@ Cubic_MN_Weights(const T alpha) const
     for(int i=0;i<weights.m;i++) weights(i)=max((T)0.,min((T)1.,weights(i)));
     return weights;
 }
-
+namespace PhysBAM{
 template class CUBIC_MN_INTERPOLATION<float,float>;
 template class CUBIC_MN_INTERPOLATION<float,VECTOR<float,3> >;
 template class CUBIC_MN_INTERPOLATION<double,double>;
 template class CUBIC_MN_INTERPOLATION<double,VECTOR<double,3> >;
+}

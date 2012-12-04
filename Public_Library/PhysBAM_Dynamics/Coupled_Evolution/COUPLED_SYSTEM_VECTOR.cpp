@@ -163,9 +163,11 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     viscous_force_coefficients.Resize(cs.viscous_force_coefficients.m);
 }
 //#####################################################################
+namespace PhysBAM{
 template class COUPLED_SYSTEM_VECTOR<VECTOR<float,1> >;
 template class COUPLED_SYSTEM_VECTOR<VECTOR<float,2> >;
 template class COUPLED_SYSTEM_VECTOR<VECTOR<float,3> >;
 template class COUPLED_SYSTEM_VECTOR<VECTOR<double,1> >;
 template class COUPLED_SYSTEM_VECTOR<VECTOR<double,2> >;
 template class COUPLED_SYSTEM_VECTOR<VECTOR<double,3> >;
+}

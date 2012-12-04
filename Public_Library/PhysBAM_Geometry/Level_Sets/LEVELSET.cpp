@@ -377,9 +377,11 @@ Principal_Curvatures(const TV& X) const
     T grad_phi_magnitude=N.Normalize();
     return Principal_Curvatures_Helper(N,grad_phi_magnitude,Hessian(X));
 }
+namespace PhysBAM{
 template class LEVELSET<VECTOR<float,1> >;
 template class LEVELSET<VECTOR<float,2> >;
 template class LEVELSET<VECTOR<float,3> >;
 template class LEVELSET<VECTOR<double,1> >;
 template class LEVELSET<VECTOR<double,2> >;
 template class LEVELSET<VECTOR<double,3> >;
+}

@@ -77,9 +77,11 @@ Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constra
     Constraint_Matrix_Helper(parent_frame.r*F_pj().r,constrained_matrix,unconstrained_matrix,constrain);
 }
 //#####################################################################
+namespace PhysBAM{
 template class NORMAL_JOINT<VECTOR<float,1> >;
 template class NORMAL_JOINT<VECTOR<float,2> >;
 template class NORMAL_JOINT<VECTOR<float,3> >;
 template class NORMAL_JOINT<VECTOR<double,1> >;
 template class NORMAL_JOINT<VECTOR<double,2> >;
 template class NORMAL_JOINT<VECTOR<double,3> >;
+}

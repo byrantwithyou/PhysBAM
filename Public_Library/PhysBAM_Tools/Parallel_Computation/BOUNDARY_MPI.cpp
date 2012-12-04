@@ -80,6 +80,7 @@ Apply_Boundary_Condition_Face(const T_GRID& grid,T_FACE_ARRAYS_T2& u,const T tim
     boundary.Apply_Boundary_Condition_Face(grid,u,time);
     mpi_grid->Average_Common_Face_Data(u);
 }
+namespace PhysBAM{
 template class BOUNDARY_MPI<GRID<VECTOR<float,1> >,VECTOR<float,1> >;
 template class BOUNDARY_MPI<GRID<VECTOR<float,1> >,VECTOR<float,3> >;
 template class BOUNDARY_MPI<GRID<VECTOR<float,1> >,float>;
@@ -104,3 +105,4 @@ template class BOUNDARY_MPI<GRID<VECTOR<double,3> >,double>;
 template class BOUNDARY_MPI<GRID<VECTOR<double,1> >,SYMMETRIC_MATRIX<double,1> >;
 template class BOUNDARY_MPI<GRID<VECTOR<double,2> >,SYMMETRIC_MATRIX<double,2> >;
 template class BOUNDARY_MPI<GRID<VECTOR<double,3> >,SYMMETRIC_MATRIX<double,3> >;
+}

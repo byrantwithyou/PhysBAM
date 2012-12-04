@@ -116,5 +116,7 @@ Toggle_Arrowhead_Mode()
     else{draw_fancy_arrow=false;draw_arrowhead=true;}
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_VECTOR_FIELD_3D<float>;
 template class OPENGL_VECTOR_FIELD_3D<double>;
+}

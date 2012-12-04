@@ -666,5 +666,7 @@ Bounding_Box() const
     return object->World_Space_Box(RANGE<VECTOR<float,3> >(RANGE<VECTOR<T,3> >::Bounding_Box(volume.particles->X.Subset(volume.mesh->elements(index)))));
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_TETRAHEDRALIZED_VOLUME<float>;
 template class OPENGL_TETRAHEDRALIZED_VOLUME<double>;
+}

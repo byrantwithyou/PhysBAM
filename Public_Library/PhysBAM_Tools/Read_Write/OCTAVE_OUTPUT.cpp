@@ -384,6 +384,7 @@ Write_Entry(const VECTOR<T2,d>& x)
     x.Write_Raw(out);
     out<<"\n";
 }
+namespace PhysBAM{
 template class OCTAVE_OUTPUT<float>;
 template void OCTAVE_OUTPUT<float>::Append_Sparse_Column<float,ARRAY_VIEW<float const,int> >(ARRAY_BASE<float,ARRAY_VIEW<float const,int>,int> const&);
 template void OCTAVE_OUTPUT<float>::Append_Sparse_Column<float,ARRAY_VIEW<float,int> >(ARRAY_BASE<float,ARRAY_VIEW<float,int>,int> const&);
@@ -419,3 +420,4 @@ template void OCTAVE_OUTPUT<double>::Write<double,ARRAY<double> >(char const*,AR
 template void OCTAVE_OUTPUT<double>::Write<int,ARRAY_VIEW<int const,int> >(char const*,ARRAY_BASE<int,ARRAY_VIEW<int const,int>,int> const&,int);
 template void OCTAVE_OUTPUT<double>::Write<double,ARRAY_VIEW<double,int> >(char const*,ARRAY_BASE<double,ARRAY_VIEW<double,int>,int> const&,int);
 template void OCTAVE_OUTPUT<double>::Write<double>(char const*,ARRAY<double,VECTOR<int,2> > const&);
+}

@@ -36,9 +36,11 @@ Add_Hypothetical_Nodes_To_Embedded_Object(EMBEDDED_OBJECT<TV,d>& embedded_object
         hypothetical_nodes(n).index_in_embedded_particles=embedded_object.Add_Embedded_Particle_If_Not_Already_There(hypothetical_nodes(n).parents,hypothetical_nodes(n).interpolation_fraction);
 }
 //#####################################################################
+namespace PhysBAM{
 template class HYPOTHETICAL_CUT<VECTOR<float,2>,2>;
 template class HYPOTHETICAL_CUT<VECTOR<float,3>,2>;
 template class HYPOTHETICAL_CUT<VECTOR<float,3>,3>;
 template class HYPOTHETICAL_CUT<VECTOR<double,2>,2>;
 template class HYPOTHETICAL_CUT<VECTOR<double,3>,2>;
 template class HYPOTHETICAL_CUT<VECTOR<double,3>,3>;
+}

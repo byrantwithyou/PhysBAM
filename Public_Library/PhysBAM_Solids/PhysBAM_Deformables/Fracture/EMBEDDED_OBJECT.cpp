@@ -341,9 +341,11 @@ Write(TYPED_OSTREAM& output) const
     Write_Binary(output,interpolation_fraction_threshold,orientation_index);
 }
 //#####################################################################
+namespace PhysBAM{
 template class EMBEDDED_OBJECT<VECTOR<float,2>,2>;
 template class EMBEDDED_OBJECT<VECTOR<float,3>,2>;
 template class EMBEDDED_OBJECT<VECTOR<float,3>,3>;
 template class EMBEDDED_OBJECT<VECTOR<double,2>,2>;
 template class EMBEDDED_OBJECT<VECTOR<double,3>,2>;
 template class EMBEDDED_OBJECT<VECTOR<double,3>,3>;
+}

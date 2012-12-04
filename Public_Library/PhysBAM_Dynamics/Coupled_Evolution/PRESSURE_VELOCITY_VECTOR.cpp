@@ -133,9 +133,11 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     pressure.Resize(pv.pressure.m);
     for(int i=0;i<pressure.m;i++) pressure(i).Resize(pv.pressure(i).Size());
 }
+namespace PhysBAM{
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<float,1> >;
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<float,2> >;
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<float,3> >;
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<double,1> >;
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<double,2> >;
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<double,3> >;
+}

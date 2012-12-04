@@ -19,5 +19,7 @@ Flux(const int m,const ARRAY<VECTOR<T,2> ,VECTOR<int,1> >& U,ARRAY<VECTOR<T,2> ,
         F(i)(1)=(T).5*sqr(U(i)(1))+gravity*eta_ghost(slice_index.x,i);} // .5*v^2+g*eta
 }
 //#####################################################################
+namespace PhysBAM{
 template class SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_G<float>;
 template class SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_G<double>;
+}

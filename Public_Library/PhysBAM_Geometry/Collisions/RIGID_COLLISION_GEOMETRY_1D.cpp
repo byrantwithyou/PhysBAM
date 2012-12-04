@@ -115,5 +115,7 @@ template<class T> void RIGID_COLLISION_GEOMETRY<VECTOR<T,1> >::
 Update_Intersection_Acceleration_Structures(const bool use_swept_triangle_hierarchy,const int state1,const int state2)
 {}
 //##################################################################### 
+namespace PhysBAM{
 template class RIGID_COLLISION_GEOMETRY<VECTOR<float,1> >;
 template class RIGID_COLLISION_GEOMETRY<VECTOR<double,1> >;
+}

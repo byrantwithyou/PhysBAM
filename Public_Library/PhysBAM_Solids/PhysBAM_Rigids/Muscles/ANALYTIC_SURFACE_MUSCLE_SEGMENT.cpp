@@ -249,5 +249,7 @@ Static_Name()
     return "analytic_surface_muscle_segment";
 }
 //#####################################################################
+namespace PhysBAM{
 template class ANALYTIC_SURFACE_MUSCLE_SEGMENT<float>;
 template class ANALYTIC_SURFACE_MUSCLE_SEGMENT<double>;
+}

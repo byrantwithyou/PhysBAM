@@ -173,5 +173,7 @@ Clear_Highlight()
     for(int i=0;i<embedded_curve_objects.m;i++)if(embedded_curve_objects(i))embedded_curve_objects(i)->Clear_Highlight();
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<float,float>;
 template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<double,double>;
+}

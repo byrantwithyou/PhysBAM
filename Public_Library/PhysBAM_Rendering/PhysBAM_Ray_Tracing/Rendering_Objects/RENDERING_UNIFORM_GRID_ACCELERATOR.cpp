@@ -44,5 +44,7 @@ Intersection(RAY<VECTOR<T,3> >& ray,const int lowest_priority,const RENDERING_OB
     return intersect_value;
 }
 //#####################################################################
+namespace PhysBAM{
 template class RENDERING_UNIFORM_GRID_ACCELERATOR<float>;
 template class RENDERING_UNIFORM_GRID_ACCELERATOR<double>;
+}

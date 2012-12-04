@@ -211,5 +211,7 @@ Dump_Curvatures() const
     if(n) LOG::cout<<"cstats "<<mn<<"   "<<mx<<std::endl;
     if(coefficients.m) LOG::cout<<"length estimates  "<<coefficients.Max()/coefficients.Min()<<std::endl;
 }
+namespace PhysBAM{
 template class SURFACE_TENSION_FORCE<VECTOR<float,2> >;
 template class SURFACE_TENSION_FORCE<VECTOR<double,2> >;
+}

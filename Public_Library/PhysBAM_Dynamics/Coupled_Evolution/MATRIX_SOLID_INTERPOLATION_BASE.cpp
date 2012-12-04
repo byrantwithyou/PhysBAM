@@ -101,9 +101,11 @@ Store_Maps(const GENERALIZED_VELOCITY<TV>& G)
     V_indices=&G.V.indices;
 }
 //#####################################################################
+namespace PhysBAM{
 template class MATRIX_SOLID_INTERPOLATION_BASE<VECTOR<float,1> >;
 template class MATRIX_SOLID_INTERPOLATION_BASE<VECTOR<float,2> >;
 template class MATRIX_SOLID_INTERPOLATION_BASE<VECTOR<float,3> >;
 template class MATRIX_SOLID_INTERPOLATION_BASE<VECTOR<double,1> >;
 template class MATRIX_SOLID_INTERPOLATION_BASE<VECTOR<double,2> >;
 template class MATRIX_SOLID_INTERPOLATION_BASE<VECTOR<double,3> >;
+}

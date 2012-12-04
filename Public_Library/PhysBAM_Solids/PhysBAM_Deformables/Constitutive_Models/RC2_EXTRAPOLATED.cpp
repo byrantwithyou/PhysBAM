@@ -540,7 +540,9 @@ Test_Model() const
         IT(u);
     }
 }
+namespace PhysBAM{
 template class RC2_EXTRAPOLATED<float,2>;
 template class RC2_EXTRAPOLATED<float,3>;
 template class RC2_EXTRAPOLATED<double,2>;
 template class RC2_EXTRAPOLATED<double,3>;
+}

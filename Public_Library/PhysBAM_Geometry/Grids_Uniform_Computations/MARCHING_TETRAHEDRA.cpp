@@ -98,7 +98,9 @@ Fill_Faces(ARRAY<T_FACE>& faces,const unsigned short* face_encoding,const TV* pt
             face.X(j)=pts[(face_encoding[i]>>4*j)&15];
         faces.Append(face);}
 }
+namespace PhysBAM{
 template class MARCHING_TETRAHEDRA<VECTOR<float,2> >;
 template class MARCHING_TETRAHEDRA<VECTOR<float,3> >;
 template class MARCHING_TETRAHEDRA<VECTOR<double,2> >;
 template class MARCHING_TETRAHEDRA<VECTOR<double,3> >;
+}

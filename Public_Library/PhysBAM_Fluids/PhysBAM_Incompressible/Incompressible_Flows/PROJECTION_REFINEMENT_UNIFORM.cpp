@@ -278,9 +278,11 @@ Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T ti
     Map_Coarse_To_Fine(coarse_face_velocities,face_velocities,dt,time);
 }
 //#####################################################################
+namespace PhysBAM{
 template class PROJECTION_REFINEMENT_UNIFORM<GRID<VECTOR<float,1> > >;
 template class PROJECTION_REFINEMENT_UNIFORM<GRID<VECTOR<float,2> > >;
 template class PROJECTION_REFINEMENT_UNIFORM<GRID<VECTOR<float,3> > >;
 template class PROJECTION_REFINEMENT_UNIFORM<GRID<VECTOR<double,1> > >;
 template class PROJECTION_REFINEMENT_UNIFORM<GRID<VECTOR<double,2> > >;
 template class PROJECTION_REFINEMENT_UNIFORM<GRID<VECTOR<double,3> > >;
+}

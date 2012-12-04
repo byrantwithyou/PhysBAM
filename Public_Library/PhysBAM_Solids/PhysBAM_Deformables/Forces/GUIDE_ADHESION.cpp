@@ -205,5 +205,7 @@ Write_State(STREAM_TYPE stream_type,const std::string& filename)
     FILE_UTILITIES::Write_To_File(stream_type,filename,*springs);
 }
 //#####################################################################
+namespace PhysBAM{
 template class GUIDE_ADHESION<VECTOR<float,3> >;
 template class GUIDE_ADHESION<VECTOR<double,3> >;
+}

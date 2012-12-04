@@ -189,5 +189,7 @@ Slice_Has_Changed()
 {
     opengl_density_valid_mask.Slice_Has_Changed();
 }
+namespace PhysBAM{
 template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<float,float>;
 template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<double,double>;
+}

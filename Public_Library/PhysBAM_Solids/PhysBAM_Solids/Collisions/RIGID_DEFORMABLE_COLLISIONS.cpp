@@ -1144,9 +1144,11 @@ Process_Push_Out()
     solid_body_collection.deformable_body_collection.soft_bindings.Clamp_Particles_To_Embedded_Velocities(true);
 }
 //#####################################################################
+namespace PhysBAM{
 template class RIGID_DEFORMABLE_COLLISIONS<VECTOR<float,1> >;
 template class RIGID_DEFORMABLE_COLLISIONS<VECTOR<float,2> >;
 template class RIGID_DEFORMABLE_COLLISIONS<VECTOR<float,3> >;
 template class RIGID_DEFORMABLE_COLLISIONS<VECTOR<double,1> >;
 template class RIGID_DEFORMABLE_COLLISIONS<VECTOR<double,2> >;
 template class RIGID_DEFORMABLE_COLLISIONS<VECTOR<double,3> >;
+}

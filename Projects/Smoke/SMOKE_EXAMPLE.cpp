@@ -101,9 +101,11 @@ Read_Output_Files(const int frame)
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,projection.p);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class SMOKE_EXAMPLE<VECTOR<float,1> >;
 template class SMOKE_EXAMPLE<VECTOR<float,2> >;
 template class SMOKE_EXAMPLE<VECTOR<float,3> >;
 template class SMOKE_EXAMPLE<VECTOR<double,1> >;
 template class SMOKE_EXAMPLE<VECTOR<double,2> >;
 template class SMOKE_EXAMPLE<VECTOR<double,3> >;
+}

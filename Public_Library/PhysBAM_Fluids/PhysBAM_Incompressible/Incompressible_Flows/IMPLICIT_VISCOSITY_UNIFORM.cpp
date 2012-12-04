@@ -165,9 +165,11 @@ Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities)
                 if(a || b) psi_R(other_axis,face_index)=(T).5*(a+b);}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class IMPLICIT_VISCOSITY_UNIFORM<GRID<VECTOR<float,1> > >;
 template class IMPLICIT_VISCOSITY_UNIFORM<GRID<VECTOR<float,2> > >;
 template class IMPLICIT_VISCOSITY_UNIFORM<GRID<VECTOR<float,3> > >;
 template class IMPLICIT_VISCOSITY_UNIFORM<GRID<VECTOR<double,1> > >;
 template class IMPLICIT_VISCOSITY_UNIFORM<GRID<VECTOR<double,2> > >;
 template class IMPLICIT_VISCOSITY_UNIFORM<GRID<VECTOR<double,3> > >;
+}

@@ -82,7 +82,9 @@ Bounding_Box() const
     return box;
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_SCALAR_FIELD_1D<float,float>;
 template class OPENGL_SCALAR_FIELD_1D<float,bool>;
 template class OPENGL_SCALAR_FIELD_1D<double,double>;
 template class OPENGL_SCALAR_FIELD_1D<double,bool>;
+}

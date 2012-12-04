@@ -209,5 +209,7 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,ARRAY<T
     LOG::cout << "QP finished in " << iteration << " iterations" << std::endl;
 }
 //####################################################################################
+namespace PhysBAM{
 template class QUADRATIC_PROGRAMMING<float>;
 template class QUADRATIC_PROGRAMMING<double>;
+}

@@ -87,5 +87,7 @@ Reinitialize(const bool force_even_if_not_drawn)
     }
 }
 
+namespace PhysBAM{
 template class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<float,float>;
 template class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<double,double>;
+}

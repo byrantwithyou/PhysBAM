@@ -101,9 +101,11 @@ Write_Output_Files(const int frame) const
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",euler.euler_projection.elliptic_solver->psi_N);
 }
 //#####################################################################
+namespace PhysBAM{
 template class COMPRESSIBLE_EXAMPLE<VECTOR<float,1> >;
 template class COMPRESSIBLE_EXAMPLE<VECTOR<float,2> >;
 template class COMPRESSIBLE_EXAMPLE<VECTOR<float,3> >;
 template class COMPRESSIBLE_EXAMPLE<VECTOR<double,1> >;
 template class COMPRESSIBLE_EXAMPLE<VECTOR<double,2> >;
 template class COMPRESSIBLE_EXAMPLE<VECTOR<double,3> >;
+}

@@ -86,5 +86,7 @@ Run_X_Range(const int xmin,const int xmax)
         }
 }
 //#####################################################################
+namespace PhysBAM{
 template class Initialize_Interior_Bitmaps_And_Diagonal_Entries_Helper<float>;
 template class Initialize_Interior_Bitmaps_And_Diagonal_Entries_Helper<double>;
+}

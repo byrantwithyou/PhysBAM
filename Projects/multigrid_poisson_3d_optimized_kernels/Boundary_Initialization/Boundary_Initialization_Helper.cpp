@@ -211,5 +211,7 @@ Run_X_Range(const int xmin,const int xmax)
         }
 }
 //#####################################################################
+namespace PhysBAM{
 template class Boundary_Initialization_Helper<void>;
+}
 

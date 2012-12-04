@@ -48,9 +48,12 @@ Initialize_Grids()
     incompressible_fluid_collection.Initialize_Grids();
 }
 //#####################################################################
+namespace PhysBAM{
 template class FLUID_COLLECTION<VECTOR<float,1> >;
 template class FLUID_COLLECTION<VECTOR<float,2> >;
 template class FLUID_COLLECTION<VECTOR<float,3> >;
 template class FLUID_COLLECTION<VECTOR<double,1> >;
 template class FLUID_COLLECTION<VECTOR<double,2> >;
 template class FLUID_COLLECTION<VECTOR<double,3> >;
+}
+

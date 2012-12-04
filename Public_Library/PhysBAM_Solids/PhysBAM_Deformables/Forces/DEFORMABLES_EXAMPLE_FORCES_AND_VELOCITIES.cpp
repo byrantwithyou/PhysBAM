@@ -62,9 +62,11 @@ Set_Deformable_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated)
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 //#####################################################################
+namespace PhysBAM{
 template class DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<float,1> >;
 template class DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<float,2> >;
 template class DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<float,3> >;
 template class DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<double,1> >;
 template class DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<double,2> >;
 template class DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<double,3> >;
+}

@@ -346,5 +346,7 @@ Bounding_Box() const
     return RANGE<VECTOR<float,3> >::Centered_Box();
 }
 
+namespace PhysBAM{
 template class OPENGL_COMPONENT_HEIGHTFIELD_2D<float,float>;
 template class OPENGL_COMPONENT_HEIGHTFIELD_2D<double,double>;
+}

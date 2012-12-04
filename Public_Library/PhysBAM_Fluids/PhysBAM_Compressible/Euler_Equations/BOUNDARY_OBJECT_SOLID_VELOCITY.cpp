@@ -28,9 +28,11 @@ Apply_Neumann_Boundary_Condition(T_ARRAYS_ELEMENT& u_1d,const TV& object_velocit
         u_1d=EULER<T_GRID>::Get_Euler_State_From_rho_velocity_And_internal_energy(rho,object_velocity,internal_energy);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class BOUNDARY_OBJECT_SOLID_VELOCITY<GRID<VECTOR<float,1> > >;
 template class BOUNDARY_OBJECT_SOLID_VELOCITY<GRID<VECTOR<float,2> > >;
 template class BOUNDARY_OBJECT_SOLID_VELOCITY<GRID<VECTOR<float,3> > >;
 template class BOUNDARY_OBJECT_SOLID_VELOCITY<GRID<VECTOR<double,1> > >;
 template class BOUNDARY_OBJECT_SOLID_VELOCITY<GRID<VECTOR<double,2> > >;
 template class BOUNDARY_OBJECT_SOLID_VELOCITY<GRID<VECTOR<double,3> > >;
+}

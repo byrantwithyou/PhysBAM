@@ -224,9 +224,11 @@ Log_Parameters() const
     LOG::cout<<"compressible_apply_isobaric_fix="<<compressible_apply_isobaric_fix<<std::endl;
 }
 //#####################################################################
+namespace PhysBAM{
 template class FLUIDS_PARAMETERS<GRID<VECTOR<float,1> > >;
 template class FLUIDS_PARAMETERS<GRID<VECTOR<float,2> > >;
 template class FLUIDS_PARAMETERS<GRID<VECTOR<float,3> > >;
 template class FLUIDS_PARAMETERS<GRID<VECTOR<double,1> > >;
 template class FLUIDS_PARAMETERS<GRID<VECTOR<double,2> > >;
 template class FLUIDS_PARAMETERS<GRID<VECTOR<double,3> > >;
+}

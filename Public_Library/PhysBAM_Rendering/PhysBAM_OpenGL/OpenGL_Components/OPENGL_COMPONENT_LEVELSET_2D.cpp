@@ -181,6 +181,7 @@ Toggle_Draw_Ghost_Values()
 {
     for(int j=0;j<opengl_levelsets.m;j++) opengl_levelsets(j)->Toggle_Draw_Ghost_Values();
 }
-
+namespace PhysBAM{
 template class OPENGL_COMPONENT_LEVELSET_2D<float,float>;
 template class OPENGL_COMPONENT_LEVELSET_2D<double,double>;
+}

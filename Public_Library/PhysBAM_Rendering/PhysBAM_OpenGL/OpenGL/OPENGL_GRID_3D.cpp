@@ -408,5 +408,7 @@ Toggle_Draw_Ghost_Values()
 {
     draw_ghost_values=!draw_ghost_values;
 }
+namespace PhysBAM{
 template class OPENGL_GRID_3D<float>;
 template class OPENGL_GRID_3D<double>;
+}

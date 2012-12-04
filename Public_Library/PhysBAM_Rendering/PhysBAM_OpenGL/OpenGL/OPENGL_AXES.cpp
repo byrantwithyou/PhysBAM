@@ -72,5 +72,7 @@ Bounding_Box() const
     return World_Space_Box(RANGE<VECTOR<float,3> >(box));
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_AXES<float>;
 template class OPENGL_AXES<double>;
+}

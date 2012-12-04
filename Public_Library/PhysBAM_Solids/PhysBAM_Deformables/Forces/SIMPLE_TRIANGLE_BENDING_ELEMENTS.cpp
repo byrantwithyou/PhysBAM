@@ -194,9 +194,11 @@ Create_Simple_Bending_Elements(TRIANGULATED_SURFACE<T>& triangulated_surface,BIN
         plastic_yield,plastic_hardening,cutoff_fraction_of_minimum_area,cutoff_fraction_of_triangles,verbose,implicit);
 }
 //#####################################################################
+namespace PhysBAM{
 template class SIMPLE_TRIANGLE_BENDING_ELEMENTS<float>;
-template SIMPLE_TRIANGLE_BENDING_ELEMENTS<float>* PhysBAM::Create_Simple_Bending_Elements<float>(TRIANGULATED_SURFACE<float>&,BINDING_LIST<VECTOR<float,3> >&,float,float,bool,float,bool,
+template SIMPLE_TRIANGLE_BENDING_ELEMENTS<float>* Create_Simple_Bending_Elements<float>(TRIANGULATED_SURFACE<float>&,BINDING_LIST<VECTOR<float,3> >&,float,float,bool,float,bool,
     float,float,float,float,bool,bool);
 template class SIMPLE_TRIANGLE_BENDING_ELEMENTS<double>;
-template SIMPLE_TRIANGLE_BENDING_ELEMENTS<double>* PhysBAM::Create_Simple_Bending_Elements<double>(TRIANGULATED_SURFACE<double>&,BINDING_LIST<VECTOR<double,3> >&,double,double,bool,double,bool,
+template SIMPLE_TRIANGLE_BENDING_ELEMENTS<double>* Create_Simple_Bending_Elements<double>(TRIANGULATED_SURFACE<double>&,BINDING_LIST<VECTOR<double,3> >&,double,double,bool,double,bool,
     double,double,double,double,bool,bool);
+}

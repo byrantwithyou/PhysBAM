@@ -205,6 +205,7 @@ Intersection(const int box,RAY<VECTOR<T,3> >& ray,const T thickness,const T thic
     return check1 || check2;
 }
 //#####################################################################
+namespace PhysBAM{
 template class TRIANGLE_HIERARCHY<float>;
 template void TRIANGLE_HIERARCHY<float>::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >&,ARRAY_VIEW<const TV>);
 template void TRIANGLE_HIERARCHY<float>::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >&,INDIRECT_ARRAY<ARRAY_VIEW<const TV> >);
@@ -215,3 +216,4 @@ template void TRIANGLE_HIERARCHY<double>::Calculate_Bounding_Boxes_Helper(ARRAY<
 template void TRIANGLE_HIERARCHY<double>::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >&,INDIRECT_ARRAY<ARRAY_VIEW<const TV> >);
 template void TRIANGLE_HIERARCHY<double>::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >&,ARRAY_VIEW<const TV>,ARRAY_VIEW<const TV>);
 template void TRIANGLE_HIERARCHY<double>::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >&,INDIRECT_ARRAY<ARRAY_VIEW<const TV> >,INDIRECT_ARRAY<ARRAY_VIEW<const TV> >);
+}

@@ -105,5 +105,7 @@ Toggle_Arrowhead()
 {
     opengl_grid_based_vector_field.draw_arrowhead = !opengl_grid_based_vector_field.draw_arrowhead;
 }
+namespace PhysBAM{
 template class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<float,float>;
 template class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<double,double>;
+}

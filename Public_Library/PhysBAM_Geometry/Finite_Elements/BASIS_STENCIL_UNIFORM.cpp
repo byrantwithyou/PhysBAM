@@ -160,6 +160,7 @@ Overlap_Padding(const BASIS_STENCIL_UNIFORM<TV,d1>& s1) const
                 padding=max((s1.diced(l).index_offset-diced(k).index_offset).Max_Abs(),padding);
     return padding;
 }
+namespace PhysBAM{
 template struct BASIS_STENCIL_UNIFORM<VECTOR<float,1>,0>;
 template struct BASIS_STENCIL_UNIFORM<VECTOR<float,1>,1>;
 template int BASIS_STENCIL_UNIFORM<VECTOR<float,1>,0>::Overlap_Padding<0>(BASIS_STENCIL_UNIFORM<VECTOR<float,1>,0> const&) const;
@@ -196,3 +197,4 @@ template int BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0>::Overlap_Padding<0>(BASIS
 template int BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0>::Overlap_Padding<1>(BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&) const;
 template int BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1>::Overlap_Padding<0>(BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0> const&) const;
 template int BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1>::Overlap_Padding<1>(BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&) const;
+}

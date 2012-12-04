@@ -44,5 +44,7 @@ Bounding_Box() const
     return RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.Append(0)),VECTOR<float,3>(grid.domain.max_corner.Append(0)));
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_SYMMETRIC_MATRIX_FIELD_2D<float>;
 template class OPENGL_SYMMETRIC_MATRIX_FIELD_2D<double>;
+}

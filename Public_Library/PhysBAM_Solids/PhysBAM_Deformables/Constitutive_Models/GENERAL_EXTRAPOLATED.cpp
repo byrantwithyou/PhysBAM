@@ -317,7 +317,9 @@ P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T>
     T sa=sqrt(constant_alpha/TV::dimension+dd*dd)-dd;
     return sb*strain_rate+sa*strain_rate.Trace();
 }
+namespace PhysBAM{
 template class GENERAL_EXTRAPOLATED<float,2>;
 template class GENERAL_EXTRAPOLATED<float,3>;
 template class GENERAL_EXTRAPOLATED<double,2>;
 template class GENERAL_EXTRAPOLATED<double,3>;
+}

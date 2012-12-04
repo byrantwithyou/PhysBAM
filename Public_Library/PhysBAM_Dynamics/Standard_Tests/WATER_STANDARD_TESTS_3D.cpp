@@ -485,5 +485,7 @@ Analytic_Velocity(const T time,const TV& location) const
     return TV();
 }
 //#####################################################################
+namespace PhysBAM{
 template class WATER_STANDARD_TESTS_3D<GRID<VECTOR<float,3> > >;
 template class WATER_STANDARD_TESTS_3D<GRID<VECTOR<double,3> > >;
+}

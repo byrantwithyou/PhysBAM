@@ -145,9 +145,11 @@ Add_Diagonal(ARRAY<T,COUPLING_CONSTRAINT_ID>& diagonal,const GENERALIZED_FLUID_M
         for(int j=0;j<4;j++) diag+=fluid_mass.one_over_fluid_mass_at_faces(e(j).x)*sqr(e(j).y);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<VECTOR<float,1> >;
 template class MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<VECTOR<float,2> >;
 template class MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<VECTOR<float,3> >;
 template class MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<VECTOR<double,1> >;
 template class MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<VECTOR<double,2> >;
 template class MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<VECTOR<double,3> >;
+}

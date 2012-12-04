@@ -122,5 +122,7 @@ Bounding_Box() const
     return oriented_box.Axis_Aligned_Bounding_Box();
 }
 //#####################################################################
+namespace PhysBAM{
 template class CYLINDER<float>;
 template class CYLINDER<double>;
+}

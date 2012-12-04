@@ -227,9 +227,11 @@ End_Asymmetric_Collisions(const int body_1,const int body_2,VECTOR<ARRAY<int>,2>
     for(int body=0;body<added_bodies(0).m;body++) Restore_Position(added_bodies(0)(body));
 }
 //#####################################################################
+namespace PhysBAM{
 template class RIGIDS_NEWMARK_COLLISION_CALLBACKS<VECTOR<float,1> >;
 template class RIGIDS_NEWMARK_COLLISION_CALLBACKS<VECTOR<float,2> >;
 template class RIGIDS_NEWMARK_COLLISION_CALLBACKS<VECTOR<float,3> >;
 template class RIGIDS_NEWMARK_COLLISION_CALLBACKS<VECTOR<double,1> >;
 template class RIGIDS_NEWMARK_COLLISION_CALLBACKS<VECTOR<double,2> >;
 template class RIGIDS_NEWMARK_COLLISION_CALLBACKS<VECTOR<double,3> >;
+}

@@ -206,5 +206,7 @@ Create_Quasistatic_Finite_Volume(HEXAHEDRALIZED_VOLUME<T>& hexahedralized_volume
     fvm->Use_Quasistatics();return fvm;
 }
 //#####################################################################
+namespace PhysBAM{
 template class FINITE_VOLUME_HEXAHEDRONS<float>;
 template class FINITE_VOLUME_HEXAHEDRONS<double>;
+}

@@ -383,5 +383,7 @@ Bounding_Box() const
     RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Bounding_Box(VECTOR<float,3>(curve.x(index),curve.u(index),0),VECTOR<float,3>(curve.x(index+1),curve.u(index+1),0));
     return object->World_Space_Box(box);
 }
+namespace PhysBAM{
 template class OPENGL_COMPONENT_CURVE_2D<float,float>;
 template class OPENGL_COMPONENT_CURVE_2D<double,double>;
+}

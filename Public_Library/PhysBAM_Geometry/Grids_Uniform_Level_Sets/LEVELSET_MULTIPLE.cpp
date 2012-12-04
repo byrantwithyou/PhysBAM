@@ -317,9 +317,11 @@ Get_Single_Levelset(const ARRAY<bool>& positive_regions,LEVELSET<TV>& levelset,c
     int number_of_positive_regions=0;for(int i=0;i<positive_regions.m;i++)if(positive_regions(i))number_of_positive_regions++;
     if(number_of_positive_regions>1)levelset.Fast_Marching_Method();
 }
+namespace PhysBAM{
 template class LEVELSET_MULTIPLE<GRID<VECTOR<float,1> > >;
 template class LEVELSET_MULTIPLE<GRID<VECTOR<float,2> > >;
 template class LEVELSET_MULTIPLE<GRID<VECTOR<float,3> > >;
 template class LEVELSET_MULTIPLE<GRID<VECTOR<double,1> > >;
 template class LEVELSET_MULTIPLE<GRID<VECTOR<double,2> > >;
 template class LEVELSET_MULTIPLE<GRID<VECTOR<double,3> > >;
+}

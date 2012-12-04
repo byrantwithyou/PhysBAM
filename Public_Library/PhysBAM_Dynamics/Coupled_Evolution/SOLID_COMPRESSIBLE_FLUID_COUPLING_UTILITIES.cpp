@@ -725,9 +725,11 @@ Compute_Post_Advected_Variables()
         }}
 }
 //#####################################################################
+namespace PhysBAM{
 template class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<VECTOR<float,1> >;
 template class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<VECTOR<float,2> >;
 template class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<VECTOR<float,3> >;
 template class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<VECTOR<double,1> >;
 template class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<VECTOR<double,2> >;
 template class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<VECTOR<double,3> >;
+}

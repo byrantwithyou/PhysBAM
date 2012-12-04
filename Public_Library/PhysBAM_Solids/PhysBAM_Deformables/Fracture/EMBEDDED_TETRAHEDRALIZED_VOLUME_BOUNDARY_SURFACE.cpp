@@ -430,5 +430,7 @@ Add_To_Material_Surface_Subtetrahedron_And_Wedge_And_Half_Oct_Plus_Tet(const int
     if(embedded_object.Node_In_Simplex_Is_Material(j,tetrahedron)) Add_To_Material_Surface_Half_Oct_Plus_Tet(i,j,k,l,is_clockwise);
 }
 //#####################################################################
+namespace PhysBAM{
 template class EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<float>;
 template class EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<double>;
+}

@@ -115,9 +115,11 @@ template<class TV> STRUCTURE_REGISTRY<TV>::
 {
     PHYSBAM_ASSERT(registered_structures_asdf);
 }
+namespace PhysBAM{
 template class STRUCTURE_REGISTRY<VECTOR<float,1> >;
 template class STRUCTURE_REGISTRY<VECTOR<float,2> >;
 template class STRUCTURE_REGISTRY<VECTOR<float,3> >;
 template class STRUCTURE_REGISTRY<VECTOR<double,1> >;
 template class STRUCTURE_REGISTRY<VECTOR<double,2> >;
 template class STRUCTURE_REGISTRY<VECTOR<double,3> >;
+}

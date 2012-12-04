@@ -49,6 +49,7 @@ Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constra
     Constraint_Matrix_Helper(parent_frame.r*F_pj().r,constrained_matrix,unconstrained_matrix,Equality_Constraint());
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d,s) \
     template PRISMATIC_TWIST_JOINT<VECTOR<T,d> >::~PRISMATIC_TWIST_JOINT(); \
     template bool PRISMATIC_TWIST_JOINT<VECTOR<T,d> >::Has_Prismatic_Constraint() const; \
@@ -64,3 +65,4 @@ template class PRISMATIC_TWIST_JOINT<VECTOR<float,1> >;
 INSTANTIATION_HELPER(double,2,1)
 INSTANTIATION_HELPER(double,3,3)
 template class PRISMATIC_TWIST_JOINT<VECTOR<double,1> >;
+}

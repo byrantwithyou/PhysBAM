@@ -279,9 +279,11 @@ Locate_Nearest_Neighbors_Helper(const KD_TREE_NODE<T>* cell,const TV& location,T
             max_distance_squared=distance_squared_of_points_found(0);}} // copy the new bounding distance
 }
 //#####################################################################
+namespace PhysBAM{
 template class KD_TREE<VECTOR<float,1> >;
 template class KD_TREE<VECTOR<float,2> >;
 template class KD_TREE<VECTOR<float,3> >;
 template class KD_TREE<VECTOR<double,1> >;
 template class KD_TREE<VECTOR<double,2> >;
 template class KD_TREE<VECTOR<double,3> >;
+}

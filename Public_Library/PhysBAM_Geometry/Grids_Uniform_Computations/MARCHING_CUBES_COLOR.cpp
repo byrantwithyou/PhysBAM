@@ -1348,7 +1348,9 @@ Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<T
             case 7: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(1,0,0)); break;
             default: PHYSBAM_FATAL_ERROR();}}
 }
+namespace PhysBAM{
 template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<float,3> >;
 template class MARCHING_CUBES_COLOR<VECTOR<double,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<double,3> >;
+}

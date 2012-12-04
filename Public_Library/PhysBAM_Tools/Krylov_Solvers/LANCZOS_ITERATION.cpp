@@ -93,5 +93,7 @@ Print_Spectral_Information(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BAS
     lanczos.tridiagonal.Print_Spectral_Information();
 }
 //#####################################################################
+namespace PhysBAM{
 template class LANCZOS_ITERATION<float>;
 template class LANCZOS_ITERATION<double>;
+}

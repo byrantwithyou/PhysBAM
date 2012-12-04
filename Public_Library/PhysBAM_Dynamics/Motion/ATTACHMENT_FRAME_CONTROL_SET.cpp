@@ -451,5 +451,7 @@ Print_Diagnostics(std::ostream& output) const
     output<<"Opening angle : "<<Opening_Angle()<<std::endl;
     output<<"Jaw constraint penalty at current configuration : "<<Jaw_Constraint_Penalty()<<std::endl;
 }
+namespace PhysBAM{
 template class ATTACHMENT_FRAME_CONTROL_SET<float>;
 template class ATTACHMENT_FRAME_CONTROL_SET<double>;
+}

@@ -182,5 +182,7 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,ARRAY<T>& x_B,ARRAY<T>&
     if(verbose) LOG::cout<<"LP Result x_B:\n"<<x_B<<"\nLP Result permute:\n"<<permute<<std::endl;
 }
 //####################################################################################
+namespace PhysBAM{
 template class LINEAR_PROGRAMMING<float>;
 template class LINEAR_PROGRAMMING<double>;
+}

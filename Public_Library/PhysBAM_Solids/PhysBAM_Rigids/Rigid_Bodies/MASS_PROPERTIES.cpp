@@ -154,6 +154,7 @@ Transform_To_Object_Frame(FRAME<TV>& frame,DIAGONAL_MATRIX<T,TV::SPIN::m>& objec
             point_cloud.X(i)=frame.Inverse()*point_cloud.X(i);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class MASS_PROPERTIES<VECTOR<float,1>,0>;
 template class MASS_PROPERTIES<VECTOR<float,2>,1>;
 template class MASS_PROPERTIES<VECTOR<float,3>,1>;
@@ -162,3 +163,4 @@ template class MASS_PROPERTIES<VECTOR<double,1>,0>;
 template class MASS_PROPERTIES<VECTOR<double,2>,1>;
 template class MASS_PROPERTIES<VECTOR<double,3>,1>;
 template class MASS_PROPERTIES<VECTOR<double,3>,2>;
+}

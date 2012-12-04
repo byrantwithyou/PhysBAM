@@ -292,5 +292,7 @@ Bounding_Box() const
     return object->World_Space_Box(body_selection->Bounding_Box());
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_2D<float,float>;
 template class OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_2D<double,double>;
+}

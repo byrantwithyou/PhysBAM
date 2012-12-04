@@ -309,6 +309,7 @@ template<class T,class TV> void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(VOL
     TV const B[]={A[0]-X0,A[1]-X0,A[2]-X0,A[3]-X0,A[4]-X0,A[5]-X0};
     Volume_From_Simplices_Helper(data,B);
 }
-
-template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<float,VECTOR<float,3> >(VOL_DATA<float,3,6>&,VECTOR<float,3> const &,VECTOR<float,3> const [6]);
-template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<double,VECTOR<double,3> >(VOL_DATA<double,3,6>&,VECTOR<double,3> const &,VECTOR<double,3> const [6]);
+namespace PhysBAM{
+template void ORIGIN_AREAS::Volume_From_Simplices<float,VECTOR<float,3> >(VOL_DATA<float,3,6>&,VECTOR<float,3> const &,VECTOR<float,3> const [6]);
+template void ORIGIN_AREAS::Volume_From_Simplices<double,VECTOR<double,3> >(VOL_DATA<double,3,6>&,VECTOR<double,3> const &,VECTOR<double,3> const [6]);
+}

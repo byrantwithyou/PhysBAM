@@ -91,6 +91,7 @@ CFL_Strain_Rate() const
     return 0;
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d,m) \
     template class BW_FORCES<VECTOR<T,3>,d,m>;
 
@@ -100,3 +101,4 @@ INSTANTIATION_HELPER(float,1,4)
 INSTANTIATION_HELPER(double,1,3)
 INSTANTIATION_HELPER(double,2,3)
 INSTANTIATION_HELPER(double,1,4)
+}

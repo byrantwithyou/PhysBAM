@@ -89,5 +89,7 @@ Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& r
             (particles.X(node4)-center).Magnitude_Squared()));}
 }
 //#####################################################################
+namespace PhysBAM{
 template class TETRAHEDRON_HIERARCHY<float>;
 template class TETRAHEDRON_HIERARCHY<double>;
+}

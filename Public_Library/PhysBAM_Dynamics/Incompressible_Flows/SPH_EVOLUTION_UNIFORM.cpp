@@ -504,6 +504,7 @@ Move_Particles_Off_Grid_Boundaries(T_ARRAYS_PARTICLES& particles,const T toleran
                     else particles(block)->X(p)[axis]=min(grid.domain.Maximum_Corner()[axis]-tolerance,particles(block)->X(p)[axis]);}}}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >;
 template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >;
 template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >;
@@ -558,3 +559,4 @@ template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >::Make_Incompressib
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,ARRAY<double,FACE_INDEX<3> >&,double,double);
 template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,double) const;
+}

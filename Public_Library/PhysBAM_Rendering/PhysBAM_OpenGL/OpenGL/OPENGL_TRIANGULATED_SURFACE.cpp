@@ -615,5 +615,7 @@ Bounding_Box() const
     return object->World_Space_Box(box);
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_TRIANGULATED_SURFACE<float>;
 template class OPENGL_TRIANGULATED_SURFACE<double>;
+}

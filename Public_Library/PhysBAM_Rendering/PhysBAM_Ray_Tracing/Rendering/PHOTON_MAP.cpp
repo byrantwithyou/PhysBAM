@@ -273,5 +273,7 @@ Light_Emission_Quota_Remains()
     if(number>=light_emission_photon_quota)return false;else return true;
 }
 //#####################################################################
+namespace PhysBAM{
 template class PHOTON_MAP<float>;
 template class PHOTON_MAP<double>;
+}

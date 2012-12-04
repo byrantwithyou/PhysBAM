@@ -72,5 +72,7 @@ Update_Object_Labels()
                     rigid_body_collection.Rigid_Body(i).Update_Angular_Velocity();}}}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<float,float>;
 template class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<double,double>;
+}

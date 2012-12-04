@@ -351,9 +351,11 @@ Add_To_Initial(ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,const TV_INT&
             if(!done(index+axis_vector)) close_k(index+axis_vector)=0;}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<float,1> > >;
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<float,2> > >;
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<float,3> > >;
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<double,1> > >;
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<double,2> > >;
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<double,3> > >;
+}

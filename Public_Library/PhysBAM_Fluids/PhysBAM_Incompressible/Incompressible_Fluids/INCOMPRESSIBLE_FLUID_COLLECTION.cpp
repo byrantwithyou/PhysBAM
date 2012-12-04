@@ -82,9 +82,11 @@ Distribute_Data(INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>& fluid_collection,THREAD
     threaded_grid.Distribute_Scalar(viscosity,fluid_collection.viscosity);    
 }
 //#####################################################################
+namespace PhysBAM{
 template class INCOMPRESSIBLE_FLUID_COLLECTION<GRID<VECTOR<float,1> > >;
 template class INCOMPRESSIBLE_FLUID_COLLECTION<GRID<VECTOR<float,2> > >;
 template class INCOMPRESSIBLE_FLUID_COLLECTION<GRID<VECTOR<float,3> > >;
 template class INCOMPRESSIBLE_FLUID_COLLECTION<GRID<VECTOR<double,1> > >;
 template class INCOMPRESSIBLE_FLUID_COLLECTION<GRID<VECTOR<double,2> > >;
 template class INCOMPRESSIBLE_FLUID_COLLECTION<GRID<VECTOR<double,3> > >;
+}

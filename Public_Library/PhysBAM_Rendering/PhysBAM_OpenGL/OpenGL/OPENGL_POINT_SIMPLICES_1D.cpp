@@ -72,5 +72,7 @@ Bounding_Box() const
     return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(xmin,0,0),VECTOR<float,3>(xmax,0,0)));
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_POINT_SIMPLICES_1D<float>;
 template class OPENGL_POINT_SIMPLICES_1D<double>;
+}

@@ -86,5 +86,7 @@ Eigenvectors(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int i,MATRIX<T,d,
     R(2,0)=1;R(2,1)=u;R(2,2)=v+celerity;
 }  
 //#####################################################################
+namespace PhysBAM{
 template class SHALLOW_WATER_2D_EIGENSYSTEM_G<float>;
 template class SHALLOW_WATER_2D_EIGENSYSTEM_G<double>;
+}

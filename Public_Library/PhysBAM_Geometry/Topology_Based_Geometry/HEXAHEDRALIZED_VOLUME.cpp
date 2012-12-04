@@ -133,5 +133,7 @@ Initialize_Triangulated_Surface()
     triangulated_surface=new TRIANGULATED_SURFACE<T>(*mesh.boundary_mesh,particles);
 }
 //#####################################################################
+namespace PhysBAM{
 template class HEXAHEDRALIZED_VOLUME<float>;
 template class HEXAHEDRALIZED_VOLUME<double>;
+}

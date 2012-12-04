@@ -146,5 +146,7 @@ Get_Sub_Zone_Normals(ARRAY<T,VECTOR<int,2> >& NN1_x,ARRAY<T,VECTOR<int,2> >& NN1
         NN4_x(i,j)=(M1_y(i,j)-C_y(i,j))/L4(i,j);NN4_y(i,j)=-(M1_x(i,j)-C_x(i,j))/L4(i,j);}    
 }
 //#####################################################################
+namespace PhysBAM{
 template class GRID_LAGRANGE_2D<float>;
 template class GRID_LAGRANGE_2D<double>;
+}

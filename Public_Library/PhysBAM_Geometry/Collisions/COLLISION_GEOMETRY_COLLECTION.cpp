@@ -192,9 +192,11 @@ Update_Bounding_Boxes()
     for(COLLISION_GEOMETRY_ID i(0);i<bodies.m;i++) if(Is_Active(i)) bodies(i)->Update_Bounding_Box();
 }
 //#####################################################################
+namespace PhysBAM{
 template class COLLISION_GEOMETRY_COLLECTION<VECTOR<float,3> >;
 template class COLLISION_GEOMETRY_COLLECTION<VECTOR<float,2> >;
 template class COLLISION_GEOMETRY_COLLECTION<VECTOR<float,1> >;
 template class COLLISION_GEOMETRY_COLLECTION<VECTOR<double,3> >;
 template class COLLISION_GEOMETRY_COLLECTION<VECTOR<double,2> >;
 template class COLLISION_GEOMETRY_COLLECTION<VECTOR<double,1> >;
+}

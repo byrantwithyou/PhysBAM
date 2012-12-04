@@ -104,9 +104,11 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
         for(int j=s;j<e;j++)
             data.Append(TRIPLE<int,int,T>(i,gradient.A(j).j,gradient.A(j).a));}
 }
+namespace PhysBAM{
 template class MATRIX_FLUID_GRADIENT_BASE<VECTOR<float,1> >;
 template class MATRIX_FLUID_GRADIENT_BASE<VECTOR<float,2> >;
 template class MATRIX_FLUID_GRADIENT_BASE<VECTOR<float,3> >;
 template class MATRIX_FLUID_GRADIENT_BASE<VECTOR<double,1> >;
 template class MATRIX_FLUID_GRADIENT_BASE<VECTOR<double,2> >;
 template class MATRIX_FLUID_GRADIENT_BASE<VECTOR<double,3> >;
+}

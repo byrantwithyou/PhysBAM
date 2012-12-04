@@ -38,6 +38,7 @@ Add_Open_Subcell_Entries(int flat_index,int subcell,int color)
 {
     for(int j=0;j<open_subcell_entries[subcell].m;j++) Add_Open_Entry(flat_index,color,open_subcell_entries[subcell](j));
 }
+namespace PhysBAM{
 template class SYSTEM_VOLUME_BLOCK_COLOR<VECTOR<float,2>,2>;
 template class SYSTEM_VOLUME_BLOCK_COLOR<VECTOR<float,3>,2>;
 template void SYSTEM_VOLUME_BLOCK_COLOR<VECTOR<float,2>,2>::Initialize<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,
@@ -58,3 +59,4 @@ template void SYSTEM_VOLUME_BLOCK_COLOR<VECTOR<double,3>,2>::Initialize<0,1>(SYS
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ARRAY<double> const&);
 template void SYSTEM_VOLUME_BLOCK_COLOR<VECTOR<double,3>,2>::Initialize<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ARRAY<double> const&);
+}

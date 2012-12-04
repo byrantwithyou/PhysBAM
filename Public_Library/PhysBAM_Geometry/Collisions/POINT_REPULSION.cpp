@@ -119,5 +119,7 @@ Update_Stats()
     average_number_neighbors=number_sum/points.m;average_repulsion_radius=number_radius/points.m;
 }
 //#####################################################################
+namespace PhysBAM{
 template class POINT_REPULSION<float>;
 template class POINT_REPULSION<double>;
+}

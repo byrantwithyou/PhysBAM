@@ -513,9 +513,11 @@ Use_Strain()
     strain=new FLUID_STRAIN_UNIFORM<T_GRID>(grid);
 }
 //#####################################################################
+namespace PhysBAM{
 template class INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<float,1> > >;
 template class INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<float,2> > >;
 template class INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<float,3> > >;
 template class INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<double,1> > >;
 template class INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<double,2> > >;
 template class INCOMPRESSIBLE_UNIFORM<GRID<VECTOR<double,3> > >;
+}

@@ -227,7 +227,9 @@ Add_To_Material_Surface_Mesh_Subquadrilateral(const int curve_particle1,const in
         Add_To_Material_Surface_Mesh_Triangle(curve_particle1,triangle_particle2,curve_particle2);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class TRIANGLES_OF_MATERIAL<VECTOR<float,2> >;
 template class TRIANGLES_OF_MATERIAL<VECTOR<float,3> >;
 template class TRIANGLES_OF_MATERIAL<VECTOR<double,2> >;
 template class TRIANGLES_OF_MATERIAL<VECTOR<double,3> >;
+}

@@ -92,6 +92,7 @@ Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& r
         radius(k)=sqrt(max((particles.X(node1)-center).Magnitude_Squared(),(particles.X(node2)-center).Magnitude_Squared()));}
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template class SEGMENT_HIERARCHY<VECTOR<T,d> >; \
     template void SEGMENT_HIERARCHY<VECTOR<T,d> >::Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<VECTOR<T,d> > >&,ARRAY_VIEW<const VECTOR<T,d> >); \
@@ -106,3 +107,4 @@ INSTANTIATION_HELPER(double,2)
 INSTANTIATION_HELPER(double,3)
 template void SEGMENT_HIERARCHY<VECTOR<double,2> >::Calculate_Bounding_Boxes_Helper<ARRAY_VIEW<VECTOR<double,2> const,int> >(ARRAY<RANGE<VECTOR<double,2> >,int>&,
     ARRAY_VIEW<VECTOR<double,2> const,int>,ARRAY_VIEW<VECTOR<double,2> const,int>);
+}

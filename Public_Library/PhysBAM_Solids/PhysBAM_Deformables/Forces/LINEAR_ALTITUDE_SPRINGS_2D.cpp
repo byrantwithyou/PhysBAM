@@ -204,5 +204,7 @@ CFL_Strain_Rate() const
     return Robust_Divide(max_strain_per_time_step,max_strain_rate);
 }
 //#####################################################################
+namespace PhysBAM{
 template class LINEAR_ALTITUDE_SPRINGS_2D<float>;
 template class LINEAR_ALTITUDE_SPRINGS_2D<double>;
+}

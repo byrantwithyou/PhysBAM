@@ -233,7 +233,9 @@ From_Rotated_Vector(const TV& initial_vector,const TV& final_vector)
     return ROTATION<TV>(sqrt(s_squared),v.x,v.y,v.z);
 }
 //#####################################################################
+namespace PhysBAM{
 template class ROTATION<VECTOR<float,2> >;
 template class ROTATION<VECTOR<float,3> >;
 template class ROTATION<VECTOR<double,2> >;
 template class ROTATION<VECTOR<double,3> >;
+}

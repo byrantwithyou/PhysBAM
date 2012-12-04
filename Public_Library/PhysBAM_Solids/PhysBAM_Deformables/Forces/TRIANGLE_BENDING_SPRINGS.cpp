@@ -78,7 +78,9 @@ Create_Bending_Springs(TRIANGULATED_SURFACE<T>& triangulated_surface,const T sti
         use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose,implicit);
 }
 //#####################################################################
+namespace PhysBAM{
 template class TRIANGLE_BENDING_SPRINGS<float>;
-template TRIANGLE_BENDING_SPRINGS<float>* PhysBAM::Create_Bending_Springs<float>(TRIANGULATED_SURFACE<float>&,float,float,bool,float,bool,float,bool,bool);
+template TRIANGLE_BENDING_SPRINGS<float>* Create_Bending_Springs<float>(TRIANGULATED_SURFACE<float>&,float,float,bool,float,bool,float,bool,bool);
 template class TRIANGLE_BENDING_SPRINGS<double>;
-template TRIANGLE_BENDING_SPRINGS<double>* PhysBAM::Create_Bending_Springs<double>(TRIANGULATED_SURFACE<double>&,double,double,bool,double,bool,double,bool,bool);
+template TRIANGLE_BENDING_SPRINGS<double>* Create_Bending_Springs<double>(TRIANGULATED_SURFACE<double>&,double,double,bool,double,bool,double,bool,bool);
+}

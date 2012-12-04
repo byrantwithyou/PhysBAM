@@ -46,9 +46,11 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
                 TV_INT cell_index=iterator.Cell_Index();
                 psi_D(cell_index)=true;p(cell_index)=fluids_parameters.euler->euler_projection.p_dirichlet(cell_index);}}}
 }
+namespace PhysBAM{
 template class COMPRESSIBLE_BOUNDARY_CONDITION_WALLS<VECTOR<float,1> >;
 template class COMPRESSIBLE_BOUNDARY_CONDITION_WALLS<VECTOR<float,2> >;
 template class COMPRESSIBLE_BOUNDARY_CONDITION_WALLS<VECTOR<float,3> >;
 template class COMPRESSIBLE_BOUNDARY_CONDITION_WALLS<VECTOR<double,1> >;
 template class COMPRESSIBLE_BOUNDARY_CONDITION_WALLS<VECTOR<double,2> >;
 template class COMPRESSIBLE_BOUNDARY_CONDITION_WALLS<VECTOR<double,3> >;
+}

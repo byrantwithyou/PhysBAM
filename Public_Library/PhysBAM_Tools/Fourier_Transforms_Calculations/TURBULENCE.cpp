@@ -86,5 +86,7 @@ Generate_Random_Turbulence(const GRID<VECTOR<T,3> >& grid,ARRAY<T,VECTOR<int,3> 
         u*=scaling;v*=scaling;w*=scaling;}
 }
 //#####################################################################
+namespace PhysBAM{
 template class TURBULENCE<float>;
 template class TURBULENCE<double>;
+}

@@ -261,5 +261,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
     return true;
 }
 //#####################################################################
+namespace PhysBAM{
 template class LEVELSET_MAKER_UNIFORM<float>;
 template class LEVELSET_MAKER_UNIFORM<double>;
+}

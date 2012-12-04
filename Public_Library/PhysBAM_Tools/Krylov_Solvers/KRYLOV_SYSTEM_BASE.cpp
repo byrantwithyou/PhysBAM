@@ -206,5 +206,7 @@ Nullspace_Check(KRYLOV_VECTOR_BASE<T>& null) const
     delete b;
     return mg>1e-10;
 }
+namespace PhysBAM{
 template class KRYLOV_SYSTEM_BASE<float>;
 template class KRYLOV_SYSTEM_BASE<double>;
+}

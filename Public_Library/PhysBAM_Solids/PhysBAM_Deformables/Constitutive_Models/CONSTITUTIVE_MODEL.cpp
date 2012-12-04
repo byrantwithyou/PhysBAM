@@ -54,7 +54,9 @@ Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input
     constant_alpha=Rayleigh_coefficient_input*constant_lambda;
     constant_beta=Rayleigh_coefficient_input*constant_mu;
 }
+namespace PhysBAM{
 template class CONSTITUTIVE_MODEL<float,2>;
 template class CONSTITUTIVE_MODEL<float,3>;
 template class CONSTITUTIVE_MODEL<double,2>;
 template class CONSTITUTIVE_MODEL<double,3>;
+}

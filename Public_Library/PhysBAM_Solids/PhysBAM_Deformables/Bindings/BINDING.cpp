@@ -76,9 +76,11 @@ Create_From_Name(const int name,DEFORMABLE_PARTICLES<TV>& particles)
     return binding;
 }
 //#####################################################################
+namespace PhysBAM{
 template class BINDING<VECTOR<float,1> >;
 template class BINDING<VECTOR<float,2> >;
 template class BINDING<VECTOR<float,3> >;
 template class BINDING<VECTOR<double,1> >;
 template class BINDING<VECTOR<double,2> >;
 template class BINDING<VECTOR<double,3> >;
+}

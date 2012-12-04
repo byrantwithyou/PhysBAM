@@ -33,9 +33,11 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
             PHYSBAM_ASSERT(psi_D(iterator.Cell_Index()));
             p(iterator.Cell_Index())-=surface_tension_coefficient*levelset.Compute_Curvature(levelset.phi,iterator.index);}
 }
+namespace PhysBAM{
 template class SURFACE_TENSION_BOUNDARY_CONDITION<VECTOR<float,1> >;
 template class SURFACE_TENSION_BOUNDARY_CONDITION<VECTOR<float,2> >;
 template class SURFACE_TENSION_BOUNDARY_CONDITION<VECTOR<float,3> >;
 template class SURFACE_TENSION_BOUNDARY_CONDITION<VECTOR<double,1> >;
 template class SURFACE_TENSION_BOUNDARY_CONDITION<VECTOR<double,2> >;
 template class SURFACE_TENSION_BOUNDARY_CONDITION<VECTOR<double,3> >;
+}

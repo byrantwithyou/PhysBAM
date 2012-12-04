@@ -139,9 +139,11 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
         UPDATE_ADVECTION_EQUATION_HELPER<TV::dimension>::Apply(*this,node_grid,Z.Component(i),Z_ghost.V_face.Component(i),V_face.Component(i),dt,time);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<float,1> >,float>;
 template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<float,2> >,float>;
 template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<float,3> >,float>;
 template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<double,1> >,double>;
 template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<double,2> >,double>;
 template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<double,3> >,double>;
+}

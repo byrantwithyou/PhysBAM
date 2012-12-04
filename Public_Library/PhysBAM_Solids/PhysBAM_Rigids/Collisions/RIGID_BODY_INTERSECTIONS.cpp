@@ -162,9 +162,11 @@ Initialize_Transformation_From_Body1_To_Body2_Coordinates(const RIGID_BODY<TV>& 
     rotation_reverse=rotation.Transposed();translation_reverse=-(rotation_reverse*translation); // reverse is from body2 to body1 coordinates
 }
 //#####################################################################
+namespace PhysBAM{
 template class RIGID_BODY_INTERSECTIONS<VECTOR<float,1> >;
 template class RIGID_BODY_INTERSECTIONS<VECTOR<float,2> >;
 template class RIGID_BODY_INTERSECTIONS<VECTOR<float,3> >;
 template class RIGID_BODY_INTERSECTIONS<VECTOR<double,1> >;
 template class RIGID_BODY_INTERSECTIONS<VECTOR<double,2> >;
 template class RIGID_BODY_INTERSECTIONS<VECTOR<double,3> >;
+}

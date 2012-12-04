@@ -59,6 +59,8 @@ Run_Index_Range(const int first_index, const int last_index)
             r[index]=T();}
 }
 //#####################################################################
+namespace PhysBAM{
 template class Residual_Boundary_Helper<float>;
 template class Residual_Boundary_Helper<double>;
+}
 

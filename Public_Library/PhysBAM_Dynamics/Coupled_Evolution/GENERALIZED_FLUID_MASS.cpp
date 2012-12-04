@@ -106,9 +106,11 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
         data.Append(TRIPLE<int,int,T>(i,i,one_over_fluid_mass_at_faces(i)));
 }
 //#####################################################################
+namespace PhysBAM{
 template class GENERALIZED_FLUID_MASS<VECTOR<float,1> >;
 template class GENERALIZED_FLUID_MASS<VECTOR<float,2> >;
 template class GENERALIZED_FLUID_MASS<VECTOR<float,3> >;
 template class GENERALIZED_FLUID_MASS<VECTOR<double,1> >;
 template class GENERALIZED_FLUID_MASS<VECTOR<double,2> >;
 template class GENERALIZED_FLUID_MASS<VECTOR<double,3> >;
+}

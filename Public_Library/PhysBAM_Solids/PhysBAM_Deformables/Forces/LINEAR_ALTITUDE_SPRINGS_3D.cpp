@@ -440,7 +440,9 @@ Create_Altitude_Springs(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,
         fraction_compression,limit_time_step_by_strain_rate,max_strain_per_time_step,use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose);
 }
 //#####################################################################
+namespace PhysBAM{
 template class LINEAR_ALTITUDE_SPRINGS_3D<float>;
-template LINEAR_ALTITUDE_SPRINGS_3D<float>* PhysBAM::Create_Altitude_Springs<float>(TETRAHEDRALIZED_VOLUME<float>&,float,float,bool,float,bool,float,bool,float,bool);
+template LINEAR_ALTITUDE_SPRINGS_3D<float>* Create_Altitude_Springs<float>(TETRAHEDRALIZED_VOLUME<float>&,float,float,bool,float,bool,float,bool,float,bool);
 template class LINEAR_ALTITUDE_SPRINGS_3D<double>;
-template LINEAR_ALTITUDE_SPRINGS_3D<double>* PhysBAM::Create_Altitude_Springs<double>(TETRAHEDRALIZED_VOLUME<double>&,double,double,bool,double,bool,double,bool,double,bool);
+template LINEAR_ALTITUDE_SPRINGS_3D<double>* Create_Altitude_Springs<double>(TETRAHEDRALIZED_VOLUME<double>&,double,double,bool,double,bool,double,bool,double,bool);
+}

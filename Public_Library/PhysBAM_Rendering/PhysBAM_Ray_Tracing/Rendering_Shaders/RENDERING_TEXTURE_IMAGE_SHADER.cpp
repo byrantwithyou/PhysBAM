@@ -44,5 +44,7 @@ Shade_Surface_Using_Direct_Illumination(const RENDERING_RAY<T>& ray,const RENDER
     return interpolation->Clamped_To_Array(grid,pixels,VECTOR<T,2>(s,t));
 }
 //#####################################################################
+namespace PhysBAM{
 template class RENDERING_TEXTURE_IMAGE_SHADER<float>;
 template class RENDERING_TEXTURE_IMAGE_SHADER<double>;
+}

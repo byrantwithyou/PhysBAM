@@ -299,9 +299,11 @@ Log_Parameters() const
     LOG::cout<<"clamped_value="<<clamped_value<<std::endl;
 }
 //#####################################################################
+namespace PhysBAM{
 template class CONSERVATION<GRID<VECTOR<double,1> >,3>;
 template class CONSERVATION<GRID<VECTOR<double,2> >,4>;
 template class CONSERVATION<GRID<VECTOR<double,3> >,5>;
 template class CONSERVATION<GRID<VECTOR<float,1> >,3>;
 template class CONSERVATION<GRID<VECTOR<float,2> >,4>;
 template class CONSERVATION<GRID<VECTOR<float,3> >,5>;
+}

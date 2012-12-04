@@ -194,5 +194,7 @@ Next_Helper()
     if(last>grid.counts(TV::m)+ghost) last=grid.counts(TV::m)+ghost;
     if(!grid.Inside_Domain(index,ghost) || last<index(TV::m)) Next_Helper();
 }
+namespace PhysBAM{
 template class GRID_COLLISION_ITERATOR<VECTOR<float,3> >;
 template class GRID_COLLISION_ITERATOR<VECTOR<double,3> >;
+}

@@ -520,9 +520,11 @@ Log_Parameters() const
     if(timesplit) euler_projection.Log_Parameters();
 }
 //#####################################################################
+namespace PhysBAM{
 template class EULER_UNIFORM<GRID<VECTOR<float,1> > >;
 template class EULER_UNIFORM<GRID<VECTOR<float,2> > >;
 template class EULER_UNIFORM<GRID<VECTOR<float,3> > >;
 template class EULER_UNIFORM<GRID<VECTOR<double,1> > >;
 template class EULER_UNIFORM<GRID<VECTOR<double,2> > >;
 template class EULER_UNIFORM<GRID<VECTOR<double,3> > >;
+}

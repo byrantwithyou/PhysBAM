@@ -69,7 +69,9 @@ Number_Of_Nodes_Shared_With_Existing_Embedded_Curve()
     return number_of_nodes_shared;
 }
 //##################################################################### 
+namespace PhysBAM{
 template class HYPOTHETICAL_CUT_TRIANGLES<VECTOR<float,2> >;
 template class HYPOTHETICAL_CUT_TRIANGLES<VECTOR<float,3> >;
 template class HYPOTHETICAL_CUT_TRIANGLES<VECTOR<double,2> >;
 template class HYPOTHETICAL_CUT_TRIANGLES<VECTOR<double,3> >;
+}

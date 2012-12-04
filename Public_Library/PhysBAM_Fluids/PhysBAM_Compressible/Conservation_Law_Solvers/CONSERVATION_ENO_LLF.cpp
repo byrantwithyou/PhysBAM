@@ -206,9 +206,11 @@ Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,
     if(save_fluxes) for(int i=U.domain.min_corner.x+2;i<U.domain.max_corner.x-3;i++) if(psi_ghost(i) || psi_ghost(i+1)) flux_temp(i)=flux(i);
 }
 //#####################################################################
+namespace PhysBAM{
 template class CONSERVATION_ENO_LLF<GRID<VECTOR<float,1> >,3>;
 template class CONSERVATION_ENO_LLF<GRID<VECTOR<float,2> >,4>;
 template class CONSERVATION_ENO_LLF<GRID<VECTOR<float,3> >,5>;
 template class CONSERVATION_ENO_LLF<GRID<VECTOR<double,1> >,3>;
 template class CONSERVATION_ENO_LLF<GRID<VECTOR<double,2> >,4>;
 template class CONSERVATION_ENO_LLF<GRID<VECTOR<double,3> >,5>;
+}

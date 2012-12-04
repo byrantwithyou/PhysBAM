@@ -245,6 +245,7 @@ Angular_Projection_Matrix(const FRAME<TV>& parent_frame) const
     return MATRIX<T,T_SPIN::m>(M.Times_Transpose(M));
 }
 //#####################################################################
+namespace PhysBAM{
 template class JOINT<VECTOR<float,1> >;
 template class JOINT<VECTOR<float,2> >;
 template class JOINT<VECTOR<float,3> >;
@@ -255,3 +256,4 @@ template class JOINT<VECTOR<double,2> >;
 template class JOINT<VECTOR<double,3> >;
 template void JOINT<VECTOR<double,2> >::Constraint_Matrix_Helper<2>(ROTATION<VECTOR<double,2> > const&,MATRIX_MXN<double>&,MATRIX_MXN<double>*,VECTOR<bool,2> const&) const;
 template void JOINT<VECTOR<double,3> >::Constraint_Matrix_Helper<3>(ROTATION<VECTOR<double,3> > const&,MATRIX_MXN<double>&,MATRIX_MXN<double>*,VECTOR<bool,3> const&) const;
+}

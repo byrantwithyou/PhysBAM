@@ -132,5 +132,7 @@ Run_X_Range(const int xmin,const int xmax)
         }
 }
 //#####################################################################
+namespace PhysBAM{
 template class Restriction_Helper<float>;
 template class Restriction_Helper<double>;
+}

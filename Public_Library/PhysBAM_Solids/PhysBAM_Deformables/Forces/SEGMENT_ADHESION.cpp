@@ -414,5 +414,7 @@ Read_State(STREAM_TYPE stream_type,const std::string& filename)
     LOG::cout<<"READING: Number of springs: "<<springs->Size()<<std::endl;
 }
 //#####################################################################
+namespace PhysBAM{
 template class SEGMENT_ADHESION<VECTOR<float,3> >;
 template class SEGMENT_ADHESION<VECTOR<double,3> >;
+}

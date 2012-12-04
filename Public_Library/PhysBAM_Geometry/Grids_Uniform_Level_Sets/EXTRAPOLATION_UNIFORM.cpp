@@ -146,6 +146,7 @@ Update_Close_Point(ARRAYS_ND_BASE<T2,TV_INT>& u,const T_ARRAYS_BASE& phi,const A
         u(index)=fraction_1*value[0]+fraction_2*value[1]+((T)1-fraction_1-fraction_2)*value[2];}
 }
 //#####################################################################
+namespace PhysBAM{
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,1> >,float>;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,2> >,float>;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,3> >,float>;
@@ -168,3 +169,4 @@ template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,3> >,VECTOR<double,3> >;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,3> >,VECTOR<double,5> >;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,2> >,SYMMETRIC_MATRIX<double,2> >;
 template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,3> >,SYMMETRIC_MATRIX<double,3> >;
+}

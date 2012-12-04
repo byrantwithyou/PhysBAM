@@ -126,5 +126,7 @@ RGB_To_XYZ(const VECTOR<T,3>& RGB) const
     return XYZ;
 }
 //#####################################################################
+namespace PhysBAM{
 template class CIE_XYZ<float>;
 template class CIE_XYZ<double>;
+}

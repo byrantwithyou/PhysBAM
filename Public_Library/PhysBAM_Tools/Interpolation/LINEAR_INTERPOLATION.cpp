@@ -53,7 +53,7 @@ Trilinear(const T2& u1,const T2& u3,const T2& u5,const T2& u7,T one_over_y_top_m
     T2 u_back=Linear_Predivided(y_bottom,one_over_y_top_minus_y_bottom,u_bottom,u_top,X.y);
     return Linear_Predivided(z_front,one_over_z_back_minus_z_front,u_front,u_back,X.z);
 }
-
+namespace PhysBAM{
 template class LINEAR_INTERPOLATION<float,MATRIX<float,3,3> >;
 template class LINEAR_INTERPOLATION<float,SYMMETRIC_MATRIX<float,2> >;
 template class LINEAR_INTERPOLATION<float,SYMMETRIC_MATRIX<float,3> >;
@@ -70,3 +70,4 @@ template class LINEAR_INTERPOLATION<double,VECTOR<double,3> >;
 template class LINEAR_INTERPOLATION<double,VECTOR<double,4> >;
 template class LINEAR_INTERPOLATION<double,VECTOR<double,5> >;
 template class LINEAR_INTERPOLATION<double,double>;
+}

@@ -144,9 +144,11 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) co
 {
 }
 //#####################################################################
+namespace PhysBAM{
 template class BW_BACKWARD_EULER_SYSTEM<VECTOR<float,1> >;
 template class BW_BACKWARD_EULER_SYSTEM<VECTOR<float,2> >;
 template class BW_BACKWARD_EULER_SYSTEM<VECTOR<float,3> >;
 template class BW_BACKWARD_EULER_SYSTEM<VECTOR<double,1> >;
 template class BW_BACKWARD_EULER_SYSTEM<VECTOR<double,2> >;
 template class BW_BACKWARD_EULER_SYSTEM<VECTOR<double,3> >;
+}

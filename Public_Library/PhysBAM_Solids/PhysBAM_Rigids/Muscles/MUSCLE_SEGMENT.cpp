@@ -183,9 +183,11 @@ Length() const
     return (point_1->Embedded_Position()-point_2->Embedded_Position()).Magnitude();
 }
 //#####################################################################
+namespace PhysBAM{
 template class MUSCLE_SEGMENT<VECTOR<float,1> >;
 template class MUSCLE_SEGMENT<VECTOR<float,2> >;
 template class MUSCLE_SEGMENT<VECTOR<float,3> >;
 template class MUSCLE_SEGMENT<VECTOR<double,1> >;
 template class MUSCLE_SEGMENT<VECTOR<double,2> >;
 template class MUSCLE_SEGMENT<VECTOR<double,3> >;
+}

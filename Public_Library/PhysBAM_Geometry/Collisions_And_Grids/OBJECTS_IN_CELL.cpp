@@ -114,9 +114,11 @@ Get_Objects_For_Cells_Start(const ID number_of_collision_bodies) const
     merge.Remove_All();
     operation_hash.Next_Operation();
 }
+namespace PhysBAM{
 template class OBJECTS_IN_CELL<GRID<VECTOR<float,1> >,COLLISION_GEOMETRY_ID>;
 template class OBJECTS_IN_CELL<GRID<VECTOR<float,2> >,COLLISION_GEOMETRY_ID>;
 template class OBJECTS_IN_CELL<GRID<VECTOR<float,3> >,COLLISION_GEOMETRY_ID>;
 template class OBJECTS_IN_CELL<GRID<VECTOR<double,1> >,COLLISION_GEOMETRY_ID>;
 template class OBJECTS_IN_CELL<GRID<VECTOR<double,2> >,COLLISION_GEOMETRY_ID>;
 template class OBJECTS_IN_CELL<GRID<VECTOR<double,3> >,COLLISION_GEOMETRY_ID>;
+}

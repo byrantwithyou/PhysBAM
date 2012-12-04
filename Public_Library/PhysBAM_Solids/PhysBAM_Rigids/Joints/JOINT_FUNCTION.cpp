@@ -90,7 +90,9 @@ Target_Angular_Velocity(const T time) const
     return target_angular_velocity;
 }
 //#####################################################################
+namespace PhysBAM{
 template class JOINT_FUNCTION<VECTOR<float,2> >;
 template class JOINT_FUNCTION<VECTOR<float,3> >;
 template class JOINT_FUNCTION<VECTOR<double,2> >;
 template class JOINT_FUNCTION<VECTOR<double,3> >;
+}

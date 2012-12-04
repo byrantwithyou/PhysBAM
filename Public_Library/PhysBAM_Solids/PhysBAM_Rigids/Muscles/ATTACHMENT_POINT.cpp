@@ -39,10 +39,12 @@ Apply_Impulse(const TV& impulse)
 {
     rigid_body.Apply_Impulse_To_Body(Embedded_Position(),impulse);
 }
+namespace PhysBAM{
 template struct ATTACHMENT_POINT<VECTOR<float,1> >;
 template struct ATTACHMENT_POINT<VECTOR<float,2> >;
 template struct ATTACHMENT_POINT<VECTOR<float,3> >;
 template struct ATTACHMENT_POINT<VECTOR<double,1> >;
 template struct ATTACHMENT_POINT<VECTOR<double,2> >;
 template struct ATTACHMENT_POINT<VECTOR<double,3> >;
+}
 

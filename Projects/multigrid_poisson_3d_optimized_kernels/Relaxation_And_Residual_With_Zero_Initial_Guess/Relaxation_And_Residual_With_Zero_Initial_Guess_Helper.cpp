@@ -644,7 +644,8 @@ Run_X_Range_Residual(const int xmin,const int xmax)
         }
 }
 //#####################################################################
-//#####################################################################
+namespace PhysBAM{
 template class Relaxation_And_Residual_With_Zero_Initial_Guess_Helper<float>;
 template class Relaxation_And_Residual_With_Zero_Initial_Guess_Helper<double>;
+}
 

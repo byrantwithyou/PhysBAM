@@ -677,5 +677,7 @@ Add_Sample(const SAMPLE& sample)
         T weight=filter(sample.film_position-grid.X(TV2_INT(i,j)),effective_filter_width);
         colors(i,j)+=weight*sample.radiance;weights(i,j)+=weight;alphas(i,j)+=weight*sample.alpha;}
 }
+namespace PhysBAM{
 template class FILM<float>;
 template class FILM<double>;
+}

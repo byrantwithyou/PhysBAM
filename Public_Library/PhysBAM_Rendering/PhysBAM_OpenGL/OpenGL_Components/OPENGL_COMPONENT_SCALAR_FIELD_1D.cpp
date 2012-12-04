@@ -109,9 +109,11 @@ Decrease_Scale()
     Scale((T).5);
 }
 //##################################################################### 
+namespace PhysBAM{
 template class OPENGL_COMPONENT_SCALAR_FIELD_1D<float,float,float>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_1D<float,float,double>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_1D<float,bool,float>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_1D<float,bool,double>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_1D<double,bool,double>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_1D<double,double,double>;
+}

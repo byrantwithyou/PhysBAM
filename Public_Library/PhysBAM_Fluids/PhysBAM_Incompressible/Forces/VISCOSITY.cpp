@@ -56,9 +56,11 @@ Initialize_Grids(const T_GRID& grid)
     elliptic_solver.Initialize_Grid(grid);
 }
 //#####################################################################
+namespace PhysBAM{
 template class VISCOSITY<GRID<VECTOR<float,1> > >;
 template class VISCOSITY<GRID<VECTOR<float,2> > >;
 template class VISCOSITY<GRID<VECTOR<float,3> > >;
 template class VISCOSITY<GRID<VECTOR<double,1> > >;
 template class VISCOSITY<GRID<VECTOR<double,2> > >;
 template class VISCOSITY<GRID<VECTOR<double,3> > >;
+}

@@ -213,7 +213,9 @@ Process_Primitives()
     return primitives_ordering;
 }
 //#####################################################################
+namespace PhysBAM{
 template class DISPLAY_PRIMITIVE<float>;
 template class DEPTH_BUFFERING<float>;
 template class DISPLAY_PRIMITIVE<double>;
 template class DEPTH_BUFFERING<double>;
+}

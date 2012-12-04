@@ -350,9 +350,11 @@ Scale(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v,const INTERFACE_STOKES_S
     }
 }
 //#####################################################################
+namespace PhysBAM{
 template class INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<VECTOR<float,1> >;
 template class INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<VECTOR<float,2> >;
 template class INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<VECTOR<float,3> >;
 template class INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<VECTOR<double,1> >;
 template class INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<VECTOR<double,2> >;
 template class INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<VECTOR<double,3> >;
+}

@@ -299,7 +299,9 @@ Update_Sources(const T time)
         if(time>(T)1.5){source_region(0)=4;}
     }
 }
+namespace PhysBAM{
 template class WATER_STANDARD_TESTS_MULTIPHASE<GRID<VECTOR<float,2> >,WATER_STANDARD_TESTS_2D<GRID<VECTOR<float,2> > > >;
 template class WATER_STANDARD_TESTS_MULTIPHASE<GRID<VECTOR<float,3> >,WATER_STANDARD_TESTS_3D<GRID<VECTOR<float,3> > > >;
 template class WATER_STANDARD_TESTS_MULTIPHASE<GRID<VECTOR<double,2> >,WATER_STANDARD_TESTS_2D<GRID<VECTOR<double,2> > > >;
 template class WATER_STANDARD_TESTS_MULTIPHASE<GRID<VECTOR<double,3> >,WATER_STANDARD_TESTS_3D<GRID<VECTOR<double,3> > > >;
+}

@@ -390,10 +390,12 @@ Add_Force(RIGIDS_FORCES<TV>* force)
     return rigid_body_collection.rigids_forces.m;
 }
 //#####################################################################
+namespace PhysBAM{
 template class SOLID_BODY_COLLECTION<VECTOR<float,1> >;
 template class SOLID_BODY_COLLECTION<VECTOR<float,2> >;
 template class SOLID_BODY_COLLECTION<VECTOR<float,3> >;
 template class SOLID_BODY_COLLECTION<VECTOR<double,1> >;
 template class SOLID_BODY_COLLECTION<VECTOR<double,2> >;
 template class SOLID_BODY_COLLECTION<VECTOR<double,3> >;
+}
 

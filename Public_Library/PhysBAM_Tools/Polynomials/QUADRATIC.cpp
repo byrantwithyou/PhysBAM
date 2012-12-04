@@ -66,5 +66,7 @@ Compute_Roots_In_Interval(const T xmin,const T xmax)
             root1=root2;
             roots--;}}
 }
+namespace PhysBAM{
 template class QUADRATIC<float>;
 template class QUADRATIC<double>;
+}

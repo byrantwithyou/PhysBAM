@@ -86,10 +86,11 @@ Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_c
     if(angular_unconstrained_matrix) angular_unconstrained_matrix->Resize(T_SPIN::dimension,0);
 }
 //#####################################################################
-
+namespace PhysBAM{
 template class RIGID_JOINT<VECTOR<float,1> >;
 template class RIGID_JOINT<VECTOR<float,2> >;
 template class RIGID_JOINT<VECTOR<float,3> >;
 template class RIGID_JOINT<VECTOR<double,1> >;
 template class RIGID_JOINT<VECTOR<double,2> >;
 template class RIGID_JOINT<VECTOR<double,3> >;
+}

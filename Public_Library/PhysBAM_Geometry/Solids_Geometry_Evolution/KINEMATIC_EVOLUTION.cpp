@@ -108,9 +108,11 @@ Reset_Kinematic_Rigid_Bodies(const T time)
         Set_External_Velocities(rigid_geometry.Twist(),time,rigid_geometry.particle_index);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class KINEMATIC_EVOLUTION<VECTOR<float,1> >;
 template class KINEMATIC_EVOLUTION<VECTOR<float,2> >;
 template class KINEMATIC_EVOLUTION<VECTOR<float,3> >;
 template class KINEMATIC_EVOLUTION<VECTOR<double,1> >;
 template class KINEMATIC_EVOLUTION<VECTOR<double,2> >;
 template class KINEMATIC_EVOLUTION<VECTOR<double,3> >;
+}

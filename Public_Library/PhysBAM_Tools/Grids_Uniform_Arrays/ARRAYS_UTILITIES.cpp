@@ -69,6 +69,7 @@ Compute_Divergence_At_Cells_From_Face_Data(const T_GRID& face_grid,T_ARRAYS_DIME
             div_cell_array(cell_index)+=one_over_dx[axis]*(face_array.Component(axis)(second_face_index)-face_array.Component(axis)(first_face_index));}}
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T) \
     template class ARRAYS_UTILITIES<GRID<VECTOR<T,1> >,T>; \
     template class ARRAYS_UTILITIES<GRID<VECTOR<T,2> >,T>; \
@@ -93,3 +94,4 @@ Compute_Divergence_At_Cells_From_Face_Data(const T_GRID& face_grid,T_ARRAYS_DIME
     template class ARRAYS_UTILITIES<GRID<VECTOR<T,3> >,VECTOR<T,6> >;
 INSTANTIATION_HELPER(float)
 INSTANTIATION_HELPER(double)
+}

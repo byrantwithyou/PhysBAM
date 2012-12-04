@@ -426,6 +426,7 @@ Add_Surface_Block_Scalar(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper,co
             if(sbs->overlap_polynomials(i).polynomial.terms(it.index))
                 surface_monomials_needed(it.index)=true;}
 }
+namespace PhysBAM{
 template class BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>;
 template class BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>;
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,
@@ -462,3 +463,4 @@ template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Surface_B
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BOUNDARY_CONDITIONS_COLOR<VECTOR<double,2> >*,ARRAY<ARRAY<double> >&,int,double);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<double,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<double,2> >*,ARRAY<ARRAY<double> >&,double);
+}

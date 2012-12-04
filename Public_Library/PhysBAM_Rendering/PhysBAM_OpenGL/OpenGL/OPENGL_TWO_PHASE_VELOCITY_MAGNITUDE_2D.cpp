@@ -93,5 +93,7 @@ Scale_Height(const T scale)
     height_scale=scale;
 }
 //#####################################################################
+namespace PhysBAM{
 template class OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D<float>;
 template class OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D<double>;
+}

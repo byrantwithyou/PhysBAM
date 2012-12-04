@@ -129,7 +129,9 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
         for(int k=0;k<TV::m*2;k++) gradient.Get_Or_Insert(I(k))+=sign*data.G[k];
         for(int k=0;k<TV::m*2;k++) for(int m=0;m<TV::m*2;m++) hessian.Get_Or_Insert(VECTOR<int,2>(I(k),I(m)))+=sign*data.H[k][m];}
 }
+namespace PhysBAM{
 template class VOLUME_COLLISIONS<VECTOR<float,2> >;
 template class VOLUME_COLLISIONS<VECTOR<float,3> >;
 template class VOLUME_COLLISIONS<VECTOR<double,2> >;
 template class VOLUME_COLLISIONS<VECTOR<double,3> >;
+}

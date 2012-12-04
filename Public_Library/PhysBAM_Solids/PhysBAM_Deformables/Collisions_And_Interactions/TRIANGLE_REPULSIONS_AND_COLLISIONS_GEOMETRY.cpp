@@ -226,6 +226,7 @@ Compute_Intersecting_Segment_Face_Pairs()
     Compute_Intersecting_Pairs_Helper<void>((TV*)NULL);
 }
 //####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template class TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<VECTOR<T,d> >;
 INSTANTIATION_HELPER(float,1);
@@ -234,3 +235,4 @@ INSTANTIATION_HELPER(float,3);
 INSTANTIATION_HELPER(double,1);
 INSTANTIATION_HELPER(double,2);
 INSTANTIATION_HELPER(double,3);
+}

@@ -102,10 +102,12 @@ Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,
     FILE_UTILITIES::Write_To_File(stream_type,prefix+"/"+FILE_UTILITIES::Number_To_String(frame)+"/deformable_object_particles",particles);
 }
 //#####################################################################
+namespace PhysBAM{
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<float,1> >;
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<float,2> >;
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<float,3> >;
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<double,1> >;
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<double,2> >;
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<double,3> >;
+}
 

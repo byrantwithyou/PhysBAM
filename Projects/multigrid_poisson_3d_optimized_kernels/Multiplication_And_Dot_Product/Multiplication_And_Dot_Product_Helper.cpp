@@ -86,6 +86,8 @@ Run_X_Range(const int xmin,const int xmax,const int partition_number)
     u_dot_v_partial_results[partition_number]=local_u_dot_v;
 }
 //#####################################################################
+namespace PhysBAM{
 template class Multiplication_And_Dot_Product_Helper<float>;
 template class Multiplication_And_Dot_Product_Helper<double>;
+}
 

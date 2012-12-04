@@ -86,9 +86,11 @@ Create_BW_Shear_Force(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangl
     return sf;
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T) \
     template class BW_SHEAR_FORCES<VECTOR<T,3> >; \
-    template BW_SHEAR_FORCES<VECTOR<T,3> >* PhysBAM::Create_BW_Shear_Force<VECTOR<T,3> >(DEFORMABLE_PARTICLES<VECTOR<T,3> >&,TRIANGLE_MESH&,const T,const T);
+    template BW_SHEAR_FORCES<VECTOR<T,3> >* Create_BW_Shear_Force<VECTOR<T,3> >(DEFORMABLE_PARTICLES<VECTOR<T,3> >&,TRIANGLE_MESH&,const T,const T);
 
 INSTANTIATION_HELPER(float)
 INSTANTIATION_HELPER(double)
+}

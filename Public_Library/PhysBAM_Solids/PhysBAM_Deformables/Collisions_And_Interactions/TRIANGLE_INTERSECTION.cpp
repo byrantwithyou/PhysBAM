@@ -78,9 +78,11 @@ Topology_Aware_Intersection_Test(VECTOR<int,4> a,VECTOR<int,4> b,ARRAY_VIEW<cons
 
     return true;
 }
-template bool PhysBAM::Topology_Aware_Intersection_Test<VECTOR<float,2> >(VECTOR<int,3>,VECTOR<int,3>,ARRAY_VIEW<VECTOR<float,2> const,int>);
-template bool PhysBAM::Topology_Aware_Intersection_Test<VECTOR<float,3> >(VECTOR<int,4>,VECTOR<int,4>,ARRAY_VIEW<VECTOR<float,3> const,int>);
-template float PhysBAM::Triangle_Intersection_Area<float,VECTOR<float,2> >(TRIANGLE_2D<float> const&,TRIANGLE_2D<float> const&,VECTOR<VECTOR<float,2>,6>&,VECTOR<VECTOR<MATRIX<float,2,2>,6>,6>&);
-template bool PhysBAM::Topology_Aware_Intersection_Test<VECTOR<double,2> >(VECTOR<int,3>,VECTOR<int,3>,ARRAY_VIEW<VECTOR<double,2> const,int>);
-template bool PhysBAM::Topology_Aware_Intersection_Test<VECTOR<double,3> >(VECTOR<int,4>,VECTOR<int,4>,ARRAY_VIEW<VECTOR<double,3> const,int>);
-template double PhysBAM::Triangle_Intersection_Area<double,VECTOR<double,2> >(TRIANGLE_2D<double> const&,TRIANGLE_2D<double> const&,VECTOR<VECTOR<double,2>,6>&,VECTOR<VECTOR<MATRIX<double,2,2>,6>,6>&);
+namespace PhysBAM{
+template bool Topology_Aware_Intersection_Test<VECTOR<float,2> >(VECTOR<int,3>,VECTOR<int,3>,ARRAY_VIEW<VECTOR<float,2> const,int>);
+template bool Topology_Aware_Intersection_Test<VECTOR<float,3> >(VECTOR<int,4>,VECTOR<int,4>,ARRAY_VIEW<VECTOR<float,3> const,int>);
+template float Triangle_Intersection_Area<float,VECTOR<float,2> >(TRIANGLE_2D<float> const&,TRIANGLE_2D<float> const&,VECTOR<VECTOR<float,2>,6>&,VECTOR<VECTOR<MATRIX<float,2,2>,6>,6>&);
+template bool Topology_Aware_Intersection_Test<VECTOR<double,2> >(VECTOR<int,3>,VECTOR<int,3>,ARRAY_VIEW<VECTOR<double,2> const,int>);
+template bool Topology_Aware_Intersection_Test<VECTOR<double,3> >(VECTOR<int,4>,VECTOR<int,4>,ARRAY_VIEW<VECTOR<double,3> const,int>);
+template double Triangle_Intersection_Area<double,VECTOR<double,2> >(TRIANGLE_2D<double> const&,TRIANGLE_2D<double> const&,VECTOR<VECTOR<double,2>,6>&,VECTOR<VECTOR<MATRIX<double,2,2>,6>,6>&);
+}

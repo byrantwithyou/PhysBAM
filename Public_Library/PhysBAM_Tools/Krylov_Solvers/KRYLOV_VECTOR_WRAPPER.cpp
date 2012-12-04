@@ -215,6 +215,7 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     if(!deep_copy) return;
     Resize_Helper(*this,debug_cast<const KRYLOV_VECTOR_WRAPPER<T,TV>&>(v));
 }
+namespace PhysBAM{
 template class KRYLOV_VECTOR_WRAPPER<float,ARRAY<ARRAY<float> > >;
 template class KRYLOV_VECTOR_WRAPPER<float,ARRAY<float> >;
 template KRYLOV_VECTOR_BASE<float>& KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY<float,int>,ARRAY<int>&> >::operator*=(float);
@@ -249,3 +250,4 @@ template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,3>
 template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,3>,int>,ARRAY<int>&> >::~KRYLOV_VECTOR_WRAPPER();
 template KRYLOV_VECTOR_WRAPPER<double,ARRAY<double>&>::KRYLOV_VECTOR_WRAPPER(ARRAY<double>&);
 template KRYLOV_VECTOR_WRAPPER<double,ARRAY<double>&>::~KRYLOV_VECTOR_WRAPPER();
+}

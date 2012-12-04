@@ -53,6 +53,7 @@ Store(const int point_index,const int face_index)
         pairs.Append(pair);}
 }
 //####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template struct TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<T,d> >; \
     template void BOX_HIERARCHY<VECTOR<T,d> >::Intersection_List<TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<T,d> >,T>(BOX_HIERARCHY<VECTOR<T,d> > const&, \
@@ -64,3 +65,4 @@ INSTANTIATION_HELPER(float,2);
 INSTANTIATION_HELPER(float,3);
 INSTANTIATION_HELPER(double,2);
 INSTANTIATION_HELPER(double,3);
+}

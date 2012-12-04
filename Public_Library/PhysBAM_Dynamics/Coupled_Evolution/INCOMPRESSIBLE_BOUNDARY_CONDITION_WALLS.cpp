@@ -40,9 +40,11 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
             for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1,GRID<TV>::GHOST_REGION,side);iterator.Valid();iterator.Next()){
                 psi_D(iterator.Cell_Index())=true;p(iterator.Cell_Index())=0;}}
 }
+namespace PhysBAM{
 template class INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS<VECTOR<float,1> >;
 template class INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS<VECTOR<float,2> >;
 template class INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS<VECTOR<float,3> >;
 template class INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS<VECTOR<double,1> >;
 template class INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS<VECTOR<double,2> >;
 template class INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS<VECTOR<double,3> >;
+}

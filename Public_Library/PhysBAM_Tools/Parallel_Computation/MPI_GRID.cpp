@@ -960,6 +960,7 @@ template<class T_GRID> void MPI_GRID<T_GRID>::Sync_Common_Cell_Weights_To(ARRAY<
 #endif
 
 //#####################################################################
+namespace PhysBAM{
 template class MPI_GRID<GRID<VECTOR<float,1> > >;
 template class MPI_GRID<GRID<VECTOR<float,2> > >;
 template class MPI_GRID<GRID<VECTOR<float,3> > >;
@@ -1176,3 +1177,4 @@ template void MPI_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Face_Data<MP
 template void MPI_GRID<GRID<VECTOR<double,3> > >::Reduce_Add<ARRAY<double,int> >(ARRAY<double,int> const&,ARRAY<double,int>&) const;
 template void MPI_GRID<GRID<VECTOR<double,3> > >::Union_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<bool,FACE_INDEX<3> > >(
     MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<bool,FACE_INDEX<3> >&) const;
+}

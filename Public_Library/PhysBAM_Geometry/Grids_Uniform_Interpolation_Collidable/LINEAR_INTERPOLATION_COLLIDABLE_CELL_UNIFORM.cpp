@@ -94,6 +94,7 @@ From_Base_Node(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X
     bool interpolation_valid;
     return From_Base_Node(grid,u,X,cell,interpolation_valid);
 }
+namespace PhysBAM{
 template class LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<float,1> >,float>;
 template class LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<float,2> >,float>;
 template class LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<float,3> >,float>;
@@ -102,3 +103,4 @@ template class LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<double,1
 template class LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<double,2> >,double>;
 template class LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<double,3> >,double>;
 template class LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<double,3> >,VECTOR<double,3> >;
+}

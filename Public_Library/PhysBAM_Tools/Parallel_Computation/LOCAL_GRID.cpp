@@ -121,6 +121,7 @@ Maximum_Error(const std::string& prefix,const T_FACE_ARRAYS& local_data,const T_
     return max_error;
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template class LOCAL_GRID<GRID<VECTOR<T,d> > >; \
     template T LOCAL_GRID<GRID<VECTOR<T,d> > >::Maximum_Error<ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > >(ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > const&,ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > const&,int,VECTOR<int,d>&,RANGE<VECTOR<int,d> > const&) const; \
@@ -144,3 +145,4 @@ INSTANTIATION_HELPER(float,3);
 INSTANTIATION_HELPER(double,1);
 INSTANTIATION_HELPER(double,2);
 INSTANTIATION_HELPER(double,3);
+}

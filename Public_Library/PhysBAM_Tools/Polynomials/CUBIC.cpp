@@ -298,5 +298,7 @@ Coefficients_From_Interpolation(T x1,T y1,T x2,T y2,T x3,T y3,T x4,T y4)
     c0=y4+den*x4*(x4*(p2-x4*p3)-p1);
 }
 //#####################################################################
+namespace PhysBAM{
 template class CUBIC<float>;
 template class CUBIC<double>;
+}

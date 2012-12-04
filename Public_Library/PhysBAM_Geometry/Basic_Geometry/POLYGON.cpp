@@ -169,9 +169,11 @@ Signed_Distance(const TV& location) const
     return Inside_Polygon(location)?-distance:distance;
 }
 //#####################################################################
+namespace PhysBAM{
 template class POLYGON<VECTOR<float,1> >;
 template class POLYGON<VECTOR<float,2> >;
 template class POLYGON<VECTOR<float,3> >;
 template class POLYGON<VECTOR<double,1> >;
 template class POLYGON<VECTOR<double,2> >;
 template class POLYGON<VECTOR<double,3> >;
+}

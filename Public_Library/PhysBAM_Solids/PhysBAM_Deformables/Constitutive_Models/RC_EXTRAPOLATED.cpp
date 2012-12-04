@@ -317,7 +317,9 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
     ddE+=2*h*dg.Transpose_Times(du).Symmetric_Part()+k*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh)+k*h*ddh;
     for(int i=0;i<d;i++) ddE+=h*g(i)*ddu(i)+h*ddg(i)*u(i);
 }
+namespace PhysBAM{
 template class RC_EXTRAPOLATED<float,2>;
 template class RC_EXTRAPOLATED<float,3>;
 template class RC_EXTRAPOLATED<double,2>;
 template class RC_EXTRAPOLATED<double,3>;
+}

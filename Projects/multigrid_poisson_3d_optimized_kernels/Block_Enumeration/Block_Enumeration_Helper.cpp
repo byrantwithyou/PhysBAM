@@ -137,5 +137,7 @@ Compute_Offsets(int& xmin,int& xmax,int& red_block_offset,int& black_block_offse
 }
 
 //#####################################################################
+namespace PhysBAM{
 template class Block_Enumeration_Helper<void>;
+}
 

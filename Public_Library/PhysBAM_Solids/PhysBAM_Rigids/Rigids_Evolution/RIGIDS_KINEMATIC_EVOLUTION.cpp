@@ -57,9 +57,11 @@ Set_External_Positions(FRAME<TV>& frame,const T time,const int id)
     BASE::Set_External_Positions(frame,time,new_id);
 }
 //#####################################################################
+namespace PhysBAM{
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<float,1> >;
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<float,2> >;
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<float,3> >;
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<double,1> >;
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<double,2> >;
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<double,3> >;
+}

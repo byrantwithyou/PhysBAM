@@ -198,7 +198,9 @@ Compute_Energy() const
     return energy;
 }
 //#####################################################################
+namespace PhysBAM{
 template class LINEAR_BENDING_ELEMENTS<VECTOR<float,2> >;
 template class LINEAR_BENDING_ELEMENTS<VECTOR<float,3> >;
 template class LINEAR_BENDING_ELEMENTS<VECTOR<double,2> >;
 template class LINEAR_BENDING_ELEMENTS<VECTOR<double,3> >;
+}

@@ -79,6 +79,7 @@ Interpolate_Face_Normalized(const T_BLOCK& block,const T_FACE_ARRAYS& face_veloc
     TV DX=Transformed(block,X),velocity=Interpolate_Face_Transformed(block,face_velocities,DX),weight=Interpolate_Face_Transformed(valid_values_block,valid_values,DX);
     return TV(weight.x==0?default_value.x:velocity.x/weight.x,weight.y==0?default_value.y:velocity.y/weight.y,weight.z==0?default_value.z:velocity.z/weight.z);
 }
+namespace PhysBAM{
 template class LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >;
 template VECTOR<float,2> LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >::Extrema_Face_X_Transformed<BLOCK_UNIFORM<GRID<VECTOR<float,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,VECTOR<float,3> const&);
 template VECTOR<float,2> LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >::Extrema_Face_Y_Transformed<BLOCK_UNIFORM<GRID<VECTOR<float,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,VECTOR<float,3> const&);
@@ -99,3 +100,4 @@ template double LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::In
 template ARRAY<PAIR<FACE_INDEX<3>,double> > LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::Interpolate_Face_X_Transformed_Weights<BLOCK_UNIFORM<GRID<VECTOR<double,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,VECTOR<double,3> const&);
 template ARRAY<PAIR<FACE_INDEX<3>,double> > LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::Interpolate_Face_Y_Transformed_Weights<BLOCK_UNIFORM<GRID<VECTOR<double,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,VECTOR<double,3> const&);
 template ARRAY<PAIR<FACE_INDEX<3>,double> > LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::Interpolate_Face_Z_Transformed_Weights<BLOCK_UNIFORM<GRID<VECTOR<double,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,VECTOR<double,3> const&);
+}

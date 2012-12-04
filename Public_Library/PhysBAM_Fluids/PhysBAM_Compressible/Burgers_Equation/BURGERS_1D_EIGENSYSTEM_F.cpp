@@ -44,5 +44,7 @@ Eigenvectors(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int i,MATRIX<T,d,
     R(0,0)=1;
 }  
 //#####################################################################
+namespace PhysBAM{
 template class BURGERS_1D_EIGENSYSTEM_F<float>;
 template class BURGERS_1D_EIGENSYSTEM_F<double>;
+}

@@ -360,5 +360,7 @@ Triangle_Segment_Intersection_Barycentric_Coordinates(const VECTOR<VECTOR<T,3>,3
     triangle_weights=VECTOR<T,2>(weights.x,weights.y);segment_weight=weights.z;
 }
 //####################################################################
+namespace PhysBAM{
 template class SIMPLEX_INTERACTIONS<float>;
 template class SIMPLEX_INTERACTIONS<double>;
+}

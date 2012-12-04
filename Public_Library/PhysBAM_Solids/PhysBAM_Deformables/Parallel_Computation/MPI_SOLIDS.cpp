@@ -867,6 +867,7 @@ template<class TV> void MPI_SOLIDS<TV>::Barrier() const {PHYSBAM_NOT_IMPLEMENTED
     INSTANTIATION_HELPER_ALL3(P(V),T,3,3); \
     INSTANTIATION_HELPER_ALL_NEED1(P(V),T);
 
+namespace PhysBAM{
 template class MPI_SOLIDS<VECTOR<float,1> >;
 template class MPI_SOLIDS<VECTOR<float,2> >;
 template class MPI_SOLIDS<VECTOR<float,3> >;
@@ -881,3 +882,4 @@ INSTANTIATION_HELPER_1D_ONLY(double);
 INSTANTIATION_HELPER_ALL(P(VECTOR<double,2>),double);
 INSTANTIATION_HELPER_ALL(P(VECTOR<double,3>),double);
 INSTANTIATION_HELPER_ALL_NEED1(P(VECTOR<double,1>),double);
+}

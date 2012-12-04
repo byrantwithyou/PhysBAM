@@ -79,8 +79,10 @@ Covariance_Ellipsoid(const T_ARRAY_TV& points)
     return ELLIPSOID<T>(average,eigenvalues.Sqrt(),eigenvectors);
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T) \
     template class ELLIPSOID<T>; \
     template ELLIPSOID<T> ELLIPSOID<T>::Covariance_Ellipsoid(const ARRAY<VECTOR<T,3> >& points);
 INSTANTIATION_HELPER(float)
 INSTANTIATION_HELPER(double)
+}

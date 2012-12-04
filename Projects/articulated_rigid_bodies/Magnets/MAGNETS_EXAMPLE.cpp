@@ -170,5 +170,7 @@ Drop_Letter(std::string letter,int parent_id,TV start,ROTATION<TV> orient,bool s
     joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(),ROTATION<TV>((T)pi/2,TV(0,1,0))));
 }
 //#####################################################################
+namespace PhysBAM{
 template class MAGNETS_EXAMPLE<float>;
 template class MAGNETS_EXAMPLE<double>;
+}

@@ -82,7 +82,9 @@ Read_Output_Files(const int frame)
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,face_velocities);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class PLS_EXAMPLE<VECTOR<float,2> >;
 template class PLS_EXAMPLE<VECTOR<float,3> >;
 template class PLS_EXAMPLE<VECTOR<double,2> >;
 template class PLS_EXAMPLE<VECTOR<double,3> >;
+}

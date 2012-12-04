@@ -263,6 +263,7 @@ Face_Jump_Multiphase(const int axis,const TV_INT& face_index,const int current_r
     return constants.z*Flame_Speed_Face_Multiphase(axis,face_index,current_region,face_region)*face_normal;
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T_GRID) \
     template class PROJECTION_DYNAMICS_UNIFORM<T_GRID>;
 
@@ -273,3 +274,4 @@ INSTANTIATION_HELPER(P(GRID<VECTOR<float,3> >));
 INSTANTIATION_HELPER(P(GRID<VECTOR<double,1> >));
 INSTANTIATION_HELPER(P(GRID<VECTOR<double,2> >));
 INSTANTIATION_HELPER(P(GRID<VECTOR<double,3> >));
+}

@@ -135,5 +135,7 @@ Get_Triangulated_Area(const int sign)
     return area;
 }
 //#####################################################################
+namespace PhysBAM{
 template class DUALCONTOUR_2D<float>;
 template class DUALCONTOUR_2D<double>;
+}

@@ -125,9 +125,11 @@ Debug_Write(const std::string& output_directory_input)
     FILE_UTILITIES::Write_To_Text_File(output_directory_axis+"/common/last_frame",frame[axis]);frame[axis]+=1;
 }
 //#####################################################################
+namespace PhysBAM{
 template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<GRID<VECTOR<float,1> > >;
 template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<GRID<VECTOR<float,2> > >;
 template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<GRID<VECTOR<float,3> > >;
 template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<GRID<VECTOR<double,1> > >;
 template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<GRID<VECTOR<double,2> > >;
 template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<GRID<VECTOR<double,3> > >;
+}

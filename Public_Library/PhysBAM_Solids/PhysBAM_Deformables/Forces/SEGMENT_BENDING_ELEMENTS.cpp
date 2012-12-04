@@ -125,5 +125,7 @@ CFL_Strain_Rate() const
     return Robust_Divide((T)pi*max_strain_per_time_step,max_dtheta_dt);
 }
 //#####################################################################
+namespace PhysBAM{
 template class SEGMENT_BENDING_ELEMENTS<float>;
 template class SEGMENT_BENDING_ELEMENTS<double>;
+}

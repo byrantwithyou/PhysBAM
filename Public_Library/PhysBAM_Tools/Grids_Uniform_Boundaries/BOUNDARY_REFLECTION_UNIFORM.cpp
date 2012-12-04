@@ -32,6 +32,7 @@ Fill_Single_Ghost_Region(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,c
             u_ghost(node)=u_ghost(reflected_node);}}
 }
 //#####################################################################
+namespace PhysBAM{
 template class BOUNDARY_REFLECTION_UNIFORM<GRID<VECTOR<float,1> >,float>;
 template class BOUNDARY_REFLECTION_UNIFORM<GRID<VECTOR<float,2> >,float>;
 template class BOUNDARY_REFLECTION_UNIFORM<GRID<VECTOR<float,3> >,float>;
@@ -44,3 +45,4 @@ template class BOUNDARY_REFLECTION_UNIFORM<GRID<VECTOR<double,3> >,double>;
 template class BOUNDARY_REFLECTION_UNIFORM<GRID<VECTOR<double,1> >,SYMMETRIC_MATRIX<double,1> >;
 template class BOUNDARY_REFLECTION_UNIFORM<GRID<VECTOR<double,2> >,SYMMETRIC_MATRIX<double,2> >;
 template class BOUNDARY_REFLECTION_UNIFORM<GRID<VECTOR<double,3> >,SYMMETRIC_MATRIX<double,3> >;
+}

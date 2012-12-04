@@ -153,5 +153,7 @@ Print_Diagnostics(std::ostream& output) const
     output<<"Translation : "<<translation<<std::endl;
     output<<"Rigidity penalty at current configuration : "<<Rigidity_Penalty()<<std::endl;
 }
+namespace PhysBAM{
 template class QUASI_RIGID_TRANSFORM_3D<float>;
 template class QUASI_RIGID_TRANSFORM_3D<double>;
+}

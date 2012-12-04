@@ -251,9 +251,11 @@ Map_Coarse_To_Fine(const T_FACE_ARRAYS_SCALAR& coarse_face_velocities,T_FACE_ARR
         levelset_projection.collidable_solver->Set_Up_Second_Order_Cut_Cell_Method(false);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<VECTOR<float,1> > >;
 template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<VECTOR<float,2> > >;
 template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<VECTOR<float,3> > >;
 template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<VECTOR<double,1> > >;
 template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<VECTOR<double,2> > >;
 template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<VECTOR<double,3> > >;
+}

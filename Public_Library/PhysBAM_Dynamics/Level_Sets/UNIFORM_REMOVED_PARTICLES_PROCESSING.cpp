@@ -99,5 +99,7 @@ Blend_Phi(ARRAY<T,VECTOR<int,3> >& result,const T blend_cells) const
         result.array(i)=(1-alpha)*(water_phi.array(i)+particle_phi.array(i))+alpha*(particle_phi.array(i)+offset);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class UNIFORM_REMOVED_PARTICLES_PROCESSING<float>;
 template class UNIFORM_REMOVED_PARTICLES_PROCESSING<double>;
+}

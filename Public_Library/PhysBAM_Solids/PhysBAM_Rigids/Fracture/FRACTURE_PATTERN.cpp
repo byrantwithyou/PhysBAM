@@ -120,5 +120,7 @@ Write(TYPED_OSTREAM& output) const
     for(int r=0;r<regions.m;r++) regions(r)->Write(output);
 }
 //#####################################################################
+namespace PhysBAM{
 template class FRACTURE_PATTERN<float>;
 template class FRACTURE_PATTERN<double>;
+}

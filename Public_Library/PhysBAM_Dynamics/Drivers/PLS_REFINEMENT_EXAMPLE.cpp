@@ -118,7 +118,9 @@ Read_Output_Files(const int frame)
         else FILE_UTILITIES::Read_From_File(stream_type,filename,coarse_face_velocities);}
 }
 //#####################################################################
+namespace PhysBAM{
 template class PLS_REFINEMENT_EXAMPLE<VECTOR<float,2> >;
 template class PLS_REFINEMENT_EXAMPLE<VECTOR<float,3> >;
 template class PLS_REFINEMENT_EXAMPLE<VECTOR<double,2> >;
 template class PLS_REFINEMENT_EXAMPLE<VECTOR<double,3> >;
+}

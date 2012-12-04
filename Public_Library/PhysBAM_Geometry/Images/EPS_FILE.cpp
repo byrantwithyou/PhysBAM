@@ -218,5 +218,7 @@ Lt(const TV &pt)
     Emit(pt);
     Emit("lineto");
 }
+namespace PhysBAM{
 template class EPS_FILE<float>;
 template class EPS_FILE<double>;
+}

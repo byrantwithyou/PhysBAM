@@ -219,9 +219,11 @@ Euler_Step(const ARRAY<TV,TV_INT>& V,const T dt,const T time,const int number_of
     levelset->boundary->Apply_Boundary_Condition(grid,phi,time+dt);
 }
 //#####################################################################
+namespace PhysBAM{
 template class LEVELSET_ADVECTION<VECTOR<float,1> >;
 template class LEVELSET_ADVECTION<VECTOR<float,2> >;
 template class LEVELSET_ADVECTION<VECTOR<float,3> >;
 template class LEVELSET_ADVECTION<VECTOR<double,1> >;
 template class LEVELSET_ADVECTION<VECTOR<double,2> >;
 template class LEVELSET_ADVECTION<VECTOR<double,3> >;
+}

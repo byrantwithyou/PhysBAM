@@ -108,9 +108,11 @@ Resize(const KRYLOV_VECTOR_BASE<T>& w)
 {
     v.Resize(debug_cast<const ARTICULATED_VECTOR<TV>&>(w).v.m);
 }
+namespace PhysBAM{
 template class ARTICULATED_VECTOR<VECTOR<float,1> >;
 template class ARTICULATED_VECTOR<VECTOR<float,2> >;
 template class ARTICULATED_VECTOR<VECTOR<float,3> >;
 template class ARTICULATED_VECTOR<VECTOR<double,1> >;
 template class ARTICULATED_VECTOR<VECTOR<double,2> >;
 template class ARTICULATED_VECTOR<VECTOR<double,3> >;
+}

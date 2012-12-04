@@ -131,9 +131,11 @@ Update_Processor_Masks(const PARTITION_ID processor,const ARRAY<PARTITION_ID>& p
         | point_processor_masks(particle_hierarchy.children(k-particle_hierarchy.leaves)(1));
 }
 //####################################################################
+namespace PhysBAM{
 template class STRUCTURE_INTERACTION_GEOMETRY<VECTOR<float,1> >;
 template class STRUCTURE_INTERACTION_GEOMETRY<VECTOR<float,2> >;
 template class STRUCTURE_INTERACTION_GEOMETRY<VECTOR<float,3> >;
 template class STRUCTURE_INTERACTION_GEOMETRY<VECTOR<double,1> >;
 template class STRUCTURE_INTERACTION_GEOMETRY<VECTOR<double,2> >;
 template class STRUCTURE_INTERACTION_GEOMETRY<VECTOR<double,3> >;
+}

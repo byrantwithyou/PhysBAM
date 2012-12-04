@@ -114,9 +114,11 @@ Add_Diagonal(ARRAY<T,COUPLING_CONSTRAINT_ID>& diagonal,const GENERALIZED_MASS<TV
         diagonal(COUPLING_CONSTRAINT_ID(i*TV::m+axis))+=solid_mass.one_over_mass.array(entries(i));
 }
 //#####################################################################
+namespace PhysBAM{
 template class MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<VECTOR<float,1> >;
 template class MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<VECTOR<float,2> >;
 template class MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<VECTOR<float,3> >;
 template class MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<VECTOR<double,1> >;
 template class MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<VECTOR<double,2> >;
 template class MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<VECTOR<double,3> >;
+}

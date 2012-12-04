@@ -306,7 +306,9 @@ Test_System(const ARRAY<VECTOR<int,TV::m+1> >& active_list,const ARRAY<int>& ind
     T dif=(rhs1.x-rhs0.x-(T).5*s.x-(T).5*t.x).Magnitude();
     LOG::cout<<"dE "<<dif/e/max(rhs1.x.Magnitude(),rhs0.x.Magnitude(),(T)1e-30)<<std::endl;
 }
+namespace PhysBAM{
 template class MARCHING_CUBES_SYSTEM<VECTOR<float,2> >;
 template class MARCHING_CUBES_SYSTEM<VECTOR<float,3> >;
 template class MARCHING_CUBES_SYSTEM<VECTOR<double,2> >;
 template class MARCHING_CUBES_SYSTEM<VECTOR<double,3> >;
+}

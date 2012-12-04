@@ -137,7 +137,9 @@ Set_All_Springs_To_Phase(const int phase_index) // 1 is critically damped
     else for(int s=0;s<segment_mesh.elements.m;s++) youngs_modulus(s)=youngs_modulus_scaling(phase_index)*base_youngs_modulus(s);
 }
 //#####################################################################
+namespace PhysBAM{
 template class MULTILINEAR_SPRINGS<VECTOR<float,2> >;
 template class MULTILINEAR_SPRINGS<VECTOR<float,3> >;
 template class MULTILINEAR_SPRINGS<VECTOR<double,2> >;
 template class MULTILINEAR_SPRINGS<VECTOR<double,3> >;
+}

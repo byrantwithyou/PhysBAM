@@ -185,5 +185,7 @@ Negative_Cell_Fraction(const T phi_lower_left,const T phi_lower_right,const T ph
     return 0; // should never be called
 }
 //#####################################################################
+namespace PhysBAM{
 template class LEVELSET_UTILITIES<float>;
 template class LEVELSET_UTILITIES<double>;
+}

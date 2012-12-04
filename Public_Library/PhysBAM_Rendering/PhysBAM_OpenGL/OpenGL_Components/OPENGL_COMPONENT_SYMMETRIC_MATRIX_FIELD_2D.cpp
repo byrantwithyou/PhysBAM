@@ -19,5 +19,7 @@ Reinitialize(bool force_load_even_if_not_drawn)
         frame_loaded=frame;valid=true;}
 }
 //##################################################################### 
+namespace PhysBAM{
 template class OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D<float,float>;
 template class OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D<double,double>;
+}

@@ -97,5 +97,7 @@ Reinitialize()
         }
     }
 }
+namespace PhysBAM{
 template class OPENGL_COMPONENT_TRIANGULATED_AREA<float,float>;
 template class OPENGL_COMPONENT_TRIANGULATED_AREA<double,double>;
+}

@@ -218,5 +218,7 @@ R_From_QR_Factorization() const // Gram Schmidt
     return R;
 }
 //#####################################################################
+namespace PhysBAM{
 template class MATRIX<float,3>;
 template class MATRIX<double,3>;
+}

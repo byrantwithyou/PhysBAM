@@ -85,6 +85,8 @@ Run_X_Range(const int xmin,const int xmax)
         }
 }
 //#####################################################################
+namespace PhysBAM{
 template class Coarsened_Discretization_Helper<float>;
 template class Coarsened_Discretization_Helper<double>;
+}
 

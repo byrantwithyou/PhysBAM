@@ -402,5 +402,7 @@ template<class TV> static void Set_Parameters_From_Parameter_List(FLUIDS_PARAMET
     parameter_list.Get_Parameter_In_Place("fluids_parameters.reincorporate_removed_particle_velocity",fluids_parameters.reincorporate_removed_particle_velocity);
 }
 //#####################################################################
+namespace PhysBAM{
 template class THIN_SHELLS_FLUID_COUPLING_UTILITIES<float>;
 template class THIN_SHELLS_FLUID_COUPLING_UTILITIES<double>;
+}

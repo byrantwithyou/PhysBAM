@@ -44,9 +44,11 @@ Euler_Step(const T dt,const T time,const int number_of_ghost_cells)
     else advection->Update_Advection_Equation_Cell(grid,array,array_ghost,*face_velocities,*boundary,dt,time);
 }
 //#####################################################################
+namespace PhysBAM{
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<float,1> >,float>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<float,2> >,float>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<float,3> >,float>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<double,1> >,double>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<double,2> >,double>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<double,3> >,double>;
+}

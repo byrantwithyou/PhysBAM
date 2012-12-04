@@ -94,6 +94,7 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix)
 
         for(int i=0;i<M.offsets.m-1;i++) M.offsets(i+1)+=M.offsets(i);}
 }
+namespace PhysBAM{
 template class SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,2> >;
 template class SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,3> >;
 template void SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,2> >::Initialize<0,1>(BASIS_STENCIL_UNIFORM<VECTOR<float,2>,0> const&,
@@ -122,3 +123,4 @@ template void SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,3> >::Initialize<0,
 template void SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,3> >::Initialize<1,1>(BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,CELL_MANAGER_COLOR<VECTOR<double,3> >&,CELL_MANAGER_COLOR<VECTOR<double,3> >&,
     CELL_DOMAIN_INTERFACE_COLOR<VECTOR<double,3> >&);
+}

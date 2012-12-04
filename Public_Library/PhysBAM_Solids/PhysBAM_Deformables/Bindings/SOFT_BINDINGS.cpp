@@ -136,9 +136,11 @@ Write(TYPED_OSTREAM& output) const
     Write_Binary(output,2,bindings,use_impulses_for_collisions);
 }
 //#####################################################################
+namespace PhysBAM{
 template class SOFT_BINDINGS<VECTOR<float,1> >;
 template class SOFT_BINDINGS<VECTOR<float,2> >;
 template class SOFT_BINDINGS<VECTOR<float,3> >;
 template class SOFT_BINDINGS<VECTOR<double,1> >;
 template class SOFT_BINDINGS<VECTOR<double,2> >;
 template class SOFT_BINDINGS<VECTOR<double,3> >;
+}

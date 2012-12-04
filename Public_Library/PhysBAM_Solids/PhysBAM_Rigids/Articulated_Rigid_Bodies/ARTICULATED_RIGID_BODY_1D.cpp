@@ -205,5 +205,7 @@ Substitute_Joint_Child_Body(JOINT_ID joint_id,int new_child)
     PHYSBAM_WARNING("ARTICULATED_RIGID_BODY<VECTOR<T,1> > not implemented");
 }
 //####################################################################################
+namespace PhysBAM{
 template class ARTICULATED_RIGID_BODY<VECTOR<float,1> >;
 template class ARTICULATED_RIGID_BODY<VECTOR<double,1> >;
+}

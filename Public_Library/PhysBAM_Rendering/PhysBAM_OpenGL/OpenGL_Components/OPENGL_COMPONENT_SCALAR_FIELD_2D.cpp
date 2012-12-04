@@ -111,9 +111,11 @@ Toggle_Color_Map()
 {
     opengl_scalar_field.Toggle_Color_Map();
 }
+namespace PhysBAM{
 template class OPENGL_COMPONENT_SCALAR_FIELD_2D<float,int,float>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_2D<float,bool,float>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_2D<float,float,float>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_2D<double,int,double>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_2D<double,bool,double>;
 template class OPENGL_COMPONENT_SCALAR_FIELD_2D<double,double,double>;
+}

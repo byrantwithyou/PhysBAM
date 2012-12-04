@@ -81,6 +81,7 @@ Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constrain
         rotation_limits.max_corner));
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d,s) \
     template POINT_JOINT<VECTOR<T,d> >::~POINT_JOINT(); \
     template void POINT_JOINT<VECTOR<T,d> >::Constrain_Relative_Linear_Velocity(const FRAME<VECTOR<T,d> >& parent_frame,VECTOR<T,d>& relative_linear_velocity) const; \
@@ -98,3 +99,4 @@ template class POINT_JOINT<VECTOR<float,1> >;
 INSTANTIATION_HELPER(double,2,1)
 INSTANTIATION_HELPER(double,3,3)
 template class POINT_JOINT<VECTOR<double,1> >;
+}

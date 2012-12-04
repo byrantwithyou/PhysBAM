@@ -89,9 +89,11 @@ All_Cell_Faces_Neumann(const TV_INT& cell_index) const
             return false;
     return true;
 }
+namespace PhysBAM{
 template class IMPLICIT_BOUNDARY_CONDITION_COLLECTION<VECTOR<float,1> >;
 template class IMPLICIT_BOUNDARY_CONDITION_COLLECTION<VECTOR<float,2> >;
 template class IMPLICIT_BOUNDARY_CONDITION_COLLECTION<VECTOR<float,3> >;
 template class IMPLICIT_BOUNDARY_CONDITION_COLLECTION<VECTOR<double,1> >;
 template class IMPLICIT_BOUNDARY_CONDITION_COLLECTION<VECTOR<double,2> >;
 template class IMPLICIT_BOUNDARY_CONDITION_COLLECTION<VECTOR<double,3> >;
+}

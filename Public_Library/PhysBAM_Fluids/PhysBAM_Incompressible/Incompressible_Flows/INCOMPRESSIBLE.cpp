@@ -98,6 +98,7 @@ Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection(T_GRID_BASED_COLLISION_
     Set_Custom_Advection(*semi_lagrangian_fire_multiphase_collidable);
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,T_GRID,d) \
     template class ADVECTION_SEMI_LAGRANGIAN_UNIFORM<T_GRID,T,AVERAGING_UNIFORM<T_GRID,FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<T_GRID > >,LINEAR_INTERPOLATION_UNIFORM<T_GRID,T,FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<T_GRID > > >;
 #define P(...) __VA_ARGS__
@@ -113,3 +114,4 @@ INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,3> >),3);
 template class INCOMPRESSIBLE<GRID<VECTOR<double,1> > >;
 template class INCOMPRESSIBLE<GRID<VECTOR<double,2> > >;
 template class INCOMPRESSIBLE<GRID<VECTOR<double,3> > >;
+}

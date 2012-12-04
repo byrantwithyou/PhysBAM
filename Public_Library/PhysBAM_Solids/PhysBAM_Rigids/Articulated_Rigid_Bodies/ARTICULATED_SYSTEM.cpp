@@ -197,7 +197,9 @@ template<class TV> void ARTICULATED_SYSTEM<TV>::
 Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
 {
 }
+namespace PhysBAM{
 template class ARTICULATED_SYSTEM<VECTOR<float,2> >;
 template class ARTICULATED_SYSTEM<VECTOR<float,3> >;
 template class ARTICULATED_SYSTEM<VECTOR<double,2> >;
 template class ARTICULATED_SYSTEM<VECTOR<double,3> >;
+}

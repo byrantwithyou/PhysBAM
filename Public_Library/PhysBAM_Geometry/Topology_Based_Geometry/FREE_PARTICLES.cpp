@@ -39,9 +39,11 @@ Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const
     marks.Subset(nodes).Fill(mark);
 }
 //#####################################################################
+namespace PhysBAM{
 template class FREE_PARTICLES<VECTOR<float,1> >;
 template class FREE_PARTICLES<VECTOR<float,2> >;
 template class FREE_PARTICLES<VECTOR<float,3> >;
 template class FREE_PARTICLES<VECTOR<double,1> >;
 template class FREE_PARTICLES<VECTOR<double,2> >;
 template class FREE_PARTICLES<VECTOR<double,3> >;
+}

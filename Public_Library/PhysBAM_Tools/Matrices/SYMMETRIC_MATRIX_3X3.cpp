@@ -125,5 +125,7 @@ Jacobi_Transform(const int sweep,const T threshold,T& app,T& apq,T& aqq,T& arp,T
         T v3p_tmp=v3p-sine*(v3q+tau*v3p);v3q=v3q+sine*(v3p-tau*v3q);v3p=v3p_tmp;}
 }
 //#####################################################################
+namespace PhysBAM{
 template class SYMMETRIC_MATRIX<float,3>;
 template class SYMMETRIC_MATRIX<double,3>;
+}

@@ -12,9 +12,11 @@ template<class TV> IMPLICIT_BOUNDARY_CONDITION<TV>::
 ~IMPLICIT_BOUNDARY_CONDITION()
 {
 }
+namespace PhysBAM{
 template class IMPLICIT_BOUNDARY_CONDITION<VECTOR<float,1> >;
 template class IMPLICIT_BOUNDARY_CONDITION<VECTOR<float,2> >;
 template class IMPLICIT_BOUNDARY_CONDITION<VECTOR<float,3> >;
 template class IMPLICIT_BOUNDARY_CONDITION<VECTOR<double,1> >;
 template class IMPLICIT_BOUNDARY_CONDITION<VECTOR<double,2> >;
 template class IMPLICIT_BOUNDARY_CONDITION<VECTOR<double,3> >;
+}

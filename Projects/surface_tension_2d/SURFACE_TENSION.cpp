@@ -685,7 +685,7 @@ Test_Analytic_Velocity(T time)
         TV dX=it.Location()-TV((T)(.5*m),(T)(.5*m));
         T r=dX.Magnitude();
         T theta=atan2(dX.y,dX.x);
-        TV u=-epsilon*omega*rh*pow(r/rh,oscillation_mode-1)*sin(omega*time)*TV(cos((1-oscillation_mode)*theta),sin((1-oscillation_mode)*theta));
+        TV u=-epsilon*omega*rh*pow(r/rh,(T)oscillation_mode-1)*sin(omega*time)*TV(cos((1-oscillation_mode)*theta),sin((1-oscillation_mode)*theta));
         T error=fabs(fluid_collection.incompressible_fluid_collection.face_velocities(it.Full_Index())-u(it.Axis()));
         if(error>max_error) max_error=error;
         L1_error+=error;
@@ -1194,7 +1194,7 @@ Postprocess_Substep(const T dt,const T time)
         p=TV(.75,.5)*m;
         LINEAR_INTERPOLATION_MAC<TV,T> interp(*fluids_parameters.grid);
         LOG::cout<<"Vel at [.75,.5]: "<<interp.Clamped_To_Array(fluid_collection.incompressible_fluid_collection.face_velocities,p)<<std::endl;
-        LOG::cout<<"Analytic Vel at [.75,.5]: "<<-omega*circle_perturbation*pow(T(.25)/circle_radius,oscillation_mode-1)*sin(omega*time)*TV(1,0)<<std::endl;
+        LOG::cout<<"Analytic Vel at [.75,.5]: "<<-omega*circle_perturbation*pow(T(.25)/circle_radius,(T)oscillation_mode-1)*sin(omega*time)*TV(1,0)<<std::endl;
     }
 }
 //#####################################################################
@@ -1208,17 +1208,19 @@ Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr)
     ARRAY_VIEW<ATTR>* attribute=particles->template Get_Array<ATTR>(id);
     attribute->Last()=attr;
 }
+namespace PhysBAM{
 template class SURFACE_TENSION<float>;
-template void PhysBAM::Add_Debug_Particle<VECTOR<float,1> >(VECTOR<float,1> const&,VECTOR<float,3> const&);
-template void PhysBAM::Add_Debug_Particle<VECTOR<float,2> >(VECTOR<float,2> const&,VECTOR<float,3> const&);
-template void PhysBAM::Add_Debug_Particle<VECTOR<float,3> >(VECTOR<float,3> const&,VECTOR<float,3> const&);
-template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,1>,VECTOR<float,1> >(ATTRIBUTE_ID,VECTOR<float,1> const&);
-template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<float,2> >(ATTRIBUTE_ID,VECTOR<float,2> const&);
-template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<float,3> >(ATTRIBUTE_ID,VECTOR<float,3> const&);
+template void Add_Debug_Particle<VECTOR<float,1> >(VECTOR<float,1> const&,VECTOR<float,3> const&);
+template void Add_Debug_Particle<VECTOR<float,2> >(VECTOR<float,2> const&,VECTOR<float,3> const&);
+template void Add_Debug_Particle<VECTOR<float,3> >(VECTOR<float,3> const&,VECTOR<float,3> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,1>,VECTOR<float,1> >(ATTRIBUTE_ID,VECTOR<float,1> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<float,2> >(ATTRIBUTE_ID,VECTOR<float,2> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<float,3> >(ATTRIBUTE_ID,VECTOR<float,3> const&);
 template class SURFACE_TENSION<double>;
-template void PhysBAM::Add_Debug_Particle<VECTOR<double,1> >(VECTOR<double,1> const&,VECTOR<double,3> const&);
-template void PhysBAM::Add_Debug_Particle<VECTOR<double,2> >(VECTOR<double,2> const&,VECTOR<double,3> const&);
-template void PhysBAM::Add_Debug_Particle<VECTOR<double,3> >(VECTOR<double,3> const&,VECTOR<double,3> const&);
-template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,1>,VECTOR<double,1> >(ATTRIBUTE_ID,VECTOR<double,1> const&);
-template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,2>,VECTOR<double,2> >(ATTRIBUTE_ID,VECTOR<double,2> const&);
-template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,3>,VECTOR<double,3> >(ATTRIBUTE_ID,VECTOR<double,3> const&);
+template void Add_Debug_Particle<VECTOR<double,1> >(VECTOR<double,1> const&,VECTOR<double,3> const&);
+template void Add_Debug_Particle<VECTOR<double,2> >(VECTOR<double,2> const&,VECTOR<double,3> const&);
+template void Add_Debug_Particle<VECTOR<double,3> >(VECTOR<double,3> const&,VECTOR<double,3> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,1>,VECTOR<double,1> >(ATTRIBUTE_ID,VECTOR<double,1> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,2>,VECTOR<double,2> >(ATTRIBUTE_ID,VECTOR<double,2> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,3>,VECTOR<double,3> >(ATTRIBUTE_ID,VECTOR<double,3> const&);
+}

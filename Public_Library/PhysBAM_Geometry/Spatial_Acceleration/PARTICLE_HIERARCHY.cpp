@@ -65,6 +65,7 @@ Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& r
     else for(int k=0;k<leaves;k++){TV center=bounding_boxes(k).Center();radius(k)=sqrt((X(k)-center).Magnitude_Squared());}
 }
 //#####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template class PARTICLE_HIERARCHY<VECTOR<T,d> >; \
     template class PARTICLE_HIERARCHY<VECTOR<T,d>,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<T,d>,int> > >;
@@ -74,3 +75,4 @@ INSTANTIATION_HELPER(float,3)
 INSTANTIATION_HELPER(double,1)
 INSTANTIATION_HELPER(double,2)
 INSTANTIATION_HELPER(double,3)
+}

@@ -249,9 +249,12 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
 }
 //#####################################################################
+namespace PhysBAM{
 template class INCOMPRESSIBLE_DRIVER<VECTOR<float,1> >;
 template class INCOMPRESSIBLE_DRIVER<VECTOR<float,2> >;
 template class INCOMPRESSIBLE_DRIVER<VECTOR<float,3> >;
 template class INCOMPRESSIBLE_DRIVER<VECTOR<double,1> >;
 template class INCOMPRESSIBLE_DRIVER<VECTOR<double,2> >;
 template class INCOMPRESSIBLE_DRIVER<VECTOR<double,3> >;
+}
+

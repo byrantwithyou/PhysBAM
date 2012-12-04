@@ -148,5 +148,7 @@ Potential_Energy(const T time) const
             pe+=coefficient/2*(surface.particles.X(p)-point).Magnitude_Squared();}
     return pe;
 }
+namespace PhysBAM{
 template class LINEAR_POINT_ATTRACTION<VECTOR<float,2> >;
 template class LINEAR_POINT_ATTRACTION<VECTOR<double,2> >;
+}

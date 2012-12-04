@@ -129,9 +129,11 @@ CFL(const T density) const
     return elastic_modulus?grid.dX.Min()*sqrt(density/elastic_modulus):(T)FLT_MAX;
 }
 //#####################################################################
+namespace PhysBAM{
 template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<float,1> > >;
 template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<float,2> > >;
 template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<float,3> > >;
 template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<double,1> > >;
 template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<double,2> > >;
 template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<double,3> > >;
+}

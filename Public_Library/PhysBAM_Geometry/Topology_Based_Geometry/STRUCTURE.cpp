@@ -71,9 +71,11 @@ Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>* p
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
 //#####################################################################
+namespace PhysBAM{
 template class STRUCTURE<VECTOR<float,1> >;
 template class STRUCTURE<VECTOR<float,2> >;
 template class STRUCTURE<VECTOR<float,3> >;
 template class STRUCTURE<VECTOR<double,1> >;
 template class STRUCTURE<VECTOR<double,2> >;
 template class STRUCTURE<VECTOR<double,3> >;
+}

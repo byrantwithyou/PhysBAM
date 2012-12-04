@@ -368,9 +368,11 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
             face_velocities(it.Full_Index())=u.v(index);
             /*Add_Debug_Particle(it.Location(),color_map(u.v(index)));*/}}
 }
+namespace PhysBAM{
 template class KANG_POISSON_VISCOSITY<VECTOR<float,1> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<float,2> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<float,3> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<double,1> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<double,2> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<double,3> >;
+}

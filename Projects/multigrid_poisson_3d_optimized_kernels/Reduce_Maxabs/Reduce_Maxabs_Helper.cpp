@@ -67,5 +67,7 @@ Run_X_Range(const int xmin,const int xmax,const int partition_number)
     maxabs_partial_results[partition_number]=local_maxabs;
 }
 //#####################################################################
+namespace PhysBAM{
 template class Reduce_Maxabs_Helper<float>;
 template class Reduce_Maxabs_Helper<double>;
+}

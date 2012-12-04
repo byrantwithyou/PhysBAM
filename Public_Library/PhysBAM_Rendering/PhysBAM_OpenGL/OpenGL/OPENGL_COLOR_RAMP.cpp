@@ -90,5 +90,7 @@ Levelset_Color_Linear_Ramp(const OPENGL_COLOR& negative_color,const OPENGL_COLOR
     if(abs_value_max>0) ramp->Add_Color(abs_value_max,OPENGL_COLOR::Gray(0,0));
     return ramp;
 }
+namespace PhysBAM{
 template class OPENGL_COLOR_RAMP<float>;
 template class OPENGL_COLOR_RAMP<double>;
+}

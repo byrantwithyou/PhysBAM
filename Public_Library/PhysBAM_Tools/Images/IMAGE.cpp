@@ -81,6 +81,7 @@ Is_Supported(const std::string& filename)
     else return false;
 }
 //#####################################################################
+namespace PhysBAM{
 template class IMAGE<float>;
 template void IMAGE<float>::Read(const std::string&,ARRAY<VECTOR<float,3> ,VECTOR<int,2> >&);
 template void IMAGE<float>::Read(const std::string&,ARRAY<VECTOR<float,4> ,VECTOR<int,2> >&);
@@ -91,3 +92,4 @@ template void IMAGE<double>::Read(const std::string&,ARRAY<VECTOR<double,3> ,VEC
 template void IMAGE<double>::Read(const std::string&,ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&);
 template void IMAGE<double>::Write(const std::string&,const ARRAY<VECTOR<double,3> ,VECTOR<int,2> >&,const double,const double);
 template void IMAGE<double>::Write(const std::string&,const ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&,const double,const double);
+}

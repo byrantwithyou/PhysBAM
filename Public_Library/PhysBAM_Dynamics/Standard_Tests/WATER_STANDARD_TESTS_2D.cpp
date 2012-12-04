@@ -424,5 +424,7 @@ Initial_Phi_Object(const TV& X) const
     return 1;
 }
 //#####################################################################
+namespace PhysBAM{
 template class WATER_STANDARD_TESTS_2D<GRID<VECTOR<float,2> > >;
 template class WATER_STANDARD_TESTS_2D<GRID<VECTOR<double,2> > >;
+}

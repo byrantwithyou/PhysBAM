@@ -92,9 +92,11 @@ Initialize_Collision_Aware_Face_Iterator(const ARRAY<bool,TV_INT>& outside_fluid
             if(!(*outside_fluid)(second_cell_index)){cfi.side=1;collision_face_info.Append(cfi);}}}
     if(use_collision_face_neighbors) Register_Neighbors_As_Collision_Faces();
 }
+namespace PhysBAM{
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<VECTOR<float,1> >;
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<VECTOR<float,2> >;
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<VECTOR<float,3> >;
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<VECTOR<double,1> >;
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<VECTOR<double,2> >;
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<VECTOR<double,3> >;
+}

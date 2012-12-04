@@ -193,9 +193,11 @@ Apply_Boundary_Condition(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE& u,const T t
     for(int side=0;side<2*T_GRID::dimension;side++) Apply_Boundary_Condition_Single_Side(grid,u,side,time);
 }
 //#####################################################################
+namespace PhysBAM{
 template class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<GRID<VECTOR<float,1> > >;
 template class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<GRID<VECTOR<float,2> > >;
 template class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<GRID<VECTOR<float,3> > >;
 template class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<GRID<VECTOR<double,1> > >;
 template class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<GRID<VECTOR<double,2> > >;
 template class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<GRID<VECTOR<double,3> > >;
+}

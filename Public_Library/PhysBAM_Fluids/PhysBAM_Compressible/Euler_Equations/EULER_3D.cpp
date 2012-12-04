@@ -51,5 +51,7 @@ CFL()
     return 1/dt_convect;
 }              
 //#####################################################################
+namespace PhysBAM{
 template class EULER_3D<float>;
 template class EULER_3D<double>;
+}

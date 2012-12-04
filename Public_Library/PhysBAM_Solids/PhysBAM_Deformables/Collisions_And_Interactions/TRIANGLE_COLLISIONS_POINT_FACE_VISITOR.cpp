@@ -57,6 +57,7 @@ Store(const int point_index,const int face_index)
     else pairs_internal.Append(nodes);
 }
 //####################################################################
+namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
     template struct TRIANGLE_COLLISIONS_POINT_FACE_VISITOR<VECTOR<T,d> >; \
     template void BOX_HIERARCHY<VECTOR<T,d> >::Intersection_List<TRIANGLE_COLLISIONS_POINT_FACE_VISITOR<VECTOR<T,d> >,ZERO>(BOX_HIERARCHY<VECTOR<T,d> > const&, \
@@ -75,3 +76,4 @@ INSTANTIATION_HELPER(float,3);
 template struct TRIANGLE_COLLISIONS_POINT_FACE_VISITOR<VECTOR<double,1> >;
 INSTANTIATION_HELPER(double,2);
 INSTANTIATION_HELPER(double,3);
+}

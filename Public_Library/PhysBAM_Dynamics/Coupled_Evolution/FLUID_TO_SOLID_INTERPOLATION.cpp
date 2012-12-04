@@ -103,9 +103,11 @@ Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const
     oo.End_Sparse_Matrix();
 }
 //#####################################################################
+namespace PhysBAM{
 template class FLUID_TO_SOLID_INTERPOLATION<VECTOR<float,1> >;
 template class FLUID_TO_SOLID_INTERPOLATION<VECTOR<float,2> >;
 template class FLUID_TO_SOLID_INTERPOLATION<VECTOR<float,3> >;
 template class FLUID_TO_SOLID_INTERPOLATION<VECTOR<double,1> >;
 template class FLUID_TO_SOLID_INTERPOLATION<VECTOR<double,2> >;
 template class FLUID_TO_SOLID_INTERPOLATION<VECTOR<double,3> >;
+}

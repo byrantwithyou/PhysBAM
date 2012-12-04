@@ -102,5 +102,7 @@ Print_Control_Points_And_Times()
 {
     for(int i=0;i<control_points.m;i++) LOG::cout<<"Time: "<<control_points_times(i)<<", Control Point: "<<control_points(i)<<std::endl;
 }
+namespace PhysBAM{
 template class BSPLINE<float,VECTOR<float,3> >;
 template class BSPLINE<double,VECTOR<double,3> >;
+}

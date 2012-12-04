@@ -441,6 +441,7 @@ Jacobian_Linear_Helper(const TV& j,const int i) const
         *(SYMMETRIC_MATRIX<T,3>::Outer_Product(v)-1))*angular.inverse_inertia[i];
 }
 //#####################################################################
+namespace PhysBAM{
 template class ANGULAR_CONSTRAINT_FUNCTION<VECTOR<float,2> >;
 template class ANGULAR_CONSTRAINT_FUNCTION<VECTOR<float,3> >;
 template class LINEAR_CONSTRAINT_FUNCTION<VECTOR<float,2> >;
@@ -453,3 +454,4 @@ template class LINEAR_CONSTRAINT_FUNCTION<VECTOR<double,2> >;
 template class LINEAR_CONSTRAINT_FUNCTION<VECTOR<double,3> >;
 template class LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<VECTOR<double,2> >;
 template class LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<VECTOR<double,3> >;
+}

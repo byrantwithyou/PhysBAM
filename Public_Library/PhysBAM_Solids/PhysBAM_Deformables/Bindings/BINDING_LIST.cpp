@@ -241,9 +241,11 @@ Apply_Impulse(const int particle_index,const TV& impulse,ARRAY_VIEW<TV> V_input,
     else V_input(particle_index)+=particles.one_over_mass(particle_index)*impulse;
 }
 //#####################################################################
+namespace PhysBAM{
 template class BINDING_LIST<VECTOR<float,1> >;
 template class BINDING_LIST<VECTOR<float,2> >;
 template class BINDING_LIST<VECTOR<float,3> >;
 template class BINDING_LIST<VECTOR<double,1> >;
 template class BINDING_LIST<VECTOR<double,2> >;
 template class BINDING_LIST<VECTOR<double,3> >;
+}

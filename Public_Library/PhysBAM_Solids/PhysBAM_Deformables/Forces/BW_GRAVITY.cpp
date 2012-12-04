@@ -39,9 +39,11 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
     force_particles.Update(Get_Particle_List(IDENTITY_ARRAY<>(particles.Size())),particle_is_simulated);
 }
 //#####################################################################
+namespace PhysBAM{
 template class BW_GRAVITY<VECTOR<float,1> >;
 template class BW_GRAVITY<VECTOR<float,2> >;
 template class BW_GRAVITY<VECTOR<float,3> >;
 template class BW_GRAVITY<VECTOR<double,1> >;
 template class BW_GRAVITY<VECTOR<double,2> >;
 template class BW_GRAVITY<VECTOR<double,3> >;
+}

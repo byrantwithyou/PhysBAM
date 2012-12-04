@@ -159,7 +159,9 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
     T log_J=log(J);
     return constant_mu*((T).5*(I1-TV::m)-log_J)+(T).5*constant_lambda*sqr(log_J);
 }
+namespace PhysBAM{
 template class NEO_HOOKEAN<float,2>;
 template class NEO_HOOKEAN<float,3>;
 template class NEO_HOOKEAN<double,2>;
 template class NEO_HOOKEAN<double,3>;
+}

@@ -229,9 +229,11 @@ Initiation_Point(const int element)
     number_of_fracture_initiations++;return true;
 }
 //#####################################################################
+namespace PhysBAM{
 template class FRACTURE_OBJECT<VECTOR<float,2>,2>;
 template class FRACTURE_OBJECT<VECTOR<float,3>,2>;
 template class FRACTURE_OBJECT<VECTOR<float,3>,3>;
 template class FRACTURE_OBJECT<VECTOR<double,2>,2>;
 template class FRACTURE_OBJECT<VECTOR<double,3>,2>;
 template class FRACTURE_OBJECT<VECTOR<double,3>,3>;
+}

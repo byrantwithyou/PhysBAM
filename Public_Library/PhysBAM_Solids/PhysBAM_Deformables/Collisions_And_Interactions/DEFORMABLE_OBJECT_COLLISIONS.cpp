@@ -416,9 +416,11 @@ Process_Push_Out()
             check_collision,particle_states,particle_to_collision_body_id,thickness_table);
 }
 //#####################################################################
+namespace PhysBAM{
 template class DEFORMABLE_OBJECT_COLLISIONS<VECTOR<float,1> >;
 template class DEFORMABLE_OBJECT_COLLISIONS<VECTOR<float,2> >;
 template class DEFORMABLE_OBJECT_COLLISIONS<VECTOR<float,3> >;
 template class DEFORMABLE_OBJECT_COLLISIONS<VECTOR<double,1> >;
 template class DEFORMABLE_OBJECT_COLLISIONS<VECTOR<double,2> >;
 template class DEFORMABLE_OBJECT_COLLISIONS<VECTOR<double,3> >;
+}
