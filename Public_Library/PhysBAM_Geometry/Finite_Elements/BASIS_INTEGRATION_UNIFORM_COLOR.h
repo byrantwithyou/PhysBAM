@@ -42,11 +42,8 @@ public:
     const GRID<TV>& phi_grid;
     const ARRAY<T,TV_INT>& phi_value;
     const ARRAY<int,TV_INT>& phi_color;
-    
 
     CELL_DOMAIN_INTERFACE_COLOR<TV>& cdi;
-    ARRAY<ARRAY<VECTOR<int,2> > > all_constraint_color_pairs;
-    ARRAY<ARRAY<int> > all_constraint_offsets;
 
     STATIC_TENSOR<bool,TV::m,static_degree+1> volume_monomials_needed;
     STATIC_TENSOR<bool,TV::m,static_degree+1> surface_monomials_needed;

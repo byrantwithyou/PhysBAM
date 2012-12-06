@@ -117,15 +117,6 @@ public:
     bool operator!=(const VECTOR& v) const
     {return x!=v.x || y!=v.y;}
 
-    bool operator<(const VECTOR& v) const
-    {return x<v.x || (x==v.x && y<v.y) ;}
-    bool operator<=(const VECTOR& v) const
-    {return x<v.x || (x==v.x && y<=v.y) ;}
-    bool operator>(const VECTOR& v) const
-    {return x>v.x || (x==v.x && y>v.y) ;}
-    bool operator>=(const VECTOR& v) const
-    {return x>=v.x || (x==v.x && y>=v.y) ;}
-
     VECTOR operator-() const
     {return VECTOR(-x,-y);}
 
