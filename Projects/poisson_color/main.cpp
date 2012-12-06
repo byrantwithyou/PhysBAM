@@ -13,6 +13,7 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <PhysBAM_Tools/Read_Write/MATLAB_OUTPUT_NEW.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
@@ -181,7 +182,8 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const ARRAY<T,VEC
 //#################################################################################################################################################
 
 template<class TV>
-void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles)
+void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool dump_matrix_matlab,
+bool debug_particles)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -277,6 +279,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
             Dump_Vector<T,TV>(ips,rhs,"extra null mode");}}
     
     if(dump_matrix) OCTAVE_OUTPUT<T>("M.txt").Write("M",ips,*vectors(0),*vectors(1));
+    if(dump_matrix_matlab) MATLAB_OUTPUT_NEW<T>("M.dat").Write("M",ips,*vectors(0),*vectors(1));
     vectors.Delete_Pointers_And_Clean_Memory();
 }
 
@@ -295,7 +298,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     T m=1,s=1,kg=1;
     int threads=1;
     int test_number=1,resolution=4,max_iter=1000000;
-    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,opt_arg=false;
+    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,dump_matrix_matlab=false,debug_particles=false,opt_arg=false;
     parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-m",&m,"unit","meter scale");
@@ -307,7 +310,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-use_preconditioner",&use_preconditioner,"Use Jacobi preconditioner");
     parse_args.Add("-max_iter",&max_iter,"iter","max number of interations");
     parse_args.Add("-null",&null,"find extra null modes of the matrix");
-    parse_args.Add("-dump_matrix",&dump_matrix,"dump system matrix");
+    parse_args.Add("-dump_matrix",&dump_matrix,"dump system matrix in Octave format");
+    parse_args.Add("-dump_matrix_matlab",&dump_matrix_matlab,"dump system matrix in MATLAB format");
     parse_args.Add("-debug_particles",&debug_particles,"dump debug particles");
     parse_args.Parse();
 
@@ -719,7 +723,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
+    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,dump_matrix_matlab,debug_particles);
     LOG::Finish_Logging();
     delete test;
 }

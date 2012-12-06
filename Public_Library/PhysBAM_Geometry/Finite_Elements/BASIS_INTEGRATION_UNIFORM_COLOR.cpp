@@ -122,6 +122,9 @@ Compute_Entries()
         for(int i=0;i<color_pairs.m;i++)
             if(color_pairs(i).x==BC::SLIP)
                 constraint_offsets(i)=slip_constraints+full_constraints++;
+        
+        all_constraint_color_pairs.Append(color_pairs);
+        all_constraint_offsets.Append(constraint_offsets);
 
         ARRAY<MATRIX<T,TV::m> > base_orientation;
         if(surface_blocks.m){
