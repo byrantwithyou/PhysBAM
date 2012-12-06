@@ -31,6 +31,11 @@ public:
     ARRAY<PAIRWISE_LEVEL_SET_DATA,TV_INT> pairwise_data;
     ARRAY<ARRAY<ARRAY<T,TV_INT> > > pairwise_phi;
 
+    ARRAY<T,TV_INT>& combined_phi;
+        ,ARRAY<int,TV_INT>& color_input)
+        :grid(grid_input),phi(phi_input),color(color_input)
+    {}
+
     TRIPLE_JUNCTION_CORRECTION(const GRID<TV>& grid,ARRAY<ARRAY<T,TV_INT> >& phi,int ghost);
     void Compute_Pairwise_Data();
     void Initialize_Pairwise_Level_Set();
@@ -44,5 +49,6 @@ public:
     void Evolve_Step(ARRAY<T,TV_INT> q[3],const ARRAY<T,TV_INT> p[3]);
     static TV Zero_Phi(const VECTOR<PHI,3>& phi,VECTOR<T,3>& p);
     static TV Meet_Phi(const VECTOR<PHI,2>& phi);
+    
 };
 }

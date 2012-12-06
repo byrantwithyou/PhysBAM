@@ -168,7 +168,7 @@ One_Step_Triple_Junction_Correction()
 {
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
 
-    T max_move=(T).8*grid.dX.Max()+1000;
+    T max_move=(T).5*grid.dX.Max();
     HASHTABLE<TRIPLE<int,int,TV_INT>,T> total_size;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         int mask=~0;
@@ -217,6 +217,25 @@ One_Step_Triple_Junction_Correction()
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
 Update_Color_Level_Sets()
 {
+    ARRAY<bool,TV_INT> filled(grid.Node_Indices(ghost));
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+        int mask=pairwise_data(it.index).valid_flags;
+        int num_bits=count_bits(mask);
+        if(num_bits<2 || !pairwise_data(it.index).trust.Contains(-1)){
+            filled(it.index)=true;
+            Add_Debug_Particle(it.index,VECTOR<T,3>(
+));}
+        if(num_bits==2 && pairwise_data(it.index).trust.Contains(-1)){
+            int rmb=rightmost_bit(mask),lmb=mask-rmb,a=integer_log_exact(rmb),b=integer_log_exact(lmb);
+            T p=pairwise_phi(a)(b)(it.index);
+            phi(a)(it.index)=p;
+            phi(b)(it.index)=-p;}
+        if(count_bits(mask)<3) continue;
+    }
+
+
+
+    
     ARRAY<T> min_phi(phi.m);
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
         min_phi.Fill(FLT_MAX);
