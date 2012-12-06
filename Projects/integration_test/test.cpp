@@ -263,11 +263,11 @@ void Compute(PARSE_ARGS& parse_args)
     for(int i=0;i<3;i++)
         color_phi(i).Resize(grid.Node_Indices(3));
 
-    if(0) // triple
+    if(1) // triple
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next()){
         TV X=it.Location()+(T).0001;
         color_phi(0)(it.index)=Levelset(X);
-        color_phi(1)(it.index)=Levelset(rot.Rotate(X));
+        color_phi(1)(it.index)=Levelset(rot.Rotate(X+.01));
         color_phi(2)(it.index)=Levelset(rot.Rotate(rot.Rotate(X)));}
     else // circle
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next()){
@@ -285,7 +285,7 @@ void Compute(PARSE_ARGS& parse_args)
 
     ARRAY<ARRAY<ARRAY<T,TV_INT> > > pairwise_phi;
     TRIPLE_JUNCTION_CORRECTION<TV> tjc(grid,color_phi,3);
-    tjc.Compute_Pairwise_Level_Set_Data(stencils,pairwise_phi);
+    tjc.Compute_Pairwise_Level_Set_Data();
 
     LOG::Finish_Logging();
 }
