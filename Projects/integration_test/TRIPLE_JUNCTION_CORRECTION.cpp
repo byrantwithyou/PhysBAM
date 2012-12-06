@@ -9,8 +9,11 @@
 #include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
 #include <PhysBAM_Tools/Math_Tools/integer_log.h>
 #include <PhysBAM_Tools/Polynomials/QUADRATIC.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
+#include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_TETRAHEDRA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include "TRIPLE_JUNCTION_CORRECTION.h"
@@ -223,8 +226,8 @@ Update_Color_Level_Sets()
         int num_bits=count_bits(mask);
         if(num_bits<2 || !pairwise_data(it.index).trust.Contains(-1)){
             filled(it.index)=true;
-            Add_Debug_Particle(it.index,VECTOR<T,3>(
-));}
+            //Add_Debug_Particle(it.index,VECTOR<T,3>());
+        }
         if(num_bits==2 && pairwise_data(it.index).trust.Contains(-1)){
             int rmb=rightmost_bit(mask),lmb=mask-rmb,a=integer_log_exact(rmb),b=integer_log_exact(lmb);
             T p=pairwise_phi(a)(b)(it.index);
@@ -232,10 +235,6 @@ Update_Color_Level_Sets()
             phi(b)(it.index)=-p;}
         if(count_bits(mask)<3) continue;
     }
-
-
-
-    
     ARRAY<T> min_phi(phi.m);
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
         min_phi.Fill(FLT_MAX);
@@ -281,30 +280,32 @@ Update_Color_Level_Sets()
 //#####################################################################
 // Function Initialize_Stencils_Helper
 //#####################################################################
-template<class TV,class TV_INT> static void
-Initialize_Stencils_Helper(const GRID<TV>& grid,ARRAY<VECTOR<TV_INT,3> >& stencils)
+template<class TV_INT> static void
+Initialize_Stencils_Helper(VECTOR<VECTOR<VECTOR<TV_INT,3>,2>,2>& stencils)
 {
-    TRIANGULATED_AREA<typename TV::SCALAR> ta;
-    ta.Initialize_Square_Mesh_And_Particles(grid,true);
-
-    stencils.Resize(ta.mesh.elements.m);
-    for(int i=0;i<ta.mesh.elements.m;i++)
-        for(int v=0;v<TV::m+1;v++)
-            stencils(i)(v)=TV_INT(rint(ta.particles.X(ta.mesh.elements(i)(v))));
+    TV_INT v00(0,0),v01(0,1),v10(1,0),v11(1,1);
+    stencils(0)(0)=VECTOR<TV_INT,3>(v00,v10,v11);
+    stencils(0)(1)=VECTOR<TV_INT,3>(v01,v00,v11);
+    stencils(1)(0)=VECTOR<TV_INT,3>(v10,v01,v00);
+    stencils(1)(1)=VECTOR<TV_INT,3>(v11,v01,v10);
 }
 //#####################################################################
 // Function Initialize_Stencils_Helper
 //#####################################################################
-template<class TV,class TV_INT> static void
-Initialize_Stencils_Helper(const GRID<TV>& grid,ARRAY<VECTOR<TV_INT,4> >& stencils)
+template<class TV_INT> static void
+Initialize_Stencils_Helper(VECTOR<VECTOR<VECTOR<TV_INT,4>,5>,2>& stencils)
 {
-    TETRAHEDRALIZED_VOLUME<typename TV::SCALAR> tv;
-    tv.Initialize_Cube_Mesh_And_Particles(grid);
-
-    stencils.Resize(tv.mesh.elements.m);
-    for(int i=0;i<tv.mesh.elements.m;i++)
-        for(int v=0;v<TV::m+1;v++)
-            stencils(i)(v)=TV_INT(rint(tv.particles.X(tv.mesh.elements(i)(v))));
+    TV_INT v000(0,0,0),v010(0,1,0),v100(1,0,0),v110(1,1,0),v001(0,0,1),v011(0,1,1),v101(1,0,1),v111(1,1,1);
+    stencils(0)(0)=VECTOR<TV_INT,4>(v000,v100,v010,v001);
+    stencils(0)(1)=VECTOR<TV_INT,4>(v110,v010,v100,v111);
+    stencils(0)(2)=VECTOR<TV_INT,4>(v011,v111,v001,v010);
+    stencils(0)(3)=VECTOR<TV_INT,4>(v101,v001,v111,v100);
+    stencils(0)(4)=VECTOR<TV_INT,4>(v111,v100,v001,v010);
+    stencils(1)(0)=VECTOR<TV_INT,4>(v001,v101,v000,v011);
+    stencils(1)(1)=VECTOR<TV_INT,4>(v111,v011,v110,v101);
+    stencils(1)(2)=VECTOR<TV_INT,4>(v010,v110,v011,v000);
+    stencils(1)(3)=VECTOR<TV_INT,4>(v100,v000,v101,v110);
+    stencils(1)(4)=VECTOR<TV_INT,4>(v110,v101,v011,v000);
 }
 //#####################################################################
 // Function Initialize_Stencils
@@ -325,19 +326,121 @@ Cut_Interface(HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data)
 #endif
 }
 //#####################################################################
+// Function Initialize_Stencils
+//#####################################################################
+template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
+Initialize_Stencils()
+{
+#if 0
+    Initialize_Stencils_Helper(stencils);
+#endif
+}
+//#####################################################################
+// Function Cut_Interface
+//#####################################################################
+template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
+Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
+{
+#if 0
+    const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        CELL_ELEMENTS ce;
+        const VECTOR<VECTOR<TV_INT,TV::m+1>,num_stencils>& stencils_parity=stencils(it.index.Sum()&1);
+        int full_mask=0;
+        for(int j=0;j<bits.m;j++)
+            full_mask|=pairwise_data(bits(j)).valid_flags;
+        if(count_bits(full_mask)<3){
+            VECTOR<int,(1<<TV::m)> colors(combined_color.Subset(bits+it.index));
+            if(colors.Count_Matches(colors(0))<=(1<<TV::m))
+                for(int i=0;i<stencils_parity.m;i++)
+                    Cut_Stencil_With_Phi(ce,it.index,VECTOR<TV_INT,TV::m+1>(stencils_parity(i)+it.index));
+            continue;}
+
+        for(int i=0;i<stencils_parity.m;i++){
+            VECTOR<TV_INT,TV::m+1> st(stencils_parity(i)+it.index);
+            int mask=~0;
+            for(int j=0;j<st.m;j++)
+                mask&=pairwise_data(st(j)).valid_flags;
+            if(count_bits(mask)<3) Cut_Stencil_With_Phi(ce,it.index,st);
+            else Cut_Stencil_With_Pairwise_Phi(ce,it.index,st);}
+        if(ce.interface.m)
+            index_to_cell_data.Get_Or_Insert(it.index)=ce;}
+#endif
+}
+//#####################################################################
 // Function Cut_Stencil_With_Phi
 //#####################################################################
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
-Cut_Stencil_With_Phi(HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,const TV_INT& cell,int s)
+Cut_Stencil_With_Phi(CELL_ELEMENTS& ce,const TV_INT& cell,const VECTOR<TV_INT,TV::m+1>& st)
 {
-    
+    VECTOR<TV,TV::m+1> X;
+    VECTOR<T,TV::m+1> element_phi;
+    VECTOR<int,2> color_pair;
+    for(int i=0;i<TV::m+1;i++){
+        X(i)=grid.Node(st(i));
+        T mn=combined_phi(st(i));
+        int col=combined_color(st(i));
+        if(color_pair.x==-1 || color_pair.x==col) color_pair.x=col;
+        else{
+            PHYSBAM_ASSERT(color_pair.y==-1 || color_pair.y==col);
+            if(color_pair.x>col){
+                element_phi=-element_phi;
+                color_pair.y=color_pair.x;
+                color_pair.x=col;}
+            else{
+                mn=-mn;
+                color_pair.y=col;}}
+        element_phi(i)=mn;}
+
+    ARRAY<T_FACE> interface,boundary_faces[2];
+    VECTOR<VECTOR<ARRAY<T_FACE>*,2>,TV::m+1> boundary;
+    int spec=0,num_diff=0;
+    for(int i=1;i<TV::m+1;i++)
+        if(st(i).x!=st(0).x){
+            num_diff++;
+            spec=i;}
+    if(num_diff==TV::m) spec=0;
+    if(TV::m!=3 || num_diff!=2)
+        boundary(spec)=VECTOR<ARRAY<T_FACE>*,2>(&boundary_faces[1],&boundary_faces[0]);
+    MARCHING_TETRAHEDRA<TV>::Get_Elements_For_Tetrahedron(interface,boundary,element_phi,X);
+
+    for(int i=0;i<interface.m;i++){
+        typename MARCHING_CUBES_COLOR<TV>::INTERFACE_ELEMENT e={interface(i),color_pair};
+        ce.interface.Append(e);}
+
+    for(int s=0;s<2;s++)
+        for(int i=0;i<boundary_faces[s].m;i++){
+            typename MARCHING_CUBES_COLOR<TV>::BOUNDARY_ELEMENT e={boundary_faces[s](i),color_pair(s)};
+            ce.boundary.Append(e);}
 }
 //#####################################################################
 // Function Cut_Stencil_With_Pairwise_Phi
 //#####################################################################
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
-Cut_Stencil_With_Pairwise_Phi(HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,const TV_INT& cell,int s)
+Cut_Stencil_With_Pairwise_Phi(CELL_ELEMENTS& ce,const TV_INT& cell,const VECTOR<TV_INT,TV::m+1>& st)
 {
+    
+}
+//#####################################################################
+// Function Fill_Combined_Level_Set
+//#####################################################################
+template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
+Fill_Combined_Level_Set()
+{
+    ARRAY<T,TV_INT> combined_phi(grid.Node_Indices(ghost));
+    ARRAY<int,TV_INT> combined_color(grid.Node_Indices(ghost));
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+        int min_index=-1;
+        T min1=FLT_MAX,min2=FLT_MAX;
+        for(int i=0;i<phi.m;i++){
+            T p=phi(i)(it.index);
+            if(p<min1){min2=min1;min1=p;min_index=i;}
+            else if(p<min2) min2=p;}
+        T shift=(T).5*(min2+min1);
+        for(int i=0;i<phi.m;i++)
+            phi(i)(it.index)-=shift;
+        combined_color(it.index)=min_index;
+        combined_phi(it.index)=min1-shift;}
 }
 //#####################################################################
 // Function Meet_Phi
