@@ -137,6 +137,12 @@ public:
     ARRAYS_ND_BASE& operator/=(const T2 a)
     {return *this*=Inverse(a);}
 
+    T* Get_Array_Pointer()
+    {return array.Get_Array_Pointer();}
+
+    const T* Get_Array_Pointer() const
+    {return array.Get_Array_Pointer();}
+
     int Number_True() const
     {return array.Number_True();}
 
