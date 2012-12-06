@@ -41,7 +41,7 @@ template<class T> OCTAVE_OUTPUT<T>::
 template<class T> template<class T2,class T_VECTOR> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const ARRAY_BASE<T2,T_VECTOR>& v)
 {
-    out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<v.Size()<<"\n# columns: "<<sizeof(v(0))/sizeof(typename SCALAR_POLICY<T2>::TYPE)<<"\n";
+    out<<"% name: "<<name<<"\n% type: matrix\n% rows: "<<v.Size()<<"\n% columns: "<<sizeof(v(0))/sizeof(typename SCALAR_POLICY<T2>::TYPE)<<"\n";
     for(int i=0;i<v.Size();i++)
         Write_Entry(v(i));
 }
@@ -51,7 +51,7 @@ Write(const char* name,const ARRAY_BASE<T2,T_VECTOR>& v)
 template<class T> template<class T2,class T_MATRIX> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const MATRIX_BASE<T2,T_MATRIX>& m)
 {
-    out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<m.Rows()<<"\n# columns: "<<m.Columns()<<"\n";
+    out<<"% name: "<<name<<"\n% type: matrix\n% rows: "<<m.Rows()<<"\n% columns: "<<m.Columns()<<"\n";
     for(int i=0;i<m.Rows();i++){
         for(int j=0;j<m.Columns();j++)
             out<<m(i,j)<<" ";
@@ -134,7 +134,7 @@ Write(const char* name,const SPARSE_MATRIX_FLAT_MXN<T>& m)
 template<class T> void OCTAVE_OUTPUT<T>::
 Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_MXN<T>& m)
 {
-    out<<"# name: "<<name<<"\n# type: sparse matrix\n# nnz: "<<m.A.m<<"\n# rows: "<<m.n<<"\n# columns: "<<m.m<<"\n";
+    out<<"% name: "<<name<<"\n% type: sparse matrix\n% nnz: "<<m.A.m<<"\n% rows: "<<m.n<<"\n% columns: "<<m.m<<"\n";
     for(int i=0;i<m.m;i++){
         int s=m.offsets(i),e=m.offsets(i+1);
         for(int j=s;j<e;j++) out<<(m.A(j).j+1)<<" "<<(i+1)<<" "<<m.A(j).a<<"\n";}
@@ -155,7 +155,7 @@ Write(const char* name,const SPARSE_MATRIX_FLAT_NXN<T>& m)
 template<class T> void OCTAVE_OUTPUT<T>::
 Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_NXN<T>& m)
 {
-    out<<"# name: "<<name<<"\n# type: sparse matrix\n# nnz: "<<m.A.m<<"\n# rows: "<<m.n<<"\n# columns: "<<m.n<<"\n";
+    out<<"% name: "<<name<<"\n% type: sparse matrix\n% nnz: "<<m.A.m<<"\n% rows: "<<m.n<<"\n% columns: "<<m.n<<"\n";
     for(int i=0;i<m.n;i++){
         int s=m.offsets(i),e=m.offsets(i+1);
         for(int j=s;j<e;j++) out<<(m.A(j).j+1)<<" "<<(i+1)<<" "<<m.A(j).a<<std::endl;}
@@ -166,7 +166,7 @@ Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_NXN<T>& m)
 template<class T> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const MATRIX_MXN<T>& m)
 {
-    out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<m.m<<"\n# columns: "<<m.n<<"\n";
+    out<<"% name: "<<name<<"\n% type: matrix\n% rows: "<<m.m<<"\n% columns: "<<m.n<<"\n";
     for(int i=0;i<m.m;i++){
         for(int j=0;j<m.n;j++)
             out<<m(i,j)<<" ";
@@ -178,7 +178,7 @@ Write(const char* name,const MATRIX_MXN<T>& m)
 template<class T> void OCTAVE_OUTPUT<T>::
 Write_Transpose(const char* name,const MATRIX_MXN<T>& m)
 {
-    out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<m.m<<"\n# columns: "<<m.n<<"\n";
+    out<<"% name: "<<name<<"\n% type: matrix\n% rows: "<<m.m<<"\n% columns: "<<m.n<<"\n";
     for(int i=0;i<m.m;i++){
         for(int j=0;j<m.n;j++)
             out<<m(j,i)<<" ";
@@ -190,9 +190,9 @@ Write_Transpose(const char* name,const MATRIX_MXN<T>& m)
 template<class T> void OCTAVE_OUTPUT<T>::
 Begin_Sparse_Matrix(const char* name,int m,int n)
 {
-    out<<"# name: "<<name<<"\n# type: sparse matrix\n# nnz: ";
+    out<<"% name: "<<name<<"\n% type: sparse matrix\n% nnz: ";
     nnz_pos=out.tellp();
-    out<<"                    \n# rows: "<<m<<"\n# columns: "<<n<<"\n";
+    out<<"                    \n% rows: "<<m<<"\n% columns: "<<n<<"\n";
     nnz=0;
     current_column=0;
 }
@@ -324,7 +324,7 @@ template<class T> template<class T2> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const ARRAY<T2,VECTOR<int,2> >& m)
 {
     VECTOR<int,2> counts=m.domain.Edge_Lengths();
-    out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<counts.y<<"\n# columns: "<<counts.x<<"\n";
+    out<<"% name: "<<name<<"\n% type: matrix\n% rows: "<<counts.y<<"\n% columns: "<<counts.x<<"\n";
     for(RANGE_ITERATOR<2> it(m.domain);it.Valid();it.Next()){
         out<<m(it.index)<<" ";
         if(it.index(0)>=it.domain.max_corner(0)) out<<"\n";}
@@ -336,7 +336,7 @@ template<class T> template<class T2,int d> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const ARRAY<VECTOR<T2,d>,VECTOR<int,2> >& m)
 {
     VECTOR<int,2> counts=m.domain.Edge_Lengths();
-    out<<"# name: "<<name<<"\n# type: matrix\n# ndims: 3\n"<<counts.x<<" "<<counts.y<<" "<<d<<"\n";
+    out<<"% name: "<<name<<"\n% type: matrix\n% ndims: 3\n"<<counts.x<<" "<<counts.y<<" "<<d<<"\n";
     for(int i=0;i<d;i++)
         for(RANGE_ITERATOR<2> it(m.domain);it.Valid();it.Next())
             out<<m(it.index)(i)<<std::endl;
@@ -347,7 +347,7 @@ Write(const char* name,const ARRAY<VECTOR<T2,d>,VECTOR<int,2> >& m)
 template<class T> template<class T2,class T_ARRAY> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const ARRAY_BASE<T2,T_ARRAY>& v,int)
 {
-    out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<v.Size()<<"\n# columns: "<<sizeof(v(0))/sizeof(typename SCALAR_POLICY<T2>::TYPE)<<"\n";
+    out<<"% name: "<<name<<"\n% type: matrix\n% rows: "<<v.Size()<<"\n% columns: "<<sizeof(v(0))/sizeof(typename SCALAR_POLICY<T2>::TYPE)<<"\n";
     for(int i=0;i<v.Size();i++)
         Write_Entry(v(i));
 }
@@ -357,7 +357,7 @@ Write(const char* name,const ARRAY_BASE<T2,T_ARRAY>& v,int)
 template<class T> void OCTAVE_OUTPUT<T>::
 Write(const char* name,T scalar)
 {
-    out<<"# name: "<<name<<"\n# type: scalar\n"<<scalar<<"\n";
+    out<<"% name: "<<name<<"\n% type: scalar\n"<<scalar<<"\n";
 }
 //#####################################################################
 // Function Write_Entry
