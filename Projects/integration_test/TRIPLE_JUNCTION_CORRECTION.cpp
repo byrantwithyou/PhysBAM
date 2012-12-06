@@ -278,64 +278,6 @@ Update_Color_Level_Sets()
         phi(color)(it.index)=min_phi(color);}
 }
 //#####################################################################
-// Function Initialize_Stencils_Helper
-//#####################################################################
-template<class TV_INT> static void
-Initialize_Stencils_Helper(VECTOR<VECTOR<VECTOR<TV_INT,3>,2>,2>& stencils)
-{
-    TV_INT v00(0,0),v01(0,1),v10(1,0),v11(1,1);
-    stencils(0)(0)=VECTOR<TV_INT,3>(v00,v10,v11);
-    stencils(0)(1)=VECTOR<TV_INT,3>(v01,v00,v11);
-    stencils(1)(0)=VECTOR<TV_INT,3>(v10,v01,v00);
-    stencils(1)(1)=VECTOR<TV_INT,3>(v11,v01,v10);
-}
-//#####################################################################
-// Function Initialize_Stencils_Helper
-//#####################################################################
-template<class TV_INT> static void
-Initialize_Stencils_Helper(VECTOR<VECTOR<VECTOR<TV_INT,4>,5>,2>& stencils)
-{
-    TV_INT v000(0,0,0),v010(0,1,0),v100(1,0,0),v110(1,1,0),v001(0,0,1),v011(0,1,1),v101(1,0,1),v111(1,1,1);
-    stencils(0)(0)=VECTOR<TV_INT,4>(v000,v100,v010,v001);
-    stencils(0)(1)=VECTOR<TV_INT,4>(v110,v010,v100,v111);
-    stencils(0)(2)=VECTOR<TV_INT,4>(v011,v111,v001,v010);
-    stencils(0)(3)=VECTOR<TV_INT,4>(v101,v001,v111,v100);
-    stencils(0)(4)=VECTOR<TV_INT,4>(v111,v100,v001,v010);
-    stencils(1)(0)=VECTOR<TV_INT,4>(v001,v101,v000,v011);
-    stencils(1)(1)=VECTOR<TV_INT,4>(v111,v011,v110,v101);
-    stencils(1)(2)=VECTOR<TV_INT,4>(v010,v110,v011,v000);
-    stencils(1)(3)=VECTOR<TV_INT,4>(v100,v000,v101,v110);
-    stencils(1)(4)=VECTOR<TV_INT,4>(v110,v101,v011,v000);
-}
-//#####################################################################
-// Function Initialize_Stencils
-//#####################################################################
-template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
-Cut_Interface(HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data)
-{
-#if 0
-    for(int i=0;i<stencils.m;i++){
-        int mask=~0;
-        for(int j=0;j<stencils(i).m;j++)
-            mask&=pairwise_data(stencils(i)(j)).valid_flags;
-        TV_INT cell(stencils(i)(0));
-        for(int j=1;j<stencils(i).m;j++)
-            cell=cell.Componentwise_Min(stencils(i)(j));
-        if(count_bits(mask)<3) Cut_Stencil_With_Phi(index_to_cell_data,cell,i);
-        else Cut_Stencil_With_Pairwise_Phi(index_to_cell_data,cell,i);}
-#endif
-}
-//#####################################################################
-// Function Initialize_Stencils
-//#####################################################################
-template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
-Initialize_Stencils()
-{
-#if 0
-    Initialize_Stencils_Helper(stencils);
-#endif
-}
-//#####################################################################
 // Function Cut_Interface
 //#####################################################################
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::

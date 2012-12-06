@@ -49,7 +49,6 @@ public:
     void Evolve_Step(ARRAY<T,TV_INT> q[3],const ARRAY<T,TV_INT> p[3]);
     static TV Zero_Phi(const VECTOR<PHI,3>& phi,VECTOR<T,3>& p);
     static TV Meet_Phi(const VECTOR<PHI,2>& phi);
-    void Initialize_Stencils();
     void Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data);
     void Cut_Stencil_With_Phi(CELL_ELEMENTS& ce,const TV_INT& cell,const VECTOR<TV_INT,TV::m+1>& st);
     void Cut_Stencil_With_Pairwise_Phi(CELL_ELEMENTS& ce,const TV_INT& cell,const VECTOR<TV_INT,TV::m+1>& st);
