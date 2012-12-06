@@ -42,5 +42,6 @@ public:
     void Cut_Interface(HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data);
     void Cut_Stencil_With_Phi(HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,const TV_INT& cell,int s);
     void Cut_Stencil_With_Pairwise_Phi(HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,const TV_INT& cell,int s);
+    void Compute_Pairwise_Level_Set_Data(const ARRAY<VECTOR<TV_INT,TV::m+1> >& stencils,ARRAY<ARRAY<ARRAY<T,TV_INT> > >& pairwise_phi);
 };
 }

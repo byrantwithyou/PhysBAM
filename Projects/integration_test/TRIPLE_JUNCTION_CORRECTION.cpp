@@ -9,6 +9,12 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include "TRIPLE_JUNCTION_CORRECTION.h"
 using namespace PhysBAM;
+template<class T,class TV_INT>
+extern void Dump_Interface(ARRAY_VIEW<T,TV_INT> p,const ARRAY<VECTOR<TV_INT,4> >& stencils,const VECTOR<T,3>& col);
+template<class T,class TV_INT>
+extern void Dump_Interface(ARRAY_VIEW<T,TV_INT> p,const ARRAY<VECTOR<TV_INT,3> >& stencils,const VECTOR<T,3>& col);
+template<class T,class TV>
+extern void Flush_Frame(const char* title);
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -274,6 +280,54 @@ Cut_Stencil_With_Phi(HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,const 
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
 Cut_Stencil_With_Pairwise_Phi(HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,const TV_INT& cell,int s)
 {
+}
+
+//#####################################################################
+// Function Compute_Pairwise_Level_Set_Data
+//#####################################################################
+template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
+Compute_Pairwise_Level_Set_Data(const ARRAY<VECTOR<TV_INT,TV::m+1> >& stencils,ARRAY<ARRAY<ARRAY<T,TV_INT> > >& pairwise_phi)
+{
+    Initialize_Stencils();
+    Compute_Pairwise_Data();
+    Initialize_Pairwise_Level_Set();
+
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
+    Flush_Frame<T,TV>("Initial pairwise level sets");
+
+    Fill_Valid_Region_With_Exprapolation();
+
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+        T p=pairwise_phi(0)(1)(it.index);
+        if((pairwise_data(it.index).valid_flags&3)==3)
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+    Flush_Frame<T,TV>("level set 01");
+
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+        T p=pairwise_phi(0)(1)(it.index);
+        if((pairwise_data(it.index).valid_flags&3)==3)
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+    Flush_Frame<T,TV>("level set 01");
+
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
+    Flush_Frame<T,TV>("Extrapolated pairwise level sets");
+
+    for(int t=0;t<1;t++){
+        One_Step_Triple_Junction_Correction();
+        Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
+        Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
+        Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
+        Flush_Frame<T,TV>("After triple junction correction");}
+
+    Update_Color_Level_Sets();
 }
 //#####################################################################
 // Constructor

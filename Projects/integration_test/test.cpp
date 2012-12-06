@@ -171,52 +171,6 @@ void Evolve_Step(GRID<TV>& grid,ARRAY_VIEW<T,TV_INT> q[3],const ARRAY_VIEW<T,TV_
             q[c](it.index)=p[c](it.index)-(T).25*Weight_Function(q[c](it.index)*grid.dX.Product());
 }
 
-template<class T,class TV,class TV_INT>
-void Compute_Pairwise_Level_Set_Data(const GRID<TV>& grid,ARRAY<ARRAY<T,TV_INT> >& phi,int ghost,const ARRAY<VECTOR<TV_INT,TV::m+1> >& stencils,ARRAY<ARRAY<ARRAY<T,TV_INT> > >& pairwise_phi)
-{
-    TRIPLE_JUNCTION_CORRECTION<TV> tjc(grid,phi,ghost);
-    tjc.Initialize_Stencils();
-    tjc.Compute_Pairwise_Data();
-    tjc.Initialize_Pairwise_Level_Set();
-
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
-    Flush_Frame<T,TV>("Initial pairwise level sets");
-
-    tjc.Fill_Valid_Region_With_Exprapolation();
-
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
-        T p=tjc.pairwise_phi(0)(1)(it.index);
-        if((tjc.pairwise_data(it.index).valid_flags&3)==3)
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(tjc.pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
-        Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
-    Flush_Frame<T,TV>("level set 01");
-
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
-        T p=tjc.pairwise_phi(0)(1)(it.index);
-        if((tjc.pairwise_data(it.index).valid_flags&3)==3)
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(tjc.pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
-        Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
-    Flush_Frame<T,TV>("level set 01");
-
-    Dump_Interface<T,TV_INT>(tjc.pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
-    Dump_Interface<T,TV_INT>(tjc.pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
-    Dump_Interface<T,TV_INT>(tjc.pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
-    Flush_Frame<T,TV>("Extrapolated pairwise level sets");
-
-    for(int t=0;t<1;t++){
-        tjc.One_Step_Triple_Junction_Correction();
-        Dump_Interface<T,TV_INT>(tjc.pairwise_phi(0)(1),stencils,VECTOR<T,3>(1,0,0));
-        Dump_Interface<T,TV_INT>(tjc.pairwise_phi(0)(2),stencils,VECTOR<T,3>(0,1,0));
-        Dump_Interface<T,TV_INT>(tjc.pairwise_phi(1)(2),stencils,VECTOR<T,3>(0,0,1));
-        Flush_Frame<T,TV>("After triple junction correction");}
-
-    tjc.Update_Color_Level_Sets();
-}
-
 template<class TV,class TV_INT>
 void Initialize(const GRID<TV>& grid,ARRAY<VECTOR<TV_INT,3> >& stencils,int resolution)
 {
@@ -330,7 +284,8 @@ void Compute(PARSE_ARGS& parse_args)
         Flush_Frame<T,TV>("Initial level set");}
 
     ARRAY<ARRAY<ARRAY<T,TV_INT> > > pairwise_phi;
-    Compute_Pairwise_Level_Set_Data(grid,color_phi,3,stencils,pairwise_phi);
+    TRIPLE_JUNCTION_CORRECTION<TV> tjc(grid,color_phi,3);
+    tjc.Compute_Pairwise_Level_Set_Data(stencils,pairwise_phi);
 
     LOG::Finish_Logging();
 }
@@ -347,7 +302,11 @@ int main(int argc, char* argv[])
     Compute<VECTOR<T,2> >(parse_args);
 }
 
-
-
-
-
+template void Dump_Interface<double,VECTOR<int,2> >(ARRAY_VIEW<double,VECTOR<int,2> >,ARRAY<VECTOR<VECTOR<int,2>,3>,int> const&,VECTOR<double,3> const&);
+template void Dump_Interface<double,VECTOR<int,3> >(ARRAY_VIEW<double,VECTOR<int,3> >,ARRAY<VECTOR<VECTOR<int,3>,4>,int> const&,VECTOR<double,3> const&);
+template void Dump_Interface<float,VECTOR<int,2> >(ARRAY_VIEW<float,VECTOR<int,2> >,ARRAY<VECTOR<VECTOR<int,2>,3>,int> const&,VECTOR<float,3> const&);
+template void Dump_Interface<float,VECTOR<int,3> >(ARRAY_VIEW<float,VECTOR<int,3> >,ARRAY<VECTOR<VECTOR<int,3>,4>,int> const&,VECTOR<float,3> const&);
+template void Flush_Frame<double,VECTOR<double,2> >(char const*);
+template void Flush_Frame<double,VECTOR<double,3> >(char const*);
+template void Flush_Frame<float,VECTOR<float,2> >(char const*);
+template void Flush_Frame<float,VECTOR<float,3> >(char const*);
