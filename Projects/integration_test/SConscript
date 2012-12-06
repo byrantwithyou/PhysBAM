@@ -15,4 +15,5 @@ Automatic_Program(env,"test",["test.cpp","TRIPLE_JUNCTION_CORRECTION.cpp"])
 Automatic_Program(env,"mc2tex",["mc2tex.cpp"])
 Automatic_Program(env,"bending",["bending.cpp"])
 Automatic_Program(env,"marching_tets",["marching_tets.cpp"])
+Automatic_Program(env,"quad",["quad.cpp"])
 
