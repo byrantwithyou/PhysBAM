@@ -314,3 +314,5 @@ template void Flush_Frame<double,VECTOR<double,2> >(char const*);
 template void Flush_Frame<double,VECTOR<double,3> >(char const*);
 template void Flush_Frame<float,VECTOR<float,2> >(char const*);
 template void Flush_Frame<float,VECTOR<float,3> >(char const*);
+template GRID<VECTOR<double,2> >* Global_Grid<VECTOR<double,2> >(GRID<VECTOR<double,2> >*);
+template GRID<VECTOR<float,2> >* Global_Grid<VECTOR<float,2> >(GRID<VECTOR<float,2> >*);
