@@ -38,7 +38,6 @@ void Emit_Rat(const GRID<TV>& grid,const RAT<T>& r,const TV_INT& cell,const VECT
         T x0=r.x0+dx*t,x1=x0+dx,y0=r.eval(x0),y1=r.eval(x1);
         VECTOR<TV,2> pts=r.in_x?VECTOR<TV,2>(TV(x0,y0),TV(x1,y1)):VECTOR<TV,2>(TV(y0,x0),TV(y1,x1));
         pts=(pts+TV(cell))*grid.dX+grid.domain.min_corner;
-        Add_Debug_Particle(pts(0),col);
         Add_Debug_Object(pts,col);}
 }
 
@@ -192,8 +191,9 @@ One_Step_Triple_Junction_Correction()
 
                                 VECTOR<T,3> pp;
                                 TV X=Zero_Phi(VECTOR<PHI,3>(ab,ac,bc),pp),Y=grid.domain.min_corner+grid.dX*(X+TV(it.index));
-                                Add_Debug_Particle(Y,VECTOR<T,3>(1,0,0));
+                                Add_Debug_Particle(Y,VECTOR<T,3>(pp(0)>0,pp(1)>0,pp(2)>0));
                                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(pp(0)));
+                                Add_Debug_Particle(it.Location(),VECTOR<T,3>(pp(0)>0,pp(1)>0,pp(2)>0));
                                 if(abs(pp(0))>max_move) pp*=max_move/abs(pp(0));
                                 LOG::cout<<"AAA "<<pp<<std::endl;
                                 for(int j=0;j<(1<<TV::m);j++){
@@ -204,6 +204,10 @@ One_Step_Triple_Junction_Correction()
                                     if(abs(p02)<abs(pp(1))) p02=pp(1);
                                     if(abs(p12)<abs(pp(2))) p12=pp(2);}}}
 
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),VECTOR<T,3>(1,0,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),VECTOR<T,3>(0,1,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),VECTOR<T,3>(0,0,1));
+    Flush_Frame<T,TV>("meet points");
     for(typename HASHTABLE<TRIPLE<int,int,TV_INT>,T>::ITERATOR it(total_size);it.Valid();it.Next())
         pairwise_phi(it.Key().x)(it.Key().y)(it.Key().z)-=it.Data();
 }
@@ -327,10 +331,13 @@ Meet_Phi(const VECTOR<PHI,2>& phi)
     if(quad.roots==0){
         quad.roots=1;
         quad.root1=-quad.b/(2*quad.a);}
-    T ya[2]={quad.root1,quad.root2},ph[2]={0,FLT_MAX};
+    T ya[2]={quad.root1,quad.root2},ph[2]={FLT_MAX,FLT_MAX};
     TV X[2];
     for(int i=0;i<quad.roots;i++){
-        X[i]=TV((-phi(1)(0)-ya[i]*phi(1)(2)+ya[i]*phi(1)(0))/(phi(1)(1)-phi(1)(0)+ya[i]*phi(1)(3)-ya[i]*phi(1)(2)-ya[i]*phi(1)(1)+ya[i]*phi(1)(0)),ya[i]);
+        if(abs(ya[i])>10) continue;
+        T num=-phi(1)(0)-ya[i]*phi(1)(2)+ya[i]*phi(1)(0);
+        T den=phi(1)(1)-phi(1)(0)+ya[i]*phi(1)(3)-ya[i]*phi(1)(2)-ya[i]*phi(1)(1)+ya[i]*phi(1)(0);
+        X[i]=TV(num/den,ya[i]);
         ph[i]=phi(0)(0)+(phi(0)(1)-phi(0)(0))*X[i].x+(phi(0)(2)-phi(0)(0))*X[i].y+(phi(0)(3)-phi(0)(2)-phi(0)(1)+phi(0)(0))*X[i].x*X[i].y;}
 
     return X[abs(ph[1])<abs(ph[0])];

@@ -20,6 +20,7 @@
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
@@ -207,6 +208,7 @@ void Initialize(const GRID<TV>& grid,ARRAY<VECTOR<TV_INT,4> >& stencils,ARRAY<T,
 }
 
 ROTATION<VECTOR<T,2> > rot(ROTATION<VECTOR<T,2> >::From_Angle(-2*(T)pi/3));
+ROTATION<VECTOR<T,2> > rot2(ROTATION<VECTOR<T,2> >::From_Angle((T)pi/10));
 
 template <class TV> typename TV::SCALAR
 Levelset(TV X)
@@ -265,7 +267,7 @@ void Compute(PARSE_ARGS& parse_args)
 
     if(1) // triple
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next()){
-        TV X=it.Location()+(T).0001;
+        TV X=rot2.Rotate(it.Location())+(T).0001;
         color_phi(0)(it.index)=Levelset(X);
         color_phi(1)(it.index)=Levelset(rot.Rotate(X+.01));
         color_phi(2)(it.index)=Levelset(rot.Rotate(rot.Rotate(X)));}
@@ -292,6 +294,8 @@ void Compute(PARSE_ARGS& parse_args)
 
 int main(int argc, char* argv[])
 {
+    PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
+    PROCESS_UTILITIES::Set_Backtrace(true);
     bool use_3d=false;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-3d",&use_3d,"use 3d");
