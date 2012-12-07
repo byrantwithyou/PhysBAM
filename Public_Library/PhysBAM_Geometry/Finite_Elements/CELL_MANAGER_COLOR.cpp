@@ -41,7 +41,7 @@ Compress_Indices()
     int total_dofs(0),offset(0);
     for(int c=0;c<cdi.colors;c++){
         offset=total_dofs;
-        total_dofs+=dofs(c);std::cout<<"c"<<c<<dofs(c)<<std::endl;
+        total_dofs+=dofs(c);
         uncompressed.Resize(total_dofs);
         for(int i=0;i<compressed(c).m;i++){
             if(compressed(c)(i)>=0) uncompressed(compressed(c)(i)+offset)=VECTOR<int,2>(c,cdi.remap(i));     

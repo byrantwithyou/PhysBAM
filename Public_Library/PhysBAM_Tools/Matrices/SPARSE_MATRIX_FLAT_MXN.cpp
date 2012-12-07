@@ -469,7 +469,7 @@ operator*(const SPARSE_MATRIX_FLAT_MXN& rhs) const
     return result;
 }
 //#####################################################################
-// Function Write_Row_Lengths
+// Function Create_NXN_Matrix
 //#####################################################################
 template<class T> SPARSE_MATRIX_FLAT_NXN<T> SPARSE_MATRIX_FLAT_MXN<T>::
 Create_NXN_Matrix()
