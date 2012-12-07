@@ -308,6 +308,13 @@ void Compute(PARSE_ARGS& parse_args)
                 if("Alexey was here") Add_Debug_Object(V.face.X+V.face.Normal()*sep*grid.dX.Min(),color_map[V.color_pair.x]);}
             else if(V.color_pair.x>=0) Add_Debug_Object(V.face.X-V.face.Normal()*sep*grid.dX.Min(),color_map[V.color_pair.x]);}}
     Flush_Frame<T,TV>("interfaces");
+    for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(index_to_cell_data);it.Valid();it.Next()){
+        const CELL_ELEMENTS& cell_elements=it.Data();
+        const ARRAY<BOUNDARY_ELEMENT>& boundary_elements=cell_elements.boundary;
+        for(int i=0;i<boundary_elements.m;i++){
+            const BOUNDARY_ELEMENT& V=boundary_elements(i);
+            Add_Debug_Object(V.face.X-V.face.Normal()*sep*grid.dX.Min(),color_map[V.color]);}}
+    Flush_Frame<T,TV>("boundarys");
 
     LOG::Finish_Logging();
 }
