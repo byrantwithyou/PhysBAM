@@ -41,6 +41,8 @@ void Dump_Frame(const char* title)
 
 int main(int argc, char* argv[])
 {
+    typedef typename MARCHING_CUBES_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
+    typedef typename MARCHING_CUBES_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
     srand(time(0));
     Get_Debug_Particles<TV>();
     std::string colors="abbbbbbb";
@@ -71,8 +73,8 @@ int main(int argc, char* argv[])
 
     for(int r=0,rr=0;r<n;r++,rr++){
         if(rr>0 && rr%1000==0) printf("====================================================== %i ======================================================\n",rr);
-        ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> > surface;
-        ARRAY<PAIR<TRIANGLE_3D<T>,int> > boundary;
+        ARRAY<INTERFACE_ELEMENT> surface;
+        ARRAY<BOUNDARY_ELEMENT> boundary;
         VECTOR<int,8> color_vector;
         for(int i=0;i<8;i++) color_vector(i)=colors[i];
         random.Fill_Uniform(phi,0.01,1);
@@ -83,21 +85,20 @@ int main(int argc, char* argv[])
         for(int i=0;i<surface.m;i++)
             for(int j=0;j<surface.m;j++)
                 for(int k=0;k<3;k++){
-                    SEGMENT_3D<T> seg(surface(j).x.X(k),surface(j).x.X((k+1)%3));
+                    SEGMENT_3D<T> seg(surface(j).face.X(k),surface(j).face.X((k+1)%3));
                     bool touch=false;
                     for(int r=0;r<3;r++)
                         for(int s=0;s<2;s++)
-                            if((surface(i).x.X(r)-seg.X(s)).Magnitude()<1e-12)
+                            if((surface(i).face.X(r)-seg.X(s)).Magnitude()<1e-12)
                                 touch=true;
                     if(touch) continue;
                     T a;
                     TV weights;
-                    if(INTERSECTION::Intersects(seg,surface(i).x,a,weights,(T)0)){
+                    if(INTERSECTION::Intersects(seg,surface(i).face,a,weights,(T)0)){
 //                        printf("weights: %g %g %g   %g\n", weights.x, weights.y, weights.z, a);
                         if(weights.Min()>1e-12 && a>1e-12 && 1-a>1e-12){
                             printf("weights: %g %g %g   %g\n", weights.x, weights.y, weights.z, a);
-                            show=true;}}
-                }
+                            show=true;}}}
         if(0){
             if(!show){
                 r--;
@@ -107,9 +108,9 @@ int main(int argc, char* argv[])
             else printf("FOUND: %i (%i)\n", r, rr);}
 
         for(int i=0;i<surface.m;i++)
-            Add_Debug_Object(surface(i).x.X,color_map(surface(i).y),color_map(surface(i).z));
+            Add_Debug_Object(surface(i).face.X,color_map(surface(i).color_pair.x),color_map(surface(i).color_pair.y));
         for(int i=0;i<boundary.m;i++)
-            Add_Debug_Object(boundary(i).x.X,color_map(boundary(i).y)*(T).2+(T).8,color_map(boundary(i).y));
+            Add_Debug_Object(boundary(i).face.X,color_map(boundary(i).color)*(T).2+(T).8,color_map(boundary(i).color));
         for(int i=0;i<8;i++){
             TV X(i&1,i/2&1,i/4&1);
             Add_Debug_Particle(X,color_map(colors[i]));}

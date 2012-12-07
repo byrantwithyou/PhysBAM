@@ -41,6 +41,8 @@ void Dump_Frame(const char* title)
 
 int main(int argc, char* argv[])
 {
+    typedef typename MARCHING_CUBES_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
+    typedef typename MARCHING_CUBES_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
     srand(time(0));
     Get_Debug_Particles<TV>();
     int n=5;
@@ -66,19 +68,19 @@ int main(int argc, char* argv[])
     RANDOM_NUMBERS<T> random;
 
     for(int r=0;r<n;r++){
-        ARRAY<TRIPLE<SEGMENT_2D<T>,int,int> > surface;
-        ARRAY<PAIR<SEGMENT_2D<T>,int> > boundary;
+        ARRAY<INTERFACE_ELEMENT> surface;
+        ARRAY<BOUNDARY_ELEMENT> boundary;
         VECTOR<int,4> color_vector;
         for(int i=0;i<4;i++) color_vector(i)=colors[i];
         random.Fill_Uniform(phi,0.01,1);
         MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(surface,boundary,color_vector,phi);
 
         for(int i=0;i<surface.m;i++){
-            Add_Debug_Object(surface(i).x.X-surface(i).x.Normal()*(T).01,color_map(surface(i).z));
-            Add_Debug_Object(surface(i).x.X+surface(i).x.Normal()*(T).01,color_map(surface(i).y));}
+            Add_Debug_Object(surface(i).face.X-surface(i).face.Normal()*(T).01,color_map(surface(i).color_pair.y));
+            Add_Debug_Object(surface(i).face.X+surface(i).face.Normal()*(T).01,color_map(surface(i).color_pair.x));}
         for(int i=0;i<boundary.m;i++){
-            Add_Debug_Object(boundary(i).x.X-boundary(i).x.Normal()*(T).01,color_map(boundary(i).y));
-            Add_Debug_Object(boundary(i).x.X+boundary(i).x.Normal()*(T).01,TV3((T).5,(T).5,(T).5));}
+            Add_Debug_Object(boundary(i).face.X-boundary(i).face.Normal()*(T).01,color_map(boundary(i).color));
+            Add_Debug_Object(boundary(i).face.X+boundary(i).face.Normal()*(T).01,TV3((T).5,(T).5,(T).5));}
         for(int i=0;i<4;i++){
             TV X(i&1,i/2&1);
             Add_Debug_Particle(X,color_map(colors[i]));}

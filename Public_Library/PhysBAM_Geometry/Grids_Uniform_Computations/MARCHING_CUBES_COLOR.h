@@ -34,25 +34,6 @@ public:
     MARCHING_CUBES_COLOR(){}
     ~MARCHING_CUBES_COLOR(){}
 
-    static void Initialize_Case_Table();
-    static void Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& interface,ARRAY<PAIR<T_FACE,int> >& boundary,
-        const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi);
-
-//#####################################################################
-
-    typedef HASHTABLE<int,T_SURFACE*> HASH_BOUNDARY;
-    typedef HASHTABLE<int,INTERVAL<int> > HASH_CELL_BOUNDARY;
-    typedef HASHTABLE<VECTOR<int,2>,T_SURFACE*> HASH_INTERFACE;
-    typedef HASHTABLE<VECTOR<int,2>,INTERVAL<int> > HASH_CELL_INTERFACE;
-
-    struct HASH_CELL_DATA
-    {
-        HASH_CELL_INTERFACE interface;
-        VECTOR<HASH_CELL_BOUNDARY,TV::m> boundary;
-    };
-
-//#####################################################################
-
     struct INTERFACE_ELEMENT
     {
         T_FACE face;
@@ -70,7 +51,25 @@ public:
         ARRAY<INTERFACE_ELEMENT> interface;
         ARRAY<BOUNDARY_ELEMENT> boundary;
     };
-    
+
+    static void Initialize_Case_Table();
+    static void Get_Elements_For_Cell(ARRAY<INTERFACE_ELEMENT>& interface,ARRAY<BOUNDARY_ELEMENT>& boundary,
+        const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi);
+
+//#####################################################################
+
+    typedef HASHTABLE<int,T_SURFACE*> HASH_BOUNDARY;
+    typedef HASHTABLE<int,INTERVAL<int> > HASH_CELL_BOUNDARY;
+    typedef HASHTABLE<VECTOR<int,2>,T_SURFACE*> HASH_INTERFACE;
+    typedef HASHTABLE<VECTOR<int,2>,INTERVAL<int> > HASH_CELL_INTERFACE;
+
+    struct HASH_CELL_DATA
+    {
+        HASH_CELL_INTERFACE interface;
+        VECTOR<HASH_CELL_BOUNDARY,TV::m> boundary;
+    };
+
+//#####################################################################
     static void Get_Elements(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<TV>& grid,
         const ARRAY<int,TV_INT>& phi_color,const ARRAY<T,TV_INT>& phi_value,
         const int newton_steps=20,const bool verbose=false);

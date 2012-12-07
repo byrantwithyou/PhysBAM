@@ -52,6 +52,8 @@ void Dump_Frame(const char* title)
 
 int main(int argc, char* argv[])
 {
+    typedef typename MARCHING_CUBES_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
+    typedef typename MARCHING_CUBES_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
     srand(time(0));
     Get_Debug_Particles<TV>();
     std::string colors="abbbbbbb";
@@ -92,8 +94,8 @@ int main(int argc, char* argv[])
 
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
 
-    ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> > surface;
-    ARRAY<PAIR<TRIANGLE_3D<T>,int> > boundary;
+    ARRAY<INTERFACE_ELEMENT> surface;
+    ARRAY<BOUNDARY_ELEMENT> boundary;
 
     HASHTABLE<VECTOR<TV_INT,2>,ARRAY<VECTOR<int,2> > > hash;
 
@@ -111,14 +113,14 @@ int main(int argc, char* argv[])
         MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(surface,boundary,c,p);
 
         for(int i=0;i<surface.m;i++){
-            surface(i).x.X*=grid.dX;
-            surface(i).x.X+=it.Location();
-//            Add_Debug_Object(surface(i).x.X,color_map(surface(i).y),color_map(surface(i).z));
+            surface(i).face.X*=grid.dX;
+            surface(i).face.X+=it.Location();
+//            Add_Debug_Object(surface(i).face.X,color_map(surface(i).y),color_map(surface(i).z));
 
-            VECTOR<int,2> col(surface(i).y,surface(i).z);
-            TV_INT a(surface(i).x.X(0)*100000000);
-            TV_INT b(surface(i).x.X(1)*100000000);
-            TV_INT c(surface(i).x.X(2)*100000000);
+            VECTOR<int,2> col(surface(i).color_pair.x,surface(i).color_pair.y);
+            TV_INT a(surface(i).face.X(0)*100000000);
+            TV_INT b(surface(i).face.X(1)*100000000);
+            TV_INT c(surface(i).face.X(2)*100000000);
             hash.Get_Or_Insert(VECTOR<TV_INT,2>(a,b)).Append(col);
             hash.Get_Or_Insert(VECTOR<TV_INT,2>(b,c)).Append(col);
             hash.Get_Or_Insert(VECTOR<TV_INT,2>(c,a)).Append(col);}}

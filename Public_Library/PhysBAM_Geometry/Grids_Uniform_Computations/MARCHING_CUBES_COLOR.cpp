@@ -428,8 +428,8 @@ const int averaging_order[7][2]={{4,6},{5,7},{0,2},{1,3},{0,1},{2,3},{12,13}};
 //#####################################################################
 // Function Get_Interface_Elements_For_Cell
 //#####################################################################
-template<class T> void
-Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,const VECTOR<int,8>& re_color,
+template<class T,class INTERFACE_ELEMENT> void
+Get_Interface_Elements_For_Cell(ARRAY<INTERFACE_ELEMENT>& interface,const VECTOR<int,8>& re_color,
     const VECTOR<int,8>& colors,const VECTOR<T,8>& phi,const int* color_list)
 {
     typedef VECTOR<T,3> TV;
@@ -475,21 +475,22 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
     do{
         pat=interface_triangle_table(tri++);
         TRIANGLE_3D<T> triangle(pts[GET_V(pat,0)],pts[GET_V(pat,2)],pts[GET_V(pat,1)]);
-        TRIPLE<TRIANGLE_3D<T>,int,int> triple(triangle,color_list[GET_C(pat,0)],color_list[GET_C(pat,1)]);
-        if(triple.y>triple.z){
-            exchange(triple.y,triple.z);
-            exchange(triple.x.X(1),triple.x.X(2));}
-        surface.Append(triple);
+        INTERFACE_ELEMENT ie={triangle,VECTOR<int,2>(color_list[GET_C(pat,0)],color_list[GET_C(pat,1)])};
+        if(ie.color_pair.x>ie.color_pair.y){
+            exchange(ie.color_pair.x,ie.color_pair.y);
+            exchange(ie.face.X(1),ie.face.X(2));}
+        interface.Append(ie);
     } while(!(pat&last_tri_bit));
 }
 //#####################################################################
 // Function Get_Boundary_Elements_For_Cell
 //#####################################################################
 template<class T> void
-Get_Boundary_Elements_For_Cell(ARRAY<PAIR<TRIANGLE_3D<T>,int> >& boundary,const int* re_color,
+Get_Boundary_Elements_For_Cell(ARRAY<typename MARCHING_CUBES_COLOR<VECTOR<T,3> >::BOUNDARY_ELEMENT>& boundary,const int* re_color,
     const int* colors,const T* phi,int s,const int* color_list)
 {
     typedef VECTOR<T,3> TV;
+    typedef typename MARCHING_CUBES_COLOR<VECTOR<T,3> >::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
     int cs=0;
     for(int i=0;i<4;i++)
         cs=cs*(i+1)+re_color[i];
@@ -518,16 +519,16 @@ Get_Boundary_Elements_For_Cell(ARRAY<PAIR<TRIANGLE_3D<T>,int> >& boundary,const 
     do{
         pat=boundary_triangle_table(tri++);
         TRIANGLE_3D<T> triangle(pts[GET_V(pat,0)],pts[GET_V(pat,1)],pts[GET_V(pat,2)]);
-        PAIR<TRIANGLE_3D<T>,int> pair(triangle,color_list[GET_C(pat,0)]);
-        if(s) exchange(pair.x.X.y,pair.x.X.z);
-        boundary.Append(pair);
+        BOUNDARY_ELEMENT be={triangle,color_list[GET_C(pat,0)]};
+        if(s) exchange(be.face.X.y,be.face.X.z);
+        boundary.Append(be);
     } while(!(pat&last_tri_bit));
 }
 //#####################################################################
 // Function Get_Interface_Elements_For_Cell
 //#####################################################################
-template<class T> void
-Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<SEGMENT_2D<T>,int,int> >& surface,const VECTOR<int,4>& re_color,
+template<class T,class INTERFACE_ELEMENT> void
+Get_Interface_Elements_For_Cell(ARRAY<INTERFACE_ELEMENT>& interface,const VECTOR<int,4>& re_color,
     const VECTOR<int,4>& colors,const VECTOR<T,4>& phi,const int* color_list)
 {
     typedef VECTOR<T,2> TV;
@@ -561,28 +562,32 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<SEGMENT_2D<T>,int,int> >& surface,c
     do{
         pat=interface_segment_table(seg++);
         SEGMENT_2D<T> segment(pts[GET_V(pat,0)],pts[GET_V(pat,1)]);
-        TRIPLE<SEGMENT_2D<T>,int,int> triple(segment,color_list[GET_C(pat,0)],color_list[GET_C(pat,1)]);
-        if(triple.y>triple.z){
-            exchange(triple.y,triple.z);
-            exchange(triple.x.X(0),triple.x.X(1));}
-        surface.Append(triple);
+        INTERFACE_ELEMENT ie={segment,VECTOR<int,2>(color_list[GET_C(pat,0)],color_list[GET_C(pat,1)])};
+        if(ie.color_pair.x>ie.color_pair.y){
+            exchange(ie.color_pair.x,ie.color_pair.y);
+            exchange(ie.face.X(0),ie.face.X(1));}
+        interface.Append(ie);
     } while(!(pat&last_tri_bit));
 }
 //#####################################################################
 // Function Get_Boundary_Elements_For_Cell
 //#####################################################################
 template<class T> void
-Get_Boundary_Elements_For_Cell(ARRAY<PAIR<SEGMENT_2D<T>,int> >& boundary,const int* re_color,
+Get_Boundary_Elements_For_Cell(ARRAY<typename MARCHING_CUBES_COLOR<VECTOR<T,2> >::BOUNDARY_ELEMENT>& boundary,const int* re_color,
     const int* colors,const T* phi,int s,const int* color_list)
 {
     typedef VECTOR<T,2> TV;
+    typedef typename MARCHING_CUBES_COLOR<VECTOR<T,2> >::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
     if(colors[0]==colors[1]){
-        boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(s,s),TV(1-s,s)),colors[0]));
+        BOUNDARY_ELEMENT be={SEGMENT_2D<T>(TV(s,s),TV(1-s,s)),colors[0]};
+        boundary.Append(be);
         return;}
 
     T theta=phi[0]/(phi[0]+phi[1]);
-    boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(theta,s),TV(1-s,s)),colors[1-s]));
-    boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(s,s),TV(theta,s)),colors[s]));
+    BOUNDARY_ELEMENT be0={SEGMENT_2D<T>(TV(theta,s),TV(1-s,s)),colors[1-s]};
+    BOUNDARY_ELEMENT be1={SEGMENT_2D<T>(TV(s,s),TV(theta,s)),colors[s]};
+    boundary.Append(be0);
+    boundary.Append(be1);
 }
 }
 //#####################################################################
@@ -605,7 +610,7 @@ Initialize_Case_Table()
 // Function Get_Elements_For_Cell
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
-Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& boundary,
+Get_Elements_For_Cell(ARRAY<INTERFACE_ELEMENT>& interface,ARRAY<BOUNDARY_ELEMENT>& boundary,
     const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi)
 {
 #ifdef ENABLE_TIMING
@@ -621,7 +626,7 @@ Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,
             color_list[next_color]=colors(i);
             color_map.Set(colors(i),next_color++);}
 
-    Get_Interface_Elements_For_Cell(surface,re_color,colors,phi,color_list);
+    Get_Interface_Elements_For_Cell(interface,re_color,colors,phi,color_list);
     Get_Boundary_Elements_For_Cell(boundary,re_color.array,colors.array,phi.array,0,color_list);
 
     next_color=0;
