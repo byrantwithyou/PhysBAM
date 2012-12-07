@@ -53,5 +53,7 @@ public:
     void Cut_Stencil_With_Phi(CELL_ELEMENTS& ce,const TV_INT& cell,const VECTOR<TV_INT,TV::m+1>& st);
     void Cut_Stencil_With_Pairwise_Phi(CELL_ELEMENTS& ce,const TV_INT& cell,const VECTOR<TV_INT,TV::m+1>& st);
     void Fill_Combined_Level_Set();
+    int Fill_Combined_Level_Set_At_Index(const TV_INT& node);
+    int Fill_Phi_From_Pairwise_Level_Set_At_Index(const TV_INT& node,int color);
 };
 }

@@ -214,6 +214,41 @@ One_Step_Triple_Junction_Correction()
         pairwise_phi(it.Key().x)(it.Key().y)(it.Key().z)-=it.Data();
 }
 //#####################################################################
+// Function Fill_Combined_Level_Set_At_Index
+//#####################################################################
+template<class TV> int TRIPLE_JUNCTION_CORRECTION<TV>::
+Fill_Combined_Level_Set_At_Index(const TV_INT& node)
+{
+    int min_index=-1;
+    T min1=FLT_MAX,min2=FLT_MAX;
+    for(int i=0;i<phi.m;i++){
+        T p=phi(i)(node);
+        if(p<min1){min2=min1;min1=p;min_index=i;}
+        else if(p<min2) min2=p;}
+    T shift=(T).5*(min2+min1);
+    for(int i=0;i<phi.m;i++)
+        phi(i)(node)-=shift;
+    combined_color(node)=min_index;
+    combined_phi(node)=min1-shift;
+    return min_index;
+}
+//#####################################################################
+// Function Fill_Combined_Level_Set_At_Index
+//#####################################################################
+template<class TV> int TRIPLE_JUNCTION_CORRECTION<TV>::
+Fill_Phi_From_Pairwise_Level_Set_At_Index(const TV_INT& node,int color)
+{
+    T min_phi=FLT_MAX;
+    int mask=pairwise_data(node).valid_flags;
+    for(int a=0;a<phi.m;a++){
+        if(a==color || !(mask&(1<<a))) continue;
+        T p=a<color?pairwise_phi(a)(color)(node):-pairwise_phi(color)(a)(node);
+        min_phi=min(p,min_phi);
+        phi(a)(node)=p;}
+    phi(color)(node)=-min_phi;
+    return Fill_Combined_Level_Set_At_Index(node);
+}
+//#####################################################################
 // Function Update_Color_Level_Sets
 //#####################################################################
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
@@ -228,7 +263,7 @@ Update_Color_Level_Sets()
         int num_bits=count_bits(mask);
         if(num_bits<2 || !pairwise_data(it.index).trust.Contains(-1)){
             todo.Append(it.index);
-            int color=combined_color(it.index);
+            int color=Fill_Combined_Level_Set_At_Index(it.index);
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(color==0,color==1,color==2));
             continue;}
         combined_color(it.index)=-1;}
@@ -252,10 +287,11 @@ Update_Color_Level_Sets()
                                 separated=true;
                                 break;}
             if(separated) continue;
+            Fill_Phi_From_Pairwise_Level_Set_At_Index(neighbor,color);
             combined_color(neighbor)=color;
             todo.Append(neighbor);
-            Add_Debug_Object(VECTOR<TV,2>(grid.Node(index),grid.Node(neighbor)),VECTOR<T,3>(color!=0,color!=1,color!=2));
-            Add_Debug_Particle(grid.Node(neighbor),VECTOR<T,3>(color!=0,color!=1,color!=2));}}
+            Add_Debug_Object(VECTOR<TV,2>(grid.Node(index),grid.Node(neighbor)),VECTOR<T,3>(color==0,color==1,color==2)/3);
+            Add_Debug_Particle(grid.Node(neighbor),VECTOR<T,3>(color==0,color==1,color==2)/3);}}
 
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next())
         PHYSBAM_ASSERT(combined_color(it.index)>=0);
@@ -264,64 +300,6 @@ Update_Color_Level_Sets()
     Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),VECTOR<T,3>(0,1,0));
     Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),VECTOR<T,3>(0,0,1));
     Flush_Frame<T,TV>("flood fill");
-
-#if 0
-
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
-        int min_index=-1;
-        T min1=FLT_MAX,min2=FLT_MAX;
-        for(int i=0;i<phi.m;i++){
-            T p=phi(i)(it.index);
-            if(p<min1){min2=min1;min1=p;min_index=i;}
-            else if(p<min2) min2=p;}
-        T shift=(T).5*(min2+min1);
-        for(int i=0;i<phi.m;i++)
-            phi(i)(it.index)-=shift;
-        combined_color(it.index)=min_index;
-        combined_phi(it.index)=min1-shift;}
-
-    ARRAY<T> min_phi(phi.m);
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
-        min_phi.Fill(FLT_MAX);
-        int mask=pairwise_data(it.index).valid_flags,color=-1,color_mask=0,not_color_mask=0;
-        int num_bits=count_bits(mask);
-        if(num_bits==2 && pairwise_data(it.index).trust.Contains(-1)){
-            int rmb=rightmost_bit(mask),lmb=mask-rmb,a=integer_log_exact(rmb),b=integer_log_exact(lmb);
-            T p=pairwise_phi(a)(b)(it.index);
-            phi(a)(it.index)=p;
-            phi(b)(it.index)=-p;}
-        if(count_bits(mask)<3) continue;
-        for(int a=0;a<phi.m;a++)
-            if(mask&(1<<a))
-                for(int b=a+1;b<phi.m;b++)
-                    if(mask&(1<<b))
-                        for(int c=b+1;c<phi.m;c++)
-                            if(mask&(1<<c)){
-                                int new_color=-1;
-                                T pab=pairwise_phi(a)(b)(it.index),pac=pairwise_phi(a)(c)(it.index),pbc=pairwise_phi(b)(c)(it.index),new_phi=0;
-                                if(pab<=0 && pac<=0){
-                                    new_phi=max(pab,pac);
-                                    new_color=a;}
-                                else if(pab>0 && pbc<=0){
-                                    new_phi=max(-pab,pbc);
-                                    new_color=b;}
-                                else if(pbc>0 && pac>0){
-                                    new_phi=max(-pbc,-pac);
-                                    new_color=c;}
-                                else continue;
-                                min_phi(new_color)=max(min_phi(new_color),new_phi);
-                                color_mask|=1<<new_color;
-                                not_color_mask|=((1<<a)|(1<<b)|(1<<c))&~(1<<new_color);}
-        color_mask&=~not_color_mask;
-        PHYSBAM_ASSERT(power_of_two(color_mask));
-        color=integer_log(color_mask);
-
-        for(int a=0;a<color;a++)
-            phi(a)(it.index)=pairwise_phi(a)(color)(it.index);
-        for(int a=color+1;a<phi.m;a++)
-            phi(a)(it.index)=-pairwise_phi(color)(a)(it.index);
-        phi(color)(it.index)=min_phi(color);}
-#endif
 }
 //#####################################################################
 // Function Cut_Interface
@@ -498,7 +476,7 @@ Compute_Pairwise_Level_Set_Data()
     Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),VECTOR<T,3>(0,0,1));
     Flush_Frame<T,TV>("Extrapolated pairwise level sets");
 
-    for(int t=0;t<10;t++){
+    for(int t=0;t<3;t++){
         One_Step_Triple_Junction_Correction();
         Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),VECTOR<T,3>(1,0,0));
         Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),VECTOR<T,3>(0,1,0));
