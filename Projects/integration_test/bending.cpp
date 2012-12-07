@@ -4,8 +4,8 @@
 //#####################################################################
 
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>

@@ -3,24 +3,24 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/CONSTANT_ARRAY.h>
-//#include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
+//#include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/CONSTRAINT_AGGREGATION_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_COLOR_NEW.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/VOLUME_FORCE_SCALAR_COLOR.h>
-#include <PhysBAM_Geometry/Finite_Elements/CONSTRAINT_AGGREGATION_COLOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

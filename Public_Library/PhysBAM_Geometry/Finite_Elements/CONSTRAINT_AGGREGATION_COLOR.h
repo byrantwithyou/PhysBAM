@@ -11,12 +11,12 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
-#include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM_COLOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR.h>
 
 
 

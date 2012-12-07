@@ -4,10 +4,10 @@
 //#####################################################################
 // Class CONSTRAINT_AGGREGATION_COLOR
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CONSTRAINT_AGGREGATION_COLOR.h>
-#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Get_Neighboring_Cells_From_Padded_Node
