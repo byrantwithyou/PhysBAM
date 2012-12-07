@@ -198,7 +198,6 @@ One_Step_Triple_Junction_Correction()
                                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(pp(0)));
                                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(pp(0)>0,pp(1)>0,pp(2)>0));
                                 if(abs(pp(0))>max_move) pp*=max_move/abs(pp(0));
-                                LOG::cout<<"AAA "<<pp<<std::endl;
                                 for(int j=0;j<(1<<TV::m);j++){
                                     T& p01=total_size.Get_Or_Insert(TRIPLE<int,int,TV_INT>(a,b,bits(j)+it.index));
                                     T& p02=total_size.Get_Or_Insert(TRIPLE<int,int,TV_INT>(a,c,bits(j)+it.index));
@@ -220,21 +219,67 @@ One_Step_Triple_Junction_Correction()
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
 Update_Color_Level_Sets()
 {
-    ARRAY<bool,TV_INT> filled(grid.Node_Indices(ghost));
+    combined_phi.Resize(grid.Node_Indices(ghost));
+    combined_color.Resize(grid.Node_Indices(ghost));
+
+    ARRAY<TV_INT> todo;
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
         int mask=pairwise_data(it.index).valid_flags;
         int num_bits=count_bits(mask);
         if(num_bits<2 || !pairwise_data(it.index).trust.Contains(-1)){
-            filled(it.index)=true;
-            //Add_Debug_Particle(it.index,VECTOR<T,3>());
-        }
-        if(num_bits==2 && pairwise_data(it.index).trust.Contains(-1)){
-            int rmb=rightmost_bit(mask),lmb=mask-rmb,a=integer_log_exact(rmb),b=integer_log_exact(lmb);
-            T p=pairwise_phi(a)(b)(it.index);
-            phi(a)(it.index)=p;
-            phi(b)(it.index)=-p;}
-        if(count_bits(mask)<3) continue;
-    }
+            todo.Append(it.index);
+            int color=combined_color(it.index);
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(color==0,color==1,color==2));
+            continue;}
+        combined_color(it.index)=-1;}
+
+    while(todo.m){
+        TV_INT index(todo.Pop());
+        int mask=pairwise_data(index).valid_flags;
+        int color=combined_color(index);
+
+        for(int i=0;i<GRID<TV>::number_of_one_ring_neighbors_per_cell;i++){
+            TV_INT neighbor=GRID<TV>::One_Ring_Neighbor(index,i);
+            if(!combined_color.domain.Lazy_Inside_Half_Open(neighbor)) continue;
+            if(combined_color(neighbor)>=0) continue;
+            int neighbor_mask=pairwise_data(neighbor).valid_flags&mask;
+            bool separated=false;
+            for(int a=0;a<phi.m;a++)
+                if(neighbor_mask&(1<<a))
+                    for(int b=a+1;b<phi.m;b++)
+                        if(neighbor_mask&(1<<b))
+                            if((pairwise_phi(a)(b)(index)>0)!=(pairwise_phi(a)(b)(neighbor)>0)){
+                                separated=true;
+                                break;}
+            if(separated) continue;
+            combined_color(neighbor)=color;
+            todo.Append(neighbor);
+            Add_Debug_Object(VECTOR<TV,2>(grid.Node(index),grid.Node(neighbor)),VECTOR<T,3>(color!=0,color!=1,color!=2));
+            Add_Debug_Particle(grid.Node(neighbor),VECTOR<T,3>(color!=0,color!=1,color!=2));}}
+
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next())
+        PHYSBAM_ASSERT(combined_color(it.index)>=0);
+
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),VECTOR<T,3>(1,0,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),VECTOR<T,3>(0,1,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),VECTOR<T,3>(0,0,1));
+    Flush_Frame<T,TV>("flood fill");
+
+#if 0
+
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+        int min_index=-1;
+        T min1=FLT_MAX,min2=FLT_MAX;
+        for(int i=0;i<phi.m;i++){
+            T p=phi(i)(it.index);
+            if(p<min1){min2=min1;min1=p;min_index=i;}
+            else if(p<min2) min2=p;}
+        T shift=(T).5*(min2+min1);
+        for(int i=0;i<phi.m;i++)
+            phi(i)(it.index)-=shift;
+        combined_color(it.index)=min_index;
+        combined_phi(it.index)=min1-shift;}
+
     ARRAY<T> min_phi(phi.m);
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
         min_phi.Fill(FLT_MAX);
@@ -276,6 +321,7 @@ Update_Color_Level_Sets()
         for(int a=color+1;a<phi.m;a++)
             phi(a)(it.index)=-pairwise_phi(color)(a)(it.index);
         phi(color)(it.index)=min_phi(color);}
+#endif
 }
 //#####################################################################
 // Function Cut_Interface
@@ -369,20 +415,6 @@ Cut_Stencil_With_Pairwise_Phi(CELL_ELEMENTS& ce,const TV_INT& cell,const VECTOR<
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
 Fill_Combined_Level_Set()
 {
-    ARRAY<T,TV_INT> combined_phi(grid.Node_Indices(ghost));
-    ARRAY<int,TV_INT> combined_color(grid.Node_Indices(ghost));
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
-        int min_index=-1;
-        T min1=FLT_MAX,min2=FLT_MAX;
-        for(int i=0;i<phi.m;i++){
-            T p=phi(i)(it.index);
-            if(p<min1){min2=min1;min1=p;min_index=i;}
-            else if(p<min2) min2=p;}
-        T shift=(T).5*(min2+min1);
-        for(int i=0;i<phi.m;i++)
-            phi(i)(it.index)-=shift;
-        combined_color(it.index)=min_index;
-        combined_phi(it.index)=min1-shift;}
 }
 //#####################################################################
 // Function Meet_Phi
