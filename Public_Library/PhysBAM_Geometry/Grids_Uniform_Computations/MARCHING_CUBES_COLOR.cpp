@@ -596,6 +596,9 @@ Get_Boundary_Elements_For_Cell(ARRAY<typename MARCHING_CUBES_COLOR<VECTOR<T,2> >
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Initialize_Case_Table()
 {
+    static bool first=true;
+    if(!first) return;
+    first=false;
 #ifdef ENABLE_TIMING
     unsigned long long t0=rdtsc();
 #endif
