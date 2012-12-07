@@ -24,6 +24,7 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
@@ -288,6 +289,25 @@ void Compute(PARSE_ARGS& parse_args)
     ARRAY<ARRAY<ARRAY<T,TV_INT> > > pairwise_phi;
     TRIPLE_JUNCTION_CORRECTION<TV> tjc(grid,color_phi,3);
     tjc.Compute_Pairwise_Level_Set_Data();
+
+    typedef typename MARCHING_CUBES_COLOR<TV>::CELL_ELEMENTS CELL_ELEMENTS;
+    typedef typename MARCHING_CUBES_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
+    typedef typename MARCHING_CUBES_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
+    HASHTABLE<TV_INT,CELL_ELEMENTS> index_to_cell_data;
+    tjc.Cut_Interface(index_to_cell_data);
+
+    VECTOR<T,3> color_map[4]={VECTOR<T,3>(0,0.7,0),VECTOR<T,3>(0.8,0.8,0),VECTOR<T,3>(0,0.4,1),VECTOR<T,3>(0.8,0.2,0)};
+    T sep=(T).08;
+    for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(index_to_cell_data);it.Valid();it.Next()){
+        const CELL_ELEMENTS& cell_elements=it.Data();
+        const ARRAY<INTERFACE_ELEMENT>& interface_elements=cell_elements.interface;
+        for(int i=0;i<interface_elements.m;i++){
+            const INTERFACE_ELEMENT& V=interface_elements(i);
+            if(V.color_pair.y>=0){
+                if(V.color_pair.y>=0) Add_Debug_Object(V.face.X-V.face.Normal()*sep*grid.dX.Min(),color_map[V.color_pair.y]);
+                if("Alexey was here") Add_Debug_Object(V.face.X+V.face.Normal()*sep*grid.dX.Min(),color_map[V.color_pair.x]);}
+            else if(V.color_pair.x>=0) Add_Debug_Object(V.face.X-V.face.Normal()*sep*grid.dX.Min(),color_map[V.color_pair.x]);}}
+    Flush_Frame<T,TV>("interfaces");
 
     LOG::Finish_Logging();
 }
