@@ -307,16 +307,18 @@ Update_Color_Level_Sets()
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
 Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
 {
+    MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        int full_mask=0;
-        for(int j=0;j<bits.m;j++)
-            full_mask|=pairwise_data(bits(j)).valid_flags;
+        int full_mask=~0;
+        for(int j=0;j<bits.m;j++){
+            full_mask&=pairwise_data(bits(j)+it.index).valid_flags;}
         VECTOR<int,(1<<TV::m)> colors(combined_color.Subset(bits+it.index));
         if(count_bits(full_mask)<3){
             if(colors.Count_Matches(colors(0))<(1<<TV::m)){
                 VECTOR<T,(1<<TV::m)> phis(combined_phi.Subset(bits+it.index));
                 CELL_ELEMENTS& ce=index_to_cell_data.Get_Or_Insert(it.index);
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,1));
                 MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(ce.interface,ce.boundary,colors,phis,
                     grid.Cell_Domain(it.index));}
             continue;}
@@ -328,7 +330,7 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
                     if(full_mask&(1<<b)){
                         if(!colors.Contains(a) && !colors.Contains(b)) continue;
                         VECTOR<T,(1<<TV::m)> phis(pairwise_phi(a)(b).Subset(bits+it.index));
-                        if(phis.Count_Matches(phis(0))<(1<<TV::m)){
+                        if(phis.Max()>0 && phis.Min()<0){
                             if(lone_a==-1){
                                 lone_a=a;
                                 lone_b=b;}
@@ -341,11 +343,18 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
             PHYSBAM_ASSERT(colors.Contains(lone_a) && colors.Contains(lone_b));
             VECTOR<T,(1<<TV::m)> phis(pairwise_phi(lone_a)(lone_b).Subset(bits+it.index));
             CELL_ELEMENTS& ce=index_to_cell_data.Get_Or_Insert(it.index);
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,0,1));
+            for(int i=0;i<phis.m;i++) phis(i)=abs(phis(i));
             MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(ce.interface,ce.boundary,colors,phis,
                 grid.Cell_Domain(it.index));
             continue;}
 
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
         Cut_Cell_With_Pairwise_Phi(index_to_cell_data,it.index);}
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),VECTOR<T,3>(1,0,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),VECTOR<T,3>(0,1,0));
+    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),VECTOR<T,3>(0,0,1));
+//    Flush_Frame<T,TV>(__FUNCTION__);
 }
 //#####################################################################
 // Function Cut_Stencil_With_Pairwise_Phi
@@ -364,9 +373,10 @@ Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,c
     int vertices_of_side[4][2]={{0,1},{1,3},{3,2},{2,0}};
 
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
-    int full_mask=0;
+    int full_mask=~0;
     for(int j=0;j<bits.m;j++)
-        full_mask|=pairwise_data(bits(j)).valid_flags;
+        full_mask&=pairwise_data(bits(j)+cell).valid_flags;
+
     VECTOR<int,(1<<TV::m)> colors(combined_color.Subset(bits+cell));
     VECTOR<ARRAY<CROSSING>,4> crossings;
     for(int a=0;a<phi.m;a++)
@@ -374,7 +384,7 @@ Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,c
             for(int b=a+1;b<phi.m;b++)
                 if(full_mask&(1<<b)){
                     VECTOR<T,(1<<TV::m)> phis(pairwise_phi(a)(b).Subset(bits+cell));
-                    if(phis.Count_Matches(phis(0))==(1<<TV::m)) continue;
+                    if(phis.Max()<=0 || phis.Min()>=0) continue;
                     for(int e=0;e<4;e++){
                         int v0=vertices_of_side[e][0],v1=vertices_of_side[e][1];
                         T p0=phis(v0),p1=phis(v1);
@@ -425,12 +435,13 @@ Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,c
                 pts.Delete(key1);
                 if(key0.x>key0.y){
                     exchange(X0,X1);
-                    key0=key1;}
-                INTERFACE_ELEMENT ie={SEGMENT_2D<T>(X0,X1),key0};
+                    key1=key0;}
+                INTERFACE_ELEMENT ie={SEGMENT_2D<T>(X0,X1),key1};
                 ce.interface.Append(ie);}
             pts.Insert(key0,X0);}
 
     TV centroid;
+    RANGE<TV> cell_range(grid.Cell_Domain(cell));
     HASHTABLE<VECTOR<int,3> > found;
     for(typename HASHTABLE<VECTOR<int,2>,TV>::ITERATOR it(pts);it.Valid();it.Next()){
         for(int c=0;c<phi.m;c++)
@@ -444,15 +455,16 @@ Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,c
                 PHI phi0(pairwise_phi(tkey.x)(tkey.y).Subset(bits+cell));
                 PHI phi1(pairwise_phi(tkey.x)(tkey.z).Subset(bits+cell));
                 PHI phi2(pairwise_phi(tkey.y)(tkey.z).Subset(bits+cell));
-                
-                centroid+=Zero_Phi(VECTOR<PHI,3>(phi0,phi1,phi2),p);}}
-    centroid/=found.Size();
-    for(typename HASHTABLE<VECTOR<int,2>,TV>::ITERATOR it(pts);it.Valid();it.Next()){
-        INTERFACE_ELEMENT ie={SEGMENT_2D<T>(it.Data(),centroid),it.Key()};
-        if(ie.color_pair.x>ie.color_pair.y){
-            exchange(ie.color_pair.x,ie.color_pair.y);
-            exchange(ie.face.X.x,ie.face.X.y);}
-        ce.interface.Append(ie);}
+                centroid+=Zero_Phi(VECTOR<PHI,3>(phi0,phi1,phi2),p)*cell_range.Edge_Lengths()+cell_range.min_corner;}}
+
+    if(found.Size()){
+        centroid/=found.Size();
+        for(typename HASHTABLE<VECTOR<int,2>,TV>::ITERATOR it(pts);it.Valid();it.Next()){
+            INTERFACE_ELEMENT ie={SEGMENT_2D<T>(centroid,it.Data()),it.Key()};
+            if(ie.color_pair.x>ie.color_pair.y){
+                exchange(ie.color_pair.x,ie.color_pair.y);
+                exchange(ie.face.X.x,ie.face.X.y);}
+            ce.interface.Append(ie);}}
 }
 //#####################################################################
 // Function Meet_Phi
