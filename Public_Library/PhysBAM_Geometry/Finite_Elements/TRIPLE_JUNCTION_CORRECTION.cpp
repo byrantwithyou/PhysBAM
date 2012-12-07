@@ -1,5 +1,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
@@ -8,20 +9,17 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND_VIEW.h>
 #include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
 #include <PhysBAM_Tools/Math_Tools/integer_log.h>
+#include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Polynomials/QUADRATIC.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
+#include <PhysBAM_Geometry/Finite_Elements/TRIPLE_JUNCTION_CORRECTION.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_TETRAHEDRA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
-#include "TRIPLE_JUNCTION_CORRECTION.h"
 using namespace PhysBAM;
-template<class T,class TV>
-extern void Flush_Frame(const char* title);
-template<class TV> GRID<TV>* Global_Grid(GRID<TV>* grid_in=0);
-
 template<class T>
 struct RAT
 {
@@ -62,23 +60,6 @@ void Handle_Square(const GRID<TV>& grid,const VECTOR<T,4>& phi,const TV_INT& cel
             RAT<T> rat={phi(0),phi(2)-phi(0),phi(0)-phi(1),phi(1)+phi(2)-phi(0)-phi(3),pts(st).y,pts(st+1).y,false};
             Emit_Rat(grid,rat,cell,col);}}
 }
-
-template<class T,class TV_INT>
-void Dump_Interface(ARRAY_VIEW<T,TV_INT> p,const VECTOR<T,3>& col)
-{
-    typedef VECTOR<T,TV_INT::m> TV;
-    const GRID<TV>& grid=*Global_Grid<TV>();
-    T default_phi=(T)1.12349871352389e-10;
-    const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
-
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        VECTOR<T,4> phi(p.Subset(bits+it.index));
-        if(phi.Contains(default_phi)) continue;
-        if(phi.Min()>=0 || phi.Max()<=0) continue;
-        Handle_Square(grid,phi,it.index,col);}
-}
-
-
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -206,10 +187,6 @@ One_Step_Triple_Junction_Correction()
                                     if(abs(p02)<abs(pp(1))) p02=pp(1);
                                     if(abs(p12)<abs(pp(2))) p12=pp(2);}}}
 
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),VECTOR<T,3>(1,0,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),VECTOR<T,3>(0,1,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),VECTOR<T,3>(0,0,1));
-    Flush_Frame<T,TV>("meet points");
     for(typename HASHTABLE<TRIPLE<int,int,TV_INT>,T>::ITERATOR it(total_size);it.Valid();it.Next())
         pairwise_phi(it.Key().x)(it.Key().y)(it.Key().z)-=it.Data();
 }
@@ -295,11 +272,6 @@ Update_Color_Level_Sets()
 
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next())
         PHYSBAM_ASSERT(combined_color(it.index)>=0);
-
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),VECTOR<T,3>(1,0,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),VECTOR<T,3>(0,1,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),VECTOR<T,3>(0,0,1));
-    Flush_Frame<T,TV>("flood fill");
 }
 //#####################################################################
 // Function Cut_Interface
@@ -351,10 +323,6 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
 
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
         Cut_Cell_With_Pairwise_Phi(index_to_cell_data,it.index);}
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),VECTOR<T,3>(1,0,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),VECTOR<T,3>(0,1,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),VECTOR<T,3>(0,0,1));
-//    Flush_Frame<T,TV>(__FUNCTION__);
 }
 //#####################################################################
 // Function Cut_Stencil_With_Pairwise_Phi
@@ -520,11 +488,6 @@ Compute_Pairwise_Level_Set_Data()
     Compute_Pairwise_Data();
     Initialize_Pairwise_Level_Set();
 
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),VECTOR<T,3>(1,0,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),VECTOR<T,3>(0,1,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),VECTOR<T,3>(0,0,1));
-    Flush_Frame<T,TV>("Initial pairwise level sets");
-
     Fill_Valid_Region_With_Exprapolation();
 
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
@@ -533,7 +496,6 @@ Compute_Pairwise_Level_Set_Data()
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
-    Flush_Frame<T,TV>("level set 01");
 
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
         T p=pairwise_phi(0)(1)(it.index);
@@ -541,19 +503,9 @@ Compute_Pairwise_Level_Set_Data()
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
-    Flush_Frame<T,TV>("level set 01");
-
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),VECTOR<T,3>(1,0,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),VECTOR<T,3>(0,1,0));
-    Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),VECTOR<T,3>(0,0,1));
-    Flush_Frame<T,TV>("Extrapolated pairwise level sets");
 
     for(int t=0;t<3;t++){
-        One_Step_Triple_Junction_Correction();
-        Dump_Interface<T,TV_INT>(pairwise_phi(0)(1),VECTOR<T,3>(1,0,0));
-        Dump_Interface<T,TV_INT>(pairwise_phi(0)(2),VECTOR<T,3>(0,1,0));
-        Dump_Interface<T,TV_INT>(pairwise_phi(1)(2),VECTOR<T,3>(0,0,1));
-        Flush_Frame<T,TV>("After triple junction correction");}
+        One_Step_Triple_Junction_Correction();}
 
     Update_Color_Level_Sets();
 }

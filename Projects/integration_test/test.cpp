@@ -26,10 +26,10 @@
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <PhysBAM_Geometry/Finite_Elements/TRIPLE_JUNCTION_CORRECTION.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
-#include "TRIPLE_JUNCTION_CORRECTION.h"
 
 using namespace PhysBAM;
 
