@@ -307,92 +307,53 @@ Update_Color_Level_Sets()
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
 Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
 {
-#if 0
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        CELL_ELEMENTS ce;
-        const VECTOR<VECTOR<TV_INT,TV::m+1>,num_stencils>& stencils_parity=stencils(it.index.Sum()&1);
         int full_mask=0;
         for(int j=0;j<bits.m;j++)
             full_mask|=pairwise_data(bits(j)).valid_flags;
+        VECTOR<int,(1<<TV::m)> colors(combined_color.Subset(bits+it.index));
         if(count_bits(full_mask)<3){
-            VECTOR<int,(1<<TV::m)> colors(combined_color.Subset(bits+it.index));
-            if(colors.Count_Matches(colors(0))<=(1<<TV::m))
-                for(int i=0;i<stencils_parity.m;i++)
-                    Cut_Stencil_With_Phi(ce,it.index,VECTOR<TV_INT,TV::m+1>(stencils_parity(i)+it.index));
+            if(colors.Count_Matches(colors(0))<=(1<<TV::m)){
+                VECTOR<T,(1<<TV::m)> phis(combined_phi.Subset(bits+it.index));
+                CELL_ELEMENTS& ce=index_to_cell_data.Get_Or_Insert(it.index);
+                MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(ce.interface,ce.boundary,colors,phis,
+                    grid.Cell_Domain(it.index));}
             continue;}
 
-        for(int i=0;i<stencils_parity.m;i++){
-            VECTOR<TV_INT,TV::m+1> st(stencils_parity(i)+it.index);
-            int mask=~0;
-            for(int j=0;j<st.m;j++)
-                mask&=pairwise_data(st(j)).valid_flags;
-            if(count_bits(mask)<3) Cut_Stencil_With_Phi(ce,it.index,st);
-            else Cut_Stencil_With_Pairwise_Phi(ce,it.index,st);}
-        if(ce.interface.m)
-            index_to_cell_data.Get_Or_Insert(it.index)=ce;}
-#endif
-}
-//#####################################################################
-// Function Cut_Stencil_With_Phi
-//#####################################################################
-template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
-Cut_Stencil_With_Phi(CELL_ELEMENTS& ce,const TV_INT& cell,const VECTOR<TV_INT,TV::m+1>& st)
-{
-    VECTOR<TV,TV::m+1> X;
-    VECTOR<T,TV::m+1> element_phi;
-    VECTOR<int,2> color_pair;
-    for(int i=0;i<TV::m+1;i++){
-        X(i)=grid.Node(st(i));
-        T mn=combined_phi(st(i));
-        int col=combined_color(st(i));
-        if(color_pair.x==-1 || color_pair.x==col) color_pair.x=col;
-        else{
-            PHYSBAM_ASSERT(color_pair.y==-1 || color_pair.y==col);
-            if(color_pair.x>col){
-                element_phi=-element_phi;
-                color_pair.y=color_pair.x;
-                color_pair.x=col;}
-            else{
-                mn=-mn;
-                color_pair.y=col;}}
-        element_phi(i)=mn;}
+        int lone_a=-1,lone_b=-1;
+        for(int a=0;a<phi.m;a++)
+            if(full_mask&(1<<a))
+                for(int b=a+1;b<phi.m;b++)
+                    if(full_mask&(1<<b)){
+                        if(!colors.Contains(a) && !colors.Contains(b)) continue;
+                        VECTOR<T,(1<<TV::m)> phis(pairwise_phi(a)(b).Subset(bits+it.index));
+                        if(phis.Count_Matches(phis(0))<=(1<<TV::m)){
+                            if(lone_a==-1){
+                                lone_a=a;
+                                lone_b=b;}
+                            else{
+                                lone_a=-2;
+                                a=phi.m;
+                                break;}}}
+        if(lone_a==-1) continue;
+        if(lone_a>=0){
+            PHYSBAM_ASSERT(colors.Contains(lone_a) && colors.Contains(lone_b));
+            VECTOR<T,(1<<TV::m)> phis(pairwise_phi(lone_a)(lone_b).Subset(bits+it.index));
+            CELL_ELEMENTS& ce=index_to_cell_data.Get_Or_Insert(it.index);
+            MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(ce.interface,ce.boundary,colors,phis,
+                grid.Cell_Domain(it.index));
+            continue;}
 
-    ARRAY<T_FACE> interface,boundary_faces[2];
-    VECTOR<VECTOR<ARRAY<T_FACE>*,2>,TV::m+1> boundary;
-    int spec=0,num_diff=0;
-    for(int i=1;i<TV::m+1;i++)
-        if(st(i).x!=st(0).x){
-            num_diff++;
-            spec=i;}
-    if(num_diff==TV::m) spec=0;
-    if(TV::m!=3 || num_diff!=2)
-        boundary(spec)=VECTOR<ARRAY<T_FACE>*,2>(&boundary_faces[1],&boundary_faces[0]);
-    MARCHING_TETRAHEDRA<TV>::Get_Elements_For_Tetrahedron(interface,boundary,element_phi,X);
-
-    for(int i=0;i<interface.m;i++){
-        typename MARCHING_CUBES_COLOR<TV>::INTERFACE_ELEMENT e={interface(i),color_pair};
-        ce.interface.Append(e);}
-
-    for(int s=0;s<2;s++)
-        for(int i=0;i<boundary_faces[s].m;i++){
-            typename MARCHING_CUBES_COLOR<TV>::BOUNDARY_ELEMENT e={boundary_faces[s](i),color_pair(s)};
-            ce.boundary.Append(e);}
+        Cut_Cell_With_Pairwise_Phi(index_to_cell_data,it.index);}
 }
 //#####################################################################
 // Function Cut_Stencil_With_Pairwise_Phi
 //#####################################################################
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
-Cut_Stencil_With_Pairwise_Phi(CELL_ELEMENTS& ce,const TV_INT& cell,const VECTOR<TV_INT,TV::m+1>& st)
+Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,const TV_INT& cell)
 {
     
-}
-//#####################################################################
-// Function Fill_Combined_Level_Set
-//#####################################################################
-template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
-Fill_Combined_Level_Set()
-{
 }
 //#####################################################################
 // Function Meet_Phi
