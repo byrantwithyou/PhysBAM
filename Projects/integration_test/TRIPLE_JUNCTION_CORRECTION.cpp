@@ -314,7 +314,7 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
             full_mask|=pairwise_data(bits(j)).valid_flags;
         VECTOR<int,(1<<TV::m)> colors(combined_color.Subset(bits+it.index));
         if(count_bits(full_mask)<3){
-            if(colors.Count_Matches(colors(0))<=(1<<TV::m)){
+            if(colors.Count_Matches(colors(0))<(1<<TV::m)){
                 VECTOR<T,(1<<TV::m)> phis(combined_phi.Subset(bits+it.index));
                 CELL_ELEMENTS& ce=index_to_cell_data.Get_Or_Insert(it.index);
                 MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(ce.interface,ce.boundary,colors,phis,
@@ -328,7 +328,7 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
                     if(full_mask&(1<<b)){
                         if(!colors.Contains(a) && !colors.Contains(b)) continue;
                         VECTOR<T,(1<<TV::m)> phis(pairwise_phi(a)(b).Subset(bits+it.index));
-                        if(phis.Count_Matches(phis(0))<=(1<<TV::m)){
+                        if(phis.Count_Matches(phis(0))<(1<<TV::m)){
                             if(lone_a==-1){
                                 lone_a=a;
                                 lone_b=b;}
@@ -353,7 +353,106 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
 Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,const TV_INT& cell)
 {
-    
+    struct CROSSING
+    {
+        T theta;
+        int c0;
+        int c1;
+        TV X;
+    };
+
+    int vertices_of_side[4][2]={{0,1},{1,3},{3,2},{2,0}};
+
+    const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
+    int full_mask=0;
+    for(int j=0;j<bits.m;j++)
+        full_mask|=pairwise_data(bits(j)).valid_flags;
+    VECTOR<int,(1<<TV::m)> colors(combined_color.Subset(bits+cell));
+    VECTOR<ARRAY<CROSSING>,4> crossings;
+    for(int a=0;a<phi.m;a++)
+        if(full_mask&(1<<a))
+            for(int b=a+1;b<phi.m;b++)
+                if(full_mask&(1<<b)){
+                    VECTOR<T,(1<<TV::m)> phis(pairwise_phi(a)(b).Subset(bits+cell));
+                    if(phis.Count_Matches(phis(0))==(1<<TV::m)) continue;
+                    for(int e=0;e<4;e++){
+                        int v0=vertices_of_side[e][0],v1=vertices_of_side[e][1];
+                        T p0=phis(v0),p1=phis(v1);
+                        if((p0>0)==(p1>0)) continue;
+                        CROSSING t={p0/(p0-p1),a,b};
+                        TV X0=grid.Node(cell+bits(v0)),X1=grid.Node(cell+bits(v1));
+                        t.X=X0+t.theta*(X1-X0);
+                        if(p0>0) exchange(t.c0,t.c1);
+                        crossings(e).Append(t);}}
+
+    for(int e=0;e<4;e++){
+        ARRAY<CROSSING>& ar=crossings(e);
+        crossings(e).Sort([](const CROSSING& a,const CROSSING& b){return a.theta<b.theta;});
+        int c0=colors(vertices_of_side[e][0]),c1=colors(vertices_of_side[e][1]),i=0,j=ar.m-1;
+        while(i<=j){
+            while(i<=j && ar(j).c1!=c1){ar.Remove_Index(j);j--;}
+            while(i<=j && ar(i).c0!=c0){ar.Remove_Index(i);j--;}
+            if(i<=j){
+                c0=ar(i++).c1;
+                PHYSBAM_ASSERT(i!=j+1 || c0==c1);
+                c1=ar(j--).c0;
+                PHYSBAM_ASSERT(i!=j+1 || c0==c1);}}}
+
+    bool empty=true;
+    for(int e=0;e<4;e++)
+        if(crossings(e).m)
+            empty=false;
+    if(empty) return;
+
+    CELL_ELEMENTS& ce=index_to_cell_data.Get_Or_Insert(cell);
+    for(int s=0;s<2;s++){
+        int c0=colors(2*s);
+        TV X0=grid.Node(cell+bits(3*s)),X1=grid.Node(cell+bits(3*s^1)),X=X0;
+        for(int i=0;i<crossings(2*s).m;i++){
+            BOUNDARY_ELEMENT be={SEGMENT_2D<T>(X,crossings(2*s)(i).X),c0};
+            ce.boundary.Append(be);
+            X=crossings(2*s)(i).X;
+            c0=crossings(2*s)(i).c1;}
+        BOUNDARY_ELEMENT be={SEGMENT_2D<T>(X,X1),c0};
+        ce.boundary.Append(be);}
+
+    HASHTABLE<VECTOR<int,2>,TV> pts;
+    for(int e=0;e<4;e++)
+        for(int i=0;i<crossings(e).m;i++){
+            VECTOR<int,2> key0(crossings(e)(i).c0,crossings(e)(i).c1),key1(crossings(e)(i).c1,crossings(e)(i).c0);
+            TV X0=crossings(e)(i).X,X1;
+            if(pts.Get(key1,X1)){
+                pts.Delete(key1);
+                if(key0.x>key0.y){
+                    exchange(X0,X1);
+                    key0=key1;}
+                INTERFACE_ELEMENT ie={SEGMENT_2D<T>(X0,X1),key0};
+                ce.interface.Append(ie);}
+            pts.Insert(key0,X0);}
+
+    TV centroid;
+    HASHTABLE<VECTOR<int,3> > found;
+    for(typename HASHTABLE<VECTOR<int,2>,TV>::ITERATOR it(pts);it.Valid();it.Next()){
+        for(int c=0;c<phi.m;c++)
+            if(c!=it.Key().x && c!=it.Key().y && full_mask&(1<<c)){
+                VECTOR<int,2> key(it.Key().y,c);
+                if(!pts.Contains(key)) continue;
+                VECTOR<int,3> tkey(key.Append(it.Key().x).Sorted());
+                if(found.Contains(tkey)) continue;
+                found.Insert(tkey);
+                VECTOR<T,3> p;
+                PHI phi0(pairwise_phi(tkey.x)(tkey.y).Subset(bits+cell));
+                PHI phi1(pairwise_phi(tkey.x)(tkey.z).Subset(bits+cell));
+                PHI phi2(pairwise_phi(tkey.y)(tkey.z).Subset(bits+cell));
+                
+                centroid+=Zero_Phi(VECTOR<PHI,3>(phi0,phi1,phi2),p);}}
+    centroid/=found.Size();
+    for(typename HASHTABLE<VECTOR<int,2>,TV>::ITERATOR it(pts);it.Valid();it.Next()){
+        INTERFACE_ELEMENT ie={SEGMENT_2D<T>(it.Data(),centroid),it.Key()};
+        if(ie.color_pair.x>ie.color_pair.y){
+            exchange(ie.color_pair.x,ie.color_pair.y);
+            exchange(ie.face.X.x,ie.face.X.y);}
+        ce.interface.Append(ie);}
 }
 //#####################################################################
 // Function Meet_Phi
