@@ -549,7 +549,7 @@
 
 (defun physbam-compile-current-file ()
   (interactive)
-  (let ((compile-command (concat physbam-compiler " -I$PHYSBAM/Public_Library -DCOMPILE_WITHOUT_DYADIC_SUPPORT -DCOMPILE_WITHOUT_RLE_SUPPORT -c " (buffer-file-name))))
+  (let ((compile-command (concat physbam-compiler " -I$PHYSBAM/Public_Library -c -g -Wall -Werror -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -fno-strict-aliasing -std=gnu++0x -Wno-unknown-pragmas " (buffer-file-name))))
     (save-buffer)
     (call-interactively 'compile)
     (physbam-setup-compile-command nil)))
