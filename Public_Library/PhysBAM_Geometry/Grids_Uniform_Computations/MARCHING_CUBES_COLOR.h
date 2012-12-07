@@ -55,6 +55,8 @@ public:
     static void Initialize_Case_Table();
     static void Get_Elements_For_Cell(ARRAY<INTERFACE_ELEMENT>& interface,ARRAY<BOUNDARY_ELEMENT>& boundary,
         const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi);
+    static void Get_Elements_For_Cell(ARRAY<INTERFACE_ELEMENT>& interface,ARRAY<BOUNDARY_ELEMENT>& boundary,
+        const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi,const RANGE<TV>& cell_range);
 
 //#####################################################################
 

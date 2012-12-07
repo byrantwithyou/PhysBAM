@@ -1353,6 +1353,20 @@ Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<T
             case 7: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(1,0,0)); break;
             default: PHYSBAM_FATAL_ERROR();}}
 }
+//#####################################################################
+// Function Get_Elements_For_Cell
+//#####################################################################
+template<class TV> void MARCHING_CUBES_COLOR<TV>::
+Get_Elements_For_Cell(ARRAY<INTERFACE_ELEMENT>& interface,ARRAY<BOUNDARY_ELEMENT>& boundary,
+    const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi,const RANGE<TV>& cell_range)
+{
+    int si=interface.m,sb=boundary.m;
+    Get_Elements_For_Cell(interface,boundary,colors,phi);
+    for(int i=si;i<interface.m;i++)
+        interface(i).face.X=interface(i).face.X*cell_range.Edge_Lengths()+cell_range.min_corner;
+    for(int i=sb;i<boundary.m;i++)
+        boundary(i).face.X=boundary(i).face.X*cell_range.Edge_Lengths()+cell_range.min_corner;
+}
 namespace PhysBAM{
 template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<float,3> >;
