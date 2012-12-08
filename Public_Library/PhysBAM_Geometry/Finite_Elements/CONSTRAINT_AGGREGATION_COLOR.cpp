@@ -253,7 +253,9 @@ Build_Condensed_Constraint_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,ARRA
         for(int i=0;i<M_new.offsets.m-1;i++){ M_new.offsets(i+1)+=M_new.offsets(i);}
     }
 }
+namespace PhysBAM{
 template class CONSTRAINT_AGGREGATION_COLOR<VECTOR<float,2> >;
 template class CONSTRAINT_AGGREGATION_COLOR<VECTOR<float,3> >;
 template class CONSTRAINT_AGGREGATION_COLOR<VECTOR<double,2> >;
 template class CONSTRAINT_AGGREGATION_COLOR<VECTOR<double,3> >;
+}

@@ -299,7 +299,9 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
 {
     debug_cast<VECTOR_T&>(z).Scale(debug_cast<const VECTOR_T&>(r),debug_cast<const VECTOR_T&>(J));
 }
+namespace PhysBAM{
 template class INTERFACE_POISSON_SYSTEM_COLOR_NEW<VECTOR<float,2> >;
 template class INTERFACE_POISSON_SYSTEM_COLOR_NEW<VECTOR<float,3> >;
 template class INTERFACE_POISSON_SYSTEM_COLOR_NEW<VECTOR<double,2> >;
 template class INTERFACE_POISSON_SYSTEM_COLOR_NEW<VECTOR<double,3> >;
+}
