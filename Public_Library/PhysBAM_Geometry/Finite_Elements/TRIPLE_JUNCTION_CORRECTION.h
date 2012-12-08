@@ -1,3 +1,11 @@
+//#####################################################################
+// Copyright 2012, Alexey Stomakhin.
+// This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
+//#####################################################################
+// Class TRIPLE_JUNCTION_CORRECTION
+//#####################################################################
+#ifndef __TRIPLE_JUNCTION_CORRECTION__
+#define __TRIPLE_JUNCTION_CORRECTION__
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -53,3 +61,4 @@ public:
     int Fill_Phi_From_Pairwise_Level_Set_At_Index(const TV_INT& node,int color);
 };
 }
+#endif
