@@ -6,6 +6,7 @@
 //#####################################################################
 #ifndef __ANALYTIC_LEVELSET_ROTATE__
 #define __ANALYTIC_LEVELSET_ROTATE__
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 
 namespace PhysBAM{
