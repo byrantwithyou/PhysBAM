@@ -7,6 +7,7 @@
 #ifndef __ANALYTIC_LEVELSET_LINE__
 #define __ANALYTIC_LEVELSET_LINE__
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SIGNED.h>
+#include <PhysBAM_Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 
 namespace PhysBAM{
 template<class TV>

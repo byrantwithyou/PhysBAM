@@ -18,7 +18,7 @@ struct ANALYTIC_LEVELSET_CONST:public ANALYTIC_LEVELSET_SIGNED<TV>
         :ANALYTIC_LEVELSET_SIGNED<TV>(c_i,c_o),value(value)
     {}
     virtual T phi2(const TV& X,T t) const {return value;}
-    virtual TV N2(const TV& X,T t) const {return TV(1,0);}
+    virtual TV N2(const TV& X,T t) const {return TV::Axis_Vector(0);}
 };
 }
 #endif
