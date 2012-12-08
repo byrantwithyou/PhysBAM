@@ -47,13 +47,13 @@ template<class TV> INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
-Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool aggregated_constraints)
+Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool aggregated_constraints,bool cell_centered_u)
 {
     // SET UP STENCILS
 
     BASIS_STENCIL_UNIFORM<TV,1> u_stencil(grid.dX);
     VECTOR<BASIS_STENCIL_UNIFORM<TV,1>*,TV::m> udx_stencil;
-    u_stencil.Set_Center();
+    if(cell_centered_u)u_stencil.Set_Center(); else u_stencil.Set_Node();
     u_stencil.Set_Multilinear_Stencil();
     u_stencil.Dice_Stencil();
     for(int i=0;i<TV::m;i++){
@@ -151,7 +151,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
-Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc)
+Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc,bool cell_centered_u)
 {
     ARRAY<ARRAY<T> > F_volume;
 
@@ -161,12 +161,17 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc)
     F_volume.Resize(cdi->colors);
     for(int c=0;c<cdi->colors;c++)
         F_volume(c).Resize(cm_u->dofs(c));
-
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-        for(int c=0;c<cdi->colors;c++){
-            int k=cm_u->Get_Index(it.index,c);
-            if(k>=0) F_volume(c)(k)=vfsc->F(it.Location(),c);}
-
+    if(cell_centered_u){
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+            for(int c=0;c<cdi->colors;c++){
+                int k=cm_u->Get_Index(it.index,c);
+                if(k>=0) F_volume(c)(k)=vfsc->F(it.Location(),c);}
+    }else{
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+            for(int c=0;c<cdi->colors;c++){
+                int k=cm_u->Get_Index(it.index,c);
+                if(k>=0) F_volume(c)(k)=vfsc->F(it.Location(),c);}
+    }
     for(int c=0;c<cdi->colors;c++)
         matrix_rhs_uu(c).Transpose_Times_Add(F_volume(c),rhs.u(c));
 

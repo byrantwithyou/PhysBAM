@@ -181,7 +181,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>& ips,const ARRAY<T
 //#################################################################################################################################################
 
 template<class TV>
-void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles,bool aggregated_constraints)
+void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles,bool aggregated_constraints,bool cell_centered_u)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -195,7 +195,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         
     INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV> ips(grid,phi_value,phi_color);
     ips.use_preconditioner=use_preconditioner;
-    ips.Set_Matrix(at.mu,at.wrap,&at,aggregated_constraints);
+    ips.Set_Matrix(at.mu,at.wrap,&at,aggregated_constraints,cell_centered_u);
 
     printf("\n");
     for(int c=0;c<ips.cdi->colors;c++) printf("u%d [%i]\t",c,ips.cm_u->dofs(c));printf("\n");
@@ -210,7 +210,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         virtual T F(const TV& X,int color){return at->f_volume(X,color);}
     } vfscl;
     vfscl.at=&at;
-    ips.Set_RHS(rhs,&vfscl);
+    ips.Set_RHS(rhs,&vfscl,cell_centered_u);
     ips.Resize_Vector(sol);
 
     MINRES<T> mr;
@@ -233,19 +233,19 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
 
     ARRAY<T,TV_INT> exact_u,numer_u,error_u;
 
-    numer_u.Resize(ips.grid.Domain_Indices());
-    exact_u.Resize(ips.grid.Domain_Indices());
-    error_u.Resize(ips.grid.Domain_Indices());
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    T avg_u(0),error_u_linf(0),error_u_l2(0);int cnt_u(0);
+    if(!cell_centered_u){
+    numer_u.Resize(ips.grid.Node_Indices());
+    exact_u.Resize(ips.grid.Node_Indices());
+    error_u.Resize(ips.grid.Node_Indices());
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
         if(c>=0){
             int k=ips.cm_u->Get_Index(it.index,c);
             assert(k>=0);
             numer_u(it.index)=sol.u(c)(k);}}
 
-    T avg_u=0;
-    int cnt_u=0;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
         if(c>=0){
             exact_u(it.index)=at.u(it.Location());
@@ -254,14 +254,42 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
             cnt_u++;}}
     avg_u/=cnt_u;
 
-    T error_u_linf=0,error_u_l2=0;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
         if(c>=0){
             error_u(it.index)-=avg_u;
             error_u_linf=max(error_u_linf,abs(error_u(it.index)));
             error_u_l2+=sqr(error_u(it.index));}}
     error_u_l2=sqrt(error_u_l2/cnt_u);
+    }
+    else{
+        numer_u.Resize(ips.grid.Domain_Indices());
+        exact_u.Resize(ips.grid.Domain_Indices());
+        error_u.Resize(ips.grid.Domain_Indices());
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+            int c=at.phi_color(it.Location());
+            if(c>=0){
+                int k=ips.cm_u->Get_Index(it.index,c);
+                assert(k>=0);
+                numer_u(it.index)=sol.u(c)(k);}}
+        
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+            int c=at.phi_color(it.Location());
+            if(c>=0){
+                exact_u(it.index)=at.u(it.Location());
+                error_u(it.index)=numer_u(it.index)-exact_u(it.index);
+                avg_u+=error_u(it.index);
+                cnt_u++;}}
+        avg_u/=cnt_u;
+        
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+            int c=at.phi_color(it.Location());
+            if(c>=0){
+                error_u(it.index)-=avg_u;
+                error_u_linf=max(error_u_linf,abs(error_u(it.index)));
+                error_u_l2+=sqr(error_u(it.index));}}
+        error_u_l2=sqrt(error_u_l2/cnt_u);
+    }
 
     LOG::cout<<"error "<<error_u_linf<<" "<<error_u_l2<<std::endl<<std::endl;
 
@@ -295,7 +323,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     T m=1,s=1,kg=1;
     int threads=1;
     int test_number=1,resolution=4,max_iter=1000000;
-    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,opt_arg=false,aggregated_constraints=false;
+    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,opt_arg=false,aggregated_constraints=false,cell_centered_u=false;
     parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-m",&m,"unit","meter scale");
@@ -310,6 +338,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-null",&null,"find extra null modes of the matrix");
     parse_args.Add("-dump_matrix",&dump_matrix,"dump system matrix");
     parse_args.Add("-debug_particles",&debug_particles,"dump debug particles");
+    parse_args.Add("-cell_centered_u",&cell_centered_u,"cell centered u");
     parse_args.Parse();
 
 #ifdef USE_OPENMP
@@ -720,7 +749,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles,aggregated_constraints);
+    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles,aggregated_constraints,cell_centered_u);
     LOG::Finish_Logging();
     delete test;
 }
