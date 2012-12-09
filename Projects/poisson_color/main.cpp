@@ -432,31 +432,23 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(0,1,TV(),TV::Axis_Vector(0)));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(1,0,TV::Axis_Vector(1)*(2*(T)pi),TV()));
             break;}
-#if 0
         case 7:{ // Three colors, periodic. u=a for r<R and x>0, u=b for r<R and x<0, zero elsewhere.
+            T r=1/(T)pi;
+            TV n;
+            for(int i=0;i<TV::m;i++) n(i)=i+(T)pi/(i+(T)pi);
+            n.Normalize();
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
             test.use_discontinuous_scalar_field=true;
-            struct ANALYTIC_POISSON_SOLUTION_7:public ANALYTIC_POISSON_SOLUTION<TV>
-            {
-                T r;
-                TV n;
-                VECTOR<T,3> a;
-                virtual void Initialize()
-                {
-                    
-                    r=m/pi;a(0)=0;a(1)=5;a(2)=7;
-                    for(int i=0;i<TV::m;i++) n(i)=i+pi/(i+pi);n.Normalize();
-                }
-                virtual T phi_value(const TV& X){TV x=X-0.5;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
-                virtual int phi_color(const TV& X){TV x=X-0.5;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?2:1):0;}
-                virtual T u(const TV& X,int color){return a(color);}
-                virtual T f_volume(const TV& X,int color){return T();}
-                virtual T j_surface(const TV& X,int color0,int color1){return T();}
-            };
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_7);
+            ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,2,1);
+            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0);
+            test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),5));
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),7));
             break;}
+#if 0
         case 8:{ // Three colors, periodic. u=a*x^2 for r<R and x*n>0, u=b*x^2 for r<R and x*n<0, zero elsewhere.
             test.mu.Append(1);
             test.mu.Append(2);
