@@ -20,6 +20,7 @@ struct ANALYTIC_LEVELSET
     virtual T phi(const TV& X,T t,int& c) const=0;
     virtual TV N(const TV& X,T t,int c) const=0;
     virtual T dist(const TV& X,T t,int c) const=0; // signed distance to color
+    void Test(const RANGE<TV>& domain) const;
 };
 }
 #endif

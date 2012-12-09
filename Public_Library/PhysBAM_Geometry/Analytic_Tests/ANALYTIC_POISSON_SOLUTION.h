@@ -17,9 +17,10 @@ struct ANALYTIC_POISSON_SOLUTION
 
     virtual ~ANALYTIC_POISSON_SOLUTION(){}
 
-    virtual T u(const TV& X)=0;
-    virtual TV du(const TV& X)=0;
-    virtual T f_volume(const TV& X)=0;
+    virtual T u(const TV& X) const=0;
+    virtual TV du(const TV& X) const=0;
+    virtual T Laplacian(const TV& X) const=0;
+    void Test(const TV& X) const;
 };
 }
 #endif

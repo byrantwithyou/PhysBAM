@@ -49,6 +49,8 @@ struct ANALYTIC_POISSON_TEST:public BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
 
     T d_surface(const TV& X,int color0,int color1)
     {return analytic_solution(color1)->u(X);}
+
+    void Test(const RANGE<TV>& domain) const;
 };
 }
 #endif
