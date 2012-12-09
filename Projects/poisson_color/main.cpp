@@ -341,6 +341,18 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     ANALYTIC_POISSON_TEST<TV> test;
 
+    struct ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS:public ANALYTIC_POISSON_SOLUTION<TV>
+    {
+        T s,c;
+        TV v,e;
+        ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(T s,T c,TV v,TV e): s(s),c(c),v(v),e(e) {}
+        virtual ~ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS() {}
+        T u_local(const TV& X,T ts,T tc) const {return (ts*sin(X.Dot(v))+tc*cos(X.Dot(v)))*exp(X.Dot(e));}
+        virtual T u(const TV& X) const {return u_local(X,s,c);}
+        virtual TV du(const TV& X) const {return e*u_local(X,s,c)+v*u_local(X,-c,s);}
+        virtual T Laplacian(const TV& X) const {return u_local(X,s,c)*(e.Magnitude_Squared()-v.Magnitude_Squared())+2*e.Dot(v)*u_local(X,-c,s);}
+    };
+
     switch(test_number){
         case 0:{ // One color, periodic. No interface, no forces, u=0.
             test.mu.Append(1);
@@ -357,13 +369,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 1:{ // One color, periodic. No interface, u=sin(2*pi*x), f=(2*pi)^2*sin(2*pi*x).
             test.mu.Append(1);
             test.analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-1);
-            struct ANALYTIC_POISSON_SOLUTION_1:public ANALYTIC_POISSON_SOLUTION<TV>
-            {
-                virtual T u(const TV& X) const {return sin(2*pi*X.x);}
-                virtual TV du(const TV& X) const {return TV::Axis_Vector(0)*(2*pi*cos(2*pi*X.x));}
-                virtual T Laplacian(const TV& X) const {return -sqr(2*pi)*sin(2*pi*X.x);}
-            };
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_1);
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(1,0,TV::Axis_Vector(0)*(2*pi),TV()));
             break;}
         case 2:{ // Two colors, periodic. Linear on [0,1/3],[1/3,2/3],[2/3,1], no volumetric forces.
             test.mu.Append(1);
@@ -402,54 +408,20 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_4);
             break;}
-#if 0
         case 5:{ // Three colors, periodic. Stripes in x 0:[0,a], 1:[a,b], 2:[b,c], 0:[c,1].
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
             test.use_discontinuous_scalar_field=true;
-            T a=m/6,b=5/12,c=5/6;
-            struct ANALYTIC_POISSON_SOLUTION_5:public ANALYTIC_POISSON_SOLUTION<TV>
-            {
-                virtual T phi_value(const TV& X)
-                {
-                    if(X.x<a) return abs(X.x-a);
-                    if(X.x<b) return (b-a)/2-abs(X.x-(b+a)/2);
-                    if(X.x<c) return (c-b)/2-abs(X.x-(c+b)/2);
-                    return abs(X.x-c);
-                }
-                virtual int phi_color(const TV& X)
-                {
-                    if(X.x<a) return 0;
-                    if(X.x<b) return 1;
-                    if(X.x<c) return 2;
-                    return 0;
-                }
-                virtual T u(const TV& X,int color){
-                    switch (color){
-                        case 0: return 0;
-                        case 1: return exp(X.x);
-                        case 2: return sin(2*pi*X.y);
-                        default: PHYSBAM_FATAL_ERROR();}
-                }
-                virtual T f_volume(const TV& X,int color)
-                {
-                    switch (color){
-                        case 0: return 0;
-                        case 1: return -exp(X.x)*mu(color)/sqr(m);
-                        case 2: return sqr(2*pi)*sin(2*pi*X.y)*mu(color)/sqr(m);
-                        default: PHYSBAM_FATAL_ERROR();}
-                }
-                virtual T j_surface(const TV& X,int color0,int color1)
-                {
-                    if(color0==0 && color1==1) return exp(X.x)*mu(1);
-                    if(color0==0 && color1==2) return 0;
-                    if(color0==1 && color1==2) return -exp(X.x)*mu(1);
-                    PHYSBAM_FATAL_ERROR();
-                }
-            };
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_5);
+            T a=(T)1/6,b=(T)5/12,c=(T)5/6;
+            ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*a,TV::Axis_Vector(0),0,1);
+            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*c,TV::Axis_Vector(0),2,0);
+            test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*b,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(0,1,TV(),TV::Axis_Vector(0)));
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(1,0,TV::Axis_Vector(1)*(2*(T)pi),TV()));
             break;}
+#if 0
         case 6:{ // Three colors (one dirichlet or neumann), periodic. Stripes in x 0:[0,a], 1:[a,b], 2:[b,c], 0:[c,1].
             test.mu.Append(1);
             test.mu.Append(2);
@@ -487,8 +459,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T f_volume(const TV& X,int color)
                 {
                     switch (color){
-                        case 0: return -exp(X.x)*mu(color)/sqr(m);
-                        case 1: return sqr(2*pi)*sin(2*pi*X.y)*mu(color)/sqr(m);
+                        case 0: return -exp(X.x)*mu(color);
+                        case 1: return sqr(2*pi)*sin(2*pi*X.y)*mu(color);
                         default: PHYSBAM_FATAL_ERROR();}
                 }
                 virtual T j_surface(const TV& X,int color0,int color1)
