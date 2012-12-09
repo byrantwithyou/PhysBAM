@@ -9,36 +9,13 @@
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 #include <PhysBAM_Geometry/Finite_Elements/BOUNDARY_CONDITIONS_SCALAR_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/VOLUME_FORCE_SCALAR_COLOR.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 
 namespace PhysBAM{
-
-template<class TV>
-struct ANALYTIC_TEST: public BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
-{
-    typedef typename TV::SCALAR T;
-    T kg,m,s;
-
-    bool wrap;
-    ARRAY<T> mu;
-
-    ANALYTIC_TEST():kg(1),m(1),s(1){}
-    virtual ~ANALYTIC_TEST(){}
-
-    virtual void Initialize()=0;
-    virtual T phi_value(const TV& X)=0;
-    virtual int phi_color(const TV& X)=0;
-    virtual T u(const TV& X,int color)=0;
-    virtual T f_volume(const TV& X,int color)=0;
-
-    virtual T u_jump(const TV& X,int color0,int color1)
-    {return u(X,color1)-u(X,color0);}
-
-    T u(const TV& X){return u(X,phi_color(X));}
-};
 
 template<class TV> class GRID;
 template<class TV> class CELL_MANAGER_COLOR;

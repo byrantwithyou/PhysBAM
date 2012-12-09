@@ -14,6 +14,8 @@
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_CONST.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_POISSON_TEST.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
@@ -94,7 +96,7 @@ void Dump_Interface(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips)
 }
 
 template<class T,class TV>
-void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_TEST<TV>& at)
+void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_POISSON_TEST<TV>& at)
 {
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
@@ -105,8 +107,10 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_TEST<TV>
     Dump_Interface<T,TV>(ips);
     Flush_Frame<T,TV>("surfaces");
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next())
-        Add_Debug_Particle(it.Location(),color_map[at.phi_color(it.Location())]);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
+        int c=0;
+        at.analytic_levelset->phi(it.Location(),0,c);
+        Add_Debug_Particle(it.Location(),color_map[c]);}
     Flush_Frame<T,TV>("level set");
     
     char buff[100];
@@ -138,9 +142,10 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_TEST<TV>
     
     Dump_Interface<T,TV>(ips);
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
-        int c=at.phi_color(it.Location());
+        int c=0;
+        at.analytic_levelset->phi(it.Location(),0,c);
         if(c>=0){
-            T f_volume=at.f_volume(it.Location(),c);
+            T f_volume=-at.mu(c)*at.analytic_solution(c)->Laplacian(it.Location());
             Add_Debug_Particle(it.Location(),f_volume==0?VECTOR<T,3>(0.25,0.25,0.25):(f_volume>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,f_volume);}}
         Flush_Frame<T,TV>("volumetric forces");
@@ -181,7 +186,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const ARRAY<T,VEC
 //#################################################################################################################################################
 
 template<class TV>
-void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles)
+void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -189,13 +194,12 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     ARRAY<T,TV_INT> phi_value(grid.Node_Indices());
     ARRAY<int,TV_INT> phi_color(grid.Node_Indices());
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
-        phi_value(it.index)=at.phi_value(it.Location());
-        phi_color(it.index)=at.phi_color(it.Location());}
-    
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+        phi_value(it.index)=at.analytic_levelset->phi(it.Location(),0,phi_color(it.index));
+
     INTERFACE_POISSON_SYSTEM_COLOR<TV> ips(grid,phi_value,phi_color);
     ips.use_preconditioner=use_preconditioner;
-    ips.Set_Matrix(at.mu,at.wrap,&at);
+    ips.Set_Matrix(at.mu,true,&at);
 
     printf("\n");
     for(int c=0;c<ips.cdi->colors;c++) printf("u%d [%i]\t",c,ips.cm_u->dofs(c));printf("\n");
@@ -206,8 +210,8 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
 
     struct VOLUME_FORCE_SCALAR_COLOR_LOCAL: public VOLUME_FORCE_SCALAR_COLOR<TV>
     {
-        ANALYTIC_TEST<TV>* at;
-        virtual T F(const TV& X,int color){return at->f_volume(X,color);}
+        ANALYTIC_POISSON_TEST<TV>* at;
+        virtual T F(const TV& X,int color){return -at->mu(color)*at->analytic_solution(color)->Laplacian(X);}
     } vfscl;
     vfscl.at=&at;
     ips.Set_RHS(rhs,&vfscl);
@@ -237,7 +241,8 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     exact_u.Resize(ips.grid.Domain_Indices());
     error_u.Resize(ips.grid.Domain_Indices());
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        int c=at.phi_color(it.Location());
+        int c=0;
+        at.analytic_levelset->phi(it.Location(),0,c);
         if(c>=0){
             int k=ips.cm_u->Get_Index(it.index,c);
             assert(k>=0);
@@ -246,9 +251,10 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     T avg_u=0;
     int cnt_u=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        int c=at.phi_color(it.Location());
+        int c=0;
+        at.analytic_levelset->phi(it.Location(),0,c);
         if(c>=0){
-            exact_u(it.index)=at.u(it.Location());
+            exact_u(it.index)=at.analytic_solution(c)->u(it.Location());
             error_u(it.index)=numer_u(it.index)-exact_u(it.index);
             avg_u+=error_u(it.index);
             cnt_u++;}}
@@ -256,7 +262,8 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
 
     T error_u_linf=0,error_u_l2=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        int c=at.phi_color(it.Location());
+        int c=0;
+        at.analytic_levelset->phi(it.Location(),0,c);
         if(c>=0){
             error_u(it.index)-=avg_u;
             error_u_linf=max(error_u_linf,abs(error_u(it.index)));
@@ -296,6 +303,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     int threads=1;
     int test_number=1,resolution=4,max_iter=1000000;
     bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,opt_arg=false;
+    bool test_analytic_diff=false;
     parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-m",&m,"unit","meter scale");
@@ -309,6 +317,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-null",&null,"find extra null modes of the matrix");
     parse_args.Add("-dump_matrix",&dump_matrix,"dump system matrix");
     parse_args.Add("-debug_particles",&debug_particles,"dump debug particles");
+    parse_args.Add("-test_diff",&test_analytic_diff,"test analytic derivatives");
     parse_args.Parse();
 
 #ifdef USE_OPENMP
@@ -325,98 +334,95 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         LOG::cerr<<"Test number is required."<<std::endl;
         exit(-1);}
 
-    ANALYTIC_TEST<TV>* test=0;
+    ANALYTIC_POISSON_TEST<TV> test;
 
     switch(test_number){
         case 0:{ // One color, periodic. No interface, no forces, u=0.
-            struct ANALYTIC_TEST_0:public ANALYTIC_TEST<TV>
+            test.mu.Append(1);
+            test.analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-1);
+            struct ANALYTIC_POISSON_SOLUTION_0:public ANALYTIC_POISSON_SOLUTION<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);}
-                virtual T phi_value(const TV& X){return (T)1;}
-                virtual int phi_color(const TV& X){return T();}
-                virtual T u(const TV& X,int color){return T();}
-                virtual T f_volume(const TV& X,int color){return T();}
-                virtual T j_surface(const TV& X,int color0,int color1){return T();}
-                virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-                virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
+                virtual ~ANALYTIC_POISSON_SOLUTION_0(){}
+                virtual T u(const TV& X) const{return 0;}
+                virtual TV du(const TV& X) const{return TV();}
+                virtual T Laplacian(const TV& X) const{return 0;}
             };
-            test=new ANALYTIC_TEST_0;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_0);
             break;}
         case 1:{ // One color, periodic. No interface, u=sin(2*pi*x), f=(2*pi)^2*sin(2*pi*x).
-            struct ANALYTIC_TEST_1:public ANALYTIC_TEST<TV>
+            test.mu.Append(1);
+            test.analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-1);
+            struct ANALYTIC_POISSON_SOLUTION_1:public ANALYTIC_POISSON_SOLUTION<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);}
-                virtual T phi_value(const TV& X){return (T)1;}
-                virtual int phi_color(const TV& X){return T();}
-                virtual T u(const TV& X,int color){return sin(2*M_PI*X.x);}
-                virtual T f_volume(const TV& X,int color){return sqr(2*M_PI)*sin(2*M_PI*X.x)*mu(color);}
-                virtual T j_surface(const TV& X,int color0,int color1){return T();}
-                virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-                virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
+                virtual T u(const TV& X) const{return sin(2*M_PI*X.x);}
+                virtual TV du(const TV& X) const{return TV::Axis_Vector(0)*(2*M_PI*cos(2*M_PI*X.x));}
+                virtual T Laplacian(const TV& X) const{return -sqr(2*M_PI)*sin(2*M_PI*X.x);}
             };
-            test=new ANALYTIC_TEST_1;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_1);
             break;}
+#if 0
         case 2:{ // Two colors, periodic. Linear on [0,1/3],[1/3,2/3],[2/3,1], no volumetric forces.
-            struct ANALYTIC_TEST_2:public ANALYTIC_TEST<TV>
+            test.mu.Append(1);
+            test.mu.Append(2);
+            virtual T phi_value(const TV& X){return abs(-m/(T)6+abs(X.x-0.5*m));}
+            virtual int phi_color(const TV& X){return (-m/(T)6+abs(X.x-0.5*m))<0;}
+            struct ANALYTIC_POISSON_SOLUTION_2a:public ANALYTIC_POISSON_SOLUTION<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
-                virtual T phi_value(const TV& X){return abs(-m/(T)6+abs(X.x-0.5*m));}
-                virtual int phi_color(const TV& X){return (-m/(T)6+abs(X.x-0.5*m))<0;}
-                virtual T u(const TV& X,int color){return (color?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
-                virtual T f_volume(const TV& X,int color){return T();}
-                virtual T j_surface(const TV& X,int color0,int color1){return ((X.x>0.5*m)?(T)(-1):(T)1)*(2*mu(1)+mu(0))/s;}
-                virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-                virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
+                virtual T u(const TV& X) const{return (((X.x>0.5*m)?(m-X.x):(-X.x)));}
+                virtual T f_volume(const TV& X){return T();}
             };
-            test=new ANALYTIC_TEST_2;
+            struct ANALYTIC_POISSON_SOLUTION_2b:public ANALYTIC_POISSON_SOLUTION<TV>
+            {
+                virtual T u(const TV& X) const{return (color?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)));}
+                virtual T f_volume(const TV& X){return T();}
+            };
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_2a);
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_2b);
             break;}
         case 3:{ // Two colors, periodic. u=||x||^2 for r<R, zero elsewhere.
-            struct ANALYTIC_TEST_3:public ANALYTIC_TEST<TV>
+            test.mu.Append(1);
+            test.mu.Append(2);
+            struct ANALYTIC_POISSON_SOLUTION_3:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T r;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){
-                    wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;
+                    r=1/M_PI;
                     this->use_discontinuous_scalar_field=true;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
                 virtual T u(const TV& X,int color){return (X-0.5*m).Magnitude_Squared()*color;}
                 virtual T f_volume(const TV& X,int color){return -(TV::m)*2*mu(color)*color;}
                 virtual T j_surface(const TV& X,int color0,int color1){return (X-0.5*m).Magnitude()*(-2)*mu(1);}
-                virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-                virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
             };
-            test=new ANALYTIC_TEST_3;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_3);
             break;}
         case 4:{ // Two colors, periodic. u=exp(-x^2) for r<R, zero elsewhere.
-            struct ANALYTIC_TEST_4:public ANALYTIC_TEST<TV>
+            test.mu.Append(1);
+            test.mu.Append(2);
+            struct ANALYTIC_POISSON_SOLUTION_4:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T r,m2,m4;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){
-                    wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;m2=sqr(m);m4=sqr(m2);
+                    r=m/M_PI;m2=sqr(m);m4=sqr(m2);
                     this->use_discontinuous_scalar_field=true;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
                 virtual T u(const TV& X,int color){return exp(-(X-0.5*m).Magnitude_Squared()/m2)*color;}
                 virtual T f_volume(const TV& X,int color){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*color;}
                 virtual T j_surface(const TV& X,int color0,int color1){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*sqrt(x2)*2*mu(1)/m2;}
-                virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-                virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
             };
-            test=new ANALYTIC_TEST_4;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_4);
             break;}
         case 5:{ // Three colors, periodic. Stripes in x 0:[0,a], 1:[a,b], 2:[b,c], 0:[c,1].
-            struct ANALYTIC_TEST_5:public ANALYTIC_TEST<TV>
+            test.mu.Append(1);
+            test.mu.Append(2);
+            test.mu.Append(3);
+            struct ANALYTIC_POISSON_SOLUTION_5:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T a,b,c;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    
                     a=m/6;b=m*5/12;c=m*5/6;
                     this->use_discontinuous_scalar_field=true;
                 }
@@ -456,20 +462,19 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     if(color0==1 && color1==2) return -exp(X.x/m)*mu(1)/m;
                     PHYSBAM_FATAL_ERROR();
                 }
-                virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-                virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
             };
-            test=new ANALYTIC_TEST_5;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_5);
             break;}
         case 6:{ // Three colors (one dirichlet or neumann), periodic. Stripes in x 0:[0,a], 1:[a,b], 2:[b,c], 0:[c,1].
-            struct ANALYTIC_TEST_6:public ANALYTIC_TEST<TV>
+            test.mu.Append(1);
+            test.mu.Append(2);
+            struct ANALYTIC_POISSON_SOLUTION_6:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T a,b,c;
                 int constraint; // [-1] - Neumann, [-2] - Dirichlet
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);
+                    
                     a=m/6;b=m*5/12;c=m*5/6;
                     constraint=-1;
                     this->use_discontinuous_scalar_field=true;
@@ -520,18 +525,20 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     PHYSBAM_FATAL_ERROR();
                 }
             };
-            test=new ANALYTIC_TEST_6;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_6);
             break;}
         case 7:{ // Three colors, periodic. u=a for r<R and x>0, u=b for r<R and x<0, zero elsewhere.
-            struct ANALYTIC_TEST_7:public ANALYTIC_TEST<TV>
+            test.mu.Append(1);
+            test.mu.Append(2);
+            test.mu.Append(3);
+            struct ANALYTIC_POISSON_SOLUTION_7:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T r;
                 TV n;
                 VECTOR<T,3> a;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
                     this->use_discontinuous_scalar_field=true;
@@ -541,21 +548,20 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T u(const TV& X,int color){return a(color);}
                 virtual T f_volume(const TV& X,int color){return T();}
                 virtual T j_surface(const TV& X,int color0,int color1){return T();}
-                virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-                virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
             };
-            test=new ANALYTIC_TEST_7;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_7);
             break;}
         case 8:{ // Three colors, periodic. u=a*x^2 for r<R and x*n>0, u=b*x^2 for r<R and x*n<0, zero elsewhere.
-            struct ANALYTIC_TEST_8:public ANALYTIC_TEST<TV>
+            test.mu.Append(1);
+            test.mu.Append(2);
+            test.mu.Append(3);
+            struct ANALYTIC_POISSON_SOLUTION_8:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T r;
                 TV n;
                 VECTOR<T,3> a;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
                     this->use_discontinuous_scalar_field=true;
@@ -565,21 +571,21 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T u(const TV& X,int color){return (X-0.5*m).Magnitude_Squared()*a(color);}
                 virtual T f_volume(const TV& X,int color){return -(TV::m)*2*mu(color)*a(color);}
                 virtual T j_surface(const TV& X,int color0,int color1){if(color0==0) return (X-0.5*m).Magnitude()*(-2)*mu(color1)*a(color1);else return T();}
-                virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-                virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
             };
-            test=new ANALYTIC_TEST_8;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_8);
             break;}
         case 9:{ // Three colors, periodic. u=a*exp(-x^2) for r<R and x*n>0, u=b*exp(-x^2) for r<R and x*n<0, zero elsewhere.
-            struct ANALYTIC_TEST_9:public ANALYTIC_TEST<TV>
+            test.mu.Append(1);
+            test.mu.Append(2);
+            test.mu.Append(3);
+            struct ANALYTIC_POISSON_SOLUTION_9:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T r,a1,a2,m2,m4;
                 TV n;
                 VECTOR<T,3> a;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;m2=sqr(m);m4=sqr(m2);
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
                     this->use_discontinuous_scalar_field=true;
@@ -589,22 +595,21 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T u(const TV& X,int color){return exp(-(X-0.5*m).Magnitude_Squared()/m2)*a(color);}
                 virtual T f_volume(const TV& X,int color){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*a(color);}
                 virtual T j_surface(const TV& X,int color0,int color1){T x2=(X-0.5*m).Magnitude_Squared();if(color0==0) return exp(-x2/m2)*2*mu(color1)*a(color1)*sqrt(x2)/m2;else return T();}
-                virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-                virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
             };
-            test=new ANALYTIC_TEST_9;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_9);
             break;}
         case 10:{ // Three colors (dirichlet/neumann outside), periodic. u=a*exp(-x^2) for r<R and x*n>0, u=b*exp(-x^2) for r<R and x*n<0, zero elsewhere.
-            struct ANALYTIC_TEST_10:public ANALYTIC_TEST<TV>
+            test.mu.Append(1);
+            test.mu.Append(2);
+            struct ANALYTIC_POISSON_SOLUTION_10:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T r,a1,a2,m2,m4;
                 TV n;
                 VECTOR<T,3> a;
                 int constraint;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);
+                    
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;m2=sqr(m);m4=sqr(m2);
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
                     constraint=-2;
@@ -616,12 +621,14 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T f_volume(const TV& X,int color){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*a(color);}
                 virtual T j_surface(const TV& X,int color0,int color1){return T();}
                 virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_ASSERT(constraint==-2); return u(X,color1);}
-                virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
             };
-            test=new ANALYTIC_TEST_10;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_10);
             break;}
         case 11:{ // Four colors (dirichlet outside). Three equal bubbles.
-            struct ANALYTIC_TEST_11:public ANALYTIC_TEST<TV>
+            test.mu.Append(1);
+            test.mu.Append(2);
+            test.mu.Append(3);
+            struct ANALYTIC_POISSON_SOLUTION_11:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T r;
                 TV n; // rotate angle with respect to e_y
@@ -629,10 +636,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 VECTOR<TV,3> centers;
                 VECTOR<TV,3> normals;
                 VECTOR<VECTOR<int,3>,3> sectors;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
                     r=(T)1/(2*M_PI-1);
                     n=TV::Axis_Vector(1);a=TV()+M_PI/200;
                     centers(0)=TV::Axis_Vector(1);
@@ -697,20 +702,15 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     PHYSBAM_FATAL_ERROR();
                 }
                 virtual T d_surface(const TV& X,int color0,int color1){return u(X,color1);}
-                virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
             };
-            test=new ANALYTIC_TEST_11;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_11);
             break;}
+#endif
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 
-    test->m=m;
-    test->s=s;
-    test->kg=kg;
-    test->Initialize();
-
     TV_INT counts=TV_INT()+resolution;
-    GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1)*test->m,true);
+    GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1),true);
 
     Global_Grid(&grid);
 
@@ -719,9 +719,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
+    if(test_analytic_diff) test.Test(grid.domain);
+
+    Analytic_Test(grid,test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
     LOG::Finish_Logging();
-    delete test;
 }
 
 //#################################################################################################################################################
