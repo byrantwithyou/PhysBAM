@@ -21,7 +21,7 @@ Test(const RANGE<TV>& domain) const
     if(c1!=c0) l1=-l1;
     TV dl0=N(X,t,c0),dl1=N(X+dX,t,c0);
     T errl=abs((dl0+dl1).Dot(dX)/2-(l1-l0))/e;
-    LOG::cout<<"analytic level set diff test "<<errl<<std::endl;
+    LOG::cout<<"analytic level set diff test "<<errl<<"   "<<X<<std::endl;
 }
 namespace PhysBAM{
 template class ANALYTIC_LEVELSET<VECTOR<float,1> >;
