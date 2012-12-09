@@ -421,69 +421,18 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(0,1,TV(),TV::Axis_Vector(0)));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(1,0,TV::Axis_Vector(1)*(2*(T)pi),TV()));
             break;}
-#if 0
         case 6:{ // Three colors (one dirichlet or neumann), periodic. Stripes in x 0:[0,a], 1:[a,b], 2:[b,c], 0:[c,1].
+            T a=(T)1/6,b=(T)5/12,c=(T)5/6,constraint=-1;
             test.mu.Append(1);
             test.mu.Append(2);
             test.use_discontinuous_scalar_field=true;
-            struct ANALYTIC_POISSON_SOLUTION_6:public ANALYTIC_POISSON_SOLUTION<TV>
-            {
-                T a,b,c;
-                int constraint; // [-1] - Neumann, [-2] - Dirichlet
-                virtual void Initialize()
-                {
-                    
-                    a=m/6;b=5/12;c=5/6;
-                    constraint=-1;
-                }
-                virtual T phi_value(const TV& X)
-                {
-                    if(X.x<a) return abs(X.x-a);
-                    if(X.x<b) return (b-a)/2-abs(X.x-(b+a)/2);
-                    if(X.x<c) return (c-b)/2-abs(X.x-(c+b)/2);
-                    return abs(X.x-c);
-                }
-                virtual int phi_color(const TV& X)
-                {
-                    if(X.x<a) return constraint;
-                    if(X.x<b) return 0;
-                    if(X.x<c) return 1;
-                    return constraint;
-                }
-                virtual T u(const TV& X,int color){
-                    switch (color){
-                        case 0: return exp(X.x);
-                        case 1: return sin(2*pi*X.y);
-                        default: PHYSBAM_FATAL_ERROR();}
-                }
-                virtual T f_volume(const TV& X,int color)
-                {
-                    switch (color){
-                        case 0: return -exp(X.x)*mu(color);
-                        case 1: return sqr(2*pi)*sin(2*pi*X.y)*mu(color);
-                        default: PHYSBAM_FATAL_ERROR();}
-                }
-                virtual T j_surface(const TV& X,int color0,int color1)
-                {
-                    return -exp(X.x)*mu(0);
-                }
-                virtual T n_surface(const TV& X,int color0,int color1)
-                {
-                    PHYSBAM_ASSERT(constraint==-1);
-                    if(color1==0) return exp(X.x)*mu(0);
-                    if(color1==1) return 0;
-                    PHYSBAM_FATAL_ERROR();
-                }
-                virtual T d_surface(const TV& X,int color0,int color1)
-                {
-                    PHYSBAM_ASSERT(constraint==-2);
-                    if(color1==0) return exp(X.x)*mu(0);
-                    if(color1==1) return 0;
-                    PHYSBAM_FATAL_ERROR();
-                }
-            };
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_6);
+            ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*a,TV::Axis_Vector(0),constraint,0);
+            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*c,TV::Axis_Vector(0),1,constraint);
+            test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*b,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(0,1,TV(),TV::Axis_Vector(0)));
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(1,0,TV::Axis_Vector(1)*(2*(T)pi),TV()));
             break;}
+#if 0
         case 7:{ // Three colors, periodic. u=a for r<R and x>0, u=b for r<R and x<0, zero elsewhere.
             test.mu.Append(1);
             test.mu.Append(2);
