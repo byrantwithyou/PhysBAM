@@ -15,6 +15,9 @@
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_CONST.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SPHERE.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_POISSON_SOLUTION_AFFINE.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_POISSON_SOLUTION_QUADRATIC.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_POISSON_TEST.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
@@ -376,47 +379,30 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual TV du(const TV& X) const {return -TV::Axis_Vector(0);}
                 virtual T Laplacian(const TV& X) const {return 0;}
             };
-            struct ANALYTIC_POISSON_SOLUTION_2b:public ANALYTIC_POISSON_SOLUTION<TV>
-            {
-                virtual T u(const TV& X) const {return 2*X.x-1;}
-                virtual TV du(const TV& X) const {return TV::Axis_Vector(0)*2;}
-                virtual T Laplacian(const TV& X) const {return 0;}
-            };
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_2a);
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_2b);
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV::Axis_Vector(0)*2,-1));
             break;}
-#if 0
         case 3:{ // Two colors, periodic. u=||x||^2 for r<R, zero elsewhere.
             test.mu.Append(1);
             test.mu.Append(2);
-            struct ANALYTIC_POISSON_SOLUTION_3:public ANALYTIC_POISSON_SOLUTION<TV>
-            {
-                T r;
-                virtual void Initialize(){
-                    r=1/pi;
-                    this->use_discontinuous_scalar_field=true;}
-                virtual T phi_value(const TV& X){return abs((X-0.5).Magnitude()-r);}
-                virtual int phi_color(const TV& X){return ((X-0.5).Magnitude()-r)<0;}
-                virtual T u(const TV& X,int color){return (X-0.5).Magnitude_Squared()*color;}
-                virtual T f_volume(const TV& X,int color){return -(TV::m)*2u(color)*color;}
-                virtual T j_surface(const TV& X,int color0,int color1){return (X-0.5).Magnitude()*(-2)u(1);}
-            };
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_3);
+            test.analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T)0.5,1/(T)pi,1,0);
+            test.use_discontinuous_scalar_field=true;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_QUADRATIC<TV>(MATRIX<T,TV::m>()+1,TV()-1,(T).25*TV::m));
             break;}
+#if 0
         case 4:{ // Two colors, periodic. u=exp(-x^2) for r<R, zero elsewhere.
             test.mu.Append(1);
             test.mu.Append(2);
+            test.use_discontinuous_scalar_field=true;
+            test.analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T)0.5,1/(T)pi,1,0);
             struct ANALYTIC_POISSON_SOLUTION_4:public ANALYTIC_POISSON_SOLUTION<TV>
             {
-                T r,m2,m4;
-                virtual void Initialize(){
-                    r=m/pi;m2=sqr(m);m4=sqr(m2);
-                    this->use_discontinuous_scalar_field=true;}
-                virtual T phi_value(const TV& X){return abs((X-0.5).Magnitude()-r);}
-                virtual int phi_color(const TV& X){return ((X-0.5).Magnitude()-r)<0;}
-                virtual T u(const TV& X,int color){return exp(-(X-0.5).Magnitude_Squared()/m2)*color;}
-                virtual T f_volume(const TV& X,int color){T x2=(X-0.5).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)u(color)*color;}
-                virtual T j_surface(const TV& X,int color0,int color1){T x2=(X-0.5).Magnitude_Squared(); return exp(-x2/m2)*sqrt(x2)*2*mu(1)/m2;}
+                T r;
+                virtual void Initialize(){}
+                virtual T u(const TV& X,int color){return exp(-(X-0.5).Magnitude_Squared())*color;}
+                virtual T f_volume(const TV& X,int color){T x2=(X-0.5).Magnitude_Squared(); return exp(-x2)*(2*TV::m-x2*4)u(color)*color;}
+                virtual T j_surface(const TV& X,int color0,int color1){T x2=(X-0.5).Magnitude_Squared(); return exp(-x2)*sqrt(x2)*2*mu(1);}
             };
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_4);
             break;}
@@ -424,6 +410,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
+            test.use_discontinuous_scalar_field=true;
             struct ANALYTIC_POISSON_SOLUTION_5:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T a,b,c;
@@ -431,7 +418,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 {
                     
                     a=m/6;b=m*5/12;c=m*5/6;
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual T phi_value(const TV& X)
                 {
@@ -475,6 +461,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 6:{ // Three colors (one dirichlet or neumann), periodic. Stripes in x 0:[0,a], 1:[a,b], 2:[b,c], 0:[c,1].
             test.mu.Append(1);
             test.mu.Append(2);
+            test.use_discontinuous_scalar_field=true;
             struct ANALYTIC_POISSON_SOLUTION_6:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T a,b,c;
@@ -484,7 +471,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     
                     a=m/6;b=m*5/12;c=m*5/6;
                     constraint=-1;
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual T phi_value(const TV& X)
                 {
@@ -538,6 +524,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
+            test.use_discontinuous_scalar_field=true;
             struct ANALYTIC_POISSON_SOLUTION_7:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T r;
@@ -548,7 +535,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     
                     r=m/pi;a(0)=0;a(1)=5;a(2)=7;
                     for(int i=0;i<TV::m;i++) n(i)=i+pi/(i+pi);n.Normalize();
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual T phi_value(const TV& X){TV x=X-0.5;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
                 virtual int phi_color(const TV& X){TV x=X-0.5;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?2:1):0;}
@@ -562,6 +548,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
+            test.use_discontinuous_scalar_field=true;
             struct ANALYTIC_POISSON_SOLUTION_8:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T r;
@@ -571,7 +558,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 {
                     r=m/pi;a(0)=0;a(1)=5;a(2)=7;
                     for(int i=0;i<TV::m;i++) n(i)=i+pi/(i+pi);n.Normalize();
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual T phi_value(const TV& X){TV x=X-0.5;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
                 virtual int phi_color(const TV& X){TV x=X-0.5;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?2:1):0;}
@@ -585,47 +571,47 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
+            test.use_discontinuous_scalar_field=true;
             struct ANALYTIC_POISSON_SOLUTION_9:public ANALYTIC_POISSON_SOLUTION<TV>
             {
-                T r,a1,a2,m2,m4;
+                T r,a1,a2;
                 TV n;
                 VECTOR<T,3> a;
                 virtual void Initialize()
                 {
                     
-                    r=m/pi;a(0)=0;a(1)=5;a(2)=7;m2=sqr(m);m4=sqr(m2);
+                    r=m/pi;a(0)=0;a(1)=5;a(2)=7;
                     for(int i=0;i<TV::m;i++) n(i)=i+pi/(i+pi);n.Normalize();
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual T phi_value(const TV& X){TV x=X-0.5;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
                 virtual int phi_color(const TV& X){TV x=X-0.5;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?2:1):0;}
-                virtual T u(const TV& X,int color){return exp(-(X-0.5).Magnitude_Squared()/m2)*a(color);}
-                virtual T f_volume(const TV& X,int color){T x2=(X-0.5).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*a(color);}
-                virtual T j_surface(const TV& X,int color0,int color1){T x2=(X-0.5).Magnitude_Squared();if(color0==0) return exp(-x2/m2)*2*mu(color1)*a(color1)*sqrt(x2)/m2;else return T();}
+                virtual T u(const TV& X,int color){return exp(-(X-0.5).Magnitude_Squared())*a(color);}
+                virtual T f_volume(const TV& X,int color){T x2=(X-0.5).Magnitude_Squared(); return exp(-x2)*(2*TV::m-x2*4)*mu(color)*a(color);}
+                virtual T j_surface(const TV& X,int color0,int color1){T x2=(X-0.5).Magnitude_Squared();if(color0==0) return exp(-x2)*2*mu(color1)*a(color1)*sqrt(x2);else return T();}
             };
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_9);
             break;}
         case 10:{ // Three colors (dirichlet/neumann outside), periodic. u=a*exp(-x^2) for r<R and x*n>0, u=b*exp(-x^2) for r<R and x*n<0, zero elsewhere.
             test.mu.Append(1);
             test.mu.Append(2);
+            test.use_discontinuous_scalar_field=true;
             struct ANALYTIC_POISSON_SOLUTION_10:public ANALYTIC_POISSON_SOLUTION<TV>
             {
-                T r,a1,a2,m2,m4;
+                T r,a1,a2;
                 TV n;
                 VECTOR<T,3> a;
                 int constraint;
                 virtual void Initialize()
                 {
                     
-                    r=m/pi;a(0)=0;a(1)=5;a(2)=7;m2=sqr(m);m4=sqr(m2);
+                    r=m/pi;a(0)=0;a(1)=5;a(2)=7;
                     for(int i=0;i<TV::m;i++) n(i)=i+pi/(i+pi);n.Normalize();
                     constraint=-2;
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual T phi_value(const TV& X){TV x=X-0.5;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
                 virtual int phi_color(const TV& X){TV x=X-0.5;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?1:0):constraint;}
-                virtual T u(const TV& X,int color){return exp(-(X-0.5).Magnitude_Squared()/m2)*a(color);}
-                virtual T f_volume(const TV& X,int color){T x2=(X-0.5).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*a(color);}
+                virtual T u(const TV& X,int color){return exp(-(X-0.5).Magnitude_Squared())*a(color);}
+                virtual T f_volume(const TV& X,int color){T x2=(X-0.5).Magnitude_Squared(); return exp(-x2)*(2*TV::m-x2*4)*mu(color)*a(color);}
                 virtual T j_surface(const TV& X,int color0,int color1){return T();}
                 virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_ASSERT(constraint==-2); return u(X,color1);}
             };
@@ -635,6 +621,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
+            test.use_discontinuous_scalar_field=true;
             struct ANALYTIC_POISSON_SOLUTION_11:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 T r;
@@ -655,7 +642,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                         normals(i).y=centers(i).x;
                         centers(i)*=r;
                         for(int j=0;j<3;j++) sectors(i)(j)=(i+j)%3;}
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual TV Transform(const TV& X){return X-0.5+a;}
                 virtual T phi_value(const TV& X)
