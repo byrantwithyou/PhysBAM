@@ -390,7 +390,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_QUADRATIC<TV>(MATRIX<T,TV::m>()+1,TV()-1,(T).25*TV::m));
             break;}
-#if 0
         case 4:{ // Two colors, periodic. u=exp(-x^2) for r<R, zero elsewhere.
             test.mu.Append(1);
             test.mu.Append(2);
@@ -398,14 +397,14 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T)0.5,1/(T)pi,1,0);
             struct ANALYTIC_POISSON_SOLUTION_4:public ANALYTIC_POISSON_SOLUTION<TV>
             {
-                T r;
-                virtual void Initialize(){}
-                virtual T u(const TV& X,int color){return exp(-(X-0.5).Magnitude_Squared())*color;}
-                virtual T f_volume(const TV& X,int color){T x2=(X-0.5).Magnitude_Squared(); return exp(-x2)*(2*TV::m-x2*4)u(color)*color;}
-                virtual T j_surface(const TV& X,int color0,int color1){T x2=(X-0.5).Magnitude_Squared(); return exp(-x2)*sqrt(x2)*2*mu(1);}
+                virtual T u(const TV& X) const {return exp(-(X-(T)0.5).Magnitude_Squared());}
+                virtual TV du(const TV& X) const {return -(X-(T)0.5)*2*u(X);}
+                virtual T Laplacian(const TV& X) const {return ((X-(T)0.5).Magnitude_Squared()*4-2*TV::m)*u(X);}
             };
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_4);
             break;}
+#if 0
         case 5:{ // Three colors, periodic. Stripes in x 0:[0,a], 1:[a,b], 2:[b,c], 0:[c,1].
             test.mu.Append(1);
             test.mu.Append(2);
