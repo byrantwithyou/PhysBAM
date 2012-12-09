@@ -15,6 +15,8 @@
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_CONST.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_LINE.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_NEST.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SPHERE.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_POISSON_SOLUTION_AFFINE.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_POISSON_SOLUTION_QUADRATIC.h>
@@ -366,13 +368,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 2:{ // Two colors, periodic. Linear on [0,1/3],[1/3,2/3],[2/3,1], no volumetric forces.
             test.mu.Append(1);
             test.mu.Append(2);
-            struct ANALYTIC_LEVELSET_SIGNED_2:public ANALYTIC_LEVELSET_SIGNED<TV>
-            {
-                ANALYTIC_LEVELSET_SIGNED_2(int c_i=1,int c_o=0): ANALYTIC_LEVELSET_SIGNED<TV>(c_i,c_o) {}
-                T phi2(const TV& X,T t) const {return -(T)1/6+abs(X.x-(T)0.5);}
-                TV N2(const TV& X,T t) const {return TV::Axis_Vector(0)*sign(X.x-(T)0.5);}
-            };
-            test.analytic_levelset=new ANALYTIC_LEVELSET_SIGNED_2;
+            ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)/3,TV::Axis_Vector(0),0,1);
+            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0);
+            test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*((T)2/3),TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
             struct ANALYTIC_POISSON_SOLUTION_2a:public ANALYTIC_POISSON_SOLUTION<TV>
             {
                 virtual T u(const TV& X) const {return (X.x>0.5)?(1-X.x):(-X.x);}
@@ -410,14 +408,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(2);
             test.mu.Append(3);
             test.use_discontinuous_scalar_field=true;
+            T a=m/6,b=5/12,c=5/6;
             struct ANALYTIC_POISSON_SOLUTION_5:public ANALYTIC_POISSON_SOLUTION<TV>
             {
-                T a,b,c;
-                virtual void Initialize()
-                {
-                    
-                    a=m/6;b=m*5/12;c=m*5/6;
-                }
                 virtual T phi_value(const TV& X)
                 {
                     if(X.x<a) return abs(X.x-a);
@@ -435,23 +428,23 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T u(const TV& X,int color){
                     switch (color){
                         case 0: return 0;
-                        case 1: return exp(X.x/m);
-                        case 2: return sin(2*pi*X.y/m);
+                        case 1: return exp(X.x);
+                        case 2: return sin(2*pi*X.y);
                         default: PHYSBAM_FATAL_ERROR();}
                 }
                 virtual T f_volume(const TV& X,int color)
                 {
                     switch (color){
                         case 0: return 0;
-                        case 1: return -exp(X.x/m)*mu(color)/sqr(m);
-                        case 2: return sqr(2*pi)*sin(2*pi*X.y/m)*mu(color)/sqr(m);
+                        case 1: return -exp(X.x)*mu(color)/sqr(m);
+                        case 2: return sqr(2*pi)*sin(2*pi*X.y)*mu(color)/sqr(m);
                         default: PHYSBAM_FATAL_ERROR();}
                 }
                 virtual T j_surface(const TV& X,int color0,int color1)
                 {
-                    if(color0==0 && color1==1) return exp(X.x/m)*mu(1)/m;
+                    if(color0==0 && color1==1) return exp(X.x)*mu(1);
                     if(color0==0 && color1==2) return 0;
-                    if(color0==1 && color1==2) return -exp(X.x/m)*mu(1)/m;
+                    if(color0==1 && color1==2) return -exp(X.x)*mu(1);
                     PHYSBAM_FATAL_ERROR();
                 }
             };
@@ -468,7 +461,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual void Initialize()
                 {
                     
-                    a=m/6;b=m*5/12;c=m*5/6;
+                    a=m/6;b=5/12;c=5/6;
                     constraint=-1;
                 }
                 virtual T phi_value(const TV& X)
@@ -487,32 +480,32 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 }
                 virtual T u(const TV& X,int color){
                     switch (color){
-                        case 0: return exp(X.x/m);
-                        case 1: return sin(2*pi*X.y/m);
+                        case 0: return exp(X.x);
+                        case 1: return sin(2*pi*X.y);
                         default: PHYSBAM_FATAL_ERROR();}
                 }
                 virtual T f_volume(const TV& X,int color)
                 {
                     switch (color){
-                        case 0: return -exp(X.x/m)*mu(color)/sqr(m);
-                        case 1: return sqr(2*pi)*sin(2*pi*X.y/m)*mu(color)/sqr(m);
+                        case 0: return -exp(X.x)*mu(color)/sqr(m);
+                        case 1: return sqr(2*pi)*sin(2*pi*X.y)*mu(color)/sqr(m);
                         default: PHYSBAM_FATAL_ERROR();}
                 }
                 virtual T j_surface(const TV& X,int color0,int color1)
                 {
-                    return -exp(X.x/m)*mu(0)/m;
+                    return -exp(X.x)*mu(0);
                 }
                 virtual T n_surface(const TV& X,int color0,int color1)
                 {
                     PHYSBAM_ASSERT(constraint==-1);
-                    if(color1==0) return exp(X.x/m)*mu(0)/m;
+                    if(color1==0) return exp(X.x)*mu(0);
                     if(color1==1) return 0;
                     PHYSBAM_FATAL_ERROR();
                 }
                 virtual T d_surface(const TV& X,int color0,int color1)
                 {
                     PHYSBAM_ASSERT(constraint==-2);
-                    if(color1==0) return exp(X.x/m)*mu(0)/m;
+                    if(color1==0) return exp(X.x)*mu(0);
                     if(color1==1) return 0;
                     PHYSBAM_FATAL_ERROR();
                 }
@@ -712,6 +705,20 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
     if(test_analytic_diff) test.Test(grid.domain);
+
+    LOG::cout<<"boo"<<std::endl;
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        int c=-4;
+        T p=test.analytic_levelset->phi(it.Location(),0,c);
+        if(c>=0) Add_Debug_Particle(it.Location(),color_map[c]);
+        else Add_Debug_Particle(it.Location(),VECTOR<T,3>()+.5);
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,p);}
+    Flush_Frame<T,TV>("level set");
+    for(int c=0;c<test.analytic_solution.m;c++){
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+            Add_Debug_Particle(it.Location(),color_map[c]);
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,test.analytic_levelset->N(it.Location(),0,c));}
+        Flush_Frame<T,TV>("normals");}
 
     Analytic_Test(grid,test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
     LOG::Finish_Logging();
