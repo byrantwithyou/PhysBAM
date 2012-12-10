@@ -31,6 +31,7 @@ public:
     T valid_width; // distance from interface we care about
     T extent; // compute pairwise level set far enough so we can exprapolate
     int extrap_width; // how far to extrapolate
+    int bc_colors;
 
     struct PAIRWISE_LEVEL_SET_DATA
     {

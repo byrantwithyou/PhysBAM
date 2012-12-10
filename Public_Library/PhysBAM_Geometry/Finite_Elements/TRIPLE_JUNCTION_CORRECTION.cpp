@@ -19,6 +19,7 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_TETRAHEDRA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <climits>
 using namespace PhysBAM;
 void (*Global_Flush_Frame)(const char* title)=0;
 template<class T>
@@ -67,7 +68,7 @@ void Handle_Square(const GRID<TV>& grid,const VECTOR<T,4>& phi,const TV_INT& cel
 template<class TV> TRIPLE_JUNCTION_CORRECTION<TV>::
 TRIPLE_JUNCTION_CORRECTION(const GRID<TV>& grid,ARRAY<ARRAY<T,TV_INT> >& phi,int ghost)
     :grid(grid),phi(phi),ghost(ghost),default_phi((T)1.12349871352389e-10),trust_buffer(grid.dX.Max()),
-    valid_width(ghost*grid.dX.Max()),extent(3*valid_width),extrap_width(2*ghost+3)
+    valid_width(ghost*grid.dX.Max()),extent(3*valid_width),extrap_width(2*ghost+3),bc_colors(3)
 {
 }
 //#####################################################################
@@ -293,7 +294,7 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
                 VECTOR<T,(1<<TV::m)> phis(combined_phi.Subset(bits+it.index));
                 CELL_ELEMENTS& ce=index_to_cell_data.Get_Or_Insert(it.index);
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,1));
-                MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(ce.interface,ce.boundary,colors,phis,
+                MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(ce.interface,ce.boundary,colors-bc_colors,phis,
                     grid.Cell_Domain(it.index));}
             continue;}
 
@@ -319,13 +320,14 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
             CELL_ELEMENTS& ce=index_to_cell_data.Get_Or_Insert(it.index);
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,0,1));
             for(int i=0;i<phis.m;i++) phis(i)=abs(phis(i));
-            MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(ce.interface,ce.boundary,colors,phis,
+            MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(ce.interface,ce.boundary,colors-bc_colors,phis,
                 grid.Cell_Domain(it.index));
             continue;}
 
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
         Cut_Cell_With_Pairwise_Phi(index_to_cell_data,it.index);}
     Global_Flush_Frame(__FUNCTION__);
+    combined_color.array-=bc_colors;
 }
 //#####################################################################
 // Function Meet_Phi
@@ -434,18 +436,23 @@ Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE
                         if(p0>0) exchange(t.c0,t.c1);
                         crossings(e).Append(t);}}
 
+    ARRAY<int> best(self.phi.m),index(self.phi.m);
     for(int e=0;e<4;e++){
         ARRAY<CROSSING>& ar=crossings(e);
-        crossings(e).Sort([](const CROSSING& a,const CROSSING& b){return a.theta<b.theta;});
-        int c0=colors(vertices_of_side[e][0]),c1=colors(vertices_of_side[e][1]),i=0,j=ar.m-1;
-        while(i<=j){
-            while(i<=j && ar(j).c1!=c1){ar.Remove_Index(j);j--;}
-            while(i<=j && ar(i).c0!=c0){ar.Remove_Index(i);j--;}
-            if(i<=j){
-                c0=ar(i++).c1;
-                PHYSBAM_ASSERT(i!=j+1 || c0==c1);
-                c1=ar(j--).c0;
-                PHYSBAM_ASSERT(i!=j+1 || c0==c1);}}}
+        ar.Sort([](const CROSSING& a,const CROSSING& b){return a.theta<b.theta;});
+        int c0=colors(vertices_of_side[e][0]),c1=colors(vertices_of_side[e][1]),k=0;
+        ARRAY<int> pa(ar.m);
+        best.Fill(-INT_MAX);
+        best(c1)=0;
+        index.Fill(-1);
+        for(int i=0;i<ar.m;i++){
+            pa(i)=index(ar(i).c1);
+            if(best(ar(i).c1)+1>best(ar(i).c0)){
+                best(ar(i).c0)=best(ar(i).c1)+1;
+                index(ar(i).c0)=i;}}
+        for(int i=index(c0);i>=0;i=pa(i))
+            ar(k++)=ar(i);
+        ar.Resize(k);}
 
     bool empty=true;
     for(int e=0;e<4;e++)
@@ -458,11 +465,11 @@ Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE
         int c0=colors(2*s);
         TV X0=self.grid.Node(cell+bits(3*s)),X1=self.grid.Node(cell+bits(3*s^1)),X=X0;
         for(int i=0;i<crossings(2*s).m;i++){
-            BOUNDARY_ELEMENT be={SEGMENT_2D<T>(X,crossings(2*s)(i).X),c0};
+            BOUNDARY_ELEMENT be={SEGMENT_2D<T>(X,crossings(2*s)(i).X),c0-self.bc_colors};
             ce.boundary.Append(be);
             X=crossings(2*s)(i).X;
             c0=crossings(2*s)(i).c1;}
-        BOUNDARY_ELEMENT be={SEGMENT_2D<T>(X,X1),c0};
+        BOUNDARY_ELEMENT be={SEGMENT_2D<T>(X,X1),c0-self.bc_colors};
         ce.boundary.Append(be);}
 
     HASHTABLE<VECTOR<int,2>,TV> pts;
@@ -475,7 +482,7 @@ Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE
                 if(key0.x>key0.y){
                     exchange(X0,X1);
                     key1=key0;}
-                INTERFACE_ELEMENT ie={SEGMENT_2D<T>(X0,X1),key1};
+                INTERFACE_ELEMENT ie={SEGMENT_2D<T>(X0,X1),key1-self.bc_colors};
                 ce.interface.Append(ie);}
             pts.Insert(key0,X0);}
 
@@ -499,7 +506,7 @@ Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE
     if(found.Size()){
         centroid/=found.Size();
         for(typename HASHTABLE<VECTOR<int,2>,TV>::ITERATOR it(pts);it.Valid();it.Next()){
-            INTERFACE_ELEMENT ie={SEGMENT_2D<T>(centroid,it.Data()),it.Key()};
+            INTERFACE_ELEMENT ie={SEGMENT_2D<T>(centroid,it.Data()),it.Key()-self.bc_colors};
             if(ie.color_pair.x>ie.color_pair.y){
                 exchange(ie.color_pair.x,ie.color_pair.y);
                 exchange(ie.face.X.x,ie.face.X.y);}
