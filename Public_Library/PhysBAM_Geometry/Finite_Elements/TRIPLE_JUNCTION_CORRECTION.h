@@ -55,8 +55,6 @@ public:
     void Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data);
     void Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,const TV_INT& cell);
     void Compute_Pairwise_Level_Set_Data();
-    static TV Zero_Phi(const VECTOR<PHI,3>& phi,VECTOR<T,3>& p);
-    static TV Meet_Phi(const VECTOR<PHI,2>& phi);
     int Fill_Combined_Level_Set_At_Index(const TV_INT& node);
     int Fill_Phi_From_Pairwise_Level_Set_At_Index(const TV_INT& node,int color);
 };

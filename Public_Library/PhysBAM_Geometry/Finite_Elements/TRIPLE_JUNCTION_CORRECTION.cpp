@@ -325,11 +325,79 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
         Cut_Cell_With_Pairwise_Phi(index_to_cell_data,it.index);}
 }
 //#####################################################################
+// Function Meet_Phi
+//#####################################################################
+template<class T> static VECTOR<T,2>
+Meet_Phi(const VECTOR<VECTOR<T,4> ,2>& phi)
+{
+    typedef VECTOR<T,2> TV;
+    QUADRATIC<T> quad(-phi(0)(0)*phi(1)(3)+phi(0)(3)*phi(1)(0)+phi(0)(1)*phi(1)(2)-phi(0)(1)*phi(1)(0)+phi(0)(2)*phi(1)(3)-phi(0)(2)*phi(1)(1)+phi(0)(0)*phi(1)(1)-phi(0)(3)*phi(1)(2),-2*phi(0)(0)*phi(1)(1)+phi(0)(0)*phi(1)(3)-phi(0)(1)*phi(1)(2)+2*phi(0)(1)*phi(1)(0)+phi(0)(2)*phi(1)(1)-phi(0)(3)*phi(1)(0),-phi(0)(1)*phi(1)(0)+phi(0)(0)*phi(1)(1));
+    quad.Compute_Roots();
+    if(quad.roots==0){
+        quad.roots=1;
+        quad.root1=-quad.b/(2*quad.a);}
+    T ya[2]={quad.root1,quad.root2},ph[2]={FLT_MAX,FLT_MAX};
+    TV X[2];
+    for(int i=0;i<quad.roots;i++){
+        if(abs(ya[i])>10) continue;
+        T num=-phi(1)(0)-ya[i]*phi(1)(2)+ya[i]*phi(1)(0);
+        T den=phi(1)(1)-phi(1)(0)+ya[i]*phi(1)(3)-ya[i]*phi(1)(2)-ya[i]*phi(1)(1)+ya[i]*phi(1)(0);
+        X[i]=TV(num/den,ya[i]);
+        ph[i]=phi(0)(0)+(phi(0)(1)-phi(0)(0))*X[i].x+(phi(0)(2)-phi(0)(0))*X[i].y+(phi(0)(3)-phi(0)(2)-phi(0)(1)+phi(0)(0))*X[i].x*X[i].y;}
+
+    return X[abs(ph[1])<abs(ph[0])];
+}
+//#####################################################################
+// Function Meet_Phi
+//#####################################################################
+template<class T> static VECTOR<T,3>
+Meet_Phi(const VECTOR<VECTOR<T,8> ,2>& phi)
+{
+    PHYSBAM_FATAL_ERROR();
+}
+//#####################################################################
+// Function Zero_Phi
+//#####################################################################
+template<class T> VECTOR<T,2>
+Zero_Phi(const VECTOR<VECTOR<T,4> ,3>& phi,VECTOR<T,3>& p)
+{
+    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,(1<<TV::m)> PHI;
+    p=VECTOR<T,3>()+FLT_MAX;
+    TV bestX,X;
+    T pp=0;
+    X=Meet_Phi(VECTOR<PHI,2>(phi.x-phi.y,phi.x-phi.z));
+    pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
+    if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,pp,pp);bestX=X;}
+    X=Meet_Phi(VECTOR<PHI,2>(phi.x+phi.y,phi.x-phi.z));
+    pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
+    if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,-pp,pp);bestX=X;}
+    X=Meet_Phi(VECTOR<PHI,2>(phi.x-phi.y,phi.x+phi.z));
+    pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
+    if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,pp,-pp);bestX=X;}
+    X=Meet_Phi(VECTOR<PHI,2>(-phi.x+phi.y,-phi.x+phi.z));
+    pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
+    if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(-pp,pp,pp);bestX=X;}
+    return bestX;
+}
+//#####################################################################
+// Function Zero_Phi
+//#####################################################################
+template<class T> VECTOR<T,3>
+Zero_Phi(const VECTOR<VECTOR<T,8> ,3>& phi,VECTOR<T,3>& p)
+{
+    PHYSBAM_FATAL_ERROR();
+}
+//#####################################################################
 // Function Cut_Stencil_With_Pairwise_Phi
 //#####################################################################
-template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
-Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,const TV_INT& cell)
+template<class TV,class TV_INT,class CELL_ELEMENTS> static void
+Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,const VECTOR<int,2>& cell)
 {
+    typedef typename TV::SCALAR T;
+    typedef typename MARCHING_CUBES_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
+    typedef typename MARCHING_CUBES_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
+    typedef VECTOR<T,(1<<TV::m)> PHI;
     struct CROSSING
     {
         T theta;
@@ -343,22 +411,22 @@ Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,c
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
     int full_mask=~0;
     for(int j=0;j<bits.m;j++)
-        full_mask&=pairwise_data(bits(j)+cell).valid_flags;
+        full_mask&=self.pairwise_data(bits(j)+cell).valid_flags;
 
-    VECTOR<int,(1<<TV::m)> colors(combined_color.Subset(bits+cell));
+    VECTOR<int,(1<<TV::m)> colors(self.combined_color.Subset(bits+cell));
     VECTOR<ARRAY<CROSSING>,4> crossings;
-    for(int a=0;a<phi.m;a++)
+    for(int a=0;a<self.phi.m;a++)
         if(full_mask&(1<<a))
-            for(int b=a+1;b<phi.m;b++)
+            for(int b=a+1;b<self.phi.m;b++)
                 if(full_mask&(1<<b)){
-                    VECTOR<T,(1<<TV::m)> phis(pairwise_phi(a)(b).Subset(bits+cell));
+                    VECTOR<T,(1<<TV::m)> phis(self.pairwise_phi(a)(b).Subset(bits+cell));
                     if(phis.Max()<=0 || phis.Min()>=0) continue;
                     for(int e=0;e<4;e++){
                         int v0=vertices_of_side[e][0],v1=vertices_of_side[e][1];
                         T p0=phis(v0),p1=phis(v1);
                         if((p0>0)==(p1>0)) continue;
                         CROSSING t={p0/(p0-p1),a,b};
-                        TV X0=grid.Node(cell+bits(v0)),X1=grid.Node(cell+bits(v1));
+                        TV X0=self.grid.Node(cell+bits(v0)),X1=self.grid.Node(cell+bits(v1));
                         t.X=X0+t.theta*(X1-X0);
                         if(p0>0) exchange(t.c0,t.c1);
                         crossings(e).Append(t);}}
@@ -385,7 +453,7 @@ Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,c
     CELL_ELEMENTS& ce=index_to_cell_data.Get_Or_Insert(cell);
     for(int s=0;s<2;s++){
         int c0=colors(2*s);
-        TV X0=grid.Node(cell+bits(3*s)),X1=grid.Node(cell+bits(3*s^1)),X=X0;
+        TV X0=self.grid.Node(cell+bits(3*s)),X1=self.grid.Node(cell+bits(3*s^1)),X=X0;
         for(int i=0;i<crossings(2*s).m;i++){
             BOUNDARY_ELEMENT be={SEGMENT_2D<T>(X,crossings(2*s)(i).X),c0};
             ce.boundary.Append(be);
@@ -409,10 +477,10 @@ Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,c
             pts.Insert(key0,X0);}
 
     TV centroid;
-    RANGE<TV> cell_range(grid.Cell_Domain(cell));
+    RANGE<TV> cell_range(self.grid.Cell_Domain(cell));
     HASHTABLE<VECTOR<int,3> > found;
     for(typename HASHTABLE<VECTOR<int,2>,TV>::ITERATOR it(pts);it.Valid();it.Next()){
-        for(int c=0;c<phi.m;c++)
+        for(int c=0;c<self.phi.m;c++)
             if(c!=it.Key().x && c!=it.Key().y && full_mask&(1<<c)){
                 VECTOR<int,2> key(it.Key().y,c);
                 if(!pts.Contains(key)) continue;
@@ -420,9 +488,9 @@ Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,c
                 if(found.Contains(tkey)) continue;
                 found.Insert(tkey);
                 VECTOR<T,3> p;
-                PHI phi0(pairwise_phi(tkey.x)(tkey.y).Subset(bits+cell));
-                PHI phi1(pairwise_phi(tkey.x)(tkey.z).Subset(bits+cell));
-                PHI phi2(pairwise_phi(tkey.y)(tkey.z).Subset(bits+cell));
+                PHI phi0(self.pairwise_phi(tkey.x)(tkey.y).Subset(bits+cell));
+                PHI phi1(self.pairwise_phi(tkey.x)(tkey.z).Subset(bits+cell));
+                PHI phi2(self.pairwise_phi(tkey.y)(tkey.z).Subset(bits+cell));
                 centroid+=Zero_Phi(VECTOR<PHI,3>(phi0,phi1,phi2),p)*cell_range.Edge_Lengths()+cell_range.min_corner;}}
 
     if(found.Size()){
@@ -435,49 +503,20 @@ Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,c
             ce.interface.Append(ie);}}
 }
 //#####################################################################
-// Function Meet_Phi
+// Function Cut_Stencil_With_Pairwise_Phi
 //#####################################################################
-template<class TV> TV TRIPLE_JUNCTION_CORRECTION<TV>::
-Meet_Phi(const VECTOR<PHI,2>& phi)
+template<class TV,class TV_INT,class CELL_ELEMENTS> static void
+Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,const VECTOR<int,3>& cell)
 {
-    QUADRATIC<T> quad(-phi(0)(0)*phi(1)(3)+phi(0)(3)*phi(1)(0)+phi(0)(1)*phi(1)(2)-phi(0)(1)*phi(1)(0)+phi(0)(2)*phi(1)(3)-phi(0)(2)*phi(1)(1)+phi(0)(0)*phi(1)(1)-phi(0)(3)*phi(1)(2),-2*phi(0)(0)*phi(1)(1)+phi(0)(0)*phi(1)(3)-phi(0)(1)*phi(1)(2)+2*phi(0)(1)*phi(1)(0)+phi(0)(2)*phi(1)(1)-phi(0)(3)*phi(1)(0),-phi(0)(1)*phi(1)(0)+phi(0)(0)*phi(1)(1));
-    quad.Compute_Roots();
-    if(quad.roots==0){
-        quad.roots=1;
-        quad.root1=-quad.b/(2*quad.a);}
-    T ya[2]={quad.root1,quad.root2},ph[2]={FLT_MAX,FLT_MAX};
-    TV X[2];
-    for(int i=0;i<quad.roots;i++){
-        if(abs(ya[i])>10) continue;
-        T num=-phi(1)(0)-ya[i]*phi(1)(2)+ya[i]*phi(1)(0);
-        T den=phi(1)(1)-phi(1)(0)+ya[i]*phi(1)(3)-ya[i]*phi(1)(2)-ya[i]*phi(1)(1)+ya[i]*phi(1)(0);
-        X[i]=TV(num/den,ya[i]);
-        ph[i]=phi(0)(0)+(phi(0)(1)-phi(0)(0))*X[i].x+(phi(0)(2)-phi(0)(0))*X[i].y+(phi(0)(3)-phi(0)(2)-phi(0)(1)+phi(0)(0))*X[i].x*X[i].y;}
-
-    return X[abs(ph[1])<abs(ph[0])];
+    PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
-// Function Zero_Phi
+// Function Cut_Cell_With_Pairwise_Phi
 //#####################################################################
-template<class TV> TV TRIPLE_JUNCTION_CORRECTION<TV>::
-Zero_Phi(const VECTOR<PHI,3>& phi,VECTOR<T,3>& p)
+template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
+Cut_Cell_With_Pairwise_Phi(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data,const TV_INT& cell)
 {
-    p=VECTOR<T,3>()+FLT_MAX;
-    TV bestX,X;
-    T pp=0;
-    X=Meet_Phi(VECTOR<PHI,2>(phi.x-phi.y,phi.x-phi.z));
-    pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
-    if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,pp,pp);bestX=X;}
-    X=Meet_Phi(VECTOR<PHI,2>(phi.x+phi.y,phi.x-phi.z));
-    pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
-    if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,-pp,pp);bestX=X;}
-    X=Meet_Phi(VECTOR<PHI,2>(phi.x-phi.y,phi.x+phi.z));
-    pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
-    if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,pp,-pp);bestX=X;}
-    X=Meet_Phi(VECTOR<PHI,2>(-phi.x+phi.y,-phi.x+phi.z));
-    pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
-    if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(-pp,pp,pp);bestX=X;}
-    return bestX;
+    Cut_Cell_With_Pairwise_Phi_Helper(*this,index_to_cell_data,cell);
 }
 //#####################################################################
 // Function Compute_Pairwise_Level_Set_Data
@@ -504,8 +543,8 @@ Compute_Pairwise_Level_Set_Data()
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
 
-    for(int t=0;t<3;t++){
-        One_Step_Triple_Junction_Correction();}
+    for(int t=0;t<3;t++)
+        One_Step_Triple_Junction_Correction();
 
     Update_Color_Level_Sets();
 }
@@ -520,4 +559,6 @@ PAIRWISE_LEVEL_SET_DATA()
 namespace PhysBAM{
 template class TRIPLE_JUNCTION_CORRECTION<VECTOR<float,2> >;
 template class TRIPLE_JUNCTION_CORRECTION<VECTOR<double,2> >;
+template class TRIPLE_JUNCTION_CORRECTION<VECTOR<float,3> >;
+template class TRIPLE_JUNCTION_CORRECTION<VECTOR<double,3> >;
 }
