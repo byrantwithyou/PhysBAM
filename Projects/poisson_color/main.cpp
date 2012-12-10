@@ -74,6 +74,7 @@ void Dump_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& u,const char* title)
     frame++;
 }
 
+extern void (*Global_Flush_Frame)(const char* title);
 template<class T,class TV>
 void Flush_Frame(const char* title)
 {
@@ -307,6 +308,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     typedef VECTOR<int,TV::m> TV_INT;
 
     Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
+
+    Global_Flush_Frame=&Flush_Frame<T,TV>;
 
     T m=1,s=1,kg=1;
     int threads=1;

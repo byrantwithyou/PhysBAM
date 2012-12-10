@@ -20,6 +20,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 using namespace PhysBAM;
+void (*Global_Flush_Frame)(const char* title)=0;
 template<class T>
 struct RAT
 {
@@ -272,6 +273,7 @@ Update_Color_Level_Sets()
 
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next())
         PHYSBAM_ASSERT(combined_color(it.index)>=0);
+    Global_Flush_Frame(__FUNCTION__);
 }
 //#####################################################################
 // Function Cut_Interface
@@ -323,6 +325,7 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
 
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
         Cut_Cell_With_Pairwise_Phi(index_to_cell_data,it.index);}
+    Global_Flush_Frame(__FUNCTION__);
 }
 //#####################################################################
 // Function Meet_Phi
