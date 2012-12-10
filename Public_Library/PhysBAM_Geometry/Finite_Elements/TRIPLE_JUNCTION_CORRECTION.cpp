@@ -445,7 +445,7 @@ Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE
         best.Fill(-INT_MAX);
         best(c1)=0;
         index.Fill(-1);
-        for(int i=0;i<ar.m;i++){
+        for(int i=ar.m-1;i>=0;i--){
             pa(i)=index(ar(i).c1);
             if(best(ar(i).c1)+1>best(ar(i).c0)){
                 best(ar(i).c0)=best(ar(i).c1)+1;
