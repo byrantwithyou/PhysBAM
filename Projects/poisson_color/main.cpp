@@ -371,14 +371,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 0:{ // One color, periodic. No interface, no forces, u=0.
             test.mu.Append(1);
             test.analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-1);
-            struct ANALYTIC_POISSON_SOLUTION_0:public ANALYTIC_POISSON_SOLUTION<TV>
-            {
-                virtual ~ANALYTIC_POISSON_SOLUTION_0(){}
-                virtual T u(const TV& X) const {return 0;}
-                virtual TV du(const TV& X) const {return TV();}
-                virtual T Laplacian(const TV& X) const {return 0;}
-            };
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_0);
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
             break;}
         case 1:{ // One color, periodic. No interface, u=sin(2*pi*x), f=(2*pi)^2*sin(2*pi*x).
             test.mu.Append(1);
@@ -413,12 +406,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(2);
             test.use_discontinuous_scalar_field=true;
             test.analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T)0.5,1/(T)pi,1,0);
-            struct ANALYTIC_POISSON_SOLUTION_4:public ANALYTIC_POISSON_SOLUTION<TV>
-            {
-                virtual T u(const TV& X) const {return exp(-(X-(T)0.5).Magnitude_Squared());}
-                virtual TV du(const TV& X) const {return -(X-(T)0.5)*2*u(X);}
-                virtual T Laplacian(const TV& X) const {return ((X-(T)0.5).Magnitude_Squared()*4-2*TV::m)*u(X);}
-            };
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(1,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m));
             break;}
@@ -509,91 +496,75 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(a0,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(a1,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1));
             break;}
-#if 0
         case 11:{ // Four colors (dirichlet outside). Three equal bubbles.
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
             test.use_discontinuous_scalar_field=true;
-            struct ANALYTIC_POISSON_SOLUTION_11:public ANALYTIC_POISSON_SOLUTION<TV>
+            struct ANALYTIC_POISSON_LEVELSET_11:public ANALYTIC_LEVELSET<TV>
             {
                 T r;
                 TV n; // rotate angle with respect to e_y
                 TV a; // shift
                 VECTOR<TV,3> centers;
                 VECTOR<TV,3> normals;
-                VECTOR<VECTOR<int,3>,3> sectors;
-                virtual void Initialize()
+                ANALYTIC_POISSON_LEVELSET_11()
                 {
                     r=(T)1/(2*pi-1);
-                    n=TV::Axis_Vector(1);a=TV()+pi/200;
+                    n=TV::Axis_Vector(1);
+                    a=TV()+pi/200;
                     centers(0)=TV::Axis_Vector(1);
                     centers(1).x=(T)sqrt(3)/2;centers(1).y=-(T)1/2;
                     centers(2).x=-(T)sqrt(3)/2;centers(2).y=-(T)1/2;
                     for(int i=0;i<3;i++){
                         normals(i).x=-centers(i).y;
                         normals(i).y=centers(i).x;
-                        centers(i)*=r;
-                        for(int j=0;j<3;j++) sectors(i)(j)=(i+j)%3;}
+                        centers(i)*=r;}
                 }
-                virtual TV Transform(const TV& X){return X-0.5+a;}
-                virtual T phi_value(const TV& X)
+                T phi(const TV& X,T t,int& c) const
                 {
-                    TV x=Transform(X);
+                    TV x=X-0.5+a;
                     int i;
-                    for(i=0;i<2;i++) if(x.Dot(normals(sectors(i)(1)))>=0 && x.Dot(normals(sectors(i)(2)))<0) break;
+                    for(i=0;i<2;i++) if(x.Dot(normals((i+1)%3))>=0 && x.Dot(normals((i+2)%3))<0) break;
                     T d=(x-centers(i)).Magnitude();
-                    if(d>r && x.Magnitude()>r/100) return d-r;
-                    else return min(abs(d-r),abs(x.Dot(normals(sectors(i)(1)))),abs(x.Dot(normals(sectors(i)(2)))));
+                    if(d>r && x.Magnitude()>r/100){
+                        c=-2;
+                        return d-r;}
+                    c=i;
+                    return min(abs(d-r),abs(x.Dot(normals((i+1)%3))),abs(x.Dot(normals((i+2)%3))));
                 }
-                virtual int phi_color(const TV& X){
-                    TV x=Transform(X);
-                    int i;
-                    for(i=0;i<2;i++) if(x.Dot(normals(sectors(i)(1)))>=0 && x.Dot(normals(sectors(i)(2)))<0) break;
-                    T d=(x-centers(i)).Magnitude();
-                    if(d>r && x.Magnitude()>r/100) return -2;
-                    else return i;
-                }
-                virtual T u(const TV& X,int color)
+                TV N(const TV& X,T t,int c) const
                 {
-                    switch(color){
-                        case 0: return sin(X.x);
-                        case 1: return cos(X.y);
-                        case 2: return X.Magnitude_Squared();
-                        default: PHYSBAM_FATAL_ERROR();}
+                    // Rough approximation
+                    TV x=X-0.5+a;
+                    if(c==-2){
+                        VECTOR<T,3> D((x-centers(0)).Magnitude()-r,(x-centers(1)).Magnitude()-r,(x-centers(2)).Magnitude()-r);
+                        return (x-centers(D.Arg_Min())).Normalized();}
+                    T x_dot_n0=-x.Dot(normals((c+1)%3)),x_dot_n1=x.Dot(normals((c+2)%3));
+                    T d=(x-centers(c)).Magnitude()-r;
+                    if(d>x_dot_n0 && d>x_dot_n1) return (x-centers(c)).Normalized();
+                    if(x_dot_n0>x_dot_n1) return -normals((c+1)%3);
+                    return normals((c+2)%3);
                 }
-                virtual TV grad_u(const TV& X,int color)
+                T dist(const TV& X,T t,int c) const
                 {
-                    switch(color){
-                        case 0: return TV::Axis_Vector(0)*cos(X.x)*mu(color);
-                        case 1: return -TV::Axis_Vector(1)*sin(X.y)*mu(color);
-                        case 2: return (TV()+2)*X*mu(color);
-                        default: PHYSBAM_FATAL_ERROR();}
+                    // Rough approximation
+                    TV x=X-0.5+a;
+                    if(c==-2){
+                        VECTOR<T,3> D((x-centers(0)).Magnitude()-r,(x-centers(1)).Magnitude()-r,(x-centers(2)).Magnitude()-r);
+                        return D.Min();}
+                    T x_dot_n0=-x.Dot(normals((c+1)%3)),x_dot_n1=x.Dot(normals((c+2)%3));
+                    T d=(x-centers(c)).Magnitude()-r;
+                    return max(max(x_dot_n0,x_dot_n1),d);
                 }
-                virtual T f_volume(const TV& X,int color)
-                {
-                    switch(color){
-                        case 0: return sin(X.x)*mu(color);
-                        case 1: return cos(X.y)*mu(color);
-                        case 2: return -2*TV::m*mu(color);
-                        default: PHYSBAM_FATAL_ERROR();}
-                }
-                virtual T j_surface(const TV& X,int color0,int color1)
-                {
-                    TV x=Transform(X);
-                    if(color0==-2){return -grad_u(X,color1).Dot((x-centers(color1)).Normalized());}
-                    if(color0==0 && color1==1) return normals(2).Dot(grad_u(X,1)-grad_u(X,0));
-                    if(color0==1 && color1==2) return normals(0).Dot(grad_u(X,2)-grad_u(X,1));
-                    if(color0==0 && color1==2) return normals(1).Dot(grad_u(X,0)-grad_u(X,2));
-                    PHYSBAM_FATAL_ERROR();
-                }
-                virtual T d_surface(const TV& X,int color0,int color1){return u(X,color1);}
             };
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_11);
+            test.analytic_levelset=new ANALYTIC_POISSON_LEVELSET_11;
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(1,0,TV::Axis_Vector(0),TV()));
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(0,1,TV::Axis_Vector(1),TV()));
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_QUADRATIC<TV>(MATRIX<T,TV::m>()+1,TV(),0));
             break;}
-#endif
         default:{
-        LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
+            LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 
     TV_INT counts=TV_INT()+resolution;
     GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1),true);
