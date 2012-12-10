@@ -196,13 +196,17 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 
-    ARRAY<T,TV_INT> phi_value(grid.Node_Indices());
-    ARRAY<int,TV_INT> phi_color(grid.Node_Indices());
+    ARRAY<ARRAY<T,TV_INT> > color_phi(at.analytic_solution.m);
+    for(int i=0;i<at.analytic_solution.m;i++)
+        color_phi(i).Resize(grid.Node_Indices());
+    // ARRAY<T,TV_INT> phi_value(grid.Node_Indices());
+    // ARRAY<int,TV_INT> phi_color(grid.Node_Indices());
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
-        phi_value(it.index)=at.analytic_levelset->phi(it.Location(),0,phi_color(it.index));
+    for(int c=0;c<color_phi.m;c++)
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+            color_phi(c)(it.index)=at.analytic_levelset->dist(it.Location(),0,c-3);
 
-    INTERFACE_POISSON_SYSTEM_COLOR<TV> ips(grid,phi_value,phi_color);
+    INTERFACE_POISSON_SYSTEM_COLOR<TV> ips(grid,color_phi);
     ips.use_preconditioner=use_preconditioner;
     ips.Set_Matrix(at.mu,true,&at);
 

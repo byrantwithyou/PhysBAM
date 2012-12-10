@@ -56,8 +56,7 @@ public:
     const GRID<TV>& grid;
 
     GRID<TV> phi_grid;
-    ARRAY<T,TV_INT> phi_value;
-    ARRAY<int,TV_INT> phi_color;
+    ARRAY<ARRAY<T,TV_INT> > color_phi;
     
     bool run_self_tests;
     bool print_matrix;
@@ -67,8 +66,9 @@ public:
 
     CELL_MANAGER_COLOR<TV> *cm_u;
     CELL_DOMAIN_INTERFACE_COLOR<TV> *cdi;
+    int ghost;
 
-    INTERFACE_POISSON_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input);
+    INTERFACE_POISSON_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<ARRAY<T,TV_INT >>& color_phi_input);
     virtual ~INTERFACE_POISSON_SYSTEM_COLOR();
 
 //#####################################################################

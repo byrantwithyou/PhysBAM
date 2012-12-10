@@ -28,10 +28,14 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> INTERFACE_POISSON_SYSTEM_COLOR<TV>::
-INTERFACE_POISSON_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input)
-    :BASE(false,false),grid(grid_input),phi_grid(grid.counts*2,grid.domain,true),phi_value(phi_grid.Node_Indices()),phi_color(phi_grid.Node_Indices())
+INTERFACE_POISSON_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<ARRAY<T,TV_INT> >& color_phi_input)
+    :BASE(false,false),grid(grid_input),phi_grid(grid.counts*2,grid.domain,true),color_phi(color_phi_input.m),ghost(3)
 {
-    CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Level_Set_To_Double_Fine_Grid(grid_input,phi_value_input,phi_color_input,phi_grid,phi_value,phi_color);
+    for(int c=0;c<color_phi.m;c++){
+        RANGE<TV_INT> domain(color_phi_input(c).domain*2);
+        domain.max_corner-=1;
+        color_phi(c).Resize(domain);
+        CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Level_Set_To_Double_Fine_Grid(color_phi_input(c).domain,color_phi_input(c),domain,color_phi(c));}
 }
 //#####################################################################
 // Destructor
@@ -68,11 +72,15 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
 
     cdi=new CELL_DOMAIN_INTERFACE_COLOR<TV>(grid,padding,mu.m,wrap); 
     cm_u=new CELL_MANAGER_COLOR<TV>(*cdi);
-    cdi->Construct_Surface_Meshes(phi_grid,phi_value,phi_color);
+
+    TRIPLE_JUNCTION_CORRECTION<TV> tjc(phi_grid.Get_Regular_Grid(),color_phi,ghost);
+    tjc.Compute_Pairwise_Level_Set_Data();
+    tjc.combined_color.array-=3;
+    tjc.Cut_Interface(cdi->index_to_cell_elements);
 
     // STENCILS INTEGRATION 
     
-    BASIS_INTEGRATION_UNIFORM_COLOR<TV,2> biu(grid,phi_grid,phi_color,*cdi);
+    BASIS_INTEGRATION_UNIFORM_COLOR<TV,2> biu(grid,phi_grid,tjc.combined_color,*cdi);
     SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV> helper_uu,helper_rhs_uu;
     SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV> helper_qu;
 
