@@ -20,6 +20,7 @@
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/TRIPLE_JUNCTION_CORRECTION.h>
 #include <PhysBAM_Geometry/Finite_Elements/VOLUME_FORCE_SCALAR_COLOR.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -46,6 +47,34 @@ template<class TV> INTERFACE_POISSON_SYSTEM_COLOR<TV>::
     delete cm_u;
     delete cdi;
 }
+
+template<class TV,class CELL_ELEMENTS> void Dump(const GRID<TV>& grid,const HASHTABLE<VECTOR<int,2>,CELL_ELEMENTS>& index_to_cell_elements)
+{
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,2> TV_INT;
+    typedef typename MARCHING_CUBES_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
+    typedef typename MARCHING_CUBES_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
+    VECTOR<T,3> color_map[4]={VECTOR<T,3>(0,0.7,0),VECTOR<T,3>(0.8,0.8,0),VECTOR<T,3>(0,0.4,1),VECTOR<T,3>(0.8,0.2,0)};
+    T sep=(T).08;
+    for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(index_to_cell_elements);it.Valid();it.Next()){
+        const CELL_ELEMENTS& cell_elements=it.Data();
+        const ARRAY<INTERFACE_ELEMENT>& interface_elements=cell_elements.interface;
+        for(int i=0;i<interface_elements.m;i++){
+            const INTERFACE_ELEMENT& V=interface_elements(i);
+            if(V.color_pair.y>=0){
+                if(V.color_pair.y>=0) Add_Debug_Object(V.face.X-V.face.Normal()*sep*grid.dX.Min(),color_map[V.color_pair.y]);
+                if("Alexey was here") Add_Debug_Object(V.face.X+V.face.Normal()*sep*grid.dX.Min(),color_map[V.color_pair.x]);}
+            else if(V.color_pair.x>=0) Add_Debug_Object(V.face.X-V.face.Normal()*sep*grid.dX.Min(),color_map[V.color_pair.x]);}}
+
+    for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(index_to_cell_elements);it.Valid();it.Next()){
+        const CELL_ELEMENTS& cell_elements=it.Data();
+        const ARRAY<BOUNDARY_ELEMENT>& boundary_elements=cell_elements.boundary;
+        for(int i=0;i<boundary_elements.m;i++){
+            const BOUNDARY_ELEMENT& V=boundary_elements(i);
+            Add_Debug_Object(V.face.X-V.face.Normal()*sep*grid.dX.Min(),color_map[V.color]);}}
+}
+template<class TV,class CELL_ELEMENTS> void Dump(const GRID<TV>& grid,const HASHTABLE<VECTOR<int,3>,CELL_ELEMENTS>& index_to_cell_elements){}
+
 //#####################################################################
 // Function Set_Matrix
 //#####################################################################
@@ -77,6 +106,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
     tjc.Compute_Pairwise_Level_Set_Data();
     tjc.combined_color.array-=3;
     tjc.Cut_Interface(cdi->index_to_cell_elements);
+    Dump(grid,cdi->index_to_cell_elements);
 
     // STENCILS INTEGRATION 
     
