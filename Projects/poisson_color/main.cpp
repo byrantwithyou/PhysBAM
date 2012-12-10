@@ -49,7 +49,7 @@ GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
 }
 
 typedef VECTOR<double,3> TV3;
-TV3 color_map[4]={TV3(0,0.7,0),TV3(0.8,0.8,0),TV3(0,0.4,1),TV3(0.8,0.2,0)};
+TV3 color_map[7]={TV3(.5,.5,.5),TV3(.8,.8,.8),TV3(1,1,1),TV3(0,0.7,0),TV3(0.8,0.8,0),TV3(0,0.4,1),TV3(0.8,0.2,0)};
 
 //#################################################################################################################################################
 // Debug Particles ################################################################################################################################
@@ -95,9 +95,9 @@ void Dump_Interface(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips)
         for(int i=0;i<interface_elements.m;i++){
             const INTERFACE_ELEMENT& V=interface_elements(i);
             if(V.color_pair.y>=0){
-                if(V.color_pair.y>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.y]);
-                if("Alexey was here") Add_Debug_Object(V.face.X+V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.x]);}
-            else if(V.color_pair.x>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.x]);}}
+                if(V.color_pair.y>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.y+3]);
+                if("Alexey was here") Add_Debug_Object(V.face.X+V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.x+3]);}
+            else if(V.color_pair.x>=0) Add_Debug_Object(V.face.X-V.face.Normal()*(T).003*ips.grid.dX.Min(),color_map[V.color_pair.x+3]);}}
 }
 
 template<class T,class TV>
@@ -115,7 +115,7 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_POISSON_
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
         int c=0;
         at.analytic_levelset->phi(it.Location(),0,c);
-        Add_Debug_Particle(it.Location(),color_map[c]);}
+        Add_Debug_Particle(it.Location(),color_map[c+3]);}
     Flush_Frame<T,TV>("level set");
     
     char buff[100];
@@ -196,14 +196,14 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 
-    ARRAY<ARRAY<T,TV_INT> > color_phi(at.analytic_solution.m);
-    for(int i=0;i<at.analytic_solution.m;i++)
-        color_phi(i).Resize(grid.Node_Indices());
+    ARRAY<ARRAY<T,TV_INT> > color_phi(at.analytic_solution.m+3);
+    for(int i=0;i<color_phi.m;i++)
+        color_phi(i).Resize(grid.Node_Indices(3));
     // ARRAY<T,TV_INT> phi_value(grid.Node_Indices());
     // ARRAY<int,TV_INT> phi_color(grid.Node_Indices());
 
     for(int c=0;c<color_phi.m;c++)
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next())
             color_phi(c)(it.index)=at.analytic_levelset->dist(it.Location(),0,c-3);
 
     INTERFACE_POISSON_SYSTEM_COLOR<TV> ips(grid,color_phi);
@@ -582,17 +582,17 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     if(test_analytic_diff) test.Test(grid.domain);
 
-    LOG::cout<<"boo"<<std::endl;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         int c=-4;
         T p=test.analytic_levelset->phi(it.Location(),0,c);
-        if(c>=0) Add_Debug_Particle(it.Location(),color_map[c]);
-        else Add_Debug_Particle(it.Location(),VECTOR<T,3>()+.5);
+        Add_Debug_Particle(it.Location(),color_map[c+3]);
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,p);}
     Flush_Frame<T,TV>("level set");
-    for(int c=0;c<test.analytic_solution.m;c++){
+    for(int c=-3;c<test.analytic_solution.m;c++){
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-            Add_Debug_Particle(it.Location(),color_map[c]);
+            T p=test.analytic_levelset->dist(it.Location(),0,c);
+            Add_Debug_Particle(it.Location(),color_map[c+3]/(p>0?2:1));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,test.analytic_levelset->N(it.Location(),0,c));}
         Flush_Frame<T,TV>("normals");}
 
