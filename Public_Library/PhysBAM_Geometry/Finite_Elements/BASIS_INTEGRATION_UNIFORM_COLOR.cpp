@@ -18,9 +18,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV,int static_degree> BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
-BASIS_INTEGRATION_UNIFORM_COLOR(const GRID<TV>& grid_input,const GRID<TV>& phi_grid_input,const ARRAY<T,TV_INT>& phi_value_input,
-    const ARRAY<int,TV_INT>& phi_color_input,CELL_DOMAIN_INTERFACE_COLOR<TV>& cdi_input)
-    :grid(grid_input),phi_grid(phi_grid_input),phi_value(phi_value_input),phi_color(phi_color_input),cdi(cdi_input)
+BASIS_INTEGRATION_UNIFORM_COLOR(const GRID<TV>& grid_input,const GRID<TV>& phi_grid_input,const ARRAY<int,TV_INT>& phi_color_input,CELL_DOMAIN_INTERFACE_COLOR<TV>& cdi_input)
+    :grid(grid_input),phi_grid(phi_grid_input),phi_color(phi_color_input),cdi(cdi_input)
 {
 }
 //#####################################################################

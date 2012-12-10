@@ -9,7 +9,6 @@
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
-//#include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM_COLOR.h>
@@ -72,7 +71,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
     cdi->Construct_Surface_Meshes(phi_grid,phi_value,phi_color);
 
     // STENCILS INTEGRATION 
-    BASIS_INTEGRATION_UNIFORM_COLOR<TV,2> biu(grid,phi_grid,phi_value,phi_color,*cdi);
+    BASIS_INTEGRATION_UNIFORM_COLOR<TV,2> biu(grid,phi_grid,phi_color,*cdi);
     SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV> helper_uu,helper_rhs_uu;
     SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV> helper_qu;
 

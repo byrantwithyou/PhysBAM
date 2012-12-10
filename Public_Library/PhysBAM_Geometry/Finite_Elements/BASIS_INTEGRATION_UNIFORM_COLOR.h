@@ -40,7 +40,6 @@ public:
 
     const GRID<TV>& grid;
     const GRID<TV>& phi_grid;
-    const ARRAY<T,TV_INT>& phi_value;
     const ARRAY<int,TV_INT>& phi_color;
     
 
@@ -55,8 +54,7 @@ public:
     ARRAY<SURFACE_BLOCK*> surface_blocks;
     ARRAY<SURFACE_BLOCK_SCALAR*> surface_blocks_scalar;
 
-    BASIS_INTEGRATION_UNIFORM_COLOR(const GRID<TV>& grid_input,const GRID<TV>& phi_grid_input,
-        const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,CELL_DOMAIN_INTERFACE_COLOR<TV>& cdi_input);
+    BASIS_INTEGRATION_UNIFORM_COLOR(const GRID<TV>& grid_input,const GRID<TV>& phi_grid_input,const ARRAY<int,TV_INT>& phi_color_input,CELL_DOMAIN_INTERFACE_COLOR<TV>& cdi_input);
     ~BASIS_INTEGRATION_UNIFORM_COLOR();
 
     void Compute_Entries();
