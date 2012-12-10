@@ -36,8 +36,9 @@ INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& 
     :BASE(false,false),grid(grid_input),phi_grid(grid.counts*2,grid.domain,true),phi_value(phi_grid.Node_Indices(mac_phi)),phi_color(phi_grid.Node_Indices(mac_phi)),
     use_p_null_mode(false),use_u_null_mode(false)
 {
-    if(mac_phi) CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Mac_Level_Set_To_Double_Fine_Grid(grid_input,phi_value_input,phi_color_input,phi_grid,phi_value,phi_color);
-    else CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Level_Set_To_Double_Fine_Grid(grid_input,phi_value_input,phi_color_input,phi_grid,phi_value,phi_color);
+    T tol=(grid.dX/TV(grid.counts)).Min();
+    if(mac_phi) CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Mac_Level_Set_To_Double_Fine_Grid(grid_input,phi_value_input,phi_color_input,phi_grid,phi_value,phi_color,tol);
+    else CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Level_Set_To_Double_Fine_Grid(grid_input,phi_value_input,phi_color_input,phi_grid,phi_value,phi_color,tol);
 }
 //#####################################################################
 // Destructor

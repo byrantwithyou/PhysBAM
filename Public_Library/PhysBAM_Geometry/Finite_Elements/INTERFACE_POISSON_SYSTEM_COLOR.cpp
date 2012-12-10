@@ -32,11 +32,12 @@ template<class TV> INTERFACE_POISSON_SYSTEM_COLOR<TV>::
 INTERFACE_POISSON_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<ARRAY<T,TV_INT> >& color_phi_input)
     :BASE(false,false),grid(grid_input),phi_grid(grid.counts*2,grid.domain,true),color_phi(color_phi_input.m),ghost(3)
 {
+    T tol=(grid.dX/TV(grid.counts)).Min();
     for(int c=0;c<color_phi.m;c++){
         RANGE<TV_INT> domain(color_phi_input(c).domain*2);
         domain.max_corner-=1;
         color_phi(c).Resize(domain);
-        CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Level_Set_To_Double_Fine_Grid(color_phi_input(c).domain,color_phi_input(c),domain,color_phi(c));}
+        CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Level_Set_To_Double_Fine_Grid(color_phi_input(c).domain,color_phi_input(c),domain,color_phi(c),tol);}
 }
 //#####################################################################
 // Destructor

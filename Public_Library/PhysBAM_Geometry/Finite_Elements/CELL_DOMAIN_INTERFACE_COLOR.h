@@ -101,17 +101,17 @@ public:
     void Construct_Surface_Meshes(const GRID<TV>& phi_grid,const ARRAY<T,TV_INT>& phi_value,const ARRAY<int,TV_INT>& phi_color);
 
     static void Interpolate_Level_Set_To_Double_Fine_Grid(const RANGE<TV_INT>& range_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,
-        const RANGE<TV_INT>& range,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color,T threshold=0.01);
+        const RANGE<TV_INT>& range,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color,T threshold);
     static void Interpolate_Level_Set_To_Double_Fine_Grid(const GRID<TV>& phi_grid_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,
-        const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color,T tol=0.01);
+        const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color,T tol);
     static void Interpolate_Mac_Level_Set_To_Double_Fine_Grid(const GRID<TV>& phi_grid_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,
-        const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color,T tol=0.01);
+        const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color,T tol);
     static void Interpolate_Level_Set_To_Double_Fine_Grid(const RANGE<TV_INT>& range_input,const ARRAY<T,TV_INT>& phi_value_input,
-        const RANGE<TV_INT>& range,ARRAY<T,TV_INT>& phi_value,T threshold=0.01);
+        const RANGE<TV_INT>& range,ARRAY<T,TV_INT>& phi_value,T threshold);
     static void Interpolate_Level_Set_To_Double_Fine_Grid(const GRID<TV>& phi_grid_input,const ARRAY<T,TV_INT>& phi_value_input,
-        const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,T tol=0.01);
+        const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,T tol);
     static void Interpolate_Mac_Level_Set_To_Double_Fine_Grid(const GRID<TV>& phi_grid_input,const ARRAY<T,TV_INT>& phi_value_input,
-        const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,T tol=0.01);
+        const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,T tol);
 
 };
 }
