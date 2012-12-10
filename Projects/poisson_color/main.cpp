@@ -597,6 +597,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         Flush_Frame<T,TV>("normals");}
 
     Analytic_Test(grid,test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
+    Flush_Frame<T,TV>("finish");
     LOG::Finish_Logging();
 }
 
