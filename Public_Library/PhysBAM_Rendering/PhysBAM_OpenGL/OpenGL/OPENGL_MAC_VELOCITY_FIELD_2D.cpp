@@ -54,9 +54,9 @@ Update()
         vector_field.Resize(ucounts.x*ucounts.y + vcounts.x*vcounts.y);
         vector_locations.Resize(ucounts.x*ucounts.y + vcounts.x*vcounts.y);
         for(int i=u.domain.min_corner.x;i<u.domain.max_corner.x;i++) for(int j=u.domain.min_corner.y;j<u.domain.max_corner.y;j++) if(!active_faces||(active_faces->Component(0))(i,j)){
-            vector_field(idx)=VECTOR<T,2>(u(i,j),0);vector_locations(idx)=grid.X_Face(TV_INT(i,j));idx++;}
+            vector_field(idx)=VECTOR<T,2>(u(i,j),0);vector_locations(idx)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j)));idx++;}
         for(int i=v.domain.min_corner.x;i<v.domain.max_corner.x;i++) for(int j=v.domain.min_corner.y;j<v.domain.max_corner.y;j++) if(!active_faces||(active_faces->Component(1))(i,j)){
-            vector_field(idx)=VECTOR<T,2>(0,v(i,j));vector_locations(idx)=grid.Y_Face(TV_INT(i,j));idx++;}
+            vector_field(idx)=VECTOR<T,2>(0,v(i,j));vector_locations(idx)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j)));idx++;}
         vector_field.Resize(idx);
         vector_locations.Resize(idx);}
     else{

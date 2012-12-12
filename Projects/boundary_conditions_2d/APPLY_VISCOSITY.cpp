@@ -33,7 +33,7 @@ void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUND
     ARRAY<int,FACE_INDEX<d> > index(u.Domain_Indices());
     ARRAY<FACE_INDEX<d> > faces;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next())
-        if(callback.Inside(grid.Axis_X_Face(it.Full_Index())))
+        if(callback.Inside(grid.Face(it.Full_Index())))
             index(it.Full_Index())=faces.Append(it.Full_Index());
 
     SPARSE_MATRIX_FLAT_NXN<T> P;
@@ -46,14 +46,14 @@ void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUND
     TV one_over_dX2=grid.one_over_dX*grid.one_over_dX;
     for(int i=0;i<faces.m;i++){
         FACE_INDEX<d> face=faces(i);
-        TV X=grid.Axis_X_Face(face);
+        TV X=grid.Face(face);
         if(!callback.Inside(X)) continue;
         T middle_value=-2*one_over_dX2.Sum();
         for(int a=0;a<d;a++){
             for(int s=-1;s<=1;s+=2){
                 FACE_INDEX<d> neighbor=face;
                 neighbor.index(a)+=s;
-                TV Y=grid.Axis_X_Face(neighbor);
+                TV Y=grid.Face(neighbor);
                 if(callback.Inside(Y)){P.Append_Entry_To_Current_Row(index(neighbor),one_over_dX2(a));continue;}
 
                 T theta=1;

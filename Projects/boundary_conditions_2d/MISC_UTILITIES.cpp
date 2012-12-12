@@ -20,7 +20,7 @@ using namespace PhysBAM;
 template<class T,class TV,int d>
 void Invalidate_Outside(const GRID<TV>& grid,int ghost,ARRAY<T,FACE_INDEX<d> >& u,const BOUNDARY_CONDITIONS<TV>& bc,T value)
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,ghost);it.Valid();it.Next()) if(!bc.Inside(grid.Axis_X_Face(it.Full_Index()))) u(it.Full_Index())=value;
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,ghost);it.Valid();it.Next()) if(!bc.Inside(grid.Face(it.Full_Index()))) u(it.Full_Index())=value;
 }
 
 template<class TV>
@@ -97,7 +97,7 @@ void Prune_Outside_Sample_Points(const GRID<TV>& grid,const BOUNDARY_CONDITIONS<
     for(int i=1;i<ai.cell_samples.m;i++) if(bc.Inside(grid.X(ai.cell_samples(i)))) ai.cell_samples(++k)=ai.cell_samples(i);
     ai.cell_samples.Resize(k);
     k=0;
-    for(int i=1;i<ai.face_samples.m;i++) if(bc.Inside(grid.Axis_X_Face(ai.face_samples(i)))) ai.face_samples(++k)=ai.face_samples(i);
+    for(int i=1;i<ai.face_samples.m;i++) if(bc.Inside(grid.Face(ai.face_samples(i)))) ai.face_samples(++k)=ai.face_samples(i);
     ai.face_samples.Resize(k);
 }
 

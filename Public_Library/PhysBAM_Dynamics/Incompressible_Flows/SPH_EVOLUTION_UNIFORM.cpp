@@ -153,7 +153,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
         for(int axis=0;axis<T_GRID::dimension;axis++)
             for(FACE_ITERATOR iterator(grid,particle_cells+RANGE<TV_INT>(TV_INT(),TV_INT::Axis_Vector(axis)),axis);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index();
-                TV X_minus_Xp=grid.Face(axis,face)-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
+                TV X_minus_Xp=grid.Face(iterator.Full_Index())-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
                 T weight=1-distance_squared*one_over_radius_squared;
                 if(weight>0)one_over_total_particle_face_weight(p)+=weight;}}
     for(int p=0;p<sph_particles.Size();p++){
@@ -355,7 +355,7 @@ Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,T_ARRAYS_SCALAR& c
                 if(incompressible.projection.elliptic_solver->psi_N(axis,face2)) if(sph_particles.X(p)(axis)<X(axis)-.5*grid.dX(axis)) weight_multiplier++;}
             if(weight>0)cell_weight(cell)+=weight_multiplier*weight;}}
     for(FACE_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
-        TV_INT face=iterator.Face_Index();int axis=iterator.Axis();TV X=grid.Face(axis,face);TV_INT cell=face;
+        TV_INT face=iterator.Face_Index();int axis=iterator.Axis();TV X=grid.Face(iterator.Full_Index());TV_INT cell=face;
         for(int k=0;k<particles_in_cell(cell).m;k++){
             int p=particles_in_cell(cell)(k);
             TV X_minus_Xp=X-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
@@ -374,7 +374,7 @@ Calculate_Particle_Deltas(const T_FACE_ARRAYS_SCALAR& minus_face_delta,ARRAY<TV>
     Calculate_SPH_Constants();
 
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
-        TV_INT face=iterator.Face_Index();int axis=iterator.Axis();TV X=grid.Face(axis,face);TV_INT cell=face;grid.Clamp(cell);
+        TV_INT face=iterator.Face_Index();int axis=iterator.Axis();TV X=grid.Face(iterator.Full_Index());TV_INT cell=face;grid.Clamp(cell);
         for(int k=0;k<particles_in_cell(cell).m;k++){
             int p=particles_in_cell(cell)(k);
             TV X_minus_Xp=X-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();

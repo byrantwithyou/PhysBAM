@@ -60,7 +60,7 @@ public:
     {return face_size;}
 
     TV Location() const
-    {return grid.Face(axis,index);}
+    {return grid.Face(Full_Index());}
 
     TV_INT First_Cell_Index() const
     {TV_INT i(index);i(axis)--;return i;}

@@ -293,11 +293,11 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         else{
             if(index1<0 && !psi_N(face1)){
                 /*Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));*/
-                /*Add_Debug_Particle(grid.Axis_X_Face(face1),VECTOR<T,3>(1,0,1));*/
+                /*Add_Debug_Particle(grid.Face(face1),VECTOR<T,3>(1,0,1));*/
                 continue;}
             if(index2<0 && !psi_N(face2)){
                 /*Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));*/
-                /*Add_Debug_Particle(grid.Axis_X_Face(face2),VECTOR<T,3>(1,0,1));*/
+                /*Add_Debug_Particle(grid.Face(face2),VECTOR<T,3>(1,0,1));*/
                 continue;}}
         if(index1<0 || index2<0){/*Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,0,1));*/}
 

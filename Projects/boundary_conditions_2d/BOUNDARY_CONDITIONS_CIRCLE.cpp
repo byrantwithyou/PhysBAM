@@ -20,7 +20,7 @@ template<class TV> BOUNDARY_CONDITIONS_CIRCLE<TV>::
     int n=0;
     T L1=0,Li=0;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,2);it.Valid();it.Next()){
-        TV X(grid.Axis_X_Face(it.Full_Index()));
+        TV X(grid.Face(it.Full_Index()));
         if(Theta(X)>grid.dX.Max()*2) continue;
         if(!Inside(X)) continue;
         TV Y;

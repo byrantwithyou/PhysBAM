@@ -184,7 +184,7 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
 //            Add_Debug_Particle(index_map.grid.X(it.Key()),VECTOR<T,3>(0,1,0));
 
 //        for(typename HASHTABLE<FACE_INDEX<TV::m>,T>::ITERATOR it(face_lengths);it.Valid();it.Next())
-//            Add_Debug_Particle(index_map.grid.Axis_X_Face(it.Key()),VECTOR<T,3>(1,0,0));
+//            Add_Debug_Particle(index_map.grid.Face(it.Key()),VECTOR<T,3>(1,0,0));
 //        PHYSBAM_DEBUG_WRITE_SUBSTEP("registered",0,1);
 
         this_.Compute_Beta();
@@ -241,7 +241,7 @@ Cut_Face(FACE_INDEX<TV::m>& f,const TV& normal,const SEGMENT_2D<T>& segment)
     if(!cut_cells.Contains(f.First_Cell_Index()) || !cut_cells.Contains(f.Second_Cell_Index())) return;
 
     T dx=index_map.grid.dX(1-f.axis);
-    TV face_center(index_map.grid.Axis_X_Face(f)),dir=TV::Axis_Vector(1-f.axis);
+    TV face_center(index_map.grid.Face(f)),dir=TV::Axis_Vector(1-f.axis);
     RAY<TV> ray(face_center-(T).5*dx*dir,dir);
     ray.semi_infinite=false;
     ray.t_max=dx;
@@ -363,7 +363,7 @@ Face_Type(int f) const
     if(!b){
         if(!(*outside_fluid)(face_index.Second_Cell_Index())) return inside;
         return index_map.two_phase?outside:unused;}
-    TV dx=index_map.grid.Axis_X_Face(face_index)-a->segment.X.x;
+    TV dx=index_map.grid.Face(face_index)-a->segment.X.x;
     TV N=(a->segment.X.y-a->segment.X.x).Rotate_Clockwise_90();
     if(TV::Dot_Product(dx,N)<=0) return inside;
     return index_map.two_phase?outside:unused;
@@ -389,7 +389,7 @@ Compute_Beta()
         else if((*outside_fluid)(cell2)) volume2=(T)0;
         else volume2=full_volume;
         inside_volume=(T).5*(volume1+volume2);
-        //Add_Debug_Particle(index_map.grid.Axis_X_Face(index_map.indexed_faces(i)),colors[Face_Type(i)]);
+        //Add_Debug_Particle(index_map.grid.Face(index_map.indexed_faces(i)),colors[Face_Type(i)]);
         switch(Face_Type(i)){
             case coupling: break;
             case unused: beta_inverse(i)=0;break;
@@ -417,7 +417,7 @@ Add_Gradient_Entry(int fi,const FACE_INDEX<TV::m>& f,int side,bool outside)
 {
     TV_INT cell=f.Cell_Index(side);
     int cell_index=index_map.cell_indices(cell);
-    TV DX=index_map.grid.Axis_X_Face(f)+TV::Axis_Vector(f.axis)*((side==0?-1:1)*index_map.grid.dX.Min()/6);(void)DX;
+    TV DX=index_map.grid.Face(f)+TV::Axis_Vector(f.axis)*((side==0?-1:1)*index_map.grid.dX.Min()/6);(void)DX;
     if(cell_index<0){
         //Add_Debug_Particle(DX,VECTOR<T,3>(1,0,0));
         return;}
@@ -437,7 +437,7 @@ Add_Cut_Gradient_Entry(int fi,const FACE_INDEX<TV::m>& f,int side)
 {
     TV_INT cell=f.Cell_Index(side);
     int cell_index=index_map.cell_indices(cell);
-    TV DX=index_map.grid.Axis_X_Face(f)+TV::Axis_Vector(f.axis)*((side==0?-1:1)*index_map.grid.dX.Min()/6);(void)DX;
+    TV DX=index_map.grid.Face(f)+TV::Axis_Vector(f.axis)*((side==0?-1:1)*index_map.grid.dX.Min()/6);(void)DX;
     if(cell_index<0){
         //Add_Debug_Particle(DX,VECTOR<T,3>(1,1,0));
         return;}
@@ -460,7 +460,7 @@ Compute_Gradient()
     for(int i=0;i<index_map.indexed_faces.m;i++){
         if((*psi_N)(index_map.indexed_faces(i))){
             gradient->gradient.Finish_Row();
-            //Add_Debug_Particle(index_map.grid.Axis_X_Face(index_map.indexed_faces(i)),VECTOR<T,3>(1,.5,0));
+            //Add_Debug_Particle(index_map.grid.Face(index_map.indexed_faces(i)),VECTOR<T,3>(1,.5,0));
             continue;}
         switch(Face_Type(i)){
             case unused: break;

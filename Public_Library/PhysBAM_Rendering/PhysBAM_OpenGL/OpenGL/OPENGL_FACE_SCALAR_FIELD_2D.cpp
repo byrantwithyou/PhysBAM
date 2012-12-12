@@ -61,17 +61,15 @@ Update()
     index_start=VECTOR<int,2>(x_face_values.domain.min_corner.x,x_face_values.domain.min_corner.y);
     index_end=VECTOR<int,2>(x_face_values.domain.max_corner.x,x_face_values.domain.max_corner.y);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) {
-        opengl_points.points(index)=grid.X_Face(TV_INT(i,j));
+        opengl_points.points(index)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j)));
         opengl_points.Set_Point_Color(index,color_map->Lookup(x_face_values(i,j)));
-        index++;
-    }
+        index++;}
     index_start=VECTOR<int,2>(y_face_values.domain.min_corner.x,y_face_values.domain.min_corner.y);
     index_end=VECTOR<int,2>(y_face_values.domain.max_corner.x,y_face_values.domain.max_corner.y);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) {
-        opengl_points.points(index)=grid.Y_Face(TV_INT(i,j));
+        opengl_points.points(index)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j)));
         opengl_points.Set_Point_Color(index,color_map->Lookup(y_face_values(i,j)));
-        index++;
-    }
+        index++;}
     opengl_points.points.Resize(index);
 }
 //#####################################################################
@@ -103,11 +101,11 @@ Update()
     index_start=VECTOR<int,2>(x_face_values.domain.min_corner.x,x_face_values.domain.min_corner.y);
     index_end=VECTOR<int,2>(x_face_values.domain.max_corner.x,x_face_values.domain.max_corner.y);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++)
-        if(x_face_values(i,j)) opengl_points.points(index++)=grid.X_Face(TV_INT(i,j));
+        if(x_face_values(i,j)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j)));
     index_start=VECTOR<int,2>(y_face_values.domain.min_corner.x,y_face_values.domain.min_corner.y);
     index_end=VECTOR<int,2>(y_face_values.domain.max_corner.x,y_face_values.domain.max_corner.y);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++)
-        if(y_face_values(i,j)) opengl_points.points(index++)=grid.Y_Face(TV_INT(i,j));
+        if(y_face_values(i,j)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j)));
     opengl_points.points.Resize(index);
 }
 //#####################################################################
@@ -123,11 +121,11 @@ Update()
     index_start=VECTOR<int,2>(x_face_values.domain.min_corner.x,x_face_values.domain.min_corner.y);
     index_end=VECTOR<int,2>(x_face_values.domain.max_corner.x,x_face_values.domain.max_corner.y);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++)
-        if(x_face_values(i,j)) opengl_points.points(index++)=grid.X_Face(TV_INT(i,j));
+        if(x_face_values(i,j)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j)));
     index_start=VECTOR<int,2>(y_face_values.domain.min_corner.x,y_face_values.domain.min_corner.y);
     index_end=VECTOR<int,2>(y_face_values.domain.max_corner.x,y_face_values.domain.max_corner.y);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++)
-        if(y_face_values(i,j)) opengl_points.points(index++)=grid.Y_Face(TV_INT(i,j));
+        if(y_face_values(i,j)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j)));
     opengl_points.points.Resize(index);
 }
 //#####################################################################

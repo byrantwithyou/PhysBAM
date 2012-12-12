@@ -219,8 +219,8 @@ void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
 typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(const FACE_INDEX<TV::m>& f1,const FACE_INDEX<TV::m>& f2,T& theta,T& value) PHYSBAM_OVERRIDE
 {
     typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::unused;
-    TV X1=fluids_parameters.grid->Axis_X_Face(f1);
-    TV X2=fluids_parameters.grid->Axis_X_Face(f2);
+    TV X1=fluids_parameters.grid->Face(f1);
+    TV X2=fluids_parameters.grid->Face(f2);
     if(circle.Inside(X2,-fluids_parameters.grid->dX.Max()*(T)2)){ // circle
         theta=1;
         value=0;

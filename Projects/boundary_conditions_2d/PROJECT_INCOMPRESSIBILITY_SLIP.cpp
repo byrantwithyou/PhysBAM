@@ -133,7 +133,7 @@ void Project_Incompressibility_Slip(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >
     system.gradient.Times(x.v,temp);
     temp*=system.beta_inverse;
 
-    for(int i=0;i<index_to_face.m;i++) Add_Debug_Particle(grid.Axis_X_Face(index_to_face(i)),color(temp(i)));
+    for(int i=0;i<index_to_face.m;i++) Add_Debug_Particle(grid.Face(index_to_face(i)),color(temp(i)));
     Dump_Frame<RW>(u,"du");
 
     for(int i=0;i<index_to_face.m;i++) u(index_to_face(i))-=temp(i);

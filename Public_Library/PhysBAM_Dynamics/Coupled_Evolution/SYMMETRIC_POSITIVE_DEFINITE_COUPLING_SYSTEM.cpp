@@ -986,7 +986,7 @@ Mark_Valid_Faces(ARRAY<bool,FACE_INDEX<TV::m> >& valid) const
     for(int i=0;i<index_map.indexed_faces.m-1;i++){
         if(offsets(i)<offsets(i+1)){
             valid(index_map.indexed_faces(i))=true;
-            /*Add_Debug_Particle(index_map.grid.Axis_X_Face(index_map.indexed_faces(i)),VECTOR<typename TV::SCALAR,3>(0,1,0));*/}}
+            /*Add_Debug_Particle(index_map.grid.Face(index_map.indexed_faces(i)),VECTOR<typename TV::SCALAR,3>(0,1,0));*/}}
     Dump_Substep(temporary_faces,"after mark valid faces");
 }
 namespace PhysBAM{

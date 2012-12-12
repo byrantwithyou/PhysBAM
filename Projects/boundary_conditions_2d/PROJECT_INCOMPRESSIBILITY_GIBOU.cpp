@@ -241,7 +241,7 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
     system.gradient.Times(x.v,temp);
     temp*=system.beta_inverse;
 
-    for(int i=0;i<index_to_face.m;i++) Add_Debug_Particle(grid.Axis_X_Face(index_to_face(i)),color(temp(i)));
+    for(int i=0;i<index_to_face.m;i++) Add_Debug_Particle(grid.Face(index_to_face(i)),color(temp(i)));
     Dump_Frame<RW>(u,"du");
 
     for(int i=0;i<index_to_face.m;i++) u(index_to_face(i))-=temp(i);
@@ -264,15 +264,15 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
 */
 
     for(int i=0;i<index_to_face.m;i++){
-        if(callback.Inside(grid.Axis_X_Face(index_to_face(i))))
-            Add_Debug_Particle(grid.Axis_X_Face(index_to_face(i)),VECTOR<T,3>(0,0,1));
-        else Add_Debug_Particle(grid.Axis_X_Face(index_to_face(i)),VECTOR<T,3>(1,1,0));}
+        if(callback.Inside(grid.Face(index_to_face(i))))
+            Add_Debug_Particle(grid.Face(index_to_face(i)),VECTOR<T,3>(0,0,1));
+        else Add_Debug_Particle(grid.Face(index_to_face(i)),VECTOR<T,3>(1,1,0));}
 
     for(int i=0;i<index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),VECTOR<T,3>(0,1,0));
     Dump_Frame<RW>(u,"in-out tests");
 
     for(int i=0;i<index_to_face.m;i++){
-        TV X=grid.Axis_X_Face(index_to_face(i));
+        TV X=grid.Face(index_to_face(i));
         T uu=u(index_to_face(i));
         T au=callback.Analytic_Velocity(X,time)(index_to_face(i).axis);
         Add_Debug_Particle(X,color(abs(uu-au)));}

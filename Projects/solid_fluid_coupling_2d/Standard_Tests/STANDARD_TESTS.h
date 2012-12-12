@@ -697,8 +697,8 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::unused;
     COLLISION_GEOMETRY_ID body_id;
-    TV X1=fluids_parameters.grid->Axis_X_Face(f1);
-    TV X2=fluids_parameters.grid->Axis_X_Face(f2);
+    TV X1=fluids_parameters.grid->Face(f1);
+    TV X2=fluids_parameters.grid->Face(f2);
     T dx=(X1-X2).Magnitude();
     RAY<TV> ray(SEGMENT_2D<T>(X1,X2));
     bool found=collision_bodies_affecting_fluid.Closest_Non_Intersecting_Point_Of_Any_Body(ray,body_id);

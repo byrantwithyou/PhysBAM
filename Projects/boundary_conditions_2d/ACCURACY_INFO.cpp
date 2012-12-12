@@ -60,7 +60,7 @@ Print_Locations(const GRID<TV>& grid) const
     for(int i=0;i<cell_samples.m;i++) LOG::cout<<grid.X(cell_samples(i))<<" ";
     LOG::cout<<std::endl;
     LOG::cout<<"FACES-X ";
-    for(int i=0;i<face_samples.m;i++) LOG::cout<<grid.Axis_X_Face(face_samples(i))<<" ";
+    for(int i=0;i<face_samples.m;i++) LOG::cout<<grid.Face(face_samples(i))<<" ";
     LOG::cout<<std::endl;
 }
 

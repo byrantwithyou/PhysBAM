@@ -46,7 +46,7 @@ Compute_Error(ARRAY<T,FACE_INDEX<TV::m> >& u,T time) const
     int n=0;
     T L1=0,Li=0;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-        TV X(grid.Axis_X_Face(it.Full_Index()));
+        TV X(grid.Face(it.Full_Index()));
         if(!Inside(X)) continue;
         TV p=Analytic_Velocity(X,time);
         n++;

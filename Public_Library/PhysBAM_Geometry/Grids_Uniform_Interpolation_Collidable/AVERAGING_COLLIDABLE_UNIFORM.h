@@ -64,7 +64,7 @@ public:
 
     TV Face_To_Face_Vector(const T_GRID& grid,const int axis,const TV_INT& face_index,const T_FACE_LOOKUP& u_face) const
     {FACE_ITERATOR iterator(grid,axis,face_index);
-    const typename T_FACE_LOOKUP::LOOKUP& lookup=u_face.Starting_Point_Face(axis,face_index);lookup.Set_Reference_Point(grid.Face(axis,face_index));
+    const typename T_FACE_LOOKUP::LOOKUP& lookup=u_face.Starting_Point_Face(axis,face_index);lookup.Set_Reference_Point(grid.Face(FACE_INDEX<TV::m>(axis,face_index)));
     return AVERAGING_UNIFORM<T_GRID,T_FACE_LOOKUP>::Average_Face_To_Face_Vector_Helper(grid,iterator,lookup);}
 
 //#####################################################################

@@ -35,7 +35,7 @@ template<class TV> BOUNDARY_CONDITIONS_BOX<TV>::
     int n=0;
     T L1=0,Li=0;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,2);it.Valid();it.Next()){
-        TV X(grid.Axis_X_Face(it.Full_Index()));
+        TV X(grid.Face(it.Full_Index()));
         if(Theta(X)>grid.dX.Max()*2) continue;
         if(!Inside(X)) continue;
         T e=bounding_box.min_corner.y;
@@ -133,7 +133,7 @@ Initialize_Velocity_Field(ARRAY<T,FACE_INDEX<TV::m> >& u,T time) const
 {
     saved_u=&u;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,2);it.Valid();it.Next()){
-      if(this->check_leaks && Theta(grid.Axis_X_Face(it.Full_Index()))>boundary_gap){u(it.Full_Index())=1e10;continue;}
+      if(this->check_leaks && Theta(grid.Face(it.Full_Index()))>boundary_gap){u(it.Full_Index())=1e10;continue;}
         TV X=it.Location();
         X-=bounding_box.Center();
 //        X-=bounding_box.min_corner;

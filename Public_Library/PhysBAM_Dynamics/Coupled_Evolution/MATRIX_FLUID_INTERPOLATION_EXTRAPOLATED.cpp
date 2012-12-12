@@ -58,7 +58,7 @@ Compute(int ghost_cells)
         int sign=(entries(i).side==0)?-1:1;
         FACE_INDEX<d> face=entries(i).face_index;
         TV_INT cell=face.Cell_Index(entries(i).side);
-        T face_X=index_map.grid.Axis_X_Face(face)(face.axis),X=entries(i).X(face.axis),cell_X=index_map.grid.X(cell)(face.axis);
+        T face_X=index_map.grid.Face(face)(face.axis),X=entries(i).X(face.axis),cell_X=index_map.grid.X(cell)(face.axis);
         T alpha=(X-face_X)*sign/index_map.grid.dX(face.axis);
         PHYSBAM_ASSERT(index_map.face_indices(face));
         stencils(i).s(face.axis)(0)=PAIR<int,T>(index_map.face_indices(face),1-alpha);

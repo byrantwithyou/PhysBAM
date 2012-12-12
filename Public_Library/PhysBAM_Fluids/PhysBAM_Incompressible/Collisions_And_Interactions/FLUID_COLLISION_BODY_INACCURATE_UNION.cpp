@@ -127,9 +127,9 @@ Initialize_Grid_Structures_Subobject(T_FACE_ARRAYS_INT& face_velocities_count,T_
         if(phi_value<0) for(int axis=0;axis<T_GRID::dimension;axis++){
             TV_INT face1=iterator.First_Face_Index(axis),face2=iterator.Second_Face_Index(axis);
             if(face_operations.Component(axis)(face1)!=subobject){face_operations.Component(axis)(face1)=subobject;
-                face_velocities.Component(axis)(face1)=collision_body.Pointwise_Object_Velocity(grid.Face(axis,face1))[axis];face_velocities_count.Component(axis)(face1)++;}
+                face_velocities.Component(axis)(face1)=collision_body.Pointwise_Object_Velocity(grid.Face(FACE_INDEX<TV::m>(axis,face1)))[axis];face_velocities_count.Component(axis)(face1)++;}
             if(face_operations.Component(axis)(face2)!=subobject){face_operations.Component(axis)(face2)=subobject;
-                face_velocities.Component(axis)(face2)=collision_body.Pointwise_Object_Velocity(grid.Face(axis,face2))[axis];face_velocities_count.Component(axis)(face2)++;}}}
+                face_velocities.Component(axis)(face2)=collision_body.Pointwise_Object_Velocity(grid.Face(FACE_INDEX<TV::m>(axis,face2)))[axis];face_velocities_count.Component(axis)(face2)++;}}}
 }
 //##################################################################### 
 #define P(...) __VA_ARGS__

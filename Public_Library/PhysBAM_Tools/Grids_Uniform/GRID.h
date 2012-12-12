@@ -134,23 +134,8 @@ public:
     TV Center(const TV_INT& index) const
     {return domain.min_corner+(TV(index)+(T).5)*dX;}
 
-    TV Axis_X_Face(const INDEX_FACE& face) const
-    {return Axis_X_Face(face.index,face.axis);}
-
-    TV Axis_X_Face(const TV_INT& index,const int axis) const
-    {TV adjusted=TV(index)+(T).5;adjusted(axis)-=(T).5;return domain.min_corner+adjusted*dX;}
-
-    TV X_Face(const TV_INT& index) const
-    {return Axis_X_Face(index,0);}
-
-    TV Y_Face(const TV_INT& index) const
-    {return Axis_X_Face(index,1);}
-
-    TV Z_Face(const TV_INT& index) const
-    {return Axis_X_Face(index,2);}
-
-    TV Face(const int axis,const TV_INT& index) const
-    {TV shifted_index(TV(index)+(T).5);shifted_index(axis)-=(T).5;return domain.min_corner+shifted_index*dX;}
+    TV Face(const FACE_INDEX<TV::m>& index) const
+    {TV shifted_index=TV(index.index)+(T).5;shifted_index(index.axis)-=(T).5;return domain.min_corner+shifted_index*dX;}
 
     RANGE<TV> Face_Domain(const int axis,const TV_INT& index,const T thickness_over_two=0) const
     {TV dimensions=(T).5*dX;dimensions[axis]=thickness_over_two;RANGE<TV> domain(Face(axis,index));domain.Change_Size(dimensions);return domain;}

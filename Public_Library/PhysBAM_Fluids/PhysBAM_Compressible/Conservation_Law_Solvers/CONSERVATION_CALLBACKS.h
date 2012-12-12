@@ -22,7 +22,7 @@ public:
     {}
 
     virtual void Get_Neumann_Face_Location(const GRID<VECTOR<T,1> >& grid_1d,const int face_index,T& location) const
-    {location=grid_1d.Face(1,VECTOR<int,1>(face_index)).x;}
+    {location=grid_1d.Face(FACE_INDEX<1>(1,VECTOR<int,1>(face_index))).x;}
 };
 }
 #endif

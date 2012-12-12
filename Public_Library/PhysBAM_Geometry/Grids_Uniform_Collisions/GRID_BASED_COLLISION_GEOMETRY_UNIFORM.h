@@ -70,12 +70,12 @@ public:
 
     bool Cell_Center_Visible_From_Face(const TV_INT& cell,const int axis,const TV_INT& face_index) const
     {ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cell(cell,objects);if(!objects.m) return true;
-    return !collision_geometry_collection.Intersection_Between_Points(grid.Center(cell),grid.Face(axis,face_index),&objects);}
+    return !collision_geometry_collection.Intersection_Between_Points(grid.Center(cell),grid.Face(FACE_INDEX<TV::m>(axis,face_index)),&objects);}
 
     bool Face_Velocity(const int axis,const TV_INT& face_index,const TV_INT* cells,const int number_of_cells,const TV& X,T& face_velocity) const
     {ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cells(cells,number_of_cells,collision_geometry_collection.bodies.m,objects);if(!objects.m) return false;
     COLLISION_GEOMETRY_ID body_id;int triangle_id;TV intersection_point;
-    if(collision_geometry_collection.Intersection_Between_Points(X,grid.Face(axis,face_index),body_id,triangle_id,intersection_point,&objects)){
+    if(collision_geometry_collection.Intersection_Between_Points(X,grid.Face(FACE_INDEX<TV::m>(axis,face_index)),body_id,triangle_id,intersection_point,&objects)){
         face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(triangle_id,intersection_point)[axis];return true;}
     return false;}
 
@@ -97,17 +97,17 @@ public:
     return false;}
 
     bool Latest_Face_Crossover(const TV_INT& face_index,const int axis,const T dt) const
-    {COLLISION_GEOMETRY_ID body_id;int aggregate_id;TV initial_hit_point,X=grid.Axis_X_Face(face_index,axis);
+    {COLLISION_GEOMETRY_ID body_id;int aggregate_id;TV initial_hit_point,X=grid.Face(FACE_INDEX<TV::m>(axis,face_index));
     return Latest_Crossover(X,X,dt,body_id,aggregate_id,initial_hit_point);}
 
     bool Latest_Velocity_Crossover(const int axis,const TV_INT& face_index,const T dt,T& face_velocity) const
-    {COLLISION_GEOMETRY_ID body_id;int aggregate_id;TV initial_hit_point,X=grid.Face(axis,face_index);
+    {COLLISION_GEOMETRY_ID body_id;int aggregate_id;TV initial_hit_point,X=grid.Face(FACE_INDEX<TV::m>(axis,face_index));
     if(Latest_Crossover(X,X,dt,body_id,aggregate_id,initial_hit_point)){
         face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(aggregate_id,initial_hit_point)[axis];return true;}
     return false;}
 
     bool Latest_Velocity_Crossover(const int side,const int axis,const TV_INT& face_index,const T dt,T& face_velocity) const
-    {COLLISION_GEOMETRY_ID body_id;int aggregate_id;TV initial_hit_point,X=grid.Face(axis,face_index);
+    {COLLISION_GEOMETRY_ID body_id;int aggregate_id;TV initial_hit_point,X=grid.Face(FACE_INDEX<TV::m>(axis,face_index));
     if(Latest_Crossover(X,X,dt,body_id,aggregate_id,initial_hit_point)){
         face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(aggregate_id,initial_hit_point)[axis];return true;}
     ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cells(face_index,face_index-TV_INT::Axis_Vector(axis),collision_geometry_collection.bodies.m,objects);if(!objects.m) return false;

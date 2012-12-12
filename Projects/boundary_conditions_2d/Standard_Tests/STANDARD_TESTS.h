@@ -126,7 +126,7 @@ public:
             LOG::cout<<std::setprecision(16)<<std::endl;
             
             LOG::cout<<"LOCATIONS ";
-            for(int i=1;i<face_samples.m;i++) LOG::cout<<fluid_collection.grid.Axis_X_Face(face_samples(i))<<" ";
+            for(int i=1;i<face_samples.m;i++) LOG::cout<<fluid_collection.grid.Face(face_samples(i))<<" ";
             LOG::cout<<std::endl;
             Print_Samples("CONVERGENCE",fluid_collection.incompressible_fluid_collection.face_velocities);
             LOG::cout<<"LOCATIONS ";
@@ -273,7 +273,7 @@ T Get_Source_Velocity(const FACE_INDEX<2>& f) const
 //        if(!viscosity_only && f.axis==2) return 0; // Only force vertically in viscosity-only case.
         bool top_d=plane_types[3]==VBC::noslip || (plane_types[3]==VBC::slip && f.axis==2);
         bool bot_d=plane_types[1]==VBC::noslip || (plane_types[1]==VBC::slip && f.axis==2);
-        T y=(fluids_parameters.grid->Axis_X_Face(f).y-domain.min_corner.y)/(domain.max_corner.y-domain.min_corner.y);
+        T y=(fluids_parameters.grid->Face(f).y-domain.min_corner.y)/(domain.max_corner.y-domain.min_corner.y);
         if(top_d && bot_d) return y*(1-y)*(2*y+5);
         if(!top_d && bot_d) return y*((16*y-39)*y+30)/6;
         if(top_d && !bot_d) return (1-y)*((32*y+5)*y+5)/6;
@@ -405,8 +405,8 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 typename VBC::RAY_TYPE Get_Boundary_Along_Ray(const FACE_INDEX<TV::m>& f1,const FACE_INDEX<TV::m>& f2,T& theta,T& value) PHYSBAM_OVERRIDE
 {
     VECTOR<RANGE<TV_INT>,TV::dimension> fi=fluids_parameters.grid->Face_Indices(0);
-    TV X1=fluids_parameters.grid->Axis_X_Face(f1);
-    TV X2=fluids_parameters.grid->Axis_X_Face(f2);
+    TV X1=fluids_parameters.grid->Face(f1);
+    TV X2=fluids_parameters.grid->Face(f2);
 
     if(test_number==2 || test_number==3 || test_number==4){
         if(f2.index.x==fi(f2.axis).min_corner.x-(f2.axis!=1)){ // left
@@ -434,7 +434,7 @@ typename VBC::RAY_TYPE Get_Boundary_Along_Ray(const FACE_INDEX<TV::m>& f1,const 
 
     if(test_number==5){
         for(int i=0;i<4;i++) if(planes[i].Signed_Distance(X2)>=-outside_tolerance){
-                if(i==0 && f1.axis==1){value=velocity_multiplier*sqr(1-fluids_parameters.grid->Axis_X_Face(f2).y);}
+                if(i==0 && f1.axis==1){value=velocity_multiplier*sqr(1-fluids_parameters.grid->Face(f2).y);}
                 planes[i].Segment_Line_Intersection(X1,X2,theta);
                 theta=clamp(theta,(T)0,(T)1);
                 return plane_types[i];}}

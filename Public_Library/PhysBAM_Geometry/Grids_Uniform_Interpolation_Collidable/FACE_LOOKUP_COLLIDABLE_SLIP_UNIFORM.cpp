@@ -64,7 +64,7 @@ template<class T_GRID,class T_NESTED_LOOKUP> typename T_GRID::VECTOR_T::SCALAR F
 operator()(const int axis,const TV_INT& face) const
 {
     if(reference_point_set && using_reference_point){
-        TV location=face_lookup.body_list.grid.Face(axis,face);
+        TV location=face_lookup.body_list.grid.Face(FACE_INDEX<TV::m>(axis,face));
         int side;
         if(location[axis]>=reference_point[axis])
             side=0;
