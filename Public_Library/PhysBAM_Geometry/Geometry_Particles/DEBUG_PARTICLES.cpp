@@ -125,5 +125,9 @@ template void Add_Debug_Object<VECTOR<double,3> >(const VECTOR<VECTOR<double,3>,
 template void Add_Debug_Object<VECTOR<double,3> >(const VECTOR<VECTOR<double,3>,3>&,const VECTOR<double,3>&,const VECTOR<double,3>&);
 template void Add_Debug_Object<VECTOR<double,2> >(const VECTOR<VECTOR<double,2>,2>&,const VECTOR<double,3>&);
 template void Add_Debug_Object<VECTOR<double,2> >(const VECTOR<VECTOR<double,2>,3>&,const VECTOR<double,3>&,const VECTOR<double,3>&);
+template void Add_Debug_Object<VECTOR<double,1> >(const VECTOR<VECTOR<double,1>,2>&,const VECTOR<double,3>&);
+template void Add_Debug_Object<VECTOR<double,1> >(const VECTOR<VECTOR<double,1>,3>&,const VECTOR<double,3>&,const VECTOR<double,3>&);
+template void Add_Debug_Object<VECTOR<float,1> >(const VECTOR<VECTOR<float,1>,2>&,const VECTOR<float,3>&);
+template void Add_Debug_Object<VECTOR<float,1> >(const VECTOR<VECTOR<float,1>,3>&,const VECTOR<float,3>&,const VECTOR<float,3>&);
 }
 
