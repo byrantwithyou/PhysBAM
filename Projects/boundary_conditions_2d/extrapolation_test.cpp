@@ -2,6 +2,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
@@ -9,45 +10,67 @@
 
 using namespace PhysBAM;
 
-template<class T> T f(const VECTOR<T,2>& r){return cos(r.x)*sin(r.y);}
-
 typedef float RW;
 typedef double T;
-typedef VECTOR<T,2> TV;
-typedef VECTOR<int,2> TV_INT;
 
-int main(int argc,char* argv[])
+T f(const VECTOR<T,1>& X) {return cos(X.x);}
+T f(const VECTOR<T,2>& X) {return cos(X.x)*sin(X.y);};
+T f(const VECTOR<T,3>& X) {return cos(X.x)*sin(X.y)*sin(X.z);}
+template<class TV> T phi_f(const TV& X) {return X.Magnitude()-sqrt((T)2.0);};
+
+template<class TV>
+void Test(PARSE_ARGS& parse_args)
 {
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
+
     LOG::cout<<std::setprecision(2*sizeof(T));
 
-    int resolution=atoi(argv[1]);
-    int iterations=atoi(argv[2]);
-    int order=atoi(argv[3]);
-    int ghost=atoi(argv[4]);
+    int resolution=32;
+    int iterations=10;
+    int order=3;
+    int ghost=3;
+    parse_args.Add("-resolution",&resolution,"res","resolution");
+    parse_args.Add("-iterations",&iterations,"iter","iterations");
+    parse_args.Add("-order",&order,"iter","order of accuracy");
+    parse_args.Add("-ghost",&ghost,"ghost","number of layers to fill");
+    parse_args.Parse();
 
     GRID<TV> grid(TV_INT()+resolution,RANGE<TV>::Centered_Box()*(T)pi,true);
-    ARRAY<T,FACE_INDEX<TV::m> > x(grid.Domain_Indices(ghost));
-    ARRAY<bool,FACE_INDEX<TV::m> > inside(grid.Domain_Indices());
+    ARRAY<T,TV_INT> x(grid.Domain_Indices(ghost));
+    ARRAY<bool,TV_INT> inside(grid.Domain_Indices());
     ARRAY<T,TV_INT> p(grid.Domain_Indices());
     LEVELSET<TV> phi(grid,p);
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-        TV X(it.Location());
-        T r=X.Magnitude()-sqrt((T)2.0);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        TV X=it.Location();
+        T r=phi_f(X);
         p(it.index)=r;
         if(r<=0){
-            x(it.Full_Index())=f(it.Location());
-            inside(it.Full_Index())=true;}}
+            x(it.index)=f(X);
+            inside(it.index)=true;}}
 
-    EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Face(grid,phi,inside,ghost,x,iterations,order,ghost);
+    EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Cell(grid,phi,inside,ghost,x,iterations,order,ghost);
 
     T m=0;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         TV X(it.Location()),Y=X;
         T r=Y.Normalize(),c=sqrt((T)2.0);
-        T e=x(it.Full_Index())-f(X);
+        T e=x(it.index)-f(X);
         if(r-c<grid.dX.Max()*ghost) m=max(abs(e),m);}
     LOG::cout<<"L-inf "<<m<<std::endl;
+}
+
+int main(int argc,char* argv[])
+{
+    PARSE_ARGS parse_args(argc,argv);
+    int dim=2;
+    parse_args.Add("-dim",&dim,"dimension","run in 1D / 2D / 3D");
+    parse_args.Parse(true);
+    if(dim==1) Test<VECTOR<T,1> >(parse_args);
+    else if(dim==2) Test<VECTOR<T,2> >(parse_args);
+    else if(dim==3) Test<VECTOR<T,3> >(parse_args);
+    else PHYSBAM_FATAL_ERROR();
 
     return 0;
 }
