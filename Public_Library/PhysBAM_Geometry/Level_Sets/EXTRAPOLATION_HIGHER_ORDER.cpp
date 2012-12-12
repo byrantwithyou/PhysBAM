@@ -42,7 +42,7 @@ Add_Neighbors(MAPPING& m,ARRAY<TV_INT>& next,const ARRAY<TV_INT>& neighbors,cons
 // Function Register_Nodes
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
-Register_Nodes(const GRID<TV>& grid,const LEVELSET<TV>& phi,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,int ghost,MAPPING& m,ARRAY<TV>& normal,
+Register_Nodes(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,MAPPING& m,ARRAY<TV>& normal,
     ARRAY<VECTOR<STENCIL,TV::m> >& stencil,int order,int fill_width)
 {
     m.node_to_index.Resize(grid.Domain_Indices(ghost+1)); // Need an extra ring for the sentinals
@@ -178,7 +178,7 @@ Extrapolate_RK2(const MAPPING& m,const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,AR
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
-Extrapolate_Node(const GRID<TV>& grid,const LEVELSET<TV>& phi,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,
+Extrapolate_Node(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool(const TV_INT& index)> inside_mask,
     int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int iterations,int order,int fill_width)
 {
     PHYSBAM_ASSERT(order>=1 && order<=3);
@@ -202,7 +202,7 @@ Extrapolate_Node(const GRID<TV>& grid,const LEVELSET<TV>& phi,const ARRAYS_ND_BA
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
-Extrapolate_Cell(const GRID<TV>& grid,const LEVELSET<TV>& phi,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,
+Extrapolate_Cell(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool(const TV_INT& index)> inside_mask,
     int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int iterations,int order,int fill_width)
 {
     GRID<TV> node_grid(grid.Get_Regular_Grid_At_MAC_Positions());
@@ -212,12 +212,13 @@ Extrapolate_Cell(const GRID<TV>& grid,const LEVELSET<TV>& phi,const ARRAYS_ND_BA
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
-Extrapolate_Face(const GRID<TV>& grid,const LEVELSET<TV>& phi,const ARRAY<bool,FACE_INDEX<TV::m> >& inside_mask,
+Extrapolate_Face(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,
     int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& u,int iterations,int order,int fill_width)
 {
     for(int i=0;i<TV::m;i++){
         GRID<TV> node_grid(grid.Get_Face_Grid(i));
-        Extrapolate_Node(node_grid,phi,inside_mask.Component(i),ghost,u.Component(i),iterations,order,fill_width);}
+        Extrapolate_Node(node_grid,phi,[&](const TV_INT& index){return inside_mask(FACE_INDEX<TV::m>(i,index));},
+            ghost,u.Component(i),iterations,order,fill_width);}
 }
 namespace PhysBAM{
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,1>,float>;

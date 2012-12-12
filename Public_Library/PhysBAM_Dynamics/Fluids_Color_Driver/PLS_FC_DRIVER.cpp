@@ -433,22 +433,13 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color,int c)
 {
-    struct MASK_FACE:public EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::MASK_FACE
-    {
-        const ARRAY<int,FACE_INDEX<TV::dimension> >* face_color;
-        int c;
-        virtual bool Inside(const FACE_INDEX<TV::m>& index)
-        {return (*face_color)(index)==c;}
-    } mask;
-    mask.face_color=&color;
-    mask.c=c;
-
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next())
         if(color(it.Full_Index())!=c)
             u(it.Full_Index())=1e20;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         u(it.Full_Index())=0;
-    EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Face(example.grid,mask,example.number_of_ghost_cells,u,3,example.number_of_ghost_cells);
+    EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Face(example.grid,[&](const FACE_INDEX<TV::m>& index){return color(index)==c;},
+        example.number_of_ghost_cells,u,3,example.number_of_ghost_cells);
 }
 //#####################################################################
 // Function Extrapolate_Velocity

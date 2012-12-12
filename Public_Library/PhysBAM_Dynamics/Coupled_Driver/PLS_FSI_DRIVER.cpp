@@ -671,10 +671,8 @@ template<class TV> void PLS_FSI_DRIVER<TV>::
 Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const LEVELSET<TV>& phi,const T band_width)
 {
     T_GRID& grid=*example.fluids_parameters.grid;
-    ARRAY<bool,FACE_INDEX<TV::m> > inside;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
-        inside(it.Full_Index())=phi.Phi(it.Location())<=0;
-    EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Face(grid,phi,inside,(int)ceil(band_width)+1,face_velocities,20,example.fluids_parameters.number_of_ghost_cells,(int)ceil(band_width));
+    EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Face(grid,phi,[&](const FACE_INDEX<TV::m>& index){return phi.Phi(grid.Face(index))<=0;},
+        (int)ceil(band_width)+1,face_velocities,20,example.fluids_parameters.number_of_ghost_cells,(int)ceil(band_width));
 }
 //#####################################################################
 namespace PhysBAM{

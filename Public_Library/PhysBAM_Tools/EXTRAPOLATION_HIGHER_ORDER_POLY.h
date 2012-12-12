@@ -11,6 +11,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <boost/function.hpp>
 namespace PhysBAM{
 
 // TODO: Limit to near interface
@@ -22,18 +23,9 @@ class EXTRAPOLATION_HIGHER_ORDER_POLY:public NONCOPYABLE
 public:
     EXTRAPOLATION_HIGHER_ORDER_POLY();
     ~EXTRAPOLATION_HIGHER_ORDER_POLY();
-    struct MASK
-    {
-        virtual bool Inside(const TV_INT& index)=0;
-    };
-    struct MASK_FACE
-    {
-        virtual bool Inside(const FACE_INDEX<TV::m>& index)=0;
-    };
-
-    static void Extrapolate_Node(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,int order_reduction_penalty=3);
-    static void Extrapolate_Cell(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,int order_reduction_penalty=3);
-    static void Extrapolate_Face(const GRID<TV>& grid,MASK_FACE& inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int order,int fill_width,int order_reduction_penalty=3);
+    static void Extrapolate_Node(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,int order_reduction_penalty=3);
+    static void Extrapolate_Cell(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,int order_reduction_penalty=3);
+    static void Extrapolate_Face(const GRID<TV>& grid,boost::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int order,int fill_width,int order_reduction_penalty=3);
 //#####################################################################
 };
 }

@@ -156,17 +156,9 @@ Fill_Valid_Region_With_Exprapolation()
 {
     for(int i=0;i<phi.m;i++)
         for(int j=i+1;j<phi.m;j++){
-            struct LOCAL_MASK:public EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::MASK
-            {
-                const ARRAY<PAIRWISE_LEVEL_SET_DATA,TV_INT>& pairwise_data;
-                VECTOR<short,2> current_pair;
-                LOCAL_MASK(const ARRAY<PAIRWISE_LEVEL_SET_DATA,TV_INT>& pairwise_data,const VECTOR<short,2>& current_pair)
-                    :pairwise_data(pairwise_data),current_pair(current_pair)
-                {}
-                bool Inside(const TV_INT& index) PHYSBAM_OVERRIDE
-                {return pairwise_data(index).trust==current_pair;}
-            } inside_mask(pairwise_data,VECTOR<short,2>(i,j));
-            EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Node(grid,inside_mask,extrap_width,pairwise_phi(i)(j),3,extrap_width);
+            EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Node(grid,
+                [&](const TV_INT& index){return pairwise_data(index).trust==VECTOR<short,2>(i,j);},
+                extrap_width,pairwise_phi(i)(j),3,extrap_width);
             for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
                 int mask=(1<<i)|(1<<j);
                 T& p=pairwise_phi(i)(j)(it.index);
@@ -174,10 +166,10 @@ Fill_Valid_Region_With_Exprapolation()
                     PHYSBAM_ASSERT(p!=default_phi);}
                 else p=default_phi;}
             if(i<3) continue;
-    Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(4),VECTOR<T,3>(1,0,0));
-    Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(5),VECTOR<T,3>(0,1,0));
-    Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(4)(5),VECTOR<T,3>(0,0,1));
-    Global_Flush_Frame("extrap");}
+            Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(4),VECTOR<T,3>(1,0,0));
+            Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(5),VECTOR<T,3>(0,1,0));
+            Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(4)(5),VECTOR<T,3>(0,0,1));
+            Global_Flush_Frame("extrap");}
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(4),VECTOR<T,3>(1,0,0));
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(5),VECTOR<T,3>(0,1,0));
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(4)(5),VECTOR<T,3>(0,0,1));

@@ -25,7 +25,7 @@ template<class TV,class T2> EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T2>::
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T2>::
-Extrapolate_Node(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int order,int fill_width,int order_reduction_penalty)
+Extrapolate_Node(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int order,int fill_width,int order_reduction_penalty)
 {
     PHYSBAM_ASSERT(!grid.Is_MAC_Grid());
     PHYSBAM_ASSERT(fill_width<=ghost);
@@ -40,7 +40,7 @@ Extrapolate_Node(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE
 
     RANGE<TV_INT> domain(grid.Domain_Indices());
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,1);it.Valid();it.Next()){
-        if(domain.Lazy_Inside_Half_Open(it.index) && inside_mask.Inside(it.index)) continue;
+        if(domain.Lazy_Inside_Half_Open(it.index) && inside_mask(it.index)) continue;
         distance(it.index)|=1;
         for(int d=0;d<TV::m;d++){
             TV_INT ia(it.index),ib(it.index);
@@ -139,7 +139,7 @@ Extrapolate_Node(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE
         for(int d=0;d<TV::m;d++){
             TV_INT ia(pt),ib(pt);
             ia(d)--;ib(d)++;
-            if(!inside_mask.Inside(ia) || !inside_mask.Inside(ib)) continue;
+            if(!inside_mask(ia) || !inside_mask(ib)) continue;
             T ua=u(ia),ub=u(ib);
             uu+=dx(d)*(ub-ua)/2;
             if(order>=3) uu+=sqr(dx(d))*(ub-2*u0+ua)/2;}
@@ -148,14 +148,14 @@ Extrapolate_Node(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE
             for(int e=d+1;e<TV::m;e++){
                 TV_INT ia(pt),ib(pt),ic(pt),id(pt);
                 ia(d)--;ib(d)--;ic(d)++;id(d)++;ia(e)--;ib(e)++;ic(e)--;id(e)++;
-                if(!inside_mask.Inside(ia) || !inside_mask.Inside(ib) || !inside_mask.Inside(ic) || !inside_mask.Inside(id)) continue;
+                if(!inside_mask(ia) || !inside_mask(ib) || !inside_mask(ic) || !inside_mask(id)) continue;
                 uu+=dx(d)*dx(e)*(u(ia)-u(ib)-u(ic)+u(id))/4;}}
 }
 //#####################################################################
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T2>::
-Extrapolate_Cell(const GRID<TV>& grid,MASK& inside_mask,
+Extrapolate_Cell(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)> inside_mask,
     int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int order,int fill_width,int order_reduction_penalty)
 {
     GRID<TV> node_grid(grid.Get_Regular_Grid_At_MAC_Positions());
@@ -165,23 +165,13 @@ Extrapolate_Cell(const GRID<TV>& grid,MASK& inside_mask,
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T2>::
-Extrapolate_Face(const GRID<TV>& grid,MASK_FACE& inside_mask,
+Extrapolate_Face(const GRID<TV>& grid,boost::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,
     int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& u,int order,int fill_width,int order_reduction_penalty)
 {
-    struct COMPONENT_MASK:public MASK
-    {
-        int axis;
-        MASK_FACE* inside_mask;
-        virtual bool Inside(const TV_INT& index)
-        {
-            return inside_mask->Inside(FACE_INDEX<TV::m>(axis,index));
-        }
-    } mask;
-    mask.inside_mask=&inside_mask;
     for(int i=0;i<TV::m;i++){
         GRID<TV> node_grid(grid.Get_Face_Grid(i));
-        mask.axis=i;
-        Extrapolate_Node(node_grid,mask,ghost,u.Component(i),order,fill_width,order_reduction_penalty);}
+        Extrapolate_Node(node_grid,[&](const TV_INT& index){return inside_mask(FACE_INDEX<TV::m>(i,index));},
+            ghost,u.Component(i),order,fill_width,order_reduction_penalty);}
 }
 namespace PhysBAM{
 template class EXTRAPOLATION_HIGHER_ORDER_POLY<VECTOR<float,1>,float>;
