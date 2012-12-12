@@ -72,11 +72,6 @@ public:
         Initialize(counts,box,MAC_grid);
     }
 
-    GRID(const GRID<TV>& grid_input)
-    {
-        Initialize(grid_input.counts,grid_input.domain,grid_input.Is_MAC_Grid());
-    }
-
     template<class T2>
     GRID(const GRID<T2>& grid_input)
     {
