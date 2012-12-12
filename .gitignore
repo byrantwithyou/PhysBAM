@@ -34,3 +34,6 @@ Projects/fluids_color_3d/fluids_color_3d
 Projects/integration_test/levelset_color
 Projects/integration_test/test
 Projects/integration_test/bending
+Projects/poisson_color_new/poisson_color_new
+Projects/integration_test/marching_tets
+Projects/integration_test/quad
