@@ -14,8 +14,6 @@
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
-namespace KRYLOV{
-
 //#####################################################################
 // Struct IS_MATRIX
 //#####################################################################
@@ -47,6 +45,5 @@ struct MATRIX_SYSTEM:public KRYLOV_SYSTEM_BASE<T>
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const PHYSBAM_OVERRIDE;
 };
 //#####################################################################
-}
 }
 #endif

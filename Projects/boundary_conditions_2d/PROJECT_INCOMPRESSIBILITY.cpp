@@ -18,7 +18,7 @@ void Project_Incompressibility(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,c
 {
     typedef VECTOR<int,d> TV_INT;
     typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > T_VECTOR;
-    typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,T_VECTOR > T_SYSTEM;
+    typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,T_VECTOR > T_SYSTEM;
 
     Fill_Ghost_Cells(grid,3,3,u,callback);
 

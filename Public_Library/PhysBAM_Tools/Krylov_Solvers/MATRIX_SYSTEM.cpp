@@ -6,7 +6,6 @@
 #include <PhysBAM_Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 using namespace PhysBAM;
-using namespace KRYLOV;
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -93,8 +92,6 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
     P->Solve_Backward_Substitution(temp_vector->v,vz.v,false,true);
 }
 namespace PhysBAM{
-namespace KRYLOV{
 template struct MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<float>,float,KRYLOV_VECTOR_WRAPPER<float,ARRAY<float> > >;
 template struct MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<double>,double,KRYLOV_VECTOR_WRAPPER<double,ARRAY<double> > >;
-}
 }

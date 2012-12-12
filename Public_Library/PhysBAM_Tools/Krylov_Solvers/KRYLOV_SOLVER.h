@@ -10,8 +10,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 namespace PhysBAM{
-namespace KRYLOV{template<class T_MATRIX> struct IS_MATRIX;}
-
+template<class T_MATRIX> struct IS_MATRIX;
 enum KRYLOV_SOLVER_TYPE {krylov_solver_cg,krylov_solver_cr,krylov_solver_symmqmr};
 
 template<class T>

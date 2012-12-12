@@ -194,7 +194,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     LOG::cout<<"pressure jump range: "<<mn<<"  "<<mx<<std::endl;
     SPARSE_MATRIX_FLAT_NXN<T> matrix;
     helper.Set_Matrix(num_cells,matrix);
-    typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > > SYSTEM;
+    typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > > SYSTEM;
     matrix.Construct_Incomplete_Cholesky_Factorization();
     SYSTEM system(matrix);
     system.P=matrix.C;
@@ -339,7 +339,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b.v);}
 
     if(implicit){
-        typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > > SYSTEM;
+        typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > > SYSTEM;
         matrix.Construct_Incomplete_Cholesky_Factorization();
         SYSTEM system(matrix);
         system.P=matrix.C;
