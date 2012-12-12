@@ -29,6 +29,8 @@
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <iostream>
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -203,9 +205,17 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
     // ARRAY<T,TV_INT> phi_value(grid.Node_Indices());
     // ARRAY<int,TV_INT> phi_color(grid.Node_Indices());
 
-    for(int c=0;c<color_phi.m;c++)
+    for(int c=0;c<color_phi.m;c++){
         for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next())
             color_phi(c)(it.index)=at.analytic_levelset->dist(it.Location(),0,c-3);
+
+        LEVELSET<TV> ls(grid,color_phi(c),3);
+        Reinitialize(ls,20,(T)0,(T)grid.dX.Max()*5,(T)100,(T).9,3,5,1);
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+            T p=color_phi(c)(it.index);
+            Add_Debug_Particle(it.Location(),color_map[c]/(p>0?2:1));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,p);}
+        Flush_Frame<T,TV>("reinitialized level set");}
 
     INTERFACE_POISSON_SYSTEM_COLOR<TV> ips(grid,color_phi);
     ips.use_preconditioner=use_preconditioner;
@@ -575,13 +585,14 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     TV_INT counts=TV_INT()+resolution;
     GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1),true);
+    GRID<TV> grid2(counts*2,RANGE<TV>(TV(),TV()+1),true);
 
-    Global_Grid(&grid);
+    Global_Grid(&grid2);
 
     FILE_UTILITIES::Create_Directory(output_directory);
     FILE_UTILITIES::Create_Directory(output_directory+"/common");
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
-    FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
+    FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid2);
 
     if(test_analytic_diff) test.Test(grid.domain);
 

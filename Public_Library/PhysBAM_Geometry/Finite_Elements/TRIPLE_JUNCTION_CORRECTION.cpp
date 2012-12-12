@@ -20,6 +20,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <climits>
+#include <iomanip>
 using namespace PhysBAM;
 void (*Global_Flush_Frame)(const char* title)=0;
 template<class T>
@@ -45,6 +46,11 @@ void Emit_Rat(const GRID<TV>& grid,const RAT<T>& r,const TV_INT& cell,const VECT
 }
 
 template<class T,class TV,class TV_INT>
+void Handle_Square(const GRID<TV>& grid,const VECTOR<T,8>& phi,const TV_INT& cell,const VECTOR<T,3>& col)
+{
+}
+
+template<class T,class TV,class TV_INT>
 void Handle_Square(const GRID<TV>& grid,const VECTOR<T,4>& phi,const TV_INT& cell,const VECTOR<T,3>& col)
 {
     VECTOR<PAIR<T,T>,4> pts(PAIR<T,T>(2,2),PAIR<T,T>(2,2),PAIR<T,T>(2,2),PAIR<T,T>(2,2));
@@ -62,12 +68,26 @@ void Handle_Square(const GRID<TV>& grid,const VECTOR<T,4>& phi,const TV_INT& cel
             RAT<T> rat={phi(0),phi(2)-phi(0),phi(0)-phi(1),phi(1)+phi(2)-phi(0)-phi(3),pts(st).y,pts(st+1).y,false};
             Emit_Rat(grid,rat,cell,col);}}
 }
+
+template<class T,class TV,class TV_INT>
+void Dump_Interface(const GRID<TV>& grid,ARRAY_VIEW<T,TV_INT> p,const VECTOR<T,3>& col)
+{
+    T default_phi=(T)1.12349871352389e-10;
+    const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
+
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        VECTOR<T,(1<<TV::m)> phi(p.Subset(bits+it.index));
+        if(phi.Contains(default_phi)) continue;
+        if(phi.Min()>=0 || phi.Max()<=0) continue;
+        Handle_Square(grid,phi,it.index,col);}
+}
+
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> TRIPLE_JUNCTION_CORRECTION<TV>::
 TRIPLE_JUNCTION_CORRECTION(const GRID<TV>& grid,ARRAY<ARRAY<T,TV_INT> >& phi,int ghost)
-    :grid(grid),phi(phi),ghost(ghost),default_phi((T)1.12349871352389e-10),trust_buffer(grid.dX.Max()),
+    :grid(grid),phi(phi),ghost(ghost),default_phi((T)1.12349871352389e-10),trust_buffer(grid.dX.Max()*2),
     valid_width(ghost*grid.dX.Max()),extent(3*valid_width),extrap_width(2*ghost+3),bc_colors(3)
 {
 }
@@ -99,6 +119,13 @@ Compute_Pairwise_Data()
         if(data.trust.y<data.trust.x){
             exchange(data.trust.x,data.trust.y);
             data.phi=min.y;}}
+
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+        PAIRWISE_LEVEL_SET_DATA& data=pairwise_data(it.index);
+        if(data.trust.Contains(-1)) continue;
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+    }
+    Global_Flush_Frame("trust");
 }
 //#####################################################################
 // Function Initialize_Pairwise_Level_Set
@@ -119,6 +146,7 @@ Initialize_Pairwise_Level_Set()
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(data.trust.y==1,data.trust.Sum()==2,data.trust.x==1)/(1+(data.phi<0)));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(data.phi));
             pairwise_phi(data.trust.x)(data.trust.y)(it.index)=data.phi;}}
+    Global_Flush_Frame(__FUNCTION__);
 }
 //#####################################################################
 // Function Fill_Valid_Region_With_Exprapolation
@@ -144,7 +172,16 @@ Fill_Valid_Region_With_Exprapolation()
                 T& p=pairwise_phi(i)(j)(it.index);
                 if((pairwise_data(it.index).valid_flags&mask)==mask){
                     PHYSBAM_ASSERT(p!=default_phi);}
-                else p=default_phi;}}
+                else p=default_phi;}
+            if(i<3) continue;
+    Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(4),VECTOR<T,3>(1,0,0));
+    Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(5),VECTOR<T,3>(0,1,0));
+    Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(4)(5),VECTOR<T,3>(0,0,1));
+    Global_Flush_Frame("extrap");}
+    Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(4),VECTOR<T,3>(1,0,0));
+    Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(5),VECTOR<T,3>(0,1,0));
+    Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(4)(5),VECTOR<T,3>(0,0,1));
+    Global_Flush_Frame("after extrap");
 }
 //#####################################################################
 // Function One_Step_Triple_Junction_Correction
@@ -174,12 +211,16 @@ One_Step_Triple_Junction_Correction()
                                 bool b02=RANGE<TV>::Unit_Box().Lazy_Inside(Meet_Phi(VECTOR<PHI,2>(ab,bc)));
                                 bool b12=RANGE<TV>::Unit_Box().Lazy_Inside(Meet_Phi(VECTOR<PHI,2>(ac,bc)));
                                 if(!b01 && !b02 && !b12) continue;
+                                if(b01){Add_Debug_Particle(Meet_Phi(VECTOR<PHI,2>(ab,ac))*grid.dX+grid.Node(it.index),VECTOR<T,3>(1,0,0));LOG::cout<<std::setprecision(16)<<it.index<<"   "<<ab<<"   "<<ac<<"   "<<Meet_Phi(VECTOR<PHI,2>(ab,ac))<<std::endl;}
+                                if(b02) Add_Debug_Particle(Meet_Phi(VECTOR<PHI,2>(ab,bc))*grid.dX+grid.Node(it.index),VECTOR<T,3>(0,1,0));
+                                if(b12) Add_Debug_Particle(Meet_Phi(VECTOR<PHI,2>(ac,bc))*grid.dX+grid.Node(it.index),VECTOR<T,3>(0,0,1));
+                                LOG::cout<<it.index<<"  "<<b01<<b02<<b12<<"   "<<ab<<"   "<<ac<<"   "<<bc<<std::endl;
 
                                 VECTOR<T,3> pp;
-                                TV X=Zero_Phi(VECTOR<PHI,3>(ab,ac,bc),pp),Y=grid.domain.min_corner+grid.dX*(X+TV(it.index));
+                                TV X=Zero_Phi(VECTOR<PHI,3>(ab,ac,bc),pp),Y=X*grid.dX+grid.Node(it.index);
                                 Add_Debug_Particle(Y,VECTOR<T,3>(pp(0)>0,pp(1)>0,pp(2)>0));
                                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(pp(0)));
-                                Add_Debug_Particle(it.Location(),VECTOR<T,3>(pp(0)>0,pp(1)>0,pp(2)>0));
+//                                Add_Debug_Particle(it.Location(),VECTOR<T,3>(pp(0)>0,pp(1)>0,pp(2)>0));
                                 if(abs(pp(0))>max_move) pp*=max_move/abs(pp(0));
                                 for(int j=0;j<(1<<TV::m);j++){
                                     T& p01=total_size.Get_Or_Insert(TRIPLE<int,int,TV_INT>(a,b,bits(j)+it.index));
@@ -191,6 +232,7 @@ One_Step_Triple_Junction_Correction()
 
     for(typename HASHTABLE<TRIPLE<int,int,TV_INT>,T>::ITERATOR it(total_size);it.Valid();it.Next())
         pairwise_phi(it.Key().x)(it.Key().y)(it.Key().z)-=it.Data();
+//    Global_Flush_Frame(__FUNCTION__);
 }
 //#####################################################################
 // Function Fill_Combined_Level_Set_At_Index
@@ -282,6 +324,11 @@ Update_Color_Level_Sets()
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
 Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
 {
+    Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(4),VECTOR<T,3>(1,0,0));
+    Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(5),VECTOR<T,3>(0,1,0));
+    Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(4)(5),VECTOR<T,3>(0,0,1));
+    Global_Flush_Frame("pairwise ls");
+
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
@@ -305,6 +352,7 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
                     if(full_mask&(1<<b)){
                         if(!colors.Contains(a) && !colors.Contains(b)) continue;
                         VECTOR<T,(1<<TV::m)> phis(pairwise_phi(a)(b).Subset(bits+it.index));
+                        PHYSBAM_ASSERT(phis.Max() && phis.Min());
                         if(phis.Max()>0 && phis.Min()<0){
                             if(lone_a==-1){
                                 lone_a=a;
@@ -314,11 +362,11 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
                                 a=phi.m;
                                 break;}}}
         if(lone_a==-1) continue;
-        if(lone_a>=0){
-            PHYSBAM_ASSERT(colors.Contains(lone_a) && colors.Contains(lone_b));
+        if(lone_a>=0 && colors.Contains(lone_a) && colors.Contains(lone_b)){
             VECTOR<T,(1<<TV::m)> phis(pairwise_phi(lone_a)(lone_b).Subset(bits+it.index));
             CELL_ELEMENTS& ce=index_to_cell_data.Get_Or_Insert(it.index);
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,0,1));
+            LOG::cout<<phis<<"  "<<(colors-bc_colors)<<std::endl;
             for(int i=0;i<phis.m;i++) phis(i)=abs(phis(i));
             MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(ce.interface,ce.boundary,colors-bc_colors,phis,
                 grid.Cell_Domain(it.index));
@@ -339,17 +387,23 @@ Meet_Phi(const VECTOR<VECTOR<T,4> ,2>& phi)
     QUADRATIC<T> quad(-phi(0)(0)*phi(1)(3)+phi(0)(3)*phi(1)(0)+phi(0)(1)*phi(1)(2)-phi(0)(1)*phi(1)(0)+phi(0)(2)*phi(1)(3)-phi(0)(2)*phi(1)(1)+phi(0)(0)*phi(1)(1)-phi(0)(3)*phi(1)(2),-2*phi(0)(0)*phi(1)(1)+phi(0)(0)*phi(1)(3)-phi(0)(1)*phi(1)(2)+2*phi(0)(1)*phi(1)(0)+phi(0)(2)*phi(1)(1)-phi(0)(3)*phi(1)(0),-phi(0)(1)*phi(1)(0)+phi(0)(0)*phi(1)(1));
     quad.Compute_Roots();
     if(quad.roots==0){
+        return TV()+1e20;
+        printf("XXX   %.15g %.15g %.15g\n", quad.a, quad.b, quad.c);
         quad.roots=1;
         quad.root1=-quad.b/(2*quad.a);}
-    T ya[2]={quad.root1,quad.root2},ph[2]={FLT_MAX,FLT_MAX};
+    T ya[2]={quad.root1,quad.root2},ph[2]={FLT_MAX,FLT_MAX},ps[2]={FLT_MAX,FLT_MAX};
     TV X[2];
     for(int i=0;i<quad.roots;i++){
         if(abs(ya[i])>10) continue;
         T num=-phi(1)(0)-ya[i]*phi(1)(2)+ya[i]*phi(1)(0);
         T den=phi(1)(1)-phi(1)(0)+ya[i]*phi(1)(3)-ya[i]*phi(1)(2)-ya[i]*phi(1)(1)+ya[i]*phi(1)(0);
         X[i]=TV(num/den,ya[i]);
-        ph[i]=phi(0)(0)+(phi(0)(1)-phi(0)(0))*X[i].x+(phi(0)(2)-phi(0)(0))*X[i].y+(phi(0)(3)-phi(0)(2)-phi(0)(1)+phi(0)(0))*X[i].x*X[i].y;}
+        ph[i]=phi(0)(0)+(phi(0)(1)-phi(0)(0))*X[i].x+(phi(0)(2)-phi(0)(0))*X[i].y+(phi(0)(3)-phi(0)(2)-phi(0)(1)+phi(0)(0))*X[i].x*X[i].y;
+        ps[i]=phi(1)(0)+(phi(1)(1)-phi(1)(0))*X[i].x+(phi(1)(2)-phi(1)(0))*X[i].y+(phi(1)(3)-phi(1)(2)-phi(1)(1)+phi(1)(0))*X[i].x*X[i].y;
+}
 
+//    LOG::cout<<phi<<std::endl;
+    printf("xx %.15g %.15g    %.15g %.15g\n", ph[0],ps[0],ph[1],ps[1]);
     return X[abs(ph[1])<abs(ph[0])];
 }
 //#####################################################################
@@ -369,20 +423,24 @@ Zero_Phi(const VECTOR<VECTOR<T,4> ,3>& phi,VECTOR<T,3>& p)
     typedef VECTOR<T,2> TV;
     typedef VECTOR<T,(1<<TV::m)> PHI;
     p=VECTOR<T,3>()+FLT_MAX;
-    TV bestX,X;
+    TV bestX=TV()+1e20,X;
     T pp=0;
     X=Meet_Phi(VECTOR<PHI,2>(phi.x-phi.y,phi.x-phi.z));
-    pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
-    if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,pp,pp);bestX=X;}
+    if(X.Magnitude_Squared()<1e10){
+        pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
+        if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,pp,pp);bestX=X;}}
     X=Meet_Phi(VECTOR<PHI,2>(phi.x+phi.y,phi.x-phi.z));
-    pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
-    if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,-pp,pp);bestX=X;}
+    if(X.Magnitude_Squared()<1e10){
+        pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
+        if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,-pp,pp);bestX=X;}}
     X=Meet_Phi(VECTOR<PHI,2>(phi.x-phi.y,phi.x+phi.z));
-    pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
-    if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,pp,-pp);bestX=X;}
+    if(X.Magnitude_Squared()<1e10){
+        pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
+        if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,pp,-pp);bestX=X;}}
     X=Meet_Phi(VECTOR<PHI,2>(-phi.x+phi.y,-phi.x+phi.z));
-    pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
-    if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(-pp,pp,pp);bestX=X;}
+    if(X.Magnitude_Squared()<1e10){
+        pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
+        if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(-pp,pp,pp);bestX=X;}}
     return bestX;
 }
 //#####################################################################
@@ -453,6 +511,16 @@ Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE
         for(int i=index(c0);i>=0;i=pa(i))
             ar(k++)=ar(i);
         ar.Resize(k);}
+    if(cell.x==50 && cell.y==23){
+        LOG::cout<<colors<<std::endl;
+    for(int e=0;e<4;e++){
+        LOG::cout<<e<<" : ";
+        ARRAY<CROSSING>& ar=crossings(e);
+        for(int i=0;i<ar.m;i++){
+            LOG::cout<<ar(i).c0<<"  "<<ar(i).c1<<"     ";
+        }
+        LOG::cout<<std::endl;
+    }}
 
     bool empty=true;
     for(int e=0;e<4;e++)
@@ -462,7 +530,7 @@ Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE
 
     CELL_ELEMENTS& ce=index_to_cell_data.Get_Or_Insert(cell);
     for(int s=0;s<2;s++){
-        int c0=colors(2*s);
+        int c0=colors(3*s);
         TV X0=self.grid.Node(cell+bits(3*s)),X1=self.grid.Node(cell+bits(3*s^1)),X=X0;
         for(int i=0;i<crossings(2*s).m;i++){
             BOUNDARY_ELEMENT be={SEGMENT_2D<T>(X,crossings(2*s)(i).X),c0-self.bc_colors};
@@ -552,8 +620,9 @@ Compute_Pairwise_Level_Set_Data()
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+    Global_Flush_Frame(__FUNCTION__);
 
-    for(int t=0;t<3;t++)
+    for(int t=0;t<5;t++)
         One_Step_Triple_Junction_Correction();
 
     Update_Color_Level_Sets();

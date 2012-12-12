@@ -57,7 +57,7 @@ template<class TV,class CELL_ELEMENTS> void Dump(const GRID<TV>& grid,const HASH
     typedef typename MARCHING_CUBES_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
     typedef typename MARCHING_CUBES_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
     VECTOR<T,3> color_map[4]={VECTOR<T,3>(0,0.7,0),VECTOR<T,3>(0.8,0.8,0),VECTOR<T,3>(0,0.4,1),VECTOR<T,3>(0.8,0.2,0)};
-    T sep=(T).08;
+    T sep=(T).02;
     for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(index_to_cell_elements);it.Valid();it.Next()){
         const CELL_ELEMENTS& cell_elements=it.Data();
         const ARRAY<INTERFACE_ELEMENT>& interface_elements=cell_elements.interface;
@@ -104,7 +104,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
     cdi=new CELL_DOMAIN_INTERFACE_COLOR<TV>(grid,padding,mu.m,wrap); 
     cm_u=new CELL_MANAGER_COLOR<TV>(*cdi);
 
-    TRIPLE_JUNCTION_CORRECTION<TV> tjc(phi_grid.Get_Regular_Grid(),color_phi,ghost);
+    TRIPLE_JUNCTION_CORRECTION<TV> tjc(phi_grid.Get_Regular_Grid(),color_phi,ghost*2);
     tjc.Compute_Pairwise_Level_Set_Data();
     tjc.Cut_Interface(cdi->index_to_cell_elements);
     Dump(grid,cdi->index_to_cell_elements);
