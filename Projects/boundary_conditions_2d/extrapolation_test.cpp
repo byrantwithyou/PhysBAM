@@ -4,6 +4,7 @@
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <iomanip>
@@ -17,6 +18,7 @@ T f(const VECTOR<T,1>& X) {return cos(X.x);}
 T f(const VECTOR<T,2>& X) {return cos(X.x)*sin(X.y);};
 T f(const VECTOR<T,3>& X) {return cos(X.x)*sin(X.y)*sin(X.z);}
 template<class TV> T phi_f(const TV& X) {return X.Magnitude()-sqrt((T)2.0);};
+//template<class TV> T phi_f(const TV& X) {return X.Max_Abs()-sqrt((T)2.0);};
 
 template<class TV>
 void Test(PARSE_ARGS& parse_args)
@@ -41,6 +43,8 @@ void Test(PARSE_ARGS& parse_args)
     ARRAY<bool,TV_INT> inside(grid.Domain_Indices());
     ARRAY<T,TV_INT> p(grid.Domain_Indices());
     LEVELSET<TV> phi(grid,p);
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid,"output");
+    vo.debug_particles.edge_separation=(T).02;
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         TV X=it.Location();
@@ -55,10 +59,11 @@ void Test(PARSE_ARGS& parse_args)
     T m=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         TV X(it.Location()),Y=X;
-        T r=Y.Normalize(),c=sqrt((T)2.0);
+        T r=phi_f(X);
         T e=x(it.index)-f(X);
-        if(r-c<grid.dX.Max()*ghost) m=max(abs(e),m);}
+        if(r<grid.dX.Max()*ghost) m=max(abs(e),m);}
     LOG::cout<<"L-inf "<<m<<std::endl;
+    vo.Flush_Frame("Finish");
 }
 
 int main(int argc,char* argv[])
