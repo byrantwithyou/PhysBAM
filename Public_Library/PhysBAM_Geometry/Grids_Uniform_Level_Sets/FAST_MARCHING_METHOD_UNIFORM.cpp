@@ -56,7 +56,7 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,c
         if(stopping_distance && abs(phi_new(index)) > stopping_distance){ // exit early
             for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()) if(!done(iterator.Cell_Index())){
                 phi_new(iterator.Cell_Index())=LEVELSET_UTILITIES<T>::Sign(phi_new(iterator.Cell_Index()))*stopping_distance;}
-            return;}
+            break;}
         done(index)=true;close_k(index)=-1; // add to done, remove from close
         FAST_MARCHING<T>::Down_Heap(phi_new,close_k,heap,heap_length);heap_length--; // remove point from heap
 
