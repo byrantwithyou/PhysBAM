@@ -36,6 +36,10 @@ public:
     static void Extrapolate_Node(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int iterations,int order,int fill_width);
     static void Extrapolate_Cell(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int iterations,int order,int fill_width);
     static void Extrapolate_Face(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int iterations,int order,int fill_width);
+
+    static void Extrapolate_Node_No_Levelset(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int iterations,int order,int fill_width,int smooth_steps=50);
+    static void Extrapolate_Cell_No_Levelset(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int iterations,int order,int fill_width,int smooth_steps=50);
+    static void Extrapolate_Face_No_Levelset(const GRID<TV>& grid,boost::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int iterations,int order,int fill_width,int smooth_steps=50);
 protected:
     static void Add_Neighbors(MAPPING& m,ARRAY<TV_INT>& next,const ARRAY<TV_INT>& neighbors,const TV_INT& index,int unregistered,int registered);
     static void Register_Nodes(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,MAPPING& m,ARRAY<TV>& normal,

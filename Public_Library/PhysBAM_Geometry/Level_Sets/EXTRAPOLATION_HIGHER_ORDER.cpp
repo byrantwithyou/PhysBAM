@@ -3,8 +3,15 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
+#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <climits>
@@ -219,6 +226,130 @@ Extrapolate_Face(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bo
         GRID<TV> node_grid(grid.Get_Face_Grid(i));
         Extrapolate_Node(node_grid,phi,[&](const TV_INT& index){return inside_mask(FACE_INDEX<TV::m>(i,index));},
             ghost,u.Component(i),iterations,order,fill_width);}
+}
+//#####################################################################
+// Function Smooth_With_Heat_Equation
+//#####################################################################
+template<class T,class TV,class T2,class TV_INT> void
+Smooth_With_Heat_Equation(const GRID<TV>& grid,ARRAY<T2,TV_INT>& phi,T frac,int n)
+{
+    ARRAY<T2,TV_INT> tmp(phi.domain);
+    for(int i=0;i<n;i++){
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+            T x=0;
+            for(int d=0;d<TV::m;d++){
+                TV_INT a(it.index),b(it.index);
+                a(d)--;
+                b(d)++;
+                x+=phi(a)+phi(b);}
+            tmp(it.index)=x;}
+        phi.Copy(frac/(2*TV::m),tmp,1-frac,phi);
+
+        Dump_Levelset(grid,phi,VECTOR<T,3>(1,0,0));
+        phi.array+=grid.dX.Max()*6;
+        Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
+        phi.array-=grid.dX.Max()*12;
+        Dump_Levelset(grid,phi,VECTOR<T,3>(0,0,1));
+        phi.array+=grid.dX.Max()*6;
+        Flush_Frame<TV>("after heat");}
+}
+//#####################################################################
+// Function Extrapolate_Node_No_Levelset
+//#####################################################################
+template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
+Extrapolate_Node_No_Levelset(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int iterations,int order,int fill_width,int smooth_steps)
+{
+    ARRAY<T,TV_INT> phi(grid.Node_Indices(ghost+1),true,1);
+    ARRAY<TV_INT> seed_indices;
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+        if(inside_mask(it.index))
+            phi(it.index)=-1;
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+        if(phi(it.index)==-1)
+            for(int d=0;d<TV::m;d++){
+                TV_INT a(it.index),b(it.index);
+                a(d)--;
+                b(d)++;
+                if(phi(a)==1 || phi(b)==1){
+                    phi(it.index)=0;
+                    seed_indices.Append(it.index);
+                    break;}}
+
+    LEVELSET<TV> levelset(const_cast<GRID<TV>&>(grid),phi,ghost+1);
+    Dump_Levelset(grid,phi,VECTOR<T,3>(1,0,0));
+    phi.array+=grid.dX.Max()*6;
+    Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
+    phi.array-=grid.dX.Max()*12;
+    Dump_Levelset(grid,phi,VECTOR<T,3>(0,0,1));
+    phi.array+=grid.dX.Max()*6;
+
+    Flush_Frame<TV>("after init");
+
+    Reinitialize(levelset,(ghost+2)*20,(T)0,(ghost+2)*grid.dX.Max()*20,(T)0,(T).9,3,5,0);
+
+    Dump_Levelset(grid,phi,VECTOR<T,3>(1,0,0));
+    phi.array+=grid.dX.Max()*6;
+    Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
+    phi.array-=grid.dX.Max()*12;
+    Dump_Levelset(grid,phi,VECTOR<T,3>(0,0,1));
+    phi.array+=grid.dX.Max()*6;
+
+    Flush_Frame<TV>("after reinit");
+
+    Smooth_With_Heat_Equation(grid,phi,(T).8,smooth_steps);
+
+    Reinitialize(levelset,(ghost+2)*20,(T)0,(ghost+2)*grid.dX.Max()*20,(T)0,(T).9,3,5,0);
+    Dump_Levelset(grid,phi,VECTOR<T,3>(1,0,0));
+    phi.array+=grid.dX.Max()*6;
+    Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
+    phi.array-=grid.dX.Max()*12;
+    Dump_Levelset(grid,phi,VECTOR<T,3>(0,0,1));
+    phi.array+=grid.dX.Max()*6;
+
+    Flush_Frame<TV>("after reinit");
+
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,levelset.Normal(it.Location()));}
+    Flush_Frame<TV>("normals");
+
+    Extrapolate_Node(grid,levelset,inside_mask,ghost,u,iterations,order,fill_width);
+}
+//#####################################################################
+// Function Extrapolate_Cell_No_Levelset
+//#####################################################################
+template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
+Extrapolate_Cell_No_Levelset(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int iterations,int order,int fill_width,int smooth_steps)
+{
+    GRID<TV> node_grid(grid.Get_Regular_Grid_At_MAC_Positions());
+    Extrapolate_Node_No_Levelset(node_grid,inside_mask,ghost,u,iterations,order,fill_width,smooth_steps);
+}
+//#####################################################################
+// Function Extrapolate_Face_No_Levelset
+//#####################################################################
+template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
+Extrapolate_Face_No_Levelset(const GRID<TV>& grid,boost::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& u,int iterations,int order,int fill_width,int smooth_steps)
+{
+    ARRAY<T,TV_INT> phi(grid.Domain_Indices(ghost+1),true,0);
+    ARRAY<TV_INT> seed_indices;
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
+        if(inside_mask(it.Full_Index())){
+            phi(it.First_Cell_Index())++;
+            phi(it.Second_Cell_Index())++;}
+    T scale=grid.dX.Max()/TV::m;
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        T& p=phi(it.index);
+        if(p!=0 && p!=TV::m*2) seed_indices.Append(it.index);
+        p=(p-TV::m)*scale;}
+
+    LEVELSET<TV> levelset(const_cast<GRID<TV>&>(grid),phi,ghost+1);
+    FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(levelset,ghost+2);
+    fmm.Fast_Marching_Method(phi,grid.dX.Max()*(ghost+2),&seed_indices);
+    Reinitialize(levelset,(ghost+2)*20,(T)0,(ghost+2)*grid.dX.Max()*20,(T)10,(T).9,3,5,0);
+    Smooth_With_Heat_Equation(grid,phi,(T).8,smooth_steps);
+    Reinitialize(levelset,(ghost+2)*20,(T)0,(ghost+2)*grid.dX.Max()*20,(T)10,(T).9,3,5,0);
+
+    Extrapolate_Face(grid,levelset,inside_mask,ghost,u,iterations,order,fill_width);
 }
 namespace PhysBAM{
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,1>,float>;
