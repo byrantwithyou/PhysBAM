@@ -15,6 +15,7 @@ namespace PhysBAM{
 
 template<class T> class TRIANGULATED_SURFACE;
 template<class T> class SEGMENTED_CURVE;
+template<class T> class POINT_SIMPLICES_1D;
 template<class T> class TRIANGLE_3D;
 template<class T> class SEGMENT_2D;
 template<class TV> class GRID;
