@@ -69,8 +69,12 @@ Display(const int in_color) const
     vertices.Remove_All();
 
     for(int i=0;i<debug_objects.m;i++)
-        if(debug_objects(i).type==DEBUG_OBJECT<TV>::segment)
-            OPENGL_SHAPES::Draw_Segment(debug_objects(i).X(0),debug_objects(i).X(1),OPENGL_COLOR(debug_objects(i).color),2);
+        if(debug_objects(i).type==DEBUG_OBJECT<TV>::segment){
+            if(debug_objects(i).separation && debug_objects(i).bgcolor!=debug_objects(i).color){
+                TV t=debug_objects(i).X(1)-debug_objects(i).X(0),n=t.Unit_Orthogonal_Vector()*debug_objects(i).separation;
+                OPENGL_SHAPES::Draw_Segment(debug_objects(i).X(0)+n,debug_objects(i).X(1)+n,OPENGL_COLOR(debug_objects(i).color),2);
+                OPENGL_SHAPES::Draw_Segment(debug_objects(i).X(0)-n,debug_objects(i).X(1)-n,OPENGL_COLOR(debug_objects(i).bgcolor),2);}
+            else OPENGL_SHAPES::Draw_Segment(debug_objects(i).X(0),debug_objects(i).X(1),OPENGL_COLOR(debug_objects(i).color),2);}
 
     glPopAttrib();
 
