@@ -93,6 +93,10 @@ public:
         :x(vector_input.x),y(vector_input.y),z(T())
     {}
 
+    explicit VECTOR(const VECTOR<T,1>& vector_input)
+        :x(vector_input.x),y(T()),z(T())
+    {}
+
     template<int n>
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,3-n>& v2)
     {
