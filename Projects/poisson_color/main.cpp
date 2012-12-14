@@ -29,6 +29,7 @@
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
+#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <iostream>
@@ -39,16 +40,6 @@
 using namespace PhysBAM;
 
 typedef float RW;
-std::string output_directory="output";
-
-template<class TV>
-GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
-{
-    static GRID<TV>* grid=0;
-    GRID<TV>* old_grid=grid;
-    if(grid_in) grid=grid_in;
-    return old_grid;
-}
 
 typedef VECTOR<double,3> TV3;
 TV3 color_map[7]={TV3(.5,.5,.5),TV3(.8,.8,.8),TV3(1,1,1),TV3(0,0.7,0),TV3(0.8,0.8,0),TV3(0,0.4,1),TV3(0.8,0.2,0)};
@@ -56,32 +47,6 @@ TV3 color_map[7]={TV3(.5,.5,.5),TV3(.8,.8,.8),TV3(1,1,1),TV3(0,0.7,0),TV3(0.8,0.
 //#################################################################################################################################################
 // Debug Particles ################################################################################################################################
 //#################################################################################################################################################
-
-template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles()
-{
-    static DEBUG_PARTICLES<TV> debug_particles;
-    return debug_particles;
-}
-
-template<class T, class TV>
-void Dump_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& u,const char* title)
-{
-    static int frame=0;
-    char buff[100];
-    sprintf(buff, "%s/%i", output_directory.c_str(), frame);
-    FILE_UTILITIES::Create_Directory(buff);
-    FILE_UTILITIES::Write_To_File<RW>((std::string)buff+"/mac_velocities.gz",u);
-    if(title) FILE_UTILITIES::Write_To_Text_File((std::string)buff+"/frame_title",title);
-    Get_Debug_Particles<TV>().Write_Debug_Particles(STREAM_TYPE((RW())),output_directory,frame);
-    frame++;
-}
-
-extern void (*Global_Flush_Frame)(const char* title);
-template<class T,class TV>
-void Flush_Frame(const char* title)
-{
-    Dump_Frame<T,TV>(ARRAY<T,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),title);
-}
 
 template<class T,class TV>
 void Dump_Interface(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips)
@@ -113,13 +78,13 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_POISSON_
     typedef VECTOR<int,TV::m> TV_INT;
 
     Dump_Interface<T,TV>(ips);
-    Flush_Frame<T,TV>("surfaces");
+    Flush_Frame<TV>("surfaces");
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
         int c=0;
         at.analytic_levelset->phi(it.Location(),0,c);
         Add_Debug_Particle(it.Location(),color_map[c+3]);}
-    Flush_Frame<T,TV>("level set");
+    Flush_Frame<TV>("level set");
     
     char buff[100];
     for(int c=0;c<ips.cdi->colors;c++){
@@ -134,7 +99,7 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_POISSON_
                     if(ips.cm_u->Get_Index(it.index,c_other)>=0) duplicated=true;}
                 if(duplicated) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,1));
                 else Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));}}                        
-        Flush_Frame<T,TV>(buff);}
+        Flush_Frame<TV>(buff);}
 
     for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(ips.cdi->index_to_cell_elements);it.Valid();it.Next()){
         const CELL_ELEMENTS& cell_elements=it.Data();
@@ -156,7 +121,7 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_POISSON_
             T f_volume=-at.mu(c)*at.analytic_solution(c)->Laplacian(it.Location());
             Add_Debug_Particle(it.Location(),f_volume==0?VECTOR<T,3>(0.25,0.25,0.25):(f_volume>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,f_volume);}}
-        Flush_Frame<T,TV>("volumetric forces");
+        Flush_Frame<TV>("volumetric forces");
 }
 
 template<class T,class TV>
@@ -172,7 +137,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const INTERFACE_P
                 T u_value=v.u(c)(k);
                 Add_Debug_Particle(it.Location(),u_value==0?VECTOR<T,3>(0.25,0.25,0.25):(u_value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,u_value);}}
-        Flush_Frame<T,TV>(buff);}
+        Flush_Frame<TV>(buff);}
 }
 
 template<class T,class TV>
@@ -186,7 +151,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const ARRAY<T,VEC
         T u_value=u(it.index);
         Add_Debug_Particle(it.Location(),u_value==0?VECTOR<T,3>(0.25,0.25,0.25):(u_value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,u_value);}
-    Flush_Frame<T,TV>(title);
+    Flush_Frame<TV>(title);
 }
 
 //#################################################################################################################################################
@@ -215,7 +180,12 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
             T p=color_phi(c)(it.index);
             Add_Debug_Particle(it.Location(),color_map[c]/(p>0?2:1));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,p);}
-        Flush_Frame<T,TV>("reinitialized level set");}
+        Flush_Frame<TV>("reinitialized level set");
+        LEVELSET<TV> levelset(grid,color_phi(c),1);
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,levelset.Normal(it.Location()));}
+        Flush_Frame<TV>("normals");}
 
     INTERFACE_POISSON_SYSTEM_COLOR<TV> ips(grid,color_phi);
     ips.use_preconditioner=use_preconditioner;
@@ -317,15 +287,12 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 
-    Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
-
-    Global_Flush_Frame=&Flush_Frame<T,TV>;
-
     T m=1,s=1,kg=1;
     int threads=1;
     int test_number=1,resolution=4,max_iter=1000000;
     bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,opt_arg=false;
     bool test_analytic_diff=false;
+    std::string output_directory="output";
     parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-m",&m,"unit","meter scale");
@@ -517,6 +484,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
+            test.mu.Append(4);
             test.use_discontinuous_scalar_field=true;
             struct ANALYTIC_POISSON_LEVELSET_11:public ANALYTIC_LEVELSET<TV>
             {
@@ -545,7 +513,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     for(i=0;i<2;i++) if(x.Dot(normals((i+1)%3))>=0 && x.Dot(normals((i+2)%3))<0) break;
                     T d=(x-centers(i)).Magnitude();
                     if(d>r && x.Magnitude()>r/100){
-                        c=-2;
+                        c=3;
                         return d-r;}
                     c=i;
                     return min(abs(d-r),abs(x.Dot(normals((i+1)%3))),abs(x.Dot(normals((i+2)%3))));
@@ -554,9 +522,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 {
                     // Rough approximation
                     TV x=X-0.5+a;
-                    if(c==-2){
+                    if(c==3){
                         VECTOR<T,3> D((x-centers(0)).Magnitude()-r,(x-centers(1)).Magnitude()-r,(x-centers(2)).Magnitude()-r);
-                        return (x-centers(D.Arg_Min())).Normalized();}
+                        return -(x-centers(D.Arg_Min())).Normalized();}
+                    if(c<0) return TV::Axis_Vector(0);
                     T x_dot_n0=-x.Dot(normals((c+1)%3)),x_dot_n1=x.Dot(normals((c+2)%3));
                     T d=(x-centers(c)).Magnitude()-r;
                     if(d>x_dot_n0 && d>x_dot_n1) return (x-centers(c)).Normalized();
@@ -567,9 +536,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 {
                     // Rough approximation
                     TV x=X-0.5+a;
-                    if(c==-2){
+                    if(c==3){
                         VECTOR<T,3> D((x-centers(0)).Magnitude()-r,(x-centers(1)).Magnitude()-r,(x-centers(2)).Magnitude()-r);
-                        return D.Min();}
+                        return -D.Min();}
+                    if(c<0) return ANALYTIC_LEVELSET<TV>::Large_Phi();
                     T x_dot_n0=-x.Dot(normals((c+1)%3)),x_dot_n1=x.Dot(normals((c+2)%3));
                     T d=(x-centers(c)).Magnitude()-r;
                     return max(max(x_dot_n0,x_dot_n1),d);
@@ -579,6 +549,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(1,0,TV::Axis_Vector(0),TV()));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(0,1,TV::Axis_Vector(1),TV()));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_QUADRATIC<TV>(MATRIX<T,TV::m>()+1,TV(),0));
+            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
             break;}
         default:{
             LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
@@ -587,12 +558,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1),true);
     GRID<TV> grid2(counts*2,RANGE<TV>(TV(),TV()+1),true);
 
-    Global_Grid(&grid2);
-
-    FILE_UTILITIES::Create_Directory(output_directory);
-    FILE_UTILITIES::Create_Directory(output_directory+"/common");
-    LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
-    FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid2);
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid2,output_directory);
+    vo.debug_particles.edge_separation=(T).02;
 
     if(test_analytic_diff) test.Test(grid.domain);
 
@@ -601,17 +568,17 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         T p=test.analytic_levelset->phi(it.Location(),0,c);
         Add_Debug_Particle(it.Location(),color_map[c+3]);
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,p);}
-    Flush_Frame<T,TV>("level set");
+    Flush_Frame<TV>("level set");
     for(int c=-3;c<test.analytic_solution.m;c++){
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
             T p=test.analytic_levelset->dist(it.Location(),0,c);
             Add_Debug_Particle(it.Location(),color_map[c+3]/(p>0?2:1));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,test.analytic_levelset->N(it.Location(),0,c));}
-        Flush_Frame<T,TV>("normals");}
+        Flush_Frame<TV>("normals");}
 
     Analytic_Test(grid,test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
-    Flush_Frame<T,TV>("finish");
+    Flush_Frame<TV>("finish");
     LOG::Finish_Logging();
 }
 
