@@ -78,13 +78,26 @@ Register_Nodes(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool
         if(b) Add_Neighbors(m,next_outside,neighbors_outside,it.index,-1,-3);
         else Add_Neighbors(m,next_inside,neighbors_inside,it.index,-2,-4);}
 
+    VECTOR<T,3> col(1,0,0);
+
+    for(int j=0;j<current.m;j++)
+        Add_Debug_Particle(grid.Node(current(j)),VECTOR<T,3>(0,0,1));
+
     for(int o=0;o<fill_width;o++){
         current.Exchange(next_outside);
         for(int j=0;j<current.m;j++){
             m.node_to_index(current(j))=m.index_to_node.Append(current(j));
             Add_Neighbors(m,next_outside,neighbors_outside,current(j),-1,-3);}
-        current.Remove_All();}
+
+        for(int j=0;j<next_outside.m;j++)
+            Add_Debug_Particle(grid.Node(next_outside(j)),col);
+
+        current.Remove_All();
+        exchange(col.x,col.y);}
     next_outside.Remove_All();
+    Add_Debug_Particle(grid.Node(m.node_to_index.domain.min_corner),VECTOR<T,3>(1,1,1));
+    Add_Debug_Particle(grid.Node(m.node_to_index.domain.max_corner),VECTOR<T,3>(1,1,1));
+    Flush_Frame<TV>("register");
 
     for(int i=1;i<m.index_to_node.m;i++){
         TV N=phi.Normal(grid.X(m.index_to_node(i)));
@@ -231,11 +244,11 @@ Extrapolate_Face(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bo
 // Function Smooth_With_Heat_Equation
 //#####################################################################
 template<class T,class TV,class T2,class TV_INT> void
-Smooth_With_Heat_Equation(const GRID<TV>& grid,ARRAY<T2,TV_INT>& phi,T frac,int n)
+Smooth_With_Heat_Equation(const GRID<TV>& grid,int ghost,ARRAY<T2,TV_INT>& phi,T frac,int n)
 {
     ARRAY<T2,TV_INT> tmp(phi.domain);
     for(int i=0;i<n;i++){
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost-1);it.Valid();it.Next()){
             T x=0;
             for(int d=0;d<TV::m;d++){
                 TV_INT a(it.index),b(it.index);
@@ -246,11 +259,6 @@ Smooth_With_Heat_Equation(const GRID<TV>& grid,ARRAY<T2,TV_INT>& phi,T frac,int 
         phi.Copy(frac/(2*TV::m),tmp,1-frac,phi);
 
         Dump_Levelset(grid,phi,VECTOR<T,3>(1,0,0));
-        phi.array+=grid.dX.Max()*6;
-        Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
-        phi.array-=grid.dX.Max()*12;
-        Dump_Levelset(grid,phi,VECTOR<T,3>(0,0,1));
-        phi.array+=grid.dX.Max()*6;
         Flush_Frame<TV>("after heat");}
 }
 //#####################################################################
@@ -277,38 +285,43 @@ Extrapolate_Node_No_Levelset(const GRID<TV>& grid,boost::function<bool(const TV_
 
     LEVELSET<TV> levelset(const_cast<GRID<TV>&>(grid),phi,ghost+1);
     Dump_Levelset(grid,phi,VECTOR<T,3>(1,0,0));
-    phi.array+=grid.dX.Max()*6;
-    Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
-    phi.array-=grid.dX.Max()*12;
-    Dump_Levelset(grid,phi,VECTOR<T,3>(0,0,1));
-    phi.array+=grid.dX.Max()*6;
+    // phi.array+=grid.dX.Max()*6;
+    // Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
+    // phi.array-=grid.dX.Max()*12;
+    // Dump_Levelset(grid,phi,VECTOR<T,3>(0,0,1));
+    // phi.array+=grid.dX.Max()*6;
 
     Flush_Frame<TV>("after init");
 
     Reinitialize(levelset,(ghost+2)*20,(T)0,(ghost+2)*grid.dX.Max()*20,(T)0,(T).9,3,5,0);
 
     Dump_Levelset(grid,phi,VECTOR<T,3>(1,0,0));
-    phi.array+=grid.dX.Max()*6;
-    Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
-    phi.array-=grid.dX.Max()*12;
-    Dump_Levelset(grid,phi,VECTOR<T,3>(0,0,1));
-    phi.array+=grid.dX.Max()*6;
+    // phi.array+=grid.dX.Max()*6;
+    // Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
+    // phi.array-=grid.dX.Max()*12;
+    // Dump_Levelset(grid,phi,VECTOR<T,3>(0,0,1));
+    // phi.array+=grid.dX.Max()*6;
 
     Flush_Frame<TV>("after reinit");
 
-    Smooth_With_Heat_Equation(grid,phi,(T).8,smooth_steps);
+    Smooth_With_Heat_Equation(grid,ghost,phi,(T).8,smooth_steps);
+
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost-1);it.Valid();it.Next()){
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,levelset.Normal(it.Location()));}
+    Flush_Frame<TV>("normals");
 
     Reinitialize(levelset,(ghost+2)*20,(T)0,(ghost+2)*grid.dX.Max()*20,(T)0,(T).9,3,5,0);
     Dump_Levelset(grid,phi,VECTOR<T,3>(1,0,0));
-    phi.array+=grid.dX.Max()*6;
-    Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
-    phi.array-=grid.dX.Max()*12;
-    Dump_Levelset(grid,phi,VECTOR<T,3>(0,0,1));
-    phi.array+=grid.dX.Max()*6;
+    // phi.array+=grid.dX.Max()*6;
+    // Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
+    // phi.array-=grid.dX.Max()*12;
+    // Dump_Levelset(grid,phi,VECTOR<T,3>(0,0,1));
+    // phi.array+=grid.dX.Max()*6;
 
     Flush_Frame<TV>("after reinit");
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost-1);it.Valid();it.Next()){
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,levelset.Normal(it.Location()));}
     Flush_Frame<TV>("normals");
@@ -346,7 +359,7 @@ Extrapolate_Face_No_Levelset(const GRID<TV>& grid,boost::function<bool(const FAC
     FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(levelset,ghost+2);
     fmm.Fast_Marching_Method(phi,grid.dX.Max()*(ghost+2),&seed_indices);
     Reinitialize(levelset,(ghost+2)*20,(T)0,(ghost+2)*grid.dX.Max()*20,(T)10,(T).9,3,5,0);
-    Smooth_With_Heat_Equation(grid,phi,(T).8,smooth_steps);
+    Smooth_With_Heat_Equation(grid,ghost,phi,(T).8,smooth_steps);
     Reinitialize(levelset,(ghost+2)*20,(T)0,(ghost+2)*grid.dX.Max()*20,(T)10,(T).9,3,5,0);
 
     Extrapolate_Face(grid,levelset,inside_mask,ghost,u,iterations,order,fill_width);

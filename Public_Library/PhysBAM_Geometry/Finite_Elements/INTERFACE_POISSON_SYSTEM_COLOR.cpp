@@ -21,11 +21,11 @@
 #include <PhysBAM_Geometry/Finite_Elements/TRIPLE_JUNCTION_CORRECTION.h>
 #include <PhysBAM_Geometry/Finite_Elements/VOLUME_FORCE_SCALAR_COLOR.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 using namespace PhysBAM;
-extern void (*Global_Flush_Frame)(const char* title);
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -108,7 +108,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
     tjc.Compute_Pairwise_Level_Set_Data();
     tjc.Cut_Interface(cdi->index_to_cell_elements);
     Dump(grid,cdi->index_to_cell_elements);
-    Global_Flush_Frame("cutting");
+    Flush_Frame<TV>("cutting");
 
     // STENCILS INTEGRATION 
     
