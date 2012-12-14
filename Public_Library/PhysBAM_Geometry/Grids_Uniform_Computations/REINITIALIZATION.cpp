@@ -56,7 +56,7 @@ Euler_Step_Of_Reinitialization(LEVELSET<TV>& levelset,const ARRAY<T,TV_INT>& sig
     GRID<TV>& grid=levelset.grid;
     ARRAY<T,TV_INT>& phi=levelset.phi;
     
-    int ghost_cells=3;
+    int ghost_cells=levelset.number_of_ghost_cells;
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));
     levelset.boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,ghost_cells);
     ARRAY<T,TV_INT> rhs(grid.Domain_Indices());
