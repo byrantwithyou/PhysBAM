@@ -7,6 +7,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
+#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/ROTATION.h>
@@ -181,8 +182,10 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>& ips,const ARRAY<T
 //#################################################################################################################################################
 
 template<class TV>
-void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles,bool aggregated_constraints,bool cell_centered_u)
+void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles,bool aggregated_constraints,bool cell_centered_u,bool eliminate_nullspace)
 {
+    LOG::SCOPE("Setup");
+
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 
@@ -195,7 +198,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         
     INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV> ips(grid,phi_value,phi_color);
     ips.use_preconditioner=use_preconditioner;
-    ips.Set_Matrix(at.mu,at.wrap,&at,aggregated_constraints,cell_centered_u);
+    ips.Set_Matrix(at.mu,at.wrap,&at,aggregated_constraints,cell_centered_u,eliminate_nullspace);
 
     printf("\n");
     for(int c=0;c<ips.cdi->colors;c++) printf("u%d [%i]\t",c,ips.cm_u->dofs(c));printf("\n");
@@ -212,24 +215,54 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     vfscl.at=&at;
     ips.Set_RHS(rhs,&vfscl,cell_centered_u);
     ips.Resize_Vector(sol);
-
-    MINRES<T> mr;
-    KRYLOV_SOLVER<T>* solver=&mr;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
-    LOG::SCOPE("System solve");
+    if(eliminate_nullspace){
+        CONJUGATE_GRADIENT<T> cg;
+        KRYLOV_SOLVER<T>* solver=&cg;
+        
+        KRYLOV_VECTOR_CONDENSED_POISSON<TV> condensed_sol;
+        ips.Resize_Condensed_Vector(condensed_sol);
+        
+        LOG::SCOPE("Condensed System solve");
+        
+        solver->Solve(ips,condensed_sol,ips.condensed_rhs,vectors,1e-10,0,max_iter);
 
-    solver->Solve(ips,sol,rhs,vectors,1e-10,0,max_iter);
+        OCTAVE_OUTPUT<T>("rhs_c.txt").Write("rhs_c",ips.condensed_rhs);OCTAVE_OUTPUT<T>("sol_c.txt").Write("sol_c",condensed_sol);
+
+        ips.Build_Full_Solution_From_Condensed(condensed_sol,sol);
+        
+        
+        ips.Multiply(condensed_sol,*vectors(0));
+        *vectors(0)-=ips.condensed_rhs;
+        LOG::cout<<"Residual: "<<ips.Convergence_Norm(*vectors(0))<<std::endl;
+        
+        ips.Multiply(ips.null_u_condensed,*vectors(0));
+        LOG::cout<<"D constraints: "<<(ips.cdi->dc_present?"yes":"no")<<std::endl;
+        LOG::cout<<"N constraints: "<<(ips.cdi->nc_present?"yes":"no")<<std::endl;
+        if(ips.cdi->dc_present) LOG::cout<<"No null modes"<<std::endl;
+        else LOG::cout<<"Null mode residual: "<<ips.Convergence_Norm(*vectors(0))<<std::endl;
     
-    ips.Multiply(sol,*vectors(0));
-    *vectors(0)-=rhs;
-    LOG::cout<<"Residual: "<<ips.Convergence_Norm(*vectors(0))<<std::endl;
+    }
+    else{
+        MINRES<T> mr;
+        KRYLOV_SOLVER<T>* solver=&mr;
 
-    ips.Multiply(ips.null_u,*vectors(0));
-    LOG::cout<<"D constraints: "<<(ips.cdi->dc_present?"yes":"no")<<std::endl;
-    LOG::cout<<"N constraints: "<<(ips.cdi->nc_present?"yes":"no")<<std::endl;
-    if(ips.cdi->dc_present) LOG::cout<<"No null modes"<<std::endl;
-    else LOG::cout<<"Null mode residual: "<<ips.Convergence_Norm(*vectors(0))<<std::endl;
+        LOG::SCOPE("System solve");
+
+        solver->Solve(ips,sol,rhs,vectors,1e-10,0,max_iter);
+        OCTAVE_OUTPUT<T>("rhs.txt").Write("rhs",rhs);OCTAVE_OUTPUT<T>("sol.txt").Write("sol",sol);
+        
+        ips.Multiply(sol,*vectors(0));
+        *vectors(0)-=rhs;
+        LOG::cout<<"Residual: "<<ips.Convergence_Norm(*vectors(0))<<std::endl;
+
+        ips.Multiply(ips.null_u,*vectors(0));
+        LOG::cout<<"D constraints: "<<(ips.cdi->dc_present?"yes":"no")<<std::endl;
+        LOG::cout<<"N constraints: "<<(ips.cdi->nc_present?"yes":"no")<<std::endl;
+        if(ips.cdi->dc_present) LOG::cout<<"No null modes"<<std::endl;
+        else LOG::cout<<"Null mode residual: "<<ips.Convergence_Norm(*vectors(0))<<std::endl;
+    }
 
     ARRAY<T,TV_INT> exact_u,numer_u,error_u;
 
@@ -304,7 +337,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
             rhs*=1/rhs.Max_Abs();
             Dump_Vector<T,TV>(ips,rhs,"extra null mode");}}
     
-    if(dump_matrix) OCTAVE_OUTPUT<T>("M.txt").Write("M",ips,*vectors(0),*vectors(1));
+    if(dump_matrix) {OCTAVE_OUTPUT<T>("M.txt").Write("M",ips,*vectors(0),*vectors(1));}//,*vectors(0),*vectors(1));
     vectors.Delete_Pointers_And_Clean_Memory();
 }
 
@@ -323,7 +356,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     T m=1,s=1,kg=1;
     int threads=1;
     int test_number=1,resolution=4,max_iter=1000000;
-    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,opt_arg=false,aggregated_constraints=false,cell_centered_u=false;
+    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,opt_arg=false,aggregated_constraints=false,cell_centered_u=false,eliminate_nullspace=false;
     parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-m",&m,"unit","meter scale");
@@ -334,6 +367,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-threads",&threads,"threads","number of threads");
     parse_args.Add("-use_preconditioner",&use_preconditioner,"Use Jacobi preconditioner");
     parse_args.Add("-agg",&aggregated_constraints,"Use aggregated constraints");
+    parse_args.Add("-spd",&eliminate_nullspace,"Form an equivalent, symmetric positive definite system");
     parse_args.Add("-max_iter",&max_iter,"iter","max number of interations");
     parse_args.Add("-null",&null,"find extra null modes of the matrix");
     parse_args.Add("-dump_matrix",&dump_matrix,"dump system matrix");
@@ -749,7 +783,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles,aggregated_constraints,cell_centered_u);
+    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles,aggregated_constraints,cell_centered_u,eliminate_nullspace);
     LOG::Finish_Logging();
     delete test;
 }

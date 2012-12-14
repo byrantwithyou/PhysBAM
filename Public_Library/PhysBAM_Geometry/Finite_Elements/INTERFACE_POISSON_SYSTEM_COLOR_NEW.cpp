@@ -47,7 +47,7 @@ template<class TV> INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
-Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool aggregated_constraints,bool cell_centered_u)
+Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool aggregated_constraints,bool cell_centered_u,bool eliminate_nullspace_input)
 {
     // SET UP STENCILS
 
@@ -62,6 +62,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
         udx_stencil(i)->Dice_Stencil();}
     
     // GATHER CELL DOMAIN & INTERFACE INFO 
+    eliminate_nullspace=eliminate_nullspace_input;
 
     int padding;
     if(wrap) padding=u_stencil.Overlap_Padding(u_stencil);
@@ -116,18 +117,22 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
     else
     {
         CONSTRAINT_AGGREGATION_COLOR<TV> cac(grid,cdi,cm_u,biu,matrix_qu_full,rhs_constraint_full);
-        cac.Aggregate_Constraints(matrix_uu,helper_qu,phi_color);
-        cac.Build_Condensed_Constraint_Matrix(matrix_qu_agg,rhs_constraint_agg);
-
-        
-       // PHYSBAM_FATAL_ERROR();
+        cac.Aggregate_Constraints(matrix_uu,phi_color);
+        cac.Build_Condensed_Constraint_Matrix(matrix_qu_agg);
         matrix_qu=matrix_qu_agg;
-        rhs_constraint=rhs_constraint_agg;
+        rhs_constraint=cac.RHS_Constraint_Agg();
+        if(eliminate_nullspace){
+            std::cout<<"\nNullspace Eliminated"<<std::endl;
+            Resize_Vector(specific_solution_to_constraints);
+            cac.Build_Nullspace_And_Specific_Constraint_Solution(matrix_uu,matrix_z,matrix_z_t,z_t_a,z_t_a_z,specific_solution_to_constraints);
+            spd_system_size=z_t_a_z.m;
+
+        }
     }
     //This is where it ends
 
     matrix_qu_t.Resize(cdi->colors);
-//cd ..#pragma omp parallel for
+#pragma omp parallel for
     for(int c=0;c<cdi->colors;c++)
         matrix_qu(c).Transpose(matrix_qu_t(c));
 
@@ -144,8 +149,29 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
         u.Fill(1);
         for(int k=0;k<inactive.m;k++) u(inactive(k))=0;}
     null_u.Normalize();
-
+    if(eliminate_nullspace){
+        null_u_condensed.v.Resize(spd_system_size);
+        null_u_condensed.v.Fill(1);
+        null_u_condensed.v.Normalize();
+    }
+    
     for(int i=0;i<TV::m;i++) delete udx_stencil(i);
+}
+//#####################################################################
+// Function Build_Full_Solution_From_Condensed
+//#####################################################################
+template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
+Build_Full_Solution_From_Condensed(KRYLOV_VECTOR_BASE<T>& small,KRYLOV_VECTOR_BASE<T>& big)
+{
+    //u=c+Zv
+    VECTOR_T& sol=debug_cast<VECTOR_T&>(big);
+    CONDENSED_VECTOR_T& condensed_sol=debug_cast<CONDENSED_VECTOR_T&>(small);
+    Resize_Vector(sol);
+    sol.Zero_Out();
+    for(int c=0;c<cdi->colors;c++){
+        matrix_z(c).Times(condensed_sol.v,sol.u(c)); 
+    }
+    sol+=specific_solution_to_constraints;
 }
 //#####################################################################
 // Function Set_RHS
@@ -182,6 +208,22 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc,bool cell_centered_u)
 
     matrix_rhs_uu.Clean_Memory();
     rhs_surface.Clean_Memory();
+    
+    if(eliminate_nullspace){Create_Condensed_RHS(rhs);}
+}
+//#####################################################################
+// Function Create_Condensed_RHS
+//#####################################################################
+template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
+Create_Condensed_RHS(VECTOR_T& rhs)
+{
+    //condensed RHS is Z'*(rhs-Ac)
+    condensed_rhs.v.Resize(spd_system_size);
+    ARRAY<T> carrier;carrier.Resize(spd_system_size);
+    for(int c=0;c<cdi->colors;c++){
+        matrix_z_t(c).Times(rhs.u(c),carrier);condensed_rhs.v+=carrier;
+        z_t_a(c).Times(specific_solution_to_constraints.u(c),carrier);condensed_rhs.v-=carrier;
+    }
 }
 //#####################################################################
 // Function Set_Jacobi_Preconditioner
@@ -189,6 +231,15 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc,bool cell_centered_u)
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
 Set_Jacobi_Preconditioner()
 {
+    if(eliminate_nullspace){
+        J0.v.Resize(spd_system_size);
+        for(int i=0;i<spd_system_size;i++){
+            T d=1/abs(z_t_a_z(i,i));
+            if(d<1e-13){LOG::cout<<"WARNING: small diagonal entry in Z'AZ."<<std::endl;
+        }J0.v(i)=d;
+        }
+    }
+    else{
     Resize_Vector(J);
     for(int c=0;c<cdi->colors;c++){
         int u_dofs=cm_u->dofs(c);
@@ -211,6 +262,7 @@ Set_Jacobi_Preconditioner()
             inactive_q.Append(k);
             LOG::cout<<"WARNING: small row sum in the QU block."<<std::endl;}
         else J.q(k)=1/sum;}
+    }
 }
 //#####################################################################
 // Function Resize_Vector
@@ -226,24 +278,44 @@ Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const
     v.q.Resize(rhs_constraint.m);
 }
 //#####################################################################
+// Function Resize_Condensed_Vector
+//#####################################################################
+template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
+Resize_Condensed_Vector(KRYLOV_VECTOR_BASE<T>& x) const
+{
+    CONDENSED_VECTOR_T& v=debug_cast<CONDENSED_VECTOR_T&>(x);
+    v.v.Resize(spd_system_size);
+}
+//#####################################################################
 // Function Multiply
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
 Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 {
-    const VECTOR_T& xc=debug_cast<const VECTOR_T&>(x);
-    VECTOR_T& rc=debug_cast<VECTOR_T&>(result);
-    rc.Zero_Out();
-    for(int c=0;c<cdi->colors;c++)
+    
+    if(eliminate_nullspace){
+        const CONDENSED_VECTOR_T& xc=debug_cast<const CONDENSED_VECTOR_T&>(x);
+        CONDENSED_VECTOR_T& rc=debug_cast<CONDENSED_VECTOR_T&>(result);
+        rc.v.Fill(0);
 #pragma omp parallel for
-        for(int i=0;i<cm_u->dofs(c);i++){
-            matrix_uu(c).Times_Add_Row(xc.u(c),rc.u(c),i);
-            matrix_qu_t(c).Times_Add_Row(xc.q,rc.u(c),i);}
-    rc.q.Fill(0);
-    for(int c=0;c<cdi->colors;c++)
+        for(int i=0;i<spd_system_size;i++)
+            z_t_a_z.Times_Add_Row(xc.v,rc.v,i);
+    }
+    else{
+        const VECTOR_T& xc=debug_cast<const VECTOR_T&>(x);
+        VECTOR_T& rc=debug_cast<VECTOR_T&>(result);
+        rc.Zero_Out();
+        for(int c=0;c<cdi->colors;c++)
 #pragma omp parallel for
-        for(int i=0;i<rhs_constraint.m;i++)
-            matrix_qu(c).Times_Add_Row(xc.u(c),rc.q,i);
+            for(int i=0;i<cm_u->dofs(c);i++){
+                matrix_uu(c).Times_Add_Row(xc.u(c),rc.u(c),i);
+                matrix_qu_t(c).Times_Add_Row(xc.q,rc.u(c),i);}
+        rc.q.Fill(0);
+        for(int c=0;c<cdi->colors;c++)
+#pragma omp parallel for
+            for(int i=0;i<rhs_constraint.m;i++)
+                matrix_qu(c).Times_Add_Row(xc.u(c),rc.q,i);
+    }
 }
 //#####################################################################
 // Function Inner_Product
@@ -251,7 +323,8 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 template<class TV> double INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const
 {
-    return debug_cast<const VECTOR_T&>(x).Dot(debug_cast<const VECTOR_T&>(y));
+    if(eliminate_nullspace) return debug_cast<const CONDENSED_VECTOR_T&>(x).v.Dot(debug_cast<const CONDENSED_VECTOR_T&>(y).v);
+    else return debug_cast<const VECTOR_T&>(x).Dot(debug_cast<const VECTOR_T&>(y));
 }
 //#####################################################################
 // Function Convergence_Norm
@@ -259,7 +332,8 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
 template<class TV> typename TV::SCALAR INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
 Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 {
-    return debug_cast<const VECTOR_T&>(x).Max_Abs();
+    if(eliminate_nullspace){return debug_cast<const CONDENSED_VECTOR_T&>(x).v.Max_Abs();}
+    else return debug_cast<const VECTOR_T&>(x).Max_Abs();
 }
 //#####################################################################
 // Function Project
@@ -267,19 +341,28 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
 Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
-    // TODO: This needs to change for N/D BC.
-    VECTOR_T& v=debug_cast<VECTOR_T&>(x);
-    if(!cdi->dc_present) v.Copy(-v.Dot(null_u),null_u,v);
+    
+    if(eliminate_nullspace){
+    //This will also need to change at some point. Also nodes aren't deactivated for this.
+        CONDENSED_VECTOR_T& v=debug_cast<CONDENSED_VECTOR_T&>(x);
+        if(!cdi->dc_present) v.Copy(-v.v.Dot(null_u_condensed.v),null_u_condensed,v);
+        //This is where we sould then deal with inactive nodes
+    }
+    else{
+        // TODO: This needs to change for N/D BC.
+        VECTOR_T& v=debug_cast<VECTOR_T&>(x);
+        if(!cdi->dc_present) v.Copy(-v.Dot(null_u),null_u,v);
 
-    for(int c=0;c<cdi->colors;c++){
-        ARRAY<T>& u=v.u(c);
-        const ARRAY<int>& inactive=inactive_u(c);
+        for(int c=0;c<cdi->colors;c++){
+            ARRAY<T>& u=v.u(c);
+            const ARRAY<int>& inactive=inactive_u(c);
 #pragma omp parallel for
-        for(int k=0;k<inactive.m;k++)
-            u(inactive(k))=0;}
+            for(int k=0;k<inactive.m;k++)
+                u(inactive(k))=0;}
 #pragma omp parallel for
-    for(int k=0;k<inactive_q.m;k++)
-        v.q(inactive_q(k))=0;
+        for(int k=0;k<inactive_q.m;k++)
+            v.q(inactive_q(k))=0;
+    }
 }
 //#####################################################################
 // Function Set_Boundary_Conditions
@@ -302,7 +385,13 @@ Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
 Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
 {
-    debug_cast<VECTOR_T&>(z).Scale(debug_cast<const VECTOR_T&>(r),debug_cast<const VECTOR_T&>(J));
+    if(eliminate_nullspace){
+       CONDENSED_VECTOR_T& zz=debug_cast<CONDENSED_VECTOR_T&>(z);
+       const CONDENSED_VECTOR_T& rr=debug_cast<const CONDENSED_VECTOR_T&>(r);
+#pragma omp parallel for
+        for(int i=0;i<spd_system_size;i++)zz.v(i)=rr.v(i)*J0.v(i);
+    }
+    else debug_cast<VECTOR_T&>(z).Scale(debug_cast<const VECTOR_T&>(r),debug_cast<const VECTOR_T&>(J));
 }
 namespace PhysBAM{
 template class INTERFACE_POISSON_SYSTEM_COLOR_NEW<VECTOR<float,2> >;

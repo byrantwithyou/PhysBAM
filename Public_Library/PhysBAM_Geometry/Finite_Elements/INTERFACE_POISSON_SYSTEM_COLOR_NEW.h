@@ -7,6 +7,7 @@
 #ifndef __INTERFACE_POISSON_SYSTEM_COLOR_NEW__
 #define __INTERFACE_POISSON_SYSTEM_COLOR_NEW__
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
+#include <PhysBAM_Geometry/Finite_Elements/KRYLOV_VECTOR_CONDENSED_POISSON.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Geometry/Finite_Elements/BOUNDARY_CONDITIONS_SCALAR_COLOR.h>
@@ -50,10 +51,12 @@ class INTERFACE_POISSON_SYSTEM_COLOR_NEW:public KRYLOV_SYSTEM_BASE<typename TV::
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV> VECTOR_T;
+    typedef KRYLOV_VECTOR_CONDENSED_POISSON<TV> CONDENSED_VECTOR_T;
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 
     VECTOR_T J; // Jacobi preconditioner 
-
+    CONDENSED_VECTOR_T J0;
+    //KRYLOV_VECTOR_CONDENSED_POISSON<TV> J0;
 public:
 
     //   #----#   #----# 
@@ -67,12 +70,16 @@ public:
     ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > matrix_uu;
     ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > matrix_qu_full,matrix_qu_agg,matrix_qu;
     ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > matrix_qu_t;
+    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > matrix_z,matrix_z_t,z_t_a;
+    SPARSE_MATRIX_FLAT_MXN<T> z_t_a_z;
 
     ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > matrix_rhs_uu;
     ARRAY<ARRAY<T> > rhs_surface;
     ARRAY<T> rhs_constraint,rhs_constraint_agg,rhs_constraint_full;
+    //ARRAY<T>& rhs_constraint; //Todo: Best way to initialize this?
 
-    VECTOR_T null_u;
+    VECTOR_T null_u,specific_solution_to_constraints;
+    CONDENSED_VECTOR_T null_u_condensed,condensed_rhs;
     ARRAY<ARRAY<int> > inactive_u;
     ARRAY<int> inactive_q;
 
@@ -82,10 +89,13 @@ public:
     ARRAY<T,TV_INT> phi_value;
     ARRAY<int,TV_INT> phi_color;
     
+    int spd_system_size;
+    
     
     bool run_self_tests;
     bool print_matrix;
     bool print_rhs;
+    bool eliminate_nullspace;
 
     static int solve_id;
 
@@ -96,9 +106,12 @@ public:
     virtual ~INTERFACE_POISSON_SYSTEM_COLOR_NEW();
 
 //#####################################################################
-    void Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool aggregated_constraints=false,bool cell_centered_u=false);
+    void Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool aggregated_constraints=false,bool cell_centered_u=false,bool eliminate_nullspace_input=false);
+    void Build_Full_Solution_From_Condensed(KRYLOV_VECTOR_BASE<T>& small,KRYLOV_VECTOR_BASE<T>& big);
     void Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc,bool cell_centered_u=false);
+    void Create_Condensed_RHS(VECTOR_T& rhs);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
+    void Resize_Condensed_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const;
