@@ -7,6 +7,7 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
+#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <cmath>
@@ -44,52 +45,6 @@ void Initialize_Grid_From_Domains(GRID<TV>& grid,int resolution,const RANGE<TV>&
     sample_domain.max_corner-=mn;
 }
 
-std::string output_directory;
-
-template<class TV> DEBUG_PARTICLES_HELPER<TV>::DEBUG_PARTICLES_HELPER()
-    :particle(*new GEOMETRY_PARTICLES<TV>)
-{
-    ATTRIBUTE_INDEX index=particle.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-    attribute=particle.template Get_Array_From_Index<VECTOR<T,3> >(index);
-}
-
-template<class TV> DEBUG_PARTICLES_HELPER<TV>::~DEBUG_PARTICLES_HELPER()
-{
-    delete &particle;
-}
-
-template<class TV>
-void Add_Debug_Particle(const TV& x,const VECTOR<typename TV::SCALAR,3>& color)
-{
-    DEBUG_PARTICLES_HELPER<TV>& dp_helper=Debug_Particles_Helper<TV>();
-    int p=dp_helper.particle.Add_Element();
-    dp_helper.particle.X(p)=x;
-    (*dp_helper.attribute)(p)=color;
-}
-
-template<class TV>
-DEBUG_PARTICLES_HELPER<TV>& Debug_Particles_Helper()
-{
-    static DEBUG_PARTICLES_HELPER<TV> helper;
-    return helper;
-}
-
-template<class RW,class T,int d>
-void Dump_Frame(const ARRAY<T,FACE_INDEX<d> >& u,const char* title)
-{
-    typedef VECTOR<T,d> TV;
-    static int frame=0;
-    char buff[100];
-    sprintf(buff, "%s/%i", output_directory.c_str(), frame);
-    FILE_UTILITIES::Create_Directory(buff);
-    FILE_UTILITIES::Write_To_File<RW>((std::string)buff+"/mac_velocities.gz",u);
-    DEBUG_PARTICLES_HELPER<TV>& dp_helper=Debug_Particles_Helper<TV>();
-    FILE_UTILITIES::Write_To_File<RW>((std::string)buff+"/debug_particles.gz",dp_helper.particle);
-    dp_helper.particle.Delete_All_Elements();
-    if(title) FILE_UTILITIES::Write_To_Text_File((std::string)buff+"/frame_title",title);
-    frame++;
-}
-
 template<class TV>
 void Prune_Outside_Sample_Points(const GRID<TV>& grid,const BOUNDARY_CONDITIONS<TV>& bc,ACCURACY_INFO<TV::m>& ai)
 {
@@ -106,9 +61,9 @@ void Add_Viscosity(const OBJECTS_COMMON<TV>& obj,const PARAMETERS_COMMON<typenam
 {
     if(use_extrapolation){
         Fill_Ghost_Cells(obj.grid,3,3,u,*obj.bc);
-        Dump_Frame<RW>(u,"fill 1");}
+        Flush_Frame(u,"fill 1");}
     for(int a=0;a<TV::m;a++) Apply_Viscosity(obj.grid,u,*obj.bc,param.dt,param.time,param.mu,param.rho,a,param.theta_threshold,param.cg_tolerance,param.print_matrix);
-    Dump_Frame<RW>(u,"after viscosity");
+    Flush_Frame(u,"after viscosity");
     obj.ai.Print("AFTVIS",u);
 }
 
@@ -121,11 +76,11 @@ void Add_Advection(const OBJECTS_COMMON<TV>& obj,const PARAMETERS_COMMON<typenam
 
     if(use_extrapolation){
         Fill_Ghost_Cells(obj.grid,3,3,u,*obj.bc);
-        Dump_Frame<RW>(u,"after extrapolation");}
+        Flush_Frame(u,"after extrapolation");}
     advection.Update_Advection_Equation_Face(obj.grid,u,u,u,boundary,param.dt,param.time);
-    Dump_Frame<RW>(u,"after advection");
+    Flush_Frame(u,"after advection");
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(obj.grid,4);it.Valid();it.Next()) if(!obj.bc->Inside(it.Location())) u(it.Full_Index())=0;
-    Dump_Frame<RW>(u,"after clear ghost");
+    Flush_Frame(u,"after clear ghost");
 }
 
 template<class TV>
@@ -133,13 +88,13 @@ void Project_Pressure(const OBJECTS_COMMON<TV>& obj,const PARAMETERS_COMMON<type
 {
     if(use_extrapolation){
         Fill_Ghost_Cells(obj.grid,3,3,u,*obj.bc);
-        Dump_Frame<RW>(u,"fill after viscosity");}
+        Flush_Frame(u,"fill after viscosity");}
     if(proj==proj_gibou) Project_Incompressibility_Gibou(obj.grid,u,*obj.bc,obj.ai,param.time,param.rho,param.theta_threshold,param.cg_tolerance,param.print_matrix);
     else if(proj==proj_slip)  Project_Incompressibility_Slip(obj.grid,u,*obj.bc,obj.ai,param.time,param.rho,param.theta_threshold,param.cg_tolerance,param.print_matrix);
     else if(proj==proj_default) Project_Incompressibility(obj.grid,u,*obj.bc,obj.ai,param.time,param.rho,param.theta_threshold,param.cg_tolerance,param.print_matrix);
     else PHYSBAM_FATAL_ERROR();
     obj.ai.Print("AFTPROJ",u);
-    Dump_Frame<RW>(u,"after project");
+    Flush_Frame(u,"after project");
 }
 
 template<class TV>
@@ -158,14 +113,14 @@ void Second_Order_RE_Step(SIM_COMMON<TV>& sim,ARRAY<typename TV::SCALAR,FACE_IND
     typedef typename TV::SCALAR T;
     u2=u;
     First_Order_Step(sim,u2);
-    Dump_Frame<RW>(u,"lo step");
+    Flush_Frame(u,"lo step");
     sim.param.time-=sim.param.dt;
 
     sim.param.dt/=2;
     First_Order_Step(sim,u);
     First_Order_Step(sim,u);
     sim.param.dt*=2;
-    Dump_Frame<RW>(u2,"hi step");
+    Flush_Frame(u2,"hi step");
 
     u.Copy((T)2,u,-(T)1,u2);
 }
@@ -176,7 +131,7 @@ void Dump_Error(const SIM_COMMON<TV>& sim,const ARRAY<typename TV::SCALAR,FACE_I
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(sim.obj.grid,4);it.Valid();it.Next()){
         if(sim.obj.bc->Inside(it.Location())) u2(it.Full_Index())=u(it.Full_Index())-sim.obj.bc->Analytic_Velocity(it.Location(),sim.param.time)(it.Axis());
         else u2(it.Full_Index())=0;}
-    Dump_Frame<RW>(u2,"error");
+    Flush_Frame(u2,"error");
 }
 
 template<class T>
@@ -248,15 +203,11 @@ void Dump_Error_Image(const SIM_COMMON<TV>& sim,const ARRAY<typename TV::SCALAR,
 template struct ERROR_COLOR_MAP<double>;
 template void Add_Advection<VECTOR<double,1> >(OBJECTS_COMMON<VECTOR<double,1> > const&,PARAMETERS_COMMON<double> const&,ARRAY<double,FACE_INDEX<1> >&,bool);
 template void Add_Advection<VECTOR<double,2> >(OBJECTS_COMMON<VECTOR<double,2> > const&,PARAMETERS_COMMON<double> const&,ARRAY<double,FACE_INDEX<2> >&,bool);
-template void Add_Debug_Particle<VECTOR<double,1> >(VECTOR<double,1> const&,VECTOR<VECTOR<double,1>::SCALAR,3> const&);
-template void Add_Debug_Particle<VECTOR<double,2> >(VECTOR<double,2> const&,VECTOR<VECTOR<double,2>::SCALAR,3> const&);
 template void Add_Viscosity<VECTOR<double,1> >(OBJECTS_COMMON<VECTOR<double,1> > const&,PARAMETERS_COMMON<double> const&,ARRAY<double,FACE_INDEX<1> >&,bool);
 template void Add_Viscosity<VECTOR<double,2> >(OBJECTS_COMMON<VECTOR<double,2> > const&,PARAMETERS_COMMON<double> const&,ARRAY<double,FACE_INDEX<2> >&,bool);
 template void Dump_Error<VECTOR<double,1> >(SIM_COMMON<VECTOR<double,1> > const&,ARRAY<double,FACE_INDEX<1> > const&,ARRAY<double,FACE_INDEX<1> >&);
 template void Dump_Error<VECTOR<double,2> >(SIM_COMMON<VECTOR<double,2> > const&,ARRAY<double,FACE_INDEX<2> > const&,ARRAY<double,FACE_INDEX<2> >&);
 template void Dump_Error_Image<VECTOR<double,2> >(SIM_COMMON<VECTOR<double,2> > const&,ARRAY<VECTOR<double,2>::SCALAR,FACE_INDEX<VECTOR<double,2>::m> > const&,VECTOR<int,VECTOR<double,2>::m>);
-template void Dump_Frame<float,double,1>(const ARRAY<double,FACE_INDEX<1> >&,char const*);
-template void Dump_Frame<float,double,2>(const ARRAY<double,FACE_INDEX<2> >&,char const*);
 template void Fill_Ghost_Cells<VECTOR<double,1> >(GRID<VECTOR<double,1> > const&,int,int,ARRAY<double,FACE_INDEX<1> >&,const BOUNDARY_CONDITIONS<VECTOR<double,1> >&);
 template void Fill_Ghost_Cells<VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,int,int,ARRAY<double,FACE_INDEX<2> >&,const BOUNDARY_CONDITIONS<VECTOR<double,2> >&);
 template void First_Order_Step<VECTOR<double,2> >(SIM_COMMON<VECTOR<double,2> >&,ARRAY<VECTOR<double,2>::SCALAR,FACE_INDEX<VECTOR<double,2>::m> >&);

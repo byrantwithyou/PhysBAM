@@ -10,4 +10,5 @@ Automatic_Program(env,"test_bed",["test_bed.cpp","APPLY_VISCOSITY.cpp","SOURCE_V
 #                                    "BOUNDARY_CONDITIONS.cpp","TEST_COMMON.cpp","SIM_COMMON.cpp","OBJECTS_COMMON.cpp","PARAMETERS_COMMON.cpp"])
 Automatic_Program(env,"boundary_conditions_2d",["main.cpp"])
 Automatic_Program(env,"extrapolation_test",["extrapolation_test.cpp"])
+Automatic_Program(env,"projection",["projection.cpp"])
 

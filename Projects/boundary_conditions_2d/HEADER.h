@@ -32,9 +32,6 @@ template<class T,class TV,int d>
 void Project_Incompressibility_Slip(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUNDARY_CONDITIONS<TV>& callback,const ACCURACY_INFO<d>& ai,T time,T density,
     T theta_threshold,T cg_tolerance,bool verbose);
 
-template<class RW,class T,int d>
-void Dump_Frame(const ARRAY<T,FACE_INDEX<d> >& u,const char* title=0);
-
 template<class TV>
 void Fill_Ghost_Cells(const GRID<TV>& grid,int ghost,int distance,ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >& u,const BOUNDARY_CONDITIONS<TV>& bc);
 
@@ -42,19 +39,6 @@ template<class TV>
 void Initialize_Grid_From_Domains(GRID<TV>& grid,int resolution,const RANGE<TV>& sample_box,const RANGE<TV>& bounding_box,RANGE<VECTOR<int,TV::m> >& sample_domain);
 
 extern std::string output_directory;
-
-namespace PhysBAM{template<class TV> class GEOMETRY_PARTICLES;}
-template<class TV>
-struct DEBUG_PARTICLES_HELPER
-{
-    typedef typename TV::SCALAR T;
-    GEOMETRY_PARTICLES<TV>& particle;
-    ARRAY_VIEW<VECTOR<T,3> >* attribute;
-    DEBUG_PARTICLES_HELPER();
-    ~DEBUG_PARTICLES_HELPER();
-};
-template<class TV> DEBUG_PARTICLES_HELPER<TV>& Debug_Particles_Helper();
-template<class TV> void Add_Debug_Particle(const TV& x,const VECTOR<typename TV::SCALAR,3>& color);
 
 template<class TV>
 void Prune_Outside_Sample_Points(const GRID<TV>& grid,const BOUNDARY_CONDITIONS<TV>& bc,ACCURACY_INFO<TV::m>& ai);

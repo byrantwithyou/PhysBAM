@@ -9,6 +9,8 @@
 #include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include "ACCURACY_INFO.h"
 #include "HEADER.h"
 #include "POISSON_PROJECTION_SYSTEM.h"
@@ -98,7 +100,7 @@ void Project_Incompressibility_Slip(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >
     for(int i=0;i<index_to_cell.m;i++) p(index_to_cell(i))=b.v(i);
     ERROR_COLOR_MAP<T> color(1e-12,1,true,true,true);
     for(int i=0;i<index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),color(p(index_to_cell(i))));
-    Dump_Frame<RW>(u,"divergence");
+    Flush_Frame(u,"divergence");
     ai.Print("DIVERGENCE",p);
     s=b;
     system.Project(s);
@@ -128,13 +130,13 @@ void Project_Incompressibility_Slip(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >
 //    ai.Print("PRESSURE",p);
 
     for(int i=0;i<index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),color(p(index_to_cell(i))));
-    Dump_Frame<RW>(u,"pressures");
+    Flush_Frame(u,"pressures");
 
     system.gradient.Times(x.v,temp);
     temp*=system.beta_inverse;
 
     for(int i=0;i<index_to_face.m;i++) Add_Debug_Particle(grid.Face(index_to_face(i)),color(temp(i)));
-    Dump_Frame<RW>(u,"du");
+    Flush_Frame(u,"du");
 
     for(int i=0;i<index_to_face.m;i++) u(index_to_face(i))-=temp(i);
 

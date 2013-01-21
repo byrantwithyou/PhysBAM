@@ -1,6 +1,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <cmath>
 #include "ACCURACY_INFO.h"
 #include "BOUNDARY_CONDITIONS_BOX.h"
@@ -31,7 +32,7 @@ int main(int argc,char* argv[])
     tc.parse_args.Add("-error_image",&error_image,"file","Image showing error distribution");
 
     tc.Init_2();
-    output_directory=tc.output_directory;
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),tc.sim.obj.grid,tc.output_directory);
 
     PHYSBAM_ASSERT(bc_types.length()==4 && bc_types.find_first_not_of("swf")==std::string::npos);
     TV_INT error_image_dim;
@@ -48,14 +49,14 @@ int main(int argc,char* argv[])
     ARRAY<T,FACE_INDEX<d> > u(tc.sim.obj.grid,4),u2(tc.sim.obj.grid,4);
     tc.sim.obj.bc->Initialize_Velocity_Field(u,tc.sim.param.time);
 
-    Dump_Frame<RW>(u,"init");
+    Flush_Frame(u,"init");
 
     tc.sim.obj.ai.Print("INIT",u);
 
     for(int k=0;k<tc.sim.steps;k++){
         First_Order_Step(tc.sim,u);
 //        Second_Order_RE_Step(tc.sim,u,u2);
-        Dump_Frame<RW>(u,"step");
+        Flush_Frame(u,"step");
         Dump_Error(tc.sim,u,u2);
         tc.sim.obj.bc->Compute_Error(u,tc.sim.param.time);
         if(error_image!="") Dump_Error_Image(tc.sim,u,error_image_dim);}
