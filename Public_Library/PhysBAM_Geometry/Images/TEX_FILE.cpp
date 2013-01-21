@@ -1,5 +1,6 @@
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 #include <PhysBAM_Geometry/Images/TEX_FILE.h>
+#include <iomanip>
 using namespace PhysBAM;
 template<class T> TEX_FILE<T>::
 //#####################################################################
@@ -48,6 +49,7 @@ template<class T> TEX_FILE<T>::
 template<class T> void TEX_FILE<T>::
 Emit(const TV &pt)
 {
+    stream.setf(std::ios_base::fixed);
     stream<<"("<<pt.x<<","<<pt.y<<")";
 }
 //#####################################################################
