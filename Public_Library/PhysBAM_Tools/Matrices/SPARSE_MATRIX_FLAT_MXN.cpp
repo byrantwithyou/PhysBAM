@@ -481,6 +481,26 @@ Create_NXN_Matrix()
     return result;
 }
 //#####################################################################
+// Function Set_Times_Diagonal
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Set_Times_Diagonal(const ARRAY<T>& D)
+{
+    for(int i=0;i<A.m;i++)
+        A(i).a*=D(A(i).j);
+}
+//#####################################################################
+// Function Set_Diagonal_Times
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Set_Diagonal_Times(const ARRAY<T>& D)
+{
+    for(int row=0;row<m;row++){
+        int start=offsets(row),end=offsets(row+1);
+        for(int i=start;i<end;i++)
+            A(i).a*=D(row);}
+}
+//#####################################################################
 // Function Write_Row_Lengths
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::

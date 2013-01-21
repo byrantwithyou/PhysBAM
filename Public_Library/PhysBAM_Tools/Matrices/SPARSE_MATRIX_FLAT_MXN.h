@@ -82,6 +82,8 @@ public:
     SPARSE_MATRIX_FLAT_MXN<T> operator-(const SPARSE_MATRIX_FLAT_MXN<T>& A_rhs) const;
     SPARSE_MATRIX_FLAT_MXN<T> operator*(const SPARSE_MATRIX_FLAT_MXN<T>& rhs) const;
     SPARSE_MATRIX_FLAT_NXN<T> Create_NXN_Matrix();
+    void Set_Times_Diagonal(const ARRAY<T>& D);
+    void Set_Diagonal_Times(const ARRAY<T>& D);
     void Write_Row_Lengths();
     void Print_Row(const int row);
     void Reset(const int c);
