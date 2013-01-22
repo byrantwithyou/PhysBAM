@@ -1,4 +1,5 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
@@ -8,12 +9,14 @@
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include "POISSON_PROJECTION_SYSTEM.h"
 #include <boost/function.hpp>
 
 using namespace PhysBAM;
 
 template<class T,class TV>
-void Project(const GRID<TV>& grid,int ghost,boost::function<T(TV X)> phi,boost::function<TV(TV X)> u_star,boost::function<TV(TV X)> u_projected,boost::function<T(TV X)> p,T density,T theta_threshold,T cg_tolerance,bool use_p_null_mode)
+void Project(const GRID<TV>& grid,int ghost,boost::function<T(TV X)> phi,boost::function<TV(TV X)> u_star,
+    boost::function<TV(TV X)> u_projected,boost::function<T(TV X)> p,T density,T theta_threshold,T cg_tolerance,bool use_p_null_mode)
 {
     typedef VECTOR<int,TV::m> TV_INT;
     ARRAY<TV> u_loc,p_loc;
@@ -24,7 +27,8 @@ void Project(const GRID<TV>& grid,int ghost,boost::function<T(TV X)> phi,boost::
     G_hat.Reset(0);
     HASHTABLE<TV_INT,int> cell_index;
     int next_cell=0;
-    INTERPOLATED_COLOR_MAP<T> color(1e-12,1,true,true,true);
+    INTERPOLATED_COLOR_MAP<T> color;
+    color.Initialize_Colors(1e-12,1,true,true,true);
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face=it.Full_Index();
@@ -60,6 +64,9 @@ void Project(const GRID<TV>& grid,int ghost,boost::function<T(TV X)> phi,boost::
     G_hat.Sort_Entries();
     S*=grid.dX.Product();
 
+    LOG::cout<<S<<std::endl;
+    LOG::cout<<G_hat<<std::endl;
+
     POISSON_PROJECTION_SYSTEM<TV> system;
     system.gradient=G_hat;
     system.gradient.Set_Times_Diagonal(S);
@@ -81,27 +88,47 @@ void Project(const GRID<TV>& grid,int ghost,boost::function<T(TV X)> phi,boost::
     CONJUGATE_GRADIENT<T> solver;
     solver.Solve(system,x,b,vectors,cg_tolerance,1,1000000);
 
-    for(int i=0;i<x.v.m;i++)
-        Add_Debug_Particle(p_loc(i),color(abs(x.v-p(p_loc(i)))));
+    T li=0,l1=0;
+    int cnt=0;
+    for(int i=0;i<x.v.m;i++){
+        T z=abs(x.v(i)-p(p_loc(i)));
+        li=max(li,z);
+        l1+=z;
+        cnt++;
+        Add_Debug_Particle(p_loc(i),color(z));}
+    printf("p %g %g\n", li, l1/cnt);
 
-    system.gradient.Times(u_proj,x.v);
+    li=0;
+    l1=0;
+    cnt=0;
+    u_proj.Resize(system.gradient.m);
+    system.gradient.Times(x.v,u_proj);
     u_proj=us-system.beta_inverse*u_proj;
     ARRAY<T,FACE_INDEX<TV::m> > u_error(grid,3);
-    for(int i=0;i<u_proj.m;i++)
-        u_error(u_face(i))=abs(u_proj(i)-u_projected(u_loc(i)));
-    Flush_Frame(u_error,"");
+    for(int i=0;i<u_proj.m;i++){
+        T z=abs(u_proj(i)-u_projected(u_loc(i))(u_face(i).axis));
+        li=max(li,z);
+        l1+=z;
+        cnt++;
+        u_error(u_face(i))=z;}
+
+    printf("u %g %g\n", li, l1/cnt);
+
+    Flush_Frame(u_error,"errors");
 }
 
 int main(int argc,char* argv[])
 {
     typedef double T;
+    typedef float RW;
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,2> TV_INT;
     PARSE_ARGS parse_args(argc,argv);
-    int test_number=0,refine=1,resolution=32;
+    int refine=1,resolution=32,interface=0,velocity_field=0;
     T rho=1,kg=1,m=1,s=1;
     bool test_analytic_diff=false,use_p_null_mode=false,dump_matrix=false;
-    parse_args.Extra(&test_number,"example number","example number to run");
+    parse_args.Extra(&interface,"number","interface to use");
+    parse_args.Extra(&velocity_field,"number","velocity to use");
     parse_args.Add("-resolution",&resolution,"resolution","grid resolution");
     parse_args.Add("-dump_matrix",&dump_matrix,"dump out system and rhs");
     parse_args.Add("-rho",&rho,"density","density for first fluid region");
@@ -114,20 +141,31 @@ int main(int argc,char* argv[])
     parse_args.Parse();
 
     GRID<TV> grid(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-    Project<T,TV>(grid,3,[](TV X){return (X-.5).Magnitude()-.3;},[](TV X){return TV(2,1);},[](TV X){return TV(2,1);},[](TV X){return 0;},rho,(T)1e-8,(T)1e-12,use_p_null_mode);
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid,"output");
 
+    boost::function<T(TV X)> phi,p;
+    boost::function<TV(TV X)> u_star,u_projected;
 
+    switch(interface){
+        case 0:phi=[](TV X){return (X-.5).Magnitude()-.3;};break;
+        default: PHYSBAM_FATAL_ERROR("Unrecognized interface");}
+
+    switch(velocity_field){
+        case 0:
+            u_star=[](TV X){return TV(0,0);};
+            u_projected=[](TV X){return TV(0,0);};
+            p=[](TV X){return 0;};
+            break;
+        case 1:
+            u_star=[](TV X){return TV(2,1);};
+            u_projected=[](TV X){return TV(2,1);};
+            p=[](TV X){return 0;};
+            break;
+        default: PHYSBAM_FATAL_ERROR("Unrecognized velocity");}
+
+    Project<T,TV>(grid,3,phi,u_star,u_projected,p,rho,(T)1e-8,(T)1e-12,use_p_null_mode);
+    Flush_Frame<TV>("flush");
+    return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
