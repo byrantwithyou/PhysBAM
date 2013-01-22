@@ -4,8 +4,11 @@
 //#####################################################################
 
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
+#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <PhysBAM_Geometry/Images/EPS_FILE.h>
 #include <PhysBAM_Geometry/Images/TEX_FILE.h>
@@ -14,6 +17,7 @@ using namespace PhysBAM;
 
 typedef float T;
 typedef VECTOR<T,3> TV;
+typedef VECTOR<int,3> TV_INT;
 typedef VECTOR<T,2> V2;
 
 V2 latex_x(1,0),latex_y(0,1),latex_z(.3,.4);
@@ -84,13 +88,12 @@ int main(int argc, char* argv[])
     parse_args.Add("-tri_edge_width",&tri_edge_width,"width","triangle edge widths");
     parse_args.Add("-o",&file,"dir","output filename");
     parse_args.Parse();
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),GRID<TV>(TV_INT()+1,RANGE<TV>::Unit_Box(),true),"output");
+    const VECTOR<TV_INT,8>& bits=GRID<TV>::Binary_Counts(TV_INT());
 
     if(file.length()>=4 && file.substr(file.length()-4)==".eps")
         vi=new EPS_FILE<T>(file);
     else vi=new TEX_FILE<T>(file);
-
-    const ARRAY<MARCHING_CUBES_CASE<3> >& table=MARCHING_CUBES<TV>::Case_Table();
-    const MARCHING_CUBES_CASE<3>& cs = table(case_number>=0?case_number:0);
 
     V2 mx_pt=to2d(TV(1,1,0));
     T margin=.2;
@@ -105,7 +108,6 @@ int main(int argc, char* argv[])
             if(!(v&mask))
                 points[k++]=(corners[v]+corners[v|mask])/2;}}
 
-    (void) cs;
     (void) edge_radius;
 
     cube_edge(0, 0, edge_width, case_number, edge_radius);
@@ -124,21 +126,44 @@ int main(int argc, char* argv[])
 
     cube_edge(2, 0, edge_width, case_number, edge_radius);
 
-    std::multimap<float, PAIR<int,TV> > tris;
+    for(case_number=0;case_number<256;case_number++){
+    std::multimap<float, PAIR<VECTOR<TV,3>,TV> > tris;
+
+    ARRAY<VECTOR<TV,TV::m> > surface;
+    VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >,2>,2*TV::m> boundary;
+    VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m> pboundary;
+    for(int f=0;f<2*TV::m;f++)
+        for(int s=0;s<2;s++)
+            pboundary(f)(s)=&boundary(f)(s);
+
+    VECTOR<T,8> phis;
+    for(int i=0;i<8;i++)
+        phis(i)=case_number&(1<<i)?-1:1;
+    MARCHING_CUBES<TV>::Get_Elements_For_Cell(surface,pboundary,phis);
 
     const VECTOR<TV,4> mc_tri_col(TV(1,0,0), TV(0,1,0), TV(0,0,1), TV(1,0,1));
     const VECTOR<TV,4> ex_tri_col(TV(.3,0,0), TV(0,.3,0), TV(0,0,.3), TV(.3,0,.3));
-    typedef std::pair<float, PAIR<int,TV> > pr;
-    for(int i=0,c=-1;i<MARCHING_CUBES_CASE<3>::max_surface && cs.surface[i];i++){
-        if(cs.surface[i]&0x8000) c++;
-        tris.insert(pr(((points[cs.surface[i]&31]+points[(cs.surface[i]>>5)&31]+points[(cs.surface[i]>>10)&31])/3).z,PAIR<int,TV>(cs.surface[i],mc_tri_col[c])));}
+    typedef std::pair<float, PAIR<VECTOR<TV,3>,TV> > pr;
 
-    for(int i=0,c=-1;i<MARCHING_CUBES_CASE<3>::max_boundary && cs.boundary[i];i++){
-        if(cs.boundary[i]&0x8000) c++;
-        tris.insert(pr(((points[cs.boundary[i]&31]+points[(cs.boundary[i]>>5)&31]+points[(cs.boundary[i]>>10)&31])/3).z,PAIR<int,TV>(cs.boundary[i],ex_tri_col[c])));}
+    for(int i=0;i<surface.m;i++){
+        Add_Debug_Object(surface(i),TV(0,1,0),TV(1,0,0));
+        tris.insert(pr(surface(i).Sum().z/3,PAIR<VECTOR<TV,3>,TV>(surface(i),TV(1,0,0))));}
 
-    for(std::map<float, PAIR<int,TV> >::iterator it=tris.begin(); it!=tris.end(); it++)
-        tri(points[it->second.x&31], points[(it->second.x>>5)&31], points[(it->second.x>>10)&31], TV(), it->second.y, tri_edge_width, .5, .1);
+    for(int f=0;f<2*TV::m;f++)
+        for(int s=0;s<2;s++)
+            for(int i=0;i<boundary(f)(s).m;i++){
+                Add_Debug_Object(boundary(f)(s)(i),TV(1/(s+1),1/(s+1),1),TV(.5,0,.5));
+                tris.insert(pr(boundary(f)(s)(i).Sum().z/3,PAIR<VECTOR<TV,3>,TV>(boundary(f)(s)(i),ex_tri_col[f/2]/(s+1))));}
+
+    for(std::map<float, PAIR<VECTOR<TV,3>,TV> >::iterator it=tris.begin(); it!=tris.end(); it++)
+        tri(it->second.x(0),it->second.x(1),it->second.x(2), TV(), it->second.y, tri_edge_width, .5, .1);
+
+    char buff[100];
+    sprintf(buff, "case %i", case_number);
+    for(int i=0;i<8;i++)
+        Add_Debug_Particle(TV(bits(i)),TV(phis(i)<0,phis(i)>0,0));
+
+    Flush_Frame<TV>(buff);}
 
     cube_edge(2, 1, edge_width, case_number, edge_radius);
     cube_edge(2, 2, edge_width, case_number, edge_radius);
@@ -155,29 +180,6 @@ int main(int argc, char* argv[])
         vi->Draw_Object(to2d(corners[v]),corner_radius);}
     vi->cur_format.fill_style=0;
     vi->cur_format.line_style=1;
-
-    if(case_number>=0){
-        TV p(1.2,-.1,1);
-        T dx=.2;
-        TV a(1,0,0),b(0,0,1);
-        if(cs.proj_dir==0) a=TV(0,1,0);
-        if(cs.proj_dir==2) b=TV(0,1,0);
-        TV q=p+(TV(1,1,1)-a-b)*dx;
-        
-        vi->cur_format.fill_style=1;
-        vi->cur_format.line_style=0;
-        vi->cur_format.fill_color=TV::Axis_Vector(cs.proj_dir);
-        vi->cur_format.fill_opacity=.5;
-        vi->Draw_Object(VECTOR<V2,4>(to2d(p),to2d(p+a*dx),to2d(p+a*dx+b*dx),to2d(p+b*dx)));
-        vi->cur_format.fill_color=TV(cs.enclose_inside,0,0);
-        vi->cur_format.fill_opacity=1;
-        vi->Draw_Object(to2d(TV(1.3,0,1.1)),corner_radius/2);
-        vi->cur_format.fill_color=TV::Axis_Vector(cs.proj_dir);
-        vi->cur_format.fill_opacity=.5;
-        vi->Draw_Object(VECTOR<V2,4>(to2d(q),to2d(q+a*dx),to2d(q+a*dx+b*dx),to2d(q+b*dx)));
-        vi->cur_format.fill_style=0;
-        vi->cur_format.line_style=1;
-        vi->cur_format.fill_opacity=1;}
 
     delete vi;
     return 0;

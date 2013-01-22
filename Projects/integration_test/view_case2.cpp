@@ -70,9 +70,6 @@ int main(int argc, char* argv[])
             if(!(v&mask))
                 points[k++]=(corners[v]+corners[v|mask])/2;}}
 
-    const ARRAY<MARCHING_CUBES_CASE<2> >& table=MARCHING_CUBES<TV>::Case_Table();
-    const MARCHING_CUBES_CASE<2>& cs = table(case_number>=0?case_number:0);
-
     F = fopen(file.c_str(), "w");
     char buff[1000];
 
@@ -90,37 +87,33 @@ int main(int argc, char* argv[])
     fprintf(F, "\\psset{unit=5cm}\n");
     fprintf(F, "\\noindent\\begin{pspicture}(%.3f,%.3f)(%.3f,%.3f)\n", -margin/2, -margin/2, mx_pt.x+margin/2, mx_pt.y+margin/2);
 
-    fprintf(F, "\\psframe[linewidth=.02](0,0)(1,1)\n");
+    fprintf(F, "\\psframe[linewidth=.005](0,0)(1,1)\n");
+
+    ARRAY<VECTOR<TV,TV::m> > surface;
+    VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >,2>,2*TV::m> boundary;
+    VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m> pboundary;
+    for(int f=0;f<2*TV::m;f++)
+        for(int s=0;s<2;s++)
+            pboundary(f)(s)=&boundary(f)(s);
+
+    VECTOR<T,4> phis;
+    for(int i=0;i<4;i++)
+        phis(i)=case_number&(1<<i)?-1:1;
+    MARCHING_CUBES<TV>::Get_Elements_For_Cell(surface,pboundary,phis);
 
     const char * mc_tri_col[4] = {"red", "green", "blue", "magenta"};
     const char * ex_tri_col[4] = {"dkred", "dkgreen", "dkblue", "dkmagenta"};
-    typedef std::pair<float, PAIR<int,const char*> > pr;
-    for(int i=0,c=-1;i<MARCHING_CUBES_CASE<2>::max_surface && cs.surface[i];i++){
-        if(cs.surface[i]&0x8000) c++;
-        norm(points[cs.surface[i]&31], points[(cs.surface[i]>>5)&31], "black", mc_tri_col[c], tri_edge_width, .2);}
+    for(int i=0;i<surface.m;i++)
+        norm(surface(i)(0),surface(i)(1), "cyan", "blue", tri_edge_width, .2);
 
-    for(int i=0,c=-1;i<MARCHING_CUBES_CASE<2>::max_boundary && cs.boundary[i];i++){
-        if(cs.boundary[i]&0x8000) c++;
-        norm(points[cs.boundary[i]&31], points[(cs.boundary[i]>>5)&31], "black", ex_tri_col[c], tri_edge_width, .2);}
+    for(int f=0;f<2*TV::m;f++)
+        for(int s=0;s<2;s++)
+            for(int i=0;i<boundary(f)(s).m;i++)
+                norm(boundary(f)(s)(i)(0),boundary(f)(s)(i)(1), "yellow", (s?mc_tri_col:ex_tri_col)[f/3], tri_edge_width, .2);
 
     for(int v=0;v<4;v++){
-        sprintf(buff, "fillstyle=solid,fillcolor=%s,linestyle=none", (case_number>=0 && case_number&(1<<v))?"red":"black");
+        sprintf(buff, "fillstyle=solid,fillcolor=%s,linestyle=none", (case_number>=0 && case_number&(1<<v))?"red":"green");
         circ(corners[v],corner_radius,buff);}
-
-    if(case_number>=0){
-        TV p(.75,-.1);
-        T dx=.15;
-        p-=dx/2;
-        fprintf(F, "\\psline[linecolor=%s,linewidth=.01,opacity=%.3f]", rgb[cs.proj_dir], .5);
-        pt(p);
-        pt(p+TV::Axis_Vector(1-cs.proj_dir)*dx);
-        fprintf(F, "\n");
-        sprintf(buff, "fillstyle=solid,fillcolor=%s,linestyle=none", cs.enclose_inside?"red":"black");
-        circ(p+dx/2,corner_radius/2,buff);
-        fprintf(F, "\\psline[linecolor=%s,linewidth=.01,opacity=%.3f]", rgb[cs.proj_dir], .5);
-        pt(p+TV::Axis_Vector(cs.proj_dir)*dx);
-        pt(p+TV(1,1)*dx);
-        fprintf(F, "\n");}
 
     fprintf(F, "\\end{pspicture}\n");
     fprintf(F, "\\end{document}\n");
