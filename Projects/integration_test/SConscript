@@ -16,4 +16,6 @@ Automatic_Program(env,"mc2tex",["mc2tex.cpp"])
 Automatic_Program(env,"bending",["bending.cpp"])
 Automatic_Program(env,"marching_tets",["marching_tets.cpp"])
 Automatic_Program(env,"quad",["quad.cpp"])
+Automatic_Program(env,"fanfu",["fanfu.cpp"])
+Automatic_Program(env,"emb2img",["emb2img.cpp"])
 
