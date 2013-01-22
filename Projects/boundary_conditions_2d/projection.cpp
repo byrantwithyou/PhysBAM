@@ -1,4 +1,6 @@
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
@@ -7,62 +9,86 @@
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
+#include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include "POISSON_PROJECTION_SYSTEM.h"
 #include <boost/function.hpp>
 
 using namespace PhysBAM;
 
-template<class T,class TV>
-void Project(const GRID<TV>& grid,int ghost,boost::function<T(TV X)> phi,boost::function<TV(TV X)> u_star,
+template<class TV,class T>
+TV Centroid(const ARRAY<VECTOR<TV,TV::m> >& ar,T* pA,TV* N=0)
+{
+    TV X;
+    T A=0;
+    if(N) *N=TV();
+    for(int i=0;i<ar.m;i++){
+        typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE face(ar(i));
+        T a=face.Size();
+        X+=a*face.Center();
+        if(N) *N+=a*face.Normal();
+        A+=a;}
+    if(pA) *pA=A;
+    if(N) *N/=A;
+    return X/A;
+}
+
+// phi at nodes
+template<class T,class TV,class TV_INT>
+void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::function<TV(TV X)> u_star,
     boost::function<TV(TV X)> u_projected,boost::function<T(TV X)> p,T density,T theta_threshold,T cg_tolerance,bool use_p_null_mode)
 {
-    typedef VECTOR<int,TV::m> TV_INT;
     ARRAY<TV> u_loc,p_loc;
-    ARRAY<T> us,u_proj;
+    ARRAY<T> us,u_proj,S,R,u_bc;
     ARRAY<FACE_INDEX<TV::m> > u_face;
-    ARRAY<T> S,R;
-    SPARSE_MATRIX_FLAT_MXN<T> G_hat;
-    G_hat.Reset(0);
+    SPARSE_MATRIX_FLAT_MXN<T> neg_div,G_hat;
+    neg_div.Reset(0);
     HASHTABLE<TV_INT,int> cell_index;
-    int next_cell=0;
+    HASHTABLE<FACE_INDEX<TV::m>,int> face_index;
     INTERPOLATED_COLOR_MAP<T> color;
     color.Initialize_Colors(1e-12,1,true,true,true);
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-        FACE_INDEX<TV::m> face=it.Full_Index();
-        TV X=grid.X(face.Cell_Index(0)),Y=grid.X(face.Cell_Index(1));
-        TV M=(X+Y)/2,D=(Y-X)/2,A=M+D.Orthogonal_Vector(),B=M-D.Orthogonal_Vector();
-        T pa=phi(A),pb=phi(B);
-        if(abs(pa)<theta_threshold) pa=sign_nonzero(pa)*theta_threshold;
-        if(abs(pb)<theta_threshold) pb=sign_nonzero(pb)*theta_threshold;
-        if(pa>0){
-            if(pb>0) continue;
-            T th=pb/(pb-pa);
-            S.Append(th);
-            u_loc.Append(B+th/2*(A-B));}
-        else if(pb<=0){
-            S.Append(1);
-            u_loc.Append(M);}
-        else{
-            T th=pa/(pa-pb);
-            S.Append(th);
-            u_loc.Append(A+th/2*(B-A));}
-        u_face.Append(face);
-        R.Append(density);
-        us.Append(u_star(u_loc.Last())(it.Axis()));
-
-        for(int s=0;s<2;s++){
-            int index=0;
-            if(!cell_index.Get(face.Cell_Index(s),index)){
-                p_loc.Append(grid.Center(face.Cell_Index(s)));
-                cell_index.Set(face.Cell_Index(s),index=next_cell++);}
-            G_hat.Append_Entry_To_Current_Row(index,(s*2-1)*grid.one_over_dX(it.Axis()));}
-        G_hat.Finish_Row();}
-    G_hat.n=next_cell;
-    G_hat.Sort_Entries();
-    S*=grid.dX.Product();
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        ARRAY<VECTOR<TV,TV::m> > surface;
+        VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >,2>,2*TV::m> boundary;
+        VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m> pboundary;
+        for(int f=0;f<2*TV::m;f++)
+            for(int s=1;s<2;s++) // Inside only
+                pboundary(f)(s)=&boundary(f)(s);
+        MARCHING_CUBES<TV>::Get_Elements_For_Cell(surface,pboundary,phi,it.index);
+        bool used_cell=false;
+        for(int a=0;a<TV::m;a++)
+            for(int s=0;s<2;s++){
+                FACE_INDEX<TV::m> face(a,it.index);
+                face.index(a)+=s;
+                if(!face_index.Contains(face)){
+                    for(int t=0;t<boundary(2*a+s)(1).m;t++)
+                        boundary(2*a+s)(1)(t)*=grid.dX;
+                    T area=0;
+                    TV centroid=Centroid(boundary(2*a+s)(1),&area);
+                    if(!area) continue;
+                    face_index.Insert(face,u_face.Append(face));
+                    S.Append(area);
+                    u_loc.Append(centroid+it.Location()-grid.dX/2);
+                    us.Append(u_star(u_loc.Last())(a));
+                    R.Append(density);}
+                int fi=-1;
+                if(face_index.Get(face,fi)){
+                    used_cell=true;
+                    neg_div.Append_Entry_To_Current_Row(fi,-(s*2-1)*grid.one_over_dX(a));}}
+        if(used_cell){
+            p_loc.Append(it.Location());
+            neg_div.Finish_Row();
+            T area=0;
+            TV N;
+            if(surface.m) u_bc.Append(u_projected(Centroid(surface,&area,&N)).Dot(N)*area);
+            else u_bc.Append(0);}}
+    neg_div.n=u_loc.m;
+    neg_div.Sort_Entries();
+    neg_div.Transpose(G_hat);
 
     LOG::cout<<S<<std::endl;
     LOG::cout<<G_hat<<std::endl;
@@ -163,7 +189,11 @@ int main(int argc,char* argv[])
             break;
         default: PHYSBAM_FATAL_ERROR("Unrecognized velocity");}
 
-    Project<T,TV>(grid,3,phi,u_star,u_projected,p,rho,(T)1e-8,(T)1e-12,use_p_null_mode);
+    ARRAY<T,TV_INT> node_phi(grid.Node_Indices());
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+        node_phi(it.index)=phi(it.Location());
+
+    Project<T,TV>(grid,3,node_phi,u_star,u_projected,p,rho,(T)1e-8,(T)1e-12,use_p_null_mode);
     Flush_Frame<TV>("flush");
     return 0;
 }
