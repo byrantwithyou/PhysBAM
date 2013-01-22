@@ -398,6 +398,33 @@ Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRA
                     for(int i=0;i<len;i++) ar->Append(VECTOR<TV,TV::m>(pts.Subset(tmp_elements[i])));}
 }
 //#####################################################################
+// Function Get_Elements_For_Cell
+//#####################################################################
+template<class TV> void MARCHING_CUBES<TV>::
+Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,const ARRAY<T,TV_INT>& phi,const TV_INT& cell)
+{
+    VECTOR<T,num_corners> phis;
+    Compute_Phis_For_Cell(phis,phi,cell);
+    Get_Interior_Elements_For_Cell(interior,exterior,phis);
+}
+//#####################################################################
+// Function Get_Interior_Elements_For_Cell
+//#####################################################################
+template<class TV> void MARCHING_CUBES<TV>::
+Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,const VECTOR<T,num_corners>& phis)
+{
+    VECTOR<TV,num_pts> pts;
+    int c=Compute_Points_For_Cell(pts,phis);
+
+    VECTOR<int,TV::m+1> tmp_elements[MARCHING_CUBES_INTERIOR_CASE<TV::m>::max_elements];
+    if(interior){
+        int len=Get_Interior_Elements(tmp_elements,true,c);
+        for(int i=0;i<len;i++) interior->Append(VECTOR<TV,TV::m+1>(pts.Subset(tmp_elements[i])));}
+    if(exterior){
+        int len=Get_Interior_Elements(tmp_elements,false,c);
+        for(int i=0;i<len;i++) exterior->Append(VECTOR<TV,TV::m+1>(pts.Subset(tmp_elements[i])));}
+}
+//#####################################################################
 // Function Create_Surface
 //#####################################################################
 template<class TV> int MARCHING_CUBES<TV>::

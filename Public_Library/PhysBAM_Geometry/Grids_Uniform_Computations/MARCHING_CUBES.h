@@ -42,7 +42,7 @@ struct MARCHING_CUBES_CASE
 template<int d>
 struct MARCHING_CUBES_INTERIOR_CASE
 {
-    enum WORKAROUND {max_elements=(d==3?10:(d==2?4:1)),num_corners=1<<d,num_edges=d<<(d-1),num_pts=num_corners+num_edges};
+    enum WORKAROUND {max_elements=(d==3?16:(d==2?4:1)),num_corners=1<<d,num_edges=d<<(d-1),num_pts=num_corners+num_edges};
     unsigned int elements[2][max_elements];
 
     static const ARRAY<MARCHING_CUBES_INTERIOR_CASE<d> >& Case_Table();
@@ -64,6 +64,8 @@ public:
     static int Compute_Points_For_Cell(VECTOR<TV,num_pts>& pts,const VECTOR<T,num_corners>& phis);
     static void Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m>& boundary,const VECTOR<T,num_corners>& phis);
     static void Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m>& boundary,const ARRAY<T,TV_INT>& phi,const TV_INT& cell);
+    static void Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,const VECTOR<T,num_corners>& phis);
+    static void Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,const ARRAY<T,TV_INT>& phi,const TV_INT& cell);
     static int Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi);
 //#####################################################################
 };
