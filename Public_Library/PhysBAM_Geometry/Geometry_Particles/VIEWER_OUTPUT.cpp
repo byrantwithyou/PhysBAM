@@ -14,7 +14,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> VIEWER_OUTPUT<TV>::
-VIEWER_OUTPUT(STREAM_TYPE stream_type,GRID<TV>& grid,const std::string& output_directory)
+VIEWER_OUTPUT(STREAM_TYPE stream_type,const GRID<TV>& grid,const std::string& output_directory)
     :frame(0),output_directory(output_directory),stream_type(stream_type),grid(grid),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
     Singleton(this);

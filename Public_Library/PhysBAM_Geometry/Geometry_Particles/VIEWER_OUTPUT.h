@@ -23,10 +23,10 @@ public:
     std::string output_directory;
     STREAM_TYPE stream_type;
 
-    GRID<TV>& grid;
+    const GRID<TV>& grid;
     DEBUG_PARTICLES<TV>& debug_particles;
 
-    VIEWER_OUTPUT(STREAM_TYPE stream_type,GRID<TV>& grid,const std::string& output_directory);
+    VIEWER_OUTPUT(STREAM_TYPE stream_type,const GRID<TV>& grid,const std::string& output_directory);
     ~VIEWER_OUTPUT();
 
     static VIEWER_OUTPUT* Singleton(VIEWER_OUTPUT* vo=0);
