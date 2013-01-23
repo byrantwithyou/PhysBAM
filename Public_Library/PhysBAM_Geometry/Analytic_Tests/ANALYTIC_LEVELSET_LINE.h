@@ -2,7 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class ANALYTIC_LEVELSET_SIGNED
+// Class ANALYTIC_LEVELSET_LINE
 //#####################################################################
 #ifndef __ANALYTIC_LEVELSET_LINE__
 #define __ANALYTIC_LEVELSET_LINE__
