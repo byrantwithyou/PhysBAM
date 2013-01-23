@@ -12,6 +12,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include "POISSON_PROJECTION_SYSTEM.h"
@@ -44,12 +45,13 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
     ARRAY<TV> u_loc,p_loc;
     ARRAY<T> us,u_proj,S,R,u_bc;
     ARRAY<FACE_INDEX<TV::m> > u_face;
+    ARRAY<T,FACE_INDEX<TV::m> > us_grid(grid);
     SPARSE_MATRIX_FLAT_MXN<T> neg_div,G_hat;
     neg_div.Reset(0);
     HASHTABLE<TV_INT,int> cell_index;
     HASHTABLE<FACE_INDEX<TV::m>,int> face_index;
     INTERPOLATED_COLOR_MAP<T> color;
-    color.Initialize_Colors(1e-12,1,true,true,true);
+    color.Initialize_Colors(1e-12,10,true,true,true);
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         ARRAY<VECTOR<TV,TV::m> > surface;
@@ -64,7 +66,7 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
             for(int s=0;s<2;s++){
                 FACE_INDEX<TV::m> face(a,it.index);
                 face.index(a)+=s;
-                if(!face_index.Contains(face)){
+                if(boundary(2*a+s)(1).m && !face_index.Contains(face)){
                     for(int t=0;t<boundary(2*a+s)(1).m;t++)
                         boundary(2*a+s)(1)(t)*=grid.dX;
                     T area=0;
@@ -74,6 +76,9 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
                     S.Append(area);
                     u_loc.Append(centroid+it.Location()-grid.dX/2);
                     us.Append(u_star(u_loc.Last())(a));
+                    Add_Debug_Particle(u_loc.Last(),VECTOR<T,3>(0,1,1));
+                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,us.Last()*TV::Axis_Vector(a));
+                    us_grid(face)=us.Last();
                     R.Append(density);}
                 int fi=-1;
                 if(face_index.Get(face,fi)){
@@ -82,21 +87,28 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
         if(used_cell){
             p_loc.Append(it.Location());
             neg_div.Finish_Row();
-            T area=0;
-            TV N;
-            if(surface.m) u_bc.Append(u_projected(Centroid(surface,&area,&N)).Dot(N)*area);
+
+            if(surface.m){
+                for(int t=0;t<surface.m;t++)
+                    surface(t)*=grid.dX;
+                T area=0;
+                TV N,X=Centroid(surface,&area,&N)+it.Location()-grid.dX/2;
+                T un=u_projected(X).Dot(N);
+                u_bc.Append(un*area);
+                Add_Debug_Particle(X,VECTOR<T,3>(1,0,1));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,un*N);}
             else u_bc.Append(0);}}
     neg_div.n=u_loc.m;
     neg_div.Sort_Entries();
     neg_div.Transpose(G_hat);
 
-    LOG::cout<<S<<std::endl;
-    LOG::cout<<G_hat<<std::endl;
+    Flush_Frame(us_grid,"disc");
 
     POISSON_PROJECTION_SYSTEM<TV> system;
     system.gradient=G_hat;
-    system.gradient.Set_Times_Diagonal(S);
-    system.beta_inverse=S/R;
+    system.gradient.Set_Diagonal_Times(S);
+    system.beta_inverse.Resize(S.m);
+    for(int i=0;i<system.beta_inverse.m;i++) system.beta_inverse(i)=1/(S(i)*R(i));
     system.Initialize();
     if(use_p_null_mode){
         system.projections.Append(ARRAY<T>());
@@ -110,6 +122,12 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
 
     system.gradient.Transpose_Times(us,b.v);
     b.v*=-(T)1;
+
+    for(int i=0;i<b.v.m;i++){
+        Add_Debug_Particle(p_loc(i),color(abs(b.v(i))));
+        Add_Debug_Particle(p_loc(i)+grid.dX/4,color(abs(u_bc(i))));
+    }
+    Flush_Frame<TV>("divergence");
 
     CONJUGATE_GRADIENT<T> solver;
     solver.Solve(system,x,b,vectors,cg_tolerance,1,1000000);
@@ -140,6 +158,7 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
 
     printf("u %g %g\n", li, l1/cnt);
 
+    Dump_Levelset(grid,phi,true,VECTOR<T,3>(1,1,0));
     Flush_Frame(u_error,"errors");
 }
 
