@@ -125,13 +125,17 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
     CONJUGATE_GRADIENT<T> solver;
     solver.Solve(system,x,b,vectors,cg_tolerance,1,1000000);
 
-    T li=0,l1=0;
+    T li=0,l1=0,ave=0;
     int cnt=0;
     for(int i=0;i<x.v.m;i++){
-        T z=abs(x.v(i)-p(p_loc(i)));
+        cnt++;
+        ave+=x.v(i)-p(p_loc(i));}
+    ave/=cnt;
+
+    for(int i=0;i<x.v.m;i++){
+        T z=abs(x.v(i)-p(p_loc(i))-ave);
         li=max(li,z);
         l1+=z;
-        cnt++;
         Add_Debug_Particle(p_loc(i),color(z));}
     printf("p %g %g\n", li, l1/cnt);
 
@@ -232,7 +236,7 @@ int main(int argc,char* argv[])
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
         node_phi(it.index)=phi(it.Location()/m)*m;
 
-    Project<T,TV>(grid,3,node_phi,[=](TV X){return u_star(X/m)*m/s;},[=](TV X){return u_projected(X/m)*m/s;},[=](TV X){return p(X/m)*unit_p*s;},rho*kg*pow(m,-TV::m),(T)1e-8,(T)1e-12,use_p_null_mode);
+    Project<T,TV>(grid,3,node_phi,[=](TV X){return u_star(X/m)*m/s;},[=](TV X){return u_projected(X/m)*m/s;},[=](TV X){return p(X/m)*unit_p*s;},rho*kg*pow(m,-TV::m),(T)1e-14,(T)1e-14,use_p_null_mode);
     Flush_Frame<TV>("flush");
     return 0;
 }
