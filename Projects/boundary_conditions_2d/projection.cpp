@@ -83,7 +83,7 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
                 int fi=-1;
                 if(face_index.Get(face,fi)){
                     used_cell=true;
-                    neg_div.Append_Entry_To_Current_Row(fi,-(s*2-1)*grid.one_over_dX(a));}}
+                    neg_div.Append_Entry_To_Current_Row(fi,-(s*2-1));}}
         if(used_cell){
             p_loc.Append(it.Location());
             neg_div.Finish_Row();
@@ -121,12 +121,9 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
     system.gradient.Transpose_Times(us,b.v);
-    b.v*=-(T)1;
+    b.v=u_bc-b.v;
 
-    for(int i=0;i<b.v.m;i++){
-        Add_Debug_Particle(p_loc(i),color(abs(b.v(i))));
-        Add_Debug_Particle(p_loc(i)+grid.dX/4,color(abs(u_bc(i))));
-    }
+    for(int i=0;i<b.v.m;i++) Add_Debug_Particle(p_loc(i),color(abs(b.v(i))));
     Flush_Frame<TV>("divergence");
 
     CONJUGATE_GRADIENT<T> solver;
