@@ -439,6 +439,7 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
         VECTOR<TV,num_pts> pts;
         Compute_Phis_For_Cell(phis,phi,it.index);
         int c=Compute_Points_For_Cell(pts,phis);
+        TV X=grid.Node(it.index);
 
         VECTOR<int,TV::m> tmp_elements[MARCHING_CUBES_CASE<TV::m>::max_elements];
         int len=Get_Interface_Elements(tmp_elements,c);
@@ -452,7 +453,7 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
                     int index=surface.particles.Add_Element();
                     face(j)=index;
                     ht.Set(fi,index);
-                    surface.particles.X(index)=pts[e];}}
+                    surface.particles.X(index)=pts[e]*grid.dX+X;}}
             surface.mesh.elements.Append(face);}}
 
     surface.Update_Number_Nodes();
