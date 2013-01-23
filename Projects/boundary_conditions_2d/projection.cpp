@@ -43,7 +43,7 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
     boost::function<TV(TV X)> u_projected,boost::function<T(TV X)> p,T density,T theta_threshold,T cg_tolerance,bool use_p_null_mode)
 {
     ARRAY<TV> u_loc,p_loc;
-    ARRAY<T> us,u_proj,S,R,u_bc;
+    ARRAY<T> us,u_proj,S,u_bc;
     ARRAY<FACE_INDEX<TV::m> > u_face;
     ARRAY<T,FACE_INDEX<TV::m> > us_grid(grid);
     SPARSE_MATRIX_FLAT_MXN<T> neg_div,G_hat;
@@ -52,6 +52,7 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
     HASHTABLE<FACE_INDEX<TV::m>,int> face_index;
     INTERPOLATED_COLOR_MAP<T> color;
     color.Initialize_Colors(1e-12,10,true,true,true);
+    POISSON_PROJECTION_SYSTEM<TV> system;
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         ARRAY<VECTOR<TV,TV::m> > surface;
@@ -79,11 +80,11 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
                     Add_Debug_Particle(u_loc.Last(),VECTOR<T,3>(0,1,1));
                     Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,us.Last()*TV::Axis_Vector(a));
                     us_grid(face)=us.Last();
-                    R.Append(density);}
+                    system.beta_inverse.Append(1/(density*grid.dX(a)*area));}
                 int fi=-1;
                 if(face_index.Get(face,fi)){
                     used_cell=true;
-                    neg_div.Append_Entry_To_Current_Row(fi,-(s*2-1));}}
+                    neg_div.Append_Entry_To_Current_Row(fi,-(s*2-1)*S(fi));}}
         if(used_cell){
             p_loc.Append(it.Location());
             neg_div.Finish_Row();
@@ -100,15 +101,10 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
             else u_bc.Append(0);}}
     neg_div.n=u_loc.m;
     neg_div.Sort_Entries();
-    neg_div.Transpose(G_hat);
+    neg_div.Transpose(system.gradient);
 
     Flush_Frame(us_grid,"disc");
 
-    POISSON_PROJECTION_SYSTEM<TV> system;
-    system.gradient=G_hat;
-    system.gradient.Set_Diagonal_Times(S);
-    system.beta_inverse.Resize(S.m);
-    for(int i=0;i<system.beta_inverse.m;i++) system.beta_inverse(i)=1/(S(i)*R(i));
     system.Initialize();
     if(use_p_null_mode){
         system.projections.Append(ARRAY<T>());
@@ -121,7 +117,7 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
     system.gradient.Transpose_Times(us,b.v);
-    b.v=u_bc-b.v;
+    b.v-=u_bc;
 
     for(int i=0;i<b.v.m;i++) Add_Debug_Particle(p_loc(i),color(abs(b.v(i))));
     Flush_Frame<TV>("divergence");
@@ -182,7 +178,9 @@ int main(int argc,char* argv[])
     parse_args.Add("-null_p",&use_p_null_mode,"Assume pressure null mode and project it out");
     parse_args.Parse();
 
-    GRID<TV> grid(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+    T unit_p=kg/(s*s)*pow(m,2-TV::m);
+
+    GRID<TV> grid(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid,"output");
 
     boost::function<T(TV X)> phi,p;
@@ -203,13 +201,38 @@ int main(int argc,char* argv[])
             u_projected=[](TV X){return TV(2,1);};
             p=[](TV X){return 0;};
             break;
+        case 2:
+            u_star=[](TV X){return X*TV(1,-1);};
+            u_projected=[](TV X){return X*TV(1,-1);};
+            p=[](TV X){return 0;};
+            break;
+        case 3:
+            u_star=[](TV X){return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y));};
+            u_projected=[](TV X){return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y));};
+            p=[](TV X){return 0;};
+            break;
+        case 4:
+            u_star=[](TV X){return TV(2,1);};
+            u_projected=[](TV X){return TV();};
+            p=[=](TV X){return rho*X.Dot(TV(2,1));};
+            break;
+        case 5:
+            u_star=[](TV X){return X*TV(1,-1);};
+            u_projected=[](TV X){return TV();};
+            p=[=](TV X){return rho*X.Dot(X*TV(1,-1))/2;};
+            break;
+        case 6:
+            u_star=[](TV X){return X;};
+            u_projected=[](TV X){return TV(1,0);};
+            p=[=](TV X){return rho*(X.Magnitude_Squared()/2-X.x);};
+            break;
         default: PHYSBAM_FATAL_ERROR("Unrecognized velocity");}
 
     ARRAY<T,TV_INT> node_phi(grid.Node_Indices());
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
-        node_phi(it.index)=phi(it.Location());
+        node_phi(it.index)=phi(it.Location()/m)*m;
 
-    Project<T,TV>(grid,3,node_phi,u_star,u_projected,p,rho,(T)1e-8,(T)1e-12,use_p_null_mode);
+    Project<T,TV>(grid,3,node_phi,[=](TV X){return u_star(X/m)*m/s;},[=](TV X){return u_projected(X/m)*m/s;},[=](TV X){return p(X/m)*unit_p*s;},rho*kg*pow(m,-TV::m),(T)1e-8,(T)1e-12,use_p_null_mode);
     Flush_Frame<TV>("flush");
     return 0;
 }
