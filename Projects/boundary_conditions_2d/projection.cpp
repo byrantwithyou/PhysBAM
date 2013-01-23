@@ -9,6 +9,7 @@
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <PhysBAM_Geometry/Analytic_Tests/VORTEX_IMPLICIT_SURFACE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -184,15 +185,21 @@ int main(int argc,char* argv[])
 
     T unit_p=kg/(s*s)*pow(m,2-TV::m);
 
-    GRID<TV> grid(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid,"output");
-
     boost::function<T(TV X)> phi,p;
     boost::function<TV(TV X)> u_star,u_projected;
 
+    RANGE<TV> domain=RANGE<TV>::Unit_Box();
+
+    VORTEX_IMPLICIT_SURFACE<TV> vis;
+
     switch(interface){
         case 0:phi=[](TV X){return (X-.5).Magnitude()-.3;};break;
+        case 1:phi=[](TV X){return X.Magnitude()-.7;};domain=RANGE<TV>::Centered_Box();break;
+        case 2:vis.k=(T).2;phi=[=](TV X){return vis.Phi(X);};domain.max_corner*=(T)pi;break;
         default: PHYSBAM_FATAL_ERROR("Unrecognized interface");}
+
+    GRID<TV> grid(TV_INT()+resolution,domain*m,true);
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid,"output");
 
     switch(velocity_field){
         case 0:
