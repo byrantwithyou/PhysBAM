@@ -486,6 +486,7 @@ Create_NXN_Matrix()
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Set_Times_Diagonal(const ARRAY<T>& D)
 {
+    assert(n==D.m);
     for(int i=0;i<A.m;i++)
         A(i).a*=D(A(i).j);
 }
@@ -495,6 +496,7 @@ Set_Times_Diagonal(const ARRAY<T>& D)
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Set_Diagonal_Times(const ARRAY<T>& D)
 {
+    assert(m==D.m);
     for(int row=0;row<m;row++){
         int start=offsets(row),end=offsets(row+1);
         for(int i=start;i<end;i++)
