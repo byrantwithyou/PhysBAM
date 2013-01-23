@@ -4,6 +4,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
+#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <PhysBAM_Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
@@ -24,8 +25,8 @@ int main(int argc,char* argv[])
 {
     typedef double T;
     typedef float RW;
-    typedef VECTOR<T,2> TV;
-    typedef VECTOR<int,2> TV_INT;
+    typedef VECTOR<T,3> TV;
+    typedef VECTOR<int,3> TV_INT;
     PARSE_ARGS parse_args(argc,argv);
     int refine=1,resolution=32,interface=0,velocity_field=0;
     T rho=1,kg=1,m=1,s=1;
@@ -50,12 +51,9 @@ int main(int argc,char* argv[])
 
     RANGE<TV> domain=RANGE<TV>::Unit_Box();
 
-    VORTEX_IMPLICIT_SURFACE<TV> vis;
-
     switch(interface){
         case 0:phi=[](TV X){return (X-.5).Magnitude()-.3;};break;
         case 1:phi=[](TV X){return X.Magnitude()-.7;};domain=RANGE<TV>::Centered_Box();break;
-        case 2:vis.k=(T).2;phi=[=](TV X){return vis.Phi(X);};domain.max_corner*=(T)pi;break;
         default: PHYSBAM_FATAL_ERROR("Unrecognized interface");}
 
     GRID<TV> grid(TV_INT()+resolution,domain*m,true);
@@ -63,38 +61,38 @@ int main(int argc,char* argv[])
 
     switch(velocity_field){
         case 0:
-            u_star=[](TV X){return TV(0,0);};
-            u_projected=[](TV X){return TV(0,0);};
+            u_star=[](TV X){return TV(0,0,0);};
+            u_projected=[](TV X){return TV(0,0,0);};
             p=[](TV X){return 0;};
             break;
         case 1:
-            u_star=[](TV X){return TV(2,1);};
-            u_projected=[](TV X){return TV(2,1);};
+            u_star=[](TV X){return TV(2,1,3);};
+            u_projected=[](TV X){return TV(2,1,3);};
             p=[](TV X){return 0;};
             break;
         case 2:
-            u_star=[](TV X){return X*TV(1,-1);};
-            u_projected=[](TV X){return X*TV(1,-1);};
+            u_star=[](TV X){return X*TV(2,-1,-1);};
+            u_projected=[](TV X){return X*TV(2,-1,-1);};
             p=[](TV X){return 0;};
             break;
         case 3:
-            u_star=[](TV X){return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y));};
-            u_projected=[](TV X){return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y));};
+            u_star=[](TV X){return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y),0);};
+            u_projected=[](TV X){return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y),0);};
             p=[](TV X){return 0;};
             break;
         case 4:
-            u_star=[](TV X){return TV(2,1);};
+            u_star=[](TV X){return TV(2,1,3);};
             u_projected=[](TV X){return TV();};
-            p=[=](TV X){return rho*X.Dot(TV(2,1));};
+            p=[=](TV X){return rho*X.Dot(TV(2,1,3));};
             break;
         case 5:
-            u_star=[](TV X){return X*TV(1,-1);};
+            u_star=[](TV X){return X*TV(2,-1,-1);};
             u_projected=[](TV X){return TV();};
-            p=[=](TV X){return rho*X.Dot(X*TV(1,-1))/2;};
+            p=[=](TV X){return rho*X.Dot(X*TV(2,-1,-1))/2;};
             break;
         case 6:
             u_star=[](TV X){return X;};
-            u_projected=[](TV X){return TV(1,0);};
+            u_projected=[](TV X){return TV(1,0,0);};
             p=[=](TV X){return rho*(X.Magnitude_Squared()/2-X.x);};
             break;
         default: PHYSBAM_FATAL_ERROR("Unrecognized velocity");}
@@ -107,3 +105,5 @@ int main(int argc,char* argv[])
     Flush_Frame<TV>("flush");
     return 0;
 }
+
+

@@ -61,5 +61,9 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
     poisson.C->Solve_Forward_Substitution(vr.v,temp,true);
     poisson.C->Solve_Backward_Substitution(temp,vz.v,false,true);
 }
+template struct POISSON_PROJECTION_SYSTEM<VECTOR<float,1> >;
+template struct POISSON_PROJECTION_SYSTEM<VECTOR<float,2> >;
+template struct POISSON_PROJECTION_SYSTEM<VECTOR<float,3> >;
 template struct POISSON_PROJECTION_SYSTEM<VECTOR<double,1> >;
 template struct POISSON_PROJECTION_SYSTEM<VECTOR<double,2> >;
+template struct POISSON_PROJECTION_SYSTEM<VECTOR<double,3> >;
