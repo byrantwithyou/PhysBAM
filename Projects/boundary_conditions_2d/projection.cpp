@@ -56,6 +56,8 @@ int main(int argc,char* argv[])
         case 0:phi=[](TV X){return (X-.5).Magnitude()-.3;};break;
         case 1:phi=[](TV X){return X.Magnitude()-.7;};domain=RANGE<TV>::Centered_Box();break;
         case 2:vis.k=(T).2;phi=[=](TV X){return vis.Phi(X);};domain.max_corner*=(T)pi;break;
+        case 3:phi=[](TV X){return X.Magnitude()-.8;};domain=RANGE<TV>::Centered_Box();break;
+        case 4:vis.k=(T).2;phi=[=](TV X){return .2-sin(X.x)*sin(X.y);};domain.max_corner*=(T)pi;break;
         default: PHYSBAM_FATAL_ERROR("Unrecognized interface");}
 
     GRID<TV> grid(TV_INT()+resolution,domain*m,true);
@@ -96,6 +98,26 @@ int main(int argc,char* argv[])
             u_star=[](TV X){return X;};
             u_projected=[](TV X){return TV(1,0);};
             p=[=](TV X){return rho*(X.Magnitude_Squared()/2-X.x);};
+            break;
+        case 7:
+            u_star=[](TV X){return TV(X.y,-X.x)*2;};
+            u_projected=[](TV X){return TV(X.y,-X.x)*2;};
+            p=[=](TV X){return 0;};
+            break;
+        case 8:
+            u_star=[](TV X){return TV(sin(X.x)*cos(X.y)+(X.x*X.x-X.x)*(X.y*X.y*X.y/3-X.y*X.y/2),-cos(X.x)*sin(X.y)+(X.y*X.y-X.y)*(X.x*X.x*X.x/3-X.x*X.x/2));};
+            u_projected=[](TV X){return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y));};
+            p=[](TV X){return (X.x*X.x*X.x/3-X.x*X.x/2)*(X.y*X.y*X.y/3-X.y*X.y/2);};
+            break;
+        case 9:
+            u_star=[](TV X){return TV((X.x*X.x-X.x)*(X.y*X.y*X.y/3-X.y*X.y/2),(X.y*X.y-X.y)*(X.x*X.x*X.x/3-X.x*X.x/2));};
+            u_projected=[](TV X){return TV();};
+            p=[](TV X){return (X.x*X.x*X.x/3-X.x*X.x/2)*(X.y*X.y*X.y/3-X.y*X.y/2);};
+            break;
+        case 10:
+            u_star=[](TV X){return TV(X.y,X.x);};
+            u_projected=[](TV X){return TV();};
+            p=[](TV X){return X.x*X.y;};
             break;
         default: PHYSBAM_FATAL_ERROR("Unrecognized velocity");}
 
