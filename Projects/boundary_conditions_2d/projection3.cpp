@@ -102,7 +102,8 @@ int main(int argc,char* argv[])
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
         node_phi(it.index)=phi(it.Location()/m)*m;
 
-    Project<T,TV>(grid,3,node_phi,[=](TV X){return u_star(X/m)*m/s;},[=](TV X){return u_projected(X/m)*m/s;},[=](TV X){return p(X/m)*unit_p*s;},rho*kg*pow(m,-TV::m),(T)1e-14,(T)1e-14,use_p_null_mode,use_bc);
+    Project<T,TV>(grid,3,node_phi,[=](TV X){return u_star(X/m)*m/s;},[=](TV X){return u_projected(X/m)*m/s;},[=](TV X){return p(X/m)*unit_p*s;},rho*kg*pow(m,-TV::m),
+        (T)1e-14,(T)1e-14,use_p_null_mode,use_bc,dump_matrix);
     Flush_Frame<TV>("flush");
     return 0;
 }

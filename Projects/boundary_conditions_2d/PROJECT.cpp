@@ -6,6 +6,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -37,19 +38,18 @@ TV Centroid(const ARRAY<VECTOR<TV,TV::m> >& ar,T& A,TV& N)
 template<class T,class TV,class TV_INT>
 void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::function<TV(TV X)> u_star,
     boost::function<TV(TV X)> u_projected,boost::function<T(TV X)> p,T density,T theta_threshold,T cg_tolerance,
-    bool use_p_null_mode,bool use_bc)
+    bool use_p_null_mode,bool use_bc,bool print_matrix)
 {
     ARRAY<TV> u_loc,p_loc;
     ARRAY<T> us,u_proj,S,u_bc;
     ARRAY<FACE_INDEX<TV::m> > u_face;
     ARRAY<T,FACE_INDEX<TV::m> > us_grid(grid);
-    SPARSE_MATRIX_FLAT_MXN<T> neg_div,G_hat;
-    neg_div.Reset(0);
     HASHTABLE<TV_INT,int> cell_index;
     HASHTABLE<FACE_INDEX<TV::m>,int> face_index;
     INTERPOLATED_COLOR_MAP<T> color;
     color.Initialize_Colors(1e-12,10,true,true,true);
     POISSON_PROJECTION_SYSTEM<TV> system;
+    system.neg_divergence.Reset(0);
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         ARRAY<VECTOR<TV,TV::m> > surface;
@@ -81,10 +81,10 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
                 int fi=-1;
                 if(face_index.Get(face,fi)){
                     used_cell=true;
-                    neg_div.Append_Entry_To_Current_Row(fi,-(s*2-1)*S(fi));}}
+                    system.neg_divergence.Append_Entry_To_Current_Row(fi,-(s*2-1)*S(fi));}}
         if(used_cell){
             p_loc.Append(it.Location());
-            neg_div.Finish_Row();
+            system.neg_divergence.Finish_Row();
 
             T bc=0;
             if(use_bc)
@@ -97,14 +97,13 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
                     Add_Debug_Particle(C,VECTOR<T,3>(1,0,1));
                     Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,un*n);}
             u_bc.Append(bc);}}
-    neg_div.n=u_loc.m;
-    neg_div.Sort_Entries();
-    neg_div.Transpose(system.gradient);
+    system.neg_divergence.n=u_loc.m;
+    system.neg_divergence.Sort_Entries();
+    system.Initialize();
 
     Dump_Levelset(grid,phi,true,VECTOR<T,3>(1,1,0));
     Flush_Frame(us_grid,"disc");
 
-    system.Initialize();
     if(use_p_null_mode){
         system.projections.Append(ARRAY<T>());
         system.projections.Last().Resize(system.poisson.n);
@@ -121,8 +120,18 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
     for(int i=0;i<b.v.m;i++) Add_Debug_Particle(p_loc(i),color(abs(b.v(i))));
     Flush_Frame<TV>("divergence");
 
+    KRYLOV_SOLVER<T>::Ensure_Size(vectors,b,2);
+    if(print_matrix){
+        OCTAVE_OUTPUT<T> oo("matrices.txt");
+        oo.Write("A",system.poisson);
+        oo.Write("Mi",system.beta_inverse);
+        oo.Write("G",system.gradient);
+        oo.Write("ND",system.neg_divergence);
+        oo.Write("b",b);}
+
     CONJUGATE_RESIDUAL<T> solver;
     solver.Solve(system,x,b,vectors,cg_tolerance,1,1000000);
+    if(print_matrix) OCTAVE_OUTPUT<T>("matrices.txt",true).Write("x",x);
 
     T li=0,l1=0,ave=0;
     int cnt=0;
@@ -159,13 +168,13 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
 }
 template void Project<float,VECTOR<float,2>,VECTOR<int,2> >(GRID<VECTOR<float,2> > const&,int,ARRAY<float,VECTOR<int,2> > const&,
     boost::function<VECTOR<float,2> (VECTOR<float,2>)>,boost::function<VECTOR<float,2> (VECTOR<float,2>)>,
-    boost::function<float (VECTOR<float,2>)>,float,float,float,bool,bool);
+    boost::function<float (VECTOR<float,2>)>,float,float,float,bool,bool,bool);
 template void Project<float,VECTOR<float,3>,VECTOR<int,3> >(GRID<VECTOR<float,3> > const&,int,ARRAY<float,VECTOR<int,3> > const&,
     boost::function<VECTOR<float,3> (VECTOR<float,3>)>,boost::function<VECTOR<float,3> (VECTOR<float,3>)>,
-    boost::function<float (VECTOR<float,3>)>,float,float,float,bool,bool);
+    boost::function<float (VECTOR<float,3>)>,float,float,float,bool,bool,bool);
 template void Project<double,VECTOR<double,2>,VECTOR<int,2> >(GRID<VECTOR<double,2> > const&,int,ARRAY<double,VECTOR<int,2> > const&,
     boost::function<VECTOR<double,2> (VECTOR<double,2>)>,boost::function<VECTOR<double,2> (VECTOR<double,2>)>,
-    boost::function<double (VECTOR<double,2>)>,double,double,double,bool,bool);
+    boost::function<double (VECTOR<double,2>)>,double,double,double,bool,bool,bool);
 template void Project<double,VECTOR<double,3>,VECTOR<int,3> >(GRID<VECTOR<double,3> > const&,int,ARRAY<double,VECTOR<int,3> > const&,
     boost::function<VECTOR<double,3> (VECTOR<double,3>)>,boost::function<VECTOR<double,3> (VECTOR<double,3>)>,
-    boost::function<double (VECTOR<double,3>)>,double,double,double,bool,bool);
+    boost::function<double (VECTOR<double,3>)>,double,double,double,bool,bool,bool);
