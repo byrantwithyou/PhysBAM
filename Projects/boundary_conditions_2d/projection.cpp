@@ -29,7 +29,7 @@ int main(int argc,char* argv[])
     PARSE_ARGS parse_args(argc,argv);
     int refine=1,resolution=32,interface=0,velocity_field=0;
     T rho=1,kg=1,m=1,s=1;
-    bool test_analytic_diff=false,use_p_null_mode=false,dump_matrix=false;
+    bool test_analytic_diff=false,use_p_null_mode=false,dump_matrix=false,use_bc=true;
     parse_args.Extra(&interface,"number","interface to use");
     parse_args.Extra(&velocity_field,"number","velocity to use");
     parse_args.Add("-resolution",&resolution,"resolution","grid resolution");
@@ -41,6 +41,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-test_diff",&test_analytic_diff,"test analytic derivatives");
     parse_args.Add("-refine",&refine,"num","Refine space/time by this factor");
     parse_args.Add("-null_p",&use_p_null_mode,"Assume pressure null mode and project it out");
+    parse_args.Add_Not("-no_bc",&use_bc,"Disable u boundary condition term");
     parse_args.Parse();
 
     T unit_p=kg/(s*s)*pow(m,2-TV::m);
@@ -125,7 +126,7 @@ int main(int argc,char* argv[])
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
         node_phi(it.index)=phi(it.Location()/m)*m;
 
-    Project<T,TV>(grid,3,node_phi,[=](TV X){return u_star(X/m)*m/s;},[=](TV X){return u_projected(X/m)*m/s;},[=](TV X){return p(X/m)*unit_p*s;},rho*kg*pow(m,-TV::m),(T)1e-14,(T)1e-14,use_p_null_mode);
+    Project<T,TV>(grid,3,node_phi,[=](TV X){return u_star(X/m)*m/s;},[=](TV X){return u_projected(X/m)*m/s;},[=](TV X){return p(X/m)*unit_p*s;},rho*kg*pow(m,-TV::m),(T)1e-14,(T)1e-14,use_p_null_mode,use_bc);
     Flush_Frame<TV>("flush");
     return 0;
 }

@@ -36,7 +36,8 @@ TV Centroid(const ARRAY<VECTOR<TV,TV::m> >& ar,T& A,TV& N)
 // phi at nodes
 template<class T,class TV,class TV_INT>
 void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::function<TV(TV X)> u_star,
-    boost::function<TV(TV X)> u_projected,boost::function<T(TV X)> p,T density,T theta_threshold,T cg_tolerance,bool use_p_null_mode)
+    boost::function<TV(TV X)> u_projected,boost::function<T(TV X)> p,T density,T theta_threshold,T cg_tolerance,
+    bool use_p_null_mode,bool use_bc)
 {
     ARRAY<TV> u_loc,p_loc;
     ARRAY<T> us,u_proj,S,u_bc;
@@ -86,19 +87,21 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
             neg_div.Finish_Row();
 
             T bc=0;
-            for(int i=0;i<surface.m;i++){
-                surface(i)*=grid.dX;
-                typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE face(surface(i));
-                TV C=face.Center()+it.Location()-grid.dX/2,u=u_projected(C),n=face.Normal();
-                T un=u.Dot(n);
-                bc+=un*face.Size();
-                Add_Debug_Particle(C,VECTOR<T,3>(1,0,1));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,un*n);}
+            if(use_bc)
+                for(int i=0;i<surface.m;i++){
+                    surface(i)*=grid.dX;
+                    typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE face(surface(i));
+                    TV C=face.Center()+it.Location()-grid.dX/2,u=u_projected(C),n=face.Normal();
+                    T un=u.Dot(n);
+                    bc+=un*face.Size();
+                    Add_Debug_Particle(C,VECTOR<T,3>(1,0,1));
+                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,un*n);}
             u_bc.Append(bc);}}
     neg_div.n=u_loc.m;
     neg_div.Sort_Entries();
     neg_div.Transpose(system.gradient);
 
+    Dump_Levelset(grid,phi,true,VECTOR<T,3>(1,1,0));
     Flush_Frame(us_grid,"disc");
 
     system.Initialize();
@@ -156,13 +159,13 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
 }
 template void Project<float,VECTOR<float,2>,VECTOR<int,2> >(GRID<VECTOR<float,2> > const&,int,ARRAY<float,VECTOR<int,2> > const&,
     boost::function<VECTOR<float,2> (VECTOR<float,2>)>,boost::function<VECTOR<float,2> (VECTOR<float,2>)>,
-    boost::function<float (VECTOR<float,2>)>,float,float,float,bool);
+    boost::function<float (VECTOR<float,2>)>,float,float,float,bool,bool);
 template void Project<float,VECTOR<float,3>,VECTOR<int,3> >(GRID<VECTOR<float,3> > const&,int,ARRAY<float,VECTOR<int,3> > const&,
     boost::function<VECTOR<float,3> (VECTOR<float,3>)>,boost::function<VECTOR<float,3> (VECTOR<float,3>)>,
-    boost::function<float (VECTOR<float,3>)>,float,float,float,bool);
+    boost::function<float (VECTOR<float,3>)>,float,float,float,bool,bool);
 template void Project<double,VECTOR<double,2>,VECTOR<int,2> >(GRID<VECTOR<double,2> > const&,int,ARRAY<double,VECTOR<int,2> > const&,
     boost::function<VECTOR<double,2> (VECTOR<double,2>)>,boost::function<VECTOR<double,2> (VECTOR<double,2>)>,
-    boost::function<double (VECTOR<double,2>)>,double,double,double,bool);
+    boost::function<double (VECTOR<double,2>)>,double,double,double,bool,bool);
 template void Project<double,VECTOR<double,3>,VECTOR<int,3> >(GRID<VECTOR<double,3> > const&,int,ARRAY<double,VECTOR<int,3> > const&,
     boost::function<VECTOR<double,3> (VECTOR<double,3>)>,boost::function<VECTOR<double,3> (VECTOR<double,3>)>,
-    boost::function<double (VECTOR<double,3>)>,double,double,double,bool);
+    boost::function<double (VECTOR<double,3>)>,double,double,double,bool,bool);
