@@ -30,7 +30,7 @@ struct OCTAVE_SPARSE_MATRIX_ENTRY
 template<class T>
 class OCTAVE_OUTPUT{
 public:
-    OCTAVE_OUTPUT(const char* file);
+    OCTAVE_OUTPUT(const char* file,bool append=false);
     ~OCTAVE_OUTPUT();
 
     std::ofstream out;

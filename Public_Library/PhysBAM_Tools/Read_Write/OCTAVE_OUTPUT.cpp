@@ -23,8 +23,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OCTAVE_OUTPUT<T>::
-OCTAVE_OUTPUT(const char* file)
-    :out(file)
+OCTAVE_OUTPUT(const char* file,bool append)
+    :out(file,append?std::ios::app:std::ios::out)
 {
     out<<std::setprecision(sizeof(T)*2);
 }
