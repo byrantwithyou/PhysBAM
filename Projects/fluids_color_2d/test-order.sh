@@ -1,4 +1,6 @@
 #!/bin/bash
+rm -rf new_test_order
+mkdir new_test_order
 for t in {00..14} {16..21} ; do
     for b in d n s ; do
         (
@@ -17,7 +19,7 @@ for t in {00..14} {16..21} ; do
             cat $L | sort -n > $T
             rm $L
 
-            gnuplot -p -e "set terminal png ; set output 'conv-$t-$b.png' ; plot '$T' u (log10(\$1)):(log10(\$3)) , -2*x , -2*x-1 , -x-2"
+            gnuplot -p -e "set terminal png ; set output 'new_test_order/conv-$t-$b.png' ; plot '$T' u (log10(\$1)):(log10(\$3)) , -2*x , -2*x-1 , -x-2"
             rm $T
         ) &
     done
