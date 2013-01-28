@@ -132,9 +132,8 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>& ips,ANALYTIC_TEST
             const INTERFACE_ELEMENT& V=interface_elements(i);
             Add_Debug_Particle(V.face.Center(),VECTOR<T,3>(0,0.1,0.5));
             T k=0;
-            if(V.color_pair.x>=0) k=at.j_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
-            else if(V.color_pair.x==-1) k=at.n_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
-            else if(V.color_pair.x==-2) k=at.d_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
+            if(V.color_pair.x>=-1) k=at.j_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
+            else if(V.color_pair.x==-2) k=at.u_jump(V.face.Center(),V.color_pair.x,V.color_pair.y);
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*T_FACE::Normal(V.face.X));}}
     
     Dump_Interface<T,TV>(ips);

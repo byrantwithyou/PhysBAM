@@ -25,8 +25,6 @@ struct BOUNDARY_CONDITIONS_COLOR: public NONCOPYABLE
 
     virtual TV u_jump(const TV& X,int color0,int color1)=0;
     virtual TV j_surface(const TV& X,int color0,int color1)=0;
-    virtual TV n_surface(const TV& X,int color0,int color1)=0;
-    virtual TV d_surface(const TV& X,int color0,int color1)=0;
 };
 }
 #endif

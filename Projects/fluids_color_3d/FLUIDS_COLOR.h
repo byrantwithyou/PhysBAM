@@ -376,32 +376,21 @@ public:
             LOG::cout<<"max_error "<<max_error<<"  "<<a<<"  "<<b<<std::endl;}
     }
 
-    TV Dirichlet_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
+    MATRIX<T,3> Stress(const TV& X,int color,T time)
     {
-        Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
-        if(analytic_velocity.m) return analytic_velocity(fluid_color)->u(X/m,time/s)*m/s;
-        return TV();
-    }
-
-    TV Neumann_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
-    {
-        Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
-        if(analytic_velocity.m && analytic_levelset){
-            MATRIX<T,3> du=analytic_velocity(fluid_color)->du(X/m,time/s)/s;
-            TV n=analytic_levelset->N(X/m,time/s,fluid_color);
-            T p=analytic_velocity(fluid_color)->p(X/m,time/s)*kg/(s*s*m);
-            return (du+du.Transposed())*n*mu(fluid_color)-p*n;}
-        return TV();
+        T p=analytic_velocity(color)->p(X/m,time/s)*kg/(s*s*m);
+        MATRIX<T,3> du=analytic_velocity(color)->du(X/m,time/s)/s;
+        return (du+du.Transposed())*mu(color)-p;
     }
 
     TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
     {
+        Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
         if(analytic_velocity.m && analytic_levelset){
-            MATRIX<T,3> du0=analytic_velocity(color0)->du(X/m,time/s)/s,du1=analytic_velocity(color1)->du(X/m,time/s)/s;
-            T p0=analytic_velocity(color0)->p(X/m,time/s)*kg/(s*s*m),p1=analytic_velocity(color1)->p(X/m,time/s)*kg/(s*s*m);
-            MATRIX<T,3> stress0=(du0+du0.Transposed())*mu(color0)-p0,stress1=(du1+du1.Transposed())*mu(color1)-p1;
+            MATRIX<T,3> jump_stress=Stress(X,color1,time);
+            if(color0>=0) jump_stress-=Stress(X,color0,time);
             TV n=analytic_levelset->N(X/m,time/s,color1);
-            return (stress1-stress0)*n;}
+            return jump_stress*n;}
         return TV();
     }
 
@@ -414,8 +403,11 @@ public:
 
     TV Velocity_Jump(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
     {
-        if(analytic_velocity.m && analytic_levelset)
-            return (analytic_velocity(color1)->u(X/m,time/s)-analytic_velocity(color0)->u(X/m,time/s))*m/s;
+        Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
+        if(analytic_velocity.m && analytic_levelset){
+            TV jump_u=analytic_velocity(color1)->u(X/m,time/s);
+            if(color0>=0) jump_u-=analytic_velocity(color0)->u(X/m,time/s);
+            return jump_u*m/s;}
         return TV();
     }
 

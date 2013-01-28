@@ -321,19 +321,19 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,const 
                                     for(int d=0;d<TV::m;d++)
                                         sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,V.color_pair.y,value(d));}}
                         else if(V.color_pair.x==BC::NEUMANN){
-                            T value=integral*sb->bc->n_surface(X,V.color_pair.x,V.color_pair.y)(sb->axis);
+                            T value=integral*sb->bc->j_surface(X,V.color_pair.x,V.color_pair.y)(sb->axis);
                             (*sb->rhs)(V.color_pair.y)(flat_index)+=value;}
                         else if(V.color_pair.x==BC::DIRICHLET){
                             if(sb->axis==0){ // This code should not be repeated for each block
-                                TV value=-integral*orientations(k).Transpose_Times(sb->bc->d_surface(X,V.color_pair.x,V.color_pair.y));
+                                TV value=-integral*orientations(k).Transpose_Times(sb->bc->u_jump(X,V.color_pair.x,V.color_pair.y));
                                 for(int d=0;d<TV::m;d++)
                                     sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,V.color_pair.y,value(d));}}
                         else{
                             TV N=orientations(k).Column(TV::m-1);
-                            T n_value=integral*sb->bc->n_surface(X,V.color_pair.x,V.color_pair.y).Projected_Orthogonal_To_Unit_Direction(N)(sb->axis);
+                            T n_value=integral*sb->bc->j_surface(X,V.color_pair.x,V.color_pair.y).Projected_Orthogonal_To_Unit_Direction(N)(sb->axis);
                             (*sb->rhs)(V.color_pair.y)(flat_index)+=n_value;
                             if(sb->axis==0){ // This code should not be repeated for each block
-                                T d_value=-integral*sb->bc->d_surface(X,V.color_pair.x,V.color_pair.y).Dot(N);
+                                T d_value=-integral*sb->bc->u_jump(X,V.color_pair.x,V.color_pair.y).Dot(N);
                                 sb->Add_Constraint_Rhs_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,V.color_pair.y,d_value);}}}}}}
 
     if(surface_blocks_scalar.m){
@@ -371,10 +371,10 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,const 
                                 T value=-integral*sbs->bc->u_jump(X,V.color_pair.x,V.color_pair.y);
                                 sbs->Add_Constraint_Rhs_Entry(cdi.constraint_base_scalar+constraint_offset,V.color_pair.y,value);}}
                         else if(V.color_pair.x==BC::NEUMANN){
-                            T value=-integral*sbs->bc->n_surface(X,V.color_pair.x,V.color_pair.y);
+                            T value=integral*sbs->bc->j_surface(X,V.color_pair.x,V.color_pair.y);
                             (*sbs->rhs)(V.color_pair.y)(flat_index)+=value;}
                         else{
-                            T value=-integral*sbs->bc->d_surface(X,V.color_pair.x,V.color_pair.y);
+                            T value=-integral*sbs->bc->u_jump(X,V.color_pair.x,V.color_pair.y);
                             sbs->Add_Constraint_Rhs_Entry(cdi.constraint_base_scalar+constraint_offset,V.color_pair.y,value);}}}}}
 }
 //#####################################################################
