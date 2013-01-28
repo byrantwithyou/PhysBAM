@@ -401,7 +401,7 @@ public:
             T p0=analytic_velocity(color0)->p(X/m,time/s)*kg/(s*s*m),p1=analytic_velocity(color1)->p(X/m,time/s)*kg/(s*s*m);
             MATRIX<T,3> stress0=(du0+du0.Transposed())*mu(color0)-p0,stress1=(du1+du1.Transposed())*mu(color1)-p1;
             TV n=analytic_levelset->N(X/m,time/s,color1);
-            return (stress0-stress1)*n;}
+            return (stress1-stress0)*n;}
         return TV();
     }
 

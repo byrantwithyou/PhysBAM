@@ -37,7 +37,7 @@ struct ANALYTIC_POISSON_TEST:public BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
     T j_surface(const TV& X,int color0,int color1)
     {
         TV du0=analytic_solution(color0)->du(X),du1=analytic_solution(color1)->du(X);
-        return (mu(color0)*du0-mu(color1)*du1).Dot(analytic_levelset->N(X,0,color1));
+        return (mu(color1)*du1-mu(color0)*du0).Dot(analytic_levelset->N(X,0,color1));
     }
 
     T n_surface(const TV& X,int color0,int color1)

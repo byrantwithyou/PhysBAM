@@ -310,7 +310,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,const 
                         
                         TV X=V.face.Center()+grid.Center(cell);
                         if(V.color_pair.x>=0){
-                            T value=-integral*sb->bc->j_surface(X,V.color_pair.x,V.color_pair.y)(sb->axis);
+                            T value=integral*sb->bc->j_surface(X,V.color_pair.x,V.color_pair.y)(sb->axis);
                             value*=(T)0.5;
                             (*sb->rhs)(V.color_pair.x)(flat_index)+=value;
                             (*sb->rhs)(V.color_pair.y)(flat_index)+=value;
@@ -362,7 +362,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,const 
                         TV X=V.face.Center()+cell_center;
                         int flat_index=cdi.Flatten(cell)+sbs->Flat_Diff(op.flat_index_diff_ref);
                         if(V.color_pair.x>=0){
-                            T value=-integral*sbs->bc->j_surface(X,V.color_pair.x,V.color_pair.y);
+                            T value=integral*sbs->bc->j_surface(X,V.color_pair.x,V.color_pair.y);
                             value*=(T)0.5;
                             (*sbs->rhs)(V.color_pair.x)(flat_index)+=value;
                             (*sbs->rhs)(V.color_pair.y)(flat_index)+=value;
