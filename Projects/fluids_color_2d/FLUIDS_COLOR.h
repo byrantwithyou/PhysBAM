@@ -81,6 +81,7 @@ public:
     {
         last_frame=16;
         int number_of_threads=1;
+        bool override_output_directory=false;
         parse_args.Extra(&test_number,"example number","example number to run");
         parse_args.Add("-restart",&restart,"frame","restart frame");
         parse_args.Add("-resolution",&resolution,"resolution","grid resolution");
@@ -106,6 +107,7 @@ public:
         parse_args.Add("-refine",&refine,"num","Refine space/time by this factor");
         parse_args.Add("-null_p",&use_p_null_mode,"Assume pressure null mode and project it out");
         parse_args.Add("-threads",&number_of_threads,"threads","Number of threads");
+        parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
         parse_args.Parse();
 
 #ifdef USE_OPENMP
@@ -133,7 +135,7 @@ public:
 
         analytic_levelset=0;
 
-        output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number);
+        if(!override_output_directory) output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number);
         switch(test_number){
             case 0:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
