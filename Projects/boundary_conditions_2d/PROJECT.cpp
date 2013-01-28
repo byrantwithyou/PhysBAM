@@ -73,6 +73,7 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
                     face_index.Insert(face,u_face.Append(face));
                     S.Append(area);
                     u_loc.Append(centroid+it.Location()-grid.dX/2);
+//                    u_loc.Last()=grid.Face(face);
                     us.Append(u_star(u_loc.Last())(a));
                     Add_Debug_Particle(u_loc.Last(),VECTOR<T,3>(0,1,1));
                     Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,us.Last()*TV::Axis_Vector(a));
@@ -155,6 +156,7 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
     u_proj=us-system.beta_inverse*u_proj;
     ARRAY<T,FACE_INDEX<TV::m> > u_error(grid,3);
     for(int i=0;i<u_proj.m;i++){
+//        if((u_loc(i)-grid.Face(u_face(i))).Magnitude()>1e-8) continue;
         T z=abs(u_proj(i)-u_projected(u_loc(i))(u_face(i).axis));
         li=max(li,z);
         l1+=z;
