@@ -17,7 +17,7 @@ struct ANALYTIC_LEVELSET_VORTEX:public ANALYTIC_LEVELSET_SIGNED<TV>
     T k;
     VORTEX_IMPLICIT_SURFACE<TV> vis;
 
-    ANALYTIC_LEVELSET_VORTEX(T kk,int c_i=0,int c_o=-4): ANALYTIC_LEVELSET_SIGNED<TV>(c_i,c_o),k(kk) {vis.k=k;}
+    ANALYTIC_LEVELSET_VORTEX(T kk,int c_i,int c_o): ANALYTIC_LEVELSET_SIGNED<TV>(c_i,c_o),k(kk) {vis.k=k;}
 
     virtual T phi2(const TV& X,T t) const {return vis.Phi(X);}
     virtual TV N2(const TV& X,T t) const {return vis.Normal(X)*sign(vis.f(X));}

@@ -15,7 +15,7 @@ struct ANALYTIC_LEVELSET_LINE:public ANALYTIC_LEVELSET_SIGNED<TV>
 {
     typedef typename TV::SCALAR T;
     typename BASIC_GEOMETRY_POLICY<TV>::HYPERPLANE plane; // N points outward
-    ANALYTIC_LEVELSET_LINE(const TV& X,const TV& N,int c_i=0,int c_o=-4): ANALYTIC_LEVELSET_SIGNED<TV>(c_i,c_o),plane(N.Normalized(),X) {}
+    ANALYTIC_LEVELSET_LINE(const TV& X,const TV& N,int c_i,int c_o): ANALYTIC_LEVELSET_SIGNED<TV>(c_i,c_o),plane(N.Normalized(),X) {}
     virtual T phi2(const TV& X,T t) const {return plane.Signed_Distance(X);}
     virtual TV N2(const TV& X,T t) const {return plane.normal;}
 };

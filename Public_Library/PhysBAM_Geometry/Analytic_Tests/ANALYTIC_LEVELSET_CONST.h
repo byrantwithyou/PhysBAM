@@ -14,7 +14,7 @@ struct ANALYTIC_LEVELSET_CONST:public ANALYTIC_LEVELSET_SIGNED<TV>
 {
     typedef typename TV::SCALAR T;
     T value;
-    ANALYTIC_LEVELSET_CONST(T value=-ANALYTIC_LEVELSET_SIGNED<TV>::Large_Phi(),int c_i=0,int c_o=-4)
+    ANALYTIC_LEVELSET_CONST(T value,int c_i,int c_o)
         :ANALYTIC_LEVELSET_SIGNED<TV>(c_i,c_o),value(value)
     {}
     virtual T phi2(const TV& X,T t) const {return value;}

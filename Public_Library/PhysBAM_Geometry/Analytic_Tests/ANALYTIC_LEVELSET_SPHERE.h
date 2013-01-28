@@ -15,7 +15,7 @@ struct ANALYTIC_LEVELSET_SPHERE:public ANALYTIC_LEVELSET_SIGNED<TV>
     typedef typename TV::SCALAR T;
     TV cen;
     T r;
-    ANALYTIC_LEVELSET_SPHERE(TV cc,T rr,int c_i=0,int c_o=-4): ANALYTIC_LEVELSET_SIGNED<TV>(c_i,c_o),cen(cc),r(rr) {}
+    ANALYTIC_LEVELSET_SPHERE(TV cc,T rr,int c_i,int c_o): ANALYTIC_LEVELSET_SIGNED<TV>(c_i,c_o),cen(cc),r(rr) {}
     virtual T phi2(const TV& X,T t) const {return (X-cen).Magnitude()-r;}
     virtual TV N2(const TV& X,T t) const {return (X-cen).Normalized();}
 };

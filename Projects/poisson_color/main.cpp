@@ -354,19 +354,19 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     switch(test_number){
         case 0:{ // One color, periodic. No interface, no forces, u=0.
             test.mu.Append(1);
-            test.analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-1);
+            test.analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-1,0,-4);
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
             break;}
         case 1:{ // One color, periodic. No interface, u=sin(2*pi*x), f=(2*pi)^2*sin(2*pi*x).
             test.mu.Append(1);
-            test.analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-1);
+            test.analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-1,0,-4);
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(1,0,TV::Axis_Vector(0)*(2*pi),TV()));
             break;}
         case 2:{ // Two colors, periodic. Linear on [0,1/3],[1/3,2/3],[2/3,1], no volumetric forces.
             test.mu.Append(1);
             test.mu.Append(2);
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)/3,TV::Axis_Vector(0),0,1);
-            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0);
+            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*((T)2/3),TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
             struct ANALYTIC_POISSON_SOLUTION_2a:public ANALYTIC_POISSON_SOLUTION<TV>
             {
@@ -427,7 +427,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(3);
             test.use_discontinuous_scalar_field=true;
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,2,1);
-            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0);
+            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),a0));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),a1));
@@ -443,7 +443,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(3);
             test.use_discontinuous_scalar_field=true;
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,2,1);
-            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0);
+            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_QUADRATIC<TV>(MATRIX<T,TV::m>()+a0,TV()-a0,(T).25*TV::m*a0));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_QUADRATIC<TV>(MATRIX<T,TV::m>()+a1,TV()-a1,(T).25*TV::m*a1));
@@ -459,7 +459,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(3);
             test.use_discontinuous_scalar_field=true;
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,2,1);
-            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0);
+            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(a0,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(a1,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1));
@@ -475,7 +475,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(2);
             test.use_discontinuous_scalar_field=true;
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,1,0);
-            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),constraint);
+            ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),constraint,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(a0,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(a1,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1));
