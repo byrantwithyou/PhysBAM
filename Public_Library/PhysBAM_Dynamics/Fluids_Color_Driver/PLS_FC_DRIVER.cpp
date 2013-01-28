@@ -150,7 +150,8 @@ Initialize()
             example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
         example.prev_face_color.Fill(-9);
         example.particle_levelset_evolution_multiple.Make_Signed_Distance();
-        example.particle_levelset_evolution_multiple.Fill_Levelset_Ghost_Cells(time);}
+        example.particle_levelset_evolution_multiple.Fill_Levelset_Ghost_Cells(time);
+        example.Get_Initial_Velocities();}
 
     example.collision_bodies_affecting_fluid.Compute_Grid_Visibility();
     example.particle_levelset_evolution_multiple.Set_Seed(2606);

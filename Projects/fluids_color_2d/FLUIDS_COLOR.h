@@ -408,6 +408,15 @@ public:
         PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (N)",0,1);
     }
 
+    void Get_Initial_Velocities()
+    {
+        if(analytic_levelset && analytic_velocity.m)
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+                int c=face_color(it.Full_Index());
+                if(c<0) continue;
+                face_velocities(c)(it.Full_Index())=analytic_velocity(c)->u(it.Location()/m,0)(it.Axis())*m/s;}
+    }
+
     void Analytic_Test()
     {
         mu.Append(mu0);
@@ -415,11 +424,6 @@ public:
         for(int i=1;i<number_of_colors;i++){
             mu.Append(mu1);
             rho.Append(rho1);}
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-            int c=-4;
-            analytic_levelset->phi(it.Location()/m,0,c);
-            if(c<0) continue;
-            face_velocities(c)(it.Full_Index())=analytic_velocity(c)->u(it.Location()/m,0)(it.Axis())*m/s;}
 
         Set_Level_Set(0);
         Dump_Analytic_Levelset(0);
