@@ -18,7 +18,7 @@ OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const st
 {
     int number_of_sets=0;
     while(filename_set!=""){
-        std::string filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,number_of_sets+1);
+        std::string filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,number_of_sets);
         LOG::cout<<"Checking "<<filename<<std::endl;
         if(FILE_UTILITIES::File_Exists(filename)) number_of_sets++;else break;}
     LOG::cout<<"Found "<<number_of_sets<<" levelsets for multiphase"<<std::endl;
@@ -106,11 +106,12 @@ Reinitialize(const bool force_even_if_not_drawn)
     if (draw||force_even_if_not_drawn){
         if ((is_animation && (frame_loaded!=frame || set_loaded!=set)) || (!is_animation && frame_loaded<0)){
             valid=false;std::string filename;
-            if(use_sets) for(int i=0;i<opengl_levelsets.m;i++){
-                filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),i,frame);
-                if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File<RW>(filename.c_str(),opengl_levelsets(i)->levelset);
-                else return;
-                opengl_levelsets(i)->Update();}
+            if(use_sets)
+                for(int i=0;i<opengl_levelsets.m;i++){
+                    filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,i);
+                    if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File<RW>(filename.c_str(),opengl_levelsets(i)->levelset);
+                    else return;
+                    opengl_levelsets(i)->Update();}
             else{
                 filename=FILE_UTILITIES::Get_Frame_Filename(levelset_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File<RW>(filename.c_str(),opengl_levelset->levelset);
