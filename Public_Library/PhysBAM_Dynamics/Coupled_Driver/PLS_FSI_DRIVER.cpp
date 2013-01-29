@@ -433,7 +433,7 @@ Advect_Fluid(const T dt,const int substep)
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     face_velocities_ghost.Resize(incompressible->grid,fluids_parameters.number_of_ghost_cells,false);
-    incompressible->boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time+dt,fluids_parameters.number_of_ghost_cells);
+    incompressible->boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time+dt,fluids_parameters.number_of_ghost_cells);
 
     fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(false);
     example.Adjust_Phi_With_Objects(time);

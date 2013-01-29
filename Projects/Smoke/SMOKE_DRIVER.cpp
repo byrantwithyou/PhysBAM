@@ -104,7 +104,7 @@ template<class TV> void SMOKE_DRIVER<TV>::
 Convect(const T dt,const T time)
 {
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.mac_grid,3,false);
-    example.boundary->Fill_Ghost_Cells_Face(example.mac_grid,example.face_velocities,face_velocities_ghost,time,3);
+    example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time,3);
     example.advection_scalar.Update_Advection_Equation_Face(example.mac_grid,example.face_velocities,face_velocities_ghost,face_velocities_ghost,*example.boundary,dt,time);
 }
 //#####################################################################

@@ -48,7 +48,7 @@ public:
             DOMAIN_ITERATOR_THREADED_ALPHA<BOUNDARY<TV,T2>,TV>(regions(side),&thread_queue,axis%TV::dimension+1).template Run<const GRID<TV>&,ARRAYS_ND_BASE<T2,TV_INT>&,int>(boundary,&BOUNDARY<TV,T2>::Fill_Single_Ghost_Region_Threaded,grid,u_ghost,side);}
     }
 
-    void Fill_Ghost_Cells_Face(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells_input) PHYSBAM_OVERRIDE
+    void Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells_input) PHYSBAM_OVERRIDE
     {for(int axis=0;axis<GRID<TV>::dimension;axis++)Fill_Ghost_Cells(grid.Get_Face_Grid(axis),u.Component(axis),u_ghost.Component(axis),0,time,number_of_ghost_cells_input);}
 
     void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) PHYSBAM_OVERRIDE

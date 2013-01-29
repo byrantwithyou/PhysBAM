@@ -26,10 +26,10 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_
             u_ghost(node)=u_ghost(node+period);}}
 }
 //#####################################################################
-// Function Fill_Ghost_Cells_Face
+// Function Fill_Ghost_Faces
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_MAC_GRID_PERIODIC<TV,T2>::
-Fill_Ghost_Cells_Face(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells)
 {
     assert(grid.Is_MAC_Grid());
     for(int axis=0;axis<GRID<TV>::dimension;axis++){

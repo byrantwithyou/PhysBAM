@@ -55,12 +55,12 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_
     mpi_grid->Exchange_Boundary_Cell_Data(u_ghost,number_of_ghost_cells_input);
 }
 //#####################################################################
-// Function Fill_Ghost_Cells_Face
+// Function Fill_Ghost_Faces
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_MPI<TV,T2>::
-Fill_Ghost_Cells_Face(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells_input)
+Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells_input)
 {
-    boundary.Fill_Ghost_Cells_Face(grid,u,u_ghost,time,number_of_ghost_cells_input);
+    boundary.Fill_Ghost_Faces(grid,u,u_ghost,time,number_of_ghost_cells_input);
     mpi_grid->Exchange_Boundary_Face_Data(u_ghost,number_of_ghost_cells_input);
 }
 //#####################################################################

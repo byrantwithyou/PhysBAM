@@ -46,9 +46,9 @@ Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& a
 {
     // TODO: make efficient if advection velocities are same as advected velocities
     T_FACE_ARRAYS_SCALAR advection_face_velocities_ghost;advection_face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
-    boundary->Fill_Ghost_Cells_Face(grid,advecting_face_velocities,advection_face_velocities_ghost,time,number_of_ghost_cells);
+    boundary->Fill_Ghost_Faces(grid,advecting_face_velocities,advection_face_velocities_ghost,time,number_of_ghost_cells);
     T_FACE_ARRAYS_SCALAR face_velocities_to_advect_ghost;face_velocities_to_advect_ghost.Resize(grid,number_of_ghost_cells,false);
-    boundary->Fill_Ghost_Cells_Face(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,time,number_of_ghost_cells);
+    boundary->Fill_Ghost_Faces(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,time,number_of_ghost_cells);
 
     // update convection
     if(pseudo_dirichlet_regions->Number_True()>0){
@@ -75,7 +75,7 @@ template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
 Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<T_ARRAYS_SCALAR>* phi_ghost,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells)
 {
     T_FACE_ARRAYS_SCALAR face_velocities_ghost(grid.Domain_Indices(number_of_ghost_cells),false);
-    boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
+    boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
 
     // update strain and apply elastic forces
     for(int i=0;i<strains.m;i++)if(strains(i)){

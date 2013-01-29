@@ -39,8 +39,8 @@ Advance_One_Time_Step_Convection(const T dt,const T time,const T_FACE_ARRAYS_SCA
     // find ghost cells
     T_FACE_ARRAYS_SCALAR advection_face_velocities_ghost(grid,number_of_ghost_cells,false);
     T_FACE_ARRAYS_SCALAR face_velocities_to_advect_ghost(grid,number_of_ghost_cells,false);
-    boundary->Fill_Ghost_Cells_Face(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,time,number_of_ghost_cells);
-    boundary->Fill_Ghost_Cells_Face(grid,advecting_face_velocities,advection_face_velocities_ghost,time,number_of_ghost_cells);
+    boundary->Fill_Ghost_Faces(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,time,number_of_ghost_cells);
+    boundary->Fill_Ghost_Faces(grid,advecting_face_velocities,advection_face_velocities_ghost,time,number_of_ghost_cells);
     
     // update convection
     advection->Update_Advection_Equation_Face(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,advection_face_velocities_ghost,*boundary,dt,time);
@@ -52,7 +52,7 @@ template<class T_GRID> void INCOMPRESSIBLE_FLUID_EVOLUTION<T_GRID>::
 Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const int number_of_ghost_cells)
 {
     T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
-    boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
+    boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
     for(int k=0;k<fluids_forces.m;k++) fluids_forces(k)->Add_Explicit_Forces(grid,face_velocities_ghost,face_velocities,dt,time);
     boundary->Apply_Boundary_Condition_Face(grid,face_velocities,time+dt);
 }
@@ -70,7 +70,7 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
 
     int ghost_cells=3;
     T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(grid,ghost_cells,false);
-    boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,ghost_cells);
+    boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,ghost_cells);
     for(int k=0;k<fluids_forces.m;k++) fluids_forces(k)->Add_Implicit_Forces_Before_Projection(grid,face_velocities_ghost,face_velocities,dt,time);
     for(int k=0;k<fluids_forces.m;k++) fluids_forces(k)->Add_Implicit_Forces_Projection(grid,face_velocities_ghost,face_velocities,dt,time);
 }

@@ -200,7 +200,7 @@ Advance_To_Target_Time(const T target_time)
         LOG::Time("Fill ghost");
 PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
         T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(example.incompressible.grid,example.number_of_ghost_cells,false);
-        example.incompressible.boundary->Fill_Ghost_Cells_Face(example.mac_grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
+        example.incompressible.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
 
         T_ARRAYS_SCALAR phi_back(example.mac_grid.Domain_Indices(example.number_of_ghost_cells));
         example.phi_boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.Particle_Levelset(0).levelset.phi,phi_back,dt,time,example.number_of_ghost_cells);
@@ -242,7 +242,7 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
         example.Advect_Particles(dt,time);
         example.incompressible.Add_Energy_With_Vorticity(example.face_velocities,example.domain_boundary,dt,time,example.number_of_ghost_cells,&pls.levelset);
         example.incompressible.Advance_One_Time_Step_Forces(example.face_velocities,dt,time,false,0,example.number_of_ghost_cells);
-        example.boundary->Fill_Ghost_Cells_Face(example.mac_grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
+        example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
 
         LOG::Time("modifying levelset");

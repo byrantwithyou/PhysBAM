@@ -81,8 +81,8 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
     if(!ensure_second_order){
         T_FACE_ARRAYS_SCALAR Z_min_ghost=Z_ghost.V_face,Z_max_ghost=Z_ghost.V_face,Z_min(grid,0,false),Z_max(grid,0,false);
         nested_advection.Update_Advection_Equation_Face(grid,Z_temp,Z_ghost.V_face,face_velocities.V_face,boundary,dt,time,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp now has time n+1 data
-        T_FACE_ARRAYS_SCALAR Z_forward_ghost(grid,number_of_ghost_cells,false);boundary.Fill_Ghost_Cells_Face(grid,Z_temp,Z_forward_ghost,time+dt,number_of_ghost_cells);
-        boundary.Fill_Ghost_Cells_Face(grid,Z_min,Z_min_ghost,time+dt,number_of_ghost_cells);boundary.Fill_Ghost_Cells_Face(grid,Z_max,Z_max_ghost,time+dt,number_of_ghost_cells);
+        T_FACE_ARRAYS_SCALAR Z_forward_ghost(grid,number_of_ghost_cells,false);boundary.Fill_Ghost_Faces(grid,Z_temp,Z_forward_ghost,time+dt,number_of_ghost_cells);
+        boundary.Fill_Ghost_Faces(grid,Z_min,Z_min_ghost,time+dt,number_of_ghost_cells);boundary.Fill_Ghost_Faces(grid,Z_max,Z_max_ghost,time+dt,number_of_ghost_cells);
         nested_advection.Update_Advection_Equation_Face(grid,Z_temp,Z_forward_ghost,face_velocities.V_face,boundary,-dt,time+dt,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp has time n data
         if(clamp_extrema)
             for(int axis=0;axis<T_GRID::dimension;axis++){
@@ -96,7 +96,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
                 thread_iterator.template Run<const T_GRID&,int,T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&>(*this,&ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::Apply_Reversion_Limiter_Face_Threaded,grid,axis,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);}}
     else{
         nested_advection.Update_Advection_Equation_Face(grid,Z_temp,Z_ghost.V_face,face_velocities.V_face,boundary,dt,time,0,0,0,0); // Z_temp now has time n+1 data
-        T_FACE_ARRAYS_SCALAR Z_forward_ghost(grid,number_of_ghost_cells,false);boundary.Fill_Ghost_Cells_Face(grid,Z_temp,Z_forward_ghost,time+dt,number_of_ghost_cells);
+        T_FACE_ARRAYS_SCALAR Z_forward_ghost(grid,number_of_ghost_cells,false);boundary.Fill_Ghost_Faces(grid,Z_temp,Z_forward_ghost,time+dt,number_of_ghost_cells);
         nested_advection.Update_Advection_Equation_Face(grid,Z_temp,Z_forward_ghost,face_velocities.V_face,boundary,-dt,time+dt,0,0,0,0); // Z_temp has time n data
         for(int axis=0;axis<T_GRID::dimension;axis++){
             RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(axis)++;

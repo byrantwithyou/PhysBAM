@@ -255,7 +255,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
 {
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Write_Output_Files(frame);
     ARRAY<T,FACE_INDEX<2> > face_velocities_ghost(*fluids_parameters.grid,3,false);
-    fluids_parameters.incompressible->boundary->Fill_Ghost_Cells_Face(*fluids_parameters.grid,fluid_collection.incompressible_fluid_collection.face_velocities,face_velocities_ghost,0,3);
+    fluids_parameters.incompressible->boundary->Fill_Ghost_Faces(*fluids_parameters.grid,fluid_collection.incompressible_fluid_collection.face_velocities,face_velocities_ghost,0,3);
     ARRAY<VECTOR<T,1>,TV_INT> grid_vorticity(fluids_parameters.grid->Domain_Indices(3),false);
     ARRAY<T,TV_INT> grid_vorticity_magnitude(fluids_parameters.grid->Domain_Indices(3),false);
     VORTICITY_UNIFORM<TV>::Vorticity(*fluids_parameters.grid,FACE_LOOKUP_UNIFORM<GRID<TV> >(face_velocities_ghost),grid_vorticity,grid_vorticity_magnitude);

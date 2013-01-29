@@ -106,7 +106,7 @@ Get_Body_Force(ARRAY<T,FACE_INDEX<3> >& force,const T dt,const T time)
 {
     if(test_number==4){
         ARRAY<T,FACE_INDEX<3> > face_velocities_ghost(*fluids_parameters.grid,fluids_parameters.number_of_ghost_cells,false);
-        fluids_parameters.incompressible->boundary->Fill_Ghost_Cells_Face(*fluids_parameters.grid,incompressible_fluid_collection.face_velocities,face_velocities_ghost,time,fluids_parameters.number_of_ghost_cells);
+        fluids_parameters.incompressible->boundary->Fill_Ghost_Faces(*fluids_parameters.grid,incompressible_fluid_collection.face_velocities,face_velocities_ghost,time,fluids_parameters.number_of_ghost_cells);
         vortex_particle_evolution->Compute_Body_Force(face_velocities_ghost,force,dt,time);
         if(time<=explosion_end_time){
             int add_count=0;VORTICITY_PARTICLES<TV >& vorticity_particles=vortex_particle_evolution->vorticity_particles;

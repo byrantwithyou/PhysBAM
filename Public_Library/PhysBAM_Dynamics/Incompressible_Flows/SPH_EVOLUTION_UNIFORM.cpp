@@ -281,7 +281,7 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
         LOG::Time(STRING_UTILITIES::string_sprintf("applying FLIP to PIC with ratio %f",flip_ratio));
         int ghost_cells=3;
         T_FACE_ARRAYS_SCALAR face_velocities_ghost(grid,ghost_cells);
-        incompressible.boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,ghost_cells);
+        incompressible.boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,ghost_cells);
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
             if(incompressible.projection.elliptic_solver->psi_N(axis,face)){int valid_neighbors=0;T face_velocity=0;
                 for(int i=0;i<T_GRID::number_of_one_ring_neighbors_per_cell;i++){

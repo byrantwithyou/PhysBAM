@@ -13,7 +13,7 @@
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 namespace PhysBAM{
 
-template<class T,class T2> class BOUNDARY;
+template<class TV,class T2> class BOUNDARY;
 
 template<class T_GRID> class LEVELSET_CALLBACKS; // TODO: invalid dependency
 template<class T_GRID>

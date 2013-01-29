@@ -57,8 +57,8 @@ Advance_One_Time_Step_Convection(const T dt,const T time,const T_FACE_ARRAYS_SCA
     // find ghost cells
     T_FACE_ARRAYS_SCALAR advection_face_velocities_ghost(grid,number_of_ghost_cells,false);
     T_FACE_ARRAYS_SCALAR face_velocities_to_advect_ghost(grid,number_of_ghost_cells,false);
-    boundary->Fill_Ghost_Cells_Face(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,time,number_of_ghost_cells);
-    boundary->Fill_Ghost_Cells_Face(grid,advecting_face_velocities,advection_face_velocities_ghost,time,number_of_ghost_cells);
+    boundary->Fill_Ghost_Faces(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,time,number_of_ghost_cells);
+    boundary->Fill_Ghost_Faces(grid,advecting_face_velocities,advection_face_velocities_ghost,time,number_of_ghost_cells);
 
     // update convection
     advection->Update_Advection_Equation_Face(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,advection_face_velocities_ghost,*boundary,dt,time);
@@ -70,7 +70,7 @@ template<class T_GRID> void INCOMPRESSIBLE_UNIFORM<T_GRID>::
 Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const T_ARRAYS_SCALAR* phi_ghost,const int number_of_ghost_cells)
 {
     T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
-    boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
+    boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
 
     // update strain and apply elastic forces
     if(strain){
@@ -85,7 +85,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
         for(int axis=0;axis<TV::dimension;axis++)
             DOMAIN_ITERATOR_THREADED_ALPHA<INCOMPRESSIBLE_UNIFORM<T_GRID>,TV>(grid.Face_Indices()[axis],thread_queue).template Run<T_FACE_ARRAYS_SCALAR&,const T,int>(*this,&INCOMPRESSIBLE_UNIFORM<T_GRID>::Add_Body_Force_Threaded,face_velocities,dt,axis);
         boundary->Apply_Boundary_Condition_Face(grid,face_velocities,time+dt);
-        boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);}
+        boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);}
 
     // update viscosity explicitly
     //if(dt && (viscosity || use_variable_viscosity) && (!implicit_viscosity || use_explicit_part_of_implicit_viscosity)){
@@ -155,7 +155,7 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
     if(!projection_boundary) projection_boundary=boundary;
     projection_boundary->Apply_Boundary_Condition_Face(projection.p_grid,face_velocities,time+dt);
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(projection.p_grid,ghost_cells);
-    projection_boundary->Fill_Ghost_Cells_Face(projection.p_grid,face_velocities,face_velocities_ghost,time,ghost_cells);
+    projection_boundary->Fill_Ghost_Faces(projection.p_grid,face_velocities,face_velocities_ghost,time,ghost_cells);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("After apply boundary",0,0);
 
     assert(Consistent_Boundary_Conditions(face_velocities));
@@ -182,7 +182,7 @@ Implicit_Viscous_Update(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T
 { 
     int number_of_ghost_cells=3;
     T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
-    boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
+    boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
 
     for(int axis=0;axis<T_GRID::dimension;axis++){
         IMPLICIT_VISCOSITY_UNIFORM<T_GRID> implicit_viscosity(*projection.elliptic_solver,variable_viscosity,projection.density,viscosity,0,axis,false,false);
@@ -256,7 +256,7 @@ Extrapolate_Velocity_Across_Interface(T_FACE_ARRAYS_SCALAR& face_velocities,cons
     const int ghost_cells=2*(int)std::ceil(band_width)+1;
     if(mpi_grid){
         T_FACE_ARRAYS_SCALAR phi_faces(grid,ghost_cells);
-        T_FACE_ARRAYS_SCALAR face_velocities_ghost(grid,ghost_cells,false);boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,0,ghost_cells); // TODO: use real time
+        T_FACE_ARRAYS_SCALAR face_velocities_ghost(grid,ghost_cells,false);boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,0,ghost_cells); // TODO: use real time
         T_FACE_ARRAYS_BOOL fixed_faces=fixed_faces_input?*fixed_faces_input:T_FACE_ARRAYS_BOOL(grid,ghost_cells);
         for(int axis=0;axis<T_GRID::dimension;axis++){
             T_ARRAYS_BASE &phi_face=phi_faces.Component(axis),&face_velocity=face_velocities_ghost.Component(axis);ARRAYS_ND_BASE<bool,TV_INT>& fixed_face=fixed_faces.Component(axis);

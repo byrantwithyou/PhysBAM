@@ -334,7 +334,7 @@ Euler_Step_Particles_Wrapper(const T_FACE_ARRAYS_SCALAR& V,T_ARRAYS_PARTICLES& p
     const bool update_particle_cells_after_euler_step,const bool assume_particles_in_correct_blocks,const bool enforce_domain_boundaries)
 {
     T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(levelset.grid,number_of_ghost_cells,false);
-    levelset.boundary->Fill_Ghost_Cells_Face(levelset.grid,V,face_velocities_ghost,time,number_of_ghost_cells);
+    levelset.boundary->Fill_Ghost_Faces(levelset.grid,V,face_velocities_ghost,time,number_of_ghost_cells);
     Euler_Step_Particles(face_velocities_ghost,particles,particle_type,dt,time,update_particle_cells_after_euler_step,assume_particles_in_correct_blocks,enforce_domain_boundaries);
 }
 //#####################################################################

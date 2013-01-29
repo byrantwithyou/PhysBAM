@@ -128,7 +128,7 @@ public:
         if(upsample==1) return;
         ARRAY<T,TV_INT> upsampled_density(upsampled_mac_grid.Domain_Indices());
         ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(mac_grid,3,false);
-        boundary->Fill_Ghost_Cells_Face(mac_grid,face_velocities,face_velocities_ghost,0,3);
+        boundary->Fill_Ghost_Faces(mac_grid,face_velocities,face_velocities_ghost,0,3);
         for(typename GRID<TV>::CELL_ITERATOR iterator(upsampled_mac_grid);iterator.Valid();iterator.Next()){
             upsampled_density(iterator.Cell_Index())=interpolation.Clamped_To_Array(mac_grid,density,iterator.Location());}
         std::string f=STRING_UTILITIES::string_sprintf("%d",frame);

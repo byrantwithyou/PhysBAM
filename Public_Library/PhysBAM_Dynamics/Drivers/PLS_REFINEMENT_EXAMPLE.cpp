@@ -41,10 +41,10 @@ Write_Output_Files(const int frame)
 {
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
     ARRAY<T,FACE_INDEX<TV::dimension> > fine_face_velocities_ghost(fine_mac_grid,3,false);
-    boundary->Fill_Ghost_Cells_Face(fine_mac_grid,fine_face_velocities,fine_face_velocities_ghost,0,3);
+    boundary->Fill_Ghost_Faces(fine_mac_grid,fine_face_velocities,fine_face_velocities_ghost,0,3);
     ARRAY<T,FACE_INDEX<TV::dimension> > coarse_face_velocities_ghost(coarse_mac_grid,3,false);
-    if(boundary_coarse) boundary_coarse->Fill_Ghost_Cells_Face(coarse_mac_grid,coarse_face_velocities,coarse_face_velocities_ghost,0,3);
-    else boundary->Fill_Ghost_Cells_Face(coarse_mac_grid,coarse_face_velocities,coarse_face_velocities_ghost,0,3);
+    if(boundary_coarse) boundary_coarse->Fill_Ghost_Faces(coarse_mac_grid,coarse_face_velocities,coarse_face_velocities_ghost,0,3);
+    else boundary->Fill_Ghost_Faces(coarse_mac_grid,coarse_face_velocities,coarse_face_velocities_ghost,0,3);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",fine_face_velocities_ghost);
     bool split=split_dir!="",first_frame=(frame==0 || (split && frame==restart));
     if(first_frame) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",fine_mac_grid);

@@ -46,7 +46,7 @@ Write_Output_Files(const int frame)
     if(write_debug_data){
         ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(mac_grid,number_of_ghost_cells,false);
         ARRAY<T,TV_INT> density_ghost(mac_grid.Domain_Indices(number_of_ghost_cells),false);
-        incompressible.boundary->Fill_Ghost_Cells_Face(mac_grid,face_velocities,face_velocities_ghost,0,number_of_ghost_cells);
+        incompressible.boundary->Fill_Ghost_Faces(mac_grid,face_velocities,face_velocities_ghost,0,number_of_ghost_cells);
         incompressible.boundary->Fill_Ghost_Cells(mac_grid,density,density_ghost,(T)0,0,number_of_ghost_cells);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities_ghost);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/density",density_ghost);

@@ -18,10 +18,10 @@ template<class TV> BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>::
 {
 }
 //#####################################################################
-// Function Fill_Ghost_Cells_Face
+// Function Fill_Ghost_Faces
 //#####################################################################
 template<class TV> void BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>::
-Fill_Ghost_Cells_Face(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAYS_SCALAR& u_ghost,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAYS_SCALAR& u_ghost,const T time,const int number_of_ghost_cells)
 {
     assert(grid.Is_MAC_Grid());
     T_FACE_ARRAYS_SCALAR::Put(u,u_ghost); // interior

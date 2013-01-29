@@ -467,7 +467,7 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const
 
         {T_ARRAYS_SCALAR phi_ghost(grid->Domain_Indices(number_of_ghost_cells),false);phi_boundary->Fill_Ghost_Cells(*grid,particle_levelset_evolution->phi,phi_ghost,0,time,number_of_ghost_cells);
         T_ARRAYS_SCALAR::Limited_Shifted_Get(particle_levelset_evolution->phi,phi_ghost,temp_shift);}
-        {T_FACE_ARRAYS_SCALAR face_velocities_ghost(*grid,number_of_ghost_cells,false);fluid_boundary->Fill_Ghost_Cells_Face(*grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
+        {T_FACE_ARRAYS_SCALAR face_velocities_ghost(*grid,number_of_ghost_cells,false);fluid_boundary->Fill_Ghost_Faces(*grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
         for(int axis=0;axis<T_GRID::dimension;axis++)
             T_ARRAYS_SCALAR::Limited_Shifted_Get(face_velocities.Component(axis),face_velocities_ghost.Component(axis),temp_shift);}
         {T_ARRAYS_SCALAR p_ghost(p_grid.Domain_Indices(number_of_ghost_cells),false);BOUNDARY<TV,T>().Fill_Ghost_Cells(p_grid,incompressible->projection.p,p_ghost,0,time,number_of_ghost_cells);

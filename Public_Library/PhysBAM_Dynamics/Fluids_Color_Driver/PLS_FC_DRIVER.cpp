@@ -186,7 +186,7 @@ Update_Pls(T dt)
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;
     face_velocities_ghost.Resize(example.grid,example.number_of_ghost_cells,false);
-    // TODO example.incompressible.boundary->Fill_Ghost_Cells_Face(example.grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
+    // TODO example.incompressible.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
 
     ARRAY<T,TV_INT> phi_back(example.grid.Domain_Indices(example.number_of_ghost_cells));
     example.phi_boundary->Fill_Ghost_Cells(example.grid,example.particle_levelset_evolution_multiple.Particle_Levelset(0).levelset.phi,phi_back,dt,time,example.number_of_ghost_cells);
@@ -203,7 +203,7 @@ Update_Pls(T dt)
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
 
     example.particle_levelset_evolution_multiple.Make_Signed_Distance();
-    // TODO example.boundary->Fill_Ghost_Cells_Face(example.grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
+    // TODO example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
 
     LOG::Time("modifying levelset");
     example.particle_levelset_evolution_multiple.Fill_Levelset_Ghost_Cells(time+dt);
