@@ -28,6 +28,7 @@
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
+#include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -47,6 +48,7 @@ public:
     using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::number_of_colors;
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
     using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
+    using BASE::particle_levelset_evolution_multiple;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -63,6 +65,7 @@ public:
     bool no_advection;
     int refine;
     static T Large_Phi() {return 1000;}
+    T surface_tension;
 
     struct ANALYTIC_VELOCITY
     {
@@ -72,12 +75,14 @@ public:
         virtual T p(const TV& X,T t) const=0;
         virtual TV F(const TV& X,T t) const=0;
     };
-    ARRAY<ANALYTIC_VELOCITY*> analytic_velocity;
+    ARRAY<ANALYTIC_VELOCITY*> analytic_velocity,initial_analytic_velocity;
     ANALYTIC_LEVELSET<TV>* analytic_levelset;
+    bool analytic_initial_only;
 
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),
-        rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),no_advection(false),refine(1)
+        rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),no_advection(false),refine(1),
+        analytic_initial_only(false)
     {
         last_frame=16;
         int number_of_threads=1;
@@ -222,7 +227,7 @@ public:
                 {
                     T x0=(T).2,x1=(T).8,g=9.8,a=rho0*sqr(m)*g/(2*mu0*s);
                     ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV(x0,0),TV(1,0),DIRICHLET,0);
-                    ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),DIRICHLET,-4);
+                    ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),DIRICHLET,DIRICHLET);
                     analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV(x1,0),TV(1,0),0,1)))->Add(ab)->Add(cd);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X(a,-a*(x0+x1),a*x0*x1,mu0*s/kg));
                     use_p_null_mode=true;
@@ -308,7 +313,7 @@ public:
                     analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,1,0),vel);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(vel));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(vel));
-                    if(bc_type!=NEUMANN) use_p_null_mode=true;
+                    use_p_null_mode=true;
                     use_level_set_method=true;
                 }
                 break;
@@ -325,6 +330,16 @@ public:
                     use_p_null_mode=true;
                     use_level_set_method=true;
                 }
+                break;
+            case 22:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,1);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()));
+                analytic_initial_only=true;
+                surface_tension=1;
+                use_p_null_mode=true;
+                use_level_set_method=true;
                 break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
@@ -540,14 +555,14 @@ public:
 
     void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE
     {
-        if(analytic_velocity.m && analytic_levelset && !use_level_set_method && !use_pls)
+        if(analytic_velocity.m && analytic_levelset && !use_level_set_method && !use_pls && !analytic_initial_only)
             Set_Level_Set(time+dt);
     }
 
     void End_Time_Step(const T time) PHYSBAM_OVERRIDE
     {
         Level_Set_Error(time);
-        if(analytic_velocity.m){
+        if(analytic_velocity.m && !analytic_initial_only){
             T max_error=0,a=0,b=0;
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
                 int c=levelset_color.Color(it.Location());
@@ -571,17 +586,23 @@ public:
     TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
     {
         Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
-        if(analytic_velocity.m && analytic_levelset){
+        if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
             MATRIX<T,2> jump_stress=Stress(X,color1,time);
             if(color0>=0) jump_stress-=Stress(X,color0,time);
             TV n=analytic_levelset->N(X/m,time/s,color1);
             return jump_stress*n;}
+        
+        if(surface_tension){
+            T k=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1)->Compute_Curvature(X);
+            TV n=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1)->Normal(X);
+            return k*surface_tension*n;}
+
         return TV();
     }
 
     TV Volume_Force(const TV& X,int color,T time) PHYSBAM_OVERRIDE
     {
-        if(analytic_velocity.m && analytic_levelset)
+        if(analytic_velocity.m && analytic_levelset && !analytic_initial_only)
             return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s);
         return TV();
     }
@@ -589,7 +610,7 @@ public:
     TV Velocity_Jump(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
     {
         Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
-        if(analytic_velocity.m && analytic_levelset){
+        if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
             TV jump_u=analytic_velocity(color1)->u(X/m,time/s);
             if(color0>=0) jump_u-=analytic_velocity(color0)->u(X/m,time/s);
             return jump_u*m/s;}
