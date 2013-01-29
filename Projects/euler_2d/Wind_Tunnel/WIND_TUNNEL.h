@@ -31,7 +31,7 @@
 namespace PhysBAM{
 
 template<class T_input>
-class WIND_TUNNEL:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >,public BOUNDARY_UNIFORM<GRID<VECTOR<T_input,2> >,VECTOR<T_input,4> >
+class WIND_TUNNEL:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >,public BOUNDARY<VECTOR<T_input,2>,VECTOR<T_input,4> >
 {
 public:
     typedef T_input T;typedef VECTOR<T,2> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
@@ -43,10 +43,10 @@ public:
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*T_GRID::dimension> T_FACE_VECTOR_BOOL;
-    typedef VECTOR<BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION>*,2*T_GRID::dimension> T_BOUNDARY_FACE_VECTOR;
+    typedef VECTOR<BOUNDARY<TV,TV_DIMENSION>*,2*T_GRID::dimension> T_BOUNDARY_FACE_VECTOR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;
-    typedef BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION> BASE_BOUNDARY;
+    typedef BOUNDARY<TV,TV_DIMENSION> BASE_BOUNDARY;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;
     using BASE::data_directory;using BASE::solid_body_collection;using BASE_BOUNDARY::Boundary;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
 
@@ -163,14 +163,14 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
     valid_wall[2]=VECTOR<bool,2>::Constant_Vector(false);
 
     if(test_number==7){
-        BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>* boundary_euler=
-            new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
+        BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>* boundary_euler=
+            new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,
             T_FACE_VECTOR(rho_left,rho_initial,rho_left,rho_initial),T_FACE_VECTOR(p_left,p_initial,p_left,p_initial),
             TV_FACE_VECTOR(TV(u_left,v_left),velocity_initial,TV(u_left,v_left),velocity_initial),(T).5,valid_wall,true,
             T_FACE_VECTOR(1.,0,1.,0),T_FACE_VECTOR_BOOL(true,true,true,true));
-        fluids_parameters.compressible_boundary=new BOUNDARY_MULTIPLE_UNIFORM<T_GRID,TV_DIMENSION>(T_BOUNDARY_FACE_VECTOR(boundary_euler,boundary_euler,this,this));}
+        fluids_parameters.compressible_boundary=new BOUNDARY_MULTIPLE_UNIFORM<TV,TV_DIMENSION>(T_BOUNDARY_FACE_VECTOR(boundary_euler,boundary_euler,this,this));}
     else{
-        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
+        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,
             T_FACE_VECTOR(rho_initial,rho_initial,rho_initial,rho_initial),T_FACE_VECTOR(p_initial,p_initial,p_initial,p_initial),
             TV_FACE_VECTOR(velocity_initial,velocity_initial,velocity_initial,velocity_initial),(T).5,valid_wall,true,
             T_FACE_VECTOR(1.,0,0,0),T_FACE_VECTOR_BOOL(true,true,false,false));}

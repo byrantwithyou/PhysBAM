@@ -47,7 +47,7 @@ public:
     T xmin, xmax, ymin, ymax;
 
     //allow for custom boundary conditions & eos's
-    BOUNDARY_UNIFORM<T_GRID,T,T_GRID::dimension+2>* u_boundary;
+    BOUNDARY<TV,T,T_GRID::dimension+2>* u_boundary;
     EOS<T>* eos;
     CONSERVATION<T,4>* conservation_method;
 

@@ -922,19 +922,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Grids_Uniform_Boundaries\BOUNDARY_UNIFORM.cpp"
+				RelativePath="..\Grids_Uniform_Boundaries\BOUNDARY.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Grids_Uniform_Boundaries\BOUNDARY_UNIFORM.h"
+				RelativePath="..\Grids_Uniform_Boundaries\BOUNDARY.h"
 				>
 			</File>
 			<File
-				RelativePath="..\Grids_Uniform_Boundaries\BOUNDARY_UNIFORM_PERIODIC.cpp"
+				RelativePath="..\Grids_Uniform_Boundaries\BOUNDARY_PERIODIC.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Grids_Uniform_Boundaries\BOUNDARY_UNIFORM_PERIODIC.h"
+				RelativePath="..\Grids_Uniform_Boundaries\BOUNDARY_PERIODIC.h"
 				>
 			</File>
 		</Filter>

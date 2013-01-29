@@ -2,11 +2,11 @@
 // Copyright 2004-2007, Ron Fedkiw, Eran Guendelman, Nipun Kwatra, Frank Losasso, Andrew Selle, Tamar Shinar, Jonathan Su, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Parallel_Computation/BOUNDARY_MPI.h>
@@ -130,29 +130,29 @@ template<class T_GRID> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Initialize_MPI()
 {
     fluids_parameters.mpi_grid->Initialize(fluids_parameters.domain_walls);
-    if(fluids_parameters.number_of_regions==1)fluids_parameters.phi_boundary=new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.phi_boundary);
+    if(fluids_parameters.number_of_regions==1)fluids_parameters.phi_boundary=new BOUNDARY_MPI<TV>(fluids_parameters.mpi_grid,*fluids_parameters.phi_boundary);
     else if(fluids_parameters.number_of_regions>=2)for(int i=0;i<fluids_parameters.number_of_regions;i++)
-        fluids_parameters.phi_boundary_multiphase(i)=new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.phi_boundary_multiphase(i));
-    fluids_parameters.fluid_boundary=new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.fluid_boundary);
+        fluids_parameters.phi_boundary_multiphase(i)=new BOUNDARY_MPI<TV>(fluids_parameters.mpi_grid,*fluids_parameters.phi_boundary_multiphase(i));
+    fluids_parameters.fluid_boundary=new BOUNDARY_MPI<TV>(fluids_parameters.mpi_grid,*fluids_parameters.fluid_boundary);
     if(fluids_parameters.use_soot){
-        if(fluids_parameters.soot_boundary) fluids_parameters.soot_boundary=new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.soot_boundary);
-        fluids_parameters.soot_container.Set_Custom_Boundary(*new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.soot_container.boundary));
-        fluids_parameters.soot_fuel_container.Set_Custom_Boundary(*new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.soot_fuel_container.boundary));}
+        if(fluids_parameters.soot_boundary) fluids_parameters.soot_boundary=new BOUNDARY_MPI<TV>(fluids_parameters.mpi_grid,*fluids_parameters.soot_boundary);
+        fluids_parameters.soot_container.Set_Custom_Boundary(*new BOUNDARY_MPI<TV>(fluids_parameters.mpi_grid,*fluids_parameters.soot_container.boundary));
+        fluids_parameters.soot_fuel_container.Set_Custom_Boundary(*new BOUNDARY_MPI<TV>(fluids_parameters.mpi_grid,*fluids_parameters.soot_fuel_container.boundary));}
     if(fluids_parameters.use_density){
-        if(fluids_parameters.density_boundary) fluids_parameters.density_boundary=new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.density_boundary);
-        fluids_parameters.density_container.Set_Custom_Boundary(*new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.density_container.boundary));}
+        if(fluids_parameters.density_boundary) fluids_parameters.density_boundary=new BOUNDARY_MPI<TV>(fluids_parameters.mpi_grid,*fluids_parameters.density_boundary);
+        fluids_parameters.density_container.Set_Custom_Boundary(*new BOUNDARY_MPI<TV>(fluids_parameters.mpi_grid,*fluids_parameters.density_container.boundary));}
     if(fluids_parameters.use_temperature){
-        if(fluids_parameters.temperature_boundary) fluids_parameters.temperature_boundary=new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.temperature_boundary);
-        fluids_parameters.temperature_container.Set_Custom_Boundary(*new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.temperature_container.boundary));}
+        if(fluids_parameters.temperature_boundary) fluids_parameters.temperature_boundary=new BOUNDARY_MPI<TV>(fluids_parameters.mpi_grid,*fluids_parameters.temperature_boundary);
+        fluids_parameters.temperature_container.Set_Custom_Boundary(*new BOUNDARY_MPI<TV>(fluids_parameters.mpi_grid,*fluids_parameters.temperature_container.boundary));}
     for(int i=0;i<fluids_parameters.number_of_regions;i++) fluids_parameters.particle_levelset_evolution->Particle_Levelset(i).mpi_grid=fluids_parameters.mpi_grid;
     if(fluids_parameters.use_strain||fluids_parameters.use_multiphase_strain.Count_Matches(0)<fluids_parameters.number_of_regions)
-        fluids_parameters.strain_boundary=new BOUNDARY_MPI<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >(fluids_parameters.mpi_grid,*fluids_parameters.strain_boundary);
+        fluids_parameters.strain_boundary=new BOUNDARY_MPI<TV,SYMMETRIC_MATRIX<T,TV::m> >(fluids_parameters.mpi_grid,*fluids_parameters.strain_boundary);
     if(fluids_parameters.incompressible){
         fluids_parameters.incompressible->mpi_grid=fluids_parameters.mpi_grid;
         fluids_parameters.incompressible->projection.elliptic_solver->mpi_grid=fluids_parameters.mpi_grid;}
     if(fluids_parameters.compressible){
-        fluids_parameters.compressible_boundary=new BOUNDARY_MPI<T_GRID,VECTOR<typename T_GRID::SCALAR,T_GRID::dimension+2> >(fluids_parameters.mpi_grid,*fluids_parameters.compressible_boundary);
-        fluids_parameters.euler->euler_projection.pressure_boundary=new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.euler->euler_projection.pressure_boundary);
+        fluids_parameters.compressible_boundary=new BOUNDARY_MPI<TV,VECTOR<typename T_GRID::SCALAR,T_GRID::dimension+2> >(fluids_parameters.mpi_grid,*fluids_parameters.compressible_boundary);
+        fluids_parameters.euler->euler_projection.pressure_boundary=new BOUNDARY_MPI<TV>(fluids_parameters.mpi_grid,*fluids_parameters.euler->euler_projection.pressure_boundary);
         fluids_parameters.euler->mpi_grid=fluids_parameters.mpi_grid;
         fluids_parameters.euler->euler_projection.elliptic_solver->mpi_grid=fluids_parameters.mpi_grid;}
     if(!restart && fluids_parameters.store_particle_ids){ // TODO: this should be fixed so that id's are scalable

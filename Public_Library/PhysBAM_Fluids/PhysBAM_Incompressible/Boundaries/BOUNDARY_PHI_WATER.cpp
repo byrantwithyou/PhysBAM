@@ -13,7 +13,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> BOUNDARY_PHI_WATER<T_GRID>::
+template<class TV> BOUNDARY_PHI_WATER<TV>::
 BOUNDARY_PHI_WATER(const TV_SIDES& constant_extrapolation)
     :sign(1),use_open_boundary_mode(false),open_boundary(6,true),V(0)
 {
@@ -25,29 +25,29 @@ BOUNDARY_PHI_WATER(const TV_SIDES& constant_extrapolation)
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> BOUNDARY_PHI_WATER<T_GRID>::
+template<class TV> BOUNDARY_PHI_WATER<TV>::
 ~BOUNDARY_PHI_WATER()
 {}
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
-template<class T_GRID> void BOUNDARY_PHI_WATER<T_GRID>::
-Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_BASE& u,T_ARRAYS_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+template<class TV> void BOUNDARY_PHI_WATER<TV>::
+Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_BASE& u,T_ARRAYS_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
     assert(grid.Is_MAC_Grid() && V);T_ARRAYS_BASE::Put(u,u_ghost);
     RANGE<TV_INT> domain_indices=grid.Domain_Indices();
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells); 
-    for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
+    for(int axis=0;axis<GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
         Fill_Single_Ghost_Region_Threaded(regions(side), grid, u_ghost, side);}
 }
 //#####################################################################
 // Function Fill_Single_Ghost_Region_Threaded
 //#####################################################################
-template<class T_GRID> void BOUNDARY_PHI_WATER<T_GRID>::
-Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const T_GRID& grid,T_ARRAYS_BASE& u_ghost,const int side)
+template<class TV> void BOUNDARY_PHI_WATER<TV>::
+Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const GRID<TV>& grid,T_ARRAYS_BASE& u_ghost,const int side)
 {
-    if(use_extrapolation_mode && Constant_Extrapolation(side)) BOUNDARY_UNIFORM<T_GRID,T>::Fill_Single_Ghost_Region(grid,u_ghost,side,region);
+    if(use_extrapolation_mode && Constant_Extrapolation(side)) BOUNDARY<TV,T>::Fill_Single_Ghost_Region(grid,u_ghost,side,region);
     else{ // either phi=phi_object for a wall, or no wall
         int axis_side=side%2;
         int axis=side/2;
@@ -63,12 +63,12 @@ Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const T_GRID& grid,T_ARR
             else u_ghost(cell)=u_ghost(boundary_cell);}}
 }
 //#####################################################################
-#define INSTANTIATION_HELPER(T,T_GRID) \
-    template BOUNDARY_PHI_WATER<T_GRID >::BOUNDARY_PHI_WATER(const VECTOR<VECTOR<bool,2>,T_GRID::dimension>&);
+#define INSTANTIATION_HELPER(T,TV) \
+    template BOUNDARY_PHI_WATER<TV>::BOUNDARY_PHI_WATER(const VECTOR<VECTOR<bool,2>,TV::dimension>&);
 #define P(...) __VA_ARGS__
-INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,1> >));
-INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,2> >));
-INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,3> >));
-INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,1> >));
-INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,2> >));
-INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,3> >));
+INSTANTIATION_HELPER(float,P(VECTOR<float,1>));
+INSTANTIATION_HELPER(float,P(VECTOR<float,2>));
+INSTANTIATION_HELPER(float,P(VECTOR<float,3>));
+INSTANTIATION_HELPER(double,P(VECTOR<double,1>));
+INSTANTIATION_HELPER(double,P(VECTOR<double,2>));
+INSTANTIATION_HELPER(double,P(VECTOR<double,3>));

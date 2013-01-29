@@ -37,7 +37,7 @@ class EULER_UNIFORM:public EULER<T_GRID>
     typedef EULER<T_GRID> BASE;
     typedef VECTOR<bool,T_GRID::dimension> TV_BOOL;
     typedef typename T_ARRAYS_DIMENSION_SCALAR::ELEMENT T_ARRAYS_ELEMENT;
-    typedef BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION> T_BOUNDARY;
+    typedef BOUNDARY<TV,TV_DIMENSION> T_BOUNDARY;
 protected:
     using BASE::max_time_step;using BASE::cut_out_grid;using BASE::gravity;using BASE::downward_direction;
 public:

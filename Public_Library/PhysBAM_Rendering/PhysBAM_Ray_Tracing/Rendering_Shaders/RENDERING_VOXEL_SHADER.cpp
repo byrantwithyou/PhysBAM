@@ -2,7 +2,7 @@
 // Copyright 2003-2005, Geoffrey Irving, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
@@ -41,7 +41,7 @@ RENDERING_VOXEL_SHADER(const TV& absorption_input,const TV& scattering_input,con
             blackbody_ramp_grid.Initialize(VECTOR<int,1>(500),RANGE<VECTOR<T,1> >(VECTOR<T,1>(0),VECTOR<T,1>((T)3000)));
             blackbody_ramp.Resize(blackbody_ramp_grid.Domain_Indices(ghost_cells));
             for(int i=0;i<blackbody_ramp_grid.counts.x;i++) blackbody_ramp(i)=blackbody.cie.XYZ_To_RGB(world_xyz_to_display_xyz*(blackbody.Calculate_XYZ(blackbody_ramp_grid.X(VECTOR<int,1>(i)).x)));
-            BOUNDARY_UNIFORM<GRID<VECTOR<T,1> >,TV>().Fill_Ghost_Cells(blackbody_ramp_grid,blackbody_ramp,blackbody_ramp,0,0,ghost_cells);}}
+            BOUNDARY<VECTOR<T,1>,TV>().Fill_Ghost_Cells(blackbody_ramp_grid,blackbody_ramp,blackbody_ramp,0,0,ghost_cells);}}
 
     LOG::cout<<"absorption="<<absorption<<", scattering="<<scattering<<", inscattering_amplification="<<inscattering_amplification<<std::endl;
     LOG::cout<<"emission_amplification="<<emission_amplification<<", white_point_temperature="<<white_point_temperature<<std::endl;

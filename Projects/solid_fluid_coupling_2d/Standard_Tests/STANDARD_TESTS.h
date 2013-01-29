@@ -1560,7 +1560,7 @@ void Oscillating_Disk()
 
     debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
 
-    fluids_parameters.fluid_boundary=new BOUNDARY_MAC_GRID_PERIODIC<GRID<TV>,T>;
+    fluids_parameters.fluid_boundary=new BOUNDARY_MAC_GRID_PERIODIC<TV,T>;
     fluids_parameters.periodic_boundary.Fill(true);
 }
 //#####################################################################

@@ -9,18 +9,18 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_OPEN_CALLBACKS.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class BOUNDARY_PHI_WATER:public BOUNDARY_UNIFORM<T_GRID,typename T_GRID::SCALAR>
+template<class TV>
+class BOUNDARY_PHI_WATER:public BOUNDARY<TV,typename TV::SCALAR>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,T_GRID::dimension> TV_SIDES;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
+    typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
+    typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,GRID<TV>::dimension> TV_SIDES;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
 public:
-    typedef BOUNDARY_UNIFORM<T_GRID,T> BASE;
+    typedef BOUNDARY<TV,T> BASE;
     using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;using BASE::Find_Ghost_Regions;using BASE::Boundary;
 
     bool use_extrapolation_mode;
@@ -29,7 +29,7 @@ public:
 
     bool use_open_boundary_mode;
     ARRAY<bool> open_boundary;
-    const BOUNDARY_OPEN_CALLBACKS<T_GRID> *callbacks;
+    const BOUNDARY_OPEN_CALLBACKS<GRID<TV> > *callbacks;
 private:
     const T_FACE_ARRAYS_SCALAR* V;
 public:
@@ -59,12 +59,12 @@ public:
     void Use_Open_Boundary_Mode(const bool use=true)
     {use_open_boundary_mode=use;}
 
-    void Set_Boundary_Open_Callbacks(const BOUNDARY_OPEN_CALLBACKS<T_GRID>& callbacks_input)
+    void Set_Boundary_Open_Callbacks(const BOUNDARY_OPEN_CALLBACKS<GRID<TV> >& callbacks_input)
     {callbacks=&callbacks_input;}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_BASE& u,T_ARRAYS_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells); // uniform grids
-    void Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const T_GRID& grid,T_ARRAYS_BASE& u_ghost,const int side);
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_BASE& u,T_ARRAYS_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells); // uniform grids
+    void Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const GRID<TV>& grid,T_ARRAYS_BASE& u_ghost,const int side);
 //#####################################################################
 };
 }

@@ -4,9 +4,9 @@
 //#####################################################################
 #ifndef __WATER_EXAMPLE__
 #define __WATER_EXAMPLE__
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -26,7 +26,7 @@ class WATER_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >,RIGID_GEOMETRY_EXAMPLE_
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef BOUNDARY_PHI_WATER<GRID<TV> > T_BOUNDARY_PHI_WATER;
+    typedef BOUNDARY_PHI_WATER<TV> T_BOUNDARY_PHI_WATER;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<GRID<TV> >::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     enum workaround1{d=TV::m};
 
@@ -52,8 +52,8 @@ public:
     INCOMPRESSIBLE_UNIFORM<GRID<TV> > incompressible;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;
-    BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
-    BOUNDARY_UNIFORM<GRID<TV>,T> *boundary,*phi_boundary;
+    BOUNDARY<TV,T> boundary_scalar;
+    BOUNDARY<TV,T> *boundary,*phi_boundary;
     T_BOUNDARY_PHI_WATER phi_boundary_water;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
     RIGID_GEOMETRY_COLLECTION<TV> rigid_geometry_collection;

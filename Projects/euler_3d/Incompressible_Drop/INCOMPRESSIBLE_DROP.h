@@ -126,7 +126,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
     VECTOR<VECTOR<bool,2>,T_GRID::dimension> valid_wall;
     for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
-    fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
+    fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,
         T_FACE_VECTOR((T)1.58317,(T)1.58317,(T)1.58317,(T)1.58317,(T)1.58317,(T)1.58317),T_FACE_VECTOR((T).5,(T).5,(T).5,(T).5,(T).5,(T).5),TV_FACE_VECTOR(),(T).5,valid_wall);
     fluids_parameters.Use_No_Fluid_Coupling_Defaults();
 }

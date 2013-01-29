@@ -8,9 +8,9 @@
 #define __DETONATION_SHOCK_DYNAMICS__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Grid_Based_Fields/GRID_AND_ARRAY_CONTAINER.h>
@@ -42,13 +42,13 @@ public:
     // Narrowband Indices
     ARRAY<TV_INT> indices_interface,indices_interface_ghost;
 
-    BOUNDARY_UNIFORM<T_GRID,T> *boundary,boundary_default;
-    BOUNDARY_UNIFORM<GRID<TV>,TV> *boundary_vector,boundary_vector_default;
+    BOUNDARY<TV,T> *boundary,boundary_default;
+    BOUNDARY<TV,TV> *boundary_vector,boundary_vector_default;
 
     DETONATION_SHOCK_DYNAMICS(T_GRID& grid_input,const LEVELSET<TV>& levelset_input,const int order_input=3);
     virtual ~DETONATION_SHOCK_DYNAMICS();
 
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,T>* boundary_input,BOUNDARY_UNIFORM<GRID<TV>,TV>* boundary_vector_input)
+    void Set_Custom_Boundary(BOUNDARY<TV,T>* boundary_input,BOUNDARY<TV,TV>* boundary_vector_input)
     {boundary=boundary_input;boundary_vector=boundary_vector_input;
     Dn.Set_Custom_Boundary(*boundary_input);Dn_dot.Set_Custom_Boundary(*boundary_input);curvature.Set_Custom_Boundary(*boundary_input);curvature_old.Set_Custom_Boundary(*boundary_input);}
 

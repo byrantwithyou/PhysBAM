@@ -7,10 +7,10 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CONSTRAINT_AGGREGATION_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h>
-#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 
 
 using namespace PhysBAM;

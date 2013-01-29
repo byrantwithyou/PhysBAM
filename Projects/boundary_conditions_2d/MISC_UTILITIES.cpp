@@ -1,8 +1,8 @@
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -72,7 +72,7 @@ void Add_Advection(const OBJECTS_COMMON<TV>& obj,const PARAMETERS_COMMON<typenam
 {
     typedef typename TV::SCALAR T;
     ADVECTION_HAMILTON_JACOBI_ENO<GRID<TV>,T> advection;
-    BOUNDARY_UNIFORM<GRID<TV>,T> boundary;
+    BOUNDARY<TV,T> boundary;
 
     if(use_extrapolation){
         Fill_Ghost_Cells(obj.grid,3,3,u,*obj.bc);

@@ -4,11 +4,11 @@
 //#####################################################################
 #ifndef __SMOKE_EXAMPLE__
 #define __SMOKE_EXAMPLE__
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -40,8 +40,8 @@ public:
     PROJECTION_UNIFORM<GRID<TV> > projection;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<GRID<TV>,T, AVERAGING_UNIFORM<GRID<TV>, FACE_LOOKUP_UNIFORM<GRID<TV> > >,LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T,FACE_LOOKUP_UNIFORM<GRID<TV> > > > advection_scalar;
-    BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
-    BOUNDARY_UNIFORM<GRID<TV>,T> *boundary;
+    BOUNDARY<TV,T> boundary_scalar;
+    BOUNDARY<TV,T> *boundary;
     ARRAY<T,TV_INT> density;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;    
     RANGE<TV> source;

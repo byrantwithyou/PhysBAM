@@ -13,8 +13,8 @@
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 template<class T_GRID> class INCOMPRESSIBLE_FLUIDS_FORCES;
-template<class T_GRID> class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP;
-template<class T_GRID,class T> class BOUNDARY_UNIFORM;
+template<class TV> class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP;
+template<class TV,class T> class BOUNDARY;
 
 template<class T_GRID>
 class INCOMPRESSIBLE_FLUID_EVOLUTION:public NONCOPYABLE
@@ -25,11 +25,11 @@ public:
     
     T_GRID grid;
     ADVECTION<T_GRID,T>* advection;
-    BOUNDARY_UNIFORM<T_GRID,T>* boundary;
+    BOUNDARY<TV,T>* boundary;
     ARRAY<INCOMPRESSIBLE_FLUIDS_FORCES<T_GRID>*> fluids_forces;
     T max_time_step;
 protected:               
-    BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<T_GRID>& boundary_default;
+    BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>& boundary_default;
 public:
 
     INCOMPRESSIBLE_FLUID_EVOLUTION(const T_GRID& grid_input);
@@ -38,7 +38,7 @@ public:
     void Set_Custom_Advection(ADVECTION<T_GRID,T>& advection_input)
     {advection=&advection_input;}
 
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,T>& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
     {boundary=&boundary_input;}
 
     template<class T_FORCE> T_FORCE

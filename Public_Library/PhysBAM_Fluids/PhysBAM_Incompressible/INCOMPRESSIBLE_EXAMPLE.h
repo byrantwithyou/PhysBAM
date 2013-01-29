@@ -4,9 +4,9 @@
 //#####################################################################
 #ifndef __INCOMPRESSIBLE_EXAMPLE__
 #define __INCOMPRESSIBLE_EXAMPLE__
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -47,8 +47,8 @@ public:
     INCOMPRESSIBLE_UNIFORM<GRID<TV> > incompressible;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities,face_velocities_save;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;
-    BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
-    BOUNDARY_UNIFORM<GRID<TV>,T> *boundary;
+    BOUNDARY<TV,T> boundary_scalar;
+    BOUNDARY<TV,T> *boundary;
     ARRAY<T,TV_INT> density,temperature;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;    
     RIGID_GEOMETRY_COLLECTION<TV> rigid_geometry_collection;

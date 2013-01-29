@@ -2,32 +2,32 @@
 // Copyright 2002-2006, Nipun Kwatra, Frank Losasso, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class BOUNDARY_UNIFORM
+// Class BOUNDARY_OPEN_WATER
 //#####################################################################
 #ifndef __BOUNDARY_OPEN_WATER__
 #define __BOUNDARY_OPEN_WATER__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_FORWARD.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class BOUNDARY_OPEN_WATER:public BOUNDARY_UNIFORM<T_GRID,typename T_GRID::SCALAR>
+template<class TV>
+class BOUNDARY_OPEN_WATER:public BOUNDARY<TV,typename TV::SCALAR>
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::VECTOR_T TV;
+    typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
+    typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
 public:
-    typedef BOUNDARY_UNIFORM<T_GRID,T> BASE;
+    typedef BOUNDARY<TV,T> BASE;
     using BASE::Constant_Extrapolation;using BASE::Fill_Single_Ghost_Region;using BASE::Find_Ghost_Regions;
 
     ARRAY<bool> open_boundary;
     T attenuate_inflow;
-    BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<T_GRID> boundary_mac_grid_solid_wall_slip;
+    BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV> boundary_mac_grid_solid_wall_slip;
 
     BOUNDARY_OPEN_WATER(const T attenuate_inflow_input=T(1),const bool left_open_boundary_input=false,const bool right_open_boundary_input=false,const bool bottom_open_boundary_input=false,const bool top_open_boundary_input=false,
         const bool front_open_boundary_input=false,const bool back_open_boundary_input=false)
@@ -47,22 +47,22 @@ public:
 public:
 
 //#####################################################################
-    void Fill_Ghost_Cells_Face(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAYS_SCALAR& u_ghost,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
+    void Fill_Ghost_Cells_Face(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAYS_SCALAR& u_ghost,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 //#####################################################################
 // Function Fill_Ghost_Cells_Face
 //#####################################################################
-template<class T_GRID> void BOUNDARY_OPEN_WATER<T_GRID>::
-Fill_Ghost_Cells_Face(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAYS_SCALAR& u_ghost,const T time,const int number_of_ghost_cells)
+template<class TV> void BOUNDARY_OPEN_WATER<TV>::
+Fill_Ghost_Cells_Face(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAYS_SCALAR& u_ghost,const T time,const int number_of_ghost_cells)
 {
     assert(grid.Is_MAC_Grid());
     T_FACE_ARRAYS_SCALAR::Put(u,u_ghost); // interior
-    for(int face_axis=0;face_axis<T_GRID::dimension;face_axis++){
-        T_GRID face_grid=grid.Get_Face_Grid(face_axis);
+    for(int face_axis=0;face_axis<GRID<TV>::dimension;face_axis++){
+        GRID<TV> face_grid=grid.Get_Face_Grid(face_axis);
         T_ARRAYS_BASE& u_ghost_component=u_ghost.Component(face_axis);
         ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);
-        for(int side=0;side<T_GRID::number_of_faces_per_cell;side++){
+        for(int side=0;side<GRID<TV>::number_of_faces_per_cell;side++){
             RANGE<TV_INT>& region=regions(side);
             int axis=side/2,boundary=side&1?region.Minimum_Corner()[axis]-1:region.Maximum_Corner()[axis]+1;
             if(open_boundary(side)) for(NODE_ITERATOR iterator(face_grid,region);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index(),boundary_node=node;boundary_node[axis]=boundary; 

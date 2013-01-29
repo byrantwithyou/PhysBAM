@@ -4,6 +4,7 @@
 //#####################################################################
 // Class FLUIDS_PARAMETERS_UNIFORM
 //#####################################################################
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_1D.h>
 #include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_2D.h>
 #include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_3D.h>
@@ -15,7 +16,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Computations/GRADIENT_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
@@ -470,7 +470,7 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const
         {T_FACE_ARRAYS_SCALAR face_velocities_ghost(*grid,number_of_ghost_cells,false);fluid_boundary->Fill_Ghost_Cells_Face(*grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
         for(int axis=0;axis<T_GRID::dimension;axis++)
             T_ARRAYS_SCALAR::Limited_Shifted_Get(face_velocities.Component(axis),face_velocities_ghost.Component(axis),temp_shift);}
-        {T_ARRAYS_SCALAR p_ghost(p_grid.Domain_Indices(number_of_ghost_cells),false);BOUNDARY_UNIFORM<T_GRID,T>().Fill_Ghost_Cells(p_grid,incompressible->projection.p,p_ghost,0,time,number_of_ghost_cells);
+        {T_ARRAYS_SCALAR p_ghost(p_grid.Domain_Indices(number_of_ghost_cells),false);BOUNDARY<TV,T>().Fill_Ghost_Cells(p_grid,incompressible->projection.p,p_ghost,0,time,number_of_ghost_cells);
         T_ARRAYS_SCALAR::Limited_Shifted_Get(incompressible->projection.p,p_ghost,temp_shift);}
         {PARTICLE_LEVELSET_UNIFORM<T_GRID>& particle_levelset=particle_levelset_evolution->particle_levelset;
         particle_levelset.Update_Particle_Cells(particle_levelset.positive_particles);

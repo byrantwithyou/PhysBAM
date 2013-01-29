@@ -215,13 +215,13 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 
     TV far_field_velocity=TV(state_outside(1),state_outside(2),state_outside(3));
     if(use_fixed_farfield_boundary){
-        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
+        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,
             T_FACE_VECTOR(state_outside(0),state_outside(0),state_outside(0),state_outside(0),state_outside(0),state_outside(0)),
             T_FACE_VECTOR(state_outside(4),state_outside(4),state_outside(4),state_outside(4),state_outside(4),state_outside(4)),
             TV_FACE_VECTOR(far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity),
             (T).5,valid_wall,true,T_FACE_VECTOR(1,1,1,1,1,1),T_FACE_VECTOR_BOOL(true,true,true,true,true,true));}
     else{
-        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
+        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,
             T_FACE_VECTOR(state_outside(0),state_outside(0),state_outside(0),state_outside(0),state_outside(0),state_outside(0)),
             T_FACE_VECTOR(state_outside(4),state_outside(4),state_outside(4),state_outside(4),state_outside(4),state_outside(4)),
             TV_FACE_VECTOR(far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity),

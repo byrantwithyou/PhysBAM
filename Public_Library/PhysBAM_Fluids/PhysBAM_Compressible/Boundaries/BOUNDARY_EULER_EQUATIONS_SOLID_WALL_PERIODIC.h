@@ -13,22 +13,22 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;
 
-template<class T_GRID,class T2> // d=T_GRID::dimension+2
-class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC:public BOUNDARY_UNIFORM<T_GRID,T2>
+template<class TV,class T2> // d=T_GRID::dimension+2
+class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC:public BOUNDARY<TV,T2>
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::VECTOR_T TV;
+    typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename T_ARRAYS_BASE::template REBIND<T2>::TYPE T_ARRAYS_DIMENSION_BASE;
-    typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
+    typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
 public:
-    typedef BOUNDARY_UNIFORM<T_GRID,T2> BASE;
+    typedef BOUNDARY<TV,T2> BASE;
     using BASE::Turn_Off_Constant_Extrapolation;using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;
     using BASE::constant_extrapolation;using BASE::Find_Ghost_Regions;using BASE::Fill_Single_Ghost_Region;
 
@@ -45,14 +45,14 @@ public:
     void Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& u,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3);
     void Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,3> ,VECTOR<int,1> >& u,const T time);
     void Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& u,const T time);
-    void Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DIMENSION_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE& u,const T time) PHYSBAM_OVERRIDE;
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DIMENSION_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
+    void Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u,const T time) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
-template<class T_GRID,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<T_GRID,T2>::
+template<class TV,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<TV,T2>::
 Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,3> ,VECTOR<int,1> >& u,ARRAY<VECTOR<T,3> ,VECTOR<int,1> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
     int m=grid.m,i,periodic_point;
@@ -79,7 +79,7 @@ Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,3> ,VECTOR<int
             u_ghost(1,i)=rho*u_velocity;
             u_ghost(2,i)=rho*(e+sqr(u_velocity)/2);}
 }
-template<class T_GRID,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<T_GRID,T2>::
+template<class TV,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<TV,T2>::
 Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& u,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
     int m=grid.m,n=grid.n;
@@ -114,8 +114,8 @@ Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,4> ,VECTOR<int
         for(j=-3;j<n+3;j++) u_ghost(k,i,j)=u_ghost(k,i,j-n+1); //top
     }
 }
-template<class T_GRID,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<T_GRID,T2>::
-Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DIMENSION_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+template<class TV,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<TV,T2>::
+Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DIMENSION_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
     //TODO: get rid of the helper functions
     //Fill_Ghost_Cells_Helper(grid,u,u_ghost,dt,time,number_of_ghost_cells);
@@ -123,7 +123,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DI
     T_ARRAYS_DIMENSION_BASE::Put(u,u_ghost); // interior
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
 
-    for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
+    for(int axis=0;axis<GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(!periodic[axis]) Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));
         else for(CELL_ITERATOR iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
                 int period=repeats_at_last_node[axis]?counts[axis]-1:counts[axis];
@@ -134,7 +134,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DI
 //#####################################################################
 // Function Apply_Boundary_Condition
 //#####################################################################
-template<class T_GRID,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<T_GRID,T2>::
+template<class TV,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<TV,T2>::
 Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,3> ,VECTOR<int,1> >& u,const T time)
 {
     int m=grid.m;
@@ -157,7 +157,7 @@ Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,3> ,VECTOR<i
         u(1,m)=rho*u_velocity;
         u(2,m)=rho*(e+sqr(u_velocity)/2);}
 }
-template<class T_GRID,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<T_GRID,T2>::
+template<class TV,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<TV,T2>::
 Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& u,const T time)
 {
     int m=grid.m,n=grid.n;
@@ -191,14 +191,14 @@ Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,4> ,VECTOR<i
 
     for(i=0;i<m;i++) for(k=0;k<u.length;k++) u(k,i,n)=u(k,i,1);
 }
-template<class T_GRID,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<T_GRID,T2>::
-Apply_Boundary_Condition(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE& u,const T time)
+template<class TV,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<TV,T2>::
+Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u,const T time)
 {
     //TODO: get rid of the helper functions
     //Apply_Boundary_Condition_Helper(grid,u,time);
-    for(int axis=0;axis<T_GRID::dimension;axis++)
+    for(int axis=0;axis<GRID<TV>::dimension;axis++)
         if(periodic[axis] && repeats_at_last_node[axis]){
-            for(CELL_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,2*axis);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+            for(CELL_ITERATOR iterator(grid,0,GRID<TV>::BOUNDARY_INTERIOR_REGION,2*axis);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
                 TV_INT opposite_cell=cell_index;opposite_cell[axis]=1;
                 typename T_ARRAYS_DIMENSION_BASE::ELEMENT u_average=(u(cell_index)+u(opposite_cell))*(T).5;
                 u(cell_index)=u_average;u(opposite_cell)=u_average;}}

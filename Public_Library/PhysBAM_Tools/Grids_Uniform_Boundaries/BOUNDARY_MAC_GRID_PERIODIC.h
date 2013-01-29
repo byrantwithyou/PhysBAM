@@ -7,26 +7,26 @@
 #ifndef __BOUNDARY_MAC_GRID_PERIODIC__
 #define __BOUNDARY_MAC_GRID_PERIODIC__
 
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
-template<class T_GRID,class T2>
-class BOUNDARY_MAC_GRID_PERIODIC:public BOUNDARY_UNIFORM<T_GRID,T2>
+template<class TV,class T2>
+class BOUNDARY_MAC_GRID_PERIODIC:public BOUNDARY<TV,T2>
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<T2,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T2;
-    typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
+    typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
 public:
-    using BOUNDARY_UNIFORM<T_GRID,T2>::Find_Ghost_Regions;
+    using BOUNDARY<TV,T2>::Find_Ghost_Regions;
 
     BOUNDARY_MAC_GRID_PERIODIC() 
     {}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
-    void Fill_Ghost_Cells_Face(const T_GRID& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) PHYSBAM_OVERRIDE {} // do nothing
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
+    void Fill_Ghost_Cells_Face(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
+    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) PHYSBAM_OVERRIDE {} // do nothing
 //#####################################################################
 };
 }

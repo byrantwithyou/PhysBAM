@@ -4,9 +4,9 @@
 //#####################################################################
 // Class RENDERING_TEXTURE_IMAGE_SHADER  
 //#####################################################################
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Images/IMAGE.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_TEXTURE_IMAGE_SHADER.h>
@@ -19,8 +19,8 @@ Setup_Interpolation(const int m,const int n)
 {
     int ghost_cells=3;
     grid.Initialize(VECTOR<int,2>(m,n),RANGE<VECTOR<T,2> >::Unit_Box(),true);pixels.Resize(grid.Domain_Indices(ghost_cells));
-    if(wrap_s||wrap_t) BOUNDARY_MAC_GRID_PERIODIC<GRID<VECTOR<T,2> >,VECTOR<T,3> >().Fill_Ghost_Cells(grid,pixels,pixels,0,0,ghost_cells);
-    else BOUNDARY_UNIFORM<GRID<VECTOR<T,2> >,VECTOR<T,3> >().Fill_Ghost_Cells(grid,pixels,pixels,0,0,ghost_cells);
+    if(wrap_s||wrap_t) BOUNDARY_MAC_GRID_PERIODIC<VECTOR<T,2>,VECTOR<T,3> >().Fill_Ghost_Cells(grid,pixels,pixels,0,0,ghost_cells);
+    else BOUNDARY<VECTOR<T,2>,VECTOR<T,3> >().Fill_Ghost_Cells(grid,pixels,pixels,0,0,ghost_cells);
 }
 //#####################################################################
 // Function Initialize

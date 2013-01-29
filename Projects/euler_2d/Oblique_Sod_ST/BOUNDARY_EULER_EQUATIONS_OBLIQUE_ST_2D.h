@@ -17,7 +17,7 @@
 namespace PhysBAM{
 
 template<class T_GRID>
-class BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D:public BOUNDARY_UNIFORM<T_GRID,VECTOR<typename T_GRID::SCALAR,T_GRID::dimension+2> >
+class BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D:public BOUNDARY<typename T_GRID::VECTOR_T,VECTOR<typename T_GRID::SCALAR,T_GRID::dimension+2> >
 {
     typedef typename T_GRID::SCALAR T;
     typedef VECTOR<T,2> TV;

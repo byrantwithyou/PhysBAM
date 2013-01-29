@@ -68,7 +68,7 @@ Initialize()
     example.incompressible.mpi_grid=example.mpi_grid;
     example.projection.elliptic_solver->mpi_grid=example.mpi_grid;
     if(example.mpi_grid){
-        example.boundary=new BOUNDARY_MPI<GRID<TV> >(example.mpi_grid,example.boundary_scalar);}
+        example.boundary=new BOUNDARY_MPI<TV>(example.mpi_grid,example.boundary_scalar);}
     else example.boundary=&example.boundary_scalar;
     example.incompressible.Set_Custom_Boundary(*example.boundary);
 

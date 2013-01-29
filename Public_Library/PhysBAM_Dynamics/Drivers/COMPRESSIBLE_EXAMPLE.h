@@ -4,9 +4,9 @@
 //#####################################################################
 #ifndef __COMPRESSIBLE_EXAMPLE__
 #define __COMPRESSIBLE_EXAMPLE__
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -45,8 +45,8 @@ public:
     T_FACE_ARRAYS_SCALAR face_velocities;
 
     CONSERVATION<GRID<TV>,GRID<TV>::dimension+2>* conservation_method;
-    BOUNDARY_REFLECTION_UNIFORM<GRID<TV>,VECTOR<T,TV::m+2> >* boundary;
-    BOUNDARY_UNIFORM<GRID<TV>,T>* pressure_boundary;
+    BOUNDARY_REFLECTION_UNIFORM<TV,VECTOR<T,TV::m+2> >* boundary;
+    BOUNDARY<TV,T>* pressure_boundary;
 
     T_GRID_BASED_COLLISION_GEOMETRY* collision_bodies_affecting_fluid;
 

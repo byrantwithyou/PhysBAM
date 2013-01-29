@@ -50,13 +50,13 @@ public:
     virtual void Set_Axis(const int axis){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual void Compute_Epsilon(){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     void Update_Advection_Equation_Node(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
-        const ARRAY<TV,TV_INT>& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
+        const ARRAY<TV,TV_INT>& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost=0,const ARRAY<T2,TV_INT>* Z_max_ghost=0,ARRAY<T2,TV_INT>* Z_min=0,ARRAY<T2,TV_INT>* Z_max=0);
     void Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
-        const T_FACE_LOOKUP& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
+        const T_FACE_LOOKUP& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost=0,const ARRAY<T2,TV_INT>* Z_max_ghost=0,ARRAY<T2,TV_INT>* Z_min=0,ARRAY<T2,TV_INT>* Z_max=0);
     void Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
-        const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T>& boundary,const T dt,const T time,
+        const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
         const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max);
     virtual void Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const ARRAY<T,VECTOR<int,1> >& u,ARRAY<T2,VECTOR<int,1> >& u_Zx){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 //#####################################################################

@@ -11,8 +11,8 @@
 #ifndef __BURGERS_1D__
 #define __BURGERS_1D__
 
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Burgers_Equation/BURGERS_1D_EIGENSYSTEM_F.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 #include <cfloat>
@@ -23,12 +23,12 @@ class BURGERS_1D
 {
     typedef VECTOR<T,1> TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
-    BOUNDARY_UNIFORM<GRID<TV>,TV>* boundary;
+    BOUNDARY<TV,TV>* boundary;
     CONSERVATION<GRID<TV>,1>* conservation;
 protected:
     GRID<TV>& grid;
     ARRAY<TV,VECTOR<int,1> >& U;
-    BOUNDARY_UNIFORM<GRID<TV>,TV> boundary_default;
+    BOUNDARY<TV,TV> boundary_default;
     CONSERVATION_ENO_LLF<GRID<TV>,1> conservation_default;
     BURGERS_1D_EIGENSYSTEM_F<T> eigensystem_F;
 private:
@@ -43,7 +43,7 @@ public:
         Set_Max_Time_Step();
     }
     
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<GRID<TV>,TV>& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY<TV,TV>& boundary_input)
     {boundary=&boundary_input;}
     
     void Set_Custom_Conservation(CONSERVATION<GRID<TV>,1>& conservation_input)

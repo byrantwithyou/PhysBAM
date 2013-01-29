@@ -29,7 +29,7 @@ public:
     using BASE::Set_Beta_Face_For_Boundary_Conditions;using BASE::Map_Fine_To_Local_Boundary_For_Cell;using BASE::Map_Fine_To_Local_Interior_For_Cell;
     using BASE::Map_Fine_To_Local_Boundaries_For_Cell;using BASE::Map_Local_To_Fine_Interior_For_Cell;
     
-    BOUNDARY_UNIFORM<GRID<TV>,T> *boundary,*phi_boundary;
+    BOUNDARY<TV,T> *boundary,*phi_boundary;
 public:
     LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> phi_interpolation;
     PROJECTION_DYNAMICS_UNIFORM<T_GRID> levelset_projection;

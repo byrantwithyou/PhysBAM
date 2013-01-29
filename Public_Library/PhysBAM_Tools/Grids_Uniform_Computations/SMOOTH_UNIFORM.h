@@ -25,7 +25,7 @@ void Smooth(T_ARRAYS_T2& d,const int steps,const ARRAY<T,VECTOR<int,dim> >* phi)
     if(!steps) return;
     int number_of_ghost_cells=-d.domain.min_corner.x;
     RANGE<TV_INT> domain_indices=d.Domain_Indices();
-    GRID<TV> grid(domain_indices.Thickened(-number_of_ghost_cells).Maximum_Corner(),RANGE<typename GRID<TV>::VECTOR_T>::Centered_Box());
+    GRID<TV> grid(domain_indices.Thickened(-number_of_ghost_cells).Maximum_Corner(),RANGE<TV>::Centered_Box());
     if(grid.Domain_Indices().Thickened(number_of_ghost_cells)!=d.Domain_Indices()) PHYSBAM_FATAL_ERROR();
 
     T_ARRAYS_T2 d_ghost(grid.Domain_Indices(number_of_ghost_cells+1),false);    

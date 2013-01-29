@@ -2,11 +2,11 @@
 // Copyright 2004-2007, Doug Enright, Ron Fedkiw, Geoffrey Irving, Frank Losasso, Andy Lutomirski, Paul-James White.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_2X2.h>
@@ -25,7 +25,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID> FLUID_STRAIN_UNIFORM<T_GRID>::
 FLUID_STRAIN_UNIFORM(const T_GRID& grid_input)
-    :external_strain_adjustment(0),e_boundary_default(*new BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >),e_advection_default(*new T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX),cfl_called(false)
+    :external_strain_adjustment(0),e_boundary_default(*new BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >),e_advection_default(*new T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX),cfl_called(false)
 {
     e_advection=&e_advection_default;
     e_boundary=&e_boundary_default;

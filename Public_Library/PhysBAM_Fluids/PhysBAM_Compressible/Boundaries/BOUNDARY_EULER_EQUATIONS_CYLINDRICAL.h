@@ -12,13 +12,13 @@
 #ifndef __BOUNDARY_EULER_EQUATIONS_CYLINDRICAL__
 #define __BOUNDARY_EULER_EQUATIONS_CYLINDRICAL__
 
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 namespace PhysBAM{
 
 template<class T_input>
-class BOUNDARY_EULER_EQUATIONS_CYLINDRICAL:public BOUNDARY_UNIFORM<GRID<VECTOR<T_input,2> >,VECTOR<T_input,4> >
+class BOUNDARY_EULER_EQUATIONS_CYLINDRICAL:public BOUNDARY<VECTOR<T_input,2>,VECTOR<T_input,4> >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<T,4> TV_DIMENSION;typedef VECTOR<int,2> TV_INT;
     enum {d=4};

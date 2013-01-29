@@ -22,7 +22,7 @@ THREADED_ADVECTION_SEMI_LAGRANGIAN_UNIFORM()
 #ifdef USE_PTHREADS
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void THREADED_ADVECTION_SEMI_LAGRANGIAN_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Update_Advection_Equation_Node(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
-    const ARRAY<TV,TV_INT>& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
+    const ARRAY<TV,TV_INT>& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
     const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
     RANGE<TV_INT> domain(grid.Domain_Indices());
@@ -37,7 +37,7 @@ Update_Advection_Equation_Node(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRA
 
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void THREADED_ADVECTION_SEMI_LAGRANGIAN_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
-    const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
+    const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
     const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
     RANGE<TV_INT> domain(grid.Domain_Indices());
@@ -52,7 +52,7 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,con
 
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void THREADED_ADVECTION_SEMI_LAGRANGIAN_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
-    const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T>& boundary,const T dt,const T time,
+    const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
     const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
 {
     for(int i=0;i<TV::dimension;i++){

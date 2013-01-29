@@ -8,7 +8,7 @@
 #define __EXAMPLE_BOUNDARY_CONDITION__
 #include <PhysBAM_Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION.h>
 namespace PhysBAM{
-template<class T_GRID> class BOUNDARY_CONDITIONS_CALLBACKS;
+template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;
 
 template<class TV>
 class EXAMPLE_BOUNDARY_CONDITION:public IMPLICIT_BOUNDARY_CONDITION<TV>

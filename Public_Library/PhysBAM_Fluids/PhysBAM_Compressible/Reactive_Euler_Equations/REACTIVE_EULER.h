@@ -12,7 +12,7 @@
 #ifndef __REACTIVE_EULER__
 #define __REACTIVE_EULER__    
 
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Equations_Of_State/REACTIVE_EOS.h>
 namespace PhysBAM{
@@ -20,15 +20,15 @@ namespace PhysBAM{
 template<class T_GRID>
 class REACTIVE_EULER
 {
-    typedef typename T_GRID::SCALAR T;typedef VECTOR<T,T_GRID::dimension+3> TV_DIMENSION;
+    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef VECTOR<T,T_GRID::dimension+3> TV_DIMENSION;
 public:
     REACTIVE_EOS<T>& eos; // needed for equation of state functions
-    BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION>* boundary;
+    BOUNDARY<TV,TV_DIMENSION>* boundary;
     CONSERVATION<T_GRID,T_GRID::dimension+3>* conservation;
 protected:
     int cut_out_grid; // (1) cut out grid, (0) no cut out grid 
 private:
-    BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION> boundary_default;
+    BOUNDARY<TV,TV_DIMENSION> boundary_default;
     CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+3> conservation_default;
 
 protected:
@@ -41,7 +41,7 @@ protected:
     }
 
 public:
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION>& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY<TV,TV_DIMENSION>& boundary_input)
     {boundary=&boundary_input;}
     
     void Set_Custom_Conservation(CONSERVATION<T_GRID,T_GRID::dimension+3>& conservation_input)

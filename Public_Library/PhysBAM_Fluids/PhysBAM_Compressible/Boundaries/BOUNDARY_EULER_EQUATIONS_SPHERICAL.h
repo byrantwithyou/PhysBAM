@@ -12,13 +12,13 @@
 #ifndef __BOUNDARY_EULER_EQUATIONS_SPHERICAL__
 #define __BOUNDARY_EULER_EQUATIONS_SPHERICAL__
 
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 namespace PhysBAM{
 
 template<class T_input>
-class BOUNDARY_EULER_EQUATIONS_SPHERICAL:public BOUNDARY_UNIFORM<GRID<VECTOR<T_input,1> >,VECTOR<T_input,3> >
+class BOUNDARY_EULER_EQUATIONS_SPHERICAL:public BOUNDARY<VECTOR<T_input,1>,VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<T,3> TV_DIMENSION;typedef VECTOR<int,1> TV_INT;typedef ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,1> > T_ARRAYS_DIMENSION_BASE;
 public:

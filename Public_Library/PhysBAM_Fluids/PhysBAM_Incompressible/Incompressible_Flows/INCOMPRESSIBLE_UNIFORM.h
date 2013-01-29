@@ -42,7 +42,7 @@ public:
     
     T_GRID grid;
     T_MPI_GRID* mpi_grid;
-    BOUNDARY_UNIFORM<T_GRID,T>* boundary;
+    BOUNDARY<TV,T>* boundary;
     PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection;
     T_ARRAYS_SCALAR variable_surface_tension;
     T_ARRAYS_SCALAR variable_viscosity;
@@ -59,14 +59,14 @@ public:
     T buoyancy_constant;
     THREAD_QUEUE* thread_queue;
 protected:               
-    BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<T_GRID>& boundary_default;
+    BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>& boundary_default;
     ADVECTION_MACCORMACK_UNIFORM<T_GRID,T,ADVECTION<T_GRID,T> >* advection_maccormack;
 public:
 
     INCOMPRESSIBLE_UNIFORM(const T_GRID& grid_input,PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection_input,THREAD_QUEUE* thread_queue_input=0);
     virtual ~INCOMPRESSIBLE_UNIFORM();
 
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,T>& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
     {boundary=&boundary_input;}
 
     void Set_Collision_Body_List(T_GRID_BASED_COLLISION_GEOMETRY& collision_body_list_input)
@@ -86,7 +86,7 @@ public:
     void Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const T_ARRAYS_SCALAR* phi_ghost,const int number_of_ghost_cells);
     void Add_Gravity_Threaded(RANGE<TV_INT>&domain,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,int axis);
     void Add_Body_Force_Threaded(RANGE<TV_INT>&domain,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,int axis);
-    void Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity=false,BOUNDARY_UNIFORM<T_GRID,T>* projection_boundary=0,
+    void Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity=false,BOUNDARY<TV,T>* projection_boundary=0,
         bool use_levelset_viscosity=false,BOUNDARY_CONDITIONS_CALLBACKS<TV>* bc_callbacks=0,bool print_viscosity_matrix=false);
     int Real_CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous_only,T input_dt) const;
     T CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid=false,const bool viscous_only=false) const;

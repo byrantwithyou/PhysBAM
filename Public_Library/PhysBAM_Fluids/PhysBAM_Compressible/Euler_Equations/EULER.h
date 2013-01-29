@@ -12,8 +12,8 @@
 #ifndef __EULER__
 #define __EULER__    
 
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Equations_Of_State/EOS_GAMMA.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/BOUNDARY_OBJECT_EULER.h>
@@ -29,7 +29,7 @@ class EULER
     enum {d=T_GRID::dimension+2};
 public:
     EOS<T>* eos;
-    BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION>* boundary;
+    BOUNDARY<TV,TV_DIMENSION>* boundary;
     CONSERVATION<T_GRID,d>* conservation;
     T cfl_number;
     VECTOR<bool,2*T_GRID::dimension> open_boundaries;
@@ -42,7 +42,7 @@ protected:
     T gravity;
     TV downward_direction;
 private:
-    BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION> boundary_default;
+    BOUNDARY<TV,TV_DIMENSION> boundary_default;
     CONSERVATION_ENO_LLF<T_GRID,d> conservation_default;
     EOS_GAMMA<T> eos_default;
 
@@ -129,7 +129,7 @@ public:
     T enthalpy(const VECTOR<T,T_GRID::dimension+2>& u) const
     {T internal_energy=e(u);T rho=u(0);T p=eos->p(rho,internal_energy);return internal_energy+p/rho;}
 
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION>& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY<TV,TV_DIMENSION>& boundary_input)
     {boundary=&boundary_input;
     for(int axis=0;axis<T_GRID::dimension;axis++){
         open_boundaries(2*axis)=boundary->Constant_Extrapolation(2*axis);

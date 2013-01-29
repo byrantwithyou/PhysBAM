@@ -28,11 +28,11 @@ public:
     ARRAY<T2,TV_INT> array;
     ADVECTION<T_GRID,T>* advection;
     ADVECTION<T_GRID,T>* advection_maccormack;
-    BOUNDARY_UNIFORM<T_GRID,T>* boundary;
+    BOUNDARY<TV,T>* boundary;
 private:
     T_ADVECTION_SEMI_LAGRANGIAN_SCALAR& advection_default;
 protected:
-    BOUNDARY_UNIFORM<T_GRID,T>& boundary_default; 
+    BOUNDARY<TV,T>& boundary_default; 
     const T_FACE_ARRAYS_SCALAR* face_velocities;
     const ARRAY<TV,TV_INT>* cell_velocities;
 public:
@@ -49,7 +49,7 @@ public:
     void Initialize_Domain_Boundary_Conditions(const TV_SIDES& domain_walls=TV_SIDES::Constant_Vector(TV_BOOL2::Constant_Vector(true)))
     {boundary->Set_Constant_Extrapolation(VECTOR_UTILITIES::Complement(domain_walls));}
 
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,T>& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
     {boundary=&boundary_input;}
 
     void Set_Custom_Advection(ADVECTION<T_GRID,T>& advection_input)

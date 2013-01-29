@@ -360,18 +360,18 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
     if(test_number==3||test_number==4) inflow_attenuation=(T)1;
     if(transition_to_incompressible){
         TV_DIMENSION state_average=(state_left+state_right)*(T).5;
-        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
+        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,
             T_FACE_VECTOR(state_average(1),state_average(1)),T_FACE_VECTOR(state_average(3),state_average(3)),
             TV_FACE_VECTOR(TV(state_average(2)),TV(state_average(2))),inflow_attenuation,
             VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));}
 
     if(test_number==6){
-        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
+        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,
             T_FACE_VECTOR(state_right(1),state_right(1)),T_FACE_VECTOR(state_right(3),state_right(3)),
             TV_FACE_VECTOR(TV(state_right(2)),TV(state_right(2))),inflow_attenuation,
             VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),true,T_FACE_VECTOR((T)0,(T)0),T_FACE_VECTOR_BOOL(true,true));}
     else{
-        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
+        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,
             T_FACE_VECTOR(state_left(1),state_right(1)),T_FACE_VECTOR(state_left(3),state_right(3)),
             TV_FACE_VECTOR(TV(state_left(2)),TV(state_right(2))),inflow_attenuation,
             VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),true,T_FACE_VECTOR((T)0,(T)0),T_FACE_VECTOR_BOOL(true,true));}

@@ -41,7 +41,7 @@ public:
     {}
 
     void Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
-        const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T>& boundary,const T dt,const T time,
+        const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
         const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
     {T_FACE_ARRAYS_BOOL face_velocities_valid_mask_next(grid,3,false);
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){

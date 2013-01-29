@@ -4,10 +4,10 @@
 //#####################################################################
 #ifndef __PLS_REFINEMENT_EXAMPLE__
 #define __PLS_REFINEMENT_EXAMPLE__
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -28,7 +28,7 @@ class PLS_REFINEMENT_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV_input> >,public R
 {
     typedef TV_input TV;typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef BOUNDARY_PHI_WATER<GRID<TV> > T_BOUNDARY_PHI_WATER;
+    typedef BOUNDARY_PHI_WATER<TV> T_BOUNDARY_PHI_WATER;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<GRID<TV> >::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     enum workaround1{d=TV::m};
 
@@ -57,9 +57,9 @@ public:
     ARRAY<T,FACE_INDEX<TV::dimension> > coarse_face_velocities;
     ARRAY<T,FACE_INDEX<TV::dimension> > fine_face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;
-    BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
+    BOUNDARY<TV,T> boundary_scalar;
     T_BOUNDARY_PHI_WATER phi_boundary_water;
-    BOUNDARY_UNIFORM<GRID<TV>,T> *boundary,*boundary_coarse,*phi_boundary;
+    BOUNDARY<TV,T> *boundary,*boundary_coarse,*phi_boundary;
     //ARRAY<T,TV_INT> density,temperature;
     ARRAY<T,TV_INT> coarse_phi;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary,non_mpi_boundary;

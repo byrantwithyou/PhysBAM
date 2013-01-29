@@ -18,7 +18,7 @@ namespace PhysBAM{
 
 template<class T> class EXTERNAL_STRAIN_ADJUSTMENT;
 template<class T_GRID> class LEVELSET_MULTIPLE;
-template<class T_GRID,class T2> class BOUNDARY_UNIFORM;
+template<class TV,class T2> class BOUNDARY;
 
 template<class T_GRID>
 class FLUID_STRAIN_UNIFORM:public FLUID_STRAIN<typename T_GRID::SCALAR>
@@ -37,11 +37,11 @@ public:
 
     T_GRID grid;
     T_ARRAYS_SYMMETRIC_MATRIX e; // strain tensor
-    BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >* e_boundary;
+    BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >* e_boundary;
     ADVECTION<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >* e_advection;
     EXTERNAL_STRAIN_ADJUSTMENT<T>* external_strain_adjustment;
 private:               
-    BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >& e_boundary_default;
+    BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >& e_boundary_default;
     T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX& e_advection_default;
     mutable bool cfl_called;
 public:
@@ -52,7 +52,7 @@ public:
     void Initialize_Grid(const T_GRID& grid_input)
     {assert(grid_input.Is_MAC_Grid());grid=grid_input;e.Resize(grid.Domain_Indices());}
 
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >& e_boundary_input)
+    void Set_Custom_Boundary(BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >& e_boundary_input)
     {e_boundary=&e_boundary_input;}
 
     void Set_Custom_Advection(ADVECTION<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >& e_advection_input)
@@ -86,11 +86,11 @@ public:
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ARRAYS_SYMMETRIC_MATRIX;
 
     T_ARRAYS_SYMMETRIC_MATRIX e; // strain tensor
-    BOUNDARY_UNIFORM<GRID<TV>,SYMMETRIC_MATRIX<T,TV::m> >* e_boundary;
+    BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >* e_boundary;
 
     FLUID_STRAIN_UNIFORM(const GRID<TV>& grid_input){PHYSBAM_NOT_IMPLEMENTED();}
     void Initialize_Grid(const GRID<TV>& grid_input){PHYSBAM_NOT_IMPLEMENTED();}
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<GRID<TV>,SYMMETRIC_MATRIX<T,TV::m> >& e_boundary_input){e_boundary=&e_boundary_input;}
+    void Set_Custom_Boundary(BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >& e_boundary_input){e_boundary=&e_boundary_input;}
     void Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
         const ARRAY<T,VECTOR<int,1> >& phi_ghost,const int number_of_ghost_cells){PHYSBAM_NOT_IMPLEMENTED();}
     void Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,

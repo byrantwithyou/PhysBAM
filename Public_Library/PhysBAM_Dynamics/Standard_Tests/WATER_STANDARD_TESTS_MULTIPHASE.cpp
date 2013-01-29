@@ -152,7 +152,7 @@ Initialize_Advection(const bool always_use_objects)
 
     if(use_open_wall)
         for(int i=0;i<Number_Of_Regions(test_number);i++){
-            BOUNDARY_PHI_WATER<T_GRID>* boundary=new BOUNDARY_PHI_WATER<T_GRID>();
+            BOUNDARY_PHI_WATER<TV>* boundary=new BOUNDARY_PHI_WATER<TV>();
             boundary->Set_Velocity_Pointer(fluid_collection.incompressible_fluid_collection.face_velocities);
             if(i==air_region)boundary->sign=-1;
             fluids_parameters.phi_boundary_multiphase(i)=boundary;}

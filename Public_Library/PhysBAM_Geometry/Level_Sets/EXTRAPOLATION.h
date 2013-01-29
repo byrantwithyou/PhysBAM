@@ -14,7 +14,7 @@
 namespace PhysBAM{
 
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
-template<class T_GRID,class T2> class BOUNDARY_UNIFORM;
+template<class TV,class T2> class BOUNDARY;
 
 template<class T_GRID,class T2>
 class EXTRAPOLATION:public NONCOPYABLE
@@ -25,20 +25,20 @@ class EXTRAPOLATION:public NONCOPYABLE
 public:
     T band_width; // band for extrapolation near the interface
     T isobaric_fix_width;  // band for the isobaric fix
-    BOUNDARY_UNIFORM<T_GRID,T2>* boundary;
+    BOUNDARY<TV,T2>* boundary;
 private:
-    BOUNDARY_UNIFORM<T_GRID,T2>& boundary_default;
+    BOUNDARY<TV,T2>& boundary_default;
 
 protected:
     EXTRAPOLATION()
-        :boundary_default(*new BOUNDARY_UNIFORM<T_GRID,T2>)
+        :boundary_default(*new BOUNDARY<TV,T2>)
     {boundary=&boundary_default;}
 
     ~EXTRAPOLATION()
     {delete &boundary_default;}
 
 public:
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,T2>& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY<TV,T2>& boundary_input)
     {boundary=&boundary_input;}
 
 protected:

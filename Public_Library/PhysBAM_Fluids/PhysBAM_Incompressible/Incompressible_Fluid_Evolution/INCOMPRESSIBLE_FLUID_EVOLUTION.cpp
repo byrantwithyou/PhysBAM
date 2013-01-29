@@ -15,7 +15,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID> INCOMPRESSIBLE_FLUID_EVOLUTION<T_GRID>::
 INCOMPRESSIBLE_FLUID_EVOLUTION(const T_GRID& grid_input)
-    :grid(grid_input.Get_MAC_Grid()),max_time_step(100),boundary_default(*new BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<T_GRID>)
+    :grid(grid_input.Get_MAC_Grid()),max_time_step(100),boundary_default(*new BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>)
 { 
     boundary=&boundary_default;
     Initialize_Grids(grid);

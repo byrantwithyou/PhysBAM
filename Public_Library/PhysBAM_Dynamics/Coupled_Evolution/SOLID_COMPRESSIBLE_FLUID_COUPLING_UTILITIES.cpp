@@ -149,8 +149,8 @@ Extrapolate_State_Into_Solids(T_ARRAYS_SCALAR& phi_all_solids_negated,const int 
     T_ARRAYS_DIMENSION_SCALAR U_extrapolated(euler.grid.Domain_Indices(number_of_ghost_cells));
 
     if(mpi_grid){
-        BOUNDARY_UNIFORM<GRID<TV>,TV_DIMENSION> boundary; // Constant extrapolation at non-mpi faces.
-        BOUNDARY_MPI<GRID<TV>,TV_DIMENSION> mpi_boundary(mpi_grid,boundary);
+        BOUNDARY<TV,TV_DIMENSION> boundary; // Constant extrapolation at non-mpi faces.
+        BOUNDARY_MPI<TV,TV_DIMENSION> mpi_boundary(mpi_grid,boundary);
         mpi_boundary.Fill_Ghost_Cells(euler.grid,euler.U,U_extrapolated,(T)0,(T)0,number_of_ghost_cells);}
     else U_extrapolated=euler.U;
 

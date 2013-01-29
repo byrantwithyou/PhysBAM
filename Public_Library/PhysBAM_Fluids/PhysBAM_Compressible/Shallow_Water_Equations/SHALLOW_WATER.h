@@ -11,19 +11,19 @@
 #ifndef __SHALLOW_WATER__
 #define __SHALLOW_WATER__    
 
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 namespace PhysBAM{
 
 template<class T_GRID>
 class SHALLOW_WATER
 {
-    typedef typename T_GRID::SCALAR T;typedef VECTOR<T,T_GRID::dimension+1> TV_DIMENSION;
+    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef VECTOR<T,T_GRID::dimension+1> TV_DIMENSION;
 public:
-    BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION>* boundary;
+    BOUNDARY<TV,TV_DIMENSION>* boundary;
     CONSERVATION<T_GRID,T_GRID::dimension+1>* conservation;
 private:
-    BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION> boundary_default;
+    BOUNDARY<TV,TV_DIMENSION> boundary_default;
     CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+1> conservation_default;
 
 protected:
@@ -34,7 +34,7 @@ protected:
     }
 public:
 
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION>& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY<TV,TV_DIMENSION>& boundary_input)
     {boundary=&boundary_input;}
     
     void Set_Custom_Conservation(CONSERVATION<T,T_GRID::dimension+1>& conservation_input)

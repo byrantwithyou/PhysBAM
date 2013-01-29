@@ -39,7 +39,7 @@ class STRAWMAN_EXAMPLE : public EXAMPLE<TV>,LEVELSET_CALLBACKS<GRID<TV> >
     typedef GRID<TV> T_GRID;
     typedef ARRAY<T,TV_INT> T_ARRAY_SCALAR;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
-    typedef BOUNDARY_PHI_WATER<T_GRID> T_BOUNDARY_PHI_WATER;
+    typedef BOUNDARY_PHI_WATER<TV> T_BOUNDARY_PHI_WATER;
 
 public:
     using BASE::Time_At_Frame;using BASE::parse_args;
@@ -63,7 +63,7 @@ public:
 
     ADVECTION_CONSERVATIVE_ENO<T_GRID,T> advection_scheme;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<T_GRID,T> passive_advection_scheme;
-    BOUNDARY_LINEAR_EXTRAPOLATION<T_GRID,T> boundary;
+    BOUNDARY_LINEAR_EXTRAPOLATION<TV,T> boundary;
 
     // Initial Conditions
     T initial_distance;          // d0

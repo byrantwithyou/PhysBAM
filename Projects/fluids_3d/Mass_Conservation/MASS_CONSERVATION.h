@@ -210,7 +210,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
         fluids_parameters.particle_levelset_evolution->Use_Reinitialization();
         fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).reincorporate_removed_particles_everywhere=true;}
     if(test_number==6){
-        fluids_parameters.phi_boundary=new BOUNDARY_MAC_GRID_PERIODIC<GRID<TV>,T>();
+        fluids_parameters.phi_boundary=new BOUNDARY_MAC_GRID_PERIODIC<TV,T>();
         fluids_parameters.incompressible->Set_Custom_Boundary(*fluids_parameters.phi_boundary);
         fluids_parameters.particle_levelset_evolution->Use_Frozen_Velocity(false);}
 }

@@ -25,7 +25,7 @@ template<class T> class FLUIDS_PARAMETERS_CALLBACKS;
 template<class T> class EOS;
 template<class T_GRID,int d> class CONSERVATION;
 template<class TV> class GRID;
-template<class T_GRID,class T2> class BOUNDARY_REFLECTION_UNIFORM;
+template<class TV,class T2> class BOUNDARY_REFLECTION_UNIFORM;
 
 template <class T_GRID>
 class FLUIDS_PARAMETERS:public NONCOPYABLE
@@ -36,9 +36,9 @@ class FLUIDS_PARAMETERS:public NONCOPYABLE
     typedef typename REBIND<T_ADVECTION_SEMI_LAGRANGIAN_SCALAR,TV>::TYPE T_ADVECTION_SEMI_LAGRANGIAN_VECTOR;
     typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_HAMILTON_JACOBI_WENO_SCALAR T_ADVECTION_HAMILTON_JACOBI_WENO_SCALAR;
     typedef typename TURBULENCE_POLICY<TV>::TURBULENCE T_TURBULENCE;typedef typename INCOMPRESSIBLE_POLICY<T_GRID>::INCOMPRESSIBLE T_INCOMPRESSIBLE;
-    typedef BOUNDARY_PHI_WATER<T_GRID> T_BOUNDARY_PHI_WATER;
-    typedef BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<T_GRID> T_BOUNDARY_MAC_GRID_SOLID_WALL_SLIP;
-    typedef BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> > T_BOUNDARY_SYMMETRIC_MATRIX;
+    typedef BOUNDARY_PHI_WATER<TV> T_BOUNDARY_PHI_WATER;
+    typedef BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV> T_BOUNDARY_MAC_GRID_SOLID_WALL_SLIP;
+    typedef BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> > T_BOUNDARY_SYMMETRIC_MATRIX;
 public:
     const bool smoke,fire,water,sph,compressible;
     bool quadtree,octree;
@@ -54,9 +54,9 @@ public:
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_walls;
     T levelset_refinement_bandwidth;
     bool minimal_air_bandwidth;
-    BOUNDARY_UNIFORM<T_GRID,T>* phi_boundary;
-    ARRAY<BOUNDARY_UNIFORM<T_GRID,T>*> phi_boundary_multiphase;
-    BOUNDARY_REFLECTION_UNIFORM<GRID<TV>,T>& phi_boundary_reflection;
+    BOUNDARY<TV,T>* phi_boundary;
+    ARRAY<BOUNDARY<TV,T>*> phi_boundary_multiphase;
+    BOUNDARY_REFLECTION_UNIFORM<TV,T>& phi_boundary_reflection;
     T_BOUNDARY_PHI_WATER& phi_boundary_water;
     T particle_half_bandwidth;
     int reseeding_frame_rate;
@@ -71,8 +71,8 @@ public:
     T removed_particle_mass_scaling;
     bool use_sph_for_removed_negative_particles;
     T normal_flame_speed,curvature_flame_speed;
-    BOUNDARY_UNIFORM<T_GRID,T>* fluid_boundary;
-    BOUNDARY_UNIFORM<T_GRID,T>& fluid_boundary_water;
+    BOUNDARY<TV,T>* fluid_boundary;
+    BOUNDARY<TV,T>& fluid_boundary_water;
     T_BOUNDARY_MAC_GRID_SOLID_WALL_SLIP& boundary_mac_slip;
     T incompressible_tolerance;
     int incompressible_iterations;
@@ -109,7 +109,7 @@ public:
     TEMPERATURE_CONTAINER<T_GRID> temperature_container;
     bool use_soot_fuel_combustion;
     T burn_temperature_threshold,burn_rate,soot_fuel_calorific_value;
-    BOUNDARY_UNIFORM<T_GRID,T> *soot_boundary,*density_boundary,*temperature_boundary;
+    BOUNDARY<TV,T> *soot_boundary,*density_boundary,*temperature_boundary;
     T temperature_fuel,temperature_products;
     T density_buoyancy_threshold,density_buoyancy_constant,temperature_buoyancy_constant;
     T removed_positive_particle_buoyancy_constant;
@@ -156,8 +156,8 @@ public:
     bool use_maccormack_for_incompressible;
     T bandwidth_without_maccormack_near_interface;
     bool analytic_test;
-    BOUNDARY_UNIFORM<GRID<TV>,VECTOR<T,T_GRID::dimension+2> >* compressible_boundary;
-    BOUNDARY_UNIFORM<T_GRID,T>* compressible_pressure_boundary;
+    BOUNDARY<TV,VECTOR<T,T_GRID::dimension+2> >* compressible_boundary;
+    BOUNDARY<TV,T>* compressible_pressure_boundary;
     EOS<T>* compressible_eos;
     CONSERVATION<T_GRID,T_GRID::dimension+2>* compressible_conservation_method;
     bool compressible_set_max_time_step;

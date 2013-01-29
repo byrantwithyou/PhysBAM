@@ -6,8 +6,8 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Geometry/Finite_Elements/KRYLOV_VECTOR_CONDENSED_POISSON.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
+#include <PhysBAM_Geometry/Finite_Elements/KRYLOV_VECTOR_CONDENSED_POISSON.h>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif

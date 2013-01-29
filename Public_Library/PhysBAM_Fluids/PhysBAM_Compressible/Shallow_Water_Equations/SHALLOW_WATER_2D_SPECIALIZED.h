@@ -11,8 +11,8 @@
 #ifndef __SHALLOW_WATER_2D_SPECIALIZED__
 #define __SHALLOW_WATER_2D_SPECIALIZED__
 
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Shallow_Water_Equations/SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_F.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Shallow_Water_Equations/SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_G.h>
@@ -24,10 +24,10 @@ class SHALLOW_WATER_2D_SPECIALIZED
     typedef VECTOR<T,2> TV;typedef VECTOR<T,3> TV_DIMENSION;
     enum {d=3};
 public:
-    BOUNDARY_UNIFORM<GRID<TV>,TV_DIMENSION>* boundary;
+    BOUNDARY<TV,TV_DIMENSION>* boundary;
     CONSERVATION<GRID<TV>,2>* conservation;
 private:
-    BOUNDARY_UNIFORM<GRID<TV>,TV_DIMENSION> boundary_default;
+    BOUNDARY<TV,TV_DIMENSION> boundary_default;
     CONSERVATION_ENO_LLF<GRID<TV>,2> conservation_default;
     CONSERVATION_ENO_LLF<GRID<TV>,3> internal_conservation;
 public:
@@ -51,7 +51,7 @@ public:
         Set_Viscosity_Coefficients(0,0);
     }
 
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<GRID<TV>,TV_DIMENSION>& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY<TV,TV_DIMENSION>& boundary_input)
     {boundary=&boundary_input;}
 
     void Set_Custom_Conservation(CONSERVATION<GRID<TV>,2>& conservation_input)

@@ -4,12 +4,12 @@
 //#####################################################################
 // Class GRID_AND_ARRAY_CONTAINER
 //#####################################################################
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Grid_Based_Fields/GRID_AND_ARRAY_CONTAINER.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -17,7 +17,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID,class T2> GRID_AND_ARRAY_CONTAINER<T_GRID,T2>::
 GRID_AND_ARRAY_CONTAINER(T_GRID& grid_input)
-    :grid(grid_input),advection_maccormack(0),advection_default(*new T_ADVECTION_SEMI_LAGRANGIAN_SCALAR),boundary_default(*new BOUNDARY_REFLECTION_UNIFORM<GRID<TV>,T>),face_velocities(0)
+    :grid(grid_input),advection_maccormack(0),advection_default(*new T_ADVECTION_SEMI_LAGRANGIAN_SCALAR),boundary_default(*new BOUNDARY_REFLECTION_UNIFORM<TV,T>),face_velocities(0)
 {
     advection=&advection_default;
     boundary=&boundary_default;

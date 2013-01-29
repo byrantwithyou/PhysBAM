@@ -2,11 +2,11 @@
 // Copyright 2002-2010, Ronald Fedkiw, Jon Gretarsson, Geoffrey Irving, Nipun Kwatra, Michael Lentine, Frank Losasso, Andrew Selle, Tamar Shinar, Jonathan Su, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
@@ -60,8 +60,8 @@ Initialize_Dsd(const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple,const ARRAY<bo
     int region=0;if(!fuel_region.Find(true,region)) PHYSBAM_FATAL_ERROR();//TODO: multiple fuel regions
     delete dsd;dsd=new DETONATION_SHOCK_DYNAMICS<T_GRID>(p_grid,*levelset_multiple.levelsets(region));
     if(elliptic_solver->mpi_grid)
-        dsd->Set_Custom_Boundary(new BOUNDARY_MPI<T_GRID>(elliptic_solver->mpi_grid,*(dsd->boundary)),
-            new BOUNDARY_MPI<T_GRID,TV>(elliptic_solver->mpi_grid,*(dsd->boundary_vector)));
+        dsd->Set_Custom_Boundary(new BOUNDARY_MPI<TV>(elliptic_solver->mpi_grid,*(dsd->boundary)),
+            new BOUNDARY_MPI<TV,TV>(elliptic_solver->mpi_grid,*(dsd->boundary_vector)));
 }
 //#####################################################################
 // Function Initialize_Dsd
@@ -72,8 +72,8 @@ Initialize_Dsd(const LEVELSET<TV>& levelset,const ARRAY<bool>& fuel_region)
     int region=0;if(!fuel_region.Find(true,region)) PHYSBAM_FATAL_ERROR();//TODO: multiple fuel regions
     delete dsd;dsd=new DETONATION_SHOCK_DYNAMICS<T_GRID>(p_grid,levelset);
     if(elliptic_solver->mpi_grid)
-        dsd->Set_Custom_Boundary(new BOUNDARY_MPI<T_GRID>(elliptic_solver->mpi_grid,*dsd->boundary),
-            new BOUNDARY_MPI<T_GRID,TV>(elliptic_solver->mpi_grid,*dsd->boundary_vector));
+        dsd->Set_Custom_Boundary(new BOUNDARY_MPI<TV>(elliptic_solver->mpi_grid,*dsd->boundary),
+            new BOUNDARY_MPI<TV,TV>(elliptic_solver->mpi_grid,*dsd->boundary_vector));
 }
 //#####################################################################
 // Function Make_Divergence_Free

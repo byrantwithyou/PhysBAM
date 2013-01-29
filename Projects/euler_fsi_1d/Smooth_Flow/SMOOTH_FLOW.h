@@ -117,8 +117,8 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Initialize_Advection() PHYSBAM_OVERRIDE
 {
     //set custom boundary
-    fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<T_GRID,VECTOR<T,T_GRID::dimension+2> >();
-    fluids_parameters.compressible_pressure_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<T_GRID,T>();
+    fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<TV,VECTOR<T,T_GRID::dimension+2> >();
+    fluids_parameters.compressible_pressure_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<TV,T>();
     fluids_parameters.euler->euler_projection.elliptic_solver->periodic_boundary(1)=true;
 }
 //#####################################################################

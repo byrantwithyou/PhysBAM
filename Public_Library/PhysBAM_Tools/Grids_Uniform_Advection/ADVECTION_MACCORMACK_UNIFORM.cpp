@@ -4,6 +4,7 @@
 //#####################################################################
 // Class ADVECTION_MACCORMACK_UNIFORM
 //#####################################################################
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
@@ -11,7 +12,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_MACCORMACK_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 using namespace PhysBAM;
@@ -27,7 +27,7 @@ ADVECTION_MACCORMACK_UNIFORM(T_NESTED_ADVECTION& nested_advection_input,const AR
 // Function Update_Advection_Equation_Node
 //#####################################################################
 template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
-Update_Advection_Equation_Node(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const ARRAY<TV,TV_INT>& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
+Update_Advection_Equation_Node(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const ARRAY<TV,TV_INT>& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
     const ARRAY<T2,TV_INT>* Z_min_ghost_input,const ARRAY<T2,TV_INT>* Z_max_ghost_input,ARRAY<T2,TV_INT>* Z_min_input,ARRAY<T2,TV_INT>* Z_max_input)
 {
     assert(node_mask && !Z_min_input && !Z_max_input);
@@ -49,7 +49,7 @@ Update_Advection_Equation_Node(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRA
 // Function Update_Advection_Equation_Cell_Lookup
 //#####################################################################
 template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
-Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const FACE_LOOKUP_UNIFORM<T_GRID>& face_velocities,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,
+Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const FACE_LOOKUP_UNIFORM<T_GRID>& face_velocities,BOUNDARY<TV,T2>& boundary,
     const T dt,const T time,const ARRAY<T2,TV_INT>* Z_min_ghost_input,const ARRAY<T2,TV_INT>* Z_max_ghost_input,ARRAY<T2,TV_INT>* Z_min_input,ARRAY<T2,TV_INT>* Z_max_input)
 {
     assert(cell_mask && !Z_min_input && !Z_max_input);
@@ -71,7 +71,7 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,con
 //#####################################################################
 template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
 Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const FACE_LOOKUP_UNIFORM<T_GRID>& Z_ghost,const FACE_LOOKUP_UNIFORM<T_GRID>& face_velocities,
-    BOUNDARY_UNIFORM<T_GRID,T>& boundary,const T dt,const T time,const FACE_LOOKUP_UNIFORM<T_GRID>* Z_min_ghost_input,const FACE_LOOKUP_UNIFORM<T_GRID>* Z_max_ghost_input,
+    BOUNDARY<TV,T>& boundary,const T dt,const T time,const FACE_LOOKUP_UNIFORM<T_GRID>* Z_min_ghost_input,const FACE_LOOKUP_UNIFORM<T_GRID>* Z_max_ghost_input,
     T_FACE_ARRAYS_SCALAR* Z_min_input,T_FACE_ARRAYS_SCALAR* Z_max_input)
 {
     assert(!ensure_second_order || !clamp_extrema);

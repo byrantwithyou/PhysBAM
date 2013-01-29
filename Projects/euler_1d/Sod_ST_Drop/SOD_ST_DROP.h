@@ -129,7 +129,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Initialize_Advection() PHYSBAM_OVERRIDE
 {
     //set custom boundary
-    fluids_parameters.compressible_boundary= new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,T_FACE_VECTOR((T).125,(T).125),T_FACE_VECTOR((T).1,(T).1),
+    fluids_parameters.compressible_boundary= new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,T_FACE_VECTOR((T).125,(T).125),T_FACE_VECTOR((T).1,(T).1),
         TV_FACE_VECTOR(),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));
     fluids_parameters.Use_No_Fluid_Coupling_Defaults();
 }

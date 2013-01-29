@@ -57,8 +57,8 @@ Initialize()
     // mpi
     if(example.mpi_grid) example.mpi_grid->Initialize(example.domain_boundary);
     example.projection.elliptic_solver->mpi_grid=example.mpi_grid;
-    if(example.mpi_grid) example.boundary=new BOUNDARY_MPI<GRID<TV> >(example.mpi_grid,example.boundary_scalar);
-    else if(example.thread_queue) example.boundary=new BOUNDARY_THREADED<GRID<TV> >(*example.thread_queue,example.boundary_scalar);    
+    if(example.mpi_grid) example.boundary=new BOUNDARY_MPI<TV>(example.mpi_grid,example.boundary_scalar);
+    else if(example.thread_queue) example.boundary=new BOUNDARY_THREADED<TV>(*example.thread_queue,example.boundary_scalar);    
     else example.boundary=&example.boundary_scalar;
 
     //threading

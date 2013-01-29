@@ -30,7 +30,7 @@ template<class T_GRID> class LEVELSET_CALLBACKS; // TODO: invalid dependency
 template<class T_GRID> struct BOUNDARY_POLICY;
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template<class TV> class GRID;
-template<class T_GRID,class T2> class BOUNDARY_UNIFORM;
+template<class TV,class T2> class BOUNDARY;
 template<class T_GRID> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
 template<class TV> class LEVELSET;
 
@@ -57,13 +57,13 @@ public:
     T fmm_initialization_iterative_drift_fraction;
     T half_band_width;
 
-    BOUNDARY_UNIFORM<GRID<TV>,T>* boundary;
+    BOUNDARY<TV,T>* boundary;
     LEVELSET_CALLBACKS<GRID<TV> >* levelset_callbacks;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >* collision_body_list;
     const T_FACE_ARRAYS_BOOL* face_velocities_valid_mask_current;
     bool collision_aware_signed_distance,clamp_phi_with_collision_bodies;
 //protected:
-    BOUNDARY_UNIFORM<GRID<TV>,T>& boundary_default;
+    BOUNDARY<TV,T>& boundary_default;
     static T_LINEAR_INTERPOLATION_SCALAR interpolation_default;
     T_INTERPOLATION_SCALAR *collision_aware_interpolation_plus,*collision_aware_interpolation_minus,*collision_unaware_interpolation;
     static T_LINEAR_INTERPOLATION_VECTOR normal_interpolation_default;
@@ -106,7 +106,7 @@ public:
         valid_mask_next.Resize(grid_input.Cell_Indices(3),false);
     }
 
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<GRID<TV>,T>& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
     {boundary=&boundary_input;}
 
     void Set_Custom_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input)

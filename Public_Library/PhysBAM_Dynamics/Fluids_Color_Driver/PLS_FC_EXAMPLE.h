@@ -4,10 +4,10 @@
 //#####################################################################
 #ifndef __PLS_FC_EXAMPLE__
 #define __PLS_FC_EXAMPLE__
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_EXTRAPOLATE_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -64,8 +64,8 @@ public:
     ARRAY<int,FACE_INDEX<TV::dimension> > face_color,prev_face_color;
     ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > face_velocities,prev_face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T>& advection_scalar;
-    BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
-    BOUNDARY_UNIFORM<GRID<TV>,T> *boundary,*phi_boundary;
+    BOUNDARY<TV,T> boundary_scalar;
+    BOUNDARY<TV,T> *boundary,*phi_boundary;
     BOUNDARY_EXTRAPOLATE_CELL<TV,T> cell_extrapolate;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
     LEVELSET_COLOR<TV> levelset_color;

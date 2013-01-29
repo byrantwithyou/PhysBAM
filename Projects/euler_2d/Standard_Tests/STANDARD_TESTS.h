@@ -221,12 +221,12 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 
     if(test_number==1 || test_number==3 || test_number==4){
         TV far_field_velocity_left=TV(state_left(1),state_left(2)),far_field_velocity_right=TV(state_right(1),state_right(2));
-        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
+        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,
             T_FACE_VECTOR(state_left(0),state_right(0),state_left(0),state_right(0)),T_FACE_VECTOR(state_left(3),state_right(3),state_left(3),state_right(3)),
             TV_FACE_VECTOR(far_field_velocity_left,far_field_velocity_right,far_field_velocity_left,far_field_velocity_right),(T)1,valid_wall);}
     else if(test_number==2){
         TV far_field_velocity_left=TV(state_left(1),state_left(2)),far_field_velocity_right=TV(state_right(1),state_right(2));
-        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
+        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,
             T_FACE_VECTOR(state_left(0),state_right(0),state_left(0),state_right(0)),T_FACE_VECTOR(state_left(3),state_right(3),state_left(3),state_right(3)),
             TV_FACE_VECTOR(far_field_velocity_left,far_field_velocity_right,far_field_velocity_left,far_field_velocity_right),(T).5,valid_wall);}
 }

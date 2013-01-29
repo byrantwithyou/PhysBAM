@@ -23,7 +23,7 @@ Euler_Step(const T dt,const T time)
     for(int i=-ghost_cells;i<grid.counts.x+ghost_cells;i++) if(U_ghost(i)(0)<=min_height) zero_height(i)=true;
 
     ARRAY<T,VECTOR<int,1> > ground_ghost(-ghost_cells,grid.counts.x+ghost_cells);
-    if(ground) BOUNDARY_UNIFORM<GRID<TV>,T>().Fill_Ghost_Cells(grid,*ground,ground_ghost,dt,time,ghost_cells);
+    if(ground) BOUNDARY<TV,T>().Fill_Ghost_Cells(grid,*ground,ground_ghost,dt,time,ghost_cells);
     for(int i=-ghost_cells;i<grid.counts.x+ghost_cells;i++) eta_ghost(i)=U_ghost(i)(0)+ground_ghost(i);
 
     T_FACE_ARRAYS_BOOL psi_N(grid.Get_MAC_Grid_At_Regular_Positions());

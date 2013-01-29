@@ -2,24 +2,25 @@
 // Copyright 2002-2007, Ronald Fedkiw, Geoffrey Irving, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class BOUNDARY_EXTRAPOLATE_CELL
+// Class BOUNDARY_PERIODIC
 //#####################################################################
-#ifndef __BOUNDARY_EXTRAPOLATE_CELL__
-#define __BOUNDARY_EXTRAPOLATE_CELL__
+#ifndef __BOUNDARY_PERIODIC__
+#define __BOUNDARY_PERIODIC__
 
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 template<class TV,class T2>
-class BOUNDARY_EXTRAPOLATE_CELL:public BOUNDARY<TV,T2>
+class BOUNDARY_PERIODIC:public BOUNDARY<TV,T2>
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
+    typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
+    typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
+    typedef BOUNDARY<TV,T2> BASE;
 public:
+    using BASE::Find_Ghost_Regions;
 
-    BOUNDARY_EXTRAPOLATE_CELL()
-    {}
-
-    virtual ~BOUNDARY_EXTRAPOLATE_CELL()
+    BOUNDARY_PERIODIC()
     {}
 
 //#####################################################################

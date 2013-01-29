@@ -157,11 +157,11 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 {
     //set custom boundary
     if(test_number==4){
-        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,T_FACE_VECTOR((T).125,(T).125),T_FACE_VECTOR((T).1,(T).1),
+        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,T_FACE_VECTOR((T).125,(T).125),T_FACE_VECTOR((T).1,(T).1),
             TV_FACE_VECTOR(),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));}
     else{
         TV velocity_initial=TV::All_Ones_Vector()*u_initial;
-        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,T_FACE_VECTOR(rho_initial,rho_initial),
+        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,T_FACE_VECTOR(rho_initial,rho_initial),
             T_FACE_VECTOR(p_initial,p_initial),TV_FACE_VECTOR(test_number==4?-velocity_initial:velocity_initial,velocity_initial),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));}
     inaccurate_union=new FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID>(fluids_parameters.euler->grid);
 }

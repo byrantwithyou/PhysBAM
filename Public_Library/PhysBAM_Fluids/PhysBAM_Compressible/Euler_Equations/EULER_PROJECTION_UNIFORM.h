@@ -45,8 +45,8 @@ public:
     EULER_LAPLACE<POISSON_COLLIDABLE_UNIFORM<T_GRID> >* elliptic_solver;
     POISSON_COLLIDABLE_UNIFORM<T_GRID>* poisson;
     T_ARRAYS_SCALAR divergence; // use this to set up a non-zero divergence
-    BOUNDARY_UNIFORM<T_GRID,T>* pressure_boundary;
-    BOUNDARY_REFLECTION_UNIFORM<T_GRID,T> pressure_boundary_default;
+    BOUNDARY<TV,T>* pressure_boundary;
+    BOUNDARY_REFLECTION_UNIFORM<TV,T> pressure_boundary_default;
     bool save_fluxes,use_exact_neumann_face_location,use_neumann_condition_for_outflow_boundaries;
 #if 1
     ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<T,1> >,T> pressure_advection_HJ;
@@ -93,7 +93,7 @@ public:
     void Set_Constant_Extrapolation_Pressure_Boundary()
     {pressure_boundary->Set_Constant_Extrapolation(euler->boundary->constant_extrapolation);}
 
-    void Set_Custom_Pressure_Boundary(BOUNDARY_UNIFORM<T_GRID,T> &pressure_boundary_input)
+    void Set_Custom_Pressure_Boundary(BOUNDARY<TV,T> &pressure_boundary_input)
     {pressure_boundary=&pressure_boundary_input;Set_Constant_Extrapolation_Pressure_Boundary();}
 
 //#####################################################################

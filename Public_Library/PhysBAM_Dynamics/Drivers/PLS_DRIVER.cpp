@@ -80,8 +80,8 @@ Initialize()
     example.projection.elliptic_solver->mpi_grid=example.mpi_grid;
     example.particle_levelset_evolution.Particle_Levelset(0).mpi_grid=example.mpi_grid;
     if(example.mpi_grid){
-        example.boundary=new BOUNDARY_MPI<GRID<TV> >(example.mpi_grid,example.boundary_scalar);
-        example.phi_boundary=new BOUNDARY_MPI<GRID<TV> >(example.mpi_grid,example.phi_boundary_water);
+        example.boundary=new BOUNDARY_MPI<TV>(example.mpi_grid,example.boundary_scalar);
+        example.phi_boundary=new BOUNDARY_MPI<TV>(example.mpi_grid,example.phi_boundary_water);
         example.particle_levelset_evolution.Particle_Levelset(0).last_unique_particle_id=example.mpi_grid->rank*30000000;}
     else{
         example.boundary=&example.boundary_scalar;

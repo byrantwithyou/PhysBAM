@@ -131,7 +131,7 @@ void Fill_Solid_Cells(const T time,const T solid_boundary,ARRAY<T,TV_INT>& rho,A
 //#####################################################################
 void Euler_Step(const T dt, const T time){
     ADVECTION_CONSERVATIVE_ENO<GRID<TV>,T> advection_scheme;advection_scheme.Set_Order(1);
-    BOUNDARY_LINEAR_EXTRAPOLATION<GRID<TV>,T> boundary;
+    BOUNDARY_LINEAR_EXTRAPOLATION<TV,T> boundary;
 
     for(typename GRID<TV>::CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
         velocity(iterator.Cell_Index())=fluid_velocity_field(iterator.Location(),time);

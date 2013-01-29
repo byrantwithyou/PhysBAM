@@ -33,7 +33,7 @@ using namespace PhysBAM;
 template<class T_GRID> INCOMPRESSIBLE_UNIFORM<T_GRID>::
 INCOMPRESSIBLE_UNIFORM(const T_GRID& grid_input,PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection_input,THREAD_QUEUE* thread_queue_input)
     :grid(grid_input.Get_MAC_Grid()),mpi_grid(0),projection(projection_input),strain(0),collision_body_list(0),momentum_conserving_vorticity(false),use_vorticity_weights(false),energy_clamp(0),vc_projection_direction(0),buoyancy_constant(0),thread_queue(thread_queue_input),
-    boundary_default(*new BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<T_GRID>),advection_maccormack(0)
+    boundary_default(*new BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>),advection_maccormack(0)
 { 
     boundary=&boundary_default;
     Initialize_Grids(grid);
@@ -146,7 +146,7 @@ Add_Energy_With_Vorticity(T_FACE_ARRAYS_SCALAR& face_velocities,const VECTOR<VEC
 // Function Advance_One_Time_Step_Implicit_Part
 //#####################################################################
 template<class T_GRID> void INCOMPRESSIBLE_UNIFORM<T_GRID>::
-Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,BOUNDARY_UNIFORM<T_GRID,T>* projection_boundary,
+Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,BOUNDARY<TV,T>* projection_boundary,
     bool use_levelset_viscosity,BOUNDARY_CONDITIONS_CALLBACKS<TV>* bc_callbacks,bool print_viscosity_matrix)
 {
     int ghost_cells=3;

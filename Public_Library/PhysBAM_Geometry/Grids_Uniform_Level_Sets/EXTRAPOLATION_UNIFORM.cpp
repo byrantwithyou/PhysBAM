@@ -5,9 +5,9 @@
 // Class EXTRAPOLATION_UNIFORM  
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
@@ -42,7 +42,7 @@ Extrapolate(const T time,const bool fill_ghost_cells)
 {
     T_ARRAYS_SCALAR phi_ghost(node_grid.Domain_Indices(ghost_cells),false);ARRAY<T2,TV_INT> u_ghost(node_grid.Domain_Indices(ghost_cells),false); 
     if(fill_ghost_cells){
-        BOUNDARY_UNIFORM<T_GRID,T> phi_boundary;phi_boundary.Fill_Ghost_Cells(node_grid,phi,phi_ghost,0,time,ghost_cells);
+        BOUNDARY<TV,T> phi_boundary;phi_boundary.Fill_Ghost_Cells(node_grid,phi,phi_ghost,0,time,ghost_cells);
         boundary->Fill_Ghost_Cells(node_grid,u,u_ghost,0,time,ghost_cells);}
     else{
         phi_ghost=phi;

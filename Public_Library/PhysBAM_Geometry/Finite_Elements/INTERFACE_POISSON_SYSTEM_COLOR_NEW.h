@@ -7,11 +7,11 @@
 #ifndef __INTERFACE_POISSON_SYSTEM_COLOR_NEW__
 #define __INTERFACE_POISSON_SYSTEM_COLOR_NEW__
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <PhysBAM_Geometry/Finite_Elements/KRYLOV_VECTOR_CONDENSED_POISSON.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Geometry/Finite_Elements/BOUNDARY_CONDITIONS_SCALAR_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/KRYLOV_VECTOR_CONDENSED_POISSON.h>
 #include <PhysBAM_Geometry/Finite_Elements/VOLUME_FORCE_SCALAR_COLOR.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 
