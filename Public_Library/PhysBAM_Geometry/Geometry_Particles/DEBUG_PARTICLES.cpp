@@ -106,10 +106,10 @@ Dump_Surface(const T_SURFACE& surface,const VECTOR<T,3>& color,const VECTOR<T,3>
 // Function Dump_Levelset
 //#####################################################################
 template<class TV,class TV_INT,class T> void PhysBAM::
-Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,bool node_centered,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor)
+Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor)
 {
     typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT surface;
-    MARCHING_CUBES<TV>::Create_Surface(surface,node_centered?grid:grid.Get_Regular_Grid_At_MAC_Positions(),phi);
+    MARCHING_CUBES<TV>::Create_Surface(surface,grid,phi);
     Dump_Surface(surface,color,bgcolor);
 }
 namespace PhysBAM{
@@ -149,11 +149,11 @@ template void Add_Debug_Object<VECTOR<double,1>,2>(const VECTOR<VECTOR<double,1>
 template void Add_Debug_Object<VECTOR<double,1>,3>(const VECTOR<VECTOR<double,1>,3>&,const VECTOR<double,3>&,const VECTOR<double,3>&);
 template void Add_Debug_Object<VECTOR<float,1>,2>(const VECTOR<VECTOR<float,1>,2>&,const VECTOR<float,3>&);
 template void Add_Debug_Object<VECTOR<float,1>,3>(const VECTOR<VECTOR<float,1>,3>&,const VECTOR<float,3>&,const VECTOR<float,3>&);
-template void Dump_Levelset<VECTOR<double,1>,VECTOR<int,1>,double>(GRID<VECTOR<double,1> > const&,ARRAY<double,VECTOR<int,1> > const&,bool,VECTOR<double,3> const&,VECTOR<double,3> const&);
-template void Dump_Levelset<VECTOR<double,2>,VECTOR<int,2>,double>(GRID<VECTOR<double,2> > const&,ARRAY<double,VECTOR<int,2> > const&,bool,VECTOR<double,3> const&,VECTOR<double,3> const&);
-template void Dump_Levelset<VECTOR<double,3>,VECTOR<int,3>,double>(GRID<VECTOR<double,3> > const&,ARRAY<double,VECTOR<int,3> > const&,bool,VECTOR<double,3> const&,VECTOR<double,3> const&);
-template void Dump_Levelset<VECTOR<float,1>,VECTOR<int,1>,float>(GRID<VECTOR<float,1> > const&,ARRAY<float,VECTOR<int,1> > const&,bool,VECTOR<float,3> const&,VECTOR<float,3> const&);
-template void Dump_Levelset<VECTOR<float,2>,VECTOR<int,2>,float>(GRID<VECTOR<float,2> > const&,ARRAY<float,VECTOR<int,2> > const&,bool,VECTOR<float,3> const&,VECTOR<float,3> const&);
-template void Dump_Levelset<VECTOR<float,3>,VECTOR<int,3>,float>(GRID<VECTOR<float,3> > const&,ARRAY<float,VECTOR<int,3> > const&,bool,VECTOR<float,3> const&,VECTOR<float,3> const&);
+template void Dump_Levelset<VECTOR<double,1>,VECTOR<int,1>,double>(GRID<VECTOR<double,1> > const&,ARRAY<double,VECTOR<int,1> > const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
+template void Dump_Levelset<VECTOR<double,2>,VECTOR<int,2>,double>(GRID<VECTOR<double,2> > const&,ARRAY<double,VECTOR<int,2> > const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
+template void Dump_Levelset<VECTOR<double,3>,VECTOR<int,3>,double>(GRID<VECTOR<double,3> > const&,ARRAY<double,VECTOR<int,3> > const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
+template void Dump_Levelset<VECTOR<float,1>,VECTOR<int,1>,float>(GRID<VECTOR<float,1> > const&,ARRAY<float,VECTOR<int,1> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
+template void Dump_Levelset<VECTOR<float,2>,VECTOR<int,2>,float>(GRID<VECTOR<float,2> > const&,ARRAY<float,VECTOR<int,2> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
+template void Dump_Levelset<VECTOR<float,3>,VECTOR<int,3>,float>(GRID<VECTOR<float,3> > const&,ARRAY<float,VECTOR<int,3> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
 }
 

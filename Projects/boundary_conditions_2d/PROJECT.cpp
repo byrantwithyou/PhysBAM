@@ -102,7 +102,7 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
     system.neg_divergence.Sort_Entries();
     system.Initialize();
 
-    Dump_Levelset(grid,phi,true,VECTOR<T,3>(1,1,0));
+    Dump_Levelset(grid,phi,VECTOR<T,3>(1,1,0));
     Flush_Frame(us_grid,"disc");
 
     if(use_p_null_mode){
@@ -165,7 +165,7 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
 
     printf("u %g %g\n", li, l1/cnt);
 
-    Dump_Levelset(grid,phi,true,VECTOR<T,3>(1,1,0));
+    Dump_Levelset(grid,phi,VECTOR<T,3>(1,1,0));
     Flush_Frame(u_error,"errors");
 }
 template void Project<float,VECTOR<float,2>,VECTOR<int,2> >(GRID<VECTOR<float,2> > const&,int,ARRAY<float,VECTOR<int,2> > const&,

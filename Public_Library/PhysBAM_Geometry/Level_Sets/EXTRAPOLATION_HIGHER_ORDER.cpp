@@ -261,7 +261,7 @@ Smooth_With_Heat_Equation(const GRID<TV>& grid,int ghost,ARRAY<T2,TV_INT>& phi,T
             tmp(it.index)=x;}
         phi.Copy(frac/(2*TV::m),tmp,1-frac,phi);
 
-        Dump_Levelset(grid,phi,true,VECTOR<T,3>(1,0,0));
+        Dump_Levelset(grid,phi,VECTOR<T,3>(1,0,0));
         Flush_Frame<TV>("after heat");}
 }
 //#####################################################################
@@ -287,7 +287,7 @@ Extrapolate_Node_No_Levelset(const GRID<TV>& grid,boost::function<bool(const TV_
                     break;}}
 
     LEVELSET<TV> levelset(const_cast<GRID<TV>&>(grid),phi,ghost+1);
-    Dump_Levelset(grid,phi,true,VECTOR<T,3>(1,0,0));
+    Dump_Levelset(grid,phi,VECTOR<T,3>(1,0,0));
     // phi.array+=grid.dX.Max()*6;
     // Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
     // phi.array-=grid.dX.Max()*12;
@@ -298,7 +298,7 @@ Extrapolate_Node_No_Levelset(const GRID<TV>& grid,boost::function<bool(const TV_
 
     Reinitialize(levelset,(ghost+2)*20,(T)0,(ghost+2)*grid.dX.Max()*20,(T)0,(T).9,3,5,0);
 
-    Dump_Levelset(grid,phi,true,VECTOR<T,3>(1,0,0));
+    Dump_Levelset(grid,phi,VECTOR<T,3>(1,0,0));
     // phi.array+=grid.dX.Max()*6;
     // Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
     // phi.array-=grid.dX.Max()*12;
@@ -315,7 +315,7 @@ Extrapolate_Node_No_Levelset(const GRID<TV>& grid,boost::function<bool(const TV_
     Flush_Frame<TV>("normals");
 
     Reinitialize(levelset,(ghost+2)*20,(T)0,(ghost+2)*grid.dX.Max()*20,(T)0,(T).9,3,5,0);
-    Dump_Levelset(grid,phi,true,VECTOR<T,3>(1,0,0));
+    Dump_Levelset(grid,phi,VECTOR<T,3>(1,0,0));
     // phi.array+=grid.dX.Max()*6;
     // Dump_Levelset(grid,phi,VECTOR<T,3>(0,1,0));
     // phi.array-=grid.dX.Max()*12;

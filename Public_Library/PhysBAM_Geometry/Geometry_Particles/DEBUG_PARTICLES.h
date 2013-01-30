@@ -51,8 +51,8 @@ template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV
 template<class TV,int d> inline void Add_Debug_Object(const VECTOR<TV,d>& object,const VECTOR<typename TV::SCALAR,3>& color){Add_Debug_Object(object,color,color);}
 template<class TV,int d> void Add_Debug_Object(const VECTOR<TV,d>& object,const VECTOR<typename TV::SCALAR,3>& color,const VECTOR<typename TV::SCALAR,3>& bgcolor);
 template<class T_SURFACE,class T> void Dump_Surface(const T_SURFACE& surface,const VECTOR<T,3>& color){Dump_Surface(surface,color,color);}
-template<class TV,class TV_INT,class T> void Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,bool node_centered,const VECTOR<T,3>& color){Dump_Levelset(grid,phi,node_centered,color,color);}
+template<class TV,class TV_INT,class T> void Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>& color){Dump_Levelset(grid,phi,color,color);}
 template<class T_SURFACE,class T> void Dump_Surface(const T_SURFACE& surface,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor);
-template<class TV,class TV_INT,class T> void Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,bool node_centered,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor);
+template<class TV,class TV_INT,class T> void Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor);
 }
 #endif
