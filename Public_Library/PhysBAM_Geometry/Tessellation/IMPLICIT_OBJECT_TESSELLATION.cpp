@@ -16,7 +16,6 @@
 #include <PhysBAM_Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
