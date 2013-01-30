@@ -142,11 +142,11 @@ template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Toggle_Draw_Mode()
 {
     for(int j=0;j<opengl_levelsets.m;j++){
-        int mask=((int)opengl_levelsets(j)->draw_area<<2) | ((int)opengl_levelsets(j)->draw_curve<<1) | ((int)opengl_levelsets(j)->draw_cells);
-        int newmask=(mask%8)+1;
-        opengl_levelsets(j)->draw_area=(newmask&4)!=0;
-        opengl_levelsets(j)->draw_curve=(newmask&2)!=0;
-        opengl_levelsets(j)->draw_cells=(newmask&1)!=0;
+        int a=opengl_levelsets(j)->draw_area,c=opengl_levelsets(j)->draw_curve,e=opengl_levelsets(j)->draw_cells;
+        int mask=c+(a+e*2)*2,newmask=(mask+1)%6;
+        opengl_levelsets(j)->draw_curve=(newmask&1)!=0;
+        opengl_levelsets(j)->draw_area=(newmask/2)==1;
+        opengl_levelsets(j)->draw_cells=(newmask/2)==2;
         opengl_levelsets(j)->Update();}
 }
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
