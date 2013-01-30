@@ -8,6 +8,28 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TRIANGULATED_AREA.h>
 using namespace PhysBAM;
 //#####################################################################
+// Constructor
+//#####################################################################
+template<class T> OPENGL_LEVELSET_2D<T>::
+OPENGL_LEVELSET_2D(LEVELSET<TV>& levelset_input,const OPENGL_COLOR& inside_color_input,const OPENGL_COLOR& outside_color_input,ARRAY<bool,VECTOR<int,2> > *active_cells_input)
+    :OPENGL_SCALAR_FIELD_2D<T,T>(levelset_input.grid,levelset_input.phi,OPENGL_COLOR_RAMP<T>::Levelset_Color_Constant_Ramp(inside_color_input,outside_color_input),active_cells_input),
+    levelset(levelset_input),opengl_triangulated_area(0),opengl_segmented_curve_2d(0),color_mode(COLOR_SOLID),inside_color(inside_color_input),outside_color(outside_color_input), 
+    gradient_color_map(0),draw_cells(false),draw_area(false),draw_curve(true),dominant_sign(-1),draw_normals(false)
+{
+    Update();
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class T> OPENGL_LEVELSET_2D<T>::
+~OPENGL_LEVELSET_2D()
+{
+    delete opengl_segmented_curve_2d;
+    delete opengl_triangulated_area;
+    delete solid_color_map;
+    delete gradient_color_map;
+}
+//#####################################################################
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_LEVELSET_2D<T>::
