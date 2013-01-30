@@ -184,9 +184,17 @@ Fill_Levelsets_From_Levelset_Color()
     for(int i=0;i<bc_phis.m;i++){
         LEVELSET<TV> fl(grid,bc_phis(i),number_of_ghost_cells);
         fl.boundary=&boundary;
-        Reinitialize(fl,number_of_ghost_cells*2,(T)0,number_of_ghost_cells*grid.dX.Max(),(T)0,(T).9,3,5,1);}
+        Reinitialize(fl,number_of_ghost_cells*2,(T)0,number_of_ghost_cells*grid.dX.Max(),grid.domain.Edge_Lengths().Magnitude(),(T).9,3,5,1);}
     for(int i=0;i<phis.m;i++)
-        Reinitialize(*particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(i),number_of_ghost_cells*2,(T)0,number_of_ghost_cells*grid.dX.Max(),(T)0,(T).9,3,5,1);
+        Reinitialize(*particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(i),number_of_ghost_cells*2,(T)0,
+            number_of_ghost_cells*grid.dX.Max(),grid.domain.Edge_Lengths().Magnitude(),(T).9,3,5,1);
+
+    for(int i=0;i<bc_phis.m;i++){
+        boundary.Fill_Ghost_Cells(grid,bc_phis(i),bc_phis(i),0,0,number_of_ghost_cells);
+        if(bc_phis(i).array.Min()>=0) bc_phis(i).array.Fill(number_of_ghost_cells*grid.dX.Max());}
+    for(int i=0;i<phis.m;i++){
+        boundary.Fill_Ghost_Cells(grid,phis(i),phis(i),0,0,number_of_ghost_cells);
+        if(phis(i).array.Min()>=0) phis(i).array.Fill(number_of_ghost_cells*grid.dX.Max());}
 }
 //#####################################################################
 // Function Get_Levelset_Velocity
