@@ -442,7 +442,7 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
         VECTOR<TV,num_pts> pts;
         Compute_Phis_For_Cell(phis,phi,it.index);
         int c=Compute_Points_For_Cell(pts,phis);
-        TV X=grid.Node(it.index);
+        TV X=grid.X(it.index);
 
         int len=Get_Interface_Elements(tmp_elements,c);
         if(len) cut_cells++;
@@ -478,7 +478,7 @@ Create_Interior(T_VOLUME& volume,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi
         VECTOR<TV,num_pts> pts;
         Compute_Phis_For_Cell(phis,phi,it.index);
         int c=Compute_Points_For_Cell(pts,phis);
-        TV X=grid.Node(it.index);
+        TV X=grid.X(it.index);
 
         int len=Get_Interior_Elements(tmp_elements,inside,c);
         if(len) cut_cells++;
