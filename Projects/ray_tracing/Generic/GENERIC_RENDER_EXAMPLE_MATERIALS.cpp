@@ -183,8 +183,8 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         RENDERING_MASKED_BLEND_SHADER<T>* shader=new RENDERING_MASKED_BLEND_SHADER<T>(*mask_shader,*child_shader_1,*child_shader_2,direct_shading_only,world);
         if(channel=="gray") shader->Use_Gray();
         else if(channel=="red") shader->Use_Red();
-        else if(channel=="blue") shader->Use_Green();
-        else if(channel=="green") shader->Use_Blue();
+        else if(channel=="green") shader->Use_Green();
+        else if(channel=="blue") shader->Use_Blue();
         shaders.Set(name,shader);
         LOG::cout<<"Material '"<<name<<"' Blend shaders="<<mask_name<<", "<<child_name_1<<", "<<child_name_2<<std::endl;}
     else if(type=="Camera_Oriented_Normal"){
