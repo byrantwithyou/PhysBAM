@@ -373,17 +373,20 @@ Compute_Points_For_Cell(VECTOR<TV,num_pts>& pts,const VECTOR<T,num_corners>& phi
 // Function Get_Elements_For_Cell
 //#####################################################################
 template<class TV> void MARCHING_CUBES<TV>::
-Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m>& boundary,const ARRAY<T,TV_INT>& phi,const TV_INT& cell)
+Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m>& boundary,
+    const ARRAY<T,TV_INT>& phi,const TV_INT& cell,T contour_value)
 {
     VECTOR<T,num_corners> phis;
     Compute_Phis_For_Cell(phis,phi,cell);
+    phis-=contour_value;
     Get_Elements_For_Cell(surface,boundary,phis);
 }
 //#####################################################################
 // Function Get_Elements_For_Cell
 //#####################################################################
 template<class TV> void MARCHING_CUBES<TV>::
-Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m>& boundary,const VECTOR<T,num_corners>& phis)
+Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m>& boundary,
+    const VECTOR<T,num_corners>& phis)
 {
     VECTOR<TV,num_pts> pts;
     int c=Compute_Points_For_Cell(pts,phis);
@@ -403,17 +406,20 @@ Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRA
 // Function Get_Elements_For_Cell
 //#####################################################################
 template<class TV> void MARCHING_CUBES<TV>::
-Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,const ARRAY<T,TV_INT>& phi,const TV_INT& cell)
+Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,
+    const ARRAY<T,TV_INT>& phi,const TV_INT& cell,T contour_value)
 {
     VECTOR<T,num_corners> phis;
     Compute_Phis_For_Cell(phis,phi,cell);
+    phis-=contour_value;
     Get_Interior_Elements_For_Cell(interior,exterior,phis);
 }
 //#####################################################################
 // Function Get_Interior_Elements_For_Cell
 //#####################################################################
 template<class TV> void MARCHING_CUBES<TV>::
-Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,const VECTOR<T,num_corners>& phis)
+Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,
+    const VECTOR<T,num_corners>& phis)
 {
     VECTOR<TV,num_pts> pts;
     int c=Compute_Points_For_Cell(pts,phis);
@@ -430,7 +436,7 @@ Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR
 // Function Create_Surface
 //#####################################################################
 template<class TV> int MARCHING_CUBES<TV>::
-Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi)
+Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,T contour_value)
 {
     const VECTOR<TV_INT,num_corners>& bits=GRID<TV>::Binary_Counts(TV_INT());
     HASHTABLE<FACE_INDEX<TV::m>,int> ht;
@@ -441,6 +447,7 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
         VECTOR<T,num_corners> phis;
         VECTOR<TV,num_pts> pts;
         Compute_Phis_For_Cell(phis,phi,it.index);
+        phis-=contour_value;
         int c=Compute_Points_For_Cell(pts,phis);
         TV X=grid.X(it.index);
 
@@ -465,7 +472,7 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
 // Function Create_Surface
 //#####################################################################
 template<class TV> int MARCHING_CUBES<TV>::
-Create_Interior(T_VOLUME& volume,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,bool inside)
+Create_Interior(T_VOLUME& volume,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,bool inside,T contour_value)
 {
     const VECTOR<TV_INT,num_corners>& bits=GRID<TV>::Binary_Counts(TV_INT());
     HASHTABLE<FACE_INDEX<TV::m>,int> ft;
@@ -477,6 +484,7 @@ Create_Interior(T_VOLUME& volume,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi
         VECTOR<T,num_corners> phis;
         VECTOR<TV,num_pts> pts;
         Compute_Phis_For_Cell(phis,phi,it.index);
+        phis-=contour_value;
         int c=Compute_Points_For_Cell(pts,phis);
         TV X=grid.X(it.index);
 

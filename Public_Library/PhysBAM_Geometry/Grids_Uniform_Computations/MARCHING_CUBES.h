@@ -63,12 +63,16 @@ public:
 
     static void Compute_Phis_For_Cell(VECTOR<T,num_corners>& phis,const ARRAY<T,TV_INT>& phi,const TV_INT& cell);
     static int Compute_Points_For_Cell(VECTOR<TV,num_pts>& pts,const VECTOR<T,num_corners>& phis);
-    static void Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m>& boundary,const VECTOR<T,num_corners>& phis);
-    static void Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m>& boundary,const ARRAY<T,TV_INT>& phi,const TV_INT& cell);
-    static void Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,const VECTOR<T,num_corners>& phis);
-    static void Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,const ARRAY<T,TV_INT>& phi,const TV_INT& cell);
-    static int Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi);
-    static int Create_Interior(T_VOLUME& volume,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,bool inside);
+    static void Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m>& boundary,
+        const VECTOR<T,num_corners>& phis);
+    static void Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m>& boundary,
+        const ARRAY<T,TV_INT>& phi,const TV_INT& cell,T contour_value=0);
+    static void Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,
+        const VECTOR<T,num_corners>& phis);
+    static void Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,
+        const ARRAY<T,TV_INT>& phi,const TV_INT& cell,T contour_value=0);
+    static int Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,T contour_value=0);
+    static int Create_Interior(T_VOLUME& volume,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,bool inside,T contour_value=0);
 //#####################################################################
 };
 }
