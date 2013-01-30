@@ -22,7 +22,7 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     max_iter(100000),dump_matrix(false),wrap(true),use_advection(true),use_reduced_advection(false),omit_solve(false),
     number_of_colors(1),use_discontinuous_velocity(false),use_p_null_mode(false),use_level_set_method(false),use_pls(false),
     grid(TV_INT(),RANGE<TV>::Unit_Box(),true),particle_levelset_evolution_multiple(*new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >(grid,number_of_ghost_cells)),
-    advection_scalar(*new ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T>),boundary(0),levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),
+    advection_scalar(*new ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T>),levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),
     collision_bodies_affecting_fluid(*new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >(grid)),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
@@ -183,6 +183,7 @@ Fill_Levelsets_From_Levelset_Color()
 
     for(int i=0;i<bc_phis.m;i++){
         LEVELSET<TV> fl(grid,bc_phis(i),number_of_ghost_cells);
+        fl.boundary=&boundary;
         Reinitialize(fl,number_of_ghost_cells*2,(T)0,number_of_ghost_cells*grid.dX.Max(),(T)0,(T).9,3,5,1);}
     for(int i=0;i<phis.m;i++)
         Reinitialize(*particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(i),number_of_ghost_cells*2,(T)0,number_of_ghost_cells*grid.dX.Max(),(T)0,(T).9,3,5,1);

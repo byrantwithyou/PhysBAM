@@ -99,12 +99,7 @@ Initialize()
     example.particle_levelset_evolution_multiple.Set_CFL_Number((T).9);
     example.particle_levelset_evolution_multiple.Use_Reinitialization();
 
-    example.boundary=&example.boundary_scalar;
-    example.phi_boundary=&example.cell_extrapolate;
-
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.domain_boundary);
-    example.phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
-    example.boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     example.particle_levelset_evolution_multiple.Levelset_Advection(0).Set_Custom_Advection(example.advection_scalar);
 
     {
@@ -121,7 +116,7 @@ Initialize()
     example.particle_levelset_evolution_multiple.runge_kutta_order_particles=3;
     example.particle_levelset_evolution_multiple.Use_Hamilton_Jacobi_Weno_Advection();
 
-    example.particle_levelset_evolution_multiple.particle_levelset.levelset.Set_Custom_Boundary(*example.phi_boundary);
+    example.particle_levelset_evolution_multiple.particle_levelset.levelset.Set_Custom_Boundary(example.boundary);
     example.particle_levelset_evolution_multiple.Bias_Towards_Negative_Particles(false);
     example.particle_levelset_evolution_multiple.Particle_Levelset(0).Store_Unique_Particle_Id();
     example.particle_levelset_evolution_multiple.use_particle_levelset=true;
@@ -189,7 +184,7 @@ Update_Pls(T dt)
     // TODO example.incompressible.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
 
     ARRAY<T,TV_INT> phi_back(example.grid.Domain_Indices(example.number_of_ghost_cells));
-    example.phi_boundary->Fill_Ghost_Cells(example.grid,example.particle_levelset_evolution_multiple.Particle_Levelset(0).levelset.phi,phi_back,dt,time,example.number_of_ghost_cells);
+    example.boundary.Fill_Ghost_Cells(example.grid,example.particle_levelset_evolution_multiple.Particle_Levelset(0).levelset.phi,phi_back,dt,time,example.number_of_ghost_cells);
     LOG::Time("Advect Levelset");
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi",0,1);
     example.particle_levelset_evolution_multiple.Advance_Levelset(dt);
