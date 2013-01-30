@@ -129,16 +129,13 @@ Initialize_Triangulated_Surface()
         if(generate_triangulated_surface){
             Initialize_Levelset();
             if(levelset){
-                if(!use_marching_tetrahedra)
-                    triangulated_surface=DUALCONTOUR_3D<T>::Create_Triangulated_Surface_From_Levelset(*levelset);
-                else{
-                    triangulated_surface=TRIANGULATED_SURFACE<T>::Create();
-                    MARCHING_CUBES<TV>::Create_Surface(*triangulated_surface,levelset->grid,levelset->phi);
-                    levelset->Compute_Normals();
-                    triangulated_surface->Use_Vertex_Normals();
-                    triangulated_surface->vertex_normals=new ARRAY<TV>(triangulated_surface->particles.Size());
-                    for(int p=0;p<triangulated_surface->particles.Size();p++)
-                        (*triangulated_surface->vertex_normals)(p)=levelset->Normal(triangulated_surface->particles.X(p));}
+                triangulated_surface=TRIANGULATED_SURFACE<T>::Create();
+                MARCHING_CUBES<TV>::Create_Surface(*triangulated_surface,levelset->grid,levelset->phi);
+                levelset->Compute_Normals();
+                triangulated_surface->Use_Vertex_Normals();
+                triangulated_surface->vertex_normals=new ARRAY<TV>(triangulated_surface->particles.Size());
+                for(int p=0;p<triangulated_surface->particles.Size();p++)
+                    (*triangulated_surface->vertex_normals)(p)=levelset->Normal(triangulated_surface->particles.X(p));
                 if(write_generated_triangulated_surface && triangulated_surface_filename.length() > 0){
                     const int vertex_normals_length=1; // needed for backwards compatibility, since vertex_normals used to be ARRAYS<TV,1>
                     FILE_UTILITIES::Write_To_File<RW>(triangulated_surface_filename,*triangulated_surface,vertex_normals_length,*triangulated_surface->vertex_normals);}
@@ -240,14 +237,6 @@ Toggle_Slice_Color_Mode()
 {
     COLOR_MODE new_color_mode=(COLOR_MODE)(((int)color_mode+1)%2);
     Set_Slice_Color_Mode(new_color_mode);
-}
-//#####################################################################
-// Function Toggle_Marching_Tetrahedra
-//#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
-Toggle_Marching_Tetrahedra() 
-{
-    use_marching_tetrahedra=!use_marching_tetrahedra;
 }
 //#####################################################################
 // Function Update

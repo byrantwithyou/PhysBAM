@@ -4,7 +4,8 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_2D.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_GRID_2D.h>
@@ -303,10 +304,12 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     opengl_points->points.Resize((end_index.x-start_index.x)*(end_index.y-start_index.y));
     int index=0;
     OPENGL_COLOR_MAP<T2>* color_map=color_maps(current_color_map);
-    for(int i=start_index.x,i_active_cells=0;i<end_index.x;i++,i_active_cells++) for(int j=start_index.y,j_active_cells=0;j<end_index.y;j++,j_active_cells++) if(!active_cells || (*active_cells)(i_active_cells,j_active_cells)){
-        opengl_points->points(index)=grid.X(TV_INT(i,j));
-        opengl_points->Set_Point_Color(index,color_map->Lookup(Pre_Map_Value(values(i,j))));
-        index++;}
+    for(int i=start_index.x,i_active_cells=0;i<end_index.x;i++,i_active_cells++)
+        for(int j=start_index.y,j_active_cells=0;j<end_index.y;j++,j_active_cells++)
+            if(!active_cells || (*active_cells)(i_active_cells,j_active_cells)){
+                opengl_points->points(index)=grid.X(TV_INT(i,j));
+                opengl_points->Set_Point_Color(index,color_map->Lookup(Pre_Map_Value(values(i,j))));
+                index++;}
     opengl_points->points.Resize(index);
 }
 
@@ -314,7 +317,7 @@ template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Update_Contour_Curves()
 {
     // not supported by these types
-    PHYSBAM_WARNING(std::string("Dual-contouring is not supported for scalar fields of type ")+typeid(T).name());
+    PHYSBAM_WARNING(std::string("MARCHING_CUBES is not supported for scalar fields of type ")+typeid(T).name());
     contour_curves.Delete_Pointers_And_Clean_Memory();
 }
 
@@ -327,8 +330,10 @@ Update_Contour_Curves()
     if(!values.domain.Empty()){
         contour_curves.Resize(contour_values.m);
         for(int i=0;i<contour_values.m;i++){
-            contour_curves(i)=new OPENGL_SEGMENTED_CURVE_2D<float>(*DUALCONTOUR_2D<float>::Create_Segmented_Curve_From_Levelset(scalar_field_as_levelset,contour_values(i),false),color_map->Lookup(Pre_Map_Value(contour_values(i))));}}
-    else contour_curves.Clean_Memory();
+            SEGMENTED_CURVE_2D<float>& sc=*SEGMENTED_CURVE_2D<float>::Create();
+            MARCHING_CUBES<TV>::Create_Surface(sc,grid,scalar_field_as_levelset.phi,contour_values(i));
+            contour_curves(i)=new OPENGL_SEGMENTED_CURVE_2D<float>(sc,color_map->Lookup(Pre_Map_Value(contour_values(i))));}}
+    else contour_curves.Delete_Pointers_And_Clean_Memory();
 }
 
 template<> void OPENGL_SCALAR_FIELD_2D<double,double>::
@@ -340,8 +345,10 @@ Update_Contour_Curves()
     if(!values.domain.Empty()){
         contour_curves.Resize(contour_values.m);
         for(int i=0;i<contour_values.m;i++){
-            contour_curves(i)=new OPENGL_SEGMENTED_CURVE_2D<double>(*DUALCONTOUR_2D<double>::Create_Segmented_Curve_From_Levelset(scalar_field_as_levelset,contour_values(i),false),color_map->Lookup(Pre_Map_Value(contour_values(i))));}}
-    else contour_curves.Clean_Memory();
+            SEGMENTED_CURVE_2D<double>& sc=*SEGMENTED_CURVE_2D<double>::Create();
+            MARCHING_CUBES<TV>::Create_Surface(sc,grid,scalar_field_as_levelset.phi,contour_values(i));
+            contour_curves(i)=new OPENGL_SEGMENTED_CURVE_2D<double>(sc,color_map->Lookup(Pre_Map_Value(contour_values(i))));}}
+    else contour_curves.Delete_Pointers_And_Clean_Memory();
 }
 
 //#####################################################################

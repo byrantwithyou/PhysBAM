@@ -41,7 +41,6 @@ private:
     std::string triangulated_surface_filename;
     bool generate_triangulated_surface;
     bool write_generated_triangulated_surface;
-    bool use_marching_tetrahedra;
     LEVELSET<TV>* levelset;
     LEVELSET_IMPLICIT_OBJECT<TV>* levelset_implicit_surface;
     TRIANGULATED_SURFACE<T>* triangulated_surface;
@@ -54,7 +53,7 @@ private:
 public:
     OPENGL_LEVELSET_MULTIVIEW()
         :color_mode(COLOR_SOLID),implicit_object_transform(0),display_overlay(false),smooth_shading(true),smooth_slice_texture(false),
-        use_marching_tetrahedra(false),levelset(0),levelset_implicit_surface(0),triangulated_surface(0),i_own_levelset(true),i_own_triangulated_surface(true),
+        levelset(0),levelset_implicit_surface(0),triangulated_surface(0),i_own_levelset(true),i_own_triangulated_surface(true),
         opengl_triangulated_surface(0),opengl_scalar_field(0),two_sided(true)
     {
         back_surface_material=OPENGL_MATERIAL::Plastic(OPENGL_COLOR((float)0.8,(float)0,0));
@@ -89,7 +88,6 @@ public:
     void Toggle_Slice_Color_Mode();
     void Toggle_Display_Overlay();
     void Toggle_Smooth_Slice_Texture();
-    void Toggle_Marching_Tetrahedra();
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
