@@ -285,15 +285,15 @@ Initialize_Components_And_Key_Bindings()
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_1",start_frame)){
         levelset_component=new OPENGL_COMPONENT_LEVELSET_2D<T>(filename,basedir+"/%d/levelset_%d");
         if(levelset_component->opengl_levelsets.m>1) for(int j=0;j<levelset_component->opengl_levelsets.m;j++){
-            levelset_component->opengl_levelsets(j)->draw_cells=true;
+            levelset_component->opengl_levelsets(j)->draw_cells=false;
             levelset_component->opengl_levelsets(j)->draw_area=false;
             levelset_component->opengl_levelsets(j)->draw_curve=true;
             levelset_component->opengl_levelsets(j)->Update();}
         else{
             levelset_component->opengl_levelsets(0)->Set_Inside_And_Outside_Colors(OPENGL_COLOR::Blue(),OPENGL_COLOR::Red(.5));
-            levelset_component->opengl_levelsets(0)->draw_cells=true;
+            levelset_component->opengl_levelsets(0)->draw_cells=false;
             levelset_component->opengl_levelsets(0)->draw_area=false;
-            levelset_component->opengl_levelsets(0)->draw_curve=false;
+            levelset_component->opengl_levelsets(0)->draw_curve=true;
             levelset_component->opengl_levelsets(0)->Update();}
         opengl_world.Set_Key_Binding_Category("Level Set");
         Add_Component(levelset_component,"Level Set",'l',BASIC_VISUALIZATION::OWNED);
