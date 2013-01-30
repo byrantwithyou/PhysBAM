@@ -54,6 +54,7 @@ class MARCHING_CUBES
 public:
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
+    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_VOLUME;
     enum WORKAROUND {num_corners=1<<TV::m,num_edges=TV::m<<(TV::m-1),num_pts=num_corners+num_edges};
     enum WORKAROUND1 {boundary_corners=1<<(TV::m-1),boundary_edges=(TV::m==3?4:1),boundary_pts=boundary_corners+boundary_edges};
 
@@ -67,6 +68,7 @@ public:
     static void Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,const VECTOR<T,num_corners>& phis);
     static void Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,const ARRAY<T,TV_INT>& phi,const TV_INT& cell);
     static int Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi);
+    static int Create_Interior(T_VOLUME& volume,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,bool inside);
 //#####################################################################
 };
 }

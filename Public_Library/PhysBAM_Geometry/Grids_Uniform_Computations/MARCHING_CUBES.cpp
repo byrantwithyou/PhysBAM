@@ -11,6 +11,8 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #define TRI(a,b,c,s) (((s)<<15) | ((c)<<10) | ((b)<<5) | (a))
 #define TRI_ORIENT_MAP(x,f) (x?((x&0x8000) | (f[(x>>10)&31]<<10) | (f[x&31]<<5) | f[(x>>5)&31]):0)
@@ -434,6 +436,7 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
     HASHTABLE<FACE_INDEX<TV::m>,int> ht;
 
     int cut_cells=0;
+    VECTOR<int,TV::m> tmp_elements[MARCHING_CUBES_CASE<TV::m>::max_elements];
     for(RANGE_ITERATOR<TV::m> it(phi.domain.To_Closed());it.Valid();it.Next()){
         VECTOR<T,num_corners> phis;
         VECTOR<TV,num_pts> pts;
@@ -441,7 +444,6 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
         int c=Compute_Points_For_Cell(pts,phis);
         TV X=grid.Node(it.index);
 
-        VECTOR<int,TV::m> tmp_elements[MARCHING_CUBES_CASE<TV::m>::max_elements];
         int len=Get_Interface_Elements(tmp_elements,c);
         if(len) cut_cells++;
         for(int i=0;i<len;i++){
@@ -462,16 +464,45 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
 //#####################################################################
 // Function Create_Surface
 //#####################################################################
-template<class TV,class TV_INT,class T> static int Create_Surface_Helper(POINT_SIMPLICES_1D<T>& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi)
+template<class TV> int MARCHING_CUBES<TV>::
+Create_Interior(T_VOLUME& volume,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,bool inside)
 {
+    const VECTOR<TV_INT,num_corners>& bits=GRID<TV>::Binary_Counts(TV_INT());
+    HASHTABLE<FACE_INDEX<TV::m>,int> ft;
+    HASHTABLE<TV_INT,int> ct;
+
     int cut_cells=0;
+    VECTOR<int,TV::m+1> tmp_elements[MARCHING_CUBES_INTERIOR_CASE<TV::m>::max_elements];
     for(RANGE_ITERATOR<TV::m> it(phi.domain.To_Closed());it.Valid();it.Next()){
-        T a=phi(it.index),b=phi(it.index+1);
-        if((a>0)==(b>0)) continue;
-        cut_cells++;
-        TV X0=grid.Center(it.index),X1=grid.Center(it.index+1);
-        surface.mesh.elements.Append(TV_INT(surface.particles.Add_Element()));
-        surface.particles.X.Last()=X0+a/(a-b)*(X1-X0);}
+        VECTOR<T,num_corners> phis;
+        VECTOR<TV,num_pts> pts;
+        Compute_Phis_For_Cell(phis,phi,it.index);
+        int c=Compute_Points_For_Cell(pts,phis);
+        TV X=grid.Node(it.index);
+
+        int len=Get_Interior_Elements(tmp_elements,inside,c);
+        if(len) cut_cells++;
+        for(int i=0;i<len;i++){
+            VECTOR<int,TV::m+1> face;
+            for(int j=0;j<TV::m+1;j++){
+                int e=tmp_elements[i](j);
+                if(e<num_edges){
+                    FACE_INDEX<TV::m> fi(e/(1<<(TV::m-1)),it.index+bits(MARCHING_CUBES_CASE<TV::m>::vertex_lookup[e][0]));
+                    if(!ft.Get(fi,face(j))){
+                        int index=volume.particles.Add_Element();
+                        face(j)=index;
+                        ft.Set(fi,index);
+                        volume.particles.X(index)=pts[e]*grid.dX+X;}}
+                else{
+                    TV_INT ci(it.index+bits(e-num_edges));
+                    if(!ct.Get(ci,face(j))){
+                        int index=volume.particles.Add_Element();
+                        face(j)=index;
+                        ct.Set(ci,index);
+                        volume.particles.X(index)=pts[e]*grid.dX+X;}}}
+            volume.mesh.elements.Append(face);}}
+
+    volume.Update_Number_Nodes();
     return cut_cells;
 }
 template class MARCHING_CUBES<VECTOR<float,1> >;
