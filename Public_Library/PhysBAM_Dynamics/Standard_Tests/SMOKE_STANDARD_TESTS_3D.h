@@ -31,7 +31,7 @@ template<class T_GRID>
 class SMOKE_STANDARD_TESTS_3D
 {
     typedef typename T_GRID::SCALAR T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
-    typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 public:
     SOLIDS_FLUIDS_EXAMPLE<TV>& example;
     FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters;

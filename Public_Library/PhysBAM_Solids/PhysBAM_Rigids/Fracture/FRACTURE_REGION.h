@@ -27,7 +27,7 @@ class FRACTURE_REGION
 {
     typedef VECTOR<T,3> TV;
     typedef VECTOR<int,3> TV_INT;
-    typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 public:
     typedef int HAS_TYPED_READ_WRITE;
 

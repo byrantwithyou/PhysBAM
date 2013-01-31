@@ -108,7 +108,7 @@ Initialize_Grid_Structures_Helper(OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>&
     T_FACE_ARRAYS_COLLISION_GEOMETRY_ID face_operations(grid,3);
     for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++)if(collision_bodies.Is_Active(i) && collision_bodies.collision_geometry_collection.bodies(i)->active)
         Initialize_Grid_Structures_Subobject(face_velocities_count,face_operations,i,typename T_GRID::GRID_TAG());
-    for(typename T_GRID::FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(face_velocities_count.Component(iterator.Axis())(iterator.Face_Index())){
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()) if(face_velocities_count.Component(iterator.Axis())(iterator.Face_Index())){
         face_velocities.Component(iterator.Axis())(iterator.Face_Index())/=face_velocities_count.Component(iterator.Axis())(iterator.Face_Index());
         face_velocities_set.Component(iterator.Axis())(iterator.Face_Index())=true;}
 }

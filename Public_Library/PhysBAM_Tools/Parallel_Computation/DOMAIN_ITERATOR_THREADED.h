@@ -57,7 +57,7 @@ public:
                 domains.Resize(split_per_dimension.Product());
                 GRID<TV> process_grid(split_per_dimension,RANGE<TV>::Centered_Box());
                 int count=0;
-                for(typename GRID<TV>::NODE_ITERATOR iterator(process_grid);iterator.Valid();iterator.Next()){
+                for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(process_grid);iterator.Valid();iterator.Next()){
                     TV_INT coordinates=iterator.Node_Index();
                     TV_INT start,end;
                     for(int axis=0;axis<TV::dimension;axis++){

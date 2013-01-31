@@ -111,7 +111,7 @@ Initialize_Bodies()
         T one_over_cell_size=(T)1/grid.Cell_Size();
 
         // TODO This appears to be broken for non-zero angles
-        for(typename T_GRID::FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();VECTOR<int,2> face_index=iterator.Face_Index();RANGE<TV> dual_cell=iterator.Dual_Cell();
             T normal_weight=(T)1-sqr(rigid_body_collection.Rigid_Body(oriented_box).implicit_object->Extended_Normal(iterator.Location())(axis));
             T volume_fraction=implicit_object.Negative_Material_In_Box(dual_cell)*one_over_cell_size;
@@ -154,7 +154,7 @@ Get_Object_Velocities(PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection,const T dt
          projection.poisson->divergence_face_weights.Copy(divergence_face_weights);
 
          // We're changing how to calculate Neumann Boundary Conditions
-         for(typename T_GRID::FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+         for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()){
              int axis=iterator.Axis();VECTOR<int,2> face_index=iterator.Face_Index();
              if(divergence_face_weights(axis,face_index)<=1e-3 || beta_face(axis,face_index)<=1e-3){
                  projection.elliptic_solver->psi_N(axis,face_index)=true;incompressible_fluid_collection.face_velocities(axis,face_index)=0;}}}

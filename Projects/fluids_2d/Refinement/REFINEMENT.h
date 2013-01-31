@@ -16,7 +16,7 @@ class REFINEMENT:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;
 public:
-    typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;

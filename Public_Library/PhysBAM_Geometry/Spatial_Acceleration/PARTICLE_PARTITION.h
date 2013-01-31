@@ -21,7 +21,7 @@ class PARTICLE_PARTITION
     enum WORKAROUND {d=TV::m};
     typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_T;
     typedef typename REBIND<T_ARRAYS_T,ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;
-    typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
 public:
     GRID<TV> grid;
     T_ARRAYS_ARRAY_INT partition;

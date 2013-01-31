@@ -235,10 +235,10 @@ template<class T>
 void Get_Variable_Viscosity_Helper(GRID<VECTOR<T,3> >& grid,const int test_number,ARRAY<T,VECTOR<int,3> >& variable_viscosity,const T time)
 {
     if(test_number==13){
-        for(typename GRID<VECTOR<T,3> >::CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())
+        for(UNIFORM_GRID_ITERATOR_CELL<VECTOR<T,3> > iterator(grid,1);iterator.Valid();iterator.Next())
             variable_viscosity(iterator.Cell_Index())=(iterator.Location().x<.2)?(T)0:(T)1000;}
     else if(test_number==15){
-        for(typename GRID<VECTOR<T,3> >::CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())
+        for(UNIFORM_GRID_ITERATOR_CELL<VECTOR<T,3> > iterator(grid,1);iterator.Valid();iterator.Next())
             variable_viscosity(iterator.Cell_Index())=(iterator.Location().x<.5)?(T)0:(T)1000;}
 }
 template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::

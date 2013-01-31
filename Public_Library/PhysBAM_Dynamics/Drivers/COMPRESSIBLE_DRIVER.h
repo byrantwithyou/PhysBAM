@@ -15,7 +15,7 @@ class COMPRESSIBLE_DRIVER:public DRIVER<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;typedef VECTOR<T,GRID<TV>::dimension+2> TV_DIMENSION;
-    typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef DRIVER<TV> BASE;

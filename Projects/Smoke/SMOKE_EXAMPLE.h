@@ -60,11 +60,11 @@ public:
     {mac_grid.Initialize(counts,domain,true);}
     
     void Initialize_Fields() 
-    {for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()) face_velocities(iterator.Full_Index())=0;
-    for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()) density(iterator.Cell_Index())=0;}
+    {for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) face_velocities(iterator.Full_Index())=0;
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) density(iterator.Cell_Index())=0;}
     
     void Get_Scalar_Field_Sources(const T time)
-    {for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next())
+    {for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
         if(source.Lazy_Inside(iterator.Location())) density(iterator.Cell_Index())=1;}
 
     virtual void Write_Output_Files(const int frame);

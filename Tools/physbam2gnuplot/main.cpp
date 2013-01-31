@@ -16,7 +16,7 @@ template<class T_GRID,class RW>
 class PHYSBAM_TO_GNUPLOT_CONVERTER
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef typename T_GRID::SCALAR T;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 

@@ -22,7 +22,7 @@ class PCG_SPARSE_THREADED:public PCG_SPARSE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::dimension> TV_INT;
-    typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef PCG_SPARSE<T> BASE;
 public:
     THREAD_QUEUE& thread_queue;

@@ -26,7 +26,7 @@ class DENSITY_CONTAINER:public GRID_AND_ARRAY_CONTAINER<T_GRID,typename T_GRID::
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     typedef typename REBIND<ARRAY<T,FACE_INDEX<TV::m> >,bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
-    typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
     typedef GRID_AND_ARRAY_CONTAINER<T_GRID,T> BASE;
     using BASE::array;using BASE::grid;
     using BASE::boundary_default;using BASE::boundary;using BASE::Set_To_Constant_Value;using BASE::Set_Custom_Advection;

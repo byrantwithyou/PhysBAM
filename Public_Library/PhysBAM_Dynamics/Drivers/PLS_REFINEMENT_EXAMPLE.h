@@ -73,7 +73,7 @@ public:
     {return initial_time+(frame-first_frame)/frame_rate;}
 
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
-    {for(typename GRID<TV>::FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) V_levelset(iterator.Full_Index())=fine_face_velocities(iterator.Full_Index());}
+    {for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()) V_levelset(iterator.Full_Index())=fine_face_velocities(iterator.Full_Index());}
 
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) PHYSBAM_OVERRIDE
     {

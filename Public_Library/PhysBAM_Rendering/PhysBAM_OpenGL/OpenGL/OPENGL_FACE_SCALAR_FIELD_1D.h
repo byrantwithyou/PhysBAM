@@ -18,7 +18,7 @@ template<class T,class T2=T>
 class OPENGL_FACE_SCALAR_FIELD_1D : public OPENGL_OBJECT
 {
     typedef VECTOR<T,1> TV;
-    typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 public:
     GRID<TV> grid;
     ARRAY<T2,FACE_INDEX<1> > &face_values;

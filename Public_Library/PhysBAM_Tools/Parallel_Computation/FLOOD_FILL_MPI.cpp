@@ -277,7 +277,7 @@ Find_Global_Colors(ARRAY<bool,VECTOR<int,1> >& color_is_global,const RANGE<TV_IN
     for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
         if(side_neighbor_ranks(side)!=proc_null){
-            for(typename T_GRID::FACE_ITERATOR iterator(local_grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Face_Index())){
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(local_grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Face_Index())){
                 color_is_global(colors(iterator.First_Cell_Index()))=true;
                 color_is_global(colors(iterator.Second_Cell_Index()))=true;}}}
 }

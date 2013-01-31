@@ -197,14 +197,11 @@ int main(int argc,char* argv[])
 #else
 
         {
-            typedef GRID_POLICY<TV>::UNIFORM_GRID T_GRID;
-            typedef T_GRID::NODE_ITERATOR T_NODE_ITERATOR;
-            typedef POLICY_UNIFORM<TV>::ARRAYS_SCALAR T_VARIABLE;
-            T_VARIABLE x(multigrid_poisson.grid);
-            T_VARIABLE p(multigrid_poisson.grid);
+            ARRAY<T,TV_INT> x(multigrid_poisson.grid);
+            ARRAY<T,TV_INT> p(multigrid_poisson.grid);
             
-            T_VARIABLE x_save(multigrid_poisson.grid); //for visualization only
-            T_VARIABLE b_save(multigrid_poisson.grid); //for visualization only
+            ARRAY<T,TV_INT> x_save(multigrid_poisson.grid); //for visualization only
+            ARRAY<T,TV_INT> b_save(multigrid_poisson.grid); //for visualization only
             b_save=multigrid_poisson.b;
             x_save=x;
             
@@ -249,7 +246,7 @@ int main(int argc,char* argv[])
                 
                 T x_min=x.Max();
                 T x_max=x.Min();
-                for(T_NODE_ITERATOR iterator(multigrid_poisson.grid);iterator.Valid();iterator.Next())
+                for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(multigrid_poisson.grid);iterator.Valid();iterator.Next())
                     if(multigrid_poisson.cell_type(iterator.Node_Index())==MULTIGRID_POISSON<T,3>::INTERIOR_CELL_TYPE){
                         x_min=min(x_min,x(iterator.Node_Index()));
                         x_max=max(x_max,x(iterator.Node_Index()));
@@ -283,11 +280,9 @@ int main(int argc,char* argv[])
             LOG::cout<<"Test number not implemented for icpcg"<<std::endl; return 1;
         }
 
-        typedef GRID_POLICY<TV>::UNIFORM_GRID T_GRID;
-        typedef T_GRID::NODE_ITERATOR T_NODE_ITERATOR;
         typedef POLICY_UNIFORM<VECTOR<MULTIGRID_POISSON<T,d>::CELL_TYPE,d> >::ARRAYS_SCALAR T_CELL_TYPE_FIELD;
         typedef POLICY_UNIFORM<T_INDEX>::ARRAYS_SCALAR T_INT_ARRAY;
-        T_GRID grid(size+2,RANGE<TV>(-TV::All_Ones_Vector()*.5*h,size*h+TV::All_Ones_Vector()*.5*h));
+        GRID<TV> grid(size+2,RANGE<TV>(-TV::All_Ones_Vector()*.5*h,size*h+TV::All_Ones_Vector()*.5*h));
         T_CELL_TYPE_FIELD cell_type(grid);
         PCG_SPARSE<T> icpcg;
         ARRAY<T> b_icpcg;
@@ -309,7 +304,7 @@ int main(int argc,char* argv[])
         T radius_squared=radius*radius;
         LOG::cout<<"M"<<std::endl;
         // Set cell types
-        for(T_NODE_ITERATOR iterator(grid,0,T_GRID::INTERIOR_REGION);iterator.Valid();iterator.Next()){
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
             const T_INDEX& index=iterator.Node_Index();
             if((iterator.Location()-circle_center).Magnitude_Squared()<radius_squared)
                 cell_type(index)=MULTIGRID_POISSON<T,d>::NEUMANN_CELL_TYPE;
@@ -318,22 +313,22 @@ int main(int argc,char* argv[])
         }
         
         LOG::cout<<"M"<<std::endl;
-        for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,0);iterator.Valid();iterator.Next())
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next())
             cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
-        for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,1);iterator.Valid();iterator.Next())
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,1);iterator.Valid();iterator.Next())
             cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
-        for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,2);iterator.Valid();iterator.Next())
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,2);iterator.Valid();iterator.Next())
             cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::NEUMANN_CELL_TYPE;
-        for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,3);iterator.Valid();iterator.Next())
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next())
             cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
-        for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,4);iterator.Valid();iterator.Next())
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,4);iterator.Valid();iterator.Next())
             cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
-        for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,5);iterator.Valid();iterator.Next())
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,5);iterator.Valid();iterator.Next())
             cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
 
         {LOG::SCOPE scope("ICPCG Initialize");
         // set up pcg matrix
-        for(T_NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid);iterator.Valid();iterator.Next()){
             const T_INDEX& index=iterator.Node_Index();
             if(cell_type(index)==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE)
                 index_ids(index)=interior_indices.Append(index);

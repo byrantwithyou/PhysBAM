@@ -16,7 +16,7 @@ template<class T_GRID>
 class FAST_MARCHING_METHOD_UNIFORM:public NONCOPYABLE
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     const LEVELSET<TV>& levelset;

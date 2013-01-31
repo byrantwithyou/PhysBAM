@@ -19,7 +19,7 @@ class LINEAR_INTERPOLATION_MAC_1D_HELPER
 {   
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename T_GRID::BLOCK T_BLOCK;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_GRID::INDEX T_INDEX;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_GRID::INDEX T_INDEX;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 public:
     VECTOR<T,1> center;
     T u2,slope_u12,slope_u23; // standard y-x major ordering

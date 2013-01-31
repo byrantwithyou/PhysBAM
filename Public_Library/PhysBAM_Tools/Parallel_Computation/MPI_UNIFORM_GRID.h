@@ -20,7 +20,7 @@ class MPI_UNIFORM_GRID:public MPI_GRID<T_GRID>
     typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<RANGE<TV_INT> >::TYPE T_ARRAYS_BOX_INT;typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
+    typedef typename T_ARRAYS_SCALAR::template REBIND<RANGE<TV_INT> >::TYPE T_ARRAYS_BOX_INT;typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 public:
     typedef T_GRID GRID_T;
 

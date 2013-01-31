@@ -15,7 +15,7 @@ class BOUNDARY_REFLECTION_WATER:public BOUNDARY<TV,T2>
 {
     typedef typename TV::SCALAR T;
     typedef typename GRID<TV>::VECTOR_INT TV_INT;typedef typename GRID<TV>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;typedef typename GRID<TV>::FACE_ARRAYS_SCALAR T_FACE_ARRAYS_SCALAR;typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;typedef typename GRID<TV>::FACE_ARRAYS_SCALAR T_FACE_ARRAYS_SCALAR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
 public:
     typedef BOUNDARY<TV,T2> BASE;
     using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;

@@ -129,7 +129,7 @@ public:
         ARRAY<T,TV_INT> upsampled_density(upsampled_mac_grid.Domain_Indices());
         ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(mac_grid,3,false);
         boundary->Fill_Ghost_Faces(mac_grid,face_velocities,face_velocities_ghost,0,3);
-        for(typename GRID<TV>::CELL_ITERATOR iterator(upsampled_mac_grid);iterator.Valid();iterator.Next()){
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(upsampled_mac_grid);iterator.Valid();iterator.Next()){
             upsampled_density(iterator.Cell_Index())=interpolation.Clamped_To_Array(mac_grid,density,iterator.Location());}
         std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_mac_velocities",face_velocities_ghost);
@@ -154,13 +154,13 @@ public:
     for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(domain_boundary(axis)(axis_side)){
             TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);    
-            for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
                 TV_INT boundary_face=axis_side==0?iterator.Face_Index()+TV_INT::Axis_Vector(axis):iterator.Face_Index()-TV_INT::Axis_Vector(axis);
                 if(axis!=2){ if(face_velocities.Component(axis).Valid_Index(boundary_face)) projection.elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(axis,boundary_face))=true;}
                 else {projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}
-            for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT boundary_face=axis_side==0?iterator.Face_Index()+TV_INT::Axis_Vector(axis):iterator.Face_Index()-TV_INT::Axis_Vector(axis);
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT boundary_face=axis_side==0?iterator.Face_Index()+TV_INT::Axis_Vector(axis):iterator.Face_Index()-TV_INT::Axis_Vector(axis);
                 if(axis!=2 && face_velocities.Component(axis).Valid_Index(boundary_face)) face_velocities(FACE_INDEX<TV::dimension>(axis,boundary_face))=0;}}}
-    for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
         if(test_number==1 && Source_Box_Lazy_Inside(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
             if(iterator.Axis()==1)face_velocities(iterator.Full_Index())=1;
@@ -186,19 +186,19 @@ public:
                 face_velocities.Component(iterator.Axis())(iterator.Face_Index())=RIGID_GEOMETRY<TV>::Pointwise_Object_Velocity(rigid_geometry_collection.particles.twist(rigid_particle_id),rigid_geometry_collection.particles.frame(rigid_particle_id).t,iterator.Location())(iterator.Axis());}}}}
 
     void Initialize_Fields()
-    {for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()) face_velocities(iterator.Full_Index())=0;
-    for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()) density(iterator.Cell_Index())=temperature(iterator.Cell_Index())=0;}
+    {for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) face_velocities(iterator.Full_Index())=0;
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) density(iterator.Cell_Index())=temperature(iterator.Cell_Index())=0;}
 
     void Get_Scalar_Field_Sources(const T time)
-    {for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next())
+    {for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
         if(Source_Box_Lazy_Inside(iterator.Location())) density(iterator.Cell_Index())=1;
-    for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next())
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
         if(use_collisions && rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(iterator.Location())) density(iterator.Cell_Index())=0;}
     
     void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::dimension> >& force,const ARRAY<T,TV_INT>& density_ghost,const T dt,const T time)
     {
         T density_buoyancy_constant=T(2)/buoyancy_clamp;
-        for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,0,GRID<TV>::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid,0,GRID<TV>::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
             T face_density=min((density_ghost(iterator.First_Cell_Index())+density_ghost(iterator.Second_Cell_Index()))*T(.5),buoyancy_clamp);
             T density_difference=face_density;
             if(density_difference>0) force.Component(1)(iterator.Face_Index())=density_buoyancy_constant*density_difference;}

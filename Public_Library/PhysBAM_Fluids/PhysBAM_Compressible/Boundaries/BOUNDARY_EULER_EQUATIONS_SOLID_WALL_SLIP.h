@@ -19,7 +19,7 @@ class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP:public BOUNDARY<TV,VECTOR<typenam
     typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;typedef VECTOR<T,GRID<TV>::dimension+2> TV_DIMENSION;
     typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,GRID<TV>::dimension> TV_SIDES;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;typedef typename T_ARRAYS_BASE::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_BASE;
-    typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;typedef VECTOR<T,2*GRID<TV>::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*GRID<TV>::dimension> TV_FACE_VECTOR;
+    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef VECTOR<T,2*GRID<TV>::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*GRID<TV>::dimension> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*GRID<TV>::dimension> T_FACE_VECTOR_BOOL;
     typedef VECTOR<TV_DIMENSION,2*GRID<TV>::dimension> TV_DIMENSION_FACE_VECTOR;
     enum {d=TV_DIMENSION::m};

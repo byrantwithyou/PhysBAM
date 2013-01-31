@@ -1090,7 +1090,7 @@ void Drop_Cubes()
 void Build_Deforming_Sphere(KINEMATIC_COLLISION_BODY<GRID<TV> >* sphere,FRAME<TV>& frame,T time,bool update_positions,bool update_velocities)
 {
     typedef VECTOR<int,3> TV_INT;
-    typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 
     T rate=1;
     T radius=rate*time+1;

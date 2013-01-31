@@ -7,12 +7,13 @@
 #ifndef __SIGNED_DISTANCE__
 #define __SIGNED_DISTANCE__
 
+#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 namespace PhysBAM{
 namespace SIGNED_DISTANCE{
 //#####################################################################
-template<class T_GRID,class T_ARRAY,class T_GEOMETRY> void Calculate(T_GEOMETRY& geometry,const T_GRID& grid,T_ARRAY& phi,bool print_progress=false){
-    typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::VECTOR_INT TV_INT;
-    for(NODE_ITERATOR iterator(grid,grid.Domain_Indices());iterator.Valid();iterator.Next()){TV_INT index=iterator.Node_Index();
+template<class T,class TV,class TV_INT,class T_GEOMETRY> void Calculate(T_GEOMETRY& geometry,const GRID<TV>& grid,ARRAY<T,TV_INT>& phi,bool print_progress=false){
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,grid.Domain_Indices());iterator.Valid();iterator.Next()){TV_INT index=iterator.Node_Index();
         phi(index)=geometry.Signed_Distance(grid.X(index));}
 }
 //#####################################################################

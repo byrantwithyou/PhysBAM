@@ -353,7 +353,7 @@ void Break_Levelset()
     TV_INT counts=TV_INT::All_Ones_Vector()*25;
     GRID<TV> body_grid(counts,levelset.grid.Domain());
     TRIANGULATED_SURFACE<T>* surface=0;    
-    for(typename GRID<TV>::CELL_ITERATOR iterator(body_grid);iterator.Valid();iterator.Next()){
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(body_grid);iterator.Valid();iterator.Next()){
         TV_INT cell=levelset.grid.Cell(iterator.Location(),0);
         if(!phi.Valid_Index(cell)) continue;
         if(phi(cell)>0) continue;

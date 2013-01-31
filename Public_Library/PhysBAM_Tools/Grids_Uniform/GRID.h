@@ -41,16 +41,11 @@ public:
     static const int number_of_neighbors_per_cell=2*dimension;
     static const int number_of_faces_per_cell=2*dimension;
     static const int number_of_one_ring_neighbors_per_cell=dimension==1?2:dimension==2?8:26;
-    typedef GRID<TV> UNIFORM_GRID;
-    typedef UNIFORM_GRID_ITERATOR<TV> BASE_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 
     typedef T SCALAR;
     typedef TV VECTOR_T;
     typedef TV_INT VECTOR_INT;
-    typedef TV_INT INDEX; typedef FACE_INDEX<TV::m> INDEX_FACE;
+    typedef TV_INT INDEX;
     typedef UNIFORM_TAG<TV> GRID_TAG;
     typedef BLOCK_UNIFORM<GRID<TV> > BLOCK;
     typedef int HAS_UNTYPED_READ_WRITE;
@@ -374,8 +369,8 @@ public:
     static TV_INT One_Ring_Neighbor(const VECTOR<int,1>& index,const int i)
     {return Node_Neighbor(index,i);}
 
-    static void Neighboring_Faces(VECTOR<INDEX_FACE,number_of_faces_per_cell>& n,const TV_INT& index)
-    {for(int a=0;a<TV::m;a++){INDEX_FACE fi(a,index);n(a*2)=fi;fi.index(a)++;n(a*2+1)=fi;}}
+    static void Neighboring_Faces(VECTOR<FACE_INDEX<TV::m>,number_of_faces_per_cell>& n,const TV_INT& index)
+    {for(int a=0;a<TV::m;a++){FACE_INDEX<TV::m> fi(a,index);n(a*2)=fi;fi.index(a)++;n(a*2+1)=fi;}}
     
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,counts);

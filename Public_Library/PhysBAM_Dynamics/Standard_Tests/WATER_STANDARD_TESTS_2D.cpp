@@ -217,13 +217,13 @@ template<class T_GRID> void WATER_STANDARD_TESTS_2D<T_GRID>::
 Get_Variable_Viscosity(ARRAY<T,VECTOR<int,2> >& variable_viscosity,const T time) const
 {
     if(test_number==13){
-        for(typename GRID<TV>::CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1);iterator.Valid();iterator.Next())
             variable_viscosity(iterator.Cell_Index())=(iterator.Location().x<.2)?(T)0:(T)1000;}
     else if(test_number==14){
-        for(typename GRID<TV>::CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1);iterator.Valid();iterator.Next())
             variable_viscosity(iterator.Cell_Index())=(iterator.Location().x<.5)?(T)0:(T)1000;}
     else if(test_number==15){
-        for(typename GRID<TV>::CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1);iterator.Valid();iterator.Next())
             variable_viscosity(iterator.Cell_Index())=(iterator.Location().x<.5)?(T)0:(T)1000;}
 }
 //#####################################################################

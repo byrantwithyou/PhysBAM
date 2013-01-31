@@ -49,7 +49,7 @@ Display(const int in_color) const
 template<class T> void
 Display_Bool_Helper(const OPENGL_FACE_SCALAR_FIELD_1D<T,bool>& self,const int in_color)
 {
-    typedef typename GRID<VECTOR<T,1> >::FACE_ITERATOR FACE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_FACE<VECTOR<T,1> > FACE_ITERATOR;
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
     glPointSize(8.0);

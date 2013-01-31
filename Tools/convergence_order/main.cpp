@@ -41,7 +41,7 @@ Write_Output(PARSE_ARGS& parse_args)
     RANGE<TV> range(TV()+start,TV()+end);
     RANGE<TV_INT> cell_range;cell_range.min_corner=coarse_grid.Index(range.min_corner);cell_range.max_corner=coarse_grid.Index(range.max_corner);
     if(end==0) cell_range=grid.Domain_Indices();
-    for(typename GRID<TV>::CELL_ITERATOR iterator(coarse_grid,cell_range);iterator.Valid();iterator.Next()){
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(coarse_grid,cell_range);iterator.Valid();iterator.Next()){
         TV X_o=iterator.Location()-((T)frame)*1/(T)frame_rate;
         TV X_o_fine=grid.Center(scale*iterator.Cell_Index()-(scale-1)*TV_INT::All_Ones_Vector())-((T)frame)*1/(T)frame_rate;
         T analytic=0;if(X_o.x>=0.25&&X_o.x<=0.75) analytic=.5*(sin(2*pi/(.5)*(X_o.x-0.25)-pi/2.)+1);

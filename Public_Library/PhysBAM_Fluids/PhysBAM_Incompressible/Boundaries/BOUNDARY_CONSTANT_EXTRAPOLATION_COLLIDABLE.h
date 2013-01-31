@@ -15,7 +15,7 @@ template<class TV,class T2>
 class BOUNDARY_CONSTANT_EXTRAPOLATION_COLLIDABLE:public BOUNDARY<TV,T2>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename GRID<TV>::NODE_ITERATOR T_NODE_ITERATOR;typedef typename GRID<TV>::RIGID_BODY_LIST T_RIGID_BODY_LIST;
+    typedef UNIFORM_GRID_ITERATOR_NODE<TV> T_NODE_ITERATOR;typedef typename GRID<TV>::RIGID_BODY_LIST T_RIGID_BODY_LIST;
 public:
     T_RIGID_BODY_LIST& body_list;
 

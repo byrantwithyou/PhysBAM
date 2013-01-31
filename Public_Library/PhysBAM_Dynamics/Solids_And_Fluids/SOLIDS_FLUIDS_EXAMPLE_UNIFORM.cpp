@@ -487,7 +487,7 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum
                 for(int axis=0;axis<T_GRID::dimension;axis++){
                     fluids_parameters.maccormack_face_mask(axis,iterator.First_Face_Index(axis))=false;fluids_parameters.maccormack_face_mask(axis,iterator.Second_Face_Index(axis))=false;}}}
         // turn off maccormack near objects
-        for(typename T_GRID::NODE_ITERATOR node_iterator(grid,2);node_iterator.Valid();node_iterator.Next()) 
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> node_iterator(grid,2);node_iterator.Valid();node_iterator.Next()) 
             if(fluids_parameters.collision_bodies_affecting_fluid->occupied_blocks(node_iterator.Node_Index())){
                 TV_INT block_index=node_iterator.Node_Index();BLOCK_UNIFORM<T_GRID> block(grid,block_index);
                 for(int cell_index=0;cell_index<T_GRID::number_of_cells_per_block;cell_index++) fluids_parameters.maccormack_cell_mask(block.Cell(cell_index))=false;

@@ -37,7 +37,7 @@ class SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM:public KRYLOV_SYSTEM_BASE<type
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::dimension> TV_INT;
     typedef COUPLED_SYSTEM_VECTOR<TV> VECTOR_T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef KRYLOV_SYSTEM_BASE<T> BASE;

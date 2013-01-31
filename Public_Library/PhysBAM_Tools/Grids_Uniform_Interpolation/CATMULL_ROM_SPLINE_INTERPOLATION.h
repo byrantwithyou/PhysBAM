@@ -17,7 +17,7 @@ class CATMULL_ROM_SPLINE_INTERPOLATION:public INTERPOLATION_UNIFORM<T_GRID,T2,T_
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::VECTOR_T::template REBIND<bool>::TYPE TV_BOOL;
-    typedef typename T_GRID::CELL_ITERATOR T_CELL_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_CELL<TV> T_CELL_ITERATOR;
 public:
     typedef INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP> BASE;
     using BASE::Clamped_Index_End_Minus_One;

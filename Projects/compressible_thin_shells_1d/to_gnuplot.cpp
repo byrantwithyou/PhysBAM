@@ -46,7 +46,7 @@ int main(int argc,char* argv[])
         LOG::cerr<<"min = "<<data.Min()<<", max = "<<data.Max()<<std::endl;
 
         LOG::cout.precision(std::numeric_limits< double >::digits10);
-        for(GRID<VECTOR<T,1> >::CELL_ITERATOR iter(grid,3);iter.Valid();iter.Next())
+        for(UNIFORM_GRID_ITERATOR_CELL<VECTOR<T,1> > iter(grid,3);iter.Valid();iter.Next())
             LOG::cout<<iter.Location().x<<"\t"<<data(iter.Cell_Index())<<std::endl;
     }
 

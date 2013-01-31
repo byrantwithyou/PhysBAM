@@ -45,7 +45,7 @@ Initialize_Grid(const T_GRID& mac_grid)
     ARRAY<int> row_counts;
     row_counts.Resize(number_of_elements);
     int count=0;
-    for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         int matrix_index;
         cell_index_to_matrix_index(cell_index)=matrix_index=count++;
         matrix_index_to_cell_index(matrix_index)=cell_index;}
@@ -57,7 +57,7 @@ Initialize_Grid(const T_GRID& mac_grid)
     TV one_over_dx2=Inverse(mac_grid.dX*mac_grid.dX);
     T default_row_sum=-2*one_over_dx2.Sum_Abs();
     TV_INT grid_counts=mac_grid.counts;
-    for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T row_sum=default_row_sum;
         int matrix_index=cell_index_to_matrix_index(cell_index);
         for(int axis=0;axis<GRID<TV>::dimension;axis++){TV_INT offset;offset[axis]=1;
@@ -74,7 +74,7 @@ template<class T_GRID> void FAST_PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
 Make_Divergence_Free_Fast(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     Compute_Divergence(typename INTERPOLATION_POLICY<GRID<TV> >::FACE_LOOKUP(face_velocities),elliptic_solver);
-    for(typename GRID<TV>::CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         int matrix_index=cell_index_to_matrix_index(cell_index);
         b(matrix_index)=elliptic_solver->f(cell_index);}

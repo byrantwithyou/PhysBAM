@@ -22,9 +22,9 @@ class GLASS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
 {
     typedef T_input T;
 public:
-    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
-    typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
@@ -298,7 +298,7 @@ void Add_SPH_Particles_For_Sources(const T dt,const T time) PHYSBAM_OVERRIDE
     GRID<TV>& grid=fluids_parameters.particle_levelset_evolution->grid;
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& removed_negative_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_negative_particles;
     for(int s=0;s<sph_sources.m;s++){
-        typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
+        typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
         RANGE<TV> source_bounding_box=sph_sources(s).Bounding_Box();
         RANGE<TV_INT> source_bounding_box_int=RANGE<TV_INT>(grid.Block_Index(TV(source_bounding_box.min_corner.x,source_bounding_box.min_corner.y,source_bounding_box.min_corner.z),1),
              grid.Block_Index(TV(source_bounding_box.max_corner.x,source_bounding_box.max_corner.y,source_bounding_box.max_corner.z),1));

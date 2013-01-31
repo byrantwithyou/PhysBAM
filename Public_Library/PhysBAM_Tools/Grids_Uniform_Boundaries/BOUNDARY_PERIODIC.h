@@ -15,7 +15,7 @@ class BOUNDARY_PERIODIC:public BOUNDARY<TV,T2>
 {
     typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
     typedef BOUNDARY<TV,T2> BASE;
 public:
     using BASE::Find_Ghost_Regions;

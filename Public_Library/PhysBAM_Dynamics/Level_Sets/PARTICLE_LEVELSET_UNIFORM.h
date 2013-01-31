@@ -23,7 +23,7 @@ template<class T_GRID>
 class PARTICLE_LEVELSET_UNIFORM:public PARTICLE_LEVELSET<T_GRID>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_GRID::BLOCK T_BLOCK;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef typename T_ARRAYS_SCALAR::template REBIND<char>::TYPE T_ARRAYS_CHAR;

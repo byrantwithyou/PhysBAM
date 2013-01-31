@@ -364,7 +364,7 @@ Add_Surface_Tension(LEVELSET<TV>& levelset,const T time)
 template<class T_GRID,class T_ARRAYS_TV,class T> static void
 Apply_Vorticity_Confinement_Force_Helper(const T_GRID& grid,ARRAY<T,FACE_INDEX<T_GRID::dimension> >& face_velocities,T_ARRAYS_TV& F,const INCOMPRESSIBLE_UNIFORM<T_GRID>& incompressible)
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
     // want cells to face averaging here
     if(incompressible.collision_body_list){
         AVERAGING_COLLIDABLE_UNIFORM<T_GRID,FACE_LOOKUP_COLLIDABLE_UNIFORM<T_GRID> > vorticity_averaging_collidable(*incompressible.collision_body_list,T());
@@ -392,7 +392,7 @@ template<class T_GRID,class T_FACE_ARRAYS,class T_ARRAYS_TV> static void
 Compute_Vorticity_Confinement_Force_Helper(const T_GRID& grid,const T_FACE_ARRAYS& face_velocities_ghost,T_ARRAYS_TV& F,const INCOMPRESSIBLE_UNIFORM<T_GRID>& incompressible)
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_ARRAYS_TV::template REBIND<T>::TYPE T_ARRAYS_SCALAR;
-    typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef typename T_GRID::VECTOR_INT TV_INT;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
     typedef typename T_ARRAYS_TV::template REBIND<typename TV::SPIN>::TYPE T_ARRAYS_SPIN;typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;
     typedef typename ADVECTION_COLLIDABLE_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE;
     T_ARRAYS_SPIN vorticity(grid.Cell_Indices(2),false);

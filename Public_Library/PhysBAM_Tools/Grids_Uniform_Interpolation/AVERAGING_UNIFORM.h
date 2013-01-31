@@ -14,7 +14,7 @@ class AVERAGING_UNIFORM
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_MAC_HELPER T_LINEAR_INTERPOLATION_MAC_HELPER;
+    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_MAC_HELPER T_LINEAR_INTERPOLATION_MAC_HELPER;
 public:
 
     typedef T_FACE_LOOKUP FACE_LOOKUP;
@@ -59,11 +59,11 @@ public:
     return Average_Face_To_Face_Vector_Helper(grid,iterator,lookup);}
 
     template<class T_FACE_LOOKUP_LOOKUP>
-    static VECTOR<T,1> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,1> >& grid,const typename GRID<VECTOR<T,1> >::FACE_ITERATOR& iterator,const T_FACE_LOOKUP_LOOKUP& u_face)
+    static VECTOR<T,1> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,1> >& grid,const UNIFORM_GRID_ITERATOR_FACE<VECTOR<T,1> >& iterator,const T_FACE_LOOKUP_LOOKUP& u_face)
     {return VECTOR<T,1>(u_face(iterator.Axis(),iterator.Face_Index()));}
 
     template<class T_FACE_LOOKUP_LOOKUP>
-    static VECTOR<T,2> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,2> >& grid,const typename GRID<VECTOR<T,2> >::FACE_ITERATOR& iterator,const T_FACE_LOOKUP_LOOKUP& u_face)
+    static VECTOR<T,2> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,2> >& grid,const UNIFORM_GRID_ITERATOR_FACE<VECTOR<T,2> >& iterator,const T_FACE_LOOKUP_LOOKUP& u_face)
     {int axis=iterator.Axis();typename GRID<VECTOR<T,2> >::INDEX face=iterator.Face_Index(),cell1,cell2;iterator.Unordered_Cell_Indices_Touching_Face(cell1,cell2);
     VECTOR<T,2> value;value[axis]=u_face(axis,face);
     int other_axis=1-axis;
@@ -72,7 +72,7 @@ public:
     return value;}
 
     template<class T_FACE_LOOKUP_LOOKUP>
-    static VECTOR<T,3> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,3> >& grid,const typename GRID<VECTOR<T,3> >::FACE_ITERATOR& iterator,const T_FACE_LOOKUP_LOOKUP& u_face)
+    static VECTOR<T,3> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,3> >& grid,const UNIFORM_GRID_ITERATOR_FACE<VECTOR<T,3> >& iterator,const T_FACE_LOOKUP_LOOKUP& u_face)
     {static const int axis_to_other_axis[3][2]={{1,2},{0,2},{0,1}};
     int axis=iterator.Axis();typename GRID<VECTOR<T,3> >::INDEX face=iterator.Face_Index(),cell1,cell2;iterator.Unordered_Cell_Indices_Touching_Face(cell1,cell2);
     VECTOR<T,3> value;value[axis]=u_face(axis,face);

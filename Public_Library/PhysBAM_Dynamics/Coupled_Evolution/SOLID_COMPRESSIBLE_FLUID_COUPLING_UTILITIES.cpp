@@ -485,7 +485,7 @@ void Add_Weight_To_Advection(const T weight, const VECTOR<int,d>& donor_cell, co
 template<class TV> void Fill_Fluid_Velocity(const GRID<TV>& grid, const ARRAY<bool,VECTOR<int,TV::dimension> >& psi, const ARRAY<bool,VECTOR<int,TV::dimension> >& psi_new, const ARRAY<bool,VECTOR<int,TV::dimension> >& swept_cells,
                                             const ARRAY<TV,VECTOR<int,TV::dimension> >& V_n, const ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,VECTOR<int,TV::dimension> >& U_new,ARRAY<TV,VECTOR<int,TV::dimension> >& velocity_field)
 {
-    typedef GRID<TV> T_GRID; typedef typename T_GRID::VECTOR_INT TV_INT; typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
+    typedef GRID<TV> T_GRID; typedef typename T_GRID::VECTOR_INT TV_INT; typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(psi(cell_index)) velocity_field(cell_index)=EULER<T_GRID>::Get_Velocity(U_new(cell_index));
         else if(swept_cells(cell_index)) velocity_field(cell_index)=V_n(cell_index);}
@@ -497,7 +497,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                                                    const ARRAY<CUT_CELLS<typename TV::SCALAR,TV::dimension>*,VECTOR<int,TV::dimension> >& cut_cells_np1,const ARRAY<typename TV::SCALAR,VECTOR<int,TV::dimension> >& cell_volumes_np1,      ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,VECTOR<int,TV::dimension> >& U_np1)
 {   // TODO(jontg): Sparse data representation.
     typedef typename TV::SCALAR T; typedef VECTOR<T,TV::dimension+2> TV_DIMENSION; typedef GRID<TV> T_GRID;
-    typedef typename T_GRID::VECTOR_INT TV_INT; typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
+    typedef typename T_GRID::VECTOR_INT TV_INT; typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 
     ARRAY<bool,VECTOR<int,TV::dimension> > near_interface(near_interface_mask);
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(!psi_np1(iterator.Cell_Index())) near_interface(iterator.Cell_Index())=false;

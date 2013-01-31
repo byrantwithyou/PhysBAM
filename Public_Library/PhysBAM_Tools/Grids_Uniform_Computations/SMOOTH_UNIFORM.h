@@ -20,7 +20,7 @@ namespace SMOOTH{
 template<class T,int dim,class T_ARRAYS_T2>
 void Smooth(T_ARRAYS_T2& d,const int steps,const ARRAY<T,VECTOR<int,dim> >* phi){
     typedef typename T_ARRAYS_T2::ELEMENT T2;typedef VECTOR<int,dim> TV_INT;typedef VECTOR<T,dim> TV;
-    typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 
     if(!steps) return;
     int number_of_ghost_cells=-d.domain.min_corner.x;

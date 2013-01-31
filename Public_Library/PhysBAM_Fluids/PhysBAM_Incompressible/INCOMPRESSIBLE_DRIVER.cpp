@@ -78,7 +78,7 @@ Initialize()
     example.face_velocities.Resize(example.mac_grid);
     example.face_velocities_save.Resize(example.mac_grid);
     sum_jc.Resize(example.mac_grid);
-    for(typename GRID<TV>::FACE_ITERATOR iterator(example.mac_grid);iterator.Valid();iterator.Next()) sum_jc(iterator.Full_Index())=1;
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()) sum_jc(iterator.Full_Index())=1;
     example.density.Resize(example.mac_grid.Domain_Indices(example.number_of_ghost_cells));
     example.temperature.Resize(example.mac_grid.Domain_Indices(example.number_of_ghost_cells));
     example.Initialize_Fields();

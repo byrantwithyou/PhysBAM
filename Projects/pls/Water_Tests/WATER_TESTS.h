@@ -63,14 +63,14 @@ public:
         TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
         if(domain_boundary(axis)(axis_side)){
-            for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index()+boundary_face_offset;
                 if(particle_levelset_evolution.phi(face+interior_cell_offset)<=0){
                     if(face_velocities.Component(axis).Valid_Index(face)){projection.elliptic_solver->psi_N.Component(axis)(face)=true;face_velocities.Component(axis)(face)=0;}}
                 else{TV_INT cell=face+exterior_cell_offset;projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}
-        else for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
+        else for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
             projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}
-    for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
         if(time<=3 && Lazy_Inside_Source(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
             if(iterator.Axis()==1) face_velocities(iterator.Full_Index())=-1;
@@ -99,13 +99,13 @@ public:
     void Adjust_Phi_With_Sources(const T time)
     {
         if(time>3) return;
-        for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){Set_Phi_Inside_Source(iterator.Cell_Index(),iterator.Location());}
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){Set_Phi_Inside_Source(iterator.Cell_Index(),iterator.Location());}
     }
 
     void Initialize_Phi()
     {
         ARRAY<T,TV_INT>& phi=particle_levelset_evolution.phi;
-        for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
             //TV center=TV::All_Ones_Vector()*.5;center(1)=.75;
             //static SPHERE<TV> circle(center,(T).2);
             const TV &X=iterator.Location();

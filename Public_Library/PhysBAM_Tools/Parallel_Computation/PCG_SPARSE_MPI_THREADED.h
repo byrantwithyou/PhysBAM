@@ -17,7 +17,7 @@ class PCG_SPARSE_MPI_THREADED:public PCG_SPARSE_MPI<GRID<VECTOR<typename TV::SCA
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::dimension> TV_INT;
-    typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
+    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef PCG_SPARSE_MPI<GRID<TV> > BASE;
 public:
     using BASE::pcg;using BASE::partition;using BASE::Fill_Ghost_Cells;

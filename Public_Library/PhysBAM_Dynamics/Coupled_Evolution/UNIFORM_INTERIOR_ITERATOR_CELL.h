@@ -13,12 +13,12 @@ namespace PhysBAM{
 
 template<class TV> class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO;
 template<class TV>
-class UNIFORM_INTERIOR_ITERATOR_CELL:public GRID<TV>::CELL_ITERATOR
+class UNIFORM_INTERIOR_ITERATOR_CELL:public UNIFORM_GRID_ITERATOR_CELL<TV>
 {
 public:
     enum WORKAROUND {d=TV::dimension};
     typedef typename TV::SCALAR T;typedef VECTOR<int,d> TV_INT;
-    typedef typename GRID<TV>::CELL_ITERATOR BASE;
+    typedef UNIFORM_GRID_ITERATOR_CELL<TV> BASE;
     using BASE::Valid;using BASE::index;
 
     const ARRAY<bool,TV_INT>& outside_fluid;

@@ -26,7 +26,7 @@ template<class T,class T_GRID,class RW>
 class MERGER
 {
 public:
-    typedef typename T_GRID::VECTOR_T TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
+    typedef typename T_GRID::VECTOR_T TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
     typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename T_FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
@@ -225,7 +225,7 @@ Scale_Cell_Data(T_ARRAYS_SCALAR& array)
 {
     T max_val=array.Max();
     if(max_val)
-        for(typename T_GRID::CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next())
             array(iterator.Cell_Index())=exp(-array(iterator.Cell_Index())/max_val);
 }
 //#####################################################################
