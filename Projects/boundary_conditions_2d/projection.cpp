@@ -9,7 +9,7 @@
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <PhysBAM_Geometry/Analytic_Tests/VORTEX_IMPLICIT_SURFACE.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_VORTEX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -51,14 +51,14 @@ int main(int argc,char* argv[])
 
     RANGE<TV> domain=RANGE<TV>::Unit_Box();
 
-    VORTEX_IMPLICIT_SURFACE<TV> vis;
+    ANALYTIC_LEVELSET_VORTEX<TV> vortex((T).2,0,1);
 
     switch(interface){
         case 0:phi=[](TV X){return (X-.5).Magnitude()-.3;};break;
         case 1:phi=[](TV X){return X.Magnitude()-.7;};domain=RANGE<TV>::Centered_Box();break;
-        case 2:vis.k=(T).2;phi=[=](TV X){return vis.Phi(X);};domain.max_corner*=(T)pi;break;
+        case 2:vortex.k=(T).2;phi=[=](TV X){return vortex.phi2(X,0);};domain.max_corner*=(T)pi;break;
         case 3:phi=[](TV X){return X.Magnitude()-.8;};domain=RANGE<TV>::Centered_Box();break;
-        case 4:vis.k=(T).2;phi=[=](TV X){return .2-sin(X.x)*sin(X.y);};domain.max_corner*=(T)pi;break;
+        case 4:vortex.k=(T).2;phi=[=](TV X){return vortex.f(X,0);};domain.max_corner*=(T)pi;break;
         default: PHYSBAM_FATAL_ERROR("Unrecognized interface");}
 
     GRID<TV> grid(TV_INT()+resolution,domain*m,true);

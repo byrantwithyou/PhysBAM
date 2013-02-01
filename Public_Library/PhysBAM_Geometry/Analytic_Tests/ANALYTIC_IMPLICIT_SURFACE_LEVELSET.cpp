@@ -9,16 +9,16 @@ namespace PhysBAM{
 // Function Find_Closest_Point
 //#####################################################################
 template<class TV> VECTOR<typename TV::SCALAR,TV::m+1> ANALYTIC_IMPLICIT_SURFACE_LEVELSET<TV>::
-Find_Closest_Point(const TV& X) const
+Find_Closest_Point(const TV& X,T t) const
 {
-    TV w=Closest_Point_Estimate(X);
+    TV w=Closest_Point_Estimate(X,t);
     VECTOR<T,TV::m+1> z(w.Append(0));
     for(int i=0;i<100;i++){
-        TV Z(z.Remove_Index(TV::m)),dg=df(Z);
-        T L=z(TV::m),g=f(Z);
+        TV Z(z.Remove_Index(TV::m)),dg=df(Z,t);
+        T L=z(TV::m),g=f(Z,t);
         VECTOR<T,TV::m+1> G=((Z-X)*2+L*dg).Append(g),Hcol=dg.Append(0);
         MATRIX<T,TV::m+1> H;
-        H.Set_Submatrix(0,0,L*ddf(Z)+2);
+        H.Set_Submatrix(0,0,L*ddf(Z,t)+2);
         H.Set_Row(TV::m,Hcol);
         H.Set_Column(TV::m,Hcol);
         z-=H.In_Place_PLU_Solve(G);
@@ -29,17 +29,17 @@ Find_Closest_Point(const TV& X) const
 // Function Phi
 //#####################################################################
 template<class TV> typename TV::SCALAR ANALYTIC_IMPLICIT_SURFACE_LEVELSET<TV>::
-Phi(const TV& X) const
+phi2(const TV& X,T t) const
 {
-    return (X-Find_Closest_Point(X).Remove_Index(TV::m)).Magnitude()*sign(f(X));
+    return (X-Find_Closest_Point(X,t).Remove_Index(TV::m)).Magnitude()*sign(f(X,t));
 }
 //#####################################################################
 // Function Normal
 //#####################################################################
 template<class TV> TV ANALYTIC_IMPLICIT_SURFACE_LEVELSET<TV>::
-Normal(const TV& X) const
+N2(const TV& X,T t) const
 {
-    return (X-Find_Closest_Point(X).Remove_Index(TV::m)).Normalized();
+    return (X-Find_Closest_Point(X,t).Remove_Index(TV::m)).Normalized()*sign(f(X,t));
 }
 template class ANALYTIC_IMPLICIT_SURFACE_LEVELSET<VECTOR<float,1> >;
 template class ANALYTIC_IMPLICIT_SURFACE_LEVELSET<VECTOR<float,2> >;
