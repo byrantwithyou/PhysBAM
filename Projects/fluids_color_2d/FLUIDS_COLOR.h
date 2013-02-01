@@ -147,6 +147,7 @@ public:
         PHYSBAM_ASSERT(bc_n+bc_d+bc_s<2);
         bc_type=bc_n?NEUMANN:(bc_s?SLIP:DIRICHLET);
         use_advection=!no_advection;
+        surface_tension*=kg*m/(s*s);
 
         analytic_levelset=0;
 
@@ -173,7 +174,7 @@ public:
             case 3:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0*sqr(m)/kg));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 4:
@@ -191,7 +192,7 @@ public:
             case 6:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_VORTEX<TV>((T).2,0,-4);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0*sqr(m)/kg));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 7:
@@ -346,7 +347,7 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,1);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()));
-                surface_tension=1;
+                surface_tension=1*kg*m/(s*s);
                 use_p_null_mode=true;
                 use_level_set_method=true;
                 break;
@@ -376,14 +377,14 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_MODE(epsilon,radius,mode,0,1);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()));
-                surface_tension=(T)0.07197;
+                surface_tension=(T)0.07197*kg*m/(s*s);
                 use_p_null_mode=true;
                 use_level_set_method=true;
-                if(!override_rho0) rho0=1000;
-                if(!override_rho1) rho1=(T)1.1839;
-                if(!override_mu0) mu0=0;
-                if(!override_mu1) mu1=0;
-                analytic_initial_only=true;
+                if(!override_rho0) rho0=1000*kg/sqr(m);
+                if(!override_rho1) rho1=(T)1.1839*kg/sqr(m);
+                if(!override_mu0) mu0=0*kg/s;
+                if(!override_mu1) mu1=0*kg/s;
+//                analytic_initial_only=true;
 
                 if(test_analytic_diff){
                     ANALYTIC_LEVELSET_MODE al(epsilon,radius,mode,0,1);
@@ -427,7 +428,7 @@ public:
     {
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
             int c=-4;
-            T p=analytic_levelset->phi(it.Location()/m,time,c)*m;
+            T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
             levelset_color.phi(it.index)=abs(p);
             levelset_color.color(it.index)=c==-4?bc_type:c;}
         Fill_Levelsets_From_Levelset_Color();
@@ -443,7 +444,7 @@ public:
         PHYSBAM_DEBUG_WRITE_SUBSTEP("level set",0,1);
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
             int c=-4;
-            T p=analytic_levelset->phi(it.Location()/m,time,c)*m;
+            T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
             if(levelset_color.color(it.index)!=(c==-4?bc_type:c)){
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(levelset_color.phi(it.index))+abs(p));}
@@ -467,18 +468,18 @@ public:
         colors.Append(VECTOR<T,3>(1,0,1));
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
             int c=-4;
-            T p=analytic_levelset->phi(it.Location()/m,time,c)*m;
+            T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
             if(c==-4) c=bc_type;
             Add_Debug_Particle(it.Location(),colors(c+3));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
         PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (phi)",0,1);
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
             int c=-4;
-            T p=analytic_levelset->phi(it.Location()/m,time,c)*m;
+            T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
             (void)p;
             if(c==-4) c=bc_type;
             Add_Debug_Particle(it.Location(),colors(c+3));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,analytic_levelset->N(it.Location()/m,time,c));}
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,analytic_levelset->N(it.Location()/m,time/s,c));}
         PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (N)",0,1);
     }
 
@@ -516,10 +517,10 @@ public:
             MATRIX<T,2> du0=analytic_velocity(c)->du(X/m,t)/s,du1=analytic_velocity(c)->du((X+dX)/m,t)/s;
             T erru=((du0+du1)*dX/2-(u1-u0)).Magnitude()/e;
             int c0,c1;
-            T l0=analytic_levelset->phi(X/m,t,c0)*m,l1=analytic_levelset->phi((X+dX)/m,t,c1)*m;
+            T l0=analytic_levelset->phi(X/m,t/s,c0)*m,l1=analytic_levelset->phi((X+dX)/m,t/s,c1)*m;
             if(c0>=0) l0=-l0;
             if(c1>=0) l1=-l1;
-            TV dl0=analytic_levelset->N(X/m,t,c),dl1=analytic_levelset->N((X+dX)/m,t,c);
+            TV dl0=analytic_levelset->N(X/m,t/s,c),dl1=analytic_levelset->N((X+dX)/m,t/s,c);
             T errl=abs((dl0+dl1).Dot(dX)/2-(l1-l0))/e;
             LOG::cout<<"analytic diff test "<<erru<<"  "<<errl<<std::endl;}
     }
@@ -635,7 +636,7 @@ public:
 
     MATRIX<T,2> Stress(const TV& X,int color,T time)
     {
-        T p=analytic_velocity(color)->p(X/m,time/s)*kg/(s*s*m);
+        T p=analytic_velocity(color)->p(X/m,time/s)*kg/(s*s);
         MATRIX<T,2> du=analytic_velocity(color)->du(X/m,time/s)/s;
         return (du+du.Transposed())*mu(color)-p;
     }
@@ -647,6 +648,8 @@ public:
         if(surface_tension){
             T k=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1)->Compute_Curvature(X);
             TV n=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1)->Normal(X);
+            Add_Debug_Particle(X,VECTOR<T,3>(0,0,1));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*surface_tension*n);
             return k*surface_tension*n;}
 
         if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
