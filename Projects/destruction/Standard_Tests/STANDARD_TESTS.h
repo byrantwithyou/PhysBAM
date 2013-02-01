@@ -30,7 +30,7 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Tessellation/RANGE_TESSELLATION.h>
@@ -728,7 +728,7 @@ void Create_Pattern(const int test_number)
 
     GRID<TV> grid(counts,domain,false);
 
-    LEVELSET_MAKER_UNIFORM<T> levelset_maker;
+    LEVELSET_MAKER<T> levelset_maker;
     levelset_maker.Verbose_Mode();
     for(int i=int(1);i<=rigid_body_collection.rigid_body_particle.Size();i++){
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(i);

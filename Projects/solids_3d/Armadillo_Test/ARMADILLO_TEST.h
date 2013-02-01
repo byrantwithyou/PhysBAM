@@ -9,7 +9,7 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
@@ -59,7 +59,7 @@ void Get_Initial_Data()
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     
-    LEVELSET_MAKER_UNIFORM<T> levelset_maker;
+    LEVELSET_MAKER<T> levelset_maker;
     TRIANGULATED_SURFACE<T>& surface=tests.Create_Triangulated_Object(STRING_UTILITIES::string_sprintf("%s/Triangulated_Surfaces/armadillo_original_400k.tri",data_directory.c_str()),
         RIGID_BODY_STATE<TV>(FRAME<TV>(VECTOR<T,3>(0,(T).6,0))),false,false,(T).01);
     surface.Update_Bounding_Box();RANGE<TV> box=*surface.bounding_box;int size_x=20;

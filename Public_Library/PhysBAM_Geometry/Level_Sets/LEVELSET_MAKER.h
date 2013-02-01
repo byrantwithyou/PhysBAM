@@ -11,13 +11,14 @@
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 namespace PhysBAM{
 
 template<class T>
 class LEVELSET_MAKER:public NONCOPYABLE
 {
 protected:
-    typedef VECTOR<int,3> TV_INT;
+    typedef VECTOR<int,3> TV_INT;typedef VECTOR<T,3> TV;
 public:
     bool verbose;
     bool compute_signed_distance_function,compute_unsigned_distance_function,compute_heaviside_function;
@@ -112,6 +113,7 @@ public:
     void Set_Phi_Offset(const T phi_offset_input=0)
     {phi_offset=phi_offset_input;}
 
+    bool Compute_Level_Set(TRIANGULATED_SURFACE<T>& trianglated_surface,GRID<TV>& grid,ARRAY<T,TV_INT>& phi,ARRAY<TV,TV_INT>* velocity=0);
 protected:
     template<class T_GRID> T Surface_Thickness_Over_Two(const T_GRID& grid) const
     {return (T).5*(surface_thickness_or_zero?surface_thickness_or_zero:grid.dX.Min()/100);}

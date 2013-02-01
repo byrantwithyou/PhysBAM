@@ -12,11 +12,11 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/SEGMENTED_CURVE_2D_SIGNED_DISTANCE.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET_MAKER.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
@@ -286,7 +286,7 @@ Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& undeformed_triangulated_sur
     GRID<TV>& grid=undeformed_levelset.levelset.grid;ARRAY<T,VECTOR<int,3> >& phi=undeformed_levelset.levelset.phi;
     grid=GRID<TV>::Create_Grid_Given_Cell_Size(box,box.Edge_Lengths().Max()/max_res,false,5);
     phi.Resize(grid.Domain_Indices());
-    LEVELSET_MAKER_UNIFORM<T> levelset_maker;
+    LEVELSET_MAKER<T> levelset_maker;
     levelset_maker.Verbose_Mode();
     levelset_maker.Set_Surface_Padding_For_Flood_Fill((T)1e-3);
     levelset_maker.Use_Fast_Marching_Method(true,0);

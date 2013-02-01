@@ -4,7 +4,7 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <fstream>
@@ -147,7 +147,7 @@ template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_arg
 
 
     {
-        LEVELSET_MAKER_UNIFORM<T> levelset_maker;
+        LEVELSET_MAKER<T> levelset_maker;
         levelset_maker.Verbose_Mode(true);
         levelset_maker.Write_Debug_Data(opt_debug);
         if(opt_path_start && opt_path_end)

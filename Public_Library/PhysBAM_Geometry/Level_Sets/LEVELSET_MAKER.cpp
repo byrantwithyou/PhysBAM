@@ -10,9 +10,9 @@
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET_MAKER.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 using namespace PhysBAM;
@@ -36,7 +36,7 @@ static void Process_Segment(const int m,const ARRAY_VIEW<bool,VECTOR<int,3> >& e
 // Function Compute_Level_Set
 //#####################################################################
 // Assumes triangulated surface is closed
-template<class T> bool LEVELSET_MAKER_UNIFORM<T>::
+template<class T> bool LEVELSET_MAKER<T>::
 Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,ARRAY<T,TV_INT>& phi,ARRAY<TV,TV_INT>* velocity)
 {
     PHYSBAM_ASSERT(grid.counts.x && grid.counts.y && grid.counts.z,"Attempting to rasterize surface onto grid with no indices");
@@ -262,6 +262,6 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
 }
 //#####################################################################
 namespace PhysBAM{
-template class LEVELSET_MAKER_UNIFORM<float>;
-template class LEVELSET_MAKER_UNIFORM<double>;
+template class LEVELSET_MAKER<float>;
+template class LEVELSET_MAKER<double>;
 }

@@ -16,10 +16,10 @@
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET_MAKER.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
@@ -436,7 +436,7 @@ Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(TETRAHEDRALIZED_
         LEVELSET_IMPLICIT_OBJECT<TV>* levelset=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         levelset->levelset.grid=GRID<TV>::Create_Grid_Given_Cell_Size(*triangulated_surface_condensed->bounding_box,cell_size,false,2); 
         if(use_implicit_surface_maker){
-            LEVELSET_MAKER_UNIFORM<T> levelset_maker;
+            LEVELSET_MAKER<T> levelset_maker;
             levelset_maker.Compute_Signed_Distance_Function(); 
             levelset_maker.Compute_Level_Set(*triangulated_surface_condensed,levelset->levelset.grid,levelset->levelset.phi);
             levelset->levelset.phi+=shrink_levelset_amount;}
