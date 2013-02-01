@@ -18,5 +18,5 @@ wait
 
 T=`tempfile`
 cat $L | sort -n > $T
-gnuplot -p -e "set terminal png ; set output '$out' ; plot '$T' u (log10(\$1)):(log10(\$3)) , -2*x , -2*x-1 , -x-2"
+gnuplot -p -e "set terminal png ; set output '$out' ; plot '$T' u (log10(\$1)):(log10(\$3)) title 'L-inf error' , -2*x , -2*x-1 , -x-2"
 rm $T $L
