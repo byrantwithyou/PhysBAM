@@ -104,7 +104,7 @@ Initialize()
 
     {
         example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.number_of_colors);
-        example.particle_levelset_evolution_multiple.particle_levelset.Set_Band_Width(6);
+        example.particle_levelset_evolution_multiple.particle_levelset.Set_Band_Width(2*example.number_of_ghost_cells);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
 
@@ -126,7 +126,7 @@ Initialize()
 
     {
         example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.number_of_colors);
-        example.particle_levelset_evolution_multiple.particle_levelset.Set_Band_Width(6);
+        example.particle_levelset_evolution_multiple.particle_levelset.Set_Band_Width(2*example.number_of_ghost_cells);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
     example.particle_levelset_evolution_multiple.levelset_advection_multiple.Set_Custom_Advection(*new ADVECTION_HAMILTON_JACOBI_ENO<GRID<TV>,T>);
@@ -253,6 +253,7 @@ Update_Level_Set(T dt,bool first_step)
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi advection",0,1);
     example.particle_levelset_evolution_multiple.Advance_Levelset(dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before reinitialization",0,1);
+    LOG::cout<<__FUNCTION__<<std::endl;
     example.particle_levelset_evolution_multiple.Make_Signed_Distance();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after level set update",0,1);
     example.Rebuild_Levelset_Color();
