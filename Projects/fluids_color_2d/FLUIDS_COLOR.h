@@ -144,15 +144,15 @@ public:
         switch(test_number){
             case 0:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,-4);
+                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()+1));
-                if(bc_type!=NEUMANN) use_p_null_mode=true;
+                use_p_null_mode=true;
                 break;
             case 1:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
-                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,-4);
+                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg));
-                if(bc_type!=NEUMANN) use_p_null_mode=true;
+                use_p_null_mode=true;
                 break;
             case 2:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
@@ -186,15 +186,15 @@ public:
                 break;
             case 7:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,-4);
+                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_RAREFACTION);
                 omit_solve=true;
                 break;
             case 8:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
-                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,-4);
+                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),TV((T).2,(T).5)));
-                if(bc_type!=NEUMANN) use_p_null_mode=true;
+                use_p_null_mode=true;
                 break;
             case 9:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
@@ -336,7 +336,6 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,1);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()));
-                analytic_initial_only=true;
                 surface_tension=1;
                 use_p_null_mode=true;
                 use_level_set_method=true;
@@ -586,16 +585,17 @@ public:
     TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
     {
         Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
+
+        if(surface_tension){
+            T k=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1)->Compute_Curvature(X);
+            TV n=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1)->Normal(X);
+            return k*surface_tension*n;}
+
         if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
             MATRIX<T,2> jump_stress=Stress(X,color1,time);
             if(color0>=0) jump_stress-=Stress(X,color0,time);
             TV n=analytic_levelset->N(X/m,time/s,color1);
             return jump_stress*n;}
-        
-        if(surface_tension){
-            T k=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1)->Compute_Curvature(X);
-            TV n=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1)->Normal(X);
-            return k*surface_tension*n;}
 
         return TV();
     }
