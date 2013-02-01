@@ -66,6 +66,10 @@ public:
     int refine;
     static T Large_Phi() {return 1000;}
     T surface_tension;
+    bool override_rho0;
+    bool override_rho1;
+    bool override_mu0;
+    bool override_mu1;
 
     struct ANALYTIC_VELOCITY
     {
@@ -78,11 +82,14 @@ public:
     ARRAY<ANALYTIC_VELOCITY*> analytic_velocity,initial_analytic_velocity;
     ANALYTIC_LEVELSET<TV>* analytic_levelset;
     bool analytic_initial_only;
+    T epsilon,radius;
+    int mode;
 
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),
         rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),no_advection(false),refine(1),
-        analytic_initial_only(false)
+        surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),analytic_initial_only(false),
+        epsilon((T).1),radius((T).05),mode(2)
     {
         last_frame=16;
         int number_of_threads=1;
@@ -95,10 +102,10 @@ public:
         parse_args.Add("-steps",&time_steps_per_frame,"steps","number of time steps per frame");
         parse_args.Add("-last_frame",&last_frame,&user_last_frame,"frame","number of frames to simulate");
         parse_args.Add("-dump_matrix",&dump_matrix,"dump out system and rhs");
-        parse_args.Add("-mu0",&mu0,"viscosity","viscosity for first fluid region");
-        parse_args.Add("-mu1",&mu1,"viscosity","viscosity for second fluid region");
-        parse_args.Add("-rho0",&rho0,"density","density for first fluid region");
-        parse_args.Add("-rho1",&rho1,"density","density for second fluid region");
+        parse_args.Add("-mu0",&mu0,&override_mu0,"viscosity","viscosity for first fluid region");
+        parse_args.Add("-mu1",&mu1,&override_mu1,"viscosity","viscosity for second fluid region");
+        parse_args.Add("-rho0",&rho0,&override_rho0,"density","density for first fluid region");
+        parse_args.Add("-rho1",&rho1,&override_rho1,"density","density for second fluid region");
         parse_args.Add("-m",&m,"scale","meter scale");
         parse_args.Add("-s",&s,"scale","second scale");
         parse_args.Add("-kg",&kg,"scale","kilogram scale");
@@ -113,6 +120,9 @@ public:
         parse_args.Add("-null_p",&use_p_null_mode,"Assume pressure null mode and project it out");
         parse_args.Add("-threads",&number_of_threads,"threads","Number of threads");
         parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
+        parse_args.Add("-mode",&mode,"mode","Oscillation mode for surface tension test");
+        parse_args.Add("-radius",&radius,"radius","Radius mode for surface tension test");
+        parse_args.Add("-epsilon",&epsilon,"eps","Epsilon for surface tension test");
         parse_args.Parse();
 
 #ifdef USE_OPENMP
@@ -339,6 +349,54 @@ public:
                 surface_tension=1;
                 use_p_null_mode=true;
                 use_level_set_method=true;
+                break;
+            case 23:
+                struct ANALYTIC_LEVELSET_MODE:public ANALYTIC_IMPLICIT_SURFACE_LEVELSET<TV>
+                {
+                    T e,r;
+                    int mode;
+                    
+                    ANALYTIC_LEVELSET_MODE(T e,T r,int mode,int c_i,int c_o): ANALYTIC_IMPLICIT_SURFACE_LEVELSET<TV>(c_i,c_o),e(e),r(r),mode(mode) {}
+                    virtual ~ANALYTIC_LEVELSET_MODE() {}
+                    
+                    virtual T f(const TV& X,T t) const {return X.Magnitude()-r*(1+e*cos(mode*atan2(X.y,X.x)));}
+                    virtual TV df(const TV& X,T t) const {TV N=X;T d=N.Normalize();return N+r*mode*e*sin(mode*atan2(X.y,X.x))/d*N.Orthogonal_Vector();}
+                    virtual MATRIX<T,TV::m> ddf(const TV& X,T t) const
+                    {
+                        TV N=X;
+                        T d=N.Normalize(),m_th=mode*atan2(X.y,X.x),cs=cos(m_th),sn=sin(m_th);
+                        TV O=N.Orthogonal_Vector();
+                        MATRIX<T,TV::m> OO=MATRIX<T,TV::m>::Outer_Product(O,O),ON=MATRIX<T,TV::m>::Outer_Product(O*2,N).Symmetric_Part();
+                        return (1/d+r*e*sqr(mode/d)*cs)*OO-r*e*mode*sn/sqr(d)*ON;
+                    }
+                    virtual TV Closest_Point_Estimate(const TV& X,T t) const {return X.Normalized()*r;}
+                };
+
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*(T).1*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_MODE(epsilon,radius,mode,0,1);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()));
+                surface_tension=(T)0.07197;
+                use_p_null_mode=true;
+                use_level_set_method=true;
+                if(!override_rho0) rho0=1000;
+                if(!override_rho1) rho1=(T)1.1839;
+                if(!override_mu0) mu0=0;
+                if(!override_mu1) mu1=0;
+                analytic_initial_only=true;
+
+                if(test_analytic_diff){
+                    ANALYTIC_LEVELSET_MODE al(epsilon,radius,mode,0,1);
+                    RANDOM_NUMBERS<T> rand;
+                    T e=1e-6,t=rand.Get_Uniform_Number(0,1);
+                    TV X=rand.Get_Uniform_Vector(grid.domain),dX;
+                    rand.Fill_Uniform(dX,-e,e);
+                    T f0=al.f(X,t),f1=al.f(X+dX,t);
+                    TV df0=al.df(X,t),df1=al.df(X+dX,t);
+                    MATRIX<T,2> ddf0=al.ddf(X,t)/s,ddf1=al.ddf(X+dX,t)/s;
+                    T err=abs((df0+df1).Dot(dX)/2-(f1-f0))/e;
+                    T errd=((ddf0+ddf1)*dX/2-(df1-df0)).Magnitude()/e;
+                    LOG::cout<<"analytic diff test f "<<err<<"  "<<errd<<std::endl;}
                 break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
