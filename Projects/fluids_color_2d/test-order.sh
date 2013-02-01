@@ -9,7 +9,7 @@ for r in {1..9} ; do
     O=`mktemp -d`
     (
         echo -n "$((8*$r)) "
-        nice ./fluids_color_2d -resolution 8 -last_frame 1 -refine $r -o $O "$@"  | grep error | tail -n 1
+        nice ./fluids_color_2d -resolution 8 -last_frame 1 -refine $r -s 1.3 -m .8 -kg 1.2 -o $O "$@"  | grep error | tail -n 1
         rm -rf $O
     ) > $T &
     L="$L $T"
