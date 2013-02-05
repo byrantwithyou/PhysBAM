@@ -399,6 +399,14 @@ public:
                     T errd=((ddf0+ddf1)*dX/2-(df1-df0)).Magnitude()/e;
                     LOG::cout<<"analytic diff test f "<<err<<"  "<<errd<<std::endl;}
                 break;
+            case 24:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
+                ANALYTIC_VELOCITY_CONST* a=new ANALYTIC_VELOCITY_CONST(TV());
+                a->const_p=1;
+                analytic_velocity.Append(a);
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
+                break;}
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
         if(analytic_velocity.m) number_of_colors=analytic_velocity.m;
@@ -528,10 +536,11 @@ public:
     struct ANALYTIC_VELOCITY_CONST:public ANALYTIC_VELOCITY
     {
         TV au;
-        ANALYTIC_VELOCITY_CONST(TV v): au(v){}
+        T const_p;
+        ANALYTIC_VELOCITY_CONST(TV v): au(v),const_p(0) {}
         virtual TV u(const TV& X,T t) const {return au;}
         virtual MATRIX<T,2> du(const TV& X,T t) const {return MATRIX<T,2>();}
-        virtual T p(const TV& X,T t) const {return 0;}
+        virtual T p(const TV& X,T t) const {return const_p;}
         virtual TV F(const TV& X,T t) const {return TV();}
     };
 
