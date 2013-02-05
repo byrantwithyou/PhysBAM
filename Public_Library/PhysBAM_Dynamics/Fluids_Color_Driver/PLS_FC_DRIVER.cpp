@@ -253,7 +253,6 @@ Update_Level_Set(T dt,bool first_step)
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi advection",0,1);
     example.particle_levelset_evolution_multiple.Advance_Levelset(dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before reinitialization",0,1);
-    LOG::cout<<__FUNCTION__<<std::endl;
     example.particle_levelset_evolution_multiple.Make_Signed_Distance();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after level set update",0,1);
     example.Rebuild_Levelset_Color();
@@ -432,9 +431,10 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE
         if(color(it.Full_Index())!=c)
             u(it.Full_Index())=1e20;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
-        u(it.Full_Index())=0;
+        u(it.Full_Index())=1e20;
     EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Face(example.grid,[&](const FACE_INDEX<TV::m>& index){return color(index)==c;},
         example.number_of_ghost_cells,u,3,example.number_of_ghost_cells);
+    example.boundary.Fill_Ghost_Faces(example.grid,u,u,0,example.number_of_ghost_cells);
 }
 //#####################################################################
 // Function Extrapolate_Velocity
