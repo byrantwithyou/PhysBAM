@@ -81,26 +81,13 @@ Register_Nodes(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool
         if(b) Add_Neighbors(m,next_outside,neighbors_outside,it.index,-1,-3);
         else Add_Neighbors(m,next_inside,neighbors_inside,it.index,-2,-4);}
 
-    VECTOR<T,3> col(1,0,0);
-
-    for(int j=0;j<current.m;j++)
-        Add_Debug_Particle(grid.Node(current(j)),VECTOR<T,3>(0,0,1));
-
     for(int o=0;o<fill_width;o++){
         current.Exchange(next_outside);
         for(int j=0;j<current.m;j++){
             m.node_to_index(current(j))=m.index_to_node.Append(current(j));
             Add_Neighbors(m,next_outside,neighbors_outside,current(j),-1,-3);}
-
-        for(int j=0;j<next_outside.m;j++)
-            Add_Debug_Particle(grid.Node(next_outside(j)),col);
-
-        current.Remove_All();
-        exchange(col.x,col.y);}
+        current.Remove_All();}
     next_outside.Remove_All();
-    Add_Debug_Particle(grid.Node(m.node_to_index.domain.min_corner),VECTOR<T,3>(1,1,1));
-    Add_Debug_Particle(grid.Node(m.node_to_index.domain.max_corner),VECTOR<T,3>(1,1,1));
-    Flush_Frame<TV>("register");
 
     for(int i=1;i<m.index_to_node.m;i++){
         TV N=phi.Normal(grid.X(m.index_to_node(i)));
@@ -109,6 +96,7 @@ Register_Nodes(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool
             TV_INT index=m.index_to_node(i);
             int s=N(d)<0?1:-1;
             for(int j=0;j<3;j++){
+                if(!m.node_to_index.Valid_Index(index)) break;
                 int& n=m.node_to_index(index);
                 if((n&-3)==-3) n=m.index_to_node.Append(index);
                 index(d)+=s;}}}
@@ -142,12 +130,12 @@ Register_Nodes(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool
             TV_INT index=m.index_to_node(i);
             int s=N(d)<0?1:-1;
             for(int j=0;j<3;j++){
-                st(d).nodes(j+1)=m.node_to_index(index);
+                st(d).nodes(j+1)=m.node_to_index.Valid_Index(index)?m.node_to_index(index):0;
                 st(d).scale=s*N(d)*grid.one_over_dX(d);
                 index(d)+=s;}
             index(d)-=4*s;
-            int n=m.node_to_index(index);
-            st(d).nodes(0)=n==-3?0:n;}
+            int n=m.node_to_index.Valid_Index(index)?m.node_to_index(index):0;
+            st(d).nodes(0)=n<0?0:n;}
         stencil.Append(st);}
 }
 //#####################################################################
