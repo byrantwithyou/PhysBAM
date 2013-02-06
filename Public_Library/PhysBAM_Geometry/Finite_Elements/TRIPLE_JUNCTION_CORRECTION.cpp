@@ -162,12 +162,9 @@ Fill_Valid_Region_With_Exprapolation()
             trust_pairs.Set(trust);}
     for(HASHTABLE<VECTOR<short,2> >::ITERATOR it(trust_pairs);it.Valid();it.Next()){
         VECTOR<short,2> k=it.Key();
-        if(1) EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Node(grid,
+        EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Node(grid,
             [&](const TV_INT& index){return pairwise_data(index).trust==k;},
             extrap_width,pairwise_phi(k.x)(k.y),3,extrap_width);
-        else EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Node_No_Levelset(grid,
-            [&](const TV_INT& index){return pairwise_data(index).trust==k;},
-            extrap_width,pairwise_phi(k.x)(k.y),50,3,extrap_width,10);
         for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
             int mask=(1<<k.x)|(1<<k.y);
             T& p=pairwise_phi(k.x)(k.y)(it.index);
