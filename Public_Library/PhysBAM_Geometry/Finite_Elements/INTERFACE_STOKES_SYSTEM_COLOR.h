@@ -103,6 +103,7 @@ public:
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const;
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const;
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const;
+    void Pack(const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u,VECTOR<ARRAY<ARRAY<T> >,TV::m>& v) const;
 private:
     void Set_Jacobi_Preconditioner();
 //#####################################################################

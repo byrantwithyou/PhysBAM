@@ -237,16 +237,7 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX
 
     if(u){
         VECTOR<ARRAY<ARRAY<T> >,TV::m> U;
-        for(int i=0;i<TV::m;i++){
-            U(i).Resize(cdi->colors);
-            for(int c=0;c<cdi->colors;c++){
-                U(i)(c).Resize(cm_u(i)->dofs(c));}}
-
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-            FACE_INDEX<TV::m> face(it.Full_Index()); 
-            for(int c=0;c<cdi->colors;c++){
-                int k=cm_u(face.axis)->Get_Index(it.index,c);
-                if(k>=0) U(face.axis)(c)(k)=(*u)(c)(face);}}
+        Pack(*u,U);
 
         for(int i=0;i<TV::m;i++)
             if(matrix_inertial_rhs(i).m)
@@ -328,6 +319,23 @@ Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const
     for(int c=0;c<cdi->colors;c++)
         v.p(c).Resize(cm_p->dofs(c));
     v.q.Resize(cdi->total_number_of_surface_constraints);
+}
+//#####################################################################
+// Function Pack
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
+Pack(const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u,VECTOR<ARRAY<ARRAY<T> >,TV::m>& v) const
+{
+    for(int i=0;i<TV::m;i++){
+        v(i).Resize(cdi->colors);
+        for(int c=0;c<cdi->colors;c++){
+            v(i)(c).Resize(cm_u(i)->dofs(c));}}
+
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+        FACE_INDEX<TV::m> face(it.Full_Index()); 
+        for(int c=0;c<cdi->colors;c++){
+            int k=cm_u(face.axis)->Get_Index(it.index,c);
+            if(k>=0) v(face.axis)(c)(k)=u(c)(face);}}
 }
 //#####################################################################
 // Function Multiply
