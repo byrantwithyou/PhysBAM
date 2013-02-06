@@ -7,14 +7,28 @@
 
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_CONST.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_LINE.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_NEST.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_ROTATE.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SCALE.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SIGNED.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SPHERE.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_TRANSLATE.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_VORTEX.h>
+#include <PhysBAM_Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
+#include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
+#include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -30,10 +44,11 @@ class FLUIDS_COLOR:public PLS_FC_EXAMPLE<TV>
 
 public:
     using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
-    using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
+    using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;using BASE::use_level_set_method;using BASE::use_pls;
     using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::number_of_colors;
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
     using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
+    using BASE::particle_levelset_evolution_multiple;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -49,25 +64,32 @@ public:
     bool test_analytic_diff;
     bool no_advection;
     int refine;
+    static T Large_Phi() {return 1000;}
+    T surface_tension;
+    bool override_rho0;
+    bool override_rho1;
+    bool override_mu0;
+    bool override_mu1;
 
     struct ANALYTIC_VELOCITY
     {
+        virtual ~ANALYTIC_VELOCITY(){}
         virtual TV u(const TV& X,T t) const=0;
         virtual MATRIX<T,3> du(const TV& X,T t) const=0;
         virtual T p(const TV& X,T t) const=0;
         virtual TV F(const TV& X,T t) const=0;
     };
-    ARRAY<ANALYTIC_VELOCITY*> analytic_velocity;
-
-    struct ANALYTIC_LEVELSET
-    {
-        virtual T phi(const TV& X,T t,int& c) const=0;
-        virtual TV N(const TV& X,T t,int c) const=0;
-    }* analytic_levelset;
+    ARRAY<ANALYTIC_VELOCITY*> analytic_velocity,initial_analytic_velocity;
+    ANALYTIC_LEVELSET<TV>* analytic_levelset;
+    bool analytic_initial_only;
+    T epsilon,radius;
+    int mode;
 
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),
-        rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),no_advection(false),refine(1)
+        rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),no_advection(false),refine(1),
+        surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),analytic_initial_only(false),
+        epsilon((T).1),radius((T).05),mode(2)
     {
         last_frame=16;
         int number_of_threads=1;
@@ -80,10 +102,10 @@ public:
         parse_args.Add("-steps",&time_steps_per_frame,"steps","number of time steps per frame");
         parse_args.Add("-last_frame",&last_frame,&user_last_frame,"frame","number of frames to simulate");
         parse_args.Add("-dump_matrix",&dump_matrix,"dump out system and rhs");
-        parse_args.Add("-mu0",&mu0,"viscosity","viscosity for first fluid region");
-        parse_args.Add("-mu1",&mu1,"viscosity","viscosity for second fluid region");
-        parse_args.Add("-rho0",&rho0,"density","density for first fluid region");
-        parse_args.Add("-rho1",&rho1,"density","density for second fluid region");
+        parse_args.Add("-mu0",&mu0,&override_mu0,"viscosity","viscosity for first fluid region");
+        parse_args.Add("-mu1",&mu1,&override_mu1,"viscosity","viscosity for second fluid region");
+        parse_args.Add("-rho0",&rho0,&override_rho0,"density","density for first fluid region");
+        parse_args.Add("-rho1",&rho1,&override_rho1,"density","density for second fluid region");
         parse_args.Add("-m",&m,"scale","meter scale");
         parse_args.Add("-s",&s,"scale","second scale");
         parse_args.Add("-kg",&kg,"scale","kilogram scale");
@@ -98,6 +120,9 @@ public:
         parse_args.Add("-null_p",&use_p_null_mode,"Assume pressure null mode and project it out");
         parse_args.Add("-threads",&number_of_threads,"threads","Number of threads");
         parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
+        parse_args.Add("-mode",&mode,"mode","Oscillation mode for surface tension test");
+        parse_args.Add("-radius",&radius,"radius","Radius mode for surface tension test");
+        parse_args.Add("-epsilon",&epsilon,"eps","Epsilon for surface tension test");
         parse_args.Parse();
 
 #ifdef USE_OPENMP
@@ -122,24 +147,27 @@ public:
         PHYSBAM_ASSERT(bc_n+bc_d+bc_s<2);
         bc_type=bc_n?NEUMANN:(bc_s?SLIP:DIRICHLET);
         use_advection=!no_advection;
+        surface_tension*=kg*m/(s*s);
 
         analytic_levelset=0;
 
         if(!override_output_directory) output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number);
         switch(test_number){
-            case 0:
+            case 0:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                analytic_levelset=new ANALYTIC_LEVELSET_PERIODIC;
+                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()+1));
-                break;
-            case 1:
-                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE(TV()+(T).5,(T).3);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()+1));
-                break;
+                use_p_null_mode=true;
+            } break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
         if(analytic_velocity.m) number_of_colors=analytic_velocity.m;
+    }
+
+    ~FLUIDS_COLOR()
+    {
+        delete analytic_levelset;
+        analytic_velocity.Delete_Pointers_And_Clean_Memory();
     }
 
     void Write_Output_Files(const int frame)
@@ -160,10 +188,59 @@ public:
     {
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
             int c=-4;
-            T p=analytic_levelset->phi(it.Location()/m,time,c)*m;
+            T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
             levelset_color.phi(it.index)=abs(p);
             levelset_color.color(it.index)=c==-4?bc_type:c;}
         Fill_Levelsets_From_Levelset_Color();
+    }
+
+    void Level_Set_Error(T time)
+    {
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+            int c=levelset_color.color(it.index);
+            T p=levelset_color.phi(it.index);
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(c<0,c>=0,p<0));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("level set",0,1);
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+            int c=-4;
+            T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
+            if(levelset_color.color(it.index)!=(c==-4?bc_type:c)){
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(levelset_color.phi(it.index))+abs(p));}
+            else{
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(levelset_color.phi(it.index)-p));}}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("level set error",0,1);
+    }
+
+    void Dump_Analytic_Levelset(T time)
+    {
+        ARRAY<VECTOR<T,3> > colors;
+        colors.Append(VECTOR<T,3>((T).25,(T).25,(T).25));
+        colors.Append(VECTOR<T,3>((T).5,(T).5,(T).5));
+        colors.Append(VECTOR<T,3>(1,1,1));
+        colors.Append(VECTOR<T,3>(1,0,0));
+        colors.Append(VECTOR<T,3>(0,1,0));
+        colors.Append(VECTOR<T,3>(0,0,1));
+        colors.Append(VECTOR<T,3>(1,1,0));
+        colors.Append(VECTOR<T,3>(0,1,1));
+        colors.Append(VECTOR<T,3>(1,0,1));
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+            int c=-4;
+            T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
+            if(c==-4) c=bc_type;
+            Add_Debug_Particle(it.Location(),colors(c+3));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (phi)",0,1);
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+            int c=-4;
+            T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
+            (void)p;
+            if(c==-4) c=bc_type;
+            Add_Debug_Particle(it.Location(),colors(c+3));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,analytic_levelset->N(it.Location()/m,time/s,c));}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (N)",0,1);
     }
 
     void Get_Initial_Velocities()
@@ -184,6 +261,7 @@ public:
             rho.Append(rho1);}
 
         Set_Level_Set(0);
+        Dump_Analytic_Levelset(0);
 
         if(test_analytic_diff){
             RANDOM_NUMBERS<T> rand;
@@ -199,10 +277,10 @@ public:
             MATRIX<T,3> du0=analytic_velocity(c)->du(X/m,t)/s,du1=analytic_velocity(c)->du((X+dX)/m,t)/s;
             T erru=((du0+du1)*dX/2-(u1-u0)).Magnitude()/e;
             int c0,c1;
-            T l0=analytic_levelset->phi(X/m,t,c0)*m,l1=analytic_levelset->phi((X+dX)/m,t,c1)*m;
+            T l0=analytic_levelset->phi(X/m,t/s,c0)*m,l1=analytic_levelset->phi((X+dX)/m,t/s,c1)*m;
             if(c0>=0) l0=-l0;
             if(c1>=0) l1=-l1;
-            TV dl0=analytic_levelset->N(X/m,t,c),dl1=analytic_levelset->N((X+dX)/m,t,c);
+            TV dl0=analytic_levelset->N(X/m,t/s,c),dl1=analytic_levelset->N((X+dX)/m,t/s,c);
             T errl=abs((dl0+dl1).Dot(dX)/2-(l1-l0))/e;
             LOG::cout<<"analytic diff test "<<erru<<"  "<<errl<<std::endl;}
     }
@@ -210,10 +288,11 @@ public:
     struct ANALYTIC_VELOCITY_CONST:public ANALYTIC_VELOCITY
     {
         TV au;
-        ANALYTIC_VELOCITY_CONST(TV v): au(v){}
+        T const_p;
+        ANALYTIC_VELOCITY_CONST(TV v): au(v),const_p(0) {}
         virtual TV u(const TV& X,T t) const {return au;}
         virtual MATRIX<T,3> du(const TV& X,T t) const {return MATRIX<T,3>();}
-        virtual T p(const TV& X,T t) const {return 0;}
+        virtual T p(const TV& X,T t) const {return const_p;}
         virtual TV F(const TV& X,T t) const {return TV();}
     };
 
@@ -242,129 +321,16 @@ public:
         virtual TV F(const TV& X,T t) const {return av->F(X-vel*t,t);}
     };
 
-    struct ANALYTIC_LEVELSET_PERIODIC:public ANALYTIC_LEVELSET
-    {
-        virtual T phi(const TV& X,T t,int& c) const {c=0;return 1;}
-        virtual TV N(const TV& X,T t,int c) const {return TV(1,0,0);}
-    };
-
-    struct ANALYTIC_LEVELSET_SPHERE:public ANALYTIC_LEVELSET
-    {
-        TV cen;
-        T r;
-        ANALYTIC_LEVELSET_SPHERE(TV cc,T rr): cen(cc),r(rr){}
-        virtual T phi(const TV& X,T t,int& c) const {T p=(X-cen).Magnitude()-r;c=p>=0?-4:0;return abs(p);}
-        virtual TV N(const TV& X,T t,int c) const {return (X-cen).Normalized();}
-    };
-
-    struct ANALYTIC_LEVELSET_BANDED:public ANALYTIC_LEVELSET
-    {
-        int bc0,bc1;
-        T x0,x1;
-        ARRAY<T> x;
-        ANALYTIC_LEVELSET_BANDED(T x0,T x1,int bc0,int bc1): bc0(bc0),bc1(bc1),x0(x0),x1(x1) {}
-        ANALYTIC_LEVELSET_BANDED* Add(T nx) {x.Append(nx);return this;}
-        virtual T phi(const TV& X,T t,int& c) const
-        {
-            T p0=X.x-x0;
-            if(p0<=0){c=bc0;return -p0;}
-            for(int i=0;i<x.m;i++){
-                T p1=X.x-x(i);
-                if(p1<=0){c=i;return min(p0,-p1);}
-                p0=p1;}
-            T p1=X.x-x1;
-            if(p1<=0){c=x.m;return min(p0,-p1);}
-            c=bc1;
-            return p1;
-        }
-        virtual TV N(const TV& X,T t,int c) const
-        {
-            if(c>0 && c<x.m)
-            {
-                T p0=X.x-x(c-1),p1=X.x-x(c);
-                return TV(p0<-p1?-1:1,0);
-            }
-            if(c==0)
-            {
-                T p0=X.x-x0,p1=X.x-x(0);
-                return TV(p0<-p1?-1:1,0);
-            }
-            T p0=X.x-x.Last(),p1=X.x-x1;
-            return TV(p0<-p1?-1:1,0);
-        }
-    };
-
-    struct ANALYTIC_LEVELSET_CONCENTRIC:public ANALYTIC_LEVELSET
-    {
-        TV center;
-        int bc0,bc1;
-        T r0,r1;
-        ARRAY<T> array;
-        ANALYTIC_LEVELSET_CONCENTRIC(TV c,T r0,T r1,int bc0,int bc1): center(c),bc0(bc0),bc1(bc1),r0(r0),r1(r1) {}
-        ANALYTIC_LEVELSET_CONCENTRIC* Add(T nr) {array.Append(nr);return this;}
-        virtual T phi(const TV& X,T t,int& c) const
-        {
-            T r=(X-center).Magnitude(),p0=r-r0;
-            if(p0<=0){c=bc0;return -p0;}
-            for(int i=0;i<array.m;i++){
-                T p1=r-array(i);
-                if(p1<=0){c=i;return min(p0,-p1);}
-                p0=p1;}
-            T p1=r-r1;
-            if(p1<=0){c=array.m;return min(p0,-p1);}
-            c=bc1;
-            return p1;
-        }
-        virtual TV N(const TV& X,T t,int c) const
-        {
-            TV n=X-center;
-            T r=n.Normalize();
-            if(c>0 && c<array.m)
-            {
-                T p0=r-array(c-1),p1=r-array(c);
-                return p0<-p1?-n:n;
-            }
-            if(c==0)
-            {
-                T p0=r-r0,p1=r-array(0);
-                return p0<-p1?-n:n;
-            }
-            T p0=r-array.Last(),p1=r-r1;
-            return p0<-p1?-n:n;
-        }
-    };
-
-    struct ANALYTIC_LEVELSET_TRANSLATE:public ANALYTIC_LEVELSET
-    {
-        ANALYTIC_LEVELSET* al;
-        TV vel;
-
-        ANALYTIC_LEVELSET_TRANSLATE(ANALYTIC_LEVELSET* al,const TV& vel): al(al),vel(vel) {}
-        ~ANALYTIC_LEVELSET_TRANSLATE() {delete al;}
-        virtual T phi(const TV& X,T t,int& c) const {return al->phi(X-vel*t,t,c);}
-        virtual TV N(const TV& X,T t,int c) const {return al->N(X-vel*t,t,c);}
-    };
-
-    struct ANALYTIC_LEVELSET_SCALE:public ANALYTIC_LEVELSET
-    {
-        ANALYTIC_LEVELSET* al;
-        T scale;
-
-        ANALYTIC_LEVELSET_SCALE(ANALYTIC_LEVELSET* al,T scale): al(al),scale(scale) {}
-        ~ANALYTIC_LEVELSET_SCALE() {delete al;}
-        virtual T phi(const TV& X,T t,int& c) const {return (1+t*scale)*al->phi(X/(1+t*scale),t,c);}
-        virtual TV N(const TV& X,T t,int c) const {return al->N(X/(1+t*scale),t,c);}
-    };
-
     void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE
     {
-        if(analytic_velocity.m && analytic_levelset)
-            Set_Level_Set(time);
+        if(analytic_velocity.m && analytic_levelset && !use_level_set_method && !use_pls && !analytic_initial_only)
+            Set_Level_Set(time+dt);
     }
 
     void End_Time_Step(const T time) PHYSBAM_OVERRIDE
     {
-        if(analytic_velocity.m){
+        Level_Set_Error(time);
+        if(analytic_velocity.m && !analytic_initial_only){
             T max_error=0,a=0,b=0;
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
                 int c=levelset_color.Color(it.Location());
@@ -380,7 +346,7 @@ public:
 
     MATRIX<T,3> Stress(const TV& X,int color,T time)
     {
-        T p=analytic_velocity(color)->p(X/m,time/s)*kg/(s*s*m);
+        T p=analytic_velocity(color)->p(X/m,time/s)*kg/(s*s);
         MATRIX<T,3> du=analytic_velocity(color)->du(X/m,time/s)/s;
         return (du+du.Transposed())*mu(color)-p;
     }
@@ -388,17 +354,26 @@ public:
     TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
     {
         Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
-        if(analytic_velocity.m && analytic_levelset){
+
+        if(surface_tension){
+            T k=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1)->Compute_Curvature(X);
+            TV n=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1)->Normal(X);
+            Add_Debug_Particle(X,VECTOR<T,3>(0,0,1));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*surface_tension*n);
+            return k*surface_tension*n;}
+
+        if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
             MATRIX<T,3> jump_stress=Stress(X,color1,time);
             if(color0>=0) jump_stress-=Stress(X,color0,time);
             TV n=analytic_levelset->N(X/m,time/s,color1);
             return jump_stress*n;}
+
         return TV();
     }
 
     TV Volume_Force(const TV& X,int color,T time) PHYSBAM_OVERRIDE
     {
-        if(analytic_velocity.m && analytic_levelset)
+        if(analytic_velocity.m && analytic_levelset && !analytic_initial_only)
             return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s);
         return TV();
     }
@@ -406,7 +381,7 @@ public:
     TV Velocity_Jump(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
     {
         Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
-        if(analytic_velocity.m && analytic_levelset){
+        if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
             TV jump_u=analytic_velocity(color1)->u(X/m,time/s);
             if(color0>=0) jump_u-=analytic_velocity(color0)->u(X/m,time/s);
             return jump_u*m/s;}

@@ -1,2 +1,2 @@
 #!/bin/bash
-rm -rf o-* *.png Test_* *~ *.txt
+rm -rf o-* *.png Test_*

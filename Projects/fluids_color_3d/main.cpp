@@ -12,7 +12,8 @@ int main(int argc,char *argv[])
     typedef VECTOR<T,3> TV;
 
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Print_Arguments();
+    LOG::Initialize_Logging(false,false,1<<30,true);
+    LOG::cout<<parse_args.Print_Arguments()<<std::endl;
     FLUIDS_COLOR<TV>* example=new FLUIDS_COLOR<TV>(stream_type,parse_args);
 
     FILE_UTILITIES::Create_Directory(example->output_directory+"/common");
@@ -20,6 +21,7 @@ int main(int argc,char *argv[])
 
     PLS_FC_DRIVER<TV> driver(*example);
     driver.Execute_Main_Program();
+    delete example;
 
     LOG::Finish_Logging();
     return 0;
