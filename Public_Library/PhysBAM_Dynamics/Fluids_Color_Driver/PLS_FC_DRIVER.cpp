@@ -236,7 +236,9 @@ Advance_One_Time_Step(bool first_step)
     else if(example.use_pls) Update_Pls(dt);
 
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
+    Extrapolate_Velocity(example.face_velocities,example.face_color);
     Advection_And_BDF(dt,first_step);
+    Extrapolate_Velocity(example.face_velocities,example.face_color);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before solve",0,1);
     Apply_Pressure_And_Viscosity(dt,first_step);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after solve",0,1);
@@ -263,8 +265,6 @@ Update_Level_Set(T dt,bool first_step)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Advection_And_BDF(T dt,bool first_step)
 {
-    Extrapolate_Velocity(example.face_velocities,example.face_color);
-    Extrapolate_Velocity(example.prev_face_velocities,example.prev_face_color);
     if(!example.use_advection)
         for(int c=0;c<example.number_of_colors;c++)
             No_Advection_And_BDF(dt,first_step,c);
@@ -276,7 +276,6 @@ Advection_And_BDF(T dt,bool first_step)
             RK2_Advection_And_BDF(dt,first_step,c);
     example.prev_face_velocities.Exchange(example.face_velocities);
     example.prev_face_color=example.face_color;
-    Extrapolate_Velocity(example.face_velocities,example.face_color);
 }
 //#####################################################################
 // Function Advection_And_BDF
@@ -375,7 +374,6 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     printf("qt [%i] ",iss.cdi->constraint_base_t);
     printf("\n");
 
-    Extrapolate_Velocity(example.face_velocities,example.face_color);
     INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> rhs,sol;
 
     struct VOLUME_FORCE_COLOR_LOCAL:public VOLUME_FORCE_COLOR<TV>
@@ -429,11 +427,14 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE
 {
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next())
         if(color(it.Full_Index())!=c)
-            u(it.Full_Index())=1e20;
+            u(it.Full_Index())=0;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
-        u(it.Full_Index())=1e20;
-    EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Face(example.grid,[&](const FACE_INDEX<TV::m>& index){return color(index)==c;},
-        example.number_of_ghost_cells,u,3,example.number_of_ghost_cells);
+        u(it.Full_Index())=0;
+
+    const LEVELSET<TV>& phi=*example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(c);
+    EXTRAPOLATION_HIGHER_ORDER<TV,T> eho(example.grid,phi,example.number_of_ghost_cells*4,3,example.number_of_ghost_cells);
+    eho.periodic=true;
+    eho.Extrapolate_Face([&](const FACE_INDEX<TV::m>& index){return color(index)==c;},u);
     example.boundary.Fill_Ghost_Faces(example.grid,u,u,0,example.number_of_ghost_cells);
 }
 //#####################################################################

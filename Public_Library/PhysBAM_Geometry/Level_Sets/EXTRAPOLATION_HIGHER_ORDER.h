@@ -21,32 +21,36 @@ template<class TV,class T2>
 class EXTRAPOLATION_HIGHER_ORDER:public NONCOPYABLE
 {
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
-    struct MAPPING
-    {
-        ARRAY<int,TV_INT> node_to_index;
-        ARRAY<TV_INT> index_to_node;
-        VECTOR<INTERVAL<int>,3> fill_indices,solve_indices;
-    };
+public:
     struct STENCIL {VECTOR<int,4> nodes;T scale;};
 
-public:
-    EXTRAPOLATION_HIGHER_ORDER();
+    GRID<TV> grid;
+    const LEVELSET<TV>& phi;
+    int iterations;
+    int order;
+    int fill_width;
+    ARRAY<int,TV_INT> node_to_index;
+    ARRAY<TV_INT> index_to_node;
+    VECTOR<INTERVAL<int>,3> fill_indices,solve_indices;
+    ARRAY<TV> normal;
+    bool periodic;
+    VECTOR<bool,TV::m> combine_ends;
+
+    EXTRAPOLATION_HIGHER_ORDER(const GRID<TV>& grid,const LEVELSET<TV>& phi,int iterations,int order,int fill_width);
     ~EXTRAPOLATION_HIGHER_ORDER();
 
-    static void Extrapolate_Node(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int iterations,int order,int fill_width);
-    static void Extrapolate_Cell(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int iterations,int order,int fill_width);
-    static void Extrapolate_Face(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int iterations,int order,int fill_width);
-
-    static void Extrapolate_Node_No_Levelset(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int iterations,int order,int fill_width,int smooth_steps=50);
-    static void Extrapolate_Cell_No_Levelset(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int iterations,int order,int fill_width,int smooth_steps=50);
-    static void Extrapolate_Face_No_Levelset(const GRID<TV>& grid,boost::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int iterations,int order,int fill_width,int smooth_steps=50);
+    void Extrapolate_Node(boost::function<bool(const TV_INT& index)> inside_mask,ARRAYS_ND_BASE<T2,TV_INT>& x);
+    void Extrapolate_Cell(boost::function<bool(const TV_INT& index)> inside_mask,ARRAYS_ND_BASE<T2,TV_INT>& x);
+    void Extrapolate_Face(boost::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,ARRAY<T2,FACE_INDEX<TV::m> >& x);
+    int Lookup_Index(TV_INT index) const;
+    int Register_Index(TV_INT index,int only_neg=0);
+    void Periodic_Index(TV_INT& index) const;
 protected:
-    static void Add_Neighbors(MAPPING& m,ARRAY<TV_INT>& next,const ARRAY<TV_INT>& neighbors,const TV_INT& index,int unregistered,int registered);
-    static void Register_Nodes(const GRID<TV>& grid,const LEVELSET<TV>& phi,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,MAPPING& m,ARRAY<TV>& normal,
-        ARRAY<VECTOR<STENCIL,TV::m> >& stencil,int order,int fill_width);
-    static void Extrapolate_FE(const MAPPING& m,const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,const ARRAY<T2>& x,ARRAY<T2>& y,const ARRAY<T2>* z,int o,T dt,T alpha);
-    static void Extrapolate_RK2(const MAPPING& m,const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,ARRAY<T2>& x,const ARRAY<T2>* z,ARRAY<T2>& tmp,int o,T dt);
-    static void Fill_un(const MAPPING& m,const TV& one_over_dx,const ARRAY<TV>& normal,const ARRAY<T2>& x,ARRAY<T2>& xn,int o,int mo);
+    void Add_Neighbors(ARRAY<TV_INT>& next,const ARRAY<TV_INT>& neighbors,const TV_INT& index,int unregistered,int registered);
+    void Register_Nodes(boost::function<bool(const TV_INT& index)> inside_mask,ARRAY<VECTOR<STENCIL,TV::m> >& stencil);
+    void Extrapolate_FE(const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,const ARRAY<T2>& x,ARRAY<T2>& y,const ARRAY<T2>* z,int o,T dt,T alpha);
+    void Extrapolate_RK2(const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,ARRAY<T2>& x,const ARRAY<T2>* z,ARRAY<T2>& tmp,int o,T dt);
+    void Fill_un(const TV& one_over_dx,const ARRAY<T2>& x,ARRAY<T2>& xn,int o,int mo);
 //#####################################################################
 };
 }
