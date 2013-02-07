@@ -54,7 +54,7 @@ void Test(PARSE_ARGS& parse_args)
             x(it.index)=f(X);
             inside(it.index)=true;}}
 
-    EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Cell(grid,phi,inside,ghost,x,iterations,order,ghost);
+    EXTRAPOLATION_HIGHER_ORDER<TV,T>(grid,phi,iterations,order,ghost).Extrapolate_Cell(inside,x);
 
     T m=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
