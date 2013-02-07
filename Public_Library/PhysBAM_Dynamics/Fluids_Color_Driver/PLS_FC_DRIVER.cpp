@@ -434,7 +434,7 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE
         u(it.Full_Index())=0;
 
     const LEVELSET<TV>& phi=*example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(c);
-    EXTRAPOLATION_HIGHER_ORDER<TV,T> eho(example.grid,phi,example.number_of_ghost_cells*4,3,example.number_of_ghost_cells);
+    EXTRAPOLATION_HIGHER_ORDER<TV,T> eho(example.grid,phi,example.number_of_ghost_cells*10,3,example.number_of_ghost_cells);
     eho.periodic=true;
     eho.Extrapolate_Face([&](const FACE_INDEX<TV::m>& index){return color(index)==c;},u);
     example.boundary.Fill_Ghost_Faces(example.grid,u,u,0,example.number_of_ghost_cells);
