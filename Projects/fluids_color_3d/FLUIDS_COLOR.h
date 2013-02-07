@@ -153,13 +153,65 @@ public:
 
         if(!override_output_directory) output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number);
         switch(test_number){
-            case 0:{
+            case 0:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()+1));
                 use_p_null_mode=true;
-            } break;
-            default: PHYSBAM_FATAL_ERROR("Missing test number");}
+                break;
+            case 1:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,TV(1,2,3),rho0*sqr(m)/kg));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
+                break;
+            case 2:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()+1));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
+                break;
+            case 3:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_RAREFACTION);
+                omit_solve=true;
+                break;
+            case 4:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).6,(T).8,(T).7),TV(1,2,3),rho0*sqr(m)/kg));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
+                break;
+            case 5:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                {
+                    TV vel((T).2,(T).5,(T).3);
+                    analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,1,0),vel);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(vel));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(vel));
+                    use_p_null_mode=true;
+                    use_level_set_method=true;
+                }
+                break;
+            case 6:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,1);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()));
+                surface_tension=1*kg*m/(s*s);
+                use_p_null_mode=true;
+                use_level_set_method=true;
+                break;
+            case 7:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
+                ANALYTIC_VELOCITY_CONST* a=new ANALYTIC_VELOCITY_CONST(TV());
+                a->const_p=1;
+                analytic_velocity.Append(a);
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
+                break;}
+             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
         if(analytic_velocity.m) number_of_colors=analytic_velocity.m;
     }
@@ -293,6 +345,27 @@ public:
         virtual TV u(const TV& X,T t) const {return au;}
         virtual MATRIX<T,3> du(const TV& X,T t) const {return MATRIX<T,3>();}
         virtual T p(const TV& X,T t) const {return const_p;}
+        virtual TV F(const TV& X,T t) const {return TV();}
+    };
+
+    struct ANALYTIC_VELOCITY_ROTATION:public ANALYTIC_VELOCITY
+    {
+        TV c;
+        TV n;
+        T rho;
+        ANALYTIC_VELOCITY_ROTATION(TV cc,TV nn,T rho): c(cc),n(nn.Normalized()),rho(rho){}
+        virtual TV u(const TV& X,T t) const {return TV::Cross_Product(n,X-c);}
+        virtual MATRIX<T,3> du(const TV& X,T t) const {return MATRIX<T,3>::Cross_Product_Matrix(n);}
+        virtual T p(const TV& X,T t) const {return (T).5*rho*u(X,t).Magnitude_Squared();}
+        virtual TV F(const TV& X,T t) const {return TV();}
+    };
+
+    struct ANALYTIC_VELOCITY_RAREFACTION:public ANALYTIC_VELOCITY
+    {
+        ANALYTIC_VELOCITY_RAREFACTION(){}
+        virtual TV u(const TV& X,T t) const {return TV(X.x,0,0)/(t+1);}
+        virtual MATRIX<T,3> du(const TV& X,T t) const {return MATRIX<T,3>(1,0,0,0,0,0,0,0,0)/(t+1);}
+        virtual T p(const TV& X,T t) const {return 0;}
         virtual TV F(const TV& X,T t) const {return TV();}
     };
 
