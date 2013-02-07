@@ -8,5 +8,5 @@
 (setq physbam-compile-count 4)
 
 
-(setq physbam-output-directory "/home/fanfu/Libs/PhysBAM-0/Projects/articulated_rigid_bodies/Blocks/output")
+(setq physbam-output-directory "/home/fanfu/Libs/PhysBAM-0/Projects/mpm/output")
 
