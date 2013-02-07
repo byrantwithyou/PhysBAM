@@ -254,8 +254,10 @@ Update_Level_Set(T dt,bool first_step)
 {
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi advection",0,1);
     example.particle_levelset_evolution_multiple.Advance_Levelset(dt);
+    Enforce_Phi_Boundary_Conditions();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before reinitialization",0,1);
     example.particle_levelset_evolution_multiple.Make_Signed_Distance();
+    Enforce_Phi_Boundary_Conditions();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after level set update",0,1);
     example.Rebuild_Levelset_Color();
 }
@@ -488,6 +490,17 @@ Write_Output_Files(const int frame)
         FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
     example.Write_Output_Files(frame);
     FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
+}
+//#####################################################################
+// Function Enforce_Phi_Boundary_Conditions
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Enforce_Phi_Boundary_Conditions()
+{
+    ARRAY<ARRAY<T,TV_INT> >& phis=example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis;
+    for(int i=0;i<phis.m;i++){
+        example.boundary.Fill_Ghost_Cells(example.grid,phis(i),phis(i),0,0,example.number_of_ghost_cells);
+        if(phis(i).array.Min()>=0) phis(i).array.Fill(example.number_of_ghost_cells*example.grid.dX.Max());}
 }
 //#####################################################################
 namespace PhysBAM{
