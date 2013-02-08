@@ -444,6 +444,7 @@ public:
 
     void Level_Set_Error(T time)
     {
+        if(!analytic_levelset || analytic_initial_only) return;
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
             int c=levelset_color.color(it.index);
             T p=levelset_color.phi(it.index);
@@ -460,6 +461,23 @@ public:
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,0));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(levelset_color.phi(it.index)-p));}}
         PHYSBAM_DEBUG_WRITE_SUBSTEP("level set error",0,1);
+    }
+
+    void Velocity_Error(T time)
+    {
+        if(!analytic_velocity.m || analytic_initial_only) return;
+        T max_error=0,a=0,b=0;
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+            int c=levelset_color.Color(it.Location());
+            if(c<0) continue;
+            T A=face_velocities(c)(it.Full_Index()),B=analytic_velocity(c)->u(it.Location()/m,time/s)(it.Axis())*m/s;
+            a=max(a,abs(A));
+            b=max(b,abs(B));
+            max_error=max(max_error,abs(A-B));
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(A-B));}
+        LOG::cout<<"max_error "<<max_error<<"  "<<a<<"  "<<b<<std::endl;
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("velocity error",0,1);
     }
 
     void Dump_Analytic_Levelset(T time)
@@ -629,19 +647,7 @@ public:
     void End_Time_Step(const T time) PHYSBAM_OVERRIDE
     {
         Level_Set_Error(time);
-        if(analytic_velocity.m && !analytic_initial_only){
-            T max_error=0,a=0,b=0;
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-                int c=levelset_color.Color(it.Location());
-                if(c<0) continue;
-                T A=face_velocities(c)(it.Full_Index()),B=analytic_velocity(c)->u(it.Location()/m,time/s)(it.Axis())*m/s;
-                a=max(a,abs(A));
-                b=max(b,abs(B));
-                max_error=max(max_error,abs(A-B));
-                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(A-B));}
-            LOG::cout<<"max_error "<<max_error<<"  "<<a<<"  "<<b<<std::endl;}
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("velocity error",0,1);
+        Velocity_Error(time);
     }
 
     MATRIX<T,2> Stress(const TV& X,int color,T time)
