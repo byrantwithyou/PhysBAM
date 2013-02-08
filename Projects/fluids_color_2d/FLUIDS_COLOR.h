@@ -641,6 +641,7 @@ public:
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(A-B));}
             LOG::cout<<"max_error "<<max_error<<"  "<<a<<"  "<<b<<std::endl;}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("velocity error",0,1);
     }
 
     MATRIX<T,2> Stress(const TV& X,int color,T time)
