@@ -63,16 +63,12 @@ Evaluate_Weights_And_Grad_Weights(const GRID<TV>& grid)
 }
 
 //#####################################################################
-template class MPM_PARTICLE<VECTOR<float,1>,2>;
 template class MPM_PARTICLE<VECTOR<float,2>,2>;
 template class MPM_PARTICLE<VECTOR<float,3>,2>;
-template class MPM_PARTICLE<VECTOR<double,1>,2>;
 template class MPM_PARTICLE<VECTOR<double,2>,2>;
 template class MPM_PARTICLE<VECTOR<double,3>,2>;
-template class MPM_PARTICLE<VECTOR<float,1>,4>;
 template class MPM_PARTICLE<VECTOR<float,2>,4>;
 template class MPM_PARTICLE<VECTOR<float,3>,4>;
-template class MPM_PARTICLE<VECTOR<double,1>,4>;
 template class MPM_PARTICLE<VECTOR<double,2>,4>;
 template class MPM_PARTICLE<VECTOR<double,3>,4>;
 }

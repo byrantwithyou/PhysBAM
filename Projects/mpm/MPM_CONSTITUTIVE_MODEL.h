@@ -9,28 +9,28 @@
 
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 
 namespace PhysBAM{
 
-using ::std::exp
+using ::std::exp;
 
 template<class TV>
 class MPM_CONSTITUTIVE_MODEL
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef MATRIX<T,TV::m> MTX;
-    typedef DIAGONAL_MATRIX<T,TV::m> MTX_DIAG;
 
 public:
 
     T mu0,lambda0,xi;
 
-    MTX Fe,Fp;
+    MATRIX<T,TV::m> Fe,Fp;
 
     T Je,Jp;
-    MTX Re,Se,Ue,Ve;
-    MTX_DIAG SIGMAe;
+    MATRIX<T,TV::m> Re,Se,Ue,Ve;
+    DIAGONAL_MATRIX<T,TV::m> SIGMAe;
     T mu,lambda;
 
     MPM_CONSTITUTIVE_MODEL();
@@ -41,10 +41,11 @@ public:
 
     T Energy_Density_Psi();
     
-    MTX dPsi_dFe();
+    MATRIX<T,TV::m> dPsi_dFe();
 
-    MTX d2Psi_dFe_dFe_Action_dF(const MTX& dF);
+    MATRIX<T,TV::m> d2Psi_dFe_dFe_Action_dF(const MATRIX<T,TV::m>& dF);
 
+protected:
 //#####################################################################
 };
 }

@@ -8,6 +8,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include "MPM_PARTICLE.h"
+#include "MPM_CONSTITUTIVE_MODEL.h"
 
 using namespace PhysBAM;
 
