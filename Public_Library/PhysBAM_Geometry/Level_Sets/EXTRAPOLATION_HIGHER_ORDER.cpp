@@ -73,8 +73,9 @@ Register_Nodes(boost::function<bool(const TV_INT& index)> inside_mask,ARRAY<VECT
         bool b=inside_mask(it.index);
         node_to_index(it.index)=-1-b;}
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
-        Add_Neighbors(next_inside,neighbors_inside,it.index,-2,-4);
+    if(!periodic)
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+            Add_Neighbors(next_inside,neighbors_inside,it.index,-2,-4);
 
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
         bool b=inside_mask(it.index);
@@ -204,6 +205,16 @@ Extrapolate_Node(boost::function<bool(const TV_INT& index)> inside_mask,ARRAYS_N
     tmp(0)=FLT_MAX/100;
     for(int o=order-1;o>=0;o--) for(int i=0;i<iterations;i++) Extrapolate_RK2(stencil,du[o],(o!=order-1?&du[o+1]:0),tmp,o,dt);
     for(int i=solve_indices(0).min_corner;i<solve_indices(0).max_corner;i++) u(index_to_node(i))=du[0](i);
+    if(periodic)
+        for(int a=0;a<TV::m;a++)
+            for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*a+1);it.Valid();it.Next()){
+                TV_INT itindex=it.index;
+                itindex(a)-=combine_ends(a);
+                TV_INT index=itindex;
+                Periodic_Index(index);
+                int k=node_to_index(index);
+                if(k>0 && k<fill_indices(0).min_corner)
+                    u(itindex)=u(index);}
     node_to_index.Clean_Memory();
     index_to_node.Remove_All();
     normal.Remove_All();
@@ -250,7 +261,7 @@ Register_Index(TV_INT index,int only_neg)
     if(!node_to_index.Valid_Index(index)) return 0;
     int& n=node_to_index(index);
     if(n<0 && (only_neg>=0 || n==only_neg)) n=index_to_node.Append(index);
-    return n;
+    return n<0?0:n;
 }
 //#####################################################################
 // Function Periodic_Index
