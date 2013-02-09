@@ -7,7 +7,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include "MPM_PARTICLE.h"
+//#include "MPM_PARTICLES.h"
 #include "MPM_CONSTITUTIVE_MODEL.h"
 
 using namespace PhysBAM;
@@ -15,23 +15,21 @@ using namespace PhysBAM;
 int main(int argc,char *argv[])
 {
     static const int dimension=2;
-    static const int influence_n=4;
     typedef double T;
     typedef VECTOR<T,dimension> TV;
     typedef VECTOR<int,dimension> TV_INT;
     
-    TV_INT grid_counts(6,7);
-    RANGE<TV> grid_box(TV(0,0),TV(5,6));
-    GRID<TV> grid(grid_counts,grid_box);
+    // TV_INT grid_counts(6,7);
+    // RANGE<TV> grid_box(TV(0,0),TV(5,6));
+    // GRID<TV> grid(grid_counts,grid_box);
     
-    MPM_PARTICLE<TV,influence_n> p(1,1,TV(2.75,3.5),TV(0,0),1,grid);
+    // MPM_PARTICLE<TV,influence_n> p(1,1,TV(2.75,3.5),TV(0,0),1,grid);
 
-    LOG::cout<<p.influence_corner<<std::endl;
-    LOG::cout<<p.weights<<std::endl;
+    // LOG::cout<<p.influence_corner<<std::endl;
+    // LOG::cout<<p.weights<<std::endl;
 
-    // MPM_CONSTITUTIVE_MODEL<TV> test;
-    // test.Initialize(3000,0.3,0);
-    // test.Derivative_Test();
+    MPM_CONSTITUTIVE_MODEL<TV> test;
+    test.Derivative_Test();
 
     return 0;
 }

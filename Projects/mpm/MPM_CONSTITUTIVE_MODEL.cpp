@@ -19,43 +19,30 @@ template<class TV> MPM_CONSTITUTIVE_MODEL<TV>::
 ~MPM_CONSTITUTIVE_MODEL()
 {}
 //#####################################################################
-// Function Initialize
+// Function Compute_Helper_Quantities_Using_F
 //#####################################################################
 template<class TV> void MPM_CONSTITUTIVE_MODEL<TV>::
-Initialize(const T youngs_modulus,const T poisson_ratio,const T hardening_coefficient)
-{
-    mu0=youngs_modulus/(2.0*(1.0+poisson_ratio));
-    lambda0=youngs_modulus*poisson_ratio/((1.0+poisson_ratio)*(1.0-2.0*poisson_ratio));
-    xi=hardening_coefficient;
-}
-//#####################################################################
-// Function Update_Quantities_Using_Current_Deformation_Gradient
-//#####################################################################
-template<class TV> void MPM_CONSTITUTIVE_MODEL<TV>::
-Update_Quantities_Using_Current_Deformation_Gradient()
+Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Fp,T& Je,T& Jp,MATRIX<T,TV::m>& Ue,DIAGONAL_MATRIX<T,TV::m>& SIGMAe,MATRIX<T,TV::m>& Ve,MATRIX<T,TV::m>& Re,MATRIX<T,TV::m>& Se)
 {
     Je=Fe.Determinant();
     Jp=Fp.Determinant();
     Fe.Fast_Singular_Value_Decomposition(Ue,SIGMAe,Ve);
     Re=Ue*Ve.Transposed();
     Se=Re.Transposed()*Fe;
-    T lame_factor=exp(xi*(1.0-Jp));
-    mu=mu0*lame_factor;
-    lambda=lambda0*lame_factor;
 }
 //#####################################################################
-// Function Energy_Density_Psi
+// Function Compute_Energy_Density_Psi
 //#####################################################################
 template<class TV> typename TV::SCALAR MPM_CONSTITUTIVE_MODEL<TV>::
-Energy_Density_Psi()
+Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je)
 {
     return (Fe-Re).Frobenius_Norm_Squared()*mu+0.5*lambda*sqr(Je-1);
 }
 //#####################################################################
-// Function dPsi_dFe
+// Function Compute_dPsi_dFe
 //#####################################################################
 template<class TV> MATRIX<typename TV::SCALAR,TV::m> MPM_CONSTITUTIVE_MODEL<TV>::
-dPsi_dFe()
+Compute_dPsi_dFe(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je)
 {
     return (Fe-Re)*2.0*mu+Fe.Inverse_Transposed()*Je*lambda*(Je-1);
 }
@@ -103,10 +90,10 @@ template<class T> static MATRIX<T,3> Compute_dR(const MATRIX<T,3>& R,const MATRI
     return R*MATRIX<T,3>(0,-x(0),-x(1),x(0),0,-x(2),x(1),x(2),0);
 }
 //#####################################################################
-// Function d2Psi_dFe_dFe_Action_dF
+// Function Compute_d2Psi_dFe_dFe_Action_dF
 //#####################################################################
 template<class TV> MATRIX<typename TV::SCALAR,TV::m> MPM_CONSTITUTIVE_MODEL<TV>::
-d2Psi_dFe_dFe_Action_dF(const MATRIX<T,TV::m>& dF)
+Compute_d2Psi_dFe_dFe_Action_dF(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const T& Je,const MATRIX<T,TV::m>& Re,const MATRIX<T,TV::m>& Se,const MATRIX<T,TV::m>& dF)
 {
     MATRIX<T,TV::m> JFinvT=Fe.Inverse_Transposed()*Je;
     MATRIX<T,TV::m> dJFinvT=Compute_dJFinvT(Fe,dF);
@@ -120,26 +107,34 @@ d2Psi_dFe_dFe_Action_dF(const MATRIX<T,TV::m>& dF)
 template<class TV> void MPM_CONSTITUTIVE_MODEL<TV>::
 Derivative_Test()
 {
+    MATRIX<T,TV::m> Fe=MATRIX<T,TV::m>::Identity_Matrix();
+    MATRIX<T,TV::m> Fp=MATRIX<T,TV::m>::Identity_Matrix();
+    MATRIX<T,TV::m> Ue,Ve,Re,Se;
+    DIAGONAL_MATRIX<T,TV::m> SIGMAe;
+    T Je,Jp;
+    T youngs_modulus=3000,poisson_ratio=0.3;
+    T mu=youngs_modulus/(2.0*(1.0+poisson_ratio));
+    T lambda=youngs_modulus*poisson_ratio/((1.0+poisson_ratio)*(1.0-2.0*poisson_ratio));
+
     RANDOM_NUMBERS<T> rand_generator;
     MATRIX<T,TV::m> F1,F2,dF;
     T Psi1,Psi2;
     MATRIX<T,TV::m> P1,P2,dP1,dP2;
     T eps=1e-5;
-
     for(int i=0;i<10000;i++){
         rand_generator.Fill_Uniform(F1,-1,1);
         rand_generator.Fill_Uniform(dF,-eps,eps);
         Fe=F1;
-        Update_Quantities_Using_Current_Deformation_Gradient();
-        Psi1=Energy_Density_Psi();
-        P1=dPsi_dFe();
-        dP1=d2Psi_dFe_dFe_Action_dF(dF);
+        Compute_Helper_Quantities_Using_F(Fe,Fp,Je,Jp,Ue,SIGMAe,Ve,Re,Se);
+        Psi1=Compute_Elastic_Energy_Density_Psi(mu,lambda,Fe,Re,Je);
+        P1=Compute_dPsi_dFe(mu,lambda,Fe,Re,Je);
+        dP1=Compute_d2Psi_dFe_dFe_Action_dF(mu,lambda,Fe,Je,Re,Se,dF);
         F2=F1+dF;
         Fe=F2;
-        Update_Quantities_Using_Current_Deformation_Gradient();
-        Psi2=Energy_Density_Psi();
-        P2=dPsi_dFe();
-        dP2=d2Psi_dFe_dFe_Action_dF(dF);
+        Compute_Helper_Quantities_Using_F(Fe,Fp,Je,Jp,Ue,SIGMAe,Ve,Re,Se);
+        Psi2=Compute_Elastic_Energy_Density_Psi(mu,lambda,Fe,Re,Je);
+        P2=Compute_dPsi_dFe(mu,lambda,Fe,Re,Je);
+        dP2=Compute_d2Psi_dFe_dFe_Action_dF(mu,lambda,Fe,Je,Re,Se,dF);
 
         T energy_test_result=((Psi2-Psi1)-(P2+P1).Times_Transpose(dF).Trace()/2)/eps;
         T force_test_result=((P2-P1)-(dP2+dP1)/2).Frobenius_Norm()/eps;

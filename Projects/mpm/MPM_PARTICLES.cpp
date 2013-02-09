@@ -3,11 +3,12 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include "MPM_PARTICLES.h"
+#include "MPM_PARTICLES_FORWARD.h"
 namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class TV,int IN> MPM_PARTICLES<TV,IN>::
+template<class TV> MPM_PARTICLES<TV>::
 MPM_PARTICLES()
 {
     Store_Velocity();
@@ -20,7 +21,7 @@ MPM_PARTICLES()
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class TV,int IN> MPM_PARTICLES<TV,IN>::
+template<class TV> MPM_PARTICLES<TV>::
 ~MPM_PARTICLES()
 {}
 static int Initialize_MPM_Particles()

@@ -14,8 +14,6 @@
 
 namespace PhysBAM{
 
-using ::std::exp;
-
 template<class TV>
 class MPM_CONSTITUTIVE_MODEL
 {
@@ -24,21 +22,13 @@ class MPM_CONSTITUTIVE_MODEL
 
 public:
 
-    T xi;
-
-    ARRAY_VIEW<T> mu,lambda;
-    ARRAY_VIEW<T> Je,Jp;
-    ARRAY_VIEW<MATRIX<T,TV::m> > Re,Se,Ue,Ve;
-    ARRAY_VIEW<DIAGONAL_MATRIX<T,TV::m> > SIGMAe;
-
     MPM_CONSTITUTIVE_MODEL();
     ~MPM_CONSTITUTIVE_MODEL();
 
-    void Initialize(const T youngs_modulus,const T poisson_ratio,const T hardening_coefficient);
-    void Update_Quantities_Using_Current_Deformation_Gradient();
-    T Energy_Density_Psi();
-    MATRIX<T,TV::m> dPsi_dFe();
-    MATRIX<T,TV::m> d2Psi_dFe_dFe_Action_dF(const MATRIX<T,TV::m>& dF);
+    void Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Fp,T& Je,T& Jp,MATRIX<T,TV::m>& Ue,DIAGONAL_MATRIX<T,TV::m>& SIGMAe,MATRIX<T,TV::m>& Ve,MATRIX<T,TV::m>& Re,MATRIX<T,TV::m>& Se);
+    T Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je);
+    MATRIX<T,TV::m> Compute_dPsi_dFe(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je);
+    MATRIX<T,TV::m> Compute_d2Psi_dFe_dFe_Action_dF(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const T& Je,const MATRIX<T,TV::m>& Re,const MATRIX<T,TV::m>& Se,const MATRIX<T,TV::m>& dF);
     void Derivative_Test();
 //#####################################################################
 };
