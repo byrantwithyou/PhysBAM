@@ -2,27 +2,30 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class MPM_GRID_BASIS_FUNCTION
+// Class MPM_CUBIC_B_SPLINE
 //#####################################################################
-#ifndef __MPM_GRID_BASIS_FUNCTION__
-#define __MPM_GRID_BASIS_FUNCTION__
+#ifndef __MPM_CUBIC_B_SPLINE__
+#define __MPM_CUBIC_B_SPLINE__
 
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include "MPM_GRID_BASIS_FUNCTION.h"
 namespace PhysBAM{
 
 template<class TV,int order>
-class MPM_GRID_BASIS_FUNCTION
+class MPM_CUBIC_B_SPLINE:public MPM_GRID_BASIS_FUNCTION<TV,order>
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
+    typedef MPM_GRID_BASIS_FUNCTION<TV,order> BASE;
 public:
-    static const int IN=order+1;
-    MPM_GRID_BASIS_FUNCTION(){}
-    ~MPM_GRID_BASIS_FUNCTION(){}
+    using BASE::IN;
+
+    MPM_CUBIC_B_SPLINE();
+    ~MPM_CUBIC_B_SPLINE();
     
-    virtual void Build_Weights_And_Grad_Weight_Over_Weights(const TV&X,const GRID<TV>& grid,TV_INT& influence_corner,VECTOR<TV,IN>& weight,VECTOR<TV,IN>& grad_weight_over_weight)=0;
+    void Build_Weights_And_Grad_Weight_Over_Weights(const TV& X,const GRID<TV>& grid,TV_INT& influence_corner,VECTOR<TV,IN>& weight,VECTOR<TV,IN>& grad_weight_over_weight) PHYSBAM_OVERRIDE;
 
 //#####################################################################
 };
