@@ -19,9 +19,7 @@ class MPM_CONSTITUTIVE_MODEL
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-
 public:
-
     MPM_CONSTITUTIVE_MODEL();
     ~MPM_CONSTITUTIVE_MODEL();
 
