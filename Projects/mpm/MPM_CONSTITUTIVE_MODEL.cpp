@@ -2,24 +2,22 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-
+#include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include "MPM_CONSTITUTIVE_MODEL.h"
 namespace PhysBAM{
-
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> MPM_CONSTITUTIVE_MODEL<TV>::
 MPM_CONSTITUTIVE_MODEL()
 {}
-
 //#####################################################################
 // Destructor
 //#####################################################################
 template<class TV> MPM_CONSTITUTIVE_MODEL<TV>::
 ~MPM_CONSTITUTIVE_MODEL()
 {}
-
 //#####################################################################
 // Function Initialize
 //#####################################################################
@@ -29,10 +27,7 @@ Initialize(const T youngs_modulus,const T poisson_ratio,const T hardening_coeffi
     mu0=youngs_modulus/(2.0*(1.0+poisson_ratio));
     lambda0=youngs_modulus*poisson_ratio/((1.0+poisson_ratio)*(1.0-2.0*poisson_ratio));
     xi=hardening_coefficient;
-    Fe=MATRIX<T,TV::m>::Identity_Matrix();
-    Fp=MATRIX<T,TV::m>::Identity_Matrix();
 }
-
 //#####################################################################
 // Function Update_Quantities_Using_Current_Deformation_Gradient
 //#####################################################################
@@ -48,7 +43,6 @@ Update_Quantities_Using_Current_Deformation_Gradient()
     mu=mu0*lame_factor;
     lambda=lambda0*lame_factor;
 }
-
 //#####################################################################
 // Function Energy_Density_Psi
 //#####################################################################
@@ -57,7 +51,6 @@ Energy_Density_Psi()
 {
     return (Fe-Re).Frobenius_Norm_Squared()*mu+0.5*lambda*sqr(Je-1);
 }
-
 //#####################################################################
 // Function dPsi_dFe
 //#####################################################################
@@ -66,19 +59,17 @@ dPsi_dFe()
 {
     return (Fe-Re)*2.0*mu+Fe.Inverse_Transposed()*Je*lambda*(Je-1);
 }
-
 //#####################################################################
 // Helper Function Compute_dJFinvT // 2d
 //#####################################################################
-template<class T> MATRIX<T,2> Compute_dJFinvT(const MATRIX<T,2>& F,const MATRIX<T,2>& dF)
+template<class T> static MATRIX<T,2> Compute_dJFinvT(const MATRIX<T,2>& F,const MATRIX<T,2>& dF)
 {
     return MATRIX<T,2>(dF(1,1),-dF(0,1),-dF(1,0),dF(0,0));
 }
-
 //#####################################################################
 // Helper Function Compute_dJFinvT // 3d
 //#####################################################################
-template<class T> MATRIX<T,3> Compute_dJFinvT(const MATRIX<T,3>&F,const MATRIX<T,3>& dF)
+template<class T> static MATRIX<T,3> Compute_dJFinvT(const MATRIX<T,3>&F,const MATRIX<T,3>& dF)
 {
     MATRIX<T,3> result;
     result(0,0)=dF(1,1)*F(2,2)+F(1,1)*dF(2,2)-dF(2,1)*F(1,2)-F(2,1)*dF(1,2);
@@ -92,20 +83,18 @@ template<class T> MATRIX<T,3> Compute_dJFinvT(const MATRIX<T,3>&F,const MATRIX<T
     result(2,2)=dF(0,0)*F(1,1)+F(0,0)*dF(1,1)-dF(1,0)*F(0,1)-F(1,0)*dF(0,1);
     return result;
 }
-
 //#####################################################################
 // Helper Function Compute_dR // 2d
 //#####################################################################
-template<class T> MATRIX<T,2> Compute_dR(const MATRIX<T,2>& R,const MATRIX<T,2>& S,const MATRIX<T,2>& dF)
+template<class T> static MATRIX<T,2> Compute_dR(const MATRIX<T,2>& R,const MATRIX<T,2>& S,const MATRIX<T,2>& dF)
 {
     T y=((R.Transposed()*dF)-(dF.Transposed()*R))(0,1)/(S(0,0)+S(1,1));
     return R*MATRIX<T,2>(0,-y,y,0);
 }
-
 //#####################################################################
 // Helper Function Compute_dR // 3d
 //#####################################################################
-template<class T> MATRIX<T,3> Compute_dR(const MATRIX<T,3>& R,const MATRIX<T,3>& S,const MATRIX<T,3>& dF)
+template<class T> static MATRIX<T,3> Compute_dR(const MATRIX<T,3>& R,const MATRIX<T,3>& S,const MATRIX<T,3>& dF)
 {
     MATRIX<T,3> H=(R.Transposed()*dF)-(dF.Transposed()*R);
     VECTOR<T,3> b(H(0,1),H(0,2),H(1,2));
@@ -113,7 +102,6 @@ template<class T> MATRIX<T,3> Compute_dR(const MATRIX<T,3>& R,const MATRIX<T,3>&
     VECTOR<T,3> x=A.Solve_Linear_System(b);
     return R*MATRIX<T,3>(0,-x(0),-x(1),x(0),0,-x(2),x(1),x(2),0);
 }
-
 //#####################################################################
 // Function d2Psi_dFe_dFe_Action_dF
 //#####################################################################
@@ -126,7 +114,39 @@ d2Psi_dFe_dFe_Action_dF(const MATRIX<T,TV::m>& dF)
     T contraction=MATRIX<T,TV::m>::Inner_Product(JFinvT,dF);
     return 2*mu*(dF-dR)+lambda*JFinvT*contraction+lambda*(Je-1)*dJFinvT;
 }
+//#####################################################################
+// Function Derivative_Test
+//#####################################################################
+template<class TV> void MPM_CONSTITUTIVE_MODEL<TV>::
+Derivative_Test()
+{
+    RANDOM_NUMBERS<T> rand_generator;
+    MATRIX<T,TV::m> F1,F2,dF;
+    T Psi1,Psi2;
+    MATRIX<T,TV::m> P1,P2,dP1,dP2;
+    T eps=1e-5;
 
+    for(int i=0;i<10000;i++){
+        rand_generator.Fill_Uniform(F1,-1,1);
+        rand_generator.Fill_Uniform(dF,-eps,eps);
+        Fe=F1;
+        Update_Quantities_Using_Current_Deformation_Gradient();
+        Psi1=Energy_Density_Psi();
+        P1=dPsi_dFe();
+        dP1=d2Psi_dFe_dFe_Action_dF(dF);
+        F2=F1+dF;
+        Fe=F2;
+        Update_Quantities_Using_Current_Deformation_Gradient();
+        Psi2=Energy_Density_Psi();
+        P2=dPsi_dFe();
+        dP2=d2Psi_dFe_dFe_Action_dF(dF);
+
+        T energy_test_result=((Psi2-Psi1)-(P2+P1).Times_Transpose(dF).Trace()/2)/eps;
+        T force_test_result=((P2-P1)-(dP2+dP1)/2).Frobenius_Norm()/eps;
+   
+        LOG::cout<<"Energy Test: "<<energy_test_result<<std::endl;
+        LOG::cout<<"P test     : "<<force_test_result<<std::endl;}
+}
 //#####################################################################
 template class MPM_CONSTITUTIVE_MODEL<VECTOR<float,2> >;
 template class MPM_CONSTITUTIVE_MODEL<VECTOR<float,3> >;

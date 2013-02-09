@@ -24,28 +24,22 @@ class MPM_CONSTITUTIVE_MODEL
 
 public:
 
-    T mu0,lambda0,xi;
+    T xi;
 
-    MATRIX<T,TV::m> Fe,Fp;
-
-    T Je,Jp;
-    MATRIX<T,TV::m> Re,Se,Ue,Ve;
-    DIAGONAL_MATRIX<T,TV::m> SIGMAe;
-    T mu,lambda;
+    ARRAY_VIEW<T> mu,lambda;
+    ARRAY_VIEW<T> Je,Jp;
+    ARRAY_VIEW<MATRIX<T,TV::m> > Re,Se,Ue,Ve;
+    ARRAY_VIEW<DIAGONAL_MATRIX<T,TV::m> > SIGMAe;
 
     MPM_CONSTITUTIVE_MODEL();
     ~MPM_CONSTITUTIVE_MODEL();
+
     void Initialize(const T youngs_modulus,const T poisson_ratio,const T hardening_coefficient);
-
     void Update_Quantities_Using_Current_Deformation_Gradient();
-
     T Energy_Density_Psi();
-    
     MATRIX<T,TV::m> dPsi_dFe();
-
     MATRIX<T,TV::m> d2Psi_dFe_dFe_Action_dF(const MATRIX<T,TV::m>& dF);
-
-protected:
+    void Derivative_Test();
 //#####################################################################
 };
 }

@@ -29,5 +29,9 @@ int main(int argc,char *argv[])
     LOG::cout<<p.influence_corner<<std::endl;
     LOG::cout<<p.weights<<std::endl;
 
+    // MPM_CONSTITUTIVE_MODEL<TV> test;
+    // test.Initialize(3000,0.3,0);
+    // test.Derivative_Test();
+
     return 0;
 }
