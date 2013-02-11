@@ -70,6 +70,7 @@ public:
     bool override_rho1;
     bool override_mu0;
     bool override_mu1;
+    bool use_pls_over_levelset;
 
     struct ANALYTIC_VELOCITY
     {
@@ -88,7 +89,7 @@ public:
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),
         rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),no_advection(false),refine(1),
-        surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),analytic_initial_only(false),
+        surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),use_pls_over_levelset(false),analytic_initial_only(false),
         epsilon((T).1),radius((T).05),mode(2)
     {
         last_frame=16;
@@ -102,6 +103,7 @@ public:
         parse_args.Add("-steps",&time_steps_per_frame,"steps","number of time steps per frame");
         parse_args.Add("-last_frame",&last_frame,&user_last_frame,"frame","number of frames to simulate");
         parse_args.Add("-dump_matrix",&dump_matrix,"dump out system and rhs");
+        parse_args.Add("-use_pls",&use_pls_over_levelset,"use_particle_level_set");
         parse_args.Add("-mu0",&mu0,&override_mu0,"viscosity","viscosity for first fluid region");
         parse_args.Add("-mu1",&mu1,&override_mu1,"viscosity","viscosity for second fluid region");
         parse_args.Add("-rho0",&rho0,&override_rho0,"density","density for first fluid region");
@@ -407,7 +409,23 @@ public:
                 analytic_velocity.Append(a);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;}
+            case 25:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+
+                ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(.5,.2),.1,1,0);
+//                ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
+                ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),-4,-4);
+                //                ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).4,1,-4);
+                //analytic_levelset=new ANALYTIC_LEVELSET_ROTATE<TV>((new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV(0,0),TV(1,0),0,1)))->Add(ab)->Add(cd),(T)1,TV()+(T).5);
+                analytic_levelset=new ANALYTIC_LEVELSET_ROTATE<TV>((new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).4,0,1)))->Add(ab)->Add(cd),(T)1,TV()+(T).5);
+                //analytic_levelset=new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).4,1,-4),(T)1,TV()+(T).5);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0*sqr(m)/kg));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0*sqr(m)/kg));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
+                break;}
+
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
+        if(use_pls_over_levelset){use_pls=use_level_set_method;use_level_set_method=false;}
 
         if(analytic_velocity.m) number_of_colors=analytic_velocity.m;
     }

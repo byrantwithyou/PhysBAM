@@ -5,7 +5,7 @@ out="$1"
 shift
 L=""
 for r in {2..9} ; do
-    T=`tempfile`
+    T=`mktemp`
     O=`mktemp -d`
     (
         echo -n "$((8*$r)) "
@@ -16,7 +16,7 @@ for r in {2..9} ; do
 done
 wait
 
-T=`tempfile`
+T=`mktemp`
 cat $L | sort -n > $T
 gnuplot -p -e "set terminal png ; set output '$out' ; plot '$T' u (log10(\$1)):(log10(\$3)) title 'L-inf error' , -2*x , -2*x-1 , -x-2"
 rm $T $L
