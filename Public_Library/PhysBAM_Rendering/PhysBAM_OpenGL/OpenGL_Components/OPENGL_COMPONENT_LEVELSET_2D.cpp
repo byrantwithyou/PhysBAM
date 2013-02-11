@@ -46,7 +46,7 @@ template<class T,class RW> OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 template<class T,class RW> bool OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Valid_Frame(int frame_input) const
 {
-    if(use_sets) return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf(filename_set.c_str(),set,frame_input));
+    if(use_sets) return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame_input,set));
     else return FILE_UTILITIES::Frame_File_Exists(levelset_filename,frame_input);
 }
 

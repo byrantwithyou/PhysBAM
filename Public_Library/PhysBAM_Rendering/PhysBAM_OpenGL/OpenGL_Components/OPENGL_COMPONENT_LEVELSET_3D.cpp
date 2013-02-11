@@ -28,7 +28,7 @@ OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename_input,
 {
     int number_of_sets=0;
     while(filename_set!=""){
-        std::string filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,(number_of_sets+1));
+        std::string filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,number_of_sets);
         LOG::cout<<"Checking "<<filename<<std::endl;
         if(FILE_UTILITIES::File_Exists(filename)) number_of_sets++;
         else break;}
@@ -149,7 +149,7 @@ Reinitialize()
         if((is_animation && (frame_loaded != frame || set_loaded != set)) || (!is_animation && frame_loaded < 0)){
             if(use_sets){
                 for(int i=0;i<opengl_levelset_multiviews.m;i++)
-                    Reinitialize_Levelset(STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,i),STRING_UTILITIES::string_sprintf(filename_triangulated_surface_set.c_str(),frame,i),opengl_levelset_multiviews(i));
+                    Reinitialize_Levelset(STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,i),STRING_UTILITIES::string_sprintf(filename_triangulated_surface_set.c_str(),i,frame),opengl_levelset_multiviews(i));
                 set_loaded=set;}
             else Reinitialize_Levelset(FILE_UTILITIES::Get_Frame_Filename(levelset_filename.c_str(),frame), FILE_UTILITIES::Get_Frame_Filename(triangulated_surface_filename.c_str(),frame), opengl_levelset_multiview);
             frame_loaded=frame;

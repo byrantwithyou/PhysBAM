@@ -23,7 +23,7 @@ OPENGL_COMPONENT_PARTICLES_2D(const std::string &filename_input, const std::stri
 {
     number_of_sets=0;
     while(filename_set!=""){
-        std::string filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),(number_of_sets+1),frame);
+        std::string filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,number_of_sets);
         LOG::cout<<"Checking "<<filename<<std::endl;
         if(FILE_UTILITIES::File_Exists(filename)) number_of_sets++;
         else break;}
@@ -248,7 +248,7 @@ Reinitialize(bool force)
 
     for(int i=0;i<number_of_sets;i++){
         std::string frame_filename;
-        if(use_sets) frame_filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),i,frame);
+        if(use_sets) frame_filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,i);
         else frame_filename=FILE_UTILITIES::Get_Frame_Filename(filename,frame);
         
         try{
