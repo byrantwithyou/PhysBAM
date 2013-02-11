@@ -2,16 +2,16 @@
 
 F=""
 for r in 8 12 16 24 32 48 64 96 128 192 256 384 512 ; do
-    T=`tempfile`
+    T=`mktemp`
     F="$F $T"
     echo $r > $T
     projection -resolution $r "$@" >> $T &
 done
 wait
-T=`tempfile`
+T=`mktemp`
 cat $F | grep -v 'iterations\|Simulation' | tr '\n' '@' | sed 's/@ *\([up]\)/ \1/g' | tr @ '\n' | sort -n > $T
-E1=`tempfile --suffix=.eps`
-P1=`tempfile --suffix=.png`
+E1=`mktemp --suffix=.eps`
+P1=`mktemp --suffix=.png`
 gnuplot <<EOF
 set terminal postscript color eps
 set output '$E1'
