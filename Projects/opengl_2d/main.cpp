@@ -162,7 +162,7 @@ Read_Grid()
     filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset",basedir.c_str(),start_frame);
     // For backwards compatibility
     if(!FILE_UTILITIES::File_Exists(filename)) filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
-    if(!FILE_UTILITIES::File_Exists(filename)) filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset_1",basedir.c_str(),start_frame);
+    if(!FILE_UTILITIES::File_Exists(filename)) filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset_0",basedir.c_str(),start_frame);
 
     if(FILE_UTILITIES::File_Exists(basedir+"/common/coarse_grid")){
         coarse_filename=basedir+"/common/coarse_grid";
@@ -281,8 +281,8 @@ Initialize_Components_And_Key_Bindings()
     // Level sets
     filename=basedir+"/%d/levelset";
     OPENGL_COMPONENT_LEVELSET_2D<T>* levelset_component=0;
-    if(!FILE_UTILITIES::Frame_File_Exists(filename,start_frame) && !FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_1",start_frame)) filename=basedir+"/%d/levelset.phi"; // for backwards compatiblity
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_1",start_frame)){
+    if(!FILE_UTILITIES::Frame_File_Exists(filename,start_frame) && !FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_0",start_frame)) filename=basedir+"/%d/levelset.phi"; // for backwards compatiblity
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_0",start_frame)){
         levelset_component=new OPENGL_COMPONENT_LEVELSET_2D<T>(filename,basedir+"/%d/levelset_%d");
         if(levelset_component->opengl_levelsets.m>1) for(int j=0;j<levelset_component->opengl_levelsets.m;j++){
             levelset_component->opengl_levelsets(j)->draw_cells=false;
@@ -325,7 +325,7 @@ Initialize_Components_And_Key_Bindings()
     bool particles_stored_per_cell_uniform=false;
     if(has_valid_grid) particles_stored_per_cell_uniform=true;
     filename=basedir+"/%d/positive_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/positive_particles_1",start_frame)){
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/positive_particles_0",start_frame)){
         positive_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,basedir+"/%d/positive_particles_%d",true,particles_stored_per_cell_uniform);
         positive_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
         if(!positive_particles_component->Uses_Sets()) positive_particles_component->opengl_points->color=OPENGL_COLOR(1,.5,0);
@@ -336,7 +336,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('<',positive_particles_component->Previous_Set_CB());
         opengl_world.Append_Bind_Key('M',positive_particles_component->Toggle_Draw_Multiple_Particle_Sets_CB());}
     filename=basedir+"/%d/negative_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/negative_particles_1",start_frame)){
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/negative_particles_0",start_frame)){
         negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,
             basedir+"/%d/negative_particles_%d",true,particles_stored_per_cell_uniform);
         negative_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
@@ -348,7 +348,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('<',negative_particles_component->Previous_Set_CB());
         opengl_world.Append_Bind_Key('M',negative_particles_component->Toggle_Draw_Multiple_Particle_Sets_CB());}
     filename=basedir+"/%d/removed_positive_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_positive_particles_1",start_frame)){
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_positive_particles_0",start_frame)){
         removed_positive_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,basedir+"/%d/removed_positive_particles_%d",
             true,particles_stored_per_cell_uniform);
         removed_positive_particles_component->opengl_points->color=OPENGL_COLOR::Green();
@@ -359,7 +359,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('<',removed_positive_particles_component->Previous_Set_CB());
         opengl_world.Append_Bind_Key('M',removed_positive_particles_component->Toggle_Draw_Multiple_Particle_Sets_CB());}
     filename=basedir+"/%d/removed_negative_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_negative_particles_1",start_frame)){
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_negative_particles_0",start_frame)){
         removed_negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,
             basedir+"/%d/removed_negative_particles_%d",true,particles_stored_per_cell_uniform);
         removed_negative_particles_component->opengl_points->color=OPENGL_COLOR::Cyan();
@@ -761,7 +761,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('+',strain_component->Increase_Size_CB());
         opengl_world.Append_Bind_Key('_',strain_component->Decrease_Size_CB());}
 
-    filename=basedir+"/%d/strain_1";
+    filename=basedir+"/%d/strain_0";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D<T>* strain_component=new OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D<T>(grid,filename);
         Add_Component(strain_component,"Strain",'e',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);

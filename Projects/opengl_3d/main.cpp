@@ -319,10 +319,10 @@ Initialize_Components_And_Key_Bindings()
     coarse_filename=basedir+"/%d/coarse_levelset";
     filename2=allow_caching?(basedir+"/%d/levelset_tesselated"):"";
     // for backwards compatiblity
-    if(!FILE_UTILITIES::Frame_File_Exists(filename,start_frame) && !FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_1",start_frame)){
+    if(!FILE_UTILITIES::Frame_File_Exists(filename,start_frame) && !FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_0",start_frame)){
         filename=basedir+"/levelset_%d.phi";
         filename2=allow_caching?(basedir+"/levelset_%d.tri"):"";}
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_1",start_frame)){
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_0",start_frame)){
         OPENGL_COMPONENT_LEVELSET_3D<T>* levelset_component=new OPENGL_COMPONENT_LEVELSET_3D<T>(filename,filename2,basedir+"/levelset_%d.%d",basedir+"/levelset_tesselated_%d.%d",true);
         opengl_world.Set_Key_Binding_Category("Levelset");
         Add_Component(levelset_component,"Levelset",'l',BASIC_VISUALIZATION::OWNED);
@@ -640,7 +640,7 @@ Initialize_Components_And_Key_Bindings()
     bool particles_stored_per_cell_uniform=false,particles_stored_per_cell_adaptive=false;
         if(has_valid_grid) particles_stored_per_cell_uniform=true;
     filename=basedir+"/%d/positive_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/positive_particles_1",start_frame)){
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/positive_particles_0",start_frame)){
         positive_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,basedir+"/positive_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
         positive_particles_component->opengl_points->color=OPENGL_COLOR(1,0.5,0);
         positive_particles_component->opengl_points->point_size=2;
@@ -649,7 +649,7 @@ Initialize_Components_And_Key_Bindings()
         if(slice_manager.slice) slice_manager.Add_Object(positive_particles_component);}
 
     filename=basedir+"/%d/negative_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/negative_particles_1",start_frame)){
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/negative_particles_0",start_frame)){
         negative_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,basedir+"/negative_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
         negative_particles_component->opengl_points->color=OPENGL_COLOR(0,0.5,1);
         negative_particles_component->opengl_points->point_size=2;
@@ -658,7 +658,7 @@ Initialize_Components_And_Key_Bindings()
         if(slice_manager.slice) slice_manager.Add_Object(negative_particles_component);}
 
     filename=basedir+"/%d/removed_positive_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_positive_particles_1",start_frame)){
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_positive_particles_0",start_frame)){
         removed_positive_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,basedir+"/removed_positive_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
         removed_positive_particles_component->opengl_points->color=OPENGL_COLOR::Green();
         removed_positive_particles_component->opengl_points->point_size=2;
@@ -667,7 +667,7 @@ Initialize_Components_And_Key_Bindings()
         if(slice_manager.slice) slice_manager.Add_Object(removed_positive_particles_component);}
 
     filename=basedir+"/%d/removed_negative_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_negative_particles_1",start_frame)){
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_negative_particles_0",start_frame)){
         removed_negative_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,basedir+"/removed_negative_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
         removed_negative_particles_component->opengl_points->color=OPENGL_COLOR::Cyan();
         removed_negative_particles_component->opengl_points->point_size=2;
@@ -786,7 +786,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('_',strain_component->Decrease_Size_CB());
         slice_manager.Add_Object(strain_component);}
 
-    filename=basedir+"/%d/strain_1";
+    filename=basedir+"/%d/strain_0";
     if(!strain_component && has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         strain_component=new OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D<T>(grid,filename);
         Add_Component(strain_component,"Strain",'e',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
