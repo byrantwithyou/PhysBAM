@@ -409,16 +409,12 @@ public:
                 analytic_velocity.Append(a);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;}
-            case 25:{
+            case 25:{//A circle being rotated around inside a larger circle
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
 
-                ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(.5,.2),.1,1,0);
-//                ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
+                ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(.5,.3),.1,1,0);
                 ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),-4,-4);
-                //                ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).4,1,-4);
-                //analytic_levelset=new ANALYTIC_LEVELSET_ROTATE<TV>((new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV(0,0),TV(1,0),0,1)))->Add(ab)->Add(cd),(T)1,TV()+(T).5);
                 analytic_levelset=new ANALYTIC_LEVELSET_ROTATE<TV>((new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).4,0,1)))->Add(ab)->Add(cd),(T)1,TV()+(T).5);
-                //analytic_levelset=new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).4,1,-4),(T)1,TV()+(T).5);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0*sqr(m)/kg));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0*sqr(m)/kg));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
