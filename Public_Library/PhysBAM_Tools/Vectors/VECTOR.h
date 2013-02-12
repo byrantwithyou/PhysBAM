@@ -14,9 +14,18 @@
 #include <PhysBAM_Tools/Vectors/VECTOR_1D.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
+#include <cmath>
 #ifdef DIFFERENCE // Windows workaround.
 #undef DIFFERENCE
 #endif
+using ::std::abs;
+using ::std::floor;
+using ::std::ceil;
+using ::std::sqrt;
+using ::std::exp;
+using ::std::sin;
+using ::std::cos;
+using ::std::pow;
 namespace PhysBAM{
 
 template<class T_ARRAY,class T_INDICES> class INDIRECT_ARRAY;
@@ -357,25 +366,167 @@ template<class T,int d> inline VECTOR<T,d>
 Inverse(const VECTOR<T,d>& v)
 {VECTOR<T,d> r;for(int i=0;i<d;i++) r.array[i]=1/v.array[i];return r;}
 
-template<class T,int d> VECTOR<T,d> abs(const VECTOR<T,d>& v);
-template<class T,int d> VECTOR<T,d> floor(const VECTOR<T,d>& v);
-template<class T,int d> VECTOR<T,d> ceil(const VECTOR<T,d>& v);
-template<class T,int d> VECTOR<T,d> rint(const VECTOR<T,d>& v);
-template<class T,int d> VECTOR<T,d> exp(const VECTOR<T,d>& v);
-template<class T,int d> VECTOR<T,d> sin(const VECTOR<T,d>& v);
-template<class T,int d> VECTOR<T,d> cos(const VECTOR<T,d>& v);
-template<class T,int d> VECTOR<T,d> sqrt(const VECTOR<T,d>& v);
-
 //#####################################################################
-// Functions clamp, clamp_min, clamp_max, in_bounds
+// Function Dominant_Axis
 //#####################################################################
-template<class T,int d> VECTOR<T,d> clamp(const VECTOR<T,d>& v,const VECTOR<T,d>& vmin,const VECTOR<T,d>& vmax);
-template<class T,int d> VECTOR<T,d> clamp(const VECTOR<T,d>& v,const T& min,const T& max);
-template<class T,int d> VECTOR<T,d> clamp_min(const VECTOR<T,d>& v,const VECTOR<T,d>& vmin);
-template<class T,int d> VECTOR<T,d> clamp_min(const VECTOR<T,d>& v,const T& min);
-template<class T,int d> VECTOR<T,d> clamp_max(const VECTOR<T,d>& v,const VECTOR<T,d>& vmax);
-template<class T,int d> VECTOR<T,d> clamp_max(const VECTOR<T,d>& v,const T& max);
-template<class T,int d> VECTOR<T,d> in_bounds(const VECTOR<T,d>& v,const VECTOR<T,d>& vmin,const VECTOR<T,d>& vmax);
+template<class T,int d> inline int VECTOR<T,d>::
+Dominant_Axis() const
+{
+    int axis=1;
+    T abs_max=abs(array[0]);
+    for(int i=1;i<d;i++){T abs_i=abs(array[i]);if(abs_max<abs_i){abs_max=abs_i;axis=i;}}
+    return axis;
+}
+//#####################################################################
+// Function abs
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+abs(const VECTOR<T,d>& v)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=abs(v.array[i]);
+    return r;
+}
+//#####################################################################
+// Function floor
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+floor(const VECTOR<T,d>& v)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=floor(v.array[i]);
+    return r;
+}
+//#####################################################################
+// Function ceil
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+ceil(const VECTOR<T,d>& v)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=ceil(v.array[i]);
+    return r;
+}
+//#####################################################################
+// Function rint
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+rint(const VECTOR<T,d>& v)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=rint(v.array[i]);
+    return r;
+}
+//#####################################################################
+// Function exp
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+exp(const VECTOR<T,d>& v)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=exp(v.array[i]);
+    return r;
+}
+//#####################################################################
+// Function sin
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+sin(const VECTOR<T,d>& v)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=sin(v.array[i]);
+    return r;
+}
+//#####################################################################
+// Function cos
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+cos(const VECTOR<T,d>& v)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=cos(v.array[i]);
+    return r;
+}
+//#####################################################################
+// Function sqrt
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+sqrt(const VECTOR<T,d>& v)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=sqrt(v.array[i]);
+    return r;
+}
+//#####################################################################
+// Function clamp
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+clamp(const VECTOR<T,d>& v,const VECTOR<T,d>& vmin,const VECTOR<T,d>& vmax)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=clamp(v.array[i],vmin.array[i],vmax.array[i]);
+    return r;
+}
+//#####################################################################
+// Function clamp
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+clamp(const VECTOR<T,d>& v,const T& min,const T& max)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=clamp(v.array[i],min,max);
+    return r;
+}
+//#####################################################################
+// Function clamp_min
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+clamp_min(const VECTOR<T,d>& v,const VECTOR<T,d>& vmin)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=clamp_min(v.array[i],vmin.array[i]);
+    return r;
+}
+//#####################################################################
+// Function clamp_min
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+clamp_min(const VECTOR<T,d>& v,const T& min)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=clamp_min(v.array[i],min);
+    return r;
+}
+//#####################################################################
+// Function clamp_max
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+clamp_max(const VECTOR<T,d>& v,const VECTOR<T,d>& vmax)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=clamp_max(v.array[i],vmax.array[i]);
+    return r;
+}
+//#####################################################################
+// Function clamp_max
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+clamp_max(const VECTOR<T,d>& v,const T& max)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=clamp_max(v.array[i],max);
+    return r;
+}
+//#####################################################################
+// Function in_bounds
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+in_bounds(const VECTOR<T,d>& v,const VECTOR<T,d>& vmin,const VECTOR<T,d>& vmax)
+{
+    for(int i=0;i<d;i++) if(!in_bounds(v.array[i],vmin.array[i],vmax.array[i])) return false;
+    return true;
+}
+//#####################################################################
 
 //#####################################################################
 // Vector construction
