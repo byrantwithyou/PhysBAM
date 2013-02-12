@@ -57,7 +57,6 @@ Build_Weights_And_Grad_Weight_Over_Weights(const TV& X,const GRID<TV>& grid,TV_I
 template<class TV,int order> void MPM_CUBIC_B_SPLINE<TV,order>::
 Build_Weights_And_Grad_Weights_Exact(const TV& X,const GRID<TV>& grid,TV_INT& influence_corner,ARRAY<T>& weight,ARRAY<TV>& grad_weight)
 {  
-    static T eps=1e-5;
     VECTOR<TV,IN> weight_short;
     VECTOR<TV,IN> grad_weight_over_weight_short;
     Build_Weights_And_Grad_Weight_Over_Weights(X,grid,influence_corner,weight_short,grad_weight_over_weight_short);

@@ -6,13 +6,14 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include "MPM_PARTICLES.h"
 #include "MPM_CONSTITUTIVE_MODEL.h"
 #include "MPM_CUBIC_B_SPLINE.h"
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
+#include "MPM_SIMULATION.h"
 using namespace PhysBAM;
 
 int main(int argc,char *argv[])
@@ -25,6 +26,11 @@ int main(int argc,char *argv[])
     TV_INT grid_counts(6,7);
     RANGE<TV> grid_box(TV(0,0),TV(5,6));
     GRID<TV> grid(grid_counts,grid_box);
+
+    RANGE<TV_INT> range(TV_INT(),TV_INT()+4);
+    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+        LOG::cout<<it.index<<std::endl;}
+
 
     // {
     //     TV X(2.75,3.5);

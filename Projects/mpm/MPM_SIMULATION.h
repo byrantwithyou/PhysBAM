@@ -25,10 +25,13 @@ class MPM_SIMULATION
     typedef VECTOR<int,TV::m> TV_INT;
     static const int basis_function_order=3;
     static const int IN=basis_function_order+1;
-    static const int influenced_node_N=pow(IN,TV::m);
+    int IN_POWER;
 public:
     MPM_PARTICLES<TV> particles;
     int N_particles;
+    T mu0,lambda0;
+    T xi;
+    ARRAY<T> mu,lambda;
     ARRAY<T> Je,Jp;
     ARRAY<MATRIX<T,TV::m> > Ue,Ve,Re,Se;
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > SIGMAe;
@@ -42,6 +45,7 @@ public:
     int N_nodes;
     ARRAY<T> node_mass;
     ARRAY<TV> node_V;
+    ARRAY<TV> node_V_old; // used for FLIP
     ARRAY<TV> node_force;
 
     T dt;
@@ -55,8 +59,11 @@ public:
 
 protected:
     void Build_Weights_And_Grad_Weights();
-    void Rasterize_Particle_Data_To_Grid();
-    void Compute_Particle_Volumes();
+    void Build_Helper_Structures_For_Constitutive_Model();
+    void Rasterize_Particle_Data_To_The_Grid();
+    void Compute_Particle_Volumes_And_Densities();
+    void Compute_Grid_Forces();
+    void Update_Grid_Velocity_Forward_Euler_Time_Integration();
 //#####################################################################
 };
 }
