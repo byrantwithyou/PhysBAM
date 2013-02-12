@@ -13,6 +13,7 @@ MPM_PARTICLES()
 {
     Store_Velocity();
     Store_Mass();
+    Add_Array(ATTRIBUTE_ID_DENSITY,&density);
     Add_Array(ATTRIBUTE_ID_VOLUME,&volume);
     Add_Array(ATTRIBUTE_ID_FE,&Fe);
     Add_Array(ATTRIBUTE_ID_FP,&Fp);
@@ -26,6 +27,7 @@ template<class TV> MPM_PARTICLES<TV>::
 {}
 static int Initialize_MPM_Particles()
 {
+    Register_Attribute_Name(ATTRIBUTE_ID_DENSITY,"density");
     Register_Attribute_Name(ATTRIBUTE_ID_VOLUME,"volume");
     Register_Attribute_Name(ATTRIBUTE_ID_FE,"Fe");
     Register_Attribute_Name(ATTRIBUTE_ID_FP,"Fp");

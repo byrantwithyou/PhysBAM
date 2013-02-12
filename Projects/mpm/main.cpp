@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-//#include "MPM_PARTICLES.h"
+#include "MPM_PARTICLES.h"
 #include "MPM_CONSTITUTIVE_MODEL.h"
 #include "MPM_CUBIC_B_SPLINE.h"
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
@@ -26,17 +26,6 @@ int main(int argc,char *argv[])
     RANGE<TV> grid_box(TV(0,0),TV(5,6));
     GRID<TV> grid(grid_counts,grid_box);
 
-    static const int asdf=pow(dimension,4);
-    LOG::cout<<asdf<<std::endl;
-
-    // {
-    //     ARRAY<T> aa;
-    //     aa.Resize(3);
-    //     aa(0)=4;aa(1)=4;aa(2)=6;
-    //     LOG::cout<<aa.m<<" "<<aa<<std::endl;
-    //     aa.Fill(0);
-    //     LOG::cout<<aa.m<<" "<<aa<<std::endl;
-    // }
     // {
     //     TV X(2.75,3.5);
     //     TV_INT influence_corner;

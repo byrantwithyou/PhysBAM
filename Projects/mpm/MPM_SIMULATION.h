@@ -42,6 +42,7 @@ public:
     int N_nodes;
     ARRAY<T> node_mass;
     ARRAY<TV> node_V;
+    ARRAY<TV> node_force;
 
     T dt;
     int frame;
@@ -49,12 +50,13 @@ public:
     MPM_SIMULATION();
     ~MPM_SIMULATION();
 
-    int Initialize(/*to be determined*/);
+    void Initialize(/*to be determined*/);
     void Advance_One_Time_Step_Forward_Euler();
 
 protected:
     void Build_Weights_And_Grad_Weights();
     void Rasterize_Particle_Data_To_Grid();
+    void Compute_Particle_Volumes();
 //#####################################################################
 };
 }

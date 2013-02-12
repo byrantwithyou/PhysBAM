@@ -20,7 +20,7 @@ template<class TV> MPM_SIMULATION<TV>::
 //#####################################################################
 // Function Initialize
 //#####################################################################
-template<class TV> int MPM_SIMULATION<TV>::
+template<class TV> void MPM_SIMULATION<TV>::
 Initialize(/*to be determined*/)
 {
     //TODO: fill in all members in particles, constitutive_model, grid, dt
@@ -43,9 +43,9 @@ Initialize(/*to be determined*/)
     N_nodes=grid.counts.Product();
     nodes_mass.Resize(N_nodes);
     nodes_V.Resize(N_nodes);
+    nodes_force.Resize(N_nodes);
 
     frame=0;
-    return 1;
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Forward_Euler
@@ -55,8 +55,7 @@ Advance_One_Time_Step_Forward_Euler()
 {
     Build_Weights_And_Grad_Weights();
     Rasterize_Particle_Data_To_Grid();
-    //TODO
-
+    if(frame==0) Compute_Particle_Volumes();
 }
 //#####################################################################
 // Function Build_Weights_And_Grad_Weights
@@ -72,17 +71,37 @@ Build_Weights_And_Grad_Weights()
 template<class TV> void MPM_SIMULATION<TV>::
 Rasterize_Particle_Data_To_Grid()
 {
+    static T eps=1e-5;
+    TV_INT TV_INT_IN=TV_INT()+IN;
+    RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
     node_mass.Fill(T(0));
-    RANGE<TV_INT> range(TV_INT(),TV_INT()+IN);
     for(int p=0;p<N_particles;p++){
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
             int ind=Flatten_Index(influence_corner(p)+it.index,grid.counts);
-            //TODO
-        }
-    }
-
+            node_mass(ind)+=particles.mass(p)*weight(p,Flatten_Index(it.index,TV_INT_IN));}}
+    node_V.Fill(TV());
+    for(int p=0;p<N_particles;p++){
+        for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+            int ind=Flatten_Index(influence_corner(p)+it.index,grid.counts);
+            if(node_mass(ind)>eps) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p,Flatten_Index(it.index,TV_INT_IN))/node_mass(ind);}}
 }
-
+//#####################################################################
+// Function Compute_Particle_Volumes
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Compute_Particle_Volumes()
+{
+    TV_INT TV_INT_IN=TV_INT()+IN;
+    T one_over_cell_volume=grid.one_over_dX.Product();
+    RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
+    particles.density.Fill(T(0));
+    particles.volume.Fill(T(0));
+    for(int p=0;p<N_particles;p++){
+        for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+            int ind=Flatten_Index(influence_corner(p)+it.index,grid.counts);
+            particles.density(p)+=node_mass(ind)*weight(p,Flatten_Index(it.index,TV_INT_IN))*one_over_cell_volume;}
+        particles.volume(p)=particles.mass(p)/particles.density(p);}
+}
 //#####################################################################
 template class MPM_SIMULATION<VECTOR<float,1> >;
 template class MPM_SIMULATION<VECTOR<float,2> >;
