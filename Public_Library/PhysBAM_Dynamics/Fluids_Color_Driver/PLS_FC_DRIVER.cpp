@@ -155,8 +155,8 @@ Initialize()
     example.collision_bodies_affecting_fluid.Compute_Grid_Visibility();
     example.particle_levelset_evolution_multiple.Set_Seed(2606);
 //    Put these back in for PLS
-//    if(!example.restart) example.particle_levelset_evolution_multiple.Seed_Particles(time);
-//    example.particle_levelset_evolution_multiple.Delete_Particles_Outside_Grid();
+    if(!example.restart) example.particle_levelset_evolution_multiple.Seed_Particles(time);
+    example.particle_levelset_evolution_multiple.Delete_Particles_Outside_Grid();
 
     int extrapolation_cells=2*example.number_of_ghost_cells+2;
     ARRAY<T,TV_INT> exchanged_phi_ghost(example.grid.Domain_Indices(extrapolation_cells));

@@ -439,7 +439,7 @@ public:
             {
                 TV vel((T).2,(T).5);
                 //analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_BOX<TV>(TV()+(T).2,TV()+(T).45,1,0),vel);
-                analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_BOX<TV>(TV()+(T).2,TV()+(T).45,1,0),(T).5,TV()+(T).5),vel);
+                analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_BOX<TV>(TV()+(T).2,TV()+(T).45,1,0),(T)0,TV()+(T).5),vel);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(vel));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(vel));
                 use_p_null_mode=true;
@@ -470,31 +470,6 @@ public:
                 use_level_set_method=true;
                 
                 break;}
-            case 29:
-                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-            {
-                TV vel((T).0,(T).0);
-                analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(.7,.7),(T).2,1,0),vel);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0*sqr(m)/kg));
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0*sqr(m)/kg));
-                use_p_null_mode=true;
-                use_level_set_method=true;
-            }
-                break;
-            case 30:
-                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-            {
-                TV vel((T).0,(T).0);
-                analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(.5,.3),(T).2,1,0),vel);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0*sqr(m)/kg));
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0*sqr(m)/kg));
-                use_p_null_mode=true;
-                use_level_set_method=true;
-            }
-                break;
-
-
-
 
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
         if(use_pls_over_levelset){use_pls=use_level_set_method;use_level_set_method=false;}
