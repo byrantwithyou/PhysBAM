@@ -31,6 +31,11 @@ public:
     int N_particles;
     T mu0,lambda0;
     T xi;
+    bool use_plasticity;
+    T theta_c;
+    T theta_s;
+    T FLIP_alpha;
+
     ARRAY<T> mu,lambda;
     ARRAY<T> Je,Jp;
     ARRAY<MATRIX<T,TV::m> > Ue,Ve,Re,Se;
@@ -69,6 +74,9 @@ protected:
     void Grid_Based_Body_Collisions();
     void Solve_The_Linear_System();
     void Update_Deformation_Gradient();
+    void Update_Particle_Velocities();
+    void Particle_Based_Body_Collisions();
+    void Update_Particle_Positions();
 //#####################################################################
 };
 }

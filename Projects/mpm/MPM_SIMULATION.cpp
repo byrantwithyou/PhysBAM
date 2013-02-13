@@ -3,6 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include "Fanfu_Utilities/FLATTEN_INDEX.h"
 #include "MPM_SIMULATION.h"
 namespace PhysBAM{
@@ -25,7 +28,7 @@ template<class TV> MPM_SIMULATION<TV>::
 template<class TV> void MPM_SIMULATION<TV>::
 Initialize()
 {
-    //TODO: fill in all members in particles, grid, dt, mu0, lambda0, xi
+    //TODO: fill in all members in particles, grid, dt, mu0, lambda0, xi, use_plasticity, theta_c, theta_s, FLIP_alpha
     //      Fe and Fp should be Identity
     N_particles=particles.X.m;
     mu.Resize(N_particles);
@@ -67,6 +70,11 @@ Advance_One_Time_Step_Forward_Euler()
     Update_Velocities_On_Grid();
     Grid_Based_Body_Collisions();
     node_V_old=node_V;node_V=node_V_star;
+    Update_Deformation_Gradient();
+    Update_Particle_Velocities();
+    Particle_Based_Body_Collisions();
+    Update_Particle_Positions();
+    frame++;
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Backward_Euler
@@ -82,6 +90,11 @@ Advance_One_Time_Step_Backward_Euler()
     Update_Velocities_On_Grid();
     Grid_Based_Body_Collisions();
     Solve_The_Linear_System();
+    Update_Deformation_Gradient();
+    Update_Particle_Velocities();
+    Particle_Based_Body_Collisions();
+    Update_Particle_Positions();
+    frame++;
 }
 //#####################################################################
 // Function Build_Weights_And_Grad_Weights
@@ -89,7 +102,8 @@ Advance_One_Time_Step_Backward_Euler()
 template<class TV> void MPM_SIMULATION<TV>::
 Build_Weights_And_Grad_Weights()
 {
-    for(int p=0;p<N_particles;p++) grid_basis_function.Build_Weights_And_Grad_Weights_Exact(particles.X(p),grid,influence_corner(p),weight(p),grad_weight(p));
+    for(int p=0;p<N_particles;p++){
+        grid_basis_function.Build_Weights_And_Grad_Weights_Exact(particles.X(p),grid,influence_corner(p),weight(p),grad_weight(p));}
 }
 //#####################################################################
 // Function Build_Helper_Structures_For_Constitutive_Model
@@ -129,6 +143,7 @@ Rasterize_Particle_Data_To_The_Grid()
 template<class TV> void MPM_SIMULATION<TV>::
 Compute_Particle_Volumes_And_Densities()
 {
+    static T eps=1e-5; 
     TV_INT TV_INT_IN=TV_INT()+IN;
     T one_over_cell_volume=grid.one_over_dX.Product();
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
@@ -138,7 +153,7 @@ Compute_Particle_Volumes_And_Densities()
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
             int ind=Flatten_Index(influence_corner(p)+it.index,grid.counts);
             particles.density(p)+=node_mass(ind)*weight(p)(Flatten_Index(it.index,TV_INT_IN))*one_over_cell_volume;}
-        particles.volume(p)=particles.mass(p)/particles.density(p);}
+        if(particles.density(p)>eps) particles.volume(p)=particles.mass(p)/particles.density(p);}
 }
 //#####################################################################
 // Function Compute_Grid_Forces
@@ -172,7 +187,7 @@ Update_Velocities_On_Grid()
 template<class TV> void MPM_SIMULATION<TV>::
 Grid_Based_Body_Collisions()
 {
-    //TODO
+    //TODO later than implicit solve
 }
 //#####################################################################
 // Function Solve_The_Linear_System
@@ -190,14 +205,67 @@ Update_Deformation_Gradient()
 {
     TV_INT TV_INT_IN=TV_INT()+IN;
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
+
+    if(!use_plasticity){
+        for(int p=0;p<N_particles;p++){
+            MATRIX<T,TV::m> grad_vp;
+            for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+                int ind=Flatten_Index(influence_corner(p)+it.index,grid.counts);
+                grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(Flatten_Index(it.index,TV_INT_IN)));}
+            particles.Fe(p)=particles.Fe(p)+dt*grad_vp*particles.Fe(p);}}
+    else{
+        for(int p=0;p<N_particles;p++){
+            MATRIX<T,TV::m> grad_vp;
+            for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+                int ind=Flatten_Index(influence_corner(p)+it.index,grid.counts);
+                grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(Flatten_Index(it.index,TV_INT_IN)));}
+            MATRIX<T,TV::m> Fe_hat=particles.Fe(p)+dt*grad_vp*particles.Fe(p);
+            MATRIX<T,TV::m> Fp_hat=particles.Fp(p);
+            MATRIX<T,TV::m> F=Fe_hat*Fp_hat;
+            MATRIX<T,TV::m> U_hat,V_hat;
+            DIAGONAL_MATRIX<T,TV::m> SIGMA_hat;
+            Fe_hat.Fast_Singular_Value_Decomposition(U_hat,SIGMA_hat,V_hat);
+            SIGMA_hat=SIGMA_hat.Clamp_Min((T)1-theta_c);
+            SIGMA_hat=SIGMA_hat.Clamp_Max((T)1+theta_s);
+            particles.Fe(p)=U_hat*SIGMA_hat*(V_hat.Transposed());
+            particles.Fp(p)=V_hat*(SIGMA_hat.Inverse())*(U_hat.Transposed())*F;}}
+}
+//#####################################################################
+// Function Update_Particle_Velocities
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Update_Particle_Velocities()
+{
+    TV_INT TV_INT_IN=TV_INT()+IN;
+    RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
+
     for(int p=0;p<N_particles;p++){
-        MATRIX<T,TV::m> grad_vp;
+        TV V_PIC;
+        TV V_FLIP=particles.V(p);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
             int ind=Flatten_Index(influence_corner(p)+it.index,grid.counts);
-            grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(Flatten_Index(it.index,TV_INT_IN)));}
-        //TODO
-    }
+            T w=weight(p)(Flatten_Index(it.index,TV_INT_IN));
+            V_PIC+=node_V(ind)*w;
+            V_FLIP+=(node_V(ind)-node_V_old(ind))*w;}
+        particles.V(p)=((T)1-FLIP_alpha)*V_PIC+FLIP_alpha*V_FLIP;}
 }
+//#####################################################################
+// Function Particle_Based_Body_Collisions
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Particle_Based_Body_Collisions()
+{
+    //TODO later than implicit solve
+}
+//#####################################################################
+// Function Update_Particle_Positions
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Update_Particle_Positions()
+{
+    for(int p=0;p<N_particles;p++) particles.X(p)+=dt*particles.V(p);
+}
+
 //#####################################################################
 template class MPM_SIMULATION<VECTOR<float,2> >;
 template class MPM_SIMULATION<VECTOR<float,3> >;

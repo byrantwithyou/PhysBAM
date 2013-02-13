@@ -29,7 +29,7 @@ Build_Weights_And_Grad_Weight_Over_Weights(const TV& X,const GRID<TV>& grid,TV_I
     influence_corner=my_corner-1;
     for(int n=0;n<IN;n++){
         for(int d=0;d<TV::m;d++){
-            T x=grid.one_over_dX(d)*(X(d)-(influence_corner(d)+n)*grid.dX(d));
+            T x=grid.one_over_dX(d)*(X(d)-(influence_corner(d)+n)*grid.dX(d)-grid.domain.min_corner(d));
             T abs_x=abs(x),x_square=abs_x*abs_x,abs_x_cube=x_square*abs_x;
             if(abs_x<1){
                 weight(n)(d)=(T)0.5*abs_x_cube-x_square+(T)0.66666666666666667;
@@ -60,7 +60,10 @@ Build_Weights_And_Grad_Weights_Exact(const TV& X,const GRID<TV>& grid,TV_INT& in
     VECTOR<TV,IN> weight_short;
     VECTOR<TV,IN> grad_weight_over_weight_short;
     Build_Weights_And_Grad_Weight_Over_Weights(X,grid,influence_corner,weight_short,grad_weight_over_weight_short);
-    
+    // LOG::cout<<X<<std::endl;
+    // LOG::cout<<influence_corner<<std::endl;
+    // LOG::cout<<weight_short<<std::endl;
+
     TV_INT local_grid_count;
     local_grid_count.Fill(IN);
     RANGE<TV_INT> range(TV_INT(),TV_INT()+IN);    
