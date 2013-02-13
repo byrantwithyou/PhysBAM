@@ -23,7 +23,7 @@ template<class TV> MPM_SIMULATION<TV>::
 // Function Initialize
 //#####################################################################
 template<class TV> void MPM_SIMULATION<TV>::
-Initialize(/*to be determined*/)
+Initialize()
 {
     //TODO: fill in all members in particles, grid, dt, mu0, lambda0, xi
     //      Fe and Fp should be Identity
@@ -48,6 +48,7 @@ Initialize(/*to be determined*/)
     N_nodes=grid.counts.Product();
     node_mass.Resize(N_nodes);
     node_V.Resize(N_nodes);
+    node_V_star.Resize(N_nodes);
     node_V_old.Resize(N_nodes);
     node_force.Resize(N_nodes);
     frame=0;
@@ -63,7 +64,24 @@ Advance_One_Time_Step_Forward_Euler()
     Rasterize_Particle_Data_To_The_Grid();
     if(frame==0) Compute_Particle_Volumes_And_Densities();
     Compute_Grid_Forces();
-    Update_Grid_Velocity_Forward_Euler_Time_Integration();
+    Update_Velocities_On_Grid();
+    Grid_Based_Body_Collisions();
+    node_V_old=node_V;node_V=node_V_star;
+}
+//#####################################################################
+// Function Advance_One_Time_Step_Backward_Euler
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Advance_One_Time_Step_Backward_Euler()
+{
+    Build_Weights_And_Grad_Weights();
+    Build_Helper_Structures_For_Constitutive_Model();
+    Rasterize_Particle_Data_To_The_Grid();
+    if(frame==0) Compute_Particle_Volumes_And_Densities();
+    Compute_Grid_Forces();
+    Update_Velocities_On_Grid();
+    Grid_Based_Body_Collisions();
+    Solve_The_Linear_System();
 }
 //#####################################################################
 // Function Build_Weights_And_Grad_Weights
@@ -138,15 +156,47 @@ Compute_Grid_Forces()
             node_force(ind)-=B*grad_weight(p)(Flatten_Index(it.index,TV_INT_IN));}}
 }
 //#####################################################################
-// Function Update_Grid_Velocity_Forward_Euler_Time_Integration
+// Function Update_Velocities_On_Grid
 //#####################################################################
 template<class TV> void MPM_SIMULATION<TV>::
-Update_Grid_Velocity_Forward_Euler_Time_Integration()
+Update_Velocities_On_Grid()
 {
     static T eps=1e-5;
     for(int i=0;i<N_nodes;i++){
-        node_V_old(i)=node_V(i);
-        if(node_mass(i)>eps) node_V(i)+=dt/node_mass(i)*node_force(i);}
+        node_V_star(i)=node_V(i);
+        if(node_mass(i)>eps) node_V_star(i)+=dt/node_mass(i)*node_force(i);}
+}
+//#####################################################################
+// Function Grid_Based_Body_Collisions
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Grid_Based_Body_Collisions()
+{
+    //TODO
+}
+//#####################################################################
+// Function Solve_The_Linear_System
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Solve_The_Linear_System()
+{
+    //TODO
+}
+//#####################################################################
+// Function Update_Deformation_Gradient
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Update_Deformation_Gradient()
+{
+    TV_INT TV_INT_IN=TV_INT()+IN;
+    RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
+    for(int p=0;p<N_particles;p++){
+        MATRIX<T,TV::m> grad_vp;
+        for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+            int ind=Flatten_Index(influence_corner(p)+it.index,grid.counts);
+            grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(Flatten_Index(it.index,TV_INT_IN)));}
+        //TODO
+    }
 }
 //#####################################################################
 template class MPM_SIMULATION<VECTOR<float,2> >;

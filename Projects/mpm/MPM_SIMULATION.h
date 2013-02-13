@@ -45,6 +45,7 @@ public:
     int N_nodes;
     ARRAY<T> node_mass;
     ARRAY<TV> node_V;
+    ARRAY<TV> node_V_star;
     ARRAY<TV> node_V_old; // used for FLIP
     ARRAY<TV> node_force;
 
@@ -54,8 +55,9 @@ public:
     MPM_SIMULATION();
     ~MPM_SIMULATION();
 
-    void Initialize(/*to be determined*/);
+    void Initialize();
     void Advance_One_Time_Step_Forward_Euler();
+    void Advance_One_Time_Step_Backward_Euler();
 
 protected:
     void Build_Weights_And_Grad_Weights();
@@ -63,7 +65,10 @@ protected:
     void Rasterize_Particle_Data_To_The_Grid();
     void Compute_Particle_Volumes_And_Densities();
     void Compute_Grid_Forces();
-    void Update_Grid_Velocity_Forward_Euler_Time_Integration();
+    void Update_Velocities_On_Grid();
+    void Grid_Based_Body_Collisions();
+    void Solve_The_Linear_System();
+    void Update_Deformation_Gradient();
 //#####################################################################
 };
 }
