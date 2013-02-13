@@ -25,7 +25,7 @@ template<class TV> MPM_SIMULATION<TV>::
 template<class TV> void MPM_SIMULATION<TV>::
 Initialize(/*to be determined*/)
 {
-    //TODO: fill in all members in particles, constitutive_model, grid, dt, mu0, lambda0, xi
+    //TODO: fill in all members in particles, grid, dt, mu0, lambda0, xi
     //      Fe and Fp should be Identity
     N_particles=particles.X.m;
     mu.Resize(N_particles);

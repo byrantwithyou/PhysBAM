@@ -2,6 +2,9 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include "MPM_PARTICLES.h"
 #include "MPM_PARTICLES_FORWARD.h"
 namespace PhysBAM{
@@ -18,13 +21,26 @@ MPM_PARTICLES()
     Add_Array(ATTRIBUTE_ID_FE,&Fe);
     Add_Array(ATTRIBUTE_ID_FP,&Fp);
 }
-
 //#####################################################################
 // Destructor
 //#####################################################################
 template<class TV> MPM_PARTICLES<TV>::
 ~MPM_PARTICLES()
 {}
+//#####################################################################
+// Function Initialize_X_As_A_Grid
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
+{
+    typedef VECTOR<int,TV::m> TV_INT;
+    GRID<TV> grid(count,box);
+    RANGE<TV_INT> range(TV_INT(),TV_INT()+count);
+    int n=0;
+    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+        TV x=grid.X(it.index);
+        X(n++)=x;}
+}
 static int Initialize_MPM_Particles()
 {
     Register_Attribute_Name(ATTRIBUTE_ID_DENSITY,"density");
@@ -35,10 +51,8 @@ static int Initialize_MPM_Particles()
 }
 int initialize_mpm_particles=Initialize_MPM_Particles();
 //#####################################################################
-template class MPM_PARTICLES<VECTOR<float,1> >;
 template class MPM_PARTICLES<VECTOR<float,2> >;
 template class MPM_PARTICLES<VECTOR<float,3> >;
-template class MPM_PARTICLES<VECTOR<double,1> >;
 template class MPM_PARTICLES<VECTOR<double,2> >;
 template class MPM_PARTICLES<VECTOR<double,3> >;
 }

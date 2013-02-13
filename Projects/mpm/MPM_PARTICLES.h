@@ -7,6 +7,8 @@
 #ifndef __MPM_PARTICLES__
 #define __MPM_PARTICLES__
 
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -35,6 +37,8 @@ public:
 
     MPM_PARTICLES();
     virtual ~MPM_PARTICLES();
+
+    void Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box);
 //#####################################################################
 };
 }

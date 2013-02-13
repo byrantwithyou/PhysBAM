@@ -15,9 +15,6 @@
 #include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
 #include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
-#include "MPM_PARTICLES.h"
-#include "MPM_CONSTITUTIVE_MODEL.h"
-#include "MPM_CUBIC_B_SPLINE.h"
 #include "MPM_SIMULATION.h"
 using namespace PhysBAM;
 
@@ -29,23 +26,38 @@ int main(int argc,char *argv[])
     typedef VECTOR<T,dimension> TV;
     typedef VECTOR<int,dimension> TV_INT;
 
-    // MPM_SIMULATION<TV> sim;
+    MPM_SIMULATION<TV> sim;
+
+    static const int test=1;
+    if(test==1){ // stretched cube
+        TV_INT grid_counts(7,7);
+        RANGE<TV> grid_box(TV(-3,-3),TV(3,3));
+        TV_INT particle_counts(7,4);
+        RANGE<TV> particle_box(TV(-0.5,-0.5),TV(0.5,0.5));
+        GRID<TV> grid(grid_counts,grid_box);
+        sim.particles.Resize(particle_counts.Product());
+        sim.particles.Initialize_X_As_A_Grid(particle_counts,particle_box);
+        sim.grid=grid;
+        sim.dt=1e-3;
+        T ym=3000;
+        T pr=0.3;
+        sim.mu0=ym;
+        sim.lambda0=pr;
+        
+    }
+
     // sim.Initialize();
-
-    TV_INT grid_counts(6,7);
-    RANGE<TV> grid_box(TV(0,0),TV(5,6));
-    GRID<TV> grid(grid_counts,grid_box);
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid,"output");
-
-    Add_Debug_Particle(TV(0,0), VECTOR<T,3>(0,1,0));
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,"output");
+    for(int i=0;i<sim.particles.X.m;i++)
+        Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
     Flush_Frame<TV>("mpm");
-    Add_Debug_Particle(TV(1,1), VECTOR<T,3>(0,1,0));
-    Flush_Frame<TV>("mpm");    
-    Add_Debug_Particle(TV(2,2), VECTOR<T,3>(0,1,0));
-    Flush_Frame<TV>("mpm");    
-    Add_Debug_Particle(TV(3,3), VECTOR<T,3>(0,1,0));
-    Add_Debug_Particle(TV(3,4), VECTOR<T,3>(0,1,0));
-    Flush_Frame<TV>("mpm");    
+    // Add_Debug_Particle(TV(1,1), VECTOR<T,3>(0,1,0));
+    // Flush_Frame<TV>("mpm");    
+    // Add_Debug_Particle(TV(2,2), VECTOR<T,3>(0,1,0));
+    // Flush_Frame<TV>("mpm");    
+    // Add_Debug_Particle(TV(3,3), VECTOR<T,3>(0,1,0));
+    // Add_Debug_Particle(TV(3,4), VECTOR<T,3>(0,1,0));
+    // Flush_Frame<TV>("mpm");    
 
     return 0;
 }
