@@ -29,6 +29,10 @@ template<class TV> MPM_SIMULATION<TV>::
 template<class TV> void MPM_SIMULATION<TV>::
 Initialize()
 {
+//#pragma omp parallel for    
+//    for(int t=0;t<1000000;t++){
+//        LOG::cout<<t<<std::endl;}
+
     gravity_constant=TV();gravity_constant(1)=-(T)9.8;
     N_particles=particles.X.m;
     mu.Resize(N_particles);
@@ -152,6 +156,7 @@ Compute_Particle_Volumes_And_Densities()
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
     particles.density.Fill(T(0));
     particles.volume.Fill(T(0));
+#pragma omp parallel for
     for(int p=0;p<N_particles;p++){
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
             int ind=Flatten_Index(influence_corner(p)+it.index,grid.counts);

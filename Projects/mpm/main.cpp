@@ -15,13 +15,14 @@
 #include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
 #include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
+#include <omp.h>
 #include "MPM_SIMULATION.h"
 
 using namespace PhysBAM;
 
 int main(int argc,char *argv[])
 {
-    static const int dimension=3;
+    static const int dimension=2;
     typedef double T;
     typedef float RW;
     typedef VECTOR<T,dimension> TV;
@@ -31,13 +32,13 @@ int main(int argc,char *argv[])
 
     static const int test=1;
     if(test==1){ // stretched cube
-        TV_INT grid_counts(6*15,6*15,6*15);
-        RANGE<TV> grid_box(TV(-3,-3,-3),TV(3,3,3));
+        TV_INT grid_counts(6*64,6*64);
+        RANGE<TV> grid_box(TV(-3,-3),TV(3,3));
         GRID<TV> grid(grid_counts,grid_box);
         sim.grid=grid;
 
-        TV_INT particle_counts(30,30,30);
-        RANGE<TV> particle_box(TV(-0.5,-0.5,-0.5),TV(0.5,0.5,0.5));
+        TV_INT particle_counts(128,128);
+        RANGE<TV> particle_box(TV(-0.5,-0.5),TV(0.5,0.5));
         sim.particles.Resize(particle_counts.Product());
         sim.particles.Initialize_X_As_A_Grid(particle_counts,particle_box);
         for(int p=0;p<sim.particles.X.m;p++){
