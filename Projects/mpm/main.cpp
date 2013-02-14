@@ -32,12 +32,12 @@ int main(int argc,char *argv[])
 
     static const int test=1;
     if(test==1){ // stretched cube
-        TV_INT grid_counts(6*16,6*16);
+        TV_INT grid_counts(6*64,6*64);
         RANGE<TV> grid_box(TV(-3,-3),TV(3,3));
         GRID<TV> grid(grid_counts,grid_box);
         sim.grid=grid;
 
-        TV_INT particle_counts(32,32);
+        TV_INT particle_counts(128,128);
         RANGE<TV> particle_box(TV(-0.5,-0.5),TV(0.5,0.5));
         sim.particles.Resize(particle_counts.Product());
         sim.particles.Initialize_X_As_A_Grid(particle_counts,particle_box);
@@ -47,7 +47,7 @@ int main(int argc,char *argv[])
             sim.particles.Fe(p)=MATRIX<T,TV::m>::Identity_Matrix();
             sim.particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();}
 
-        sim.dt=1e-4;
+        sim.dt=5e-4;
         T ym=1e4;
         T pr=0.3;
         sim.mu0=ym/((T)2*((T)1+pr));
@@ -73,7 +73,7 @@ int main(int argc,char *argv[])
 
     for(int f=1;f<100000;f++){
         LOG::cout<<"FRAME "<<f<<std::endl;
-        sim.Advance_One_Time_Step_Forward_Euler();
+        sim.Advance_One_Time_Step_Backward_Euler();
         for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
         Flush_Frame<TV>("mpm");}
 

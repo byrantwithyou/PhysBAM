@@ -6,7 +6,11 @@
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
+#include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <omp.h>
+#include "MPM_SYSTEM.h"
+#include "MPM_VECTOR.h"
 #include "MPM_SIMULATION.h"
 namespace PhysBAM{
 using ::std::exp;
@@ -220,7 +224,23 @@ Grid_Based_Body_Collisions()
 template<class TV> void MPM_SIMULATION<TV>::
 Solve_The_Linear_System()
 {
-    //TODO
+    MPM_SYSTEM<TV> system(debug_cast<MPM_SIMULATION<TV>&>(*this));
+    MPM_VECTOR<TV> rhs,x;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
+    rhs.v.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
+    x.v.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
+    KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
+    rhs.v=node_V_star;
+
+    system.Test_System(*vectors(0),*vectors(1),*vectors(2));
+
+    CONJUGATE_GRADIENT<T> cg;
+    KRYLOV_SOLVER<T>* solver=&cg;
+    solver->print_residuals=true;
+    solver->Solve(system,x,rhs,vectors,(T)1e-3,0,1000);
+    
+    node_V_old=node_V;
+    node_V=x.v;
 }
 //#####################################################################
 // Function Update_Deformation_Gradient
