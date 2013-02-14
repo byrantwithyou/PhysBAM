@@ -46,19 +46,21 @@ int main(int argc,char *argv[])
             sim.particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();}
 
         sim.dt=1e-3;
-        T ym=3000;
+        T ym=3e6;
         T pr=0.3;
         sim.mu0=ym/((T)2*((T)1+pr));
         sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
         sim.xi=0;
         sim.use_plasticity=false;
+        sim.use_gravity=true;
+        sim.ground_level=-2;
         sim.theta_c=0.01;
         sim.theta_s=0.01;
         sim.FLIP_alpha=0.95;
-
-        for(int p=0;p<sim.particles.X.m;p++){
-            sim.particles.X(p)(0)*=2;
-            sim.particles.Fe(p)(0,0)=2;}
+        sim.friction_coefficient=0.6;
+        // for(int p=0;p<sim.particles.X.m;p++){
+        //     sim.particles.X(p)(0)*=2;
+        //     sim.particles.Fe(p)(0,0)=2;}
     }
 
     sim.Initialize();

@@ -28,8 +28,7 @@ template<class TV> MPM_SIMULATION<TV>::
 template<class TV> void MPM_SIMULATION<TV>::
 Initialize()
 {
-    //TODO: fill in all members in particles, grid, dt, mu0, lambda0, xi, use_plasticity, theta_c, theta_s, FLIP_alpha
-    //      Fe and Fp should be Identity
+    gravity_constant=TV();gravity_constant(1)=-(T)9.8;
     N_particles=particles.X.m;
     mu.Resize(N_particles);
     lambda.Resize(N_particles);
@@ -54,6 +53,7 @@ Initialize()
     node_V_star.Resize(N_nodes);
     node_V_old.Resize(N_nodes);
     node_force.Resize(N_nodes);
+    node_external_force.Resize(N_nodes);
     frame=0;
 }
 //#####################################################################
@@ -67,6 +67,7 @@ Advance_One_Time_Step_Forward_Euler()
     Rasterize_Particle_Data_To_The_Grid();
     if(frame==0) Compute_Particle_Volumes_And_Densities();
     Compute_Grid_Forces();
+    if(use_gravity) Apply_Gravity_To_Grid_Forces();
     Update_Velocities_On_Grid();
     Grid_Based_Body_Collisions();
     node_V_old=node_V;node_V=node_V_star;
@@ -87,6 +88,7 @@ Advance_One_Time_Step_Backward_Euler()
     Rasterize_Particle_Data_To_The_Grid();
     if(frame==0) Compute_Particle_Volumes_And_Densities();
     Compute_Grid_Forces();
+    if(use_gravity) Apply_Gravity_To_Grid_Forces();
     Update_Velocities_On_Grid();
     Grid_Based_Body_Collisions();
     Solve_The_Linear_System();
@@ -171,6 +173,21 @@ Compute_Grid_Forces()
             node_force(ind)-=B*grad_weight(p)(Flatten_Index(it.index,TV_INT_IN));}}
 }
 //#####################################################################
+// Function Apply_Gravity_To_Grid_Forces
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Apply_Gravity_To_Grid_Forces()
+{
+    TV_INT TV_INT_IN=TV_INT()+IN;
+    RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
+    node_external_force.Fill(TV());
+    for(int p=0;p<N_particles;p++){
+        for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+            int ind=Flatten_Index(influence_corner(p)+it.index,grid.counts);
+            node_external_force(ind)=node_mass(ind)*gravity_constant;}}
+    node_force+=node_external_force;
+}
+//#####################################################################
 // Function Update_Velocities_On_Grid
 //#####################################################################
 template<class TV> void MPM_SIMULATION<TV>::
@@ -187,7 +204,16 @@ Update_Velocities_On_Grid()
 template<class TV> void MPM_SIMULATION<TV>::
 Grid_Based_Body_Collisions()
 {
-    //TODO later than implicit solve
+    static T eps=1e-5;
+    RANGE<TV_INT> range(TV_INT(),grid.counts);
+    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+        int ind=Flatten_Index(it.index,grid.counts);
+        if(grid.Node(it.index)(1)<=ground_level && node_V_star(ind)(1)<=(T)0){
+            TV vt(node_V_star(ind));vt(1)=(T)0;
+            T vn=node_V_star(ind)(1);
+            T vt_mag=vt.Magnitude();
+            if(vt_mag>eps) node_V_star(ind)=vt+friction_coefficient*vn*vt/vt_mag;
+            else node_V_star(ind)=vt;}}
 }
 //#####################################################################
 // Function Solve_The_Linear_System
@@ -205,7 +231,6 @@ Update_Deformation_Gradient()
 {
     TV_INT TV_INT_IN=TV_INT()+IN;
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
-
     if(!use_plasticity){
         for(int p=0;p<N_particles;p++){
             MATRIX<T,TV::m> grad_vp;
@@ -238,7 +263,6 @@ Update_Particle_Velocities()
 {
     TV_INT TV_INT_IN=TV_INT()+IN;
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
-
     for(int p=0;p<N_particles;p++){
         TV V_PIC;
         TV V_FLIP=particles.V(p);
@@ -255,7 +279,14 @@ Update_Particle_Velocities()
 template<class TV> void MPM_SIMULATION<TV>::
 Particle_Based_Body_Collisions()
 {
-    //TODO later than implicit solve
+    static T eps=1e-5;
+    for(int p=0;p<N_particles;p++){
+        if(particles.X(p)(1)<=ground_level && particles.V(p)(1)<=(T)0){
+            TV vt(particles.V(p));vt(1)=(T)0;
+            T vn=particles.V(p)(1);
+            T vt_mag=vt.Magnitude();
+            if(vt_mag>eps) particles.V(p)=vt+friction_coefficient*vn*vt/vt_mag;
+            else particles.V(p)=vt;}}
 }
 //#####################################################################
 // Function Update_Particle_Positions
@@ -265,7 +296,6 @@ Update_Particle_Positions()
 {
     for(int p=0;p<N_particles;p++) particles.X(p)+=dt*particles.V(p);
 }
-
 //#####################################################################
 template class MPM_SIMULATION<VECTOR<float,2> >;
 template class MPM_SIMULATION<VECTOR<float,3> >;

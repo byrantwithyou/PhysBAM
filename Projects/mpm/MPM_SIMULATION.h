@@ -29,13 +29,16 @@ class MPM_SIMULATION
 public:
     MPM_PARTICLES<TV> particles;
     int N_particles;
+    TV gravity_constant;
+    T friction_coefficient;
+    bool use_gravity;
+    T ground_level;
     T mu0,lambda0;
     T xi;
     bool use_plasticity;
     T theta_c;
     T theta_s;
     T FLIP_alpha;
-
     ARRAY<T> mu,lambda;
     ARRAY<T> Je,Jp;
     ARRAY<MATRIX<T,TV::m> > Ue,Ve,Re,Se;
@@ -45,15 +48,14 @@ public:
     ARRAY<ARRAY<TV> > grad_weight;
     MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function; 
     MPM_CONSTITUTIVE_MODEL<TV> constitutive_model;
-
     GRID<TV> grid;
     int N_nodes;
     ARRAY<T> node_mass;
     ARRAY<TV> node_V;
     ARRAY<TV> node_V_star;
-    ARRAY<TV> node_V_old; // used for FLIP
+    ARRAY<TV> node_V_old;
     ARRAY<TV> node_force;
-
+    ARRAY<TV> node_external_force;
     T dt;
     int frame;
 
@@ -63,13 +65,13 @@ public:
     void Initialize();
     void Advance_One_Time_Step_Forward_Euler();
     void Advance_One_Time_Step_Backward_Euler();
-
 protected:
     void Build_Weights_And_Grad_Weights();
     void Build_Helper_Structures_For_Constitutive_Model();
     void Rasterize_Particle_Data_To_The_Grid();
     void Compute_Particle_Volumes_And_Densities();
     void Compute_Grid_Forces();
+    void Apply_Gravity_To_Grid_Forces();
     void Update_Velocities_On_Grid();
     void Grid_Based_Body_Collisions();
     void Solve_The_Linear_System();
