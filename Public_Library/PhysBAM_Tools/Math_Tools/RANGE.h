@@ -52,7 +52,7 @@ public:
         :min_corner(TV(box.min_corner)),max_corner(TV(box.max_corner))
     {}
 
-    RANGE(const TV& point)
+    explicit RANGE(const TV& point)
         :min_corner(point),max_corner(point)
     {}
 

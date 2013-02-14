@@ -314,7 +314,7 @@ Find_Boundary_Regions(ARRAY<RANGE<VECTOR<int,1> > >& regions,const RANGE<VECTOR<
     RANGE<VECTOR<int,1> > band_x=band;
     if(skip_common_boundary && band.max_corner.x>0){
         if(band.min_corner.x<0) PHYSBAM_NOT_IMPLEMENTED();
-        if(sentinels.max_corner.x) band_x+=VECTOR<int,1>(1);}
+        if(sentinels.max_corner.x){band_x.min_corner.x++;band_x.max_corner.x++;}}
     regions.Clean_Memory();
     regions.Append(RANGE<VECTOR<int,1> >(box.min_corner,box.min_corner)+band_x);
     regions.Append(RANGE<VECTOR<int,1> >(box.max_corner,box.max_corner)-band_x);
@@ -336,8 +336,8 @@ Find_Boundary_Regions(ARRAY<RANGE<VECTOR<int,2> > >& regions,const RANGE<VECTOR<
     RANGE<VECTOR<int,2> > band_x(VECTOR<int,2>(band.min_corner.x,0),VECTOR<int,2>(band.max_corner.x,0)),band_y(VECTOR<int,2>(0,band.min_corner.x),VECTOR<int,2>(0,band.max_corner.x));
     if(skip_common_boundary && band.max_corner.x>0){
         if(band.min_corner.x<0) PHYSBAM_NOT_IMPLEMENTED();
-        if(sentinels.max_corner.x) band_x+=VECTOR<int,2>(1,0);
-        if(sentinels.max_corner.y) band_y+=VECTOR<int,2>(0,1);}
+        if(sentinels.max_corner.x){band_x.min_corner.x++;band_x.max_corner.x++;}
+        if(sentinels.max_corner.y){band_y.min_corner.y++;band_y.max_corner.y++;}}
     regions.Clean_Memory();
     if(!include_corners){ // add in side order
         regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.min_corner.x,box.min_corner.y),VECTOR<int,2>(box.min_corner.x,box.max_corner.y))+band_x);
@@ -373,9 +373,9 @@ Find_Boundary_Regions(ARRAY<RANGE<VECTOR<int,3> > >& regions,const RANGE<VECTOR<
     RANGE<VECTOR<int,3> > band_x(VECTOR<int,3>(band.min_corner.x,0,0),VECTOR<int,3>(band.max_corner.x,0,0)),band_y(VECTOR<int,3>(0,band.min_corner.x,0),VECTOR<int,3>(0,band.max_corner.x,0)),band_z(VECTOR<int,3>(0,0,band.min_corner.x),VECTOR<int,3>(0,0,band.max_corner.x));
     if(skip_common_boundary && band.max_corner.x>0){
         if(band.min_corner.x<0) PHYSBAM_NOT_IMPLEMENTED();
-        if(sentinels.max_corner.x) band_x+=VECTOR<int,3>(1,0,0);
-        if(sentinels.max_corner.y) band_y+=VECTOR<int,3>(0,1,0);
-        if(sentinels.max_corner.z) band_z+=VECTOR<int,3>(0,0,1);}
+        if(sentinels.max_corner.x){band_x.min_corner.x++;band_x.max_corner.x++;}
+        if(sentinels.max_corner.y){band_y.min_corner.y++;band_y.max_corner.y++;}
+        if(sentinels.max_corner.z){band_z.min_corner.z++;band_z.max_corner.z++;}}
     regions.Clean_Memory();
     if(!include_corners){ // add in side order
         regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.max_corner.z))+band_x);

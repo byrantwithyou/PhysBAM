@@ -447,7 +447,9 @@ Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<GRID<VEC
                 int id=removed_negative_particles(block)->Add_Element();
                 (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
                 removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.dX.Min();}
-            particle_region+=TV(1,0,0);number_of_sph_particles=int(particle_multiplier*number_of_sph_particles);}}
+            particle_region.min_corner.x++;
+            particle_region.max_corner.x++;
+            number_of_sph_particles=int(particle_multiplier*number_of_sph_particles);}}
     else if(test_number==10){
         sph_evolution.target_particles_per_unit_volume=tests.target_particles_per_unit_volume;
         sph_evolution.ballistic_particles_per_unit_volume=tests.ballistic_particles_as_percentage_of_target*sph_evolution.target_particles_per_unit_volume;
