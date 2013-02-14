@@ -297,6 +297,28 @@ Update_Particle_Positions()
     for(int p=0;p<N_particles;p++) particles.X(p)+=dt*particles.V(p);
 }
 //#####################################################################
+// Function Compute_df
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Compute_df(const ARRAY<TV>& du,ARRAY<TV>& df)
+{
+    TV_INT TV_INT_IN=TV_INT()+IN;
+    RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
+    df.Resize(N_nodes);
+    df.Fill(TV());
+    for(int p=0;p<N_particles;p++){
+        MATRIX<T,TV::m> Cp;
+        for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+            int j=Flatten_Index(influence_corner(p)+it.index,grid.counts);
+            Cp+=MATRIX<T,TV::m>::Outer_Product(du(j),grad_weight(p)(Flatten_Index(it.index,TV_INT_IN)));}
+        MATRIX<T,TV::m> Ep=Cp*particles.Fe(p);
+        MATRIX<T,TV::m> Ap=constitutive_model.Compute_d2Psi_dFe_dFe_Action_dF(mu(p),lambda(p),particles.Fe(p),Je(p),Re(p),Se(p),Ep);
+        MATRIX<T,TV::m> Gp=particles.volume(p)*Ap*(particles.Fe(p).Transposed());
+        for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+            int i=Flatten_Index(influence_corner(p)+it.index,grid.counts);
+            df(i)-=Gp*grad_weight(p)(Flatten_Index(it.index,TV_INT_IN));}}
+}
+//#####################################################################
 template class MPM_SIMULATION<VECTOR<float,2> >;
 template class MPM_SIMULATION<VECTOR<float,3> >;
 template class MPM_SIMULATION<VECTOR<double,2> >;

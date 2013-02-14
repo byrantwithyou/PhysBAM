@@ -30,12 +30,12 @@ int main(int argc,char *argv[])
 
     static const int test=1;
     if(test==1){ // stretched cube
-        TV_INT grid_counts(161,161);
+        TV_INT grid_counts(60,60);
         RANGE<TV> grid_box(TV(-3,-3),TV(3,3));
         GRID<TV> grid(grid_counts,grid_box);
         sim.grid=grid;
 
-        TV_INT particle_counts(120,120);
+        TV_INT particle_counts(30,30);
         RANGE<TV> particle_box(TV(-0.5,-0.5),TV(0.5,0.5));
         sim.particles.Resize(particle_counts.Product());
         sim.particles.Initialize_X_As_A_Grid(particle_counts,particle_box);
@@ -45,7 +45,7 @@ int main(int argc,char *argv[])
             sim.particles.Fe(p)=MATRIX<T,TV::m>::Identity_Matrix();
             sim.particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();}
 
-        sim.dt=1e-3;
+        sim.dt=1e-4;
         T ym=3e6;
         T pr=0.3;
         sim.mu0=ym/((T)2*((T)1+pr));
@@ -53,7 +53,7 @@ int main(int argc,char *argv[])
         sim.xi=0;
         sim.use_plasticity=false;
         sim.use_gravity=true;
-        sim.ground_level=-2;
+        sim.ground_level=-1;
         sim.theta_c=0.01;
         sim.theta_s=0.01;
         sim.FLIP_alpha=0.95;

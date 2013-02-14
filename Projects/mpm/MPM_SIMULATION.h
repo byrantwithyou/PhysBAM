@@ -79,6 +79,8 @@ protected:
     void Update_Particle_Velocities();
     void Particle_Based_Body_Collisions();
     void Update_Particle_Positions();
+private:
+    void Compute_df(const ARRAY<TV>& du,ARRAY<TV>& df);
 //#####################################################################
 };
 }
