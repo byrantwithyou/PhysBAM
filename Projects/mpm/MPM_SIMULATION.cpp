@@ -29,10 +29,10 @@ template<class TV> MPM_SIMULATION<TV>::
 template<class TV> void MPM_SIMULATION<TV>::
 Initialize()
 {
-//#pragma omp parallel for    
-//    for(int t=0;t<1000000;t++){
-//        LOG::cout<<t<<std::endl;}
-
+// #pragma omp parallel for    
+//     for(int t=0;t<1000;t++){
+//         LOG::cout<<omp_get_thread_num()<<" ";}
+//     LOG::cout<<std::endl;
     gravity_constant=TV();gravity_constant(1)=-(T)9.8;
     N_particles=particles.X.m;
     mu.Resize(N_particles);
