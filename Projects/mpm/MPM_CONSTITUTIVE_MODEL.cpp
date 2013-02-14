@@ -22,7 +22,7 @@ template<class TV> MPM_CONSTITUTIVE_MODEL<TV>::
 // Function Compute_Helper_Quantities_Using_F
 //#####################################################################
 template<class TV> void MPM_CONSTITUTIVE_MODEL<TV>::
-Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Fp,T& Je,T& Jp,MATRIX<T,TV::m>& Ue,DIAGONAL_MATRIX<T,TV::m>& SIGMAe,MATRIX<T,TV::m>& Ve,MATRIX<T,TV::m>& Re,MATRIX<T,TV::m>& Se)
+Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Fp,T& Je,T& Jp,MATRIX<T,TV::m>& Ue,DIAGONAL_MATRIX<T,TV::m>& SIGMAe,MATRIX<T,TV::m>& Ve,MATRIX<T,TV::m>& Re,MATRIX<T,TV::m>& Se) const
 {
     Je=Fe.Determinant();
     Jp=Fp.Determinant();
@@ -34,7 +34,7 @@ Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m
 // Function Compute_Energy_Density_Psi
 //#####################################################################
 template<class TV> typename TV::SCALAR MPM_CONSTITUTIVE_MODEL<TV>::
-Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je)
+Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const
 {
     return (Fe-Re).Frobenius_Norm_Squared()*mu+0.5*lambda*sqr(Je-1);
 }
@@ -42,7 +42,7 @@ Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV
 // Function Compute_dPsi_dFe
 //#####################################################################
 template<class TV> MATRIX<typename TV::SCALAR,TV::m> MPM_CONSTITUTIVE_MODEL<TV>::
-Compute_dPsi_dFe(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je)
+Compute_dPsi_dFe(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const
 {
     return (Fe-Re)*2.0*mu+Fe.Inverse_Transposed()*Je*lambda*(Je-1);
 }
@@ -93,7 +93,7 @@ template<class T> static MATRIX<T,3> Compute_dR(const MATRIX<T,3>& R,const MATRI
 // Function Compute_d2Psi_dFe_dFe_Action_dF
 //#####################################################################
 template<class TV> MATRIX<typename TV::SCALAR,TV::m> MPM_CONSTITUTIVE_MODEL<TV>::
-Compute_d2Psi_dFe_dFe_Action_dF(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const T& Je,const MATRIX<T,TV::m>& Re,const MATRIX<T,TV::m>& Se,const MATRIX<T,TV::m>& dF)
+Compute_d2Psi_dFe_dFe_Action_dF(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const T& Je,const MATRIX<T,TV::m>& Re,const MATRIX<T,TV::m>& Se,const MATRIX<T,TV::m>& dF) const
 {
     MATRIX<T,TV::m> JFinvT=Fe.Inverse_Transposed()*Je;
     MATRIX<T,TV::m> dJFinvT=Compute_dJFinvT(Fe,dF);
@@ -105,7 +105,7 @@ Compute_d2Psi_dFe_dFe_Action_dF(const T& mu,const T& lambda,const MATRIX<T,TV::m
 // Function Derivative_Test
 //#####################################################################
 template<class TV> void MPM_CONSTITUTIVE_MODEL<TV>::
-Derivative_Test()
+Derivative_Test() const
 {
     MATRIX<T,TV::m> Fe=MATRIX<T,TV::m>::Identity_Matrix();
     MATRIX<T,TV::m> Fp=MATRIX<T,TV::m>::Identity_Matrix();

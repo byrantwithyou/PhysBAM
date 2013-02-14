@@ -61,7 +61,7 @@ operator*=(const T a)
 template<class TV> void MPM_VECTOR<TV>::
 Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 {
-    v=c*debug_cast<const MPM_VECTOR&>(bv).v;
+    v.Copy(c,debug_cast<const MPM_VECTOR&>(bv).v);
 }
 //#####################################################################
 // Function Copy
@@ -69,7 +69,7 @@ Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 template<class TV> void MPM_VECTOR<TV>::
 Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2)
 {
-    v=c1*debug_cast<const MPM_VECTOR&>(bv1).v+debug_cast<const MPM_VECTOR&>(bv2).v;
+    v.Copy(c1,debug_cast<const MPM_VECTOR&>(bv1).v,debug_cast<const MPM_VECTOR&>(bv2).v);
 }
 //#####################################################################
 // Function Raw_Size
@@ -77,7 +77,7 @@ Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv
 template<class TV> int MPM_VECTOR<TV>::
 Raw_Size() const
 {
-    return Value(v.m)*TV::m;
+    return Value(v.array.m)*TV::m;
 }
 //#####################################################################
 // Function Raw_Get
@@ -85,7 +85,7 @@ Raw_Size() const
 template<class TV> typename TV::SCALAR& MPM_VECTOR<TV>::
 Raw_Get(int i)
 {
-    return v(i/2)(i%2);
+    return v.array(i/TV::m)(i%TV::m);
 }
 //#####################################################################
 // Function Clone_Default
@@ -94,7 +94,7 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>* MPM_VECTOR<TV>::
 Clone_Default() const
 {
     MPM_VECTOR<TV>* c=new MPM_VECTOR<TV>;
-    c->v.Resize(v.m);
+    c->v.Resize(v.domain);
     return c;
 }
 //#####################################################################
@@ -103,7 +103,7 @@ Clone_Default() const
 template<class TV> void MPM_VECTOR<TV>::
 Resize(const KRYLOV_VECTOR_BASE<T>& w)
 {
-    v.Resize(debug_cast<const MPM_VECTOR<TV>&>(w).v.m);
+    v.Resize(debug_cast<const MPM_VECTOR<TV>&>(w).v.domain);
 }
 namespace PhysBAM{
 template class MPM_VECTOR<VECTOR<float,2> >;

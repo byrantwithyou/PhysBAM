@@ -2,26 +2,18 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
-#include <PhysBAM_Tools/Vectors/TWIST.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_VECTOR.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_MESH.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <iomanip>
+#include "MPM_SIMULATION.h"
 #include "MPM_SYSTEM.h"
+#include "MPM_VECTOR.h"
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> MPM_SYSTEM<TV>::
-MPM_SYSTEM(ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body_input)
-    :BASE(false,false),articulated_rigid_body(articulated_rigid_body_input),break_loops(false),internal_x(0)
+MPM_SYSTEM(const MPM_SIMULATION<TV>& sim)
+    :BASE(false,true),sim(sim),beta(1)
 {
 }
 //#####################################################################
@@ -32,71 +24,34 @@ template<class TV> MPM_SYSTEM<TV>::
 {
 }
 //#####################################################################
-// Function Initialize
+// Function Force
 //#####################################################################
 template<class TV> void MPM_SYSTEM<TV>::
-Initialize()
+Force(ARRAY<TV,TV_INT>& f) const
 {
-    const JOINT_MESH<TV>& joint_mesh=articulated_rigid_body.joint_mesh;
-    prismatic_projection.Resize(joint_mesh.Size());
-    angular_projection.Resize(joint_mesh.Size());
-    location.Resize(joint_mesh.Size());
-    effective_mass.Resize(joint_mesh.Size());
-    intermediate_twists.Resize(articulated_rigid_body.rigid_body_collection.rigid_body_particle.Size());
-    keep_joint.Remove_All();
-    for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
-        const RIGID_BODY<TV>& parent_body=*articulated_rigid_body.Parent(j);
-        const RIGID_BODY<TV>& child_body=*articulated_rigid_body.Child(j);
-        location(j)=joint_mesh(j)->Location(parent_body,child_body);
-        prismatic_projection(j)=joint_mesh(j)->Prismatic_Projection_Matrix(parent_body.Frame());
-        angular_projection(j)=joint_mesh(j)->Angular_Projection_Matrix(parent_body.Frame());
-        MATRIX<T,TWIST<TV>::dimension> M,N;
-        parent_body.Effective_Inertia_Inverse(M,location(j));
-        child_body.Effective_Inertia_Inverse(N,location(j));
-        effective_mass(j)=M+N;
-        effective_mass(j).In_Place_Cholesky_Inverse();}
-
-    if(break_loops){
-        keep_joint.Resize(joint_mesh.Size());
-        UNION_FIND<int> u(intermediate_twists.m);
-        for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
-            int p=articulated_rigid_body.Parent_Id(j),c=articulated_rigid_body.Child_Id(j);
-            if(u.Find(p)==u.Find(c)) continue;
-            keep_joint(j)=true;
-            u.Union(c,p);}}
+    f.Fill(TV());
+    for(int p=0;p<sim.particles.number;p++){
+        MATRIX<T,TV::m> B=sim.particles.volume(p)*sim.constitutive_model.Compute_dPsi_dFe(sim.mu(p),sim.lambda(p),sim.particles.Fe(p),sim.Re(p),sim.Je(p))*(sim.particles.Fe(p).Transposed());
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.IN));it.Valid();it.Next())
+            f(sim.influence_corner(p)+it.index)-=B*sim.grad_weight(p)(it.index);}
 }
 //#####################################################################
-// Function Gather
+// Function Apply_Force_Derivatives
 //#####################################################################
 template<class TV> void MPM_SYSTEM<TV>::
-Gather(const ARRAY_VIEW<const TWIST<TV>,JOINT_ID> x,ARRAY_VIEW<TWIST<TV> > y) const
-{
-    const JOINT_MESH<TV>& joint_mesh=articulated_rigid_body.joint_mesh;
-    for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
-        if(break_loops && !keep_joint(j)) continue;
-        y(articulated_rigid_body.Parent_Id(j))+=articulated_rigid_body.Parent(j)->Gather(x(j),location(j));
-        y(articulated_rigid_body.Child_Id(j))-=articulated_rigid_body.Child(j)->Gather(x(j),location(j));}
-}
-//#####################################################################
-// Function Inverse_Mass
-//#####################################################################
-template<class TV> void MPM_SYSTEM<TV>::
-Inverse_Mass(ARRAY_VIEW<TWIST<TV> > x) const
-{
-    for(int i=0;i<articulated_rigid_body.rigid_body_collection.rigid_body_particle.Size();i++)
-        x(i)=articulated_rigid_body.rigid_body_collection.Rigid_Body(i).Inertia_Inverse_Times(x(i));
-}
-//#####################################################################
-// Function Scatter
-//#####################################################################
-template<class TV> void MPM_SYSTEM<TV>::
-Scatter(const ARRAY_VIEW<const TWIST<TV> > x,ARRAY_VIEW<TWIST<TV>,JOINT_ID> y) const
-{
-    const JOINT_MESH<TV>& joint_mesh=articulated_rigid_body.joint_mesh;
-    for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
-        if(break_loops && !keep_joint(j)) continue;
-        y(j)+=articulated_rigid_body.Parent(j)->Scatter(x(articulated_rigid_body.Parent_Id(j)),location(j));
-        y(j)-=articulated_rigid_body.Child(j)->Scatter(x(articulated_rigid_body.Child_Id(j)),location(j));}
+Apply_Force_Derivatives(const ARRAY<TV,TV_INT>& du,ARRAY<TV,TV_INT>& df) const
+{ 
+    df.Resize(RANGE<TV_INT>(TV_INT(),sim.grid.counts));
+    df.Fill(TV());
+    for(int p=0;p<sim.particles.number;p++){
+        MATRIX<T,TV::m> Cp;
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.IN));it.Valid();it.Next())
+            Cp+=MATRIX<T,TV::m>::Outer_Product(du(sim.influence_corner(p)+it.index),sim.grad_weight(p)(it.index));
+        MATRIX<T,TV::m> Ep=Cp*sim.particles.Fe(p);
+        MATRIX<T,TV::m> Ap=sim.constitutive_model.Compute_d2Psi_dFe_dFe_Action_dF(sim.mu(p),sim.lambda(p),sim.particles.Fe(p),sim.Je(p),sim.Re(p),sim.Se(p),Ep);
+        MATRIX<T,TV::m> Gp=sim.particles.volume(p)*Ap*(sim.particles.Fe(p).Transposed());
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.IN));it.Valid();it.Next())
+            df(sim.influence_corner(p)+it.index)-=Gp*sim.grad_weight(p)(it.index);}
 }
 //#####################################################################
 // Function Multiply
@@ -104,39 +59,15 @@ Scatter(const ARRAY_VIEW<const TWIST<TV> > x,ARRAY_VIEW<TWIST<TV>,JOINT_ID> y) c
 template<class TV> void MPM_SYSTEM<TV>::
 Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 {
-    ARRAY<TWIST<TV>,JOINT_ID>& twist=debug_cast<ARTICULATED_VECTOR<TV>&>(result).v;
-    const ARRAY<TWIST<TV>,JOINT_ID>& wrench=debug_cast<const ARTICULATED_VECTOR<TV>&>(x).v;
-    intermediate_twists.Fill(TWIST<TV>());
-    twist.Fill(TWIST<TV>());
+    ARRAY<TV,TV_INT>& rr=debug_cast<MPM_VECTOR<TV>&>(result).v;
+    const ARRAY<TV,TV_INT>& xx=debug_cast<const MPM_VECTOR<TV>&>(x).v;
+    Apply_Force_Derivatives(xx,rr);
 
-    Gather(wrench,intermediate_twists);
-    Inverse_Mass(intermediate_twists);
-    Scatter(intermediate_twists,twist);
-    if(break_loops)
-        for(JOINT_ID j(0);j<articulated_rigid_body.joint_mesh.Size();j++) if(articulated_rigid_body.joint_mesh.Is_Active(j))
-            if(!keep_joint(j))
-                twist(j)=wrench(j);
-
-    Kinetic_Energy();
-}
-//#####################################################################
-// Function Kinetic_Energy
-//#####################################################################
-template<class TV> void MPM_SYSTEM<TV>::
-Kinetic_Energy() const
-{
-    if(!internal_x) return;
-    intermediate_twists.Fill(TWIST<TV>());
-    Gather(internal_x->v,intermediate_twists);
-    Inverse_Mass(intermediate_twists);
-    intermediate_twists+=articulated_rigid_body.rigid_body_collection.rigid_body_particle.twist;
-    T ke=0;
-    for(int i=0;i<articulated_rigid_body.rigid_body_collection.rigid_body_particle.Size();i++){
-        RIGID_BODY<TV>& rb=articulated_rigid_body.rigid_body_collection.Rigid_Body(i);
-        if(rb.Has_Infinite_Inertia()) continue;
-        TWIST<TV> wrench=rb.Inertia_Times(intermediate_twists(i));
-        ke+=(T).5*(TV::Dot_Product(wrench.linear,intermediate_twists(i).linear)+TV::SPIN::Dot_Product(wrench.angular,intermediate_twists(i).angular));}
-    LOG::cout<<std::setprecision(20)<<"system ke "<<ke<<std::endl;
+    T beta_dt2=beta*sqr(sim.dt);
+    for(int i=0;i<rr.array.m;i++){
+        if(sim.node_mass.array(i)>sim.min_mass)
+            rr.array(i)=xx.array(i)+beta_dt2/sim.node_mass.array(i)*rr.array(i);
+        else rr.array(i)=TV();}
 }
 //#####################################################################
 // Function Project
@@ -144,12 +75,6 @@ Kinetic_Energy() const
 template<class TV> void MPM_SYSTEM<TV>::
 Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
-    const JOINT_MESH<TV>& joint_mesh=articulated_rigid_body.joint_mesh;
-    ARRAY<TWIST<TV>,JOINT_ID>& twist=debug_cast<ARTICULATED_VECTOR<TV>&>(x).v;
-    for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
-        if(break_loops && !keep_joint(j)) continue;
-        twist(j).linear=prismatic_projection(j)*twist(j).linear;
-        twist(j).angular=angular_projection(j)*twist(j).angular;}
 }
 //#####################################################################
 // Function Inner_Product
@@ -157,15 +82,10 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> double MPM_SYSTEM<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const
 {
-    const JOINT_MESH<TV>& joint_mesh=articulated_rigid_body.joint_mesh;
-    const ARRAY<TWIST<TV>,JOINT_ID>& xx=debug_cast<const ARTICULATED_VECTOR<TV>&>(x).v;
-    const ARRAY<TWIST<TV>,JOINT_ID>& yy=debug_cast<const ARTICULATED_VECTOR<TV>&>(y).v;
-
-    // TODO: Better inner product.
+    const ARRAY<TV,TV_INT>& xx=debug_cast<const MPM_VECTOR<TV>&>(x).v;
+    const ARRAY<TV,TV_INT>& yy=debug_cast<const MPM_VECTOR<TV>&>(y).v;
     double r=0;
-    for(JOINT_ID j(0);j<joint_mesh.Size();j++)
-        if(joint_mesh.Is_Active(j))
-            r+=xx(j).Get_Vector().Dot(yy(j).Get_Vector());
+    for(int i=0;i<xx.array.m;i++) r+=sim.node_mass.array(i)*xx.array(i).Dot(yy.array(i));
     return r;
 }
 //#####################################################################
@@ -174,7 +94,8 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
 template<class TV> typename TV::SCALAR MPM_SYSTEM<TV>::
 Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 {
-    return (T)sqrt(Inner_Product(x,x));
+    const ARRAY<TV,TV_INT>& xx=debug_cast<const MPM_VECTOR<TV>&>(x).v;
+    return xx.array.Maximum_Magnitude();
 }
 //#####################################################################
 // Function Set_Boundary_Conditions

@@ -18,12 +18,12 @@ class MPM_GRID_BASIS_FUNCTION
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
-    static const int IN=order+1;
+    enum WORKAROUND {IN=order+1};
     MPM_GRID_BASIS_FUNCTION(){}
     ~MPM_GRID_BASIS_FUNCTION(){}
     
     virtual void Build_Weights_And_Grad_Weight_Over_Weights(const TV&X,const GRID<TV>& grid,TV_INT& influence_corner,VECTOR<TV,IN>& weight,VECTOR<TV,IN>& grad_weight_over_weight)=0;
-    virtual void Build_Weights_And_Grad_Weights_Exact(const TV& X,const GRID<TV>& grid,TV_INT& influence_corner,ARRAY<T>& weight,ARRAY<TV>& grad_weight)=0;
+    virtual void Build_Weights_And_Grad_Weights_Exact(const TV& X,const GRID<TV>& grid,TV_INT& influence_corner,ARRAY<T,TV_INT>& weight,ARRAY<TV,TV_INT>& grad_weight)=0;
 //#####################################################################
 };
 }

@@ -7,7 +7,7 @@
 #ifndef __MPM_VECTOR__
 #define __MPM_VECTOR__
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
@@ -15,9 +15,9 @@ namespace PhysBAM{
 template<class TV>
 class MPM_VECTOR:public KRYLOV_VECTOR_BASE<typename TV::SCALAR>
 {
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
-    ARRAY<TV> v;
+    ARRAY<TV,TV_INT> v;
 
     MPM_VECTOR();
     virtual ~MPM_VECTOR();
