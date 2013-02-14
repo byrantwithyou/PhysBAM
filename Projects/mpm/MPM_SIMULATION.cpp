@@ -6,6 +6,7 @@
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <omp.h>
 #include "Fanfu_Utilities/FLATTEN_INDEX.h"
 #include "MPM_SIMULATION.h"
 namespace PhysBAM{
