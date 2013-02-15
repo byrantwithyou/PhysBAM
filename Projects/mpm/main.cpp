@@ -39,10 +39,10 @@ int main(int argc,char *argv[])
         GRID<TV> grid(grid_counts,grid_box);
         sim.grid=grid;
 
-        TV_INT particle_counts(0.2*64,0.2*64);
+        TV_INT particle_counts(0.2*96,0.2*96);
         RANGE<TV> particle_box(TV(-0.1,-0.1),TV(0.1,0.1));
         sim.particles.Initialize_X_As_A_Grid(particle_counts,particle_box);
-        T object_mass=4000*0.04;
+        T object_mass=400*0.04;
         for(int p=0;p<sim.particles.number;p++){
             sim.particles.V(p)=TV();
             sim.particles.mass(p)=object_mass/sim.particles.number;
@@ -56,17 +56,12 @@ int main(int argc,char *argv[])
         sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
         sim.xi=0;
         sim.use_plasticity=false;
-        sim.use_gravity=false;
+        sim.use_gravity=true;
         sim.ground_level=-0.3;
         sim.theta_c=0.025;
         sim.theta_s=0.0075;
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;
-        for(int p=0;p<sim.particles.X.m;p++){
-            sim.particles.X(p)(0)*=2;
-            sim.particles.X(p)(1)*=0.5;
-            sim.particles.Fe(p)(0,0)=2;
-            sim.particles.Fe(p)(1,1)=0.5;}
     }
 
     sim.Initialize();

@@ -304,6 +304,7 @@ Update_Particle_Velocities()
     TV_INT TV_INT_IN=TV_INT()+IN;
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
     for(int p=0;p<N_particles;p++){
+        if(particles.is_dirichlet(p)) continue;
         TV V_PIC;
         TV V_FLIP=particles.V(p);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
@@ -338,7 +339,9 @@ template<class TV> void MPM_SIMULATION<TV>::
 Update_Particle_Positions()
 {
     TIMING_START;
-    for(int p=0;p<N_particles;p++) particles.X(p)+=dt*particles.V(p);
+    for(int p=0;p<N_particles;p++){
+        if(particles.is_dirichlet(p)) continue;
+        particles.X(p)+=dt*particles.V(p);}
     if(PROFILING) TIMING_END("Update_Particle_Positions");
 }
 //#####################################################################
