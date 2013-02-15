@@ -461,7 +461,7 @@ public:
             case 28:{//Test 25 but using the level set method
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 
-                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(.5,.3),.1,1,0),(T)1,TV()+(T).5);
+                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(.5,.4),.1,1,0),(T)1,TV()+(T).5);
                 ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),-4,-4);
                 analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).4,0,1)))->Add(ab)->Add(cd);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0*sqr(m)/kg));

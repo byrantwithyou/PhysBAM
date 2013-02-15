@@ -4,7 +4,7 @@
 out="$1"
 shift
 L=""
-for r in {2..9} ; do
+for r in {2..11} ; do
     T=`mktemp`
     O=`mktemp -d`
     (

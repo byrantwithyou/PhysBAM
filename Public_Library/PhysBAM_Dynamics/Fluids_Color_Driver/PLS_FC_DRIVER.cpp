@@ -21,6 +21,7 @@
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/VOLUME_FORCE_COLOR.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
@@ -229,6 +230,11 @@ Update_Pls(T dt)
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,1.5,time+dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after remove",0,1);
+    
+    Enforce_Phi_Boundary_Conditions();
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after level set update",0,1);
+    example.Rebuild_Levelset_Color();
+
 }
 //#####################################################################
 // Function Advance_One_Time_Step
@@ -349,7 +355,9 @@ RK2_Advection_And_BDF(T dt,bool first_step,int c)
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp5,lookup_prev_face_velocities,lookup_temp3,boundary,2*dt,time+dt);
         example.prev_face_velocities(c).Copy((T)2/(T)1.5,temp4,-(T).5/(T)1.5,temp5);}
     else{
-        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);}
+        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
+    }
+    
 }
 //#####################################################################
 // Function Apply_Pressure_And_Viscosity
@@ -426,6 +434,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         int k=iss.cm_u(it.Axis())->Get_Index(it.index,c);
         assert(k>=0);
         example.face_velocities(c)(it.Full_Index())=sol.u(it.Axis())(c)(k);}
+    
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
     vectors.Delete_Pointers_And_Clean_Memory();
@@ -436,6 +445,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color,int c)
 {
+    
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next())
         if(color(it.Full_Index())!=c)
             u(it.Full_Index())=1e20;
@@ -445,7 +455,15 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE
     const LEVELSET<TV>& phi=*example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(c);
     EXTRAPOLATION_HIGHER_ORDER<TV,T> eho(example.grid,phi,example.number_of_ghost_cells*10,3,example.number_of_ghost_cells);
     eho.periodic=true;
+
     eho.Extrapolate_Face([&](const FACE_INDEX<TV::m>& index){return color(index)==c;},u);
+
+//    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){ //Going to keep this here for a while in case it is needed again
+//            if((abs(example.face_velocities(c)(it.Full_Index())))>1e10)
+//            {Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));}
+//        }
+//    PHYSBAM_DEBUG_WRITE_SUBSTEP("Bad particles!",0,1);
+
     example.boundary.Fill_Ghost_Faces(example.grid,u,u,0,example.number_of_ghost_cells);
 }
 //#####################################################################
