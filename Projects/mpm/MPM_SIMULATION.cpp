@@ -9,6 +9,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <omp.h>
+#include "TIMING.h"
 #include "MPM_SYSTEM.h"
 #include "MPM_VECTOR.h"
 #include "MPM_SIMULATION.h"
@@ -37,6 +38,8 @@ Initialize()
 //     for(int t=0;t<1000;t++){
 //         LOG::cout<<omp_get_thread_num()<<" ";}
 //     LOG::cout<<std::endl;
+    LOG::cout<<"Allocating Memories for Simulation..."<<std::endl;
+    TIMING_START;
     gravity_constant=TV();gravity_constant(1)=-(T)9.8;
     N_particles=particles.X.m;
     mu.Resize(N_particles);
@@ -61,6 +64,7 @@ Initialize()
     node_force.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     node_external_force.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     frame=0;
+    TIMING_END("");
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Forward_Euler
@@ -110,8 +114,10 @@ Advance_One_Time_Step_Backward_Euler()
 template<class TV> void MPM_SIMULATION<TV>::
 Build_Weights_And_Grad_Weights()
 {
+    TIMING_START;
     for(int p=0;p<N_particles;p++){
         grid_basis_function.Build_Weights_And_Grad_Weights_Exact(particles.X(p),grid,influence_corner(p),weight(p),grad_weight(p));}
+    TIMING_END("Build_Weights_And_Grad_Weights");
 }
 //#####################################################################
 // Function Build_Helper_Structures_For_Constitutive_Model
@@ -119,11 +125,13 @@ Build_Weights_And_Grad_Weights()
 template<class TV> void MPM_SIMULATION<TV>::
 Build_Helper_Structures_For_Constitutive_Model()
 {
+    TIMING_START;
     for(int p=0;p<N_particles;p++){
         constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),particles.Fp(p),Je(p),Jp(p),Ue(p),SIGMAe(p),Ve(p),Re(p),Se(p));
         T lame_scale=exp(xi*((T)1-Jp(p)));
         mu(p)=mu0*lame_scale;
         lambda(p)=lambda0*lame_scale;}
+    TIMING_END("Build_Helper_Structures_For_Constitutive_Model");
 }
 //#####################################################################
 // Function Rasterize_Particle_Data_To_The_Grid
@@ -131,6 +139,7 @@ Build_Helper_Structures_For_Constitutive_Model()
 template<class TV> void MPM_SIMULATION<TV>::
 Rasterize_Particle_Data_To_The_Grid()
 {
+    TIMING_START;
     TV_INT TV_INT_IN=TV_INT()+IN;
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
     node_mass.Fill(T(0));
@@ -142,6 +151,7 @@ Rasterize_Particle_Data_To_The_Grid()
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
             if(node_mass(ind)>min_mass) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p)(it.index)/node_mass(ind);}}
+    TIMING_END("Rasterize_Particle_Data_To_The_Grid");
 }
 //#####################################################################
 // Function Compute_Particle_Volumes_And_Densities
@@ -149,17 +159,18 @@ Rasterize_Particle_Data_To_The_Grid()
 template<class TV> void MPM_SIMULATION<TV>::
 Compute_Particle_Volumes_And_Densities()
 {
+    TIMING_START;
     TV_INT TV_INT_IN=TV_INT()+IN;
     T one_over_cell_volume=grid.one_over_dX.Product();
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
     particles.density.Fill(T(0));
     particles.volume.Fill(T(0));
-#pragma omp parallel for
     for(int p=0;p<N_particles;p++){
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
             particles.density(p)+=node_mass(ind)*weight(p)(it.index)*one_over_cell_volume;}
         if(particles.density(p)>min_pho) particles.volume(p)=particles.mass(p)/particles.density(p);}
+    TIMING_END("Compute_Particle_Volumes_And_Densities");
 }
 //#####################################################################
 // Function Compute_Grid_Forces
@@ -167,6 +178,7 @@ Compute_Particle_Volumes_And_Densities()
 template<class TV> void MPM_SIMULATION<TV>::
 Compute_Grid_Forces()
 {
+    TIMING_START;
     TV_INT TV_INT_IN=TV_INT()+IN;
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
     node_force.Fill(TV());
@@ -175,6 +187,7 @@ Compute_Grid_Forces()
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
             node_force(ind)-=B*grad_weight(p)(it.index);}}
+    TIMING_END("Compute_Grid_Forces");
 }
 //#####################################################################
 // Function Apply_Gravity_To_Grid_Forces
@@ -182,6 +195,7 @@ Compute_Grid_Forces()
 template<class TV> void MPM_SIMULATION<TV>::
 Apply_Gravity_To_Grid_Forces()
 {
+    TIMING_START;
     TV_INT TV_INT_IN=TV_INT()+IN;
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
     node_external_force.Fill(TV());
@@ -190,6 +204,7 @@ Apply_Gravity_To_Grid_Forces()
             TV_INT ind=influence_corner(p)+it.index;
             node_external_force(ind)=node_mass(ind)*gravity_constant;}}
     node_force+=node_external_force;
+    TIMING_END("Apply_Gravity_To_Grid_Forces");
 }
 //#####################################################################
 // Function Update_Velocities_On_Grid
@@ -197,10 +212,12 @@ Apply_Gravity_To_Grid_Forces()
 template<class TV> void MPM_SIMULATION<TV>::
 Update_Velocities_On_Grid()
 {
+    TIMING_START;
     static T eps=1e-5;
     for(int i=0;i<node_V.array.m;i++){
         node_V_star.array(i)=node_V.array(i);
         if(node_mass.array(i)>eps) node_V_star.array(i)+=dt/node_mass.array(i)*node_force.array(i);}
+    TIMING_END("Update_Velocities_On_Grid");
 }
 //#####################################################################
 // Function Grid_Based_Body_Collisions
@@ -208,6 +225,7 @@ Update_Velocities_On_Grid()
 template<class TV> void MPM_SIMULATION<TV>::
 Grid_Based_Body_Collisions()
 {
+    TIMING_START;
     static T eps=1e-5;
     RANGE<TV_INT> range(TV_INT(),grid.counts);
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
@@ -217,6 +235,7 @@ Grid_Based_Body_Collisions()
             T vt_mag=vt.Magnitude();
             if(vt_mag>eps) node_V_star(it.index)=vt+friction_coefficient*vn*vt/vt_mag;
             else node_V_star(it.index)=vt;}}
+    TIMING_END("Grid_Based_Body_Collisions");
 }
 //#####################################################################
 // Function Solve_The_Linear_System
@@ -224,6 +243,7 @@ Grid_Based_Body_Collisions()
 template<class TV> void MPM_SIMULATION<TV>::
 Solve_The_Linear_System()
 {
+    TIMING_START;
     MPM_SYSTEM<TV> system(debug_cast<MPM_SIMULATION<TV>&>(*this));
     MPM_VECTOR<TV> rhs,x;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
@@ -231,16 +251,14 @@ Solve_The_Linear_System()
     x.v.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
     rhs.v=node_V_star;
-
-    system.Test_System(*vectors(0),*vectors(1),*vectors(2));
-
+    // system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     KRYLOV_SOLVER<T>* solver=&cg;
-    solver->print_residuals=true;
+    std::cout<<std::setw(50);
     solver->Solve(system,x,rhs,vectors,(T)1e-3,0,1000);
-    
     node_V_old=node_V;
     node_V=x.v;
+    TIMING_END("Solve_The_Linear_System");
 }
 //#####################################################################
 // Function Update_Deformation_Gradient
@@ -248,6 +266,7 @@ Solve_The_Linear_System()
 template<class TV> void MPM_SIMULATION<TV>::
 Update_Deformation_Gradient()
 {
+    TIMING_START;
     TV_INT TV_INT_IN=TV_INT()+IN;
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
     if(!use_plasticity){
@@ -273,6 +292,7 @@ Update_Deformation_Gradient()
             SIGMA_hat=SIGMA_hat.Clamp_Max((T)1+theta_s);
             particles.Fe(p)=U_hat*SIGMA_hat*(V_hat.Transposed());
             particles.Fp(p)=V_hat*(SIGMA_hat.Inverse())*(U_hat.Transposed())*F;}}
+    TIMING_END("Update_Deformation_Gradient")
 }
 //#####################################################################
 // Function Update_Particle_Velocities
@@ -280,6 +300,7 @@ Update_Deformation_Gradient()
 template<class TV> void MPM_SIMULATION<TV>::
 Update_Particle_Velocities()
 {
+    TIMING_START;
     TV_INT TV_INT_IN=TV_INT()+IN;
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
     for(int p=0;p<N_particles;p++){
@@ -291,6 +312,7 @@ Update_Particle_Velocities()
             V_PIC+=node_V(ind)*w;
             V_FLIP+=(node_V(ind)-node_V_old(ind))*w;}
         particles.V(p)=((T)1-FLIP_alpha)*V_PIC+FLIP_alpha*V_FLIP;}
+    TIMING_END("Update_Particle_Velocities");
 }
 //#####################################################################
 // Function Particle_Based_Body_Collisions
@@ -298,6 +320,7 @@ Update_Particle_Velocities()
 template<class TV> void MPM_SIMULATION<TV>::
 Particle_Based_Body_Collisions()
 {
+    TIMING_START;
     static T eps=1e-5;
     for(int p=0;p<N_particles;p++){
         if(particles.X(p)(1)<=ground_level && particles.V(p)(1)<=(T)0){
@@ -306,6 +329,7 @@ Particle_Based_Body_Collisions()
             T vt_mag=vt.Magnitude();
             if(vt_mag>eps) particles.V(p)=vt+friction_coefficient*vn*vt/vt_mag;
             else particles.V(p)=vt;}}
+    TIMING_END("Particle_Based_Body_Collisions");
 }
 //#####################################################################
 // Function Update_Particle_Positions
@@ -313,7 +337,9 @@ Particle_Based_Body_Collisions()
 template<class TV> void MPM_SIMULATION<TV>::
 Update_Particle_Positions()
 {
+    TIMING_START;
     for(int p=0;p<N_particles;p++) particles.X(p)+=dt*particles.V(p);
+    TIMING_END("Update_Particle_Positions");
 }
 //#####################################################################
 template class MPM_SIMULATION<VECTOR<float,2> >;
