@@ -64,7 +64,7 @@ Initialize()
     node_force.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     node_external_force.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     frame=0;
-    TIMING_END("");
+    if(PROFILING) TIMING_END("");
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Forward_Euler
@@ -117,7 +117,7 @@ Build_Weights_And_Grad_Weights()
     TIMING_START;
     for(int p=0;p<N_particles;p++){
         grid_basis_function.Build_Weights_And_Grad_Weights_Exact(particles.X(p),grid,influence_corner(p),weight(p),grad_weight(p));}
-    TIMING_END("Build_Weights_And_Grad_Weights");
+    if(PROFILING) TIMING_END("Build_Weights_And_Grad_Weights");
 }
 //#####################################################################
 // Function Build_Helper_Structures_For_Constitutive_Model
@@ -131,7 +131,7 @@ Build_Helper_Structures_For_Constitutive_Model()
         T lame_scale=exp(xi*((T)1-Jp(p)));
         mu(p)=mu0*lame_scale;
         lambda(p)=lambda0*lame_scale;}
-    TIMING_END("Build_Helper_Structures_For_Constitutive_Model");
+    if(PROFILING) TIMING_END("Build_Helper_Structures_For_Constitutive_Model");
 }
 //#####################################################################
 // Function Rasterize_Particle_Data_To_The_Grid
@@ -151,7 +151,7 @@ Rasterize_Particle_Data_To_The_Grid()
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
             if(node_mass(ind)>min_mass) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p)(it.index)/node_mass(ind);}}
-    TIMING_END("Rasterize_Particle_Data_To_The_Grid");
+    if(PROFILING) TIMING_END("Rasterize_Particle_Data_To_The_Grid");
 }
 //#####################################################################
 // Function Compute_Particle_Volumes_And_Densities
@@ -170,7 +170,7 @@ Compute_Particle_Volumes_And_Densities()
             TV_INT ind=influence_corner(p)+it.index;
             particles.density(p)+=node_mass(ind)*weight(p)(it.index)*one_over_cell_volume;}
         if(particles.density(p)>min_pho) particles.volume(p)=particles.mass(p)/particles.density(p);}
-    TIMING_END("Compute_Particle_Volumes_And_Densities");
+    if(PROFILING) TIMING_END("Compute_Particle_Volumes_And_Densities");
 }
 //#####################################################################
 // Function Compute_Grid_Forces
@@ -187,7 +187,7 @@ Compute_Grid_Forces()
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
             node_force(ind)-=B*grad_weight(p)(it.index);}}
-    TIMING_END("Compute_Grid_Forces");
+    if(PROFILING) TIMING_END("Compute_Grid_Forces");
 }
 //#####################################################################
 // Function Apply_Gravity_To_Grid_Forces
@@ -204,7 +204,7 @@ Apply_Gravity_To_Grid_Forces()
             TV_INT ind=influence_corner(p)+it.index;
             node_external_force(ind)=node_mass(ind)*gravity_constant;}}
     node_force+=node_external_force;
-    TIMING_END("Apply_Gravity_To_Grid_Forces");
+    if(PROFILING) TIMING_END("Apply_Gravity_To_Grid_Forces");
 }
 //#####################################################################
 // Function Update_Velocities_On_Grid
@@ -217,7 +217,7 @@ Update_Velocities_On_Grid()
     for(int i=0;i<node_V.array.m;i++){
         node_V_star.array(i)=node_V.array(i);
         if(node_mass.array(i)>eps) node_V_star.array(i)+=dt/node_mass.array(i)*node_force.array(i);}
-    TIMING_END("Update_Velocities_On_Grid");
+    if(PROFILING) TIMING_END("Update_Velocities_On_Grid");
 }
 //#####################################################################
 // Function Grid_Based_Body_Collisions
@@ -235,7 +235,7 @@ Grid_Based_Body_Collisions()
             T vt_mag=vt.Magnitude();
             if(vt_mag>eps) node_V_star(it.index)=vt+friction_coefficient*vn*vt/vt_mag;
             else node_V_star(it.index)=vt;}}
-    TIMING_END("Grid_Based_Body_Collisions");
+    if(PROFILING) TIMING_END("Grid_Based_Body_Collisions");
 }
 //#####################################################################
 // Function Solve_The_Linear_System
@@ -254,11 +254,11 @@ Solve_The_Linear_System()
     // system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     KRYLOV_SOLVER<T>* solver=&cg;
-    std::cout<<std::setw(50);
-    solver->Solve(system,x,rhs,vectors,(T)1e-3,0,1000);
+    solver->print_residuals=true;
+    solver->Solve(system,x,rhs,vectors,(T)1e-6,0,1000);
     node_V_old=node_V;
     node_V=x.v;
-    TIMING_END("Solve_The_Linear_System");
+    if(PROFILING) TIMING_END("Solve_The_Linear_System");
 }
 //#####################################################################
 // Function Update_Deformation_Gradient
@@ -292,7 +292,7 @@ Update_Deformation_Gradient()
             SIGMA_hat=SIGMA_hat.Clamp_Max((T)1+theta_s);
             particles.Fe(p)=U_hat*SIGMA_hat*(V_hat.Transposed());
             particles.Fp(p)=V_hat*(SIGMA_hat.Inverse())*(U_hat.Transposed())*F;}}
-    TIMING_END("Update_Deformation_Gradient")
+    if(PROFILING) TIMING_END("Update_Deformation_Gradient")
 }
 //#####################################################################
 // Function Update_Particle_Velocities
@@ -312,7 +312,7 @@ Update_Particle_Velocities()
             V_PIC+=node_V(ind)*w;
             V_FLIP+=(node_V(ind)-node_V_old(ind))*w;}
         particles.V(p)=((T)1-FLIP_alpha)*V_PIC+FLIP_alpha*V_FLIP;}
-    TIMING_END("Update_Particle_Velocities");
+    if(PROFILING) TIMING_END("Update_Particle_Velocities");
 }
 //#####################################################################
 // Function Particle_Based_Body_Collisions
@@ -329,7 +329,7 @@ Particle_Based_Body_Collisions()
             T vt_mag=vt.Magnitude();
             if(vt_mag>eps) particles.V(p)=vt+friction_coefficient*vn*vt/vt_mag;
             else particles.V(p)=vt;}}
-    TIMING_END("Particle_Based_Body_Collisions");
+    if(PROFILING) TIMING_END("Particle_Based_Body_Collisions");
 }
 //#####################################################################
 // Function Update_Particle_Positions
@@ -339,7 +339,7 @@ Update_Particle_Positions()
 {
     TIMING_START;
     for(int p=0;p<N_particles;p++) particles.X(p)+=dt*particles.V(p);
-    TIMING_END("Update_Particle_Positions");
+    if(PROFILING) TIMING_END("Update_Particle_Positions");
 }
 //#####################################################################
 template class MPM_SIMULATION<VECTOR<float,2> >;

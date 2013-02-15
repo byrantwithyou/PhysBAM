@@ -36,10 +36,30 @@ Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
     typedef VECTOR<int,TV::m> TV_INT;
     GRID<TV> grid(count,box);
     RANGE<TV_INT> range(TV_INT(),TV_INT()+count);
-    int n=0;
+    ARRAY<TV> sample_X;
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
         TV x=grid.X(it.index);
-        X(n++)=x;}
+        sample_X.Append(x);}
+    this->Resize(sample_X.m);
+    X=sample_X;
+}
+//#####################################################################
+// Function Initialize_X_As_A_Ball
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Initialize_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box)
+{
+    typedef VECTOR<int,TV::m> TV_INT;
+    GRID<TV> grid(count,square_box);
+    TV center=square_box.Center();
+    T r=0.5*((-square_box.min_corner+square_box.max_corner)(0));
+    RANGE<TV_INT> range(TV_INT(),TV_INT()+count);
+    ARRAY<TV> sample_X;
+    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+        TV x=grid.X(it.index);
+        if((x-center).Magnitude()<=r) sample_X.Append(x);}
+    this->Resize(sample_X.m);
+    X=sample_X;
 }
 static int Initialize_MPM_Particles()
 {
