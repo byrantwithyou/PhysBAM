@@ -4,7 +4,7 @@
 out="$1"
 shift
 L=""
-for r in {2..11} ; do
+for r in {2..9} ; do
     T=`mktemp`
     O=`mktemp -d`
     (
@@ -16,7 +16,10 @@ for r in {2..11} ; do
 done
 wait
 
+echo $@
+			
 T=`mktemp`
 cat $L | sort -n > $T
-gnuplot -p -e "set terminal png ; set output '$out' ; plot '$T' u (log10(\$1)):(log10(\$3)) title 'L-inf error' , -2*x , -2*x-1 , -x-2"
+gnuplot -p -e "set terminal png ; set output '$out' ; plot '$T' u (log10(\$1)):(log10(\$3)) title 'L-inf error' , -2*x , -2*x-1 , -x-2;"
+#gnuplot -p -e "set terminal png ; set output '$out' ; plot '$T' u (log10(\$1)):(log10(\$3)) title 'L-inf error' , -2*x , -2*x-1 , -x-2; f(x) = m*x+b; fit f(x) '$T' using (log10(\$1)):(log10(\$3)) via m,b"
 rm $T $L
