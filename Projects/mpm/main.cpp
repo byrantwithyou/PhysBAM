@@ -34,12 +34,14 @@ int main(int argc,char *argv[])
 
     static const int test=1;
     if(test==1){
-        TV_INT grid_counts(1*32,1*32);
+        static const int grid_res=64;
+        TV_INT grid_counts(1*grid_res,1*grid_res);
         RANGE<TV> grid_box(TV(-0.5,-0.5),TV(0.5,0.5));
         GRID<TV> grid(grid_counts,grid_box);
         sim.grid=grid;
 
-        TV_INT particle_counts(0.2*96,0.2*96);
+        static const int particle_res=300;
+        TV_INT particle_counts(0.2*particle_res,0.2*particle_res);
         RANGE<TV> particle_box(TV(-0.1,-0.1),TV(0.1,0.1));
         sim.particles.Initialize_X_As_A_Grid(particle_counts,particle_box);
         T object_mass=400*0.04;

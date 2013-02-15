@@ -20,7 +20,7 @@ using ::std::exp;
 //#####################################################################
 template<class TV> MPM_SIMULATION<TV>::
 MPM_SIMULATION()
-    :min_mass(1e-5),min_pho(1e-5)
+    :min_mass(1e-8),min_pho((T)0)
 {}
 //#####################################################################
 // Destructor
@@ -64,6 +64,7 @@ Initialize()
     node_force.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     node_external_force.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     frame=0;
+    min_mass=particles.mass.Min()*(T)1e-5;
     if(PROFILING) TIMING_END("");
 }
 //#####################################################################
@@ -81,8 +82,18 @@ Advance_One_Time_Step_Forward_Euler()
     Update_Velocities_On_Grid();
     Grid_Based_Body_Collisions();
     node_V_old=node_V;node_V=node_V_star;
+    T max_node_v=0;
+    for(int i=0;i<node_V.array.m;i++){
+        T mag=node_V.array(i).Magnitude();
+        if(mag>max_node_v) max_node_v=mag;}
+    LOG::cout<<"Maximum node velocity: "<<max_node_v<<" = "<<max_node_v/(grid.dX(0)/dt)<<" h/dt"<<std::endl;
     Update_Deformation_Gradient();
     Update_Particle_Velocities();
+    T max_particle_v=0;
+    for(int i=0;i<particles.V.m;i++){
+        T mag=particles.V(i).Magnitude();
+        if(mag>max_particle_v) max_particle_v=mag;}
+    LOG::cout<<"Maximum particle velocity: "<<max_particle_v<<" = "<<max_particle_v/(grid.dX.Min()/dt)<<" h/dt"<<std::endl;
     Particle_Based_Body_Collisions();
     Update_Particle_Positions();
     frame++;
@@ -102,8 +113,18 @@ Advance_One_Time_Step_Backward_Euler()
     Update_Velocities_On_Grid();
     Grid_Based_Body_Collisions();
     Solve_The_Linear_System();
+    T max_node_v=0;
+    for(int i=0;i<node_V.array.m;i++){
+        T mag=node_V.array(i).Magnitude();
+        if(mag>max_node_v) max_node_v=mag;}
+    LOG::cout<<"Maximum node velocity: "<<max_node_v<<" = "<<max_node_v/(grid.dX(0)/dt)<<" h/dt"<<std::endl;
     Update_Deformation_Gradient();
     Update_Particle_Velocities();
+    T max_particle_v=0;
+    for(int i=0;i<particles.V.m;i++){
+        T mag=particles.V(i).Magnitude();
+        if(mag>max_particle_v) max_particle_v=mag;}
+    LOG::cout<<"Maximum particle velocity: "<<max_particle_v<<" = "<<max_particle_v/(grid.dX.Min()/dt)<<" h/dt"<<std::endl;
     Particle_Based_Body_Collisions();
     Update_Particle_Positions();
     frame++;
@@ -146,6 +167,10 @@ Rasterize_Particle_Data_To_The_Grid()
     for(int p=0;p<N_particles;p++){
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
             node_mass(influence_corner(p)+it.index)+=particles.mass(p)*weight(p)(it.index);}
+
+    //DEBUG check mass conservation
+    LOG::cout<<"[DEBUG] mass difference grid and particles: "<<node_mass.array.Sum()<<"-"<<particles.mass.Sum()<<"="<<node_mass.array.Sum()-particles.mass.Sum()<<std::endl;
+
     node_V.Fill(TV());
     for(int p=0;p<N_particles;p++){
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
@@ -213,10 +238,9 @@ template<class TV> void MPM_SIMULATION<TV>::
 Update_Velocities_On_Grid()
 {
     TIMING_START;
-    static T eps=1e-5;
     for(int i=0;i<node_V.array.m;i++){
         node_V_star.array(i)=node_V.array(i);
-        if(node_mass.array(i)>eps) node_V_star.array(i)+=dt/node_mass.array(i)*node_force.array(i);}
+        if(node_mass.array(i)>min_mass) node_V_star.array(i)+=dt/node_mass.array(i)*node_force.array(i);}
     if(PROFILING) TIMING_END("Update_Velocities_On_Grid");
 }
 //#####################################################################
@@ -226,7 +250,7 @@ template<class TV> void MPM_SIMULATION<TV>::
 Grid_Based_Body_Collisions()
 {
     TIMING_START;
-    static T eps=1e-5;
+    static T eps=1e-8;
     RANGE<TV_INT> range(TV_INT(),grid.counts);
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
         if(grid.Node(it.index)(1)<=ground_level && node_V_star(it.index)(1)<=(T)0){
@@ -322,7 +346,7 @@ template<class TV> void MPM_SIMULATION<TV>::
 Particle_Based_Body_Collisions()
 {
     TIMING_START;
-    static T eps=1e-5;
+    static T eps=1e-8;
     for(int p=0;p<N_particles;p++){
         if(particles.X(p)(1)<=ground_level && particles.V(p)(1)<=(T)0){
             TV vt(particles.V(p));vt(1)=(T)0;

@@ -24,7 +24,7 @@ class MPM_SIMULATION
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    static const bool PROFILING=false;
+    static const bool PROFILING=true;
 public:
     enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
     MPM_PARTICLES<TV> particles;
