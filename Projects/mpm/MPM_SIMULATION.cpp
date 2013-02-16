@@ -291,7 +291,7 @@ Solve_The_Linear_System()
     system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
-    KRYLOV_SOLVER<T>* solver=&cr;
+    KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=true;
     solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
     node_V_old=node_V;

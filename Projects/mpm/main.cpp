@@ -130,8 +130,8 @@ int main(int argc,char *argv[])
         sim.friction_coefficient=0.6;}
     if(test==4){ // cube falling on beam
         static const int grid_res=64;
-        TV_INT grid_counts(1*grid_res,1.3*grid_res);
-        RANGE<TV> grid_box(TV(-0.5,-0.3),TV(0.5,1));
+        TV_INT grid_counts(0.7*grid_res,0.85*grid_res);
+        RANGE<TV> grid_box(TV(-0.35,-0.3),TV(0.35,0.55));
         GRID<TV> grid(grid_counts,grid_box);
         sim.grid=grid;
         static const int particle_res=200;
@@ -152,7 +152,7 @@ int main(int argc,char *argv[])
         sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.25,10)));
         sim.dirichlet_velocity.Append(TV());
         sim.dt=1e-4;
-        T ym=2000;
+        T ym=2500;
         T pr=0.3;
         sim.mu0=ym/((T)2*((T)1+pr));
         sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
