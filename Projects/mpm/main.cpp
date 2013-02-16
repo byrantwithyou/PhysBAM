@@ -14,14 +14,16 @@
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
 #include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/TIMER.h>
+#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <omp.h>
 #include "TIMING.h"
 #include "MPM_SIMULATION.h"
 
+#define CHECK_ARG(x,arg,argdefault) if(arg!=argdefault) x=arg;
 using namespace PhysBAM;
-
 int main(int argc,char *argv[])
 {
     static const int dimension=2;
@@ -30,9 +32,18 @@ int main(int argc,char *argv[])
     typedef VECTOR<T,dimension> TV;
     typedef VECTOR<int,dimension> TV_INT;
 
-    MPM_SIMULATION<TV> sim;
+    PARSE_ARGS parse_args(argc,argv);
+    int test_input=-1;;
+    std::string output_directory_input("");
+    parse_args.Add("-test",&test_input,"test","test number");
+    parse_args.Add("-o",&output_directory_input,"o","output directory");
+    parse_args.Parse(true);
 
-    static const int test=4;
+    int test=1;CHECK_ARG(test,test_input,-1);
+    std::string output_directory=std::string("test")+FILE_UTILITIES::Number_To_String(test);CHECK_ARG(output_directory,output_directory_input,"");
+
+
+    MPM_SIMULATION<TV> sim;
     if(test==1){ // cube falling on ground
         static const int grid_res=64;
         TV_INT grid_counts(1*grid_res,1*grid_res);
@@ -168,7 +179,7 @@ int main(int argc,char *argv[])
 
     sim.Initialize();
 
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,"output");
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
     for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
     Flush_Frame<TV>("mpm");
 
