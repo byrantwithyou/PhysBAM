@@ -168,7 +168,7 @@ Rasterize_Particle_Data_To_The_Grid()
             node_mass(influence_corner(p)+it.index)+=particles.mass(p)*weight(p)(it.index);}
 
     //DEBUG check mass conservation
-    LOG::cout<<"[DEBUG] mass difference grid and particles: "<<node_mass.array.Sum()<<"-"<<particles.mass.Sum()<<"="<<node_mass.array.Sum()-particles.mass.Sum()<<std::endl;
+    // LOG::cout<<"[DEBUG] mass difference grid and particles: "<<node_mass.array.Sum()<<"-"<<particles.mass.Sum()<<"="<<node_mass.array.Sum()-particles.mass.Sum()<<std::endl;
 
     node_V.Fill(TV());
     for(int p=0;p<N_particles;p++){
