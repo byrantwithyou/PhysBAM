@@ -187,13 +187,14 @@ Compute_Particle_Volumes_And_Densities()
     TV_INT TV_INT_IN=TV_INT()+IN;
     T one_over_cell_volume=grid.one_over_dX.Product();
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
-    particles.density.Fill(T(0));
+    ARRAY<T> particles_density(particles.number);
+    particles_density.Fill(T(0));
     particles.volume.Fill(T(0));
     for(int p=0;p<N_particles;p++){
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
-            particles.density(p)+=node_mass(ind)*weight(p)(it.index)*one_over_cell_volume;}
-        if(particles.density(p)>min_pho) particles.volume(p)=particles.mass(p)/particles.density(p);}
+            particles_density(p)+=node_mass(ind)*weight(p)(it.index)*one_over_cell_volume;}
+        if(particles_density(p)>min_pho) particles.volume(p)=particles.mass(p)/particles_density(p);}
     if(PROFILING) TIMING_END("Compute_Particle_Volumes_And_Densities");
 }
 //#####################################################################
