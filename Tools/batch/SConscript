@@ -1,0 +1,14 @@
+# SConscript
+
+local_env=Environment();
+
+local_env.Append(CXXFLAGS=['-I/usr/local/include', '-g'])
+local_env.Append(LINKFLAGS=['-L/usr/local/lib'])
+local_env.Append(CPPPATH=[])
+local_env.Append(LIBPATH=[])
+local_env.Append(RPATH=[])
+local_env.Append(LIBS=['boost_program_options','boost_thread','boost_system','rt'])
+
+program=local_env.Program("master",["master.cpp"])
+program=local_env.Program("slave",["slave.cpp"])
+
