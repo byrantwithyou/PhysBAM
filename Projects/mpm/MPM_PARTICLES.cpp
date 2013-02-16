@@ -16,7 +16,6 @@ MPM_PARTICLES()
 {
     Store_Velocity();
     Store_Mass();
-    Add_Array(ATTRIBUTE_ID_ISDIRICHLET,&is_dirichlet);
     Add_Array(ATTRIBUTE_ID_DENSITY,&density);
     Add_Array(ATTRIBUTE_ID_VOLUME,&volume);
     Add_Array(ATTRIBUTE_ID_FE,&Fe);
@@ -61,14 +60,6 @@ Initialize_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_bo
         if((x-center).Magnitude()<=r) sample_X.Append(x);}
     this->Resize(sample_X.m);
     X=sample_X;
-}
-//#####################################################################
-// Function Identify_Dirichlet_Particles_With_A_Box
-//#####################################################################
-template<class TV> void MPM_PARTICLES<TV>::
-Identify_Dirichlet_Particles_With_A_Box(const RANGE<TV>& box)
-{
-    for(int p=0;p<this->number;p++) if(box.Lazy_Inside(X(p))) is_dirichlet(p)=true;
 }
 static int Initialize_MPM_Particles()
 {

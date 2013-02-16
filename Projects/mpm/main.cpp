@@ -32,14 +32,13 @@ int main(int argc,char *argv[])
 
     MPM_SIMULATION<TV> sim;
 
-    static const int test=1;
-    if(test==1){
+    static const int test=2;
+    if(test==1){ // falling cube
         static const int grid_res=64;
         TV_INT grid_counts(1*grid_res,1*grid_res);
         RANGE<TV> grid_box(TV(-0.5,-0.5),TV(0.5,0.5));
         GRID<TV> grid(grid_counts,grid_box);
         sim.grid=grid;
-
         static const int particle_res=300;
         TV_INT particle_counts(0.2*particle_res,0.2*particle_res);
         RANGE<TV> particle_box(TV(-0.1,-0.1),TV(0.1,0.1));
@@ -50,7 +49,6 @@ int main(int argc,char *argv[])
             sim.particles.mass(p)=object_mass/sim.particles.number;
             sim.particles.Fe(p)=MATRIX<T,TV::m>::Identity_Matrix();
             sim.particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();}
-
         sim.dt=1e-3;
         T ym=3000;
         T pr=0.3;
@@ -63,8 +61,41 @@ int main(int argc,char *argv[])
         sim.theta_c=0.025;
         sim.theta_s=0.0075;
         sim.FLIP_alpha=0.95;
-        sim.friction_coefficient=0.6;
-    }
+        sim.friction_coefficient=0.6;}
+    if(test==2){ // bending beam
+        static const int grid_res=64;
+        TV_INT grid_counts(1*grid_res,1*grid_res);
+        RANGE<TV> grid_box(TV(-0.5,-0.5),TV(0.5,0.5));
+        GRID<TV> grid(grid_counts,grid_box);
+        sim.grid=grid;
+        static const int particle_res=200;
+        TV_INT particle_counts(0.6*particle_res,0.2*particle_res);
+        RANGE<TV> particle_box(TV(-0.3,-0.1),TV(0.3,0.1));
+        sim.particles.Initialize_X_As_A_Grid(particle_counts,particle_box);
+        T object_mass=40*0.12;
+        for(int p=0;p<sim.particles.number;p++){
+            sim.particles.V(p)=TV();
+            sim.particles.mass(p)=object_mass/sim.particles.number;
+            sim.particles.Fe(p)=MATRIX<T,TV::m>::Identity_Matrix();
+            sim.particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();}
+        sim.dirichlet_box.Append(RANGE<TV>(TV(0.25,-10),TV(10,10)));
+        sim.dirichlet_velocity.Append(TV());
+        sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.25,10)));
+        sim.dirichlet_velocity.Append(TV());
+        sim.dt=1e-4;
+        T ym=1500;
+        T pr=0.3;
+        sim.mu0=ym/((T)2*((T)1+pr));
+        sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
+        sim.xi=0;
+        sim.use_plasticity=false;
+        sim.use_gravity=true;
+        sim.ground_level=-100;
+        sim.theta_c=0.025;
+        sim.theta_s=0.0075;
+        sim.FLIP_alpha=0.95;
+        sim.friction_coefficient=0.6;}
+    
 
     sim.Initialize();
 
@@ -77,7 +108,7 @@ int main(int argc,char *argv[])
         LOG::cout<<"TIMESTEP "<<f<<std::endl;
         sim.Advance_One_Time_Step_Backward_Euler();
         TIMING_END("Current time step totally");
-        if(f%10==0){
+        if(f%100==0){
             for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
             Flush_Frame<TV>("mpm");}
         LOG::cout<<std::endl;

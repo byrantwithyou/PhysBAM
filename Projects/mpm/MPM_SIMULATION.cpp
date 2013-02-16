@@ -34,10 +34,6 @@ template<class TV> MPM_SIMULATION<TV>::
 template<class TV> void MPM_SIMULATION<TV>::
 Initialize()
 {
-// #pragma omp parallel for    
-//     for(int t=0;t<1000;t++){
-//         LOG::cout<<omp_get_thread_num()<<" ";}
-//     LOG::cout<<std::endl;
     LOG::cout<<"Allocating Memories for Simulation..."<<std::endl;
     TIMING_START;
     gravity_constant=TV();gravity_constant(1)=-(T)9.8;
@@ -81,7 +77,7 @@ Advance_One_Time_Step_Forward_Euler()
     if(use_gravity) Apply_Gravity_To_Grid_Forces();
     Update_Velocities_On_Grid();
     Grid_Based_Body_Collisions();
-    node_V_old=node_V;node_V=node_V_star;
+    Solve_The_Linear_System_Explicit();
     T max_node_v=0;
     for(int i=0;i<node_V.array.m;i++){
         T mag=node_V.array(i).Magnitude();
@@ -96,6 +92,7 @@ Advance_One_Time_Step_Forward_Euler()
     LOG::cout<<"Maximum particle velocity: "<<max_particle_v<<" = "<<max_particle_v/(grid.dX.Min()/dt)<<" h/dt"<<std::endl;
     Particle_Based_Body_Collisions();
     Update_Particle_Positions();
+    Update_Dirichlet_Box_Positions();
     frame++;
 }
 //#####################################################################
@@ -127,6 +124,7 @@ Advance_One_Time_Step_Backward_Euler()
     LOG::cout<<"Maximum particle velocity: "<<max_particle_v<<" = "<<max_particle_v/(grid.dX.Min()/dt)<<" h/dt"<<std::endl;
     Particle_Based_Body_Collisions();
     Update_Particle_Positions();
+    Update_Dirichlet_Box_Positions();
     frame++;
 }
 //#####################################################################
@@ -238,9 +236,13 @@ template<class TV> void MPM_SIMULATION<TV>::
 Update_Velocities_On_Grid()
 {
     TIMING_START;
-    for(int i=0;i<node_V.array.m;i++){
-        node_V_star.array(i)=node_V.array(i);
-        if(node_mass.array(i)>min_mass) node_V_star.array(i)+=dt/node_mass.array(i)*node_force.array(i);}
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),grid.counts));it.Valid();it.Next()){
+        node_V_star(it.index)=node_V(it.index);
+        if(node_mass(it.index)>min_mass){
+            node_V_star(it.index)+=dt/node_mass(it.index)*node_force(it.index);
+            for(int b=0;b<dirichlet_box.m;b++)
+                if(dirichlet_box(b).Lazy_Inside(grid.Node(it.index)))
+                    node_V_star(it.index)=dirichlet_velocity(b);}}
     if(PROFILING) TIMING_END("Update_Velocities_On_Grid");
 }
 //#####################################################################
@@ -262,6 +264,16 @@ Grid_Based_Body_Collisions()
     if(PROFILING) TIMING_END("Grid_Based_Body_Collisions");
 }
 //#####################################################################
+// Function Solve_The_Linear_System_Explicit
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Solve_The_Linear_System_Explicit()
+{
+    TIMING_START;
+    node_V_old=node_V;node_V=node_V_star;
+    if(PROFILING) TIMING_END("Solve_The_Linear_System_Explicit");
+}
+//#####################################################################
 // Function Solve_The_Linear_System
 //#####################################################################
 template<class TV> void MPM_SIMULATION<TV>::
@@ -275,7 +287,7 @@ Solve_The_Linear_System()
     x.v.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
     rhs.v=node_V_star;
-    // system.Test_System(*vectors(0),*vectors(1),*vectors(2));
+    system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=true;
@@ -328,7 +340,6 @@ Update_Particle_Velocities()
     TV_INT TV_INT_IN=TV_INT()+IN;
     RANGE<TV_INT> range(TV_INT(),TV_INT_IN);
     for(int p=0;p<N_particles;p++){
-        if(particles.is_dirichlet(p)) continue;
         TV V_PIC;
         TV V_FLIP=particles.V(p);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
@@ -363,9 +374,19 @@ template<class TV> void MPM_SIMULATION<TV>::
 Update_Particle_Positions()
 {
     TIMING_START;
-    for(int p=0;p<N_particles;p++){
-        if(particles.is_dirichlet(p)) continue;
-        particles.X(p)+=dt*particles.V(p);}
+    for(int p=0;p<N_particles;p++)
+        particles.X(p)+=dt*particles.V(p);
+    if(PROFILING) TIMING_END("Update_Particle_Positions");
+}
+//#####################################################################
+// Function Update_Dirichlet_Box_Positions
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Update_Dirichlet_Box_Positions()
+{
+    TIMING_START;
+    for(int b=0;b<dirichlet_box.m;b++)
+        dirichlet_box(b)+=dt*dirichlet_velocity(b);
     if(PROFILING) TIMING_END("Update_Particle_Positions");
 }
 //#####################################################################

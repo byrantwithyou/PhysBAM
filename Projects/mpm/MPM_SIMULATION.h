@@ -27,18 +27,27 @@ class MPM_SIMULATION
     static const bool PROFILING=true;
 public:
     enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
-    MPM_PARTICLES<TV> particles;
-    int N_particles;
-    TV gravity_constant;
-    T friction_coefficient;
-    bool use_gravity;
-    T ground_level;
+
+    //#################################################################
+    // need external input
+    //#################################################################
+    MPM_PARTICLES<TV> particles; // Resize(), X, V, mass, Fe, Fp
+    GRID<TV> grid;    
+    T dt;
     T mu0,lambda0;
     T xi;
     bool use_plasticity;
     T theta_c;
     T theta_s;
     T FLIP_alpha;
+    T friction_coefficient;
+    bool use_gravity;
+    T ground_level;
+    ARRAY<RANGE<TV> > dirichlet_box;
+    ARRAY<TV> dirichlet_velocity;
+    //#################################################################
+    int N_particles;
+    TV gravity_constant;
     T min_mass,min_pho;
     ARRAY<T> mu,lambda;
     ARRAY<T> Je,Jp;
@@ -49,14 +58,12 @@ public:
     ARRAY<ARRAY<TV,TV_INT> > grad_weight;
     MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function; 
     MPM_CONSTITUTIVE_MODEL<TV> constitutive_model;
-    GRID<TV> grid;
     ARRAY<T,TV_INT> node_mass;
     ARRAY<TV,TV_INT> node_V;
     ARRAY<TV,TV_INT> node_V_star;
     ARRAY<TV,TV_INT> node_V_old;
     ARRAY<TV,TV_INT> node_force;
     ARRAY<TV,TV_INT> node_external_force;
-    T dt;
     int frame;
 
     MPM_SIMULATION();
@@ -74,11 +81,13 @@ protected:
     void Apply_Gravity_To_Grid_Forces();
     void Update_Velocities_On_Grid();
     void Grid_Based_Body_Collisions();
+    void Solve_The_Linear_System_Explicit();
     void Solve_The_Linear_System();
     void Update_Deformation_Gradient();
     void Update_Particle_Velocities();
     void Particle_Based_Body_Collisions();
     void Update_Particle_Positions();
+    void Update_Dirichlet_Box_Positions();
 //#####################################################################
 };
 }

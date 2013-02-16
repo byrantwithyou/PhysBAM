@@ -52,6 +52,10 @@ Apply_Force_Derivatives(const ARRAY<TV,TV_INT>& du,ARRAY<TV,TV_INT>& df) const
         MATRIX<T,TV::m> Gp=sim.particles.volume(p)*Ap*(sim.particles.Fe(p).Transposed());
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.IN));it.Valid();it.Next())
             df(sim.influence_corner(p)+it.index)-=Gp*sim.grad_weight(p)(it.index);}
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.grid.counts));it.Valid();it.Next())
+        for(int b=0;b<sim.dirichlet_box.m;b++)
+            if(sim.dirichlet_box(b).Lazy_Inside(sim.grid.Node(it.index)))
+                df(it.index)=TV();
 }
 //#####################################################################
 // Function Multiply
@@ -62,12 +66,11 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
     ARRAY<TV,TV_INT>& rr=debug_cast<MPM_VECTOR<TV>&>(result).v;
     const ARRAY<TV,TV_INT>& xx=debug_cast<const MPM_VECTOR<TV>&>(x).v;
     Apply_Force_Derivatives(xx,rr);
-
     T beta_dt2=beta*sqr(sim.dt);
-    for(int i=0;i<rr.array.m;i++){
-        if(sim.node_mass.array(i)>sim.min_mass)
-            rr.array(i)=xx.array(i)+beta_dt2/sim.node_mass.array(i)*rr.array(i);
-        else rr.array(i)=TV();}
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.grid.counts));it.Valid();it.Next()){
+        if(sim.node_mass(it.index)>sim.min_mass)
+            rr(it.index)=xx(it.index)+beta_dt2/sim.node_mass(it.index)*rr(it.index);
+        else rr(it.index)=TV();}
 }
 //#####################################################################
 // Function Project
