@@ -26,6 +26,7 @@ template<class TV>
 class MPM_PARTICLES:public CLONEABLE<MPM_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> > // X, V, mass
 {
     typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef CLONEABLE<MPM_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> > BASE;
 public:
     using BASE::X;using BASE::V;using BASE::mass;using BASE::Store_Velocity;using BASE::Store_Mass;using BASE::Add_Array;using BASE::Remove_Array;using BASE::Get_Attribute_Index;using BASE::Remove_Array_Using_Index;

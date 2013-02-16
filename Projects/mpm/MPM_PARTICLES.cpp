@@ -32,11 +32,9 @@ template<class TV> MPM_PARTICLES<TV>::
 template<class TV> void MPM_PARTICLES<TV>::
 Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
 {
-    typedef VECTOR<int,TV::m> TV_INT;
     GRID<TV> grid(count,box);
-    RANGE<TV_INT> range(TV_INT(),TV_INT()+count);
     ARRAY<TV> sample_X;
-    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
         TV x=grid.X(it.index);
         sample_X.Append(x);}
     this->Resize(sample_X.m);
@@ -48,13 +46,11 @@ Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
 template<class TV> void MPM_PARTICLES<TV>::
 Initialize_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box)
 {
-    typedef VECTOR<int,TV::m> TV_INT;
     GRID<TV> grid(count,square_box);
     TV center=square_box.Center();
     T r=0.5*((-square_box.min_corner+square_box.max_corner)(0));
-    RANGE<TV_INT> range(TV_INT(),TV_INT()+count);
     ARRAY<TV> sample_X;
-    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
         TV x=grid.X(it.index);
         if((x-center).Magnitude()<=r) sample_X.Append(x);}
     this->Resize(sample_X.m);
@@ -66,14 +62,12 @@ Initialize_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_bo
 template<class TV> void MPM_PARTICLES<TV>::
 Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
 {
-    typedef VECTOR<int,TV::m> TV_INT;
     GRID<TV> grid(count,box);
-    RANGE<TV_INT> range(TV_INT(),TV_INT()+count);
     ARRAY<TV> old_X;
     old_X.Resize(X.m);
     for(int i=0;i<X.m;i++) old_X(i)=X(i);
     ARRAY<TV> sample_X;
-    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
         TV x=grid.X(it.index);
         sample_X.Append(x);}
     old_X.Append_Elements(sample_X);
