@@ -27,8 +27,8 @@ Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m
     Je=Fe.Determinant();
     Jp=Fp.Determinant();
     Fe.Fast_Singular_Value_Decomposition(Ue,SIGMAe,Ve);
-    Re=Ue*Ve.Transposed();
-    Se=Re.Transposed()*Fe;
+    Re=Ue.Times_Transpose(Ve);
+    Se=Re.Transpose_Times(Fe);
 }
 //#####################################################################
 // Function Compute_Energy_Density_Psi
@@ -36,7 +36,7 @@ Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m
 template<class TV> typename TV::SCALAR MPM_CONSTITUTIVE_MODEL<TV>::
 Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const
 {
-    return (Fe-Re).Frobenius_Norm_Squared()*mu+0.5*lambda*sqr(Je-1);
+    return (Fe-Re).Frobenius_Norm_Squared()*mu+0.5*lambda*sqr(Je-(T)1);
 }
 //#####################################################################
 // Function Compute_dPsi_dFe
@@ -44,7 +44,7 @@ Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV
 template<class TV> MATRIX<typename TV::SCALAR,TV::m> MPM_CONSTITUTIVE_MODEL<TV>::
 Compute_dPsi_dFe(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const
 {
-    return (Fe-Re)*2.0*mu+Fe.Inverse_Transposed()*Je*lambda*(Je-1);
+    return (Fe-Re)*2.0*mu+Fe.Inverse_Transposed()*Je*lambda*(Je-(T)1);
 }
 //#####################################################################
 // Helper Function Compute_dJFinvT // 2d
@@ -75,7 +75,7 @@ template<class T> static MATRIX<T,3> Compute_dJFinvT(const MATRIX<T,3>&F,const M
 //#####################################################################
 template<class T> static MATRIX<T,2> Compute_dR(const MATRIX<T,2>& R,const MATRIX<T,2>& S,const MATRIX<T,2>& dF)
 {
-    T y=((R.Transposed()*dF)-(dF.Transposed()*R))(0,1)/(S(0,0)+S(1,1));
+    T y=((R.Transpose_Times(dF))-(dF.Transpose_Times(R)))(0,1)/(S(0,0)+S(1,1));
     return R*MATRIX<T,2>(0,-y,y,0);
 }
 //#####################################################################
@@ -83,7 +83,7 @@ template<class T> static MATRIX<T,2> Compute_dR(const MATRIX<T,2>& R,const MATRI
 //#####################################################################
 template<class T> static MATRIX<T,3> Compute_dR(const MATRIX<T,3>& R,const MATRIX<T,3>& S,const MATRIX<T,3>& dF)
 {
-    MATRIX<T,3> H=(R.Transposed()*dF)-(dF.Transposed()*R);
+    MATRIX<T,3> H=(R.Transpose_Times(dF))-(dF.Transpose_Times(R));
     VECTOR<T,3> b(H(0,1),H(0,2),H(1,2));
     MATRIX<T,3> A(S(0,0)+S(1,1),S(1,2),-S(0,2),S(1,2),S(0,0)+S(2,2),S(1,0),-S(0,2),S(0,1),S(1,1)+S(2,2));
     VECTOR<T,3> x=A.Solve_Linear_System(b);
@@ -135,10 +135,8 @@ Derivative_Test() const
         Psi2=Compute_Elastic_Energy_Density_Psi(mu,lambda,Fe,Re,Je);
         P2=Compute_dPsi_dFe(mu,lambda,Fe,Re,Je);
         dP2=Compute_d2Psi_dFe_dFe_Action_dF(mu,lambda,Fe,Je,Re,Se,dF);
-
         T energy_test_result=((Psi2-Psi1)-(P2+P1).Times_Transpose(dF).Trace()/2)/eps;
         T force_test_result=((P2-P1)-(dP2+dP1)/2).Frobenius_Norm()/eps;
-   
         LOG::cout<<"Energy Test: "<<energy_test_result<<std::endl;
         LOG::cout<<"P test     : "<<force_test_result<<std::endl;}
 }
