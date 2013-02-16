@@ -7,6 +7,7 @@
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
+#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <omp.h>
 #include "TIMING.h"
@@ -289,9 +290,10 @@ Solve_The_Linear_System()
     rhs.v=node_V_star;
     system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
-    KRYLOV_SOLVER<T>* solver=&cg;
+    CONJUGATE_RESIDUAL<T> cr;
+    KRYLOV_SOLVER<T>* solver=&cr;
     solver->print_residuals=true;
-    solver->Solve(system,x,rhs,vectors,(T)1e-6,0,1000);
+    solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
     node_V_old=node_V;
     node_V=x.v;
     if(PROFILING) TIMING_END("Solve_The_Linear_System");

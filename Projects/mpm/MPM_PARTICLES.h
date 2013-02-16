@@ -40,6 +40,7 @@ public:
 
     void Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box);
     void Initialize_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box);
+    void Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box);
 //#####################################################################
 };
 }

@@ -61,6 +61,26 @@ Initialize_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_bo
     this->Resize(sample_X.m);
     X=sample_X;
 }
+//#####################################################################
+// Function Add_X_As_A_Grid
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
+{
+    typedef VECTOR<int,TV::m> TV_INT;
+    GRID<TV> grid(count,box);
+    RANGE<TV_INT> range(TV_INT(),TV_INT()+count);
+    ARRAY<TV> old_X;
+    old_X.Resize(X.m);
+    for(int i=0;i<X.m;i++) old_X(i)=X(i);
+    ARRAY<TV> sample_X;
+    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+        TV x=grid.X(it.index);
+        sample_X.Append(x);}
+    old_X.Append_Elements(sample_X);
+    this->Resize(old_X.m);
+    X=old_X;
+}
 static int Initialize_MPM_Particles()
 {
     Register_Attribute_Name(ATTRIBUTE_ID_DENSITY,"density");
