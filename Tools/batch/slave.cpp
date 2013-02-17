@@ -13,7 +13,7 @@ int main(int argc,char* argv[])
 {
     po::options_description desc("Options");
 
-    string name="batch_queue_default";
+    string name="batch_queue_default",in="/dev/null",out="/dev/null",err="/dev/null";
     int priority=50;
     vector<int> deps;
     vector<string> tokens;
@@ -23,6 +23,11 @@ int main(int argc,char* argv[])
         ("depends,d",po::value<vector<int> >(&deps),"depends on this job id")
         ("token,t",po::value<vector<string> >(&tokens),"command to run")
         ("name,n",po::value<string>(&name)->default_value(name),"batch queue name")
+        ("in,i",po::value<string>(&in)->default_value(in),"read stdin from this file")
+        ("out,o",po::value<string>(&out)->default_value(out),"write stdout to this file")
+        ("err,e",po::value<string>(&err)->default_value(err),"write stderr to this file")
+        ("append-stdout,a","append stdout")
+        ("append-stderr,A","append stderr")
         ("kill,k","kill master")
         ("print-job-id,i","prints job id");
 
@@ -72,9 +77,12 @@ int main(int argc,char* argv[])
         return 0;
     }
 
-    size_t size = (tokens.size()+2)*sizeof(size_t) + sizeof(int)*deps.size();
+    size_t size = (tokens.size()+2)*sizeof(size_t) + sizeof(int)*(deps.size()+2);
     for(size_t i = 0; i < tokens.size(); i++)
         size += tokens[i].size();
+    size += sizeof(size_t) + in.size();
+    size += sizeof(size_t) + out.size();
+    size += sizeof(size_t) + err.size();
 
     if(size > layout->message_max_length)
     {
@@ -83,10 +91,18 @@ int main(int argc,char* argv[])
     }
     int job_id = -1;
 
+    int append_out=vm.count("append-stdout")>0;
+    int append_err=vm.count("append-stderr")>0;
+
     unsigned char * buff = new unsigned char[size];
     size_t k = 0;
     k += pack(buff + k, tokens);
     k += pack(buff + k, deps);
+    k += pack(buff + k, in);
+    k += pack(buff + k, out);
+    k += pack(buff + k, err);
+    k += pack(buff + k, append_out);
+    k += pack(buff + k, append_err);
     assert(k == size);
 
     try

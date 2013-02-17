@@ -1,5 +1,3 @@
-# SConscript
-
 local_env=Environment();
 
 local_env.Append(CXXFLAGS=['-I/usr/local/include', '-g'])

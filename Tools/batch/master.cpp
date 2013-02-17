@@ -22,6 +22,8 @@ struct job
     int id;
     int priority;
     vector<string> argv_data;
+    string in,out,err;
+    int append_out,append_err;
 };
 
 multimap<int,job*> jobs;
@@ -102,15 +104,20 @@ void run_jobs()
         for(size_t i = 0; i < j->argv_data.size(); i++)
             cout<<" "<<j->argv_data[i];
         cout<<endl;
-/*
         pid_t pid = fork();
         if(!pid)
         {
+            close(0);
+            close(1);
+            close(2);
+            int in = open(j->in.c_str(),O_RDONLY);
+            int out = open(j->out.c_str(),O_WRONLY|O_CREAT|(j->append_out?O_APPEND:0),0755);
+            int err = open(j->err.c_str(),O_WRONLY|O_CREAT|(j->append_err?O_APPEND:0),0755);
+            if(in<0 || out<0 || err<0) exit(1);
             execvp(argv[0], &argv[0]);
             exit(1);
         }
         waitpid(pid, 0, 0);
-*/
         delete j;
     }
 }
@@ -120,7 +127,7 @@ int main(int argc,char* argv[])
     po::options_description desc("Options");
 
     string name="batch_queue_default";
-    int num_processes=12;
+    int num_processes = boost::thread::hardware_concurrency();
     vector<int> deps;
     vector<string> tokens;
     desc.add_options()
@@ -213,6 +220,12 @@ int main(int argc,char* argv[])
             int k = 0;
             k += unpack(buffer + k, message_size - k, j->argv_data);
             k += unpack(buffer + k, message_size - k, deps);
+            k += unpack(buffer + k, message_size - k, j->in);
+            k += unpack(buffer + k, message_size - k, j->out);
+            k += unpack(buffer + k, message_size - k, j->err);
+            k += unpack(buffer + k, message_size - k, j->append_out);
+            k += unpack(buffer + k, message_size - k, j->append_err);
+
             if(k != message_size) cout<<"only used "<<k<<" of "<<message_size<<std::endl;
         }
         catch(...)
