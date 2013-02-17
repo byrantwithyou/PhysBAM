@@ -29,7 +29,7 @@ int main(int argc,char* argv[])
         ("append-stdout,a","append stdout")
         ("append-stderr,A","append stderr")
         ("kill,k","kill master")
-        ("print-job-id,i","prints job id");
+        ("print-job-id,j","prints job id");
 
     po::positional_options_description pod;
     pod.add("token", -1);
