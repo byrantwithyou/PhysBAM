@@ -367,7 +367,7 @@ Update_Dirichlet_Box_Positions()
 //#####################################################################
 // Function Get_Maximum_Node_Velocity
 //#####################################################################
-template<class TV> T MPM_SIMULATION<TV>::
+template<class TV> typename TV::SCALAR MPM_SIMULATION<TV>::
 Get_Maximum_Node_Velocity() const
 {
     T max_node_v=0;
@@ -379,7 +379,7 @@ Get_Maximum_Node_Velocity() const
 //#####################################################################
 // Function Get_Maximum_Particle_Velocity
 //#####################################################################
-template<class TV> T MPM_SIMULATION<TV>::
+template<class TV> typename TV::SCALAR MPM_SIMULATION<TV>::
 Get_Maximum_Particle_Velocity() const
 {
     T max_particle_v=0;
