@@ -74,6 +74,24 @@ Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
     this->Resize(old_X.m);
     X=old_X;
 }
+//#####################################################################
+// Function Reduce_X_As_A_Ball
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Reduce_X_As_A_Ball(const RANGE<TV>& square_box)
+{
+    ARRAY<TV> old_X;
+    old_X.Resize(X.m);
+    for(int i=0;i<X.m;i++) old_X(i)=X(i);
+    TV center=square_box.Center();
+    T r=0.5*((-square_box.min_corner+square_box.max_corner)(0));
+    ARRAY<TV> sample_X;
+    for(int i=0;i<old_X.m;i++)
+        if((old_x(i)-center).Magnitude()>r)
+            sample_X.Append(old_x(i));
+    this->Resize(sample_X.m);
+    X=sample_X;
+}
 static int Initialize_MPM_Particles()
 {
     Register_Attribute_Name(ATTRIBUTE_ID_VOLUME,"volume");
