@@ -16,9 +16,7 @@
 #include "MPM_CONSTITUTIVE_MODEL.h"
 #include "MPM_CUBIC_B_SPLINE.h"
 #include "MPM_PARTICLES.h"
-
 namespace PhysBAM{
-
 template<class TV>
 class MPM_SIMULATION
 {
@@ -27,7 +25,6 @@ class MPM_SIMULATION
     static const bool PROFILING=false;
 public:
     enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
-
     //#################################################################
     // need external input
     //#################################################################
@@ -46,7 +43,6 @@ public:
     ARRAY<RANGE<TV> > dirichlet_box;
     ARRAY<TV> dirichlet_velocity;
     //#################################################################
-    int N_particles;
     TV gravity_constant;
     T min_mass,min_pho;
     ARRAY<T> mu,lambda;
@@ -88,6 +84,9 @@ protected:
     void Particle_Based_Body_Collisions();
     void Update_Particle_Positions();
     void Update_Dirichlet_Box_Positions();
+private:
+    T Get_Maximum_Node_Velocity() const;
+    T Get_Maximum_Particle_Velocity() const;
 //#####################################################################
 };
 }
