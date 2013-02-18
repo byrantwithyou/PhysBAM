@@ -35,8 +35,10 @@ int main(int argc,char *argv[])
     PARSE_ARGS parse_args(argc,argv);
     int test_input=-1;;
     std::string output_directory_input("");
+    T dt_input=0;
     parse_args.Add("-test",&test_input,"test","test number");
     parse_args.Add("-o",&output_directory_input,"o","output directory");
+    parse_args.Add("-dt",&dt_input,"dt","dt");
     parse_args.Parse(true);
 
     int test=1;CHECK_ARG(test,test_input,-1);
@@ -44,12 +46,12 @@ int main(int argc,char *argv[])
 
     MPM_SIMULATION<TV> sim;
     if(test==1){ // cube falling on ground
-        static const int grid_res=64;
+        static const int grid_res=256;
         TV_INT grid_counts(1*grid_res,1*grid_res);
         RANGE<TV> grid_box(TV(-0.5,-0.5),TV(0.5,0.5));
         GRID<TV> grid(grid_counts,grid_box);
         sim.grid=grid;
-        static const int particle_res=300;
+        static const int particle_res=1800;
         TV_INT particle_counts(0.2*particle_res,0.2*particle_res);
         RANGE<TV> particle_box(TV(-0.1,-0.1),TV(0.1,0.1));
         sim.particles.Initialize_X_As_A_Grid(particle_counts,particle_box);
@@ -59,7 +61,7 @@ int main(int argc,char *argv[])
             sim.particles.mass(p)=object_mass/sim.particles.number;
             sim.particles.Fe(p)=MATRIX<T,TV::m>::Identity_Matrix();
             sim.particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();}
-        sim.dt=1e-3;
+        sim.dt=1e-4;CHECK_ARG(sim.dt,dt_input,0);
         T ym=3000;
         T pr=0.3;
         sim.mu0=ym/((T)2*((T)1+pr));
@@ -92,7 +94,7 @@ int main(int argc,char *argv[])
         sim.dirichlet_velocity.Append(TV());
         sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.25,10)));
         sim.dirichlet_velocity.Append(TV());
-        sim.dt=1e-4;
+        sim.dt=1e-4;CHECK_ARG(sim.dt,dt_input,0);
         T ym=1500;
         T pr=0.3;
         sim.mu0=ym/((T)2*((T)1+pr));
@@ -125,7 +127,7 @@ int main(int argc,char *argv[])
         sim.dirichlet_velocity.Append(TV(0.2,0));
         sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.25,10)));
         sim.dirichlet_velocity.Append(TV(-0.2,0));
-        sim.dt=1e-4;
+        sim.dt=1e-4;CHECK_ARG(sim.dt,dt_input,0);
         T ym=500;
         T pr=0.3;
         sim.mu0=ym/((T)2*((T)1+pr));
@@ -161,7 +163,7 @@ int main(int argc,char *argv[])
         sim.dirichlet_velocity.Append(TV());
         sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.25,10)));
         sim.dirichlet_velocity.Append(TV());
-        sim.dt=1e-4;
+        sim.dt=1e-4;CHECK_ARG(sim.dt,dt_input,0);
         T ym=2500;
         T pr=0.3;
         sim.mu0=ym/((T)2*((T)1+pr));
@@ -186,7 +188,7 @@ int main(int argc,char *argv[])
         LOG::cout<<"TIMESTEP "<<f<<std::endl;
         sim.Advance_One_Time_Step_Backward_Euler();
         TIMING_END("Current time step totally");
-        if(f%100==0){
+        if(f%1==0){
             for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
             Flush_Frame<TV>("mpm");}
         LOG::cout<<std::endl;
