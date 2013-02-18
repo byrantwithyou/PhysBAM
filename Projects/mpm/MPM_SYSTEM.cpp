@@ -51,13 +51,9 @@ Apply_Force_Derivatives(const ARRAY<TV,TV_INT>& du,ARRAY<TV,TV_INT>& df) const
             if(contribute) Cp+=MATRIX<T,TV::m>::Outer_Product(du(sim.influence_corner(p)+it.index),sim.grad_weight(p)(it.index));}
         MATRIX<T,TV::m> Ep=Cp*sim.particles.Fe(p);
         MATRIX<T,TV::m> Ap=sim.constitutive_model.Compute_d2Psi_dFe_dFe_Action_dF(sim.mu(p),sim.lambda(p),sim.particles.Fe(p),sim.Je(p),sim.Re(p),sim.Se(p),Ep);
-        MATRIX<T,TV::m> Gp=sim.particles.volume(p)*Ap*(sim.particles.Fe(p).Transposed());
+        MATRIX<T,TV::m> Gp=sim.particles.volume(p)*(Ap.Times_Transpose(sim.particles.Fe(p)));
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.IN));it.Valid();it.Next())
             df(sim.influence_corner(p)+it.index)-=Gp*sim.grad_weight(p)(it.index);}
-    // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.grid.counts));it.Valid();it.Next())
-    //     for(int b=0;b<sim.dirichlet_box.m;b++)
-    //         if(sim.dirichlet_box(b).Lazy_Inside(sim.grid.Node(it.index)))
-    //             df(it.index)=TV();
 }
 //#####################################################################
 // Function Multiply

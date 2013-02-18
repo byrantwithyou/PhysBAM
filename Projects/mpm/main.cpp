@@ -42,7 +42,6 @@ int main(int argc,char *argv[])
     int test=1;CHECK_ARG(test,test_input,-1);
     std::string output_directory=std::string("test")+FILE_UTILITIES::Number_To_String(test);CHECK_ARG(output_directory,output_directory_input,"");
 
-
     MPM_SIMULATION<TV> sim;
     if(test==1){ // cube falling on ground
         static const int grid_res=64;
@@ -175,7 +174,6 @@ int main(int argc,char *argv[])
         sim.theta_s=0.0075;
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
-    
 
     sim.Initialize();
 

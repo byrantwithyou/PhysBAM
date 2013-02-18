@@ -59,12 +59,6 @@ Build_Weights_And_Grad_Weights_Exact(const TV& X,const GRID<TV>& grid,TV_INT& in
     VECTOR<TV,IN> weight_short;
     VECTOR<TV,IN> grad_weight_over_weight_short;
     Build_Weights_And_Grad_Weight_Over_Weights(X,grid,influence_corner,weight_short,grad_weight_over_weight_short);
-    // LOG::cout<<X<<std::endl;
-    // LOG::cout<<influence_corner<<std::endl;
-    // LOG::cout<<weight_short<<std::endl;
-
-    TV_INT local_grid_count;
-    local_grid_count.Fill(IN);
     RANGE<TV_INT> range(TV_INT(),TV_INT()+IN);    
     weight.Fill(T(1));
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
