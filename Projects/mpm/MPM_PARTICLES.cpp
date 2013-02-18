@@ -87,8 +87,8 @@ Reduce_X_As_A_Ball(const RANGE<TV>& square_box)
     T r=0.5*((-square_box.min_corner+square_box.max_corner)(0));
     ARRAY<TV> sample_X;
     for(int i=0;i<old_X.m;i++)
-        if((old_x(i)-center).Magnitude()>r)
-            sample_X.Append(old_x(i));
+        if((old_X(i)-center).Magnitude()>r)
+            sample_X.Append(old_X(i));
     this->Resize(sample_X.m);
     X=sample_X;
 }

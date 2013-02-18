@@ -204,7 +204,7 @@ int main(int argc,char *argv[])
         sim.mu0=ym/((T)2*((T)1+pr));
         sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
         sim.xi=0;
-        sim.use_plasticity=false;
+        sim.use_plasticity=true;
         sim.use_gravity=false;
         sim.ground_level=-100;
         sim.theta_c=0.025;
@@ -223,7 +223,7 @@ int main(int argc,char *argv[])
         LOG::cout<<"TIMESTEP "<<f<<std::endl;
         sim.Advance_One_Time_Step_Backward_Euler();
         TIMING_END("Current time step totally");
-        if(f%1==0){
+        if(f%20==0){
             for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
             Flush_Frame<TV>("mpm");}
         LOG::cout<<std::endl;
