@@ -66,6 +66,7 @@ public:
     ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > face_velocities,prev_face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T>& advection_scalar;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
+    BOUNDARY_MAC_GRID_PERIODIC<TV,int> boundary_int;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
     LEVELSET_COLOR<TV> levelset_color;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid;

@@ -234,7 +234,6 @@ Update_Pls(T dt)
     Enforce_Phi_Boundary_Conditions();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after level set update",0,1);
     example.Rebuild_Levelset_Color();
-
 }
 //#####################################################################
 // Function Advance_One_Time_Step
@@ -438,6 +437,10 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
     vectors.Delete_Pointers_And_Clean_Memory();
+
+    for(int c=0;c<example.face_velocities.m;c++)
+        example.boundary.Fill_Ghost_Faces(example.grid,example.face_velocities(c),example.face_velocities(c),0,example.number_of_ghost_cells);
+    example.boundary_int.Fill_Ghost_Faces(example.grid,example.face_color,example.face_color,0,example.number_of_ghost_cells);
 }
 //#####################################################################
 // Function Extrapolate_Velocity

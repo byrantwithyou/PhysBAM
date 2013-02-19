@@ -165,6 +165,8 @@ Rebuild_Levelset_Color()
     Make_Levelsets_Consistent();
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next())
         levelset_color.color(it.index)=Color_At_Cell(it.index,levelset_color.phi(it.index));
+    boundary.Fill_Ghost_Cells(grid,levelset_color.phi,levelset_color.phi,0,0,number_of_ghost_cells);
+    boundary_int.Fill_Ghost_Cells(grid,levelset_color.color,levelset_color.color,0,0,number_of_ghost_cells);
 }
 //#####################################################################
 // Function Fill_Levelsets_From_Levelset_Color
