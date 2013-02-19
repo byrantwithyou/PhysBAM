@@ -87,6 +87,7 @@ Advance_One_Time_Step_Forward_Euler()
     Particle_Based_Body_Collisions();
     Update_Particle_Positions();
     Update_Dirichlet_Box_Positions();
+    Update_Colliding_Object_Positions();
     frame++;
 }
 //#####################################################################
@@ -113,6 +114,7 @@ Advance_One_Time_Step_Backward_Euler()
     Particle_Based_Body_Collisions();
     Update_Particle_Positions();
     Update_Dirichlet_Box_Positions();
+    Update_Colliding_Object_Positions();
     frame++;
 }
 //#####################################################################
@@ -235,12 +237,24 @@ Grid_Based_Body_Collisions()
     TIMING_START;
     static T eps=1e-8;
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),grid.counts));it.Valid();it.Next()){
-        if(grid.Node(it.index)(1)<=ground_level && node_V_star(it.index)(1)<=(T)0){
+        if(node_mass(it.index)<min_mass) continue;
+        const TV& x=grid.Node(it.index);
+        if(x(1)<=ground_level && node_V_star(it.index)(1)<=(T)0){
             TV vt(node_V_star(it.index));vt(1)=(T)0;
             T vn=node_V_star(it.index)(1);
             T vt_mag=vt.Magnitude();
             if(vt_mag>eps) node_V_star(it.index)=vt+friction_coefficient*vn*vt/vt_mag;
-            else node_V_star(it.index)=vt;}}
+            else node_V_star(it.index)=vt;}
+        for(int b=0;b<rigid_ball.m;b++){
+            if(rigid_ball(b).Lazy_Inside(x)){
+                TV n=rigid_ball(b).Normal(x);
+                TV v_rel=node_V_star(it.index)-rigid_ball_velocity(b);
+                T vn=TV::Dot_Product(v_rel,n);
+                if(vn<(T)0){
+                    TV vt=v_rel-n*vn;
+                    T vt_mag=vt.Magnitude();
+                    if(vt_mag>eps) node_V_star(it.index)=vt+friction_coefficient*vn*vt/vt_mag+rigid_ball_velocity(b);
+                    else node_V_star(it.index)=vt+rigid_ball_velocity(b);}}}}
     if(PROFILING) TIMING_END("Grid_Based_Body_Collisions");
 }
 //#####################################################################
@@ -352,12 +366,23 @@ Particle_Based_Body_Collisions()
     TIMING_START;
     static T eps=1e-8;
     for(int p=0;p<particles.number;p++){
-        if(particles.X(p)(1)<=ground_level && particles.V(p)(1)<=(T)0){
+        TV& x=particles.X(p);
+        if(x(1)<=ground_level && particles.V(p)(1)<=(T)0){
             TV vt(particles.V(p));vt(1)=(T)0;
             T vn=particles.V(p)(1);
             T vt_mag=vt.Magnitude();
             if(vt_mag>eps) particles.V(p)=vt+friction_coefficient*vn*vt/vt_mag;
-            else particles.V(p)=vt;}}
+            else particles.V(p)=vt;}
+        for(int b=0;b<rigid_ball.m;b++){
+            if(rigid_ball(b).Lazy_Inside(x)){
+                TV n=rigid_ball(b).Normal(x);
+                TV v_rel=particles.V(p)-rigid_ball_velocity(b);
+                T vn=TV::Dot_Product(v_rel,n);
+                if(vn<(T)0){
+                    TV vt=v_rel-n*vn;
+                    T vt_mag=vt.Magnitude();
+                    if(vt_mag>eps) particles.V(p)=vt+friction_coefficient*vn*vt/vt_mag+rigid_ball_velocity(b);
+                    else particles.V(p)=vt+rigid_ball_velocity(b);}}}}
     if(PROFILING) TIMING_END("Particle_Based_Body_Collisions");
 }
 //#####################################################################
@@ -380,6 +405,17 @@ Update_Dirichlet_Box_Positions()
     TIMING_START;
     for(int b=0;b<dirichlet_box.m;b++)
         dirichlet_box(b)+=dt*dirichlet_velocity(b);
+    if(PROFILING) TIMING_END("Update_Particle_Positions");
+}
+//#####################################################################
+// Function Update_Colliding_Object_Positions
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Update_Colliding_Object_Positions()
+{
+    TIMING_START;
+    for(int b=0;b<rigid_ball.m;b++)
+        rigid_ball(b).center+=dt*rigid_ball_velocity(b);
     if(PROFILING) TIMING_END("Update_Particle_Positions");
 }
 //#####################################################################
@@ -406,6 +442,8 @@ Get_Maximum_Particle_Velocity() const
         if(mag>max_particle_v) max_particle_v=mag;}
     return max_particle_v;
 }
+
+
 //#####################################################################
 template class MPM_SIMULATION<VECTOR<float,2> >;
 template class MPM_SIMULATION<VECTOR<float,3> >;

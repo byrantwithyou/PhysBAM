@@ -36,9 +36,11 @@ int main(int argc,char *argv[])
     int test_input=-1;;
     std::string output_directory_input("");
     T dt_input=0;
+    int frame_jump_input=-1;
     parse_args.Add("-test",&test_input,"test","test number");
     parse_args.Add("-o",&output_directory_input,"o","output directory");
     parse_args.Add("-dt",&dt_input,"dt","dt");
+    parse_args.Add("-fj",&frame_jump_input,"fj","frame jump");
     parse_args.Parse(true);
 
     int test=5;CHECK_ARG(test,test_input,-1);
@@ -72,6 +74,7 @@ int main(int argc,char *argv[])
         sim.ground_level=-0.3;
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
+
     if(test==2){ // bending beam
         static const int grid_res=64;
         TV_INT grid_counts(1*grid_res,1*grid_res);
@@ -103,6 +106,7 @@ int main(int argc,char *argv[])
         sim.ground_level=-100;
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
+
     if(test==3){ // stretching beam
         static const int grid_res=64;
         TV_INT grid_counts(4*grid_res,0.6*grid_res);
@@ -134,6 +138,7 @@ int main(int argc,char *argv[])
         sim.ground_level=-100;
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
+
     if(test==4){ // cube falling on beam
         static const int grid_res=256;
         TV_INT grid_counts(0.7*grid_res,0.85*grid_res);
@@ -168,6 +173,7 @@ int main(int argc,char *argv[])
         sim.ground_level=-100;
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
+
     if(test==5){ // notch test
         static const int grid_res=64;
         TV_INT grid_counts(0.4*grid_res,0.8*grid_res);
@@ -207,19 +213,63 @@ int main(int argc,char *argv[])
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
 
+    if(test==6){ // wall test
+        static const int grid_res=64;
+        TV_INT grid_counts(3.2*grid_res,0.95*grid_res);
+        RANGE<TV> grid_box(TV(-0.2,-0.45),TV(3.0,0.5));
+        GRID<TV> grid(grid_counts,grid_box);
+        sim.grid=grid;
+        static const int particle_res=500;
+        TV_INT particle_counts_cube(0.1*particle_res,0.8*particle_res);
+        RANGE<TV> particle_box_cube(TV(-0.05,-0.4),TV(0.05,0.4));
+        sim.particles.Initialize_X_As_A_Grid(particle_counts_cube,particle_box_cube);
+        T object_mass=10;
+        for(int p=0;p<sim.particles.number;p++){
+            sim.particles.V(p)=TV();
+            sim.particles.mass(p)=object_mass/sim.particles.number;
+            sim.particles.Fe(p)=MATRIX<T,TV::m>::Identity_Matrix();
+            sim.particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();}
+        sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.38)));
+        sim.dirichlet_velocity.Append(TV());
+        sim.rigid_ball.Append(SPHERE<TV>(TV(-0.25,0),0.03));
+        sim.rigid_ball_velocity.Append(TV(5,0));
+        sim.dt=1e-4;CHECK_ARG(sim.dt,dt_input,0);
+        T ym=3000;
+        T pr=0.3;
+        sim.mu0=ym/((T)2*((T)1+pr));
+        sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
+        sim.xi=0;
+        sim.use_plasticity_yield=true;
+        sim.yield_max=1.1;
+        sim.yield_min=1.0/sim.yield_max;
+        sim.use_plasticity_clamp=true;
+        sim.clamp_max=1.3;
+        sim.clamp_min=1.0/sim.clamp_max;
+        sim.use_gravity=true;
+        sim.ground_level=-0.4;
+        sim.FLIP_alpha=0.95;
+        sim.friction_coefficient=0.6;}
+
     sim.Initialize();
 
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
     for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
     Flush_Frame<TV>("mpm");
 
+    int frame_jump=20;CHECK_ARG(frame_jump,frame_jump_input,-1);
     for(int f=1;f<1000000;f++){
         TIMING_START;
         LOG::cout<<"TIMESTEP "<<f<<std::endl;
         sim.Advance_One_Time_Step_Backward_Euler();
         TIMING_END("Current time step totally");
-        if(f%20==0){
+        if(f%frame_jump==0){
             for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+            for(int b=0;b<sim.rigid_ball.m;b++){
+                for(T theta=0;theta<2*3.1415;theta+=2*3.1415/20.0){
+                    TV p=sim.rigid_ball(b).center;
+                    p(0)+=sim.rigid_ball(b).radius*cos(theta);
+                    p(1)+=sim.rigid_ball(b).radius*sin(theta);
+                    Add_Debug_Particle(p,VECTOR<T,3>(1,0,0));}}
             Flush_Frame<TV>("mpm");}
         LOG::cout<<std::endl;
     }

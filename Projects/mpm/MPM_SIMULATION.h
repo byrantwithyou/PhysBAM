@@ -13,6 +13,7 @@
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include "MPM_CONSTITUTIVE_MODEL.h"
 #include "MPM_CUBIC_B_SPLINE.h"
 #include "MPM_PARTICLES.h"
@@ -45,6 +46,8 @@ public:
     T ground_level;
     ARRAY<RANGE<TV> > dirichlet_box;
     ARRAY<TV> dirichlet_velocity;
+    ARRAY<SPHERE<TV> > rigid_ball;
+    ARRAY<TV> rigid_ball_velocity;
     //#################################################################
     TV gravity_constant;
     T min_mass,min_pho;
@@ -87,6 +90,7 @@ protected:
     void Particle_Based_Body_Collisions();
     void Update_Particle_Positions();
     void Update_Dirichlet_Box_Positions();
+    void Update_Colliding_Object_Positions();
 private:
     T Get_Maximum_Node_Velocity() const;
     T Get_Maximum_Particle_Velocity() const;
