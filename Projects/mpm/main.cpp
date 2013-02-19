@@ -182,13 +182,13 @@ int main(int argc,char *argv[])
         RANGE<TV> grid_box(TV(-0.2,-0.4),TV(0.2,0.4));
         GRID<TV> grid(grid_counts,grid_box);
         sim.grid=grid;
-        static const int particle_res=200;
+        static const int particle_res=500;
         TV_INT particle_counts_cube(0.2*particle_res,0.3*particle_res);
         RANGE<TV> particle_box_cube(TV(-0.1,-0.15),TV(0.1,0.15));
         RANGE<TV> ball_box(TV(0.07,-0.03),TV(0.13,0.03));
         sim.particles.Initialize_X_As_A_Grid(particle_counts_cube,particle_box_cube);
         sim.particles.Reduce_X_As_A_Ball(ball_box);
-        T object_mass=40*0.06;
+        T object_mass=1;;
         for(int p=0;p<sim.particles.number;p++){
             sim.particles.V(p)=TV();
             sim.particles.mass(p)=object_mass/sim.particles.number;
@@ -199,13 +199,13 @@ int main(int argc,char *argv[])
         sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.13)));
         sim.dirichlet_velocity.Append(TV(0,-0.2));
         sim.dt=1e-4;CHECK_ARG(sim.dt,dt_input,0);
-        T ym=2500;
+        T ym=3000;
         T pr=0.3;
         sim.mu0=ym/((T)2*((T)1+pr));
         sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
         sim.xi=0;
-        sim.use_plasticity=true;
-        sim.use_gravity=false;
+        sim.use_plasticity=false;
+        sim.use_gravity=true;
         sim.ground_level=-100;
         sim.theta_c=0.025;
         sim.theta_s=0.0075;
