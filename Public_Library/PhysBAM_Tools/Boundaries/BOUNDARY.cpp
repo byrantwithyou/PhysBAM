@@ -174,4 +174,10 @@ template class BOUNDARY<VECTOR<double,3>,bool>;
 template class BOUNDARY<VECTOR<double,1>,SYMMETRIC_MATRIX<double,1> >;
 template class BOUNDARY<VECTOR<double,2>,SYMMETRIC_MATRIX<double,2> >;
 template class BOUNDARY<VECTOR<double,3>,SYMMETRIC_MATRIX<double,3> >;
+template class BOUNDARY<VECTOR<float,1>,int>;
+template class BOUNDARY<VECTOR<float,2>,int>;
+template class BOUNDARY<VECTOR<float,3>,int>;
+template class BOUNDARY<VECTOR<double,1>,int>;
+template class BOUNDARY<VECTOR<double,2>,int>;
+template class BOUNDARY<VECTOR<double,3>,int>;
 }

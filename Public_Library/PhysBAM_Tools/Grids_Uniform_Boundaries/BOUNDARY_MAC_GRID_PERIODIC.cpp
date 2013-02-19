@@ -54,4 +54,8 @@ template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,3>,float>;
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,2>,VECTOR<double,3> >;
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,2>,double>;
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,3>,double>;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,2>,int>;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,3>,int>;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,2>,int>;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,3>,int>;
 }
