@@ -151,8 +151,8 @@ Rasterize_Particle_Data_To_The_Grid()
     TIMING_START;
     node_mass.Fill(T(0));
     for(int p=0;p<particles.number;p++){
-        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next())
-            node_mass(influence_corner(p)+it.index)+=particles.mass(p)*weight(p)(it.index);}
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+            node_mass(influence_corner(p)+it.index)+=particles.mass(p)*weight(p)(it.index);}}
     //DEBUG check mass conservation
     // LOG::cout<<"[DEBUG] mass difference grid and particles: "<<node_mass.array.Sum()<<"-"<<particles.mass.Sum()<<"="<<node_mass.array.Sum()-particles.mass.Sum()<<std::endl;
     node_V.Fill(TV());
@@ -307,14 +307,23 @@ Update_Deformation_Gradient()
             SIGMA_hat=SIGMA_hat.Clamp_Max(yield_max);
             particles.Fe(p)=U_hat*SIGMA_hat.Times_Transpose(V_hat);
             particles.Fp(p)=V_hat*(SIGMA_hat.Inverse()).Times_Transpose(U_hat)*F;
+            // if(use_plasticity_clamp){
+            //     MATRIX<T,TV::m> Uphat,Vphat;
+            //     DIAGONAL_MATRIX<T,TV::m> SIGMAphat;
+            //     particles.Fp(p).Fast_Singular_Value_Decomposition(Uphat,SIGMAphat,Vphat);
+            //     if(SIGMAphat.Min()<clamp_min || SIGMAphat.Max()>clamp_max){
+            //         particles.Fp(p)=Fp_hat;
+            //         particles.Fe(p)=Fe_hat;}}
             if(use_plasticity_clamp){
                 MATRIX<T,TV::m> Uphat,Vphat;
                 DIAGONAL_MATRIX<T,TV::m> SIGMAphat;
                 particles.Fp(p).Fast_Singular_Value_Decomposition(Uphat,SIGMAphat,Vphat);
-                SIGMAphat=SIGMAphat.Clamp_Min(clamp_min);
-                SIGMAphat=SIGMAphat.Clamp_Max(clamp_max);
-                particles.Fp(p)=Uphat*SIGMAphat.Times_Transpose(Vphat);}}}
-    if(PROFILING) TIMING_END("Update_Deformation_Gradient")
+                SIGMAphat.Clamp_Min(clamp_min);
+                SIGMAphat.Clamp_Max(clamp_max);
+                particles.Fp(p)=Uphat*SIGMAphat.Times_Transpose(Vphat);
+                particles.Fe(p)=F*(particles.Fp(p).Inverse());}
+        }}
+    if(PROFILING) TIMING_END("Update_Deformation_Gradient");
 }
 //#####################################################################
 // Function Update_Particle_Velocities

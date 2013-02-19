@@ -135,12 +135,12 @@ int main(int argc,char *argv[])
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
     if(test==4){ // cube falling on beam
-        static const int grid_res=64;
+        static const int grid_res=256;
         TV_INT grid_counts(0.7*grid_res,0.85*grid_res);
         RANGE<TV> grid_box(TV(-0.35,-0.3),TV(0.35,0.55));
         GRID<TV> grid(grid_counts,grid_box);
         sim.grid=grid;
-        static const int particle_res=200;
+        static const int particle_res=800;
         TV_INT particle_counts_beam(0.6*particle_res,0.2*particle_res);
         RANGE<TV> particle_box_beam(TV(-0.3,-0.1),TV(0.3,0.1));
         TV_INT particle_counts_cube(0.2*particle_res,0.2*particle_res);
