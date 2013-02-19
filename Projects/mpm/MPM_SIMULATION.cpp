@@ -284,7 +284,7 @@ template<class TV> void MPM_SIMULATION<TV>::
 Update_Deformation_Gradient()
 {
     TIMING_START;
-    if(!use_plasticity){
+    if(!use_plasticity_yield){
         for(int p=0;p<particles.number;p++){
             MATRIX<T,TV::m> grad_vp;
             for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
@@ -303,10 +303,17 @@ Update_Deformation_Gradient()
             MATRIX<T,TV::m> U_hat,V_hat;
             DIAGONAL_MATRIX<T,TV::m> SIGMA_hat;
             Fe_hat.Fast_Singular_Value_Decomposition(U_hat,SIGMA_hat,V_hat);
-            SIGMA_hat=SIGMA_hat.Clamp_Min((T)1-theta_c);
-            SIGMA_hat=SIGMA_hat.Clamp_Max((T)1+theta_s);
+            SIGMA_hat=SIGMA_hat.Clamp_Min(yield_min);
+            SIGMA_hat=SIGMA_hat.Clamp_Max(yield_max);
             particles.Fe(p)=U_hat*SIGMA_hat.Times_Transpose(V_hat);
-            particles.Fp(p)=V_hat*(SIGMA_hat.Inverse()).Times_Transpose(U_hat)*F;}}
+            particles.Fp(p)=V_hat*(SIGMA_hat.Inverse()).Times_Transpose(U_hat)*F;
+            if(use_plasticity_clamp){
+                MATRIX<T,TV::m> Uphat,Vphat;
+                DIAGONAL_MATRIX<T,TV::m> SIGMAphat;
+                particles.Fp(p).Fast_Singular_Value_Decomposition(Uphat,SIGMAphat,Vphat);
+                SIGMAphat=SIGMAphat.Clamp_Min(clamp_min);
+                SIGMAphat=SIGMAphat.Clamp_Max(clamp_max);
+                particles.Fp(p)=Uphat*SIGMAphat.Times_Transpose(Vphat);}}}
     if(PROFILING) TIMING_END("Update_Deformation_Gradient")
 }
 //#####################################################################

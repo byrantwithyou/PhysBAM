@@ -33,9 +33,12 @@ public:
     T dt;
     T mu0,lambda0;
     T xi;
-    bool use_plasticity;
-    T theta_c;
-    T theta_s;
+    bool use_plasticity_yield;
+    T yield_min;
+    T yield_max;
+    bool use_plasticity_clamp;
+    T clamp_min;
+    T clamp_max;
     T FLIP_alpha;
     T friction_coefficient;
     bool use_gravity;

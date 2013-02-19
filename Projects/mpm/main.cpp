@@ -67,11 +67,9 @@ int main(int argc,char *argv[])
         sim.mu0=ym/((T)2*((T)1+pr));
         sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
         sim.xi=0;
-        sim.use_plasticity=false;
+        sim.use_plasticity_yield=false;
         sim.use_gravity=true;
         sim.ground_level=-0.3;
-        sim.theta_c=0.025;
-        sim.theta_s=0.0075;
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
     if(test==2){ // bending beam
@@ -100,11 +98,9 @@ int main(int argc,char *argv[])
         sim.mu0=ym/((T)2*((T)1+pr));
         sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
         sim.xi=0;
-        sim.use_plasticity=false;
+        sim.use_plasticity_yield=false;
         sim.use_gravity=true;
         sim.ground_level=-100;
-        sim.theta_c=0.025;
-        sim.theta_s=0.0075;
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
     if(test==3){ // stretching beam
@@ -133,11 +129,9 @@ int main(int argc,char *argv[])
         sim.mu0=ym/((T)2*((T)1+pr));
         sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
         sim.xi=0;
-        sim.use_plasticity=false;
+        sim.use_plasticity_yield=false;
         sim.use_gravity=false;
         sim.ground_level=-100;
-        sim.theta_c=0.025;
-        sim.theta_s=0.0075;
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
     if(test==4){ // cube falling on beam
@@ -169,11 +163,9 @@ int main(int argc,char *argv[])
         sim.mu0=ym/((T)2*((T)1+pr));
         sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
         sim.xi=0;
-        sim.use_plasticity=false;
+        sim.use_plasticity_yield=false;
         sim.use_gravity=true;
         sim.ground_level=-100;
-        sim.theta_c=0.025;
-        sim.theta_s=0.0075;
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
     if(test==5){ // notch test
@@ -204,11 +196,14 @@ int main(int argc,char *argv[])
         sim.mu0=ym/((T)2*((T)1+pr));
         sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
         sim.xi=0;
-        sim.use_plasticity=false;
+        sim.use_plasticity_yield=true;
+        sim.yield_max=1.1;
+        sim.yield_min=1.0/sim.yield_max;
+        sim.use_plasticity_clamp=true;
+        sim.clamp_max=1.3;
+        sim.clamp_min=1.0/sim.clamp_max;
         sim.use_gravity=true;
         sim.ground_level=-100;
-        sim.theta_c=0.025;
-        sim.theta_s=0.0075;
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
 
