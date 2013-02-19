@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <signal.h>
 
 namespace ip = boost::interprocess;
 namespace po = boost::program_options;
@@ -31,13 +32,23 @@ map<int,vector<int> > dependents;
 map<int,pair<int,job*> > waiting_jobs;
 set<int> finished_jobs;
 int first_uncompleted_job;
+set<pid_t> pids;
 
 boost::condition_variable local_cond_job;
 boost::mutex local_mutex;
 int num_waiting_threads;
+int num_threads_alive;
+int die;
+memory_layout* layout;
 
 void add_job(job* j)
 {
+    cout<<"Add:";
+    for(size_t i = 0; i < j->argv_data.size(); i++)
+        cout<<" "<<j->argv_data[i];
+    cout<<"   "<<j->out;
+    cout<<endl;
+
     if(num_waiting_threads)
     {
         num_waiting_threads--;
@@ -50,7 +61,11 @@ void run_jobs()
 {
     job * j = 0;
     int last_j_id = -1;
-    while(1)
+    {
+        boost::unique_lock<boost::mutex> lock(local_mutex);
+        num_threads_alive++;
+    }
+    while(!die)
     {
         boost::unique_lock<boost::mutex> lock(local_mutex);
         if(last_j_id >= 0)
@@ -87,11 +102,17 @@ void run_jobs()
             local_cond_job.wait(lock);
         }
 
-        j = jobs.begin()->second;
-        jobs.erase(jobs.begin());
+        multimap<int,job*>::iterator last=jobs.end();
+        last--;
+        j = last->second;
+        jobs.erase(last);
         lock.unlock();
 
-        if(!j) break;
+        if(!j)
+        {
+            cout<<"kill "<<jobs.size()<<endl;
+            break;
+        }
 
         last_j_id = j->id;
 
@@ -117,8 +138,30 @@ void run_jobs()
             execvp(argv[0], &argv[0]);
             exit(1);
         }
+
+        {
+            boost::unique_lock<boost::mutex> lock(local_mutex);
+            pids.insert(pid);
+        }
+        
         waitpid(pid, 0, 0);
+
+        {
+            boost::unique_lock<boost::mutex> lock(local_mutex);
+            pids.erase(pid);
+        }
+
         delete j;
+    }
+
+    {
+        boost::unique_lock<boost::mutex> lock(local_mutex);
+        num_threads_alive--;
+        if(!num_threads_alive) 
+        {
+            die = 1;
+            layout->cond_job.notify_one();
+        }
     }
 }
 
@@ -126,14 +169,16 @@ int main(int argc,char* argv[])
 {
     po::options_description desc("Options");
 
-    string name="batch_queue_default";
+    string name="batch_queue_default",pid_file="";
     int num_processes = boost::thread::hardware_concurrency();
     vector<int> deps;
     vector<string> tokens;
     desc.add_options()
         ("help,h","usage info")
         ("processes,p",po::value<int>(&num_processes)->default_value(num_processes),"number of processes to run")
-        ("name,n",po::value<string>(&name)->default_value(name),"batch queue name");
+        ("name,n",po::value<string>(&name)->default_value(name),"batch queue name")
+        ("pid,P",po::value<string>(&pid_file)->default_value(name),"write pid to this file")
+        ("background,b","put seld in the background when it is safe");
 
     po::variables_map vm;
     try
@@ -159,7 +204,7 @@ int main(int argc,char* argv[])
     shm.truncate(buffer_size);
     ip::mapped_region region(shm, ip::read_write);
     memset(region.get_address(), 0, region.get_size());
-    memory_layout* layout = new (region.get_address()) memory_layout;
+    layout = new (region.get_address()) memory_layout;
     layout->message_offset = sizeof(memory_layout);
     size_t message_max_length = region.get_size() - layout->message_offset;
     layout->message_max_length = message_max_length;
@@ -167,6 +212,25 @@ int main(int argc,char* argv[])
     layout->next_job_id = ++next_job_id;
     layout->priority = 0;
     unsigned char *message = (unsigned char*)region.get_address() + layout->message_offset;
+
+    if(vm.count("background"))
+    {
+        pid_t pid = fork();
+        if(pid)
+        {
+            if(vm.count("pid"))
+            {
+                ofstream fout(pid_file.c_str());
+                fout<<pid;
+            }
+            return 0;
+        }
+    }
+    else if(vm.count("pid"))
+    {
+        ofstream fout(pid_file.c_str());
+        fout<<getpid();
+    }
 
     vector<boost::thread*> threads;
     for(int i = 0; i < num_processes; i++)
@@ -179,18 +243,25 @@ int main(int argc,char* argv[])
 
     unsigned char buffer[buffer_size];
 
-    while(1)
+    while(!die)
     {
+        cout<<"loop"<<endl;
         int job_id = -1, priority = 0;
         size_t message_size = 0;
         try
         {
             ip::scoped_lock<ip::interprocess_mutex> lock(layout->mutex);
             if(!layout->filled) layout->cond_job.wait(lock);
+            if(die) break;
             layout->filled = 0;
             layout->cond_no_job.notify_one();
 
-            if(layout->next_job_id < 0) break;
+            cout<<"job id "<<layout->next_job_id<<std::endl;
+            if(layout->next_job_id == -2)
+            {
+                die = 1;
+                break;
+            }
 
             if(layout->message_length <= message_max_length)
             {
@@ -238,6 +309,15 @@ int main(int argc,char* argv[])
         {
             boost::unique_lock<boost::mutex> lock(local_mutex);
 
+            if(job_id < 0)
+            {
+                delete j;
+                while(num_waiting_threads--) local_cond_job.notify_one();
+                for(size_t i = 0; i < threads.size(); i++)
+                    jobs.insert(pair<int,job*>(INT_MIN,0));
+                continue;
+            }
+
             size_t num_deps = deps.size();
             for(size_t i = 0; i < deps.size(); i++)
             {
@@ -252,6 +332,17 @@ int main(int argc,char* argv[])
         catch(...)
         {
         }
+    }
+
+    {
+        boost::unique_lock<boost::mutex> lock(local_mutex);
+        for(set<pid_t>::iterator it = pids.begin(); it != pids.end(); it++)
+            kill(*it, SIGTERM);
+        pids.clear();
+
+        while(num_waiting_threads--) local_cond_job.notify_one();
+        for(size_t i = 0; i < threads.size(); i++)
+            jobs.insert(pair<int,job*>(INT_MIN,0));
     }
 
     try

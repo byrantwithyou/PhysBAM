@@ -29,6 +29,7 @@ int main(int argc,char* argv[])
         ("append-stdout,a","append stdout")
         ("append-stderr,A","append stderr")
         ("kill,k","kill master")
+        ("kill-now,K","kill master immediately")
         ("print-job-id,j","prints job id");
 
     po::positional_options_description pod;
@@ -56,7 +57,7 @@ int main(int argc,char* argv[])
     ip::mapped_region region(shm, ip::read_write);
     memory_layout* layout = reinterpret_cast<memory_layout*>(region.get_address());
 
-    if(vm.count("kill"))
+    if(vm.count("kill") || vm.count("kill-now"))
     {
         try
         {
@@ -66,7 +67,8 @@ int main(int argc,char* argv[])
                 layout->filled = 1;
                 layout->message_length = 0;
                 layout->cond_job.notify_one();
-                layout->next_job_id = -1;
+                if(vm.count("kill-now")) layout->next_job_id = -2;
+                else layout->next_job_id = -1;
             }
         }
         catch(...)
@@ -122,7 +124,6 @@ int main(int argc,char* argv[])
 
         if(vm.count("print-job-id"))
             printf("%i\n", job_id);
-
     }
     catch(...)
     {
