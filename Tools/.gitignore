@@ -30,3 +30,5 @@ rigid_body_simplicial_particles_dump/rigid_body_simplicial_particles_dump_debug
 solids_mpi_merge/solids_mpi_merge_debug
 tet2obj/tet2obj_debug
 tri2obj/tri2obj_debug
+batch/slave
+batch/master
