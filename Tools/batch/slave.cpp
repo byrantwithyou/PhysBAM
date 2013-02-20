@@ -2,8 +2,10 @@
 #include <vector>
 #include "pack.h"
 #include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/program_options.hpp>
+#include <boost/interprocess/sync/named_condition.hpp>
+#include <boost/interprocess/sync/named_mutex.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
+#include <boost/program_options.hpp>
 
 namespace ip = boost::interprocess;
 namespace po = boost::program_options;
@@ -30,6 +32,7 @@ int main(int argc,char* argv[])
         ("append-stderr,A","append stderr")
         ("kill,k","kill master")
         ("kill-now,K","kill master immediately")
+        ("clean,c","clean up resources only")
         ("print-job-id,j","prints job id");
 
     po::positional_options_description pod;
@@ -53,23 +56,46 @@ int main(int argc,char* argv[])
         return 1;
     }
 
-    ip::shared_memory_object shm(ip::open_only, name.c_str(), ip::read_write);
-    ip::mapped_region region(shm, ip::read_write);
+    string mutex_name=name+"_mutex";
+    string cond_job_name=name+"_job";
+    string cond_no_job_name=name+"_no_job";
+
+    if(vm.count("clean"))
+    {
+        ip::shared_memory_object::remove(name.c_str());
+        boost::interprocess::named_mutex::remove(mutex_name.c_str());
+        boost::interprocess::named_condition::remove(cond_job_name.c_str());
+        boost::interprocess::named_condition::remove(cond_no_job_name.c_str());
+        return 0;
+    }
+
+    boost::interprocess::named_mutex mutex(ip::open_or_create_t(),mutex_name.c_str());
+    boost::interprocess::named_condition cond_job(ip::open_or_create_t(),cond_job_name.c_str());
+    boost::interprocess::named_condition cond_no_job(ip::open_or_create_t(),cond_no_job_name.c_str());
+    ip::scoped_lock<ip::named_mutex> lock(mutex);
+
+    ip::shared_memory_object * shm = 0;
+    try
+    {
+        shm = new ip::shared_memory_object(ip::open_only, name.c_str(), ip::read_write);
+    }
+    catch(...)
+    {
+        cond_no_job.wait(lock);
+        shm = new ip::shared_memory_object(ip::open_only, name.c_str(), ip::read_write);
+    }
+
+    ip::mapped_region region(*shm, ip::read_write);
     memory_layout* layout = reinterpret_cast<memory_layout*>(region.get_address());
+    if(layout->filled) cond_no_job.wait(lock);
+    cond_job.notify_one();
 
     if(vm.count("kill") || vm.count("kill-now"))
     {
         try
         {
-            {
-                ip::scoped_lock<ip::interprocess_mutex> lock(layout->mutex);
-                if(layout->filled) layout->cond_no_job.wait(lock);
-                layout->filled = 1;
-                layout->message_length = 0;
-                layout->cond_job.notify_one();
-                if(vm.count("kill-now")) layout->next_job_id = -2;
-                else layout->next_job_id = -1;
-            }
+            if(vm.count("kill-now")) layout->next_job_id = -2;
+            else layout->next_job_id = -1;
         }
         catch(...)
         {
@@ -110,11 +136,7 @@ int main(int argc,char* argv[])
     try
     {
         {
-            ip::scoped_lock<ip::interprocess_mutex> lock(layout->mutex);
-            if(layout->filled) layout->cond_no_job.wait(lock);
-            layout->filled = 1;
             layout->message_length = 0;
-            layout->cond_job.notify_one();
 
             job_id = layout->next_job_id;
             layout->priority = priority;
@@ -132,6 +154,7 @@ int main(int argc,char* argv[])
     }
 
     delete [] buff;
+    delete shm;
 
     return 0;
 }

@@ -2,8 +2,8 @@
 #define __pack__
 #include <vector>
 #include <exception>
-#include <boost/interprocess/sync/interprocess_mutex.hpp>
-#include <boost/interprocess/sync/interprocess_condition.hpp>
+#include <stdexcept>
+#include <cstring>
 
 using namespace std;
 
@@ -88,9 +88,6 @@ struct memory_layout
     int next_job_id;
     int priority;
     int filled;
-    boost::interprocess::interprocess_mutex mutex;
-    boost::interprocess::interprocess_condition cond_no_job;
-    boost::interprocess::interprocess_condition cond_job;
 };
 
 #endif
