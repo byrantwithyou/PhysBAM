@@ -2,19 +2,20 @@
 #include <map>
 #include <vector>
 #include "pack.h"
-#include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/interprocess/sync/named_condition.hpp>
-#include <boost/interprocess/sync/named_mutex.hpp>
 #include <boost/program_options.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/condition_variable.hpp>
-#include <boost/thread/mutex.hpp>
+#include <errno.h>
+#include <fcntl.h>
+#include <pthread.h>
 #include <signal.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/un.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
-namespace ip = boost::interprocess;
 namespace po = boost::program_options;
 
 static const size_t buffer_size = 1<<16;
@@ -35,49 +36,44 @@ set<int> finished_jobs;
 int first_uncompleted_job;
 set<pid_t> pids;
 
-boost::condition_variable local_cond_job;
-boost::mutex local_mutex;
-int num_waiting_threads;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond_job = PTHREAD_COND_INITIALIZER;
+
 int num_threads_alive;
 int die;
-vector<boost::thread*> threads;
-
-boost::interprocess::named_condition * p_cond_job;
+vector<pthread_t> threads;
+int sock;
 
 void add_job(job* j)
 {
-    // cout<<"Add:";
-    // for(size_t i = 0; i < j->argv_data.size(); i++)
-    //     cout<<" "<<j->argv_data[i];
-    // cout<<"   "<<j->out;
-    // cout<<endl;
-
-    if(num_waiting_threads)
-    {
-        num_waiting_threads--;
-        local_cond_job.notify_one();
-    }
+    pthread_cond_signal(&cond_job);
     jobs.insert(pair<int,job*>(j->priority,j));
 }
 
 void add_kill_jobs()
 {
-    while(num_waiting_threads--) local_cond_job.notify_one();
+    pthread_cond_broadcast(&cond_job);
     for(size_t i = 0; i < threads.size(); i++)
         jobs.insert(pair<int,job*>(INT_MIN,0));
 }
 
-void run_jobs()
+int get_number_cpus()
+{
+    return sysconf(_SC_NPROCESSORS_ONLN);
+}
+
+void* run_jobs(void*)
 {
     job * j = 0;
     int last_j_id = -1;
     {
-        boost::unique_lock<boost::mutex> lock(local_mutex);
+        pthread_mutex_lock(&mutex);
         num_threads_alive++;
+        pthread_mutex_unlock(&mutex);
     }
     while(!die)
     {
-        boost::unique_lock<boost::mutex> lock(local_mutex);
+        pthread_mutex_lock(&mutex);
         if(last_j_id >= 0)
         {
             finished_jobs.insert(last_j_id);
@@ -106,21 +102,17 @@ void run_jobs()
             last_j_id = -1;
         }
 
-        if(jobs.empty())
-        {
-            num_waiting_threads++;
-            local_cond_job.wait(lock);
-        }
+        while(jobs.empty())
+            pthread_cond_wait(&cond_job,&mutex);
 
         multimap<int,job*>::iterator last=jobs.end();
         last--;
         j = last->second;
         jobs.erase(last);
-        lock.unlock();
+        pthread_mutex_unlock(&mutex);
 
         if(!j)
         {
-//            cout<<"kill "<<jobs.size()<<endl;
             break;
         }
 
@@ -131,10 +123,6 @@ void run_jobs()
             argv.push_back(const_cast<char*>(j->argv_data[i].c_str()));
         argv.push_back(0);
 
-        cout<<"Run:";
-        for(size_t i = 0; i < j->argv_data.size(); i++)
-            cout<<" "<<j->argv_data[i];
-        cout<<endl;
         pid_t pid = fork();
         if(!pid)
         {
@@ -149,29 +137,104 @@ void run_jobs()
             exit(1);
         }
 
-        {
-            boost::unique_lock<boost::mutex> lock(local_mutex);
-            pids.insert(pid);
-        }
-        
+        pthread_mutex_lock(&mutex);
+        pids.insert(pid);
+        pthread_mutex_unlock(&mutex);
+
         waitpid(pid, 0, 0);
 
-        {
-            boost::unique_lock<boost::mutex> lock(local_mutex);
-            pids.erase(pid);
-        }
+        pthread_mutex_lock(&mutex);
+        pids.erase(pid);
+        pthread_mutex_unlock(&mutex);
 
         delete j;
     }
 
+    pthread_mutex_lock(&mutex);
+    num_threads_alive--;
+    if(!num_threads_alive) die = 1;
+    pthread_mutex_unlock(&mutex);
+    return 0;
+}
+
+void* listen_for_jobs(void*)
+{
+    std::vector<unsigned char> buffer(buffer_size);
+
+    int next_job_id = 0;
+    while(!die)
     {
-        boost::unique_lock<boost::mutex> lock(local_mutex);
-        num_threads_alive--;
-        if(!num_threads_alive) 
+        sockaddr_un addr;
+        socklen_t addrlen;
+        int new_sock = accept(sock, (sockaddr *)&addr, &addrlen);
+        if(new_sock<0) continue;
+
+        size_t message_size;
+        if(read(new_sock, &message_size, sizeof(size_t)) == sizeof(size_t))
         {
-            die = 1;
-            p_cond_job->notify_one();
+            if(message_size == (size_t)-1)
+            {
+                pthread_mutex_lock(&mutex);
+                add_kill_jobs();
+                pthread_mutex_unlock(&mutex);
+            }
+            else if(message_size == (size_t)-2)
+            {
+                pthread_mutex_lock(&mutex);
+                die = 1;
+                for(set<pid_t>::iterator it = pids.begin(); it != pids.end(); it++)
+                    kill(*it, SIGTERM);
+                pids.clear();
+                add_kill_jobs();
+                pthread_mutex_unlock(&mutex);
+            }
+            else
+            {
+                message_size -= sizeof(size_t);
+                if(buffer.size() < message_size)
+                    buffer.resize(message_size);
+
+                size_t got = 0;
+                while(got < message_size)
+                {
+                    ssize_t r = read(new_sock, &buffer[0], message_size - got);
+                    if(r <= 0) break;
+                    got += r;
+                }
+                if(got == message_size)
+                {
+                    job* j = new job;
+                    j->id = next_job_id++;
+                    vector<int> deps;
+                    int k = 0;
+                    k += unpack(&buffer[k], message_size - k, j->argv_data);
+                    k += unpack(&buffer[k], message_size - k, deps);
+                    k += unpack(&buffer[k], message_size - k, j->in);
+                    k += unpack(&buffer[k], message_size - k, j->out);
+                    k += unpack(&buffer[k], message_size - k, j->err);
+                    k += unpack(&buffer[k], message_size - k, j->append_out);
+                    k += unpack(&buffer[k], message_size - k, j->append_err);
+                    k += unpack(&buffer[k], message_size - k, j->priority);
+                    if(k != message_size) cout<<"only used "<<k<<" of "<<message_size<<std::endl;
+
+                    pthread_mutex_lock(&mutex);
+                    size_t num_deps = deps.size();
+                    for(size_t i = 0; i < deps.size(); i++)
+                    {
+                        if(deps[i] >= first_uncompleted_job && deps[i] < j->id && finished_jobs.find(deps[i]) == finished_jobs.end())
+                            dependents[deps[i]].push_back(j->id);
+                        else num_deps--;
+                    }
+
+                    if(num_deps) waiting_jobs[j->id] = pair<int,job*>(num_deps, j);
+                    else add_job(j);
+                    pthread_mutex_unlock(&mutex);
+
+                    write(new_sock, &j->id, sizeof(j->id));
+                }
+            }
         }
+        close(new_sock);
     }
 }
 
@@ -179,8 +242,8 @@ int main(int argc,char* argv[])
 {
     po::options_description desc("Options");
 
-    string name="batch_queue_default",pid_file="";
-    int num_processes = boost::thread::hardware_concurrency();
+    string name="/tmp/batch_queue_default",pid_file="";
+    int num_processes = get_number_cpus();
     vector<int> deps;
     vector<string> tokens;
     desc.add_options()
@@ -206,144 +269,59 @@ int main(int argc,char* argv[])
         return 1;
     }
 
-    string mutex_name=name+"_mutex";
-    string cond_job_name=name+"_job";
-    string cond_no_job_name=name+"_no_job";
+    struct sockaddr_un sock_name;
+    if(name.length()>=sizeof(sock_name.sun_path))
+    {
+        cout<<"name too long"<<endl;
+        return 1;
+    }
 
-    boost::interprocess::named_mutex mutex(ip::open_or_create_t(),mutex_name.c_str());
-    boost::interprocess::named_condition cond_job(ip::open_or_create_t(),cond_job_name.c_str());
-    boost::interprocess::named_condition cond_no_job(ip::open_or_create_t(),cond_no_job_name.c_str());
-    p_cond_job = &cond_job;
+    sock = socket(PF_LOCAL, SOCK_STREAM, 0);
+    if(sock < 0)
+    {
+        cout<<"failed to create socket"<<endl;
+        return 1;
+    }
 
-    int next_job_id = -1;
-    ip::shared_memory_object::remove(name.c_str());
-    ip::shared_memory_object shm(ip::create_only, name.c_str(), ip::read_write);
-    shm.truncate(buffer_size);
-    ip::mapped_region region(shm, ip::read_write);
-    memset(region.get_address(), 0, region.get_size());
-    memory_layout* layout = new (region.get_address()) memory_layout;
-    layout->message_offset = sizeof(memory_layout);
-    size_t message_max_length = region.get_size() - layout->message_offset;
-    layout->message_max_length = message_max_length;
-    layout->message_length = 0;
-    layout->next_job_id = ++next_job_id;
-    layout->priority = 0;
-    unsigned char *message = (unsigned char*)region.get_address() + layout->message_offset;
+    sock_name.sun_family = AF_LOCAL;
+    strcpy(sock_name.sun_path, name.c_str());
+    unlink(name.c_str());
 
+    if(bind(sock, (sockaddr *)&sock_name, SUN_LEN(&sock_name)) < 0)
+    {
+        cout<<"failed to bind socket   "<<errno<<endl;
+        return 1;
+    }
+
+    if(listen(sock, 1000) < 0)
+    {
+        cout<<"failed to listen"<<endl;
+        return 1;
+    }
+
+    pthread_t listen_thread;
+    threads.resize(num_processes);
     for(int i = 0; i < num_processes; i++)
-        threads.push_back(new boost::thread(run_jobs));
+        if(pthread_create(&threads[i], NULL, run_jobs, 0))
+            {
+                cout<<"failed to create thread"<<endl;
+                return 1;
+            }
 
+    if(pthread_create(&listen_thread, NULL, listen_for_jobs, 0))
     {
-        ip::scoped_lock<ip::named_mutex> lock(mutex);
-        cond_no_job.notify_one();
+        cout<<"failed to create thread"<<endl;
+        return 1;
     }
 
-    unsigned char buffer[buffer_size];
-
-    while(!die)
-    {
-        int job_id = -1, priority = 0;
-        size_t message_size = 0;
-        try
-        {
-            ip::scoped_lock<ip::named_mutex> lock(mutex);
-            if(!layout->filled) cond_job.wait(lock);
-            if(die) break;
-            layout->filled = 0;
-            cond_no_job.notify_one();
-
-            if(layout->next_job_id == -2)
-            {
-                die = 1;
-                for(set<pid_t>::iterator it = pids.begin(); it != pids.end(); it++)
-                    kill(*it, SIGTERM);
-                pids.clear();
-                add_kill_jobs();
-                break;
-            }
-
-            if(layout->next_job_id >= 0 && layout->message_length == 0) continue;
-
-            if(layout->message_length <= message_max_length)
-            {
-                job_id = next_job_id;
-                priority = layout->priority;
-                memcpy(buffer, message, layout->message_length);
-                message_size = layout->message_length;
-            }
-
-            layout->message_length = 0;
-            layout->message_offset = sizeof(memory_layout);
-            layout->message_max_length = message_max_length;
-            layout->next_job_id = ++next_job_id;
-            layout->priority = 0;
-        }
-        catch(...)
-        {
-            continue;
-        }
-
-        job* j = new job;
-        j->id = job_id;
-        j->priority = priority;
-        vector<int> deps;
-        try
-        {
-            int k = 0;
-            k += unpack(buffer + k, message_size - k, j->argv_data);
-            k += unpack(buffer + k, message_size - k, deps);
-            k += unpack(buffer + k, message_size - k, j->in);
-            k += unpack(buffer + k, message_size - k, j->out);
-            k += unpack(buffer + k, message_size - k, j->err);
-            k += unpack(buffer + k, message_size - k, j->append_out);
-            k += unpack(buffer + k, message_size - k, j->append_err);
-
-            if(k != message_size) cout<<"only used "<<k<<" of "<<message_size<<std::endl;
-        }
-        catch(...)
-        {
-            delete j;
-            continue;
-        }
-
-        try
-        {
-            boost::unique_lock<boost::mutex> lock(local_mutex);
-
-            if(job_id < 0)
-            {
-                delete j;
-                add_kill_jobs();
-                continue;
-            }
-
-            size_t num_deps = deps.size();
-            for(size_t i = 0; i < deps.size(); i++)
-            {
-                if(deps[i] >= first_uncompleted_job && deps[i] < job_id && finished_jobs.find(deps[i])==finished_jobs.end())
-                    dependents[deps[i]].push_back(job_id);
-                else num_deps--;
-            }
-
-            if(num_deps) waiting_jobs[job_id] = pair<int,job*>(num_deps, j);
-            else add_job(j);
-        }
-        catch(...)
-        {
-        }
-    }
-
+    void* ret = 0;
     for(size_t i = 0; i < threads.size(); i++)
-    {
-        threads[i]->join();
-        delete threads[i];
-    }
+        pthread_join(threads[i], &ret);
+    pthread_cancel(listen_thread);
 
-    layout->~memory_layout();
-    boost::interprocess::named_mutex::remove(mutex_name.c_str());
-    boost::interprocess::named_condition::remove(cond_job_name.c_str());
-    boost::interprocess::named_condition::remove(cond_no_job_name.c_str());
-    ip::shared_memory_object::remove(name.c_str());
+    unlink(name.c_str());
+
+    pthread_mutex_destroy(&mutex);
 
     return 0;
 }

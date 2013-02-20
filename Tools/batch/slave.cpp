@@ -6,6 +6,8 @@
 #include <boost/interprocess/sync/named_mutex.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #include <boost/program_options.hpp>
+#include <sys/socket.h>
+#include <sys/un.h>
 
 namespace ip = boost::interprocess;
 namespace po = boost::program_options;
@@ -15,7 +17,7 @@ int main(int argc,char* argv[])
 {
     po::options_description desc("Options");
 
-    string name="batch_queue_default",in="/dev/null",out="/dev/null",err="/dev/null";
+    string name="/tmp/batch_queue_default",in="/dev/null",out="/dev/null",err="/dev/null";
     int priority=50;
     vector<int> deps;
     vector<string> tokens;
@@ -31,9 +33,7 @@ int main(int argc,char* argv[])
         ("append-stdout,a","append stdout")
         ("append-stderr,A","append stderr")
         ("kill,k","kill master")
-        ("kill-now,K","kill master immediately")
-        ("clean,c","clean up resources only")
-        ("print-job-id,j","prints job id");
+        ("kill-now,K","kill master immediately");
 
     po::positional_options_description pod;
     pod.add("token", -1);
@@ -56,74 +56,48 @@ int main(int argc,char* argv[])
         return 1;
     }
 
-    string mutex_name=name+"_mutex";
-    string cond_job_name=name+"_job";
-    string cond_no_job_name=name+"_no_job";
-
-    if(vm.count("clean"))
+    int sock = socket(PF_LOCAL, SOCK_STREAM, 0);
+    if(sock < 0)
     {
-        ip::shared_memory_object::remove(name.c_str());
-        boost::interprocess::named_mutex::remove(mutex_name.c_str());
-        boost::interprocess::named_condition::remove(cond_job_name.c_str());
-        boost::interprocess::named_condition::remove(cond_no_job_name.c_str());
-        return 0;
+        cout<<"failed to create socket"<<endl;
+        return 1;
     }
 
-    boost::interprocess::named_mutex mutex(ip::open_or_create_t(),mutex_name.c_str());
-    boost::interprocess::named_condition cond_job(ip::open_or_create_t(),cond_job_name.c_str());
-    boost::interprocess::named_condition cond_no_job(ip::open_or_create_t(),cond_no_job_name.c_str());
-    ip::scoped_lock<ip::named_mutex> lock(mutex);
-
-    ip::shared_memory_object * shm = 0;
-    try
+    struct sockaddr_un sock_name;
+    sock_name.sun_family = AF_LOCAL;
+    strcpy(sock_name.sun_path, name.c_str());
+    if(connect(sock, (sockaddr *)&sock_name, SUN_LEN(&sock_name)) < 0)
     {
-        shm = new ip::shared_memory_object(ip::open_only, name.c_str(), ip::read_write);
+        cout<<"failed to connect socket"<<endl;
+        return 1;
     }
-    catch(...)
-    {
-        cond_no_job.wait(lock);
-        shm = new ip::shared_memory_object(ip::open_only, name.c_str(), ip::read_write);
-    }
-
-    ip::mapped_region region(*shm, ip::read_write);
-    memory_layout* layout = reinterpret_cast<memory_layout*>(region.get_address());
-    if(layout->filled) cond_no_job.wait(lock);
-    cond_job.notify_one();
 
     if(vm.count("kill") || vm.count("kill-now"))
     {
-        try
-        {
-            if(vm.count("kill-now")) layout->next_job_id = -2;
-            else layout->next_job_id = -1;
-        }
-        catch(...)
-        {
-            printf("failed to kill master\n");
-            return 3;
-        }
+        unsigned char buff[100];
+        size_t k = pack(buff, vm.count("kill") ? (size_t)-1 : (size_t)-2);
+        write(sock, buff, k);
+        close(sock);
         return 0;
     }
-
-    size_t size = (tokens.size()+2)*sizeof(size_t) + sizeof(int)*(deps.size()+2);
-    for(size_t i = 0; i < tokens.size(); i++)
-        size += tokens[i].size();
-    size += sizeof(size_t) + in.size();
-    size += sizeof(size_t) + out.size();
-    size += sizeof(size_t) + err.size();
-
-    if(size > layout->message_max_length)
-    {
-        printf("maximum job size: %zi.  This job size: %zi\n", layout->message_max_length, size);
-        return 2;
-    }
-    int job_id = -1;
 
     int append_out=vm.count("append-stdout")>0;
     int append_err=vm.count("append-stderr")>0;
 
+    size_t size = 2 * sizeof(size);
+    for(size_t i = 0; i < tokens.size(); i++)
+        size += sizeof(size_t) + tokens[i].size();
+    size += sizeof(size_t) + sizeof(deps[0]) * deps.size();
+    size += sizeof(size_t) + in.size();
+    size += sizeof(size_t) + out.size();
+    size += sizeof(size_t) + err.size();
+    size += sizeof(append_out);
+    size += sizeof(append_err);
+    size += sizeof(priority);
+
     unsigned char * buff = new unsigned char[size];
     size_t k = 0;
+    k += pack(buff + k, size);
     k += pack(buff + k, tokens);
     k += pack(buff + k, deps);
     k += pack(buff + k, in);
@@ -131,30 +105,18 @@ int main(int argc,char* argv[])
     k += pack(buff + k, err);
     k += pack(buff + k, append_out);
     k += pack(buff + k, append_err);
+    k += pack(buff + k, priority);
     assert(k == size);
 
-    try
-    {
-        {
-            layout->message_length = 0;
+    int w = write(sock, buff, k);
 
-            job_id = layout->next_job_id;
-            layout->priority = priority;
-            memcpy((unsigned char*)region.get_address() + layout->message_offset, buff, size);
-            layout->message_length = size;
-        }
+    int job_id = -1;
+    if(read(sock, &job_id, sizeof(job_id)) == sizeof(job_id))
+        printf("%i\n", job_id);
 
-        if(vm.count("print-job-id"))
-            printf("%i\n", job_id);
-    }
-    catch(...)
-    {
-        printf("failed to send job\n");
-        return 3;
-    }
+    close(sock);
 
     delete [] buff;
-    delete shm;
 
     return 0;
 }
