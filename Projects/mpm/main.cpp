@@ -415,8 +415,8 @@ int main(int argc,char *argv[])
 
     if(test==6){ // wall test
         static const int grid_res=32;
-        TV_INT grid_counts(5.2*grid_res,0.95*grid_res,0.95*grid_res);
-        RANGE<TV> grid_box(TV(-0.2,-0.45,-0.45),TV(5,0.5,0.5));
+        TV_INT grid_counts(0.4*grid_res,0.95*grid_res,0.95*grid_res);
+        RANGE<TV> grid_box(TV(-0.2,-0.45,-0.45),TV(0.2,0.5,0.5));
         GRID<TV> grid(grid_counts,grid_box);
         sim.grid=grid;
         static const int particle_res=64;
