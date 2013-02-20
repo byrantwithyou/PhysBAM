@@ -57,6 +57,7 @@ public:
     bool use_p_null_mode;
     bool use_level_set_method;
     bool use_pls;
+    bool periodic_particles;
 
     GRID<TV> grid;
     PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >& particle_levelset_evolution_multiple;
