@@ -129,6 +129,8 @@ Deduce_Op(int type,T& out,T* in0,T* in1) const
 template<class T> int PROGRAM<T>::
 Diff(int diff_expr,int diff_var)
 {
+    Optimize();
+
     ARRAY<int> diff_tmp(num_tmp);
     diff_tmp.Fill(-1);
 
@@ -522,6 +524,7 @@ Optimize()
     Sparse_Conditional_Constant_Propagation();
     Simplify_Phis();
     Copy_Propagation();
+    Local_Common_Expresssion_Elimination();
     Remove_Dead_Code();
 }
 //#####################################################################
@@ -850,9 +853,8 @@ Sparse_Conditional_Constant_Propagation()
     while(block_worklist.m || op_worklist.m){
         while(op_worklist.m){
             VECTOR<int,2> I=op_worklist.Pop();
-            const ARRAY<VECTOR<int,2> >& uses=Get_Uses(I);
-            for(int i=0;i<uses.m;i++){
-                VECTOR<int,2> J=uses(i);
+            for(HASHTABLE<VECTOR<int,2> >::CONST_ITERATOR it(Get_Uses(I));it.Valid();it.Next()){
+                VECTOR<int,2> J=it.Key();
                 if(block_exec(J.x))
                     SCCP_Visit_Instruction(J,variable_state,block_worklist,op_worklist,block_exec);}}
 
@@ -879,6 +881,22 @@ Sparse_Conditional_Constant_Propagation()
 // Function Copy_Propagation
 //#####################################################################
 template<class T> void PROGRAM<T>::
+Propagate_Copy(int old_var,int new_var)
+{
+    HASHTABLE<VECTOR<int,2> >& old_uses = uses(old_var>>mem_shift)(old_var&~mem_mask);
+    HASHTABLE<VECTOR<int,2> >& new_uses = uses(new_var>>mem_shift)(new_var&~mem_mask);
+    for(HASHTABLE<VECTOR<int,2> >::ITERATOR it(old_uses);it.Valid();it.Next()){
+        VECTOR<int,2> I=it.Key();
+        INSTRUCTION& o2=code_blocks(I.x)->code(I.y);
+        if(o2.src0==old_var) o2.src0=new_var;
+        if(o2.src1==old_var) o2.src1=new_var;
+        new_uses.Set(I);}
+    old_uses.Remove_All();
+}
+//#####################################################################
+// Function Copy_Propagation
+//#####################################################################
+template<class T> void PROGRAM<T>::
 Copy_Propagation()
 {
     if(def_use_stale) Update_Use_Def();
@@ -888,13 +906,8 @@ Copy_Propagation()
         if(!code_blocks(bl)) continue;
         for(int ip=0;ip<code_blocks(bl)->code.m;ip++){
             INSTRUCTION& o=code_blocks(bl)->code(ip);
-            if(o.type!=op_copy) continue;
-            const ARRAY<VECTOR<int,2> >& users=Get_Uses(VECTOR<int,2>(bl,ip));
-            for(int i=0;i<users.m;i++){
-                INSTRUCTION& o2=code_blocks(users(i).x)->code(users(i).y);
-                if(o2.src0==o.dest) o2.src0=o.src0;
-                if(o2.src1==o.dest) o2.src1=o.src0;}}}
-    def_use_stale=true;
+            if(o.type==op_copy)
+                Propagate_Copy(o.dest,o.src0);}}
 
     LOG::cout<<__FUNCTION__<<std::endl;
     Print();
@@ -952,25 +965,25 @@ Remove_Dead_Code()
             code_blocks(nb->id)=0;}}
 
     Update_Use_Def();
-    ARRAY<int> num_uses(uses(0).m),worklist;
-    for(int j=0;j<uses(0).m;j++)
-        num_uses(j)=uses(0)(j).m;
-
+    ARRAY<int> worklist;
     for(int j=0;j<defs(0).m;j++)
-        if(defs(0)(j).x!=-1 && !num_uses(j))
+        if(defs(0)(j).x!=-1 && !uses(0)(j).Size())
             worklist.Append(j);
 
     while(worklist.m){
         int var=worklist.Pop();
         VECTOR<int,2> I=Get_Def(var);
         INSTRUCTION& o=Get_Instruction(I);
-        o.type=op_nop;
-        if(op_flags_table[o.type]&flag_reg_src0 && (o.src0&mem_mask)==mem_reg)
-            if(!--num_uses(o.src0))
-                worklist.Append(o.src0);
-        if(op_flags_table[o.type]&flag_reg_src1 && (o.src1&mem_mask)==mem_reg)
-            if(o.src0!=o.src1 && !--num_uses(o.src1))
+        if(op_flags_table[o.type]&flag_reg_src0 && (o.src0&mem_mask)==mem_reg){
+            HASHTABLE<VECTOR<int,2> >& h=Get_Uses(o.src0);
+            if(h.Delete_If_Present(I) && !h.Size())
+                worklist.Append(o.src0);}
+        if(op_flags_table[o.type]&flag_reg_src1 && (o.src1&mem_mask)==mem_reg){
+            HASHTABLE<VECTOR<int,2> >& h=Get_Uses(o.src1);
+            if(h.Delete_If_Present(I) && !h.Size())
                 worklist.Append(o.src1);}
+        o.type=op_nop;
+        Set_Def(var,VECTOR<int,2>(-1,-1));}
 
     for(int bl=0;bl<code_blocks.m;bl++){
         if(!code_blocks(bl)) continue;
@@ -1007,6 +1020,93 @@ Add_Constant(T x)
     int i=constants.Append(x);
     constant_lookup[x]=i;
     return i|mem_const;
+}
+//#####################################################################
+// Function Local_Common_Expresssion_Elimination
+//#####################################################################
+template<class T> void PROGRAM<T>::
+Local_Common_Expresssion_Elimination(CODE_BLOCK<T>* B)
+{
+    ARRAY<INSTRUCTION>& code=B->code;
+    HASHTABLE<VECTOR<int,3>,int> expr;
+    for(int ip=0;ip<code.m;ip++){
+        INSTRUCTION& o=code(ip);
+        if(!(op_flags_table[o.type]&flag_reg_dest)) continue;
+        Reduce_In_Place(o);
+        if(o.type==op_copy){
+            Propagate_Copy(o.dest,o.src0);
+            continue;}
+        VECTOR<int,3> in(o.type,o.src0,o.src1);
+        if(!(op_flags_table[o.type]&flag_reg_src1)) in.z=-1;
+        if(op_flags_table[o.type]&flag_commute) exchange_sort(in.y,in.z);
+        int e=-1;
+        if(expr.Get(in,e))
+            Propagate_Copy(o.dest,e);
+        else expr.Set(in,o.dest);}
+}
+//#####################################################################
+// Function Local_Common_Expresssion_Elimination
+//#####################################################################
+template<class T> void PROGRAM<T>::
+Local_Common_Expresssion_Elimination()
+{
+    for(int bl=0;bl<code_blocks.m;bl++){
+        if(!code_blocks(bl)) continue;
+        Local_Common_Expresssion_Elimination(code_blocks(bl));}
+}
+//#####################################################################
+// Function Reduce_In_Place
+//#####################################################################
+template<class T> void PROGRAM<T>::
+Reduce_In_Place(INSTRUCTION& o)
+{
+    int const_0=Add_Constant(0),const_1=Add_Constant(1);
+    switch(o.type){
+        case op_add:
+            if(o.src1==const_0){o.type=op_copy;return;}
+            if(o.src0==const_0){o.type=op_copy;o.src0=o.src1;return;}
+            break;
+        case op_sub:
+            if(o.src0==o.src1){o.type=op_copy;o.src0=const_0;return;}
+            if(o.src1==const_0){o.type=op_copy;return;}
+            if(o.src0==const_0){o.type=op_neg;o.src0=o.src1;return;}
+            break;
+        case op_mul:
+            if(o.src1==const_0 || o.src0==const_0){o.type=op_copy;o.src0=const_0;return;}
+            if(o.src1==const_1){o.type=op_copy;return;}
+            if(o.src0==const_1){o.type=op_copy;o.src0=o.src1;return;}
+            break;
+        case op_div:
+            if(o.src0==o.src1){o.type=op_copy;o.src0=const_1;return;}
+            if(o.src0==const_0 || o.src1==const_1){o.type=op_copy;return;}
+            if(o.src0==const_1){o.type=op_inv;o.src0=o.src1;return;}
+            break;
+        case op_neg: break;
+        case op_inv: break;
+        case op_sqrt: break;
+        case op_exp: break;
+        case op_ln: break;
+        case op_pow:
+            if(o.src1==const_0){o.type=op_copy;o.src0=const_0;return;}
+            if(o.src1==const_1){o.type=op_copy;return;}
+            if(o.src1==Add_Constant(2)){o.type=op_mul;o.src1=o.src0;return;}
+            if(o.src1==Add_Constant(-1)){o.type=op_neg;return;}
+            break;
+        case op_lt:
+        case op_gt:
+        case op_ne:
+            if(o.src0==o.src1){o.type=op_copy;o.src0=const_0;return;}
+            break;
+        case op_le:
+        case op_ge:
+        case op_eq:
+            if(o.src0==o.src1){o.type=op_copy;o.src0=const_1;return;}
+            break;
+        case op_or:
+        case op_and:
+            if(o.src0==o.src1){o.type=op_copy;return;}
+            break;
+        default: break;}
 }
 template struct PROGRAM<float>;
 template struct PROGRAM<double>;

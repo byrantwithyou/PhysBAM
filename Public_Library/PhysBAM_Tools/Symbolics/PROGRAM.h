@@ -65,7 +65,7 @@ struct PROGRAM
     HASHTABLE<std::string,int> dict;
     bool finalized;
     VECTOR<ARRAY<VECTOR<int,2> >,4> defs;
-    VECTOR<ARRAY<ARRAY<VECTOR<int,2> > >,4> uses;
+    VECTOR<ARRAY<HASHTABLE<VECTOR<int,2> > >,4> uses;
     bool def_use_stale;
 
     struct VARIABLE_STATE
@@ -94,9 +94,10 @@ struct PROGRAM
 
     VECTOR<int,2> Get_Def(int var) const {return defs(var>>mem_shift)(var&~mem_mask);}
     void Set_Def(int var,const VECTOR<int,2>& def) {defs(var>>mem_shift)(var&~mem_mask)=def;}
-    const ARRAY<VECTOR<int,2> >& Get_Uses(int var) const {return uses(var>>mem_shift)(var&~mem_mask);}
-    void Add_Use(int var,const VECTOR<int,2>& use) {uses(var>>mem_shift)(var&~mem_mask).Append(use);}
-    const ARRAY<VECTOR<int,2> >& Get_Uses(const VECTOR<int,2>& I) const {return Get_Uses(Get_Instruction(I).dest);}
+    const HASHTABLE<VECTOR<int,2> >& Get_Uses(int var) const {return uses(var>>mem_shift)(var&~mem_mask);}
+    HASHTABLE<VECTOR<int,2> >& Get_Uses(int var) {return uses(var>>mem_shift)(var&~mem_mask);}
+    void Add_Use(int var,const VECTOR<int,2>& use) {uses(var>>mem_shift)(var&~mem_mask).Set(use);}
+    const HASHTABLE<VECTOR<int,2> >& Get_Uses(const VECTOR<int,2>& I) const {return Get_Uses(Get_Instruction(I).dest);}
     INSTRUCTION& Get_Instruction(const VECTOR<int,2>& I) {return code_blocks(I.x)->code(I.y);}
     const INSTRUCTION& Get_Instruction(const VECTOR<int,2>& I) const {return code_blocks(I.x)->code(I.y);}
 
@@ -116,6 +117,10 @@ protected:
         ARRAY<CODE_BLOCK<T>*>& block_worklist,ARRAY<VECTOR<int,2> >& op_worklist,ARRAY<bool>& block_exec);
     void Remove_Dead_Code();
     void Detach_Next(CODE_BLOCK<T>* B,int j);
+    void Propagate_Copy(int old_var,int new_var);
+    void Local_Common_Expresssion_Elimination(CODE_BLOCK<T>* B);
+    void Local_Common_Expresssion_Elimination();
+    void Reduce_In_Place(INSTRUCTION& o);
 };
 template<class T>
 struct PROGRAM_CONTEXT
