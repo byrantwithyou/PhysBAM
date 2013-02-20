@@ -15,8 +15,12 @@ class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
+    ARRAY<TV> X;
+
     SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL();
     ~SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL();
+
+    
 //#####################################################################
 };
 }
