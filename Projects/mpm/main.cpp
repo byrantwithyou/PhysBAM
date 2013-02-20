@@ -22,10 +22,13 @@
 #include "TIMING.h"
 #include "MPM_SIMULATION.h"
 
+#define MPM_3D
+
 #define CHECK_ARG(x,arg,argdefault) if(arg!=argdefault) x=arg;
 using namespace PhysBAM;
 int main(int argc,char *argv[])
 {
+#ifdef MPM_2D
     static const int dimension=2;
     typedef double T;
     typedef float RW;
@@ -44,7 +47,7 @@ int main(int argc,char *argv[])
     parse_args.Parse(true);
 
     int test=5;CHECK_ARG(test,test_input,-1);
-    std::string output_directory=std::string("test")+FILE_UTILITIES::Number_To_String(test);CHECK_ARG(output_directory,output_directory_input,"");
+    std::string output_directory=std::string("MPM_2D_test")+FILE_UTILITIES::Number_To_String(test);CHECK_ARG(output_directory,output_directory_input,"");
 
     MPM_SIMULATION<TV> sim;
     if(test==1){ // cube falling on ground
@@ -349,6 +352,84 @@ int main(int argc,char *argv[])
             Flush_Frame<TV>("mpm");}
         LOG::cout<<std::endl;
     }
+#endif
 
+#ifdef MPM_3D
+    static const int dimension=3;
+    typedef double T;
+    typedef float RW;
+    typedef VECTOR<T,dimension> TV;
+    typedef VECTOR<int,dimension> TV_INT;
+
+    PARSE_ARGS parse_args(argc,argv);
+    int test_input=-1;;
+    std::string output_directory_input("");
+    T dt_input=0;
+    int frame_jump_input=-1;
+    parse_args.Add("-test",&test_input,"test","test number");
+    parse_args.Add("-o",&output_directory_input,"o","output directory");
+    parse_args.Add("-dt",&dt_input,"dt","dt");
+    parse_args.Add("-fj",&frame_jump_input,"fj","frame jump");
+    parse_args.Parse(true);
+
+    int test=4;CHECK_ARG(test,test_input,-1);
+    std::string output_directory=std::string("MPM_3D_test")+FILE_UTILITIES::Number_To_String(test);CHECK_ARG(output_directory,output_directory_input,"");
+
+    MPM_SIMULATION<TV> sim;
+
+    if(test==4){ // cube falling on beam
+        static const int grid_res=32;
+        TV_INT grid_counts(0.7*grid_res,0.85*grid_res,0.4*grid_res);
+        RANGE<TV> grid_box(TV(-0.35,-0.3,-0.2),TV(0.35,0.55,0.2));
+        GRID<TV> grid(grid_counts,grid_box);
+        sim.grid=grid;
+        static const int particle_res=64;
+        TV_INT particle_counts_beam(0.6*particle_res,0.2*particle_res,0.2*particle_res);
+        RANGE<TV> particle_box_beam(TV(-0.3,-0.1,-0.1),TV(0.3,0.1,0.1));
+        TV_INT particle_counts_cube(0.2*particle_res,0.2*particle_res,0.2*particle_res);
+        RANGE<TV> particle_box_cube(TV(-0.1,0.3,-0.1),TV(0.1,0.5,0.1));
+        sim.particles.Initialize_X_As_A_Grid(particle_counts_beam,particle_box_beam);
+        sim.particles.Add_X_As_A_Grid(particle_counts_cube,particle_box_cube);
+        T object_mass=1;
+        for(int p=0;p<sim.particles.number;p++){
+            if(sim.particles.X(p)(1)>0.2) sim.particles.V(p)=TV(0,-1.5,0);
+            else sim.particles.V(p)=TV();
+            sim.particles.mass(p)=object_mass/sim.particles.number;
+            sim.particles.Fe(p)=MATRIX<T,TV::m>::Identity_Matrix();
+            sim.particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();}
+        sim.dirichlet_box.Append(RANGE<TV>(TV(0.25,-10,-10),TV(10,10,10)));
+        sim.dirichlet_velocity.Append(TV());
+        sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10,-10),TV(-0.25,10,10)));
+        sim.dirichlet_velocity.Append(TV());
+        sim.dt=1e-4;CHECK_ARG(sim.dt,dt_input,0);
+        T ym=3000;
+        T pr=0.3;
+        sim.mu0=ym/((T)2*((T)1+pr));
+        sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
+        sim.xi=0;
+        sim.use_plasticity_yield=false;
+        sim.use_gravity=true;
+        sim.ground_level=-100;
+        sim.FLIP_alpha=0.95;
+        sim.friction_coefficient=0.6;}
+
+    sim.Initialize();
+
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
+    for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+    Flush_Frame<TV>("mpm");
+
+    int frame_jump=20;CHECK_ARG(frame_jump,frame_jump_input,-1);
+    for(int f=1;f<1000000;f++){
+        TIMING_START;
+        LOG::cout<<"TIMESTEP "<<f<<std::endl;
+        sim.Advance_One_Time_Step_Backward_Euler();
+        TIMING_END("Current time step totally");
+        if(f%frame_jump==0){
+            for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+            Flush_Frame<TV>("mpm");}
+        LOG::cout<<std::endl;}
+
+#endif
     return 0;
 }
