@@ -114,6 +114,12 @@ public:
     RANGE<TV> operator-(const RANGE<TV>& r) const
     {return RANGE<TV>(min_corner-r.max_corner,max_corner-r.min_corner);}
 
+    RANGE<TV>& operator+=(const TV& v)
+    {min_corner+=v;max_corner+=v;return *this;}
+
+    RANGE<TV>& operator-=(const TV& v)
+    {min_corner-=v;max_corner-=v;return *this;}
+
     RANGE<TV> operator*(const T a) const
     {return a>=0?RANGE<TV>(min_corner*a,max_corner*a):RANGE<TV>(max_corner*a,min_corner*a);}
 
