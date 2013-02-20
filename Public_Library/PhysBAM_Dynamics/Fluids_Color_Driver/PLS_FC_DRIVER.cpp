@@ -119,6 +119,8 @@ Initialize()
     example.particle_levelset_evolution_multiple.Use_Hamilton_Jacobi_Weno_Advection();
 
     example.particle_levelset_evolution_multiple.particle_levelset.levelset.Set_Custom_Boundary(example.boundary);
+    for(int i=0;i<example.number_of_colors;i++)
+        example.particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(i)->levelset.Set_Custom_Boundary(example.boundary);
     example.particle_levelset_evolution_multiple.Bias_Towards_Negative_Particles(false);
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Store_Unique_Particle_Id();
@@ -320,7 +322,7 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Reduced_Advection_And_BDF(T dt,bool first_step,int c)
 {
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T,AVERAGING_UNIFORM<GRID<TV> >,QUADRATIC_INTERPOLATION_UNIFORM<GRID<TV>,T> > quadratic_advection;
-    BOUNDARY<TV,T> boundary;
+    BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
     FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_face_velocities(example.face_velocities(c)),lookup_prev_face_velocities(example.prev_face_velocities(c));
     PHYSBAM_DEBUG_ONLY(Assert_Advection_CFL(example.face_velocities(c),example.face_color,c,dt));
     if(!first_step){
@@ -340,7 +342,7 @@ RK2_Advection_And_BDF(T dt,bool first_step,int c)
 {
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T,AVERAGING_UNIFORM<GRID<TV> >,QUADRATIC_INTERPOLATION_UNIFORM<GRID<TV>,T> > quadratic_advection;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T,AVERAGING_UNIFORM<GRID<TV> >,LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> > linear_advection;
-    BOUNDARY<TV,T> boundary;
+    BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
     ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,example.number_of_ghost_cells),temp2(example.grid,example.number_of_ghost_cells),
         temp3(example.grid,example.number_of_ghost_cells),temp4(example.grid,example.number_of_ghost_cells),temp5(example.grid,example.number_of_ghost_cells);
     FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_temp(temp),lookup_temp2(temp2),lookup_temp3(temp3),lookup_temp4(temp4),lookup_temp5(temp5);
@@ -463,13 +465,7 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE
     eho.periodic=true;
 
     eho.Extrapolate_Face([&](const FACE_INDEX<TV::m>& index){return color(index)==c;},u);
-
-//    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){ //Going to keep this here for a while in case it is needed again
-//            if((abs(example.face_velocities(c)(it.Full_Index())))>1e10)
-//            {Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));}
-//        }
-//    PHYSBAM_DEBUG_WRITE_SUBSTEP("Bad particles!",0,1);
-
+    
     example.boundary.Apply_Boundary_Condition_Face(example.grid,u,time+example.dt);
     example.boundary.Fill_Ghost_Faces(example.grid,u,u,0,example.number_of_ghost_cells);
 }

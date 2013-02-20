@@ -324,7 +324,7 @@ public:
             case 20:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 {
-                    TV vel((T).2,(T).5);
+                    TV vel((T)-.5,(T).2);
                     analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,1,0),vel);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(vel));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(vel));
@@ -513,7 +513,7 @@ public:
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
             int c=levelset_color.color(it.index);
             T p=levelset_color.phi(it.index);
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(c<0,c>=0,p<0));
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(c<1,c>=0,p<0));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
         PHYSBAM_DEBUG_WRITE_SUBSTEP("level set",0,1);
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
