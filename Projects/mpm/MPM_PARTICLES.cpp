@@ -75,6 +75,26 @@ Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
     X=old_X;
 }
 //#####################################################################
+// Function Add_X_As_A_Ball
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Add_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box)
+{
+    GRID<TV> grid(count,square_box);
+    TV center=square_box.Center();
+    T r=0.5*((-square_box.min_corner+square_box.max_corner)(0));
+    ARRAY<TV> old_X;
+    old_X.Resize(X.m);
+    for(int i=0;i<X.m;i++) old_X(i)=X(i);
+    ARRAY<TV> sample_X;
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
+        TV x=grid.X(it.index);
+        if((x-center).Magnitude()<=r) sample_X.Append(x);}
+    old_X.Append_Elements(sample_X);
+    this->Resize(old_X.m);
+    X=old_X;
+}
+//#####################################################################
 // Function Reduce_X_As_A_Ball
 //#####################################################################
 template<class TV> void MPM_PARTICLES<TV>::

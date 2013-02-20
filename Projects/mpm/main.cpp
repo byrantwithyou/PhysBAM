@@ -284,6 +284,45 @@ int main(int argc,char *argv[])
         sim.FLIP_alpha=0.95;
         sim.friction_coefficient=0.6;}
 
+    if(test==8){ // two ring hitting each other
+        static const int grid_res=64;
+        TV_INT grid_counts(1.0*grid_res,0.4*grid_res);
+        RANGE<TV> grid_box(TV(-0.5,-0.2),TV(0.5,0.2));
+        GRID<TV> grid(grid_counts,grid_box);
+        sim.grid=grid;
+        static const int particle_res=500;
+        TV_INT particle_counts_ball1(0.2*particle_res,0.2*particle_res);
+        RANGE<TV> particle_box_ball1(TV(-0.3,-0.1),TV(-0.1,0.1));
+        TV_INT particle_counts_ball2(0.2*particle_res,0.2*particle_res);
+        RANGE<TV> particle_box_ball2(TV(0.1,-0.1),TV(0.3,0.1));
+        sim.particles.Initialize_X_As_A_Ball(particle_counts_ball1,particle_box_ball1);
+        sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(-0.28,-0.08),TV(-0.12,0.08)));
+        sim.particles.Add_X_As_A_Ball(particle_counts_ball2,particle_box_ball2);
+        sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.12,-0.08),TV(0.28,0.08)));
+        T object_mass=10;
+        for(int p=0;p<sim.particles.number;p++){
+            if(sim.particles.X(p)(0)<0) sim.particles.V(p)=TV(2,0);
+            else sim.particles.V(p)=TV(-2,0);
+            sim.particles.mass(p)=object_mass/sim.particles.number;
+            sim.particles.Fe(p)=MATRIX<T,TV::m>::Identity_Matrix();
+            sim.particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();}
+        sim.dt=1e-4;CHECK_ARG(sim.dt,dt_input,0);
+        T ym=100000;
+        T pr=0.3;
+        sim.mu0=ym/((T)2*((T)1+pr));
+        sim.lambda0=ym*pr/(((T)1+pr)*((T)1-2*pr));
+        sim.xi=0;
+        sim.use_plasticity_yield=false;
+        sim.yield_max=1.1;
+        sim.yield_min=1.0/sim.yield_max;
+        sim.use_plasticity_clamp=false;
+        sim.clamp_max=1.3;
+        sim.clamp_min=1.0/sim.clamp_max;
+        sim.use_gravity=false;
+        sim.ground_level=-100;
+        sim.FLIP_alpha=0.95;
+        sim.friction_coefficient=0.6;}
+
     sim.Initialize();
 
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
