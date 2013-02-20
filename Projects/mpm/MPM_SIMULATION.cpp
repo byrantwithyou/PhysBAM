@@ -299,6 +299,7 @@ Update_Deformation_Gradient()
 {
     TIMING_START;
     if(!use_plasticity_yield){
+#pragma omp parallel for
         for(int p=0;p<particles.number;p++){
             MATRIX<T,TV::m> grad_vp;
             for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
@@ -306,6 +307,7 @@ Update_Deformation_Gradient()
                 grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
             particles.Fe(p)=particles.Fe(p)+dt*grad_vp*particles.Fe(p);}}
     else{
+#pragma omp parallel for
         for(int p=0;p<particles.number;p++){
             MATRIX<T,TV::m> grad_vp;
             for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
@@ -346,6 +348,7 @@ template<class TV> void MPM_SIMULATION<TV>::
 Update_Particle_Velocities()
 {
     TIMING_START;
+#pragma omp parallel for
     for(int p=0;p<particles.number;p++){
         TV V_PIC;
         TV V_FLIP=particles.V(p);
@@ -365,6 +368,7 @@ Particle_Based_Body_Collisions()
 {
     TIMING_START;
     static T eps=1e-8;
+#pragma omp parallel for
     for(int p=0;p<particles.number;p++){
         TV& x=particles.X(p);
         if(x(1)<=ground_level && particles.V(p)(1)<=(T)0){
@@ -392,6 +396,7 @@ template<class TV> void MPM_SIMULATION<TV>::
 Update_Particle_Positions()
 {
     TIMING_START;
+#pragma omp parallel for
     for(int p=0;p<particles.number;p++)
         particles.X(p)+=dt*particles.V(p);
     if(PROFILING) TIMING_END("Update_Particle_Positions");
@@ -442,8 +447,6 @@ Get_Maximum_Particle_Velocity() const
         if(mag>max_particle_v) max_particle_v=mag;}
     return max_particle_v;
 }
-
-
 //#####################################################################
 template class MPM_SIMULATION<VECTOR<float,2> >;
 template class MPM_SIMULATION<VECTOR<float,3> >;
