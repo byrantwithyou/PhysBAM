@@ -2,18 +2,19 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
-#include <omp.h>
-#include "TIMING.h"
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include "MPM_SIMULATION.h"
 #include "MPM_SYSTEM.h"
 #include "MPM_VECTOR.h"
-#include "MPM_SIMULATION.h"
+#include "TIMING.h"
+#include <omp.h>
 namespace PhysBAM{
 using ::std::exp;
 //#####################################################################
@@ -21,7 +22,7 @@ using ::std::exp;
 //#####################################################################
 template<class TV> MPM_SIMULATION<TV>::
 MPM_SIMULATION()
-    :min_mass(1e-8),min_pho((T)0)
+    :dump_matrix(false),test_system(false),min_mass(1e-8),min_pho((T)0)
 {}
 //#####################################################################
 // Destructor
@@ -274,6 +275,7 @@ template<class TV> void MPM_SIMULATION<TV>::
 Solve_The_Linear_System()
 {
     TIMING_START;
+    static int solve_id=-1;solve_id++;
     MPM_SYSTEM<TV> system(debug_cast<MPM_SIMULATION<TV>&>(*this));
     MPM_VECTOR<TV> rhs,x;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
@@ -281,12 +283,23 @@ Solve_The_Linear_System()
     x.v.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
     rhs.v=node_V_star;
-    system.Test_System(*vectors(0),*vectors(1),*vectors(2));
+    if(test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=true;
+
+    if(dump_matrix){
+        LOG::cout<<"solve id "<<solve_id<<std::endl;
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs);}
+
     solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
+
+    if(dump_matrix){
+        LOG::cout<<"solve id "<<solve_id<<std::endl;
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",x);}
+
     node_V_old=node_V;
     node_V=x.v;
     if(PROFILING) TIMING_END("Solve_The_Linear_System");

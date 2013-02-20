@@ -40,16 +40,21 @@ int main(int argc,char *argv[])
     std::string output_directory_input("");
     T dt_input=0;
     int frame_jump_input=-1;
+    bool dump_matrix=false,test_system=false;
     parse_args.Add("-test",&test_input,"test","test number");
     parse_args.Add("-o",&output_directory_input,"o","output directory");
     parse_args.Add("-dt",&dt_input,"dt","dt");
     parse_args.Add("-fj",&frame_jump_input,"fj","frame jump");
-    parse_args.Parse(true);
+    parse_args.Add("-dump_matrix",&dump_matrix,"dump linear system");
+    parse_args.Add("-test_system",&test_system,"test linear system");
+    parse_args.Parse();
 
     int test=5;CHECK_ARG(test,test_input,-1);
     std::string output_directory=std::string("MPM_2D_test")+FILE_UTILITIES::Number_To_String(test);CHECK_ARG(output_directory,output_directory_input,"");
 
     MPM_SIMULATION<TV> sim;
+    sim.dump_matrix=dump_matrix;
+    sim.test_system=test_system;
     if(test==1){ // cube falling on ground
         static const int grid_res=256;
         TV_INT grid_counts(1*grid_res,1*grid_res);

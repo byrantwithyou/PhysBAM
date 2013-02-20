@@ -31,6 +31,7 @@ public:
     //#################################################################
     MPM_PARTICLES<TV> particles; // Resize(), X, V, mass, Fe, Fp
     GRID<TV> grid;    
+    bool dump_matrix,test_system;
     T dt;
     T mu0,lambda0;
     T xi;
