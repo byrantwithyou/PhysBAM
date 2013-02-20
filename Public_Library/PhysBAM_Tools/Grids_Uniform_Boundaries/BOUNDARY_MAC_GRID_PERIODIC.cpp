@@ -6,10 +6,24 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 using namespace PhysBAM;
+//#####################################################################
+// Function Apply_Boundary_Condition
+//#####################################################################
+template<class TV,class T2> void BOUNDARY_MAC_GRID_PERIODIC<TV,T2>::
+Apply_Boundary_Condition_Face(const GRID<TV>& grid,ARRAY<T2,FACE_INDEX<TV::m> >& u,const T time)
+{
+    TV_INT periods=grid.Domain_Indices().Maximum_Corner();
+    for(int axis=0;axis<GRID<TV>::dimension;axis++)
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*axis,axis);it.Valid();it.Next()){
+            FACE_INDEX<TV::m> face(it.Full_Index());
+            face.index(axis)+=periods(axis);
+            u(face)=u(it.Full_Index());}
+}
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################

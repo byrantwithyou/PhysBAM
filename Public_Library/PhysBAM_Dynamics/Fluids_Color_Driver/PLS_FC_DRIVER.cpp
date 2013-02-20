@@ -186,6 +186,7 @@ Update_Pls(T dt)
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,example.number_of_ghost_cells);
     example.Merge_Velocities(face_velocities_ghost,example.face_velocities,example.face_color);
+    example.boundary.Apply_Boundary_Condition_Face(example.grid,face_velocities_ghost,time+example.dt);
     example.boundary.Fill_Ghost_Faces(example.grid,face_velocities_ghost,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
 
     ARRAY<T,TV_INT> phi_back(example.grid.Domain_Indices(example.number_of_ghost_cells));
@@ -438,8 +439,10 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
     vectors.Delete_Pointers_And_Clean_Memory();
 
-    for(int c=0;c<example.face_velocities.m;c++)
-        example.boundary.Fill_Ghost_Faces(example.grid,example.face_velocities(c),example.face_velocities(c),0,example.number_of_ghost_cells);
+    for(int c=0;c<example.face_velocities.m;c++){
+        example.boundary.Apply_Boundary_Condition_Face(example.grid,example.face_velocities(c),time+example.dt);
+        example.boundary.Fill_Ghost_Faces(example.grid,example.face_velocities(c),example.face_velocities(c),0,example.number_of_ghost_cells);}
+    example.boundary_int.Apply_Boundary_Condition_Face(example.grid,example.face_color,time+example.dt);
     example.boundary_int.Fill_Ghost_Faces(example.grid,example.face_color,example.face_color,0,example.number_of_ghost_cells);
 }
 //#####################################################################
@@ -467,6 +470,7 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE
 //        }
 //    PHYSBAM_DEBUG_WRITE_SUBSTEP("Bad particles!",0,1);
 
+    example.boundary.Apply_Boundary_Condition_Face(example.grid,u,time+example.dt);
     example.boundary.Fill_Ghost_Faces(example.grid,u,u,0,example.number_of_ghost_cells);
 }
 //#####################################################################
