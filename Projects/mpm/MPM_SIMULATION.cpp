@@ -22,7 +22,7 @@ using ::std::exp;
 //#####################################################################
 template<class TV> MPM_SIMULATION<TV>::
 MPM_SIMULATION()
-    :dump_matrix(false),test_system(false),min_mass(1e-8),min_pho((T)0)
+    :dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0)
 {}
 //#####################################################################
 // Destructor
@@ -180,7 +180,7 @@ Compute_Particle_Volumes_And_Densities()
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
             particles_density(p)+=node_mass(ind)*weight(p)(it.index)*one_over_cell_volume;}
-        if(particles_density(p)>min_pho) particles.volume(p)=particles.mass(p)/particles_density(p);}
+        if(particles_density(p)>min_rho) particles.volume(p)=particles.mass(p)/particles_density(p);}
     if(PROFILING) TIMING_END("Compute_Particle_Volumes_And_Densities");
 }
 //#####################################################################
@@ -292,6 +292,7 @@ Solve_The_Linear_System()
     if(dump_matrix){
         LOG::cout<<"solve id "<<solve_id<<std::endl;
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("m-%i.txt",solve_id).c_str()).Write("m",node_mass.array);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs);}
 
     solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);

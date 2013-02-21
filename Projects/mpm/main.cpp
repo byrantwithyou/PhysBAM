@@ -28,17 +28,10 @@
 using namespace PhysBAM;
 int main(int argc,char *argv[])
 {
-#ifdef MPM_2D
-    static const int dimension=2;
-    typedef double T;
-    typedef float RW;
-    typedef VECTOR<T,dimension> TV;
-    typedef VECTOR<int,dimension> TV_INT;
-
     PARSE_ARGS parse_args(argc,argv);
     int test_input=-1;;
     std::string output_directory_input("");
-    T dt_input=0;
+    double dt_input=0;
     int frame_jump_input=-1;
     bool dump_matrix=false,test_system=false;
     parse_args.Add("-test",&test_input,"test","test number");
@@ -48,6 +41,13 @@ int main(int argc,char *argv[])
     parse_args.Add("-dump_matrix",&dump_matrix,"dump linear system");
     parse_args.Add("-test_system",&test_system,"test linear system");
     parse_args.Parse();
+
+#ifdef MPM_2D
+    static const int dimension=2;
+    typedef double T;
+    typedef float RW;
+    typedef VECTOR<T,dimension> TV;
+    typedef VECTOR<int,dimension> TV_INT;
 
     int test=5;CHECK_ARG(test,test_input,-1);
     std::string output_directory=std::string("MPM_2D_test")+FILE_UTILITIES::Number_To_String(test);CHECK_ARG(output_directory,output_directory_input,"");
@@ -63,7 +63,7 @@ int main(int argc,char *argv[])
         sim.grid=grid;
         static const int particle_res=1800;
         TV_INT particle_counts(0.2*particle_res,0.2*particle_res);
-        RANGE<TV> particle_box(TV(-0.1,-0.1),TV(0.1,0.1));
+        RANGE<TV> particle_box(RANGE<TV>::Centered_Box()*(T).1);
         sim.particles.Initialize_X_As_A_Grid(particle_counts,particle_box);
         T object_mass=400*0.04;
         for(int p=0;p<sim.particles.number;p++){
@@ -366,22 +366,12 @@ int main(int argc,char *argv[])
     typedef VECTOR<T,dimension> TV;
     typedef VECTOR<int,dimension> TV_INT;
 
-    PARSE_ARGS parse_args(argc,argv);
-    int test_input=-1;;
-    std::string output_directory_input("");
-    T dt_input=0;
-    int frame_jump_input=-1;
-    parse_args.Add("-test",&test_input,"test","test number");
-    parse_args.Add("-o",&output_directory_input,"o","output directory");
-    parse_args.Add("-dt",&dt_input,"dt","dt");
-    parse_args.Add("-fj",&frame_jump_input,"fj","frame jump");
-    parse_args.Parse(true);
-
     int test=4;CHECK_ARG(test,test_input,-1);
     std::string output_directory=std::string("MPM_3D_test")+FILE_UTILITIES::Number_To_String(test);CHECK_ARG(output_directory,output_directory_input,"");
 
     MPM_SIMULATION<TV> sim;
-
+    sim.dump_matrix=dump_matrix;
+    sim.test_system=test_system;
     if(test==4){ // cube falling on beam
         static const int grid_res=32;
         TV_INT grid_counts(0.7*grid_res,0.85*grid_res,0.4*grid_res);
