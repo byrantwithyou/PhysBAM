@@ -22,7 +22,7 @@ using ::std::exp;
 //#####################################################################
 template<class TV> MPM_SIMULATION<TV>::
 MPM_SIMULATION()
-    :dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0)
+    :dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_plasticity_yield(true),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0.6)
 {}
 //#####################################################################
 // Destructor
@@ -62,6 +62,8 @@ Initialize()
     node_external_force.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     frame=0;
     min_mass=particles.mass.Min()*(T)1e-5;
+    mu0=ym0/((T)2*((T)1+pr0));
+    lambda0=ym0*pr0/(((T)1+pr0)*((T)1-2*pr0));
     if(PROFILING) TIMING_END("");
 }
 //#####################################################################

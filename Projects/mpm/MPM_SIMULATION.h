@@ -33,7 +33,7 @@ public:
     GRID<TV> grid;    
     bool dump_matrix,test_system;
     T dt;
-    T mu0,lambda0;
+    T mu0,lambda0,ym0,pr0;
     T xi;
     bool use_plasticity_yield;
     T yield_min;
