@@ -83,7 +83,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
             break;
         case 5: // notch test
             sim.grid.Initialize(TV_INT(0.4*grid_res,0.8*grid_res),RANGE<TV>(TV(-0.2,-0.4),TV(0.2,0.4)));
-            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res,0.3*particle_res),RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
+            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res,0.4*particle_res),RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
             sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.05,-0.05),TV(0.15,0.05)));
             sim.ground_level=-100;
             sim.dirichlet_box.Append(RANGE<TV>(TV(-10,0.17),TV(10,10)));
@@ -111,16 +111,17 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
             sim.clamp_min=1.0/sim.clamp_max;
             break;
         case 7: // dropping sphere
-            sim.grid.Initialize(TV_INT(0.4*grid_res,0.45*grid_res),RANGE<TV>(TV(-0.2,-0.25),TV(0.2,0.2)));
+            sim.grid.Initialize(TV_INT(0.8*grid_res,0.4*grid_res),RANGE<TV>(TV(-0.4,-0.25),TV(0.4,0.15)));
             sim.particles.Initialize_X_As_A_Ball(TV_INT(0.2*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1)));
             sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(-0.08,-0.08),TV(0.08,0.08)));
-            sim.use_plasticity_yield=false;
             sim.ground_level=-0.2;
-            sim.yield_max=1.1;
+            sim.use_plasticity_yield=false;
+            sim.yield_max=1.2;
             sim.yield_min=1.0/sim.yield_max;
             sim.use_plasticity_clamp=false;
             sim.clamp_max=1.3;
             sim.clamp_min=1.0/sim.clamp_max;
+            for(int p=0;p<sim.particles.number;p++) sim.particles.V(p)=TV(0,-0.1);
             break;
         case 8: // two ring hitting each other
             sim.grid.Initialize(TV_INT(1.0*grid_res,0.4*grid_res),RANGE<TV>(TV(-0.5,-0.2),TV(0.5,0.2)));
