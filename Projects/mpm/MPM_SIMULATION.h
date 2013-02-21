@@ -32,6 +32,7 @@ public:
     MPM_PARTICLES<TV> particles; // Resize(), X, V, mass, Fe, Fp
     GRID<TV> grid;    
     bool dump_matrix,test_system;
+    T min_mass,min_rho;
     T dt;
     T mu0,lambda0,ym0,pr0;
     T xi;
@@ -41,9 +42,9 @@ public:
     bool use_plasticity_clamp;
     T clamp_min;
     T clamp_max;
+    bool use_gravity;
     T FLIP_alpha;
     T friction_coefficient;
-    bool use_gravity;
     T ground_level;
     ARRAY<RANGE<TV> > dirichlet_box;
     ARRAY<TV> dirichlet_velocity;
@@ -51,7 +52,6 @@ public:
     ARRAY<TV> rigid_ball_velocity;
     //#################################################################
     TV gravity_constant;
-    T min_mass,min_rho;
     ARRAY<T> mu,lambda;
     ARRAY<T> Je,Jp;
     ARRAY<MATRIX<T,TV::m> > Ue,Ve,Re,Se;

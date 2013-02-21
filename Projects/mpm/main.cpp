@@ -22,12 +22,15 @@
 #include "TIMING.h"
 #include "MPM_SIMULATION.h"
 
-template<class T>
-void Initialize(MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_args,int grid_res,int particle_res,T object_mass)
-{
-    parse_args.Parse();
-    stiffness*=3000;
+using namespace PhysBAM;
 
+template<class T>
+void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_args,int grid_res,int particle_res,T object_mass)
+{
+    typedef VECTOR<T,2> TV;
+    typedef VECTOR<int,2> TV_INT;
+    parse_args.Parse();
+    sim.ym0*=3000;
     switch(test){
         case 1: // cube falling on ground
             sim.grid.Initialize(TV_INT(1*grid_res,1*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.5)));
@@ -84,7 +87,7 @@ void Initialize(MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_args,int gri
             break;
         case 6: // wall test
             sim.grid.Initialize(TV_INT(3.2*grid_res,0.95*grid_res),RANGE<TV>(TV(-0.2,-0.45),TV(3.0,0.5)));
-            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.1*particle_res,0.8*particle_res),RANGE<TV> particle_box_cube(TV(-0.05,-0.4),TV(0.05,0.4)));
+            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.1*particle_res,0.8*particle_res),RANGE<TV>(TV(-0.05,-0.4),TV(0.05,0.4)));
             sim.ground_level=-0.4;
             sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.38)));
             sim.dirichlet_velocity.Append(TV());
@@ -135,10 +138,12 @@ void Initialize(MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_args,int gri
 }
 
 template<class T>
-void Initialize(MPM_SIMULATION<VECTOR<T,3> >& sim,int grid_res,int grid_res,int particle_res,T object_mass)
+void Initialize(int test,MPM_SIMULATION<VECTOR<T,3> >& sim,PARSE_ARGS& parse_args,int grid_res,int particle_res,T object_mass)
 {
+    typedef VECTOR<T,3> TV;
+    typedef VECTOR<int,3> TV_INT;
     parse_args.Parse();
-    stiffness*=3000;
+    sim.ym0*=3000;
     switch(test){
         case 4: // cube falling on beam
             sim.grid.Initialize(TV_INT(0.7*grid_res,0.85*grid_res,0.4*grid_res),RANGE<TV>(TV(-0.35,-0.3,-0.2),TV(0.35,0.55,0.2)));
@@ -186,9 +191,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     bool use_output_directory=false;
     sim.dt=(T)1e-4;
     int frame_jump=20;
-    bool dump_matrix=false,test_system=false;
+    int grid_res=16,particle_res=32;
+    T mass=(T)1;
     sim.ym0=1;
     sim.pr0=(T).3;
+    sim.xi=(T)0;
     parse_args.Add("-test",&test_number,"test","test number");
     parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
     parse_args.Add("-dt",&sim.dt,"dt","dt");
@@ -199,14 +206,16 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-poisson_ratio",&sim.pr0,"value","poisson's ratio");
     parse_args.Add("-hardening",&sim.xi,"value","hardening coefficient");
     parse_args.Add("-flip",&sim.FLIP_alpha,"value","flip fraction");
+    parse_args.Add("-g_res",&grid_res,"value","grid resolution");
+    parse_args.Add("-p_res",&particle_res,"value","particle resolution");
+    parse_args.Add("-m",&mass,"value","object total mass");
     parse_args.Parse(true);
 
-    static const int TV::m=2;
     typedef VECTOR<int,TV::m> TV_INT;
 
     if(!use_output_directory) output_directory=STRING_UTILITIES::string_sprintf("MPM_%dD_test_%d",TV::m,test_number);
 
-    Initialize(sim,parse_args);
+    Initialize(test_number,sim,parse_args,grid_res,particle_res,mass);
 
     sim.Initialize();
 
@@ -221,22 +230,10 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         TIMING_END("Current time step totally");
         if(f%frame_jump==0){
             for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-            for(int b=0;b<sim.rigid_ball.m;b++){
-                for(T theta=0;theta<2*3.1415;theta+=2*3.1415/20.0){
-                    TV p=sim.rigid_ball(b).center;
-                    p(0)+=sim.rigid_ball(b).radius*cos(theta);
-                    p(1)+=sim.rigid_ball(b).radius*sin(theta);
-                    Add_Debug_Particle(p,VECTOR<T,3>(1,0,0));}}
-            if(sim.ground_level>-10)
-                for(T x=-5;x<5;x+=0.02)
-                    Add_Debug_Particle(TV(x,sim.ground_level),VECTOR<T,3>(0,0,1));
             Flush_Frame<TV>("mpm");}
-        LOG::cout<<std::endl;
-    }
+        LOG::cout<<std::endl;}
 }
 
-
-using namespace PhysBAM;
 int main(int argc,char *argv[])
 {
     bool use_3d=false;
