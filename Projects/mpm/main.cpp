@@ -45,10 +45,10 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
     sim.ym0*=3000;
     switch(test){
         case 1: // cube falling on ground
-            sim.grid.Initialize(TV_INT(1*grid_res,1*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.5)));
+            sim.grid.Initialize(TV_INT(1*grid_res,1.5*grid_res),RANGE<TV>(TV(-0.5,-1.0),TV(0.5,0.5)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res,0.2*particle_res),RANGE<TV>::Centered_Box()*(T).1);
             sim.use_plasticity_yield=false;
-            sim.ground_level=-0.2;
+            sim.ground_level=-0.7;
             break;
         case 2: // bending beam
             sim.grid.Initialize(TV_INT(1*grid_res,1*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.5)));
@@ -218,8 +218,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-poisson_ratio",&sim.pr0,"value","poisson's ratio");
     parse_args.Add("-hardening",&sim.xi,"value","hardening coefficient");
     parse_args.Add("-flip",&sim.FLIP_alpha,"value","flip fraction");
-    parse_args.Add("-g_res",&grid_res,"value","grid resolution");
-    parse_args.Add("-p_res",&particle_res,"value","particle resolution");
+    parse_args.Add("-gres",&grid_res,"value","grid resolution");
+    parse_args.Add("-pres",&particle_res,"value","particle resolution");
     parse_args.Add("-m",&mass,"value","object total mass");
     parse_args.Parse(true);
 
