@@ -22,8 +22,10 @@ template<class TV> MPM_CONSTITUTIVE_MODEL<TV>::
 // Function Compute_Helper_Quantities_Using_F
 //#####################################################################
 template<class TV> void MPM_CONSTITUTIVE_MODEL<TV>::
-Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Fp,T& Je,T& Jp,MATRIX<T,TV::m>& Ue,DIAGONAL_MATRIX<T,TV::m>& SIGMAe,MATRIX<T,TV::m>& Ve,MATRIX<T,TV::m>& Re,MATRIX<T,TV::m>& Se) const
+Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Fp,T& Je,T& Jp,MATRIX<T,TV::m>& Re,MATRIX<T,TV::m>& Se) const
 {
+    MATRIX<T,TV::m> Ue,Ve;
+    DIAGONAL_MATRIX<T,TV::m> SIGMAe;
     Je=Fe.Determinant();
     Jp=Fp.Determinant();
     Fe.Fast_Singular_Value_Decomposition(Ue,SIGMAe,Ve);
@@ -109,8 +111,7 @@ Derivative_Test() const
 {
     MATRIX<T,TV::m> Fe=MATRIX<T,TV::m>::Identity_Matrix();
     MATRIX<T,TV::m> Fp=MATRIX<T,TV::m>::Identity_Matrix();
-    MATRIX<T,TV::m> Ue,Ve,Re,Se;
-    DIAGONAL_MATRIX<T,TV::m> SIGMAe;
+    MATRIX<T,TV::m> Re,Se;
     T Je,Jp;
     T youngs_modulus=3000,poisson_ratio=0.3;
     T mu=youngs_modulus/(2.0*(1.0+poisson_ratio));
@@ -125,13 +126,13 @@ Derivative_Test() const
         rand_generator.Fill_Uniform(F1,-1,1);
         rand_generator.Fill_Uniform(dF,-eps,eps);
         Fe=F1;
-        Compute_Helper_Quantities_Using_F(Fe,Fp,Je,Jp,Ue,SIGMAe,Ve,Re,Se);
+        Compute_Helper_Quantities_Using_F(Fe,Fp,Je,Jp,Re,Se);
         Psi1=Compute_Elastic_Energy_Density_Psi(mu,lambda,Fe,Re,Je);
         P1=Compute_dPsi_dFe(mu,lambda,Fe,Re,Je);
         dP1=Compute_d2Psi_dFe_dFe_Action_dF(mu,lambda,Fe,Je,Re,Se,dF);
         F2=F1+dF;
         Fe=F2;
-        Compute_Helper_Quantities_Using_F(Fe,Fp,Je,Jp,Ue,SIGMAe,Ve,Re,Se);
+        Compute_Helper_Quantities_Using_F(Fe,Fp,Je,Jp,Re,Se);
         Psi2=Compute_Elastic_Energy_Density_Psi(mu,lambda,Fe,Re,Je);
         P2=Compute_dPsi_dFe(mu,lambda,Fe,Re,Je);
         dP2=Compute_d2Psi_dFe_dFe_Action_dF(mu,lambda,Fe,Je,Re,Se,dF);

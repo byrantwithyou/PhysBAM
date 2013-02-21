@@ -44,11 +44,8 @@ Initialize()
     lambda.Resize(particles.number);
     Je.Resize(particles.number);
     Jp.Resize(particles.number);
-    Ue.Resize(particles.number);
-    Ve.Resize(particles.number);
     Re.Resize(particles.number);
     Se.Resize(particles.number);
-    SIGMAe.Resize(particles.number);
     influence_corner.Resize(particles.number);
     weight.Resize(particles.number);
     grad_weight.Resize(particles.number);
@@ -142,7 +139,7 @@ Build_Helper_Structures_For_Constitutive_Model()
     TIMING_START;
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++){
-        constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),particles.Fp(p),Je(p),Jp(p),Ue(p),SIGMAe(p),Ve(p),Re(p),Se(p));
+        constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),particles.Fp(p),Je(p),Jp(p),Re(p),Se(p));
         T lame_scale=exp(xi*((T)1-Jp(p)));
         mu(p)=mu0*lame_scale;
         lambda(p)=lambda0*lame_scale;}

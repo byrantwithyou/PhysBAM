@@ -23,7 +23,7 @@ public:
     MPM_CONSTITUTIVE_MODEL();
     ~MPM_CONSTITUTIVE_MODEL();
 
-    void Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Fp,T& Je,T& Jp,MATRIX<T,TV::m>& Ue,DIAGONAL_MATRIX<T,TV::m>& SIGMAe,MATRIX<T,TV::m>& Ve,MATRIX<T,TV::m>& Re,MATRIX<T,TV::m>& Se) const;
+    void Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Fp,T& Je,T& Jp,MATRIX<T,TV::m>& Re,MATRIX<T,TV::m>& Se) const;
     T Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const;
     MATRIX<T,TV::m> Compute_dPsi_dFe(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const;
     MATRIX<T,TV::m> Compute_d2Psi_dFe_dFe_Action_dF(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const T& Je,const MATRIX<T,TV::m>& Re,const MATRIX<T,TV::m>& Se,const MATRIX<T,TV::m>& dF) const;

@@ -55,8 +55,7 @@ public:
     ARRAY<bool> valid;
     ARRAY<T> mu,lambda;
     ARRAY<T> Je,Jp;
-    ARRAY<MATRIX<T,TV::m> > Ue,Ve,Re,Se;
-    ARRAY<DIAGONAL_MATRIX<T,TV::m> > SIGMAe;
+    ARRAY<MATRIX<T,TV::m> > Re,Se;
     ARRAY<TV_INT> influence_corner;
     ARRAY<ARRAY<T,TV_INT> > weight;
     ARRAY<ARRAY<TV,TV_INT> > grad_weight;

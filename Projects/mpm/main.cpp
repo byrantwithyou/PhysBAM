@@ -66,9 +66,9 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
             sim.ground_level=-100;
             sim.use_gravity=false;
             sim.dirichlet_box.Append(RANGE<TV>(TV(0.25,-10),TV(10,10)));
-            sim.dirichlet_velocity.Append(TV(0.2,0));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.25,10)));
             sim.dirichlet_velocity.Append(TV(-0.2,0));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.25,10)));
+            sim.dirichlet_velocity.Append(TV(0.2,0));
             break;
         case 4: // cube falling on beam
             sim.grid.Initialize(TV_INT(1.0*grid_res,1.2*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.7)));
