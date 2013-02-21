@@ -2,6 +2,18 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+//#####################################################################
+// tests
+//#####################################################################
+//   1. cube falling on ground
+//   2. bending beam
+//   3. stretching beam
+//   4. cube falling on beam
+//   5. notch test
+//   6. wall test
+//   7. dropping sphere
+//   8. two ring hit each other
+//#####################################################################
 #include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
