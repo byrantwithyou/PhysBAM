@@ -119,7 +119,7 @@ public:
         parse_args.Add("-test_diff",&test_analytic_diff,"test analytic derivatives");
         parse_args.Add("-no_advect",&no_advection,"Disable advection");
         parse_args.Add("-no_solve",&omit_solve,"Disable visocity and pressure solve");
-        parse_args.Add("-reduced_advect",&use_reduced_advection,"Peform reduced advection");
+        parse_args.Add_Not("-no_reduced_advect",&use_reduced_advection,"Peform reduced advection");
         parse_args.Add("-refine",&refine,"num","Refine space/time by this factor");
         parse_args.Add("-null_p",&use_p_null_mode,"Assume pressure null mode and project it out");
         parse_args.Add("-threads",&number_of_threads,"threads","Number of threads");
