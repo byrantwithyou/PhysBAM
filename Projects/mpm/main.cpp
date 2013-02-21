@@ -84,14 +84,14 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
         case 5: // notch test
             sim.grid.Initialize(TV_INT(0.4*grid_res,0.8*grid_res),RANGE<TV>(TV(-0.2,-0.4),TV(0.2,0.4)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res,0.3*particle_res),RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
-            sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.07,-0.03),TV(0.13,0.03)));
+            sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.05,-0.05),TV(0.15,0.05)));
             sim.ground_level=-100;
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,0.13),TV(10,10)));
-            sim.dirichlet_velocity.Append(TV(0,0.2));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.13)));
-            sim.dirichlet_velocity.Append(TV(0,-0.2));
-            sim.yield_max=1.4;
-            sim.yield_min=1.0/sim.yield_max;
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,0.17),TV(10,10)));
+            sim.dirichlet_velocity.Append(TV(0,0.02));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.17)));
+            sim.dirichlet_velocity.Append(TV(0,-0.02));
+            sim.yield_max=1.3;
+            sim.yield_min=-100;
             sim.use_plasticity_clamp=false;
             sim.clamp_max=1.8;
             sim.clamp_min=1.0/sim.clamp_max;
