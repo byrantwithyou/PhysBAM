@@ -21,7 +21,7 @@ function emit_test()
         L="$L $T"
     done
     PPJ=`$SLAVE $J -p 10 -- /bin/bash ./post-process.sh "$out" $L`
-    $SLAVE -d $PPJ -p 10 -- /bin/bash -c "echo rm -r $OO >> rm-list.txt" >/dev/null
+    $SLAVE -d $PPJ -p 10 -- /bin/bash -c "rm -r $OO" >/dev/null
 }
 
 rm -rf new_test_order
