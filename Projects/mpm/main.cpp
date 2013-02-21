@@ -48,7 +48,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
             sim.grid.Initialize(TV_INT(1*grid_res,1*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.5)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res,0.2*particle_res),RANGE<TV>::Centered_Box()*(T).1);
             sim.use_plasticity_yield=false;
-            sim.ground_level=-0.3;
+            sim.ground_level=-0.2;
             break;
         case 2: // bending beam
             sim.grid.Initialize(TV_INT(1*grid_res,1*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.5)));
@@ -72,7 +72,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
             sim.dirichlet_velocity.Append(TV(-0.2,0));
             break;
         case 4: // cube falling on beam
-            sim.grid.Initialize(TV_INT(0.7*grid_res,0.85*grid_res),RANGE<TV>(TV(-0.35,-0.3),TV(0.35,0.55)));
+            sim.grid.Initialize(TV_INT(1.0*grid_res,1.2*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.7)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.6*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
             sim.particles.Add_X_As_A_Grid(TV_INT(0.2*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.1,0.3),TV(0.1,0.5)));
             sim.use_plasticity_yield=false;
@@ -101,10 +101,10 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
             sim.grid.Initialize(TV_INT(3.2*grid_res,0.95*grid_res),RANGE<TV>(TV(-0.2,-0.45),TV(3.0,0.5)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.1*particle_res,0.8*particle_res),RANGE<TV>(TV(-0.05,-0.4),TV(0.05,0.4)));
             sim.ground_level=-0.4;
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.38)));
-            sim.dirichlet_velocity.Append(TV());
+            // sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.38)));
+            // sim.dirichlet_velocity.Append(TV());
             sim.rigid_ball.Append(SPHERE<TV>(TV(-0.25,0),0.03));
-            sim.rigid_ball_velocity.Append(TV(5,0));
+            sim.rigid_ball_velocity.Append(TV(1,0));
             sim.yield_max=1.1;
             sim.yield_min=1.0/sim.yield_max;
             sim.use_plasticity_clamp=true;
@@ -201,7 +201,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     int test_number=-1;
     std::string output_directory="";
     bool use_output_directory=false;
-    sim.dt=(T)1e-4;
+    sim.dt=(T)1e-3;
     int frame_jump=20;
     int grid_res=16,particle_res=32;
     T mass=(T)1;
@@ -242,6 +242,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         TIMING_END("Current time step totally");
         if(f%frame_jump==0){
             for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+            if(sim.ground_level>-10){
+                
+
+            }
+
+
             Flush_Frame<TV>("mpm");}
         LOG::cout<<std::endl;}
 }
