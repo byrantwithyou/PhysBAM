@@ -26,7 +26,7 @@ function emit_test()
 
 rm -rf new_test_order
 mkdir new_test_order
-for t in 02 03 04 05 06 10 11 16 17 18 19 24 ; do
+for t in 02 03 04 05 06 10 11 16 17 18 19 24 25 28 ; do
     for b in d n s ; do
         emit_test  new_test_order/conv-$t-$b.png -bc_$b -dt .05 $t
     done
