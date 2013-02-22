@@ -49,7 +49,7 @@ public:
     ARRAY<TV> dirichlet_velocity;
     ARRAY<SPHERE<TV> > rigid_ball;
     ARRAY<TV> rigid_ball_velocity;
-
+    T xi;
     T visco_nu;
     T visco_tau;
 

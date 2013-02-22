@@ -13,6 +13,7 @@
 //   6. wall test
 //   7. dropping sphere
 //   8. two ring hit each other
+//   9. snow block breaks over a ball
 //#####################################################################
 
 #include <PhysBAM_Tools/Math_Tools/pow.h>
@@ -39,16 +40,18 @@
 using namespace PhysBAM;
 
 template<class T>
-void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,MPM_SURFACE_2D<VECTOR<T,2> >& surface,PARSE_ARGS& parse_args,int grid_res,int particle_res,int particle_count,T object_mass)
+void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,MPM_SURFACE_2D<VECTOR<T,2> >& surface,PARSE_ARGS& parse_args,int grid_res,int particle_res,int particle_count,T density)
 {
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,2> TV_INT;
     parse_args.Parse();
-    sim.ym0*=300;
+    sim.ym0*=(T)140000;
+    T object_mass=1;
     switch(test){
         case 1: // cube falling on ground
             sim.grid.Initialize(TV_INT(1*grid_res,1.5*grid_res),RANGE<TV>(TV(-0.5,-1.0),TV(0.5,0.5)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res,0.2*particle_res),RANGE<TV>::Centered_Box()*(T).1);
+            object_mass=density*(RANGE<TV>::Centered_Box()*(T).1).Size();
             sim.use_plasticity_yield=false;
             sim.ground_level=-0.7;
             break;
@@ -148,14 +151,13 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,MPM_SURFACE_2D<VECTOR
         case 9: // beam falling on balls
             sim.grid.Initialize(TV_INT(2*grid_res,1.3*grid_res),RANGE<TV>(TV(-1,-1.0),TV(1,0.3)));
             sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
+            object_mass=density*(RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1))).Size();
             sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.4),0.06));
             sim.rigid_ball_velocity.Append(TV());
-            sim.rigid_ball.Append(SPHERE<TV>(TV(-0.2,-0.4),0.06));
-            sim.rigid_ball_velocity.Append(TV());
-            sim.rigid_ball.Append(SPHERE<TV>(TV(0.2,-0.4),0.06));
-            sim.rigid_ball_velocity.Append(TV());
-            sim.use_plasticity_yield=false;
             sim.ground_level=-0.9;
+            sim.yield_max=(T)1+0.0075;
+            sim.yield_min=(T)1-0.025;
+            sim.use_plasticity_clamp=false;
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -180,9 +182,10 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     sim.dt=(T)1e-3;
     int frame_jump=20;
     int grid_res=16,particle_res=32,particle_count=100;
-    T mass=(T)40;
+    T density=(T)400;
     sim.ym0=1;
-    sim.pr0=(T).3;
+    sim.pr0=(T).2;
+    sim.xi=(T)0;
     parse_args.Add("-test",&test_number,"test","test number");
     parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
     parse_args.Add("-dt",&sim.dt,"dt","dt");
@@ -191,18 +194,19 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-test_system",&sim.test_system,"test linear system");
     parse_args.Add("-stiffness",&sim.ym0,"value","scale stiffness");
     parse_args.Add("-poisson_ratio",&sim.pr0,"value","poisson's ratio");
+    parse_args.Add("-hardening",&sim.xi,"value","harderning coefficient");
     parse_args.Add("-flip",&sim.FLIP_alpha,"value","flip fraction");
     parse_args.Add("-gres",&grid_res,"value","grid resolution");
     parse_args.Add("-pres",&particle_res,"value","particle resolution");
     parse_args.Add("-pn",&particle_count,"value","particle number");
-    parse_args.Add("-m",&mass,"value","object total mass");
+    parse_args.Add("-rho",&density,"value","object density");
     parse_args.Parse(true);
 
     typedef VECTOR<int,TV::m> TV_INT;
 
     if(!use_output_directory) output_directory=STRING_UTILITIES::string_sprintf("MPM_%dD_test_%d",TV::m,test_number);
 
-    Initialize(test_number,sim,surface,parse_args,grid_res,particle_res,particle_count,mass);
+    Initialize(test_number,sim,surface,parse_args,grid_res,particle_res,particle_count,density);
 
     sim.Initialize();
 

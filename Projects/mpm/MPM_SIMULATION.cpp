@@ -26,7 +26,7 @@ using ::std::exp;
 //#####################################################################
 template<class TV> MPM_SIMULATION<TV>::
 MPM_SIMULATION()
-    :dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_plasticity_yield(true),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0.1),visco_nu(1e5),visco_tau(200)
+    :dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_plasticity_yield(true),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0.1),visco_nu(1e5),visco_tau(0)
 {}
 //#####################################################################
 // Destructor
@@ -42,7 +42,7 @@ Initialize()
 {
     LOG::cout<<"Allocating Memories for Simulation..."<<std::endl;
     TIMING_START;
-    gravity_constant=TV();gravity_constant(1)=-(T)0.8;
+    gravity_constant=TV();gravity_constant(1)=-(T)9.8;
     valid.Resize(particles.number);valid.Fill(true);
     mu.Resize(particles.number);
     lambda.Resize(particles.number);
@@ -142,7 +142,7 @@ Build_Helper_Structures_For_Constitutive_Model()
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++){
         constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),particles.Fp(p),Je(p),Re(p),Se(p));
-        T lame_scale=(T)1;
+        T lame_scale=exp(xi*(1-particles.Fp(p).Determinant()));
         mu(p)=mu0*lame_scale;
         lambda(p)=lambda0*lame_scale;}
     if(PROFILING) TIMING_END("Build_Helper_Structures_For_Constitutive_Model");
@@ -318,67 +318,63 @@ template<class TV> void MPM_SIMULATION<TV>::
 Update_Deformation_Gradient()
 {
     TIMING_START;
+// #pragma omp parallel for
+//      for(int p=0;p<particles.number;p++){
+//          if(valid(p)){
+//              MATRIX<T,TV::m> grad_vp;
+//              for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+//                  TV_INT ind=influence_corner(p)+it.index;
+//                  grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
+//              MATRIX<T,TV::m> Fe_hat=particles.Fe(p)+dt*grad_vp*particles.Fe(p);
+//              MATRIX<T,TV::m> Fp_hat=particles.Fp(p);
+//              MATRIX<T,TV::m> F=Fe_hat*Fp_hat;
+//              MATRIX<T,TV::m> U_hat,V_hat;
+//              DIAGONAL_MATRIX<T,TV::m> Sigma;
+//              Fe_hat.Fast_Singular_Value_Decomposition(U_hat,Sigma,V_hat);
+//              T Pnorm=(constitutive_model.Compute_dPsi_dFe(mu(p),lambda(p),particles.Fe(p),Re(p),Je(p))).Frobenius_Norm();
+//              T gamma=(T)0;
+//              if(Pnorm>1e-10) gamma=clamp(dt*visco_nu*(Pnorm-visco_tau)/Pnorm,(T)0,(T)1);
+//              T scale=Inverse(cbrt(Sigma.Determinant()));
+//              DIAGONAL_MATRIX<T,TV::m> Middle;
+//              for(int d=0;d<TV::m;d++) Middle(d,d)=pow(Sigma(d,d)*scale,gamma);
+//              particles.Fp(p)=V_hat*Middle.Times_Transpose(V_hat)*Fp_hat;
+//              particles.Fe(p)=F*particles.Fp(p).Inverse();}}
+    if(!use_plasticity_yield){
 #pragma omp parallel for
-     for(int p=0;p<particles.number;p++){
-         if(valid(p)){
-             MATRIX<T,TV::m> grad_vp;
-             for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-                 TV_INT ind=influence_corner(p)+it.index;
-                 grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
-             MATRIX<T,TV::m> Fe_hat=particles.Fe(p)+dt*grad_vp*particles.Fe(p);
-             MATRIX<T,TV::m> Fp_hat=particles.Fp(p);
-             MATRIX<T,TV::m> F=Fe_hat*Fp_hat;
-             MATRIX<T,TV::m> U_hat,V_hat;
-             DIAGONAL_MATRIX<T,TV::m> Sigma;
-             Fe_hat.Fast_Singular_Value_Decomposition(U_hat,Sigma,V_hat);
-             T Pnorm=(constitutive_model.Compute_dPsi_dFe(mu(p),lambda(p),particles.Fe(p),Re(p),Je(p))).Frobenius_Norm();
-             T gamma=(T)0;
-             if(Pnorm>1e-10) gamma=clamp(dt*visco_nu*(Pnorm-visco_tau)/Pnorm,(T)0,(T)1);
-             T scale=Inverse(cbrt(Sigma.Determinant()));
-             DIAGONAL_MATRIX<T,TV::m> Middle;
-             for(int d=0;d<TV::m;d++) Middle(d,d)=pow(Sigma(d,d)*scale,gamma);
-             particles.Fp(p)=V_hat*Middle.Times_Transpose(V_hat)*Fp_hat;
-             particles.Fe(p)=F*particles.Fp(p).Inverse();}}
-
-//     if(!use_plasticity_yield){
-// #pragma omp parallel for
-//         for(int p=0;p<particles.number;p++){
-//             if(valid(p)){
-//                 MATRIX<T,TV::m> grad_vp;
-//                 for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-//                     TV_INT ind=influence_corner(p)+it.index;
-//                     grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
-//                 particles.Fe(p)=particles.Fe(p)+dt*grad_vp*particles.Fe(p);}}}
-//     else{
-// #pragma omp parallel for
-//         for(int p=0;p<particles.number;p++){
-//             if(valid(p)){
-//                 MATRIX<T,TV::m> grad_vp;
-//                 for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-//                     TV_INT ind=influence_corner(p)+it.index;
-//                     grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
-//                 MATRIX<T,TV::m> Fe_hat=particles.Fe(p)+dt*grad_vp*particles.Fe(p);
-//                 MATRIX<T,TV::m> Fp_hat=particles.Fp(p);
-//                 MATRIX<T,TV::m> F=Fe_hat*Fp_hat;
-//                 MATRIX<T,TV::m> U_hat,V_hat;
-//                 DIAGONAL_MATRIX<T,TV::m> SIGMA_hat;
-//                 Fe_hat.Fast_Singular_Value_Decomposition(U_hat,SIGMA_hat,V_hat);
-//                 // if(SIGMA_hat.Min()<yield_min || SIGMA_hat.Max()>yield_max){
-//                 //     valid(p)=false;
-//                 //     continue;}
-//                 SIGMA_hat=SIGMA_hat.Clamp_Min(yield_min);
-//                 SIGMA_hat=SIGMA_hat.Clamp_Max(yield_max);
-//                 particles.Fe(p)=U_hat*SIGMA_hat.Times_Transpose(V_hat);
-//                 particles.Fp(p)=V_hat*(SIGMA_hat.Inverse()).Times_Transpose(U_hat)*F;
-//                 if(use_plasticity_clamp){
-//                     MATRIX<T,TV::m> Uphat,Vphat;
-//                     DIAGONAL_MATRIX<T,TV::m> SIGMAphat;
-//                     particles.Fp(p).Fast_Singular_Value_Decomposition(Uphat,SIGMAphat,Vphat);
-//                     SIGMAphat.Clamp_Min(clamp_min);
-//                     SIGMAphat.Clamp_Max(clamp_max);
-//                     particles.Fp(p)=Uphat*SIGMAphat.Times_Transpose(Vphat);
-//                     particles.Fe(p)=F*(particles.Fp(p).Inverse());}}}}
-
+        for(int p=0;p<particles.number;p++){
+            if(valid(p)){
+                MATRIX<T,TV::m> grad_vp;
+                for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+                    TV_INT ind=influence_corner(p)+it.index;
+                    grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
+                particles.Fe(p)=particles.Fe(p)+dt*grad_vp*particles.Fe(p);}}}
+    else{
+#pragma omp parallel for
+        for(int p=0;p<particles.number;p++){
+            if(valid(p)){
+                MATRIX<T,TV::m> grad_vp;
+                for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+                    TV_INT ind=influence_corner(p)+it.index;
+                    grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
+                MATRIX<T,TV::m> Fe_hat=particles.Fe(p)+dt*grad_vp*particles.Fe(p);
+                MATRIX<T,TV::m> Fp_hat=particles.Fp(p);
+                MATRIX<T,TV::m> F=Fe_hat*Fp_hat;
+                MATRIX<T,TV::m> U_hat,V_hat;
+                DIAGONAL_MATRIX<T,TV::m> SIGMA_hat;
+                Fe_hat.Fast_Singular_Value_Decomposition(U_hat,SIGMA_hat,V_hat);
+                // if(SIGMA_hat.Min()<yield_min || SIGMA_hat.Max()>yield_max){valid(p)=false;continue;}
+                SIGMA_hat=SIGMA_hat.Clamp_Min(yield_min);
+                SIGMA_hat=SIGMA_hat.Clamp_Max(yield_max);
+                particles.Fe(p)=U_hat*SIGMA_hat.Times_Transpose(V_hat);
+                particles.Fp(p)=V_hat*(SIGMA_hat.Inverse()).Times_Transpose(U_hat)*F;
+                if(use_plasticity_clamp){
+                    MATRIX<T,TV::m> Uphat,Vphat;
+                    DIAGONAL_MATRIX<T,TV::m> SIGMAphat;
+                    particles.Fp(p).Fast_Singular_Value_Decomposition(Uphat,SIGMAphat,Vphat);
+                    SIGMAphat.Clamp_Min(clamp_min);
+                    SIGMAphat.Clamp_Max(clamp_max);
+                    particles.Fp(p)=Uphat*SIGMAphat.Times_Transpose(Vphat);
+                    particles.Fe(p)=F*(particles.Fp(p).Inverse());}}}}
     if(PROFILING) TIMING_END("Update_Deformation_Gradient");
 }
 //#####################################################################
