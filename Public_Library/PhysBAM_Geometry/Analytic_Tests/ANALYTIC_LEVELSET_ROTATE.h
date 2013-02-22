@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __ANALYTIC_LEVELSET_ROTATE__
 #define __ANALYTIC_LEVELSET_ROTATE__
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Matrices/ROTATION.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 
 namespace PhysBAM{
@@ -15,14 +15,14 @@ struct ANALYTIC_LEVELSET_ROTATE:public ANALYTIC_LEVELSET<TV>
 {
     typedef typename TV::SCALAR T;
     ANALYTIC_LEVELSET<TV>* al;
-    T w;
+    typename TV::SPIN w;
     TV center;
 
-    ANALYTIC_LEVELSET_ROTATE(ANALYTIC_LEVELSET<TV>* al,T w,TV cc=TV()): al(al),w(w),center(cc) {}
+    ANALYTIC_LEVELSET_ROTATE(ANALYTIC_LEVELSET<TV>* al,const typename TV::SPIN& w,TV cc=TV()): al(al),w(w),center(cc) {}
     ~ANALYTIC_LEVELSET_ROTATE() {delete al;}
-    virtual T phi(const TV& X,T t,int& c) const {MATRIX<T,2> Q(MATRIX<T,2>::Rotation_Matrix(w*t));return al->phi(Q.Transpose_Times(X-center)+center,t,c);}
-    virtual TV N(const TV& X,T t,int c) const {MATRIX<T,2> Q(MATRIX<T,2>::Rotation_Matrix(w*t));return Q*(al->N(Q.Transpose_Times(X-center)+center,t,c));}
-    virtual T dist(const TV& X,T t,int c) const {MATRIX<T,2> Q(MATRIX<T,2>::Rotation_Matrix(w*t));return al->dist(Q.Transpose_Times(X-center)+center,t,c);}
+    virtual T phi(const TV& X,T t,int& c) const {ROTATION<TV> rot(ROTATION<TV>::From_Rotation_Vector(w*t));return al->phi(rot.Inverse_Rotate(X-center)+center,t,c);}
+    virtual TV N(const TV& X,T t,int c) const {ROTATION<TV> rot(ROTATION<TV>::From_Rotation_Vector(w*t));return rot.Rotate(al->N(rot.Inverse_Rotate(X-center)+center,t,c));}
+    virtual T dist(const TV& X,T t,int c) const {ROTATION<TV> rot(ROTATION<TV>::From_Rotation_Vector(w*t));return al->dist(rot.Inverse_Rotate(X-center)+center,t,c);}
 };
 }
 #endif
