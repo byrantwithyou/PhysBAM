@@ -6,6 +6,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
@@ -31,13 +32,14 @@ template<class TV,class T2> void BOUNDARY_MAC_GRID_PERIODIC<TV,T2>::
 Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
     ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost); // interior
-    TV_INT periods=grid.Domain_Indices().Maximum_Corner();
-    ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
-    for(int axis=0;axis<GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
-        int side=2*axis+axis_side;
-        TV_INT period=(axis_side==0?1:-1)*periods[axis]*TV_INT::Axis_Vector(axis);
-        for(NODE_ITERATOR iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
-            u_ghost(node)=u_ghost(node+period);}}
+    TV_INT periods=grid.numbers_of_cells;
+    for(int axis=0;axis<TV::m;axis++)
+        for(int axis_side=0;axis_side<2;axis_side++){
+            int shift=periods(axis)*(1-2*axis_side);
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,number_of_ghost_cells,GRID<TV>::GHOST_REGION,2*axis+axis_side);it.Valid();it.Next()){
+                TV_INT ind(it.index);
+                ind(axis)+=shift;
+                u_ghost(it.index)=u_ghost(ind);}}
 }
 //#####################################################################
 // Function Fill_Ghost_Faces
