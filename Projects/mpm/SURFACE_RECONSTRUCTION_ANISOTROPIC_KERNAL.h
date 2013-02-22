@@ -15,8 +15,7 @@ class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL
 public:
     SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL();
     ~SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL();
-
-    static void Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particles,ARRAY<TV>& Xbar,ARRAY<MATRIX<T,TV::m> >& G);
+    void Compute_Kernal_Centers_And_Transformation(GEOMETRY_PARTICLES<TV>& particles,const T h,const T r,const T lambda,const int N_eps,const T kr,const T ks,const T kn,ARRAY<TV>& Xbar,ARRAY<MATRIX<T,TV::m> >& G) const;
 //#####################################################################
 };
 }

@@ -3,6 +3,12 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Math_Tools/cube.h>
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/PARTICLE_3D_SPATIAL_PARTITION.h>
 #include "SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL.h"
 namespace PhysBAM{
@@ -21,31 +27,39 @@ template<class TV> SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV>::
 //#####################################################################
 // Function Compute_Kernal_Centers_And_Transformation
 //#####################################################################
-template<class TV> static void SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV>::
-Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particles,const T h,const T r,const T lambda,const int N_eps,const T kr,const T ks,const T kn,ARRAY<TV>& Xbar,ARRAY<MATRIX<T,TV::m> >& G)
+template<class TV> void SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV>::
+Compute_Kernal_Centers_And_Transformation(GEOMETRY_PARTICLES<TV>& particles,const T h,const T r,const T lambda,const int N_eps,const T kr,const T ks,const T kn,ARRAY<TV>& Xbar,ARRAY<MATRIX<T,TV::m> >& G) const
 {
+    LOG::cout<<"1"<<std::endl;
     ARRAY<T> total_weight_on_particle(particles.number);total_weight_on_particle.Fill(T(1));
     ARRAY<TV> xw(particles.number);for(int i=0;i<particles.number;i++) xw(i)=particles.X(i);
     Xbar.Resize(particles.number);
-    PARTICLE_3D_SPATIAL_PARTITION<T> partition_spatial_partition(particles,r);
+    PARTICLE_3D_SPATIAL_PARTITION<T> particle_spatial_partition(particles,r);
     particle_spatial_partition.Reinitialize();particle_spatial_partition.Reset_Pair_Finder();
+    LOG::cout<<"11"<<std::endl;    
     int index1;ARRAY<int> nearby_particle_indices;nearby_particle_indices.Preallocate(100);
+    LOG::cout<<"12"<<std::endl;    
     while(particle_spatial_partition.Get_Next_Particles_Potentially_Within_Interaction_Radius(index1,nearby_particle_indices)){
+    LOG::cout<<"16"<<std::endl;    
+        if(index1>=particles.number) LOG::cout<<index1<<" "<<particles.number<<std::endl;
+    LOG::cout<<"13"<<std::endl;    
         TV position1=particles.X(index1);
+    LOG::cout<<"14"<<std::endl;    
         for(int k=0;k<nearby_particle_indices.m;k++){
             int index2=nearby_particle_indices(k);
-            if(index1==index2) PHYSBAM_FATAL_ERROR;
+            if(index1==index2) PHYSBAM_FATAL_ERROR();
             TV position2=particles.X(index2);
             T distance=(position2-position1).Magnitude();
             T w=(distance<r)?((T)1-cube(distance/r)):(T)0;
+            if(index1>=particles.number||index2>=particles.number) LOG::cout<<index1<<" "<<index2<<" "<<particles.number<<std::endl;
             total_weight_on_particle(index1)+=w;
             total_weight_on_particle(index2)+=w;
             xw(index1)+=w*position2;
             xw(index2)+=w*position1;}}
     for(int i=0;i<particles.number;i++){
         xw(i)/=total_weight_on_particle(i);
-        Xbar(i)=((T)1-lambda)*partcles.X(i)+lambda*xw(i);}
-
+        Xbar(i)=((T)1-lambda)*particles.X(i)+lambda*xw(i);}
+    LOG::cout<<"2"<<std::endl;
     ARRAY<int> neighbor_count(particles.number);neighbor_count.Fill(0);
     ARRAY<MATRIX<T,TV::m> > C(particles.number);
     for(int i=0;i<particles.number;i++) C(i)=MATRIX<T,TV::m>::Outer_Product(particles.X(i)-xw(i),particles.X(i)-xw(i));
@@ -53,7 +67,7 @@ Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particle
         TV position1=particles.X(index1);
         for(int k=0;k<nearby_particle_indices.m;k++){
             int index2=nearby_particle_indices(k);
-            if(index1==index2) PHYSBAM_FATAL_ERROR;
+            if(index1==index2) PHYSBAM_FATAL_ERROR();
             TV position2=particles.X(index2);
             T distance=(position2-position1).Magnitude();
             T w=(distance<r)?((T)1-cube(distance/r)):(T)0;
@@ -62,16 +76,16 @@ Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particle
             C(index1)+=w*MATRIX<T,TV::m>::Outer_Product(position2-xw(index1),position2-xw(index1));
             C(index2)+=w*MATRIX<T,TV::m>::Outer_Product(position1-xw(index2),position1-xw(index2));}}
     for(int i=0;i<particles.number;i++) C(i)/=total_weight_on_particle(i);
-
-    G.resize(particles.number);
+    LOG::cout<<"3"<<std::endl;
+    G.Resize(particles.number);
     T one_over_h=(T)1/h;
     for(int i=0;i<particles.number;i++){
         MATRIX<T,TV::m> U,V;
         DIAGONAL_MATRIX<T,TV::m> Sigma,Sigma_wave;
-        C(i).Fast_Singular_Value_Decompositon(U,Sigma,V);
-        for(int d=0;d<TV::m-1;d++) if(Sigma(d,d)<Sigma(d+1,d+1)) PHYSBAM_FATAL_ERROR;
-        if(Sigma(TV::m-1,TV::m-1)<0) PHYSBAM_FATAL_ERROR;
-        if((U-V).Frobenius_Norm_Squared()>1e-10) PHYSBAM_FATEL_ERROR;
+        C(i).Fast_Singular_Value_Decomposition(U,Sigma,V);
+        for(int d=0;d<TV::m-1;d++) if(Sigma(d,d)<Sigma(d+1,d+1)) PHYSBAM_FATAL_ERROR();
+        if(Sigma(TV::m-1,TV::m-1)<0) PHYSBAM_FATAL_ERROR();
+        if((U-V).Frobenius_Norm_Squared()>1e-10) PHYSBAM_FATAL_ERROR();
         if(neighbor_count(i)<=N_eps) Sigma_wave=DIAGONAL_MATRIX<T,TV::m>::Identity_Matrix()*kn;
         else{
             Sigma_wave(0,0)=ks*Sigma(0,0);
