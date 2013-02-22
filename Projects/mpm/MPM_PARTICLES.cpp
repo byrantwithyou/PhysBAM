@@ -5,6 +5,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include "MPM_PARTICLES.h"
 #include "MPM_PARTICLES_FORWARD.h"
 namespace PhysBAM{
@@ -36,6 +37,22 @@ Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
     ARRAY<TV> sample_X;
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
         TV x=grid.X(it.index);
+        sample_X.Append(x);}
+    this->Resize(sample_X.m);
+    X=sample_X;
+}
+//#####################################################################
+// Function Initialize_X_As_A_Randomly_Sampled_Box
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box)
+{
+    RANDOM_NUMBERS<T> rand_generator;
+    rand_generator.Set_Seed(0);
+    ARRAY<TV> sample_X;
+    for(int n=0;n<N;n++){
+        TV x;
+        rand_generator.Fill_Uniform(x,box);
         sample_X.Append(x);}
     this->Resize(sample_X.m);
     X=sample_X;
