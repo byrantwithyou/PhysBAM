@@ -417,7 +417,8 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     if(example.dump_matrix){
         KRYLOV_SOLVER<T>::Ensure_Size(vectors,rhs,2);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%d.txt",solve_id).c_str()).Write("M",iss,*vectors(0),*vectors(1));
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%d.txt",solve_id).c_str()).Write_Preconditioner("P",iss,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("Z-%d.txt",solve_id).c_str()).Write_Preconditioner("Z",iss,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%d.txt",solve_id).c_str()).Write_Projection("P",iss,*vectors(0));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
 
