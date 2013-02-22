@@ -89,8 +89,6 @@ Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particle
         G(i)=one_over_h*(eigenvectors*Sigma_wave.Inverse()).Times_Transpose(eigenvectors);}
 }
 //#####################################################################
-template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<float,2> >;
-template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<double,2> >;
 template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<float,3> >;
 template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<double,3> >;
 }

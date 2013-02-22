@@ -52,6 +52,7 @@ public:
     ARRAY<TV> rigid_ball_velocity;
     //#################################################################
     TV gravity_constant;
+    ARRAY<bool> valid;
     ARRAY<T> mu,lambda;
     ARRAY<T> Je,Jp;
     ARRAY<MATRIX<T,TV::m> > Ue,Ve,Re,Se;

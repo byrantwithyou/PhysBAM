@@ -83,17 +83,17 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
             break;
         case 5: // notch test
             sim.grid.Initialize(TV_INT(0.4*grid_res,0.8*grid_res),RANGE<TV>(TV(-0.2,-0.4),TV(0.2,0.4)));
-            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res,0.3*particle_res),RANGE<TV>(TV(-0.1,-0.15),TV(0.1,0.15)));
-            //sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.07,-0.03),TV(0.13,0.03)));
+            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res,0.3*particle_res),RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
+            sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.07,-0.03),TV(0.13,0.03)));
             sim.ground_level=-100;
             sim.dirichlet_box.Append(RANGE<TV>(TV(-10,0.13),TV(10,10)));
-            sim.dirichlet_velocity.Append(TV(0,0.1));
+            sim.dirichlet_velocity.Append(TV(0,0.2));
             sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.13)));
-            sim.dirichlet_velocity.Append(TV(0,-0.1));
-            sim.yield_max=1.1;
+            sim.dirichlet_velocity.Append(TV(0,-0.2));
+            sim.yield_max=1.4;
             sim.yield_min=1.0/sim.yield_max;
             sim.use_plasticity_clamp=false;
-            sim.clamp_max=1.3;
+            sim.clamp_max=1.8;
             sim.clamp_min=1.0/sim.clamp_max;
             break;
         case 6: // wall test
@@ -240,13 +240,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Advance_One_Time_Step_Backward_Euler();
         TIMING_END("Current time step totally");
         if(f%frame_jump==0){
-            for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-            if(sim.ground_level>-10){
-                
-
-            }
-
-
+            for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
             Flush_Frame<TV>("mpm");}
         LOG::cout<<std::endl;}
 }
