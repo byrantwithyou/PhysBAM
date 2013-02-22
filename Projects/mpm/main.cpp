@@ -307,7 +307,7 @@ int main(int argc,char *argv[])
     SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV> sr;
     ARRAY<TV> Xbar;
     ARRAY<MATRIX<T,TV::m> > G;
-    sr.Compute_Kernal_Centers_And_Transformation(particles,0.08,0.16,0.95,15,4,1400,0.5,Xbar,G);
+    sr.Compute_Kernal_Centers_And_Transformation(particles,0.03,0.06,0.95,15,4,1400,0.5,Xbar,G);
 
     return 0;
 }
