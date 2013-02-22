@@ -716,7 +716,7 @@ Get_Hashed_Interface_Elements_For_Cell(const TV_INT& cell_index,const VECTOR<TV,
     do{
         pat=interface_segment_table(seg++);
         VECTOR<int,2> c(color_list[GET_C(pat,0)],color_list[GET_C(pat,1)]);
-        VECTOR<int,2> v(p_index[GET_V(pat,0)],p_index[GET_V(pat,1)]);
+        VECTOR<int,2> v(p_index[GET_V(pat,1)],p_index[GET_V(pat,0)]);
         if(c.x>c.y){
             exchange(c.x,c.y);
             exchange(v.x,v.y);}
@@ -809,7 +809,7 @@ Get_Hashed_Interface_Elements_For_Cell(const TV_INT& cell_index,const VECTOR<TV,
                     cell_vertices.Set(cell_index,index);
                     particles.X(index)=pts[e];}}}
 
-        TV_INT v(p_index[triangle(0)],p_index[triangle(2)],p_index[triangle(1)]);
+        TV_INT v(p_index[triangle(0)],p_index[triangle(1)],p_index[triangle(2)]);
         VECTOR<int,2> c(color_list[GET_C(pat,0)],color_list[GET_C(pat,1)]);
         if(c.x>c.y){exchange(c.x,c.y);exchange(v(1),v(2));}
         
@@ -997,7 +997,7 @@ Get_Hashed_Boundary_Elements_For_Cell(const TV_INT& cell_index,const VECTOR<TV,8
                             face_vertices.Set(fi,index);
                             particles.X(index)=pts[e];}}}
                 
-                TV_INT v(p_index[triangle(0)],p_index[triangle(2)],p_index[triangle(1)]);
+                TV_INT v(p_index[triangle(0)],p_index[triangle(1)],p_index[triangle(2)]);
                 int color=color_list[GET_C(pat,0)];
                 if(sc^(b-a==2)) exchange(v.y,v.z);
                 

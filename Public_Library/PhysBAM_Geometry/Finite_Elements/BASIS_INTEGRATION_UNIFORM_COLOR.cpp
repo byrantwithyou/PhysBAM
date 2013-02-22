@@ -247,8 +247,8 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,const 
                 const INTERFACE_ELEMENT& V=cell_elements.interface(i);
                 if(V.color_pair.y<0) continue;
                 T integral=monomial.Quadrature_Over_Primitive(V.face.X)*T_FACE::Normal(V.face.X)(TV::m-1);
-                if(V.color_pair.x>=0) integrals(V.color_pair.x)-=integral;
-                if("Alexey was here") integrals(V.color_pair.y)+=integral;}
+                if(V.color_pair.x>=0) integrals(V.color_pair.x)+=integral;
+                if("Alexey was here") integrals(V.color_pair.y)-=integral;}
             for(int c=0;c<cdi.colors;c++) precomputed_volume_integrals(c)(it.index)+=integrals(c);}
 
     for(int i=0;i<volume_blocks.m;i++){
@@ -299,12 +299,12 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,const 
 
                         if(V.color_pair.x!=BC::SLIP && V.color_pair.x!=BC::NEUMANN)
                             for(int orientation=0;orientation<TV::m-1;orientation++){
-                                T value=integral*orientations(k)(sb->axis,orientation);
+                                T value=-integral*orientations(k)(sb->axis,orientation);
                                 if(V.color_pair.x>=0) sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.color_pair.x,value);
                                 if("Alexey was here") sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.color_pair.y,-value);}
                         
                         if(V.color_pair.x!=BC::NEUMANN){
-                            T value=integral*orientations(k)(sb->axis,TV::m-1);
+                            T value=-integral*orientations(k)(sb->axis,TV::m-1);
                             if(V.color_pair.x>=0) sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.color_pair.x,value);
                             if("Alexey was here") sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.color_pair.y,-value);}
                         
@@ -317,7 +317,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,const 
 
                             if(sb->bc->use_discontinuous_velocity)
                                 if(sb->axis==0){ // This code should not be repeated for each block
-                                    TV value=-integral*orientations(k).Transpose_Times(sb->bc->u_jump(X,V.color_pair.x,V.color_pair.y));
+                                    TV value=integral*orientations(k).Transpose_Times(sb->bc->u_jump(X,V.color_pair.x,V.color_pair.y));
                                     for(int d=0;d<TV::m;d++)
                                         sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,V.color_pair.y,value(d));}}
                         else if(V.color_pair.x==BC::NEUMANN){
@@ -325,11 +325,11 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,const 
                             (*sb->rhs)(V.color_pair.y)(flat_index)+=value;}
                         else if(V.color_pair.x==BC::DIRICHLET){
                             if(sb->axis==0){ // This code should not be repeated for each block
-                                TV value=-integral*orientations(k).Transpose_Times(sb->bc->u_jump(X,V.color_pair.x,V.color_pair.y));
+                                TV value=integral*orientations(k).Transpose_Times(sb->bc->u_jump(X,V.color_pair.x,V.color_pair.y));
                                 for(int d=0;d<TV::m;d++)
                                     sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,V.color_pair.y,value(d));}}
                         else{
-                            TV N=orientations(k).Column(TV::m-1);
+                            TV N=-orientations(k).Column(TV::m-1);
                             T n_value=integral*sb->bc->j_surface(X,V.color_pair.x,V.color_pair.y).Projected_Orthogonal_To_Unit_Direction(N)(sb->axis);
                             (*sb->rhs)(V.color_pair.y)(flat_index)+=n_value;
                             if(sb->axis==0){ // This code should not be repeated for each block

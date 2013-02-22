@@ -52,6 +52,10 @@ public:
         ARRAY<BOUNDARY_ELEMENT> boundary;
     };
 
+    // Boundary elements have standard orientation
+    //   2D: regions are traced counterclockwise
+    //   3D: triangles are counterclockwise when viewed from the outside
+    // Interface elements are consistent with boundary elements from first color
     static void Initialize_Case_Table();
     static void Get_Elements_For_Cell(ARRAY<INTERFACE_ELEMENT>& interface,ARRAY<BOUNDARY_ELEMENT>& boundary,
         const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi);
