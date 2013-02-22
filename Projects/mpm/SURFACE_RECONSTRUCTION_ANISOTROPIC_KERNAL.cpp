@@ -34,16 +34,9 @@ template<class TV> SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV>::
 template<class TV> void SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV>::
 Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particles,const T h,const T r,const T lambda,const int N_eps,const T kr,const T ks,const T kn,ARRAY<TV>& Xbar,ARRAY<MATRIX<T,TV::m> >& G) const
 {
-    LOG::cout<<"1 "<<r<<std::endl;
-    ARRAY<T> total_weight_on_particle(particles.number);
-    ARRAY<TV> xw(particles.X);
-    Xbar.Resize(particles.number);
-
     HASHTABLE<TV_INT,ARRAY<int> > buckets;
     for(int i=0;i<particles.number;i++)
         buckets.Get_Or_Insert(TV_INT(floor(particles.X(i)/r))).Append(i);
-
-    LOG::cout<<"a"<<std::endl;
     T r2=r*r;
     ARRAY<TRIPLE<int,int,T> > pairs;
     for(typename HASHTABLE<TV_INT,ARRAY<int> >::ITERATOR it(buckets);it.Valid();it.Next()){
@@ -57,8 +50,10 @@ Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particle
                             if(tr.z<r2){
                                 tr.z=1-cube(sqrt(tr.z)/r);
                                 pairs.Append(tr);}}}}}
-    LOG::cout<<"b"<<std::endl;
 
+    ARRAY<T> total_weight_on_particle(particles.number);
+    ARRAY<TV> xw(particles.X);
+    Xbar.Resize(particles.number);
     for(int i=0;i<pairs.m;i++){
         total_weight_on_particle(pairs(i).x)+=pairs(i).z;
         total_weight_on_particle(pairs(i).y)+=pairs(i).z;
@@ -67,10 +62,12 @@ Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particle
     for(int i=0;i<particles.number;i++){
         xw(i)/=total_weight_on_particle(i)+1;
         Xbar(i)=((T)1-lambda)*particles.X(i)+lambda*xw(i);}
-    LOG::cout<<"2"<<std::endl;
+
     ARRAY<int> neighbor_count(particles.number);
     ARRAY<MATRIX<T,TV::m> > C(particles.number);
-    for(int i=0;i<particles.number;i++) C(i)=MATRIX<T,TV::m>::Outer_Product(particles.X(i)-xw(i),particles.X(i)-xw(i));
+    for(int i=0;i<particles.number;i++){
+        TV dd=particles.X(i)-xw(i);
+        C(i)=MATRIX<T,TV::m>::Outer_Product(dd,dd);}
     for(int i=0;i<pairs.m;i++){
         neighbor_count(pairs(i).x)++;
         neighbor_count(pairs(i).y)++;
@@ -78,7 +75,7 @@ Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particle
         C(pairs(i).x)+=MATRIX<T,TV::m>::Outer_Product(d2,pairs(i).z*d2);
         C(pairs(i).y)+=MATRIX<T,TV::m>::Outer_Product(d1,pairs(i).z*d1);}
     for(int i=0;i<particles.number;i++) C(i)/=total_weight_on_particle(i)+1;
-    LOG::cout<<"3"<<std::endl;
+
     G.Resize(particles.number);
     T one_over_h=(T)1/h;
     for(int i=0;i<particles.number;i++){
@@ -88,13 +85,12 @@ Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particle
         int index_max=eigenvalues.To_Vector().Arg_Max();
         T max_ev=eigenvalues(index_max,index_max);
         if(neighbor_count(i)<=N_eps) Sigma_wave+=kn;
-        else{
-            if(kr<1){Sigma_wave+=ks*max_ev/kr;Sigma_wave(index_max,index_max)=ks*max_ev;}
-            else for(int d=0;d<TV::m;d++) Sigma_wave(d,d)=ks*max(eigenvalues(d,d),max_ev/kr);}
-
+        else for(int d=0;d<TV::m;d++) Sigma_wave(d,d)=ks*max(eigenvalues(d,d),max_ev/kr);
         G(i)=one_over_h*(eigenvectors*Sigma_wave.Inverse()).Times_Transpose(eigenvectors);}
 }
 //#####################################################################
+template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<float,2> >;
+template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<double,2> >;
 template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<float,3> >;
 template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<double,3> >;
 }

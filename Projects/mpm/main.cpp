@@ -14,7 +14,7 @@
 //   7. dropping sphere
 //   8. two ring hit each other
 //#####################################################################
-/*
+
 #include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
@@ -84,15 +84,15 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
         case 5: // notch test
             sim.grid.Initialize(TV_INT(0.4*grid_res,0.8*grid_res),RANGE<TV>(TV(-0.2,-0.4),TV(0.2,0.4)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res,0.3*particle_res),RANGE<TV>(TV(-0.1,-0.15),TV(0.1,0.15)));
-            sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.07,-0.03),TV(0.13,0.03)));
+            //sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.07,-0.03),TV(0.13,0.03)));
             sim.ground_level=-100;
             sim.dirichlet_box.Append(RANGE<TV>(TV(-10,0.13),TV(10,10)));
-            sim.dirichlet_velocity.Append(TV(0,0.2));
+            sim.dirichlet_velocity.Append(TV(0,0.1));
             sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.13)));
-            sim.dirichlet_velocity.Append(TV(0,-0.2));
+            sim.dirichlet_velocity.Append(TV(0,-0.1));
             sim.yield_max=1.1;
             sim.yield_min=1.0/sim.yield_max;
-            sim.use_plasticity_clamp=true;
+            sim.use_plasticity_clamp=false;
             sim.clamp_max=1.3;
             sim.clamp_min=1.0/sim.clamp_max;
             break;
@@ -264,50 +264,50 @@ int main(int argc,char *argv[])
         Run_Simulation<VECTOR<double,2> >(parse_args);
     return 0;
 }
-*/
-#include <PhysBAM_Tools/Math_Tools/pow.h>
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
-#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
-#include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
-#include <PhysBAM_Tools/Utilities/TIMER.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <omp.h>
-#include "TIMING.h"
-#include "MPM_SIMULATION.h"
-#include "SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL.h"
 
-using namespace PhysBAM;
-int main(int argc,char *argv[])
-{
-    typedef double T;
-    typedef VECTOR<T,3> TV;
-    typedef VECTOR<int,3> TV_INT;
+// #include <PhysBAM_Tools/Math_Tools/pow.h>
+// #include <PhysBAM_Tools/Arrays/ARRAY.h>
+// #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+// #include <PhysBAM_Tools/Log/LOG.h>
+// #include <PhysBAM_Tools/Math_Tools/RANGE.h>
+// #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
+// #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
+// #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
+// #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+// #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+// #include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
+// #include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
+// #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+// #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
+// #include <PhysBAM_Tools/Utilities/TIMER.h>
+// #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+// #include <omp.h>
+// #include "TIMING.h"
+// #include "MPM_SIMULATION.h"
+// #include "SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL.h"
 
-    GEOMETRY_PARTICLES<TV> particles;
-    VECTOR<int,TV::m> count(50,50,50);
-    RANGE<TV> box(TV(-0.5,-0.5,-0.5),TV(0.5,0.5,0.5));
-    GRID<TV> grid(count,box);
-    ARRAY<TV> sample_X;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
-        TV x=grid.X(it.index);
-        sample_X.Append(x);}
-    particles.Resize(sample_X.m);
-    particles.X=sample_X;
-    LOG::cout<<"wtf"<<std::endl;
-    SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV> sr;
-    ARRAY<TV> Xbar;
-    ARRAY<MATRIX<T,TV::m> > G;
-    sr.Compute_Kernal_Centers_And_Transformation(particles,0.03,0.06,0.95,15,4,1400,0.5,Xbar,G);
+// using namespace PhysBAM;
+// int main(int argc,char *argv[])
+// {
+//     typedef double T;
+//     typedef VECTOR<T,3> TV;
+//     typedef VECTOR<int,3> TV_INT;
 
-    return 0;
-}
+//     GEOMETRY_PARTICLES<TV> particles;
+//     VECTOR<int,TV::m> count(50,50,50);
+//     RANGE<TV> box(TV(-0.5,-0.5,-0.5),TV(0.5,0.5,0.5));
+//     GRID<TV> grid(count,box);
+//     ARRAY<TV> sample_X;
+//     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
+//         TV x=grid.X(it.index);
+//         sample_X.Append(x);}
+//     particles.Resize(sample_X.m);
+//     particles.X=sample_X;
+//     LOG::cout<<"wtf"<<std::endl;
+//     SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV> sr;
+//     ARRAY<TV> Xbar;
+//     ARRAY<MATRIX<T,TV::m> > G;
+//     sr.Compute_Kernal_Centers_And_Transformation(particles,0.03,0.06,0.95,15,4,1400,0.5,Xbar,G);
+
+//     return 0;
+// }

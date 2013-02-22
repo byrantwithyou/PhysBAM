@@ -38,7 +38,7 @@ Initialize()
 {
     LOG::cout<<"Allocating Memories for Simulation..."<<std::endl;
     TIMING_START;
-    gravity_constant=TV();gravity_constant(1)=-(T)9.8;
+    gravity_constant=TV();gravity_constant(1)=-(T)0.8;
     mu.Resize(particles.number);
     lambda.Resize(particles.number);
     Je.Resize(particles.number);
