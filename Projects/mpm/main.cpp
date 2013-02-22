@@ -14,6 +14,7 @@
 //   7. dropping sphere
 //   8. two ring hit each other
 //#####################################################################
+/*
 #include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
@@ -261,5 +262,52 @@ int main(int argc,char *argv[])
         Run_Simulation<VECTOR<double,3> >(parse_args);
     else
         Run_Simulation<VECTOR<double,2> >(parse_args);
+    return 0;
+}
+*/
+#include <PhysBAM_Tools/Math_Tools/pow.h>
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
+#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
+#include <PhysBAM_Tools/Utilities/TIMER.h>
+#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <omp.h>
+#include "TIMING.h"
+#include "MPM_SIMULATION.h"
+#include "SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL.h"
+
+using namespace PhysBAM;
+int main(int argc,char *argv[])
+{
+    typedef double T;
+    typedef VECTOR<T,3> TV;
+    typedef VECTOR<int,3> TV_INT;
+
+    GEOMETRY_PARTICLES<TV> particles;
+    VECTOR<int,TV::m> count(50,50,50);
+    RANGE<TV> box(TV(-0.5,-0.5,-0.5),TV(0.5,0.5,0.5));
+    GRID<TV> grid(count,box);
+    ARRAY<TV> sample_X;
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
+        TV x=grid.X(it.index);
+        sample_X.Append(x);}
+    particles.Resize(sample_X.m);
+    particles.X=sample_X;
+    LOG::cout<<"wtf"<<std::endl;
+    SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV> sr;
+    ARRAY<TV> Xbar;
+    ARRAY<MATRIX<T,TV::m> > G;
+    sr.Compute_Kernal_Centers_And_Transformation(particles,0.08,0.16,0.95,15,4,1400,0.5,Xbar,G);
+
     return 0;
 }
