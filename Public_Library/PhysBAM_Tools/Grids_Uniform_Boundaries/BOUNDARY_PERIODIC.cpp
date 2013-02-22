@@ -16,7 +16,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_
 {
     ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost); // interior
     TV_INT periods=grid.Domain_Indices().Maximum_Corner();
-    ARRAY<RANGE<TV_INT> > regions;
+    VECTOR<RANGE<TV_INT>,2*TV::m> regions;
     Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     for(int axis=0;axis<GRID<TV>::dimension;axis++)
         for(int axis_side=0;axis_side<2;axis_side++){

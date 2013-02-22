@@ -161,7 +161,7 @@ template<class TV> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>::
 Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DIMENSION_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
     T_ARRAYS_DIMENSION_BASE::Put(u,u_ghost); // interior
-    ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
+    VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     for(int side=0;side<2*GRID<TV>::dimension;side++){
         Fill_Single_Ghost_Region(grid,u_ghost,regions(side),side,dt,time,number_of_ghost_cells);}
 }

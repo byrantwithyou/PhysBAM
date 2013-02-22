@@ -55,7 +55,7 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2
         ARRAYS_ND_BASE<T2,TV_INT>::Put(u_axis,u_ghost_axis); // interior
         GRID<TV> face_grid=grid.Get_Face_Grid(axis);
         TV_INT periods=grid.Domain_Indices().Maximum_Corner();
-        ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);
+        VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);
         for(int face_axis=0;face_axis<GRID<TV>::dimension;face_axis++)for(int axis_side=0;axis_side<2;axis_side++){
             int side=2*face_axis+axis_side;
             TV_INT period=(axis_side==0?1:-1)*periods[face_axis]*TV_INT::Axis_Vector(face_axis);

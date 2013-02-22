@@ -35,7 +35,7 @@ template<class TV,class T2> void BOUNDARY<TV,T2>::
 Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
     ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost);
-    ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
+    VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     for(int side=0;side<GRID<TV>::number_of_faces_per_cell;side++)Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));
 }
 //#####################################################################
@@ -51,33 +51,18 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const ARRAY<T2,FACE_INDEX<TV::m> >& u,ARRA
 //#####################################################################
 // Function Find_Ghost_Regions
 //#####################################################################
-static inline void Find_Ghost_Regions_Helper(ARRAY<RANGE<VECTOR<int,1> > >& regions,const RANGE<VECTOR<int,1> >& domain,const RANGE<VECTOR<int,1> >& ghost)
-{
-    regions(0)=RANGE<VECTOR<int,1> >(VECTOR<int,1>(ghost.min_corner.x),VECTOR<int,1>(domain.min_corner.x)); // left
-    regions(1)=RANGE<VECTOR<int,1> >(VECTOR<int,1>(domain.max_corner.x),VECTOR<int,1>(ghost.max_corner.x)); // right
-}
-static inline void Find_Ghost_Regions_Helper(ARRAY<RANGE<VECTOR<int,2> > >& regions,const RANGE<VECTOR<int,2> >& domain,const RANGE<VECTOR<int,2> >& ghost)
-{
-    regions(0)=RANGE<VECTOR<int,2> >(VECTOR<int,2>(ghost.min_corner.x,domain.min_corner.y),VECTOR<int,2>(domain.min_corner.x,domain.max_corner.y)); // left
-    regions(1)=RANGE<VECTOR<int,2> >(VECTOR<int,2>(domain.max_corner.x,domain.min_corner.y),VECTOR<int,2>(ghost.max_corner.x,domain.max_corner.y)); // right
-    regions(2)=RANGE<VECTOR<int,2> >(VECTOR<int,2>(ghost.min_corner.x,ghost.min_corner.y),VECTOR<int,2>(ghost.max_corner.x,domain.min_corner.y)); // bottom
-    regions(3)=RANGE<VECTOR<int,2> >(VECTOR<int,2>(ghost.min_corner.x,domain.max_corner.y),VECTOR<int,2>(ghost.max_corner.x,ghost.max_corner.y)); // top
-}
-static inline void Find_Ghost_Regions_Helper(ARRAY<RANGE<VECTOR<int,3> > >& regions,const RANGE<VECTOR<int,3> >& domain,const RANGE<VECTOR<int,3> >& ghost)
-{
-    regions(0)=RANGE<VECTOR<int,3> >(VECTOR<int,3>(ghost.min_corner.x,domain.min_corner.y,domain.min_corner.z),VECTOR<int,3>(domain.min_corner.x,domain.max_corner.y,domain.max_corner.z)); // left
-    regions(1)=RANGE<VECTOR<int,3> >(VECTOR<int,3>(domain.max_corner.x,domain.min_corner.y,domain.min_corner.z),VECTOR<int,3>(ghost.max_corner.x,domain.max_corner.y,domain.max_corner.z)); // right
-    regions(2)=RANGE<VECTOR<int,3> >(VECTOR<int,3>(ghost.min_corner.x,ghost.min_corner.y,domain.min_corner.z),VECTOR<int,3>(ghost.max_corner.x,domain.min_corner.y,domain.max_corner.z)); // bottom
-    regions(3)=RANGE<VECTOR<int,3> >(VECTOR<int,3>(ghost.min_corner.x,domain.max_corner.y,domain.min_corner.z),VECTOR<int,3>(ghost.max_corner.x,ghost.max_corner.y,domain.max_corner.z)); // top
-    regions(4)=RANGE<VECTOR<int,3> >(VECTOR<int,3>(ghost.min_corner.x,ghost.min_corner.y,ghost.min_corner.z),VECTOR<int,3>(ghost.max_corner.x,ghost.max_corner.y,domain.min_corner.z)); // front
-    regions(5)=RANGE<VECTOR<int,3> >(VECTOR<int,3>(ghost.min_corner.x,ghost.min_corner.y,domain.max_corner.z),VECTOR<int,3>(ghost.max_corner.x,ghost.max_corner.y,ghost.max_corner.z)); // back
-}
 template<class TV,class T2> void BOUNDARY<TV,T2>::
-Find_Ghost_Regions(const GRID<TV>& grid,ARRAY<RANGE<TV_INT> >& regions,const int ghost_cells) const
+Find_Ghost_Regions(const GRID<TV>& grid,VECTOR<RANGE<TV_INT>,2*TV::m>& regions,const int ghost_cells) const
 {
-    RANGE<TV_INT> domain=grid.Domain_Indices(),ghost=domain.Thickened(ghost_cells);
-    regions.Resize(GRID<TV>::number_of_faces_per_cell);
-    Find_Ghost_Regions_Helper(regions,domain,ghost);
+    RANGE<TV_INT> inner=grid.Domain_Indices(),ghost=grid.Domain_Indices(ghost_cells),current=inner;
+    for(int axis=0;axis<TV::m;axis++){
+        current.min_corner(axis)=ghost.min_corner(axis);
+        current.max_corner(axis)=inner.min_corner(axis);
+        regions(2*axis)=current;
+        current.min_corner(axis)=inner.max_corner(axis);
+        current.max_corner(axis)=ghost.max_corner(axis);
+        regions(2*axis+1)=current;
+        current.min_corner(axis)=ghost.min_corner(axis);}
 }
 //#####################################################################
 // Function Fill_Single_Ghost_Region

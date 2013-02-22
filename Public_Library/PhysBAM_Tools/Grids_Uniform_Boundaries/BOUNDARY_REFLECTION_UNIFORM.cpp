@@ -16,7 +16,7 @@ template<class TV,class T2> void BOUNDARY_REFLECTION_UNIFORM<TV,T2>::
 Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
     ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost); // interior
-    ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
+    VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     for(int side=0;side<GRID<TV>::number_of_faces_per_cell;side++) Fill_Single_Ghost_Region(grid,u_ghost,regions(side),side,dt,time,number_of_ghost_cells);
 }
 //#####################################################################
