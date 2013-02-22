@@ -55,8 +55,6 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.6*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
             sim.use_plasticity_yield=false;
             sim.ground_level=-100;
-            sim.dirichlet_box.Append(RANGE<TV>(TV(0.25,-10),TV(10,10)));
-            sim.dirichlet_velocity.Append(TV());
             sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.25,10)));
             sim.dirichlet_velocity.Append(TV());
             break;
