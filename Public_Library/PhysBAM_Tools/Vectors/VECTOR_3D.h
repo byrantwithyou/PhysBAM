@@ -286,7 +286,7 @@ public:
     {*this-=Dot_Product(*this,direction)*direction;}
 
     static VECTOR Cross_Product(const VECTOR& v1,const VECTOR& v2) // 6 mults, 3 adds
-    {return VECTOR(v1.y*v2.z-v1.z*v2.y,v1.z*v2.x-v1.x*v2.z,v1.x*v2.y-v1.y*v2.x);}
+    {return v1.Cross(v2);}
 
     VECTOR Cross(const VECTOR& v) const // 6 mults, 3 adds
     {return VECTOR(y*v.z-z*v.y,z*v.x-x*v.z,x*v.y-y*v.x);}

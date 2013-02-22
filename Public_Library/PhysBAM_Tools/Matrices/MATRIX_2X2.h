@@ -219,6 +219,9 @@ public:
     static MATRIX Identity_Matrix()
     {return MATRIX(1,0,0,1);}
 
+    static MATRIX Cross_Product_Matrix(const VECTOR<T,1>& v)
+    {return MATRIX(0,v.x,-v.x,0);}
+
     T Antisymmetric_Part_Cross_Product_Vector() const
     {return (T).5*(x[1]-x[2]);}
 

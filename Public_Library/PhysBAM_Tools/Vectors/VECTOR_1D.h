@@ -267,6 +267,15 @@ public:
     static VECTOR<T,0> Cross_Product(const VECTOR&,const VECTOR&)
     {return VECTOR<T,0>();}
 
+    VECTOR<T,1> Cross(const VECTOR<T,0>) const
+    {return VECTOR<T,1>();}
+
+    VECTOR<T,0> Cross(const VECTOR&) const
+    {return VECTOR<T,0>();}
+
+    VECTOR<T,2> Cross(const VECTOR<T,2>& v) const
+    {return VECTOR<T,2>(-x*v.y,x*v.x);}
+
     T Sum() const
     {return x;}
 

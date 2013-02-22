@@ -278,13 +278,19 @@ public:
     {return *this-Dot_Product(*this,direction)*direction;}
 
     static VECTOR<T,1> Cross_Product(const VECTOR& v1,const VECTOR& v2)
-    {return VECTOR<T,1>(v1.x*v2.y-v1.y*v2.x);}
+    {return v1.Cross(v2);}
 
     static VECTOR Cross_Product(const VECTOR& v1,const VECTOR<T,1>& v2) // v2 is out of plane
-    {return VECTOR(v1.y*v2.x,-v1.x*v2.x);}
+    {return v1.Cross(v2);}
 
     static VECTOR Cross_Product(const VECTOR<T,1>& v1,const VECTOR& v2) // v1 is out of plane
-    {return VECTOR(-v1.x*v2.y,v1.x*v2.x);}
+    {return v1.Cross(v2);}
+
+    VECTOR<T,1> Cross(const VECTOR& v) const
+    {return VECTOR<T,1>(x*v.y-y*v.x);}
+
+    VECTOR Cross(const VECTOR<T,1>& v) const // v2 is out of plane
+    {return VECTOR(y*v.x,-x*v.x);}
 
     static T Angle_Between(const VECTOR& u,const VECTOR& v)
     {T s=Cross_Product(u,v).Magnitude(),c=Dot_Product(u,v);return atan2(s,c);}
