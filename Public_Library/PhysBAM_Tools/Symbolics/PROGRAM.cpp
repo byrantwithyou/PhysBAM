@@ -1063,23 +1063,25 @@ Reduce_In_Place(INSTRUCTION& o)
     int const_0=Add_Constant(0),const_1=Add_Constant(1);
     switch(o.type){
         case op_add:
-            if(o.src1==const_0){o.type=op_copy;return;}
-            if(o.src0==const_0){o.type=op_copy;o.src0=o.src1;return;}
+            if(o.src1==const_0){o.type=op_copy;break;}
+            if(o.src0==const_0){o.type=op_copy;o.src0=o.src1;break;}
             break;
         case op_sub:
-            if(o.src0==o.src1){o.type=op_copy;o.src0=const_0;return;}
-            if(o.src1==const_0){o.type=op_copy;return;}
-            if(o.src0==const_0){o.type=op_neg;o.src0=o.src1;return;}
+            if(o.src0==o.src1){o.type=op_copy;o.src0=const_0;break;}
+            if(o.src1==const_0){o.type=op_copy;break;}
+            if(o.src0==const_0){o.type=op_neg;o.src0=o.src1;break;}
             break;
         case op_mul:
-            if(o.src1==const_0 || o.src0==const_0){o.type=op_copy;o.src0=const_0;return;}
-            if(o.src1==const_1){o.type=op_copy;return;}
-            if(o.src0==const_1){o.type=op_copy;o.src0=o.src1;return;}
+            if(o.src1==const_0 || o.src0==const_0){o.type=op_copy;o.src0=const_0;break;}
+            if(o.src1==const_1){o.type=op_copy;break;}
+            if(o.src0==const_1){o.type=op_copy;o.src0=o.src1;break;}
+            if(o.src1==Add_Constant(2)){o.type=op_add;o.src1=o.src0;break;}
+            if(o.src0==Add_Constant(2)){o.type=op_add;o.src0=o.src1;break;}
             break;
         case op_div:
-            if(o.src0==o.src1){o.type=op_copy;o.src0=const_1;return;}
-            if(o.src0==const_0 || o.src1==const_1){o.type=op_copy;return;}
-            if(o.src0==const_1){o.type=op_inv;o.src0=o.src1;return;}
+            if(o.src0==o.src1){o.type=op_copy;o.src0=const_1;break;}
+            if(o.src0==const_0 || o.src1==const_1){o.type=op_copy;break;}
+            if(o.src0==const_1){o.type=op_inv;o.src0=o.src1;break;}
             break;
         case op_neg: break;
         case op_inv: break;
@@ -1087,24 +1089,24 @@ Reduce_In_Place(INSTRUCTION& o)
         case op_exp: break;
         case op_ln: break;
         case op_pow:
-            if(o.src1==const_0){o.type=op_copy;o.src0=const_0;return;}
-            if(o.src1==const_1){o.type=op_copy;return;}
-            if(o.src1==Add_Constant(2)){o.type=op_mul;o.src1=o.src0;return;}
-            if(o.src1==Add_Constant(-1)){o.type=op_neg;return;}
+            if(o.src1==const_0){o.type=op_copy;o.src0=const_0;break;}
+            if(o.src1==const_1){o.type=op_copy;break;}
+            if(o.src1==Add_Constant(2)){o.type=op_mul;o.src1=o.src0;break;}
+            if(o.src1==Add_Constant(-1)){o.type=op_neg;break;}
             break;
         case op_lt:
         case op_gt:
         case op_ne:
-            if(o.src0==o.src1){o.type=op_copy;o.src0=const_0;return;}
+            if(o.src0==o.src1){o.type=op_copy;o.src0=const_0;break;}
             break;
         case op_le:
         case op_ge:
         case op_eq:
-            if(o.src0==o.src1){o.type=op_copy;o.src0=const_1;return;}
+            if(o.src0==o.src1){o.type=op_copy;o.src0=const_1;break;}
             break;
         case op_or:
         case op_and:
-            if(o.src0==o.src1){o.type=op_copy;return;}
+            if(o.src0==o.src1){o.type=op_copy;break;}
             break;
         default: break;}
 }
