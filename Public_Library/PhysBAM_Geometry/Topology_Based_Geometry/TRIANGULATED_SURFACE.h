@@ -150,7 +150,6 @@ public:
     T Minimum_Altitude(int* index=0) const;
     T Maximum_Magnitude_Phi(const IMPLICIT_OBJECT<TV>& implicit_surface,int* index=0);
     void Make_Orientations_Consistent_With_Implicit_Surface(const IMPLICIT_OBJECT<TV>& implicit_surface);
-    void Close_Surface(const bool merge_coincident_vertices,const T merge_coincident_vertices_threshold,const bool fill_holes,const bool verbose=false);
     void Remove_Degenerate_Triangles(const T area_threshold=(T)1e-8);
     TRIANGULATED_SURFACE* Create_Compact_Copy() const;
     void Print_Statistics(std::ostream& output,const T thickness_over_2=(T)1e-8);

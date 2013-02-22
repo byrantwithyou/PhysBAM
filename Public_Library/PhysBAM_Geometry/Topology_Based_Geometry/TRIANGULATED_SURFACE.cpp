@@ -16,7 +16,6 @@
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Registry/STRUCTURE_REGISTRY.h>
-#include <PhysBAM_Geometry/Spatial_Acceleration/PARTICLE_3D_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
@@ -761,84 +760,6 @@ Make_Orientations_Consistent_With_Implicit_Surface(const IMPLICIT_OBJECT<TV>& im
         TV centroid=(T)one_third*(particles.X(i)+particles.X(j)+particles.X(k));
         TV normal=PLANE<T>::Normal(particles.X(i),particles.X(j),particles.X(k));
         if(TV::Dot_Product(normal,implicit_surface.Normal(centroid))<0)mesh.elements(t).Set(i,k,j);}
-}
-//#####################################################################
-// Function Close_Surface
-//#####################################################################
-template<class T> void TRIANGULATED_SURFACE<T>::
-Close_Surface(const bool merge_coincident_vertices,const T merge_coincident_vertices_threshold,const bool fill_holes,const bool verbose)
-{
-    typedef VECTOR<T,3> TV;
-    PHYSBAM_ASSERT(merge_coincident_vertices_threshold<1);
-    bool incident_elements_defined=(mesh.incident_elements!=0);if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
-    bool boundary_mesh_defined=(mesh.boundary_mesh!=0);if(!boundary_mesh_defined) mesh.Initialize_Boundary_Mesh();
-    bool node_on_boundary_defined=(mesh.node_on_boundary!=0);if(!node_on_boundary_defined) mesh.Initialize_Node_On_Boundary();
-
-    // for each node on boundary, get minimum length of boundary segments adjacent to it - also keep track of longest boundary segment
-    ARRAY<T> minimum_incident_boundary_segment_length(mesh.boundary_mesh->number_nodes,false);
-    minimum_incident_boundary_segment_length.Fill(FLT_MAX);
-    T maximum_boundary_segment_length=0;
-    for(int i=0;i<mesh.boundary_mesh->elements.m;i++){
-        int node1,node2;mesh.boundary_mesh->elements(i).Get(node1,node2);
-        T length=(particles.X(node1)-particles.X(node2)).Magnitude();
-        minimum_incident_boundary_segment_length(node1)=min(minimum_incident_boundary_segment_length(node1),length);
-        minimum_incident_boundary_segment_length(node2)=min(minimum_incident_boundary_segment_length(node2),length);
-        maximum_boundary_segment_length=max(maximum_boundary_segment_length,length);}
-
-    if(merge_coincident_vertices && maximum_boundary_segment_length>0){
-        if(verbose) LOG::cout<<"MERGING VERTICES (threshold="<<merge_coincident_vertices_threshold<<")"<<std::endl;
-        int number_merged=0;
-        PARTICLE_3D_SPATIAL_PARTITION<T> particle_spatial_partition(particles,2*maximum_boundary_segment_length);
-        particle_spatial_partition.Reinitialize();particle_spatial_partition.Reset_Pair_Finder();
-        int index1;ARRAY<int> nearby_particle_indices;nearby_particle_indices.Preallocate(100);
-        while(particle_spatial_partition.Get_Next_Particles_Potentially_Within_Interaction_Radius(index1,nearby_particle_indices)) if((*mesh.node_on_boundary)(index1)){
-            TV position1=particles.X(index1);
-            int closest_index2=0;T closest_distance_squared=FLT_MAX;
-            for(int k=0;k<nearby_particle_indices.m;k++){
-                int index2=nearby_particle_indices(k);if(!(*mesh.node_on_boundary)(index2)) continue;
-                T distance_squared=(particles.X(index2)-position1).Magnitude_Squared();
-                if(distance_squared < closest_distance_squared){closest_index2=index2;closest_distance_squared=distance_squared;}}
-            if(closest_index2){ // merge index1 to closest_index2
-                T real_threshold=merge_coincident_vertices_threshold*min(minimum_incident_boundary_segment_length(index1),minimum_incident_boundary_segment_length(closest_index2));
-                if(closest_distance_squared<=sqr(real_threshold)){
-                    number_merged++;
-                    if(verbose) LOG::cout<<index1<<"->"<<closest_index2<<" "<<std::flush;
-                    for(int j=0;j<(*mesh.incident_elements)(index1).m;j++){
-                        int t=(*mesh.incident_elements)(index1)(j);
-                        if(mesh.elements(t)(0)==index1)mesh.elements(t)(0)=closest_index2;
-                        else if(mesh.elements(t)(1)==index1)mesh.elements(t)(1)=closest_index2;
-                        else if(mesh.elements(t)(2)==index1)mesh.elements(t)(2)=closest_index2;}
-                    (*mesh.incident_elements)(closest_index2).Append_Elements((*mesh.incident_elements)(index1));}}} // dynamically update the incident triangles list
-        if(verbose) LOG::cout<<std::endl<<number_merged<<" vertices merged"<<std::endl<<std::endl;
-        Refresh_Auxiliary_Structures();}
-
-    if(fill_holes){
-        if(verbose) LOG::cout<<"HOLE FILLING"<<std::endl;
-        bool connected_segments_defined=(mesh.boundary_mesh->connected_segments!=0);if(!connected_segments_defined) mesh.boundary_mesh->Initialize_Connected_Segments();
-        ARRAY<ARRAY<VECTOR<int,2> > >& connected_segments=*mesh.boundary_mesh->connected_segments;
-        for(int i=0;i<connected_segments.m;i++){
-            TV centroid;
-            for(int j=0;j<connected_segments(i).m;j++){int node1,node2;connected_segments(i)(j).Get(node1,node2);centroid+=particles.X(node1)+particles.X(node2);}
-            centroid/=(T)(2*connected_segments(i).m); // assuming we count each node exactly twice, this gives us the average
-            int new_particle_index=particles.Add_Element();mesh.number_nodes++;particles.X(new_particle_index)=centroid;
-            if(particles.store_velocity){
-                TV velocity;
-                for(int j=0;j<connected_segments(i).m;j++){int node1,node2;connected_segments(i)(j).Get(node1,node2);velocity+=particles.V(node1)+particles.V(node2);}
-                particles.V(new_particle_index)=velocity/(T)(2*connected_segments(i).m);}
-            if(verbose){LOG::cout<<"Adding particle "<<new_particle_index<<": "<<particles.X(new_particle_index)<<std::endl;LOG::cout<<"Adding triangles: "<<std::flush;}
-            for(int j=0;j<connected_segments(i).m;j++){ // assumes segment orientation is consistent with triangle orientation!
-                int node1,node2;connected_segments(i)(j).Get(node1,node2);
-                if(verbose) LOG::cout<<"("<<node2<<","<<node1<<","<<new_particle_index<<") "<<std::flush;
-                mesh.elements.Append(VECTOR<int,3>(node2,node1,new_particle_index));}
-            if(verbose) LOG::cout<<std::endl<<std::endl;
-        }
-        if(!connected_segments_defined){delete mesh.boundary_mesh->connected_segments;mesh.boundary_mesh->connected_segments=0;}}
-
-    if(!incident_elements_defined){delete mesh.incident_elements;mesh.incident_elements=0;}
-    if(!boundary_mesh_defined){delete mesh.boundary_mesh;mesh.boundary_mesh=0;}
-    if(!node_on_boundary_defined){delete mesh.node_on_boundary;mesh.node_on_boundary=0;}
-
-    Discard_Valence_Zero_Particles_And_Renumber();  // refreshes auxiliary structures too 
 }
 //#####################################################################
 // Function Remove_Degenerate_Triangles
