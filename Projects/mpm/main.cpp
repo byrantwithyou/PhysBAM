@@ -33,12 +33,13 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <omp.h>
 #include "TIMING.h"
+#include "MPM_SURFACE_2D.h"
 #include "MPM_SIMULATION.h"
 
 using namespace PhysBAM;
 
 template<class T>
-void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_args,int grid_res,int particle_res,int particle_count,T object_mass)
+void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,MPM_SURFACE_2D<VECTOR<T,2> >& surface,PARSE_ARGS& parse_args,int grid_res,int particle_res,int particle_count,T object_mass)
 {
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,2> TV_INT;
@@ -60,6 +61,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
             sim.dirichlet_velocity.Append(TV());
             break;
         case 3: // stretching beam
+            surface.Initialize_With_A_Box(0.01,RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
             sim.grid.Initialize(TV_INT(4*grid_res,0.6*grid_res),RANGE<TV>(TV(-2,-0.3),TV(2,0.3)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.6*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
             sim.use_plasticity_yield=false;
@@ -251,15 +253,24 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Parse(true);
 
     typedef VECTOR<int,TV::m> TV_INT;
+    MPM_SURFACE_2D<TV> surface(sim.particles);
 
     if(!use_output_directory) output_directory=STRING_UTILITIES::string_sprintf("MPM_%dD_test_%d",TV::m,test_number);
 
-    Initialize(test_number,sim,parse_args,grid_res,particle_res,particle_count,mass);
+    Initialize(test_number,sim,surface,parse_args,grid_res,particle_res,particle_count,mass);
 
     sim.Initialize();
 
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
     for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+
+    for(int i=0;i<surface.curve.particles.X.m;i++) {
+        LOG::cout<<surface.curve.particles.X(i)<<std::endl;
+        Add_Debug_Particle(surface.curve.particles.X(i),VECTOR<T,3>(1,0,0));
+    }
+        for(int i=0;i<surface.curve.mesh.elements.m;i++)
+            Add_Debug_Object(VECTOR<TV,TV::m>(surface.curve.particles.X.Subset(surface.curve.mesh.elements(i))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+
     Flush_Frame<TV>("mpm");
 
     for(int f=1;f<1000000;f++){
@@ -286,7 +297,7 @@ int main(int argc,char *argv[])
     parse_args.Parse(true);
 
     if(use_3d)
-        Run_Simulation<VECTOR<double,3> >(parse_args);
+        Run_Simulation<VECTOR<double,2> >(parse_args);
     else
         Run_Simulation<VECTOR<double,2> >(parse_args);
     return 0;
