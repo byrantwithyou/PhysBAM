@@ -43,7 +43,6 @@ Initialize()
     mu.Resize(particles.number);
     lambda.Resize(particles.number);
     Je.Resize(particles.number);
-    Jp.Resize(particles.number);
     Re.Resize(particles.number);
     Se.Resize(particles.number);
     influence_corner.Resize(particles.number);
@@ -57,7 +56,6 @@ Initialize()
     node_V_star.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     node_V_old.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     node_force.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
-    node_external_force.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     frame=0;
     min_mass=particles.mass.Min()*(T)1e-5;
     mu0=ym0/((T)2*((T)1+pr0));
@@ -139,8 +137,8 @@ Build_Helper_Structures_For_Constitutive_Model()
     TIMING_START;
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++){
-        constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),particles.Fp(p),Je(p),Jp(p),Re(p),Se(p));
-        T lame_scale=exp(xi*((T)1-Jp(p)));
+        constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),particles.Fp(p),Je(p),Re(p),Se(p));
+        T lame_scale=(T)1;
         mu(p)=mu0*lame_scale;
         lambda(p)=lambda0*lame_scale;}
     if(PROFILING) TIMING_END("Build_Helper_Structures_For_Constitutive_Model");
@@ -208,13 +206,9 @@ template<class TV> void MPM_SIMULATION<TV>::
 Apply_Gravity_To_Grid_Forces()
 {
     TIMING_START;
-    node_external_force.Fill(TV());
-    for(int p=0;p<particles.number;p++){
-        if(valid(p)){
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-                TV_INT ind=influence_corner(p)+it.index;
-                node_external_force(ind)=node_mass(ind)*gravity_constant;}}}
-    node_force+=node_external_force;
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),grid.counts));it.Valid();it.Next())
+        if(node_mass(it.index)>=min_mass)
+            node_force(it.index)+=node_mass(it.index)*gravity_constant;
     if(PROFILING) TIMING_END("Apply_Gravity_To_Grid_Forces");
 }
 //#####################################################################
@@ -350,13 +344,6 @@ Update_Deformation_Gradient()
                 SIGMA_hat=SIGMA_hat.Clamp_Max(yield_max);
                 particles.Fe(p)=U_hat*SIGMA_hat.Times_Transpose(V_hat);
                 particles.Fp(p)=V_hat*(SIGMA_hat.Inverse()).Times_Transpose(U_hat)*F;
-                // if(use_plasticity_clamp){
-                //     MATRIX<T,TV::m> Uphat,Vphat;
-                //     DIAGONAL_MATRIX<T,TV::m> SIGMAphat;
-                //     particles.Fp(p).Fast_Singular_Value_Decomposition(Uphat,SIGMAphat,Vphat);
-                //     if(SIGMAphat.Min()<clamp_min || SIGMAphat.Max()>clamp_max){
-                //         particles.Fp(p)=Fp_hat;
-                //         particles.Fe(p)=Fe_hat;}}
                 if(use_plasticity_clamp){
                     MATRIX<T,TV::m> Uphat,Vphat;
                     DIAGONAL_MATRIX<T,TV::m> SIGMAphat;

@@ -17,6 +17,7 @@ MPM_PARTICLES()
 {
     Store_Velocity();
     Store_Mass();
+    Add_Array(ATTRIBUTE_ID_MATERIAL_COORDINATE,&Xm);
     Add_Array(ATTRIBUTE_ID_VOLUME,&volume);
     Add_Array(ATTRIBUTE_ID_FE,&Fe);
     Add_Array(ATTRIBUTE_ID_FP,&Fp);
@@ -40,6 +41,7 @@ Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
         sample_X.Append(x);}
     this->Resize(sample_X.m);
     X=sample_X;
+    Xm=X;
 }
 //#####################################################################
 // Function Initialize_X_As_A_Randomly_Sampled_Box
@@ -56,6 +58,7 @@ Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box)
         sample_X.Append(x);}
     this->Resize(sample_X.m);
     X=sample_X;
+    Xm=X;
 }
 //#####################################################################
 // Function Initialize_X_As_A_Ball
@@ -72,6 +75,7 @@ Initialize_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_bo
         if((x-center).Magnitude()<=r) sample_X.Append(x);}
     this->Resize(sample_X.m);
     X=sample_X;
+    Xm=X;
 }
 //#####################################################################
 // Function Add_X_As_A_Grid
@@ -90,6 +94,7 @@ Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
     old_X.Append_Elements(sample_X);
     this->Resize(old_X.m);
     X=old_X;
+    Xm=X;
 }
 //#####################################################################
 // Function Add_X_As_A_Ball
@@ -110,6 +115,7 @@ Add_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box)
     old_X.Append_Elements(sample_X);
     this->Resize(old_X.m);
     X=old_X;
+    Xm=X;
 }
 //#####################################################################
 // Function Reduce_X_As_A_Ball
@@ -128,9 +134,11 @@ Reduce_X_As_A_Ball(const RANGE<TV>& square_box)
             sample_X.Append(old_X(i));
     this->Resize(sample_X.m);
     X=sample_X;
+    Xm=X;
 }
 static int Initialize_MPM_Particles()
 {
+    Register_Attribute_Name(ATTRIBUTE_ID_MATERIAL_COORDINATE,"Xm");
     Register_Attribute_Name(ATTRIBUTE_ID_VOLUME,"volume");
     Register_Attribute_Name(ATTRIBUTE_ID_FE,"Fe");
     Register_Attribute_Name(ATTRIBUTE_ID_FP,"Fp");

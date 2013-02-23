@@ -18,6 +18,7 @@
 #include <PhysBAM_Tools/Particles/PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
+#include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include "MPM_PARTICLES_FORWARD.h"
 
 namespace PhysBAM{
@@ -31,6 +32,7 @@ class MPM_PARTICLES:public CLONEABLE<MPM_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> 
 public:
     using BASE::X;using BASE::V;using BASE::mass;using BASE::Store_Velocity;using BASE::Store_Mass;using BASE::Add_Array;using BASE::Remove_Array;using BASE::Get_Attribute_Index;using BASE::Remove_Array_Using_Index;
 
+    ARRAY_VIEW<TV> Xm;
     ARRAY_VIEW<T> volume;
     ARRAY_VIEW<MATRIX<T,TV::m> > Fe;
     ARRAY_VIEW<MATRIX<T,TV::m> > Fp;

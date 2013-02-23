@@ -35,7 +35,6 @@ public:
     T min_mass,min_rho;
     T dt;
     T mu0,lambda0,ym0,pr0;
-    T xi;
     bool use_plasticity_yield;
     T yield_min;
     T yield_max;
@@ -54,7 +53,7 @@ public:
     TV gravity_constant;
     ARRAY<bool> valid;
     ARRAY<T> mu,lambda;
-    ARRAY<T> Je,Jp;
+    ARRAY<T> Je;
     ARRAY<MATRIX<T,TV::m> > Re,Se;
     ARRAY<TV_INT> influence_corner;
     ARRAY<ARRAY<T,TV_INT> > weight;
@@ -66,7 +65,6 @@ public:
     ARRAY<TV,TV_INT> node_V_star;
     ARRAY<TV,TV_INT> node_V_old;
     ARRAY<TV,TV_INT> node_force;
-    ARRAY<TV,TV_INT> node_external_force;
     int frame;
 
     MPM_SIMULATION();

@@ -117,7 +117,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
             sim.particles.Initialize_X_As_A_Ball(TV_INT(0.2*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1)));
             sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(-0.08,-0.08),TV(0.08,0.08)));
             sim.ground_level=-0.2;
-            sim.use_plasticity_yield=true;
+            sim.use_plasticity_yield=false;
             sim.yield_max=1.001;
             sim.yield_min=0.999;
             sim.use_plasticity_clamp=false;
@@ -170,6 +170,32 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,3> >& sim,PARSE_ARGS& parse_arg
             sim.use_plasticity_yield=false;
             sim.ground_level=-100;
             break;
+        case 5: // notch test
+            sim.grid.Initialize(TV_INT(0.4*grid_res,0.8*grid_res,0.4*grid_res),RANGE<TV>(TV(-0.2,-0.4,-0.2),TV(0.2,0.4,0.2)));
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.2,-0.05),TV(0.1,0.2,0.05)));
+            {CYLINDER<T> cylinder(TV(0.1,0,-10),TV(0.1,0,10),0.03);
+                ARRAY<TV> old_X;
+                old_X.Resize(sim.particles.X.m);
+                for(int i=0;i<old_X.m;i++) old_X(i)=sim.particles.X(i);
+                ARRAY<TV> sample_X;
+                for(int i=0;i<old_X.m;i++)
+                    if(!cylinder.Lazy_Inside(old_X(i)))
+                        sample_X.Append(old_X(i));
+                sim.particles.Resize(sample_X.m);
+                sim.particles.X=sample_X;}
+            sim.ground_level=-100;
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,0.19,-10),TV(10,10,10)));
+            sim.dirichlet_velocity.Append(TV(0,0.1,0));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10,-10),TV(10,-0.19,10)));
+            sim.dirichlet_velocity.Append(TV(0,-0.1,0));
+            sim.use_gravity=false;
+            sim.use_plasticity_yield=true;
+            sim.yield_max=2.0;
+            sim.yield_min=-100;
+            sim.use_plasticity_clamp=false;
+            sim.clamp_max=1.8;
+            sim.clamp_min=1.0/sim.clamp_max;
+            break;
         case 6: // wall test
             sim.grid.Initialize(TV_INT(0.4*grid_res,0.95*grid_res,0.95*grid_res),RANGE<TV>(TV(-0.2,-0.45,-0.45),TV(0.2,0.5,0.5)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.1*particle_res,0.8*particle_res,0.8*particle_res),RANGE<TV>(TV(-0.05,-0.4,-0.4),TV(0.05,0.4,0.4)));
@@ -209,7 +235,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     T mass=(T)40;
     sim.ym0=1;
     sim.pr0=(T).3;
-    sim.xi=(T)0;
     parse_args.Add("-test",&test_number,"test","test number");
     parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
     parse_args.Add("-dt",&sim.dt,"dt","dt");
@@ -218,7 +243,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-test_system",&sim.test_system,"test linear system");
     parse_args.Add("-stiffness",&sim.ym0,"value","scale stiffness");
     parse_args.Add("-poisson_ratio",&sim.pr0,"value","poisson's ratio");
-    parse_args.Add("-hardening",&sim.xi,"value","hardening coefficient");
     parse_args.Add("-flip",&sim.FLIP_alpha,"value","flip fraction");
     parse_args.Add("-gres",&grid_res,"value","grid resolution");
     parse_args.Add("-pres",&particle_res,"value","particle resolution");
@@ -267,50 +291,3 @@ int main(int argc,char *argv[])
         Run_Simulation<VECTOR<double,2> >(parse_args);
     return 0;
 }
-
-// #include <PhysBAM_Tools/Math_Tools/pow.h>
-// #include <PhysBAM_Tools/Arrays/ARRAY.h>
-// #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-// #include <PhysBAM_Tools/Log/LOG.h>
-// #include <PhysBAM_Tools/Math_Tools/RANGE.h>
-// #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
-// #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-// #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-// #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
-// #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-// #include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
-// #include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
-// #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-// #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
-// #include <PhysBAM_Tools/Utilities/TIMER.h>
-// #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-// #include <omp.h>
-// #include "TIMING.h"
-// #include "MPM_SIMULATION.h"
-// #include "SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL.h"
-
-// using namespace PhysBAM;
-// int main(int argc,char *argv[])
-// {
-//     typedef double T;
-//     typedef VECTOR<T,3> TV;
-//     typedef VECTOR<int,3> TV_INT;
-
-//     GEOMETRY_PARTICLES<TV> particles;
-//     VECTOR<int,TV::m> count(50,50,50);
-//     RANGE<TV> box(TV(-0.5,-0.5,-0.5),TV(0.5,0.5,0.5));
-//     GRID<TV> grid(count,box);
-//     ARRAY<TV> sample_X;
-//     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
-//         TV x=grid.X(it.index);
-//         sample_X.Append(x);}
-//     particles.Resize(sample_X.m);
-//     particles.X=sample_X;
-//     LOG::cout<<"wtf"<<std::endl;
-//     SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV> sr;
-//     ARRAY<TV> Xbar;
-//     ARRAY<MATRIX<T,TV::m> > G;
-//     sr.Compute_Kernal_Centers_And_Transformation(particles,0.03,0.06,0.95,15,4,1400,0.5,Xbar,G);
-
-//     return 0;
-// }
