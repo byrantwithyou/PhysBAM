@@ -1,22 +1,39 @@
 #!/bin/bash
+MASTER="$PHYSBAM/Tools/batch/master"
+SLAVE="$PHYSBAM/Tools/batch/slave"
 
-# test-order.sh output args
-out="$1"
-shift
-L=""
-for r in {1..9} ; do
-    T=`mktemp`
-    O=`mktemp -d`
-    (
-        echo -n "$((8*$r)) "
-        nice ./fluids_color_2d -resolution 8 -last_frame 1 -refine $r -s 1.3 -m .8 -kg 1.2 -o $O "$@"  | grep error | tail -n 1
-        rm -rf $O
-    ) > $T &
-    L="$L $T"
+$MASTER &
+
+function emit_test()
+{
+    out="$1"
+    shift
+    L=""
+    J=""
+    OO=""
+    for r in {2..8} ; do
+        T=`mktemp`
+        O=`mktemp -d`
+        echo "$((8*$r))" > $T
+        K=`$SLAVE -a -o $T -p $r -- nice ./fluids_color_3d -resolution 8 -last_frame 1 -refine $r -s 1.3 -m .8 -kg 1.2 -o $O "$@"`
+        J="$J -d $K"
+        OO="$OO $O"
+        L="$L $T"
+    done
+    PPJ=`$SLAVE $J -p 10 -- /bin/bash ./post-process.sh "$out" $L`
+    $SLAVE -d $PPJ -p 10 -- /bin/bash -c "rm -r $OO" >/dev/null
+}
+
+rm -rf new_test_order
+mkdir new_test_order
+for t in 03 04 11 17 18 24 25 28 ; do
+    for b in d n s ; do
+        emit_test  new_test_order/conv-$t-$b.png -bc_$b -dt .05 $t
+    done
 done
-wait
+for t in 00 09 12 13 14 20 21 ; do
+    emit_test new_test_order/conv-$t-x.png -dt .05 $t
+done
 
-T=`mktemp`
-cat $L | sort -n > $T
-gnuplot -p -e "set terminal png ; set output '$out' ; plot '$T' u (log10(\$1)):(log10(\$3)) title 'L-inf error' , -2*x , -2*x-1 , -x-2"
-rm $T $L
+$SLAVE -k
+wait
