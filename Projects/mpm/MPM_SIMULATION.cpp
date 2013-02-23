@@ -230,7 +230,9 @@ Update_Velocities_On_Grid()
             node_V_star(it.index)+=dt/node_mass(it.index)*node_force(it.index);
             for(int b=0;b<dirichlet_box.m;b++)
                 if(dirichlet_box(b).Lazy_Inside(grid.Node(it.index)))
-                    node_V_star(it.index)=dirichlet_velocity(b);}}
+                    node_V_star(it.index)=dirichlet_velocity(b);
+        }
+    }
     if(PROFILING) TIMING_END("Update_Velocities_On_Grid");
 }
 //#####################################################################
@@ -292,19 +294,15 @@ Solve_The_Linear_System()
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=true;
-
     if(dump_matrix){
         LOG::cout<<"solve id "<<solve_id<<std::endl;
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("m-%i.txt",solve_id).c_str()).Write("m",node_mass.array);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs);}
-
     solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
-
     if(dump_matrix){
         LOG::cout<<"solve id "<<solve_id<<std::endl;
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",x);}
-
     node_V_old=node_V;
     node_V=x.v;
     if(PROFILING) TIMING_END("Solve_The_Linear_System");

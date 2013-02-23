@@ -86,11 +86,13 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
             sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
             sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.05,-0.05),TV(0.15,0.05)));
             sim.ground_level=-100;
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,0.17),TV(10,10)));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,0.19),TV(10,10)));
             sim.dirichlet_velocity.Append(TV(0,0.1));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.17)));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.19)));
             sim.dirichlet_velocity.Append(TV(0,-0.1));
-            sim.yield_max=1.3;
+            sim.use_gravity=false;
+            sim.use_plasticity_yield=true;
+            sim.yield_max=2;
             sim.yield_min=-100;
             sim.use_plasticity_clamp=false;
             sim.clamp_max=1.8;
@@ -100,8 +102,6 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_arg
             sim.grid.Initialize(TV_INT(3.2*grid_res,0.95*grid_res),RANGE<TV>(TV(-0.2,-0.45),TV(3.0,0.5)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.1*particle_res,0.8*particle_res),RANGE<TV>(TV(-0.05,-0.4),TV(0.05,0.4)));
             sim.ground_level=-0.4;
-            // sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.38)));
-            // sim.dirichlet_velocity.Append(TV());
             sim.rigid_ball.Append(SPHERE<TV>(TV(-0.25,0),0.03));
             sim.rigid_ball_velocity.Append(TV(1,0));
             sim.yield_max=1.1;
