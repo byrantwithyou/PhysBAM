@@ -343,9 +343,9 @@ Update_Deformation_Gradient()
                 MATRIX<T,TV::m> U_hat,V_hat;
                 DIAGONAL_MATRIX<T,TV::m> SIGMA_hat;
                 Fe_hat.Fast_Singular_Value_Decomposition(U_hat,SIGMA_hat,V_hat);
-                if(SIGMA_hat.Min()<yield_min || SIGMA_hat.Max()>yield_max){
-                    valid(p)=false;
-                    continue;}
+                // if(SIGMA_hat.Min()<yield_min || SIGMA_hat.Max()>yield_max){
+                //     valid(p)=false;
+                //     continue;}
                 SIGMA_hat=SIGMA_hat.Clamp_Min(yield_min);
                 SIGMA_hat=SIGMA_hat.Clamp_Max(yield_max);
                 particles.Fe(p)=U_hat*SIGMA_hat.Times_Transpose(V_hat);
