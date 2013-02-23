@@ -250,7 +250,10 @@ Grid_Based_Body_Collisions()
             TV vt(node_V_star(it.index));vt(1)=(T)0;
             T vn=node_V_star(it.index)(1);
             T vt_mag=vt.Magnitude();
-            if(vt_mag>eps) node_V_star(it.index)=vt+friction_coefficient*vn*vt/vt_mag;
+            if(vt_mag>eps){
+                T impulse=friction_coefficient*vn/vt_mag;
+                if(impulse<-(T)1) impulse=-(T)1;
+                node_V_star(it.index)=vt*((T)1+impulse);}
             else node_V_star(it.index)=vt;}
         for(int b=0;b<rigid_ball.m;b++){
             if(rigid_ball(b).Lazy_Inside(x)){
@@ -260,7 +263,10 @@ Grid_Based_Body_Collisions()
                 if(vn<(T)0){
                     TV vt=v_rel-n*vn;
                     T vt_mag=vt.Magnitude();
-                    if(vt_mag>eps) node_V_star(it.index)=vt+friction_coefficient*vn*vt/vt_mag+rigid_ball_velocity(b);
+                    if(vt_mag>eps){
+                        T impulse=friction_coefficient*vn/vt_mag;
+                        if(impulse<-(T)1) impulse=-(T)1;
+                        node_V_star(it.index)=vt*((T)1+impulse)+rigid_ball_velocity(b);}
                     else node_V_star(it.index)=vt+rigid_ball_velocity(b);}}}}
     if(PROFILING) TIMING_END("Grid_Based_Body_Collisions");
 }
@@ -398,7 +404,10 @@ Particle_Based_Body_Collisions()
                 TV vt(particles.V(p));vt(1)=(T)0;
                 T vn=particles.V(p)(1);
                 T vt_mag=vt.Magnitude();
-                if(vt_mag>eps) particles.V(p)=vt+friction_coefficient*vn*vt/vt_mag;
+                if(vt_mag>eps){
+                    T impulse=friction_coefficient*vn/vt_mag;
+                    if(impulse<(T)-1) impulse=(T)-1;
+                    particles.V(p)=vt*(1+impulse);}
                 else particles.V(p)=vt;}
             for(int b=0;b<rigid_ball.m;b++){
                 if(rigid_ball(b).Lazy_Inside(x)){
@@ -408,7 +417,10 @@ Particle_Based_Body_Collisions()
                     if(vn<(T)0){
                         TV vt=v_rel-n*vn;
                         T vt_mag=vt.Magnitude();
-                        if(vt_mag>eps) particles.V(p)=vt+friction_coefficient*vn*vt/vt_mag+rigid_ball_velocity(b);
+                        if(vt_mag>eps){
+                            T impulse=friction_coefficient*vn/vt_mag;
+                            if(impulse<(T)-1) impulse=(T)-1;
+                            particles.V(p)=vt*(1+impulse)+rigid_ball_velocity(b);}
                         else particles.V(p)=vt+rigid_ball_velocity(b);}}}}}
         if(PROFILING) TIMING_END("Particle_Based_Body_Collisions");
 }
