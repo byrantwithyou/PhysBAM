@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Tools/Math_Tools/clamp.h>
 #include "MPM_CONSTITUTIVE_MODEL.h"
 namespace PhysBAM{
 //#####################################################################

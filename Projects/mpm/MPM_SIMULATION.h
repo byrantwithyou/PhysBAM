@@ -49,6 +49,10 @@ public:
     ARRAY<TV> dirichlet_velocity;
     ARRAY<SPHERE<TV> > rigid_ball;
     ARRAY<TV> rigid_ball_velocity;
+
+    T visco_nu;
+    T visco_tau;
+
     //#################################################################
     TV gravity_constant;
     ARRAY<bool> valid;
@@ -66,6 +70,8 @@ public:
     ARRAY<TV,TV_INT> node_V_old;
     ARRAY<TV,TV_INT> node_force;
     int frame;
+
+
 
     MPM_SIMULATION();
     ~MPM_SIMULATION();

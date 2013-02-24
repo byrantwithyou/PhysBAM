@@ -145,6 +145,18 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,MPM_SURFACE_2D<VECTOR
                 if(sim.particles.X(p)(0)<0) sim.particles.V(p)=TV(2,0);
                 else sim.particles.V(p)=TV(-2,0);}
             break;
+        case 9: // beam falling on balls
+            sim.grid.Initialize(TV_INT(2*grid_res,1.3*grid_res),RANGE<TV>(TV(-1,-1.0),TV(1,0.3)));
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
+            sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.4),0.06));
+            sim.rigid_ball_velocity.Append(TV());
+            sim.rigid_ball.Append(SPHERE<TV>(TV(-0.2,-0.4),0.06));
+            sim.rigid_ball_velocity.Append(TV());
+            sim.rigid_ball.Append(SPHERE<TV>(TV(0.2,-0.4),0.06));
+            sim.rigid_ball_velocity.Append(TV());
+            sim.use_plasticity_yield=false;
+            sim.ground_level=-0.9;
+            break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
     for(int p=0;p<sim.particles.number;p++){
@@ -218,6 +230,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                     T theta=k*2.0*3.14/50.0;
                     TV disp;disp(0)=sim.rigid_ball(b).radius*cos(theta);disp(1)=sim.rigid_ball(b).radius*sin(theta);
                     Add_Debug_Particle(sim.rigid_ball(b).center+disp,VECTOR<T,3>(1,0,0));}}
+            for(int i=0;i<50;i++) Add_Debug_Particle(TV(-1+i*0.04,sim.ground_level),VECTOR<T,3>(0,0,1));
             Flush_Frame<TV>("mpm");}
         LOG::cout<<std::endl;}
 }
