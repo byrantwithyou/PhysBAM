@@ -54,7 +54,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,MPM_SURFACE_2D<VECTOR
             break;
         case 2: // bending beam
             sim.grid.Initialize(TV_INT(1*grid_res,1*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.5)));
-            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.6*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
             surface.Initialize_With_A_Box(0.01,RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
             sim.use_plasticity_yield=false;
             sim.ground_level=-100;
@@ -196,9 +196,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
     for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-    for(int i=0;i<surface.curve.particles.X.m;i++) {
-        LOG::cout<<surface.curve.particles.X(i)<<std::endl;
-        Add_Debug_Particle(surface.curve.particles.X(i),VECTOR<T,3>(1,0,0));}
+    for(int i=0;i<surface.curve.particles.X.m;i++)
+        Add_Debug_Particle(surface.curve.particles.X(i),VECTOR<T,3>(1,0,0));
     for(int i=0;i<surface.curve.mesh.elements.m;i++)
         Add_Debug_Object(VECTOR<TV,TV::m>(surface.curve.particles.X.Subset(surface.curve.mesh.elements(i))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
     Flush_Frame<TV>("mpm");
@@ -211,7 +210,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
             for(int i=0;i<surface.curve.particles.X.m;i++) {
-                LOG::cout<<surface.curve.particles.X(i)<<std::endl;
                 Add_Debug_Particle(surface.curve.particles.X(i),VECTOR<T,3>(1,0,0));}
             for(int i=0;i<surface.curve.mesh.elements.m;i++)
                 Add_Debug_Object(VECTOR<TV,TV::m>(surface.curve.particles.X.Subset(surface.curve.mesh.elements(i))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));

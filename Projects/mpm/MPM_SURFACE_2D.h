@@ -32,6 +32,7 @@ public:
     ~MPM_SURFACE_2D();
 
     void Initialize_With_A_Box(const T h,const RANGE<TV>& box);
+    // void Build_Nearby_Phyxels_In_Material_Space(cosnt T h);
 //#####################################################################
 };
 }
