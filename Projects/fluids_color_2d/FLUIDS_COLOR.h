@@ -51,6 +51,22 @@ struct ANALYTIC_VELOCITY_VORTEX:public ANALYTIC_VELOCITY<TV>
     virtual T p(const TV& X,T t) const {return (T).25*rho*(cos(2*X.x)+cos(2*X.y))*exp(-4*nu*t);}
     virtual TV F(const TV& X,T t) const {return TV();}
 };
+    
+template<class TV>
+struct ANALYTIC_VELOCITY_VORTEX_AND_SHIFT:public ANALYTIC_VELOCITY<TV>
+{
+    typedef typename TV::SCALAR T;
+    T nu,rho;
+    TV au;
+    T const_p;
+    ANALYTIC_VELOCITY_VORTEX_AND_SHIFT(T mu,T rho,TV v): nu(mu/rho),rho(rho),au(v),const_p(0){}
+    virtual TV u(const TV& X,T t) const
+    {return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y))*exp(-2*nu*t)+au;}
+    virtual MATRIX<T,2> du(const TV& X,T t) const
+    {T c=cos(X.x)*cos(X.y),s=sin(X.x)*sin(X.y);return MATRIX<T,2>(c,s,-s,-c)*exp(-2*nu*t);}
+    virtual T p(const TV& X,T t) const {return const_p+(T).25*rho*(cos(2*X.x)+cos(2*X.y))*exp(-4*nu*t);}
+    virtual TV F(const TV& X,T t) const {return TV();}
+};
 
 template<class T>
 class FLUIDS_COLOR<VECTOR<T,2> >:public FLUIDS_COLOR_BASE<VECTOR<T,2> >
@@ -192,17 +208,6 @@ public:
                     T errd=((ddf0+ddf1)*dX/2-(df1-df0)).Magnitude()/e;
                     LOG::cout<<"analytic diff test f "<<err<<"  "<<errd<<std::endl;}
                 break;
-//            case 26://A rotated box
-//                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-//            {
-//                TV vel((T).0,(T).0);
-//                analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_BOX<TV>(TV()+(T).2,TV()+(T).45,1,0),(T).5,TV()+(T).5),vel);
-//                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(vel));
-//                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(vel));
-//                use_p_null_mode=true;
-//                use_level_set_method=true;
-//            }
-//                break;
             case 27:{//Like test 25 but with an ellipse instead of the smaller circle
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 
@@ -214,6 +219,15 @@ public:
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 //use_level_set_method=true;
                 
+                break;}
+            case 29:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*pi*m,true);
+                TV vel((T)-.5,(T).2);
+                analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3*pi,1,0),vel);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(0*mu0*s/kg,rho0*sqr(m)/kg,vel));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(0*mu0*s/kg,rho0*sqr(m)/kg,vel));
+                use_p_null_mode=true;
+                use_level_set_method=true;
                 break;}
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
     }

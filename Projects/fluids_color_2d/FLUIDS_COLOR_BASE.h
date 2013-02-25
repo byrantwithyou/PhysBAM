@@ -483,10 +483,21 @@ public:
     void Level_Set_Error(T time)
     {
         if(!analytic_levelset || analytic_initial_only) return;
+        ARRAY<VECTOR<T,3> > colors;
+        colors.Append(VECTOR<T,3>((T).25,(T).25,(T).25));
+        colors.Append(VECTOR<T,3>((T).5,(T).5,(T).5));
+        colors.Append(VECTOR<T,3>(1,1,1));
+        colors.Append(VECTOR<T,3>(1,0,0));
+        colors.Append(VECTOR<T,3>(0,1,0));
+        colors.Append(VECTOR<T,3>(0,0,1));
+        colors.Append(VECTOR<T,3>(1,1,0));
+        colors.Append(VECTOR<T,3>(0,1,1));
+        colors.Append(VECTOR<T,3>(1,0,1));
+
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
             int c=levelset_color.color(it.index);
             T p=levelset_color.phi(it.index);
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(c<1,c>=0,p<0));
+            Add_Debug_Particle(it.Location(),colors(c+3));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
         PHYSBAM_DEBUG_WRITE_SUBSTEP("level set",0,1);
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){

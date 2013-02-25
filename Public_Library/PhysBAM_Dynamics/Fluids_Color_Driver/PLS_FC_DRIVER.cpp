@@ -34,17 +34,17 @@
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 using namespace PhysBAM;
 namespace{
-template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
-{
-    ((PLS_FC_DRIVER<TV>*)writer)->Write_Substep(title,substep,level);
-}
+    template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
+    {
+        ((PLS_FC_DRIVER<TV>*)writer)->Write_Substep(title,substep,level);
+    }
 };
 //#####################################################################
 // Initialize
 //#####################################################################
 template<class TV> PLS_FC_DRIVER<TV>::
 PLS_FC_DRIVER(PLS_FC_EXAMPLE<TV>& example)
-    :example(example)
+:example(example)
 {
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }
@@ -72,12 +72,12 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Initialize()
 {
     DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
-
+    
     // setup time
     current_frame=example.restart;
     output_number=current_frame;
     example.time=time=example.time_steps_per_frame*current_frame*example.dt;
-
+    
     example.levelset_color.phi.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
     example.levelset_color.color.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
     example.face_color.Resize(example.grid,example.number_of_ghost_cells);
@@ -89,26 +89,26 @@ Initialize()
         example.prev_face_velocities(i).Resize(example.grid,example.number_of_ghost_cells);}
     for(int i=0;i<example.bc_phis.m;i++)
         example.bc_phis(i).Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
-
+    
     {
         example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.number_of_colors);
         example.particle_levelset_evolution_multiple.particle_levelset.Set_Band_Width(2*example.number_of_ghost_cells);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
-
+    
     example.particle_levelset_evolution_multiple.time=time;
     example.particle_levelset_evolution_multiple.Set_CFL_Number((T).9);
     example.particle_levelset_evolution_multiple.Use_Reinitialization();
-
+    
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.domain_boundary);
     example.particle_levelset_evolution_multiple.Levelset_Advection(0).Set_Custom_Advection(example.advection_scalar);
-
+    
     {
         example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.number_of_colors);
         example.particle_levelset_evolution_multiple.particle_levelset.Set_Band_Width(2*example.number_of_ghost_cells);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
-
+    
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).number_of_ghost_cells=example.number_of_ghost_cells;
     example.particle_levelset_evolution_multiple.Set_Number_Particles_Per_Cell(16);
@@ -117,27 +117,27 @@ Initialize()
     example.particle_levelset_evolution_multiple.runge_kutta_order_levelset=3;
     example.particle_levelset_evolution_multiple.runge_kutta_order_particles=3;
     example.particle_levelset_evolution_multiple.Use_Hamilton_Jacobi_Weno_Advection();
-
+    
     example.particle_levelset_evolution_multiple.particle_levelset.levelset.Set_Custom_Boundary(example.boundary);
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(i)->levelset.Set_Custom_Boundary(example.boundary);
-    example.particle_levelset_evolution_multiple.Bias_Towards_Negative_Particles(false);
+    example.particle_levelset_evolution_multiple.Bias_Towards_Negative_Particles(true);
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Store_Unique_Particle_Id();
     example.particle_levelset_evolution_multiple.use_particle_levelset=true;
-
+    
     for(int i=0;i<example.number_of_colors;i++){
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).levelset.Set_Collision_Body_List(example.collision_bodies_affecting_fluid);
         // TODO example.particle_levelset_evolution_multiple.particle_levelset.levelset.Set_Face_Velocities_Valid_Mask(&example.incompressible.valid_mask);
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Set_Collision_Distance_Factors(.1,1);}
-
+    
     {
         example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.number_of_colors);
         example.particle_levelset_evolution_multiple.particle_levelset.Set_Band_Width(2*example.number_of_ghost_cells);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
     example.particle_levelset_evolution_multiple.levelset_advection_multiple.Set_Custom_Advection(*new ADVECTION_HAMILTON_JACOBI_ENO<GRID<TV>,T>);
-
+    
     if(example.restart){
         example.Read_Output_Files(example.restart);
         example.collision_bodies_affecting_fluid.Rasterize_Objects();
@@ -154,18 +154,18 @@ Initialize()
         example.particle_levelset_evolution_multiple.Make_Signed_Distance();
         example.particle_levelset_evolution_multiple.Fill_Levelset_Ghost_Cells(time);
         example.Get_Initial_Velocities();}
-
+    
     example.collision_bodies_affecting_fluid.Compute_Grid_Visibility();
     example.particle_levelset_evolution_multiple.Set_Seed(2606);
-//    Put these back in for PLS
-    if(!example.restart) example.particle_levelset_evolution_multiple.Seed_Particles(time);
+    //    Put these back in for PLS
+    if(!example.restart && example.use_pls) example.particle_levelset_evolution_multiple.Seed_Particles(time);
     example.particle_levelset_evolution_multiple.Delete_Particles_Outside_Grid();
-
+    
     int extrapolation_cells=2*example.number_of_ghost_cells+2;
     ARRAY<T,TV_INT> exchanged_phi_ghost(example.grid.Domain_Indices(extrapolation_cells));
     example.particle_levelset_evolution_multiple.particle_levelset.levelset.boundary->Fill_Ghost_Cells(example.grid,example.particle_levelset_evolution_multiple.phi,exchanged_phi_ghost,0,time,extrapolation_cells);
-// TODO    example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,example.number_of_ghost_cells,0,TV());
-
+    // TODO    example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,example.number_of_ghost_cells,0,TV());
+    
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
 }
@@ -180,43 +180,45 @@ Update_Pls(T dt)
         int c=example.face_color(it.Full_Index());
         if(c<0) continue;
         maximum_fluid_speed=max(maximum_fluid_speed,abs(example.face_velocities(c)(it.Full_Index())));}
-
+    
     T max_particle_collision_distance=example.particle_levelset_evolution_multiple.Particle_Levelset(0).max_collision_distance_factor*example.grid.dX.Max();
     example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_fluid_speed+2*max_particle_collision_distance+(T).5*example.grid.dX.Max(),10);
-
+    
     LOG::Time("Fill ghost");
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before PLS phi advection",0,1);
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,example.number_of_ghost_cells);
     example.Merge_Velocities(face_velocities_ghost,example.face_velocities,example.face_color);
     example.boundary.Apply_Boundary_Condition_Face(example.grid,face_velocities_ghost,time+example.dt);
     example.boundary.Fill_Ghost_Faces(example.grid,face_velocities_ghost,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
-
+    
     ARRAY<T,TV_INT> phi_back(example.grid.Domain_Indices(example.number_of_ghost_cells));
     Enforce_Phi_Boundary_Conditions();
     LOG::Time("Advect Levelset");
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("phi BCs prior to advection",0,1);
     example.particle_levelset_evolution_multiple.Advance_Levelset(dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after phi",0,1);
     LOG::Time("advecting particles");
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Euler_Step_Particles(face_velocities_ghost,dt,time,true,true,false,false);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after advection",0,1);
-
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle advection",0,1);
+    
     LOG::Time("updating removed particle velocities");
     example.particle_levelset_evolution_multiple.Fill_Levelset_Ghost_Cells(time);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
-
-    example.particle_levelset_evolution_multiple.Make_Signed_Distance();
-    // TODO example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
-
-    LOG::Time("modifying levelset");
-    example.particle_levelset_evolution_multiple.Fill_Levelset_Ghost_Cells(time+dt);
-    for(int i=0;i<example.number_of_colors;i++)
-        example.particle_levelset_evolution_multiple.Particle_Levelset(i).Exchange_Overlap_Particles();
-    example.particle_levelset_evolution_multiple.Modify_Levelset_And_Particles(&face_velocities_ghost);
-    example.particle_levelset_evolution_multiple.Make_Signed_Distance();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
-
+    
+    //example.particle_levelset_evolution_multiple.Make_Signed_Distance(); //This happens way too much in the current code.
+    
+    ////    LOG::Time("modifying levelset");
+    ////    example.particle_levelset_evolution_multiple.Fill_Levelset_Ghost_Cells(time+dt);
+    //    for(int i=0;i<example.number_of_colors;i++)
+    //        example.particle_levelset_evolution_multiple.Particle_Levelset(i).Exchange_Overlap_Particles();//Doesn't do anything in this implementation
+    ////    example.particle_levelset_evolution_multiple.Modify_Levelset_And_Particles(&face_velocities_ghost);
+    
+    Modify_Levelset_And_Particles(&face_velocities_ghost);
+    
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after modifying levelset",0,1);
+    //    example.particle_levelset_evolution_multiple.Make_Signed_Distance();
+    //    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
+    
     LOG::Time("deleting particles"); // needs to be after adding sources, since it does a reseed
     example.particle_levelset_evolution_multiple.Delete_Particles_Outside_Grid();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 1",0,1);
@@ -228,16 +230,73 @@ Update_Pls(T dt)
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Delete_Particles_Far_From_Interface(); // uses visibility
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 3",0,1);
-
+    
     LOG::Time("re-incorporating removed particles");
     for(int i=0;i<example.number_of_colors;i++)
-        example.particle_levelset_evolution_multiple.Particle_Levelset(i).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,1.5,time+dt);
+        example.particle_levelset_evolution_multiple.Particle_Levelset(i).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,5,time+dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after remove",0,1);
     
     Enforce_Phi_Boundary_Conditions();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after level set update",0,1);
     example.Rebuild_Levelset_Color();
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after rebuilding level set again",0,1);
 }
+//#####################################################################
+// Function Modify_Levelset_And_Particles
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Modify_Levelset_And_Particles(T_FACE_ARRAYS_SCALAR* face_velocities)
+{
+    assert(example.use_pls);
+    //This is modified from the function of the same name in the particle_levelset_evolution_multiple class
+    if(example.use_pls){
+        LOG::Time("modifying levelset");
+        example.particle_levelset_evolution_multiple.particle_levelset_multiple.Modify_Levelset_Using_Escaped_Particles(face_velocities);}
+    LOG::Time("reinitializing and projecting levelset");
+    //    PHYSBAM_DEBUG_WRITE_SUBSTEP("after modifying levelset 0",0,1);
+    Project_Levelset();
+    //    PHYSBAM_DEBUG_WRITE_SUBSTEP("after modifying levelset 1",0,1);
+    example.particle_levelset_evolution_multiple.Make_Signed_Distance();
+    //    PHYSBAM_DEBUG_WRITE_SUBSTEP("after modifying levelset 2",0,1);
+    if(example.use_pls){
+        LOG::Time("modifying levelset");
+        example.particle_levelset_evolution_multiple.particle_levelset_multiple.Modify_Levelset_Using_Escaped_Particles(face_velocities);
+        //        PHYSBAM_DEBUG_WRITE_SUBSTEP("after modifying levelset 3",0,1);
+        LOG::Time("adjusting particle radii");
+        example.particle_levelset_evolution_multiple.particle_levelset_multiple.Adjust_Particle_Radii();
+        LOG::Stop_Time();}
+    Project_Levelset();
+}
+//#####################################################################
+// Function Modify_Levelset_Using_Escaped_Particles
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* face_velocities)
+{
+    //This is modified from the functions of the same name in the particle_levelset_multiple and class
+    for(int i=0;i<example.particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets.m;i++){
+        ARRAY<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES*> other_positive_particles(example.particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets.m-1);
+        int index=0;for(int j=0;j<example.particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets.m;j++)if(i!=j)other_positive_particles(index++)=&example.particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(j)->negative_particles;
+        example.particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(i)->Modify_Levelset_Using_Escaped_Particles(face_velocities,&other_positive_particles);}
+    
+}
+//#####################################################################
+// Function Project_Levelset
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Project_Levelset(const int number_of_ghost_cells)
+{
+    //This isn't working with boundary conditions but it seems we can ignore it for now
+    //    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(example.grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){
+    //        bool is_boundary=false;
+    //        for(int i=0;i<example.bc_phis.m;i++)if(example.bc_phis(i)(iterator.Cell_Index())<0)is_boundary=true;
+    //        if(!is_boundary){
+    //        int minimum_region,second_minimum_region;T minimum_phi,second_minimum_phi;
+    //        example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.Two_Minimum_Regions(iterator.Cell_Index(),minimum_region,second_minimum_region,minimum_phi,second_minimum_phi);
+    //        T correction=(T).5*(minimum_phi+second_minimum_phi);
+    //            for(int k=0;k<example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis.m;k++) example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis(k)(iterator.Cell_Index())-=correction;}}
+}
+
 //#####################################################################
 // Function Advance_One_Time_Step
 //#####################################################################
@@ -248,11 +307,11 @@ Advance_One_Time_Step(bool first_step)
     example.Begin_Time_Step(time);
     T dt=example.dt;
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before levelset evolution",0,1);
-
+    
     if(example.use_level_set_method) Update_Level_Set(dt,first_step);
     else if(example.use_pls) Update_Pls(dt);
-
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
+    
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before velocity advection",0,1);
     Extrapolate_Velocity(example.face_velocities,example.face_color);
     Advection_And_BDF(dt,first_step);
     Extrapolate_Velocity(example.face_velocities,example.face_color);
@@ -344,7 +403,7 @@ RK2_Advection_And_BDF(T dt,bool first_step,int c)
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T,AVERAGING_UNIFORM<GRID<TV> >,LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> > linear_advection;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
     ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,example.number_of_ghost_cells),temp2(example.grid,example.number_of_ghost_cells),
-        temp3(example.grid,example.number_of_ghost_cells),temp4(example.grid,example.number_of_ghost_cells),temp5(example.grid,example.number_of_ghost_cells);
+    temp3(example.grid,example.number_of_ghost_cells),temp4(example.grid,example.number_of_ghost_cells),temp5(example.grid,example.number_of_ghost_cells);
     FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_temp(temp),lookup_temp2(temp2),lookup_temp3(temp3),lookup_temp4(temp4),lookup_temp5(temp5);
     FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_face_velocities(example.face_velocities(c)),lookup_prev_face_velocities(example.prev_face_velocities(c));
     PHYSBAM_DEBUG_ONLY(Assert_Advection_CFL(example.face_velocities(c),example.face_color,c,dt));
@@ -380,23 +439,23 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     bccl.time=time+dt;
     bccl.dt=dt;
     bccl.use_discontinuous_velocity=example.use_discontinuous_velocity;
-
+    
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color,true);
     iss.use_preconditioner=example.use_preconditioner;
     iss.use_p_null_mode=example.use_p_null_mode;
     ARRAY<T> system_inertia=example.rho,dt_mu(example.mu*dt);
     if(!first_step) system_inertia*=(T)1.5;
     iss.Set_Matrix(dt_mu,example.wrap,&bccl,&system_inertia,&system_inertia);
-
+    
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
     for(int c=0;c<iss.cdi->colors;c++) printf("p%d [%i]\t",c,iss.cm_p->dofs(c));printf("\n");
     printf("qn [%i]\t",iss.cdi->constraint_base_n);
     printf("qt [%i] ",iss.cdi->constraint_base_t);
     printf("\n");
-
+    
     INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> rhs,sol;
-
+    
     struct VOLUME_FORCE_COLOR_LOCAL:public VOLUME_FORCE_COLOR<TV>
     {
         PLS_FC_EXAMPLE<TV>* example;
@@ -406,14 +465,14 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     vfcl.example=&example;
     vfcl.time=time+dt;
     vfcl.dt=dt;
-
+    
     iss.Set_RHS(rhs,&vfcl,&example.face_velocities,false);
     iss.Resize_Vector(sol);
-
+    
     MINRES<T> mr;
     KRYLOV_SOLVER<T>* solver=&mr;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
-
+    
     if(example.dump_matrix){
         KRYLOV_SOLVER<T>::Ensure_Size(vectors,rhs,2);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%d.txt",solve_id).c_str()).Write("M",iss,*vectors(0),*vectors(1));
@@ -421,15 +480,15 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%d.txt",solve_id).c_str()).Write_Projection("P",iss,*vectors(0));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
-
+    
     iss.Multiply(sol,*vectors(0));
     *vectors(0)-=rhs;
     LOG::cout<<"Residual: "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
-
+    
     for(int i=0;i<iss.null_modes.m;i++){
         iss.Multiply(*iss.null_modes(i),*vectors(0));
         LOG::cout<<"null mode["<<i<<"] "<<iss.Convergence_Norm(*vectors(0))<<std::endl;}
-
+    
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){
         int c=example.levelset_color.Color(it.Location());
         example.face_color(it.Full_Index())=c;
@@ -441,7 +500,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
     vectors.Delete_Pointers_And_Clean_Memory();
-
+    
     for(int c=0;c<example.face_velocities.m;c++){
         example.boundary.Apply_Boundary_Condition_Face(example.grid,example.face_velocities(c),time+example.dt);
         example.boundary.Fill_Ghost_Faces(example.grid,example.face_velocities(c),example.face_velocities(c),0,example.number_of_ghost_cells);}
@@ -460,11 +519,11 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE
             u(it.Full_Index())=1e20;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         u(it.Full_Index())=1e20;
-
+    
     const LEVELSET<TV>& phi=*example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(c);
     EXTRAPOLATION_HIGHER_ORDER<TV,T> eho(example.grid,phi,example.number_of_ghost_cells*10,3,example.number_of_ghost_cells);
     eho.periodic=true;
-
+    
     eho.Extrapolate_Face([&](const FACE_INDEX<TV::m>& index){return color(index)==c;},u);
     
     example.boundary.Apply_Boundary_Condition_Face(example.grid,u,time+example.dt);
@@ -535,8 +594,8 @@ Enforce_Phi_Boundary_Conditions()
 }
 //#####################################################################
 namespace PhysBAM{
-template class PLS_FC_DRIVER<VECTOR<float,2> >;
-template class PLS_FC_DRIVER<VECTOR<float,3> >;
-template class PLS_FC_DRIVER<VECTOR<double,2> >;
-template class PLS_FC_DRIVER<VECTOR<double,3> >;
+    template class PLS_FC_DRIVER<VECTOR<float,2> >;
+    template class PLS_FC_DRIVER<VECTOR<float,3> >;
+    template class PLS_FC_DRIVER<VECTOR<double,2> >;
+    template class PLS_FC_DRIVER<VECTOR<double,3> >;
 }

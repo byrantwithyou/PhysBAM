@@ -4,12 +4,13 @@
 //#####################################################################
 #ifndef __PLS_FC_DRIVER__
 #define __PLS_FC_DRIVER__
+#include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
-
-
+    
+    
 template<class TV> class PLS_FC_EXAMPLE;
 
 template<class TV>
@@ -18,19 +19,25 @@ class PLS_FC_DRIVER
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
 public:
-
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
+    
+    
     int current_frame;
     T time;
     int output_number;
-
+    
     PLS_FC_EXAMPLE<TV>& example;
-
+    
     PLS_FC_DRIVER(PLS_FC_EXAMPLE<TV>& example);
     virtual ~PLS_FC_DRIVER();
     
     void Execute_Main_Program();
     void Initialize();
-
+    
+    void Modify_Levelset_And_Particles(T_FACE_ARRAYS_SCALAR* face_velocities);
+    void Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* face_velocities);
+    void Project_Levelset(const int number_of_ghost_cells=0);
     void Advance_One_Time_Step(bool first_step);
     void Update_Pls(T dt);
     void Simulate_To_Frame(const int frame_input);
