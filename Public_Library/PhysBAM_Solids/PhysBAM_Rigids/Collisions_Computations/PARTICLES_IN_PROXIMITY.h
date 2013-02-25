@@ -153,7 +153,6 @@ void Particles_In_Proximity(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levels
 {
     typedef typename TV::SCALAR T;
     const int d=TV::dimension;
-    typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
 
     FRAME<TV> frame=levelset_body.Frame().Inverse_Times(particle_body.Frame());
     MATRIX<T,d> rotation=frame.r.Rotation_Matrix();

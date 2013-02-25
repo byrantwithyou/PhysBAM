@@ -167,7 +167,6 @@ bool Solve(
     LOG::SCOPE scope("PROJECTED_GAUSS_SEIDEL::Solve");
 
     typedef typename TV::SCALAR T;
-    typedef typename TV::SPIN T_SPIN;
     typedef TWIST<TV> T_TWIST;
     const int d=TV::dimension;
 
@@ -255,7 +254,6 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
     //LOG::SCOPE scope("Solve_Projected_Gauss_Seidel_Friction");
 
     typedef typename TV::SCALAR T;
-    typedef typename TV::SPIN T_SPIN;
     typedef TWIST<TV> T_TWIST;
     const int d=TV::dimension;
 

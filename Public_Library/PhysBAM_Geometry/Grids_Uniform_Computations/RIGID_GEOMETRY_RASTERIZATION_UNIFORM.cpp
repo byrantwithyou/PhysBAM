@@ -45,7 +45,6 @@ template<class T,class TV,class T_GRID> void Compute_Occupied_Blocks(const COLLI
 //#####################################################################
 template<class TV,class T_GRID> void Rasterize_Box_Onto_Blocks(const T_GRID& grid,ARRAY<bool,VECTOR<int,TV::m> >& occupied,const RANGE<TV>& box)
 {
-    typedef typename REBIND<TV,int>::TYPE TV_INT;
     TV DX_over_two=(typename TV::SCALAR).5*grid.dX;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,grid.Clamp_To_Cell(box.Translated(-DX_over_two),3));iterator.Valid();iterator.Next())
         occupied(iterator.Cell_Index()+1)=true;
@@ -55,7 +54,6 @@ template<class TV,class T_GRID> void Rasterize_Box_Onto_Blocks(const T_GRID& gri
 //#####################################################################
 template<class TV,class T_GRID> void Rasterize_Box(const T_GRID& grid,OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>& objects_in_cell,const RANGE<TV>& box,const COLLISION_GEOMETRY_ID id)
 {
-    typedef typename REBIND<TV,int>::TYPE TV_INT;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,grid.Clamp_To_Cell(box,3));iterator.Valid();iterator.Next())
         objects_in_cell.Add_Object_To_Cell(iterator.Cell_Index(),id);
 }

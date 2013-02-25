@@ -522,7 +522,6 @@ Update_Particle_Cells(T_ARRAYS_PARTICLES& particles)
 template<class T_GRID> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Update_Particle_Cells_Part_One_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block)
 {
-    typedef typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE T_PARTICLES;
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
         while(cell_particles){number_of_particles_per_block(block).Append(cell_particles->Size());cell_particles=cell_particles->next;}}

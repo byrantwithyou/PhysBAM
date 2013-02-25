@@ -187,6 +187,80 @@ Fill_Valid_Region_With_Exprapolation()
     Flush_Frame<TV>("after extrap");
 }
 //#####################################################################
+// Function Meet_Phi
+//#####################################################################
+template<class T> static VECTOR<T,2>
+Meet_Phi(const VECTOR<VECTOR<T,4> ,2>& phi)
+{
+    typedef VECTOR<T,2> TV;
+    QUADRATIC<T> quad(-phi(0)(0)*phi(1)(3)+phi(0)(3)*phi(1)(0)+phi(0)(1)*phi(1)(2)-phi(0)(1)*phi(1)(0)+phi(0)(2)*phi(1)(3)-phi(0)(2)*phi(1)(1)+phi(0)(0)*phi(1)(1)-phi(0)(3)*phi(1)(2),-2*phi(0)(0)*phi(1)(1)+phi(0)(0)*phi(1)(3)-phi(0)(1)*phi(1)(2)+2*phi(0)(1)*phi(1)(0)+phi(0)(2)*phi(1)(1)-phi(0)(3)*phi(1)(0),-phi(0)(1)*phi(1)(0)+phi(0)(0)*phi(1)(1));
+    quad.Compute_Roots();
+    if(quad.roots==0){
+        return TV()+1e20;
+//        printf("XXX   %.15g %.15g %.15g\n", quad.a, quad.b, quad.c);
+        quad.roots=1;
+        quad.root1=-quad.b/(2*quad.a);}
+    T ya[2]={quad.root1,quad.root2},ph[2]={FLT_MAX,FLT_MAX},ps[2]={FLT_MAX,FLT_MAX};(void)ps;
+    TV X[2];
+    for(int i=0;i<quad.roots;i++){
+        if(abs(ya[i])>10) continue;
+        T num=-phi(1)(0)-ya[i]*phi(1)(2)+ya[i]*phi(1)(0);
+        T den=phi(1)(1)-phi(1)(0)+ya[i]*phi(1)(3)-ya[i]*phi(1)(2)-ya[i]*phi(1)(1)+ya[i]*phi(1)(0);
+        X[i]=TV(num/den,ya[i]);
+        ph[i]=phi(0)(0)+(phi(0)(1)-phi(0)(0))*X[i].x+(phi(0)(2)-phi(0)(0))*X[i].y+(phi(0)(3)-phi(0)(2)-phi(0)(1)+phi(0)(0))*X[i].x*X[i].y;
+        ps[i]=phi(1)(0)+(phi(1)(1)-phi(1)(0))*X[i].x+(phi(1)(2)-phi(1)(0))*X[i].y+(phi(1)(3)-phi(1)(2)-phi(1)(1)+phi(1)(0))*X[i].x*X[i].y;
+}
+
+//    LOG::cout<<phi<<std::endl;
+//    printf("xx %.15g %.15g    %.15g %.15g\n", ph[0],ps[0],ph[1],ps[1]);
+    return X[abs(ph[1])<abs(ph[0])];
+}
+//#####################################################################
+// Function Meet_Phi
+//#####################################################################
+template<class T> static VECTOR<T,3>
+Meet_Phi(const VECTOR<VECTOR<T,8> ,2>& phi)
+{
+    PHYSBAM_FATAL_ERROR();
+}
+//#####################################################################
+// Function Zero_Phi
+//#####################################################################
+template<class T> VECTOR<T,2>
+Zero_Phi(const VECTOR<VECTOR<T,4> ,3>& phi,VECTOR<T,3>& p)
+{
+    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,(1<<TV::m)> PHI;
+    p=VECTOR<T,3>()+FLT_MAX;
+    TV bestX=TV()+1e20,X;
+    T pp=0;
+    X=Meet_Phi(VECTOR<PHI,2>(phi.x-phi.y,phi.x-phi.z));
+    if(X.Magnitude_Squared()<1e10){
+        pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
+        if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,pp,pp);bestX=X;}}
+    X=Meet_Phi(VECTOR<PHI,2>(phi.x+phi.y,phi.x-phi.z));
+    if(X.Magnitude_Squared()<1e10){
+        pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
+        if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,-pp,pp);bestX=X;}}
+    X=Meet_Phi(VECTOR<PHI,2>(phi.x-phi.y,phi.x+phi.z));
+    if(X.Magnitude_Squared()<1e10){
+        pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
+        if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,pp,-pp);bestX=X;}}
+    X=Meet_Phi(VECTOR<PHI,2>(-phi.x+phi.y,-phi.x+phi.z));
+    if(X.Magnitude_Squared()<1e10){
+        pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
+        if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(-pp,pp,pp);bestX=X;}}
+    return bestX;
+}
+//#####################################################################
+// Function Zero_Phi
+//#####################################################################
+template<class T> VECTOR<T,3>
+Zero_Phi(const VECTOR<VECTOR<T,8> ,3>& phi,VECTOR<T,3>& p)
+{
+    PHYSBAM_FATAL_ERROR();
+}
+//#####################################################################
 // Function One_Step_Triple_Junction_Correction
 //#####################################################################
 template<class TV> void TRIPLE_JUNCTION_CORRECTION<TV>::
@@ -396,80 +470,6 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
         Cut_Cell_With_Pairwise_Phi(index_to_cell_data,it.index);}
     Flush_Frame<TV>(__FUNCTION__);
     combined_color.array-=bc_colors;
-}
-//#####################################################################
-// Function Meet_Phi
-//#####################################################################
-template<class T> static VECTOR<T,2>
-Meet_Phi(const VECTOR<VECTOR<T,4> ,2>& phi)
-{
-    typedef VECTOR<T,2> TV;
-    QUADRATIC<T> quad(-phi(0)(0)*phi(1)(3)+phi(0)(3)*phi(1)(0)+phi(0)(1)*phi(1)(2)-phi(0)(1)*phi(1)(0)+phi(0)(2)*phi(1)(3)-phi(0)(2)*phi(1)(1)+phi(0)(0)*phi(1)(1)-phi(0)(3)*phi(1)(2),-2*phi(0)(0)*phi(1)(1)+phi(0)(0)*phi(1)(3)-phi(0)(1)*phi(1)(2)+2*phi(0)(1)*phi(1)(0)+phi(0)(2)*phi(1)(1)-phi(0)(3)*phi(1)(0),-phi(0)(1)*phi(1)(0)+phi(0)(0)*phi(1)(1));
-    quad.Compute_Roots();
-    if(quad.roots==0){
-        return TV()+1e20;
-//        printf("XXX   %.15g %.15g %.15g\n", quad.a, quad.b, quad.c);
-        quad.roots=1;
-        quad.root1=-quad.b/(2*quad.a);}
-    T ya[2]={quad.root1,quad.root2},ph[2]={FLT_MAX,FLT_MAX},ps[2]={FLT_MAX,FLT_MAX};(void)ps;
-    TV X[2];
-    for(int i=0;i<quad.roots;i++){
-        if(abs(ya[i])>10) continue;
-        T num=-phi(1)(0)-ya[i]*phi(1)(2)+ya[i]*phi(1)(0);
-        T den=phi(1)(1)-phi(1)(0)+ya[i]*phi(1)(3)-ya[i]*phi(1)(2)-ya[i]*phi(1)(1)+ya[i]*phi(1)(0);
-        X[i]=TV(num/den,ya[i]);
-        ph[i]=phi(0)(0)+(phi(0)(1)-phi(0)(0))*X[i].x+(phi(0)(2)-phi(0)(0))*X[i].y+(phi(0)(3)-phi(0)(2)-phi(0)(1)+phi(0)(0))*X[i].x*X[i].y;
-        ps[i]=phi(1)(0)+(phi(1)(1)-phi(1)(0))*X[i].x+(phi(1)(2)-phi(1)(0))*X[i].y+(phi(1)(3)-phi(1)(2)-phi(1)(1)+phi(1)(0))*X[i].x*X[i].y;
-}
-
-//    LOG::cout<<phi<<std::endl;
-//    printf("xx %.15g %.15g    %.15g %.15g\n", ph[0],ps[0],ph[1],ps[1]);
-    return X[abs(ph[1])<abs(ph[0])];
-}
-//#####################################################################
-// Function Meet_Phi
-//#####################################################################
-template<class T> static VECTOR<T,3>
-Meet_Phi(const VECTOR<VECTOR<T,8> ,2>& phi)
-{
-    PHYSBAM_FATAL_ERROR();
-}
-//#####################################################################
-// Function Zero_Phi
-//#####################################################################
-template<class T> VECTOR<T,2>
-Zero_Phi(const VECTOR<VECTOR<T,4> ,3>& phi,VECTOR<T,3>& p)
-{
-    typedef VECTOR<T,2> TV;
-    typedef VECTOR<T,(1<<TV::m)> PHI;
-    p=VECTOR<T,3>()+FLT_MAX;
-    TV bestX=TV()+1e20,X;
-    T pp=0;
-    X=Meet_Phi(VECTOR<PHI,2>(phi.x-phi.y,phi.x-phi.z));
-    if(X.Magnitude_Squared()<1e10){
-        pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
-        if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,pp,pp);bestX=X;}}
-    X=Meet_Phi(VECTOR<PHI,2>(phi.x+phi.y,phi.x-phi.z));
-    if(X.Magnitude_Squared()<1e10){
-        pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
-        if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,-pp,pp);bestX=X;}}
-    X=Meet_Phi(VECTOR<PHI,2>(phi.x-phi.y,phi.x+phi.z));
-    if(X.Magnitude_Squared()<1e10){
-        pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
-        if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(pp,pp,-pp);bestX=X;}}
-    X=Meet_Phi(VECTOR<PHI,2>(-phi.x+phi.y,-phi.x+phi.z));
-    if(X.Magnitude_Squared()<1e10){
-        pp=LINEAR_INTERPOLATION<T,T>::Linear(&phi.x(0),X);
-        if(abs(pp)<abs(p.x)){p=VECTOR<T,3>(-pp,pp,pp);bestX=X;}}
-    return bestX;
-}
-//#####################################################################
-// Function Zero_Phi
-//#####################################################################
-template<class T> VECTOR<T,3>
-Zero_Phi(const VECTOR<VECTOR<T,8> ,3>& phi,VECTOR<T,3>& p)
-{
-    PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
 // Function Cut_Stencil_With_Pairwise_Phi

@@ -97,7 +97,6 @@ template<class T> void POLYGONAL_TRIANGULATION<T>::
 Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positions,const ARRAY<ARRAY<VECTOR<int,2> > >& segments_input,ARRAY<VECTOR<int,3> >& triangles)
 {
     // ensure no 2 vertices are coincident (in float coordinates)
-    typedef VECTOR<float,2> TV_float;
 
     // TODO: Fix the triangulation (this triangulates as if the polygon was simple and convex)
     const ARRAY<VECTOR<int,2> >& segments=segments_input(0);
@@ -111,6 +110,7 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
 
 #if 0
     return;
+    //typedef VECTOR<float,2> TV_float;
     //HASHTABLE<TV_float> float_vertices;
     //for(int v=0;v<positions.m;v++){TV_float float_vertex(positions(v));
     //    if(float_vertices.Contains(float_vertex)) PHYSBAM_FATAL_ERROR();

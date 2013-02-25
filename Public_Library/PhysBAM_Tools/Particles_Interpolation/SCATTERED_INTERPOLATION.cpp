@@ -31,7 +31,6 @@ template<class T_GRID> SCATTERED_INTERPOLATION<T_GRID>::
 template<class T_GRID> template<class T_ARRAYS_T2> void SCATTERED_INTERPOLATION<T_GRID>::
 Transfer_To_Grid_Helper(ARRAY_VIEW<const TV> domain,ARRAY_VIEW<const typename T_ARRAYS_T2::ELEMENT> range,const T_GRID& grid,T_ARRAYS_T2& grid_data) const
 {
-    typedef typename T_ARRAYS_T2::ELEMENT T2;
     T_ARRAYS_ARRAY_INT points_in_cell;Bin_Domain_Values(domain,grid,points_in_cell);
     if(use_tent_weights) Transfer_With_Tent_Weights(domain,range,grid,grid_data,points_in_cell);
     else if(use_distance_averaged_weights) Transfer_With_Distance_Averaged_Weights(domain,range,grid,grid_data,points_in_cell);

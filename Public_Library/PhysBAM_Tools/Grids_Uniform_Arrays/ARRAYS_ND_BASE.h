@@ -215,7 +215,7 @@ public:
 
     template<class TV2>
     static typename SCALAR_POLICY<T>::TYPE Maximum_Magnitude(const ARRAYS_ND_BASE<TV2,VECTOR<int,d> >& a)
-    {STATIC_ASSERT(IS_SAME<T,TV2>::value);typedef typename TV2::SCALAR TS;
+    {STATIC_ASSERT(IS_SAME<T,TV2>::value);
     return ARRAY_VIEW<T>::Maximum_Magnitude(a.array);}
 
     T& operator()(const int i,const int j,const int k)

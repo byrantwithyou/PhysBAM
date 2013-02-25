@@ -84,9 +84,6 @@ Compare_Attributes(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& pls_particles_1,PART
 template<class TV,class T_PARTICLES> bool
 Compare_Attributes(GRID<TV>& grid,ARRAY<T_PARTICLES*,VECTOR<int,TV::dimension> >& pls_particles_1,ARRAY<T_PARTICLES*,VECTOR<int,TV::dimension> >& pls_particles_2)
 {
-    typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::dimension> TV_INT;
-    
     bool success=true;
     for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid);iterator.Valid();iterator.Next()){
         PARTICLE_LEVELSET_PARTICLES<TV> *particles_1=pls_particles_1(iterator.Node_Index()),*particles_2=pls_particles_2(iterator.Node_Index());
@@ -118,8 +115,6 @@ Compare_PLS_Particles(std::string& input_directory_1,std::string& input_director
 template<class TV> bool
 Compare_Particles(std::string& input_directory_1,std::string& input_directory_2,GRID<TV>& grid,int frame,int type,bool verbose=true)
 {
-    typedef typename TV::SCALAR T;
-    
     if(type==-1){
         bool success=true;
         for(int i=0;i<4;i++){

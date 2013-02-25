@@ -71,7 +71,6 @@ Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color)
 template<class TV,class ATTR> void PhysBAM::
 Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr)
 {
-    typedef typename TV::SCALAR T;
     DEBUG_PARTICLES<TV>* particles=DEBUG_PARTICLES<TV>::Store_Debug_Particles();
     ARRAY_VIEW<ATTR>* attribute=particles->debug_particles.template Get_Array<ATTR>(id);
     attribute->Last()=attr;

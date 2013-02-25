@@ -256,7 +256,6 @@ template<class TV> bool
 Update_Box_Box_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,const int i1,const int i2,IMPLICIT_OBJECT<TV>* object1,
     IMPLICIT_OBJECT<TV>* object2,const typename TV::SCALAR dt,const typename TV::SCALAR time,const bool mpi_one_ghost)
 {
-    typedef typename TV::SCALAR T;
     RIGID_BODY<TV>& body1=rigid_body_collisions.rigid_body_collection.Rigid_Body(i1);
     RIGID_BODY<TV>& body2=rigid_body_collisions.rigid_body_collection.Rigid_Body(i2);
     FRAME<TV> transform1,transform2;

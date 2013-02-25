@@ -133,7 +133,6 @@ template<class TV> void RIGID_BODY_INTERSECTIONS<TV>::
 Particles_In_Levelset(const int particle_body_id,const int levelset_body_id,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,
     const T contour_value,const bool exit_early) const
 {
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     RIGID_BODY<TV> &body1=rigid_body_collection.Rigid_Body(particle_body_id),&body2=rigid_body_collection.Rigid_Body(levelset_body_id);
     if(use_particle_hierarchy){
         PARTICLES_IN_IMPLICIT_OBJECT::Particles_In_Implicit_Object_Hierarchy<TV>(body1,body2,particle_intersections,contour_value,particle_hierarchies);}

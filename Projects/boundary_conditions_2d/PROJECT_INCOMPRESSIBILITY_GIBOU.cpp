@@ -144,7 +144,6 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
 {
     typedef VECTOR<int,d> TV_INT;
     typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > T_VECTOR;
-    typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,T_VECTOR > T_SYSTEM;
 
     ARRAY<int,TV_INT> cell_to_index(grid.Domain_Indices(1));
     cell_to_index.Fill(-1);

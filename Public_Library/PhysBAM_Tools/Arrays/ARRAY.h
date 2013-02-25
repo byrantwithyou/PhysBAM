@@ -204,8 +204,7 @@ public:
     {Remove_End();return base_pointer[Value(m)];}
 
     ARRAY_VIEW<const T> Pop_Elements(const int count) // return value should be copied immediately, not kept around
-    {static const bool has_trivial_destructor=HAS_TRIVIAL_DESTRUCTOR<T>::value;
-    STATIC_ASSERT(has_trivial_destructor);
+    {STATIC_ASSERT(HAS_TRIVIAL_DESTRUCTOR<T>::value);
     assert(m-count>=ID());m-=count;
     return ARRAY_VIEW<const T>(count,base_pointer+m);}
 

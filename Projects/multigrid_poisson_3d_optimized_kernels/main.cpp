@@ -108,7 +108,6 @@ int main(int argc,char *argv[])
     static const int d=3;
     typedef VECTOR<int,d> T_INDEX;
     typedef STENCIL<T,d> T_STENCIL;
-    typedef STENCIL_ITERATOR<T,d> T_STENCIL_ITERATOR;
 
     T_STENCIL residual;
     for(int v=0;v<d;v++){

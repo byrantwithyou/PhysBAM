@@ -242,9 +242,6 @@ bool Solve_Projected_Gauss_Seidel(RIGID_BODY_COLLECTION<TV>& rigid_body_collecti
 {
     LOG::SCOPE scope("Solve_Projected_Gauss_Seidel");
 
-    typedef typename TV::SCALAR T;
-    typedef typename TV::SPIN T_SPIN;
-
     ARRAY<CONTACT<TV> > contacts;
     Get_Contact_Points(rigid_body_collection,collision_callbacks,pairs,contacts,contact_proximity,dt,true,true);
     
@@ -334,7 +331,6 @@ void Push_Out(RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks,RIGID_BODY_COL
     LOG::SCOPE scope("Projected Gauss Seidel Push_Out");
 
     typedef typename TV::SCALAR T;
-    typedef typename TV::SPIN T_SPIN;
 
     ARRAY<VECTOR<int,2> > pairs;
     pairs_processed_by_contact.Get_Keys(pairs);

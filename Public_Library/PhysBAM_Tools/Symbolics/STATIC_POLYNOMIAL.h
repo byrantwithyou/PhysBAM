@@ -291,7 +291,6 @@ struct STATIC_POLYNOMIAL
             table[v][0]=1;
             for(int i=1;i<=copy.size(v);i++) table[v][i]=table[v][i-1]*a(v);}
         
-        typedef VECTOR<T,1> TV1;
         typedef VECTOR<int,1> TV_INT1;
         
         STATIC_POLYNOMIAL<T,1,d*rank> barycentric;
@@ -326,7 +325,6 @@ struct STATIC_POLYNOMIAL
                 for(int j=1;j<i;j++)
                     table[v][i][j]=table[v][i-1][j-1]*b(v)+table[v][i-1][j]*a(v);}}
     
-        typedef VECTOR<T,2> TV2;
         typedef VECTOR<int,2> TV_INT2;
 
         STATIC_POLYNOMIAL<T,2,d*rank> barycentric;

@@ -26,8 +26,6 @@ bool Update_Box_Box_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collision
     const int id_1,const int id_2,IMPLICIT_OBJECT<TV>* object1,IMPLICIT_OBJECT<TV>* object2,const bool correct_contact_energy,const int max_iterations,
     const typename TV::SCALAR epsilon_scale,const typename TV::SCALAR dt,const typename TV::SCALAR time,const bool mpi_one_ghost)
 {
-    typedef typename TV::SCALAR T;
-
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=rigid_body_collisions.rigid_body_collection;
 
     FRAME<TV> transform1,transform2;

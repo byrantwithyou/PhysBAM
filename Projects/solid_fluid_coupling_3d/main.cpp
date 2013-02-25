@@ -19,7 +19,6 @@ int main(int argc,char* argv[])
     typedef float T;
     typedef float RW;
     typedef VECTOR<T,3> TV;
-    typedef GRID<TV> T_GRID;
     STREAM_TYPE stream_type((RW()));
 
     bool opt_water=false;
@@ -45,7 +44,7 @@ int main(int argc,char* argv[])
         VECTOR<int,3> proc_counts;
         if(xprocs) proc_counts=VECTOR<int,3>(xprocs,1,zprocs);
         if(example->solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
-            example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<T_GRID>(*example->fluids_parameters.grid,3,false,proc_counts,VECTOR<bool,3>(),
+            example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(*example->fluids_parameters.grid,3,false,proc_counts,VECTOR<bool,3>(),
                 example->solids_fluids_parameters.mpi_solid_fluid->fluid_group);
             example->solid_body_collection.deformable_body_collection.simulate=false;
             example->solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=false;}

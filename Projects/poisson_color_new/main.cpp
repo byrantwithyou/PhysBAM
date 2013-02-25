@@ -78,9 +78,7 @@ template<class T,class TV>
 void Dump_Interface(const INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>& ips)
 {
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
-    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::CELL_ELEMENTS CELL_ELEMENTS;
-    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_FACE T_FACE;
     typedef VECTOR<int,TV::m> TV_INT;
 
     for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(ips.cdi->index_to_cell_elements);it.Valid();it.Next()){
@@ -98,7 +96,6 @@ template<class T,class TV>
 void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>& ips,ANALYTIC_TEST<TV>& at)
 {
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
-    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::CELL_ELEMENTS CELL_ELEMENTS;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_FACE T_FACE;
     typedef VECTOR<int,TV::m> TV_INT;

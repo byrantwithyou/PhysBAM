@@ -21,7 +21,6 @@ int main(int argc,char* argv[])
     typedef double T;
     typedef float RW;
     typedef VECTOR<T,2> TV;
-    typedef GRID<TV> T_GRID;
     STREAM_TYPE stream_type((RW()));
 
     if(0){
@@ -33,7 +32,7 @@ int main(int argc,char* argv[])
         if(example->mpi_world->initialized){
             example->solids_fluids_parameters.mpi_solid_fluid=new MPI_SOLID_FLUID<TV>();
             if(example->solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
-                example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<T_GRID>(*example->fluids_parameters.grid,3,false,VECTOR<int,2>(),VECTOR<bool,2>(),
+                example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(*example->fluids_parameters.grid,3,false,VECTOR<int,2>(),VECTOR<bool,2>(),
                     example->solids_fluids_parameters.mpi_solid_fluid->fluid_group);
                 example->solid_body_collection.deformable_body_collection.simulate=false;
                 example->solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=false;}
