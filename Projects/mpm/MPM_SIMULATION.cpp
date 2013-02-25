@@ -62,8 +62,6 @@ Initialize()
     node_force.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     frame=0;
     min_mass=particles.mass.Min()*(T)1e-5;
-    mu0=ym0/((T)2*((T)1+pr0));
-    lambda0=ym0*pr0/(((T)1+pr0)*((T)1-2*pr0));
     if(PROFILING) TIMING_END("");
 }
 //#####################################################################
@@ -143,8 +141,8 @@ Build_Helper_Structures_For_Constitutive_Model()
     for(int p=0;p<particles.number;p++){
         constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),particles.Fp(p),Je(p),Re(p),Se(p));
         T lame_scale=exp(xi*(1-particles.Fp(p).Determinant()));
-        mu(p)=mu0*lame_scale;
-        lambda(p)=lambda0*lame_scale;}
+        mu(p)=mu(p)*lame_scale;
+        lambda(p)=lambda(p)*lame_scale;}
     if(PROFILING) TIMING_END("Build_Helper_Structures_For_Constitutive_Model");
 }
 //#####################################################################

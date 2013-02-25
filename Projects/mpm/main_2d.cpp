@@ -34,46 +34,43 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <omp.h>
 #include "TIMING.h"
-#include "MPM_SURFACE_2D.h"
+#include "VORONOI_2D.h"
 #include "MPM_SIMULATION.h"
 
 using namespace PhysBAM;
 
 template<class T>
-void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,MPM_SURFACE_2D<VECTOR<T,2> >& surface,PARSE_ARGS& parse_args,int grid_res,int particle_res,int particle_count,T density)
+void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,PARSE_ARGS& parse_args,int grid_res,int particle_res,int particle_count,T density_scale,T ym,T pr)
 {
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,2> TV_INT;
     parse_args.Parse();
-    sim.ym0*=(T)140000;
+
     T object_mass=1;
+
+    // geometry setting
     switch(test){
         case 1: // cube falling on ground
             sim.grid.Initialize(TV_INT(1*grid_res,1.5*grid_res),RANGE<TV>(TV(-0.5,-1.0),TV(0.5,0.5)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res,0.2*particle_res),RANGE<TV>::Centered_Box()*(T).1);
-            object_mass=density*(RANGE<TV>::Centered_Box()*(T).1).Size();
-            sim.use_plasticity_yield=false;
+            object_mass=density_scale*(RANGE<TV>::Centered_Box()*(T).1).Size();
             sim.ground_level=-0.7;
             break;
         case 2: // bending beam
             sim.grid.Initialize(TV_INT(1*grid_res,1*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.5)));
             sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
-            surface.Initialize_With_A_Box(0.01,RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
-            sim.use_plasticity_yield=false;
             sim.ground_level=-100;
             sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.25,10)));
             sim.dirichlet_velocity.Append(TV());
             break;
         case 3: // stretching beam
-            sim.grid.Initialize(TV_INT(4*grid_res,0.6*grid_res),RANGE<TV>(TV(-2,-0.3),TV(2,0.3)));
-            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.6*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
-            sim.use_plasticity_yield=false;
+            sim.grid.Initialize(TV_INT(2*grid_res,0.4*grid_res),RANGE<TV>(TV(-1,-0.2),TV(1,0.2)));
+            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.4*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.2,-0.1),TV(0.2,0.1)));
             sim.ground_level=-100;
-            sim.use_gravity=false;
-            sim.dirichlet_box.Append(RANGE<TV>(TV(0.25,-10),TV(10,10)));
-            sim.dirichlet_velocity.Append(TV(-0.2,0));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.25,10)));
-            sim.dirichlet_velocity.Append(TV(0.2,0));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(0.18,-10),TV(10,10)));
+            sim.dirichlet_velocity.Append(TV(1,0));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.18,10)));
+            sim.dirichlet_velocity.Append(TV(-1,0));
             break;
         case 4: // cube falling on beam
             sim.grid.Initialize(TV_INT(1.0*grid_res,1.2*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.7)));
@@ -151,7 +148,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,MPM_SURFACE_2D<VECTOR
         case 9: // beam falling on balls
             sim.grid.Initialize(TV_INT(2*grid_res,1.3*grid_res),RANGE<TV>(TV(-1,-1.0),TV(1,0.3)));
             sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
-            object_mass=density*(RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1))).Size();
+            object_mass=density_scale*(RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1))).Size();
             sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.4),0.06));
             sim.rigid_ball_velocity.Append(TV());
             sim.ground_level=-0.9;
@@ -165,7 +162,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,MPM_SURFACE_2D<VECTOR
             sim.particles.Reduce_X_Where_Not_In_A_Ball(SPHERE<TV>(TV(-0.2,0),0.09));
             sim.particles.Add_X_As_A_Randomly_Sampled_Box(particle_count/2,RANGE<TV>(TV(0.1,-0.1),TV(0.3,0.1)));
             sim.particles.Reduce_X_Where_Not_In_A_Ball_But_In_A_Box(SPHERE<TV>(TV(0.2,0),0.09),RANGE<TV>(TV(0,-10),TV(10,10)));
-            object_mass=density*(SPHERE<TV>(TV(-0.2,0),0.09).Size()+SPHERE<TV>(TV(0.2,0),0.09).Size());
+            object_mass=density_scale*(SPHERE<TV>(TV(-0.2,0),0.09).Size()+SPHERE<TV>(TV(0.2,0),0.09).Size());
             sim.ground_level=-0.5;
             sim.yield_max=(T)1+0.0075;
             sim.yield_min=(T)1-0.025;
@@ -173,6 +170,22 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,MPM_SURFACE_2D<VECTOR
             for(int p=0;p<sim.particles.number;p++){
                 if(sim.particles.X(p)(0)<0) sim.particles.V(p)=TV(1,0);
                 else sim.particles.V(p)=TV(-1,0);}
+            break;
+        default: PHYSBAM_FATAL_ERROR("Missing test");};
+
+    // material setting
+    sim.Initialize();
+    switch(test){
+        case 3: // stretching beam
+            object_mass=(T)1200*density_scale*RANGE<TV>(TV(-0.2,-0.1),TV(0.2,0.1)).Size();
+            ym*=(T)1e5;
+            for(int p=0;p<sim.particles.number;p++){
+                T this_x=sim.particles.X(p)(0);
+                T this_ym=(90.0/4.0)*ym*this_x*this_x+0.1*ym;
+                sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
+                sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
+            sim.use_gravity=false;
+            sim.use_plasticity_yield=false;
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -189,7 +202,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     typedef float RW;
 
     MPM_SIMULATION<TV> sim;
-    MPM_SURFACE_2D<TV> surface(sim);
 
     int test_number=-1;
     std::string output_directory="";
@@ -197,9 +209,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     sim.dt=(T)1e-3;
     int frame_jump=20;
     int grid_res=16,particle_res=32,particle_count=100;
-    T density=(T)400;
-    sim.ym0=1;
-    sim.pr0=(T).2;
+    T density_scale=(T)1;
+    T ym_scale=1;
+    T pr=(T).3;
     sim.xi=(T)0;
     parse_args.Add("-test",&test_number,"test","test number");
     parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
@@ -207,31 +219,37 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-fj",&frame_jump,"fj","frame jump");
     parse_args.Add("-dump_matrix",&sim.dump_matrix,"dump linear system");
     parse_args.Add("-test_system",&sim.test_system,"test linear system");
-    parse_args.Add("-stiffness",&sim.ym0,"value","scale stiffness");
-    parse_args.Add("-poisson_ratio",&sim.pr0,"value","poisson's ratio");
+    parse_args.Add("-stiffness",&ym_scale,"value","scale stiffness");
+    parse_args.Add("-poisson_ratio",&pr,"value","poisson's ratio");
     parse_args.Add("-hardening",&sim.xi,"value","harderning coefficient");
     parse_args.Add("-flip",&sim.FLIP_alpha,"value","flip fraction");
     parse_args.Add("-gres",&grid_res,"value","grid resolution");
     parse_args.Add("-pres",&particle_res,"value","particle resolution");
     parse_args.Add("-pn",&particle_count,"value","particle number");
-    parse_args.Add("-rho",&density,"value","object density");
+    parse_args.Add("-rho",&density_scale,"value","scale object density");
     parse_args.Parse(true);
 
     typedef VECTOR<int,TV::m> TV_INT;
 
     if(!use_output_directory) output_directory=STRING_UTILITIES::string_sprintf("MPM_%dD_test_%d",TV::m,test_number);
 
-    Initialize(test_number,sim,surface,parse_args,grid_res,particle_res,particle_count,density);
+    Initialize(test_number,sim,parse_args,grid_res,particle_res,particle_count,density_scale,ym_scale,pr);
 
-    sim.Initialize();
+    VORONOI_2D<T> voronoi;
+    voronoi.Initialize_With_A_Regular_Grid(GRID<TV>(TV_INT(0.4*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.2,-0.1),TV(0.2,0.1))));
+
 
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
     for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-    for(int i=0;i<surface.curve.particles.X.m;i++)
-        Add_Debug_Particle(surface.curve.particles.X(i),VECTOR<T,3>(1,0,0));
-    for(int i=0;i<surface.curve.mesh.elements.m;i++)
-        Add_Debug_Object(VECTOR<TV,TV::m>(surface.curve.particles.X.Subset(surface.curve.mesh.elements(i))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+    for(int i=0;i<voronoi.segment_mesh_particles.X.m;i++)
+        Add_Debug_Particle(voronoi.segment_mesh_particles.X(i),VECTOR<T,3>(1,0,0));
+    for(int s=0;s<voronoi.segment_mesh.elements.m;s++){
+        int i,j;voronoi.segment_mesh.elements(s).Get(i,j);
+        Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.segment_mesh_particles.X.Subset(voronoi.segment_mesh.elements(s))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+    }
     Flush_Frame<TV>("mpm");
+
+    exit(0);
 
     for(int f=1;f<1000000;f++){
         TIMING_START;
@@ -240,10 +258,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         TIMING_END("Current time step totally");
         if(f%frame_jump==0){
             for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-            for(int i=0;i<surface.curve.particles.X.m;i++) {
-                Add_Debug_Particle(surface.curve.particles.X(i),VECTOR<T,3>(1,0,0));}
-            for(int i=0;i<surface.curve.mesh.elements.m;i++)
-                Add_Debug_Object(VECTOR<TV,TV::m>(surface.curve.particles.X.Subset(surface.curve.mesh.elements(i))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+            for(int s=0;s<voronoi.segment_mesh.elements.m;s++){
+                int i,j;voronoi.segment_mesh.elements(s).Get(i,j);
+                Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.segment_mesh_particles.X.Subset(voronoi.segment_mesh.elements(s))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+            }
+            for(int i=0;i<voronoi.segment_mesh_particles.X.m;i++)
+                Add_Debug_Particle(voronoi.segment_mesh_particles.X(i),VECTOR<T,3>(1,0,0));
             for(int b=0;b<sim.rigid_ball.m;b++){
                 for(int k=0;k<50;k++){
                     T theta=k*2.0*3.14/50.0;
@@ -261,3 +281,5 @@ int main(int argc,char *argv[])
     Run_Simulation<VECTOR<double,2> >(parse_args);
     return 0;
 }
+
+
