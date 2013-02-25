@@ -19,6 +19,8 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include "MPM_PARTICLES_FORWARD.h"
 
 namespace PhysBAM{
@@ -36,6 +38,7 @@ public:
     ARRAY_VIEW<T> volume;
     ARRAY_VIEW<MATRIX<T,TV::m> > Fe;
     ARRAY_VIEW<MATRIX<T,TV::m> > Fp;
+    RANDOM_NUMBERS<T> rand_generator;
 
     MPM_PARTICLES();
     virtual ~MPM_PARTICLES();
@@ -44,8 +47,11 @@ public:
     void Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box);
     void Initialize_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box);
     void Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box);
+    void Add_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box);
     void Add_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box);
     void Reduce_X_As_A_Ball(const RANGE<TV>& square_box);
+    void Reduce_X_Where_Not_In_A_Ball(const SPHERE<TV>& ball);
+    void Reduce_X_Where_Not_In_A_Ball_But_In_A_Box(const SPHERE<TV>& ball,const RANGE<TV>& box);
 //#####################################################################
 };
 }

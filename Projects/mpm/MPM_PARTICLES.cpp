@@ -5,7 +5,6 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include "MPM_PARTICLES.h"
 #include "MPM_PARTICLES_FORWARD.h"
 namespace PhysBAM{
@@ -21,6 +20,7 @@ MPM_PARTICLES()
     Add_Array(ATTRIBUTE_ID_VOLUME,&volume);
     Add_Array(ATTRIBUTE_ID_FE,&Fe);
     Add_Array(ATTRIBUTE_ID_FP,&Fp);
+    rand_generator.Set_Seed(0);
 }
 //#####################################################################
 // Destructor
@@ -49,8 +49,6 @@ Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
 template<class TV> void MPM_PARTICLES<TV>::
 Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box)
 {
-    RANDOM_NUMBERS<T> rand_generator;
-    rand_generator.Set_Seed(0);
     ARRAY<TV> sample_X;
     for(int n=0;n<N;n++){
         TV x;
@@ -97,6 +95,25 @@ Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
     Xm=X;
 }
 //#####################################################################
+// Function Add_X_As_A_Randomly_Sampled_Box
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Add_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box)
+{
+    ARRAY<TV> sample_X;
+    for(int n=0;n<N;n++){
+        TV x;
+        rand_generator.Fill_Uniform(x,box);
+        sample_X.Append(x);}
+    ARRAY<TV> old_X;
+    old_X.Resize(X.m);
+    for(int i=0;i<X.m;i++) old_X(i)=X(i);
+    old_X.Append_Elements(sample_X);
+    this->Resize(old_X.m);
+    X=old_X;
+    Xm=X;
+}
+//#####################################################################
 // Function Add_X_As_A_Ball
 //#####################################################################
 template<class TV> void MPM_PARTICLES<TV>::
@@ -132,6 +149,40 @@ Reduce_X_As_A_Ball(const RANGE<TV>& square_box)
     for(int i=0;i<old_X.m;i++)
         if((old_X(i)-center).Magnitude()>r)
             sample_X.Append(old_X(i));
+    this->Resize(sample_X.m);
+    X=sample_X;
+    Xm=X;
+}
+//#####################################################################
+// Function Reduce_X_Where_Not_In_A_Ball
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Reduce_X_Where_Not_In_A_Ball(const SPHERE<TV>& ball)
+{
+    ARRAY<TV> old_X;
+    old_X.Resize(X.m);
+    for(int i=0;i<X.m;i++) old_X(i)=X(i);
+    ARRAY<TV> sample_X;
+    for(int i=0;i<old_X.m;i++)
+        if(ball.Lazy_Inside(old_X(i)))
+            sample_X.Append(old_X(i));
+    this->Resize(sample_X.m);
+    X=sample_X;
+    Xm=X;
+}
+//#####################################################################
+// Function Reduce_X_Where_Not_In_A_Ball_But_In_A_Box
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Reduce_X_Where_Not_In_A_Ball_But_In_A_Box(const SPHERE<TV>& ball,const RANGE<TV>& box)
+{
+    ARRAY<TV> old_X;
+    old_X.Resize(X.m);
+    for(int i=0;i<X.m;i++) old_X(i)=X(i);
+    ARRAY<TV> sample_X;
+    for(int i=0;i<old_X.m;i++){
+        if(!ball.Lazy_Inside(old_X(i)) && box.Lazy_Inside(old_X(i))) continue;
+        sample_X.Append(old_X(i));}
     this->Resize(sample_X.m);
     X=sample_X;
     Xm=X;

@@ -159,6 +159,21 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,MPM_SURFACE_2D<VECTOR
             sim.yield_min=(T)1-0.025;
             sim.use_plasticity_clamp=false;
             break;
+        case 10: // snow ball hit each other
+            sim.grid.Initialize(TV_INT(2*grid_res,1.0*grid_res),RANGE<TV>(TV(-1,-0.7),TV(1,0.3)));
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count/2,RANGE<TV>(TV(-0.3,-0.1),TV(-0.1,0.1)));
+            sim.particles.Reduce_X_Where_Not_In_A_Ball(SPHERE<TV>(TV(-0.2,0),0.09));
+            sim.particles.Add_X_As_A_Randomly_Sampled_Box(particle_count/2,RANGE<TV>(TV(0.1,-0.1),TV(0.3,0.1)));
+            sim.particles.Reduce_X_Where_Not_In_A_Ball_But_In_A_Box(SPHERE<TV>(TV(0.2,0),0.09),RANGE<TV>(TV(0,-10),TV(10,10)));
+            object_mass=density*(SPHERE<TV>(TV(-0.2,0),0.09).Size()+SPHERE<TV>(TV(0.2,0),0.09).Size());
+            sim.ground_level=-0.5;
+            sim.yield_max=(T)1+0.0075;
+            sim.yield_min=(T)1-0.025;
+            sim.use_plasticity_clamp=false;
+            for(int p=0;p<sim.particles.number;p++){
+                if(sim.particles.X(p)(0)<0) sim.particles.V(p)=TV(1,0);
+                else sim.particles.V(p)=TV(-1,0);}
+            break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
     for(int p=0;p<sim.particles.number;p++){
