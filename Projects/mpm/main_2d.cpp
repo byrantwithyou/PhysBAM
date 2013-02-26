@@ -64,14 +64,14 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             sim.dirichlet_velocity.Append(TV());
             break;
         case 3: // stretching beam
-            sim.grid.Initialize(TV_INT(2*grid_res,0.4*grid_res),RANGE<TV>(TV(-1,-0.2),TV(1,0.2)));
+            sim.grid.Initialize(TV_INT(2*grid_res+1,0.5*grid_res+1),RANGE<TV>(TV(-1,-0.25),TV(1,0.25)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.4*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.2,-0.1),TV(0.2,0.1)));
             voronoi.Initialize_With_A_Regular_Grid(GRID<TV>(TV_INT(0.4*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.2,-0.1),TV(0.2,0.1))));
             sim.ground_level=-100;
             sim.dirichlet_box.Append(RANGE<TV>(TV(0.18,-10),TV(10,10)));
-            sim.dirichlet_velocity.Append(TV(1,0));
+            sim.dirichlet_velocity.Append(TV(0.2,0));
             sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.18,10)));
-            sim.dirichlet_velocity.Append(TV(-1,0));
+            sim.dirichlet_velocity.Append(TV(-0.2,0));
             break;
         case 4: // cube falling on beam
             sim.grid.Initialize(TV_INT(1.0*grid_res,1.2*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.7)));
@@ -183,19 +183,22 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             ym*=(T)1e5;
             for(int p=0;p<sim.particles.number;p++){
                 T this_x=sim.particles.X(p)(0);
-                //T this_ym=(90.0/4.0)*ym*this_x*this_x+0.1*ym;
-                T this_ym=(abs(this_x)<0.01&&sim.particles.X(p)(1)>0)?0.01*ym:ym;
-                if(abs(this_x)<0.01&&sim.particles.X(p)(1)<=0)this_ym=0.6*ym;
+                T this_ym=(90.0/4.0)*ym*this_x*this_x+0.1*ym;
+                //if(abs(this_x)<0.02) this_ym*=0.01;
+                pr=(T)0;
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
             sim.use_gravity=false;
-            sim.use_plasticity_yield=false;
+            LOG::cout<<sim.grid.dX<<std::endl;
             break;
         case 9:
             object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
             ym*=(T)1e5;
             sim.mu.Fill(ym/((T)2*((T)1+pr)));
             sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
+            sim.use_visco_plasticity=true;
+            sim.visco_nu=1e4;
+            sim.visco_tau=1000;
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 

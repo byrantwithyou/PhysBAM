@@ -35,6 +35,9 @@ public:
     T min_mass,min_rho;
     T dt;
     ARRAY<T> mu,lambda;
+    bool use_visco_plasticity;
+    T visco_nu;
+    T visco_tau;
     bool use_plasticity_yield;
     T yield_min;
     T yield_max;
@@ -50,8 +53,6 @@ public:
     ARRAY<SPHERE<TV> > rigid_ball;
     ARRAY<TV> rigid_ball_velocity;
     T xi;
-    T visco_nu;
-    T visco_tau;
     //#################################################################
     TV gravity_constant;
     ARRAY<bool> valid;
