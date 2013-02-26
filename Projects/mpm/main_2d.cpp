@@ -147,14 +147,15 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
                 else sim.particles.V(p)=TV(-2,0);}
             break;
         case 9: // beam falling on balls
-            sim.grid.Initialize(TV_INT(2*grid_res,1.3*grid_res),RANGE<TV>(TV(-1,-1.0),TV(1,0.3)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
-            object_mass=density_scale*(RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1))).Size();
-            sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.4),0.06));
+            sim.grid.Initialize(TV_INT(1*grid_res,0.82*grid_res),RANGE<TV>(TV(-0.5,-0.7),TV(0.5,0.12)));
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1)));
+            // sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.3),0.02));
+            // sim.rigid_ball_velocity.Append(TV());
+            sim.rigid_ball.Append(SPHERE<TV>(TV(0.08,-0.3),0.02));
             sim.rigid_ball_velocity.Append(TV());
-            sim.ground_level=-0.9;
-            sim.yield_max=(T)1+0.0075;
-            sim.yield_min=(T)1-0.025;
+            sim.rigid_ball.Append(SPHERE<TV>(TV(-0.08,-0.3),0.04));
+            sim.rigid_ball_velocity.Append(TV());
+            sim.ground_level=-0.6;
             sim.use_plasticity_clamp=false;
             break;
         case 10: // snow ball hit each other
@@ -189,6 +190,12 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
             sim.use_gravity=false;
             sim.use_plasticity_yield=false;
+            break;
+        case 9:
+            object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
+            ym*=(T)1e5;
+            sim.mu.Fill(ym/((T)2*((T)1+pr)));
+            sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
