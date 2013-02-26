@@ -135,6 +135,23 @@ Add_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box)
     Xm=X;
 }
 //#####################################################################
+// Function Reduce_X_As_A_Box
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Reduce_X_In_A_Box(const RANGE<TV>& box)
+{
+    ARRAY<TV> old_X;
+    old_X.Resize(X.m);
+    for(int i=0;i<X.m;i++) old_X(i)=X(i);
+    ARRAY<TV> sample_X;
+    for(int i=0;i<old_X.m;i++)
+        if(!box.Lazy_Inside(old_X(i)))
+            sample_X.Append(old_X(i));
+    this->Resize(sample_X.m);
+    X=sample_X;
+    Xm=X;
+}
+//#####################################################################
 // Function Reduce_X_As_A_Ball
 //#####################################################################
 template<class TV> void MPM_PARTICLES<TV>::

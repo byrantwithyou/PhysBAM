@@ -49,6 +49,7 @@ public:
     void Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box);
     void Add_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box);
     void Add_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box);
+    void Reduce_X_In_A_Box(const RANGE<TV>& box);
     void Reduce_X_As_A_Ball(const RANGE<TV>& square_box);
     void Reduce_X_Where_Not_In_A_Ball(const SPHERE<TV>& ball);
     void Reduce_X_Where_Not_In_A_Ball_But_In_A_Box(const SPHERE<TV>& ball,const RANGE<TV>& box);
