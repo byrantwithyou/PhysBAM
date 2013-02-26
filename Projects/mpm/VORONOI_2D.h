@@ -12,7 +12,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-
 namespace PhysBAM{
 template<class T>
 class VORONOI_2D
@@ -21,8 +20,10 @@ class VORONOI_2D
     typedef VECTOR<int,2> TV_INT;
 public:    
     GEOMETRY_PARTICLES<TV> segment_mesh_particles;
+    ARRAY<TV> Xm;
     SEGMENT_MESH segment_mesh;
-    ARRAY<ARRAY<TV_INT> > voronoi_mesh_of_particle;
+    ARRAY<ARRAY<TV_INT> > local_voronoi_elements_of_sample_particle;
+    ARRAY<ARRAY<int> > local_voronoi_particles_of_sample_particle;
 
     VORONOI_2D(){}
     ~VORONOI_2D(){}
