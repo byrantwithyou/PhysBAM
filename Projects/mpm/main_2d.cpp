@@ -65,7 +65,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
                 T this_ym=ym;
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
-            sim.use_gravity=true;
+            sim.use_gravity=false;
             break;
         case 2:
             object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
@@ -156,6 +156,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             // MPM particles
             for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+            // grid force
+            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
+                Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_force(it.index));}
+
             // Voronoi cells
             // for(int p=0;p<sim.particles.X.m;p++){
             //     TV b=sim.particles.X(p)-sim.particles.Fe(p)*sim.particles.Fp(p)*sim.particles.Xm(p);
