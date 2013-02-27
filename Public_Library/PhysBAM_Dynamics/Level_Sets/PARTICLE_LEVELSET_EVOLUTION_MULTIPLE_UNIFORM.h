@@ -62,8 +62,8 @@ public:
     void Advance_One_Time_Step(T_FACE_ARRAYS_SCALAR* face_velocities,const T dt) PHYSBAM_OVERRIDE;
     void Advance_Levelset(const T dt) PHYSBAM_OVERRIDE;
     void Advance_Particles(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const bool analytic_test=false) PHYSBAM_OVERRIDE;
-    T Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time) PHYSBAM_OVERRIDE;
-    T Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time) PHYSBAM_OVERRIDE;
+    T Advance_Particles(ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time) PHYSBAM_OVERRIDE;
+    T Advance_Particles(ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time) PHYSBAM_OVERRIDE;
     void Modify_Levelset_And_Particles(T_FACE_ARRAYS_SCALAR* face_velocities) PHYSBAM_OVERRIDE;
     void Reseed_Particles(const T time,const int time_step=0,ARRAY<bool,TV_INT>* cell_centered_mask=0,const bool verbose=true) PHYSBAM_OVERRIDE;
     void Fill_Levelset_Ghost_Cells(const T time) PHYSBAM_OVERRIDE;

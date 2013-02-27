@@ -61,7 +61,7 @@ CFL(const bool need_to_get_velocity,const bool analytic_test)
 // Function Advance_To_Time
 //#####################################################################
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
-Advance_To_Time(T_FACE_ARRAYS_SCALAR* face_velocities,const T stopping_time,const bool verbose)
+Advance_To_Time(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities,const T stopping_time,const bool verbose)
 {
     int substep=0;bool done=false;
     while(!done){substep++;
@@ -76,7 +76,7 @@ Advance_To_Time(T_FACE_ARRAYS_SCALAR* face_velocities,const T stopping_time,cons
 // Function Advance_One_Time_Step
 //#####################################################################
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
-Advance_One_Time_Step(T_FACE_ARRAYS_SCALAR* face_velocities,const T dt)
+Advance_One_Time_Step(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities,const T dt)
 {
     LOG::Time("advancing levelset");
     Advance_Levelset(dt);
@@ -90,8 +90,8 @@ Advance_One_Time_Step(T_FACE_ARRAYS_SCALAR* face_velocities,const T dt)
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Advance_Levelset(const T dt)
 {
-    ARRAY<RUNGEKUTTA<T_ARRAYS_SCALAR>*> rungekutta_phis(phis.m);
-    for(int i=0;i<phis.m;i++) rungekutta_phis(i)=new RUNGEKUTTA<T_ARRAYS_SCALAR>(phis(i),runge_kutta_order_levelset,0,time);
+    ARRAY<RUNGEKUTTA<ARRAY<T,TV_INT> >*> rungekutta_phis(phis.m);
+    for(int i=0;i<phis.m;i++) rungekutta_phis(i)=new RUNGEKUTTA<ARRAY<T,TV_INT> >(phis(i),runge_kutta_order_levelset,0,time);
     for(int k=0;k<runge_kutta_order_levelset;k++){
         if(k==0 || !use_frozen_velocity) particle_levelset_multiple.levelset_multiple.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset_multiple.levelset_multiple,V,time);
         levelset_advection_multiple.Euler_Step(V,dt,time,particle_levelset_multiple.number_of_ghost_cells);
@@ -105,7 +105,7 @@ Advance_Levelset(const T dt)
 // Function Advance_Particles
 //#####################################################################
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
-Advance_Particles(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const bool analytic_test)
+Advance_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const bool analytic_test)
 {
     if(analytic_test) PHYSBAM_NOT_IMPLEMENTED("analytic_test");
     if(use_particle_levelset){
@@ -124,7 +124,7 @@ Advance_Particles(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const b
 // Function Advance_Particles
 //#####################################################################
 template<class T_GRID> typename T_GRID::SCALAR PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
-Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time)
+Advance_Particles(ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time)
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }
@@ -132,7 +132,7 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const PARTICLE
 // Function Advance_Particles
 //#####################################################################
 template<class T_GRID> typename T_GRID::SCALAR PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
-Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time)
+Advance_Particles(ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time)
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }
@@ -140,7 +140,7 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const 
 // Function Modify_Levelset_And_Particles
 //#####################################################################
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
-Modify_Levelset_And_Particles(T_FACE_ARRAYS_SCALAR* face_velocities)
+Modify_Levelset_And_Particles(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities)
 {
     if(use_particle_levelset){
         LOG::Time("modifying levelset");
