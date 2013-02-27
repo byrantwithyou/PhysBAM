@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
@@ -22,7 +23,7 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     max_iter(100000),dump_matrix(false),wrap(true),use_advection(true),use_reduced_advection(true),omit_solve(false),
     number_of_colors(1),use_discontinuous_velocity(false),use_p_null_mode(false),use_level_set_method(false),use_pls(false),periodic_particles(true),
     grid(TV_INT(),RANGE<TV>::Unit_Box(),true),particle_levelset_evolution_multiple(*new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >(grid,number_of_ghost_cells)),
-    advection_scalar(*new ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T>),levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),
+    advection_scalar(*new ADVECTION_HAMILTON_JACOBI_ENO<GRID<TV>,T>),levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),
     collision_bodies_affecting_fluid(*new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >(grid)),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
@@ -164,6 +165,17 @@ Color_At_Cell(const TV_INT& index,T& phi) const
     return c;
 }
 //#####################################################################
+// Function Enforce_Phi_Boundary_Conditions
+//#####################################################################
+template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
+Enforce_Phi_Boundary_Conditions()
+{
+    ARRAY<ARRAY<T,TV_INT> >& phis=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis;
+    for(int i=0;i<phis.m;i++){
+        boundary.Fill_Ghost_Cells(grid,phis(i),phis(i),0,0,number_of_ghost_cells);
+        if(phis(i).array.Min()>=0) phis(i).array.Fill(number_of_ghost_cells*grid.dX.Max());}
+}
+//#####################################################################
 // Function Rebuild_Levelset_Color
 //#####################################################################
 template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
@@ -241,9 +253,10 @@ Make_Levelsets_Consistent()
             T p=phis(i)(it.index);
             if(p<min1){min2=min1;min1=p;}
             else if(p<min2) min2=p;}
-        T shift=(bc_min<min2)?-bc_min-min1:-(T).5*(min2+min1);
+        T shift=min(bc_min+min1,(T).5*(min2+min1));
         for(int i=0;i<phis.m;i++)
-            phis(i)(it.index)+=shift;}
+            phis(i)(it.index)-=shift;}
+    Enforce_Phi_Boundary_Conditions();
 }
 //#####################################################################
 namespace PhysBAM{

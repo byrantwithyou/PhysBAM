@@ -65,7 +65,7 @@ public:
     VECTOR<LEVELSET<TV>*,num_bc> bc_levelsets;
     ARRAY<int,FACE_INDEX<TV::dimension> > face_color,prev_face_color;
     ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > face_velocities,prev_face_velocities;
-    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T>& advection_scalar;
+    ADVECTION<GRID<TV>,T>& advection_scalar;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
     BOUNDARY_MAC_GRID_PERIODIC<TV,int> boundary_int;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
@@ -94,6 +94,7 @@ public:
     void Rebuild_Levelset_Color();
     void Make_Levelsets_Consistent();
     void Fill_Levelsets_From_Levelset_Color();
+    void Enforce_Phi_Boundary_Conditions();
 //#####################################################################
 };
 }
