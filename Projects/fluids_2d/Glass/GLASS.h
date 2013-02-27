@@ -264,7 +264,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     for(int s=0;s<sources.m;s++)Adjust_Phi_With_Source(sources(s),world_to_source(s));
-    T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& removed_positive_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles;
+    T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& removed_positive_particles=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_positive_particles;
     GRID<TV>& grid=*fluids_parameters.grid;
 
     for(int s=0;s<sources.m;s++){
@@ -346,7 +346,7 @@ void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sph_sources,c
         bool use_initial_targetting=false)
 {
     GRID<TV> & grid=fluids_parameters.particle_levelset_evolution->grid;
-    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_negative_particles;
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles;
     for(int s=0;s<sph_sources.m;s++){
         RANGE<TV> source_bounding_box=sph_sources_bounding_box(s);
         RANGE<TV_INT> source_bounding_box_int=RANGE<TV_INT>(grid.Block_Index(TV(source_bounding_box.min_corner.x,source_bounding_box.min_corner.y),1),

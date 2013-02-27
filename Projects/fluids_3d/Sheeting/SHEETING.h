@@ -212,7 +212,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 virtual void Update_Sources(const T time)
 {
-    T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& removed_positive_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles;
+    T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& removed_positive_particles=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_positive_particles;
     GRID<TV>& grid=*fluids_parameters.grid;
     VECTOR<T,3> source_radius_vector=source_radius*VECTOR<T,3>::All_Ones_Vector();
     RANGE<TV_INT> source_nodes(grid.Clamp_To_Cell(source_center-source_radius_vector),grid.Clamp_To_Cell(source_center+source_radius_vector)+TV_INT::All_Ones_Vector());

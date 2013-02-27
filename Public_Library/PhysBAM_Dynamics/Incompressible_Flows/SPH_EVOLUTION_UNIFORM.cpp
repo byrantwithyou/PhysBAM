@@ -63,8 +63,8 @@ CFL() const
     T max_particle_velocity=0;
     if(particle_levelset_evolution) for(NODE_ITERATOR node_iterator(grid);node_iterator.Valid();node_iterator.Next()){
         TV_INT block=node_iterator.Node_Index();
-        if(particle_levelset_evolution->particle_levelset.removed_negative_particles(block)){
-            PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*particle_levelset_evolution->particle_levelset.removed_negative_particles(block);
+        if(particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles(block)){
+            PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles(block);
             for(int p=0;p<particles.Size();p++) max_particle_velocity=max(max_particle_velocity,particles.V(p).Max_Abs());}}
     else for(int i=0;i<sph_particles.Size();i++)max_particle_velocity=max(max_particle_velocity,sph_particles.V(i).Max_Abs());
     if(max_particle_velocity) return 3*grid.dX.Min()/max_particle_velocity;
@@ -392,7 +392,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
     Calculate_SPH_Constants();
 
     LOG::Time("modifying levelset");
-    PARTICLE_LEVELSET_UNIFORM<T_GRID>& particle_levelset=particle_levelset_evolution->particle_levelset;
+    PARTICLE_LEVELSET_UNIFORM<T_GRID>& particle_levelset=particle_levelset_evolution->Particle_Levelset(0);
     particle_levelset.Modify_Levelset_Using_Escaped_Particles(face_velocities);
 
     LOG::Time("creating fluid from particles");
@@ -464,14 +464,14 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
             TV_INT block=iterator.Node_Index();
             if(positive_particles(block)){
                 for(int p=0;p<positive_particles(block)->Size();p++) 
-                    if(particle_levelset_evolution->particle_levelset.levelset.Phi(positive_particles(block)->X(p))<0){
+                    if(particle_levelset_evolution->Particle_Levelset(0).levelset.Phi(positive_particles(block)->X(p))<0){
                         positive_particles(block)->Add_To_Deletion_List(p);
                         if(!removed_positive_particles(block)) removed_positive_particles(block)=particle_levelset.template_removed_particles.Clone();
                         removed_positive_particles(block)->Append(*positive_particles(block),p);}
                 positive_particles(block)->Delete_Elements_On_Deletion_List();}
             if(removed_negative_particles(block)){
                 for(int p=0;p<removed_negative_particles(block)->Size();p++)
-                    if(particle_levelset_evolution->particle_levelset.levelset.Phi(removed_negative_particles(block)->X(p))<0){
+                    if(particle_levelset_evolution->Particle_Levelset(0).levelset.Phi(removed_negative_particles(block)->X(p))<0){
                         removed_negative_particles(block)->Add_To_Deletion_List(p);
                         if(!negative_particles(block)) negative_particles(block)=particle_levelset.template_particles.Clone();
                         negative_particles(block)->Append(*removed_negative_particles(block),p);}
@@ -480,12 +480,12 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
     LOG::Time("reseeding around new fluid");
     ARRAYS_UTILITIES<T_GRID,T>::Make_Ghost_Mask_From_Active_Mask(grid.Get_Regular_Grid_At_MAC_Positions(),converting_cells,converting_cells_neighborhood,2,1);
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();converting_cells(cell)=converting_cells(cell)||converting_cells_neighborhood(cell);}
-    particle_levelset_evolution->particle_levelset.Reseed_Particles(time,&converting_cells);
+    particle_levelset_evolution->Particle_Levelset(0).Reseed_Particles(time,&converting_cells);
         
     LOG::Time("modifying levelset");        
-    particle_levelset_evolution->particle_levelset.Modify_Levelset_Using_Escaped_Particles(face_velocities);
+    particle_levelset_evolution->Particle_Levelset(0).Modify_Levelset_Using_Escaped_Particles(face_velocities);
     LOG::Time("adjusting particle radii");
-    particle_levelset_evolution->particle_levelset.Adjust_Particle_Radii();
+    particle_levelset_evolution->Particle_Levelset(0).Adjust_Particle_Radii();
     LOG::Stop_Time();
 }
 //#####################################################################

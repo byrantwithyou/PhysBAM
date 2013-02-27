@@ -98,14 +98,14 @@ Initialize_Fluid_Evolution(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities)
         incompressible_multiphase=new INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>(grid->Get_MAC_Grid(),*projection);
         phi_boundary_multiphase.Resize(number_of_regions);for(int i=0;i<number_of_regions;i++) phi_boundary_multiphase(i)=&phi_boundary_reflection;
         phi_boundary=0;
-        particle_levelset_evolution=particle_levelset_evolution_multiple;
+        particle_levelset_evolution=0;
         incompressible=incompressible_multiphase;}
     else if(number_of_regions==1){ // free surface_flow
-        particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> >(*grid,number_of_ghost_cells);
-        particle_levelset_evolution->particle_levelset.thread_queue=thread_queue;
-        particle_levelset_evolution->particle_levelset.levelset.thread_queue=thread_queue;
+        particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> >(*grid,number_of_ghost_cells,false);
+        particle_levelset_evolution->Particle_Levelset(0).thread_queue=thread_queue;
+        particle_levelset_evolution->Particle_Levelset(0).levelset.thread_queue=thread_queue;
         if(!projection){
-            if(use_modified_projection) projection=new PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>(*grid,particle_levelset_evolution->particle_levelset.levelset,projection_scale,1,use_surface_solve,fire,false,use_poisson,use_poisson);
+            if(use_modified_projection) projection=new PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>(*grid,particle_levelset_evolution->Particle_Levelset(0).levelset,projection_scale,1,use_surface_solve,fire,false,use_poisson,use_poisson);
             else projection=new PROJECTION_DYNAMICS_UNIFORM<T_GRID>(*grid,fire,false,false,use_poisson,thread_queue);}
         projection->elliptic_solver->thread_queue=thread_queue;        
         incompressible=new T_INCOMPRESSIBLE(*grid,*projection);
@@ -214,8 +214,10 @@ Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles
     if(particle_type==PARTICLE_LEVELSET_POSITIVE || particle_type==PARTICLE_LEVELSET_REMOVED_POSITIVE) return;
 
     TV& X=particles.X(index);TV X_new=X+dt*V;
-    T max_collision_distance=particle_levelset_evolution->particle_levelset.Particle_Collision_Distance(particles.quantized_collision_distance(index));
-    T min_collision_distance=particle_levelset_evolution->particle_levelset.min_collision_distance_factor*max_collision_distance;
+    T max_collision_distance=0;
+    if(number_of_regions==1) particle_levelset_evolution->Particle_Levelset(0).Particle_Collision_Distance(particles.quantized_collision_distance(index));
+    else particle_levelset_evolution_multiple->particle_levelset_multiple.Particle_Collision_Distance(particles.quantized_collision_distance(index));
+    T min_collision_distance=particle_levelset_evolution->Particle_Levelset(0).min_collision_distance_factor*max_collision_distance;
     TV min_corner=grid->domain.Minimum_Corner(),max_corner=grid->domain.Maximum_Corner();
     for(int axis=0;axis<T_GRID::dimension;axis++){
         if(domain_walls[axis][0] && X_new[axis]<min_corner[axis]+max_collision_distance){
@@ -239,7 +241,7 @@ Delete_Particles_Inside_Objects(const T time)
 {
     for(int i=0;i<number_of_regions;i++){
         PARTICLE_LEVELSET_UNIFORM<T_GRID>* particle_levelset;
-        if(number_of_regions==1) particle_levelset=&particle_levelset_evolution->particle_levelset;
+        if(number_of_regions==1) particle_levelset=&particle_levelset_evolution->Particle_Levelset(0);
         else particle_levelset=particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
         Delete_Particles_Inside_Objects<PARTICLE_LEVELSET_PARTICLES<TV> >(particle_levelset->positive_particles,PARTICLE_LEVELSET_POSITIVE,time);
         Delete_Particles_Inside_Objects<PARTICLE_LEVELSET_PARTICLES<TV> >(particle_levelset->negative_particles,PARTICLE_LEVELSET_NEGATIVE,time);
@@ -264,7 +266,7 @@ Delete_Particles_Inside_Objects(typename T_ARRAYS_SCALAR::template REBIND<T_PART
             // TODO(jontg): Shouldn't this delete particles inside the solid, not just on the surface?
             for(int k=block_particles.Size()-1;k>=0;k--) if(collision_bodies_affecting_fluid->Inside_Any_Simplex_Of_Any_Body(block_particles.X(k),body_id,aggregate_id)) block_particles.Delete_Element(k);}
         callbacks->Delete_Particles_Inside_Objects(block_particles,particle_type,time);
-        if(block_particles.Size()==0) particle_levelset_evolution->particle_levelset.Free_Particle_And_Clear_Pointer(particles(block_index));}}
+        if(block_particles.Size()==0) for(int i=0;i<number_of_regions;i++) particle_levelset_evolution->Particle_Levelset(i).Free_Particle_And_Clear_Pointer(particles(block_index));}}
 }
 //#####################################################################
 // Function Set_Projection
@@ -472,12 +474,14 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const
             T_ARRAYS_SCALAR::Limited_Shifted_Get(face_velocities.Component(axis),face_velocities_ghost.Component(axis),temp_shift);}
         {T_ARRAYS_SCALAR p_ghost(p_grid.Domain_Indices(number_of_ghost_cells),false);BOUNDARY<TV,T>().Fill_Ghost_Cells(p_grid,incompressible->projection.p,p_ghost,0,time,number_of_ghost_cells);
         T_ARRAYS_SCALAR::Limited_Shifted_Get(incompressible->projection.p,p_ghost,temp_shift);}
-        {PARTICLE_LEVELSET_UNIFORM<T_GRID>& particle_levelset=particle_levelset_evolution->particle_levelset;
-        particle_levelset.Update_Particle_Cells(particle_levelset.positive_particles);
-        particle_levelset.Update_Particle_Cells(particle_levelset.negative_particles);
-        if(particle_levelset.use_removed_positive_particles) particle_levelset.Update_Particle_Cells(particle_levelset.removed_positive_particles);
-        if(particle_levelset.use_removed_negative_particles) particle_levelset.Update_Particle_Cells(particle_levelset.removed_negative_particles);
-        particle_levelset.Delete_Particles_Outside_Grid();}}
+
+        for(int i=0;i<number_of_regions;i++){
+            PARTICLE_LEVELSET_UNIFORM<T_GRID>& particle_levelset=particle_levelset_evolution->Particle_Levelset(i);
+            particle_levelset.Update_Particle_Cells(particle_levelset.positive_particles);
+            particle_levelset.Update_Particle_Cells(particle_levelset.negative_particles);
+            if(particle_levelset.use_removed_positive_particles) particle_levelset.Update_Particle_Cells(particle_levelset.removed_positive_particles);
+            if(particle_levelset.use_removed_negative_particles) particle_levelset.Update_Particle_Cells(particle_levelset.removed_negative_particles);
+            particle_levelset.Delete_Particles_Outside_Grid();}}
 }
 //#####################################################################
 // Function Move_Grid
@@ -560,10 +564,11 @@ Sync_Parameters(FLUIDS_PARAMETERS_UNIFORM<T_GRID>& global_parameters,THREADED_UN
     threaded_grid.Sync_Scalar(incompressible->projection.p,global_parameters.incompressible->projection.p);
     threaded_grid.Sync_Scalar(incompressible->projection.elliptic_solver->psi_D,global_parameters.incompressible->projection.elliptic_solver->psi_D);
     threaded_grid.Sync_Face_Scalar(incompressible->projection.elliptic_solver->psi_N,global_parameters.incompressible->projection.elliptic_solver->psi_N);
-    threaded_grid.Sync_Particles(particle_levelset_evolution->particle_levelset.positive_particles,global_parameters.particle_levelset_evolution->particle_levelset.positive_particles);
-    threaded_grid.Sync_Particles(particle_levelset_evolution->particle_levelset.negative_particles,global_parameters.particle_levelset_evolution->particle_levelset.negative_particles);
-    threaded_grid.Sync_Particles(particle_levelset_evolution->particle_levelset.removed_positive_particles,global_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles);
-    threaded_grid.Sync_Particles(particle_levelset_evolution->particle_levelset.removed_negative_particles,global_parameters.particle_levelset_evolution->particle_levelset.removed_negative_particles);
+    for(int i=0;i<number_of_regions;i++){
+        threaded_grid.Sync_Particles(particle_levelset_evolution->Particle_Levelset(i).positive_particles,global_parameters.particle_levelset_evolution->Particle_Levelset(i).positive_particles);
+        threaded_grid.Sync_Particles(particle_levelset_evolution->Particle_Levelset(i).negative_particles,global_parameters.particle_levelset_evolution->Particle_Levelset(i).negative_particles);
+        threaded_grid.Sync_Particles(particle_levelset_evolution->Particle_Levelset(i).removed_positive_particles,global_parameters.particle_levelset_evolution->Particle_Levelset(i).removed_positive_particles);
+        threaded_grid.Sync_Particles(particle_levelset_evolution->Particle_Levelset(i).removed_negative_particles,global_parameters.particle_levelset_evolution->Particle_Levelset(i).removed_negative_particles);}
 }
 //#####################################################################
 // Function Distribute_Parameters 
@@ -654,7 +659,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
         // particle levelset
         if(write_levelset){
             if(number_of_regions==1){
-                PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution->particle_levelset;
+                PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution->Particle_Levelset(0);
                 FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
                 if(write_particles && frame%restart_data_write_rate==0){
                     Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles",frame);
@@ -740,7 +745,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
         // particle levelset
         if(write_levelset){
             if(number_of_regions==1){
-                PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution->particle_levelset;
+                PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution->Particle_Levelset(0);
                 FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
                 if(write_particles && frame%restart_data_write_rate==0){
                     Write_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles",frame);
@@ -822,7 +827,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
                 FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/p_internal_energy",euler->euler_cavitation_internal_energy.p_cavitation);}}
 
         if(number_of_regions && write_levelset){
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset_evolution->particle_levelset.levelset);}}
+            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset_evolution->Particle_Levelset(0).levelset);}}
 }
 //#####################################################################
 // Function Log_Parameters 

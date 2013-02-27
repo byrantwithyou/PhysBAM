@@ -398,7 +398,7 @@ Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<GRID<VEC
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 
     FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >&>(fluids_parameters);
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=fluids_parameters_uniform.particle_levelset_evolution->particle_levelset;
+    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=fluids_parameters_uniform.particle_levelset_evolution->Particle_Levelset(0);
     SPH_EVOLUTION_UNIFORM<GRID<TV> >& sph_evolution=*fluids_parameters_uniform.sph_evolution;
     GRID<TV>& grid=fluids_parameters_uniform.particle_levelset_evolution->grid;
 

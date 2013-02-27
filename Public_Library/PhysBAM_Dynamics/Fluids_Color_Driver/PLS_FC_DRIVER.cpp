@@ -92,7 +92,7 @@ Initialize()
     
     {
         example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.number_of_colors);
-        example.particle_levelset_evolution_multiple.particle_levelset.Set_Band_Width(2*example.number_of_ghost_cells);
+        example.particle_levelset_evolution_multiple.Particle_Levelset(0).Set_Band_Width(2*example.number_of_ghost_cells);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
     
@@ -105,7 +105,7 @@ Initialize()
     
     {
         example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.number_of_colors);
-        example.particle_levelset_evolution_multiple.particle_levelset.Set_Band_Width(2*example.number_of_ghost_cells);
+        example.particle_levelset_evolution_multiple.Particle_Levelset(0).Set_Band_Width(2*example.number_of_ghost_cells);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
     
@@ -118,7 +118,7 @@ Initialize()
     example.particle_levelset_evolution_multiple.runge_kutta_order_particles=3;
     example.particle_levelset_evolution_multiple.Use_Hamilton_Jacobi_Weno_Advection();
     
-    example.particle_levelset_evolution_multiple.particle_levelset.levelset.Set_Custom_Boundary(example.boundary);
+    example.particle_levelset_evolution_multiple.Particle_Levelset(0).levelset.Set_Custom_Boundary(example.boundary);
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(i)->levelset.Set_Custom_Boundary(example.boundary);
     example.particle_levelset_evolution_multiple.Bias_Towards_Negative_Particles(true);
@@ -128,12 +128,12 @@ Initialize()
     
     for(int i=0;i<example.number_of_colors;i++){
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).levelset.Set_Collision_Body_List(example.collision_bodies_affecting_fluid);
-        // TODO example.particle_levelset_evolution_multiple.particle_levelset.levelset.Set_Face_Velocities_Valid_Mask(&example.incompressible.valid_mask);
+        // TODO example.particle_levelset_evolution_multiple.Particle_Levelset(0).levelset.Set_Face_Velocities_Valid_Mask(&example.incompressible.valid_mask);
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Set_Collision_Distance_Factors(.1,1);}
     
     {
         example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.number_of_colors);
-        example.particle_levelset_evolution_multiple.particle_levelset.Set_Band_Width(2*example.number_of_ghost_cells);
+        example.particle_levelset_evolution_multiple.Particle_Levelset(0).Set_Band_Width(2*example.number_of_ghost_cells);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
     example.particle_levelset_evolution_multiple.levelset_advection_multiple.Set_Custom_Advection(*new ADVECTION_HAMILTON_JACOBI_ENO<GRID<TV>,T>);
@@ -163,7 +163,7 @@ Initialize()
     
     int extrapolation_cells=2*example.number_of_ghost_cells+2;
     ARRAY<T,TV_INT> exchanged_phi_ghost(example.grid.Domain_Indices(extrapolation_cells));
-    example.particle_levelset_evolution_multiple.particle_levelset.levelset.boundary->Fill_Ghost_Cells(example.grid,example.particle_levelset_evolution_multiple.phi,exchanged_phi_ghost,0,time,extrapolation_cells);
+    example.particle_levelset_evolution_multiple.Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(example.grid,example.particle_levelset_evolution_multiple.phi,exchanged_phi_ghost,0,time,extrapolation_cells);
     // TODO    example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,example.number_of_ghost_cells,0,TV());
     
     if(!example.restart) Write_Output_Files(0);

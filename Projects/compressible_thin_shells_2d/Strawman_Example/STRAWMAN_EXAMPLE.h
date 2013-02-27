@@ -153,7 +153,7 @@ virtual void Parse_Options() PHYSBAM_OVERRIDE
     face_velocities.Resize(grid.Domain_Indices(3));
     face_valid_mask.Resize(grid.Domain_Indices(3));
 
-    pls_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>(grid,3);
+    pls_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>(grid,3,false);
 }
 //#####################################################################
 // Function Initialize
@@ -198,7 +198,7 @@ void Initialize()
         pls_boundary.Set_Velocity_Pointer(face_velocities);
         {
             pls_evolution->Initialize_Domain(grid);
-            pls_evolution->particle_levelset.Set_Band_Width(6);
+            pls_evolution->Particle_Levelset(0).Set_Band_Width(6);
         }
         pls_evolution->time=time;
         pls_evolution->Set_CFL_Number((T).9);
@@ -206,25 +206,25 @@ void Initialize()
         pls_evolution->Levelset_Advection(1).Set_Custom_Advection(passive_advection_scheme);
         {
             pls_evolution->Initialize_Domain(grid);
-            pls_evolution->particle_levelset.Set_Band_Width(6);
+            pls_evolution->Particle_Levelset(0).Set_Band_Width(6);
         }
         pls_evolution->Set_Number_Particles_Per_Cell(16);
         pls_evolution->Set_Levelset_Callbacks(*this);
         pls_evolution->Initialize_FMM_Initialization_Iterative_Solver(true);
-        pls_evolution->particle_levelset.levelset.Set_Custom_Boundary(pls_boundary); // TODO: better boundary
+        pls_evolution->Particle_Levelset(0).levelset.Set_Custom_Boundary(pls_boundary); // TODO: better boundary
         pls_evolution->Bias_Towards_Negative_Particles(false);
         pls_evolution->Particle_Levelset(1).Store_Unique_Particle_Id();
         pls_evolution->use_particle_levelset=true;
-        pls_evolution->particle_levelset.levelset.Set_Face_Velocities_Valid_Mask(&face_valid_mask);
-        //pls_evolution->particle_levelset.levelset.Set_Collision_Body_List(collision_bodies_affecting_fluid); // TODO: ?
-        pls_evolution->particle_levelset.Set_Collision_Distance_Factors(.1,1);
+        pls_evolution->Particle_Levelset(0).levelset.Set_Face_Velocities_Valid_Mask(&face_valid_mask);
+        //pls_evolution->Particle_Levelset(0).levelset.Set_Collision_Body_List(collision_bodies_affecting_fluid); // TODO: ?
+        pls_evolution->Particle_Levelset(0).Set_Collision_Distance_Factors(.1,1);
         {
             pls_evolution->Initialize_Domain(grid);
-            pls_evolution->particle_levelset.Set_Band_Width(6);
+            pls_evolution->Particle_Levelset(0).Set_Band_Width(6);
         }
 
         for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3);iterator.Valid();iterator.Next())
-            pls_evolution->particle_levelset.levelset.phi(iterator.Cell_Index())=initial_phi(iterator.Location());
+            pls_evolution->Particle_Levelset(0).levelset.phi(iterator.Cell_Index())=initial_phi(iterator.Location());
         pls_evolution->Make_Signed_Distance();
         pls_evolution->Fill_Levelset_Ghost_Cells(time);
         pls_evolution->Set_Seed(2606);
@@ -339,12 +339,12 @@ void Euler_Step(const T dt, const T time){
         face_velocities(iterator.Full_Index())=fluid_velocity_field(iterator.Location(),time)(iterator.Axis());}
     pls_boundary.Use_Extrapolation_Mode(false);
     {
-        boundary.Fill_Ghost_Cells(grid,pls_evolution->particle_levelset.levelset.phi,phi_tmp,dt,time,3);
+        boundary.Fill_Ghost_Cells(grid,pls_evolution->Particle_Levelset(0).levelset.phi,phi_tmp,dt,time,3);
         LOG::Time("advancing levelset");
         pls_evolution->Advance_Levelset(dt);
-        Fill_Uncovered_Cells(dt,time,pls_evolution->particle_levelset.levelset.phi,phi_tmp);
+        Fill_Uncovered_Cells(dt,time,pls_evolution->Particle_Levelset(0).levelset.phi,phi_tmp);
         // TODO(jontg): Fill uncovered cells new way here
-        //  pls_evolution->particle_levelset.levelset.phi(iterator.Cell_Index())=initial_phi(iterator.Location());
+        //  pls_evolution->Particle_Levelset(0).levelset.phi(iterator.Cell_Index())=initial_phi(iterator.Location());
         LOG::Time("advancing particles");
         pls_evolution->Advance_Particles(face_velocities,dt);
         pls_evolution->Modify_Levelset_And_Particles(&face_velocities);
@@ -395,7 +395,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/phi",phi);
 
     { // PLS
-        const PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=pls_evolution->particle_levelset;
+        const PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=pls_evolution->Particle_Levelset(0);
         FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"levelset",particle_levelset.levelset);
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s",frame_folder.c_str(),"positive_particles"),particle_levelset.positive_particles);
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s",frame_folder.c_str(),"negative_particles"),particle_levelset.negative_particles);

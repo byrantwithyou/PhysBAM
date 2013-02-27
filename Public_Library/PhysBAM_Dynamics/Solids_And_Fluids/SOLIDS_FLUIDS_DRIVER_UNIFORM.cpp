@@ -93,9 +93,10 @@ Initialize()
 
     // this needs to be before Initialize_Fluids_Grids
     if(example.fluids_parameters.use_sph_for_removed_negative_particles){
-        PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=example.fluids_parameters.particle_levelset_evolution->particle_levelset;
-        pls.template_particles.template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
-        pls.template_removed_particles.template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
+        for(int i=0;i<number_of_regions;i++){
+            PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(i);
+            pls.template_particles.template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
+            pls.template_removed_particles.template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);}
         example.fluids_parameters.sph_evolution=new SPH_EVOLUTION_UNIFORM<T_GRID>(grid,*incompressible,example.fluids_parameters,particle_levelset_evolution);
         example.fluids_parameters.sph_evolution->Set_SPH_Callbacks(example);
         example.fluids_parameters.fluid_boundary=&example.fluids_parameters.fluid_boundary_water;}
@@ -174,7 +175,7 @@ Initialize()
         particle_levelset_evolution->Initialize_FMM_Initialization_Iterative_Solver(example.fluids_parameters.refine_fmm_initialization_with_iterative_solver);
 
         if(number_of_regions>=2) for(int i=0;i<number_of_regions;i++) particle_levelset_evolution->Levelset(i).Set_Custom_Boundary(*example.fluids_parameters.phi_boundary_multiphase(i));
-        else particle_levelset_evolution->particle_levelset.levelset.Set_Custom_Boundary(*example.fluids_parameters.phi_boundary);
+        else particle_levelset_evolution->Particle_Levelset(0).levelset.Set_Custom_Boundary(*example.fluids_parameters.phi_boundary);
         particle_levelset_evolution->Bias_Towards_Negative_Particles(example.fluids_parameters.bias_towards_negative_particles);
         for(int i=0;i<number_of_regions;i++){
             if(example.fluids_parameters.use_removed_positive_particles) particle_levelset_evolution->Particle_Levelset(i).Use_Removed_Positive_Particles();
@@ -193,11 +194,12 @@ Initialize()
         particle_levelset_evolution_multiple->particle_levelset_multiple.Set_Collision_Distance_Factors(example.fluids_parameters.min_collision_distance_factor,
             example.fluids_parameters.max_collision_distance_factor);}
     else if(number_of_regions==1){
-        particle_levelset_evolution->particle_levelset.levelset.Set_Collision_Body_List(collision_bodies_affecting_fluid);
-        particle_levelset_evolution->particle_levelset.levelset.Set_Face_Velocities_Valid_Mask(&incompressible->valid_mask);
-        particle_levelset_evolution->particle_levelset.Set_Collision_Distance_Factors(example.fluids_parameters.min_collision_distance_factor,
+        particle_levelset_evolution->Particle_Levelset(0).levelset.Set_Collision_Body_List(collision_bodies_affecting_fluid);
+        particle_levelset_evolution->Particle_Levelset(0).levelset.Set_Face_Velocities_Valid_Mask(&incompressible->valid_mask);
+        particle_levelset_evolution->Particle_Levelset(0).Set_Collision_Distance_Factors(example.fluids_parameters.min_collision_distance_factor,
             example.fluids_parameters.max_collision_distance_factor);}
 
+    PHYSBAM_ASSERT(number_of_regions<2 || (!example.fluids_parameters.use_dsd && !example.fluids_parameters.compressible));
     // incompressible flow
     if(incompressible){
         if(number_of_regions>=2){
@@ -211,9 +213,9 @@ Initialize()
         incompressible->projection.elliptic_solver->pcg.cg_restart_iterations=example.fluids_parameters.cg_restart_iterations;
         incompressible->projection.elliptic_solver->pcg.Show_Results();
         if(!example.fluids_parameters.use_reacting_flow && example.fluids_parameters.use_dsd)
-            incompressible->projection.Initialize_Dsd(particle_levelset_evolution->particle_levelset.levelset,example.fluids_parameters.fuel_region);
+            incompressible->projection.Initialize_Dsd(particle_levelset_evolution->Particle_Levelset(0).levelset,example.fluids_parameters.fuel_region);
         if(number_of_regions==1 && example.fluids_parameters.second_order_cut_cell_method)
-            incompressible->projection.collidable_solver->Use_External_Level_Set(particle_levelset_evolution->particle_levelset.levelset);
+            incompressible->projection.collidable_solver->Use_External_Level_Set(particle_levelset_evolution->Particle_Levelset(0).levelset);
         if(example.fluids_parameters.use_reacting_flow){
             incompressible_multiphase->projection.poisson_collidable->Set_Jump_Multiphase();
             if(example.fluids_parameters.use_flame_speed_multiplier) incompressible_multiphase->projection.Use_Flame_Speed_Multiplier();
@@ -297,7 +299,7 @@ Initialize()
         if(number_of_regions==1){
             int extrapolation_ghost_cells=2*example.fluids_parameters.number_of_ghost_cells+2;
             T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
-            particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time,extrapolation_ghost_cells);
+            particle_levelset_evolution->Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time,extrapolation_ghost_cells);
             incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,example.fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),
                 &collision_bodies_affecting_fluid.face_neighbors_visible);}
         else if(number_of_regions>=2 && example.fluids_parameters.dirichlet_regions.Number_True()>0){
@@ -311,13 +313,13 @@ Initialize()
         if(number_of_regions){
             int extrapolation_ghost_cells=2*example.fluids_parameters.number_of_ghost_cells+2;
             T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
-            particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time,extrapolation_ghost_cells);
+            particle_levelset_evolution->Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time,extrapolation_ghost_cells);
             euler->Fill_Ghost_Cells(fictitious_dt,time,extrapolation_ghost_cells);
             COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::Extrapolate_Compressible_State_Into_Incompressible_Region(fictitious_dt,time,(T)example.fluids_parameters.number_of_ghost_cells,extrapolation_ghost_cells,*euler->eos,euler->grid,
                 exchanged_phi_ghost,fluid_collection.incompressible_fluid_collection.face_velocities,euler->U_ghost,euler->U);}}
 
     if(number_of_regions==1 && example.fluids_parameters.monitor_mass){
-        example.fluids_parameters.mass=particle_levelset_evolution->levelset_advection.Approximate_Negative_Material();
+        example.fluids_parameters.mass=particle_levelset_evolution->Levelset_Advection(0).Approximate_Negative_Material();
         LOG::cout<<"Initial Material = "<<example.fluids_parameters.mass<<std::endl;}
     else if(number_of_regions>=2 && example.fluids_parameters.monitor_mass){
         example.fluids_parameters.masses.Resize(number_of_regions);
@@ -392,7 +394,7 @@ Initialize_Fluids_Grids()
     example.fluid_collection.Initialize_Grids();
     if(number_of_regions==1){
         fluids_parameters.particle_levelset_evolution->Initialize_Domain(fluids_parameters.p_grid);
-        fluids_parameters.particle_levelset_evolution->particle_levelset.Set_Band_Width((T)2*fluids_parameters.particle_half_bandwidth);}
+        fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).Set_Band_Width((T)2*fluids_parameters.particle_half_bandwidth);}
     else if(number_of_regions>=2){
         fluids_parameters.particle_levelset_evolution_multiple->Initialize_Domain(fluids_parameters.p_grid,number_of_regions);
         for(int i=0;i<number_of_regions;i++)
@@ -687,7 +689,7 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
             if(fluids_parameters.second_order_cut_cell_method) incompressible->projection.collidable_solver->Set_Up_Second_Order_Cut_Cell_Method();
             if(fluids_parameters.surface_tension || fluids_parameters.variable_surface_tension){
                 particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time);
-                incompressible->Add_Surface_Tension(particle_levelset_evolution->particle_levelset.levelset,time_projection+dt_projection);}}
+                incompressible->Add_Surface_Tension(particle_levelset_evolution->Particle_Levelset(0).levelset,time_projection+dt_projection);}}
         else if(number_of_regions>=2 && fluids_parameters.dirichlet_regions.Number_True()>0){
             particle_levelset_evolution_multiple->Fill_Levelset_Ghost_Cells(time_projection+dt_projection);
             particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Get_Single_Levelset(fluids_parameters.dirichlet_regions,levelset_for_dirichlet_regions,
@@ -703,9 +705,10 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
             if(add_surface_tension) fluids_parameters.incompressible_multiphase->Add_Surface_Tension(levelset_for_dirichlet_regions,time_projection+dt_projection);}
 
         if(incompressible && incompressible->mpi_grid && fluids_parameters.use_sph_for_removed_negative_particles){
-            fluids_parameters.sph_evolution->Move_Particles_Off_Grid_Boundaries(particle_levelset_evolution->particle_levelset.removed_negative_particles,(T)1e-4*grid.dX.Max());
-            Exchange_Ghost_Particles(*particle_levelset_evolution->particle_levelset.mpi_grid,particle_levelset_evolution->particle_levelset.template_removed_particles,
-                particle_levelset_evolution->particle_levelset.removed_negative_particles,example.fluids_parameters.number_of_ghost_cells,particle_levelset_evolution->particle_levelset);}
+            for(int i=0;i<number_of_regions;i++){
+                fluids_parameters.sph_evolution->Move_Particles_Off_Grid_Boundaries(particle_levelset_evolution->Particle_Levelset(i).removed_negative_particles,(T)1e-4*grid.dX.Max());
+                Exchange_Ghost_Particles(*particle_levelset_evolution->Particle_Levelset(i).mpi_grid,particle_levelset_evolution->Particle_Levelset(i).template_removed_particles,
+                    particle_levelset_evolution->Particle_Levelset(i).removed_negative_particles,example.fluids_parameters.number_of_ghost_cells,particle_levelset_evolution->Particle_Levelset(i));}}
 
         if(fluids_parameters.use_sph_for_removed_negative_particles && !fluids_parameters.sph_evolution->use_two_way_coupling){
             LOG::Time("updating removed negative particle velocities via sph");
@@ -815,7 +818,7 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
             // makes MPI work. TODO: make phi in levelset store 8 by default
             int extrapolation_ghost_cells=2*example.fluids_parameters.number_of_ghost_cells+2;
             T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
-            particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time_projection+dt_projection,extrapolation_ghost_cells);
+            particle_levelset_evolution->Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time_projection+dt_projection,extrapolation_ghost_cells);
             incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,
                 fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
             if(fluids_parameters.use_strain){LOG::Time("extrapolating strain across interface");
@@ -990,7 +993,7 @@ Advect_Fluid(const T dt,const int substep)
         incompressible_multiphase->projection.dsd->Advance_One_Time_Step(particle_levelset_evolution_multiple->V,dt,time,fluids_parameters.number_of_ghost_cells);}
     else if(incompressible && incompressible->projection.dsd){
         LOG::Time("advancing detonation shock dynamics");
-        LEVELSET<TV> &levelset=particle_levelset_evolution->particle_levelset.levelset;
+        LEVELSET<TV> &levelset=particle_levelset_evolution->Particle_Levelset(0).levelset;
         levelset.Compute_Normals();levelset.Compute_Curvature();
         incompressible->projection.dsd->Advance_One_Time_Step(particle_levelset_evolution->V,dt,time,fluids_parameters.number_of_ghost_cells);}
 
@@ -1118,7 +1121,7 @@ Advect_Fluid(const T dt,const int substep)
         if(fluids_parameters.delete_fluid_inside_objects) fluids_parameters.Delete_Particles_Inside_Objects(time+dt);
         LOG::Time("deleting particles in local maxima");
         if(!fluids_parameters.analytic_test){
-            if(number_of_regions==1) particle_levelset_evolution->particle_levelset.Delete_Particles_In_Local_Maximum_Phi_Cells(1);
+            if(number_of_regions==1) particle_levelset_evolution->Particle_Levelset(0).Delete_Particles_In_Local_Maximum_Phi_Cells(1);
             else for(int i=0;i<number_of_regions;i++) if(fluids_parameters.dirichlet_regions(i))
                 particle_levelset_evolution->Particle_Levelset(i).Delete_Particles_In_Local_Maximum_Phi_Cells(-1);
             LOG::Time("deleting particles far from interface");
@@ -1227,7 +1230,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
             // makes MPI work. TODO: make phi in levelset store 8 by default
             int extrapolation_ghost_cells=2*example.fluids_parameters.number_of_ghost_cells+2;
             T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
-            particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time+dt,extrapolation_ghost_cells);
+            particle_levelset_evolution->Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time+dt,extrapolation_ghost_cells);
             incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,
                 fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
             if(fluids_parameters.use_strain){LOG::Time("extrapolating strain across interface");
@@ -1309,7 +1312,7 @@ Postprocess_Frame(const int frame)
 
     if(example.fluids_parameters.monitor_mass){
         if(number_of_regions==1){
-            T mass_new=particle_levelset_evolution->levelset_advection.Approximate_Negative_Material();
+            T mass_new=particle_levelset_evolution->Levelset_Advection(0).Approximate_Negative_Material();
             LOG::cout<<"Material = "<<mass_new<<" - change = "<<mass_new-example.fluids_parameters.mass<<std::endl;
             example.fluids_parameters.mass=mass_new;}
         else if(number_of_regions>=2){
@@ -1402,7 +1405,7 @@ Write_Output_Files(const int frame)
         for(int i=0;i<number_of_regions;i++){
             int number_of_positive_particles=0,number_of_negative_particles=0,number_of_removed_positive_particles=0,number_of_removed_negative_particles=0;
             PARTICLE_LEVELSET_UNIFORM<T_GRID>* pls=0;
-            if(number_of_regions==1) pls=&example.fluids_parameters.particle_levelset_evolution->particle_levelset;
+            if(number_of_regions==1) pls=&example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(0);
             else pls=example.fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
             for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->positive_particles(iterator.Cell_Index()))
                 number_of_positive_particles+=pls->positive_particles(iterator.Cell_Index())->Size();

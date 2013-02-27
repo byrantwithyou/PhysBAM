@@ -138,7 +138,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
     DETONATION_SHOCK_DYNAMICS<T_GRID>& dsd=*fluids_parameters.incompressible->projection.dsd;
     fluids_parameters.incompressible->projection.dsd->Dn.array.Fill(Dn_initial);
     dsd.Dn.boundary->Fill_Ghost_Cells(dsd.Dn.grid,dsd.Dn.array,dsd.Dn.array,0,0,3); // TODO: use real dt/time
-    LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset;
+    LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).levelset;
     levelset.Compute_Curvature();dsd.curvature_old.array=*levelset.curvature;
 }
 //#####################################################################
@@ -187,7 +187,7 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
     T_GRID& grid=*fluids_parameters.grid;
     DETONATION_SHOCK_DYNAMICS<T_GRID>& dsd=*fluids_parameters.incompressible->projection.dsd;
     dsd.Dn.boundary->Fill_Ghost_Cells(dsd.Dn.grid,dsd.Dn.array,dsd.Dn.array,0,time);
-    LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset;
+    LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).levelset;
     ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();TV_INT face=iterator.Face_Index();

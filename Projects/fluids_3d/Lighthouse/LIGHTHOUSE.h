@@ -97,7 +97,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
     fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
     fluids_parameters.write_debug_data=true;
-    fluids_parameters.particle_levelset_evolution->particle_levelset.save_removed_particle_times=true;
+    fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).save_removed_particle_times=true;
     output_directory=STRING_UTILITIES::string_sprintf("Lighthouse/Test_%d_Lighthouse_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
         (fluids_parameters.grid->counts.z-1));
     fluids_parameters.delete_fluid_inside_objects=true;
@@ -218,7 +218,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
         TV X=iterator.Location();
         fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=X.y-depth-Get_Wave_Height(X,iterator.Cell_Index(),time);}
 
-    T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& removed_negative_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_negative_particles;
+    T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& removed_negative_particles=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles;
     RANGE<VECTOR<int,3> > right_grid_nodes=RANGE<VECTOR<int,3> >(TV_INT(fluids_parameters.grid->counts.x-9,-2,-2),TV_INT(fluids_parameters.grid->counts.x+3,fluids_parameters.grid->counts.y+3,fluids_parameters.grid->counts.z+3));
     for(NODE_ITERATOR iterator(*fluids_parameters.grid,right_grid_nodes);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(removed_negative_particles(block)){removed_negative_particles(block)->Delete_All_Elements();removed_negative_particles(block)=0;}}
@@ -230,9 +230,9 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/removed_particle_times.%d",output_directory.c_str(),frame),
-        fluids_parameters.particle_levelset_evolution->particle_levelset.removed_particle_times);
-    std::cout<<"Wrote "<<fluids_parameters.particle_levelset_evolution->particle_levelset.removed_particle_times.m<<" number of particles"<<std::endl;
-    fluids_parameters.particle_levelset_evolution->particle_levelset.removed_particle_times.Clean_Memory();
+        fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_particle_times);
+    std::cout<<"Wrote "<<fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_particle_times.m<<" number of particles"<<std::endl;
+    fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_particle_times.Clean_Memory();
 }
 //#####################################################################
 // Function Initialize_Advection

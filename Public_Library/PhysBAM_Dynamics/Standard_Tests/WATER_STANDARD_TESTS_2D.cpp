@@ -332,7 +332,7 @@ template<class T_GRID> void WATER_STANDARD_TESTS_2D<T_GRID>::
 Initialize_SPH_Particles()
 {
     FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >&>(fluids_parameters);
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=fluids_parameters_uniform.particle_levelset_evolution->particle_levelset;
+    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=fluids_parameters_uniform.particle_levelset_evolution->Particle_Levelset(0);
     SPH_EVOLUTION_UNIFORM<T_GRID>& sph_evolution=*fluids_parameters_uniform.sph_evolution;
     T_GRID& grid=fluids_parameters_uniform.particle_levelset_evolution->grid;
 

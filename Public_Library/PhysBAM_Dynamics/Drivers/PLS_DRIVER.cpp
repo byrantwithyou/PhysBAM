@@ -65,7 +65,7 @@ Initialize()
 
     {
         example.particle_levelset_evolution.Initialize_Domain(example.mac_grid);
-        example.particle_levelset_evolution.particle_levelset.Set_Band_Width(6);
+        example.particle_levelset_evolution.Particle_Levelset(0).Set_Band_Width(6);
         example.incompressible.Initialize_Grids(example.mac_grid);
         example.projection.Initialize_Grid(example.mac_grid);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
@@ -99,7 +99,7 @@ Initialize()
 
     {
         example.particle_levelset_evolution.Initialize_Domain(example.mac_grid);
-        example.particle_levelset_evolution.particle_levelset.Set_Band_Width(6);
+        example.particle_levelset_evolution.Particle_Levelset(0).Set_Band_Width(6);
         example.incompressible.Initialize_Grids(example.mac_grid);
         example.projection.Initialize_Grid(example.mac_grid);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
@@ -110,15 +110,15 @@ Initialize()
     example.particle_levelset_evolution.Set_Levelset_Callbacks(example);
     example.particle_levelset_evolution.Initialize_FMM_Initialization_Iterative_Solver(true);
 
-    example.particle_levelset_evolution.particle_levelset.levelset.Set_Custom_Boundary(*example.phi_boundary);
+    example.particle_levelset_evolution.Particle_Levelset(0).levelset.Set_Custom_Boundary(*example.phi_boundary);
     example.particle_levelset_evolution.Bias_Towards_Negative_Particles(false);
     example.particle_levelset_evolution.Particle_Levelset(0).Use_Removed_Positive_Particles();
     example.particle_levelset_evolution.Particle_Levelset(0).Use_Removed_Negative_Particles();
     example.particle_levelset_evolution.Particle_Levelset(0).Store_Unique_Particle_Id();
     example.particle_levelset_evolution.use_particle_levelset=true;
-    example.particle_levelset_evolution.particle_levelset.levelset.Set_Collision_Body_List(example.collision_bodies_affecting_fluid);
-    example.particle_levelset_evolution.particle_levelset.levelset.Set_Face_Velocities_Valid_Mask(&example.incompressible.valid_mask);
-    example.particle_levelset_evolution.particle_levelset.Set_Collision_Distance_Factors(.1,1);
+    example.particle_levelset_evolution.Particle_Levelset(0).levelset.Set_Collision_Body_List(example.collision_bodies_affecting_fluid);
+    example.particle_levelset_evolution.Particle_Levelset(0).levelset.Set_Face_Velocities_Valid_Mask(&example.incompressible.valid_mask);
+    example.particle_levelset_evolution.Particle_Levelset(0).Set_Collision_Distance_Factors(.1,1);
 
     example.incompressible.Set_Custom_Boundary(*example.boundary);
     example.incompressible.projection.elliptic_solver->Set_Relative_Tolerance(1e-8);
@@ -126,11 +126,11 @@ Initialize()
     example.incompressible.projection.elliptic_solver->pcg.evolution_solver_type=krylov_solver_cg;
     example.incompressible.projection.elliptic_solver->pcg.cg_restart_iterations=0;
     example.incompressible.projection.elliptic_solver->pcg.Show_Results();
-    example.incompressible.projection.collidable_solver->Use_External_Level_Set(example.particle_levelset_evolution.particle_levelset.levelset);
+    example.incompressible.projection.collidable_solver->Use_External_Level_Set(example.particle_levelset_evolution.Particle_Levelset(0).levelset);
 
     {
         example.particle_levelset_evolution.Initialize_Domain(example.mac_grid);
-        example.particle_levelset_evolution.particle_levelset.Set_Band_Width(6);
+        example.particle_levelset_evolution.Particle_Levelset(0).Set_Band_Width(6);
         example.incompressible.Initialize_Grids(example.mac_grid);
         example.projection.Initialize_Grid(example.mac_grid);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
@@ -171,7 +171,7 @@ Initialize()
 
     int extrapolation_cells=2*example.number_of_ghost_cells+2;
     ARRAY<T,TV_INT> exchanged_phi_ghost(example.mac_grid.Domain_Indices(extrapolation_cells));
-    example.particle_levelset_evolution.particle_levelset.levelset.boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.phi,exchanged_phi_ghost,0,time,extrapolation_cells);
+    example.particle_levelset_evolution.Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.phi,exchanged_phi_ghost,0,time,extrapolation_cells);
     example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,example.number_of_ghost_cells,0,TV());
 
     example.Set_Boundary_Conditions(time); // get so CFL is correct
@@ -261,7 +261,7 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
         example.particle_levelset_evolution.Delete_Particles_Outside_Grid();
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 1",0,1);
         LOG::Time("deleting particles in local maxima");
-        example.particle_levelset_evolution.particle_levelset.Delete_Particles_In_Local_Maximum_Phi_Cells(0);
+        example.particle_levelset_evolution.Particle_Levelset(0).Delete_Particles_In_Local_Maximum_Phi_Cells(0);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 2",0,1);
         LOG::Time("deleting particles far from interface");
         example.particle_levelset_evolution.Particle_Levelset(0).Delete_Particles_Far_From_Interface(); // uses visibility
@@ -296,7 +296,7 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
         LOG::Time("extrapolating velocity across interface");
         int band_width=example.number_of_ghost_cells+1;
         T_ARRAYS_SCALAR exchanged_phi_ghost(example.mac_grid.Domain_Indices(2*band_width+2));
-        example.particle_levelset_evolution.particle_levelset.levelset.boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.phi,exchanged_phi_ghost,0,time+dt,2*band_width+2);
+        example.particle_levelset_evolution.Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.phi,exchanged_phi_ghost,0,time+dt,2*band_width+2);
         example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,band_width,0,TV());
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after extrapolate",0,1);
 

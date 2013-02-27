@@ -16,7 +16,7 @@ PLS_REFINEMENT_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(100),frame_rate(24),write_debug_data(true),
     output_directory("output"),restart(0),number_of_ghost_cells(3),cfl(.9),use_collidable_advection(false),gravity(9.8),
     fine_mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),coarse_mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),fine_mpi_grid(0),coarse_mpi_grid(0),
-    projection(coarse_mac_grid),particle_levelset_evolution(fine_mac_grid,number_of_ghost_cells),incompressible(fine_mac_grid,projection),boundary(0),boundary_coarse(0),phi_boundary(0),
+    projection(coarse_mac_grid),particle_levelset_evolution(fine_mac_grid,number_of_ghost_cells,false),incompressible(fine_mac_grid,projection),boundary(0),boundary_coarse(0),phi_boundary(0),
     //projection(coarse_mac_grid,false,false,true,true),particle_levelset_evolution(fine_mac_grid),incompressible(fine_mac_grid,projection),boundary(0),
     rigid_geometry_collection(this),collision_bodies_affecting_fluid(fine_mac_grid)
 {
@@ -55,7 +55,7 @@ Write_Output_Files(const int frame)
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_pressure",incompressible.projection.p);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_psi_N",projection.elliptic_solver->psi_N);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_psi_D",projection.elliptic_solver->psi_D);}
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution.particle_levelset;
+    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
     LEVELSET<TV> coarse_levelset(coarse_mac_grid,coarse_phi);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
     if(write_debug_data){
@@ -72,7 +72,7 @@ Read_Output_Files(const int frame)
     bool split=split_dir!="";
     std::string my_output_directory=split?split_dir:output_directory;
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution.particle_levelset;
+    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
     if(split){
         ARRAY<T,TV_INT> phi_global(fine_mpi_grid->global_grid.Domain_Indices());
         LEVELSET<TV> levelset_global(fine_mpi_grid->global_grid,phi_global);        

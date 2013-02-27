@@ -80,8 +80,8 @@ public:
         if(particle_type==PARTICLE_LEVELSET_POSITIVE || particle_type==PARTICLE_LEVELSET_REMOVED_POSITIVE) return;
 
         TV& X=particles.X(index);TV X_new=X+dt*V;
-        T max_collision_distance=particle_levelset_evolution.particle_levelset.Particle_Collision_Distance(particles.quantized_collision_distance(index));
-        T min_collision_distance=particle_levelset_evolution.particle_levelset.min_collision_distance_factor*max_collision_distance;
+        T max_collision_distance=particle_levelset_evolution.Particle_Levelset(0).Particle_Collision_Distance(particles.quantized_collision_distance(index));
+        T min_collision_distance=particle_levelset_evolution.Particle_Levelset(0).min_collision_distance_factor*max_collision_distance;
         TV min_corner=fine_mac_grid.domain.Minimum_Corner(),max_corner=fine_mac_grid.domain.Maximum_Corner();
         for(int axis=0;axis<GRID<TV>::dimension;axis++){
             if(domain_boundary[axis][0] && X_new[axis]<min_corner[axis]+max_collision_distance){

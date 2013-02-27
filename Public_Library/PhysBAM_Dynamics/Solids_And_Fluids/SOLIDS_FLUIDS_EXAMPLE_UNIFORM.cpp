@@ -434,7 +434,7 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum
     T maximum_particle_speed=0;
     if(fluids_parameters.fire){
         if(fluids_parameters.number_of_regions==1){
-            Get_Levelset_Velocity(*fluids_parameters.grid,fluids_parameters.particle_levelset_evolution->particle_levelset.levelset,
+            Get_Levelset_Velocity(*fluids_parameters.grid,fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).levelset,
                 fluids_parameters.particle_levelset_evolution->V,time);
             maximum_fluid_speed=max(maximum_fluid_speed,fluids_parameters.particle_levelset_evolution->V.Max_Abs().Max());}
         else{

@@ -374,8 +374,8 @@ Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles
     if(particle_type==PARTICLE_LEVELSET_POSITIVE || particle_type==PARTICLE_LEVELSET_REMOVED_POSITIVE) return;
 
     TV& X=particles.X(index);TV X_new=X+dt*V;
-    T max_collision_distance=fluids_parameters.particle_levelset_evolution->particle_levelset.Particle_Collision_Distance(particles.quantized_collision_distance(index));
-    T min_collision_distance=fluids_parameters.particle_levelset_evolution->particle_levelset.min_collision_distance_factor*max_collision_distance;
+    T max_collision_distance=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).Particle_Collision_Distance(particles.quantized_collision_distance(index));
+    T min_collision_distance=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).min_collision_distance_factor*max_collision_distance;
     TV min_corner=fluids_parameters.grid->domain.Minimum_Corner(),max_corner=fluids_parameters.grid->domain.Maximum_Corner();
     for(int axis=0;axis<TV::m;axis++){
         if(fluids_parameters.domain_walls[axis][0] && X_new[axis]<min_corner[axis]+max_collision_distance){

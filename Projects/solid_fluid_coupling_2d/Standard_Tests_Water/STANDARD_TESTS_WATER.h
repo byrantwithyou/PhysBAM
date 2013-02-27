@@ -99,13 +99,13 @@ public:
         
     if(flow_particles)
     {
-        fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(TV_INT(1,1))=fluids_parameters.particle_levelset_evolution->particle_levelset.template_removed_particles.Clone();
+        fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_positive_particles(TV_INT(1,1))=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).template_removed_particles.Clone();
         int particle_count=40;
         for(int i=0;i<particle_count;i++){
-            int particle_index=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(TV_INT(1,1))->Add_Element();
-            fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(TV_INT(1,1))->X(particle_index)=TV((T).05,.05+(i/(T)particle_count)*0.9);
+            int particle_index=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_positive_particles(TV_INT(1,1))->Add_Element();
+            fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_positive_particles(TV_INT(1,1))->X(particle_index)=TV((T).05,.05+(i/(T)particle_count)*0.9);
         }
-        fluids_parameters.particle_levelset_evolution->particle_levelset.Update_Particle_Cells(fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles);
+        fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).Update_Particle_Cells(fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_positive_particles);
     }
         
         }

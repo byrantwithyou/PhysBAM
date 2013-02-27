@@ -18,7 +18,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID> PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM(const T_GRID& grid_input,const int number_of_ghost_cells_input)
-    :PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>(grid_input,number_of_ghost_cells_input),
+    :PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>(grid_input,number_of_ghost_cells_input,true),
     particle_levelset_multiple(*new PARTICLE_LEVELSET_MULTIPLE_UNIFORM<T_GRID>(grid,phis,number_of_ghost_cells_input)),
     levelset_advection_multiple(*new LEVELSET_ADVECTION_MULTIPLE<T_GRID>(particle_levelset_multiple.levelset_multiple))
 {

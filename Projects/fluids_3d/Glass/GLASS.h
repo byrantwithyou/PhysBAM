@@ -262,7 +262,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     for(int s=0;s<sources.m;s++)Adjust_Phi_With_Source(sources(s),world_to_sources(s));
     
-    T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& removed_positive_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles;
+    T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& removed_positive_particles=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_positive_particles;
     GRID<TV>& grid=*fluids_parameters.grid; 
 
     for(int s=0;s<sources.m;s++){
@@ -296,7 +296,7 @@ void Add_SPH_Particles_For_Sources(const T dt,const T time) PHYSBAM_OVERRIDE
 {
     if(time>time_pour) return;
     GRID<TV>& grid=fluids_parameters.particle_levelset_evolution->grid;
-    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& removed_negative_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_negative_particles;
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& removed_negative_particles=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles;
     for(int s=0;s<sph_sources.m;s++){
         typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
         RANGE<TV> source_bounding_box=sph_sources(s).Bounding_Box();

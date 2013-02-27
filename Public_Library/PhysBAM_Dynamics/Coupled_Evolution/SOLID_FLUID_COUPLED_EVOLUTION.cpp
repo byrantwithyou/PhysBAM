@@ -726,7 +726,7 @@ Compute_W(const T current_position_time)
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
         const TV axis_vector=TV::Axis_Vector(axis);const TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
         const RANGE<TV> dual_cell=iterator.Dual_Cell().Thickened(grid.dX.Min()*(T)1e-2);
-        if(!using_levelset || Negative(grid,axis,face_index,fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi)){
+        if(!using_levelset || Negative(grid,axis,face_index,fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).levelset.phi)){
             // compute solid volume in dual cell
             RANGE<TV> clamped_dual_cell=RANGE<TV>::Intersect(dual_cell,grid.domain);
 
@@ -797,7 +797,7 @@ Compute_W(const T current_position_time)
             // check whether this face can see fluid
             // cast a ray left and right
             // TODO: must exchange solid velocities to do this! for parallel.  Alt, just do solid explicit part on all procs.
-            T_ARRAYS_SCALAR& phi=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi;
+            T_ARRAYS_SCALAR& phi=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).levelset.phi;
             ARRAY<COLLISION_GEOMETRY_ID> objects;collision_bodies.objects_in_cell.Get_Objects_For_Cells(first_cell_index,second_cell_index,collision_bodies.collision_geometry_collection.bodies.m,objects);if(!objects.m) continue;
             COLLISION_GEOMETRY_ID body_id;bool occluded=true;
             RAY<TV> ray(iterator.First_Cell_Center(),TV::Axis_Vector(axis),true);ray.t_max=(T).5*grid.dX[axis];ray.semi_infinite=false;

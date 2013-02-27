@@ -394,7 +394,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
         Add_SPH_Particles_For_Sources(initial_sources,initial_sources_bounding_box,initial_sources_velocity,true);
         return;}
 
-    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=fluids_parameters_uniform.particle_levelset_evolution->particle_levelset.removed_negative_particles;
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=fluids_parameters_uniform.particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles;
     T height_scaling=8;
     RANGE<TV> particle_region(TV(grid.domain.min_corner.x,grid.domain.min_corner.y),TV(grid.domain.max_corner.x,grid.domain.max_corner.y/height_scaling));
     int number_of_sph_particles=0;
@@ -423,7 +423,7 @@ void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sources,const
         bool use_initial_targetting=false)
 {
     GRID<TV> & grid=fluids_parameters.particle_levelset_evolution->grid;
-    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_negative_particles;
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles;
     for(int s=0;s<sources.m;s++){
         RANGE<TV> source_bounding_box=sources_bounding_box(s);
         RANGE<TV_INT> source_bounding_box_int=RANGE<TV_INT>(grid.Block_Index(TV(source_bounding_box.min_corner.x,source_bounding_box.min_corner.y),1),
