@@ -306,16 +306,17 @@ Solve_The_Linear_System()
     x.v.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
     rhs.v=node_V_star;
+    x.v=rhs.v;
     if(test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=true;
-    if(dump_matrix){
+    if(dump_matrix){ // load M-1.txt;load m-1.txt;mm=reshape([m m]',rows(M),1);R=diag(mm)*M;max(max(abs(R-R')))
         LOG::cout<<"solve id "<<solve_id<<std::endl;
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("m-%i.txt",solve_id).c_str()).Write("m",node_mass.array);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs);}
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs);} 
     solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
     if(dump_matrix){
         LOG::cout<<"solve id "<<solve_id<<std::endl;

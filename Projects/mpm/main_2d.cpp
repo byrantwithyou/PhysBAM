@@ -2,20 +2,6 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-//#####################################################################
-// tests
-//#####################################################################
-//   1. cube falling on ground
-//   2. bending beam
-//   3. stretching beam
-//   4. cube falling on beam
-//   5. notch test
-//   6. wall test
-//   7. dropping sphere
-//   8. two ring hit each other
-//   9. snow block breaks over a ball
-//#####################################################################
-
 #include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
@@ -53,45 +39,33 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
         case 1: // stretching beam
             sim.grid.Initialize(TV_INT(2*grid_res+1,0.5*grid_res+1),RANGE<TV>(TV(-1,-0.25),TV(1,0.25)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12)));
-            sim.particles.Reduce_X_In_A_Box(RANGE<TV>(TV(sim.grid.Node(sim.grid.counts/2)(0)-0.0*sim.grid.dX(0),-10),TV(sim.grid.Node(sim.grid.counts/2+1)(0)-0.0*sim.grid.dX(0),10)));
             sim.ground_level=-100;
-            sim.dirichlet_box.Append(RANGE<TV>(TV(0.18,-10),TV(10,10)));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(0.16,-0.15),TV(0.25,0.15)));
             sim.dirichlet_velocity.Append(TV(0.2,0));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.18,10)));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.25,-0.15),TV(-0.16,0.15)));
             sim.dirichlet_velocity.Append(TV(-0.2,0));
             break;
         case 2: // shit fall
-            sim.grid.Initialize(TV_INT(1*grid_res+1,0.82*grid_res+1),RANGE<TV>(TV(-0.5,-0.7),TV(0.5,0.12)));
+            sim.grid.Initialize(TV_INT(1*grid_res+1,1*grid_res+1),RANGE<TV>(TV(-0.5,-0.7),TV(0.5,0.3)));
             sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1)));
             sim.ground_level=-0.3;
-            break;
-        case 3: // sqeeze shit out
-            sim.grid.Initialize(TV_INT(1*grid_res+1,1*grid_res+1),RANGE<TV>(TV(-0.5,-0.6),TV(0.5,0.4)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.09,-0.09),TV(0.09,0.09)));
-            sim.rigid_box.Append(ORIENTED_BOX<TV>(TV(-0.25,-0.1),MATRIX<T,TV::m>(0.15,0,0,0.4)));
-            sim.rigid_box.Append(ORIENTED_BOX<TV>(TV(0.1,-0.1),MATRIX<T,TV::m>(0.15,0,0,0.4)));
-            sim.rigid_box.Append(ORIENTED_BOX<TV>(TV(-0.25,-0.3),MATRIX<T,TV::m>(0.2,0,0,0.2)));
-            sim.rigid_box.Append(ORIENTED_BOX<TV>(TV(0.05,-0.3),MATRIX<T,TV::m>(0.2,0,0,0.2)));
-            for(int b=0;b<4;b++) sim.rigid_box_velocity.Append(TV());
-            sim.rigid_ball.Append(SPHERE<TV>(TV(0,0.3),0.05));
-            sim.rigid_ball_velocity.Append(TV(0,-(T)1));
-            sim.ground_level=-0.5;
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
     // material setting
     sim.Initialize();
-    LOG::cout<<sim.grid.dX<<std::endl;
+    if(abs(sim.grid.dX(0)-sim.grid.dX(1))>(T)1e-10){
+        LOG::cout<<"grid dx: "<<sim.grid.dX<<std::endl;
+        exit(0);}
     switch(test){
         case 1:
             object_mass=(T)1200*density_scale*RANGE<TV>(TV(-0.2,-0.1),TV(0.2,0.1)).Size();
-            ym*=(T)1e5;
+            ym*=(T)1e3;
             for(int p=0;p<sim.particles.number;p++){
                 T this_ym=ym;
-                pr=(T)0;
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
-            sim.use_gravity=false;
+            sim.use_gravity=true;
             break;
         case 2:
             object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
@@ -101,15 +75,6 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             sim.use_visco_plasticity=true;
             sim.visco_nu=1e4;
             sim.visco_tau=1000;
-            break;
-        case 3:
-            object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
-            ym*=(T)1e5;
-            sim.mu.Fill(ym/((T)2*((T)1+pr)));
-            sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
-            sim.use_visco_plasticity=true;
-            sim.visco_nu=1e3;
-            sim.visco_tau=100;
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
