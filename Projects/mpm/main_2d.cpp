@@ -50,20 +50,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
 
     // geometry setting
     switch(test){
-        case 1: // cube falling on ground
-            sim.grid.Initialize(TV_INT(1*grid_res,1.5*grid_res),RANGE<TV>(TV(-0.5,-1.0),TV(0.5,0.5)));
-            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res,0.2*particle_res),RANGE<TV>::Centered_Box()*(T).1);
-            object_mass=density_scale*(RANGE<TV>::Centered_Box()*(T).1).Size();
-            sim.ground_level=-0.7;
-            break;
-        case 2: // bending beam
-            sim.grid.Initialize(TV_INT(1*grid_res,1*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.5)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
-            sim.ground_level=-100;
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.25,10)));
-            sim.dirichlet_velocity.Append(TV());
-            break;
-        case 3: // stretching beam
+        case 1: // stretching beam
             sim.grid.Initialize(TV_INT(2*grid_res+1,0.5*grid_res+1),RANGE<TV>(TV(-1,-0.25),TV(1,0.25)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12)));
             sim.particles.Reduce_X_In_A_Box(RANGE<TV>(TV(sim.grid.Node(sim.grid.counts/2)(0)-0.0*sim.grid.dX(0),-10),TV(sim.grid.Node(sim.grid.counts/2+1)(0)-0.0*sim.grid.dX(0),10)));
@@ -73,102 +60,22 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.18,10)));
             sim.dirichlet_velocity.Append(TV(-0.2,0));
             break;
-        case 4: // cube falling on beam
-            sim.grid.Initialize(TV_INT(1.0*grid_res,1.2*grid_res),RANGE<TV>(TV(-0.5,-0.5),TV(0.5,0.7)));
-            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.6*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.3,-0.1),TV(0.3,0.1)));
-            sim.particles.Add_X_As_A_Grid(TV_INT(0.2*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.1,0.3),TV(0.1,0.5)));
-            sim.use_plasticity_yield=false;
-            sim.ground_level=-100;
-            sim.dirichlet_box.Append(RANGE<TV>(TV(0.25,-10),TV(10,10)));
-            sim.dirichlet_velocity.Append(TV());
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(-0.25,10)));
-            sim.dirichlet_velocity.Append(TV());
-            break;
-        case 5: // notch test
-            sim.grid.Initialize(TV_INT(0.4*grid_res,0.8*grid_res),RANGE<TV>(TV(-0.2,-0.4),TV(0.2,0.4)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
-            sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.05,-0.05),TV(0.15,0.05)));
-            sim.ground_level=-100;
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,0.19),TV(10,10)));
-            sim.dirichlet_velocity.Append(TV(0,0.1));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-10,-10),TV(10,-0.19)));
-            sim.dirichlet_velocity.Append(TV(0,-0.1));
-            sim.use_gravity=false;
-            sim.use_plasticity_yield=true;
-            sim.yield_max=2;
-            sim.yield_min=-100;
-            sim.use_plasticity_clamp=false;
-            sim.clamp_max=1.8;
-            sim.clamp_min=1.0/sim.clamp_max;
-            break;
-        case 6: // wall test
-            sim.grid.Initialize(TV_INT(3.2*grid_res,0.95*grid_res),RANGE<TV>(TV(-0.2,-0.45),TV(3.0,0.5)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.05,-0.4),TV(0.05,0.4)));
-            sim.ground_level=-0.4;
-            sim.rigid_ball.Append(SPHERE<TV>(TV(-0.25,0),0.03));
-            sim.rigid_ball_velocity.Append(TV(1,0));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.05,-10),TV(0.05,-0.37)));
-            sim.dirichlet_velocity.Append(TV());
-            sim.yield_max=1.2;
-            sim.yield_min=1.0/sim.yield_max;
-            sim.use_plasticity_clamp=true;
-            sim.clamp_max=1.5;
-            sim.clamp_min=1.0/sim.clamp_max;
-            break;
-        case 7: // dropping sphere
-            sim.grid.Initialize(TV_INT(0.8*grid_res,0.4*grid_res),RANGE<TV>(TV(-0.4,-0.25),TV(0.4,0.15)));
-            sim.particles.Initialize_X_As_A_Ball(TV_INT(0.2*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1)));
-            sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(-0.08,-0.08),TV(0.08,0.08)));
-            sim.ground_level=-0.2;
-            sim.use_plasticity_yield=false;
-            sim.yield_max=1.001;
-            sim.yield_min=0.999;
-            sim.use_plasticity_clamp=false;
-            sim.clamp_max=1.3;
-            sim.clamp_min=1.0/sim.clamp_max;
-            for(int p=0;p<sim.particles.number;p++) sim.particles.V(p)=TV(0,-0.1);
-            break;
-        case 8: // two ring hitting each other
-            sim.grid.Initialize(TV_INT(1.0*grid_res,0.4*grid_res),RANGE<TV>(TV(-0.5,-0.2),TV(0.5,0.2)));
-            sim.particles.Initialize_X_As_A_Ball(TV_INT(0.2*particle_res,0.2*particle_res),RANGE<TV>(TV(-0.3,-0.1),TV(-0.1,0.1)));
-            sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(-0.28,-0.08),TV(-0.12,0.08)));
-            sim.particles.Add_X_As_A_Ball(TV_INT(0.2*particle_res,0.2*particle_res),RANGE<TV>(TV(0.1,-0.1),TV(0.3,0.1)));
-            sim.ground_level=-100;
-            sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.12,-0.08),TV(0.28,0.08)));
-            sim.use_plasticity_yield=false;
-            sim.yield_max=1.1;
-            sim.yield_min=1.0/sim.yield_max;
-            sim.use_plasticity_clamp=false;
-            sim.clamp_max=1.3;
-            sim.clamp_min=1.0/sim.clamp_max;
-            sim.use_gravity=false;
-            for(int p=0;p<sim.particles.number;p++){
-                if(sim.particles.X(p)(0)<0) sim.particles.V(p)=TV(2,0);
-                else sim.particles.V(p)=TV(-2,0);}
-            break;
-        case 9: // beam falling on balls
+        case 2: // shit fall
             sim.grid.Initialize(TV_INT(1*grid_res+1,0.82*grid_res+1),RANGE<TV>(TV(-0.5,-0.7),TV(0.5,0.12)));
             sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1)));
-            // sim.rigid_ball.Append(SPHERE<TV>(TV(0.08,-0.3),0.02));
-            // sim.rigid_ball_velocity.Append(TV());
-            // sim.rigid_ball.Append(SPHERE<TV>(TV(-0.08,-0.3),0.04));
-            // sim.rigid_ball_velocity.Append(TV());
             sim.ground_level=-0.3;
             break;
-        case 10: // snow ball hit each other
-            sim.grid.Initialize(TV_INT(2*grid_res,1.0*grid_res),RANGE<TV>(TV(-1,-0.7),TV(1,0.3)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count/2,RANGE<TV>(TV(-0.3,-0.1),TV(-0.1,0.1)));
-            sim.particles.Reduce_X_Where_Not_In_A_Ball(SPHERE<TV>(TV(-0.2,0),0.09));
-            sim.particles.Add_X_As_A_Randomly_Sampled_Box(particle_count/2,RANGE<TV>(TV(0.1,-0.1),TV(0.3,0.1)));
-            sim.particles.Reduce_X_Where_Not_In_A_Ball_But_In_A_Box(SPHERE<TV>(TV(0.2,0),0.09),RANGE<TV>(TV(0,-10),TV(10,10)));
-            object_mass=density_scale*(SPHERE<TV>(TV(-0.2,0),0.09).Size()+SPHERE<TV>(TV(0.2,0),0.09).Size());
+        case 3: // sqeeze shit out
+            sim.grid.Initialize(TV_INT(1*grid_res+1,1*grid_res+1),RANGE<TV>(TV(-0.5,-0.6),TV(0.5,0.4)));
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.09,-0.09),TV(0.09,0.09)));
+            sim.rigid_box.Append(ORIENTED_BOX<TV>(TV(-0.25,-0.1),MATRIX<T,TV::m>(0.15,0,0,0.4)));
+            sim.rigid_box.Append(ORIENTED_BOX<TV>(TV(0.1,-0.1),MATRIX<T,TV::m>(0.15,0,0,0.4)));
+            sim.rigid_box.Append(ORIENTED_BOX<TV>(TV(-0.25,-0.3),MATRIX<T,TV::m>(0.2,0,0,0.2)));
+            sim.rigid_box.Append(ORIENTED_BOX<TV>(TV(0.05,-0.3),MATRIX<T,TV::m>(0.2,0,0,0.2)));
+            for(int b=0;b<4;b++) sim.rigid_box_velocity.Append(TV());
+            sim.rigid_ball.Append(SPHERE<TV>(TV(0,0.3),0.05));
+            sim.rigid_ball_velocity.Append(TV(0,-(T)1));
             sim.ground_level=-0.5;
-            sim.yield_max=(T)1+0.0075;
-            sim.yield_min=(T)1-0.025;
-            sim.use_plasticity_clamp=false;
-            for(int p=0;p<sim.particles.number;p++){
-                if(sim.particles.X(p)(0)<0) sim.particles.V(p)=TV(1,0);
-                else sim.particles.V(p)=TV(-1,0);}
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -176,20 +83,17 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
     sim.Initialize();
     LOG::cout<<sim.grid.dX<<std::endl;
     switch(test){
-        case 3: // stretching beam
+        case 1:
             object_mass=(T)1200*density_scale*RANGE<TV>(TV(-0.2,-0.1),TV(0.2,0.1)).Size();
             ym*=(T)1e5;
             for(int p=0;p<sim.particles.number;p++){
-                // T this_x=sim.particles.X(p)(0);
                 T this_ym=ym;
-                //T this_ym=(90.0/4.0)*ym*this_x*this_x+0.1*ym;
-                //if(abs(this_x)<0.02) this_ym*=0.01;
-                //pr=(T)0;
+                pr=(T)0;
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
             sim.use_gravity=false;
             break;
-        case 9:
+        case 2:
             object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
             ym*=(T)1e5;
             sim.mu.Fill(ym/((T)2*((T)1+pr)));
@@ -197,6 +101,15 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             sim.use_visco_plasticity=true;
             sim.visco_nu=1e4;
             sim.visco_tau=1000;
+            break;
+        case 3:
+            object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
+            ym*=(T)1e5;
+            sim.mu.Fill(ym/((T)2*((T)1+pr)));
+            sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
+            sim.use_visco_plasticity=true;
+            sim.visco_nu=1e3;
+            sim.visco_tau=100;
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -250,6 +163,18 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
     // MPM particles
     for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+    for(int b=0;b<sim.rigid_ball.m;b++){
+        for(int k=0;k<50;k++){
+            T theta=k*2.0*3.14/50.0;
+            TV disp;disp(0)=sim.rigid_ball(b).radius*cos(theta);disp(1)=sim.rigid_ball(b).radius*sin(theta);
+            Add_Debug_Particle(sim.rigid_ball(b).center+disp,VECTOR<T,3>(1,0,0));}}
+    for(int b=0;b<sim.rigid_box.m;b++){
+        Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner,sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+        Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner,sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(1)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+        Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)+sim.rigid_box(b).edges.Column(1),sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+        Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)+sim.rigid_box(b).edges.Column(1),sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(1)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}
+    for(int i=0;i<50;i++) Add_Debug_Particle(TV(-1+i*0.04,sim.ground_level),VECTOR<T,3>(0,0,1));
+
     // Voronoi particles
     // for(int i=0;i<voronoi.segment_mesh_particles.X.m;i++) Add_Debug_Particle(voronoi.segment_mesh_particles.X(i),VECTOR<T,3>(1,0,0));
     // Voronoi mesh
@@ -288,6 +213,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                     T theta=k*2.0*3.14/50.0;
                     TV disp;disp(0)=sim.rigid_ball(b).radius*cos(theta);disp(1)=sim.rigid_ball(b).radius*sin(theta);
                     Add_Debug_Particle(sim.rigid_ball(b).center+disp,VECTOR<T,3>(1,0,0));}}
+            for(int b=0;b<sim.rigid_box.m;b++){
+                Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner,sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+                Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner,sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(1)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+                Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)+sim.rigid_box(b).edges.Column(1),sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+                Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)+sim.rigid_box(b).edges.Column(1),sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(1)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}
             for(int i=0;i<50;i++) Add_Debug_Particle(TV(-1+i*0.04,sim.ground_level),VECTOR<T,3>(0,0,1));
             Flush_Frame<TV>("mpm");}
         LOG::cout<<std::endl;}

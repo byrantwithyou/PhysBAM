@@ -240,31 +240,45 @@ Grid_Based_Body_Collisions()
     TIMING_START;
     static T eps=1e-8;
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),grid.counts));it.Valid();it.Next()){
-        if(node_mass(it.index)<min_mass) continue;
-        const TV& x=grid.Node(it.index);
-        if(x(1)<=ground_level && node_V_star(it.index)(1)<=(T)0){
-            // TV vt(node_V_star(it.index));vt(1)=(T)0;
-            // T vn=node_V_star(it.index)(1);
-            // T vt_mag=vt.Magnitude();
-            // if(vt_mag>eps){
-            //     T impulse=friction_coefficient*vn/vt_mag;
-            //     if(impulse<-(T)1) impulse=-(T)1;
-            //     node_V_star(it.index)=vt*((T)1+impulse);}
-            // else node_V_star(it.index)=vt;}
-            node_V_star(it.index)=TV();} // sticky
-        for(int b=0;b<rigid_ball.m;b++){
-            if(rigid_ball(b).Lazy_Inside(x)){
-                TV n=rigid_ball(b).Normal(x);
-                TV v_rel=node_V_star(it.index)-rigid_ball_velocity(b);
-                T vn=TV::Dot_Product(v_rel,n);
-                if(vn<(T)0){
-                    TV vt=v_rel-n*vn;
-                    T vt_mag=vt.Magnitude();
-                    if(vt_mag>eps){
-                        T impulse=friction_coefficient*vn/vt_mag;
-                        if(impulse<-(T)1) impulse=-(T)1;
-                        node_V_star(it.index)=vt*((T)1+impulse)+rigid_ball_velocity(b);}
-                    else node_V_star(it.index)=vt+rigid_ball_velocity(b);}}}}
+        if(node_mass(it.index)>min_mass){
+            const TV& x=grid.Node(it.index);
+            if(x(1)<=ground_level && node_V_star(it.index)(1)<=(T)0){
+                // TV vt(node_V_star(it.index));vt(1)=(T)0;
+                // T vn=node_V_star(it.index)(1);
+                // T vt_mag=vt.Magnitude();
+                // if(vt_mag>eps){
+                //     T impulse=friction_coefficient*vn/vt_mag;
+                //     if(impulse<-(T)1) impulse=-(T)1;
+                //     node_V_star(it.index)=vt*((T)1+impulse);}
+                // else node_V_star(it.index)=vt;}
+                node_V_star(it.index)=TV();} // sticky
+            for(int b=0;b<rigid_ball.m;b++){
+                if(rigid_ball(b).Lazy_Inside(x)){
+                    TV n=rigid_ball(b).Normal(x);
+                    TV v_rel=node_V_star(it.index)-rigid_ball_velocity(b);
+                    T vn=TV::Dot_Product(v_rel,n);
+                    if(vn<(T)0){
+                        TV vt=v_rel-n*vn;
+                        T vt_mag=vt.Magnitude();
+                        if(vt_mag>eps){
+                            T impulse=friction_coefficient*vn/vt_mag;
+                            if(impulse<-(T)1) impulse=-(T)1;
+                            node_V_star(it.index)=vt*((T)1+impulse)+rigid_ball_velocity(b);}
+                        else node_V_star(it.index)=vt+rigid_ball_velocity(b);}}}
+            for(int b=0;b<rigid_box.m;b++){
+                if(rigid_box(b).Lazy_Inside(x)){
+                    // TV n=(x-rigid_box(b).Center()).Normalized();
+                    // TV v_rel=node_V_star(it.index)-rigid_box_velocity(b);
+                    // T vn=TV::Dot_Product(v_rel,n);
+                    // if(vn<(T)0){
+                    //     TV vt=v_rel-n*vn;
+                    //     T vt_mag=vt.Magnitude();
+                    //     if(vt_mag>eps){
+                    //         T impulse=friction_coefficient*vn/vt_mag;
+                    //         if(impulse<-(T)1) impulse=-(T)1;
+                    //         node_V_star(it.index)=vt*((T)1+impulse)+rigid_box_velocity(b);}
+                    //     else node_V_star(it.index)=vt+rigid_box_velocity(b);}
+                    node_V_star(it.index)=TV();}}}} // sticky
     if(PROFILING) TIMING_END("Grid_Based_Body_Collisions");
 }
 //#####################################################################
@@ -421,8 +435,22 @@ Particle_Based_Body_Collisions()
                 particles.V(p)=TV();} // sticky
             for(int b=0;b<rigid_ball.m;b++){
                 if(rigid_ball(b).Lazy_Inside(x)){
-                    TV n=rigid_ball(b).Normal(x);
-                    TV v_rel=particles.V(p)-rigid_ball_velocity(b);
+                    // TV n=rigid_ball(b).Normal(x);
+                    // TV v_rel=particles.V(p)-rigid_ball_velocity(b);
+                    // T vn=TV::Dot_Product(v_rel,n);
+                    // if(vn<(T)0){
+                    //     TV vt=v_rel-n*vn;
+                    //     T vt_mag=vt.Magnitude();
+                    //     if(vt_mag>eps){
+                    //         T impulse=friction_coefficient*vn/vt_mag;
+                    //         if(impulse<(T)-1) impulse=(T)-1;
+                    //         particles.V(p)=vt*(1+impulse)+rigid_ball_velocity(b);}
+                    //     else particles.V(p)=vt+rigid_ball_velocity(b);}
+                    particles.V(p)=TV();}} // sticky
+            for(int b=0;b<rigid_box.m;b++){
+                if(rigid_box(b).Lazy_Inside(x)){
+                    TV n=(x-rigid_box(b).Center()).Normalized();
+                    TV v_rel=particles.V(p)-rigid_box_velocity(b);
                     T vn=TV::Dot_Product(v_rel,n);
                     if(vn<(T)0){
                         TV vt=v_rel-n*vn;
@@ -430,8 +458,9 @@ Particle_Based_Body_Collisions()
                         if(vt_mag>eps){
                             T impulse=friction_coefficient*vn/vt_mag;
                             if(impulse<(T)-1) impulse=(T)-1;
-                            particles.V(p)=vt*(1+impulse)+rigid_ball_velocity(b);}
-                        else particles.V(p)=vt+rigid_ball_velocity(b);}}}}}
+                            particles.V(p)=vt*(1+impulse)+rigid_box_velocity(b);}
+                        else particles.V(p)=vt+rigid_box_velocity(b);}
+                    particles.V(p)=TV();}}}} // sticky
         if(PROFILING) TIMING_END("Particle_Based_Body_Collisions");
 }
 //#####################################################################
@@ -467,6 +496,8 @@ Update_Colliding_Object_Positions()
     TIMING_START;
     for(int b=0;b<rigid_ball.m;b++)
         rigid_ball(b).center+=dt*rigid_ball_velocity(b);
+    for(int b=0;b<rigid_box.m;b++)
+        rigid_box(b).corner+=dt*rigid_box_velocity(b);
     if(PROFILING) TIMING_END("Update_Particle_Positions");
 }
 //#####################################################################

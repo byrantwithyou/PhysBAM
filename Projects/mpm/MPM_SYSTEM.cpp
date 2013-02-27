@@ -50,6 +50,7 @@ Apply_Force_Derivatives(const ARRAY<TV,TV_INT>& du,ARRAY<TV,TV_INT>& df) const
             bool contribute=true;
             for(int b=0;b<sim.dirichlet_box.m;b++) if(sim.dirichlet_box(b).Lazy_Inside(sim.grid.Node(sim.influence_corner(p)+it.index))) contribute=false;
             for(int b=0;b<sim.rigid_ball.m;b++) if(sim.rigid_ball(b).Lazy_Inside(sim.grid.Node(sim.influence_corner(p)+it.index))) contribute=false;
+            for(int b=0;b<sim.rigid_box.m;b++) if(sim.rigid_box(b).Lazy_Inside(sim.grid.Node(sim.influence_corner(p)+it.index))) contribute=false;
             if(sim.grid.Node(sim.influence_corner(p)+it.index)(1)<sim.ground_level) contribute=false;
             if(contribute) Cp+=MATRIX<T,TV::m>::Outer_Product(du(sim.influence_corner(p)+it.index),sim.grad_weight(p)(it.index));}
         MATRIX<T,TV::m> Ep=Cp*sim.particles.Fe(p);
@@ -59,6 +60,7 @@ Apply_Force_Derivatives(const ARRAY<TV,TV_INT>& du,ARRAY<TV,TV_INT>& df) const
             bool contribute=true;
             for(int b=0;b<sim.dirichlet_box.m;b++) if(sim.dirichlet_box(b).Lazy_Inside(sim.grid.Node(sim.influence_corner(p)+it.index))) contribute=false;
             for(int b=0;b<sim.rigid_ball.m;b++) if(sim.rigid_ball(b).Lazy_Inside(sim.grid.Node(sim.influence_corner(p)+it.index))) contribute=false;
+            for(int b=0;b<sim.rigid_box.m;b++) if(sim.rigid_box(b).Lazy_Inside(sim.grid.Node(sim.influence_corner(p)+it.index))) contribute=false;
             if(sim.grid.Node(sim.influence_corner(p)+it.index)(1)<sim.ground_level) contribute=false;
             if(contribute) df(sim.influence_corner(p)+it.index)-=Gp*sim.grad_weight(p)(it.index);}}
 }
