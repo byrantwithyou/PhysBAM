@@ -443,9 +443,9 @@ public:
             case 28:{//Test 25 but using the level set method
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 
-                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(vector_count*(T)-.2+(T).5,.1,1,0),spin_count+1,TV()+(T).5);
+                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(vector_count*(T)-.1+(T).5,.1,1,0),spin_count+1,TV()+(T).5);
                 ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),-4,-4);
-                analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).35,0,1)))->Add(ab)->Add(cd);
+                analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).4,0,1)))->Add(ab)->Add(cd);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0*sqr(m)/kg));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0*sqr(m)/kg));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
@@ -604,6 +604,11 @@ public:
     {
         if(analytic_velocity.m && analytic_levelset && !use_level_set_method && !use_pls && !analytic_initial_only)
             Set_Level_Set(time+dt);
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+            for (int c=0;c<face_velocities.m;c++){
+            face_velocities(c)(it.Full_Index())=analytic_velocity(c)->u(it.Location()/m,time/s)(it.Axis())*m/s;
+              }}
+
     }
 
     void End_Time_Step(const T time) PHYSBAM_OVERRIDE
