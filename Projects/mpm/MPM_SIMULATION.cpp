@@ -323,6 +323,7 @@ Solve_The_Linear_System()
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",x);}
     node_V_old=node_V;
     node_V=x.v;
+    vectors.Delete_Pointers_And_Clean_Memory();
     if(PROFILING) TIMING_END("Solve_The_Linear_System");
 }
 //#####################################################################

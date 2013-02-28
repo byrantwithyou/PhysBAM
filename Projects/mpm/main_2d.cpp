@@ -37,13 +37,13 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
     // geometry setting
     switch(test){
         case 1: // stretching beam
-            sim.grid.Initialize(TV_INT(2*grid_res+1,0.5*grid_res+1),RANGE<TV>(TV(-1,-0.25),TV(1,0.25)));
-            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12)));
+            sim.grid.Initialize(TV_INT(6*grid_res+1,0.5*grid_res+1),RANGE<TV>(TV(-3,-0.25),TV(3,0.25)));
+            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.4*3*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.6,-0.12),TV(0.6,0.12)));
             sim.ground_level=-100;
-            sim.dirichlet_box.Append(RANGE<TV>(TV(0.16,-0.15),TV(0.25,0.15)));
-            sim.dirichlet_velocity.Append(TV(0.2,0));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.25,-0.15),TV(-0.16,0.15)));
-            sim.dirichlet_velocity.Append(TV(-0.2,0));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(0.16*3,-0.15),TV(0.25*3,0.15)));
+            sim.dirichlet_velocity.Append(TV(0.2*3,0));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.25*3,-0.15),TV(-0.16*3,0.15)));
+            sim.dirichlet_velocity.Append(TV(-0.2*3,0));
             break;
         case 2: // shit fall
             sim.grid.Initialize(TV_INT(1*grid_res+1,1*grid_res+1),RANGE<TV>(TV(-0.5,-0.7),TV(0.5,0.3)));
@@ -59,10 +59,11 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
         exit(0);}
     switch(test){
         case 1:
-            object_mass=(T)1200*density_scale*RANGE<TV>(TV(-0.2,-0.1),TV(0.2,0.1)).Size();
+            object_mass=(T)1200*density_scale*RANGE<TV>(TV(-0.2*3,-0.1),TV(0.2*3,0.1)).Size();
             ym*=(T)1e3;
             for(int p=0;p<sim.particles.number;p++){
                 T this_ym=ym;
+                this_ym*=.1+sqr(sim.particles.X(p).x);
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
             sim.use_gravity=false;
@@ -149,6 +150,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     Flush_Frame<TV>("mpm");
 
     for(int f=1;f<1000000;f++){
+        if(f==5000) sim.dirichlet_velocity.Fill(TV());
         TIMING_START;
         LOG::cout<<"TIMESTEP "<<f<<std::endl;
         sim.Advance_One_Time_Step_Backward_Euler();
@@ -198,6 +200,7 @@ int main(int argc,char *argv[])
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Parse(true);
     Run_Simulation<VECTOR<double,2> >(parse_args);
+    LOG::Finish_Logging();
     return 0;
 }
 
