@@ -491,10 +491,6 @@ public:
     void Clamp_Below(const T& value)
     {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)=clamp_min(self(i),value);}
 
-    static void Find_Common_Elements(const T_ARRAY& a,const T_ARRAY& b,T_ARRAY& result)
-    {assert(&a!=&result);assert(&b!=&result);result.Remove_All();
-    ID m=a.Size();for(ID i(0);i<m;i++) if(b.Contains(a(i))) result.Append(a(i));}
-
     template<class T_ARRAY1,class T_ARRAY2>
     static bool Equal_Dimensions(const T_ARRAY1& a,const T_ARRAY2& b)
     {return a.Size()==b.Size();}

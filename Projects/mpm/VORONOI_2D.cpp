@@ -40,14 +40,14 @@ Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& particle_grid)
             mesh.elements.Append(TV_INT(node_index.Get_Or_Insert(it.index),ID-1));
             mesh.elements.Append(TV_INT(ID-1,node_index.Get_Or_Insert(it.index+TV_INT(0,1))));
             int A=node_index.Get_Or_Insert(it.index),B=node_index.Get_Or_Insert(it.index+TV_INT(0,1));
-            ARRAY<int>::Find_Common_Elements(association(A),association(B),association(ID-1));}}
+            association(ID-1).Find_Common_Elements(association(A),association(B));}}
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+node_grid.counts));it.Valid();it.Next()){
         if(it.index(0)+1<node_grid.counts(0)){
             X(ID++)=node_grid.Node(it.index)+TV((T)0.5*node_grid.dX(0),(T)0);
             mesh.elements.Append(TV_INT(node_index.Get_Or_Insert(it.index),ID-1));
             mesh.elements.Append(TV_INT(ID-1,node_index.Get_Or_Insert(it.index+TV_INT(1,0))));
             int A=node_index.Get_Or_Insert(it.index),B=node_index.Get_Or_Insert(it.index+TV_INT(1,0));
-            ARRAY<int>::Find_Common_Elements(association(A),association(B),association(ID-1));}}
+            association(ID-1).Find_Common_Elements(association(A),association(B));}}
     Xm=X;
 }
 //#####################################################################
