@@ -7,6 +7,7 @@
 #ifndef __VORONOI_2D__
 #define __VORONOI_2D__
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
@@ -19,16 +20,16 @@ class VORONOI_2D
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,2> TV_INT;
 public:    
-    GEOMETRY_PARTICLES<TV> segment_mesh_particles;
+    ARRAY<TV> X;
     ARRAY<TV> Xm;
-    SEGMENT_MESH segment_mesh;
-    ARRAY<ARRAY<TV_INT> > local_voronoi_elements_of_sample_particle;
-    ARRAY<ARRAY<int> > local_voronoi_particles_of_sample_particle;
-
+    ARRAY<ARRAY<int> > association;
+    SEGMENT_MESH mesh;
+    
     VORONOI_2D(){}
     ~VORONOI_2D(){}
 
-    void Initialize_With_A_Regular_Grid(const GRID<TV>& grid);
+    void Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& grid);
+    void Deform_Mesh_Using_Particle_Deformation(const ARRAY_VIEW<TV>& particle_Xm,const ARRAY_VIEW<TV>& particle_X,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fe,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fp);
 //#####################################################################
 };
 }

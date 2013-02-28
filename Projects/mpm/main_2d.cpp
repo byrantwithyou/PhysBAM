@@ -37,18 +37,20 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
     // geometry setting
     switch(test){
         case 1: // stretching beam
-            sim.grid.Initialize(TV_INT(6*grid_res+1,0.5*grid_res+1),RANGE<TV>(TV(-3,-0.25),TV(3,0.25)));
-            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.4*3*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.6,-0.12),TV(0.6,0.12)));
+            sim.grid.Initialize(TV_INT(2*grid_res+1,0.5*grid_res+1),RANGE<TV>(TV(-1,-0.25),TV(1,0.25)));
+            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12)));
             sim.ground_level=-100;
-            sim.dirichlet_box.Append(RANGE<TV>(TV(0.16*3,-0.15),TV(0.25*3,0.15)));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(0.16,-0.15),TV(0.25,0.15)));
             sim.dirichlet_velocity.Append(TV(0.2*3,0));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.25*3,-0.15),TV(-0.16*3,0.15)));
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.25,-0.15),TV(-0.16,0.15)));
             sim.dirichlet_velocity.Append(TV(-0.2*3,0));
+            voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
             break;
         case 2: // shit fall
             sim.grid.Initialize(TV_INT(1*grid_res+1,1*grid_res+1),RANGE<TV>(TV(-0.5,-0.7),TV(0.5,0.3)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1)));
+            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1)));
             sim.ground_level=-0.3;
+            voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))));
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -59,11 +61,11 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
         exit(0);}
     switch(test){
         case 1:
-            object_mass=(T)1200*density_scale*RANGE<TV>(TV(-0.2*3,-0.1),TV(0.2*3,0.1)).Size();
+            object_mass=(T)1200*density_scale*RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12)).Size();
             ym*=(T)1e3;
             for(int p=0;p<sim.particles.number;p++){
                 T this_ym=ym;
-                this_ym*=.1+sqr(sim.particles.X(p).x);
+                this_ym*=.1+sqr(sim.particles.X(p).x)*25;
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
             sim.use_gravity=false;
@@ -127,8 +129,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     Initialize(test_number,sim,voronoi,parse_args,grid_res,particle_res,particle_count,density_scale,ym_scale,pr);
 
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
-    // MPM particles
     for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+    for(int i=0;i<voronoi.X.m;i++) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,0,0));
+    for(int s=0;s<voronoi.mesh.elements.m;s++){
+        int i,j;voronoi.mesh.elements(s).Get(i,j);
+        Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.mesh.elements(s))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}
     for(int b=0;b<sim.rigid_ball.m;b++){
         for(int k=0;k<50;k++){
             T theta=k*2.0*3.14/50.0;
@@ -141,12 +146,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)+sim.rigid_box(b).edges.Column(1),sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(1)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}
     for(int i=0;i<50;i++) Add_Debug_Particle(TV(-1+i*0.04,sim.ground_level),VECTOR<T,3>(0,0,1));
 
-    // Voronoi particles
-    // for(int i=0;i<voronoi.segment_mesh_particles.X.m;i++) Add_Debug_Particle(voronoi.segment_mesh_particles.X(i),VECTOR<T,3>(1,0,0));
-    // Voronoi mesh
-    // for(int s=0;s<voronoi.segment_mesh.elements.m;s++){
-    //     int i,j;voronoi.segment_mesh.elements(s).Get(i,j);
-    //     Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.segment_mesh_particles.X.Subset(voronoi.segment_mesh.elements(s))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}
     Flush_Frame<TV>("mpm");
 
     for(int f=1;f<1000000;f++){
@@ -156,30 +155,15 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Advance_One_Time_Step_Backward_Euler();
         TIMING_END("Current time step totally");
         if(f%frame_jump==0){
-            // MPM particles
             for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-            // grid force
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
-                Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_force(it.index));}
-
-            // Voronoi cells
-            // for(int p=0;p<sim.particles.X.m;p++){
-            //     TV b=sim.particles.X(p)-sim.particles.Fe(p)*sim.particles.Fp(p)*sim.particles.Xm(p);
-            //     for(int lp=0;lp<voronoi.local_voronoi_particles_of_sample_particle(p).m;lp++){
-            //         int id=voronoi.local_voronoi_particles_of_sample_particle(p)(lp);
-            //         voronoi.segment_mesh_particles.X(id)=sim.particles.Fe(p)*sim.particles.Fp(p)*voronoi.Xm(id)+b;}
-            //     for(int s=0;s<voronoi.local_voronoi_elements_of_sample_particle(p).m;s++)
-            //         Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.segment_mesh_particles.X.Subset(voronoi.local_voronoi_elements_of_sample_particle(p)(s))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
-            // }
-
-            // for(int s=0;s<voronoi.segment_mesh.elements.m;s++){
-            //     int i,j;voronoi.segment_mesh.elements(s).Get(i,j);
-            //     Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.segment_mesh_particles.X.Subset(voronoi.segment_mesh.elements(s))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
-            // }
-            // for(int i=0;i<voronoi.segment_mesh_particles.X.m;i++)
-            //     Add_Debug_Particle(voronoi.segment_mesh_particles.X(i),VECTOR<T,3>(1,0,0));
-
+            // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
+            //     Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
+            //     Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_force(it.index));}
+            voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp);
+            // for(int i=0;i<voronoi.X.m;i++) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,0,0));
+            for(int s=0;s<voronoi.mesh.elements.m;s++){
+                int i,j;voronoi.mesh.elements(s).Get(i,j);
+                Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.mesh.elements(s))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}
             for(int b=0;b<sim.rigid_ball.m;b++){
                 for(int k=0;k<50;k++){
                     T theta=k*2.0*3.14/50.0;
