@@ -114,7 +114,7 @@ Initialize()
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Store_Unique_Particle_Id();
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).levelset.Set_Collision_Body_List(example.collision_bodies_affecting_fluid);
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Set_Collision_Distance_Factors(.1,1);}
-    example.particle_levelset_evolution_multiple.Bias_Towards_Negative_Particles(false);
+    example.particle_levelset_evolution_multiple.Bias_Towards_Negative_Particles(true);
     example.particle_levelset_evolution_multiple.use_particle_levelset=true;
 
     if(example.restart){
@@ -176,25 +176,17 @@ Update_Pls(T dt)
     LOG::Time("updating removed particle velocities");
     example.Make_Levelsets_Consistent();
 
+    LOG::Time("modifying levelset");
+    example.particle_levelset_evolution_multiple.particle_levelset_multiple.Modify_Levelset_Using_Escaped_Particles(&face_velocities_ghost);
+    example.Make_Levelsets_Consistent();
     example.particle_levelset_evolution_multiple.Make_Signed_Distance();
+    example.Make_Levelsets_Consistent();
+    example.particle_levelset_evolution_multiple.particle_levelset_multiple.Modify_Levelset_Using_Escaped_Particles(&face_velocities_ghost);
     example.Make_Levelsets_Consistent();
 
-    LOG::Time("modifying levelset");
-    example.particle_levelset_evolution_multiple.particle_levelset_multiple.Modify_Levelset_Using_Escaped_Particles(&face_velocities_ghost);
-    example.Make_Levelsets_Consistent();
-    LOG::Time("reinitializing and projecting levelset");
-    example.particle_levelset_evolution_multiple.Make_Signed_Distance();
-    example.Make_Levelsets_Consistent();
-    LOG::Time("modifying levelset");
-    example.particle_levelset_evolution_multiple.particle_levelset_multiple.Modify_Levelset_Using_Escaped_Particles(&face_velocities_ghost);
-    example.Make_Levelsets_Consistent();
     LOG::Time("adjusting particle radii");
     example.particle_levelset_evolution_multiple.particle_levelset_multiple.Adjust_Particle_Radii();
     LOG::Stop_Time();
-
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after modifying levelset",0,1);
-    example.particle_levelset_evolution_multiple.Make_Signed_Distance();
-    example.Make_Levelsets_Consistent();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
 
     LOG::Time("deleting particles"); // needs to be after adding sources, since it does a reseed
