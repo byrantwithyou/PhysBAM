@@ -12,43 +12,95 @@ namespace PhysBAM{
 template<class T> void VORONOI_2D<T>::
 Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& particle_grid)
 {
+    GRID<TV> node_grid(TV_INT(particle_grid.counts.x*2+1,particle_grid.counts.y*2+1),RANGE<TV>(particle_grid.domain.min_corner-particle_grid.dX/2.0,TV(particle_grid.domain.max_corner+particle_grid.dX/2.0)));
     HASHTABLE<TV_INT,int> particle_index;
     int ID=0;
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+particle_grid.counts));it.Valid();it.Next()) particle_index.Get_Or_Insert(it.index)=ID++;
-    RANGE<TV> segmented_mesh_domain(particle_grid.domain.min_corner-(T)0.5*particle_grid.dX,particle_grid.domain.max_corner+(T)0.5*particle_grid.dX);
-    GRID<TV> node_grid(particle_grid.counts+TV_INT(1,1),segmented_mesh_domain);
     HASHTABLE<TV_INT,int> node_index;
     ID=0;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+particle_grid.counts+1));it.Valid();it.Next()) node_index.Get_Or_Insert(it.index)=ID++;
-    int N_mesh_nodes=3*node_grid.counts.Product()-node_grid.counts.Sum();
-    X.Resize(N_mesh_nodes);
-    association.Resize(N_mesh_nodes);
-    mesh.Set_Number_Nodes(N_mesh_nodes);
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+node_grid.counts));it.Valid();it.Next()){
+        int n_old_component=(int)(it.index.x%2==1)+(int)(it.index.y%2==1);
+        if(n_old_component==0){
+            node_index.Get_Or_Insert(it.index)=ID++;
+            Xm.Append(node_grid.Node(it.index));
+            if(it.index.x==0||it.index.x==node_grid.counts.x-1||it.index.y==0||it.index.y==node_grid.counts.y-1) type.Append(1);
+            else type.Append(2);}
+        else if(n_old_component==1){
+            node_index.Get_Or_Insert(it.index)=ID++;
+            Xm.Append(node_grid.Node(it.index));
+            type.Append(3);}}
     ID=0;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+node_grid.counts));it.Valid();it.Next()){
-        X(ID++)=node_grid.Node(it.index);}
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+particle_grid.counts));it.Valid();it.Next()){
-        TV particleX=particle_grid.Node(it.index);
-        TV_INT cell=node_grid.Cell(particleX,0);
-        association(node_index.Get_Or_Insert(cell)).Append(particle_index.Get_Or_Insert(it.index));
-        association(node_index.Get_Or_Insert(cell+TV_INT(1,0))).Append(particle_index.Get_Or_Insert(it.index));
-        association(node_index.Get_Or_Insert(cell+TV_INT(0,1))).Append(particle_index.Get_Or_Insert(it.index));
-        association(node_index.Get_Or_Insert(cell+TV_INT(1,1))).Append(particle_index.Get_Or_Insert(it.index));}
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+node_grid.counts));it.Valid();it.Next()){
-        if(it.index(1)+1<node_grid.counts(1)){
-            X(ID++)=node_grid.Node(it.index)+TV((T)0,(T)0.5*node_grid.dX(1));
-            mesh.elements.Append(TV_INT(node_index.Get_Or_Insert(it.index),ID-1));
-            mesh.elements.Append(TV_INT(ID-1,node_index.Get_Or_Insert(it.index+TV_INT(0,1))));
-            int A=node_index.Get_Or_Insert(it.index),B=node_index.Get_Or_Insert(it.index+TV_INT(0,1));
-            association(ID-1).Find_Common_Elements(association(A),association(B));}}
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+node_grid.counts));it.Valid();it.Next()){
-        if(it.index(0)+1<node_grid.counts(0)){
-            X(ID++)=node_grid.Node(it.index)+TV((T)0.5*node_grid.dX(0),(T)0);
-            mesh.elements.Append(TV_INT(node_index.Get_Or_Insert(it.index),ID-1));
-            mesh.elements.Append(TV_INT(ID-1,node_index.Get_Or_Insert(it.index+TV_INT(1,0))));
-            int A=node_index.Get_Or_Insert(it.index),B=node_index.Get_Or_Insert(it.index+TV_INT(1,0));
-            association(ID-1).Find_Common_Elements(association(A),association(B));}}
-    Xm=X;
+    elements.Resize(particle_grid.counts.Product());
+    for(int i=0;i<node_grid.counts.x-1;i+=2){
+        for(int j=0;j<node_grid.counts.y-1;j+=2){
+            TV_INT aa(i,j),bb(i+1,j),cc(i+2,j),dd(i+2,j+1),ee(i+2,j+2),ff(i+1,j+2),gg(i,j+2),hh(i,j+1);
+            int a=node_index.Get_Or_Insert(aa),b=node_index.Get_Or_Insert(bb),c=node_index.Get_Or_Insert(cc),d=node_index.Get_Or_Insert(dd),e=node_index.Get_Or_Insert(ee),f=node_index.Get_Or_Insert(ff),g=node_index.Get_Or_Insert(gg),h=node_index.Get_Or_Insert(hh);
+            elements(ID).Append(a);elements(ID).Append(b);elements(ID).Append(c);elements(ID).Append(d);elements(ID).Append(e);elements(ID).Append(f);elements(ID).Append(g);elements(ID).Append(h);
+            ID++;}}
+    X=Xm;
+    Initialize_Neighbor_Cells();
+    Build_Association();
+}
+//#####################################################################
+// Function Initialize_Neighbor_Cells
+//#####################################################################
+template<class T> void VORONOI_2D<T>::
+Initialize_Neighbor_Cells()
+{
+    HASHTABLE<TV_INT,bool> neighbor_cells_hash;
+    for(int c1=0;c1<elements.m;c1++){
+        for(int c2=c1+1;c2<elements.m;c2++){
+            ARRAY<int> common_nodes;
+            common_nodes.Find_Common_Elements(elements(c1),elements(c2));
+            for(int v=0;v<common_nodes.m;v++){
+                if(type(common_nodes(v))==3){
+                    neighbor_cells_hash.Get_Or_Insert(TV_INT(c1,c2))=true;
+                    break;}}}}
+    for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(neighbor_cells_hash);it.Valid();it.Next()) neighbor_cells.Append(TRIPLE<int,int,bool>(it.Key().x,it.Key().y,true));
+}
+//#####################################################################
+// Function Build_Association
+//#####################################################################
+template<class T> void VORONOI_2D<T>::
+Build_Association()
+{
+    association.Clean_Memory();
+    association.Resize(Xm.m);
+    for(int c=0;c<elements.m;c++) for(int v=0;v<elements(c).m;v++) association(elements(c)(v)).Append(c);
+}
+//#####################################################################
+// Function Build_Segments
+//#####################################################################
+template<class T> void VORONOI_2D<T>::
+Build_Segments()
+{
+    segments.Clean_Memory();
+    HASHTABLE<TV_INT,bool> seg;
+    for(int e=0;e<elements.m;e++){
+        int total_nodes=elements(e).m;
+        for(int a=0;a<total_nodes;a++){
+            int first=elements(e)(a),second=elements(e)(a+1);
+            if(a==total_nodes-1) second=elements(e)(0);
+            if(first<second) seg.Get_Or_Insert(TV_INT(first,second))=true;
+            else seg.Get_Or_Insert(TV_INT(second,first))=true;}}
+    for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(seg);it.Valid();it.Next()) segments.Append(it.Key());
+}
+//#####################################################################
+// Function Build_Boundary_Segments
+//#####################################################################
+template<class T> void VORONOI_2D<T>::
+Build_Boundary_Segments()
+{
+    boundary_segments.Clean_Memory();
+    HASHTABLE<TV_INT,int> seg;
+    for(int e=0;e<elements.m;e++){
+        int total_nodes=elements(e).m;
+        for(int a=0;a<total_nodes;a++){
+            int first=elements(e)(a),second=elements(e)(a+1);
+            if(a==total_nodes-1) second=elements(e)(0);
+            if(first<second) seg.Get_Or_Insert(TV_INT(first,second))++;
+            else seg.Get_Or_Insert(TV_INT(second,first))++;}}
+    for(typename HASHTABLE<TV_INT,int>::ITERATOR it(seg);it.Valid();it.Next()) if(it.Data()==1) boundary_segments.Append(it.Key());
 }
 //#####################################################################
 // Function Deform_Mesh_Using_Particle_Deformation

@@ -10,6 +10,7 @@
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
@@ -19,17 +20,28 @@ class VORONOI_2D
 {
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,2> TV_INT;
-public:    
-    ARRAY<TV> X;
+public:
+    ARRAY<int> type; // 1-boundary, 2-interior, 3-face
     ARRAY<TV> Xm;
+    ARRAY<ARRAY<int> > elements;
+    ARRAY<TV> X;
     ARRAY<ARRAY<int> > association;
-    SEGMENT_MESH mesh;
-    
+    ARRAY<TV_INT> segments;
+    ARRAY<TV_INT> boundary_segments;
+private:
+    ARRAY<TRIPLE<int,int,bool> > neighbor_cells;
+public:    
     VORONOI_2D(){}
     ~VORONOI_2D(){}
 
     void Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& grid);
+    void Build_Association();
+    void Build_Segments();
+    void Build_Boundary_Segments();
     void Deform_Mesh_Using_Particle_Deformation(const ARRAY_VIEW<TV>& particle_Xm,const ARRAY_VIEW<TV>& particle_X,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fe,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fp);
+private:
+    void Initialize_Neighbor_Cells();
+
 //#####################################################################
 };
 }
