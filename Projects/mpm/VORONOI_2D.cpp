@@ -24,11 +24,11 @@ Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& particle_grid)
             node_index.Get_Or_Insert(it.index)=ID++;
             Xm.Append(node_grid.Node(it.index));
             if(it.index.x==0||it.index.x==node_grid.counts.x-1||it.index.y==0||it.index.y==node_grid.counts.y-1) type.Append(1);
-            else type.Append(2);}
+            else type.Append(10);}
         else if(n_old_component==1){
             node_index.Get_Or_Insert(it.index)=ID++;
             Xm.Append(node_grid.Node(it.index));
-            type.Append(3);}}
+            type.Append(100);}}
     ID=0;
     elements.Resize(particle_grid.counts.Product());
     for(int i=0;i<node_grid.counts.x-1;i+=2){
@@ -53,7 +53,7 @@ Initialize_Neighbor_Cells()
             ARRAY<int> common_nodes;
             common_nodes.Find_Common_Elements(elements(c1),elements(c2));
             for(int v=0;v<common_nodes.m;v++){
-                if(type(common_nodes(v))==3){
+                if(type(common_nodes(v))==100){
                     neighbor_cells_hash.Get_Or_Insert(TV_INT(c1,c2))=true;
                     break;}}}}
     for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(neighbor_cells_hash);it.Valid();it.Next()) neighbor_cells.Append(TRIPLE<int,int,bool>(it.Key().x,it.Key().y,true));
@@ -108,17 +108,156 @@ Build_Boundary_Segments()
 template<class T> void VORONOI_2D<T>::
 Deform_Mesh_Using_Particle_Deformation(const ARRAY_VIEW<TV>& particle_Xm,const ARRAY_VIEW<TV>& particle_X,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fe,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fp)
 {
-    ARRAY<TV> particle_b(particle_X.m);
-    ARRAY<MATRIX<T,TV::m> > particle_F(particle_X.m);
-    for(int i=0;i<particle_b.m;i++){
-        particle_F(i)=particle_Fe(i)*particle_Fp(i);
-        particle_b(i)=particle_X(i)-particle_F(i)*particle_Xm(i);}
-    for(int i=0;i<X.m;i++){
-        X(i)=TV();
-        for(int p=0;p<association(i).m;p++){
-            int particle=association(i)(p);
-            X(i)+=particle_F(particle)*Xm(i)+particle_b(particle);}
-        X(i)/=association(i).m;}
+    X.Clean_Memory();X.Resize(Xm.m);
+    bool use_deformation_gradient=false;
+    bool use_average_world_space=true;
+    if(use_deformation_gradient){
+        ARRAY<TV> particle_b(particle_X.m);
+        ARRAY<MATRIX<T,TV::m> > particle_F(particle_X.m);
+        for(int i=0;i<particle_b.m;i++){
+            particle_F(i)=particle_Fe(i)*particle_Fp(i);
+            particle_b(i)=particle_X(i)-particle_F(i)*particle_Xm(i);}
+        for(int i=0;i<X.m;i++){
+            X(i)=TV();
+            for(int p=0;p<association(i).m;p++){
+                int particle=association(i)(p);
+                X(i)+=particle_F(particle)*Xm(i)+particle_b(particle);}
+            X(i)/=association(i).m;}}
+    else if(use_average_world_space){
+        for(int i=0;i<X.m;i++){
+            X(i)=TV();
+            for(int p=0;p<association(i).m;p++){
+                int particle=association(i)(p);
+                X(i)+=particle_X(particle);}
+            X(i)/=association(i).m;}}
+}
+//#####################################################################
+// Function Crack
+//#####################################################################
+template<class T> void VORONOI_2D<T>::
+Crack(const ARRAY_VIEW<TV>& particle_X,const T threshold)
+{
+    T threshold_squared=sqr(threshold);
+    for(int nc=0;nc<neighbor_cells.m;nc++){
+        TRIPLE<int,int,bool>& tr=neighbor_cells(nc);
+        if(tr.z && (particle_X(tr.x)-particle_X(tr.y)).Magnitude_Squared()>threshold_squared){
+            ARRAY<int> shared_nodes;shared_nodes.Find_Common_Elements(elements(tr.x),elements(tr.y));
+            PHYSBAM_ASSERT(shared_nodes.m==3);
+            VECTOR<int,3> types(type(shared_nodes(0)),type(shared_nodes(1)),type(shared_nodes(2)));
+            int sum=types.Sum();
+            switch(sum){
+                case 120:{
+                    int f1=0,i1=0,i2=0;
+                    for(int i=0;i<3;i++){
+                        if(types(i)==100) f1=shared_nodes(i);
+                        else if(types(i)==10){
+                            if(i1==0) i1=shared_nodes(i);
+                            else i2=shared_nodes(i);}
+                        else PHYSBAM_FATAL_ERROR();}
+                    type(i1)=1;type(i2)=1;
+                    type.Append(100);Xm.Append(Xm(f1));
+                    int f2=Xm.m-1;
+                    for(int i=0;i<elements(tr.y).m;i++) if(elements(tr.y)(i)==f1) elements(tr.y)(i)=f2;
+                    tr.z=false;
+                    break;}
+                case 111:{
+                    int f1=0,i1=0,b1=0;
+                    for(int i=0;i<3;i++){
+                        if(types(i)==100) f1=shared_nodes(i);
+                        else if(types(i)==10) i1=shared_nodes(i);
+                        else if(types(i)==1) b1=shared_nodes(i);
+                        else PHYSBAM_FATAL_ERROR();}
+                    type(i1)=1;
+                    type.Append(100);Xm.Append(Xm(f1));
+                    int f2=Xm.m-1;
+                    for(int i=0;i<elements(tr.y).m;i++) if(elements(tr.y)(i)==f1) elements(tr.y)(i)=f2;
+                    tr.z=false;
+
+                    type.Append(1);Xm.Append(Xm(b1));
+                    int b2=Xm.m-1;
+                    ARRAY<int> cells_share_b1;
+                    for(int i=0;i<elements.m;i++) if(elements(i).Contains(b1)) cells_share_b1.Append(i);
+                    ARRAY<int> groupA,groupB;
+                    groupA.Append(cells_share_b1(0));
+                    for(int i=1;i<cells_share_b1.m;i++){
+                        int this_cell=cells_share_b1(i);
+                        bool flag=false;
+                        for(int j=0;j<groupA.m;j++){
+                            int that_cell=groupA(j);
+                            int small_cell=(this_cell>that_cell)?that_cell:this_cell;
+                            int big_cell=(this_cell==small_cell)?that_cell:this_cell;
+                            if(neighbor_cells.Contains(TRIPLE<int,int,bool>(small_cell,big_cell,true))){
+                                flag=true;
+                                break;}}
+                        if(flag) groupA.Append(this_cell);
+                        else groupB.Append(this_cell);}
+                    for(int i=0;i<groupB.m;i++){
+                        int this_cell=groupB(i);
+                        for(int j=0;j<elements(this_cell).m;j++) if(elements(this_cell)(j)==b1) elements(this_cell)(j)=b2;}
+                    break;}
+                case 102:{
+                    int f1=0,bfirst1=0,bsecond1=0;
+                    for(int i=0;i<3;i++){
+                        if(types(i)==100) f1=shared_nodes(i);
+                        else if(types(i)==1){
+                            if(bfirst1==0) bfirst1=shared_nodes(i);
+                            else bsecond1=shared_nodes(i);}
+                        else PHYSBAM_FATAL_ERROR();}
+                    type.Append(100);Xm.Append(Xm(f1));
+                    int f2=Xm.m-1;
+                    for(int i=0;i<elements(tr.y).m;i++) if(elements(tr.y)(i)==f1) elements(tr.y)(i)=f2;
+                    tr.z=false;
+                    
+                    type.Append(1);Xm.Append(Xm(bfirst1));
+                    int bfirst2=Xm.m-1;
+                    ARRAY<int> cells_share_bfirst1;
+                    for(int i=0;i<elements.m;i++) if(elements(i).Contains(bfirst1)) cells_share_bfirst1.Append(i);
+                    ARRAY<int> groupA,groupB;
+                    groupA.Append(cells_share_bfirst1(0));
+                    for(int i=1;i<cells_share_bfirst1.m;i++){
+                        int this_cell=cells_share_bfirst1(i);
+                        bool flag=false;
+                        for(int j=0;j<groupA.m;j++){
+                            int that_cell=groupA(j);
+                            int small_cell=(this_cell>that_cell)?that_cell:this_cell;
+                            int big_cell=(this_cell==small_cell)?that_cell:this_cell;
+                            if(neighbor_cells.Contains(TRIPLE<int,int,bool>(small_cell,big_cell,true))){
+                                flag=true;
+                                break;}}
+                        if(flag) groupA.Append(this_cell);
+                        else groupB.Append(this_cell);}
+                    for(int i=0;i<groupB.m;i++){
+                        int this_cell=groupB(i);
+                        for(int j=0;j<elements(this_cell).m;j++) if(elements(this_cell)(j)==bfirst1) elements(this_cell)(j)=bfirst2;}
+
+                    type.Append(1);Xm.Append(Xm(bsecond1));
+                    int bsecond2=Xm.m-1;
+                    ARRAY<int> cells_share_bsecond1;
+                    for(int i=0;i<elements.m;i++) if(elements(i).Contains(bsecond1)) cells_share_bsecond1.Append(i);
+                    ARRAY<int> groupC,groupD;
+                    groupC.Append(cells_share_bsecond1(0));
+                    for(int i=1;i<cells_share_bsecond1.m;i++){
+                        int this_cell=cells_share_bsecond1(i);
+                        bool flag=false;
+                        for(int j=0;j<groupC.m;j++){
+                            int that_cell=groupC(j);
+                            int small_cell=(this_cell>that_cell)?that_cell:this_cell;
+                            int big_cell=(this_cell==small_cell)?that_cell:this_cell;
+                            if(neighbor_cells.Contains(TRIPLE<int,int,bool>(small_cell,big_cell,true))){
+                                flag=true;
+                                break;}}
+                        if(flag) groupC.Append(this_cell);
+                        else groupD.Append(this_cell);}
+                    for(int i=0;i<groupD.m;i++){
+                        int this_cell=groupD(i);
+                        for(int j=0;j<elements(this_cell).m;j++) if(elements(this_cell)(j)==bsecond1) elements(this_cell)(j)=bsecond2;}
+
+                    break;}    
+                default:
+                    PHYSBAM_FATAL_ERROR();
+            };
+        }
+    }
 }
 //#####################################################################
 template class VORONOI_2D<float>;
