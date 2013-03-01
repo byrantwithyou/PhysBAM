@@ -121,6 +121,9 @@ protected:
     void Local_Common_Expresssion_Elimination(CODE_BLOCK<T>* B);
     void Local_Common_Expresssion_Elimination();
     void Reduce_In_Place(INSTRUCTION& o);
+    void Compress_Registers();
+    void Eliminate_Unused_Register(int var);
+    void Eliminate_Unused_Constant(int var);
 };
 template<class T>
 struct PROGRAM_CONTEXT

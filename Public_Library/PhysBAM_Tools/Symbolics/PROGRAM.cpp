@@ -202,6 +202,11 @@ Diff(int diff_expr,int diff_var)
         }
         code.Exchange(c);
     }
+
+    LOG::cout<<__FUNCTION__<<std::endl;
+    Print();
+
+    def_use_stale=true;
     return var_out.m+extra_out++;
 }
 struct OPERATOR_DEFINITIONS
@@ -479,6 +484,15 @@ Print() const
 template<class T> void PROGRAM<T>::
 Finalize()
 {
+    for(int j=0;j<defs(3).m;j++){
+        INSTRUCTION& o=Get_Instruction(defs(3)(j));
+        if(o.type==op_copy && (o.src0&mem_mask)==mem_reg){
+            INSTRUCTION& o2=Get_Instruction(Get_Def(o.src0));
+            Propagate_Copy(o.src0,o.dest);
+            Set_Def(o.src0,VECTOR<int,2>(-1,-1));
+            o2.dest=o.dest;
+            o.type=op_nop;}}
+
     Leave_SSA();
 
     int off_in=num_tmp,off_out=off_in+var_in.m,off_const=off_out+var_out.m+extra_out;
@@ -526,6 +540,7 @@ Optimize()
     Copy_Propagation();
     Local_Common_Expresssion_Elimination();
     Remove_Dead_Code();
+    Compress_Registers();
 }
 //#####################################################################
 // Function Optimize
@@ -1109,6 +1124,56 @@ Reduce_In_Place(INSTRUCTION& o)
             if(o.src0==o.src1){o.type=op_copy;break;}
             break;
         default: break;}
+}
+//#####################################################################
+// Function Compress_Registers
+//#####################################################################
+template<class T> void PROGRAM<T>::
+Eliminate_Unused_Register(int k)
+{
+    int last=uses(0).m-1;
+    if(k<last){
+        if(defs(0)(last).x!=-1) Get_Instruction(defs(0)(last)).dest=k;
+        defs(0)(k)=defs(0)(last);
+        Propagate_Copy(last,k);}
+    defs(0).Pop();
+    uses(0).Pop();
+}
+//#####################################################################
+// Function Compress_Registers
+//#####################################################################
+template<class T> void PROGRAM<T>::
+Eliminate_Unused_Constant(int k)
+{
+    int last=uses(1).m-1;
+    constant_lookup.erase(constant_lookup.find(constants(k)));
+    if(k<last){
+        constant_lookup[constants(last)]=k;
+        constants(k)=constants(last);
+        Propagate_Copy(last|mem_const,k|mem_const);}
+    constants.Pop();
+    uses(1).Pop();
+}
+//#####################################################################
+// Function Compress_Registers
+//#####################################################################
+template<class T> void PROGRAM<T>::
+Compress_Registers()
+{
+    if(def_use_stale) Update_Use_Def();
+
+    for(int j=0;j<defs(0).m;j++)
+        if(defs(0)(j).x==-1)
+            Eliminate_Unused_Register(j--);
+
+    for(int j=0;j<constants.m;j++)
+        if(!uses(1)(j).Size())
+            Eliminate_Unused_Constant(j--);
+
+    num_tmp=uses(0).m;
+
+    LOG::cout<<__FUNCTION__<<std::endl;
+    Print();
 }
 template struct PROGRAM<float>;
 template struct PROGRAM<double>;
