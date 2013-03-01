@@ -80,9 +80,9 @@ public:
     using BASE::analytic_velocity;using BASE::m;using BASE::s;using BASE::kg;using BASE::resolution;
     using BASE::analytic_levelset;using BASE::Large_Phi;using BASE::mu0;using BASE::mu1;using BASE::rho0;
     using BASE::rho1;using BASE::bc_type;using BASE::SLIP;using BASE::DIRICHLET;using BASE::NEUMANN;
-    using BASE::surface_tension;using BASE::override_rho0;using BASE::override_rho1;
-    using BASE::override_mu0;using BASE::override_mu1;using BASE::test_analytic_diff;
-    using BASE::Initialize_Common_Example;using BASE::After_Initialize_Example;
+    using BASE::unit_rho;using BASE::unit_mu;using BASE::unit_st;using BASE::surface_tension;
+    using BASE::override_rho0;using BASE::override_rho1;using BASE::override_mu0;using BASE::override_mu1;
+    using BASE::test_analytic_diff;using BASE::Initialize_Common_Example;using BASE::After_Initialize_Example;
 
     T epsilon,radius;
     int mode;
@@ -111,31 +111,31 @@ public:
             case 1:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0*s/kg,rho0*sqr(m)/kg));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0/unit_mu,rho0/unit_rho));
                 use_p_null_mode=true;
                 break;
             case 2:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_VORTEX<TV>((T).2,0,-4);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0*s/kg,rho0*sqr(m)/kg));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0/unit_mu,rho0/unit_rho));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 5:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0*s/kg,rho0*sqr(m)/kg));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0/unit_mu,rho0/unit_rho));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 6:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_VORTEX<TV>((T).2,0,-4);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,VECTOR<T,1>(1),rho0*sqr(m)/kg));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,VECTOR<T,1>(1),rho0/unit_rho));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 8:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0*s/kg,rho0*sqr(m)/kg),TV((T).2,(T).5)));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0/unit_mu,rho0/unit_rho),TV((T).2,(T).5)));
                 use_p_null_mode=true;
                 break;
             case 10:
@@ -149,7 +149,7 @@ public:
                 {
                     TV vel((T).2,(T).5);
                     analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_VORTEX<TV>((T).2,0,-4),vel);
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0*s/kg,rho0*sqr(m)/kg),vel));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0/unit_mu,rho0/unit_rho),vel));
                     if(bc_type!=NEUMANN) use_p_null_mode=true;
                 }
                 break;
@@ -157,7 +157,7 @@ public:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
                 {
                     analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_SCALE<TV>(new ANALYTIC_LEVELSET_VORTEX<TV>((T).2,0,-4),-2),VECTOR<T,1>(4)),TV(9,.4));
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0*s/kg,rho0*sqr(m)/kg),TV(.5,-.2)));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0/unit_mu,rho0/unit_rho),TV(.5,-.2)));
                     if(bc_type!=NEUMANN) use_p_null_mode=true;
                 }
                 break;
@@ -187,13 +187,13 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_MODE(epsilon,radius,mode,0,1);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
-                surface_tension=(T)0.07197*kg*m/(s*s);
+                surface_tension=(T)0.07197*unit_st;
                 use_p_null_mode=true;
                 use_level_set_method=true;
-                if(!override_rho0) rho0=1000*kg/sqr(m);
-                if(!override_rho1) rho1=(T)1.1839*kg/sqr(m);
-                if(!override_mu0) mu0=0*kg/s;
-                if(!override_mu1) mu1=0*kg/s;
+                if(!override_rho0) rho0=1000*unit_rho;
+                if(!override_rho1) rho1=(T)1.1839*unit_rho;
+                if(!override_mu0) mu0=0*unit_mu;
+                if(!override_mu1) mu1=0*unit_mu;
 //                analytic_initial_only=true;
 
                 if(test_analytic_diff){
@@ -215,8 +215,8 @@ public:
                 ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_ELLIPSOID<TV>(TV(.5,.3),TV(.15,.1),1,0),VECTOR<T,1>(1),TV()+(T).5);
                 ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),-4,-4);
                 analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).42,0,1)))->Add(ab)->Add(cd);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,VECTOR<T,1>(1),rho0*sqr(m)/kg));
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,VECTOR<T,1>(1),rho0*sqr(m)/kg));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,VECTOR<T,1>(1),rho0/unit_rho));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,VECTOR<T,1>(1),rho0/unit_rho));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 //use_level_set_method=true;
                 
@@ -225,8 +225,8 @@ public:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*pi*m,true);
                 TV vel((T)-.5,(T).2);
                 analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3*pi,1,0),vel);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(0*mu0*s/kg,rho0*sqr(m)/kg,vel));
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(0*mu0*s/kg,rho0*sqr(m)/kg,vel));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(0*mu0/unit_mu,rho0/unit_rho,vel));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(0*mu0/unit_mu,rho0/unit_rho,vel));
                 use_p_null_mode=true;
                 use_level_set_method=true;
                 break;}

@@ -151,6 +151,7 @@ public:
     bool user_last_frame;
     T mu0,mu1;
     T rho0,rho1;
+    T unit_mu,unit_rho,unit_st,unit_p;
     T m,s,kg;
     int bc_type;
     bool bc_n,bc_d,bc_s;
@@ -172,10 +173,10 @@ public:
     bool override_output_directory;
 
     FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-        :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),
-        rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),no_advection(false),refine(1),
-        surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),use_pls_over_levelset(false),
-        analytic_initial_only(false),number_of_threads(1),override_output_directory(false)
+        :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),rho0(1),
+        rho1(2),unit_mu(0),unit_rho(0),unit_st(0),unit_p(0),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),
+        no_advection(false),refine(1),surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),
+        use_pls_over_levelset(false),analytic_initial_only(false),number_of_threads(1),override_output_directory(false)
     {
         last_frame=16;
         parse_args.Extra(&test_number,"example number","example number to run");
@@ -217,20 +218,24 @@ public:
             LOG::cout<<"Running on "<<number_of_threads<<" threads"<<std::endl;
         }
 #endif
-        
+
         resolution*=refine;
         dt/=refine;
         time_steps_per_frame*=refine;
         stored_last_frame=last_frame;
-        mu0*=kg/s;
-        mu1*=kg/s;
-        rho0*=kg/sqr(m);
-        rho1*=kg/sqr(m);
+        unit_mu=kg*pow<TV::m-2>(m)/s;
+        unit_rho=kg/pow<TV::m>(m);
+        unit_st=kg*pow<3-TV::m>(m)/(s*s);
+        unit_p=kg*pow<2-TV::m>(m)/(s*s);
+        mu0*=unit_mu;
+        mu1*=unit_mu;
+        rho0*=unit_rho;
+        rho1*=unit_rho;
+        surface_tension*=unit_st;
         dt*=s;
         PHYSBAM_ASSERT(bc_n+bc_d+bc_s<2);
         bc_type=bc_n?NEUMANN:(bc_s?SLIP:DIRICHLET);
         use_advection=!no_advection;
-        surface_tension*=kg*m/(s*s);
 
         analytic_levelset=0;
     }
@@ -256,6 +261,7 @@ public:
         TV vector_count;
         for(int i=0;i<TV::SPIN::m;i++) spin_count(i)=i;
         for(int i=0;i<TV::m;i++) vector_count(i)=i;
+
         switch(test_number){
             case 0:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
@@ -266,7 +272,7 @@ public:
             case 3:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0*sqr(m)/kg));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0/unit_rho));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 4:
@@ -284,33 +290,33 @@ public:
             case 9:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 {
-                    T x0=(T).2,x1=(T).5,x2=(T).8,v0=1,v2=-1;
-                    T v1=(v0*mu0/(x1-x0)+v2*mu1/(x2-x1))/(mu0/(x1-x0)+mu1/(x2-x1));
+                    T x0=(T).2,x1=(T).5,x2=(T).8,v0=1,v2=-1,u_mu0=mu0/unit_mu,u_mu1=mu1/unit_mu;
+                    T v1=(v0*u_mu0/(x1-x0)+v2*u_mu1/(x2-x1))/(u_mu0/(x1-x0)+u_mu1/(x2-x1));
                     MATRIX<T,TV::m> du0,du1;
                     du0(1,0)=(v1-v0)/(x1-x0);
                     du1(1,0)=(v2-v1)/(x2-x1);
                     ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x0,TV::Axis_Vector(0),DIRICHLET,0);
                     ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x2,TV::Axis_Vector(0),1,DIRICHLET);
                     analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(1)*v1,du0,rho0*sqr(m)/kg));
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(1)*v1,du1,rho1*sqr(m)/kg));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(1)*v1,du0,rho0/unit_rho));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(1)*v1,du1,rho1/unit_rho));
                     use_p_null_mode=true;
                 }
                 break;
             case 11:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(vector_count*(T).2+(T).6,spin_count+1,rho0*sqr(m)/kg));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(vector_count*(T).2+(T).6,spin_count+1,rho0/unit_rho));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 12:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 {
-                    T x0=(T).2,x1=(T).8,g=9.8,a=rho0*sqr(m)*g/(2*mu0*s);
+                    T x0=(T).2,x1=(T).8,g=9.8,a=rho0/unit_rho*g/(2*mu0/unit_mu);
                     ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x0,TV::Axis_Vector(0),DIRICHLET,0);
                     ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),DIRICHLET,DIRICHLET);
                     analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X<TV>(a,-a*(x0+x1),a*x0*x1,mu0*s/kg));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X<TV>(a,-a*(x0+x1),a*x0*x1,mu0/unit_mu));
                     use_p_null_mode=true;
                 }
                 break;
@@ -324,8 +330,8 @@ public:
                     ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x0,TV::Axis_Vector(0),DIRICHLET,0);
                     ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x2,TV::Axis_Vector(0),1,DIRICHLET);
                     analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(1)*v1,du0,rho0*sqr(m)/kg));
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(1)*v1,du1,rho1*sqr(m)/kg));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(1)*v1,du0,rho0/unit_rho));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(1)*v1,du1,rho1/unit_rho));
                     use_p_null_mode=true;
                 }
                 break;
@@ -349,8 +355,8 @@ public:
                     ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),x0,DIRICHLET,0);
                     ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),x2,1,DIRICHLET);
                     analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),x1,0,1)))->Add(ab)->Add(cd);
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X<TV>((T).5,(T).2,(T).3,mu0*s/kg));
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).1,spin_count+1,rho1*sqr(m)/kg));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X<TV>((T).5,(T).2,(T).3,mu0/unit_mu));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).1,spin_count+1,rho1/unit_rho));
                     use_discontinuous_velocity=true;
                     use_p_null_mode=true;
                 }
@@ -368,7 +374,7 @@ public:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 {
                     analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4),vector_count*(T).1+(T).1);
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+1,spin_count+1,rho0*sqr(m)/kg),vector_count*(T)-.9+(T).5));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+1,spin_count+1,rho0/unit_rho),vector_count*(T)-.9+(T).5));
                     if(bc_type!=NEUMANN) use_p_null_mode=true;
                 }
                 break;
@@ -402,7 +408,7 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,1);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
-                surface_tension=1*kg*m/(s*s);
+                surface_tension=unit_st;
                 use_p_null_mode=true;
                 use_level_set_method=true;
                 break;
@@ -420,8 +426,8 @@ public:
                 ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(vector_count*(T)-.2+(T).5,.1,1,0),spin_count+1,TV()+(T).5);
                 ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),-4,-4);
                 analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).4,0,1)))->Add(ab)->Add(cd);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0*sqr(m)/kg));
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0*sqr(m)/kg));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0/unit_rho));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0/unit_rho));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 //use_level_set_method=true;
 
@@ -442,8 +448,8 @@ public:
                 ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_ROTATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(vector_count*(T)-.1+(T).5,.1,1,0),spin_count+1,TV()+(T).5);
                 ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),-4,-4);
                 analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).4,0,1)))->Add(ab)->Add(cd);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0*sqr(m)/kg));
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0*sqr(m)/kg));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0/unit_rho));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0/unit_rho));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 use_level_set_method=true;
                 
@@ -615,7 +621,7 @@ public:
 
     MATRIX<T,TV::m> Stress(const TV& X,int color,T time)
     {
-        T p=analytic_velocity(color)->p(X/m,time/s)*kg/(s*s);
+        T p=analytic_velocity(color)->p(X/m,time/s)*unit_p;
         MATRIX<T,TV::m> du=analytic_velocity(color)->du(X/m,time/s)/s;
         return (du+du.Transposed())*mu(color)-p;
     }
