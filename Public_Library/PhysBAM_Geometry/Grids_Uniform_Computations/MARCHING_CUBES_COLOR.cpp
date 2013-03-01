@@ -1071,6 +1071,7 @@ Get_Elements(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<
 
     // FIX AND SAVE MESHES
 
+    junctions_present=false; // What follows dies, so don't run it
     if(junctions_present){
         ARRAY<int> particle_dofs(particles.number);
         HASHTABLE<TV_INT> variable_cells;
