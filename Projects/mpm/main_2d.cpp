@@ -151,18 +151,18 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     Flush_Frame<TV>("mpm");
 
-    for(int f=1;f<1000000;f++){
-        // if(f==5000) sim.dirichlet_velocity.Fill(TV());
+    for(int f=1;f<29977;f++){
+        if(f==12500) sim.dirichlet_velocity.Fill(TV());
         TIMING_START;
         LOG::cout<<"TIMESTEP "<<f<<std::endl;
         sim.Advance_One_Time_Step_Backward_Euler();
         TIMING_END("Current time step totally");
         if(f%frame_jump==0){
-            for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+            // for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
             // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
             //     Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
             //     Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_force(it.index));}
-            voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.5);
+            voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.3);
             voronoi.Build_Association();
             voronoi.Build_Boundary_Segments();
             voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp);

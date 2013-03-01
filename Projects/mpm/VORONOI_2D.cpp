@@ -79,8 +79,9 @@ Build_Segments()
     for(int e=0;e<elements.m;e++){
         int total_nodes=elements(e).m;
         for(int a=0;a<total_nodes;a++){
-            int first=elements(e)(a),second=elements(e)(a+1);
+            int first=elements(e)(a),second;
             if(a==total_nodes-1) second=elements(e)(0);
+            else second=elements(e)(a+1);
             if(first<second) seg.Get_Or_Insert(TV_INT(first,second))=true;
             else seg.Get_Or_Insert(TV_INT(second,first))=true;}}
     for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(seg);it.Valid();it.Next()) segments.Append(it.Key());
@@ -96,8 +97,9 @@ Build_Boundary_Segments()
     for(int e=0;e<elements.m;e++){
         int total_nodes=elements(e).m;
         for(int a=0;a<total_nodes;a++){
-            int first=elements(e)(a),second=elements(e)(a+1);
+            int first=elements(e)(a),second;
             if(a==total_nodes-1) second=elements(e)(0);
+            else second=elements(e)(a+1);
             if(first<second) seg.Get_Or_Insert(TV_INT(first,second))++;
             else seg.Get_Or_Insert(TV_INT(second,first))++;}}
     for(typename HASHTABLE<TV_INT,int>::ITERATOR it(seg);it.Valid();it.Next()) if(it.Data()==1) boundary_segments.Append(it.Key());
@@ -137,6 +139,7 @@ Deform_Mesh_Using_Particle_Deformation(const ARRAY_VIEW<TV>& particle_Xm,const A
 template<class T> void VORONOI_2D<T>::
 Crack(const ARRAY_VIEW<TV>& particle_X,const T threshold)
 {
+    LOG::cout<<"crack start"<<std::endl;
     T threshold_squared=sqr(threshold);
     for(int nc=0;nc<neighbor_cells.m;nc++){
         TRIPLE<int,int,bool>& tr=neighbor_cells(nc);
