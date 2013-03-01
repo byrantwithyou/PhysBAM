@@ -136,7 +136,7 @@ class FLUIDS_COLOR_BASE:public PLS_FC_EXAMPLE<TV>
     typedef PLS_FC_EXAMPLE<TV> BASE;
 
 public:
-    using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
+    using BASE::grid;using BASE::output_directory;using BASE::face_velocities;
     using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;using BASE::use_level_set_method;using BASE::use_pls;
     using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::number_of_colors;
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;

@@ -21,13 +21,11 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),write_output_files(true),
     output_directory("output"),restart(0),number_of_ghost_cells(5),dt(1),time(0),time_steps_per_frame(1),use_preconditioner(true),
     max_iter(100000),dump_matrix(false),wrap(true),use_advection(true),use_reduced_advection(true),omit_solve(false),
-    number_of_colors(1),use_discontinuous_velocity(false),use_p_null_mode(false),use_level_set_method(false),use_pls(false),periodic_particles(true),
+    number_of_colors(1),use_discontinuous_velocity(false),use_p_null_mode(false),use_level_set_method(false),use_pls(false),
     grid(TV_INT(),RANGE<TV>::Unit_Box(),true),particle_levelset_evolution_multiple(*new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >(grid,number_of_ghost_cells)),
     advection_scalar(*new ADVECTION_HAMILTON_JACOBI_ENO<GRID<TV>,T>),levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),
     collision_bodies_affecting_fluid(*new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >(grid)),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
-    for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
-    if(!periodic_particles)domain_boundary(1)(1)=false;
     debug_particles.debug_particles.template Add_Array<TV>(ATTRIBUTE_ID_V);
     debug_particles.debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
 }
@@ -98,46 +96,6 @@ Read_Output_Files(const int frame)
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/removed_positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_positive_particles);
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/removed_negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_negative_particles);
         FILE_UTILITIES::Read_From_Text_File(STRING_UTILITIES::string_sprintf("%s/%d/last_unique_particle_id_%d",output_directory.c_str(),frame,i),particle_levelset.last_unique_particle_id);}
-    std::string filename;
-//    filename=output_directory+"/"+f+"/pressure";
-//    if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible.projection.p);}
-    filename=output_directory+"/"+f+"/mac_velocities";
-    if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,face_velocities);}
-}
-//#####################################################################
-// Function Adjust_Particle_For_Domain_Boundaries
-//#####################################################################
-template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
-Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time)
-{
-    if(particle_type==PARTICLE_LEVELSET_POSITIVE || particle_type==PARTICLE_LEVELSET_REMOVED_POSITIVE) return;
-
-    for(int i=0;i<number_of_colors;i++){
-        PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=*particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(i);
-        TV& X=particles.X(index);TV X_new=X+dt*V;
-        T max_collision_distance=particle_levelset.Particle_Collision_Distance(particles.quantized_collision_distance(index));
-        T min_collision_distance=particle_levelset.min_collision_distance_factor*max_collision_distance;
-        TV min_corner=grid.domain.Minimum_Corner(),max_corner=grid.domain.Maximum_Corner();
-        if(periodic_particles){
-            for(int axis=0;axis<GRID<TV>::dimension;axis++){
-                T shift=((X_new[axis]-min_corner[axis])/(max_corner[axis]-min_corner[axis]));if(shift<0)shift-=(T)1;X_new[axis]-=(max_corner[axis]-min_corner[axis])*(int)shift;X=X_new-dt*V;
-        }}
-        else{
-        for(int axis=0;axis<GRID<TV>::dimension;axis++){
-            if(domain_boundary[axis][0] && X_new[axis]<min_corner[axis]+max_collision_distance){
-                T collision_distance=X[axis]-min_corner[axis];
-                if(collision_distance>max_collision_distance)collision_distance=X_new[axis]-min_corner[axis];
-                collision_distance=max(min_collision_distance,collision_distance);
-                X_new[axis]+=max((T)0,min_corner[axis]-X_new[axis]+collision_distance);
-                V[axis]=max((T)0,V[axis]);X=X_new-dt*V;}
-            if(domain_boundary[axis][1] && X_new[axis]>max_corner[axis]-max_collision_distance){
-                T collision_distance=max_corner[axis]-X[axis];
-                if(collision_distance>max_collision_distance) collision_distance=max_corner[axis]-X_new[axis];
-                collision_distance=max(min_collision_distance,collision_distance);
-                X_new[axis]-=max((T)0,X_new[axis]-max_corner[axis]+collision_distance);
-                V[axis]=min((T)0,V[axis]);X=X_new-dt*V;}}
-        }
-    }
 }
 //#####################################################################
 // Function Color_At_Cell
