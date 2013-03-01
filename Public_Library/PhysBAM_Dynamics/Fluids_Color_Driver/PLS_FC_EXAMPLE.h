@@ -37,6 +37,7 @@ public:
     int last_frame;
     std::string frame_title;
     int write_substeps_level;
+    int substeps_delay_frame;
     bool write_output_files;
     std::string output_directory;
     int restart;

@@ -71,7 +71,7 @@ Execute_Main_Program()
 template<class TV> void PLS_FC_DRIVER<TV>::
 Initialize()
 {
-    DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
+    DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.substeps_delay_frame<0?example.write_substeps_level:-1);
     
     // setup time
     current_frame=example.restart;
@@ -455,7 +455,8 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Simulate_To_Frame(const int frame)
 {
     for(;current_frame<frame;current_frame++){
-        LOG::SCOPE scope("FRAME","Frame %d",current_frame+1);
+        if(example.substeps_delay_frame==current_frame)
+            DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
         for(int substep=0;substep<example.time_steps_per_frame;substep++){
             LOG::SCOPE scope("SUBSTEP","substep %d",substep+1);
             Advance_One_Time_Step(current_frame==0 && substep==0);}
