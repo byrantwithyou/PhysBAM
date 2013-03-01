@@ -117,15 +117,10 @@ Initialize()
     example.particle_levelset_evolution_multiple.Bias_Towards_Negative_Particles(true);
     example.particle_levelset_evolution_multiple.use_particle_levelset=true;
 
+    example.Initialize();
     if(example.restart){
-        example.Read_Output_Files(example.restart);
-        example.collision_bodies_affecting_fluid.Rasterize_Objects();
-        example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.grid.dX.Min(),5);} // compute grid visibility (for advection later)
+        example.Read_Output_Files(example.restart);}
     else{
-        example.collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
-        example.collision_bodies_affecting_fluid.Rasterize_Objects();
-        example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.grid.dX.Min(),5);
-        example.Initialize();
         example.Rebuild_Levelset_Color();
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells);it.Valid();it.Next())
             example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
@@ -134,6 +129,9 @@ Initialize()
         example.Make_Levelsets_Consistent();
         example.Get_Initial_Velocities();}
 
+    example.collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
+    example.collision_bodies_affecting_fluid.Rasterize_Objects();
+    example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.grid.dX.Min(),5);
     example.collision_bodies_affecting_fluid.Compute_Grid_Visibility();
     example.particle_levelset_evolution_multiple.Set_Seed(2606);
     if(!example.restart && example.use_pls) example.particle_levelset_evolution_multiple.Seed_Particles(time);
@@ -423,7 +421,6 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color,int c)
 {
-    
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next())
         if(color(it.Full_Index())!=c)
             u(it.Full_Index())=1e20;
@@ -455,6 +452,7 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Simulate_To_Frame(const int frame)
 {
     for(;current_frame<frame;current_frame++){
+        LOG::SCOPE scope("FRAME","frame %d",current_frame+1);
         if(example.substeps_delay_frame==current_frame)
             DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
         for(int substep=0;substep<example.time_steps_per_frame;substep++){
