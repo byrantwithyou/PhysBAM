@@ -76,22 +76,23 @@ class FLUIDS_COLOR<VECTOR<T,2> >:public FLUIDS_COLOR_BASE<VECTOR<T,2> >
     typedef FLUIDS_COLOR_BASE<TV> BASE;
 
 public:
-    using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
-    using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;using BASE::use_level_set_method;using BASE::use_pls;
-    using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::number_of_colors;
-    using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
-    using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
-    using BASE::particle_levelset_evolution_multiple;using BASE::test_number;using BASE::use_pls_over_levelset;
-    using BASE::analytic_velocity;using BASE::m;using BASE::s;using BASE::kg;using BASE::resolution;using BASE::analytic_levelset;
-    using BASE::Large_Phi;using BASE::mu0;using BASE::mu1;using BASE::rho0;using BASE::rho1;using BASE::bc_type;using BASE::SLIP;
-    using BASE::DIRICHLET;using BASE::NEUMANN;using BASE::surface_tension;using BASE::epsilon;using BASE::override_rho0;
-    using BASE::override_rho1;using BASE::override_mu0;using BASE::override_mu1;using BASE::test_analytic_diff;using BASE::radius;
-    using BASE::mode;using BASE::analytic_initial_only;using BASE::Set_Level_Set;using BASE::Level_Set_Error;
-    using BASE::Velocity_Error;using BASE::Initialize_Common_Example;using BASE::After_Initialize_Example;
+    using BASE::grid;using BASE::use_level_set_method;using BASE::use_p_null_mode;using BASE::test_number;
+    using BASE::analytic_velocity;using BASE::m;using BASE::s;using BASE::kg;using BASE::resolution;
+    using BASE::analytic_levelset;using BASE::Large_Phi;using BASE::mu0;using BASE::mu1;using BASE::rho0;
+    using BASE::rho1;using BASE::bc_type;using BASE::SLIP;using BASE::DIRICHLET;using BASE::NEUMANN;
+    using BASE::surface_tension;using BASE::override_rho0;using BASE::override_rho1;
+    using BASE::override_mu0;using BASE::override_mu1;using BASE::test_analytic_diff;
+    using BASE::Initialize_Common_Example;using BASE::After_Initialize_Example;
+
+    T epsilon,radius;
+    int mode;
 
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-        :FLUIDS_COLOR_BASE<TV>(stream_type,parse_args)
+        :FLUIDS_COLOR_BASE<TV>(stream_type,parse_args),epsilon((T).1),radius((T).05),mode(2)
     {
+        parse_args.Add("-mode",&mode,"mode","Oscillation mode for surface tension test");
+        parse_args.Add("-radius",&radius,"radius","Radius mode for surface tension test");
+        parse_args.Add("-epsilon",&epsilon,"eps","Epsilon for surface tension test");
         parse_args.Parse();
 
         if(!Initialize_Common_Example())

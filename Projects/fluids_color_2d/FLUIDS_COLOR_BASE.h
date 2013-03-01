@@ -168,16 +168,14 @@ public:
     ARRAY<ANALYTIC_VELOCITY<TV>*> analytic_velocity,initial_analytic_velocity;
     ANALYTIC_LEVELSET<TV>* analytic_levelset;
     bool analytic_initial_only;
-    T epsilon,radius;
-    int mode;
     int number_of_threads;
     bool override_output_directory;
 
     FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),
         rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),no_advection(false),refine(1),
-        surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),use_pls_over_levelset(false),analytic_initial_only(false),
-        epsilon((T).1),radius((T).05),mode(2),number_of_threads(1),override_output_directory(false)
+        surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),use_pls_over_levelset(false),
+        analytic_initial_only(false),number_of_threads(1),override_output_directory(false)
     {
         last_frame=16;
         parse_args.Extra(&test_number,"example number","example number to run");
@@ -207,9 +205,6 @@ public:
         parse_args.Add("-null_p",&use_p_null_mode,"Assume pressure null mode and project it out");
         parse_args.Add("-threads",&number_of_threads,"threads","Number of threads");
         parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
-        parse_args.Add("-mode",&mode,"mode","Oscillation mode for surface tension test");
-        parse_args.Add("-radius",&radius,"radius","Radius mode for surface tension test");
-        parse_args.Add("-epsilon",&epsilon,"eps","Epsilon for surface tension test");
         parse_args.Parse(true);
 
 #ifdef USE_OPENMP
