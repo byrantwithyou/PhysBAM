@@ -52,9 +52,9 @@ public:
     using BASE::particle_levelset_evolution_multiple;using BASE::test_number;using BASE::use_pls_over_levelset;
     using BASE::analytic_velocity;using BASE::m;using BASE::s;using BASE::kg;using BASE::resolution;using BASE::analytic_levelset;
     using BASE::Large_Phi;using BASE::mu0;using BASE::mu1;using BASE::rho0;using BASE::rho1;using BASE::bc_type;using BASE::SLIP;
-    using BASE::DIRICHLET;using BASE::NEUMANN;using BASE::surface_tension;using BASE::epsilon;using BASE::override_rho0;
-    using BASE::override_rho1;using BASE::override_mu0;using BASE::override_mu1;using BASE::test_analytic_diff;using BASE::radius;
-    using BASE::mode;using BASE::analytic_initial_only;using BASE::Set_Level_Set;using BASE::Level_Set_Error;
+    using BASE::DIRICHLET;using BASE::NEUMANN;using BASE::surface_tension;using BASE::override_rho0;
+    using BASE::override_rho1;using BASE::override_mu0;using BASE::override_mu1;using BASE::test_analytic_diff;
+    using BASE::analytic_initial_only;using BASE::Set_Level_Set;using BASE::Level_Set_Error;
     using BASE::Velocity_Error;using BASE::Initialize_Common_Example;using BASE::After_Initialize_Example;
 
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
