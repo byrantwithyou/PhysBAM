@@ -49,8 +49,12 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
         case 2: // shit fall
             sim.grid.Initialize(TV_INT(1*grid_res+1,1*grid_res+1),RANGE<TV>(TV(-0.5,-0.7),TV(0.5,0.3)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1)));
-            sim.ground_level=-0.3;
-            // voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))));
+            sim.ground_level=-0.6;
+            sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.3),0.03));
+            sim.rigid_ball_velocity.Append(TV());
+            sim.rigid_ball.Append(SPHERE<TV>(TV(0.09,-0.3),0.01));
+            sim.rigid_ball_velocity.Append(TV());
+            voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))));
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -68,6 +72,9 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
             sim.use_gravity=false;
+            sim.use_plasticity_yield=true;
+            sim.yield_min=-100;
+            sim.yield_max=1.3;
             break;
         case 2:
             object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
@@ -75,7 +82,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             sim.mu.Fill(ym/((T)2*((T)1+pr)));
             sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
             sim.use_visco_plasticity=true;
-            sim.visco_nu=1e4;
+            sim.visco_nu=1e3;
             sim.visco_tau=1000;
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
@@ -142,11 +149,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             T theta=k*2.0*3.14/50.0;
             TV disp;disp(0)=sim.rigid_ball(b).radius*cos(theta);disp(1)=sim.rigid_ball(b).radius*sin(theta);
             Add_Debug_Particle(sim.rigid_ball(b).center+disp,VECTOR<T,3>(1,0,0));}}
-    for(int b=0;b<sim.rigid_box.m;b++){
-        Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner,sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
-        Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner,sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(1)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
-        Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)+sim.rigid_box(b).edges.Column(1),sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
-        Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)+sim.rigid_box(b).edges.Column(1),sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(1)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}
     for(int i=0;i<50;i++) Add_Debug_Particle(TV(-1+i*0.04,sim.ground_level),VECTOR<T,3>(0,0,1));
 
     Flush_Frame<TV>("mpm");
@@ -158,7 +160,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Advance_One_Time_Step_Backward_Euler();
         TIMING_END("Current time step totally");
         if(f%frame_jump==0){
-            // for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+            for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
             // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
             //     Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
             //     Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_force(it.index));}
@@ -174,11 +176,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                     T theta=k*2.0*3.14/50.0;
                     TV disp;disp(0)=sim.rigid_ball(b).radius*cos(theta);disp(1)=sim.rigid_ball(b).radius*sin(theta);
                     Add_Debug_Particle(sim.rigid_ball(b).center+disp,VECTOR<T,3>(1,0,0));}}
-            for(int b=0;b<sim.rigid_box.m;b++){
-                Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner,sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
-                Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner,sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(1)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
-                Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)+sim.rigid_box(b).edges.Column(1),sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
-                Add_Debug_Object(VECTOR<TV,TV::m>(sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(0)+sim.rigid_box(b).edges.Column(1),sim.rigid_box(b).corner+sim.rigid_box(b).edges.Column(1)),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}
             for(int i=0;i<50;i++) Add_Debug_Particle(TV(-1+i*0.04,sim.ground_level),VECTOR<T,3>(0,0,1));
             Flush_Frame<TV>("mpm");}
         LOG::cout<<std::endl;}

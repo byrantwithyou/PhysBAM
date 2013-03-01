@@ -53,8 +53,6 @@ public:
     ARRAY<TV> dirichlet_velocity;
     ARRAY<SPHERE<TV> > rigid_ball;
     ARRAY<TV> rigid_ball_velocity;
-    ARRAY<ORIENTED_BOX<TV> > rigid_box;
-    ARRAY<TV> rigid_box_velocity;
     T xi;
     //#################################################################
     TV gravity_constant;
@@ -71,6 +69,7 @@ public:
     ARRAY<TV,TV_INT> node_V_star;
     ARRAY<TV,TV_INT> node_V_old;
     ARRAY<TV,TV_INT> node_force;
+    ARRAY<TV_INT> nodes_need_projection;
     int frame;
 
     MPM_SIMULATION();

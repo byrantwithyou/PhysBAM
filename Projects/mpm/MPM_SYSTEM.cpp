@@ -46,23 +46,13 @@ Apply_Force_Derivatives(const ARRAY<TV,TV_INT>& du,ARRAY<TV,TV_INT>& df) const
     df.Fill(TV());
     for(int p=0;p<sim.particles.number;p++){
         MATRIX<T,TV::m> Cp;
-        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.IN));it.Valid();it.Next()){
-            bool contribute=true;
-            // for(int b=0;b<sim.dirichlet_box.m;b++) if(sim.dirichlet_box(b).Lazy_Inside(sim.grid.Node(sim.influence_corner(p)+it.index))) contribute=false;
-            // for(int b=0;b<sim.rigid_ball.m;b++) if(sim.rigid_ball(b).Lazy_Inside(sim.grid.Node(sim.influence_corner(p)+it.index))) contribute=false;
-            // for(int b=0;b<sim.rigid_box.m;b++) if(sim.rigid_box(b).Lazy_Inside(sim.grid.Node(sim.influence_corner(p)+it.index))) contribute=false;
-            // if(sim.grid.Node(sim.influence_corner(p)+it.index)(1)<sim.ground_level) contribute=false;
-            if(contribute) Cp+=MATRIX<T,TV::m>::Outer_Product(du(sim.influence_corner(p)+it.index),sim.grad_weight(p)(it.index));}
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.IN));it.Valid();it.Next())
+            Cp+=MATRIX<T,TV::m>::Outer_Product(du(sim.influence_corner(p)+it.index),sim.grad_weight(p)(it.index));
         MATRIX<T,TV::m> Ep=Cp*sim.particles.Fe(p);
         MATRIX<T,TV::m> Ap=sim.constitutive_model.Compute_d2Psi_dFe_dFe_Action_dF(sim.mu(p),sim.lambda(p),sim.particles.Fe(p),sim.Je(p),sim.Re(p),sim.Se(p),Ep);
         MATRIX<T,TV::m> Gp=sim.particles.volume(p)*(Ap.Times_Transpose(sim.particles.Fe(p)));
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.IN));it.Valid();it.Next()){
-            bool contribute=true;
-            // for(int b=0;b<sim.dirichlet_box.m;b++) if(sim.dirichlet_box(b).Lazy_Inside(sim.grid.Node(sim.influence_corner(p)+it.index))) contribute=false;
-            // for(int b=0;b<sim.rigid_ball.m;b++) if(sim.rigid_ball(b).Lazy_Inside(sim.grid.Node(sim.influence_corner(p)+it.index))) contribute=false;
-            // for(int b=0;b<sim.rigid_box.m;b++) if(sim.rigid_box(b).Lazy_Inside(sim.grid.Node(sim.influence_corner(p)+it.index))) contribute=false;
-            // if(sim.grid.Node(sim.influence_corner(p)+it.index)(1)<sim.ground_level) contribute=false;
-            if(contribute) df(sim.influence_corner(p)+it.index)-=Gp*sim.grad_weight(p)(it.index);}}
+            df(sim.influence_corner(p)+it.index)-=Gp*sim.grad_weight(p)(it.index);}}
 }
 //#####################################################################
 // Function Multiply
@@ -86,10 +76,7 @@ template<class TV> void MPM_SYSTEM<TV>::
 Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
     ARRAY<TV,TV_INT>& xx=debug_cast<MPM_VECTOR<TV>&>(x).v;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.grid.counts));it.Valid();it.Next())
-        for(int b=0;b<sim.dirichlet_box.m;b++)
-            if(sim.dirichlet_box(b).Lazy_Inside(sim.grid.Node(it.index)))
-                xx(it.index)=TV();
+    for(int i=0;i<sim.nodes_need_projection.m;i++) xx(sim.nodes_need_projection(i))=TV();
 }
 //#####################################################################
 // Function Inner_Product
