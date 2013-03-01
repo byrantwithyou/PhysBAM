@@ -109,8 +109,8 @@ template<class T> void VORONOI_2D<T>::
 Deform_Mesh_Using_Particle_Deformation(const ARRAY_VIEW<TV>& particle_Xm,const ARRAY_VIEW<TV>& particle_X,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fe,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fp)
 {
     X.Clean_Memory();X.Resize(Xm.m);
-    bool use_deformation_gradient=false;
-    bool use_average_world_space=true;
+    bool use_deformation_gradient=true;
+    bool use_average_world_space=false;
     if(use_deformation_gradient){
         ARRAY<TV> particle_b(particle_X.m);
         ARRAY<MATRIX<T,TV::m> > particle_F(particle_X.m);
