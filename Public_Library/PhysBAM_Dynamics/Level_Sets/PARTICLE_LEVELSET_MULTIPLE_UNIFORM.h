@@ -36,16 +36,16 @@ public:
         particle_levelsets.Delete_Pointers_And_Clean_Memory();
     }
 
-    void Initialize_Particle_Levelsets_And_Grid_Values(T_GRID& grid,ARRAY<T_ARRAYS_SCALAR>& phis,const int number_of_regions)
+    void Initialize_Particle_Levelsets_And_Grid_Values(T_GRID& grid,ARRAY<T_ARRAYS_SCALAR>& phis,const int number_of_regions,const bool only_use_negative_particles=true)
     {if(particle_levelsets.m!=number_of_regions){
         for(int i=0;i<particle_levelsets.m;i++)delete particle_levelsets(i);
         particle_levelsets.Resize(number_of_regions);levelset_multiple.levelsets.Resize(particle_levelsets.m);
         for(int i=0;i<particle_levelsets.m;i++){
             particle_levelsets(i)=new PARTICLE_LEVELSET_UNIFORM<T_GRID>(grid,phis(i),number_of_ghost_cells);
-            particle_levelsets(i)->only_use_negative_particles=true;
+            particle_levelsets(i)->only_use_negative_particles=only_use_negative_particles;
             particle_levelsets(i)->Initialize_Particle_Levelset_Grid_Values();
             levelset_multiple.levelsets(i)=&particle_levelsets(i)->levelset;}}
-    else for(int i=0;i<particle_levelsets.m;i++) particle_levelsets(i)->Initialize_Particle_Levelset_Grid_Values();}
+        else for(int i=0;i<particle_levelsets.m;i++) particle_levelsets(i)->Initialize_Particle_Levelset_Grid_Values();}
 
     void Store_Unique_Particle_Id()
     {for(int i=0;i<particle_levelsets.m;i++) particle_levelsets(i)->Store_Unique_Particle_Id();}

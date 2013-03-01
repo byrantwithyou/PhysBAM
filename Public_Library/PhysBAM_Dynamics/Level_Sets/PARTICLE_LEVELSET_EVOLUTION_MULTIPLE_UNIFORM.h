@@ -44,7 +44,7 @@ public:
     void Use_Hamilton_Jacobi_Weno_Advection() PHYSBAM_OVERRIDE;
     void Use_Hamilton_Jacobi_Eno_Advection(const int order) PHYSBAM_OVERRIDE;
     void Track_Mass(const bool track_mass_input=true) PHYSBAM_OVERRIDE;
-    void Initialize_Domain(const T_GRID& grid_input,const int number_of_regions);  // don't call up to the base class here because we don't need those variables initialized OVERRIDE PROBLEM
+    void Initialize_Domain(const T_GRID& grid_input,const int number_of_regions,const bool use_only_negative_particles=true);  // don't call up to the base class here because we don't need those variables initialized OVERRIDE PROBLEM
     void Initialize_Domain(const T_GRID& grid_input) PHYSBAM_OVERRIDE;
     void Make_Signed_Distance() PHYSBAM_OVERRIDE;
     void Set_Number_Particles_Per_Cell(const int number_particles_per_cell) PHYSBAM_OVERRIDE;

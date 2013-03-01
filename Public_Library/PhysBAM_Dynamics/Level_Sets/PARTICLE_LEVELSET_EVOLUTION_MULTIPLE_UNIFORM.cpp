@@ -199,14 +199,14 @@ Track_Mass(const bool track_mass_input)
         LOG::cout<<"negative material("<<i<<") = "<<initial_mass(i)<<std::endl;}
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
-Initialize_Domain(const T_GRID& grid_input,const int number_of_regions)  // don't call up to the base class here because we don't need those variables initialized OVERRIDE PROBLEM
+Initialize_Domain(const T_GRID& grid_input,const int number_of_regions,const bool use_only_negative_particles)  // don't call up to the base class here because we don't need those variables initialized OVERRIDE PROBLEM
 {
     assert(grid_input.Is_MAC_Grid());
     grid=grid_input;
     phis.Resize(number_of_regions);
     for(int i=0;i<phis.m;i++) phis(i).Resize(grid.Domain_Indices(particle_levelset_multiple.number_of_ghost_cells));
     V.Resize(grid);
-    particle_levelset_multiple.Initialize_Particle_Levelsets_And_Grid_Values(grid,phis,number_of_regions);
+    particle_levelset_multiple.Initialize_Particle_Levelsets_And_Grid_Values(grid,phis,number_of_regions,use_only_negative_particles);
     levelset_advection_multiple.Initialize();
     for(int i=0;i<phis.m;i++)
         if(levelset_advection_multiple.levelset_advections(i).semi_lagrangian_collidable)

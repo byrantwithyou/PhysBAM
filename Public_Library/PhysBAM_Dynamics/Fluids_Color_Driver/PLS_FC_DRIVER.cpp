@@ -90,7 +90,7 @@ Initialize()
     for(int i=0;i<example.bc_phis.m;i++)
         example.bc_phis(i).Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
 
-    example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.number_of_colors);
+    example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.number_of_colors,false);//false= we use positive and negative particles, not just negative
     example.particle_levelset_evolution_multiple.particle_levelset_multiple.Set_Band_Width(2*example.number_of_ghost_cells);
     example.collision_bodies_affecting_fluid.Initialize_Grids();
 
