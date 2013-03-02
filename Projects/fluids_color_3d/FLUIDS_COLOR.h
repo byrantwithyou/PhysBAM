@@ -44,7 +44,7 @@ class FLUIDS_COLOR<VECTOR<T,3> >:public FLUIDS_COLOR_BASE<VECTOR<T,3> >
     typedef FLUIDS_COLOR_BASE<TV> BASE;
 
 public:
-    using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
+    using BASE::grid;using BASE::output_directory;using BASE::face_velocities;
     using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;using BASE::use_level_set_method;using BASE::use_pls;
     using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::number_of_colors;
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
