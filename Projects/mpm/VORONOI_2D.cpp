@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
+#include "TIMING.h"
 #include "VORONOI_2D.h"
 namespace PhysBAM{
 //#####################################################################
@@ -12,6 +13,7 @@ namespace PhysBAM{
 template<class T> void VORONOI_2D<T>::
 Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& particle_grid)
 {
+    TIMING_START;
     GRID<TV> node_grid(TV_INT(particle_grid.counts.x*2+1,particle_grid.counts.y*2+1),RANGE<TV>(particle_grid.domain.min_corner-particle_grid.dX/2.0,TV(particle_grid.domain.max_corner+particle_grid.dX/2.0)));
     HASHTABLE<TV_INT,int> particle_index;
     int ID=0;
@@ -38,6 +40,7 @@ Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& particle_grid)
             elements(ID).Append(a);elements(ID).Append(b);elements(ID).Append(c);elements(ID).Append(d);elements(ID).Append(e);elements(ID).Append(f);elements(ID).Append(g);elements(ID).Append(h);
             ID++;}}
     X=Xm;
+    TIMING_END("Initialize polygon voronoi mesh");
     Initialize_Neighbor_Cells();
     Build_Association();
 }
@@ -47,18 +50,15 @@ Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& particle_grid)
 template<class T> void VORONOI_2D<T>::
 Initialize_Neighbor_Cells()
 {
-    LOG::cout<<"Initializing Neighbor Cells..."<<std::endl;
-    HASHTABLE<TV_INT,bool> neighbor_cells_hash;
-    for(int c1=0;c1<elements.m;c1++){
-        for(int c2=c1+1;c2<elements.m;c2++){
-            ARRAY<int> common_nodes;
-            common_nodes.Find_Common_Elements(elements(c1),elements(c2));
-            for(int v=0;v<common_nodes.m;v++){
-                if(type(common_nodes(v))==100){
-                    neighbor_cells_hash.Get_Or_Insert(TV_INT(c1,c2))=true;
-                    break;}}}}
-    for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(neighbor_cells_hash);it.Valid();it.Next()) neighbor_cells.Append(TRIPLE<int,int,bool>(it.Key().x,it.Key().y,true));
-    LOG::cout<<"Done."<<std::endl;
+    LOG::cout<<"Initializing Neighbor Cells for voronoi mesh..."<<std::endl;
+    TIMING_START;
+    HASHTABLE<int,ARRAY<int> > f2e;
+    for(int i=0;i<elements.m;i++) for(int j=0;j<elements(i).m;j++) if(type(elements(i)(j))==100) f2e.Get_Or_Insert(elements(i)(j)).Append(i);
+    for(typename HASHTABLE<int,ARRAY<int> >::ITERATOR it(f2e);it.Valid();it.Next())
+        if(it.Data().m>1){
+            PHYSBAM_ASSERT(it.Data().m==2);
+            neighbor_cells.Append(TRIPLE<int,int,bool>(it.Data()(0),it.Data()(1),true));}
+    TIMING_END("");
 }
 //#####################################################################
 // Function Build_Association
