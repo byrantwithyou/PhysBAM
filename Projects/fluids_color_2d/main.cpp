@@ -7,7 +7,7 @@ using namespace PhysBAM;
 int main(int argc,char *argv[])
 {
     typedef double T;
-    typedef float RW;
+    typedef double RW;
     STREAM_TYPE stream_type((RW()));
     typedef VECTOR<T,2> TV;
 
