@@ -52,7 +52,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             sim.ground_level=-0.6;
             sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.3),0.03));
             sim.rigid_ball_velocity.Append(TV());
-            sim.rigid_ball.Append(SPHERE<TV>(TV(0.09,-0.3),0.01));
+            sim.rigid_ball.Append(SPHERE<TV>(TV(0.09,-0.3),0.03));
             sim.rigid_ball_velocity.Append(TV());
             voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))));
             break;

@@ -47,6 +47,7 @@ Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& particle_grid)
 template<class T> void VORONOI_2D<T>::
 Initialize_Neighbor_Cells()
 {
+    LOG::cout<<"Initializing Neighbor Cells..."<<std::endl;
     HASHTABLE<TV_INT,bool> neighbor_cells_hash;
     for(int c1=0;c1<elements.m;c1++){
         for(int c2=c1+1;c2<elements.m;c2++){
@@ -57,6 +58,7 @@ Initialize_Neighbor_Cells()
                     neighbor_cells_hash.Get_Or_Insert(TV_INT(c1,c2))=true;
                     break;}}}}
     for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(neighbor_cells_hash);it.Valid();it.Next()) neighbor_cells.Append(TRIPLE<int,int,bool>(it.Key().x,it.Key().y,true));
+    LOG::cout<<"Done."<<std::endl;
 }
 //#####################################################################
 // Function Build_Association
