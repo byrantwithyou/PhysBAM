@@ -47,13 +47,14 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
             break;
         case 2: // shit fall
-            sim.grid.Initialize(TV_INT(1*grid_res+1,1*grid_res+1),RANGE<TV>(TV(-0.5,-0.7),TV(0.5,0.3)));
+            sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1)));
-            sim.ground_level=-0.6;
-            sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.3),0.03));
-            sim.rigid_ball_velocity.Append(TV());
-            sim.rigid_ball.Append(SPHERE<TV>(TV(0.09,-0.3),0.03));
-            sim.rigid_ball_velocity.Append(TV());
+            sim.particles.Add_X_As_A_Grid(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,0.2),TV(0.1,0.4)));
+            sim.ground_level=-0.4;
+            // sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.3),0.03));
+            // sim.rigid_ball_velocity.Append(TV());
+            // sim.rigid_ball.Append(SPHERE<TV>(TV(0.09,-0.3),0.03));
+            // sim.rigid_ball_velocity.Append(TV());
             voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))));
             break;
         case 3: // snow fall
@@ -86,7 +87,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             sim.yield_max=1.3;
             break;
         case 2:
-            object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
+            object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size()*2;
             ym*=(T)1e5;
             sim.mu.Fill(ym/((T)2*((T)1+pr)));
             sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
@@ -174,7 +175,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     Flush_Frame<TV>("mpm");
 
     for(int f=1;f<29977;f++){
-        if(f==12500) sim.dirichlet_velocity.Fill(TV());
+        if(f==5600){
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.18,-0.3),TV(0.18,-0.23)));
+            sim.dirichlet_velocity.Append(TV(0,0.2));}
         TIMING_START;
         LOG::cout<<"TIMESTEP "<<f<<std::endl;
         sim.Advance_One_Time_Step_Backward_Euler();
