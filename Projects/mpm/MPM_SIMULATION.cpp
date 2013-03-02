@@ -26,7 +26,7 @@ using ::std::exp;
 //#####################################################################
 template<class TV> MPM_SIMULATION<TV>::
 MPM_SIMULATION()
-    :dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_visco_plasticity(false),use_plasticity_yield(false),use_plasticity_clamp(false),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0)
+    :dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_visco_plasticity(false),use_plasticity_yield(false),use_plasticity_clamp(false),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0.5)
 {}
 //#####################################################################
 // Destructor
@@ -44,8 +44,8 @@ Initialize()
     TIMING_START;
     gravity_constant=TV();gravity_constant(1)=-(T)9.8;
     valid.Resize(particles.number);valid.Fill(true);
-    mu.Resize(particles.number);
-    lambda.Resize(particles.number);
+    mu.Resize(particles.number);mu0.Resize(particles.number);
+    lambda.Resize(particles.number);lambda0.Resize(particles.number);
     Je.Resize(particles.number);
     Re.Resize(particles.number);
     Se.Resize(particles.number);
@@ -141,8 +141,8 @@ Build_Helper_Structures_For_Constitutive_Model()
     for(int p=0;p<particles.number;p++){
         constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),particles.Fp(p),Je(p),Re(p),Se(p));
         T lame_scale=exp(xi*(1-particles.Fp(p).Determinant()));
-        mu(p)=mu(p)*lame_scale;
-        lambda(p)=lambda(p)*lame_scale;}
+        mu(p)=mu0(p)*lame_scale;
+        lambda(p)=lambda0(p)*lame_scale;}
     if(PROFILING) TIMING_END("Build_Helper_Structures_For_Constitutive_Model");
 }
 //#####################################################################
@@ -243,16 +243,16 @@ Grid_Based_Body_Collisions()
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),grid.counts));it.Valid();it.Next()){
         if(node_mass(it.index)>min_mass){
             const TV& x=grid.Node(it.index);
-            if(x(1)<=ground_level && node_V_star(it.index)(1)<=(T)0){
-                // TV vt(node_V_star(it.index));vt(1)=(T)0;
-                // T vn=node_V_star(it.index)(1);
-                // T vt_mag=vt.Magnitude();
-                // if(vt_mag>eps){
-                //     T impulse=friction_coefficient*vn/vt_mag;
-                //     if(impulse<-(T)1) impulse=-(T)1;
-                //     node_V_star(it.index)=vt*((T)1+impulse);}
-                // else node_V_star(it.index)=vt;}
-                node_V_star(it.index)=TV();
+            if(x(1)<ground_level && node_V_star(it.index)(1)<(T)0){
+                TV vt(node_V_star(it.index));vt(1)=(T)0;
+                T vn=node_V_star(it.index)(1);
+                T vt_mag=vt.Magnitude();
+                if(vt_mag>eps){
+                    T impulse=friction_coefficient*vn/vt_mag;
+                    if(impulse<-(T)1) impulse=-(T)1;
+                    node_V_star(it.index)=vt*((T)1+impulse);}
+                else node_V_star(it.index)=vt;
+                // node_V_star(it.index)=TV();
                 nodes_need_projection.Append(it.index);}
             for(int b=0;b<rigid_ball.m;b++){
                 if(rigid_ball(b).Lazy_Inside(x)){
@@ -416,15 +416,15 @@ Particle_Based_Body_Collisions()
         if(valid(p)){
             TV& x=particles.X(p);
             if(x(1)<=ground_level && particles.V(p)(1)<=(T)0){
-                // TV vt(particles.V(p));vt(1)=(T)0;
-                // T vn=particles.V(p)(1);
-                // T vt_mag=vt.Magnitude();
-                // if(vt_mag>eps){
-                //     T impulse=friction_coefficient*vn/vt_mag;
-                //     if(impulse<(T)-1) impulse=(T)-1;
-                //     particles.V(p)=vt*(1+impulse);}
-                // else particles.V(p)=vt;}
-                particles.V(p)=TV();} // sticky
+                TV vt(particles.V(p));vt(1)=(T)0;
+                T vn=particles.V(p)(1);
+                T vt_mag=vt.Magnitude();
+                if(vt_mag>eps){
+                    T impulse=friction_coefficient*vn/vt_mag;
+                    if(impulse<(T)-1) impulse=(T)-1;
+                    particles.V(p)=vt*(1+impulse);}
+                else particles.V(p)=vt;}
+                // particles.V(p)=TV();} // sticky
             for(int b=0;b<rigid_ball.m;b++){
                 if(rigid_ball(b).Lazy_Inside(x)){
                     TV n=rigid_ball(b).Normal(x);

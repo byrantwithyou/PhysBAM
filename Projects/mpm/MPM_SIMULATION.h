@@ -35,7 +35,7 @@ public:
     bool dump_matrix,test_system;
     T min_mass,min_rho;
     T dt;
-    ARRAY<T> mu,lambda;
+    ARRAY<T> mu,lambda,mu0,lambda0;
     bool use_visco_plasticity;
     T visco_nu;
     T visco_tau;
