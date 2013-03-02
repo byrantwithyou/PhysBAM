@@ -46,6 +46,7 @@ Initialize()
     valid.Resize(particles.number);valid.Fill(true);
     mu.Resize(particles.number);mu0.Resize(particles.number);
     lambda.Resize(particles.number);lambda0.Resize(particles.number);
+    visco_tau.Resize(particles.number);
     Je.Resize(particles.number);
     Re.Resize(particles.number);
     Se.Resize(particles.number);
@@ -339,12 +340,13 @@ Update_Deformation_Gradient()
              Fe_hat.Fast_Singular_Value_Decomposition(U_hat,Sigma,V_hat);
              T Pnorm=(constitutive_model.Compute_dPsi_dFe(mu(p),lambda(p),particles.Fe(p),Re(p),Je(p))).Frobenius_Norm();
              T gamma=(T)0;
-             if(Pnorm>1e-10) gamma=clamp(dt*visco_nu*(Pnorm-visco_tau)/Pnorm,(T)0,(T)1);
+             if(Pnorm>1e-10) gamma=clamp(dt*visco_nu*(Pnorm-visco_tau(p))/Pnorm,(T)0,(T)1);
              T scale=Inverse(cbrt(Sigma.Determinant()));
              DIAGONAL_MATRIX<T,TV::m> Middle;
              for(int d=0;d<TV::m;d++) Middle(d,d)=pow(Sigma(d,d)*scale,gamma);
              particles.Fp(p)=V_hat*Middle.Times_Transpose(V_hat)*Fp_hat;
-             particles.Fe(p)=F*particles.Fp(p).Inverse();}}}
+             particles.Fe(p)=F*particles.Fp(p).Inverse();
+             visco_tau(p)+=visco_kappa*gamma*Pnorm;}}}
     else if(use_plasticity_yield){
 #pragma omp parallel for
         for(int p=0;p<particles.number;p++){

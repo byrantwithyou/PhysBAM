@@ -38,7 +38,8 @@ public:
     ARRAY<T> mu,lambda,mu0,lambda0;
     bool use_visco_plasticity;
     T visco_nu;
-    T visco_tau;
+    ARRAY<T> visco_tau;
+    T visco_kappa;
     bool use_plasticity_yield;
     T yield_min;
     T yield_max;

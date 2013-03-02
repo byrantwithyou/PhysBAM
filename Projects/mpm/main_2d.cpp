@@ -103,7 +103,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
             sim.use_visco_plasticity=true;
             sim.visco_nu=1e3;
-            sim.visco_tau=1000;
+            sim.visco_tau.Fill(1000);
             break;
         case 3:
             object_mass=(T)400*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
@@ -151,6 +151,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     T pr=(T).3;
     bool use_voronoi=false;
     sim.xi=(T)0;
+    sim.visco_kappa=(T)0;
     parse_args.Add("-test",&test_number,"test","test number");
     parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
     parse_args.Add("-dt",&sim.dt,"dt","dt");
@@ -160,7 +161,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-voronoi",&use_voronoi,"use voronoi mesh reconstruction on the fly");
     parse_args.Add("-stiffness",&ym_scale,"value","scale stiffness");
     parse_args.Add("-poisson_ratio",&pr,"value","poisson's ratio");
-    parse_args.Add("-hardening",&sim.xi,"value","harderning coefficient");
+    parse_args.Add("-hardening",&sim.xi,"value","harderning coefficient for normal plasticity");
+    parse_args.Add("-visco_hardening",&sim.visco_kappa,"value","harderning coefficient for visco plasticity");
     parse_args.Add("-flip",&sim.FLIP_alpha,"value","flip fraction");
     parse_args.Add("-gres",&grid_res,"value","grid resolution");
     parse_args.Add("-pres",&particle_res,"value","particle resolution");
