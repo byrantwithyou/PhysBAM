@@ -32,7 +32,7 @@ template<class TV,class T2> BOUNDARY<TV,T2>::
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class TV,class T2> void BOUNDARY<TV,T2>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const
 {
     ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost);
     VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
@@ -42,7 +42,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_
 // Function Fill_Ghost_Faces
 //#####################################################################
 template<class TV,class T2> void BOUNDARY<TV,T2>::
-Fill_Ghost_Faces(const GRID<TV>& grid,const ARRAY<T2,FACE_INDEX<TV::m> >& u,ARRAY<T2,FACE_INDEX<TV::m> >& u_ghost,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Faces(const GRID<TV>& grid,const ARRAY<T2,FACE_INDEX<TV::m> >& u,ARRAY<T2,FACE_INDEX<TV::m> >& u_ghost,const T time,const int number_of_ghost_cells) const
 {
     assert(grid.Is_MAC_Grid() && !clamp_below && !clamp_above);BOUNDARY<TV,T2> temp_boundary;
     if(use_fixed_boundary) temp_boundary.Set_Fixed_Boundary(true,fixed_boundary_value);
@@ -68,7 +68,7 @@ Find_Ghost_Regions(const GRID<TV>& grid,VECTOR<RANGE<TV_INT>,2*TV::m>& regions,c
 // Function Fill_Single_Ghost_Region
 //#####################################################################
 template<class TV,class T2> void BOUNDARY<TV,T2>::
-Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const int side)
+Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const int side) const
 {
     Fill_Single_Ghost_Region(grid,u_ghost,side,region);
 }
@@ -95,14 +95,14 @@ Fill_Single_Ghost_Region(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class TV,class T2> void BOUNDARY<TV,T2>::
-Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time)
+Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) const
 {
 }
 //#####################################################################
 // Function Apply_Boundary_Condition_Face
 //#####################################################################
 template<class TV,class T2> void BOUNDARY<TV,T2>::
-Apply_Boundary_Condition_Face(const GRID<TV>& grid,ARRAY<T2,FACE_INDEX<TV::m> >& u,const T time)
+Apply_Boundary_Condition_Face(const GRID<TV>& grid,ARRAY<T2,FACE_INDEX<TV::m> >& u,const T time) const
 {
 }
 //#####################################################################

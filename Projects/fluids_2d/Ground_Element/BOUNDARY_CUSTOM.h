@@ -25,15 +25,15 @@ public:
     {}
 
 //#####################################################################
-    void Fill_Ghost_Cells(GRID_2D<T>& grid,ARRAY<T2,VECTOR<int,2> >& u,ARRAY<T2,VECTOR<int,2> >& u_ghost,const T dt=0,const T time=0,const int number_of_ghost_cells=3);
-    void Apply_Boundary_Condition(GRID_2D<T>& grid,ARRAY<T2,VECTOR<int,2> >& u,const T time=0);
+    void Fill_Ghost_Cells(GRID_2D<T>& grid,ARRAY<T2,VECTOR<int,2> >& u,ARRAY<T2,VECTOR<int,2> >& u_ghost,const T dt=0,const T time=0,const int number_of_ghost_cells=3) const;
+    void Apply_Boundary_Condition(GRID_2D<T>& grid,ARRAY<T2,VECTOR<int,2> >& u,const T time=0) const;
 //#####################################################################
 };
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
 template <class T,class T2> void BOUNDARY_CUSTOM<T,T2>::
-Fill_Ghost_Cells(GRID_2D<T>& grid,ARRAY<T2,VECTOR<int,2> >& u,ARRAY<T2,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(GRID_2D<T>& grid,ARRAY<T2,VECTOR<int,2> >& u,ARRAY<T2,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const
 {
     if(u.length != 1){Default();return;}
 
@@ -59,7 +59,7 @@ Fill_Ghost_Cells(GRID_2D<T>& grid,ARRAY<T2,VECTOR<int,2> >& u,ARRAY<T2,VECTOR<in
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class T,class T2> void BOUNDARY_CUSTOM<T,T2>::
-Apply_Boundary_Condition(GRID_2D<T>& grid,ARRAY<T2,VECTOR<int,2> >& u,const T time) 
+Apply_Boundary_Condition(GRID_2D<T>& grid,ARRAY<T2,VECTOR<int,2> >& u,const T time) const
 {
 //    if(u.length != 1){Default();return;}
     

@@ -12,7 +12,7 @@ using namespace PhysBAM;
 // Function Fill_Ghost_Cells
 //#####################################################################
 void BOUNDARY_CUSTOM_PHI::
-Fill_Ghost_Cells(GRID_2D& grid,ARRAY_2D& u,ARRAY_2D& u_ghost,const double dt,const double time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(GRID_2D& grid,ARRAY_2D& u,ARRAY_2D& u_ghost,const double dt,const double time,const int number_of_ghost_cells) const
 {
     if(u.length != 1){Default();return;}
 

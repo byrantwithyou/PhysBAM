@@ -47,14 +47,14 @@ public:
     {tolerance=tolerance_input;}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_REFLECTION_WATER<TV,T2>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const
 {
     assert(grid.Is_MAC_Grid() && phi && V);ARRAY<T2,TV_INT>::Put(u,u_ghost);
     RANGE<TV_INT> domain_indices=grid.Domain_Indices();

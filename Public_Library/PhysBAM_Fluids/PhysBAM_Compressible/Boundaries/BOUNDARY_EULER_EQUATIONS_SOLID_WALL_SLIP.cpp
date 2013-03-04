@@ -158,7 +158,7 @@ Fill_Single_Ghost_Region(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u_ghost,c
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class TV> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DIMENSION_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DIMENSION_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const
 {
     T_ARRAYS_DIMENSION_BASE::Put(u,u_ghost); // interior
     VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
@@ -187,7 +187,7 @@ Apply_Boundary_Condition_Single_Side(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BAS
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class TV> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>::
-Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u,const T time)
+Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u,const T time) const
 {
     if(grid.Is_MAC_Grid()) return;
     for(int side=0;side<2*GRID<TV>::dimension;side++) Apply_Boundary_Condition_Single_Side(grid,u,side,time);

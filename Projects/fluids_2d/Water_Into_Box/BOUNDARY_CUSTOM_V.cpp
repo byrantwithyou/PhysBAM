@@ -12,7 +12,7 @@ using namespace PhysBAM;
 // Function Fill_Ghost_Cells
 //#####################################################################
 void BOUNDARY_CUSTOM_V::
-Fill_Ghost_Cells(GRID_2D& grid,ARRAY_2D& u,ARRAY_2D& u_ghost,const double dt,const double time,const int number_of_ghost_cells=3)
+Fill_Ghost_Cells(GRID_2D& grid,ARRAY_2D& u,ARRAY_2D& u_ghost,const double dt,const double time,const int number_of_ghost_cells=3) const
 {
     if(u.length != 1){Default();return;}
 
@@ -40,7 +40,7 @@ Fill_Ghost_Cells(GRID_2D& grid,ARRAY_2D& u,ARRAY_2D& u_ghost,const double dt,con
 // Function Apply_Boundary_Condition
 //#####################################################################
 void BOUNDARY_CUSTOM_V::
-Apply_Boundary_Condition(GRID_2D& grid,ARRAY_2D& u,const double time) 
+Apply_Boundary_Condition(GRID_2D& grid,ARRAY_2D& u,const double time) const
 {
     if(u.length != 1){Default();return;}
     

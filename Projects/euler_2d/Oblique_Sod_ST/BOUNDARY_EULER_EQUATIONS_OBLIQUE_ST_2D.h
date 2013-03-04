@@ -42,15 +42,15 @@ public:
     {right_constant_extrapolation=true;}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells) PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,const T time) PHYSBAM_OVERRIDE;
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const PHYSBAM_OVERRIDE;
+    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,const T time) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class T_GRID> void BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D<T_GRID>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const
 {
     //if(u.length == 1){Default();return;}
 
@@ -96,7 +96,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& 
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class T_GRID> void BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D<T_GRID>::
-Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,const T time) 
+Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,const T time) const
 {
     //if(u.length == 1){Default();return;}
     

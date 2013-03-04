@@ -21,7 +21,7 @@ template<class TV> BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>::
 // Function Fill_Ghost_Faces
 //#####################################################################
 template<class TV> void BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>::
-Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAYS_SCALAR& u_ghost,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAYS_SCALAR& u_ghost,const T time,const int number_of_ghost_cells) const
 {
     assert(grid.Is_MAC_Grid());
     T_FACE_ARRAYS_SCALAR::Put(u,u_ghost); // interior
@@ -37,7 +37,7 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAY
 // Function Reflect_Single_Ghost_Region
 //#####################################################################
 template<class TV> void BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>::
-Reflect_Single_Ghost_Region(const int face_axis,const GRID<TV>& face_grid,T_ARRAYS_BASE& u_ghost_component,const int side,const RANGE<TV_INT>& region)
+Reflect_Single_Ghost_Region(const int face_axis,const GRID<TV>& face_grid,T_ARRAYS_BASE& u_ghost_component,const int side,const RANGE<TV_INT>& region) const
 {
     int axis=side/2,axis_side=side&1;
     int boundary=Boundary(side,region),reflection_times_two,flip;
@@ -51,7 +51,7 @@ Reflect_Single_Ghost_Region(const int face_axis,const GRID<TV>& face_grid,T_ARRA
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class TV> void BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>::
-Apply_Boundary_Condition_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& u,const T time) 
+Apply_Boundary_Condition_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& u,const T time)  const
 {
     assert(grid.Is_MAC_Grid());
     for(int side=0;side<GRID<TV>::number_of_faces_per_cell;side++)
@@ -61,7 +61,7 @@ Apply_Boundary_Condition_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& u,const
 // Function Zero_Single_Boundary_Side
 //#####################################################################
 template<class TV> void BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>::
-Zero_Single_Boundary_Side(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& u,const int side)
+Zero_Single_Boundary_Side(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& u,const int side) const
 {
     int axis=side/2,axis_side=side&1;
     FACE_ITERATOR iterator(grid,0,GRID<TV>::BOUNDARY_REGION,side);

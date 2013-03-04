@@ -23,8 +23,8 @@ public:
     {}
 
 //#####################################################################
-    void Fill_Ghost_Cells(GRID_2D& grid,ARRAY_2D& u,ARRAY_2D& u_ghost,const double dt=0,const double time=0,const int number_of_ghost_cells=3);
-    void Apply_Boundary_Condition(GRID_2D& grid,ARRAY_2D& u,const double time=0){} // do nothing
+    void Fill_Ghost_Cells(GRID_2D& grid,ARRAY_2D& u,ARRAY_2D& u_ghost,const double dt=0,const double time=0,const int number_of_ghost_cells=3) const;
+    void Apply_Boundary_Condition(GRID_2D& grid,ARRAY_2D& u,const double time=0) const {} // do nothing
 //#####################################################################
 };
 }

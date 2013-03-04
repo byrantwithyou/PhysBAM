@@ -18,7 +18,7 @@ public:
         :inflow_height(0),initial_base(0)
     {}
     
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,VECTOR<int,3> >& u,ARRAY<T2,VECTOR<int,3> >& u_ghost,const T dt=0,const T time=0,const int number_of_ghost_cells=3)
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,VECTOR<int,3> >& u,ARRAY<T2,VECTOR<int,3> >& u_ghost,const T dt=0,const T time=0,const int number_of_ghost_cells=3) const
     {ARRAY<T2,VECTOR<int,3> >::put(u,u_ghost);
     Fill_Left_Ghost_Cells(grid,u_ghost,time);Fill_Right_Ghost_Cells(grid,u_ghost,time);
     Fill_Bottom_Ghost_Cells(grid,u_ghost,time);Fill_Top_Ghost_Cells(grid,u_ghost,time);

@@ -12,7 +12,7 @@ using namespace PhysBAM;
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_PERIODIC<TV,T2>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const
 {
     ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost); // interior
     TV_INT periods=grid.Domain_Indices().Maximum_Corner();
@@ -29,7 +29,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_PERIODIC<TV,T2>::
-Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time)
+Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) const
 {
     assert(!grid.Is_MAC_Grid());
     for(int axis=0;axis<GRID<TV>::dimension;axis++)

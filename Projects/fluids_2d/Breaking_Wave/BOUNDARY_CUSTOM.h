@@ -18,19 +18,19 @@ public:
     {}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,1> >& u,ARRAY<TV,VECTOR<int,1> >& u_ghost,const T dt=0,const T time=0,const int number_of_ghost_cells=3){};
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,2> >& u,ARRAY<TV,VECTOR<int,2> >& u_ghost,const T dt=0,const T time=0,const int number_of_ghost_cells=3);
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,3> >& u,ARRAY<TV,VECTOR<int,3> >& u_ghost,const T dt=0,const T time=0,const int number_of_ghost_cells=3){};
-    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,1> >& u,const T time=0){};
-    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,2> >& u,const T time=0);
-    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,3> >& u,const T time=0){}; 
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,1> >& u,ARRAY<TV,VECTOR<int,1> >& u_ghost,const T dt=0,const T time=0,const int number_of_ghost_cells=3) const {};
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,2> >& u,ARRAY<TV,VECTOR<int,2> >& u_ghost,const T dt=0,const T time=0,const int number_of_ghost_cells=3) const ;
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,3> >& u,ARRAY<TV,VECTOR<int,3> >& u_ghost,const T dt=0,const T time=0,const int number_of_ghost_cells=3) const {};
+    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,1> >& u,const T time=0) const {};
+    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,2> >& u,const T time=0) const ;
+    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,3> >& u,const T time=0) const {}; 
 //#####################################################################
 };
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class T,class TV> void BOUNDARY_CUSTOM<T,TV>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,2> >& u,ARRAY<TV,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,2> >& u,ARRAY<TV,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const
 {
     if(u.length != 1){assert(false);return;}
 
@@ -58,7 +58,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,2> >& u,ARRAY<TV
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class T,class TV> void BOUNDARY_CUSTOM<T,TV>::
-Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,2> >& u,const T time) 
+Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,2> >& u,const T time) const
 {
     if(u.length != 1){assert(false);return;}
     

@@ -346,6 +346,25 @@ public:
     }
 };
 
+template<class TYPE,class T_ITERATOR,class T1,class T2,class T3>
+class ITERATOR_TASK_3c:public THREAD_QUEUE::TASK
+{   
+public:
+    TYPE& my_class;
+    void (TYPE::*func)(T_ITERATOR&,T1,T2,T3) const;
+    T_ITERATOR iterator;
+    T1 arg1;T2 arg2;T3 arg3;
+
+    ITERATOR_TASK_3c(TYPE& class_input,void (TYPE::*func_input)(T_ITERATOR&,T1,T2,T3) const,const T_ITERATOR& iterator_input,T1 arg1_input,T2 arg2_input,T3 arg3_input)
+        :my_class(class_input),func(func_input),iterator(iterator_input),arg1(arg1_input),arg2(arg2_input),arg3(arg3_input)
+    {}
+    
+    void Run()
+    {
+        (my_class.*func)(iterator,arg1,arg2,arg3);
+    }
+};
+
 template<class TYPE,class T_ITERATOR,class T1,class T2,class T3,class T4>
 class ITERATOR_TASK_4:public THREAD_QUEUE::TASK
 {   

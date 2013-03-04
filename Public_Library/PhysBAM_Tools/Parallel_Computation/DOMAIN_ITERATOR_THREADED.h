@@ -197,6 +197,19 @@ public:
         PHYSBAM_FATAL_ERROR();
 #endif
     }
+
+    template<class T1,class T2,class T3> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3) const,T1 arg1,T2 arg2,T3 arg3)
+    {
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2,arg3);return;}
+#ifdef USE_PTHREADS
+        for(int i=0;i<domains.m;i++){
+            ITERATOR_TASK_3c<TYPE,RANGE<TV_INT>,T1,T2,T3>* task=new ITERATOR_TASK_3c<TYPE,RANGE<TV_INT>,T1,T2,T3>(my_class,func,domains(i),arg1,arg2,arg3);
+            thread_queue->Queue(task);}
+        if(do_wait)thread_queue->Wait();
+#else
+        PHYSBAM_FATAL_ERROR();
+#endif
+    }
  
     template<class T1,class T2,class T3,class T4> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3,T4),T1 arg1,T2 arg2,T3 arg3,T4 arg4)
     {

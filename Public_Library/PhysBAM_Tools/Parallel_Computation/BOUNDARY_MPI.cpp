@@ -49,7 +49,7 @@ Set_Fixed_Boundary(const bool use_fixed_boundary_input,const T2 fixed_boundary_v
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_MPI<TV,T2>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells_input)
+Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells_input) const
 {
     boundary.Fill_Ghost_Cells(grid,u,u_ghost,dt,time,number_of_ghost_cells_input);
     mpi_grid->Exchange_Boundary_Cell_Data(u_ghost,number_of_ghost_cells_input);
@@ -58,7 +58,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_
 // Function Fill_Ghost_Faces
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_MPI<TV,T2>::
-Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells_input)
+Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells_input) const
 {
     boundary.Fill_Ghost_Faces(grid,u,u_ghost,time,number_of_ghost_cells_input);
     mpi_grid->Exchange_Boundary_Face_Data(u_ghost,number_of_ghost_cells_input);
@@ -67,7 +67,7 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_MPI<TV,T2>::
-Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time)
+Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) const
 {
     boundary.Apply_Boundary_Condition(grid,u,time);
 }
@@ -75,7 +75,7 @@ Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const
 // Function Apply_Boundary_Condition_Face
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_MPI<TV,T2>::
-Apply_Boundary_Condition_Face(const GRID<TV>& grid,T_FACE_ARRAYS_T2& u,const T time)
+Apply_Boundary_Condition_Face(const GRID<TV>& grid,T_FACE_ARRAYS_T2& u,const T time) const
 {
     boundary.Apply_Boundary_Condition_Face(grid,u,time);
     mpi_grid->Average_Common_Face_Data(u);

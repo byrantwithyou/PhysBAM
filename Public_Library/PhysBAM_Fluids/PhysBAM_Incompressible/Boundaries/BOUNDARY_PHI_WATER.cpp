@@ -32,7 +32,7 @@ template<class TV> BOUNDARY_PHI_WATER<TV>::
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class TV> void BOUNDARY_PHI_WATER<TV>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_BASE& u,T_ARRAYS_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_BASE& u,T_ARRAYS_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const
 {
     assert(grid.Is_MAC_Grid() && V);T_ARRAYS_BASE::Put(u,u_ghost);
     RANGE<TV_INT> domain_indices=grid.Domain_Indices();
@@ -45,7 +45,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_BASE& u,T_ARRAYS_BASE& u_gh
 // Function Fill_Single_Ghost_Region_Threaded
 //#####################################################################
 template<class TV> void BOUNDARY_PHI_WATER<TV>::
-Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const GRID<TV>& grid,T_ARRAYS_BASE& u_ghost,const int side)
+Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const GRID<TV>& grid,T_ARRAYS_BASE& u_ghost,const int side) const
 {
     if(use_extrapolation_mode && Constant_Extrapolation(side)) BOUNDARY<TV,T>::Fill_Single_Ghost_Region(grid,u_ghost,side,region);
     else{ // either phi=phi_object for a wall, or no wall

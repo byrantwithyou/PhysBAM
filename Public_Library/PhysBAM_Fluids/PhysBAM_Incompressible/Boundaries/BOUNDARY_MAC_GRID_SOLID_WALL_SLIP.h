@@ -33,11 +33,11 @@ public:
     {phi=&phi_input;}
 
 //#####################################################################
-    void Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAYS_SCALAR& u_ghost,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& u,const T time) PHYSBAM_OVERRIDE;
-    void Reflect_Single_Ghost_Region(const int face_axis,const GRID<TV>& face_grid,T_ARRAYS_BASE& u_ghost_component,const int side,const RANGE<TV_INT>& region);
+    void Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAYS_SCALAR& u_ghost,const T time,const int number_of_ghost_cells=3) const PHYSBAM_OVERRIDE;
+    void Apply_Boundary_Condition_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& u,const T time) const PHYSBAM_OVERRIDE;
+    void Reflect_Single_Ghost_Region(const int face_axis,const GRID<TV>& face_grid,T_ARRAYS_BASE& u_ghost_component,const int side,const RANGE<TV_INT>& region) const;
 protected:
-    void Zero_Single_Boundary_Side(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& u,const int side);
+    void Zero_Single_Boundary_Side(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& u,const int side) const;
 //#####################################################################
 };
 }
