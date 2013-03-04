@@ -201,6 +201,7 @@ Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelse
     T alpha=(time-this->time)/dt;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
         V_levelset(it.Full_Index())=(1-alpha)*n(it.Full_Index())+alpha*m(it.Full_Index());
+    boundary.Apply_Boundary_Condition_Face(grid,V_levelset,time+dt);
 }
 //#####################################################################
 // Function Make_Levelsets_Consistent
