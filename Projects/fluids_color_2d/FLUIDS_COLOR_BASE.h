@@ -606,11 +606,6 @@ public:
     {
         if(analytic_velocity.m && analytic_levelset && !use_level_set_method && !use_pls && !analytic_initial_only)
             Set_Level_Set(time+dt);
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-            for (int c=0;c<face_velocities.m;c++){
-            face_velocities(c)(it.Full_Index())=analytic_velocity(c)->u(it.Location()/m,time/s)(it.Axis())*m/s;
-              }}
-
     }
 
     void End_Time_Step(const T time) PHYSBAM_OVERRIDE
