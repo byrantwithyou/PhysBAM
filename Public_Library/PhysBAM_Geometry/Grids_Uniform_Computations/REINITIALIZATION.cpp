@@ -109,7 +109,7 @@ Reinitialize(LEVELSET<TV>& levelset,int time_steps,T time,T half_band_width,T ex
 
     T dt=cfl*grid.dX.Min();
     for(int k=0;k<time_steps;k++)
-        for(RUNGEKUTTA<ARRAY<T,TV_INT> > rk(phi,temporal_order,0,time);rk.Valid();){
+        for(RUNGEKUTTA<ARRAY<T,TV_INT> > rk(phi,temporal_order,dt,time);rk.Valid();){
             Euler_Step_Of_Reinitialization(levelset,signed_distance,sign_phi,dt,time,half_band_width,spatial_order);
             rk.Next();
             levelset.boundary->Apply_Boundary_Condition(grid,phi,time);}

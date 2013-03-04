@@ -91,7 +91,7 @@ template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>
 Advance_Levelset(const T dt)
 {
     ARRAY<RUNGEKUTTA<ARRAY<T,TV_INT> >*> rungekutta_phis(phis.m);
-    for(int i=0;i<phis.m;i++) rungekutta_phis(i)=new RUNGEKUTTA<ARRAY<T,TV_INT> >(phis(i),runge_kutta_order_levelset,0,time);
+    for(int i=0;i<phis.m;i++) rungekutta_phis(i)=new RUNGEKUTTA<ARRAY<T,TV_INT> >(phis(i),runge_kutta_order_levelset,dt,time);
     for(int k=0;k<runge_kutta_order_levelset;k++){
         if(k==0 || !use_frozen_velocity) particle_levelset_multiple.levelset_multiple.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset_multiple.levelset_multiple,V,time);
         levelset_advection_multiple.Euler_Step(V,dt,time,particle_levelset_multiple.number_of_ghost_cells);
