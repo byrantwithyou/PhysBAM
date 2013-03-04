@@ -33,7 +33,7 @@ public:
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_CONSTANT_EXTRAPOLATION_COLLIDABLE<TV,T2>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const
 {
     ARRAY<T2,TV_INT>::Put(u,u_ghost); // interior
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
