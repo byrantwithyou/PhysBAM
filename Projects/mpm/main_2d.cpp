@@ -50,11 +50,11 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
             sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1)));
             // sim.particles.Add_X_As_A_Grid(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,0.2),TV(0.1,0.4)));
-            sim.ground_level=-0.4;
+            sim.ground_level=-0.55;
             sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.2),0.03));
             sim.rigid_ball_velocity.Append(TV());
-            // sim.rigid_ball.Append(SPHERE<TV>(TV(0.09,-0.3),0.03));
-            // sim.rigid_ball_velocity.Append(TV());
+            sim.rigid_ball.Append(SPHERE<TV>(TV(0.09,-0.3),0.03));
+            sim.rigid_ball_velocity.Append(TV());
             if(use_voronoi) voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))));
             break;
         case 3: // snow fall
@@ -75,6 +75,16 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             sim.dirichlet_velocity.Append(TV(0,-0.2));
             sim.dirichlet_box.Append(RANGE<TV>(TV(-0.15,0.17),TV(0.15,0.23)));
             sim.dirichlet_velocity.Append(TV(0,0.2));
+            break;
+        case 5: // wall
+            sim.grid.Initialize(TV_INT(6*grid_res+1,1*grid_res+1),RANGE<TV>(TV(-0.1,-0.2),TV(5.9,0.8)));
+            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.1*particle_res+1,0.5*particle_res+1),RANGE<TV>(TV(0,0),TV(0.1,0.5)));
+            sim.ground_level=0;
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.02,-0.02),TV(0.12,0.02)));
+            sim.dirichlet_velocity.Append(TV());
+            sim.rigid_ball.Append(SPHERE<TV>(TV(-0.1,0.25),0.05));
+            sim.rigid_ball_velocity.Append(TV(50,0));
+            if(use_voronoi) voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.1*particle_res+1,0.5*particle_res+1),RANGE<TV>(TV(0,0),TV(0.1,0.5))));
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -116,13 +126,23 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             break;
         case 4:
             object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)).Size()-SPHERE<TV>(TV(0.1,0),0.04).Size());
-            ym*=(T)1e3;
+            ym*=(T)5e3;
             sim.mu.Fill(ym/((T)2*((T)1+pr)));
             sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
             sim.use_gravity=false;
             sim.use_plasticity_yield=true;
             sim.yield_min=-100;
-            sim.yield_max=1.3;
+            sim.yield_max=1.5;
+            break;
+        case 5:
+            object_mass=(T)1200*density_scale*(RANGE<TV>(TV(0,0),TV(0.1,0.5)).Size());
+            ym*=(T)5e3;
+            sim.mu.Fill(ym/((T)2*((T)1+pr)));
+            sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
+            sim.use_gravity=true;
+            sim.use_plasticity_yield=true;
+            sim.yield_min=0.8;
+            sim.yield_max=1.2;
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
     for(int p=0;p<sim.particles.number;p++){
@@ -188,15 +208,15 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     for(int i=0;i<50;i++) Add_Debug_Particle(TV(-1+i*0.04,sim.ground_level),VECTOR<T,3>(0,0,1));
     Flush_Frame<TV>("mpm");
 
-    for(int f=1;f<29977;f++){
+    for(int f=1;f<2900000977;f++){
         TIMING_START;
         LOG::cout<<"TIMESTEP "<<f<<std::endl;
         sim.Advance_One_Time_Step_Backward_Euler();
         TIMING_END("Current time step totally");
         if(f%frame_jump==0){
-            for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+            // for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
             if(use_voronoi){
-                voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.3);
+                voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.0);
                 voronoi.Build_Association();
                 voronoi.Build_Boundary_Segments();
                 voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp);

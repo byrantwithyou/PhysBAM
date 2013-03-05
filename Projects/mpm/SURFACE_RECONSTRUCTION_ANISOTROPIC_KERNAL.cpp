@@ -6,6 +6,7 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
+#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/cube.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
@@ -29,14 +30,27 @@ template<class TV> SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV>::
 ~SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL()
 {}
 //#####################################################################
-// Function Compute_Kernal_Centers_And_Transformation
+// Function - kernel stuff
+//#####################################################################
+template<class T> T
+P(const T x)
+{
+    if(x<(T)1) return (T)0.25*cube((T)2-x)-cube((T)1-x);
+    else if(x<(T)2) return (T)0.25*cube((T)2-x);
+    else return (T)0;
+}
+static double kernel_sigma[3]={0.666666666666667,0.4547284088339866859,0.3183098861837906912};
+//#####################################################################
+// Function Compute_Kernal_Centers_And_Transformation_And_Density
 //#####################################################################
 template<class TV> void SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV>::
-Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particles,const T h,const T r,const T lambda,const int N_eps,const T kr,const T ks,const T kn,ARRAY<TV>& Xbar,ARRAY<MATRIX<T,TV::m> >& G) const
+Compute_Kernal_Centers_And_Transformation_And_Density(const ARRAY_VIEW<TV>& X,const ARRAY_VIEW<T>& m,const T h,const T r,const T lambda,const int N_eps,const T kr,const T ks,const T kn,ARRAY<TV>& Xbar,ARRAY<MATRIX<T,TV::m> >& G,ARRAY<T>& density) const
 {
+    // spatial hash
     HASHTABLE<TV_INT,ARRAY<int> > buckets;
-    for(int i=0;i<particles.number;i++)
-        buckets.Get_Or_Insert(TV_INT(floor(particles.X(i)/r))).Append(i);
+    for(int i=0;i<X.m;i++)
+        buckets.Get_Or_Insert(TV_INT(floor(X(i)/r))).Append(i);
+    // close pairs
     T r2=r*r;
     ARRAY<TRIPLE<int,int,T> > pairs;
     for(typename HASHTABLE<TV_INT,ARRAY<int> >::ITERATOR it(buckets);it.Valid();it.Next()){
@@ -46,39 +60,46 @@ Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particle
                 for(int i=0;i<l0.m;i++)
                     for(int j=0;j<l1->m;j++)
                         if(l0(i)<(*l1)(j)){
-                            TRIPLE<int,int,T> tr(l0(i),(*l1)(j),(particles.X(l0(i))-particles.X((*l1)(j))).Magnitude_Squared());
+                            TRIPLE<int,int,T> tr(l0(i),(*l1)(j),(X(l0(i))-X((*l1)(j))).Magnitude_Squared());
                             if(tr.z<r2){
                                 tr.z=1-cube(sqrt(tr.z)/r);
                                 pairs.Append(tr);}}}}}
-
-    ARRAY<T> total_weight_on_particle(particles.number);
-    ARRAY<TV> xw(particles.X);
-    Xbar.Resize(particles.number);
+    // Xbar and density
+    ARRAY<T> total_weight_on_particle(X.m);
+    ARRAY<TV> xw(X);
+    Xbar.Resize(X.m);
+    density.Resize(X.m);
+    T one_over_h=Inverse(h);
+    T one_over_h_d=one_over_h;for(int d=1;d<TV::m;d++) one_over_h_d*=one_over_h;
+    for(int i=0;i<X.m;i++) density(i)=m(i)*(T)kernel_sigma[TV::m-1]*one_over_h_d;
     for(int i=0;i<pairs.m;i++){
         total_weight_on_particle(pairs(i).x)+=pairs(i).z;
         total_weight_on_particle(pairs(i).y)+=pairs(i).z;
-        xw(pairs(i).y)+=pairs(i).z*particles.X(pairs(i).x);
-        xw(pairs(i).x)+=pairs(i).z*particles.X(pairs(i).y);}
-    for(int i=0;i<particles.number;i++){
+        xw(pairs(i).y)+=pairs(i).z*X(pairs(i).x);
+        xw(pairs(i).x)+=pairs(i).z*X(pairs(i).y);
+        T r_over_h=(X(pairs(i).x)-X(pairs(i).y)).Magnitude()*one_over_h;
+        T kernel_evaluation=(T)kernel_sigma[TV::m-1]*one_over_h_d*P(r_over_h);
+        density(pairs(i).x)+=m(pairs(i).y)*kernel_evaluation;
+        density(pairs(i).y)+=m(pairs(i).x)*kernel_evaluation;}
+    for(int i=0;i<X.m;i++){
         xw(i)/=total_weight_on_particle(i)+1;
-        Xbar(i)=((T)1-lambda)*particles.X(i)+lambda*xw(i);}
-
-    ARRAY<int> neighbor_count(particles.number);
-    ARRAY<MATRIX<T,TV::m> > C(particles.number);
-    for(int i=0;i<particles.number;i++){
-        TV dd=particles.X(i)-xw(i);
+        Xbar(i)=((T)1-lambda)*X(i)+lambda*xw(i);}
+    // C
+    ARRAY<int> neighbor_count(X.m);
+    ARRAY<MATRIX<T,TV::m> > C(X.m);
+    for(int i=0;i<X.m;i++){
+        TV dd=X(i)-xw(i);
         C(i)=MATRIX<T,TV::m>::Outer_Product(dd,dd);}
     for(int i=0;i<pairs.m;i++){
         neighbor_count(pairs(i).x)++;
         neighbor_count(pairs(i).y)++;
-        TV d1=particles.X(pairs(i).x)-xw(pairs(i).y),d2=particles.X(pairs(i).y)-xw(pairs(i).x);
+        TV d1=X(pairs(i).x)-xw(pairs(i).y),d2=X(pairs(i).y)-xw(pairs(i).x);
         C(pairs(i).x)+=MATRIX<T,TV::m>::Outer_Product(d2,pairs(i).z*d2);
         C(pairs(i).y)+=MATRIX<T,TV::m>::Outer_Product(d1,pairs(i).z*d1);}
-    for(int i=0;i<particles.number;i++) C(i)/=total_weight_on_particle(i)+1;
-
-    G.Resize(particles.number);
-    T one_over_h=(T)1/h;
-    for(int i=0;i<particles.number;i++){
+    for(int i=0;i<X.m;i++) C(i)/=total_weight_on_particle(i)+1;
+    // G
+    G.Resize(X.m);
+    for(int i=0;i<X.m;i++){
         DIAGONAL_MATRIX<T,3> eigenvalues,Sigma_wave;
         MATRIX<T,3> eigenvectors;
         SYMMETRIC_MATRIX<T,3>(C(i).Symmetric_Part()).Solve_Eigenproblem(eigenvalues,eigenvectors);
@@ -87,6 +108,27 @@ Compute_Kernal_Centers_And_Transformation(const GEOMETRY_PARTICLES<TV>& particle
         if(neighbor_count(i)<=N_eps) Sigma_wave+=kn;
         else for(int d=0;d<TV::m;d++) Sigma_wave(d,d)=ks*max(eigenvalues(d,d),max_ev/kr);
         G(i)=one_over_h*(eigenvectors*Sigma_wave.Inverse()).Times_Transpose(eigenvectors);}
+}
+//#####################################################################
+// Function Build_Scalar_Field
+//#####################################################################
+template<class TV> void SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV>::
+Build_Scalar_Field(const ARRAY<TV>& Xbar,const ARRAY_VIEW<T>& m,const ARRAY_VIEW<T>& density,const ARRAY<MATRIX<T,TV::m> >& G,const GRID<TV>& grid,ARRAY<T,TV_INT>& phi) const
+{
+    phi.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));phi.Fill(T(0));
+    
+    // for(int i=0;i<Xbar.m;i++){
+    //     TV_INT particle_cell=grid.Cell(Xbar(i),0);
+    //     int layer=1;
+    //     while(1){
+    //         bool should_go_to_next_layer=false;
+    //         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(particle_cell-layer,paricle_cell+layer+1));it.Valid();it.Next()){
+                
+    //         }
+    //     }
+    // }
+        
+
 }
 //#####################################################################
 template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<float,3> >;
