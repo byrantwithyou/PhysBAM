@@ -22,6 +22,7 @@
 #include "TIMING.h"
 #include "VORONOI_2D.h"
 #include "MPM_SIMULATION.h"
+#include "SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL.h"
 
 using namespace PhysBAM;
 
@@ -68,6 +69,7 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
             break;
         case 4: // notch
             sim.grid.Initialize(TV_INT(2*grid_res+1,2*grid_res+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
+            // sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res+1,0.4*particle_res+1),RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
             sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
             sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.06,-0.04),TV(0.14,0.04)));
             sim.ground_level=-100;
@@ -193,8 +195,31 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     if(!use_output_directory) output_directory=STRING_UTILITIES::string_sprintf("MPM_%dD_test_%d",TV::m,test_number);
     Initialize(test_number,sim,voronoi,parse_args,grid_res,particle_res,particle_count,density_scale,ym_scale,pr,use_voronoi);
 
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
+    // VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
+    // for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+
+    
+    
+    SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV> recons;
+    ARRAY<TV> xbar;
+    ARRAY<MATRIX<T,TV::m> > G;
+    ARRAY<T> density;
+    GRID<TV> recons_grid(TV_INT(0.6*grid_res+1,0.6*grid_res+1),RANGE<TV>(TV(-0.3,-0.3),TV(0.3,0.3)));
+    ARRAY<T,TV_INT> phi;
+    // recons.Compute_Kernal_Centers_And_Transformation_And_Density(sim.particles.X,sim.particles.mass,(T)10/(T)particle_res,(T)20/(T)particle_res,0.05,5,4,1400,0.5,xbar,G,density);
+    recons.Compute_Kernal_Centers_And_Transformation_And_Density(sim.particles.X,sim.particles.mass,0.01,0.02,0.55,5,4,1400,0.5,xbar,G,density);
+    recons.Build_Scalar_Field(xbar,sim.particles.mass,density,G,recons_grid,phi);
+    LOG::cout<<phi.Max()<<std::endl;
+    LOG::cout<<phi.Min()<<std::endl;
+    T k;std::cin>>k;
+    LOG::cout<<phi<<std::endl;for(int i=0;i<phi.array.m;i++) phi.array(i)-=k;
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),recons_grid,output_directory);
     for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+    Dump_Levelset(recons_grid,phi,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+    Flush_Frame<TV>("mpm");
+    return;
+
+
     if(use_voronoi){
         voronoi.Build_Boundary_Segments();
         for(int s=0;s<voronoi.boundary_segments.m;s++){
@@ -208,7 +233,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     for(int i=0;i<50;i++) Add_Debug_Particle(TV(-1+i*0.04,sim.ground_level),VECTOR<T,3>(0,0,1));
     Flush_Frame<TV>("mpm");
 
-    for(int f=1;f<2900000977;f++){
+    for(int f=1;f<2900977;f++){
         TIMING_START;
         LOG::cout<<"TIMESTEP "<<f<<std::endl;
         sim.Advance_One_Time_Step_Backward_Euler();

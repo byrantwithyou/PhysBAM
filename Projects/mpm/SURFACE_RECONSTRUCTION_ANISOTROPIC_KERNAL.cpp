@@ -100,14 +100,16 @@ Compute_Kernal_Centers_And_Transformation_And_Density(const ARRAY_VIEW<TV>& X,co
     // G
     G.Resize(X.m);
     for(int i=0;i<X.m;i++){
-        DIAGONAL_MATRIX<T,3> eigenvalues,Sigma_wave;
-        MATRIX<T,3> eigenvectors;
-        SYMMETRIC_MATRIX<T,3>(C(i).Symmetric_Part()).Solve_Eigenproblem(eigenvalues,eigenvectors);
+        DIAGONAL_MATRIX<T,TV::m> eigenvalues,Sigma_wave;
+        MATRIX<T,TV::m> eigenvectors;
+        SYMMETRIC_MATRIX<T,TV::m>(C(i).Symmetric_Part()).Solve_Eigenproblem(eigenvalues,eigenvectors);
         int index_max=eigenvalues.To_Vector().Arg_Max();
         T max_ev=eigenvalues(index_max,index_max);
         if(neighbor_count(i)<=N_eps) Sigma_wave+=kn;
         else for(int d=0;d<TV::m;d++) Sigma_wave(d,d)=ks*max(eigenvalues(d,d),max_ev/kr);
-        G(i)=one_over_h*(eigenvectors*Sigma_wave.Inverse()).Times_Transpose(eigenvectors);}
+        G(i)=one_over_h*(eigenvectors*Sigma_wave.Inverse()).Times_Transpose(eigenvectors);
+        // G(i)=one_over_h*MATRIX<T,TV::m>::Identity_Matrix();
+    }
 }
 //#####################################################################
 // Function Build_Scalar_Field
@@ -117,20 +119,27 @@ Build_Scalar_Field(const ARRAY<TV>& Xbar,const ARRAY_VIEW<T>& m,const ARRAY_VIEW
 {
     phi.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));phi.Fill(T(0));
     
-    // for(int i=0;i<Xbar.m;i++){
-    //     TV_INT particle_cell=grid.Cell(Xbar(i),0);
-    //     int layer=1;
-    //     while(1){
-    //         bool should_go_to_next_layer=false;
-    //         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(particle_cell-layer,paricle_cell+layer+1));it.Valid();it.Next()){
-                
-    //         }
-    //     }
-    // }
-        
-
+    for(int i=0;i<Xbar.m;i++){
+        TV_INT particle_cell=grid.Cell(Xbar(i),0);
+        int layer=1;
+        while(1){
+            bool should_go_to_next_layer=false;
+            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(particle_cell-layer,particle_cell+layer+1));it.Valid();it.Next()){
+                bool boundary=false;
+                for(int d=0;d<TV::m;d++){
+                    if(it.index(d)==(particle_cell-layer)(d) || it.index(d)==(particle_cell+layer+1)(d)){
+                        boundary=true;
+                        break;}}
+                if(boundary && (G(i)*(grid.Node(it.index)-Xbar(i))).Magnitude_Squared()<(T)2)
+                    should_go_to_next_layer=true;}
+            if(should_go_to_next_layer) layer++;
+            else break;}
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(particle_cell-layer,particle_cell+layer+1));it.Valid();it.Next())
+            phi(it.index)+=m(i)/density(i)*kernel_sigma[TV::m-1]*G(i).Determinant()*P((G(i)*(grid.Node(it.index)-Xbar(i))).Magnitude());}
 }
 //#####################################################################
+template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<float,2> >;
+template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<double,2> >;
 template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<float,3> >;
 template class SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<VECTOR<double,3> >;
 }
