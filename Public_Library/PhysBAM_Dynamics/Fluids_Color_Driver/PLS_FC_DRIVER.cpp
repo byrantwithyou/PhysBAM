@@ -72,6 +72,7 @@ Execute_Main_Program()
 template<class TV> void PLS_FC_DRIVER<TV>::
 Initialize()
 {
+    LOG::cout<<std::setprecision(16)<<std::endl;
     DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.substeps_delay_frame<0?example.write_substeps_level:-1);
 
     // setup time
