@@ -16,6 +16,7 @@ Rotate_Right(NODE* node)
     else node->P->L=tmp;
     tmp->R=node;
     node->P=tmp;
+    if(func) func(tmp,0,rot_r);
 }
 //#####################################################################
 // Function Rotate_Left
@@ -33,6 +34,7 @@ Rotate_Left(NODE* node)
     else node->P->R=tmp;
     tmp->L=node;
     node->P=tmp;
+    if(func) func(tmp,0,rot_l);
 }
 //#####################################################################
 // Function Exchange_Nodes
@@ -57,6 +59,7 @@ Exchange_Nodes(NODE* a,NODE* b)
     if(a->R) a->R->P=a;
     if(b->L) b->L->P=b;
     if(b->R) b->R->P=b;
+    if(func) func(a,b,exch);
 }
 //#####################################################################
 // Function Assert_Valid_Helper
@@ -84,6 +87,7 @@ Root_Insert(NODE* node)
     node->Reset();
     root=node;
     root->black=true;
+    if(func) func(node,0,insert);
 }
 //#####################################################################
 // Function Insert
@@ -96,6 +100,7 @@ Insert(NODE* node,NODE* parent,bool left)
     node->P=parent;
     if(left) parent->L=node;
     else parent->R=node;
+    if(func) func(node,0,insert);
     Insert_Fixup(node);
 }
 //#####################################################################
@@ -144,18 +149,18 @@ Insert_Fixup(NODE* node)
 void RED_BLACK_TREE_CORE::
 Remove(NODE* node)
 {
-    if(node->L && node->R){
-        NODE* temp=node->R;while(temp->L) temp=temp->L;
-        Exchange_Nodes(node,temp);}
+    if(node->L && node->R) Exchange_Nodes(node,node->R->Far_Left());
     assert(!node->L || !node->R);
     NODE* child=node->L?node->L:node->R?node->R:0,*P=node->P;
     if(!child && node->black){ // Use node as a sentinal
         Remove_Fixup(node);
+        if(func) func(node,0,remove);
         if(!P) root=0;
         else if(node==P->L) P->L=0;
         else P->R=0;}
     else{
         if(child) child->P=P;
+        if(func) func(node,0,remove);
         if(!P) root=child;
         else if(node==P->L) P->L=child;
         else P->R=child;

@@ -150,9 +150,12 @@ public:
 
     NODE *root;
     int size;
-    
+
+    enum FUNC_CODE {insert,remove,rot_l,rot_r,exch};
+    void (*func)(NODE* A,NODE* B,int code);
+
     RED_BLACK_TREE_CORE()
-        :root(0),size(0)
+        :root(0),size(0),func(0)
     {}
     
     ~RED_BLACK_TREE_CORE()
@@ -282,6 +285,11 @@ public:
 
     int Size() const {return core.size;}
 
+    void Set_Callback(void (*func)(NODE* A,NODE* B,int code))
+    {
+        core.func=reinterpret_cast<void (*)(CORE::NODE*,CORE::NODE*,int)>(func);
+    }
+    
     void Assert_Valid() const
     {
         if(!core.root) return;
