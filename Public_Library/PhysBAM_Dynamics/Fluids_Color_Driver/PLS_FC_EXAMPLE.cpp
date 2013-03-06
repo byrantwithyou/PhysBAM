@@ -104,6 +104,20 @@ Read_Output_Files(const int frame)
         time,face_color,prev_face_color,face_velocities,prev_face_velocities);
 }
 //#####################################################################
+// Function Adjust_Particle_For_Domain_Boundaries
+//#####################################################################
+template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
+Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time)
+{
+    for(int i=0;i<number_of_colors;i++){
+        TV& X=particles.X(index);TV X_new=X+dt*V;
+        TV min_corner=grid.domain.Minimum_Corner(),max_corner=grid.domain.Maximum_Corner();
+        for(int axis=0;axis<GRID<TV>::dimension;axis++){
+            T shift=((X_new[axis]-min_corner[axis])/(max_corner[axis]-min_corner[axis]));if(shift<0)shift-=(T)1;X_new[axis]-=(max_corner[axis]-min_corner[axis])*(int)shift;X=X_new-dt*V;
+        }
+    }
+}
+//#####################################################################
 // Function Color_At_Cell
 //#####################################################################
 template<class TV_input> int PLS_FC_EXAMPLE<TV_input>::
