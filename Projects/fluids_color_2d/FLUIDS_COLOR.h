@@ -48,7 +48,7 @@ struct ANALYTIC_VELOCITY_VORTEX:public ANALYTIC_VELOCITY<TV>
     {return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y))*exp(-2*nu*t);}
     virtual MATRIX<T,TV::m> du(const TV& X,T t) const
     {T c=cos(X.x)*cos(X.y),s=sin(X.x)*sin(X.y);return MATRIX<T,TV::m>(c,s,-s,-c)*exp(-2*nu*t);}
-    virtual T p(const TV& X,T t) const {return (T).25*rho*(cos(2*X.x)+cos(2*X.y))*exp(-4*nu*t);}
+    virtual T p(const TV& X,T t) const {return (T).25*rho*(cos(2*X.x)*cos(2*X.y))*exp(-4*nu*t);}
     virtual TV F(const TV& X,T t) const {return TV();}
 };
     
@@ -64,7 +64,7 @@ struct ANALYTIC_VELOCITY_VORTEX_AND_SHIFT:public ANALYTIC_VELOCITY<TV>
     {return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y))*exp(-2*nu*t)+au;}
     virtual MATRIX<T,2> du(const TV& X,T t) const
     {T c=cos(X.x)*cos(X.y),s=sin(X.x)*sin(X.y);return MATRIX<T,2>(c,s,-s,-c)*exp(-2*nu*t);}
-    virtual T p(const TV& X,T t) const {return const_p+(T).25*rho*(cos(2*X.x)+cos(2*X.y))*exp(-4*nu*t);}
+    virtual T p(const TV& X,T t) const {return const_p+(T).25*rho*(cos(2*X.x)*cos(2*X.y))*exp(-4*nu*t);}
     virtual TV F(const TV& X,T t) const {return TV();}
 };
 
@@ -223,10 +223,12 @@ public:
                 break;}
             case 29:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*pi*m,true);
-                TV vel((T)-.5,(T).2);
+                TV vel((T)-.00,(T).0);
                 analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3*pi,1,0),vel);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(0*mu0/unit_mu,rho0/unit_rho,vel));
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(0*mu0/unit_mu,rho0/unit_rho,vel));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(0*mu0/unit_mu,rho0/unit_rho));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(0*mu0/unit_mu,rho0/unit_rho));
+//                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(0*mu0/unit_mu,rho0/unit_rho,vel));
+//                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(0*mu0/unit_mu,rho0/unit_rho,vel));
                 use_p_null_mode=true;
                 use_level_set_method=true;
                 break;}
