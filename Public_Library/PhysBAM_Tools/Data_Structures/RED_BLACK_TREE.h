@@ -13,6 +13,8 @@
 #include <cassert>
 namespace PhysBAM{
 
+template<class K,class T=void> class RED_BLACK_TREE;
+
 class RED_BLACK_TREE_CORE
 {
     struct UNUSABLE{};
@@ -201,7 +203,10 @@ public:
 template<class K,class T_DATA> struct RED_BLACK_TREE_NODE_PAYLOAD{RED_BLACK_TREE_NODE_PAYLOAD(const K& k,const T_DATA& t):key(k),data(t){} K key;T_DATA data;};
 template<class K> struct RED_BLACK_TREE_NODE_PAYLOAD<K,void>{RED_BLACK_TREE_NODE_PAYLOAD(const K& k):key(k){} K key;};
 
-template<class K,class T=void> // K=key,T=data
+template<class K,class T> void (*Set_T_Callback_Helper(int(*)[sizeof(&T::Callback)]))(typename RED_BLACK_TREE<K,T>::NODE*,typename RED_BLACK_TREE<K,T>::NODE*,int) {return &T::Callback;}
+void (*Set_T_Callback_Helper(...))(RED_BLACK_TREE_CORE::NODE*,RED_BLACK_TREE_CORE::NODE*,int) {return 0;}
+
+template<class K,class T> // K=key,T=data (=void)
 class RED_BLACK_TREE
 {
     struct UNUSABLE{};
@@ -267,8 +272,8 @@ public:
         const K& Key() const {return static_cast<NODE*>(node)->key;}
         const T_OR_UNUSABLE& Data() const {return static_cast<NODE*>(node)->data;}
     };
-    
-    RED_BLACK_TREE() {}
+
+    RED_BLACK_TREE() {core.func=reinterpret_cast<void (*)(CORE::NODE*,CORE::NODE*,int)>(Set_T_Callback_Helper(0));}
 
     ~RED_BLACK_TREE() {Clean_Memory();}
 
@@ -285,11 +290,6 @@ public:
 
     int Size() const {return core.size;}
 
-    void Set_Callback(void (*func)(NODE* A,NODE* B,int code))
-    {
-        core.func=reinterpret_cast<void (*)(CORE::NODE*,CORE::NODE*,int)>(func);
-    }
-    
     void Assert_Valid() const
     {
         if(!core.root) return;
