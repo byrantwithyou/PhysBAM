@@ -44,7 +44,7 @@ public:
     virtual ~MPM_PARTICLES();
 
     void Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box);
-    void Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box);
+    void Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box,const T exclude_radius=(T)999);
     void Initialize_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box);
     void Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box);
     void Add_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box);

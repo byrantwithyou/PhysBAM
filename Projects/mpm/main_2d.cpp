@@ -70,7 +70,8 @@ void Initialize(int test,MPM_SIMULATION<VECTOR<T,2> >& sim,VORONOI_2D<T>& vorono
         case 4: // notch
             sim.grid.Initialize(TV_INT(2*grid_res+1,2*grid_res+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
             // sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res+1,0.4*particle_res+1),RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)),0.2/sqrt((T)particle_count));
+            // sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
             sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.06,-0.04),TV(0.14,0.04)));
             sim.ground_level=-100;
             sim.dirichlet_box.Append(RANGE<TV>(TV(-0.15,-0.23),TV(0.15,-0.17)));
@@ -198,18 +199,18 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
     for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
     
-    SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV> recons;
-    ARRAY<TV> xbar;
-    ARRAY<MATRIX<T,TV::m> > G;
-    ARRAY<T> density;
-    GRID<TV> recons_grid(TV_INT(0.6*300+1,2*300+1),RANGE<TV>(TV(-0.3,-1),TV(0.3,1)));
-    ARRAY<T,TV_INT> phi;
-    recons.Compute_Kernal_Centers_And_Transformation_And_Density(sim.particles.X,sim.particles.mass,0.02,0.04,0.9,10,4,1400,0.5,xbar,G,density);
-    recons.Build_Scalar_Field(xbar,sim.particles.mass,density,G,recons_grid,phi);
-    T k;std::cin>>k;
-    for(int i=0;i<phi.array.m;i++) phi.array(i)-=k;
-    for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-    Dump_Levelset(recons_grid,phi,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+    // SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV> recons;
+    // ARRAY<TV> xbar;
+    // ARRAY<MATRIX<T,TV::m> > G;
+    // ARRAY<T> density;
+    // GRID<TV> recons_grid(TV_INT(0.6*300+1,2*300+1),RANGE<TV>(TV(-0.3,-1),TV(0.3,1)));
+    // ARRAY<T,TV_INT> phi;
+    // recons.Compute_Kernal_Centers_And_Transformation_And_Density(sim.particles.X,sim.particles.mass,0.02,0.04,0.9,10,4,1400,0.5,xbar,G,density);
+    // recons.Build_Scalar_Field(xbar,sim.particles.mass,density,G,recons_grid,phi);
+    // T k;std::cin>>k;
+    // for(int i=0;i<phi.array.m;i++) phi.array(i)-=k;
+    // Dump_Levelset(recons_grid,phi,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+
     if(use_voronoi){
         voronoi.Build_Boundary_Segments();
         for(int s=0;s<voronoi.boundary_segments.m;s++){
@@ -230,10 +231,10 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         TIMING_END("Current time step totally");
         if(f%frame_jump==0){
             for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-            recons.Compute_Kernal_Centers_And_Transformation_And_Density(sim.particles.X,sim.particles.mass,0.02,0.04,0.5,10,4,1400,0.5,xbar,G,density);
-            recons.Build_Scalar_Field(xbar,sim.particles.mass,density,G,recons_grid,phi);
-            for(int i=0;i<phi.array.m;i++) phi.array(i)-=k;
-            Dump_Levelset(recons_grid,phi,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
+            // recons.Compute_Kernal_Centers_And_Transformation_And_Density(sim.particles.X,sim.particles.mass,0.02,0.04,0.5,10,4,1400,0.5,xbar,G,density);
+            // recons.Build_Scalar_Field(xbar,sim.particles.mass,density,G,recons_grid,phi);
+            // for(int i=0;i<phi.array.m;i++) phi.array(i)-=k;
+            // Dump_Levelset(recons_grid,phi,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
             if(use_voronoi){
                 voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1000.0);
                 voronoi.Build_Association();

@@ -5,6 +5,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include "MPM_PARTICLES.h"
 #include "MPM_PARTICLES_FORWARD.h"
 namespace PhysBAM{
@@ -47,15 +48,36 @@ Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
 // Function Initialize_X_As_A_Randomly_Sampled_Box
 //#####################################################################
 template<class TV> void MPM_PARTICLES<TV>::
-Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box)
+Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box,const T exclude_radius)
 {
+    
     ARRAY<TV> sample_X;
     for(int n=0;n<N;n++){
         TV x;
         rand_generator.Fill_Uniform(x,box);
         sample_X.Append(x);}
-    this->Resize(sample_X.m);
-    X=sample_X;
+    ARRAY<bool> should_go_away(sample_X.m);
+    should_go_away.Fill(false);
+    if(exclude_radius<(T)100){
+        T exclude_radius2=exclude_radius*exclude_radius;
+        HASHTABLE<TV_INT,ARRAY<int> > buckets;
+        for(int i=0;i<sample_X.m;i++)
+            buckets.Get_Or_Insert(TV_INT(floor(sample_X(i)/exclude_radius))).Append(i);
+        for(int i=0;i<sample_X.m;i++){
+            if(!should_go_away(i)){
+                TV_INT my_cell=TV_INT(floor(sample_X(i)/exclude_radius));
+                TV_INT aaa=TV_INT(floor(sample_X(i)/exclude_radius)-1.0);
+                TV_INT bbb=TV_INT(floor(sample_X(i)/exclude_radius)+2.0);
+                for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(aaa,bbb));it.Valid();it.Next()){
+                     if(const ARRAY<int>* l1=buckets.Get_Pointer(it.index)){
+                         for(int j=0;j<l1->m;j++){
+                             if((*l1)(j)!=i && !should_go_away((*l1)(j)) && (sample_X(i)-sample_X((*l1)(j))).Magnitude_Squared()<exclude_radius2){
+                                 should_go_away((*l1)(j))=true;}}}}}}}
+    ARRAY<TV> filted_X;
+    for(int i=0;i<sample_X.m;i++)
+        if(!should_go_away(i)) filted_X.Append(sample_X(i));
+    this->Resize(filted_X.m);
+    X=filted_X;
     Xm=X;
 }
 //#####################################################################

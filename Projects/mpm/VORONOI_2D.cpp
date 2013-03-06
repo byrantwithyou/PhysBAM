@@ -4,8 +4,10 @@
 //#####################################################################
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
+#include <geompack.hpp>
 #include "TIMING.h"
 #include "VORONOI_2D.h"
+
 namespace PhysBAM{
 //#####################################################################
 // Function Initialize_With_A_Regular_Grid_Of_Particles
