@@ -389,6 +389,10 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
     
+    if(example.dump_matrix){
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%d.txt",solve_id).c_str()).Write("x",sol);}
+    if(example.dump_largest_eigenvector) Dump_Largest_Eigenvector(iss,vectors);
+
     iss.Multiply(sol,*vectors(0));
     *vectors(0)-=rhs;
     LOG::cout<<"Residual: "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
@@ -489,6 +493,67 @@ Write_Output_Files(const int frame)
         FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
     example.Write_Output_Files(frame);
     FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
+}
+//#####################################################################
+// Function Dump_Largest_Eigenvector
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Dump_Largest_Eigenvector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors) const
+{
+    static int solve_id=-1;solve_id++;
+    INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> sol,rhs,tmp;
+    sol.Resize(*vectors(0));
+    rhs.Resize(*vectors(0));
+    tmp.Resize(*vectors(0));
+
+    MINRES<T> mr;
+    KRYLOV_SOLVER<T>* solver=&mr;
+
+    ARRAY<INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>*> evs;
+    ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > fv;
+    RANDOM_NUMBERS<T> random;
+
+    OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("ev-%d.txt",solve_id).c_str());
+
+    for(int j=0;j<5;j++){
+        random.Fill_Uniform(sol.u,-1,1);
+        for(int i=0;i<evs.m;i++) sol.Copy(-sol.Dot(*evs(i)),*evs(i),sol);
+        sol*=1/sqrt((T)iss.Inner_Product(sol,sol));
+        T a;
+        for(int i=0;i<20;i++){
+            for(int d=0;d<TV::m;d++)
+                for(int c=0;c<example.number_of_colors;c++)
+                    iss.matrix_inertial_rhs(d)(c).Times(sol.u(d)(c),rhs.u(d)(c));
+            iss.Project(rhs);
+
+            tmp=sol;
+            sol*=0;
+            solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
+
+            iss.Project(sol);
+            for(int i=0;i<evs.m;i++) sol.Copy(-sol.Dot(*evs(i)),*evs(i),sol);
+
+            a=sqrt((T)iss.Inner_Product(sol,sol));
+            sol*=1/a;
+            LOG::cout<<"eig approx "<<a<<"   dp "<<iss.Inner_Product(sol,tmp)<<std::endl;
+            tmp=sol;}
+
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){
+            int c=example.levelset_color.Color(it.Location());
+            example.face_color(it.Full_Index())=c;
+            if(c<0) continue;
+            int k=iss.cm_u(it.Axis())->Get_Index(it.index,c);
+            assert(k>=0);
+            example.face_velocities(c)(it.Full_Index())=sol.u(it.Axis())(c)(k);}
+
+        fv=example.face_velocities;
+        PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("eigenvector (%g)",a),0,1);
+        example.face_velocities=fv;
+        evs.Append(new INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>(sol));
+        oo.Write(STRING_UTILITIES::string_sprintf("EV%d",j).c_str(),sol);
+        oo.Write(STRING_UTILITIES::string_sprintf("ev%d",j).c_str(),a);}
+
+    evs.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 namespace PhysBAM{

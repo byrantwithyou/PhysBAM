@@ -142,6 +142,7 @@ public:
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
     using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
     using BASE::particle_levelset_evolution_multiple;using BASE::face_color;using BASE::substeps_delay_frame;
+    using BASE::dump_largest_eigenvector;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -207,6 +208,7 @@ public:
         parse_args.Add("-null_p",&use_p_null_mode,"Assume pressure null mode and project it out");
         parse_args.Add("-threads",&number_of_threads,"threads","Number of threads");
         parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
+        parse_args.Add("-dump_eigen",&dump_largest_eigenvector,"Dump largest few eigenvectors");
         parse_args.Parse(true);
 
 #ifdef USE_OPENMP
