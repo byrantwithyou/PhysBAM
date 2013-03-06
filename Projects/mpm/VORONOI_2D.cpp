@@ -4,7 +4,9 @@
 //#####################################################################
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
+#ifdef USE_GEOMPACK
 #include <geompack.hpp>
+#endif
 #include "TIMING.h"
 #include "VORONOI_2D.h"
 
