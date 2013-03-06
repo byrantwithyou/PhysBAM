@@ -130,7 +130,7 @@ Build_Scalar_Field(const ARRAY<TV>& Xbar,const ARRAY_VIEW<T>& m,const ARRAY_VIEW
                     if(it.index(d)==(particle_cell-layer)(d) || it.index(d)==(particle_cell+layer+1)(d)){
                         boundary=true;
                         break;}}
-                if(boundary && (G(i)*(grid.Node(it.index)-Xbar(i))).Magnitude_Squared()<(T)2)
+                if(boundary && (G(i)*(grid.Node(it.index)-Xbar(i))).Magnitude_Squared()<(T)4)
                     should_go_to_next_layer=true;}
             if(should_go_to_next_layer) layer++;
             else break;}

@@ -195,31 +195,21 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     if(!use_output_directory) output_directory=STRING_UTILITIES::string_sprintf("MPM_%dD_test_%d",TV::m,test_number);
     Initialize(test_number,sim,voronoi,parse_args,grid_res,particle_res,particle_count,density_scale,ym_scale,pr,use_voronoi);
 
-    // VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
-    // for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-
-    
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
+    for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
     
     SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV> recons;
     ARRAY<TV> xbar;
     ARRAY<MATRIX<T,TV::m> > G;
     ARRAY<T> density;
-    GRID<TV> recons_grid(TV_INT(0.6*grid_res+1,0.6*grid_res+1),RANGE<TV>(TV(-0.3,-0.3),TV(0.3,0.3)));
+    GRID<TV> recons_grid(TV_INT(0.6*300+1,2*300+1),RANGE<TV>(TV(-0.3,-1),TV(0.3,1)));
     ARRAY<T,TV_INT> phi;
-    // recons.Compute_Kernal_Centers_And_Transformation_And_Density(sim.particles.X,sim.particles.mass,(T)10/(T)particle_res,(T)20/(T)particle_res,0.05,5,4,1400,0.5,xbar,G,density);
-    recons.Compute_Kernal_Centers_And_Transformation_And_Density(sim.particles.X,sim.particles.mass,0.01,0.02,0.55,5,4,1400,0.5,xbar,G,density);
+    recons.Compute_Kernal_Centers_And_Transformation_And_Density(sim.particles.X,sim.particles.mass,0.02,0.04,0.9,10,4,1400,0.5,xbar,G,density);
     recons.Build_Scalar_Field(xbar,sim.particles.mass,density,G,recons_grid,phi);
-    LOG::cout<<phi.Max()<<std::endl;
-    LOG::cout<<phi.Min()<<std::endl;
     T k;std::cin>>k;
-    LOG::cout<<phi<<std::endl;for(int i=0;i<phi.array.m;i++) phi.array(i)-=k;
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),recons_grid,output_directory);
+    for(int i=0;i<phi.array.m;i++) phi.array(i)-=k;
     for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
     Dump_Levelset(recons_grid,phi,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
-    Flush_Frame<TV>("mpm");
-    return;
-
-
     if(use_voronoi){
         voronoi.Build_Boundary_Segments();
         for(int s=0;s<voronoi.boundary_segments.m;s++){
@@ -239,9 +229,13 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Advance_One_Time_Step_Backward_Euler();
         TIMING_END("Current time step totally");
         if(f%frame_jump==0){
-            // for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+            for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+            recons.Compute_Kernal_Centers_And_Transformation_And_Density(sim.particles.X,sim.particles.mass,0.02,0.04,0.5,10,4,1400,0.5,xbar,G,density);
+            recons.Build_Scalar_Field(xbar,sim.particles.mass,density,G,recons_grid,phi);
+            for(int i=0;i<phi.array.m;i++) phi.array(i)-=k;
+            Dump_Levelset(recons_grid,phi,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
             if(use_voronoi){
-                voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.0);
+                voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1000.0);
                 voronoi.Build_Association();
                 voronoi.Build_Boundary_Segments();
                 voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp);
