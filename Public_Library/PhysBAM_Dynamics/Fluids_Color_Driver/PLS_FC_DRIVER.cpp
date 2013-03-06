@@ -529,8 +529,9 @@ Dump_Largest_Eigenvector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ARRAY<KRYL
             tmp=sol;
             sol*=0;
             solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
-
             iss.Project(sol);
+            for(int c=0;c<example.number_of_colors;c++) sol.p(c).Fill(0);
+            sol.q.Fill(0);
             for(int i=0;i<evs.m;i++) sol.Copy(-sol.Dot(*evs(i)),*evs(i),sol);
 
             a=sqrt((T)iss.Inner_Product(sol,sol));
