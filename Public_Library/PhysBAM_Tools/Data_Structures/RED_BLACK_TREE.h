@@ -50,7 +50,7 @@ public:
             return node;
         }
 
-        NODE* Inorder_Previous()
+        NODE* Inorder_Prev()
         {
             if(L) return L->Far_Right();
             NODE* save=this,*node=P;
@@ -68,7 +68,7 @@ public:
             return node;
         }
 
-        NODE* Preorder_Previous()
+        NODE* Preorder_Prev()
         {
             if(!P || !P->L || P->L==this) return P;
             NODE* node=P->L;
@@ -82,7 +82,7 @@ public:
             return node->Far_Left_Leaf();
         }
 
-        NODE* Postorder_Previous()
+        NODE* Postorder_Prev()
         {
             if(R) return R;
             if(L) return L;
@@ -91,63 +91,6 @@ public:
             if(node) node=node->L;
             return node;
         }
-    };
-
-    struct PREORDER_ITERATOR
-    {
-        NODE* node;
-
-        PREORDER_ITERATOR(NODE* n)
-            :node(n)
-        {}
-
-        PREORDER_ITERATOR(RED_BLACK_TREE_CORE& tree)
-            :node(tree.root)
-        {}
-
-        bool Valid() const
-        {return node!=0;}
-
-        void Next()
-        {node=node->Preorder_Next();}
-    };
-
-    struct POSTORDER_ITERATOR
-    {
-        NODE* node;
-
-        POSTORDER_ITERATOR(NODE* n)
-            :node(n)
-        {if(node) node=node->Far_Left_Leaf();}
-
-        POSTORDER_ITERATOR(RED_BLACK_TREE_CORE& tree)
-            :node(tree.root)
-        {if(node) node=node->Far_Left_Leaf();}
-
-        bool Valid() const
-        {return node!=0;}
-
-        void Next()
-        {node=node->Postorder_Next();}
-    };
-
-    struct INORDER_ITERATOR
-    {
-        NODE* node;
-
-        INORDER_ITERATOR(NODE* n)
-            :node(n)
-        {if(node) node=node->Far_Left();}
-
-        INORDER_ITERATOR(RED_BLACK_TREE_CORE& tree)
-            :node(tree.root)
-        {if(node) node=node->Far_Left();}
-
-        bool Valid() const
-        {return node!=0;}
-
-        void Next()
-        {node=node->Inorder_Next();}
     };
 
     NODE *root;
@@ -218,59 +161,49 @@ public:
     struct NODE:public CORE::NODE,public RED_BLACK_TREE_NODE_PAYLOAD<K,T>
     {
         NODE(const K& k,const T_OR_UNUSABLE& t): RED_BLACK_TREE_NODE_PAYLOAD<K,T>(k,t) {}
-        NODE(const K& k): RED_BLACK_TREE_NODE_PAYLOAD<K,T>(k) {}
+        explicit NODE(const K& k): RED_BLACK_TREE_NODE_PAYLOAD<K,T>(k) {}
         ~NODE() {}
     };
 
-    struct PREORDER_ITERATOR:public CORE::PREORDER_ITERATOR
+    struct ITERATOR
     {
-        PREORDER_ITERATOR(NODE* n): CORE::PREORDER_ITERATOR(n) {}
-        PREORDER_ITERATOR(RED_BLACK_TREE& tree): CORE::PREORDER_ITERATOR(tree.core.root) {}
-        const K& Key() const {return static_cast<NODE*>(node)->key;}
-        K& Data() {return static_cast<NODE*>(node)->data;}
-        const K& Data() const {return static_cast<NODE*>(node)->data;}
+        NODE* node;
+        explicit ITERATOR(NODE* n=0) :node(n) {}
+        explicit ITERATOR(RED_BLACK_TREE& tree) :node(static_cast<NODE*>(tree.core.root)) {}
+        bool Valid() const {return node!=0;}
+        const K& Key() const {return node->key;}
+        K& Data() {return node->data;}
+        const K& Data() const {return node->data;}
+        void Parent() {node=static_cast<NODE*>(node->P);}
+        void Left() {node=static_cast<NODE*>(node->L);}
+        void Right() {node=static_cast<NODE*>(node->R);}
     };
 
-    struct POSTORDER_ITERATOR:public CORE::POSTORDER_ITERATOR
+    struct PREORDER_ITERATOR : public ITERATOR
     {
-        POSTORDER_ITERATOR(NODE* n): CORE::POSTORDER_ITERATOR(n) {}
-        POSTORDER_ITERATOR(RED_BLACK_TREE& tree): CORE::POSTORDER_ITERATOR(tree.core.root) {}
-        const K& Key() const {return static_cast<NODE*>(node)->key;}
-        K& Data() {return static_cast<NODE*>(node)->data;}
-        const K& Data() const {return static_cast<NODE*>(node)->data;}
+        using ITERATOR::node;
+        explicit PREORDER_ITERATOR(NODE* n=0): ITERATOR(n) {}
+        explicit PREORDER_ITERATOR(RED_BLACK_TREE& tree): ITERATOR(tree) {}
+        void Next() {node=static_cast<NODE*>(node->Preorder_Next());}
+        void Prev() {node=static_cast<NODE*>(node->Preorder_Prev());}
     };
 
-    struct INORDER_ITERATOR:public CORE::INORDER_ITERATOR
+    struct POSTORDER_ITERATOR : public ITERATOR
     {
-        INORDER_ITERATOR(NODE* n): CORE::INORDER_ITERATOR(n) {}
-        INORDER_ITERATOR(RED_BLACK_TREE& tree): CORE::INORDER_ITERATOR(tree.core.root) {}
-        const K& Key() const {return static_cast<NODE*>(node)->key;}
-        T_OR_UNUSABLE& Data() {return static_cast<NODE*>(node)->data;}
-        const T_OR_UNUSABLE& Data() const {return static_cast<NODE*>(node)->data;}
+        using ITERATOR::node;
+        explicit POSTORDER_ITERATOR(NODE* n=0): ITERATOR(n) {if(node) node=static_cast<NODE*>(node->Far_Left_Leaf());}
+        explicit POSTORDER_ITERATOR(RED_BLACK_TREE& tree): ITERATOR(tree) {if(node) node=static_cast<NODE*>(node->Far_Left_Leaf());}
+        void Next() {node=static_cast<NODE*>(node->Postorder_Next());}
+        void Prev() {node=static_cast<NODE*>(node->Postorder_Prev());}
     };
 
-    struct CONST_PREORDER_ITERATOR:public CORE::PREORDER_ITERATOR
+    struct INORDER_ITERATOR : public ITERATOR
     {
-        CONST_PREORDER_ITERATOR(NODE* n): CORE::PREORDER_ITERATOR(n) {}
-        CONST_PREORDER_ITERATOR(const RED_BLACK_TREE& tree): CORE::PREORDER_ITERATOR(const_cast<CORE::NODE*>(tree.core.root)) {}
-        const K& Key() const {return static_cast<NODE*>(node)->key;}
-        const K& Data() const {return static_cast<NODE*>(node)->data;}
-    };
-
-    struct CONST_POSTORDER_ITERATOR:public CORE::POSTORDER_ITERATOR
-    {
-        CONST_POSTORDER_ITERATOR(NODE* n): CORE::POSTORDER_ITERATOR(n) {}
-        CONST_POSTORDER_ITERATOR(const RED_BLACK_TREE& tree): CORE::POSTORDER_ITERATOR(const_cast<CORE::NODE*>(tree.core.root)) {}
-        const K& Key() const {return static_cast<NODE*>(node)->key;}
-        const K& Data() const {return static_cast<NODE*>(node)->data;}
-    };
-
-    struct CONST_INORDER_ITERATOR:public CORE::INORDER_ITERATOR
-    {
-        CONST_INORDER_ITERATOR(NODE* n): CORE::INORDER_ITERATOR(n) {}
-        CONST_INORDER_ITERATOR(const RED_BLACK_TREE& tree): CORE::INORDER_ITERATOR(const_cast<CORE::NODE*>(tree.core.root)) {}
-        const K& Key() const {return static_cast<NODE*>(node)->key;}
-        const T_OR_UNUSABLE& Data() const {return static_cast<NODE*>(node)->data;}
+        using ITERATOR::node;
+        explicit INORDER_ITERATOR(NODE* n=0): ITERATOR(n) {if(node) node=static_cast<NODE*>(node->Far_Left());}
+        explicit INORDER_ITERATOR(RED_BLACK_TREE& tree): ITERATOR(tree) {if(node) node=static_cast<NODE*>(node->Far_Left());}
+        void Next() {node=static_cast<NODE*>(node->Inorder_Next());}
+        void Prev() {node=static_cast<NODE*>(node->Inorder_Prev());}
     };
 
     RED_BLACK_TREE() {core.func=reinterpret_cast<void (*)(CORE::NODE*,CORE::NODE*,int)>(Set_T_Callback_Helper(0));}
@@ -297,30 +230,51 @@ public:
         core.Assert_Valid_Helper(core.root);
     }
 
-    NODE* Find(const K& key) const
-    {int result;NODE* node=Find(key,result);return result?0:node;}
+    ITERATOR Find(const K& key) const
+    {int result;ITERATOR found=Find(key,result);return result?ITERATOR():found;}
 
-    NODE* Insert(const K& key,const T_OR_UNUSABLE& data)
-    {NODE* node=new NODE(key,data);Insert(node);return node;}
+    ITERATOR Insert(const K& key,const T_OR_UNUSABLE& data)
+    {NODE* node=new NODE(key,data);Insert(node);return ITERATOR(node);}
 
-    NODE* Insert(const K& key)
-    {NODE* node=new NODE(key);Insert(node);return node;}
+    ITERATOR Insert(const K& key)
+    {NODE* node=new NODE(key);Insert(node);return ITERATOR(node);}
 
-    NODE* Insert_Unique(const K& key,const T_OR_UNUSABLE& data)
-    {NODE* node=new NODE(key,data);if(Insert(node,true)) return node;delete node;return 0;}
+    ITERATOR Insert_Unique(const K& key,const T_OR_UNUSABLE& data)
+    {NODE* node=new NODE(key,data);if(Insert(node,true)) return ITERATOR(node);delete node;return ITERATOR(0);}
 
-    NODE* Insert_Unique(const K& key)
-    {NODE* node=new NODE(key);if(Insert(node,true)) return node;delete node;return 0;}
+    ITERATOR Insert_Unique(const K& key)
+    {NODE* node=new NODE(key);if(Insert(node,true)) return ITERATOR(node);delete node;return ITERATOR(0);}
 
     bool Remove(const K& key)
-    {int result;NODE* found=Find(key,result);if(!result) Remove(found);return !result;}
+    {int result;ITERATOR found=Find(key,result);if(!result) Remove(found);return !result;}
 
-    void Remove(NODE* node)
+    void Remove(ITERATOR it)
     {
-        core.Remove(node);
-        delete node;
+        core.Remove(it.node);
+        delete it.node;
     }
 
+    ITERATOR Find(const K& key,int& result) const // result: -1 -> less than returned.  0 -> equal to returned.  1 -> greater than returned.
+    {
+        if(!core.root){result=-1;return ITERATOR();}
+        NODE* node=static_cast<NODE*>(core.root);
+        while(1){
+            if(key<node->key){
+                if(!node->L){result=-1;return ITERATOR(node);}
+                node=static_cast<NODE*>(node->L);}
+            else if(key>node->key){
+                if(!node->R){result=1;return ITERATOR(node);}
+                node=static_cast<NODE*>(node->R);}
+            else{result=0;return ITERATOR(node);}}
+    }
+
+    void Print(std::ostream& o=LOG::cout) const
+    {
+        if(core.root) Print(o,core.root);
+        else o<<"null";
+    }
+
+protected:
     bool Insert(NODE* node,bool unique=false)
     {
         if(!core.root){core.Root_Insert(node);return true;}
@@ -334,28 +288,8 @@ public:
         return true;
     }
 
-    NODE* Find(const K& key,int& result) const // result: -1 -> less than returned.  0 -> equal to returned.  1 -> greater than returned.
-    {
-        if(!core.root){result=-1;return 0;}
-        NODE* node=static_cast<NODE*>(core.root);
-        while(1){
-            if(key<node->key){
-                if(!node->L){result=-1;return node;}
-                node=static_cast<NODE*>(node->L);}
-            else if(key>node->key){
-                if(!node->R){result=1;return node;}
-                node=static_cast<NODE*>(node->R);}
-            else{result=0;return node;}}
-    }
-
     void Print_Data_Helper(std::ostream& o,CORE::NODE* node,const UNUSABLE*) const {}
     void Print_Data_Helper(std::ostream& o,CORE::NODE* node,const T*) const {o<<" : "<<static_cast<NODE*>(node)->data;}
-
-    void Print(std::ostream& o=LOG::cout) const
-    {
-        if(core.root) Print(o,core.root);
-        else o<<"null";
-    }
 
     void Print(std::ostream& o,CORE::NODE* node) const
     {
@@ -372,7 +306,6 @@ public:
         o<<')';
     }
 
-protected:
     void Assert_Valid_Helper(CORE::NODE* node) const
     {
         if(node->L){
