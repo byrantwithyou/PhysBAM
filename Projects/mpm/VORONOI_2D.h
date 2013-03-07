@@ -14,6 +14,8 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include "MPM_PARTICLES.h"
 namespace PhysBAM{
 template<class T>
 class VORONOI_2D
@@ -34,6 +36,7 @@ public:
     ~VORONOI_2D(){}
 
     void Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& grid);
+    void Initialize_Particles_And_Voronoi_Mesh_From_A_Triangulated_Area(const TRIANGULATED_AREA<T>& triangulated_area,MPM_PARTICLES<TV>& mpm_particles);
     void Initialize_Neighbor_Cells();
     void Build_Association();
     void Build_Segments();

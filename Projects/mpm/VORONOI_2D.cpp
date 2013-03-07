@@ -9,7 +9,6 @@
 #endif
 #include "TIMING.h"
 #include "VORONOI_2D.h"
-
 namespace PhysBAM{
 //#####################################################################
 // Function Initialize_With_A_Regular_Grid_Of_Particles
@@ -47,6 +46,15 @@ Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& particle_grid)
     TIMING_END("Initialize polygon voronoi mesh");
     Initialize_Neighbor_Cells();
     Build_Association();
+}
+//#####################################################################
+// Function Initialize_Particles_And_Voronoi_Mesh_From_A_Triangulated_Area
+//#####################################################################
+template<class T> void VORONOI_2D<T>::
+Initialize_Particles_And_Voronoi_Mesh_From_A_Triangulated_Area(const TRIANGULATED_AREA<T>& triangulated_area,MPM_PARTICLES<TV>& mpm_particles)
+{
+    
+
 }
 //#####################################################################
 // Function Initialize_Neighbor_Cells
