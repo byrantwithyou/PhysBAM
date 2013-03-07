@@ -223,12 +223,10 @@ public:
                 break;}
             case 29:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*pi*m,true);
-                TV vel((T)-.00,(T).0);
+                TV vel((T).2,(T).5);
                 analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3*pi,1,0),vel);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0/unit_mu,rho0/unit_rho));
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0/unit_mu,rho0/unit_rho));
-//                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(0*mu0/unit_mu,rho0/unit_rho,vel));
-//                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(0*mu0/unit_mu,rho0/unit_rho,vel));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(mu0/unit_mu,rho0/unit_rho,vel));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(mu0/unit_mu,rho0/unit_rho,vel));
                 use_p_null_mode=true;
                 use_level_set_method=true;
                 break;}
