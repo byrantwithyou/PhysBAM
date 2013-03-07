@@ -240,10 +240,10 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     // Zhu and Bridson
     SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON<TV> recons;
-    GRID<TV> recons_grid(TV_INT(2*600+1,2*600+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
+    GRID<TV> recons_grid(TV_INT(2*1200+1,2*1200+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
     ARRAY<T,TV_INT> phi_bridson;
     recons.Initialize((T)1/(T)particle_res);
-    recons.Build_Scalar_Field(sim.particles.X,recons_grid,phi_bridson);
+    recons.Build_Scalar_Field(sim.particles.X,recons_grid,phi_bridson,1);
     Dump_Levelset(recons_grid,phi_bridson,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
 
     // voronoi reconstruction
@@ -272,7 +272,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
 
             // Zhu and Bridson
-            recons.Build_Scalar_Field(sim.particles.X,recons_grid,phi_bridson);
+            recons.Build_Scalar_Field(sim.particles.X,recons_grid,phi_bridson,1);
             Dump_Levelset(recons_grid,phi_bridson,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
 
             // voronoi reconstruction

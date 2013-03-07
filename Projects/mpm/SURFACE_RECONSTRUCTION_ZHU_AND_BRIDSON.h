@@ -20,7 +20,7 @@ public:
     ~SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON(){}
 
     void Initialize(const T average_particle_spacing);
-    void Build_Scalar_Field(const ARRAY_VIEW<TV>& X,const GRID<TV>& grid,ARRAY<T,TV_INT>& phi) const;
+    void Build_Scalar_Field(const ARRAY_VIEW<TV>& X,const GRID<TV>& grid,ARRAY<T,TV_INT>& phi,const int smooth=0) const;
 //#####################################################################
 };
 }

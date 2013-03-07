@@ -37,7 +37,7 @@ Initialize(const T average_particle_spacing)
 // Function Build_Scalar_Field
 //#####################################################################
 template<class TV> void SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON<TV>::
-Build_Scalar_Field(const ARRAY_VIEW<TV>& X,const GRID<TV>& grid,ARRAY<T,TV_INT>& phi) const
+Build_Scalar_Field(const ARRAY_VIEW<TV>& X,const GRID<TV>& grid,ARRAY<T,TV_INT>& phi,const int smooth) const
 {
     T R2=sqr(radius_of_neighborhood);
     T one_over_R2=Inverse(R2);
@@ -72,6 +72,22 @@ Build_Scalar_Field(const ARRAY_VIEW<TV>& X,const GRID<TV>& grid,ARRAY<T,TV_INT>&
                 x_average+=w(i)*X(my_neighbors(i));
                 r_average+=w(i)*particle_radii;}
             phi(it.index)=(x-x_average).Magnitude()-r_average;}}
+
+    for(int s=0;s<smooth;s++){
+        ARRAY<T,TV_INT> phi_old=phi;
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),grid.counts));it.Valid();it.Next()){
+            bool is_boundary=false;
+            for(int d=0;d<TV::m;d++)
+                if(it.index(d)==0 || it.index(d)==grid.counts(d)-1){
+                    is_boundary=true;
+                    break;}
+            if(!is_boundary){
+                phi(it.index)=(T)0;
+                int n=0;
+                for(RANGE_ITERATOR<TV::m> it2(RANGE<TV_INT>(TV_INT()-1,TV_INT()+2));it2.Valid();it2.Next()){
+                    phi(it.index)+=phi_old(it.index+it2.index);
+                    n++;}
+                phi(it.index)/=(T)n;}}}
 }
 //#####################################################################
 template class SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON<VECTOR<float,2> >;
