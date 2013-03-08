@@ -91,7 +91,7 @@ int main(int argc,char *argv[])
     example->last_frame=100;
     example->cfl=1;
     parse_args.Add("-restart",&example->restart,"frame","restart frame");
-    parse_args.Add("-substep",&example->write_substeps_level,"level","output-substep level");
+    parse_args.Add("-substeps",&example->write_substeps_level,"level","output-substep level");
     parse_args.Add("-e",&example->last_frame,"frame","last frame");
     parse_args.Add("-cfl",&example->cfl,"cfl","cfl number");
     parse_args.Parse();

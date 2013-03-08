@@ -53,7 +53,7 @@ public:
         parse_args.Add("-source_radius",&source_radius,"radius","radius of source");
         parse_args.Add("-buoyancy",&buoyancy_clamp,"const","buoyancy constant");
         parse_args.Add("-test_number",&test_number,"test","test number");
-        parse_args.Add("-substep",&write_substeps_level,"level","level of writing sub-steps");
+        parse_args.Add("-substeps",&write_substeps_level,"level","level of writing sub-steps");
         parse_args.Add("-upsample",&upsample,"level","level of refinement");
         parse_args.Parse();
 

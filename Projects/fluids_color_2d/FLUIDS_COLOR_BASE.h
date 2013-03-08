@@ -183,7 +183,7 @@ public:
         parse_args.Extra(&test_number,"example number","example number to run");
         parse_args.Add("-restart",&restart,"frame","restart frame");
         parse_args.Add("-resolution",&resolution,"resolution","grid resolution");
-        parse_args.Add("-substep",&write_substeps_level,"level","output-substep level");
+        parse_args.Add("-substeps",&write_substeps_level,"level","output-substep level");
         parse_args.Add("-substeps_delay",&substeps_delay_frame,"frame","delay substeps until after this frame");
         parse_args.Add("-dt",&dt,"dt","time step size to use for simulation");
         parse_args.Add("-steps",&time_steps_per_frame,"steps","number of time steps per frame");

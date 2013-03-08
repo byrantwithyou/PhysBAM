@@ -22,7 +22,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     example->Initialize_Grid(counts,range);
     example->last_frame=100;
     parse_args.Add("-restart",&example->restart,"frame","restart frame");
-    parse_args.Add("-substep",&example->write_substeps_level,"level","output-substep level");
+    parse_args.Add("-substeps",&example->write_substeps_level,"level","output-substep level");
     parse_args.Add("-e",&example->last_frame,"frame","last frame");
     parse_args.Parse();
 

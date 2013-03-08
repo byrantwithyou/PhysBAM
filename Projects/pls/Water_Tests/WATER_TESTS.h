@@ -38,7 +38,7 @@ public:
 
         parse_args.Add("-restart",&restart,"frame","restart frame");
         parse_args.Add("-scale",&scale,"scale","fine scale grid resolution");
-        parse_args.Add("-substep",&write_substeps_level,"frame","output-substep level");
+        parse_args.Add("-substeps",&write_substeps_level,"frame","output-substep level");
         parse_args.Parse();
 
         mac_grid.Initialize(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true);
