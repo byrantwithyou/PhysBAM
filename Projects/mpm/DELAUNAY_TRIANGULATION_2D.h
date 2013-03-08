@@ -19,7 +19,7 @@ public:
     DELAUNAY_TRIANGULATION_2D(){}
     ~DELAUNAY_TRIANGULATION_2D(){}
 
-    static void Triangulate(const ARRAY_VIEW<TV>& X,ARRAY<E>& elements);
+    static void Triangulate(const ARRAY_VIEW<TV>& X,ARRAY<E>& elements,const T threshold=(T)99999);
 //#####################################################################
 };
 }
