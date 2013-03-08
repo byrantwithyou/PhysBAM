@@ -25,7 +25,7 @@
 #include "MPM_SIMULATION.h"
 #include "SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL.h"
 #include "SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON.h"
-
+#include "DELAUNAY_TRIANGULATION_2D.h"
 using namespace PhysBAM;
 // TRIANGULATED_AREA<double> triangulated_area;
 template<class T>
