@@ -272,7 +272,7 @@ Set_Jacobi_Preconditioner()
             SPARSE_MATRIX_FLAT_MXN<T>& m_uu=matrix_uu(i)(i)(c);
             for(int k=0;k<u_dofs;k++){
                 T d=abs(m_uu(k,k));
-                if(d<1e-13){
+                if(!d){
                     inactive_u(i)(c).Append(k);
                     LOG::cout<<"WARNING: small diagonal entry in the UU block."<<std::endl;}
                 else J.u(i)(c)(k)=1/abs(m_uu(k,k));}}
@@ -285,7 +285,7 @@ Set_Jacobi_Preconditioner()
                 int end=m_pu.offsets(k+1);
                 for(int e=start;e<end;e++)
                     sum+=sqr(m_pu.A(e).a)*J.u(i)(c)(m_pu.A(e).j);}
-            if(sum<1e-13){
+            if(!sum){
                 inactive_p(c).Append(k);
                 LOG::cout<<"WARNING: small row sum in the PU block."<<std::endl;}
             else J.p(c)(k)=1/sum;}}
@@ -298,7 +298,7 @@ Set_Jacobi_Preconditioner()
                 int end=m_qu.offsets(k+1);
                 for(int j=start;j<end;j++)
                     sum+=sqr(m_qu.A(j).a)*J.u(i)(c)(m_qu.A(j).j);}
-        if(sum<1e-13){
+        if(!sum){
             inactive_q.Append(k);
             LOG::cout<<"WARNING: small row sum in the QU block."<<std::endl;}
         else J.q(k)=1/sum;}
