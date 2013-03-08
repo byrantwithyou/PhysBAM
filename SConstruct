@@ -15,7 +15,7 @@ variables=Variables('SConstruct.options')
 variables.AddVariables(
     ('CXX','C++ compiler',default_cxx),
     EnumVariable('ARCH','Architecture (e.g. pentium4, opteron, nocona, powerpc)','',allowed_values=('pentium3','pentium4','opteron','nocona','powerpc','test','wine','')),
-    EnumVariable('DEFAULT_ARCH','Architecture that doesn\'t need a suffix','',allowed_values=('pentium3','pentium4','opteron','nocona','powerpc','test','wine','')),
+    EnumVariable('DEFAULT_ARCH','Architecture that doesn\'t need a suffix','',allowed_values=('pentium3','pentium4','opteron','nocona','powerpc','test','wine','darwin','')),
     EnumVariable('TYPE','Type of build (release, debug, profile, optdebug)','release',allowed_values=('release','debug','profile','optdebug')),
     ('cache','Cache directory to use',''),
     BoolVariable('shared','Build shared libraries',1),

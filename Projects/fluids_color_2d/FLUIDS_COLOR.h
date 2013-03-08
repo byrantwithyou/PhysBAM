@@ -51,21 +51,21 @@ struct ANALYTIC_VELOCITY_VORTEX:public ANALYTIC_VELOCITY<TV>
     virtual T p(const TV& X,T t) const {return (T).25*rho*(cos(2*X.x)+cos(2*X.y))*exp(-4*nu*t);}
     virtual TV F(const TV& X,T t) const {return TV();}
 };
-    
-template<class TV>
-struct ANALYTIC_VELOCITY_VORTEX_AND_SHIFT:public ANALYTIC_VELOCITY<TV>
+
+template<class TV> //Reverses direction with cos(t), adds constant velocity
+struct ANALYTIC_VELOCITY_VORTEX_NEW:public ANALYTIC_VELOCITY<TV>
 {
     typedef typename TV::SCALAR T;
-    T nu,rho;
-    TV au;
+    T nu,rho,l; //lambda is frequency of reversing, 0 doesn't reverse at all
+    TV au; //shift vector
     T const_p;
-    ANALYTIC_VELOCITY_VORTEX_AND_SHIFT(T mu,T rho,TV v): nu(mu/rho),rho(rho),au(v),const_p(0){}
+    ANALYTIC_VELOCITY_VORTEX_NEW(T mu,T rho,T lambda,TV v): nu(mu/rho),rho(rho),l(lambda),au(v),const_p(0){}
     virtual TV u(const TV& X,T t) const
-    {return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y))*exp(-2*nu*t)+au;}
+    {return TV(sin(X.x)*cos(X.y)*cos(l*t),-cos(X.x)*sin(X.y)*cos(l*t))+au;}
     virtual MATRIX<T,2> du(const TV& X,T t) const
-    {T c=cos(X.x)*cos(X.y),s=sin(X.x)*sin(X.y);return MATRIX<T,2>(c,s,-s,-c)*exp(-2*nu*t);}
-    virtual T p(const TV& X,T t) const {return const_p+(T).25*rho*(cos(2*X.x)+cos(2*X.y))*exp(-4*nu*t);}
-    virtual TV F(const TV& X,T t) const {return TV();}
+    {T c=cos(X.x)*cos(X.y)*cos(l*t),s=sin(X.x)*sin(X.y)*cos(l*t);return MATRIX<T,2>(c,s,-s,-c);}
+    virtual T p(const TV& X,T t) const {return const_p+(T).25*rho*cos(l*t)*cos(l*t)*(cos(2*X.x)+cos(2*X.y));}
+    virtual TV F(const TV& X,T t) const {return TV(sin(X.x)*cos(X.y)*((T)2*nu*cos(l*t)-l*sin(l*t))+cos(l*t)*cos(l*t)*(au(0)*cos(X.x)*cos(X.y)-au(1)*sin(X.x)*sin(X.y))-au(0)*l*sin(l*t),-cos(X.x)*sin(X.y)*((T)2*nu*cos(l*t)-l*sin(l*t))+cos(l*t)*cos(l*t)*(au(0)*sin(X.x)*sin(X.y)-au(1)*cos(X.x)*cos(X.y))-au(1)*l*sin(l*t));}
 };
 
 template<class T>
@@ -216,20 +216,32 @@ public:
                 ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),-4,-4);
                 analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).42,0,1)))->Add(ab)->Add(cd);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,VECTOR<T,1>(1),rho0/unit_rho));
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,VECTOR<T,1>(1),rho0/unit_rho));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,VECTOR<T,1>(1),rho1/unit_rho));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 //use_level_set_method=true;
                 
                 break;}
+
             case 29:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*pi*m,true);
-                TV vel((T).2,(T).5);
+                TV vel((T).0,(T).0);
+                T lambda = (T)0;
                 analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3*pi,1,0),vel);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(mu0/unit_mu,rho0/unit_rho,vel));
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_AND_SHIFT<TV>(mu0/unit_mu,rho0/unit_rho,vel));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_NEW<TV>(mu0/unit_mu,rho0/unit_rho,lambda,vel));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_NEW<TV>(mu1/unit_mu,rho1/unit_rho,lambda,vel));
                 use_p_null_mode=true;
                 use_level_set_method=true;
                 break;}
+            case 30:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*pi*m,true);
+                TV vel((T).5,(T).3);
+                T lambda = (T)1;
+                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,-4);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX_NEW<TV>(mu0/unit_mu,rho0/unit_rho,lambda,vel));
+                use_p_null_mode=true;
+                use_level_set_method=true;
+                break;}
+
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
     }
 
