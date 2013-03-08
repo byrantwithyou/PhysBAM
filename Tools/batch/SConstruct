@@ -3,7 +3,7 @@ local_env=Environment();
 local_env.Append(CXXFLAGS=['-I/usr/local/include', '-g'])
 local_env.Append(LINKFLAGS=['-L/usr/local/lib'])
 local_env.Append(LIBS=['boost_program_options'])
-if env['PLATFORM']!='darwin':
+if local_env['PLATFORM']!='darwin':
 	local_env.Append(LIBS=['rt'])
 
 program=local_env.Program("master",["master.cpp"])
