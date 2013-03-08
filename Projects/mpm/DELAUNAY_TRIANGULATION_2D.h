@@ -9,6 +9,7 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 namespace PhysBAM{
 template<class T>
 class DELAUNAY_TRIANGULATION_2D
@@ -19,7 +20,8 @@ public:
     DELAUNAY_TRIANGULATION_2D(){}
     ~DELAUNAY_TRIANGULATION_2D(){}
 
-    static void Triangulate(const ARRAY_VIEW<TV>& X,ARRAY<E>& elements,const T threshold=(T)99999);
+    static void Triangulate(const ARRAY_VIEW<TV>& X,TRIANGULATED_AREA<T>& ta,const T length_max=(T)99999,const T theta_min=-(T)1.0);
+    static void Test(const TRIANGULATED_AREA<T>& ta);
 //#####################################################################
 };
 }

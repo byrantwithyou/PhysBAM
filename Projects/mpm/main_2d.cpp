@@ -18,6 +18,7 @@
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/TIMER.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <omp.h>
 #include "TIMING.h"
 #include "VORONOI_2D.h"
@@ -50,8 +51,10 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     bool use_bridson=false;
     bool use_delaunay=false;
     T delaunay_maximum_edge_length=(T)99999;
+    T delaunay_minimum_angle=(T)0;
     sim.xi=(T)0;
     sim.visco_kappa=(T)0;
+    sim.PROFILING=false;
     parse_args.Add("-test",&test_number,"test","test number");
     parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
     parse_args.Add("-dt",&sim.dt,"dt","dt");
@@ -62,7 +65,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-turk",&use_turk,"use turk mesh reconstruction on the fly");
     parse_args.Add("-bridson",&use_bridson,"use bridson mesh reconstruction on the fly");
     parse_args.Add("-delaunay",&use_delaunay,"use delaunay to generate voronoi");
-    parse_args.Add("-delaunay_max_length",&delaunay_maximum_edge_length,"value","triangles with edge longer than this will get deleted");
+    parse_args.Add("-delaunay_maxl",&delaunay_maximum_edge_length,"value","triangles with edge longer than this will get deleted");
+    parse_args.Add("-delaunay_mina",&delaunay_minimum_angle,"value","triangles with angle smaller than this will get deleted");
     parse_args.Add("-stiffness",&ym,"value","scale stiffness");
     parse_args.Add("-poisson_ratio",&pr,"value","poisson's ratio");
     parse_args.Add("-hardening",&sim.xi,"value","harderning coefficient for normal plasticity");
@@ -73,6 +77,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-pn",&particle_count,"value","particle number");
     parse_args.Add("-exclude",&particle_exclude_radius,"value","particle exclude radius when using pn");
     parse_args.Add("-rho",&density_scale,"value","scale object density");
+    parse_args.Add("-profile",&sim.PROFILING,"print out timing statements");
     parse_args.Parse(true);
     parse_args.Parse();
 
@@ -202,9 +207,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
 
-    // MPM particles
-    for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-
     // Greg Turk
     if(use_turk){
         SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV> recons;
@@ -230,12 +232,18 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     // Delaunay Triangulation
     if(use_delaunay){
-        ARRAY<VECTOR<int,3> > delaunay_tris;
-        DELAUNAY_TRIANGULATION_2D<T>::Triangulate(sim.particles.X,delaunay_tris,delaunay_maximum_edge_length);
-        for(int s=0;s<delaunay_tris.m;s++){
-            Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(delaunay_tris(s)(0)),sim.particles.X(delaunay_tris(s)(1))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
-            Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(delaunay_tris(s)(1)),sim.particles.X(delaunay_tris(s)(2))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));
-            Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(delaunay_tris(s)(2)),sim.particles.X(delaunay_tris(s)(0))),VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}}
+        TRIANGULATED_AREA<T> ta;
+        DELAUNAY_TRIANGULATION_2D<T>::Triangulate(sim.particles.X,ta,delaunay_maximum_edge_length,delaunay_minimum_angle);
+        for(int s=0;s<ta.mesh.elements.m;s++){
+            Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(ta.mesh.elements(s)(0)),sim.particles.X(ta.mesh.elements(s)(1))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));
+            Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(ta.mesh.elements(s)(1)),sim.particles.X(ta.mesh.elements(s)(2))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));
+            Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(ta.mesh.elements(s)(2)),sim.particles.X(ta.mesh.elements(s)(0))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}
+        for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+        Flush_Frame<TV>("delaunay triangulation");
+        SEGMENTED_CURVE_2D<T>& boundary_curve=ta.Get_Boundary_Object();
+        for(int s=0;s<boundary_curve.mesh.elements.m;s++) Add_Debug_Object(VECTOR<TV,TV::m>(ta.particles.X.Subset(boundary_curve.mesh.elements(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));
+        for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+        Flush_Frame<TV>("delaunay triangulation boundary");}
     
     // voronoi reconstruction
     if(use_voronoi){
@@ -251,8 +259,10 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             Add_Debug_Particle(sim.rigid_ball(b).center+disp,VECTOR<T,3>(0,0,1));}}
     for(int i=0;i<50;i++) Add_Debug_Particle(TV(-1+i*0.04,sim.ground_level),VECTOR<T,3>(0,0,1));
 
+    // MPM particles
+    for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+
     Flush_Frame<TV>("mpm");
-    exit(0);
 
     for(int f=1;f<2900977;f++){
         TIMING_START;

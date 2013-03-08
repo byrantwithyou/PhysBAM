@@ -92,7 +92,7 @@ public:
     void Print(const char* _name)
     {
         float time=Elapsed();
-        LOG::cout<<std::setw(50)<<_name<<std::setw(6)<<" took "<<std::setw(20)<<time<<std::setw(18)<<" milliseconds"<<std::endl;
+        LOG::cout<<_name<<" took "<<time<<" milliseconds"<<std::endl;
         fflush(stdout);
         Restart();
     }

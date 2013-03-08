@@ -24,12 +24,12 @@ class MPM_SIMULATION
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    static const bool PROFILING=true;
 public:
     enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
     //#################################################################
     // need external input
     //#################################################################
+    bool PROFILING;
     MPM_PARTICLES<TV> particles; // Resize(), X, V, mass, Fe, Fp
     GRID<TV> grid;    
     bool dump_matrix,test_system;
