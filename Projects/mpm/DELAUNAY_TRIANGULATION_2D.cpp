@@ -39,6 +39,8 @@ Triangulate(const ARRAY_VIEW<TV>& X,TRIANGULATED_AREA<T>& ta,const T length_max,
                     elements.Append(E(a,b,c));}}
             trisf.close();}}
     else LOG::cout<<"Delaunay triangulation failed."<<std::endl;
+    if(system("rm pts")) PHYSBAM_FATAL_ERROR();
+    if(system("rm tris")) PHYSBAM_FATAL_ERROR();
     ARRAY<E> filted_elements;
     T length_max2=sqr(length_max);
     T theta_min_converted=theta_min/(T)360*(T)6.28318530717959;
