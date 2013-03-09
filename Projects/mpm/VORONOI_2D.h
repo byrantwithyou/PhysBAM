@@ -36,7 +36,7 @@ public:
     ~VORONOI_2D(){}
 
     void Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& grid);
-    void Initialize_Particles_And_Voronoi_Mesh_From_A_Triangulated_Area(const TRIANGULATED_AREA<T>& triangulated_area,MPM_PARTICLES<TV>& mpm_particles);
+    void Initialize_With_A_Triangulated_Area(const TRIANGULATED_AREA<T>& ta);
     void Initialize_Neighbor_Cells();
     void Build_Association();
     void Build_Segments();

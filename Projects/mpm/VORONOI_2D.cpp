@@ -4,9 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#ifdef USE_GEOMPACK
-#include <geompack.hpp>
-#endif
 #include "TIMING.h"
 #include "VORONOI_2D.h"
 namespace PhysBAM{
@@ -48,12 +45,65 @@ Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& particle_grid)
     Build_Association();
 }
 //#####################################################################
-// Function Initialize_Particles_And_Voronoi_Mesh_From_A_Triangulated_Area
+// Function Initialize_With_A_Triangulated_Area
 //#####################################################################
 template<class T> void VORONOI_2D<T>::
-Initialize_Particles_And_Voronoi_Mesh_From_A_Triangulated_Area(const TRIANGULATED_AREA<T>& triangulated_area,MPM_PARTICLES<TV>& mpm_particles)
+Initialize_With_A_Triangulated_Area(const TRIANGULATED_AREA<T>& ta)
 {
+    // Preprocessing
+    HASHTABLE<TV_INT,bool> triedge2type; // true-boundary,false-interior
+    ARRAY<bool> particle2type(ta.particles.number); // true-boundary,false-interior
+    ARRAY<int> boundary_particles;
+    ARRAY<int> interior_particles;
+    HASHTABLE<int,ARRAY<int> > particle2neighbortris;
     
+    HASHTABLE<TV_INT,int> edge_count;
+    for(int i=0;i<ta.mesh.elements.m;i++){
+        for(int j=0;j<3;j++){
+            int jp1=(j==2)?0:(j+1);
+            int a=ta.mesh.elements(i)(j);
+            particle2neighbortris.Get_Or_Insert(a).Append(i);
+            int b=ta.mesh.elements(i)(jp1);
+            TV_INT edge(min(a,b),max(a,b));
+            if(edge_count.Get_Pointer(edge)==NULL) edge_count.Get_Or_Insert(edge)=1;
+            else edge_count.Get_Or_Insert(edge)++;}}
+    for(typename HASHTABLE<TV_INT,int>::ITERATOR it(edge_count);it.Valid();it.Next()){
+        if(it.Data()==1) triedge2type.Get_Or_Insert(it.Key())=true;
+        else{PHYSBAM_ASSERT(it.Data()==2);triedge2type.Get_Or_Insert(it.Key())=false;}}
+    particle2type.Fill(false);
+    for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(triedge2type);it.Valid();it.Next())
+        if(it.Data()==true) for(int d=0;d<2;d++) particle2type(it.Key()(d))=true;
+    for(int i=0;i<ta.particles.number;i++){
+        if(particle2type(i)) boundary_particles.Append(i);
+        else interior_particles.Append(i);}
+    for(int i=0;i<interior_particles.m;i++){
+        int p=interior_particles(i);
+        ARRAY<int> unsorted_neighbors=particle2neighbortris.Get_Or_Insert(p);
+        int original_size=unsorted_neighbors.m;
+        ARRAY<int> sorted_neighbors;
+        int selection=unsorted_neighbors(0);
+        sorted_neighbors.Append(selection);
+        int id=unsorted_neighbors.Find(selection);
+        unsorted_neighbors.Remove_Index_Lazy(id);
+        while(unsorted_neighbors.m!=0){
+            for(int k=0;k<unsorted_neighbors.m;k++){
+                ARRAY<int> common;
+                common.Find_Common_Elements(ta.mesh.elements(selection),ta.mesh.elements(unsorted_neighbors(k)));
+                PHYSBAM_ASSERT(common.m<=2); // sanity check
+                if(common.m==2){
+                    selection=unsorted_neighbors(k);
+                    sorted_neighbors.Append(selection);
+                    unsorted_neighbors.Remove_Index_Lazy(k);
+                    break;}}}
+        PHYSBAM_ASSERT(sorted_neighbors.m==original_size); // sanity check
+        // sanity check
+        for(int j=0;j<sorted_neighbors.m;j++){
+            int jp1=(j==sorted_neighbors.m-1)?0:(j+1);
+            ARRAY<int> common;
+            common.Find_Common_Elements(ta.mesh.elements(sorted_neighbors(j)),ta.mesh.elements(sorted_neighbors(jp1)));
+            PHYSBAM_ASSERT(common.m==2);}
+        particle2neighbortris.Get_Or_Insert(p)=sorted_neighbors;}
+            
 
 }
 //#####################################################################
