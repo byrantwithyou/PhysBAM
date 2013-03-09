@@ -103,8 +103,6 @@ Initialize_With_A_Triangulated_Area(const TRIANGULATED_AREA<T>& ta)
             common.Find_Common_Elements(ta.mesh.elements(sorted_neighbors(j)),ta.mesh.elements(sorted_neighbors(jp1)));
             PHYSBAM_ASSERT(common.m==2);}
         particle2neighbortris.Get_Or_Insert(p)=sorted_neighbors;}
-            
-
 }
 //#####################################################################
 // Function Initialize_Neighbor_Cells

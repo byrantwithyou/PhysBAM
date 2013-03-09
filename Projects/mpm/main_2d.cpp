@@ -302,6 +302,29 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
 int main(int argc,char *argv[])
 {
+    // TRIANGULATED_AREA<double> ta;
+    // ta.Clean_Memory();
+    // ta.particles.Delete_All_Elements();
+    // ta.particles.Add_Elements(12);
+    // ta.mesh.number_nodes=12;
+    // ta.mesh.elements.Exact_Resize(13);
+    // ta.mesh.elements(0).Set(4,3,8);
+    // ta.mesh.elements(1).Set(3,7,8);
+    // ta.mesh.elements(2).Set(1,6,3);
+    // ta.mesh.elements(3).Set(2,1,3);
+    // ta.mesh.elements(4).Set(0,1,2);
+    // ta.mesh.elements(5).Set(4,8,10);
+    // ta.mesh.elements(6).Set(10,8,9);
+    // ta.mesh.elements(7).Set(8,7,9);
+    // ta.mesh.elements(8).Set(5,4,2);
+    // ta.mesh.elements(9).Set(11,10,4);
+    // ta.mesh.elements(10).Set(5,4,11);
+    // ta.mesh.elements(11).Set(2,4,3);
+    // ta.mesh.elements(12).Set(3,7,6);
+    // VORONOI_2D<double> vr;
+    // vr.Initialize_With_A_Triangulated_Area(ta);
+    // exit(0);
+
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Parse(true);
     Run_Simulation<VECTOR<double,2> >(parse_args);
