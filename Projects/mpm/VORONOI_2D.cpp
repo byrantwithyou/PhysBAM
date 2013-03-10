@@ -50,7 +50,7 @@ Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& particle_grid)
 template<class T> void VORONOI_2D<T>::
 Initialize_With_A_Triangulated_Area(const TRIANGULATED_AREA<T>& ta)
 {
-    // Preprocessing
+    //*** Preprocessing
     HASHTABLE<TV_INT,bool> triedge2type; // true-boundary,false-interior
     ARRAY<bool> particle2type(ta.particles.number); // true-boundary,false-interior
     ARRAY<int> boundary_particles;
@@ -103,6 +103,118 @@ Initialize_With_A_Triangulated_Area(const TRIANGULATED_AREA<T>& ta)
             common.Find_Common_Elements(ta.mesh.elements(sorted_neighbors(j)),ta.mesh.elements(sorted_neighbors(jp1)));
             PHYSBAM_ASSERT(common.m==2);}
         particle2neighbortris.Get_Or_Insert(p)=sorted_neighbors;}
+
+    //*** go through all tris, each tri insert an interior node, build map node<->tri on the fly.
+    HASHTABLE<int,int> tri2node;
+    for(int i=0;i<ta.mesh.elements.m;i++){
+        TV barycenter=TV();
+        for(int d=0;d<3;d++) barycenter+=ta.particles.X(ta.mesh.elements(i)(d));
+        barycenter*=(T)0.3333333333333333;
+        X.Append(barycenter);
+        type.Append(10);
+        tri2node.Get_Or_Insert(i)=X.m-1;}
+
+    //*** go through all triangle edges: if it's an interior edge, insert a face node; if it's a boundary edge, insert a boundary node. build map node<->edge on the fly.
+    HASHTABLE<TV_INT,int> edge2node;
+    for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(triedge2type);it.Valid();it.Next()){
+        TV_INT edge=it.Key();
+        X.Append((T)0.5*(ta.particles.X(edge(0))+ta.particles.X(edge(1))));
+        edge2node.Get_Or_Insert(edge)=X.m-1;
+        if(it.Data()) type.Append(1);
+        else type.Append(100);}
+    
+    //*** go through all boundary partilces, each particle insert an boundary node, build map node<->particle on the fly.
+    HASHTABLE<int,int> particle2node;
+    for(int i=0;i<boundary_particles.m;i++){
+        int p=boundary_particles(i);
+        X.Append(ta.particles.X(p));
+        type.Append(1);
+        particle2node.Get_Or_Insert(p)=X.m-1;}
+            
+    //*** resize polygons to the size of particles.
+    elements.Resize(ta.particles.number);
+
+    //*** for all interior particle p
+    for(int i=0;i<interior_particles.m;i++){
+        int p=interior_particles(i);
+        ARRAY<int>& nt=particle2neighbortris.Get_Or_Insert(p);
+        for(int aa=0;aa<nt.m;aa++){
+            int bb=(aa==nt.m-1)?0:(aa+1);
+            int a=nt(aa),b=nt(bb);
+            ARRAY<int> common;common.Find_Common_Elements(ta.mesh.elements(a),ta.mesh.elements(b));
+            PHYSBAM_ASSERT(common.m==2);
+            TV_INT edge(min(common(0),common(1)),max(common(0),common(1)));
+            elements(p).Append(tri2node.Get_Or_Insert(a));
+            elements(p).Append(edge2node.Get_Or_Insert(edge));}}
+    
+    // tested - good
+    // LOG::cout<<X<<std::endl;
+    // LOG::cout<<type<<std::endl;
+    // LOG::cout<<elements<<std::endl;
+
+    //*** for all boundary particle p
+    for(int i=0;i<boundary_particles.m;i++){
+        int p=boundary_particles(i);
+        ARRAY<int>& nt=particle2neighbortris.Get_Or_Insert(p);
+        HASHTABLE<TV_INT,bool> boundary_edges_share_p;
+        for(int j=0;j<nt.m;j++){
+            int a=ta.mesh.elements(nt(j))(0),b=ta.mesh.elements(nt(j))(1),c=ta.mesh.elements(nt(j))(2);
+            TV_INT edge1=TV_INT(min(a,b),max(a,b)),edge2=TV_INT(min(b,c),max(b,c)),edge3=TV_INT(min(c,a),max(c,a));
+            if(triedge2type.Get_Or_Insert(edge1) && ((a==p) || (b==p))) boundary_edges_share_p.Get_Or_Insert(edge1)=true;
+            if(triedge2type.Get_Or_Insert(edge2) && ((b==p) || (c==p))) boundary_edges_share_p.Get_Or_Insert(edge2)=true;
+            if(triedge2type.Get_Or_Insert(edge3) && ((c==p) || (a==p))) boundary_edges_share_p.Get_Or_Insert(edge3)=true;}
+        PHYSBAM_ASSERT(boundary_edges_share_p.Size()==2);
+        TV_INT e1,e2;
+        int count=0;
+        for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(boundary_edges_share_p);it.Valid();it.Next()){
+            if(count++==0) e1=it.Key();
+            else e2=it.Key();}
+        elements(p).Append(particle2node.Get_Or_Insert(p));
+        elements(p).Append(edge2node.Get_Or_Insert(e1));
+        
+        ARRAY<int> ntlocal=nt;
+        int selection;
+        for(int j=0;j<ntlocal.m;j++){
+            int a=ta.mesh.elements(ntlocal(j))(0),b=ta.mesh.elements(ntlocal(j))(1),c=ta.mesh.elements(ntlocal(j))(2);
+            TV_INT edge1=TV_INT(min(a,b),max(a,b)),edge2=TV_INT(min(b,c),max(b,c)),edge3=TV_INT(min(c,a),max(c,a));
+            if(edge1==e1 || edge2==e1 || edge3==e1){
+                selection=ntlocal(j);
+                break;}}
+        elements(p).Append(tri2node.Get_Or_Insert(selection));
+        
+        int id=ntlocal.Find(selection);
+        ntlocal.Remove_Index_Lazy(id);
+        while(ntlocal.m>0){
+            for(int k=0;k<ntlocal.m;k++){
+                ARRAY<int> common;common.Find_Common_Elements(ta.mesh.elements(selection),ta.mesh.elements(ntlocal(k)));
+                PHYSBAM_ASSERT(common.m==1 || common.m==2);
+                if(common.m==2){
+                    TV_INT edge(min(common(0),common(1)),max(common(0),common(1)));
+                    selection=ntlocal(k);
+                    elements(p).Append(edge2node.Get_Or_Insert(edge));
+                    elements(p).Append(tri2node.Get_Or_Insert(selection));
+                    ntlocal.Remove_Index_Lazy(k);
+                    break;}}}
+        PHYSBAM_ASSERT(ta.mesh.elements(selection)(0)==e2(0) || ta.mesh.elements(selection)(1)==e2(0) || ta.mesh.elements(selection)(2)==e2(0));
+        PHYSBAM_ASSERT(ta.mesh.elements(selection)(0)==e2(1) || ta.mesh.elements(selection)(1)==e2(1) || ta.mesh.elements(selection)(2)==e2(1));
+        elements(p).Append(edge2node.Get_Or_Insert(e2));}
+
+    // tested - good                    
+    // LOG::cout<<"\n"<<X<<std::endl;
+    // LOG::cout<<type<<std::endl;
+    // LOG::cout<<elements<<std::endl;
+
+    //*** insert face nodes to fix stuff
+    HASHTABLE<TV_INT,int> face_fixer;
+    
+                        
+
+
+
+            
+            
+            
+    
 }
 //#####################################################################
 // Function Initialize_Neighbor_Cells
