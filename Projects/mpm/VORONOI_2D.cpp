@@ -206,18 +206,40 @@ Initialize_With_A_Triangulated_Area(const TRIANGULATED_AREA<T>& ta)
 
     //*** insert face nodes to fix stuff
     HASHTABLE<TV_INT,int> face_fixer;
-    
-                        
+    for(int i=0;i<boundary_particles.m;i++){
+        int p=boundary_particles(i);
+        for(int aa=0;aa<elements(p).m;aa++){
+            int bb=(aa==elements(p).m-1)?0:(aa+1);
+            TV_INT edge(min(elements(p)(aa),elements(p)(bb)),max(elements(p)(aa),elements(p)(bb)));
+            if((type(edge(0))==1 && type(edge(1))==1) || (type(edge(0))==1 && type(edge(1))==10) || (type(edge(0))==10 && type(edge(1))==1)){
+                if(face_fixer.Get_Pointer(edge)==NULL){
+                    X.Append((T)0.5*(X(edge(0))+X(edge(1))));
+                    type.Append(100);
+                    face_fixer.Get_Or_Insert(edge)=X.m-1;}}}}
 
+    for(int i=0;i<boundary_particles.m;i++){
+        int p=boundary_particles(i);
+        ARRAY<int> new_elements=elements(p);
+        for(int aa=0;aa<elements(p).m;aa++){
+            int bb=(aa==elements(p).m-1)?0:(aa+1);
+            TV_INT edge(min(elements(p)(aa),elements(p)(bb)),max(elements(p)(aa),elements(p)(bb)));
+            if((type(edge(0))==1 && type(edge(1))==1) || (type(edge(0))==1 && type(edge(1))==10) || (type(edge(0))==10 && type(edge(1))==1)){
+                int f_index=face_fixer.Get_Or_Insert(edge);
+                int id=new_elements.Find(elements(p)(aa));
+                new_elements.Insert(f_index,id+1);}}
+        elements(p)=new_elements;}
+                
 
+    // LOG::cout<<"\n"<<X<<std::endl;
+    // LOG::cout<<type<<std::endl;
+    // LOG::cout<<elements<<std::endl;
 
-            
-            
-            
-    
+    Xm=X;
+    Initialize_Neighbor_Cells();
+    Build_Association();
 }
 //#####################################################################
-// Function Initialize_Neighbor_Cells
+// function Initialize_Neighbor_Cells
 //#####################################################################
 template<class T> void VORONOI_2D<T>::
 Initialize_Neighbor_Cells()

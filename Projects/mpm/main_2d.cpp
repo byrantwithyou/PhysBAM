@@ -95,7 +95,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.dirichlet_velocity.Append(TV(0.2,0));
             sim.dirichlet_box.Append(RANGE<TV>(TV(-0.25,-0.15),TV(-0.16,0.15)));
             sim.dirichlet_velocity.Append(TV(-0.2,0));
-            if(use_voronoi) voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
             break;
         case 2: // shit fall
             sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
@@ -106,7 +105,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.rigid_ball_velocity.Append(TV());
             sim.rigid_ball.Append(SPHERE<TV>(TV(0.09,-0.3),0.03));
             sim.rigid_ball_velocity.Append(TV());
-            if(use_voronoi) voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))));
             break;
         case 3: // snow fall
             sim.grid.Initialize(TV_INT(1*grid_res+1,1*grid_res+1),RANGE<TV>(TV(-0.5,-0.7),TV(0.5,0.3)));
@@ -137,7 +135,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.dirichlet_velocity.Append(TV());
             sim.rigid_ball.Append(SPHERE<TV>(TV(-0.1,0.25),0.05));
             sim.rigid_ball_velocity.Append(TV(50,0));
-            if(use_voronoi) voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.1*particle_res+1,0.5*particle_res+1),RANGE<TV>(TV(0,0),TV(0.1,0.5))));
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -231,8 +228,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}
 
     // Delaunay Triangulation
+    TRIANGULATED_AREA<T> ta;
     if(use_delaunay){
-        TRIANGULATED_AREA<T> ta;
         DELAUNAY_TRIANGULATION_2D<T>::Triangulate(sim.particles.X,ta,delaunay_maximum_edge_length,delaunay_minimum_angle);
         for(int s=0;s<ta.mesh.elements.m;s++){
             Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(ta.mesh.elements(s)(0)),sim.particles.X(ta.mesh.elements(s)(1))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));
@@ -247,9 +244,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     
     // voronoi reconstruction
     if(use_voronoi){
-        voronoi.Build_Boundary_Segments();
-        for(int s=0;s<voronoi.boundary_segments.m;s++){
-            Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.boundary_segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
+        voronoi.Initialize_With_A_Triangulated_Area(ta);
+        voronoi.Build_Segments();
+        for(int s=0;s<voronoi.segments.m;s++){
+            Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}
+        for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+        Flush_Frame<TV>("voronoi cells");}
 
     // collision objects
     for(int b=0;b<sim.rigid_ball.m;b++){
@@ -280,13 +280,13 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
             // voronoi reconstruction
             if(use_voronoi){
-                voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1000.0);
+                voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.3);
                 voronoi.Build_Association();
-                voronoi.Build_Boundary_Segments();
+                voronoi.Build_Segments();
                 voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp);
-                for(int s=0;s<voronoi.boundary_segments.m;s++){
-                    int i,j;voronoi.boundary_segments(s).Get(i,j);
-                    Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.boundary_segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
+                for(int s=0;s<voronoi.segments.m;s++){
+                    int i,j;voronoi.segments(s).Get(i,j);
+                    Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
             
             // collision objects
             for(int b=0;b<sim.rigid_ball.m;b++){
@@ -302,40 +302,43 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
 int main(int argc,char *argv[])
 {
-    TRIANGULATED_AREA<double> ta;
-    ta.Clean_Memory();
-    ta.particles.Delete_All_Elements();
-    ta.particles.Add_Elements(12);
-    ta.particles.X(0)=VECTOR<double,2>(6,1);
-    ta.particles.X(1)=VECTOR<double,2>(8,2);
-    ta.particles.X(2)=VECTOR<double,2>(4,2);
-    ta.particles.X(3)=VECTOR<double,2>(8,4);
-    ta.particles.X(4)=VECTOR<double,2>(4,4);
-    ta.particles.X(5)=VECTOR<double,2>(1,3);
-    ta.particles.X(6)=VECTOR<double,2>(10,5);
-    ta.particles.X(7)=VECTOR<double,2>(9,9);
-    ta.particles.X(8)=VECTOR<double,2>(7,7);
-    ta.particles.X(9)=VECTOR<double,2>(5,10);
-    ta.particles.X(10)=VECTOR<double,2>(3,8);
-    ta.particles.X(11)=VECTOR<double,2>(2,6);
-    ta.mesh.number_nodes=12;
-    ta.mesh.elements.Exact_Resize(13);
-    ta.mesh.elements(0).Set(4,3,8);
-    ta.mesh.elements(1).Set(3,7,8);
-    ta.mesh.elements(2).Set(1,6,3);
-    ta.mesh.elements(3).Set(2,1,3);
-    ta.mesh.elements(4).Set(0,1,2);
-    ta.mesh.elements(5).Set(4,8,10);
-    ta.mesh.elements(6).Set(10,8,9);
-    ta.mesh.elements(7).Set(8,7,9);
-    ta.mesh.elements(8).Set(5,4,2);
-    ta.mesh.elements(9).Set(11,10,4);
-    ta.mesh.elements(10).Set(5,4,11);
-    ta.mesh.elements(11).Set(2,4,3);
-    ta.mesh.elements(12).Set(3,7,6);
-    VORONOI_2D<double> vr;
-    vr.Initialize_With_A_Triangulated_Area(ta);
-    exit(0);
+    // TRIANGULATED_AREA<double> ta;
+    // ta.Clean_Memory();
+    // ta.particles.Delete_All_Elements();
+    // ta.particles.Add_Elements(12);
+    // ta.particles.X(0)=VECTOR<double,2>(6,1);
+    // ta.particles.X(1)=VECTOR<double,2>(8,2);
+    // ta.particles.X(2)=VECTOR<double,2>(4,2);
+    // ta.particles.X(3)=VECTOR<double,2>(8,4);
+    // ta.particles.X(4)=VECTOR<double,2>(4,4);
+    // ta.particles.X(5)=VECTOR<double,2>(1,3);
+    // ta.particles.X(6)=VECTOR<double,2>(10,5);
+    // ta.particles.X(7)=VECTOR<double,2>(9,9);
+    // ta.particles.X(8)=VECTOR<double,2>(7,7);
+    // ta.particles.X(9)=VECTOR<double,2>(5,10);
+    // ta.particles.X(10)=VECTOR<double,2>(3,8);
+    // ta.particles.X(11)=VECTOR<double,2>(2,6);
+    // ta.mesh.number_nodes=12;
+    // ta.mesh.elements.Exact_Resize(13);
+    // ta.mesh.elements(0).Set(4,3,8);
+    // ta.mesh.elements(1).Set(3,7,8);
+    // ta.mesh.elements(2).Set(1,6,3);
+    // ta.mesh.elements(3).Set(2,1,3);
+    // ta.mesh.elements(4).Set(0,1,2);
+    // ta.mesh.elements(5).Set(4,8,10);
+    // ta.mesh.elements(6).Set(10,8,9);
+    // ta.mesh.elements(7).Set(8,7,9);
+    // ta.mesh.elements(8).Set(5,4,2);
+    // ta.mesh.elements(9).Set(11,10,4);
+    // ta.mesh.elements(10).Set(5,4,11);
+    // ta.mesh.elements(11).Set(2,4,3);
+    // ta.mesh.elements(12).Set(3,7,6);
+    // VORONOI_2D<double> vr;
+    // vr.Initialize_With_A_Triangulated_Area(ta);
+    // exit(0);
+
+    // ./mpm_2d -test 4 -gres 32 -pn 400000 -exclude 0.01 -delaunay -delaunay_maxl 0.03 -delaunay_mina 10 -voronoi -dt 1e-4 -fj 50
+
 
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Parse(true);
