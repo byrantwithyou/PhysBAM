@@ -284,6 +284,36 @@ public:
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);T_MATRIX matrix((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
     for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) matrix(i,j)=-(*this)(i,j);return matrix;}
 
+    T Trace() const
+    {assert(m==n);T trace=0;for(int i=0;i<Columns();i++) trace+=(*this)(i,i);return trace;}
+
+    template<class T_VECTOR>
+    MATRIX_MXN<T> Permute_Columns(const ARRAY_BASE<int,T_VECTOR>& p) const
+    {assert(n==p.m);T_MATRIX x((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());for(int i=0;i<Rows();i++) for(int j=0;j<Columns();j++) x(i,j)=(*this)(i,p(j));return x;}
+
+    template<class T_VECTOR>
+    MATRIX_MXN<T> Unpermute_Columns(const ARRAY_BASE<int,T_VECTOR>& p) const
+    {assert(n==p.m);T_MATRIX x((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());for(int i=0;i<Rows();i++) for(int j=0;j<Columns();j++) x(i,p(j))=(*this)(i,j);return x;}
+
+    template<class T_VECTOR1,class T_VECTOR2>
+    static MATRIX_MXN<T> Outer_Product(const ARRAY_BASE<T,T_VECTOR1> u,const ARRAY_BASE<T,T_VECTOR2> v)
+    {MATRIX_MXN<T> result(u.m,v.m);for(int i=0;i<u.m;i++) for(int j=0;j<v.m;j++) result(i,j)=u(i)*v(j);return result;}
+
+    template<class T_VECTOR1,class T_VECTOR2>
+    void Gauss_Seidel_Single_Iteration(ARRAY_BASE<T,T_VECTOR1>& x,const ARRAY_BASE<T,T_VECTOR2>& b) const
+    {assert(m==n && x.m==b.m && x.m==n);
+    for(int i=0;i<Columns();i++){
+        T rho=0;
+        for(int j=0;j<i;j++) rho+=(*this)(i,j)*x(j);
+        for(int j=i+1;j<Columns();j++) rho+=(*this)(i,j)*x(j);
+        x(i)=(b(i)-rho)/(*this)(i,i);}}
+
+    void Left_Givens_Rotation(const int i,const int j,const T c,const T s)
+    {assert(0<=i && i<j && j<m);for(int k=0;k<Columns();k++){T x=(*this)(i,k);(*this)(i,k)=c*(*this)(i,k)-s*(*this)(j,k);(*this)(j,k)=s*x+c*(*this)(j,k);}}
+    
+    void Right_Givens_Rotation(const int i,const int j,const T c,const T s)
+    {assert(0<=i && i<j && j<n);for(int k=0;k<Rows();k++){T x=(*this)(k,i);(*this)(k,i)=c*(*this)(k,i)-s*(*this)(k,j);(*this)(k,j)=s*x+c*(*this)(k,j);}}
+
     T Max_Abs() const
     {T max_abs=0;for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) max_abs=max(max_abs,abs((*this)(i,j)));return max_abs;}
 
@@ -521,6 +551,10 @@ public:
     void LU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse) const
     {(T_MATRIX2(Derived())).In_Place_LU_Inverse(inverse);}
 
+    template<class T_VECTOR>
+    RIGHT_VECTOR Solve_Linear_System(const ARRAY_BASE<T,T_VECTOR>& b)
+    {return PLU_Solve(b);}
+
 //#####################################################################
     template<class T_MATRIX2> void In_Place_Gram_Schmidt_QR_Factorization(MATRIX_BASE<T,T_MATRIX2>& R); // this=Q
     template<class T_MATRIX2,class T_MATRIX3> void Householder_QR_Factorization(MATRIX_BASE<T,T_MATRIX2>& V,MATRIX_BASE<T,T_MATRIX3>& R);
@@ -529,6 +563,9 @@ public:
     void In_Place_Cholesky_Factorization(); // this=L
     template<class T_MATRIX2> void In_Place_LU_Factorization(MATRIX_BASE<T,T_MATRIX2>& L); // this=U
     int Number_Of_Nonzero_Rows(const T threshold) const;
+    void Jacobi_Singular_Value_Decomposition(ARRAY<VECTOR<int,2> >& left_givens_pairs,ARRAY<VECTOR<T,2> >& left_givens_coefficients,
+        ARRAY<VECTOR<int,2> >& right_givens_pairs,ARRAY<VECTOR<T,2> >& right_givens_coefficients,const T tolerance=(T)1e-10,
+        const int max_iterations=1000000);
 //#####################################################################
 };
 template<class T,class T_MATRIX> inline std::ostream& operator<<(std::ostream& output_stream,const MATRIX_BASE<T,T_MATRIX>& A)

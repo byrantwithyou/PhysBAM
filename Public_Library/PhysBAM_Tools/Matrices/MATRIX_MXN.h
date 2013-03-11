@@ -131,9 +131,6 @@ public:
     MATRIX_MXN<T>& operator=(const UPPER_TRIANGULAR_MATRIX<T,d>& A)
     {x.Resize(d*d);m=n=d;for(int j=0;j<d;j++) for(int i=0;i<=j;i++) (*this)(i,j)=A(i,j);return *this;}
 
-    T Trace() const
-    {assert(m==n);T trace=0;for(int i=0;i<n;i++) trace+=(*this)(i,i);return trace;}
-
     void Transpose()
     {*this=Transposed();}
 
@@ -152,42 +149,14 @@ public:
     MATRIX_MXN<T> Cross_Product_Matrix_Times(const VECTOR<T,3>& v) const
     {assert(m==3);MATRIX_MXN<T> matrix(3,n);for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(0,i),(*this)(1,i),(*this)(2,i))));return matrix;}
 
-    MATRIX_MXN<T> Permute_Columns(const ARRAY<int>& p) const
-    {assert(n==p.m);MATRIX_MXN<T> x(m,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,j)=(*this)(i,p(j));return x;}
-
-    MATRIX_MXN<T> Unpermute_Columns(const ARRAY<int>& p) const
-    {assert(n==p.m);MATRIX_MXN<T> x(m,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,p(j))=(*this)(i,j);return x;}
-
-    static MATRIX_MXN<T> Outer_Product(const ARRAY<T> u,const ARRAY<T> v)
-    {MATRIX_MXN<T> result(u.m,v.m);for(int i=0;i<u.m;i++) for(int j=0;j<v.m;j++) result(i,j)=u(i)*v(j);return result;}
-
     MATRIX_MXN<T> Normal_Equations_Matrix() const
     {MATRIX_MXN<T> result(n);for(int j=0;j<n;j++) for(int i=j;i<n;i++){T a=0;for(int k=0;k<m;k++) a+=(*this)(k,i)*(*this)(k,j);result(i,j)=result(j,i)=a;}return result;}
 
     ARRAY<T> Normal_Equations_Solve(const ARRAY<T>& b) const
     {MATRIX_MXN<T> A_transpose_A(Normal_Equations_Matrix());ARRAY<T> A_transpose_b(Transpose_Times(b));return A_transpose_A.Cholesky_Solve(A_transpose_b);}
 
-    void Gauss_Seidel_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b) const
-    {assert(m==n && x.m==b.m && x.m==n);
-    for(int i=0;i<n;i++){
-        T rho=0;
-        for(int j=0;j<i;j++) rho+=(*this)(i,j)*x(j);
-        for(int j=i+1;j<n;j++) rho+=(*this)(i,j)*x(j);
-        x(i)=(b(i)-rho)/(*this)(i,i);}}
-
-    void Left_Givens_Rotation(const int i,const int j,const T c,const T s)
-    {assert(0<=i && i<j && j<m);for(int k=0;k<n;k++){T x=(*this)(i,k);(*this)(i,k)=c*(*this)(i,k)-s*(*this)(j,k);(*this)(j,k)=s*x+c*(*this)(j,k);}}
-    
-    void Right_Givens_Rotation(const int i,const int j,const T c,const T s)
-    {assert(0<=i && i<j && j<n);for(int k=0;k<m;k++){T x=(*this)(k,i);(*this)(k,i)=c*(*this)(k,i)-s*(*this)(k,j);(*this)(k,j)=s*x+c*(*this)(k,j);}}
-
     void Append_Row()
     {x.Resize(++m*n);}
-
-//#####################################################################
-    void Jacobi_Singular_Value_Decomposition(ARRAY<VECTOR<int,2> >& left_givens_pairs,ARRAY<VECTOR<T,2> >& left_givens_coefficients,
-        ARRAY<VECTOR<int,2> >& right_givens_pairs,ARRAY<VECTOR<T,2> >& right_givens_coefficients,const T tolerance=(T)1e-10,
-        const int max_iterations=1000000);
 //#####################################################################
 };
 template<class T>

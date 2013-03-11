@@ -189,24 +189,11 @@ public:
     static MATRIX<T,0,1> Cross_Product_Matrix(const VECTOR<T,1>& v)
     {STATIC_ASSERT((m==0 && n==1));return MATRIX<T,0,1>();}
 
-    MATRIX Permute_Columns(const VECTOR<int,n>& p) const
-    {MATRIX x;for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,j)=(*this)(i,p(j));return x;}
-
-    MATRIX Unpermute_Columns(const VECTOR<int,n>& p) const
-    {MATRIX x;for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,p(j))=(*this)(i,j);return x;}
-
-    static MATRIX Outer_Product(const VECTOR<T,m>& u,const VECTOR<T,n>& v)
-    {MATRIX result;for(int i=0;i<m;i++) for(int j=0;j<n;j++) result(i,j)=u(i)*v(j);return result;}
-
     MATRIX<T,n> Normal_Equations_Matrix() const
     {MATRIX<T,n> result;for(int j=0;j<n;j++) for(int i=0;i<n;i++) for(int k=0;k<m;k++) result(i,j)+=(*this)(k,i)*(*this)(k,j);return result;}
 
     VECTOR<T,n> Normal_Equations_Solve(const VECTOR<T,m>& b) const
     {MATRIX<T,n> A_transpose_A(Normal_Equations_Matrix());VECTOR<T,n> A_transpose_b(Transpose_Times(b));return A_transpose_A.Cholesky_Solve(A_transpose_b);}
-
-    template<class T_VECTOR>
-    VECTOR<T,n> Solve_Linear_System(const ARRAY_BASE<T,T_VECTOR>& b)
-    {return PLU_Solve(b);}
 
     T Parallelepiped_Measure() const
     {STATIC_ASSERT(n==1);return sqrt(Frobenius_Norm_Squared());}
