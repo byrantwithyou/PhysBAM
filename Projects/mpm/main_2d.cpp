@@ -47,6 +47,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     T ym=1;
     T pr=(T).3;
     bool use_voronoi=false;
+    bool use_voronoi_boundary=false;
     bool use_turk=false;
     bool use_bridson=false;
     bool use_delaunay=false;
@@ -62,6 +63,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-dump_matrix",&sim.dump_matrix,"dump linear system");
     parse_args.Add("-test_system",&sim.test_system,"test linear system");
     parse_args.Add("-voronoi",&use_voronoi,"use voronoi mesh reconstruction on the fly");
+    parse_args.Add("-voronoib",&use_voronoi_boundary,"use voronoi boundary mesh reconstruction on the fly");
     parse_args.Add("-turk",&use_turk,"use turk mesh reconstruction on the fly");
     parse_args.Add("-bridson",&use_bridson,"use bridson mesh reconstruction on the fly");
     parse_args.Add("-delaunay",&use_delaunay,"use delaunay to generate voronoi");
@@ -250,6 +252,13 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}
         for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
         Flush_Frame<TV>("voronoi cells");}
+    if(use_voronoi_boundary){
+        voronoi.Initialize_With_A_Triangulated_Area(ta);
+        voronoi.Build_Boundary_Segments();
+        for(int s=0;s<voronoi.boundary_segments.m;s++){
+            Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.boundary_segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}
+        for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+        Flush_Frame<TV>("voronoi cell boundary");}
 
     // collision objects
     for(int b=0;b<sim.rigid_ball.m;b++){
@@ -285,8 +294,14 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 voronoi.Build_Segments();
                 voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp);
                 for(int s=0;s<voronoi.segments.m;s++){
-                    int i,j;voronoi.segments(s).Get(i,j);
                     Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
+            if(use_voronoi_boundary){
+                voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.3);
+                voronoi.Build_Association();
+                voronoi.Build_Boundary_Segments();
+                voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp);
+                for(int s=0;s<voronoi.boundary_segments.m;s++){
+                    Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.boundary_segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
             
             // collision objects
             for(int b=0;b<sim.rigid_ball.m;b++){
