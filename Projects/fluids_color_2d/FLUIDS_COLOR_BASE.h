@@ -456,6 +456,19 @@ public:
                 use_level_set_method=true;
                 
                 break;}
+            case 31:{//Test to illustrate issues with extrapolation
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                TV vel=TV::Axis_Vector(0);
+                T x0=(T).2,x1=(T).8;
+                ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x0,TV::Axis_Vector(0),DIRICHLET,0);
+                ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),DIRICHLET,DIRICHLET);
+                analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(vel));
+                use_p_null_mode=true;
+            
+                break;
+            }
+
             default: return false;}
         return true;
     }
