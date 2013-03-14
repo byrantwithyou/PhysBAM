@@ -2,10 +2,11 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include "MPM_PARTICLES.h"
 #include "MPM_PARTICLES_FORWARD.h"
 namespace PhysBAM{
@@ -40,7 +41,7 @@ Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
         TV x=grid.X(it.index);
         sample_X.Append(x);}
-    this->Resize(sample_X.m);
+    Resize(sample_X.m);
     X=sample_X;
     Xm=X;
 }
@@ -57,7 +58,6 @@ Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box,const T 
         rand_generator.Fill_Uniform(x,box);
         sample_X.Append(x);}
     ARRAY<bool> should_go_away(sample_X.m);
-    should_go_away.Fill(false);
     if(exclude_radius<(T)100){
         T exclude_radius2=exclude_radius*exclude_radius;
         HASHTABLE<TV_INT,ARRAY<int> > buckets;
@@ -76,9 +76,41 @@ Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box,const T 
     ARRAY<TV> filted_X;
     for(int i=0;i<sample_X.m;i++)
         if(!should_go_away(i)) filted_X.Append(sample_X(i));
-    this->Resize(filted_X.m);
+    Resize(filted_X.m);
     X=filted_X;
     Xm=X;
+}
+//#####################################################################
+// Function Add_Randomly_Sampled_Object
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Add_Randomly_Sampled_Implicit_Object(const IMPLICIT_OBJECT<TV>& object,const T exclude_radius)
+{
+    const_cast<IMPLICIT_OBJECT<TV>&>(object).Update_Box();
+    RANGE<TV> bounding_box(object.box);
+    TV_INT cells(ceil(bounding_box.Edge_Lengths()/exclude_radius));
+    bounding_box.Scale_About_Center(exclude_radius*TV(cells)/bounding_box.Edge_Lengths());
+    GRID<TV> grid(cells,bounding_box,true);
+    ARRAY<bool,TV_INT> ok(grid.Domain_Indices(1));
+    ARRAY<TV_INT> todo;
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+        if(object.Extended_Phi(it.Location())<=0){
+            ok(it.index)=true;
+            todo.Append(it.index);}
+    rand_generator.Random_Shuffle(todo);
+    RANGE<TV_INT> neigh_index(TV_INT()-1,TV_INT()+2);
+    for(int i=0;i<todo.m;i++){
+        TV_INT index=todo(i);
+        if(!ok(index)) continue;
+        TV new_X;
+        for(int j=0;j<1000;j++){
+            new_X=rand_generator.Get_Uniform_Vector(grid.Cell_Domain(index));
+            if(object.Extended_Phi(new_X)<=0) break;}
+        for(RANGE_ITERATOR<TV::m> it(neigh_index);it.Valid();it.Next())
+            ok(it.index+index)=false;
+        int p=this->Add_Element();
+        X(p)=new_X;
+        Xm(p)=new_X;}
 }
 //#####################################################################
 // Function Initialize_X_As_A_Ball
@@ -93,7 +125,7 @@ Initialize_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_bo
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
         TV x=grid.X(it.index);
         if((x-center).Magnitude()<=r) sample_X.Append(x);}
-    this->Resize(sample_X.m);
+    Resize(sample_X.m);
     X=sample_X;
     Xm=X;
 }
@@ -112,7 +144,7 @@ Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
         TV x=grid.X(it.index);
         sample_X.Append(x);}
     old_X.Append_Elements(sample_X);
-    this->Resize(old_X.m);
+    Resize(old_X.m);
     X=old_X;
     Xm=X;
 }
@@ -131,7 +163,7 @@ Add_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box)
     old_X.Resize(X.m);
     for(int i=0;i<X.m;i++) old_X(i)=X(i);
     old_X.Append_Elements(sample_X);
-    this->Resize(old_X.m);
+    Resize(old_X.m);
     X=old_X;
     Xm=X;
 }
@@ -152,7 +184,7 @@ Add_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box)
         TV x=grid.X(it.index);
         if((x-center).Magnitude()<=r) sample_X.Append(x);}
     old_X.Append_Elements(sample_X);
-    this->Resize(old_X.m);
+    Resize(old_X.m);
     X=old_X;
     Xm=X;
 }
@@ -169,7 +201,7 @@ Reduce_X_In_A_Box(const RANGE<TV>& box)
     for(int i=0;i<old_X.m;i++)
         if(!box.Lazy_Inside(old_X(i)))
             sample_X.Append(old_X(i));
-    this->Resize(sample_X.m);
+    Resize(sample_X.m);
     X=sample_X;
     Xm=X;
 }
@@ -188,7 +220,7 @@ Reduce_X_As_A_Ball(const RANGE<TV>& square_box)
     for(int i=0;i<old_X.m;i++)
         if((old_X(i)-center).Magnitude()>r)
             sample_X.Append(old_X(i));
-    this->Resize(sample_X.m);
+    Resize(sample_X.m);
     X=sample_X;
     Xm=X;
 }
@@ -205,7 +237,7 @@ Reduce_X_Where_Not_In_A_Ball(const SPHERE<TV>& ball)
     for(int i=0;i<old_X.m;i++)
         if(ball.Lazy_Inside(old_X(i)))
             sample_X.Append(old_X(i));
-    this->Resize(sample_X.m);
+    Resize(sample_X.m);
     X=sample_X;
     Xm=X;
 }
@@ -222,7 +254,7 @@ Reduce_X_Where_Not_In_A_Ball_But_In_A_Box(const SPHERE<TV>& ball,const RANGE<TV>
     for(int i=0;i<old_X.m;i++){
         if(!ball.Lazy_Inside(old_X(i)) && box.Lazy_Inside(old_X(i))) continue;
         sample_X.Append(old_X(i));}
-    this->Resize(sample_X.m);
+    Resize(sample_X.m);
     X=sample_X;
     Xm=X;
 }
