@@ -2,6 +2,7 @@
 // Copyright 2002-2003, Robert Bridson, Ron Fedkiw, Eran Guendelman.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Fourier_Transforms/FFT_1D.h>
 #include <PhysBAM_Tools/Fourier_Transforms/FFT_2D.h>
 #include <PhysBAM_Tools/Fourier_Transforms/FFT_3D.h>
 #include <PhysBAM_Tools/Fourier_Transforms/FFT_POLICY.h>
@@ -56,8 +57,10 @@ Generate_Random_Turbulence(const GRID<TV>& grid,VECTOR<ARRAY<T,TV_INT>,TV::m>& u
 }
 //#####################################################################
 namespace PhysBAM{
+template class TURBULENCE<VECTOR<float,1> >;
 template class TURBULENCE<VECTOR<float,2> >;
 template class TURBULENCE<VECTOR<float,3> >;
+template class TURBULENCE<VECTOR<double,1> >;
 template class TURBULENCE<VECTOR<double,2> >;
 template class TURBULENCE<VECTOR<double,3> >;
 }
