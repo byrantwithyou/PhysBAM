@@ -2,30 +2,31 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
+#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
+#include <PhysBAM_Tools/Utilities/TIMER.h>
+#include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
-#include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
-#include <PhysBAM_Tools/Utilities/TIMER.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
-#include <omp.h>
-#include "TIMING.h"
-#include "VORONOI_2D.h"
+#include "DELAUNAY_TRIANGULATION_2D.h"
 #include "MPM_SIMULATION.h"
 #include "SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL.h"
 #include "SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON.h"
-#include "DELAUNAY_TRIANGULATION_2D.h"
+#include "TIMING.h"
+#include "VORONOI_2D.h"
+#include <omp.h>
 using namespace PhysBAM;
 
 template<class TV>
@@ -138,6 +139,16 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.rigid_ball.Append(SPHERE<TV>(TV(-0.1,0.25),0.05));
             sim.rigid_ball_velocity.Append(TV(50,0));
             break;
+        case 6:
+            sim.grid.Initialize(TV_INT(2*grid_res+1,0.5*grid_res+1),RANGE<TV>(TV(-1,-0.25),TV(1,0.25)));
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.5,-0.12),TV(-0.1,0.12)),particle_exclude_radius);
+            sim.particles.V.Fill(TV(20,0));
+//            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.1,-0.12),TV(0.5,0.12)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0.3,0),.2),particle_exclude_radius);
+            sim.particles.Reduce_X_As_A_Ball(SPHERE<TV>(TV(0.3,0),.1).Bounding_Box());
+            sim.particles.V-=TV(10,0);
+            sim.ground_level=-100;
+            break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
     // material setting
@@ -196,6 +207,13 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.yield_min=0.8;
             sim.yield_max=1.2;
             break;
+        case 6:
+            object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)).Size()-SPHERE<TV>(TV(0.1,0),0.04).Size());
+            ym*=(T)5e3;
+            sim.mu.Fill(ym/((T)2*((T)1+pr)));
+            sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
+            sim.use_gravity=false;
+            break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
     for(int p=0;p<sim.particles.number;p++){
         sim.particles.mass(p)=object_mass/sim.particles.number;
@@ -218,16 +236,20 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         recons.Build_Scalar_Field(xbar,sim.particles.mass,density,G,recons_grid,phi);
         T k;std::cin>>k;
         for(int i=0;i<phi.array.m;i++) phi.array(i)-=k;
-        Dump_Levelset(recons_grid,phi,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}
+//        Dump_Levelset(recons_grid,phi,VECTOR<T,3>(0,0,1),VECTOR<T,3>(0,0,1));
+}
 
     // Zhu and Bridson
     SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON<TV> recons_bridson;
-    GRID<TV> recons_bridson_grid(TV_INT(2*1200+1,2*1200+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
+    GRID<TV> recons_bridson_grid(TV_INT()+(grid_res*8+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
     ARRAY<T,TV_INT> phi_bridson;
     if(use_bridson){
-        recons_bridson.Initialize((T)1/(T)particle_res);
+        recons_bridson.Initialize(particle_exclude_radius*2);
         recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,1);
-        Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}
+//        Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(1,0,0));
+        phi_bridson.array+=1;
+//        Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(0,1,0));
+}
 
     // Delaunay Triangulation
     TRIANGULATED_AREA<T> ta;
@@ -285,7 +307,16 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             // Zhu and Bridson
             if(use_bridson){
                 recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,1);
-                Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,0,0));}
+                Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(1,0,0));
+                
+                LEVELSET<TV> ls(recons_bridson_grid,phi_bridson,0);
+                ls.Fast_Marching_Method();
+                phi_bridson.array+=particle_exclude_radius*3;
+                ls.Fast_Marching_Method();
+                phi_bridson.array-=particle_exclude_radius*2;
+                ls.Fast_Marching_Method();
+                Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(0,1,0));
+}
 
             // voronoi reconstruction
             if(use_voronoi){
