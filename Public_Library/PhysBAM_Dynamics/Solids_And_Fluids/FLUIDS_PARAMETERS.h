@@ -7,7 +7,6 @@
 #ifndef __FLUIDS_PARAMETERS__
 #define __FLUIDS_PARAMETERS__
 
-#include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_POLICY.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_POLICY.h>
@@ -25,6 +24,7 @@ template<class T> class FLUIDS_PARAMETERS_CALLBACKS;
 template<class T> class EOS;
 template<class T_GRID,int d> class CONSERVATION;
 template<class TV> class GRID;
+template<class TV> class TURBULENCE;
 template<class TV,class T2> class BOUNDARY_REFLECTION_UNIFORM;
 
 template <class T_GRID>
@@ -35,7 +35,7 @@ class FLUIDS_PARAMETERS:public NONCOPYABLE
     typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
     typedef typename REBIND<T_ADVECTION_SEMI_LAGRANGIAN_SCALAR,TV>::TYPE T_ADVECTION_SEMI_LAGRANGIAN_VECTOR;
     typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_HAMILTON_JACOBI_WENO_SCALAR T_ADVECTION_HAMILTON_JACOBI_WENO_SCALAR;
-    typedef typename TURBULENCE_POLICY<TV>::TURBULENCE T_TURBULENCE;typedef typename INCOMPRESSIBLE_POLICY<T_GRID>::INCOMPRESSIBLE T_INCOMPRESSIBLE;
+    typedef typename INCOMPRESSIBLE_POLICY<T_GRID>::INCOMPRESSIBLE T_INCOMPRESSIBLE;
     typedef BOUNDARY_PHI_WATER<TV> T_BOUNDARY_PHI_WATER;
     typedef BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV> T_BOUNDARY_MAC_GRID_SOLID_WALL_SLIP;
     typedef BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> > T_BOUNDARY_SYMMETRIC_MATRIX;
@@ -97,7 +97,7 @@ public:
     T turbulence_lowest_angular_frequency;
     int turbulence_update_frame_rate;
     GRID<TV> turbulence_grid;
-    T_TURBULENCE& turbulence;
+    TURBULENCE<TV>& turbulence;
     bool use_external_velocity;
     bool use_soot,use_density,use_temperature;
     bool use_fixed_soot_boundary,use_fixed_density_boundary,use_fixed_temperature_boundary;

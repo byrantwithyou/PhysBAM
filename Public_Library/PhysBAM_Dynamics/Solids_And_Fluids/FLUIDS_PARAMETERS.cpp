@@ -2,9 +2,7 @@
 // Copyright 2004-2008, Eran Guendelman, Geoffrey Irving, Nipun Kwatra, Michael Lentine, Frank Losasso, Avi Robinson-Mosher, Andrew Selle, Tamar Shinar, Jonathan Su, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_1D.h>
-#include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_2D.h>
-#include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_3D.h>
+#include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
@@ -48,7 +46,7 @@ FLUIDS_PARAMETERS(const TYPE type)
     confinement_parameter((T).05),confinement_parameter_fuel((T)1.2),
     use_non_zero_divergence(false),
     second_order_cut_cell_method(false),enforce_divergence_free_extrapolation(false),solve_neumann_regions(true),solve_single_cell_neumann_regions(false),evolution_solver_type(krylov_solver_cg),
-    kolmogorov((T)0),turbulence_lowest_angular_frequency(16),turbulence_update_frame_rate(20),turbulence(*new T_TURBULENCE),
+    kolmogorov((T)0),turbulence_lowest_angular_frequency(16),turbulence_update_frame_rate(20),turbulence(*new TURBULENCE<TV>),
     use_external_velocity(false),
     use_soot(false),use_density(true),use_temperature(true),
     use_fixed_soot_boundary(true),use_fixed_density_boundary(true),use_fixed_temperature_boundary(true),

@@ -28,15 +28,15 @@ template<class T> class COMPLEX;
 template<class T>
 class FFT_3D
 {
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     GRID<TV> grid;
 private:
     // for fftw
     typedef typename IF<IS_SAME<T,float>::value,fftwf_plan_s*,fftw_plan_s*>::TYPE T_FFTW_PLAN;
-    mutable ARRAY<COMPLEX<T> ,VECTOR<int,3> > u_hat_copy;
+    mutable ARRAY<COMPLEX<T>,TV_INT> u_hat_copy;
     mutable T_FFTW_PLAN plan_u_to_u_hat,plan_u_hat_to_u;
-    mutable VECTOR<int,3> plan_u_to_u_hat_counts,plan_u_hat_to_u_counts;
+    mutable TV_INT plan_u_to_u_hat_counts,plan_u_hat_to_u_counts;
     // for NR
     mutable ARRAY<float> data; // array of complex numbers
 public:
@@ -44,16 +44,18 @@ public:
     FFT_3D(const GRID<TV>& grid_input);
     ~FFT_3D();
 
-    void Inverse_Transform(const ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<T,VECTOR<int,3> >& u,bool normalize=true) const
-    {Inverse_Transform(const_cast<ARRAY<COMPLEX<T> ,VECTOR<int,3> >&>(u_hat),u,normalize,true);}
+    void Inverse_Transform(const ARRAY<COMPLEX<T>,TV_INT>& u_hat,ARRAY<T,TV_INT>& u,bool normalize=true) const
+    {Inverse_Transform(const_cast<ARRAY<COMPLEX<T>,TV_INT>&>(u_hat),u,normalize,true);}
 
 //#####################################################################
-    void Transform(const ARRAY<T,VECTOR<int,3> >& u,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat) const;
-    void Inverse_Transform(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<T,VECTOR<int,3> >& u,bool normalize=true,bool preserve_u_hat=true) const;
-    void Enforce_Real_Valued_Symmetry(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat) const;
-    void First_Derivatives(const ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& ux_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& uy_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& uz_hat) const;
-    void Make_Divergence_Free(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& v_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& w_hat) const;
-    void Filter_High_Frequencies(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,T scale=(T)1) const;
+    void Transform(const ARRAY<T,TV_INT>& u,ARRAY<COMPLEX<T>,TV_INT>& u_hat) const;
+    void Inverse_Transform(ARRAY<COMPLEX<T>,TV_INT>& u_hat,ARRAY<T,TV_INT>& u,bool normalize=true,bool preserve_u_hat=true) const;
+    void Enforce_Real_Valued_Symmetry(ARRAY<COMPLEX<T>,TV_INT>& u_hat) const;
+    void First_Derivatives(const ARRAY<COMPLEX<T>,TV_INT>& u_hat,ARRAY<COMPLEX<T>,TV_INT>& ux_hat,ARRAY<COMPLEX<T>,TV_INT>& uy_hat,ARRAY<COMPLEX<T>,TV_INT>& uz_hat) const;
+    void Make_Divergence_Free(ARRAY<COMPLEX<T>,TV_INT>& u_hat,ARRAY<COMPLEX<T>,TV_INT>& v_hat,ARRAY<COMPLEX<T>,TV_INT>& w_hat) const;
+    void Make_Divergence_Free(VECTOR<ARRAY<COMPLEX<T>,TV_INT>,TV::m>& u_hat) const
+    {Make_Divergence_Free(u_hat.x,u_hat.y,u_hat.z);}
+    void Filter_High_Frequencies(ARRAY<COMPLEX<T>,TV_INT>& u_hat,T scale=(T)1) const;
 //#####################################################################
 };
 }

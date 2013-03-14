@@ -5,9 +5,7 @@
 // Class FLUIDS_PARAMETERS_UNIFORM
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_1D.h>
-#include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_2D.h>
-#include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_3D.h>
+#include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
