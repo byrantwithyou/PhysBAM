@@ -52,6 +52,9 @@ public:
     template<class TV> void Fill_Uniform(TV& X,const RANGE<TV>& box)
     {X=Get_Uniform_Vector<TV>(box);}
 
+    template<class T2,class T_ARRAY,class ID> void Random_Shuffle(ARRAY_BASE<T2,T_ARRAY,ID>& array)
+    {T_ARRAY& derived=array.Derived();for(ID i(derived.Size()-1);i>=ID(0);i--) exchange(array(i),array(Get_Uniform_Integer(0,i+1)));}
+
 //#####################################################################
     void Set_Seed(const unsigned int seed_input=time(0));
     int Get_Uniform_Integer(const int a,const int b);
