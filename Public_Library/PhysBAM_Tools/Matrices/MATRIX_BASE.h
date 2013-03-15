@@ -285,15 +285,15 @@ public:
     for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) matrix(i,j)=-(*this)(i,j);return matrix;}
 
     T Trace() const
-    {assert(m==n);T trace=0;for(int i=0;i<Columns();i++) trace+=(*this)(i,i);return trace;}
+    {assert(Rows()==Columns());T trace=0;for(int i=0;i<Columns();i++) trace+=(*this)(i,i);return trace;}
 
     template<class T_VECTOR>
     T_MATRIX Permute_Columns(const ARRAY_BASE<int,T_VECTOR>& p) const
-    {assert(n==p.Size());T_MATRIX x((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());for(int i=0;i<Rows();i++) for(int j=0;j<Columns();j++) x(i,j)=(*this)(i,p(j));return x;}
+    {assert(Columns()==p.Size());T_MATRIX x((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());for(int i=0;i<Rows();i++) for(int j=0;j<Columns();j++) x(i,j)=(*this)(i,p(j));return x;}
 
     template<class T_VECTOR>
     T_MATRIX Unpermute_Columns(const ARRAY_BASE<int,T_VECTOR>& p) const
-    {assert(n==p.Size());T_MATRIX x((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());for(int i=0;i<Rows();i++) for(int j=0;j<Columns();j++) x(i,p(j))=(*this)(i,j);return x;}
+    {assert(Columns()==p.Size());T_MATRIX x((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());for(int i=0;i<Rows();i++) for(int j=0;j<Columns();j++) x(i,p(j))=(*this)(i,j);return x;}
 
     template<class T_VECTOR1,class T_VECTOR2>
     static T_MATRIX Outer_Product(const ARRAY_BASE<T,T_VECTOR1>& u,const ARRAY_BASE<T,T_VECTOR2>& v)
@@ -301,7 +301,7 @@ public:
 
     template<class T_VECTOR1,class T_VECTOR2>
     void Gauss_Seidel_Single_Iteration(ARRAY_BASE<T,T_VECTOR1>& x,const ARRAY_BASE<T,T_VECTOR2>& b) const
-    {assert(m==n && x.Size()==b.Size() && x.Size()==n);
+    {assert(Rows()==Columns() && x.Size()==b.Size() && x.Size()==Columns());
     for(int i=0;i<Columns();i++){
         T rho=0;
         for(int j=0;j<i;j++) rho+=(*this)(i,j)*x(j);
@@ -309,10 +309,10 @@ public:
         x(i)=(b(i)-rho)/(*this)(i,i);}}
 
     void Left_Givens_Rotation(const int i,const int j,const T c,const T s)
-    {assert(0<=i && i<j && j<m);for(int k=0;k<Columns();k++){T x=(*this)(i,k);(*this)(i,k)=c*(*this)(i,k)-s*(*this)(j,k);(*this)(j,k)=s*x+c*(*this)(j,k);}}
+    {assert(0<=i && i<j && j<Rows());for(int k=0;k<Columns();k++){T x=(*this)(i,k);(*this)(i,k)=c*(*this)(i,k)-s*(*this)(j,k);(*this)(j,k)=s*x+c*(*this)(j,k);}}
     
     void Right_Givens_Rotation(const int i,const int j,const T c,const T s)
-    {assert(0<=i && i<j && j<n);for(int k=0;k<Rows();k++){T x=(*this)(k,i);(*this)(k,i)=c*(*this)(k,i)-s*(*this)(k,j);(*this)(k,j)=s*x+c*(*this)(k,j);}}
+    {assert(0<=i && i<j && j<Columns());for(int k=0;k<Rows();k++){T x=(*this)(k,i);(*this)(k,i)=c*(*this)(k,i)-s*(*this)(k,j);(*this)(k,j)=s*x+c*(*this)(k,j);}}
 
     T Max_Abs() const
     {T max_abs=0;for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) max_abs=max(max_abs,abs((*this)(i,j)));return max_abs;}
