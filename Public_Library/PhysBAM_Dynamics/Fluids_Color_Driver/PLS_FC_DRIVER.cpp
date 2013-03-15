@@ -2,6 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
@@ -44,7 +45,7 @@ namespace{
 //#####################################################################
 template<class TV> PLS_FC_DRIVER<TV>::
 PLS_FC_DRIVER(PLS_FC_EXAMPLE<TV>& example)
-:example(example)
+    :example(example)
 {
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }
@@ -72,12 +73,12 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Initialize()
 {
     DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.substeps_delay_frame<0?example.write_substeps_level:-1);
-    
+
     // setup time
     current_frame=example.restart;
     output_number=current_frame;
     example.time=time=example.time_steps_per_frame*current_frame*example.dt;
-    
+
     example.levelset_color.phi.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
     example.levelset_color.color.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
     example.face_color.Resize(example.grid,example.number_of_ghost_cells);
@@ -151,10 +152,10 @@ Update_Pls(T dt)
         int c=example.face_color(it.Full_Index());
         if(c<0) continue;
         maximum_fluid_speed=max(maximum_fluid_speed,abs(example.face_velocities(c)(it.Full_Index())));}
-    
+
     T max_particle_collision_distance=example.particle_levelset_evolution_multiple.Particle_Levelset(0).max_collision_distance_factor*example.grid.dX.Max();
     example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_fluid_speed+2*max_particle_collision_distance+(T).5*example.grid.dX.Max(),10);
-    
+
     LOG::Time("Fill ghost");
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before PLS phi advection",0,1);
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,example.number_of_ghost_cells);
@@ -170,7 +171,7 @@ Update_Pls(T dt)
     example.particle_levelset_evolution_multiple.particle_levelset_multiple.Euler_Step_Particles(face_velocities_ghost,dt,time,true,true,false);
 
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle advection",0,1);
-    
+
     LOG::Time("updating removed particle velocities");
     example.Make_Levelsets_Consistent();
 
@@ -198,7 +199,7 @@ Update_Pls(T dt)
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Delete_Particles_Far_From_Interface(); // uses visibility
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 3",0,1);
-    
+
     LOG::Time("re-incorporating removed particles");
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,5,time+dt);
@@ -216,10 +217,10 @@ Advance_One_Time_Step(bool first_step)
     example.Begin_Time_Step(time);
     T dt=example.dt;
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before levelset evolution",0,1);
-    
+
     if(example.use_level_set_method) Update_Level_Set(dt,first_step);
     else if(example.use_pls) Update_Pls(dt);
-    
+
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before velocity advection",0,1);
     Extrapolate_Velocity(example.face_velocities,example.face_color);
     Advection_And_BDF(dt,first_step);
@@ -298,8 +299,7 @@ Reduced_Advection_And_BDF(T dt,bool first_step,int c)
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp,lookup_prev_face_velocities,lookup_prev_face_velocities,boundary,2*dt,time+dt);
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
         example.prev_face_velocities(c).Copy((T)2/(T)1.5,example.prev_face_velocities(c),-(T).5/(T)1.5,temp);}
-    else{
-        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);}
+    else quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
 }
 //#####################################################################
 // Function Advection_And_BDF
@@ -323,10 +323,7 @@ RK2_Advection_And_BDF(T dt,bool first_step,int c)
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp4,lookup_face_velocities,lookup_temp2,boundary,dt,time+dt);
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp5,lookup_prev_face_velocities,lookup_temp3,boundary,2*dt,time+dt);
         example.prev_face_velocities(c).Copy((T)2/(T)1.5,temp4,-(T).5/(T)1.5,temp5);}
-    else{
-        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
-    }
-    
+    else quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
 }
 //#####################################################################
 // Function Apply_Pressure_And_Viscosity
@@ -347,23 +344,23 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     bccl.time=time+dt;
     bccl.dt=dt;
     bccl.use_discontinuous_velocity=example.use_discontinuous_velocity;
-    
+
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color,true);
     iss.use_preconditioner=example.use_preconditioner;
     iss.use_p_null_mode=example.use_p_null_mode;
     ARRAY<T> system_inertia=example.rho,dt_mu(example.mu*dt);
     if(!first_step) system_inertia*=(T)1.5;
     iss.Set_Matrix(dt_mu,example.wrap,&bccl,&system_inertia,&system_inertia);
-    
+
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
     for(int c=0;c<iss.cdi->colors;c++) printf("p%d [%i]\t",c,iss.cm_p->dofs(c));printf("\n");
     printf("qn [%i]\t",iss.cdi->constraint_base_n);
     printf("qt [%i] ",iss.cdi->constraint_base_t);
     printf("\n");
-    
+
     INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> rhs,sol;
-    
+
     struct VOLUME_FORCE_COLOR_LOCAL:public VOLUME_FORCE_COLOR<TV>
     {
         PLS_FC_EXAMPLE<TV>* example;
@@ -373,14 +370,14 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     vfcl.example=&example;
     vfcl.time=time+dt;
     vfcl.dt=dt;
-    
+
     iss.Set_RHS(rhs,&vfcl,&example.face_velocities,false);
     iss.Resize_Vector(sol);
-    
+
     MINRES<T> mr;
     KRYLOV_SOLVER<T>* solver=&mr;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
-    
+
     if(example.dump_matrix){
         KRYLOV_SOLVER<T>::Ensure_Size(vectors,rhs,2);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%d.txt",solve_id).c_str()).Write("M",iss,*vectors(0),*vectors(1));
@@ -388,7 +385,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%d.txt",solve_id).c_str()).Write_Projection("P",iss,*vectors(0));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
-    
+
     if(example.dump_matrix){
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%d.txt",solve_id).c_str()).Write("x",sol);}
     if(example.dump_largest_eigenvector) Dump_Largest_Eigenvector(iss,vectors);
@@ -396,11 +393,11 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     iss.Multiply(sol,*vectors(0));
     *vectors(0)-=rhs;
     LOG::cout<<"Residual: "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
-    
+
     for(int i=0;i<iss.null_modes.m;i++){
         iss.Multiply(*iss.null_modes(i),*vectors(0));
         LOG::cout<<"null mode["<<i<<"] "<<iss.Convergence_Norm(*vectors(0))<<std::endl;}
-    
+
     for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         int c=example.levelset_color.Color(it.Location());
         example.face_color(it.Full_Index())=c;
@@ -408,11 +405,11 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         int k=iss.cm_u(it.Axis())->Get_Index(it.index,c);
         assert(k>=0);
         example.face_velocities(c)(it.Full_Index())=sol.u(it.Axis())(c)(k);}
-    
+
     for(FACE_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
     vectors.Delete_Pointers_And_Clean_Memory();
-    
+
     for(int c=0;c<example.face_velocities.m;c++){
         example.boundary.Apply_Boundary_Condition_Face(example.grid,example.face_velocities(c),time+example.dt);
         example.boundary.Fill_Ghost_Faces(example.grid,example.face_velocities(c),example.face_velocities(c),0,example.number_of_ghost_cells);}
@@ -430,13 +427,13 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE
             u(it.Full_Index())=1e20;
     for(FACE_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         u(it.Full_Index())=1e20;
-    
+
     const LEVELSET<TV>& phi=*example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(c);
     EXTRAPOLATION_HIGHER_ORDER<TV,T> eho(example.grid,phi,example.number_of_ghost_cells*10,3,example.number_of_ghost_cells);
     eho.periodic=true;
-    
+
     eho.Extrapolate_Face([&](const FACE_INDEX<TV::m>& index){return color(index)==c;},u);
-    
+
     example.boundary.Apply_Boundary_Condition_Face(example.grid,u,time+example.dt);
     example.boundary.Fill_Ghost_Faces(example.grid,u,u,0,example.number_of_ghost_cells);
 }
@@ -448,6 +445,127 @@ Extrapolate_Velocity(ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > >& u,const ARRAY<
 {
     for(int c=0;c<example.number_of_colors;c++)
         Extrapolate_Velocity(u(c),color,c);
+}
+//#####################################################################
+// Function Extrapolate_Velocity
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Project_Ghost_Velocities(int project_width,int c)
+{
+    T width=project_width*example.grid.dX.Max();
+    static int solve_id=-1;solve_id++;
+    struct BOUNDARY_CONDITIONS_COLOR_LOCAL:public BOUNDARY_CONDITIONS_COLOR<TV>
+    {
+        virtual TV u_jump(const TV& X,int color0,int color1) {return TV();}
+        virtual TV j_surface(const TV& X,int color0,int color1) {return TV();}
+    } bccl;
+
+    ARRAY<T,TV_INT> shifted_phi(example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis(c));
+    shifted_phi.array-=width;
+    LEVELSET<TV> ls(example.grid,shifted_phi,example.number_of_ghost_cells);
+    Reinitialize(ls,example.number_of_ghost_cells*2,(T)0,example.number_of_ghost_cells*example.grid.dX.Max(),example.grid.domain.Edge_Lengths().Magnitude(),(T).9,3,5,0);
+    ARRAY<int,TV_INT> shifted_color(example.levelset_color.color.domain);
+    for(CELL_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells);it.Valid();it.Next())
+        shifted_color(it.index)=shifted_phi(it.index)<=0?0:CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_CONDITIONS::NEUMANN;
+
+    INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,shifted_phi,shifted_color,true);
+    iss.use_preconditioner=example.use_preconditioner;
+    ARRAY<T> system_inertia(1),dt_mu(1);
+    system_inertia(0)=example.rho(c);
+    dt_mu(1)=0;
+
+    iss.Set_Matrix(dt_mu,example.wrap,&bccl,&system_inertia,&system_inertia);
+
+    printf("\n");
+    for(int i=0;i<TV::m;i++){printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(0));printf("\n");}
+    printf("p%d [%i]\t",c,iss.cm_p->dofs(0));printf("\n");
+    printf("qn [%i]\t",iss.cdi->constraint_base_n);
+    printf("qt [%i] ",iss.cdi->constraint_base_t);
+    printf("\n");
+
+    INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> rhs,sol,tmp,tmp2;
+
+    struct VOLUME_FORCE_COLOR_LOCAL:public VOLUME_FORCE_COLOR<TV>
+    {
+        PLS_FC_EXAMPLE<TV>* example;
+        T time,dt;
+        virtual TV F(const TV& X,int color) {return TV();}
+    } vfcl;
+    vfcl.example=&example;
+    vfcl.time=time+example.dt;
+    vfcl.dt=example.dt;
+
+    iss.Set_RHS(rhs,&vfcl,&example.face_velocities,false);
+    iss.Resize_Vector(sol);
+    iss.Resize_Vector(tmp);
+
+    VECTOR<ARRAY<int>,TV::m> index_map,indices;
+    for(int i=0;i<TV::m;i++){
+        index_map(i).Resize(sol.u(i)(0).m);
+        index_map(i).Fill(-1);}
+    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+        if(example.face_color(it.Full_Index())==c){
+            int k=iss.cm_u(it.Axis())->Get_Index(it.index,0);
+            assert(k>=0);
+            tmp.u(it.Axis())(0)(k)=example.face_velocities(c)(it.Full_Index());}
+        else{
+            int k=iss.cm_u(it.Axis())->Get_Index(it.index,0);
+            if(k>=0){
+                index_map(it.Axis())(k)=indices(it.Axis()).Append(k);
+                tmp2.u(it.Axis())(0)(k)=example.face_velocities(c)(it.Full_Index());}}}
+
+    iss.Multiply(tmp,sol);
+    sol.Copy(-1,sol,rhs);
+    for(int i=0;i<TV::m;i++){
+        rhs.u(i)(0)=sol.u(i)(0).Subset(indices(i));
+        sol.u(i)(0)=tmp2.u(i)(0).Subset(indices(i));}
+    ARRAY<int> p_index_map(sol.p(0).m),p_indices;
+    for(int i=0;i<TV::m;i++){
+        for(int j=0;j<TV::m;j++)
+            if(j>=i){
+                iss.matrix_uu(i)(j)(0).Row_Subset(indices(i));
+                iss.matrix_uu(i)(j)(0).Column_Subset(indices(j));}
+        iss.matrix_pu(i)(0).Column_Subset(indices(i));
+        iss.matrix_qu(i)(0).Column_Subset(indices(i));
+        for(int i=0;i<iss.matrix_pu(i)(0).m;i++)
+            if(iss.matrix_pu(i)(0).offsets(i)<iss.matrix_pu(i)(0).offsets(i+1))
+                p_index_map(i)=1;}
+    for(int i=0;i<p_index_map.m;i++)
+        p_index_map(i)=p_index_map(i)?p_indices.Append(i):-1;
+    for(int i=0;i<TV::m;i++)
+        iss.matrix_pu(i)(0).Row_Subset(p_indices);
+    rhs.p(0)=rhs.p(0).Subset(p_indices);
+    sol.p(0)=sol.p(0).Subset(p_indices);
+
+    MINRES<T> mr;
+    KRYLOV_SOLVER<T>* solver=&mr;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
+
+    if(example.dump_matrix){
+        KRYLOV_SOLVER<T>::Ensure_Size(vectors,rhs,2);
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%d.txt",solve_id).c_str()).Write("M",iss,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("Z-%d.txt",solve_id).c_str()).Write_Preconditioner("Z",iss,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%d.txt",solve_id).c_str()).Write_Projection("P",iss,*vectors(0));
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
+    solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
+
+    if(example.dump_matrix){
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%d.txt",solve_id).c_str()).Write("x",sol);}
+
+    iss.Multiply(sol,*vectors(0));
+    *vectors(0)-=rhs;
+    LOG::cout<<"Residual: "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
+
+    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+        int ct=example.levelset_color.Color(it.Location());
+        int k=iss.cm_u(it.Axis())->Get_Index(it.index,ct);
+        if(k>=0){
+            int j=index_map(it.Axis())(k);
+            if(j>=0) example.face_velocities(c)(it.Full_Index())=sol.u(it.Axis())(0)(j);}}
+    vectors.Delete_Pointers_And_Clean_Memory();
+
+    example.boundary.Apply_Boundary_Condition_Face(example.grid,example.face_velocities(c),time+example.dt);
+    example.boundary.Fill_Ghost_Faces(example.grid,example.face_velocities(c),example.face_velocities(c),0,example.number_of_ghost_cells);
 }
 //#####################################################################
 // Simulate_To_Frame
@@ -466,7 +584,7 @@ Simulate_To_Frame(const int frame)
             example.particle_levelset_evolution_multiple.Reseed_Particles(time);
             example.particle_levelset_evolution_multiple.Delete_Particles_Outside_Grid();}
         Write_Output_Files(++output_number);}
-} 
+}
 //#####################################################################
 // Function Write_Substep
 //#####################################################################
@@ -489,7 +607,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Create_Directory(example.output_directory+STRING_UTILITIES::string_sprintf("/%d",frame));
     FILE_UTILITIES::Create_Directory(example.output_directory+"/common");
     FILE_UTILITIES::Write_To_Text_File(example.output_directory+STRING_UTILITIES::string_sprintf("/%d/frame_title",frame),example.frame_title);
-    if(frame==0) 
+    if(frame==0)
         FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
     example.Write_Output_Files(frame);
     FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
