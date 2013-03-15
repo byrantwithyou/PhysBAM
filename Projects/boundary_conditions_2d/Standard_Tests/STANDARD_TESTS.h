@@ -13,7 +13,7 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_WENO.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_MACCORMACK_UNIFORM.h>
@@ -305,10 +305,10 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,F
 {
     return;
     if(test_number==2){
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);it.Valid();it.Next()){
+        for(FACE_ITERATOR<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);it.Valid();it.Next()){
             face_velocities(it.Full_Index())=velocity_multiplier;psi_N(it.Full_Index())=true;}}
     if(test_number==3 || test_number==4){
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);it.Valid();it.Next()){
+        for(FACE_ITERATOR<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);it.Valid();it.Next()){
             face_velocities(it.Full_Index())=Get_Source_Velocity(it.Full_Index());psi_N(it.Full_Index())=true;}}
 }
 //#####################################################################
@@ -317,7 +317,7 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,F
 void Get_Reflection_Conditions(ARRAY<T,FACE_INDEX<2> >& psi_R,const T time)
 {
     if(test_number==2 || test_number==3 || test_number==4){
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,2);it.Valid();it.Next())
+        for(FACE_ITERATOR<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,2);it.Valid();it.Next())
             psi_R(it.Full_Index())=mass_multiplier;
         psi_R(FACE_INDEX<2>(2,TV_INT(fluids_parameters.grid->counts.x+1,1)))=mass_multiplier;}
 }
@@ -374,10 +374,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
 {
     if(test_number==2 || test_number==3 || test_number==4){
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION);it.Valid();it.Next())
+        for(FACE_ITERATOR<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION);it.Valid();it.Next())
             outside(it.Full_Index())=true;}
     if(test_number==5){
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){TV X=it.Location();
+        for(FACE_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){TV X=it.Location();
             for(int i=0;i<4;i++) if(planes[i].Signed_Distance(X)>=-outside_tolerance) outside(it.Full_Index())=true;}}
 }
 //#####################################################################
@@ -386,7 +386,7 @@ void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
 void Mark_Outside(ARRAY<bool,TV_INT>& outside) PHYSBAM_OVERRIDE
 {
     if(test_number==5){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){TV X=it.Location();
+        for(CELL_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){TV X=it.Location();
             for(int i=0;i<4;i++) if(planes[i].Signed_Distance(X)>=-outside_tolerance) outside(it.index)=true;}}
 }
 //#####################################################################
@@ -395,7 +395,7 @@ void Mark_Outside(ARRAY<bool,TV_INT>& outside) PHYSBAM_OVERRIDE
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
     if(test_number==4)
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){TV X=it.Location()-(T).5;
+        for(FACE_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){TV X=it.Location()-(T).5;
             TV V=X.Orthogonal_Vector()+X;
             fluid_collection.incompressible_fluid_collection.face_velocities(it.Full_Index())=V(it.Axis());}
 }

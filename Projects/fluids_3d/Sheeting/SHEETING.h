@@ -7,7 +7,7 @@
 #ifndef __SHEETING__
 #define __SHEETING__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
@@ -21,9 +21,8 @@ class SHEETING:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;
 public:
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef VECTOR<int,3> TV_INT;
+    typedef VECTOR<int,3> TV_INT;
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
@@ -132,7 +131,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
-    for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(iterator.Axis())(iterator.Face_Index())=0;
 }
 //#####################################################################
@@ -141,7 +140,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 void Initialize_Phi() PHYSBAM_OVERRIDE
 {
     GRID<TV>& grid=*fluids_parameters.grid;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();TV X=iterator.Location();
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();TV X=iterator.Location();
         fluids_parameters.particle_levelset_evolution->phi(cell)=sources(1).Signed_Distance(world_to_source(1).Homogeneous_Times(X));}
 }
 //#####################################################################
@@ -216,7 +215,7 @@ virtual void Update_Sources(const T time)
     GRID<TV>& grid=*fluids_parameters.grid;
     VECTOR<T,3> source_radius_vector=source_radius*VECTOR<T,3>::All_Ones_Vector();
     RANGE<TV_INT> source_nodes(grid.Clamp_To_Cell(source_center-source_radius_vector),grid.Clamp_To_Cell(source_center+source_radius_vector)+TV_INT::All_Ones_Vector());
-    for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(!removed_positive_particles(block)) continue;
         for(int p=0;p<removed_positive_particles(block)->Size();p++)
             if(sources(1).Inside(world_to_source(1).Homogeneous_Times(removed_positive_particles(block)->X(p)),(T)1e-4)) removed_positive_particles(block)->Add_To_Deletion_List(p);

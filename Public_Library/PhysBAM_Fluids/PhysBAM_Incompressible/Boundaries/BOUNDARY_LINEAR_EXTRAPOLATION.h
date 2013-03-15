@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 namespace PhysBAM{
@@ -19,7 +19,6 @@ class BOUNDARY_LINEAR_EXTRAPOLATION:public BOUNDARY<TV,T2>
 {
     typedef typename TV::SCALAR T;typedef BOUNDARY<TV,T2> BASE;
     typedef typename GRID<TV>::VECTOR_INT TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
 public:
     using BASE::Find_Ghost_Regions;using BASE::Boundary;
@@ -47,7 +46,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_
         int side=2*axis+axis_side,outward_sign=axis_side?-1:1;
         int boundary=Boundary(side,regions(side));
         TV_INT inward_offset=-outward_sign*TV_INT::Axis_Vector(axis);
-        for(NODE_ITERATOR iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
+        for(NODE_ITERATOR<TV> iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
             TV_INT boundary_node=node;boundary_node[axis]=boundary;int ghost_layer=outward_sign*(node[axis]-boundary);
             u_ghost(node)=u_ghost(boundary_node)+ghost_layer*(u_ghost(boundary_node)-u_ghost(boundary_node+inward_offset));}}
 }

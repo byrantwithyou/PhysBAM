@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/LEVELSET_INDEX_MAP_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Solids_And_Fluids/BOUNDARY_CONDITIONS_CALLBACKS.h>
 using namespace PhysBAM;
@@ -36,14 +36,14 @@ Compute(int axis,VECTOR<bool,d> periodic_boundary_input)
     inside.Fill(false);
     callback->Mark_Outside(inside);
     periodic_boundary=periodic_boundary_input;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){FACE_INDEX<d> index=it.Full_Index();
+    for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){FACE_INDEX<d> index=it.Full_Index();
         bool& b=inside(index);
         b=!b;
         if(b && !(periodic_boundary[index.axis] && index.index[index.axis]==0))
             face_to_index(index)=index_to_face.Append(index);}
 
     for(int a=0;a<d;a++) if(periodic_boundary[a])
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*a,a);it.Valid();it.Next()){
+        for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*a,a);it.Valid();it.Next()){
             FACE_INDEX<d> index=it.Full_Index();
             FACE_INDEX<d> matching_index(index);matching_index.index(a)=1;
             assert(face_to_index(index));
@@ -65,7 +65,7 @@ Scatter(const ARRAY<T>& u,ARRAY<T,FACE_INDEX<d> >& v) const
 {
     for(int i=0;i<index_to_face.m;i++) v(index_to_face(i))=u(i);
     for(int a=0;a<d;a++) if(periodic_boundary[a])
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*a,a);it.Valid();it.Next()){
+        for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*a,a);it.Valid();it.Next()){
             FACE_INDEX<d> index=it.Full_Index();
             FACE_INDEX<d> matching_index(index);matching_index.index(a)=1;
             v(matching_index)=v(index);}

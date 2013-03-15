@@ -9,10 +9,10 @@ namespace PhysBAM{
 
 template<class TV> class GRID;
 
-template<class T> class UNIFORM_GRID_ITERATOR;
-template<class T> class UNIFORM_GRID_ITERATOR_NODE;
-template<class T> class UNIFORM_GRID_ITERATOR_CELL;
-template<class T> class UNIFORM_GRID_ITERATOR_FACE;
+template<class T> class GRID_ITERATOR_BASE;
+template<class T> class NODE_ITERATOR;
+template<class T> class CELL_ITERATOR;
+template<class T> class FACE_ITERATOR;
 template<class TV> struct UNIFORM_TAG{};
 
 template<class T_GRID> class BLOCK_UNIFORM;

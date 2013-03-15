@@ -2,13 +2,13 @@
 // Copyright 2005-2007, Eran Guendelman, Andrew Selle, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class UNIFORM_GRID_ITERATOR_CELL
+// Class CELL_ITERATOR
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 using namespace PhysBAM;
-template<class TV> UNIFORM_GRID_ITERATOR_CELL<TV>::
-UNIFORM_GRID_ITERATOR_CELL(const GRID<TV>& grid_input,const int number_of_ghost_cells,const T_REGION& region_type,const int side)
-    :UNIFORM_GRID_ITERATOR<TV>(grid_input)
+template<class TV> CELL_ITERATOR<TV>::
+CELL_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells,const T_REGION& region_type,const int side)
+    :GRID_ITERATOR_BASE<TV>(grid_input)
 {
     assert(-1<=side&&side<6);assert(region_type!=GRID<TV>::BOUNDARY_REGION && region_type!=GRID<TV>::INTERIOR_REGION); // these types may not really make sense here
     RANGE<TV_INT> domain(grid.Domain_Indices(number_of_ghost_cells));
@@ -44,12 +44,12 @@ UNIFORM_GRID_ITERATOR_CELL(const GRID<TV>& grid_input,const int number_of_ghost_
 }
 //#####################################################################
 namespace PhysBAM{
-template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<float,0> >;
-template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<float,1> >;
-template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<float,2> >;
-template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<float,3> >;
-template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<double,0> >;
-template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<double,1> >;
-template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<double,2> >;
-template class UNIFORM_GRID_ITERATOR_CELL<VECTOR<double,3> >;
+template class CELL_ITERATOR<VECTOR<float,0> >;
+template class CELL_ITERATOR<VECTOR<float,1> >;
+template class CELL_ITERATOR<VECTOR<float,2> >;
+template class CELL_ITERATOR<VECTOR<float,3> >;
+template class CELL_ITERATOR<VECTOR<double,0> >;
+template class CELL_ITERATOR<VECTOR<double,1> >;
+template class CELL_ITERATOR<VECTOR<double,2> >;
+template class CELL_ITERATOR<VECTOR<double,3> >;
 }

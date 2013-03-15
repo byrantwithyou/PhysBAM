@@ -5,7 +5,7 @@
 // Class BOUNDARY_REFLECTION_UNIFORM
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 using namespace PhysBAM;
@@ -27,7 +27,7 @@ Fill_Single_Ghost_Region(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost
 {
     if(Constant_Extrapolation(side)) Fill_Single_Ghost_Region(grid,u_ghost,side,region);
     else{int axis=side/2,boundary=Boundary(side,region),reflection_times_two=2*boundary+(side&1?1:-1);
-        for(NODE_ITERATOR iterator(grid,region);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
+        for(NODE_ITERATOR<TV> iterator(grid,region);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
             TV_INT reflected_node=node;reflected_node[axis]=reflection_times_two-node[axis];
             u_ghost(node)=u_ghost(reflected_node);}}
 }

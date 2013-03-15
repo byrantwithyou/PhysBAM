@@ -4,7 +4,7 @@
 //#####################################################################
 // Class CONSTRAINT_AGGREGATION_COLOR
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -33,7 +33,7 @@ template<class TV> void CONSTRAINT_AGGREGATION_COLOR<TV>::
     
     GRID<TV> grid2(counts,RANGE<TV>(TV(),TV()+1),true);
     
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid2);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid2);it.Valid();it.Next()){
         TV_INT this_neighbors_address=node_index+it.index-cube_radius;
         for(int i=0;i<TV::m;i++){
             if(this_neighbors_address(i)<0)this_neighbors_address(i)+=grid.numbers_of_cells(i);
@@ -119,7 +119,7 @@ Aggregate_Constraints(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix_uu,const ARRAY<i
     //for(int i=0;i<all_dofs;i++)std::cout<<i<<" "<<weights(i)<<" "<<std::endl;
     //for(int i=0;i<all_dofs;i++)std::cout<<indices(i)<<" "<<cm->uncompressed(i)(1)<<" "<<weights(i)<<std::endl;
     //Set weights to be zero for non-virtual nodes
-//    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+//    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
 //        int c=phi_color(it.index);
 //        if(c>=0){
 //            std::cout<<it.index<<" "<<it.Location()<<" "<<c<<std::endl;

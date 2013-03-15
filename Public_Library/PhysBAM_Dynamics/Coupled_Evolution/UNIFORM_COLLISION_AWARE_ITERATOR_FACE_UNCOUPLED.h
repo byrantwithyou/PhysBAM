@@ -7,7 +7,7 @@
 #ifndef __UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED__
 #define __UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 
@@ -15,13 +15,13 @@ namespace PhysBAM{
 template<class TV> class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO;
 
 template<class TV>
-class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED:public UNIFORM_GRID_ITERATOR_FACE<TV>
+class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED:public FACE_ITERATOR<TV>
 {
     typedef VECTOR<int,TV::m> TV_INT;
     const ARRAY<bool,TV_INT>& outside_fluid;
 public:
     typedef typename TV::SCALAR T;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> BASE;typedef typename GRID<TV>::REGION T_REGION;
+    typedef FACE_ITERATOR<TV> BASE;typedef typename GRID<TV>::REGION T_REGION;
     using BASE::grid;using BASE::index;using BASE::region;using BASE::valid;using BASE::Reset;using BASE::current_region;using BASE::number_of_ghost_cells;using BASE::axis;
     using BASE::Add_Region;using BASE::Reset_Regions;using BASE::First_Cell_Index;using BASE::Second_Cell_Index;using BASE::Valid;using BASE::Full_Index;using BASE::region_type;
 

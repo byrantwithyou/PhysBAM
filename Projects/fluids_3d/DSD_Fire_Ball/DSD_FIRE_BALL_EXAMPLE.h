@@ -21,7 +21,6 @@ class DSD_FIRE_BALL_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_i
     typedef T_input T;
 public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef GRID<TV> T_GRID;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;
@@ -140,7 +139,7 @@ void Initialize_Advection()    PHYSBAM_OVERRIDE
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
     T_GRID& grid=*fluids_parameters.grid;
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         const TV location=iterator.Location();
         if(source_sphere.Lazy_Inside(location)){
             const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
@@ -158,7 +157,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,FACE_INDEX<3> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
     T_GRID& grid=*fluids_parameters.grid;
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         const TV location=iterator.Location();
         if(source_sphere.Lazy_Inside(location)){
             const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
@@ -172,7 +171,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 {
     T_GRID& grid=*fluids_parameters.grid;
     ARRAY<T_ARRAYS_SCALAR>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) phis(1)(iterator.Cell_Index())=source_sphere.Signed_Distance(iterator.Location());
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) phis(1)(iterator.Cell_Index())=source_sphere.Signed_Distance(iterator.Location());
     phis(2).Copy(-1,phis(1));
 }
 //#####################################################################
@@ -182,7 +181,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     T_GRID& grid=*fluids_parameters.grid;
     ARRAY<T_ARRAYS_SCALAR>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
         if(source_sphere.Lazy_Inside(iterator.Location())) phis(1)(iterator.Cell_Index())=-grid.dX.x;
     return false;
 }

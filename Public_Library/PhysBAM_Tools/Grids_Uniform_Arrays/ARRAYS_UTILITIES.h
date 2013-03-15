@@ -18,7 +18,6 @@ class ARRAYS_UTILITIES
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<T2,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T2;
     typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 public:
 
 //#####################################################################

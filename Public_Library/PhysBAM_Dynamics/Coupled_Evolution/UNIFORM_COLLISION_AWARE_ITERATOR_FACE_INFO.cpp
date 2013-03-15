@@ -2,8 +2,8 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_POINT_SIMPLEX_1D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_SEGMENT_2D_INTERSECTION.h>
@@ -29,7 +29,7 @@ Register_Neighbors_As_Collision_Faces()
     VECTOR<FACE_INDEX<TV::m>,TV::m*2> faces;
     VECTOR<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV::m> simplices,merged;
     for(int i=0;i<collision_face_info.m;i++) old_faces.Set(FACE_INDEX<TV::m>(collision_face_info(i).axis,collision_face_info(i).index),i);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         if((*outside_fluid)(it.index)) continue;
         grid.Neighboring_Faces(faces,it.index);
         for(int i=0;i<TV::m;i++){simplices(i).Remove_All();merged(i).Remove_All();}
@@ -61,7 +61,7 @@ Initialize_Collision_Aware_Face_Iterator(const ARRAY<bool,TV_INT>& outside_fluid
 
     COLLISION_FACE_INFO<TV> cfi;
     collision_face_info.Remove_All();
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
         // don't couple ghost cells (for mpi assigns face to the correct proc)
         if((!grid.Inside_Domain(first_cell_index) && (*outside_fluid)(second_cell_index))

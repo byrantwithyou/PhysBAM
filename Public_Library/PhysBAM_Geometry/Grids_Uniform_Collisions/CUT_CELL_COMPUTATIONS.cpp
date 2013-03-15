@@ -4,8 +4,8 @@
 //#####################################################################
 // Namespace CUT_CELL_COMPUTATIONS
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/OBJECTS_IN_CELL.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/CUT_CELL.h>
@@ -31,7 +31,7 @@ template<class T>
 void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_cells,typename COLLISION_GEOMETRY_COLLECTION_POLICY<GRID<VECTOR<T,1> > >::GRID_BASED_COLLISION_GEOMETRY& collision_bodies_affecting_fluid,ARRAY<CUT_CELLS<T,1>*,VECTOR<int,1> >& cut_cells){
     typedef VECTOR<T,1> TV;
     typedef VECTOR<int,1> TV_INT;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,num_ghost_cells);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,num_ghost_cells);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Cell_Index();COLLISION_GEOMETRY_ID body_id;
         ARRAY<COLLISION_GEOMETRY_ID> collision_objects;collision_bodies_affecting_fluid.objects_in_cell.Get_Objects_For_Cell(index,collision_objects);
         if(!collision_objects.Size()) cut_cells(index)=0;
@@ -90,7 +90,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,2> >& grid,const int num_ghost_c
 
     // typedef VECTOR<T,1> TV;
     // typedef VECTOR<int,1> TV_INT;
-    // for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,num_ghost_cells);iterator.Valid();iterator.Next()){
+    // for(CELL_ITERATOR<TV> iterator(grid,num_ghost_cells);iterator.Valid();iterator.Next()){
     //     TV_INT index=iterator.Cell_Index();COLLISION_GEOMETRY_ID body_id;
     //     ARRAY<COLLISION_GEOMETRY_ID> collision_objects;collision_bodies_affecting_fluid.objects_in_cell.Get_Objects_For_Cell(index,collision_objects);
     //     if(!collision_objects.Size()) cut_cells(index)=0;

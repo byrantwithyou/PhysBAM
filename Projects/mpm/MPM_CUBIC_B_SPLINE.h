@@ -7,9 +7,9 @@
 #ifndef __MPM_CUBIC_B_SPLINE__
 #define __MPM_CUBIC_B_SPLINE__
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include "MPM_GRID_BASIS_FUNCTION.h"
 namespace PhysBAM{
 

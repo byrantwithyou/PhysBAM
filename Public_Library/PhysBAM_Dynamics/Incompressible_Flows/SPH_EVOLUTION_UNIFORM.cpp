@@ -6,9 +6,9 @@
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/constants.h>
@@ -61,7 +61,7 @@ template<class T_GRID> typename T_GRID::SCALAR SPH_EVOLUTION_UNIFORM<T_GRID>::
 CFL() const
 {
     T max_particle_velocity=0;
-    if(particle_levelset_evolution) for(NODE_ITERATOR node_iterator(grid);node_iterator.Valid();node_iterator.Next()){
+    if(particle_levelset_evolution) for(NODE_ITERATOR<TV> node_iterator(grid);node_iterator.Valid();node_iterator.Next()){
         TV_INT block=node_iterator.Node_Index();
         if(particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles(block)){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles(block);
@@ -77,7 +77,7 @@ template<class T_GRID> template<class T_ARRAYS_PARTICLES> void SPH_EVOLUTION_UNI
 Copy_Particle_Attributes_From_Array(T_ARRAYS_PARTICLES& particles)
 {
     int particle_index=0;sph_particles.Delete_All_Elements();
-    for(NODE_ITERATOR iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(particles(block)){sph_particles.Add_Elements(particles(block)->Size());
             for(int p=0;p<particles(block)->Size();p++){particle_index++;sph_particles.X(particle_index)=particles(block)->X(p);sph_particles.V(particle_index)=particles(block)->V(p);}}}
 }
@@ -88,7 +88,7 @@ template<class T_GRID> template<class T_ARRAYS_PARTICLES> void SPH_EVOLUTION_UNI
 Copy_Particle_Attributes_To_Array(T_ARRAYS_PARTICLES& particles) const
 {
     int particle_index=0;
-    for(NODE_ITERATOR iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(particles(block)) for(int p=0;p<particles(block)->Size();p++){particle_index++;
             particles(block)->X(p)=sph_particles.X(particle_index);particles(block)->V(p)=sph_particles.V(particle_index);}}
 }
@@ -142,7 +142,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
 
     for(int p=0;p<sph_particles.Size();p++){
         RANGE<TV_INT> particle_cells(grid.Cell(sph_particles.X(p)-radius_vector,2),grid.Cell(sph_particles.X(p)+radius_vector,2));
-        for(CELL_ITERATOR iterator(grid,particle_cells);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid,particle_cells);iterator.Valid();iterator.Next()){
             TV_INT cell=iterator.Cell_Index();
             TV X_minus_Xp=grid.Center(cell)-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
             T weight=1-distance_squared*one_over_radius_squared;
@@ -151,7 +151,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
                 if(!particles_in_cell(cell).m)particles_in_cell(cell).Preallocate(15);
                 particles_in_cell(cell).Append(p);}}
         for(int axis=0;axis<T_GRID::dimension;axis++)
-            for(FACE_ITERATOR iterator(grid,particle_cells+RANGE<TV_INT>(TV_INT(),TV_INT::Axis_Vector(axis)),axis);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(grid,particle_cells+RANGE<TV_INT>(TV_INT(),TV_INT::Axis_Vector(axis)),axis);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index();
                 TV X_minus_Xp=grid.Face(iterator.Full_Index())-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
                 T weight=1-distance_squared*one_over_radius_squared;
@@ -169,13 +169,13 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     
     LOG::Time("rasterize velocities to grid");
     Rasterize_Velocities_To_Grid(particle_velocities,cell_weight,face_weight);
-    for(FACE_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
         if(face_weight(axis,face)) particle_velocities(axis,face)/=face_weight(axis,face);}
 
     if(use_two_way_coupling){
         LOG::Time("adding levelset weight to cells"); // TODO: Determine the correct value for interface cells when using 2nd order cut cell
-        for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(!projection.elliptic_solver->psi_D(iterator.Cell_Index()))
+        for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) if(!projection.elliptic_solver->psi_D(iterator.Cell_Index()))
             cell_weight(iterator.Cell_Index())=target_particles_per_cell;}
 
     if(fluids_parameters.mpi_grid){ // TODO: Assert that received cell weights are within tolerance of those generated locally
@@ -186,7 +186,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     callbacks->Do_Something_With_Density(grid,cell_weight);
 
     LOG::Time("copying fluid velocities");
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();TV_INT face=iterator.Face_Index();TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
         if(projection.elliptic_solver->psi_D(cell_1)&&projection.elliptic_solver->psi_D(cell_2)) face_velocities(axis,face)=particle_velocities(axis,face);}
 
@@ -196,10 +196,10 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     projection.Use_Non_Zero_Divergence(true);projection.Use_Divergence_Multiplier(true);
     projection.divergence_multiplier.Fill(0);projection.divergence.Fill(0);
     ARRAY<bool,TV_INT> cells_valid(grid.Domain_Indices(1));cells_valid.Fill(true); 
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         if(projection.elliptic_solver->psi_D(cell)) for(int axis=0;axis<T_GRID::dimension;axis++) for(int k=0;k<2;k++){
             TV_INT face(cell);face[axis]+=k;if(!face_weight(axis,face)) cells_valid(cell)=false;}}
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         if(cells_valid(cell) && cell_weight(cell)>ballistic_particles_per_cell) projection.elliptic_solver->psi_D(cell)=false;
         if(projection.divergence.Valid_Index(cell)) Set_Divergence_And_Multiplier(cell,cells_valid,time);
         if(cell_weight(cell) && !projection.elliptic_solver->psi_D(cell) && use_variable_density_solve)
@@ -208,13 +208,13 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     if(use_variable_density_solve){LOG::Time("setting betas for poisson solve");projection.poisson->Find_Variable_beta();}
 
     LOG::Time("restoring object and water boundaries");
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
         if(projection.elliptic_solver->psi_N(axis,face)) face_velocities(axis,face)=preset_velocities(axis,face);}
     for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(!fluids_parameters.mpi_grid || !fluids_parameters.mpi_grid->Neighbor(axis,axis_side)){
             TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
-            for(FACE_ITERATOR iterator(grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
+            for(FACE_ITERATOR<TV> iterator(grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
                 projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}
 }
 //#####################################################################
@@ -236,7 +236,7 @@ Set_Divergence_And_Multiplier(const TV_INT cell,const ARRAY<bool,TV_INT>& cells_
         T target_density_factor=callbacks->Target_Density_Factor(grid.Center(cell),time);bool near_interface=false;
         if(!enforce_density_near_interface){
             RANGE<TV_INT> neighbor_cells=grid.Clamp_To_Cell(RANGE<TV>(grid.Center(cell)).Thickened(radius_vector),1);
-            for(CELL_ITERATOR iterator_neighbor(grid,neighbor_cells);iterator_neighbor.Valid();iterator_neighbor.Next()){
+            for(CELL_ITERATOR<TV> iterator_neighbor(grid,neighbor_cells);iterator_neighbor.Valid();iterator_neighbor.Next()){
                 if(!cells_valid(iterator_neighbor.Cell_Index()) || cell_weight(iterator_neighbor.Cell_Index())<=ballistic_particles_per_cell){near_interface=true;break;}}}
         if(!near_interface){
             projection.divergence_multiplier(cell)=1; 
@@ -254,7 +254,7 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
     Calculate_SPH_Constants();
 
     LOG::Time("calculate particle deltas");
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
         particle_velocities(axis,face)-=face_velocities(axis,face);}
     ARRAY<TV> delta_velocity(sph_particles.Size());ARRAY<TV> delta_weight(sph_particles.Size());
     Calculate_Particle_Deltas(particle_velocities,delta_velocity,delta_weight);
@@ -262,11 +262,11 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
     if(neumann_boundary_slip_multiplier){ // TODO:  Probably can yank this if we use adjust_cell_weight_for
         LOG::Time("neumann slip multiplier");
         T_ARRAYS_INT cell_faces_blocked(grid.Domain_Indices(1));
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             if(incompressible.projection.elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())){
                 cell_faces_blocked(iterator.First_Cell_Index())++;cell_faces_blocked(iterator.Second_Cell_Index())++;}}
         T multiplier_over_number_of_faces_per_cell=neumann_boundary_slip_multiplier/(T)T_GRID::number_of_faces_per_cell;
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             cell_weight(iterator.Cell_Index())*=1+cell_faces_blocked(iterator.Cell_Index())*multiplier_over_number_of_faces_per_cell;}}
 
     LOG::Time("applying deltas");
@@ -282,7 +282,7 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
         int ghost_cells=3;
         T_FACE_ARRAYS_SCALAR face_velocities_ghost(grid,ghost_cells);
         incompressible.boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,ghost_cells);
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
             if(incompressible.projection.elliptic_solver->psi_N(axis,face)){int valid_neighbors=0;T face_velocity=0;
                 for(int i=0;i<T_GRID::number_of_one_ring_neighbors_per_cell;i++){
                     TV_INT face_neighbor=T_GRID::One_Ring_Neighbor(face,i); // TODO: Check that this is correct for one-way coupling
@@ -343,7 +343,7 @@ Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,T_ARRAYS_SCALAR& c
 {
     Calculate_SPH_Constants();
 
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();TV X=grid.Center(cell);
         for(int k=0;k<particles_in_cell(cell).m;k++){
             int p=particles_in_cell(cell)(k);
@@ -354,7 +354,7 @@ Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,T_ARRAYS_SCALAR& c
                 if(incompressible.projection.elliptic_solver->psi_N(axis,face1)) if(sph_particles.X(p)(axis)>X(axis)+.5*grid.dX(axis)) weight_multiplier++;
                 if(incompressible.projection.elliptic_solver->psi_N(axis,face2)) if(sph_particles.X(p)(axis)<X(axis)-.5*grid.dX(axis)) weight_multiplier++;}
             if(weight>0)cell_weight(cell)+=weight_multiplier*weight;}}
-    for(FACE_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
         TV_INT face=iterator.Face_Index();int axis=iterator.Axis();TV X=grid.Face(iterator.Full_Index());TV_INT cell=face;
         for(int k=0;k<particles_in_cell(cell).m;k++){
             int p=particles_in_cell(cell)(k);
@@ -373,7 +373,7 @@ Calculate_Particle_Deltas(const T_FACE_ARRAYS_SCALAR& minus_face_delta,ARRAY<TV>
 {
     Calculate_SPH_Constants();
 
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT face=iterator.Face_Index();int axis=iterator.Axis();TV X=grid.Face(iterator.Full_Index());TV_INT cell=face;grid.Clamp(cell);
         for(int k=0;k<particles_in_cell(cell).m;k++){
             int p=particles_in_cell(cell)(k);
@@ -404,7 +404,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
     T_ARRAYS_ARRAY_SCALAR one_over_total_removed_negative_particle_cell_weight(grid.Block_Indices(1));
     T_ARRAYS_SCALAR removed_negative_particle_cell_weight(grid.Domain_Indices());
     
-    for(NODE_ITERATOR node_iterator(grid,1);node_iterator.Valid();node_iterator.Next()){
+    for(NODE_ITERATOR<TV> node_iterator(grid,1);node_iterator.Valid();node_iterator.Next()){
         TV_INT block=node_iterator.Node_Index();
         if(removed_negative_particles(block)){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*removed_negative_particles(block);
@@ -412,7 +412,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
             for(int p=0;p<particles.Size();p++){
                 PAIR<TV_INT,int> particle_record(block,p);
                 RANGE<TV_INT> range=grid.Clamp_To_Cell(RANGE<TV>(particles.X(p)).Thickened(radius_vector));
-                for(CELL_ITERATOR cell_iterator(grid,range);cell_iterator.Valid();cell_iterator.Next()){
+                for(CELL_ITERATOR<TV> cell_iterator(grid,range);cell_iterator.Valid();cell_iterator.Next()){
                     TV_INT cell=cell_iterator.Cell_Index();
                     TV X_minus_Xp=grid.Center(cell)-particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
                     T weight=1-distance_squared*one_over_radius_squared;
@@ -421,7 +421,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
                         if(!removed_negative_particles_affecting_cell(cell).m)removed_negative_particles_affecting_cell(cell).Preallocate(15);
                         removed_negative_particles_affecting_cell(cell).Append(particle_record);}}}}}
 
-    for(NODE_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
+    for(NODE_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
         TV_INT block=iterator.Node_Index(); if(removed_negative_particles(block)){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*removed_negative_particles(block);
             for(int p=0;p<particles.Size();p++) if(one_over_total_removed_negative_particle_cell_weight(block)(p))
@@ -430,7 +430,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
     ARRAY<bool,TV_INT> converting_cells(grid.Domain_Indices(1)),converting_cells_neighborhood(grid.Domain_Indices(1));
 
     bool created_fluid_from_particles=false;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();TV X=grid.Center(cell);
         for(int k=0;k<removed_negative_particles_affecting_cell(cell).m;k++){
             PAIR<TV_INT,int>& particle_record=removed_negative_particles_affecting_cell(cell)(k);
@@ -441,10 +441,10 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
 
     if(created_fluid_from_particles){
         ARRAYS_UTILITIES<T_GRID,T>::Make_Ghost_Mask_From_Active_Mask(grid.Get_Regular_Grid_At_MAC_Positions(),converting_cells,converting_cells_neighborhood,2,1);
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();converting_cells(cell)=converting_cells(cell)||converting_cells_neighborhood(cell);}
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();converting_cells(cell)=converting_cells(cell)||converting_cells_neighborhood(cell);}
         
         T blending_particle_radius=(T).5*grid.dX.Min();
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){ 
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){ 
             TV_INT cell=iterator.Cell_Index();
             if(converting_cells(cell)){ // TODO: Use smooth density function to determine if a particle contributes to the levelset
                 for(int p=0;p<removed_negative_particles_affecting_cell(cell).m;p++){
@@ -460,7 +460,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
     
     if(created_fluid_from_particles){
         LOG::Time("reclassifying sph particles");
-        for(NODE_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
+        for(NODE_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
             TV_INT block=iterator.Node_Index();
             if(positive_particles(block)){
                 for(int p=0;p<positive_particles(block)->Size();p++) 
@@ -479,7 +479,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
 
     LOG::Time("reseeding around new fluid");
     ARRAYS_UTILITIES<T_GRID,T>::Make_Ghost_Mask_From_Active_Mask(grid.Get_Regular_Grid_At_MAC_Positions(),converting_cells,converting_cells_neighborhood,2,1);
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();converting_cells(cell)=converting_cells(cell)||converting_cells_neighborhood(cell);}
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();converting_cells(cell)=converting_cells(cell)||converting_cells_neighborhood(cell);}
     particle_levelset_evolution->Particle_Levelset(0).Reseed_Particles(time,&converting_cells);
         
     LOG::Time("modifying levelset");        
@@ -497,7 +497,7 @@ Move_Particles_Off_Grid_Boundaries(T_ARRAYS_PARTICLES& particles,const T toleran
     assert(fluids_parameters.mpi_grid);
     for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(fluids_parameters.mpi_grid->Neighbor(axis,axis_side)){
-            for(NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+            for(NODE_ITERATOR<TV> iterator(grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT block=iterator.Node_Index();
                 if(particles(block)) for(int p=0;p<particles(block)->Size();p++){
                     if(axis_side==0) particles(block)->X(p)[axis]=max(grid.domain.Minimum_Corner()[axis]+tolerance,particles(block)->X(p)[axis]);

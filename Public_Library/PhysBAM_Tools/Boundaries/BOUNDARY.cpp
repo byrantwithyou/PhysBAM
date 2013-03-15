@@ -6,7 +6,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 using namespace PhysBAM;
@@ -79,7 +79,7 @@ template<class TV,class T2> void BOUNDARY<TV,T2>::
 Fill_Single_Ghost_Region(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const int side,const RANGE<TV_INT>& region) const
 {
     int axis=side/2,boundary=side&1?region.Minimum_Corner()[axis]-1:region.Maximum_Corner()[axis];
-    UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,region);
+    NODE_ITERATOR<TV> iterator(grid,region);
     if(use_fixed_boundary) for(;iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
         u_ghost(node)=fixed_boundary_value;}
     else if(clamp_below&&clamp_above) for(;iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index(),boundary_node=node;boundary_node[axis]=boundary;

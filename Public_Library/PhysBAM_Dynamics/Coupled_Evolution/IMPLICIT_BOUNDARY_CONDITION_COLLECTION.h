@@ -7,7 +7,7 @@
 #ifndef __IMPLICIT_BOUNDARY_CONDITION_COLLECTION__
 #define __IMPLICIT_BOUNDARY_CONDITION_COLLECTION__
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Solids_And_Fluids/BOUNDARY_CONDITIONS_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/BOUNDARY_CONDITION_INFO.h>

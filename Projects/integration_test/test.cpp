@@ -8,9 +8,9 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
@@ -168,7 +168,7 @@ void Evolve_Step(GRID<TV>& grid,ARRAY_VIEW<T,TV_INT> q[3],const ARRAY_VIEW<T,TV_
         for(int c=0;c<3;c++)
             q[c].Subset(stencils(i))+=A;}
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next())
         for(int c=0;c<3;c++)
             q[c](it.index)=p[c](it.index)-(T).25*Weight_Function(q[c](it.index)*grid.dX.Product());
 }
@@ -204,7 +204,7 @@ void Initialize(const GRID<TV>& grid,ARRAY<VECTOR<TV_INT,4> >& stencils,ARRAY<T,
     planes[2]=PLANE<T>(-TV(.11,.41,0).Normalized(),TV(.41,.61,.5));
 
     for(int c=0;c<3;c++){
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next())
+        for(NODE_ITERATOR<TV> it(grid,3);it.Valid();it.Next())
             p[c](it.index)=planes[c].Signed_Distance(it.Location());}
 }
 
@@ -267,20 +267,20 @@ void Compute(PARSE_ARGS& parse_args)
         color_phi(i).Resize(grid.Node_Indices(3));
 
     if(1) // triple
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid,3);it.Valid();it.Next()){
         TV X=rot2.Rotate(it.Location())+(T).0001;
         color_phi(0)(it.index)=Levelset(X);
         color_phi(1)(it.index)=Levelset(rot.Rotate(X+.01));
         color_phi(2)(it.index)=Levelset(rot.Rotate(rot.Rotate(X)));}
     else // circle
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid,3);it.Valid();it.Next()){
         TV X=it.Location();
         color_phi(0)(it.index)=Levelset(X,0);
         color_phi(1)(it.index)=Levelset(-X,0);
         color_phi(2)(it.index)=Levelset(X,1);}
 
     for(int i=0;i<3;i++){
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next()){
+        for(NODE_ITERATOR<TV> it(grid,3);it.Valid();it.Next()){
             T p=color_phi(i)(it.index);
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}

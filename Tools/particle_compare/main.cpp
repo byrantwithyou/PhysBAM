@@ -4,9 +4,9 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/SORT.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
@@ -85,7 +85,7 @@ template<class TV,class T_PARTICLES> bool
 Compare_Attributes(GRID<TV>& grid,ARRAY<T_PARTICLES*,VECTOR<int,TV::dimension> >& pls_particles_1,ARRAY<T_PARTICLES*,VECTOR<int,TV::dimension> >& pls_particles_2)
 {
     bool success=true;
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid);iterator.Valid();iterator.Next()){
+    for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         PARTICLE_LEVELSET_PARTICLES<TV> *particles_1=pls_particles_1(iterator.Node_Index()),*particles_2=pls_particles_2(iterator.Node_Index());
         if(!particles_1 && !particles_2) continue;
         if(!particles_1){LOG::cout<<"WARNING: 1 at "<<iterator.Node_Index()<<" is MISSING"<<std::endl;success=false;continue;}
@@ -151,7 +151,7 @@ Compare_Levelsets(std::string& input_directory_1,std::string& input_directory_2,
     bool success=true;ARRAY<T,TV_INT> phi1,phi2;
     LEVELSET<TV> l1(grid,phi1);FILE_UTILITIES::Read_From_File<T>(input_directory_1+"/"+f+"/levelset",l1);
     LEVELSET<TV> l2(grid,phi2);FILE_UTILITIES::Read_From_File<T>(input_directory_2+"/"+f+"/levelset",l2);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         if(l1.phi(iterator.Cell_Index())!=l2.phi(iterator.Cell_Index())){LOG::cout<<"WARNING: Phi don't match at index:["<<iterator.Cell_Index()<<std::endl;success=false;break;}}
     return success;
 }
@@ -169,7 +169,7 @@ Compare_Velocities(std::string& input_directory_1,std::string& input_directory_2
     bool success=true;
     ARRAY<T,FACE_INDEX<TV::dimension> > u1;FILE_UTILITIES::Read_From_File<T>(input_directory_1+"/"+f+"/mac_velocities",u1);
     ARRAY<T,FACE_INDEX<TV::dimension> > u2;FILE_UTILITIES::Read_From_File<T>(input_directory_2+"/"+f+"/mac_velocities",u2);
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         if(u1(iterator.Full_Index())!=u2(iterator.Full_Index())){LOG::cout<<"WARNING: Velocities don't match at axis:["<<iterator.Axis()<<"] index:["<<iterator.Face_Index()<<"]"<<std::endl;success=false;break;}}
     return success;
 }

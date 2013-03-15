@@ -1,4 +1,4 @@
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
@@ -63,7 +63,7 @@ int main(int argc,char* argv[])
 
     tc.sim.obj.ai.Print("END",u);
 /*
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(tc.sim.obj.grid,0,GRID<TV>::WHOLE_REGION,-1,0);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(tc.sim.obj.grid,0,GRID<TV>::WHOLE_REGION,-1,0);it.Valid();it.Next()){
         if(it.index.y==1 && it.index.x>1) LOG::cout<<std::endl;
         TV X(tc.sim.obj.grid.Face(it.Full_Index()));
         T e=0;

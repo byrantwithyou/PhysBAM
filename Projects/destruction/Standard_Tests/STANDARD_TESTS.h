@@ -21,7 +21,7 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
@@ -75,7 +75,6 @@ class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3>
 {
     typedef T_input T;typedef VECTOR<T_input,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 public:
     SOLIDS_STANDARD_TESTS<TV> tests;
     int parameter;
@@ -424,7 +423,7 @@ void Ball_Hitting_Wall()
     implicit_object.levelset.grid.Initialize(levelset_resolution+2*ghost_cells,box.Thickened(levelset_dx.x*ghost_cells),false);
     implicit_object.levelset.phi.Resize(implicit_object.levelset.grid.Domain_Indices());implicit_object.levelset.phi.Fill(FLT_MAX);
     implicit_object.Update_Box();implicit_object.Update_Minimum_Cell_Size();
-    for(NODE_ITERATOR iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
+    for(NODE_ITERATOR<TV> iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
         implicit_object.levelset.phi(iterator.index)=box.Signed_Distance(iterator.Location());
     rigid_body->Add_Structure(implicit_object);
     rigid_body->Frame().r=ROTATION<TV>((T)-pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/2,TV(0,(T)1,0));
@@ -552,7 +551,7 @@ void Raining_Spheres()
     implicit_object.levelset.grid.Initialize(levelset_resolution+2*ghost_cells,box.Thickened(levelset_dx.x*ghost_cells),false);
     implicit_object.levelset.phi.Resize(implicit_object.levelset.grid.Domain_Indices());implicit_object.levelset.phi.Fill(FLT_MAX);
     implicit_object.Update_Box();implicit_object.Update_Minimum_Cell_Size();
-    for(NODE_ITERATOR iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
+    for(NODE_ITERATOR<TV> iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
         implicit_object.levelset.phi(iterator.index)=box.Signed_Distance(iterator.Location());
     rigid_body->Add_Structure(implicit_object);
     rigid_body->Frame().t=TV(0,(T)-.2,0);
@@ -678,7 +677,7 @@ void Create_Pattern(const int test_number)
                 LOG::cout << "constructing region " << r << std::endl;
                 RANGE<TV_INT> local_counts=RANGE<TV_INT>::Zero_Box().Thickened(-INT_MAX);
                 RANGE<TV> local_domain;
-                for(NODE_ITERATOR iterator(levelset_grid);iterator.Valid();iterator.Next()){
+                for(NODE_ITERATOR<TV> iterator(levelset_grid);iterator.Valid();iterator.Next()){
                     if(regions(iterator.index)==r){
                         local_counts.Enlarge_To_Include_Point(iterator.index);
                         local_domain.Enlarge_To_Include_Point(iterator.Location());
@@ -690,7 +689,7 @@ void Create_Pattern(const int test_number)
                 ARRAY<T,VECTOR<int,3> > local_phi(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
                 LOG::cout << "local_grid " << local_grid << std::endl;
                 ARRAY<TV_INT> local_initialized_cells;
-                for(NODE_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next()){
+                for(NODE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next()){
                     TV_INT global_index=iterator.index+local_counts.min_corner-1;
                     if(levelset_grid.Domain_Indices().Lazy_Inside(global_index) && regions(global_index)==r){
                         local_phi(iterator.index)=-FLT_MAX;
@@ -761,13 +760,13 @@ void Shrink_Levelset(GRID<TV>& grid,ARRAY<T,VECTOR<int,3> >& phi,int boundary,TV
 {
     TV_INT min_adjust;
     RANGE<TV_INT> inside=RANGE<TV_INT>::Zero_Box().Thickened(-INT_MAX),domain=grid.Domain_Indices();
-    for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(phi(iterator.index)<0) inside.Enlarge_To_Include_Point(iterator.index);
+    for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(phi(iterator.index)<0) inside.Enlarge_To_Include_Point(iterator.index);
     inside=RANGE<TV_INT>::Intersect(inside.Thickened(boundary),domain);
     min_adjust=inside.min_corner-domain.min_corner;
     center-=min_adjust;
     GRID<TV> grid_new(inside.Edge_Lengths()+1,RANGE<TV>(grid.Node(inside.min_corner),grid.Node(inside.max_corner)),false);
     ARRAY<T,VECTOR<int,3> > phi_new(grid_new.Domain_Indices());
-    for(NODE_ITERATOR iterator(grid_new);iterator.Valid();iterator.Next()) phi_new(iterator.index)=phi(iterator.index+min_adjust);
+    for(NODE_ITERATOR<TV> iterator(grid_new);iterator.Valid();iterator.Next()) phi_new(iterator.index)=phi(iterator.index+min_adjust);
     grid=grid_new;
     phi=phi_new;
 }
@@ -788,7 +787,7 @@ void Create_Wall_Pattern()
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/wall/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
         LEVELSET_IMPLICIT_OBJECT<TV>* lio=new LEVELSET_IMPLICIT_OBJECT<TV>(local_grid,local_phi);
-        for(NODE_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next())
             local_phi(iterator.index)=refined_lio->levelset.Extended_Phi(iterator.Location());
         TV_INT center_index=local_grid.Domain_Indices().Center();
         Shrink_Levelset(local_grid,local_phi,2,center_index);
@@ -819,7 +818,7 @@ void Create_Bunny_Pattern()
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/bunny/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
         LEVELSET_IMPLICIT_OBJECT<TV>* lio=new LEVELSET_IMPLICIT_OBJECT<TV>(local_grid,local_phi);
-        for(NODE_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next())
             local_phi(iterator.index)=refined_lio->levelset.Extended_Phi(iterator.Location());
         TV_INT center_index=local_grid.Domain_Indices().Center();
         Shrink_Levelset(local_grid,local_phi,2,center_index);
@@ -850,7 +849,7 @@ void Create_Cylinder_Pattern()
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/cylinder/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
         LEVELSET_IMPLICIT_OBJECT<TV>* lio=new LEVELSET_IMPLICIT_OBJECT<TV>(local_grid,local_phi);
-        for(NODE_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next())
             local_phi(iterator.index)=refined_lio->levelset.Extended_Phi(iterator.Location());
         TV_INT center_index=local_grid.Domain_Indices().Center();
         Shrink_Levelset(local_grid,local_phi,2,center_index);
@@ -881,7 +880,7 @@ void Create_Raining_Spheres_Pattern()
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/raining_spheres/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
         LEVELSET_IMPLICIT_OBJECT<TV>* lio=new LEVELSET_IMPLICIT_OBJECT<TV>(local_grid,local_phi);
-        for(NODE_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next())
             local_phi(iterator.index)=refined_lio->levelset.Extended_Phi(iterator.Location());
         TV_INT center_index=local_grid.Domain_Indices().Center();
         Shrink_Levelset(local_grid,local_phi,2,center_index);
@@ -910,10 +909,10 @@ void Create_Box_Split_Pattern()
         GRID<TV> local_grid(counts,RANGE<TV>(-half_edge_length,half_edge_length),false);
         ARRAY<T,VECTOR<int,3> > local_phi(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
         LEVELSET_IMPLICIT_OBJECT<TV>* lio=new LEVELSET_IMPLICIT_OBJECT<TV>(local_grid,local_phi);
-        for(NODE_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next())
             local_phi(iterator.index)=RANGE<TV>(original_grid.Domain()).Signed_Distance(iterator.Location());
         TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-        for(NODE_ITERATOR iterator(original_grid,0,GRID<TV>::BOUNDARY_REGION);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(original_grid,0,GRID<TV>::BOUNDARY_REGION);iterator.Valid();iterator.Next())
             surface->particles.X(surface->particles.Add_Element())=iterator.Location();
         surface->Update_Number_Nodes();
         FRACTURE_REGION<T>* fr=new FRACTURE_REGION<T>(surface,lio,false);
@@ -947,12 +946,12 @@ void Create_Pyramid_Pattern(RANGE<TV> boundary,const int min_resolution,const in
         phi.Fill(-FLT_MAX);
         for(int i=0;i<4;i++){
             TRIANGLE_3D<T> tri(pts(corners(m)(i)),pts(corners(m)(i%4+1)),center);
-            for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+            for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
                 phi(iterator.index)=-min(-phi(iterator.index),tri.Distance_To_Triangle(iterator.Location()+jitter));}
         for(int i=0;i<4;i++){
             PLANE<T> plane(pts(corners(m)(i)),pts(corners(m)(i%4+1)),center);
             if(plane.Signed_Distance(pt_inside)>0) plane.normal=-plane.normal;
-            for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+            for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
                 if(plane.Signed_Distance(iterator.Location()+jitter)>0) phi(iterator.index)=abs(phi(iterator.index));}
 
         surface->particles.X(surface->particles.Add_Element())=center;
@@ -1005,7 +1004,7 @@ void Create_Crossing_Planes_Pattern()
             TV pt_inside=TV(x_coords.Average(),0,side*original_half_edge_length.z);
             if(plane1.Signed_Distance(pt_inside)>0) plane1.normal=-plane1.normal;
             if(plane2.Signed_Distance(pt_inside)>0) plane2.normal=-plane2.normal;
-            for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+            for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
                 phi(iterator.index)=max(plane1.Signed_Distance(iterator.Location()+jitter),plane2.Signed_Distance(iterator.Location()+jitter));
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
             for(int plane=0;plane<2;plane++){
@@ -1046,7 +1045,7 @@ void Create_Crossing_Planes_Pattern()
             TV pt_inside=TV(side*original_half_edge_length.x,0,z_coords.Average());
             if(plane1.Signed_Distance(pt_inside)>0) plane1.normal=-plane1.normal;
             if(plane2.Signed_Distance(pt_inside)>0) plane2.normal=-plane2.normal;
-            for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+            for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
                 phi(iterator.index)=max(plane1.Signed_Distance(iterator.Location()+jitter),plane2.Signed_Distance(iterator.Location()+jitter));
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
             for(int plane=0;plane<2;plane++){

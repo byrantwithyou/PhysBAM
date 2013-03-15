@@ -317,7 +317,6 @@ const PARTICLE_PARTITION<TV>& Particle_Partition(const RIGID_BODY<TV>& rigid_bod
 template<class TV>
 void Particles_In_Implicit_Object_Partition(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levelset_body,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool use_particle_partition_center_phi_test,const VECTOR<int,TV::dimension>& particle_partition_size,const bool exit_early)
 {
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef typename TV::SCALAR T;
     const int d=TV::dimension;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
@@ -332,7 +331,7 @@ void Particles_In_Implicit_Object_Partition(RIGID_BODY<TV>& particle_body,RIGID_
     const PARTICLE_PARTITION<TV>& particle_partition=Particle_Partition(particle_body,particle_partition_size);
     if(!use_particle_partition_center_phi_test){
         RANGE<VECTOR<int,d> > range=particle_partition.Range(bounding_box2_in_body1_coordinates);      
-        for(CELL_ITERATOR iterator(particle_partition.grid,range);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(particle_partition.grid,range);iterator.Valid();iterator.Next()){
             const ARRAY<int>& particles_in_cell=particle_partition.partition(iterator.Cell_Index());
             for(int t=0;t<particles_in_cell.m;t++){int p=particles_in_cell(t);
                 if(bounding_box2_in_body1_coordinates.Lazy_Inside(particles_X(p)) &&

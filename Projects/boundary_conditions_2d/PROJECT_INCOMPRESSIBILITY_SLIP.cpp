@@ -1,7 +1,7 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
@@ -50,7 +50,7 @@ void Project_Incompressibility_Slip(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >
     ARRAY<int,TV_INT> cell_to_index(grid.Domain_Indices(1));
     ARRAY<TV_INT> index_to_cell;
     ARRAY<FACE_INDEX<d> > index_to_face;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
         if(callback.Inside(grid.X(it.index)))
             cell_to_index(it.index)=index_to_cell.Append(it.index);
 
@@ -61,7 +61,7 @@ void Project_Incompressibility_Slip(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >
     ARRAY<T> fractions;
 
     bool neumann_pocket=true;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         FACE_INDEX<d> face=it.Full_Index();
         VECTOR<TV,2> X;
         T dxi=grid.one_over_dX(it.Axis());

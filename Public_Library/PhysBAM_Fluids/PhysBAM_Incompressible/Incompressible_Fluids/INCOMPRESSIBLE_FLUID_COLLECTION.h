@@ -20,7 +20,6 @@ class INCOMPRESSIBLE_FLUID_COLLECTION:public NONCOPYABLE
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<T,SIDED_FACE_INDEX<TV::m> >  T_FACE_ARRAYS_SLIP_SCALAR;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 public:
     const T_GRID& grid;
     T_FACE_ARRAYS_SCALAR face_velocities;

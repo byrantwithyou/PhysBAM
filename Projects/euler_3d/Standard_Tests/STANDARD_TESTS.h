@@ -12,10 +12,10 @@
 #include <iostream>
 #include "math.h"
 
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_ATTENUATION.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
@@ -72,8 +72,6 @@ public:
     typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*T_GRID::dimension> T_FACE_VECTOR_BOOL;
     typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_SCALAR T_LINEAR_INTERPOLATION_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::restart;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solids_fluids_parameters;
@@ -589,7 +587,7 @@ void Initialize_Euler_State()
 
     if(transition_to_incompressible) fluids_parameters.euler->euler_projection.use_neumann_condition_for_outflow_boundaries=false;
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         T rho,u_vel,v_vel,w_vel,p;
         if(Inside_Shock(grid.X(cell_index))){
@@ -617,7 +615,7 @@ void Read_Soot_Velocities()
     FILE_UTILITIES::Read_From_File(stream_type,soot_velocity_file,soot_mac_velocities);
     T soot_dx_over_2=soot_grid.dX.Max()*(T).5;
     RANGE<TV> soot_domain=soot_grid.Domain();
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         TV location=iterator.Location();
         if(soot_domain.Inside(location,soot_dx_over_2)){
             T velocity;
@@ -636,7 +634,7 @@ void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
 
     if(!use_smoke_sourcing){ // use shock data to initialize density and temperature
         EOS<T>& eos=*fluids_parameters.compressible_eos;
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index();
             T rho,temperature,p,e;
             if(Inside_Shock(grid.X(cell_index))){
@@ -652,7 +650,7 @@ void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
             fluids_parameters.density_container.density(cell_index)=rho;
             fluids_parameters.temperature_container.temperature(cell_index)=temperature;}}
     else{
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index();
             if(smoke_source.Lazy_Inside(grid.X(cell_index))){
                 fluids_parameters.density_container.density(cell_index)=source_density_value;
@@ -671,7 +669,7 @@ void Clear_Inside_Solid_Soot()
             COLLISION_GEOMETRY<TV>& collision_body=*(collision_bodies_affecting_fluid.collision_geometry_collection.bodies(id));
             collision_body.Update_Bounding_Box();
             RANGE<TV_INT> grid_clamped_bounding_box=grid.Clamp_To_Cell(collision_body.Axis_Aligned_Bounding_Box(),0);
-            for(CELL_ITERATOR iterator(grid,grid_clamped_bounding_box);iterator.Valid();iterator.Next()){
+            for(CELL_ITERATOR<TV> iterator(grid,grid_clamped_bounding_box);iterator.Valid();iterator.Next()){
                 TV_INT cell_index=iterator.Cell_Index();
                 T phi_value=collision_body.Implicit_Geometry_Extended_Value(iterator.Location());
                 if(phi_value<(T)0){
@@ -699,23 +697,23 @@ void Adjust_Soot_With_Sources(const T time) PHYSBAM_OVERRIDE
         FILE_UTILITIES::Read_From_File(stream_type,soot_file,soot_values);
         T soot_dx_over_2=soot_grid.dX.Max()*(T).5;
         RANGE<TV> soot_domain=soot_grid.Domain();
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             TV location=iterator.Location();
             if(soot_domain.Inside(location,soot_dx_over_2)){
                 fluids_parameters.soot_container.density(cell_index)=
                     soot_interpolation.Clamped_To_Array(soot_grid,soot_values,location);}
             else fluids_parameters.soot_container.density(cell_index)=(T)0;}}
     else if(use_soot_sourcing){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index();
             if(soot_source.Lazy_Inside(grid.X(cell_index))){
                 fluids_parameters.soot_container.density(cell_index)=source_soot_value;}}}
     else if(use_soot_sourcing_from_shock){ // use shock region to source soot
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index();
             if(Inside_Shock(grid.X(cell_index))) fluids_parameters.soot_container.density(cell_index)=(T)1;}}
     else{ // use shock data to initialize soot
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index();
             T soot,fuel;
             if(Inside_Shock(grid.X(cell_index))){
@@ -732,7 +730,7 @@ void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_B
 {
     if(!use_smoke_sourcing) return;
     if(!incompressible) PHYSBAM_FATAL_ERROR("this shouldn't be called in compressible case");
-    for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         if(smoke_source.Lazy_Inside(iterator.Location())){
             int axis=iterator.Axis();
             if(source_velocity_value(axis)){
@@ -800,7 +798,7 @@ void Add_Destructive_Wall()
     implicit_object.levelset.grid.Initialize(levelset_resolution+2*ghost_cells,box.Thickened(levelset_dx.x*ghost_cells),false);
     implicit_object.levelset.phi.Resize(implicit_object.levelset.grid.Domain_Indices());implicit_object.levelset.phi.Fill(FLT_MAX);
     implicit_object.Update_Box();implicit_object.Update_Minimum_Cell_Size();
-    for(NODE_ITERATOR iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
+    for(NODE_ITERATOR<TV> iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
         implicit_object.levelset.phi(iterator.index)=box.Signed_Distance(iterator.Location());
     rigid_body->Add_Structure(implicit_object);
     if(test_number==11){
@@ -830,7 +828,7 @@ void Add_Room()
         implicit_object.levelset.grid.Initialize(levelset_resolution+2*ghost_cells,box.Thickened(levelset_dx.x*ghost_cells),false);
         implicit_object.levelset.phi.Resize(implicit_object.levelset.grid.Domain_Indices());implicit_object.levelset.phi.Fill(FLT_MAX);
         implicit_object.Update_Box();implicit_object.Update_Minimum_Cell_Size();
-        for(NODE_ITERATOR iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
             implicit_object.levelset.phi(iterator.index)=box.Signed_Distance(iterator.Location());
         rigid_body->Add_Structure(implicit_object);
         ROTATION<TV> rotation((T)i*(T)pi/2,TV(0,1,0));
@@ -865,7 +863,7 @@ void Add_Enclosed_Room()
         implicit_object.levelset.grid.Initialize(levelset_resolution+2*ghost_cells,box.Thickened(levelset_dx.x*ghost_cells),false);
         implicit_object.levelset.phi.Resize(implicit_object.levelset.grid.Domain_Indices());implicit_object.levelset.phi.Fill(FLT_MAX);
         implicit_object.Update_Box();implicit_object.Update_Minimum_Cell_Size();
-        for(NODE_ITERATOR iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
             implicit_object.levelset.phi(iterator.index)=box.Signed_Distance(iterator.Location());
         rigid_body->Add_Structure(implicit_object);
         ROTATION<TV> rotation((T)i*(T)pi/2,TV(0,1,0));
@@ -890,7 +888,7 @@ void Add_Enclosed_Room()
         implicit_object.levelset.grid.Initialize(levelset_resolution+2*ghost_cells,box.Thickened(levelset_dx.x*ghost_cells),false);
         implicit_object.levelset.phi.Resize(implicit_object.levelset.grid.Domain_Indices());implicit_object.levelset.phi.Fill(FLT_MAX);
         implicit_object.Update_Box();implicit_object.Update_Minimum_Cell_Size();
-        for(NODE_ITERATOR iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
             implicit_object.levelset.phi(iterator.index)=box.Signed_Distance(iterator.Location());
         rigid_body->Add_Structure(implicit_object);
         ROTATION<TV> rotation((T)pi/2,TV(1,0,0));
@@ -1236,13 +1234,13 @@ void Shrink_Levelset(GRID<TV>& grid,ARRAY<T,VECTOR<int,3> >& phi,int boundary,TV
 {
     TV_INT min_adjust;
     RANGE<TV_INT> inside=RANGE<TV_INT>::Zero_Box().Thickened(-INT_MAX),domain=grid.Domain_Indices();
-    for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(phi(iterator.index)<0) inside.Enlarge_To_Include_Point(iterator.index);
+    for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(phi(iterator.index)<0) inside.Enlarge_To_Include_Point(iterator.index);
     inside=RANGE<TV_INT>::Intersect(inside.Thickened(boundary),domain);
     min_adjust=inside.min_corner-domain.min_corner;
     center-=min_adjust;
     GRID<TV> grid_new(inside.Edge_Lengths()+1,RANGE<TV>(grid.Node(inside.min_corner),grid.Node(inside.max_corner)),false);
     ARRAY<T,VECTOR<int,3> > phi_new(grid_new.Domain_Indices());
-    for(NODE_ITERATOR iterator(grid_new);iterator.Valid();iterator.Next()) phi_new(iterator.index)=phi(iterator.index+min_adjust);
+    for(NODE_ITERATOR<TV> iterator(grid_new);iterator.Valid();iterator.Next()) phi_new(iterator.index)=phi(iterator.index+min_adjust);
     grid=grid_new;
     phi=phi_new;
 }
@@ -1263,7 +1261,7 @@ void Create_Wall_Pattern()
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/wall/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
         LEVELSET_IMPLICIT_OBJECT<TV>* lio=new LEVELSET_IMPLICIT_OBJECT<TV>(local_grid,local_phi);
-        for(NODE_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next())
             local_phi(iterator.index)=refined_lio->levelset.Extended_Phi(iterator.Location());
         TV_INT center_index=local_grid.Domain_Indices().Center();
         Shrink_Levelset(local_grid,local_phi,2,center_index);

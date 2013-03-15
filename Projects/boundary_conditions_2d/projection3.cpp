@@ -1,6 +1,6 @@
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
@@ -98,7 +98,7 @@ int main(int argc,char* argv[])
         default: PHYSBAM_FATAL_ERROR("Unrecognized velocity");}
 
     ARRAY<T,TV_INT> node_phi(grid.Node_Indices());
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next())
         node_phi(it.index)=phi(it.Location()/m)*m;
 
     Project<T,TV>(grid,3,node_phi,[=](TV X){return u_star(X/m)*m/s;},[=](TV X){return u_projected(X/m)*m/s;},[=](TV X){return p(X/m)*unit_p*s;},rho*kg*pow(m,-TV::m),

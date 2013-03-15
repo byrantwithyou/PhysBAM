@@ -6,10 +6,10 @@
 #ifndef __THREADED_ADVECTION_SEMI_LAGRANGIAN_TASK__
 #define __THREADED_ADVECTION_SEMI_LAGRANGIAN_TASK__
 
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
@@ -21,9 +21,7 @@ template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION>
 class ADVECTION_SEMI_LAGRANGIAN_TASK_NODE:public THREAD_QUEUE::TASK
 {    
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
 
 public:
 
@@ -48,12 +46,12 @@ public:
     void Run()
     {
         T_INTERPOLATION interpolation;
-        if(Z_min && Z_max) for(NODE_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
+        if(Z_min && Z_max) for(NODE_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
             TV_INT node=iterator.Node_Index();TV X=iterator.Location()-dt*V(node);
             Z(node)=interpolation.Clamped_To_Array_Node(grid,Z_ghost,X);
             VECTOR<T2,2> extrema=interpolation.Extrema_Clamped_To_Array_Node(grid,*Z_min_ghost,*Z_max_ghost,X);
             (*Z_min)(node)=extrema.x;(*Z_max)(node)=extrema.y;}
-        else for(NODE_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
+        else for(NODE_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
             Z(node)=interpolation.Clamped_To_Array(grid,Z_ghost,iterator.Location()-dt*V(node));}
     }
 };
@@ -62,9 +60,7 @@ template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION>
 class ADVECTION_SEMI_LAGRANGIAN_TASK_CELL:public THREAD_QUEUE::TASK
 {    
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
 
 public:
 
@@ -89,13 +85,13 @@ public:
     void Run()
     {
         T_INTERPOLATION interpolation;T_AVERAGING averaging;
-        if(Z_min && Z_max) for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
+        if(Z_min && Z_max) for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
             TV_INT cell=iterator.Cell_Index();
             TV X=iterator.Location()-dt*averaging.Face_To_Cell_Vector(grid,cell,face_velocities);
              Z(cell)=interpolation.Clamped_To_Array(grid,Z_ghost,X);
             VECTOR<T2,2> extrema=interpolation.Extrema_Clamped_To_Array_Cell(grid,*Z_min_ghost,*Z_max_ghost,X);
             (*Z_min)(cell)=extrema.x;(*Z_max)(cell)=extrema.y;}
-        else for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
+        else for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
             TV_INT cell=iterator.Cell_Index();
             TV cell_velocity(averaging.Face_To_Cell_Vector(grid,cell,face_velocities));
             cell_velocity*=dt; // TODO: gcc 4.1.2 compiler bug workaround
@@ -107,9 +103,7 @@ template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION>
 class ADVECTION_SEMI_LAGRANGIAN_TASK_FACE:public THREAD_QUEUE::TASK
 {    
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
 
 public:
 
@@ -135,12 +129,12 @@ public:
     void Run()
     {
         T_INTERPOLATION interpolation;T_AVERAGING averaging;
-        if(Z_min && Z_max) for(FACE_ITERATOR iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
+        if(Z_min && Z_max) for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
             TV_INT face=iterator.Face_Index();int axis=iterator.Axis();TV X=iterator.Location()-dt*averaging.Face_To_Face_Vector(grid,axis,face,face_velocities);
             Z.Component(axis)(face)=interpolation.Clamped_To_Array_Face_Component(axis,grid,Z_ghost.Starting_Point_Face(axis,face),X);
             VECTOR<T,2> extrema=interpolation.Extrema_Clamped_To_Array_Face_Component(axis,grid,Z_min_ghost->Starting_Point_Face(axis,face),Z_max_ghost->Starting_Point_Face(axis,face),X);
             (*Z_min).Component(axis)(face)=extrema.x;(*Z_max).Component(axis)(face)=extrema.y;}
-        else for(FACE_ITERATOR iterator(grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT face=iterator.Face_Index();int axis=iterator.Axis();
+        else for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT face=iterator.Face_Index();int axis=iterator.Axis();
             Z.Component(axis)(face)=interpolation.Clamped_To_Array_Face_Component(axis,grid,Z_ghost.Starting_Point_Face(axis,face),
                 iterator.Location()-dt*averaging.Face_To_Face_Vector(grid,axis,face,face_velocities));}
     }

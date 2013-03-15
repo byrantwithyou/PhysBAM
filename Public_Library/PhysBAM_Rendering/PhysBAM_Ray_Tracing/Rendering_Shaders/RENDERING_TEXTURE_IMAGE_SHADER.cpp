@@ -5,7 +5,7 @@
 // Class RENDERING_TEXTURE_IMAGE_SHADER  
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <PhysBAM_Tools/Images/IMAGE.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>

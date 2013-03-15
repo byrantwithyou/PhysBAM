@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include "MPM_PARTICLES.h"
@@ -93,7 +93,7 @@ Add_Randomly_Sampled_Implicit_Object(const IMPLICIT_OBJECT<TV>& object,const T e
     GRID<TV> grid(cells,bounding_box,true);
     ARRAY<bool,TV_INT> ok(grid.Domain_Indices(1));
     ARRAY<TV_INT> todo;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
         if(object.Extended_Phi(it.Location())<=0){
             ok(it.index)=true;
             todo.Append(it.index);}

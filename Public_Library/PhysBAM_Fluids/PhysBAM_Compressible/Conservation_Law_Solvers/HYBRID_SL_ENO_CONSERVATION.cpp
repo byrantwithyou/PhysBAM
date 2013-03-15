@@ -5,8 +5,8 @@
 // Class HYBRID_SL_ENO_CONSERVATION  
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
@@ -37,12 +37,12 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
 
     {
         LOG::SCOPE scope("Regular Update for Hybrid scheme.");
-        for(CELL_ITERATOR iterator(grid,3);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
             if(regular_cell(iterator.Cell_Index())){
                 bool compute_self_weight=true;for(int dim=0;dim<TV::dimension;dim++) compute_self_weight &= flux_face(iterator.Full_First_Face_Index(dim)) & flux_face(iterator.Full_Second_Face_Index(dim));
                 regular_cell(iterator.Cell_Index())=compute_self_weight;
                 cell_near_interface_tmp(iterator.Cell_Index())=!compute_self_weight;}}
-        for(CELL_ITERATOR iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             cell_near_interface(cell_index)=cell_near_interface_tmp(cell_index);
             if(cell_near_interface_tmp(cell_index)){
                 for(int dim=0;dim<TV::dimension;dim++) {
@@ -74,7 +74,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
             ARRAY<ARRAY<int>,INDEX> receivers;receivers.Resize(grid.Domain_Indices(3));
             T_ARRAYS_SCALAR sigma;sigma.Resize(grid.Domain_Indices(3));
 
-            for(FACE_ITERATOR iterator(grid,2);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(grid,2);iterator.Valid();iterator.Next()){
                 FACE_INDEX<TV::dimension> face_index=iterator.Full_Index();
                 if(flux_face(face_index) && (cell_near_interface(iterator.First_Cell_Index()) || cell_near_interface(iterator.Second_Cell_Index()))){
                     T weight=dt*face_fluxes(face_index)(dim);
@@ -85,7 +85,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
                     sigma(donor_cell)+=weight; donors(donor_cell).Append(index);receivers(receiver_cell).Append(index);}}
 
             // "Finish" cells that are entirely updated via the high order method.
-            for(CELL_ITERATOR iterator(grid,2);iterator.Valid();iterator.Next()){
+            for(CELL_ITERATOR<TV> iterator(grid,2);iterator.Valid();iterator.Next()){
                 INDEX cell_index=iterator.Cell_Index();
                 if(regular_cell(cell_index) && cell_near_interface(cell_index)){
                     T weight=U_ghost(cell_index)(dim)*cell_volume - sigma(cell_index);
@@ -95,12 +95,12 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
 
             // Compute backward-cast weights
             LINEAR_INTERPOLATION_UNIFORM<T_GRID,T> linear;
-            for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
+            for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
                 INDEX cell_index=iterator.Cell_Index();
                 if(!regular_cell(cell_index)){
                     RANGE<TV> cell_preimage=iterator.Bounding_Box() - dt*linear.Clamped_To_Array_Face(grid,face_velocities,iterator.Location());
                     RANGE<TV_INT> affected_cells(grid.Index(cell_preimage.min_corner),grid.Index(cell_preimage.max_corner)+TV_INT::All_Ones_Vector());
-                    for(CELL_ITERATOR intersecting_iter(grid,affected_cells);intersecting_iter.Valid();intersecting_iter.Next()){
+                    for(CELL_ITERATOR<TV> intersecting_iter(grid,affected_cells);intersecting_iter.Valid();intersecting_iter.Next()){
                         INDEX donor_cell=intersecting_iter.Cell_Index();
                         if(regular_cell(donor_cell)) continue;
                         T weight=U_ghost(donor_cell)(dim) * cell_preimage.Intersection_Area(intersecting_iter.Bounding_Box());
@@ -109,7 +109,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
                             sigma(donor_cell) += weight; donors(donor_cell).Append(index); receivers(cell_index).Append(index);}}}}
 
             // Clamp and forward-cast weights
-            for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
+            for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
                 INDEX cell_index=iterator.Cell_Index();
                 if(!regular_cell(cell_index)){
                     T cell_stuff = U_ghost(cell_index)(dim) * cell_volume;
@@ -121,7 +121,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
                         T remainder = (cell_stuff - sigma(cell_index))/cell_volume;
                         RANGE<TV> cell_postimage=iterator.Bounding_Box() + dt*linear.Clamped_To_Array_Face(grid,face_velocities,iterator.Location());
                         RANGE<TV_INT> affected_cells(grid.Index(cell_postimage.min_corner),grid.Index(cell_postimage.max_corner)+TV_INT::All_Ones_Vector());
-                        for(CELL_ITERATOR intersecting_iter(grid,affected_cells);intersecting_iter.Valid();intersecting_iter.Next()){
+                        for(CELL_ITERATOR<TV> intersecting_iter(grid,affected_cells);intersecting_iter.Valid();intersecting_iter.Next()){
                             INDEX receiver_cell=intersecting_iter.Cell_Index();
                             T weight= remainder * cell_postimage.Intersection_Area(intersecting_iter.Bounding_Box());
                             int index=weights.Append(PAIR<T,INDEX>(weight,receiver_cell));
@@ -132,7 +132,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
                 if(U.Valid_Index(weight_pair.y)) U(weight_pair.y)(dim) += weight_pair.x;}}
     }
 
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){INDEX cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){INDEX cell_index=iterator.Cell_Index();
         if(cell_near_interface(cell_index)) U(cell_index) *= one_over_cell_volume;
         else if(psi(cell_index)) U(cell_index) = U_ghost(cell_index) - dt*rhs(cell_index);}
 }

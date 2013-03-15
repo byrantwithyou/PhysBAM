@@ -3,10 +3,10 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Geometry/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
@@ -85,18 +85,18 @@ Find_Constant_beta(T_FACE_ARRAYS_SCALAR& beta_face,const T_ARRAYS_SCALAR& phi_gh
     // interior
     T half_width=(T).5*number_of_interface_cells*grid.dX.Max();
     if(GFM || smear_beta){
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             beta_face.Component(iterator.Axis())(iterator.Face_Index())=
                 LEVELSET_UTILITIES<T>::Heaviside((T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index())),beta_minus,beta_plus,half_width);}
     else{ // smear 1/beta for the delta function method
         T rho_minus=1/beta_minus,rho_plus=1/beta_plus;
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             beta_face.Component(iterator.Axis())(iterator.Face_Index())=
                 1/LEVELSET_UTILITIES<T>::Heaviside((T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index())),rho_minus,rho_plus,half_width);}
 
     if(GFM){ // adjust beta near interface
         T beta_minus_times_beta_plus=beta_minus*beta_plus;
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(iterator.First_Cell_Index()),phi_ghost(iterator.Second_Cell_Index())))
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(iterator.First_Cell_Index()),phi_ghost(iterator.Second_Cell_Index())))
             beta_face.Component(iterator.Axis())(iterator.Face_Index())=
                 beta_minus_times_beta_plus/LEVELSET_UTILITIES<T>::Convex_Average(phi_ghost(iterator.First_Cell_Index()),phi_ghost(iterator.Second_Cell_Index()),beta_minus,beta_plus);}
 }
@@ -111,20 +111,20 @@ Find_Constant_beta_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost)
 
     T half_width=(T).5*number_of_interface_cells*grid.dX.Max();
     if(GFM || smear_beta){
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             // use the beta from the non dirichlet region for dirichlet boundary conditions
             if(psi_D(iterator.First_Cell_Index())) beta_face.Component(iterator.Axis())(iterator.Face_Index())=levelset.Region_Value(iterator.Second_Cell_Index(),beta_multiphase); 
             else if(psi_D(iterator.Second_Cell_Index())) beta_face.Component(iterator.Axis())(iterator.Face_Index())=levelset.Region_Value(iterator.First_Cell_Index(),beta_multiphase);
             else beta_face.Component(iterator.Axis())(iterator.Face_Index())=levelset.Heaviside(iterator.First_Cell_Index(),iterator.Second_Cell_Index(),beta_multiphase,half_width);}}
     else{ // smear 1/beta for the delta function method
         ARRAY<T> rho_multiphase(beta_multiphase.m);for(int i=0;i<rho_multiphase.m;i++)rho_multiphase(i)=1/beta_multiphase(i);
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             // use the beta from the non dirichlet region for dirichlet boundary conditions
             if(psi_D(iterator.First_Cell_Index())) beta_face.Component(iterator.Axis())(iterator.Face_Index())=levelset.Region_Value(iterator.Second_Cell_Index(),beta_multiphase); 
             else if(psi_D(iterator.Second_Cell_Index())) beta_face.Component(iterator.Axis())(iterator.Face_Index())=levelset.Region_Value(iterator.First_Cell_Index(),beta_multiphase);
             else beta_face.Component(iterator.Axis())(iterator.Face_Index())=1/levelset.Heaviside(iterator.First_Cell_Index(),iterator.Second_Cell_Index(),rho_multiphase,half_width);}}
     if(GFM){ // adjust beta near interface
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) 
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) 
             if(!(psi_D(iterator.First_Cell_Index())||psi_D(iterator.Second_Cell_Index()))&&levelset.Interface(iterator.First_Cell_Index(),iterator.Second_Cell_Index())){
                 T denominator=levelset.Convex_Average(iterator.First_Cell_Index(),iterator.Second_Cell_Index(),beta_multiphase);
                 if(denominator == 0) beta_face.Component(iterator.Axis())(iterator.Face_Index())=0; // fix for overloading this class for implicit viscosity (with viscosity=0)
@@ -150,7 +150,7 @@ Add_Jump_To_b(const T_ARRAYS_SCALAR& phi_ghost)
     assert(!multiphase);
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
 
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index(),face_index=iterator.Face_Index();int axis=iterator.Axis();
         if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(first_cell_index),phi_ghost(second_cell_index)) && !psi_N.Component(axis)(face_index) && !(psi_D(first_cell_index) && psi_D(second_cell_index))){
             T jump=beta_face.Component(axis)(face_index)*one_over_dx2[axis]*
@@ -166,7 +166,7 @@ Add_Jump_To_b_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost)
 {
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
     LEVELSET_MULTIPLE<T_GRID> levelset(grid,phis_ghost);levelset.Recreate_Levelsets();
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index(),face_index=iterator.Face_Index();int axis=iterator.Axis();
         if(levelset.Interface(first_cell_index,second_cell_index) && !psi_N.Component(axis)(face_index) && !(psi_D(first_cell_index) && psi_D(second_cell_index))){
             int region_1,region_2;T phi_1,phi_2;levelset.Minimum_Regions(first_cell_index,second_cell_index,region_1,region_2,phi_1,phi_2);
@@ -184,7 +184,7 @@ Add_Derivative_Jump_To_b(const T_ARRAYS_SCALAR& phi_ghost)
     TV one_over_dx=Inverse(grid.dX);
     bool normals_defined=(levelset->normals!=0);levelset->Compute_Normals();
 
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index(),face_index=iterator.Face_Index();int axis=iterator.Axis();
         if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(first_cell_index),phi_ghost(second_cell_index)) && !psi_N.Component(axis)(face_index) && !(psi_D(first_cell_index) && psi_D(second_cell_index))){
             T jump=LEVELSET_UTILITIES<T>::Sign(phi_ghost(first_cell_index))*beta_face.Component(axis)(face_index)*one_over_dx[axis]*
@@ -212,7 +212,7 @@ Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLA
             if(face_domain.max_corner(axis)==grid.Domain_Indices(1).max_corner(axis)) face_domain.max_corner(axis)-=1;}
         if(face_domain.min_corner(i)==grid.Domain_Indices().min_corner(i)) face_domain.min_corner(i)+=1;
         if(face_domain.max_corner(i)!=grid.Domain_Indices().max_corner(i)) face_domain.max_corner(i)+=1;
-        for(FACE_ITERATOR iterator(grid,face_domain,i);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid,face_domain,i);iterator.Valid();iterator.Next()){
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index(),face_index=iterator.Face_Index();int axis=iterator.Axis();
             if(!psi_N.Component(axis)(face_index) && LEVELSET_UTILITIES<T>::Interface(levelset->phi(first_cell_index),levelset->phi(second_cell_index))){
                 T theta=LEVELSET_UTILITIES<T>::Theta(levelset->phi(first_cell_index),levelset->phi(second_cell_index));
@@ -239,7 +239,7 @@ Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLA
             if(face_domain.max_corner(axis)==grid.Domain_Indices(1).max_corner(axis)) face_domain.max_corner(axis)-=1;}
         if(face_domain.min_corner(i)==grid.Domain_Indices().min_corner(i)) face_domain.min_corner(i)+=1;
         if(face_domain.max_corner(i)!=grid.Domain_Indices().max_corner(i)) face_domain.max_corner(i)+=1;
-        for(FACE_ITERATOR iterator(grid,face_domain,i);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid,face_domain,i);iterator.Valid();iterator.Next()){
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index(),face_index=iterator.Face_Index();int axis=iterator.Axis();
             if(!psi_N.Component(axis)(face_index) && LEVELSET_UTILITIES<T>::Interface(levelset->phi(first_cell_index),levelset->phi(second_cell_index))){
                 T theta=LEVELSET_UTILITIES<T>::Theta(levelset->phi(first_cell_index),levelset->phi(second_cell_index));

@@ -41,7 +41,7 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
     LEVELSET_IMPLICIT_OBJECT<TV>* fragment_implicit_object=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
     RANGE<TV_INT> intersection_domain=RANGE<TV_INT>::Intersect(body.implicit_object->levelset.grid.Domain_Indices()-offset,implicit_object->levelset.grid.Domain_Indices());
     RANGE<TV_INT> fragment_counts=RANGE<TV_INT>::Zero_Box().Thickened(-INT_MAX); // Empty_Box() is not implemented properly for integers.
-    for(NODE_ITERATOR iterator(implicit_object->levelset.grid,intersection_domain);iterator.Valid();iterator.Next()){
+    for(NODE_ITERATOR<TV> iterator(implicit_object->levelset.grid,intersection_domain);iterator.Valid();iterator.Next()){
         if(implicit_object->levelset.phi(iterator.index)>0) continue;
         if(body.implicit_object->levelset.phi.Valid_Index(iterator.index+offset) && body.implicit_object->levelset.phi(iterator.index+offset)>0) continue;
         fragment_counts.Enlarge_To_Include_Point(iterator.index);}
@@ -54,7 +54,7 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
     fragment_implicit_object->levelset.phi.Resize(fragment_implicit_object->levelset.grid.Domain_Indices());
     fragment_implicit_object->Update_Box();fragment_implicit_object->Update_Minimum_Cell_Size();
     ARRAY<int,VECTOR<int,3> > colors(fragment_implicit_object->levelset.grid.Domain_Indices());colors.Fill(-1);
-    for(NODE_ITERATOR iterator(fragment_implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
+    for(NODE_ITERATOR<TV> iterator(fragment_implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
         TV_INT my_cell_index=iterator.index+fragment_counts.min_corner-TV_INT::All_Ones_Vector();
         T body_phi=body.implicit_object->levelset.phi.Valid_Index(my_cell_index+offset)?body.implicit_object->levelset.phi(my_cell_index+offset):1;
         fragment_implicit_object->levelset.phi(iterator.index)=max(implicit_object->levelset.phi(my_cell_index),body_phi/phi_scale);
@@ -67,7 +67,7 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
     region_counts.Resize(num_colors);
     for(int region=0;region<num_colors;region++) region_counts(region)=RANGE<TV_INT>::Zero_Box().Thickened(-INT_MAX);
     if(num_colors>1)
-        for(NODE_ITERATOR iterator(fragment_implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
+        for(NODE_ITERATOR<TV> iterator(fragment_implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
             int color=colors(iterator.index);
             if(color>0) region_counts(color).Enlarge_To_Include_Point(iterator.index);}
     else region_counts(0)=fragment_implicit_object->levelset.grid.Domain_Indices();
@@ -86,7 +86,7 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
             region_implicit_object->levelset.grid.Initialize(region_counts(color).Edge_Lengths()+TV_INT::All_Ones_Vector(),region_domain,implicit_object->levelset.grid.Is_MAC_Grid());
             region_implicit_object->levelset.phi.Resize(region_implicit_object->levelset.grid.Domain_Indices());
             region_implicit_object->Update_Box();region_implicit_object->Update_Minimum_Cell_Size();
-            for(NODE_ITERATOR iterator(region_implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
+            for(NODE_ITERATOR<TV> iterator(region_implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
                 TV_INT old_index=iterator.index+region_counts(color).min_corner-TV_INT::All_Ones_Vector();
                 if(colors(old_index)==color) region_implicit_object->levelset.phi(iterator.index)=fragment_implicit_object->levelset.phi(old_index);
                 else region_implicit_object->levelset.phi(iterator.index)=abs(fragment_implicit_object->levelset.phi(old_index));}}
@@ -122,7 +122,7 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
                         region_triangulated_surface->particles.X(added_particle)=point_to_add;}}}}
         else{
             // Iterate over the new levelset's cells, and find the corresponding cell in both the levelsets. Grab all particles from those cells.
-            for(NODE_ITERATOR iterator(region_implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
+            for(NODE_ITERATOR<TV> iterator(region_implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
                 TV_INT old_index=iterator.index+region_counts(color).min_corner-TV_INT::All_Ones_Vector();
                 if(region_implicit_object->levelset.phi(iterator.index)-particle_intersection_thickness<=0){
                     TV_INT my_cell_index=old_index+fragment_counts.min_corner-TV_INT::All_Ones_Vector();
@@ -171,7 +171,7 @@ Compute_Inertial_Properties(const T density,TV& com,T& mass,SYMMETRIC_MATRIX<T,T
 {
     int num_inside=0;
     com=TV();
-    for(NODE_ITERATOR iterator(implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
+    for(NODE_ITERATOR<TV> iterator(implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
         if(implicit_object->levelset.phi(iterator.index)>0) continue; // ignore if outside
         num_inside++;
         com+=iterator.Location();}
@@ -180,7 +180,7 @@ Compute_Inertial_Properties(const T density,TV& com,T& mass,SYMMETRIC_MATRIX<T,T
     mass=cell_mass*num_inside;
 
     SYMMETRIC_MATRIX<T,3> moments;
-    for(NODE_ITERATOR iterator(implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
+    for(NODE_ITERATOR<TV> iterator(implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
         if(implicit_object->levelset.phi(iterator.index)>0) continue; // ignore if outside
         moments+=SYMMETRIC_MATRIX<T,3>::Outer_Product(extra_levelset_frame*iterator.Location()-com);}
     inertia=cell_mass*((moments.Trace()+num_inside*sqr(implicit_object->levelset.grid.dX.x)/6)-moments);

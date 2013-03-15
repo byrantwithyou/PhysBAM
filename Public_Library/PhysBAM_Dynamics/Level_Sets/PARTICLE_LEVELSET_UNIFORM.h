@@ -7,7 +7,7 @@
 #ifndef __PARTICLE_LEVELSET_UNIFORM__
 #define __PARTICLE_LEVELSET_UNIFORM__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID_POLICY.h>
 #ifdef USE_PTHREADS
 #include <PhysBAM_Tools/Parallel_Computation/PTHREAD.h>
@@ -23,8 +23,7 @@ template<class T_GRID>
 class PARTICLE_LEVELSET_UNIFORM:public PARTICLE_LEVELSET<T_GRID>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_GRID::BLOCK T_BLOCK;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_GRID::BLOCK T_BLOCK;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef typename T_ARRAYS_SCALAR::template REBIND<char>::TYPE T_ARRAYS_CHAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<bool> >::TYPE T_ARRAYS_ARRAY_BOOL;

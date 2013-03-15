@@ -1,5 +1,5 @@
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include "BOUNDARY_CONDITIONS.h"
 
@@ -34,7 +34,7 @@ template<class TV> void BOUNDARY_CONDITIONS<TV>::
 Initialize_Phi(int ghost)
 {
     phi_array.Resize(grid.Domain_Indices(ghost));
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,ghost);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next())
         phi_array(it.index)=Theta(it.Location());
     if(!phi) phi=new LEVELSET<TV>(grid,phi_array);
 }
@@ -45,7 +45,7 @@ Compute_Error(ARRAY<T,FACE_INDEX<TV::m> >& u,T time) const
     if(!use_analytic_solution) return;
     int n=0;
     T L1=0,Li=0;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         TV X(grid.Face(it.Full_Index()));
         if(!Inside(X)) continue;
         TV p=Analytic_Velocity(X,time);

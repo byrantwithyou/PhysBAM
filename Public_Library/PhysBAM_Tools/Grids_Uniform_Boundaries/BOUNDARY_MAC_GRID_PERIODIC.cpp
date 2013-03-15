@@ -5,10 +5,10 @@
 // Class BOUNDARY_MAC_GRID_PERIODIC
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 using namespace PhysBAM;
@@ -20,7 +20,7 @@ Apply_Boundary_Condition_Face(const GRID<TV>& grid,ARRAY<T2,FACE_INDEX<TV::m> >&
 {
     TV_INT periods=grid.Domain_Indices().Maximum_Corner();
     for(int axis=0;axis<GRID<TV>::dimension;axis++)
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*axis,axis);it.Valid();it.Next()){
+        for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*axis,axis);it.Valid();it.Next()){
             FACE_INDEX<TV::m> face(it.Full_Index());
             face.index(axis)+=periods(axis);
             u(face)=u(it.Full_Index());}
@@ -36,7 +36,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_
     for(int axis=0;axis<TV::m;axis++)
         for(int axis_side=0;axis_side<2;axis_side++){
             int shift=periods(axis)*(1-2*axis_side);
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,number_of_ghost_cells,GRID<TV>::GHOST_REGION,2*axis+axis_side);it.Valid();it.Next()){
+            for(CELL_ITERATOR<TV> it(grid,number_of_ghost_cells,GRID<TV>::GHOST_REGION,2*axis+axis_side);it.Valid();it.Next()){
                 TV_INT ind(it.index);
                 ind(axis)+=shift;
                 u_ghost(it.index)=u_ghost(ind);}}
@@ -59,7 +59,7 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2
         for(int face_axis=0;face_axis<GRID<TV>::dimension;face_axis++)for(int axis_side=0;axis_side<2;axis_side++){
             int side=2*face_axis+axis_side;
             TV_INT period=(axis_side==0?1:-1)*periods[face_axis]*TV_INT::Axis_Vector(face_axis);
-            for(NODE_ITERATOR iterator(face_grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
+            for(NODE_ITERATOR<TV> iterator(face_grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
                 u_ghost_axis(node)=u_ghost_axis(node+period);}}}
 }
 //#####################################################################

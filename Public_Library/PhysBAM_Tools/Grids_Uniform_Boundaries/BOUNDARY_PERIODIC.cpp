@@ -5,7 +5,7 @@
 // Class BOUNDARY_PERIODIC
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_PERIODIC.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -22,7 +22,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_
         for(int axis_side=0;axis_side<2;axis_side++){
             int side=2*axis+axis_side,sign=1-2*side;
             TV_INT period=sign*periods[axis]*TV_INT::Axis_Vector(axis);
-            for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
+            for(NODE_ITERATOR<TV> iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
                 u_ghost(node)=u_ghost(node+period);}}
 }
 //#####################################################################
@@ -33,7 +33,7 @@ Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const
 {
     assert(!grid.Is_MAC_Grid());
     for(int axis=0;axis<GRID<TV>::dimension;axis++)
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,2*axis);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
+        for(NODE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,2*axis);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
             TV_INT opposite_node=node;opposite_node[axis]=0;
             u(node)=u(opposite_node);}
 }

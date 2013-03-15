@@ -1,4 +1,4 @@
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <PhysBAM_Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
@@ -32,7 +32,7 @@ void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUND
 
     ARRAY<int,FACE_INDEX<d> > index(u.Domain_Indices());
     ARRAY<FACE_INDEX<d> > faces;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next())
+    for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next())
         if(callback.Inside(grid.Face(it.Full_Index())))
             index(it.Full_Index())=faces.Append(it.Full_Index());
 

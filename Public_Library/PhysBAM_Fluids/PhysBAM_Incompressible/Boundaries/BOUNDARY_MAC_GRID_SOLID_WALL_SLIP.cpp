@@ -43,7 +43,7 @@ Reflect_Single_Ghost_Region(const int face_axis,const GRID<TV>& face_grid,T_ARRA
     int boundary=Boundary(side,region),reflection_times_two,flip;
     if(face_axis==axis){reflection_times_two=2*boundary;flip=-1;}
     else{reflection_times_two=2*boundary+(axis_side==0?-1:1);flip=1;}
-    for(NODE_ITERATOR iterator(face_grid,region);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(face_grid,region);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
         TV_INT reflected_node=node;reflected_node[axis]=reflection_times_two-node[axis];
         u_ghost_component(node)=flip*u_ghost_component(reflected_node);}
 }
@@ -64,7 +64,7 @@ template<class TV> void BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>::
 Zero_Single_Boundary_Side(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& u,const int side) const
 {
     int axis=side/2,axis_side=side&1;
-    FACE_ITERATOR iterator(grid,0,GRID<TV>::BOUNDARY_REGION,side);
+    FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,side);
     if(phi){
         TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
         for(;iterator.Valid();iterator.Next()){TV_INT face=iterator.Face_Index();

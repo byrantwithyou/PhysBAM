@@ -11,9 +11,9 @@
 #include <fstream>
 #include <iostream>
 
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_UTILITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.h>
@@ -139,14 +139,14 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
     if(test_number==1||test_number==2){
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
             fluid_collection.incompressible_fluid_collection.face_velocities.Component(iterator.Axis())(iterator.Face_Index())=(T)0;
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
             fluids_parameters.incompressible->projection.p(iterator.Cell_Index())=(T)98066.5;}
     else if(test_number==3||test_number==4){
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
             fluid_collection.incompressible_fluid_collection.face_velocities.Component(iterator.Axis())(iterator.Face_Index())=(T)100;
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
             fluids_parameters.incompressible->projection.p(iterator.Cell_Index())=(T)1e5;}
 }
 //#####################################################################
@@ -158,7 +158,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     ARRAY<T,VECTOR<int,1> >& phi=fluids_parameters.particle_levelset_evolution->phi;
     ARRAY<bool,VECTOR<int,1> > psi_cut_out(grid.Domain_Indices(),true);
     T incompressible_left_boundary=(T)-.1,incompressible_right_boundary=(T).1;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         VECTOR<int,1> cell_index=iterator.Cell_Index();VECTOR<T,1> X=iterator.Location();
         if(X.x<=((incompressible_left_boundary+incompressible_right_boundary)*(T).5)) phi(cell_index)=incompressible_left_boundary-X.x;
         else phi(cell_index)=X.x-incompressible_right_boundary;
@@ -177,13 +177,13 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     //initialize grid variables
     //1 == density, 2 == momentum, 3 == total energy
     if(test_number==1||test_number==2){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             VECTOR<int,1> cell_index=iterator.Cell_Index();
             T rho=(T)0.,u=(T)0.,p=(T)0.;
             if(iterator.Location().x<(T)-.4){rho=(T)2.124;p=(T)148407.3;} else{rho=(T)1.58317;p=(T)98066.5;}
             U(cell_index)(1)=rho;U(cell_index)(2)=rho*u;U(cell_index)(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}}
     else if(test_number==3||test_number==4){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             VECTOR<int,1> cell_index=iterator.Cell_Index();
             T rho=(T)1.226,u=(T)0.,p=(T)1e5;
             U(cell_index)(1)=rho;U(cell_index)(2)=rho*u;U(cell_index)(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}}

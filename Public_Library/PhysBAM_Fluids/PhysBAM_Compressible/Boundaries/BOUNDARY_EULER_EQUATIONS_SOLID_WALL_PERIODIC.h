@@ -26,7 +26,6 @@ class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC:public BOUNDARY<TV,T2>
     typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename T_ARRAYS_BASE::template REBIND<T2>::TYPE T_ARRAYS_DIMENSION_BASE;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
 public:
     typedef BOUNDARY<TV,T2> BASE;
     using BASE::Turn_Off_Constant_Extrapolation;using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;
@@ -125,7 +124,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_
 
     for(int axis=0;axis<GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(!periodic[axis]) Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));
-        else for(CELL_ITERATOR iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+        else for(CELL_ITERATOR<TV> iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
                 int period=repeats_at_last_node[axis]?counts[axis]-1:counts[axis];
                 int axis_periodic_node=wrap(cell[axis],period);
                 TV_INT periodic_node=cell;periodic_node[axis]=axis_periodic_node;
@@ -198,7 +197,7 @@ Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u,const T
     //Apply_Boundary_Condition_Helper(grid,u,time);
     for(int axis=0;axis<GRID<TV>::dimension;axis++)
         if(periodic[axis] && repeats_at_last_node[axis]){
-            for(CELL_ITERATOR iterator(grid,0,GRID<TV>::BOUNDARY_INTERIOR_REGION,2*axis);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+            for(CELL_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_INTERIOR_REGION,2*axis);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
                 TV_INT opposite_cell=cell_index;opposite_cell[axis]=1;
                 typename T_ARRAYS_DIMENSION_BASE::ELEMENT u_average=(u(cell_index)+u(opposite_cell))*(T).5;
                 u(cell_index)=u_average;u(opposite_cell)=u_average;}}

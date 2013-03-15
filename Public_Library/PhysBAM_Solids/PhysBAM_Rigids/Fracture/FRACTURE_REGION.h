@@ -8,7 +8,7 @@
 #define __FRACTURE_REGION__
 
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/FRAME.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
@@ -27,7 +27,6 @@ class FRACTURE_REGION
 {
     typedef VECTOR<T,3> TV;
     typedef VECTOR<int,3> TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 public:
     typedef int HAS_TYPED_READ_WRITE;
 

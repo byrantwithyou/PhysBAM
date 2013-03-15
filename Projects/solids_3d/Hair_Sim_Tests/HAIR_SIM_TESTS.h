@@ -24,7 +24,6 @@ class HAIR_SIM_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3>
     typedef T_input T;
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;

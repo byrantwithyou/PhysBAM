@@ -5,8 +5,8 @@
 // Class BOUNDARY_EXTRAPOLATE_CELL
 //#####################################################################
 #include <PhysBAM_Tools/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_EXTRAPOLATE_CELL.h>
 using namespace PhysBAM;
 //#####################################################################

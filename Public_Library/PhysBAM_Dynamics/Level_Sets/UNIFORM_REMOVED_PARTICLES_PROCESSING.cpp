@@ -2,8 +2,8 @@
 // Copyright 2005-2006, Geoffrey Irving, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Math_Tools/cube.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Dynamics/Level_Sets/REMOVED_PARTICLES_BLENDER_3D.h>
@@ -20,7 +20,7 @@ Refine_Grid_To_Particle_Size(const LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* water
     sim_grid=new GRID<TV>(grid);
     GRID<TV> temp_grid(TV_INT(scale_factor*TV(grid.counts)),grid.domain,true);
     ARRAY<T,VECTOR<int,3> > temp_phi(temp_grid.Domain_Indices(3));
-    for(CELL_ITERATOR iterator(temp_grid,3);iterator.Valid();iterator.Next()) temp_phi(iterator.Cell_Index())=(*water_levelset)(iterator.Location());
+    for(CELL_ITERATOR<TV> iterator(temp_grid,3);iterator.Valid();iterator.Next()) temp_phi(iterator.Cell_Index())=(*water_levelset)(iterator.Location());
     grid=temp_grid;water_phi.Resize(grid.Domain_Indices(3),false,false);water_phi.Copy(temp_phi);
     particle_phi.Resize(grid.Domain_Indices(3),false,false);particle_phi.Fill(0);
 }
@@ -52,14 +52,14 @@ Incorporate_Removed_Negative_Particles()
 {
     REMOVED_PARTICLES_BLENDER_3D<T> particle_blender(blending_parameter);
     T max_dX_times_particle_power=grid.dX.Max()*particle_power;
-    for(NODE_ITERATOR it(*sim_grid);it.Valid();it.Next())if(particle_array(it.Node_Index())){
+    for(NODE_ITERATOR<TV> it(*sim_grid);it.Valid();it.Next())if(particle_array(it.Node_Index())){
         PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<T,3> >& particles=*particle_array(it.Node_Index());
         for(int p=0;p<particles.Size();p++){
             T radius_x,radius_yz;VECTOR<T,3> major_axis;Get_Ellipsoid(particles,p,radius_x,radius_yz,major_axis);
             T one_over_radius_x_squared=(T)1/sqr(radius_x),one_over_radius_yz_squared=(T)1/sqr(radius_yz);
             RANGE<TV> box=particle_blender.Get_Bounding_Box(radius_x,radius_yz,particles.X(p),major_axis);
             VECTOR<int,3> min_index=grid.Clamped_Index_End_Minus_One(box.Minimum_Corner())+VECTOR<int,3>(1,1,1),max_index=grid.Clamped_Index(box.Maximum_Corner());
-            for(CELL_ITERATOR jt(grid,RANGE<VECTOR<int,3> >(min_index,max_index));jt.Valid();jt.Next()){
+            for(CELL_ITERATOR<TV> jt(grid,RANGE<VECTOR<int,3> >(min_index,max_index));jt.Valid();jt.Next()){
                 T distance=particle_blender.Get_Distance(one_over_radius_x_squared,one_over_radius_yz_squared,particles.X(p),major_axis,grid.X(jt.Cell_Index()));
                 particle_phi(jt.Cell_Index())-=max_dX_times_particle_power*particle_blender.C(distance);}}}
 }

@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/IDENTITY_ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
@@ -263,7 +263,7 @@ Setup_Fluids(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T curren
         if(fluids_parameters.use_density){
             fluids_parameters.density_container.Get_Ghost_Density(dt,current_position_time,1,density);}
         else if(!two_phase) density.Fill(fluids_parameters.density);
-        else for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+        else for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
             density(it.index)=boundary_condition_collection.psi_D(it.index)?fluids_parameters.outside_density:fluids_parameters.density;}
     if(Simulate_Compressible_Fluids()){
         euler_projection.Compute_Density_Weighted_Face_Velocities(dt,current_position_time,boundary_condition_collection.psi_N);
@@ -271,7 +271,7 @@ Setup_Fluids(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T curren
         euler_projection.Get_Ghost_Density(dt,current_position_time,1,density);
         euler_projection.Get_Ghost_Centered_Velocity(dt,current_position_time,1,centered_velocity);
         one_over_rho_c_squared=euler_projection.one_over_rho_c_squared;
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             p_advected_over_rho_c_squared_dt(cell_index)=euler_projection.p_advected(cell_index)*one_over_rho_c_squared(cell_index)*(1/dt);
             p_advected(cell_index)=euler_projection.p_advected(cell_index);}}
 }
@@ -463,7 +463,7 @@ Apply_Second_Order_Cut_Cell_Method(const T_ARRAYS_INT& cell_index_to_divergence_
     // TODO: this will not work for multiphase, obviously
     assert(fluids_parameters.number_of_regions==1); // this should not be called for gas or multiphase
     LEVELSET<TV>* levelset=&fluids_parameters.particle_levelset_evolution->Levelset(0);
-    for(FACE_ITERATOR iterator(poisson->grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(poisson->grid);iterator.Valid();iterator.Next()){
         TV_INT face_index=iterator.Face_Index();int axis=iterator.Axis();
         TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
         if(!psi_N(axis,face_index) && LEVELSET_UTILITIES<T>::Interface(levelset->phi(first_cell_index),levelset->phi(second_cell_index)) && Cell_To_Cell_Visible(axis,first_cell_index,second_cell_index)){
@@ -564,14 +564,14 @@ Apply_Viscosity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 
         LOG::cout<<"KE before viscosity: "<<std::endl;
         TV KE=TV();
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             KE[iterator.Axis()]+=sqr(face_velocities(iterator.Axis(),iterator.Face_Index()));
         for(int axis=0;axis<TV::dimension;axis++)
             LOG::cout<<"axis "<<axis<<": "<<KE[axis]<<std::endl;
         viscosity_helper.Add_Implicit_Forces_Before_Projection(grid,face_velocities,face_velocities,dt,time);
         LOG::cout<<"KE after viscosity: "<<std::endl;
         KE=TV();
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             KE[iterator.Axis()]+=sqr(face_velocities(iterator.Axis(),iterator.Face_Index()));
         for(int axis=0;axis<TV::dimension;axis++)
             LOG::cout<<"axis "<<axis<<": "<<KE[axis]<<std::endl;
@@ -583,7 +583,7 @@ Apply_Viscosity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
 Warn_For_Exposed_Dirichlet_Cell(const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N)
 {
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(!psi_D(cell_index)) continue;
         for(int axis=0;axis<TV::dimension;axis++){
             TV_INT first_cell_index=iterator.Cell_Neighbor(2*axis),second_cell_index=iterator.Cell_Neighbor(2*axis+1);

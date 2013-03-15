@@ -4,7 +4,7 @@
 //#####################################################################
 // Class FLUID_TO_SOLID_INTERPOLATION
 //##################################################################### 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
@@ -35,7 +35,7 @@ template<class TV> void FLUID_TO_SOLID_INTERPOLATION<TV>::
 Compute_Weights(const TV& X,int axis,ARRAY<ENTRY>& array)
 {
     T limit=max_dist*index_map.grid.dX.Max(),total_weight=0;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(index_map.grid,RANGE<TV_INT>(index_map.grid.Index(X)).Thickened(3),axis);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(index_map.grid,RANGE<TV_INT>(index_map.grid.Index(X)).Thickened(3),axis);it.Valid();it.Next()){
         T dist=(it.Location()-X).Magnitude();
         if(dist>limit) continue;
         int index=index_map.face_indices(it.Full_Index());

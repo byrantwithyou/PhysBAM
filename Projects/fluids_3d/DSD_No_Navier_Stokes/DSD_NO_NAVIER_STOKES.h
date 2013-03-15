@@ -7,7 +7,7 @@
 #ifndef __DSD_NO_NAVIER_STOKES__
 #define __DSD_NO_NAVIER_STOKES__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
@@ -24,9 +24,7 @@ class DSD_NO_NAVIER_STOKES:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_in
 public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef GRID<TV> T_GRID;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
@@ -129,7 +127,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
     T_GRID& grid=*fluids_parameters.grid;
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         const TV location=iterator.Location();
         for(int s=0;s<sources.m;s++) if(sources(s).Lazy_Inside(location)){
             const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
@@ -150,7 +148,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     T_GRID& grid=*fluids_parameters.grid;
     ARRAY<T,VECTOR<int,3> >& phi=fluids_parameters.particle_levelset_evolution->phi;
     T initial_phi;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV X=iterator.Location();
         initial_phi=1;
         for(int s=0;s<sources.m;s++) initial_phi=min(initial_phi,sources(s).Signed_Distance(X));
@@ -189,7 +187,7 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
     dsd.Dn.boundary->Fill_Ghost_Cells(dsd.Dn.grid,dsd.Dn.array,dsd.Dn.array,0,time);
     LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).levelset;
     ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
         TV_INT cell1,cell2;grid.Cells_Touching_Face(axis,face,cell1,cell2);
         face_velocities.Component(axis)(face)=dsd.Normal_Flame_Speed(axis,face)*(levelset.phi(cell2)-levelset.phi(cell1))*grid.One_Over_DX()[axis];}

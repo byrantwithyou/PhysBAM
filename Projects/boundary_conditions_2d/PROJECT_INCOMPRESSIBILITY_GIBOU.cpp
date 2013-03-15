@@ -1,6 +1,6 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
@@ -58,7 +58,7 @@ template<class T,class TV,class TV_INT>
 void Test_Gibou(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<2> >& u,const ARRAY<T,TV_INT>& p,ARRAY<T,FACE_INDEX<2> >& du,const BOUNDARY_CONDITIONS<TV>& callback,T density)
 {
     ERROR_COLOR_MAP<T> color(1e-12,1,true,true,true);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
     {
         TV X=grid.X(it.index);
         T dx=grid.dX.x;
@@ -149,7 +149,7 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
     cell_to_index.Fill(-1);
     ARRAY<TV_INT> index_to_cell;
     ARRAY<FACE_INDEX<d> > index_to_face;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
         if(callback.Inside(grid.X(it.index)))
             cell_to_index(it.index)=index_to_cell.Append(it.index);
 
@@ -162,7 +162,7 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
 
     ARRAY<FACE_INDEX<d> > uncut_faces;
     bool neumann_pocket=true;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         FACE_INDEX<d> face=it.Full_Index();
         VECTOR<TV,2> X;
         T dxi=grid.one_over_dX(it.Axis());
@@ -259,7 +259,7 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
         new_u(index_to_face(i))=0;
     }
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         if(!new_u(it.Full_Index())) continue;
         LOG::cout<<"Extra "<<it.Full_Index()<<"  du "<<new_u(it.Full_Index())<<"   phi "<<callback.Theta(it.Location())/grid.dX.Max()<<std::endl;
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));

@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/CONSTANT_ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
@@ -224,7 +224,7 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX
         for(int c=0;c<cdi->colors;c++)
             F_volume(i)(c).Resize(cm_p->dofs(c));}
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
         for(int c=0;c<cdi->colors;c++){
             int k=cm_p->Get_Index(it.index,c);
             if(k>=0)
@@ -331,7 +331,7 @@ Pack(const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u,VECTOR<ARRAY<ARRAY<T> >,TV::m>
         for(int c=0;c<cdi->colors;c++){
             v(i)(c).Resize(cm_u(i)->dofs(c));}}
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face(it.Full_Index()); 
         for(int c=0;c<cdi->colors;c++){
             int k=cm_u(face.axis)->Get_Index(it.index,c);

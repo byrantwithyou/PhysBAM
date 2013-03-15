@@ -13,7 +13,7 @@
 #define __STANDARD_TESTS__
 
 #include <PhysBAM_Tools/Arrays/IDENTITY_ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
@@ -44,8 +44,6 @@ template<class T_input>
 class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
@@ -315,7 +313,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
-    for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(iterator.Axis())(iterator.Face_Index())=velocity_multiplier*smoke_tests.Initial_Velocity(iterator.Location())[iterator.Axis()];
     BASE::Initialize_Velocities();
 }

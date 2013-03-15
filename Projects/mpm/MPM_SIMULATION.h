@@ -13,8 +13,8 @@
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include "MPM_CONSTITUTIVE_MODEL.h"
 #include "MPM_CUBIC_B_SPLINE.h"
 #include "MPM_PARTICLES.h"

@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_MACCORMACK_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
@@ -111,7 +111,7 @@ Approximate_Negative_Material(const T interface_thickness,const T time) const
     T_ARRAYS_SCALAR& phi=levelset->phi;
     GRID<TV> node_grid=grid.Is_MAC_Grid()?grid.Get_Regular_Grid_At_MAC_Positions():grid;
     T interface_half_width=interface_thickness*grid.dX.Max()/2,volume=0;
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(node_grid);iterator.Valid();iterator.Next()) volume+=LEVELSET_UTILITIES<T>::Heaviside(-phi(iterator.Node_Index()),interface_half_width);
+    for(NODE_ITERATOR<TV> iterator(node_grid);iterator.Valid();iterator.Next()) volume+=LEVELSET_UTILITIES<T>::Heaviside(-phi(iterator.Node_Index()),interface_half_width);
     return volume*grid.Cell_Size();
 }
 //#####################################################################
@@ -125,7 +125,7 @@ Approximate_Positive_Material(const T interface_thickness,const T time) const
     T_ARRAYS_SCALAR& phi=levelset->phi;
     GRID<TV> node_grid=grid.Is_MAC_Grid()?grid.Get_Regular_Grid_At_MAC_Positions():grid;
     T interface_half_width=interface_thickness*grid.dX.Max()/2,volume=0;
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(node_grid);iterator.Valid();iterator.Next()) volume+=LEVELSET_UTILITIES<T>::Heaviside(phi(iterator.Node_Index()),interface_half_width);
+    for(NODE_ITERATOR<TV> iterator(node_grid);iterator.Valid();iterator.Next()) volume+=LEVELSET_UTILITIES<T>::Heaviside(phi(iterator.Node_Index()),interface_half_width);
     return volume*grid.Cell_Size();
 }
 //#####################################################################
@@ -207,12 +207,12 @@ Euler_Step(const ARRAY<TV,TV_INT>& V,const T dt,const T time,const int number_of
 
     if(local_semi_lagrangian_advection){
         LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi_ghost(cell)) <= levelset->half_band_width)
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi_ghost(cell)) <= levelset->half_band_width)
             phi(cell)=interpolation.Clamped_To_Array(grid,phi_ghost,iterator.Location()-dt*V(cell));}}
     else if(local_advection_spatial_order){
         T_ARRAYS_SCALAR rhs(grid.Domain_Indices());
         Euler_Step_High_Order(grid,V,phi,phi_ghost,rhs,local_advection_spatial_order,levelset->half_band_width);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi(cell)) <= levelset->half_band_width) phi(cell)-=dt*rhs(cell);}}
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi(cell)) <= levelset->half_band_width) phi(cell)-=dt*rhs(cell);}}
     else // use the advection routine in the level set base class
         advection->Update_Advection_Equation_Node(grid,phi,phi_ghost,V,*levelset->boundary,dt,time);
 

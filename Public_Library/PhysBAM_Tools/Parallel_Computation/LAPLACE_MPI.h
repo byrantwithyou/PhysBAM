@@ -25,7 +25,7 @@ class SPARSE_MATRIX_PARTITION;
 template<class T_GRID>
 class LAPLACE_MPI:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef typename MPI_GRID_POLICY<T_GRID>::MPI_GRID T_MPI_GRID;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename MPI_GRID_POLICY<T_GRID>::MPI_GRID T_MPI_GRID;
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename LAPLACE_POLICY<T_GRID>::LAPLACE T_LAPLACE;
     typedef typename T_GRID::INDEX T_INDEX;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;

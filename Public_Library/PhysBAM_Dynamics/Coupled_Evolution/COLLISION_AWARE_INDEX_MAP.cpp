@@ -57,13 +57,13 @@ Construct_Indices(const int ghost_cells)
     for(int i=0;i<real_cell_indices.m;i++) real_cell_indices_reverse_map(real_cell_indices(i))=i;
     for(int axis=0;axis<d;axis++){
         if(boundary_condition_collection.periodic_boundary[axis]){
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1,GRID<TV>::GHOST_REGION,2*axis);iterator.Valid();iterator.Next()){
+            for(CELL_ITERATOR<TV> iterator(grid,1,GRID<TV>::GHOST_REGION,2*axis);iterator.Valid();iterator.Next()){
                 TV_INT cell_index=iterator.Cell_Index();
                 TV_INT matching_cell_index(cell_index);matching_cell_index(axis)=1;
                 cell_indices(cell_index)=cell_indices(matching_cell_index);
                 cell_indices(matching_cell_index-TV_INT::Axis_Vector(axis))=cell_indices(cell_index-TV_INT::Axis_Vector(axis));
             }
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,2*axis,axis);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,2*axis,axis);iterator.Valid();iterator.Next()){
                 FACE_INDEX<d> face_index=iterator.Full_Index();
                 FACE_INDEX<d> matching_face_index(face_index);matching_face_index.index(axis)=1;
                 if(face_indices(face_index)) face_indices(matching_face_index)=face_indices(face_index);

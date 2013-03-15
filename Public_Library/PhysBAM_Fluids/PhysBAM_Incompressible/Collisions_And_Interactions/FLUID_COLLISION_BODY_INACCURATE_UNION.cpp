@@ -5,8 +5,8 @@
 // Class FLUID_COLLISION_BODY_INACCURATE_UNION
 //##################################################################### 
 #include <PhysBAM_Tools/Data_Structures/OPERATION_HASH.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
@@ -108,7 +108,7 @@ Initialize_Grid_Structures_Helper(OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>&
     T_FACE_ARRAYS_COLLISION_GEOMETRY_ID face_operations(grid,3);
     for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++)if(collision_bodies.Is_Active(i) && collision_bodies.collision_geometry_collection.bodies(i)->active)
         Initialize_Grid_Structures_Subobject(face_velocities_count,face_operations,i,typename T_GRID::GRID_TAG());
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()) if(face_velocities_count.Component(iterator.Axis())(iterator.Face_Index())){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(face_velocities_count.Component(iterator.Axis())(iterator.Face_Index())){
         face_velocities.Component(iterator.Axis())(iterator.Face_Index())/=face_velocities_count.Component(iterator.Axis())(iterator.Face_Index());
         face_velocities_set.Component(iterator.Axis())(iterator.Face_Index())=true;}
 }
@@ -121,7 +121,7 @@ Initialize_Grid_Structures_Subobject(T_FACE_ARRAYS_INT& face_velocities_count,T_
     COLLISION_GEOMETRY<TV>& collision_body=*collision_bodies.collision_geometry_collection.bodies(subobject);
     RANGE<TV> bounding_box=collision_body.Axis_Aligned_Bounding_Box();
     RANGE<TV_INT> box=grid.Clamp_To_Cell(bounding_box,2).Thickened(1);
-    for(CELL_ITERATOR iterator(grid,box);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,box);iterator.Valid();iterator.Next()){
         T phi_value=collision_body.Implicit_Geometry_Extended_Value(iterator.Location());
         phi(iterator.Cell_Index())=min(phi_value,phi(iterator.Cell_Index()));
         if(phi_value<0) for(int axis=0;axis<T_GRID::dimension;axis++){

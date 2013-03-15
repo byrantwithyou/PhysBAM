@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
@@ -227,7 +227,7 @@ Initialize_Compressible_Incompressible_Coupling()
 template<class T_GRID> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Set_Ghost_Density_And_Temperature_Inside_Flame_Core()
 {
-    for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         int region=fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Inside_Region(iterator.Cell_Index());
         if(fluids_parameters.fuel_region(region)){
             fluids_parameters.density_container.density(iterator.Cell_Index())=fluids_parameters.density;
@@ -244,7 +244,7 @@ Set_Dirichlet_Boundary_Conditions(const T time)
             fluids_parameters.incompressible_multiphase->Set_Dirichlet_Boundary_Conditions(fluids_parameters.particle_levelset_evolution_multiple->phis,fluids_parameters.dirichlet_regions);
         else if(fluids_parameters.number_of_regions==1) fluids_parameters.incompressible->Set_Dirichlet_Boundary_Conditions(&fluids_parameters.particle_levelset_evolution->phi,0);
         else fluids_parameters.incompressible->Set_Dirichlet_Boundary_Conditions(0,0);} // 1 phase
-    else if(fluids_parameters.sph) for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+    else if(fluids_parameters.sph) for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         fluids_parameters.incompressible->projection.elliptic_solver->psi_D(iterator.Cell_Index())=true;fluids_parameters.incompressible->projection.p(iterator.Cell_Index())=0;}
     else if(fluids_parameters.compressible){
         fluids_parameters.euler->euler_projection.Set_Dirichlet_Boundary_Conditions(time);
@@ -267,7 +267,7 @@ Set_Dirichlet_Boundary_Conditions(const T time)
 template<class T_GRID> template<class GEOMETRY> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity)
 {
-    for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(source.Lazy_Inside(world_to_source.Homogeneous_Times(iterator.Location()))){
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(source.Lazy_Inside(world_to_source.Homogeneous_Times(iterator.Location()))){
         int axis=iterator.Axis();fluids_parameters.incompressible->projection.elliptic_solver->psi_N.Component(axis)(iterator.Face_Index())=true;
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis)(iterator.Face_Index())=constant_source_velocity[axis];}
 }
@@ -277,7 +277,7 @@ Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& worl
 template<class T_GRID> template<class GEOMETRY> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity,const T_FACE_ARRAYS_BOOL& invalid_mask)
 {
-    for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
         if(!invalid_mask(axis,face_index) && source.Lazy_Inside(world_to_source.Homogeneous_Times(iterator.Location()))){
             fluids_parameters.incompressible->projection.elliptic_solver->psi_N.Component(axis)(face_index)=true;
             fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis)(face_index)=constant_source_velocity[axis];}}
@@ -288,7 +288,7 @@ Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& worl
 template<class T_GRID> template<class GEOMETRY> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Adjust_Phi_With_Source(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source)
 {
-    for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){TV source_X=world_to_source.Homogeneous_Times(iterator.Location());
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){TV source_X=world_to_source.Homogeneous_Times(iterator.Location());
         if(source.Lazy_Inside(source_X)) 
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=min(fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index()),
                                                                                           source.Signed_Distance(source_X));}
@@ -301,7 +301,7 @@ Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORM
 {
     T bandwidth=3*fluids_parameters.grid->dX.Min();
     ARRAY<T_ARRAYS_SCALAR>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
-    for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         TV source_X=world_to_source.Homogeneous_Times(iterator.Location());
         if(source.Inside(source_X,-bandwidth)){
             T source_signed_distance=source.Signed_Distance(source_X);
@@ -317,7 +317,7 @@ Get_Source_Reseed_Mask(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& wor
 {
     if(reset_mask){if(cell_centered_mask) delete cell_centered_mask;cell_centered_mask=new ARRAY<bool,TV_INT>(fluids_parameters.grid->Domain_Indices(1));}
     T padding=3*fluids_parameters.grid->dX.Max();
-    for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
         if(!source.Outside(world_to_source.Homogeneous_Times(iterator.Location()),padding)) (*cell_centered_mask)(iterator.Cell_Index())=true;
 }
 //#####################################################################
@@ -326,7 +326,7 @@ Get_Source_Reseed_Mask(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& wor
 template<class T_GRID> template<class GEOMETRY> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Adjust_Density_And_Temperature_With_Sources(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const T source_density,const T source_temperature)
 {
-    for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(source.Lazy_Inside(world_to_source.Homogeneous_Times(iterator.Location()))){
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(source.Lazy_Inside(world_to_source.Homogeneous_Times(iterator.Location()))){
         if(fluids_parameters.use_density) fluids_parameters.density_container.density(iterator.Cell_Index())=source_density;
         if(fluids_parameters.use_temperature) fluids_parameters.temperature_container.temperature(iterator.Cell_Index())=source_temperature;}
 }
@@ -402,7 +402,7 @@ Get_Levelset_Velocity(const T_GRID& grid,LEVELSET_MULTIPLE<T_GRID>& levelset_mul
     if(!fluids_parameters.use_reacting_flow) T_FACE_ARRAYS_SCALAR::Put(fluid_collection.incompressible_fluid_collection.face_velocities,V_levelset);
     else{
         const PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection=fluids_parameters.incompressible_multiphase->projection;
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
             TV_INT cell1,cell2;grid.Cells_Touching_Face(axis,face,cell1,cell2);
             int region1,other_region1,region2,other_region2;T phi1,other_phi1,phi2,other_phi2;
             levelset_multiple.Two_Minimum_Regions(cell1,region1,other_region1,phi1,other_phi1);
@@ -444,10 +444,10 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum
     if(include_removed_particle_velocities){
         for(int i=0;i<fluids_parameters.number_of_regions;i++){
             PARTICLE_LEVELSET_UNIFORM<T_GRID>& particle_levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(i);
-            if(particle_levelset.use_removed_negative_particles) for(CELL_ITERATOR iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
+            if(particle_levelset.use_removed_negative_particles) for(CELL_ITERATOR<TV> iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
                 PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=particle_levelset.removed_negative_particles(iterator.Cell_Index());
                 if(particles) maximum_particle_speed=max(maximum_particle_speed,particles->V.Maximum_Magnitude());}
-            if(particle_levelset.use_removed_positive_particles) for(CELL_ITERATOR iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
+            if(particle_levelset.use_removed_positive_particles) for(CELL_ITERATOR<TV> iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
                 PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=particle_levelset.removed_positive_particles(iterator.Cell_Index());
                 if(particles) maximum_particle_speed=max(maximum_particle_speed,particles->V.Maximum_Magnitude());}}}
     T max_particle_collision_distance=0;
@@ -461,33 +461,33 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum
         fluids_parameters.maccormack_cell_mask.Resize(grid.Domain_Indices(fluids_parameters.number_of_ghost_cells),false,false);
         fluids_parameters.maccormack_face_mask.Resize(grid,fluids_parameters.number_of_ghost_cells);
         // don't use maccormack near domain boundary conditions
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             fluids_parameters.maccormack_cell_mask(iterator.Cell_Index())=TV_INT::Componentwise_Min(iterator.Cell_Index()-grid.Domain_Indices().Minimum_Corner(),
                 grid.Domain_Indices().Maximum_Corner()-iterator.Cell_Index()).Min()>fluids_parameters.cfl;
         VECTOR<T_GRID,T_GRID::dimension> grids;
         for(int i=0;i<T_GRID::dimension;i++) grids[i]=grid.Get_Face_Grid(i);
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT index=iterator.Face_Index();
             fluids_parameters.maccormack_face_mask(axis,index)
                 =TV_INT::Componentwise_Min(index-grids[axis].Domain_Indices().Minimum_Corner(),grids[axis].Domain_Indices().Maximum_Corner()-index).Min()>fluids_parameters.cfl;}
         if(fluids_parameters.mpi_grid){ // if mpi check turned off domain boundary regions to make sure they are global domain boundaries
             RANGE<TV> global_domain=fluids_parameters.mpi_grid->global_grid.domain;T double_cfl_dx=(T)fluids_parameters.cfl*fluids_parameters.p_grid.dX.Max();
-            for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+            for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
                 if(!fluids_parameters.maccormack_cell_mask(iterator.Cell_Index()) && global_domain.Inside(iterator.Location(),(T)double_cfl_dx))
                     fluids_parameters.maccormack_cell_mask(iterator.Cell_Index())=true;
-            for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
                 int axis=iterator.Axis();TV_INT index=iterator.Face_Index();
                 if(!fluids_parameters.maccormack_face_mask(axis,index) && global_domain.Inside(iterator.Location(),(T)double_cfl_dx))
                     fluids_parameters.maccormack_face_mask(axis,index)=true;}}
         // don't use maccormack near the interface
         if(fluids_parameters.bandwidth_without_maccormack_near_interface){
             T dx_times_band=grid.dX.Max()*fluids_parameters.bandwidth_without_maccormack_near_interface;
-            for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next())if(fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())>-dx_times_band){
+            for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())if(fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())>-dx_times_band){
                 fluids_parameters.maccormack_cell_mask(iterator.Cell_Index())=false;
                 for(int axis=0;axis<T_GRID::dimension;axis++){
                     fluids_parameters.maccormack_face_mask(axis,iterator.First_Face_Index(axis))=false;fluids_parameters.maccormack_face_mask(axis,iterator.Second_Face_Index(axis))=false;}}}
         // turn off maccormack near objects
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> node_iterator(grid,2);node_iterator.Valid();node_iterator.Next()) 
+        for(NODE_ITERATOR<TV> node_iterator(grid,2);node_iterator.Valid();node_iterator.Next()) 
             if(fluids_parameters.collision_bodies_affecting_fluid->occupied_blocks(node_iterator.Node_Index())){
                 TV_INT block_index=node_iterator.Node_Index();BLOCK_UNIFORM<T_GRID> block(grid,block_index);
                 for(int cell_index=0;cell_index<T_GRID::number_of_cells_per_block;cell_index++) fluids_parameters.maccormack_cell_mask(block.Cell(cell_index))=false;

@@ -11,8 +11,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
@@ -43,7 +43,6 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
     typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
     using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Add_To_Fluid_Simulation;
 
@@ -373,7 +372,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     if(write_transparency_output){ 
         std::ostream* output=FILE_UTILITIES::Safe_Open_Output(output_directory+STRING_UTILITIES::string_sprintf("/U_%d.txt",frame),false,false);
-        for(CELL_ITERATOR it(*fluids_parameters.grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
             if(fluids_parameters.euler->euler_projection.elliptic_solver->psi_D(it.Cell_Index())) continue;
             TV_DIMENSION U_cell=fluids_parameters.euler->U(it.Cell_Index());
             (*output)<<U_cell(0)<<"\t"<<U_cell(1)<<"\t"<<U_cell(2)<<"\t"

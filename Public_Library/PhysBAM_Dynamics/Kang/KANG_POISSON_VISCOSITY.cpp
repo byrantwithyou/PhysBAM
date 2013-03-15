@@ -5,8 +5,8 @@
 // Class KANG_POISSON_VISCOSITY
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
@@ -122,7 +122,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
 
     int num_cells=0;
     ARRAY<int,TV_INT> cell_index(grid.Domain_Indices(3));
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
         if(!psi_D(it.index))
             cell_index(it.index)=++num_cells;
 
@@ -141,7 +141,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     T mn=FLT_MAX,mx=-mn;
     GRAD_HELPER<T> null_helper={0,0,0};
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
         bool psi_n=psi_N(it.Full_Index());
         //bool psi_n=false; // disable any Neumann bc's
@@ -221,7 +221,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     INTERPOLATED_COLOR_MAP<T> color_map;
     color_map.Initialize_Colors((T)-.3,(T).3,false,true,false);
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int ci=cell_index(it.index);
         if(ci==0) continue;
         T val=p.v(ci);
@@ -229,7 +229,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
         /*Add_Debug_Particle(it.Location(), color_map(val));*/}
 
     int i=1;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next(),i++){
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next(),i++){
         T dp=0;
         if(grad_helper(i).i) dp-=p.v(grad_helper(i).i);
         if(grad_helper(i).j) dp+=p.v(grad_helper(i).j);
@@ -259,7 +259,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
 
     int num_dual_cells=0;
     ARRAY<int,TV_INT> dual_cell_index(dual_grid.Domain_Indices(3));
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){
         if(psi_N(it.Full_Index())) face_velocities(it.Full_Index())=psi_N_value(it.Full_Index());
         else if(!(psi_D(it.First_Cell_Index()) && psi_D(it.Second_Cell_Index())))
             dual_cell_index(it.index)=++num_dual_cells;}
@@ -277,14 +277,14 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     T rho_n=fluids_parameters.density,rho_p=fluids_parameters.outside_density;
     TV one_over_dX_2=sqr(dual_grid.one_over_dX);
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){
         int index=dual_cell_index(it.index);
         if(index>=0){
             b.v(index)=face_velocities(it.Full_Index());
             r.v(index)=Face_Phi(it.Full_Index())<0?rho_n:rho_p;}}
     if(!implicit) u.v=b.v;
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(dual_grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(dual_grid);it.Valid();it.Next()){
         TV_INT dual_cell1=it.First_Cell_Index(),dual_cell2=it.Second_Cell_Index();
         FACE_INDEX<TV::m> face1(axis,dual_cell1),face2(axis,dual_cell2);
         int index1=dual_cell_index(dual_cell1),index2=dual_cell_index(dual_cell2);
@@ -362,7 +362,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     INTERPOLATED_COLOR_MAP<T> color_map;
     color_map.Initialize_Colors(u.v.Min(),u.v.Max(),false,true,false);
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){
         int index=dual_cell_index(it.index);
         if(index>=0){
             face_velocities(it.Full_Index())=u.v(index);

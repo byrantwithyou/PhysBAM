@@ -5,7 +5,7 @@
 #ifndef __SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT__
 #define __SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Images/IMAGE.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
@@ -27,7 +27,7 @@ public:
     {
         ARRAY<TV,VECTOR<int,2> > slice_image;IMAGE<T>::Read(filename,slice_image);
         slice_grid=GRID<VECTOR<T,2> >(slice_image.Size(),RANGE<VECTOR<T,2> >(VECTOR<T,2>(),VECTOR<T,2>(width,height)));slice_phi.Resize(slice_grid.Domain_Indices());
-        for(UNIFORM_GRID_ITERATOR_NODE<VECTOR<T,2> > iterator(slice_grid);iterator.Valid();iterator.Next()){VECTOR<int,2> node=iterator.Node_Index();
+        for(NODE_ITERATOR<VECTOR<T,2> > iterator(slice_grid);iterator.Valid();iterator.Next()){VECTOR<int,2> node=iterator.Node_Index();
             slice_phi(node)=2*slice_image(node).Average()-1;}
         slice_levelset.Fast_Marching_Method();slice_levelset.Compute_Normals();
         Update_Box();

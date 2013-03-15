@@ -2,8 +2,8 @@
 // Copyright 2009, Avi Robinson-Mosher, Craig Schroeder
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLECTION.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -39,11 +39,11 @@ Compute(const GRID<TV>& grid,ARRAY<T,TV_INT>& p,ARRAY<T,FACE_INDEX<TV::dimension
     for(int i=0;i<boundary_conditions.m;i++) boundary_conditions(i)->Update_Boundary_Conditions(grid,psi_D,psi_N,p,face_velocities,time);
 
     if(set_all_neumann_cells_to_dirichlet){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1);iterator.Valid();iterator.Next()) if(All_Cell_Faces_Neumann(iterator.Cell_Index())){
+        for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) if(All_Cell_Faces_Neumann(iterator.Cell_Index())){
             psi_D(iterator.Cell_Index())=true;p(iterator.Cell_Index())=0;}}
 
     if(zero_all_dirichlet_face_velocities){
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             if(psi_D(iterator.First_Cell_Index()) && psi_D(iterator.Second_Cell_Index())){
                 face_velocities(iterator.Axis(),iterator.Face_Index())=0;}}}
 
@@ -56,7 +56,7 @@ template<class TV> void IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>::
 Compute_Boundary_Condition_Info(const GRID<TV>& grid,const ARRAY<T,TV_INT>& p,const ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities)
 {
     boundary_condition_info.Remove_All();
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         Compute_Boundary_Condition_Info(p,face_velocities,iterator.Full_Index(),1);
         Compute_Boundary_Condition_Info(p,face_velocities,iterator.Full_Index(),2);}
 }

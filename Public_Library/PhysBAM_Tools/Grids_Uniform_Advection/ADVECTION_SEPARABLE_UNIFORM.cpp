@@ -4,8 +4,8 @@
 //#####################################################################
 // Class ADVECTION_SEPARABLE_UNIFORM
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 using namespace PhysBAM;
@@ -117,7 +117,7 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,con
 
     ARRAY<TV,TV_INT> V_cell(grid.Domain_Indices(3));T_AVERAGING averaging;
 
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) V_cell(iterator.Cell_Index())=averaging.Face_To_Cell_Vector(grid,iterator.Cell_Index(),V);
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) V_cell(iterator.Cell_Index())=averaging.Face_To_Cell_Vector(grid,iterator.Cell_Index(),V);
 
     UPDATE_ADVECTION_EQUATION_HELPER<TV::dimension>::Apply(*this,grid,Z,Z_ghost,V_cell,dt,time);
 }
@@ -132,7 +132,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
 
     ARRAY<TV,FACE_INDEX<TV::m> > V_face(grid,0);T_AVERAGING averaging;
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()) V_face(iterator.Full_Index())=averaging.Face_To_Face_Vector(grid,iterator.Full_Index(),V);
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) V_face(iterator.Full_Index())=averaging.Face_To_Face_Vector(grid,iterator.Full_Index(),V);
 
     for(int i=0;i<TV::m;i++){
         GRID<TV> node_grid(grid.Get_Face_Grid(i));

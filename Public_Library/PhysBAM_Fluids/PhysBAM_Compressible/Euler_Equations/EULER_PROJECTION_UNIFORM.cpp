@@ -2,8 +2,8 @@
 // Copyright 2007, Jon Gretarsson, Nipun Kwatra, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
@@ -63,10 +63,10 @@ Get_Pressure(T_ARRAYS_SCALAR& pressure) const
     if(transition_to_using_implicit_pressure){
         LOG::cout<<"using implicit pressure, is_pressure_scaled="<<is_pressure_scaled<<std::endl;
         T scaling=(T)1;if(is_pressure_scaled) scaling=(T)1/dt_scale_pressure;
-        for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             pressure(cell_index)=p(cell_index)*scaling;}}
     else{ 
-        for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             pressure(cell_index)=euler->eos->p(euler->U(cell_index)(0),euler->e(euler->U,cell_index));}}
 }
 //#####################################################################
@@ -76,7 +76,7 @@ template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
 Fill_Face_Weights_For_Projection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& beta_face)
 {
     euler->Fill_Ghost_Cells(dt,time,1);
-    for(FACE_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
+    for(FACE_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
         T rho_first_cell=euler->U_ghost(iterator.First_Cell_Index())(0),rho_second_cell=euler->U_ghost(iterator.Second_Cell_Index())(0);
         T rho_face=(rho_first_cell+rho_second_cell)*(T).5;
         beta_face.Component(axis)(face_index)=(T)1/rho_face;}
@@ -91,7 +91,7 @@ template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
 Get_Ghost_Density(const T dt,const T time,const int number_of_ghost_cells,T_ARRAYS_SCALAR& density_ghost) const
 {
     euler->Fill_Ghost_Cells(dt,time,number_of_ghost_cells);
-    for(CELL_ITERATOR iterator(euler->grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(euler->grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         density_ghost(cell_index)=euler->U_ghost(cell_index)(0);}
 }
@@ -102,7 +102,7 @@ template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
 Get_Ghost_Centered_Velocity(const T dt,const T time,const int number_of_ghost_cells,ARRAY<TV,TV_INT>& centered_velocity_ghost) const
 {
     euler->Fill_Ghost_Cells(dt,time,number_of_ghost_cells);
-    for(CELL_ITERATOR iterator(euler->grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(euler->grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(!euler->psi.Valid_Index(cell_index) || euler->psi(cell_index))
             centered_velocity_ghost(cell_index)=EULER<T_GRID>::Get_Velocity(euler->U_ghost(cell_index));}
@@ -115,7 +115,7 @@ Make_Boundary_Faces_Neumann(T_FACE_ARRAYS_BOOL& psi_N)
 {
     for(int side=0;side<2*TV::dimension;side++)
         if(!euler->mpi_grid || euler->mpi_grid->side_neighbor_ranks(side)>0)
-            for(FACE_ITERATOR iterator(euler->grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(euler->grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face_index=iterator.Face_Index();int axis=iterator.Axis();
                 psi_N.Component(axis)(face_index)=true;}
 }
@@ -163,7 +163,7 @@ template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
 Get_Dirichlet_Boundary_Conditions(const T_ARRAYS_DIMENSION_SCALAR& U_dirichlet)
 {
     TV_INT cell_index;
-    for(CELL_ITERATOR iterator(euler->grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(euler->grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
         cell_index=iterator.Cell_Index();
         p_dirichlet(cell_index)=euler->eos->p(U_dirichlet(cell_index)(0),euler->e(U_dirichlet,cell_index));}
 }
@@ -175,12 +175,12 @@ Set_Dirichlet_Boundary_Conditions(const T time)
 {
     assert(!is_pressure_scaled);
     TV_INT cell_index;
-    for(CELL_ITERATOR iterator(euler->grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(euler->grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
         cell_index=iterator.Cell_Index();
         p(cell_index)=p_dirichlet(cell_index);}
 
     // TODO: should we set unsolved cells to be dirichlet
-    //for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){cell_index=iterator.Cell_Index();
+    //for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){cell_index=iterator.Cell_Index();
     //   if(!euler->psi(cell_index)) elliptic_solver->psi_D(cell_index)=true;}
 
     if(euler->mpi_grid){
@@ -195,7 +195,7 @@ Compute_Divergence(const FACE_LOOKUP& face_lookup)
 {
     TV one_over_dx=euler->grid.one_over_dX;
     // Compute divergence at cell centers
-    for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){
         const typename FACE_LOOKUP::LOOKUP& lookup=face_lookup.Starting_Point_Cell(iterator.Cell_Index());
         T divergence=0;for(int axis=0;axis<T_GRID::dimension;axis++){
             divergence+=(lookup(axis,iterator.Second_Face_Index(axis))-lookup(axis,iterator.First_Face_Index(axis)))*one_over_dx[axis];}
@@ -216,7 +216,7 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_
 
 #if 1
     ARRAY<TV,TV_INT> v_cell(euler->grid.Domain_Indices(3));
-    for(CELL_ITERATOR iterator(euler->grid,3);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(euler->grid,3);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         v_cell(cell_index)=euler->Get_Velocity(U_ghost,cell_index);}
 
     FLOOD_FILL<1> find_connected_components;
@@ -241,7 +241,7 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_
                     use_exact_neumann_face_location,VECTOR<int,2>(0,grid_1d.counts.x),region_boundary,psi_N_boundary,0);
                 pressure_advection_HJ.Advection_Solver(region_boundary.x,region_boundary.y,grid_1d.dX.x,p_1d,u,u_px);
                 for(int k=region_boundary.x;k<region_boundary.y;k++) rhs(cell_index.Insert(k,axis))+=u_px(k);}}}
-    for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next())
+    for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next())
         p_advected(iterator.Cell_Index())=p_ghost(iterator.Cell_Index())-dt*rhs(iterator.Cell_Index());
 #else
     FACE_LOOKUP_UNIFORM<T_GRID> face_lookup(face_velocities);
@@ -255,7 +255,7 @@ template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
 Compute_Right_Hand_Side(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     Compute_Divergence(T_FACE_LOOKUP(face_velocities));
-    for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(euler->psi(cell_index)) elliptic_solver->f(cell_index)-=p_advected(cell_index)*one_over_rho_c_squared(cell_index)*(1/dt);}
 }
 //#####################################################################
@@ -264,7 +264,7 @@ Compute_Right_Hand_Side(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,c
 template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
 Compute_One_Over_rho_c_Squared()
 {
-    for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(euler->psi(cell_index)){
             T rho=euler->U_ghost(cell_index)(0);
             T one_over_c=euler->eos->one_over_c(euler->U_ghost(cell_index)(0),euler->e(euler->U_ghost,cell_index));
@@ -284,7 +284,7 @@ template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
 Compute_Density_Weighted_Face_Velocities(const T_GRID& face_grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T_FACE_ARRAYS_BOOL& psi_N)
 {
     TV_INT first_cell_index,second_cell_index;int axis;
-    for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){
         first_cell_index=iterator.First_Cell_Index();second_cell_index=iterator.Second_Cell_Index();axis=iterator.Axis();
         if(!psi_N.Component(axis)(iterator.Face_Index()) && ((!psi.Valid_Index(first_cell_index) || psi(first_cell_index)) && (!psi.Valid_Index(second_cell_index) || psi(second_cell_index)))){
             T rho_first_cell=U_ghost(first_cell_index)(0),rho_second_cell=U_ghost(second_cell_index)(0);
@@ -299,7 +299,7 @@ template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
 Compute_Face_Pressure_From_Cell_Pressures(const T_GRID& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,T_FACE_ARRAYS_SCALAR& p_face,const T_ARRAYS_SCALAR& p_cell)
 {
     TV_INT first_cell_index,second_cell_index;int axis;
-    for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){
         first_cell_index=iterator.First_Cell_Index();second_cell_index=iterator.Second_Cell_Index();axis=iterator.Axis();
         if((!psi.Valid_Index(first_cell_index) || psi(first_cell_index)) && (!psi.Valid_Index(second_cell_index) || psi(second_cell_index))){
             T rho_first_cell=U_ghost(first_cell_index)(0),rho_second_cell=U_ghost(second_cell_index)(0);
@@ -324,7 +324,7 @@ Get_Ghost_Pressures(const T dt,const T time,const ARRAY<bool,TV_INT>& psi_D,cons
     if(!use_neumann_condition_for_outflow_boundaries){
         for(int axis=0;axis<T_GRID::dimension;axis++) if(!elliptic_solver->periodic_boundary[axis]){
             for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
-                for(CELL_ITERATOR iterator(euler->grid,1,T_GRID::GHOST_REGION,side);iterator.Valid();iterator.Next()){
+                for(CELL_ITERATOR<TV> iterator(euler->grid,1,T_GRID::GHOST_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT cell_index=iterator.Cell_Index();
                     TV_INT boundary_face_index=side&1?iterator.First_Face_Index(axis):iterator.Second_Face_Index(axis);
                     if(psi_D(cell_index) && !psi_N.Component(axis)(boundary_face_index)){
@@ -373,7 +373,7 @@ Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face
     
     TV one_over_dx=euler->grid.one_over_dX;T one_over_dt=1/dt;
     // update momentum
-    for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()) if(euler->psi(iterator.Cell_Index())){
+    for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()) if(euler->psi(iterator.Cell_Index())){
         TV_INT cell_index=iterator.Cell_Index();
         for(int axis=0;axis<T_GRID::dimension;axis++){
             TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
@@ -391,14 +391,14 @@ Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face
         // update face velocities for energy update
         T_FACE_ARRAYS_SCALAR grad_p_hat_face(euler->grid);
         ARRAYS_UTILITIES<T_GRID,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler->grid,grad_p_hat_face,p_hat);
-        for(FACE_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
+        for(FACE_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
             if(!psi_N.Component(axis)(face_index) && (!euler->psi.Valid_Index(first_cell_index) || euler->psi(first_cell_index)) && (!euler->psi.Valid_Index(second_cell_index) || euler->psi(second_cell_index))){
                 T rho_face=(euler->U_ghost(first_cell_index)(0)+euler->U_ghost(second_cell_index)(0))*(T).5;
                 face_velocities_np1.Component(axis)(face_index)-=grad_p_hat_face.Component(axis)(face_index)/rho_face;}}}
 
    // update energy
-   for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()) if(euler->psi(iterator.Cell_Index())){TV_INT cell_index=iterator.Cell_Index();
+   for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()) if(euler->psi(iterator.Cell_Index())){TV_INT cell_index=iterator.Cell_Index();
        T div_p_hat_u=0;
        for(int axis=0;axis<T_GRID::dimension;axis++){
            TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
@@ -427,7 +427,7 @@ Consistent_Boundary_Conditions() const
         euler->mpi_grid->Exchange_Boundary_Cell_Data(psi_D_ghost,1);
         for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
             if(euler->mpi_grid->Neighbor(axis,axis_side)){TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
-                for(FACE_ITERATOR iterator(euler->grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+                for(FACE_ITERATOR<TV> iterator(euler->grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT face=iterator.Face_Index(),cell=face+exterior_cell_offset;int axis=iterator.Axis();
                     psi_N_ghost(axis,face)=(T)elliptic_solver->psi_N(axis,face);
                     assert(elliptic_solver->psi_D(cell)==psi_D_ghost(cell));}}}

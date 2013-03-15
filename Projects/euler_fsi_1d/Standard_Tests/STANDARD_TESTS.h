@@ -11,8 +11,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
@@ -48,7 +48,6 @@ public:
     typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*T_GRID::dimension> T_FACE_VECTOR_BOOL;
     typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR; typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
@@ -442,7 +441,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     //initialize grid variables
     //1 == density, 2 == momentum, 3 == total energy
     // for(int i=0;i<grid.counts.x;i++){
-    for(CELL_ITERATOR iter(grid);iter.Valid();iter.Next()){
+    for(CELL_ITERATOR<TV> iter(grid);iter.Valid();iter.Next()){
         TV location=iter.Location();
         T rho=0.,u=0.,p=0.;
         if(location.x <= middle_state_start_point){rho=state_left(1);u=state_left(2);p=state_left(3);}
@@ -452,7 +451,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
         U(iter.Cell_Index())(1) = rho; U(iter.Cell_Index())(2) = rho*u; U(iter.Cell_Index())(3) = rho*(eos.e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}
 
     flux_face.Resize(grid.Domain_Indices(3));
-    for(FACE_ITERATOR iter(grid,3);iter.Valid();iter.Next())
+    for(FACE_ITERATOR<TV> iter(grid,3);iter.Valid();iter.Next())
         flux_face(iter.Full_Index()) = true;
 }
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE 
@@ -514,7 +513,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         //if(time>eos_smooth_transition->t_start_transition) fluids_parameters.euler->euler_projection.Set_Transition_To_Using_Implicit_Pressure(true);
     }
     // T_GRID& grid=fluids_parameters.euler->grid;
-    // for(FACE_ITERATOR iter(grid,3);iter.Valid();iter.Next())
+    // for(FACE_ITERATOR<TV> iter(grid,3);iter.Valid();iter.Next())
     //     flux_face(iter.Full_Index()) = true;
 }
 virtual void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE

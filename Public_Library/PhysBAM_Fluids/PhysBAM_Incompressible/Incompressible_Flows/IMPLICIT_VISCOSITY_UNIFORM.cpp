@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/LAPLACE_UNIFORM.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
@@ -50,18 +50,18 @@ Viscous_Update(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_
 
     // copy velocities into u so unchanged velocities can be copied out unconditionally...
     // TODO: make shared face copied in a more clever way to avoid this copy 
-    for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
         TV_INT p_face_index=iterator.Face_Index(),cell_index=p_face_index;
         u(cell_index)=velocity_component_ghost(p_face_index);}
 
-    for(CELL_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()) heat_solver->f(iterator.Cell_Index())=velocity_component_ghost(iterator.Cell_Index());
+    for(CELL_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()) heat_solver->f(iterator.Cell_Index())=velocity_component_ghost(iterator.Cell_Index());
     heat_solver->f*=-1;
     heat_solver->Compute_beta_And_Add_Jumps_To_b(dt,time);
     heat_solver->Solve(time);
 
     // update face_velocities
     T_ARRAYS_BASE& velocity_component=face_velocities.Component(axis);
-    for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Face_Index();
         velocity_component(index)=u(index);}
 }
@@ -72,7 +72,7 @@ template<class T_GRID> void IMPLICIT_VISCOSITY_UNIFORM<T_GRID>::
 Variable_Viscosity_Explicit_Part(const T density,const T_ARRAYS_SCALAR& variable_viscosity,const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T time)
 {
     TV one_over_DX=grid.one_over_dX;
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
         for(int term_axis=0;term_axis<T_GRID::dimension;term_axis++){
             TV_INT positive_base_index=face_index+TV_INT::Axis_Vector(term_axis);
@@ -109,7 +109,7 @@ Setup_Viscosity(const T dt)
     if(HEAT_LAPLACE<POISSON_COLLIDABLE_UNIFORM<T_GRID> >* heat_poisson=dynamic_cast<HEAT_LAPLACE<POISSON_COLLIDABLE_UNIFORM<T_GRID> >*>(heat_solver)){
         heat_poisson->Set_Variable_beta();
         T half_dt_over_density=(T).5*dt/density;
-        for(CELL_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next())
             heat_poisson->variable_beta(iterator.Cell_Index())=half_dt_over_density*(variable_viscosity(iterator.Cell_Index())+variable_viscosity(iterator.Cell_Index()-TV_INT::Axis_Vector(axis)));}
     else if(HEAT_LAPLACE<LAPLACE_COLLIDABLE_UNIFORM<T_GRID> >* heat_laplace=dynamic_cast<HEAT_LAPLACE<LAPLACE_COLLIDABLE_UNIFORM<T_GRID> >*>(heat_solver)) {
         T dt_times_kinematic_viscosity=dt*viscosity/density;
@@ -127,20 +127,20 @@ Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities)
     T_FACE_ARRAYS_SCALAR& psi_R=heat_solver->psi_R;
 
     // dirichlet velocity boundary condition where we have neumann condition for the pressure
-    for(CELL_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
+    for(CELL_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
         u(cell_index)=face_velocities(axis,p_face_index); // always copy over current velocity to get a good initial guess
         if(p_psi_N(axis,p_face_index)) psi_D(cell_index)=true;} // TODO -- make sure face velocity bc are correct after advection
     if(heat_solver->mpi_grid) heat_solver->mpi_grid->Exchange_Boundary_Cell_Data(*heat_solver->mpi_grid,face_grid,psi_D,1,false);
 
     // set neumann b.c. around a cell if its corresponding face in the pressure grid has psi_D set on both sides
-    for(CELL_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
+    for(CELL_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
         TV_INT p_cell_index_1,p_cell_index_2;T_GRID::Cells_Touching_Face(axis,p_face_index,p_cell_index_1,p_cell_index_2);
         if(p_psi_D(p_cell_index_1)&&p_psi_D(p_cell_index_2)) for(int face_axis=0;face_axis<T_GRID::dimension;face_axis++){
             psi_N(face_axis,face_grid.First_Face_Index_In_Cell(face_axis,cell_index))=psi_N(face_axis,face_grid.Second_Face_Index_In_Cell(face_axis,cell_index))=true;}}
 
     // do the same for the sides tangential to the axis being iterated over
     for(int grid_axis=0;grid_axis<T_GRID::dimension;grid_axis++)if(grid_axis!=axis)for(int side=0;side<2;side++){
-        for(CELL_ITERATOR iterator(face_grid,1,T_GRID::GHOST_REGION,2*grid_axis+side);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(face_grid,1,T_GRID::GHOST_REGION,2*grid_axis+side);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
             TV_INT p_cell_index_1,p_cell_index_2;T_GRID::Cells_Touching_Face(axis,p_face_index,p_cell_index_1,p_cell_index_2);
             if(p_psi_D.Valid_Index(p_cell_index_1)&&p_psi_D.Valid_Index(p_cell_index_2)&&p_psi_D(p_cell_index_1)&&p_psi_D(p_cell_index_2))
@@ -149,18 +149,18 @@ Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities)
 
     // set neumann for the faces in the same axis that are on dirichlet primal cells
     const TV_INT axis_offset=TV_INT::Axis_Vector(axis);
-    for(FACE_ITERATOR iterator(face_grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next())if(p_psi_D(iterator.Face_Index()-axis_offset)) 
+    for(FACE_ITERATOR<TV> iterator(face_grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next())if(p_psi_D(iterator.Face_Index()-axis_offset)) 
         psi_N(axis,iterator.Face_Index())=true;
 
     // set slip boundary conditions for tangential walls
     for(int other_axis=0;other_axis<T_GRID::dimension;other_axis++) if(other_axis!=axis){
-        for(FACE_ITERATOR iterator(face_grid,0,T_GRID::BOUNDARY_REGION,-1,other_axis);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index(),p_node_index=face_index;
+        for(FACE_ITERATOR<TV> iterator(face_grid,0,T_GRID::BOUNDARY_REGION,-1,other_axis);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index(),p_node_index=face_index;
             if(p_psi_N(other_axis,p_node_index-axis_offset)||p_psi_N(other_axis,p_node_index)) psi_N(other_axis,face_index)=true;}}
 
     // set slip boundary conditions for tangential walls
     if(p_psi_R.base_pointer)
         for(int other_axis=0;other_axis<T_GRID::dimension;other_axis++) if(other_axis!=axis){
-            for(FACE_ITERATOR iterator(face_grid,0,T_GRID::BOUNDARY_REGION,-1,other_axis);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index(),p_node_index=face_index;
+            for(FACE_ITERATOR<TV> iterator(face_grid,0,T_GRID::BOUNDARY_REGION,-1,other_axis);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index(),p_node_index=face_index;
                 T a=p_psi_R(other_axis,p_node_index-axis_offset),b=p_psi_R(other_axis,p_node_index);
                 if(a || b) psi_R(other_axis,face_index)=(T).5*(a+b);}}
 }

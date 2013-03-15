@@ -19,7 +19,6 @@ class INTERPOLATION_UNIFORM:public NONCOPYABLE
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     STATIC_ASSERT((IS_SAME<typename T_GRID::GRID_TAG,UNIFORM_TAG<TV> >::value));
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     template<class T3> struct REBIND{typedef INTERPOLATION_UNIFORM<T_GRID,T3,T_FACE_LOOKUP> TYPE;};
@@ -44,12 +43,12 @@ public:
     {return Clamped_Index(grid,u,location,1,2);}
 
     void Populate_New_Array(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const T_GRID& grid_new,ARRAYS_ND_BASE<T2,TV_INT>& u_new)
-    {for(CELL_ITERATOR iterator(grid_new,u_new.Domain_Indices());iterator.Valid();iterator.Next()){ // CELL ITERATOR works for nodal
+    {for(CELL_ITERATOR<TV> iterator(grid_new,u_new.Domain_Indices());iterator.Valid();iterator.Next()){ // CELL ITERATOR works for nodal
         u_new(iterator.Cell_Index())=Clamped_To_Array(grid,u,grid_new.X(iterator.Cell_Index()));}}
 
     void Populate_New_Array(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& u,const T_GRID& grid_new,T_FACE_ARRAYS_SCALAR& u_new)
     {FACE_LOOKUP_UNIFORM<T_GRID> lookup(u);
-    for(FACE_ITERATOR iterator(grid_new);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
+    for(FACE_ITERATOR<TV> iterator(grid_new);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
         u_new.Component(axis)(iterator.Face_Index())=Clamped_To_Array_Face_Component(axis,grid,lookup,iterator.Location());}}
 
     T2 Clamped_To_Array_Cell(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const

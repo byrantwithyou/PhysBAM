@@ -3,9 +3,9 @@
 // This file is part of PhysBAM hose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/IDENTITY_ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
@@ -222,7 +222,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         Compute_W(current_position_time); // set Neumann conditions on all dual cells which have object faces
         
         /*TV dimensionwise_fluid_momentum;
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             const int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             if(dual_cell_fluid_volume(axis,face_index)) dimensionwise_fluid_momentum(axis)+=Get_Density_At_Face(axis,face_index)*dual_cell_fluid_volume(axis,face_index)*face_velocities(axis,face_index);}
         LOG::cout<<"Dimensionwise fluid momentum after explicit forces: "<<dimensionwise_fluid_momentum<<std::endl;*/
@@ -242,7 +242,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         
         // Set up fluids RHS (poisson->f)
         T_FACE_ARRAYS_SCALAR copy_face_velocities(face_velocities);
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
             if(dual_cell_contains_solid(axis,face_index)) face_velocities(axis,face_index)=(T)0;} // These faces should not be pulled to the RHS, so zero them out
         Transfer_Momentum_And_Set_Boundary_Conditions(current_position_time,&B);
@@ -263,7 +263,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         cell_index_to_matrix_index.Fill(-1);
         ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-2,number_of_regions);
         A_array.Resize(number_of_regions);b_array.Resize(number_of_regions);
-        for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(poisson.filled_region_colors(iterator.Cell_Index()))++;
+        for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(poisson.filled_region_colors(iterator.Cell_Index()))++;
         for(int color=0;color<number_of_regions;color++) if(poisson.filled_region_touches_dirichlet(color)||poisson.solve_neumann_regions){
             matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color));}
         filled_region_cell_count.Fill(0); // reusing this array in order to make the indirection arrays
@@ -314,7 +314,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         if(!fluids_parameters.compressible){
             PHYSBAM_DEBUG_WRITE_SUBSTEP("using face velocities to set up solid RHS (sf coupled evolution)",0,1);
             T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
-            for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
                 const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();TV axis_vector=TV::Axis_Vector(axis);
                 const TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
                 TV momentum_chunk=axis_vector*dual_cell_fluid_volume(axis,face_index)*Get_Density_At_Face(axis,face_index)*face_velocities(axis,face_index);
@@ -580,7 +580,7 @@ Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<
             // wonder if this works
             TV total_length_by_dimension;
             for(int axis=0;axis<TV::dimension;axis++){
-                for(FACE_ITERATOR iterator(grid,bounding_grid_cells,axis);iterator.Valid();iterator.Next()){
+                for(FACE_ITERATOR<TV> iterator(grid,bounding_grid_cells,axis);iterator.Valid();iterator.Next()){
                     RANGE<TV> dual_cell=iterator.Dual_Cell();
                     const TV_INT& face_index=iterator.Face_Index();
                     if(((!rigid_body_dual_cell_weights.Component(axis).Valid_Index(face_index) || !rigid_body_dual_cell_weights(axis,face_index)) && 
@@ -598,7 +598,7 @@ Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<
                         modified_face_velocities(axis,face_index)+=jet_velocity(axis)*total_length;
                         modified_face_weight(axis,face_index)+=total_length;}}}}}
 
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         const int axis=iterator.Axis();
         const TV_INT& face_index=iterator.Face_Index();
         if(modified_face(axis,face_index)){
@@ -626,7 +626,7 @@ Set_Neumann_and_Dirichlet_Boundary_Conditions(const T time)
     fluids_parameters.callbacks->Set_Dirichlet_Boundary_Conditions(time);
 
     // Don't use Neumann faces for coupling if they have dirichlet conditions on both sides - prevent nasty mass lumping bug
-    for(FACE_ITERATOR iterator(Get_Grid(),0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(Get_Grid(),0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
         const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
         if(poisson.psi_N(axis,face_index) && ((poisson.psi_D(iterator.First_Cell_Index()) && poisson.psi_D(iterator.Second_Cell_Index()))
     // Also, don't couple to thin-shell faces, as euler is having difficulties dealing with them.
@@ -645,14 +645,14 @@ Set_Dirichlet_Boundary_Conditions(const T time)
 
     // Set all cells inside a solid to be dirichlet
     COLLISION_GEOMETRY_ID inside_body_id;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();TV location=iterator.Location();
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();TV location=iterator.Location();
         if(fluids_parameters.collision_bodies_affecting_fluid->Inside_Any_Body(location,inside_body_id)){
             poisson.psi_D(cell_index)=true;p(cell_index)=(T)-100;}} // These dirichlet pressures should never be used.
 
     if(fluids_parameters.mpi_grid) fluids_parameters.mpi_grid->Exchange_Boundary_Cell_Data(poisson.psi_D,1);
     if(!fluids_parameters.solve_neumann_regions){ // Turn off cells which should not be solved for...
         poisson.Find_Solution_Regions();
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index();int color=poisson.filled_region_colors(cell_index);
             if(!poisson.psi_D(cell_index) && (color==-1 || !poisson.filled_region_touches_dirichlet(color))){
                 poisson.psi_D(cell_index)=true;p(cell_index)=-100;}}}
@@ -697,7 +697,7 @@ Compute_W(const T current_position_time)
             for(int e=0;e<mesh->elements.m;e++){
                 const RANGE<TV>& box=body.World_Space_Simplex(e).Bounding_Box();
                 RANGE<TV_INT> bounding_grid_cells(grid.Clamp_To_Cell(box,1));
-                for(CELL_ITERATOR iterator(grid,bounding_grid_cells);iterator.Valid();iterator.Next())
+                for(CELL_ITERATOR<TV> iterator(grid,bounding_grid_cells);iterator.Valid();iterator.Next())
                     structure_simplex_list(iterator.Cell_Index()).Append(PAIR<COLLISION_GEOMETRY_ID,int>(i,e));}}
 
     // =====================================================================================
@@ -723,7 +723,7 @@ Compute_W(const T current_position_time)
     POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson=Get_Poisson();
     fluids_parameters.Set_Domain_Boundary_Conditions(*poisson,face_velocities,current_position_time);
     const T one_over_number_nodes_thin_shell=(T)1/TV::dimension;
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
         const TV axis_vector=TV::Axis_Vector(axis);const TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
         const RANGE<TV> dual_cell=iterator.Dual_Cell().Thickened(grid.dX.Min()*(T)1e-2);
         if(!using_levelset || Negative(grid,axis,face_index,fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).levelset.phi)){
@@ -836,7 +836,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
         const GRID<TV>& grid=Get_Grid();
         RANGE<TV_INT> domain_indices=grid.Domain_Indices();
         // estimate the number of non-zero entries per row - DEFORMABLE PART
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             if(!dual_cell_weights(axis,face_index)) continue;
             FACE_WEIGHT_ELEMENTS& dual_cell_weight=*dual_cell_weights(axis,face_index);
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
@@ -873,7 +873,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
         const GRID<TV>& grid=Get_Grid();
         RANGE<TV_INT> domain_indices=grid.Domain_Indices();
         TV one_over_dx=grid.one_over_dX;
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             if(!dual_cell_weights(axis,face_index)) continue;
             FACE_WEIGHT_ELEMENTS& dual_cell_weight=*dual_cell_weights(axis,face_index);
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
@@ -917,7 +917,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
         // estimate the number of non-zero entries per row - RIGID PART
         // think of this as a separate block of the matrix - call it J_rigid
         RANGE<TV_INT> domain_indices=grid.Domain_Indices();
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             if(!rigid_body_dual_cell_weights(axis,face_index)) continue;
             FACE_WEIGHT_ELEMENTS& dual_cell_weight=*rigid_body_dual_cell_weights(axis,face_index);
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
@@ -993,7 +993,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
         const GRID<TV>& grid=Get_Grid();
         TV one_over_dx=grid.one_over_dX;
         RANGE<TV_INT> domain_indices=grid.Domain_Indices();
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             if(!rigid_body_dual_cell_weights(axis,face_index)) continue;
             const TV axis_vector=TV::Axis_Vector(axis);
             FACE_WEIGHT_ELEMENTS& dual_cell_weight=*rigid_body_dual_cell_weights(axis,face_index);
@@ -1099,7 +1099,7 @@ Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<ARRAY<T> >& right_hand_side,const
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Average_Solid_Projected_Face_Velocities_For_Energy_Update(const T_FACE_ARRAYS_SCALAR& solid_projected_face_velocities_star,const T_FACE_ARRAYS_SCALAR& solid_projected_face_velocities_np1,T_FACE_ARRAYS_SCALAR& face_velocities)
 {
-    for(FACE_ITERATOR iterator(Get_Grid());iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
+    for(FACE_ITERATOR<TV> iterator(Get_Grid());iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
         if(dual_cell_contains_solid(axis,face_index)){
             face_velocities.Component(axis)(face_index)=(solid_projected_face_velocities_star.Component(axis)(face_index)+solid_projected_face_velocities_np1.Component(axis)(face_index))*(T).5;}}
 }
@@ -1124,7 +1124,7 @@ Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_
         for(COLLISION_GEOMETRY_ID i(0);i<fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;i++)
             if(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(i)){
                 collisions=dynamic_cast<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*>(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies(i));if(collisions) break;}
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
             if(dual_cell_contains_solid(axis,face_index)){
                 poisson.psi_N(axis,face_index)=true;
@@ -1140,7 +1140,7 @@ Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_
                         COLLISION_GEOMETRY<TV>& collision_geometry=*fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Get_Collision_Geometry(face_weights(i).x);
                         velocity+=face_weights(i).y*collision_geometry.Pointwise_Object_Pseudo_Velocity(0,iterator.Location(),state1,state2)(axis);}}}}}
     else{
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
             if(dual_cell_contains_solid(axis,face_index)){
                 poisson.psi_N(axis,face_index)=true;

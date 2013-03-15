@@ -42,7 +42,7 @@ template<class TV> void SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>::
 Mark_Active_Cells(T tol)
 {
     if(cdi->wrap) // add ghost rows to material ones 
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(cdi->grid,cdi->padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(cdi->grid,cdi->padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next()){
             int i=cdi->Flatten(it.index);
             int r=cdi->remap(i);
             for(int c=0;c<cdi->colors;c++)

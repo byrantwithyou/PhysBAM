@@ -5,7 +5,7 @@
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Data_Structures/HEAPIFY.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
@@ -46,7 +46,7 @@ template<class T_GRID> PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 #ifdef USE_PTHREADS
     pthread_mutex_destroy(&cell_lock);
 #endif
-    for(NODE_ITERATOR iterator(levelset.grid,positive_particles.Domain_Indices());iterator.Valid();iterator.Next()) Delete_All_Particles_In_Cell(iterator.Node_Index());
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,positive_particles.Domain_Indices());iterator.Valid();iterator.Next()) Delete_All_Particles_In_Cell(iterator.Node_Index());
 }
 //#####################################################################
 // Function Consistency_Check
@@ -55,7 +55,7 @@ template<class T_GRID> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET
 Consistency_Check(RANGE<TV_INT> domain,T_ARRAYS_PARTICLES& particles)
 {
     HASHTABLE<typename T_ARRAYS_PARTICLES::ELEMENT> hash;
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
         while(cell_particles){
             assert(!hash.Contains(cell_particles));hash.Insert(cell_particles);
@@ -156,9 +156,9 @@ Adjust_Particle_Radii()
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Adjust_Particle_Radii_Threaded(RANGE<TV_INT>& domain)
 {
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(negative_particles(block)) Adjust_Particle_Radii(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*negative_particles(block),-1);}
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(positive_particles(block)) Adjust_Particle_Radii(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*positive_particles(block),1);}
 }
 //#####################################################################
@@ -191,7 +191,7 @@ Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* V,ARRAY<T_ARRAYS_P
         Modify_Levelset_Using_Escaped_Particles(phi_minus,negative_particles,0,-1);Modify_Levelset_Using_Escaped_Particles(phi_plus,positive_particles,0,1);
         if(other_positive_particles)for(int i=0;i<other_positive_particles->m;i++)Modify_Levelset_Using_Escaped_Particles(phi_plus,*(*other_positive_particles)(i),0,1);
         if(reincorporate_removed_particles_everywhere) Modify_Levelset_Using_Escaped_Particles(phi_minus,removed_negative_particles,V,-1);
-        for(CELL_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();levelset.phi(cell)=minmag(phi_minus(cell),phi_plus(cell));}}
+        for(CELL_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();levelset.phi(cell)=minmag(phi_minus(cell),phi_plus(cell));}}
 }
 //#####################################################################
 // Function Modify_Levelset_Using_Escaped_Particles
@@ -212,7 +212,7 @@ template<class T_GRID> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET
 Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi,T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR* V,const int sign,const T one_over_radius_multiplier)
 {
     RANGE<TV_INT> range_domain(domain);range_domain.max_corner+=TV_INT::All_Ones_Vector();
-    for(NODE_ITERATOR iterator(levelset.grid,range_domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,range_domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block_index);
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
         bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
@@ -249,7 +249,7 @@ Update_Particles_To_Reflect_Mass_Conservation(const LEVELSET<TV>& levelset_old,T
 {
     const int maximum_iterations=5;
     const T epsilon=levelset_old.grid.dX.Min()*(T)1e-2;
-    for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
+    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=particles(block_index);
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
         while(cell_particles){for(int k=cell_particles->Size()-1;k>=0;k--){
@@ -307,7 +307,7 @@ Euler_Step_Removed_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& parti
     const bool update_particle_cells_after_euler_step,const bool verbose)
 {
     int number_of_deleted_particles=0,number_of_non_occupied_cells=0;
-    for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(particles(block)){
+    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(particles(block)){
         PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& cell_particles=*particles(block);
         if(!levelset.collision_body_list->Swept_Occupied_Block(T_BLOCK(levelset.grid,block))){
             number_of_non_occupied_cells++;
@@ -359,7 +359,7 @@ Euler_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_FACE_ARRAYS_SCALAR& 
     const bool assume_particles_in_correct_blocks,const bool enforce_domain_boundaries)
 {
     if(assume_particles_in_correct_blocks){
-        for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(particles(block)){
+        for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(particles(block)){
             // TODO: optimize using slope precomputation
             typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
             T_LINEAR_INTERPOLATION_MAC_HELPER linear_interpolation_mac_helper(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),V);
@@ -372,7 +372,7 @@ Euler_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_FACE_ARRAYS_SCALAR& 
                 cell_particles=cell_particles->next;}}}}
     else{
         T_LINEAR_INTERPOLATION_SCALAR linear_interpolation;T_FACE_LOOKUP V_lookup(V);
-        for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(particles(block)){
+        for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(particles(block)){
             typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
             while(cell_particles){for(int k=0;k<cell_particles->Size();k++){
                 TV velocity=linear_interpolation.Clamped_To_Array_Face(levelset.grid,V_lookup,cell_particles->X(k));
@@ -411,7 +411,7 @@ Second_Order_Runge_Kutta_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_F
     const T one_over_dt=1/dt;
 
     int max_particles=0;
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block_index);
         max_particles=max(max_particles,cell_particles->Size());
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
@@ -493,7 +493,7 @@ Update_Particle_Cells(T_ARRAYS_PARTICLES& particles)
         for(int i=0;i<threaded_iterator.domains.m;i++)pthread_mutex_init(&mutexes(i),0);
         ARRAY<int,TV_INT> domain_index(domain.Thickened(1));
         for(int i=0;i<threaded_iterator.domains.m;i++)
-            for(NODE_ITERATOR iterator(levelset.grid,threaded_iterator.domains(i));iterator.Valid();iterator.Next())
+            for(NODE_ITERATOR<TV> iterator(levelset.grid,threaded_iterator.domains(i));iterator.Valid();iterator.Next())
                 domain_index(iterator.Node_Index())=i; // TODO: thread
         
         ARRAY<ARRAY<TRIPLE<TV_INT,T_PARTICLES*,int> >,TV_INT> list_to_process(domain.Thickened(1));
@@ -522,7 +522,7 @@ Update_Particle_Cells(T_ARRAYS_PARTICLES& particles)
 template<class T_GRID> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Update_Particle_Cells_Part_One_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block)
 {
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
         while(cell_particles){number_of_particles_per_block(block).Append(cell_particles->Size());cell_particles=cell_particles->next;}}
 }
@@ -532,7 +532,7 @@ Update_Particle_Cells_Part_One_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES
 template<class T_GRID> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Update_Particle_Cells_Find_List(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process)
 {
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
     typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
     for(int i=0;i<number_of_particles_per_block(block).m;i++){
         for(int k=0;k<number_of_particles_per_block(block)(i);k++){
@@ -553,7 +553,7 @@ Update_Particle_Cells_Part_Two_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES
 {
     typedef typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE T_PARTICLES;
     const T_PARTICLES& template_particles=choice<(1-IS_SAME<T_PARTICLES,PARTICLE_LEVELSET_PARTICLES<TV> >::value)>(this->template_particles,this->template_removed_particles);
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT final_block=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT final_block=iterator.Node_Index();
         for(int i=0;i<list_to_process(final_block).m;i++){
             T_PARTICLES* cell_particles=list_to_process(final_block)(i).y;int k=list_to_process(final_block)(i).z;
             if(!particles(final_block))particles(final_block)=Allocate_Particles(template_particles);
@@ -570,7 +570,7 @@ Update_Particle_Cells_Part_Three_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICL
 #endif
 {
     typedef typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE T_PARTICLES;
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT final_block=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT final_block=iterator.Node_Index();
         for(int i=0;i<list_to_process(final_block).m;i++){
             T_PARTICLES* cell_particles=list_to_process(final_block)(i).y;int k=list_to_process(final_block)(i).z;
             assert(cell_particles->radius(k)>0);
@@ -582,7 +582,7 @@ Update_Particle_Cells_Part_Three_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICL
 template<class T_GRID> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Delete_Marked_Particles(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles)
 {
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(particles(block)){
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(particles(block)){
         typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
         while(1){
             for(int k=0;k<cell_particles->Size();k++) if(cell_particles->radius(k)<0){
@@ -617,7 +617,7 @@ template<class T_GRID> int PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Reseed_Delete_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const int sign)
 {
     int number_deleted=0;ARRAY<int> heap_particle_indices(number_particles_per_cell);heap_particle_indices.Fill(-1);ARRAY<T> heap_phi_minus_radius(number_particles_per_cell);
-    for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
+    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> > deletion_list;
         PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles=*particles(block_index);
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
@@ -687,7 +687,7 @@ Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PA
         for(int i=0;i<threaded_iterator.domains.m;i++)pthread_mutex_init(&mutexes(i),0);
         ARRAY<int,TV_INT> domain_index(domain);
         for(int i=0;i<threaded_iterator.domains.m;i++)
-            for(NODE_ITERATOR iterator(levelset.grid,threaded_iterator.domains(i));iterator.Valid();iterator.Next())
+            for(NODE_ITERATOR<TV> iterator(levelset.grid,threaded_iterator.domains(i));iterator.Valid();iterator.Next())
                 domain_index(iterator.Node_Index())=i; // TODO: thread
 
         ARRAY<ARRAY<int>,TV_INT> number_of_particles_per_block(levelset.grid.Block_Indices());
@@ -708,7 +708,7 @@ Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PA
         Update_Particle_Cells_Part_Three_Threaded(domain,particles,number_of_particles_per_block,list_to_process,0,0);
         Delete_Marked_Particles(domain,particles);}
     Consistency_Check(domain,particles);
-    for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()) number_added+=number_of_particles_to_add(iterator.Node_Index());
+    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()) number_added+=number_of_particles_to_add(iterator.Node_Index());
     return number_added;
 }
 //#####################################################################
@@ -717,7 +717,7 @@ Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PA
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Reseed_Add_Particles_Threaded_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& other_particles,const int sign,ARRAY<bool,TV_INT>* cell_centered_mask,ARRAY<int,TV_INT>& number_of_particles_to_add)
 {
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
         for(int cell_index=0;cell_index<T_GRID::number_of_cells_per_block;cell_index++){TV_INT cell=block.Cell(cell_index);
             T unsigned_phi=sign*levelset.phi(cell);
@@ -749,7 +749,7 @@ Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
 #endif
 {
     RANDOM_NUMBERS<T> local_random;
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();
         if(!number_of_particles_to_add(block_index)) continue;
         VECTOR<T,TV::dimension+1> h;for(int axis=0;axis<TV::dimension;axis++) h(axis)=(T)block_index(axis);h(TV::dimension)=time;
         local_random.Set_Seed(Hash(h));
@@ -785,11 +785,11 @@ template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Identify_Escaped_Particles(RANGE<TV_INT>& domain,const int sign)
 {
     if(!sign || sign==1){
-        for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
+        for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
             if(positive_particles(block)) Identify_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*positive_particles(block),escaped_positive_particles(block),1);
             else escaped_positive_particles(block).Resize(0);}}
     if(!sign || sign==-1){
-        for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
+        for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
             if(negative_particles(block)) Identify_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*negative_particles(block),escaped_negative_particles(block),-1);
             else escaped_negative_particles(block).Resize(0);}}
 }
@@ -827,18 +827,18 @@ template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Delete_Deep_Escaped_Particles(const T radius_fraction,const bool need_to_identify_escaped_particles,const bool verbose)
 {
     if(verbose) LOG::cout << "positive particles - ";int number_of_positive_particles_deleted=0;
-    for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
+    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
         number_of_positive_particles_deleted+=Delete_Deep_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*positive_particles(block),escaped_positive_particles(block),1,radius_fraction,
             need_to_identify_escaped_particles);
         if(positive_particles(block)->Size()==0) Free_Particle_And_Clear_Pointer(positive_particles(block));}}
     if(verbose) LOG::cout << "deleted " << number_of_positive_particles_deleted << " particles" << std::endl;
     if(verbose) LOG::cout << "negative particles - ";int number_of_negative_particles_deleted=0;
-    for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(negative_particles(block)){
+    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(negative_particles(block)){
         number_of_negative_particles_deleted+=Delete_Deep_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*negative_particles(block),escaped_negative_particles(block),-1,radius_fraction,
             need_to_identify_escaped_particles);
         if(negative_particles(block)->Size()==0) Free_Particle_And_Clear_Pointer(negative_particles(block));}}
     if(verbose) LOG::cout << "deleted " << number_of_negative_particles_deleted << " particles" << std::endl;
-    for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();assert(deletion_list(block).m==0);}
+    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();assert(deletion_list(block).m==0);}
 }
 //#####################################################################
 // Function Delete_Deep_Escaped_Particles
@@ -888,7 +888,7 @@ Delete_Particles_Outside_Grid()
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Delete_Particles_Far_Outside_Grid(RANGE<TV_INT>& domain)
 {
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()) Delete_All_Particles_In_Cell(iterator.Node_Index());
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()) Delete_All_Particles_In_Cell(iterator.Node_Index());
 }
 //#####################################################################
 // Function Delete_Particles_Near_Outside_Grid
@@ -898,7 +898,7 @@ Delete_Particles_Near_Outside_Grid(RANGE<TV_INT>& domain,int axis,int side)
 {
     // delete particles barely outside grid
     RANGE<TV> local_domain=levelset.grid.domain;TV domain_boundaries[2]={local_domain.Minimum_Corner(),local_domain.Maximum_Corner()};
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(negative_particles(block)){
             Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*negative_particles(block),2*side-1);
             if(!negative_particles(block)->Size()) Free_Particle_And_Clear_Pointer(negative_particles(block));}
@@ -935,7 +935,7 @@ Delete_Particles_In_Local_Maximum_Phi_Cells(const int sign)
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Delete_Particles_In_Local_Maximum_Phi_Cells_Threaded(RANGE<TV_INT>& domain,const int sign,const T tolerance)
 {
-    for(CELL_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         bool local_minima=true;
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             if(sign*levelset.phi(cell)<sign*levelset.phi(cell+axis_vector)-tolerance||sign*levelset.phi(cell)<sign*levelset.phi(cell-axis_vector)-tolerance){local_minima=false;break;}}
@@ -993,21 +993,21 @@ Identify_And_Remove_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,const T_FAC
 
     Identify_Escaped_Particles(domain);int p=0,n=0;
     if(use_removed_positive_particles){
-        for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
+        for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
             p+=Remove_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*positive_particles(block),escaped_positive_particles(block),1,removed_positive_particles(block),
                 V_lookup_collidable_lookup,radius_fraction,time);
             if(!positive_particles(block)->Size()) Free_Particle_And_Clear_Pointer(positive_particles(block));}}}
     else{
-        for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
+        for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
             p+=Remove_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*positive_particles(block),escaped_positive_particles(block),1,radius_fraction);
             if(!positive_particles(block)->Size()) Free_Particle_And_Clear_Pointer(positive_particles(block));}}}
     if(use_removed_negative_particles){
-        for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(negative_particles(block)){
+        for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(negative_particles(block)){
             n+=Remove_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*negative_particles(block),escaped_negative_particles(block),-1,removed_negative_particles(block),
                 V_lookup_collidable_lookup,radius_fraction,time);
             if(!negative_particles(block)->Size()) Free_Particle_And_Clear_Pointer(negative_particles(block));}}}
     else{
-        for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(negative_particles(block)){
+        for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(negative_particles(block)){
             n+=Remove_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*negative_particles(block),escaped_negative_particles(block),-1,radius_fraction);
             if(!negative_particles(block)->Size()) Free_Particle_And_Clear_Pointer(negative_particles(block));}}}
     //LOG::cout << "new removed positive particles = " << p << std::endl;LOG::cout << "new removed negative particles = " << n << std::endl;
@@ -1027,11 +1027,11 @@ Identify_And_Remove_Escaped_Positive_Particles(const T_FACE_ARRAYS_SCALAR& V,con
     escaped_negative_particles.Resize(levelset.grid.Domain_Indices(3));
     Identify_Escaped_Particles(domain);int p=0;
     if(use_removed_positive_particles){
-        for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block))
+        for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block))
             p+=Remove_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*positive_particles(block),escaped_positive_particles(block),1,removed_positive_particles(block),
                 V_lookup_collidable_lookup,radius_fraction,time);}}
     else{
-        for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block))
+        for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block))
             p+=Remove_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*positive_particles(block),escaped_positive_particles(block),1,radius_fraction);}}
 }
 //#####################################################################
@@ -1081,7 +1081,7 @@ Fix_Momentum_With_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const T_ARRAYS
     bool done=true;
     T_LINEAR_INTERPOLATION_SCALAR linear_interpolation;
     T_LINEAR_INTERPOLATION_COLLIDABLE_FACE_SCALAR linear_interpolation_collidable;
-    for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
+    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
         T local_momentum_lost=linear_interpolation.Clamped_To_Array(levelset.grid,momentum_lost,iterator.Location());
         if(local_momentum_lost==0) continue; //Nothing to add
         BLOCK_UNIFORM<T_GRID> block_uniform(levelset.grid,block);
@@ -1160,10 +1160,10 @@ template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Reincorporate_Removed_Particles_Threaded(RANGE<TV_INT>& domain,const T radius_fraction,const T mass_scaling,T_FACE_ARRAYS_SCALAR* V)
 {
     if(use_removed_positive_particles){
-        for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(removed_positive_particles(block))
+        for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(removed_positive_particles(block))
             Reincorporate_Removed_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),positive_particles(block),1,*removed_positive_particles(block),radius_fraction,mass_scaling,0);}}
     if(use_removed_negative_particles){
-        for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(removed_negative_particles(block))
+        for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(removed_negative_particles(block))
             Reincorporate_Removed_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),negative_particles(block),-1,*removed_negative_particles(block),radius_fraction,mass_scaling,V);}}
 }
 //#####################################################################
@@ -1227,7 +1227,7 @@ template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Delete_Particles_Far_From_Interface_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_CHAR& near_interface)
 {
     const ARRAY<VECTOR<bool,TV::m>,TV_INT>& cell_neighbors_visible=levelset.collision_body_list->cell_neighbors_visible;
-    for(CELL_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT neighbor=cell+TV_INT::Axis_Vector(axis);
             if(near_interface.Valid_Index(neighbor) && cell_neighbors_visible(cell)(axis) && LEVELSET_UTILITIES<T>::Interface(levelset.phi(cell),levelset.phi(neighbor))){
             near_interface(cell)=near_interface(neighbor)=1;}}}
@@ -1241,7 +1241,7 @@ Delete_Particles_Far_From_Interface_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_CHAR
     const ARRAY<VECTOR<bool,TV::m>,TV_INT>& cell_neighbors_visible=levelset.collision_body_list->cell_neighbors_visible;
     RANGE<TV_INT> ghost_domain(domain);if(ghost_domain.min_corner.x>0) ghost_domain.min_corner.x-=1;
     char new_mask=1<<(distance+1),old_mask=new_mask-1;
-    for(CELL_ITERATOR iterator(levelset.grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(levelset.grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT neighbor=cell+TV_INT::Axis_Vector(axis);
             if(near_interface.Valid_Index(neighbor) && cell_neighbors_visible(cell)(axis) && (near_interface(cell)|near_interface(neighbor))&old_mask){
                 if(domain.Lazy_Inside_Half_Open(cell)) near_interface(cell)|=new_mask;if(domain.Lazy_Inside_Half_Open(neighbor)) near_interface(neighbor)|=new_mask;}}}
@@ -1252,7 +1252,7 @@ Delete_Particles_Far_From_Interface_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_CHAR
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Delete_Particles_Far_From_Interface_Part_Three(RANGE<TV_INT>& domain,T_ARRAYS_CHAR& near_interface)
 {
-    for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT b=iterator.Node_Index();if(negative_particles(b) || positive_particles(b)){
+    for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT b=iterator.Node_Index();if(negative_particles(b) || positive_particles(b)){
         T_BLOCK block(levelset.grid,b);
         for(int i=0;i<T_GRID::number_of_cells_per_block;i++)if(near_interface.Valid_Index(block.Cell(i))&&near_interface(block.Cell(i))) goto NEAR_INTERFACE;
         // if not near interface, delete particles

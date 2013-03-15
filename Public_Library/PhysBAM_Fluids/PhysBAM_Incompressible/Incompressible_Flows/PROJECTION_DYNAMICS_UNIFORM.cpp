@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/BOUNDARY_MPI.h>
@@ -100,14 +100,14 @@ template<class T_GRID> void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
 Compute_Divergence(const T_FACE_LOOKUP_FIRE_MULTIPHASE& face_lookup,LAPLACE_UNIFORM<T_GRID>* solver)
 {
     TV one_over_dx=p_grid.one_over_dX;
-    for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
         const typename T_FACE_LOOKUP_FIRE_MULTIPHASE::LOOKUP& lookup=face_lookup.Starting_Point_Cell(iterator.Cell_Index());T divergence=0;
         for(int axis=0;axis<T_GRID::dimension;axis++)divergence+=(lookup(axis,iterator.Second_Face_Index(axis))-lookup(axis,iterator.First_Face_Index(axis)))*one_over_dx[axis];
         solver->f(iterator.Cell_Index())=divergence;}
     
-    if(use_non_zero_divergence) for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next())
+    if(use_non_zero_divergence) for(CELL_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next())
         solver->f(iterator.Cell_Index())-=divergence(iterator.Cell_Index());
-    if(use_divergence_multiplier) for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next())
+    if(use_divergence_multiplier) for(CELL_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next())
         solver->f(iterator.Cell_Index())*=divergence_multiplier(iterator.Cell_Index());
 }
 //#####################################################################
@@ -129,7 +129,7 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
             for(int i=0;i<poisson_collidable->levelset_multiple->levelsets.m;i++){phis_ghost(i).Resize(p_grid.Domain_Indices(ghost_cells),false);
                 poisson_collidable->levelset_multiple->levelsets(i)->boundary->Fill_Ghost_Cells(p_grid,poisson_collidable->levelset_multiple->levelsets(i)->phi,phis_ghost(i),dt,time,ghost_cells);}
             LEVELSET_MULTIPLE<T_GRID> levelset_multiple(p_grid,phis_ghost);
-            for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
                 int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
                 if(levelset_multiple.Interface(second_cell,first_cell) && !psi_N.Component(axis)(face_index) && !(psi_D(second_cell)&&psi_D(first_cell))){
                     int region_1,region_2;T phi_1,phi_2;levelset_multiple.Minimum_Regions(second_cell,first_cell,region_1,region_2,phi_1,phi_2);
@@ -137,7 +137,7 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
                         LEVELSET_MULTIPLE<T_GRID>::Sign(region_1,region_2)*poisson_collidable->u_jump_face.Component(axis)(face_index);}}}
         else{
             T_ARRAYS_SCALAR phi_ghost(p_grid.Domain_Indices(ghost_cells));poisson_collidable->levelset->boundary->Fill_Ghost_Cells(p_grid,poisson_collidable->levelset->phi,phi_ghost,dt,time,ghost_cells);
-            for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
                 int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
                 if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(second_cell),phi_ghost(first_cell)) && !psi_N.Component(axis)(face_index) && !(psi_D(second_cell)&&psi_D(first_cell))){
                     face_velocities.Component(axis)(face_index)+=poisson->beta_face.Component(axis)(face_index)*one_over_dx[axis]*LEVELSET_UTILITIES<T>::Sign(phi_ghost(second_cell))*
@@ -165,7 +165,7 @@ Set_Up_For_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_den
         if(use_one_way_coupling){
             use_non_zero_divergence_save_for_sph=use_non_zero_divergence;
             use_divergence_multiplier_save_for_sph=use_divergence_multiplier;
-            for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
                 TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
                 if(!elliptic_solver_save_for_sph->psi_D(cell_1) || !elliptic_solver_save_for_sph->psi_D(cell_2)) elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;}}}
     else if(use_one_way_coupling){
@@ -177,7 +177,7 @@ Set_Up_For_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_den
         use_non_zero_divergence_save_for_sph=use_non_zero_divergence;
         elliptic_solver->psi_D_save_for_sph=new ARRAY<bool,TV_INT>(elliptic_solver->psi_D);
         elliptic_solver->psi_N_save_for_sph=new T_FACE_ARRAYS_BOOL(elliptic_solver->psi_N);
-        for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
             if(!(*elliptic_solver->psi_D_save_for_sph)(cell_1) || !(*elliptic_solver->psi_D_save_for_sph)(cell_2)) elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;}}
 
@@ -219,7 +219,7 @@ Update_Phi_And_Move_Velocity_Discontinuity(T_FACE_ARRAYS_SCALAR& face_velocities
     levelset_multiple.Fill_Ghost_Cells(levelset_multiple.phis,time,ghost_cells);
     if(!update_phi_only){
         LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_old=*poisson_collidable->levelset_multiple;
-        for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
+        for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
             int region_old=levelset_multiple_old.Inside_Region_Face(axis,face),region_new=levelset_multiple.Inside_Region_Face(axis,face);
             if(region_old!=region_new) face_velocities.Component(axis)(face)-=Face_Jump_Multiphase(axis,face,region_new,region_old);}}
     poisson_collidable->Update_Internal_Level_Set(levelset_multiple);poisson_collidable->levelset_multiple->Compute_Normals();

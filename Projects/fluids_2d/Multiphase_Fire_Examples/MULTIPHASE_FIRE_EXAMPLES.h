@@ -23,7 +23,6 @@ class MULTIPHASE_FIRE_EXAMPLES:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
@@ -131,7 +130,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
     flame_speed_multiplier.Fill(0);
 
     if(test_number==1){
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
             if(.45<iterator.Location().x&&iterator.Location().x<=.55) flame_speed_multiplier.Component(iterator.Axis())(iterator.Face_Index())=1;
 
         T ignition_temperature=1150; // 1100 is .5 as fast as 1000, 1150 is .25 as fast as 1000.
@@ -139,7 +138,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
         BOUNDARY<TV,T> boundary;boundary.Fill_Ghost_Cells(*fluids_parameters.grid,fluids_parameters.temperature_container.temperature,temp_temperature,dt,time,3);
         SMOOTH::Smooth<T,TV::m>(temp_temperature,5,0);
         if(fluids_parameters.mpi_grid)fluids_parameters.mpi_grid->Exchange_Boundary_Cell_Data(temp_temperature,1);
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             T face_temperature=(T).5*(temp_temperature(iterator.First_Cell_Index())+temp_temperature(iterator.Second_Cell_Index()));
             if(face_temperature>ignition_temperature) flame_speed_multiplier.Component(iterator.Axis())(iterator.Face_Index())=clamp((T).01*(face_temperature-ignition_temperature),(T)0,(T)1);}}
     if(test_number==2){
@@ -152,14 +151,14 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
         T_ARRAYS_SCALAR& phi2=phis(2);
         //T_FAST_LEVELSET levelset2(fluids_parameters.grid,phi2);
         //levelset2.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.dX.Min());levelset2.Fast_Marching_Method();
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<int,2> cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
             T face_phi1=(T).5*(phi1(cell1)+phi1(cell2)),face_phi2=(T).5*(phi2(cell1)+phi2(cell2));
             if(face_phi1<reaction_bandwidth_times_edge_length&&face_phi2<reaction_bandwidth_times_edge_length){
                 T min_phi=min(face_phi1,face_phi2);
                 flame_speed_multiplier.Component(iterator.Axis())(iterator.Face_Index())=clamp(reaction_bandwidth_times_edge_length+min_phi,(T)0,(T)1);}}}
 /*
-        for(FACE_ITERATOR iterator(fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<int,2> cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
             T face_phi1=(T).5*(phis(1)(cell1)+phis(1)(cell2)),face_phi2=(T).5*(phis(2)(cell1)+phis(2)(cell2));
             if(face_phi1<reaction_bandwidth_times_edge_length&&face_phi2<reaction_bandwidth_times_edge_length){
@@ -177,7 +176,7 @@ void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
     if(test_number==1){
         fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Get_Single_Levelset(fluids_parameters.fuel_region,levelset,false);
         
-        for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             T cell_flame_speed_multiplier=0;
             for(int i=0;i<2;i++)
                 cell_flame_speed_multiplier+=flame_speed_multiplier.Component(i)(iterator.First_Face_Index(i))+flame_speed_multiplier.Component(i)(iterator.Second_Face_Index(i));
@@ -195,12 +194,12 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 {
     ARRAY<ARRAY<T,VECTOR<int,2> > >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
     if(test_number==1){
-        for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
             phis(1)(iterator.Cell_Index())=min(iterator.Location().y-(T).2,RANGE<TV>(TV(),TV((T).2,(T).5)).Signed_Distance(iterator.Location()));
         //phis(1)(iterator.Cell_Index())=iterator.Location().y-(T).2;
         phis(2).Copy(-1,phis(1));}
     if(test_number==2){
-        for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<T,2> X=iterator.Location();VECTOR<int,2> cell=iterator.Cell_Index();
             phis(1)(cell)=1;//RANGE<TV>(0,1,.0,.2).Signed_Distance(X);
             phis(2)(cell)=1;//RANGE<TV>(.45,.55,.4,.5).Signed_Distance(X);
@@ -222,7 +221,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
         Adjust_Phi_With_Source(RANGE<TV>(TV((T).9,(T).1),TV(1,(T).3)),2,MATRIX<T,3>::Identity_Matrix());
         ARRAY<ARRAY<T,VECTOR<int,2> > >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
         T reaction_seed_bandwidth=(T).5*reaction_bandwidth*fluids_parameters.grid->dX.Min();
-        for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<int,2> cell=iterator.Cell_Index();
             T band=max(fabs(phis(1)(cell)),fabs(phis(2)(cell)))-reaction_seed_bandwidth;
             int region1,region2;T min_phi1,min_phi2;

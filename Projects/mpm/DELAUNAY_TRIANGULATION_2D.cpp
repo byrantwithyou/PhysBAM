@@ -2,11 +2,11 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include "DELAUNAY_TRIANGULATION_2D.h"
 namespace PhysBAM{
 //#####################################################################

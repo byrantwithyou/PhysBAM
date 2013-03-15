@@ -4,8 +4,8 @@
 //#####################################################################
 // Class EULER_UNIFORM
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
@@ -135,7 +135,7 @@ template<class T_GRID> void EULER_UNIFORM<T_GRID>::
 Get_Cell_Velocities(const T dt,const T time,const int ghost_cells,ARRAY<TV,TV_INT>& centered_velocities)
 {
     Fill_Ghost_Cells(dt,time,ghost_cells);
-    for(CELL_ITERATOR iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         centered_velocities(cell_index)=EULER<T_GRID>::Get_Velocity(U_ghost(cell_index));}
 }
 //#####################################################################
@@ -147,9 +147,9 @@ Compute_Total_Conserved_Quantity(const bool update_boundary_flux,const T dt,TV_D
     assert(conservation->save_fluxes);
     T cell_size=grid.Cell_Size();
     total_conserved_quantity=TV_DIMENSION();
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(psi(cell_index)) total_conserved_quantity+=U(cell_index)*cell_size;}
-    if(update_boundary_flux) for(FACE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION);iterator.Valid();iterator.Next()){
+    if(update_boundary_flux) for(FACE_ITERATOR<TV> iterator(grid,0,T_GRID::BOUNDARY_REGION);iterator.Valid();iterator.Next()){
         const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
         const T direction=iterator.First_Boundary()?(T)1:(T)-1;
         const TV_INT inside_cell_index=iterator.First_Boundary()?iterator.Second_Cell_Index():iterator.First_Cell_Index();
@@ -164,7 +164,7 @@ Compute_Total_Conserved_Quantity(const bool update_boundary_flux,const T dt,TV_D
 template<class T_GRID> void EULER_UNIFORM<T_GRID>::
 Warn_For_Low_Internal_Energy() const
 {
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_DIMENSION U_cell=U(iterator.Cell_Index());
         T e=EULER<T_GRID>::e(U_cell);
         if(e<e_min){
@@ -184,7 +184,7 @@ Invalidate_Ghost_Cells()
 template<class T_GRID> bool EULER_UNIFORM<T_GRID>::
 Equal_Real_Data(const T_ARRAYS_DIMENSION_SCALAR& U1,const T_ARRAYS_DIMENSION_SCALAR& U2) const
 {
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(U1(cell_index)!=U2(cell_index)) return false;}
     return true;
 }
@@ -220,12 +220,12 @@ template<class T_GRID> void EULER_UNIFORM<T_GRID>::
 Advance_One_Time_Step_Forces(const T dt,const T time)
 {
     // update gravity
-    if(gravity) for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    if(gravity) for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         for(int axis=0;axis<T_GRID::dimension;axis++){
             if(downward_direction[axis]) U(cell_index)(axis+1)+=dt*U(cell_index)(0)*gravity*downward_direction[axis];}}
 
     // update body force
-    if(use_force) for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    if(use_force) for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         for(int axis=0;axis<T_GRID::dimension;axis++) U(cell_index)(axis+1)+=dt*U(cell_index)(0)*force.Component(axis)(cell_index);}
 
     //TODO: Is this necessary?
@@ -238,7 +238,7 @@ Advance_One_Time_Step_Forces(const T dt,const T time)
 template<class T_GRID> void EULER_UNIFORM<T_GRID>::
 Compute_Cavitation_Velocity(T_ARRAYS_SCALAR& rho_n, T_FACE_ARRAYS_SCALAR& face_velocities_n, T_ARRAYS_DIMENSION_SCALAR& momentum_n)
 {
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
         if(!euler_projection.elliptic_solver->psi_N.Component(axis)(face_index)){
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
             T rho_face_n=(T).5*(rho_n(first_cell_index)+rho_n(second_cell_index));T one_over_rho_face_n=1/rho_face_n;
@@ -258,7 +258,7 @@ Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep
     // Store time n density values
     T_ARRAYS_SCALAR rho_n(grid.Domain_Indices(0));T_ARRAYS_DIMENSION_SCALAR momentum_n(grid.Domain_Indices(0));T_FACE_ARRAYS_SCALAR face_velocities_n(grid);
     if(apply_cavitation_correction){
-        for(CELL_ITERATOR iterator(grid,0);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(grid,0);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             rho_n(cell_index)=U_ghost(cell_index)(0);}
 
         // Store time n velocities
@@ -266,7 +266,7 @@ Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep
         face_velocities_n=euler_projection.face_velocities;
 
         // Store time n momentum
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             for(int axis=0;axis<T_GRID::dimension;axis++) momentum_n(cell_index)(axis)=U_ghost(cell_index)(axis+1);}}
 
     if(compute_pressure_fluxes && !timesplit){
@@ -277,7 +277,7 @@ Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep
         conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_default,euler_projection.elliptic_solver->psi_N,euler_projection.face_velocities,false,
             open_boundaries);}
 
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(U_ghost(cell_index)(0)<=0){LOG::cout<<"Density at cell "<<cell_index<<" is: "<<U_ghost(cell_index)(0)<<std::endl;
             PHYSBAM_FATAL_ERROR("Density should not be zero or negative");}}
 
@@ -313,7 +313,7 @@ Clamp_Internal_Energy(const T dt,const T time)
     //assert(!need_to_remove_added_internal_energy);
     need_to_remove_added_internal_energy=true;
     added_internal_energy.Fill(0);
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(!psi(cell_index)) continue;
         TV_DIMENSION U_cell=U(cell_index);
@@ -333,7 +333,7 @@ Clamp_Internal_Energy_Ghost(T_ARRAYS_DIMENSION_SCALAR& U_ghost,const int number_
 {
     if(apply_cavitation_correction) return;
     for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++) if(!mpi_grid || !mpi_grid->Neighbor(axis,axis_side)){
-        for(CELL_ITERATOR iterator(grid,number_of_ghost_cells,T_GRID::GHOST_REGION,2*axis-(1-axis_side));iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid,number_of_ghost_cells,T_GRID::GHOST_REGION,2*axis-(1-axis_side));iterator.Valid();iterator.Next()){
             TV_DIMENSION U_cell=U_ghost(iterator.Cell_Index());
             T e=EULER<T_GRID>::e(U_cell);
             if(e<e_min){
@@ -350,7 +350,7 @@ Remove_Added_Internal_Energy(const T dt,const T time)
     if(apply_cavitation_correction) return;
     //assert(need_to_remove_added_internal_energy);
     need_to_remove_added_internal_energy=false;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(!psi(cell_index)) continue;
         T added_e=added_internal_energy(cell_index);
@@ -380,7 +380,7 @@ CFL_Using_Sound_Speed() const
 {
     ARRAY<TV,TV_INT> velocity(grid.Domain_Indices()),velocity_minus_c(grid.Domain_Indices()),velocity_plus_c(grid.Domain_Indices());
     T max_sound_speed=0;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(psi(cell_index)){
             TV velocity_cell=Get_Velocity(U,cell_index);
@@ -411,13 +411,13 @@ CFL(const T time) const
 
         Fill_Ghost_Cells(last_dt,time,3);
         T_ARRAYS_SCALAR p_approx(grid.Domain_Indices(1));
-        for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())
             p_approx(iterator.Cell_Index())=eos->p(U_ghost(iterator.Cell_Index())(0),e(U_ghost,iterator.Cell_Index()));
         T_FACE_ARRAYS_SCALAR p_approx_face(grid);
         euler_projection.Compute_Face_Pressure_From_Cell_Pressures(grid,U_ghost,psi,p_approx_face,p_approx);
         ARRAY<TV,TV_INT> grad_p_approx(grid.Domain_Indices());ARRAYS_UTILITIES<T_GRID,T>::Compute_Gradient_At_Cells_From_Face_Data(grid,grad_p_approx,p_approx_face);
 
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){const TV_INT cell_index=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){const TV_INT cell_index=iterator.Cell_Index();
             if(psi(cell_index)) for(int axis=0;axis<T_GRID::dimension;axis++){
                 max_lambdas[axis]=max(max_lambdas[axis],eigensystems[axis]->Maximum_Magnitude_Eigenvalue(U(cell_index)));
                 max_grad_p[axis]=maxabs(max_grad_p[axis],grad_p_approx(cell_index)[axis]);

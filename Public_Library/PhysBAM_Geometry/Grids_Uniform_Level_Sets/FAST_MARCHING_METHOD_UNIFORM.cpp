@@ -2,9 +2,9 @@
 // Copyright 2005-2007, Eran Guendelman, Geoffrey Irving, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
@@ -44,7 +44,7 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,c
 {
     int heap_length=0;
     T_ARRAYS_SCALAR phi_new(domain);
-    for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();phi_new(cell)=phi_ghost(cell);}
+    for(CELL_ITERATOR<TV> iterator(cell_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();phi_new(cell)=phi_ghost(cell);}
     ARRAY<bool,TV_INT> done(domain.Thickened(1));
     ARRAY<int,TV_INT> close_k(domain.Thickened(1),false); // extra cell so that it is the same size as the done array for optimizations
     close_k.Fill(-1);
@@ -54,7 +54,7 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,c
     while(heap_length != 0){
         TV_INT index=heap(0); // smallest point is on top of heap
         if(stopping_distance && abs(phi_new(index)) > stopping_distance){ // exit early
-            for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()) if(!done(iterator.Cell_Index())){
+            for(CELL_ITERATOR<TV> iterator(cell_grid,domain);iterator.Valid();iterator.Next()) if(!done(iterator.Cell_Index())){
                 phi_new(iterator.Cell_Index())=LEVELSET_UTILITIES<T>::Sign(phi_new(iterator.Cell_Index()))*stopping_distance;}
             break;}
         done(index)=true;close_k(index)=-1; // add to done, remove from close
@@ -76,7 +76,7 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,c
                     Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index+axis_vector);}}
 
     RANGE<TV_INT> interior_domain=domain.Thickened(-ghost_cells);
-    for(CELL_ITERATOR iterator(cell_grid,interior_domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();phi_ghost(cell)=phi_new(cell);}
+    for(CELL_ITERATOR<TV> iterator(cell_grid,interior_domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();phi_ghost(cell)=phi_new(cell);}
 }
 //#####################################################################
 // Function Update_Or_Add_Neighbor
@@ -106,7 +106,7 @@ Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool
         if(add_seed_indices_for_ghost_cells){
             for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
                 RANGE<TV_INT> ghost_domain=domain;if(side==0) ghost_domain.max_corner(axis)=interior_domain.min_corner(axis)-1;else ghost_domain.min_corner(axis)=interior_domain.max_corner(axis)+1;
-                for(CELL_ITERATOR iterator(cell_grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
+                for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
                     for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
                         if(domain.Lazy_Inside_Half_Open(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
                             if(!done(index))Add_To_Initial(done,close_k,index);
@@ -117,7 +117,7 @@ Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool
         if(levelset.collision_body_list){
             for(int axis=0;axis<TV::dimension;axis++){
                 domain.min_corner(axis)++;
-                for(FACE_ITERATOR iterator(cell_grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
+                for(FACE_ITERATOR<TV> iterator(cell_grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
                     if(!Neighbor_Visible(iterator.Axis(),index1)){
                         if(phi_ghost(index1)<=0) Add_To_Initial(done,close_k,index1);
                         if(phi_ghost(index2)<=0) Add_To_Initial(done,close_k,index2);}
@@ -127,16 +127,16 @@ Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool
         else{
             for(int axis=0;axis<TV::dimension;axis++){
                 domain.min_corner(axis)++;
-                for(FACE_ITERATOR iterator(cell_grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
+                for(FACE_ITERATOR<TV> iterator(cell_grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
                     if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(index1),phi_ghost(index2))){
                         Add_To_Initial(done,close_k,index1);Add_To_Initial(done,close_k,index2);}}
                 domain.min_corner(axis)--;}}
 
         Initialize_Interface_Threaded(domain,phi_ghost,phi_new,done);
-        for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) phi_ghost(iterator.Cell_Index())=phi_new(iterator.Cell_Index());} // initialize done points
+        for(CELL_ITERATOR<TV> iterator(cell_grid,domain);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) phi_ghost(iterator.Cell_Index())=phi_new(iterator.Cell_Index());} // initialize done points
 
     // initialize close points
-    for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(cell_grid,domain);iterator.Valid();iterator.Next()){
         if(close_k(iterator.Cell_Index())>=0){
         Update_Close_Point(phi_ghost,done,iterator.Cell_Index());
         heap(heap_length++)=iterator.Cell_Index();
@@ -152,7 +152,7 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<i
     if(seed_indices){
         for(int i=0;i<seed_indices->m;i++)Add_To_Initial(done,close_k,(*seed_indices)(i));
         if(add_seed_indices_for_ghost_cells){RANGE<TV_INT> ghost_domain=cell_grid.Domain_Indices().Thickened(ghost_cells);
-            for(CELL_ITERATOR iterator(cell_grid,ghost_cells,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
+            for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
                 for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
                     if(ghost_domain.Lazy_Inside_Half_Open(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
                         if(!done(index))Add_To_Initial(done,close_k,index);
@@ -161,23 +161,23 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<i
         T_ARRAYS_SCALAR phi_new(cell_grid.Domain_Indices(ghost_cells+1),false); // same size as done and close_k for array accelerations
         phi_new.Fill(2*cell_grid.dX.Max()); // ok positive, since minmag is used below
         if(levelset.collision_body_list){
-            for(FACE_ITERATOR iterator(cell_grid,ghost_cells,T_GRID::INTERIOR_REGION);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
+            for(FACE_ITERATOR<TV> iterator(cell_grid,ghost_cells,T_GRID::INTERIOR_REGION);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
                 if(!Neighbor_Visible(iterator.Axis(),index1)){
                     if(phi_ghost(index1)<=0) Add_To_Initial(done,close_k,index1);
                     if(phi_ghost(index2)<=0) Add_To_Initial(done,close_k,index2);}
                 else if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(index1),phi_ghost(index2))){
                     Add_To_Initial(done,close_k,index1);Add_To_Initial(done,close_k,index2);}}}
         else{
-            for(FACE_ITERATOR iterator(cell_grid,ghost_cells,T_GRID::INTERIOR_REGION);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
+            for(FACE_ITERATOR<TV> iterator(cell_grid,ghost_cells,T_GRID::INTERIOR_REGION);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
                 if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(index1),phi_ghost(index2))){
                     Add_To_Initial(done,close_k,index1);Add_To_Initial(done,close_k,index2);}}}
 
         DOMAIN_ITERATOR_THREADED_ALPHA<FAST_MARCHING_METHOD_UNIFORM<T_GRID>,TV>(cell_grid.Domain_Indices(ghost_cells),thread_queue).template Run<T_ARRAYS_SCALAR&,T_ARRAYS_SCALAR&,ARRAY<bool,TV_INT>&>(*this,&FAST_MARCHING_METHOD_UNIFORM<T_GRID>::Initialize_Interface_Threaded,phi_ghost,phi_new,done);
 
-        for(CELL_ITERATOR iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) phi_ghost(iterator.Cell_Index())=phi_new(iterator.Cell_Index());} // initialize done points
+        for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) phi_ghost(iterator.Cell_Index())=phi_new(iterator.Cell_Index());} // initialize done points
 
     // initialize close points
-    for(CELL_ITERATOR iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(close_k(iterator.Cell_Index())>=0){
+    for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(close_k(iterator.Cell_Index())>=0){
         Update_Close_Point(phi_ghost,done,iterator.Cell_Index());
         heap(heap_length++)=iterator.Cell_Index();
         FAST_MARCHING<T>::Up_Heap(phi_ghost,close_k,heap,heap_length-1);}
@@ -195,7 +195,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
  
     if(levelset.collision_body_list){
         COLLISION_GEOMETRY_ID body_id;
-        for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(cell_grid,domain);iterator.Valid();iterator.Next()){
             TV_INT index=iterator.Cell_Index();
             if(!done(index)) continue;
             T value[3]={0}; // the phi value to use in the given direction
@@ -247,7 +247,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
                         break;}}}
             phi_new(index)*=LEVELSET_UTILITIES<T>::Sign(phi_ghost(index));}}
     else{
-        for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(cell_grid,domain);iterator.Valid();iterator.Next()){
             TV_INT index=iterator.Cell_Index();
             if(!done(index)) continue;
             T value[3]={0}; // the phi value to use in the given direction
@@ -292,16 +292,16 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<i
 {
     LEVELSET<TV> levelset_ghost(cell_grid,phi_ghost);
 
-    for(CELL_ITERATOR iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) Add_To_Initial(done,close_k,iterator.Cell_Index());
+    for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) Add_To_Initial(done,close_k,iterator.Cell_Index());
     if(add_seed_indices_for_ghost_cells){RANGE<TV_INT> ghost_domain=cell_grid.Domain_Indices().Thickened(ghost_cells);
-        for(CELL_ITERATOR iterator(cell_grid,ghost_cells,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
             for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
                 if(ghost_domain.Lazy_Inside_Half_Open(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
                     if(!done(index))Add_To_Initial(done,close_k,index);
                     if(!done(neighbor_index))Add_To_Initial(done,close_k,neighbor_index);}}}}
 
    // initialize close points
-    for(CELL_ITERATOR iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(close_k(iterator.Cell_Index())>=0){
+    for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(close_k(iterator.Cell_Index())>=0){
         Update_Close_Point(phi_ghost,done,iterator.Cell_Index());
         heap(heap_length++)=iterator.Cell_Index();
         FAST_MARCHING<T>::Up_Heap(phi_ghost,close_k,heap,heap_length-1);}

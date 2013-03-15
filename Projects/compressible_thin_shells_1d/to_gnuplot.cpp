@@ -2,8 +2,8 @@
 // Copyright 2010, Jon Gretarsson.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
@@ -46,7 +46,7 @@ int main(int argc,char* argv[])
         LOG::cerr<<"min = "<<data.Min()<<", max = "<<data.Max()<<std::endl;
 
         LOG::cout.precision(std::numeric_limits< double >::digits10);
-        for(UNIFORM_GRID_ITERATOR_CELL<VECTOR<T,1> > iter(grid,3);iter.Valid();iter.Next())
+        for(CELL_ITERATOR<VECTOR<T,1> > iter(grid,3);iter.Valid();iter.Next())
             LOG::cout<<iter.Location().x<<"\t"<<data(iter.Cell_Index())<<std::endl;
     }
 

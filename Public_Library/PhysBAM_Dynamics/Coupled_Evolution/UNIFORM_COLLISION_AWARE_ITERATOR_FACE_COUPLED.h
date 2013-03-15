@@ -7,8 +7,8 @@
 #ifndef __UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED__
 #define __UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED__
 
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/SIDED_FACE_INDEX.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 
 namespace PhysBAM{
 
@@ -16,11 +16,11 @@ template<class TV> class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO;
 template<class TV> struct COLLISION_FACE_INFO;
 
 template<class TV>
-class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED:public UNIFORM_GRID_ITERATOR_FACE<TV>
+class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED:public FACE_ITERATOR<TV>
 {
 public:
     enum WORKAROUND {d=TV::dimension};
-    typedef typename TV::SCALAR T;typedef VECTOR<int,d> TV_INT;typedef typename GRID<TV>::REGION T_REGION;typedef UNIFORM_GRID_ITERATOR_FACE<TV> BASE;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,d> TV_INT;typedef typename GRID<TV>::REGION T_REGION;typedef FACE_ITERATOR<TV> BASE;
     using BASE::grid;using BASE::index;using BASE::region;using BASE::valid;using BASE::Reset;using BASE::current_region;using BASE::Add_Region;using BASE::Reset_Regions;using BASE::axis;
     using BASE::First_Cell_Index;using BASE::Second_Cell_Index;
 

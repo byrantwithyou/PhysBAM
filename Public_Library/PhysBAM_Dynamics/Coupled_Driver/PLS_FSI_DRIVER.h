@@ -19,9 +19,7 @@ class PLS_FSI_DRIVER:public DRIVER<TV>,public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef DRIVER<TV> BASE;
-    typedef GRID<TV> T_GRID;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
+    typedef GRID<TV> T_GRID;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     using BASE::time;
 public:

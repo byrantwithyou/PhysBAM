@@ -7,7 +7,7 @@
 #ifndef __PARTICLE_PARTITION__
 #define __PARTICLE_PARTITION__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
@@ -21,7 +21,6 @@ class PARTICLE_PARTITION
     enum WORKAROUND {d=TV::m};
     typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_T;
     typedef typename REBIND<T_ARRAYS_T,ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
 public:
     GRID<TV> grid;
     T_ARRAYS_ARRAY_INT partition;
@@ -47,13 +46,13 @@ public:
 
     void Intersection_List(const IMPLICIT_OBJECT<TV>& test_surface,const MATRIX<T,d>& rotation,const TV& translation,ARRAY<VECTOR<int,d> >& intersection_list,const T contour_value=0) const
     {PHYSBAM_ASSERT(use_radius);intersection_list.Remove_All();
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){VECTOR<int,d> cell=iterator.Cell_Index(); 
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){VECTOR<int,d> cell=iterator.Cell_Index(); 
         if(partition(cell).m && !test_surface.Lazy_Outside_Extended_Levelset(rotation*grid.Center(cell)+translation,radius(cell)+contour_value)) intersection_list.Append(cell);}}
 
     void Proximity_List(const TV& location,const T proximity,ARRAY<int>& proximity_list)
     {
         proximity_list.Remove_All();
-        for(CELL_ITERATOR iterator(grid,grid.Clamp_To_Cell(RANGE<TV>(location).Thickened(proximity),0));iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(grid,grid.Clamp_To_Cell(RANGE<TV>(location).Thickened(proximity),0));iterator.Valid();iterator.Next())
             proximity_list.Append_Unique_Elements(partition(iterator.Cell_Index()));
     }
 

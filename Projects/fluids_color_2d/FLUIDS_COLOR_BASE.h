@@ -5,8 +5,8 @@
 #ifndef __FLUIDS_COLOR_BASE__
 #define __FLUIDS_COLOR_BASE__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -489,7 +489,7 @@ public:
 
     void Set_Level_Set(T time)
     {
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
             int c=-4;
             T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
             levelset_color.phi(it.index)=abs(p);
@@ -511,13 +511,13 @@ public:
         colors.Append(VECTOR<T,3>(0,1,1));
         colors.Append(VECTOR<T,3>(1,0,1));
 
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
             int c=levelset_color.color(it.index);
             T p=levelset_color.phi(it.index);
             Add_Debug_Particle(it.Location(),colors(c+3));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
         PHYSBAM_DEBUG_WRITE_SUBSTEP("level set",0,1);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
             int c=-4;
             T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
             if(levelset_color.color(it.index)!=(c==-4?bc_type:c)){
@@ -533,7 +533,7 @@ public:
     {
         if(!analytic_velocity.m || analytic_initial_only) return;
         T max_error=0,a=0,b=0;
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+        for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             int c=levelset_color.Color(it.Location());
             if(c<0) continue;
             T A=face_velocities(c)(it.Full_Index()),B=analytic_velocity(c)->u(it.Location()/m,time/s)(it.Axis())*m/s;
@@ -558,14 +558,14 @@ public:
         colors.Append(VECTOR<T,3>(1,1,0));
         colors.Append(VECTOR<T,3>(0,1,1));
         colors.Append(VECTOR<T,3>(1,0,1));
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
             int c=-4;
             T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
             if(c==-4) c=bc_type;
             Add_Debug_Particle(it.Location(),colors(c+3));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
         PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (phi)",0,1);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
             int c=-4;
             T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
             (void)p;
@@ -578,7 +578,7 @@ public:
     void Get_Initial_Velocities()
     {
         if(analytic_levelset && analytic_velocity.m)
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+            for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
                 int c=face_color(it.Full_Index());
                 if(c<0) continue;
                 face_velocities(c)(it.Full_Index())=analytic_velocity(c)->u(it.Location()/m,0)(it.Axis())*m/s;}

@@ -28,7 +28,6 @@ template<class T_GRID>
 class SMOKE_STANDARD_TESTS_2D
 {
     typedef typename T_GRID::SCALAR T;typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:

@@ -5,7 +5,7 @@
 // Class FLUID_TO_SOLID_INTERPOLATION_CUT
 //##################################################################### 
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>

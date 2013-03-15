@@ -1,4 +1,4 @@
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include "ACCURACY_INFO.h"
 #include "BOUNDARY_CONDITIONS_SEGMENT.h"
 #include "HEADER.h"

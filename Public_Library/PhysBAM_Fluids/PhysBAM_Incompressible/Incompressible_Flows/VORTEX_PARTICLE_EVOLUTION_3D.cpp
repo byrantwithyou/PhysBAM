@@ -2,9 +2,9 @@
 // Copyright 2004-2005, Ron Fedkiw, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Computations/VORTICITY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
@@ -84,13 +84,13 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV
         // form grid vorticity from vortex particles
         scattered_interpolation.Transfer_To_Grid(vorticity_particles.X,vorticity_particles.vorticity,grid,grid_vorticity_particles);
         if(remove_grid_vorticity_from_particle_vorticity)
-            for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+            for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next())
                 grid_vorticity_particles(it.index)-=grid_vorticity(it.index);
     
         // find vorticity magnitudes
         for(RANGE_ITERATOR<TV::m> it(grid_vorticity.domain);it.Valid();it.Next())
             grid_vorticity_magnitude(it.index)=grid_vorticity(it.index).Magnitude();
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+        for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next())
             grid_vorticity_particles_magnitude(it.index)=grid_vorticity_particles(it.index).Magnitude();
     
         // compute confinement force
@@ -115,7 +115,7 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRA
 {
     ARRAY<TV,TV_INT> cell_force(grid.Domain_Indices(1),false);
     Compute_Body_Force(face_velocities_ghost,cell_force,dt,time);
-    for(T_FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
         force.Component(axis)(iterator.Face_Index())+=(T).5*(cell_force(iterator.First_Cell_Index())[axis]+cell_force(iterator.Second_Cell_Index())[axis]);}
 }
 //#####################################################################
@@ -127,7 +127,7 @@ Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T 
     LOG::Time("Advancing vorticity particles");
     
     ARRAY<TV,TV_INT> two_times_V_ghost(grid.Domain_Indices(2));
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,2);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid,2);it.Valid();it.Next())
         for(int d=0;d<TV::m;d++){
             TV_INT next(it.index);
             next(d)++;

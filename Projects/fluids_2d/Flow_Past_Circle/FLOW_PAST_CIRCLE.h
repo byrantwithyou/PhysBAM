@@ -7,8 +7,8 @@
 #ifndef __FLOW_PAST_CIRCLE__
 #define __FLOW_PAST_CIRCLE__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Computations/VORTICITY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
@@ -175,7 +175,7 @@ void Initialize_Advection()    PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Dirichlet_Boundary_Conditions(const T time)
 {
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
         if(circle.Inside(iterator.Location(),(T).1*fluids_parameters.grid->dX.Max()))
             fluids_parameters.incompressible->projection.elliptic_solver->psi_D(iterator.index)=true;
 }
@@ -205,10 +205,10 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 //#####################################################################
 void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,2);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(circle.Lazy_Inside(iterator.Location())){
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,2);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(circle.Lazy_Inside(iterator.Location())){
         VECTOR<FACE_INDEX<2>,4> faces;
         GRID<TV>::Neighboring_Faces(faces,iterator.index);
         for(int i=0;i<faces.m;i++) outside(faces(i))=true;}
@@ -259,8 +259,8 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     ARRAY<VECTOR<T,1>,TV_INT> grid_vorticity(fluids_parameters.grid->Domain_Indices(3),false);
     ARRAY<T,TV_INT> grid_vorticity_magnitude(fluids_parameters.grid->Domain_Indices(3),false);
     VORTICITY_UNIFORM<TV>::Vorticity(*fluids_parameters.grid,FACE_LOOKUP_UNIFORM<GRID<TV> >(face_velocities_ghost),grid_vorticity,grid_vorticity_magnitude);
-    //UNIFORM_GRID_ITERATOR_CELL<TV> fuckyou(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()) grid_vorticity(iterator.Cell_Index())=VECTOR<T,1>();
+    //CELL_ITERATOR<TV> fuckyou(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()) grid_vorticity(iterator.Cell_Index())=VECTOR<T,1>();
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/grid_vorticity.%d",output_directory.c_str(),frame),grid_vorticity);
 }
 //#####################################################################

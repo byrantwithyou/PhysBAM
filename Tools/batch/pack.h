@@ -1,9 +1,9 @@
 #ifndef __pack__
 #define __pack__
-#include <vector>
+#include <cstring>
 #include <exception>
 #include <stdexcept>
-#include <cstring>
+#include <vector>
 
 using namespace std;
 

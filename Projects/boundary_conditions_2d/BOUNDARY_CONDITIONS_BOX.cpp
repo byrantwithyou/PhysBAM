@@ -1,4 +1,4 @@
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <climits>
 #include <cstdio>
@@ -34,7 +34,7 @@ template<class TV> BOUNDARY_CONDITIONS_BOX<TV>::
 {
     int n=0;
     T L1=0,Li=0;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,2);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid,2);it.Valid();it.Next()){
         TV X(grid.Face(it.Full_Index()));
         if(Theta(X)>grid.dX.Max()*2) continue;
         if(!Inside(X)) continue;
@@ -132,7 +132,7 @@ template<class TV> void BOUNDARY_CONDITIONS_BOX<TV>::
 Initialize_Velocity_Field(ARRAY<T,FACE_INDEX<TV::m> >& u,T time) const
 {
     saved_u=&u;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,2);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid,2);it.Valid();it.Next()){
       if(this->check_leaks && Theta(grid.Face(it.Full_Index()))>boundary_gap){u(it.Full_Index())=1e10;continue;}
         TV X=it.Location();
         X-=bounding_box.Center();

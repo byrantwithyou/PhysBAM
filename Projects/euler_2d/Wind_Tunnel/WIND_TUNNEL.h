@@ -12,8 +12,8 @@
 #include <iostream>
 #include "math.h"
 
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_MULTIPLE_UNIFORM.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
@@ -39,7 +39,6 @@ public:
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename T_ARRAYS_BASE::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*T_GRID::dimension> T_FACE_VECTOR_BOOL;
@@ -185,7 +184,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
 
     T rho,u_vel,v_vel,p;
     //initialize grid variables
-    for(CELL_ITERATOR iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();TV location=iterator.Location();
+    for(CELL_ITERATOR<TV> iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();TV location=iterator.Location();
         rho=rho_initial;u_vel=u_vel_initial;v_vel=v_vel_initial;p=p_initial;
         if(test_number==1 || test_number==2 || test_number==3 || test_number==5 || test_number==6){rho=rho_initial;u_vel=u_vel_initial;v_vel=v_vel_initial;p=p_initial;}
         else if(test_number==4){
@@ -242,7 +241,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 
     //Set Neumann condition for the .2 unit hight step
     bool inside=false;
-    for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){TV location=iterator.Location();
+    for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){TV location=iterator.Location();
         if(test_number==5) inside=location.x<=domain_center.x;
         else if(test_number==6) inside=location.x>=domain_center.x;
         else if(test_number==4){inside=false;
@@ -275,7 +274,7 @@ void Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& u_gh
         if(grid.Is_MAC_Grid())
             reflection_times_two=2*boundary+(side&1?-1:1);
         else reflection_times_two=2*boundary;
-        for(CELL_ITERATOR iterator(grid,region);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid,region);iterator.Valid();iterator.Next()){
             const TV_INT cell_index=iterator.Cell_Index();const TV location=iterator.Location();
             if(location.x>=(T).1667){
                 TV_INT reflected_node=cell_index;reflected_node[axis]=reflection_times_two-cell_index[axis];
@@ -286,7 +285,7 @@ void Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& u_gh
             else{EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell_index,rho_left,TV(u_left,v_left),euler.eos->e_From_p_And_rho(p_left,rho_left));}}}
     else if(side==4){
         T rho=rho_initial,p=p_initial,u_vel=u_vel_initial,v_vel=v_vel_initial;
-        for(CELL_ITERATOR iterator(grid,region);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid,region);iterator.Valid();iterator.Next()){
             const TV_INT& cell_index=iterator.Cell_Index();const TV location=iterator.Location();
             if(location.y-sqrt((T)3)*(location.x-(T)1./(T)6) + (T)2*(T)10*time <= 0){rho=rho_initial;u_vel=u_vel_initial;v_vel=v_vel_initial;p=p_initial;}
             else{rho=rho_left;u_vel=u_left;v_vel=v_left;p=p_left;}
@@ -346,16 +345,16 @@ void Fedkiw_Isobaric_Fix(bool fix_only_6_cells)
     const T gamma=gamma_law->gamma;
     // Could do the one-ring and two-ring calculations somewhere before we begin...
     ARRAY<VECTOR<int,1> ,VECTOR<int,2> > ring(euler.grid.Domain_Indices());ring.Fill(VECTOR<int,1>(-1));
-    for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){bool is_one_ring=false;
+    for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){bool is_one_ring=false;
         for(int axis=0;axis<TV::dimension;axis++) is_one_ring=is_one_ring || psi_N(axis,iterator.First_Face_Index(axis)) || psi_N(axis,iterator.Second_Face_Index(axis));
         if(is_one_ring) ring(iterator.Cell_Index())(1)=1;}
-    for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){if(ring(iterator.Cell_Index())(1)==1) break;
+    for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){if(ring(iterator.Cell_Index())(1)==1) break;
         bool is_two_ring=false;for(int axis=0;axis<2*TV::dimension;axis++) is_two_ring=is_two_ring || (ring.Valid_Index(iterator.Cell_Neighbor(axis)) && ring(iterator.Cell_Neighbor(axis))(1)==1);
         if(is_two_ring) ring(iterator.Cell_Index())(1)=2;}
 
     static TV_INT reference_cell=fluids_parameters.grid->Closest_Node(TV((T).6-fluids_parameters.grid->dX.x,(T).2-fluids_parameters.grid->dX.y));
     // Fix the two-ring
-    for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){if(ring(iterator.Cell_Index())(1)!=2) continue;
+    for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){if(ring(iterator.Cell_Index())(1)!=2) continue;
         const TV_INT& cell_index=iterator.Cell_Index();
         if(fix_only_6_cells){
             TV_INT delta=cell_index-reference_cell;
@@ -368,7 +367,7 @@ void Fedkiw_Isobaric_Fix(bool fix_only_6_cells)
             break;}}
      
     // Fix the one-ring
-    for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){if(ring(iterator.Cell_Index())(1)!=1) continue;
+    for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){if(ring(iterator.Cell_Index())(1)!=1) continue;
         const TV_INT& cell_index=iterator.Cell_Index();
         if(fix_only_6_cells){
             TV_INT delta=cell_index-reference_cell;

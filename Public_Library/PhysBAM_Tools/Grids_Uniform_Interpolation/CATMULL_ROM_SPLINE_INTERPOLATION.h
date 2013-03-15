@@ -7,7 +7,7 @@
 #ifndef __CATMULL_ROM_SPLINE_INTERPOLATION__
 #define __CATMULL_ROM_SPLINE_INTERPOLATION__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Math_Tools/cube.h>
 namespace PhysBAM{
@@ -17,7 +17,6 @@ class CATMULL_ROM_SPLINE_INTERPOLATION:public INTERPOLATION_UNIFORM<T_GRID,T2,T_
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::VECTOR_T::template REBIND<bool>::TYPE TV_BOOL;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> T_CELL_ITERATOR;
 public:
     typedef INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP> BASE;
     using BASE::Clamped_Index_End_Minus_One;
@@ -37,7 +36,7 @@ public:
     T2 From_Base_Node(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE
     {T basis[T_GRID::dimension][4];T2 sum=T2();TV X_normalized=(X-grid.X(index))*grid.one_over_dX;
     for(int axis=0;axis<T_GRID::dimension;axis++) Catmull_Rom_Basis(X_normalized[axis],basis[axis]);
-    for(T_CELL_ITERATOR iterator(grid,RANGE<TV_INT>(index-TV_INT::All_Ones_Vector(),index+2*TV_INT::All_Ones_Vector()));iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,RANGE<TV_INT>(index-TV_INT::All_Ones_Vector(),index+2*TV_INT::All_Ones_Vector()));iterator.Valid();iterator.Next()){
         T product=1;for(int axis=0;axis<T_GRID::dimension;axis++) product*=basis[axis][iterator.Cell_Index()[axis]-index[axis]+1];
         sum+=u(iterator.Cell_Index())*product;}
     return sum;}
@@ -47,7 +46,7 @@ public:
     for(int axis=0;axis<T_GRID::dimension;axis++)
         if(derivative[axis]) Catmull_Rom_Basis_Derivative(X_normalized[axis],basis[axis]);
         else Catmull_Rom_Basis(X_normalized[axis],basis[axis]);
-    for(T_CELL_ITERATOR iterator(grid,RANGE<TV_INT>(index-TV_INT::All_Ones_Vector(),index+2*TV_INT::All_Ones_Vector()));iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,RANGE<TV_INT>(index-TV_INT::All_Ones_Vector(),index+2*TV_INT::All_Ones_Vector()));iterator.Valid();iterator.Next()){
         T product=1;for(int axis=0;axis<T_GRID::dimension;axis++) product*=basis[axis][iterator.Cell_Index()[axis]-index[axis]+1];
         sum+=u(iterator.Cell_Index())*product;}
     return sum;}

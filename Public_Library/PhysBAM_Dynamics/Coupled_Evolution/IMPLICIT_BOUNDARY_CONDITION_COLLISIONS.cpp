@@ -5,7 +5,7 @@
 // Class IMPLICIT_BOUNDARY_CONDITION_COLLISIONS
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
@@ -41,7 +41,7 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
 
     if(use_implicit_geometry){
         COLLISION_GEOMETRY_ID body_id;
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1);iterator.Valid();iterator.Next()){TV location=iterator.Location();
+        for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){TV location=iterator.Location();
             TV_INT cell_index=iterator.Cell_Index();
             if(collision_geometry_collection.Implicit_Geometry_Lazy_Inside_Any_Body(location,body_id)){
                 psi_D(cell_index)=true;p(cell_index)=p_inside_solid;}}
@@ -53,12 +53,12 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
             if(!object->volume_object){
                 object->object.Update_Bounding_Box();
                 object->object.Refresh_Auxiliary_Structures();
-                for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,grid.Clamp_To_Cell(*object->object.bounding_box,1));iterator.Valid();iterator.Next())
+                for(CELL_ITERATOR<TV> iterator(grid,grid.Clamp_To_Cell(*object->object.bounding_box,1));iterator.Valid();iterator.Next())
                     if(object->Inside(iterator.Location(),collision_thickness_over_two)){
                         psi_D(iterator.Cell_Index())=true;p(iterator.Cell_Index())=p_inside_solid;}}
             else{
                 for(int i=0;i<object->volume_object->mesh.elements.m;i++){T_SIMPLEX simplex=object->volume_object->Get_Element(i);
-                    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,grid.Clamp_To_Cell(simplex.Bounding_Box(),1));iterator.Valid();iterator.Next())
+                    for(CELL_ITERATOR<TV> iterator(grid,grid.Clamp_To_Cell(simplex.Bounding_Box(),1));iterator.Valid();iterator.Next())
                         if(simplex.Inside(iterator.Location(),collision_thickness_over_two)){
                             psi_D(iterator.Cell_Index())=true;p(iterator.Cell_Index())=p_inside_solid;}}}}
         else if(RIGID_COLLISION_GEOMETRY_BASE<TV>* object=dynamic_cast<RIGID_COLLISION_GEOMETRY_BASE<TV>*>(&collision_geometry_collection(i))){
@@ -66,7 +66,7 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
             if(!rigid_body.simplicial_object->mesh.incident_elements) rigid_body.simplicial_object->mesh.Initialize_Incident_Elements();
             if(!rigid_body.simplicial_object->mesh.adjacent_elements) rigid_body.simplicial_object->mesh.Initialize_Adjacent_Elements();
             object->Update_Bounding_Box();
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,grid.Clamp_To_Cell(object->Axis_Aligned_Bounding_Box(),1));iterator.Valid();iterator.Next()){
+            for(CELL_ITERATOR<TV> iterator(grid,grid.Clamp_To_Cell(object->Axis_Aligned_Bounding_Box(),1));iterator.Valid();iterator.Next()){
                 if(collision_geometry_collection(i).Inside(iterator.Location(),collision_thickness_over_two)){
                     psi_D(iterator.Cell_Index())=true;p(iterator.Cell_Index())=p_inside_solid;}}}
         else PHYSBAM_FATAL_ERROR("Unrecognized collision body type");}

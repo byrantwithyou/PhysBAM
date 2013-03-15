@@ -4,9 +4,9 @@
 //#####################################################################
 // Class SOLIDS_FLUIDS_DRIVER_UNIFORM
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -782,11 +782,11 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
             incompressible->Advance_One_Time_Step_Implicit_Part(face_velocities,dt_projection,time_projection,fluids_parameters.implicit_viscosity,0,fluids_parameters.use_levelset_viscosity,
                 fluids_parameters.callbacks,fluids_parameters.print_viscosity_matrix);
             Write_Substep("after pseudo dirichlet solve 1",substep,1);
-            for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+            for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
                 if(incompressible_multiphase->projection.elliptic_solver->psi_D(iterator.Cell_Index()))incompressible->projection.p(iterator.Cell_Index())=p_old(iterator.Cell_Index());
             incompressible->projection.elliptic_solver->psi_D=psi_D_old;
             T_FACE_ARRAYS_BOOL psi_N_old=incompressible_multiphase->projection.elliptic_solver->psi_N;
-            for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
                 TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();int region_1,region_2;T phi_1,phi_2;
                 particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Minimum_Regions(cell_1,cell_2,region_1,region_2,phi_1,phi_2);
                 if((!fluids_parameters.pseudo_dirichlet_regions(region_1) && !incompressible->projection.elliptic_solver->psi_D(cell_1)) ||
@@ -871,7 +871,7 @@ Calculate_Maximum_Allowable_dt(const T dt,T& min_dt,const int substep,RUNGEKUTTA
 
     EULER_UNIFORM<T_GRID>* euler=example.fluids_parameters.euler;
     ARRAY_VIEW<TV_DIMENSION,TV_INT> U_n(rungekutta_u.u_copy);
-    for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T clamp_rho_cell=euler->conservation->clamp_rho*U_n(cell_index)(0);
         T clamp_e_cell=euler->conservation->clamp_e*EULER<T_GRID>::e(U_n,cell_index);
         if((euler->U(cell_index)(0)<U_n(cell_index)(0))&&(abs(euler->U(cell_index)(0)-U_n(cell_index)(0))>1e-5))
@@ -910,7 +910,7 @@ Advect_Fluid(const T dt,const int substep)
     T_FACE_ARRAYS_BOOL region_inside_pseudo_dirichlet_region;
     if(fluids_parameters.pseudo_dirichlet_regions.Number_True()>0){
         region_inside_pseudo_dirichlet_region.Resize(grid);
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             int region=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Inside_Region_Face(iterator.Axis(),iterator.Face_Index());
             region_inside_pseudo_dirichlet_region.Component(iterator.Axis())(iterator.Face_Index())=fluids_parameters.pseudo_dirichlet_regions(region);}}
 
@@ -968,13 +968,13 @@ Advect_Fluid(const T dt,const int substep)
     if(!fluids_parameters.analytic_test) for(int k=0;k<number_of_regions;k++){
         PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=particle_levelset_evolution->Particle_Levelset(k);
         LINEAR_INTERPOLATION_UNIFORM<T_GRID,TV> interpolation;
-        if(pls.use_removed_positive_particles) for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
+        if(pls.use_removed_positive_particles) for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());
             for(int p=0;p<particles.Size();p++){
                 TV X=particles.X(p),V=interpolation.Clamped_To_Array_Face(grid,*advection_face_velocities_ghost,X);
                 if(-pls.levelset.Phi(X)>1.5*particles.radius(p)) V-=fluids_parameters.removed_positive_particle_buoyancy_constant*fluids_parameters.gravity_direction; // buoyancy
                 particles.V(p)=V;}}
-        if(pls.use_removed_negative_particles) for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_negative_particles(iterator.Node_Index())){
+        if(pls.use_removed_negative_particles) for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_negative_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_negative_particles(iterator.Node_Index());
             for(int p=0;p<particles.Size();p++) particles.V(p)+=dt*fluids_parameters.gravity*fluids_parameters.gravity_direction; // ballistic
             if(fluids_parameters.use_body_force) for(int p=0;p<particles.Size();p++)
@@ -1044,7 +1044,7 @@ Advect_Fluid(const T dt,const int substep)
                 else if((rk.substep==1)&&(rk.order==2)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);restart_dt=min_dt;break;}
                 else if((rk.substep==1)&&(rk.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);*const_cast<T*>(&dt)=min_dt;rk.time-=dt/2;continue;}
                 else if((rk.substep==2)&&(rk.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);restart_dt=min_dt;break;}}
-            for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+            for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
                 assert(euler->U(cell_index)(0)>0);assert(EULER<T_GRID>::e(euler->U,cell_index)>0);}
             if(euler->timesplit && euler->perform_rungekutta_for_implicit_part){assert(!euler->thinshell);
                 euler->Get_Dirichlet_Boundary_Conditions(dt,rk.time);
@@ -1100,7 +1100,7 @@ Advect_Fluid(const T dt,const int substep)
         Write_Substep("after revalidate phi",0,1);
 
         // fixing the velocity in regions that are no longer pseudo-Dirichlet
-        if(fluids_parameters.pseudo_dirichlet_regions.Number_True()>0) for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        if(fluids_parameters.pseudo_dirichlet_regions.Number_True()>0) for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             const int axis=iterator.Axis();const TV_INT index=iterator.Face_Index();
             int region1=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Inside_Region(iterator.First_Cell_Index());
             int region2=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Inside_Region(iterator.Second_Cell_Index());
@@ -1277,7 +1277,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
             T max_density=-FLT_MAX,min_density=FLT_MAX;
             TV max_velocity=TV();
             TV_INT min_cell_index,max_cell_index,max_velocity_index;
-            for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+            for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
                 if(euler->psi(cell_index)){
                     T current_density=euler->U(cell_index)[0];
                     TV current_velocity=EULER<T_GRID>::Get_Velocity(euler->U,cell_index);
@@ -1407,16 +1407,16 @@ Write_Output_Files(const int frame)
             PARTICLE_LEVELSET_UNIFORM<T_GRID>* pls=0;
             if(number_of_regions==1) pls=&example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(0);
             else pls=example.fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
-            for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->positive_particles(iterator.Cell_Index()))
+            for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls->positive_particles(iterator.Cell_Index()))
                 number_of_positive_particles+=pls->positive_particles(iterator.Cell_Index())->Size();
-            for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->negative_particles(iterator.Cell_Index()))
+            for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls->negative_particles(iterator.Cell_Index()))
                 number_of_negative_particles+=pls->negative_particles(iterator.Cell_Index())->Size();
             LOG::cout<<number_of_positive_particles<<" positive and "<<number_of_negative_particles<<" negative particles "<<std::endl;
             if(pls->use_removed_positive_particles)
-                for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->removed_positive_particles(iterator.Cell_Index()))
+                for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls->removed_positive_particles(iterator.Cell_Index()))
                     number_of_removed_positive_particles+=pls->removed_positive_particles(iterator.Cell_Index())->Size();
             if(pls->use_removed_negative_particles)
-                for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->removed_negative_particles(iterator.Cell_Index()))
+                for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls->removed_negative_particles(iterator.Cell_Index()))
                     number_of_removed_negative_particles+=pls->removed_negative_particles(iterator.Cell_Index())->Size();
             LOG::cout<<number_of_removed_positive_particles<<" positive and "<<number_of_removed_negative_particles<<" negative removed particles "<<std::endl;}}
 

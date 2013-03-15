@@ -7,7 +7,7 @@
 #ifndef __STANDARD_TESTS_MULTIPHASE__
 #define __STANDARD_TESTS_MULTIPHASE__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE_3D.h>
 namespace PhysBAM{
@@ -17,7 +17,7 @@ class STANDARD_TESTS_MULTIPHASE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR
 {
     typedef T_input T;
 public:
-    typedef VECTOR<T,3> TV;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
+    typedef VECTOR<T,3> TV;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
@@ -88,7 +88,7 @@ void Initialize_Advection()    PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_Phi() PHYSBAM_OVERRIDE
 {
-    for(int i=0;i<fluids_parameters.number_of_regions;i++)for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+    for(int i=0;i<fluids_parameters.number_of_regions;i++)for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
         fluids_parameters.particle_levelset_evolution_multiple->phis(i)(iterator.Cell_Index())=tests.Initial_Phi(i,iterator.Location());        
 }
 //#####################################################################
@@ -152,7 +152,7 @@ void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
         ARRAY<T,VECTOR<int,3> >& w=fluids_parameters.incompressible_multiphase->projection.face_velocities.Component(2);
         ARRAY<bool,VECTOR<int,3> >& psi_N_u=fluids_parameters.incompressible_multiphase->projection.elliptic_solver->psi_N.Component(0);
         ARRAY<bool,VECTOR<int,3> >& psi_N_w=fluids_parameters.incompressible_multiphase->projection.elliptic_solver->psi_N.Component(2);
-        for(CELL_ITERATOR iterator(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,2);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,2);iterator.Valid();iterator.Next()){
             //if(fluids_parameters.particle_levelset_evolution->Levelset(0).phi(iterator.Cell_Index())<=0){
             VECTOR<int,3> cell=iterator.Cell_Index();
             if(tests.armadillo->phi(cell+VECTOR<int,3>(0,1,0))<=0){

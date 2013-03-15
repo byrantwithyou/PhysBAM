@@ -23,7 +23,6 @@ class EXTRAPOLATION_UNIFORM:public EXTRAPOLATION<T_GRID,T2>
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 public:
     template<class T3> struct REBIND{typedef EXTRAPOLATION_UNIFORM<T_GRID,T3> TYPE;};
     typedef  EXTRAPOLATION<T_GRID,T2> BASE;

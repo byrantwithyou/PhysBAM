@@ -4,7 +4,7 @@
 //#####################################################################
 // Class WATER_STANDARD_TESTS_3D
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
@@ -235,10 +235,10 @@ template<class T>
 void Get_Variable_Viscosity_Helper(GRID<VECTOR<T,3> >& grid,const int test_number,ARRAY<T,VECTOR<int,3> >& variable_viscosity,const T time)
 {
     if(test_number==13){
-        for(UNIFORM_GRID_ITERATOR_CELL<VECTOR<T,3> > iterator(grid,1);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<VECTOR<T,3> > iterator(grid,1);iterator.Valid();iterator.Next())
             variable_viscosity(iterator.Cell_Index())=(iterator.Location().x<.2)?(T)0:(T)1000;}
     else if(test_number==15){
-        for(UNIFORM_GRID_ITERATOR_CELL<VECTOR<T,3> > iterator(grid,1);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<VECTOR<T,3> > iterator(grid,1);iterator.Valid();iterator.Next())
             variable_viscosity(iterator.Cell_Index())=(iterator.Location().x<.5)?(T)0:(T)1000;}
 }
 template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::

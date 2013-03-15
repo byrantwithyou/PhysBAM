@@ -309,13 +309,13 @@ Initialize_Phi()
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
     if(test_number==1 || test_number==3){
         SPHERE<TV> object(TV((T).02*m,(T).02*m),(T).01*m);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
             TV X=it.Location();
             if(make_ellipse) X*=TV((T)1.1,(T).9);
             phi(it.index)=object.Signed_Distance(X);}}
     else if(test_number==2) phi.Fill(1);
     else if(test_number==4 || test_number==5){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
             TV dX=it.Location()-TV((T)(.5*m),(T)(.5*m));
             T distance=dX.Magnitude();
             T angle=atan2(dX.y,dX.x);
@@ -324,20 +324,20 @@ Initialize_Phi()
     else if(test_number==6) phi.Fill(-1);
     else if(test_number==7){
         SPHERE<TV> object(TV((T).5*m,(T).5*m),(T).2*m);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
+        for(CELL_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
             phi(it.index)=-object.Signed_Distance(it.Location());}
     else if(test_number==10 || test_number==9){
         SPHERE<TV> object(TV((T).5*m,(T).5*m),(T).25*m);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
             phi(it.index)=object.Signed_Distance(it.Location());}}
     else if(test_number==8) Initialize_Sine_Phi();
     else if(test_number==11 || test_number==13){
         SPHERE<TV> object(TV(),(T)1/300*m);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
+        for(CELL_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
             phi(it.index)=-object.Signed_Distance(it.Location());}
     else if(test_number==12){
         SPHERE<TV> object(TV(),(T).4*m);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
+        for(CELL_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
             phi(it.index)=-object.Signed_Distance(it.Location());}
 }
 //#####################################################################
@@ -650,7 +650,7 @@ Initialize_Sine_Phi()
     const GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
     SINE_DIST<T> sd;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         TV X=it.Location();
         sd.X=X.x;
         sd.Y=X.y;
@@ -678,7 +678,7 @@ Test_Analytic_Velocity(T time)
     T L1_error=0;
     int cnt=0;
     ARRAY<T,FACE_INDEX<TV::m> > u2(fluid_collection.incompressible_fluid_collection.face_velocities);
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
         if(fluids_parameters.particle_levelset_evolution->Levelset(0).Phi(it.Location())>fluids_parameters.grid->dX.Min()*0){
             fluid_collection.incompressible_fluid_collection.face_velocities(it.Full_Index())=0;
             continue;}
@@ -712,7 +712,7 @@ Test_Analytic_Pressure(T time)
     T L1_error=0;
     int cnt=0;
     ARRAY<T,TV_INT>& p=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*solids_evolution).pressure;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
         if(fluids_parameters.particle_levelset_evolution->Levelset(0).Phi(it.Location())>fluids_parameters.grid->dX.Min()*0) continue;
         TV dX=it.Location()-TV((T)(.5*m),(T)(.5*m));
         T r=dX.Magnitude();
@@ -950,7 +950,7 @@ Rebuild_Surface()
     HASHTABLE<TV_INT,ARRAY<int> > used_cells;
     int next=1;
     const ARRAY<T,TV_INT>& phi=fluids_parameters.particle_levelset_evolution->Levelset(0).phi;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face=it.Full_Index();
         TV_INT cell1=face.First_Cell_Index(),cell2=face.Second_Cell_Index();
         T phi1=phi(cell1),phi2=phi(cell2);
@@ -1154,7 +1154,7 @@ Postprocess_Frame(const int frame)
         ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
         int count=0;
         T mx=0,sum=0;
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
+        for(FACE_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
             TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
             T phi1=phi(cell1),phi2=phi(cell2);
             if(phi1<=0 || phi2<=0){
@@ -1167,7 +1167,7 @@ Postprocess_Frame(const int frame)
         T D=(T).8,sum=0;
         T U_sig=sqrt(surface_tension/(fluids_parameters.density*D));
         int num=0;
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
+        for(FACE_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
             T v=fluid_collection.incompressible_fluid_collection.face_velocities(it.Full_Index());
             sum+=sqr(v);
             num++;}

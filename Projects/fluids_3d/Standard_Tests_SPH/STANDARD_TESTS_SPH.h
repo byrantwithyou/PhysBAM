@@ -7,7 +7,7 @@
 #ifndef __STANDARD_TESTS_SPH__
 #define __STANDARD_TESTS_SPH__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <PhysBAM_Dynamics/Particles/SPH_PARTICLES.h>
@@ -20,9 +20,7 @@ class STANDARD_TESTS_SPH:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_inpu
 {
     typedef T_input T;
 public:
-    typedef VECTOR<T,3> TV;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
-
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef VECTOR<T,3> TV;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
     using BASE::Adjust_Phi_With_Sources;using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::Get_Object_Velocities; // silence -Woverloaded-virtual
@@ -126,7 +124,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 void Get_Object_Velocities(const bool set_densities_for_coupling,const T dt,const T time) // TODO: PHYSBAM_OVERRIDE Problem
 {
     if(tests.test_number==1 && time<4)
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(iterator.Location().x<(T).7){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(iterator.Location().x<(T).7){
             fluids_parameters.incompressible->projection.elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;
             fluids_parameters.incompressible->projection.face_velocities(iterator.Axis(),iterator.Face_Index())=0;}
 }

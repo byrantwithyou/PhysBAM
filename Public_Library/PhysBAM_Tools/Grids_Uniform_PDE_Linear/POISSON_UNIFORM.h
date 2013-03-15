@@ -17,9 +17,9 @@ template<class T_GRID>
 class POISSON_UNIFORM:public POISSON<typename T_GRID::SCALAR>,public LAPLACE_UNIFORM<T_GRID>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
+    typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     using LAPLACE_UNIFORM<T_GRID>::grid;using POISSON<T>::use_variable_beta;using POISSON<T>::beta_given_on_faces;
     using POISSON<T>::use_weighted_divergence;using POISSON<T>::multiphase;

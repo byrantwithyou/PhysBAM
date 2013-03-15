@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
@@ -77,7 +77,7 @@ Zero_Out_Neumann_Pocket_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities)
     // zero out the velocities in neumann pockets to prevent gravity from accumulating
     T_FACE_ARRAYS_BOOL &psi_N=elliptic_solver->psi_N;
     if(!elliptic_solver->solve_neumann_regions){ 
-        for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
             int color1=elliptic_solver->filled_region_colors(first_cell),color2=elliptic_solver->filled_region_colors(second_cell);
             if(color1==-1 || color2==-1 || psi_N.Component(axis)(face_index)) continue;
@@ -97,12 +97,12 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
     T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver->psi_N;
     if(scale_by_dt) p*=dt;
     if(laplace) 
-        for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
             if(!psi_N.Component(axis)(face_index) && !(psi_D(first_cell) && psi_D(second_cell)))
                 face_velocities.Component(axis)(face_index)-=(p(second_cell)-p(first_cell))*one_over_dx[axis];}
     else if(poisson)
-        for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
             if(!psi_N.Component(axis)(face_index) && !(psi_D(first_cell) && psi_D(second_cell)))
                 face_velocities.Component(axis)(face_index)-=poisson->beta_face.Component(axis)(face_index)*(p(second_cell)-p(first_cell))*one_over_dx[axis];}
@@ -120,14 +120,14 @@ template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
 Compute_Divergence_Threaded(RANGE<TV_INT>& domain,const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<T_GRID>* solver)
 {
     TV one_over_dx=p_grid.one_over_dX;
-    for(CELL_ITERATOR iterator(p_grid,domain);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(p_grid,domain);iterator.Valid();iterator.Next()){
         const typename T_FACE_LOOKUP::LOOKUP& lookup=face_lookup.Starting_Point_Cell(iterator.Cell_Index());T divergence=0;
         for(int axis=0;axis<T_GRID::dimension;axis++)divergence+=(lookup(axis,iterator.Second_Face_Index(axis))-lookup(axis,iterator.First_Face_Index(axis)))*one_over_dx[axis];
         solver->f(iterator.Cell_Index())=divergence;}
 
-    if(use_non_zero_divergence) for(CELL_ITERATOR iterator(p_grid,domain);iterator.Valid();iterator.Next())
+    if(use_non_zero_divergence) for(CELL_ITERATOR<TV> iterator(p_grid,domain);iterator.Valid();iterator.Next())
         solver->f(iterator.Cell_Index())-=divergence(iterator.Cell_Index());
-    if(use_divergence_multiplier) for(CELL_ITERATOR iterator(p_grid,domain);iterator.Valid();iterator.Next())
+    if(use_divergence_multiplier) for(CELL_ITERATOR<TV> iterator(p_grid,domain);iterator.Valid();iterator.Next())
         solver->f(iterator.Cell_Index())*=divergence_multiplier(iterator.Cell_Index());
 }
 //#####################################################################
@@ -146,11 +146,11 @@ Enforce_Velocity_Compatibility(T_FACE_ARRAYS_SCALAR& face_velocities)
 
     ARRAY<double> compatibility_fraction(elliptic_solver->number_of_regions),boundary_size(elliptic_solver->number_of_regions);
     // calculate the compatibility errors
-    for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
         int color=elliptic_solver->filled_region_colors(iterator.Cell_Index());
         if(color>0 && !elliptic_solver->filled_region_touches_dirichlet(color)) compatibility_fraction(color)+=elliptic_solver->f(iterator.Cell_Index());}
 
-    for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
         int color1=elliptic_solver->filled_region_colors(iterator.First_Cell_Index()),color2=elliptic_solver->filled_region_colors(iterator.Second_Cell_Index());
         if(color1==color2) continue;T face_size=iterator.Face_Size();
         if(color1>0 && !elliptic_solver->filled_region_touches_dirichlet(color1)) boundary_size(color1)+=face_size;
@@ -172,7 +172,7 @@ Enforce_Velocity_Compatibility(T_FACE_ARRAYS_SCALAR& face_velocities)
     for(int i=0;i<elliptic_solver->number_of_regions;i++) if(boundary_size(i)) compatibility_fraction(i)*=cell_size/boundary_size(i);
 
     // adjust the compatibility error to zero
-    for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
         int color1=elliptic_solver->filled_region_colors(iterator.First_Cell_Index()),color2=elliptic_solver->filled_region_colors(iterator.Second_Cell_Index());
         if(color1<=0 || elliptic_solver->filled_region_touches_dirichlet(color1)) color1=0;
         if(color2<=0 || elliptic_solver->filled_region_touches_dirichlet(color2)) color2=0;

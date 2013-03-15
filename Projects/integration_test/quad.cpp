@@ -5,9 +5,9 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -189,7 +189,7 @@ void Evolve_Step(GRID<TV>& grid,ARRAY<T,TV_INT> q[3],const ARRAY<T,TV_INT> p[3],
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
 
     for(int i=0;i<3;i++) q[i].Fill(0);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         VECTOR<T,3> pp;
         VECTOR<VECTOR<T,(1<<TV::m)>,3> phi;
         for(int i=0;i<3;i++) phi(i)=VECTOR<T,(1<<TV::m)>(p[i].Subset(bits+it.index));
@@ -205,7 +205,7 @@ void Evolve_Step(GRID<TV>& grid,ARRAY<T,TV_INT> q[3],const ARRAY<T,TV_INT> p[3],
         LOG::cout<<pp<<std::endl;
         for(int i=0;i<3;i++) q[i].Subset(bits+it.index)+=pp(i);}
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next())
         for(int c=0;c<3;c++)
             q[c](it.index)=p[c](it.index)-(T).25*q[c](it.index);
 }
@@ -228,7 +228,7 @@ void Initialize(const GRID<TV>& grid,ARRAY<VECTOR<TV_INT,3> >& stencils,ARRAY<T,
     lines[2]=LINE_2D<T>(-TV(.11,.41).Normalized(),TV(.41,.61));
 
     for(int c=0;c<3;c++){
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next())
+        for(NODE_ITERATOR<TV> it(grid,3);it.Valid();it.Next())
             p[c](it.index)=lines[c].Signed_Distance(it.Location());}
     
 }
@@ -251,7 +251,7 @@ void Initialize(const GRID<TV>& grid,ARRAY<VECTOR<TV_INT,4> >& stencils,ARRAY<T,
     planes[2]=PLANE<T>(-TV(.11,.41,0).Normalized(),TV(.41,.61,.5));
 
     for(int c=0;c<3;c++){
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,3);it.Valid();it.Next())
+        for(NODE_ITERATOR<TV> it(grid,3);it.Valid();it.Next())
             p[c](it.index)=planes[c].Signed_Distance(it.Location());}
 }
 

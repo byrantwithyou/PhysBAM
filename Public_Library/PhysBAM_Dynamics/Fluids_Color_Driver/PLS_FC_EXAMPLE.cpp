@@ -2,7 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
@@ -48,7 +48,7 @@ template<class TV_input> PLS_FC_EXAMPLE<TV_input>::
 template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Merge_Velocities(ARRAY<T,FACE_INDEX<TV::dimension> >& V,const ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color) const
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
         int c=color(it.Full_Index());
         if(c<0){
             c=0;
@@ -160,7 +160,7 @@ template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Rebuild_Levelset_Color()
 {
     Make_Levelsets_Consistent();
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next())
         levelset_color.color(it.index)=Color_At_Cell(it.index,levelset_color.phi(it.index));
     boundary.Fill_Ghost_Cells(grid,levelset_color.phi,levelset_color.phi,0,0,number_of_ghost_cells);
     boundary_int.Fill_Ghost_Cells(grid,levelset_color.color,levelset_color.color,0,0,number_of_ghost_cells);
@@ -172,7 +172,7 @@ template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Fill_Levelsets_From_Levelset_Color()
 {
     ARRAY<ARRAY<T,TV_INT> >& phis=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
         int c=levelset_color.color(it.index);
         T p=levelset_color.phi(it.index);
         for(int i=0;i<bc_phis.m;i++)
@@ -213,7 +213,7 @@ Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelse
     Merge_Velocities(n,face_velocities,face_color);
     Merge_Velocities(m,prev_face_velocities,prev_face_color);
     T alpha=(time-this->time)/dt;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next())
         V_levelset(it.Full_Index())=(1-alpha)*n(it.Full_Index())+alpha*m(it.Full_Index());
     boundary.Apply_Boundary_Condition_Face(grid,V_levelset,time+dt);
 }
@@ -224,7 +224,7 @@ template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Make_Levelsets_Consistent()
 {
     ARRAY<ARRAY<T,TV_INT> >& phis=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
         T min1=FLT_MAX,min2=FLT_MAX,bc_min=FLT_MAX;
         for(int i=0;i<bc_phis.m;i++)
             bc_min=min(bc_min,bc_phis(i)(it.index));

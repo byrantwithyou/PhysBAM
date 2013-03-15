@@ -5,10 +5,10 @@
 // Class ADVECTION_MACCORMACK_UNIFORM
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_MACCORMACK_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
@@ -106,7 +106,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
 template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
 Apply_Clamped_Extrema_Limiter_Node_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_forward_ghost,const ARRAY<T2,TV_INT>& Z_backward_ghost,const ARRAY<T2,TV_INT>& Z_min,const ARRAY<T2,TV_INT>& Z_max)
 {
-    for(NODE_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
+    for(NODE_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Node_Index();
         if((*node_mask)(index)) Z(index)=clamp(Z_forward_ghost(index)+(T).5*(Z(index)-Z_backward_ghost(index)),Z_min(index),Z_max(index));
         else Z(index)=Z_forward_ghost(index);}
@@ -115,7 +115,7 @@ Apply_Clamped_Extrema_Limiter_Node_Threaded(RANGE<TV_INT>& domain,const T_GRID& 
 template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
 Apply_Clamped_Extrema_Limiter_Cell_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,ARRAY<T2,TV_INT>& Z, const ARRAY<T2,TV_INT>& Z_forward_ghost, const ARRAY<T2,TV_INT>& Z_backward_ghost, const ARRAY<T2,TV_INT>& Z_min, const ARRAY<T2,TV_INT>& Z_max)
 {
-    for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Cell_Index();
         if((*cell_mask)(index)) Z(index)=clamp(Z_forward_ghost(index)+(T).5*(Z(index)-Z_backward_ghost(index)),Z_min(index),Z_max(index));
         else Z(index)=Z_forward_ghost(index);}
@@ -124,7 +124,7 @@ Apply_Clamped_Extrema_Limiter_Cell_Threaded(RANGE<TV_INT>& domain,const T_GRID& 
 template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
 Apply_Clamped_Extrema_Limiter_Face_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,int axis,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_ARRAYS_SCALAR& Z_forward_ghost,const T_FACE_ARRAYS_SCALAR& Z_backward_ghost,const T_FACE_ARRAYS_SCALAR& Z_min,const T_FACE_ARRAYS_SCALAR& Z_max)
 {
-    for(FACE_ITERATOR iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Face_Index();int axis=iterator.Axis();
         if((*face_mask)(axis,index)) Z(axis,index)=clamp(Z_forward_ghost(axis,index)+(T).5*(Z(axis,index)-Z_backward_ghost(axis,index)),Z_min(axis,index),Z_max(axis,index));
         else Z(axis,index)=Z_forward_ghost(axis,index);}
@@ -133,7 +133,7 @@ Apply_Clamped_Extrema_Limiter_Face_Threaded(RANGE<TV_INT>& domain,const T_GRID& 
 template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
 Apply_Reversion_Limiter_Node_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_forward_ghost,const ARRAY<T2,TV_INT>& Z_backward_ghost,const ARRAY<T2,TV_INT>& Z_min,const ARRAY<T2,TV_INT>& Z_max)
 {
-    for(NODE_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
+    for(NODE_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Node_Index();
         if((*node_mask)(index)){
             Z(index)=Z_forward_ghost(index)+(T).5*(Z(index)-Z_backward_ghost(index));
@@ -144,7 +144,7 @@ Apply_Reversion_Limiter_Node_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,A
 template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
 Apply_Reversion_Limiter_Cell_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_forward_ghost,const ARRAY<T2,TV_INT>& Z_backward_ghost,const ARRAY<T2,TV_INT>& Z_min,const ARRAY<T2,TV_INT>& Z_max)
 {
-    for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Cell_Index();
         if((*cell_mask)(index)){
             Z(index)=Z_forward_ghost(index)+(T).5*(Z(index)-Z_backward_ghost(index));
@@ -155,7 +155,7 @@ Apply_Reversion_Limiter_Cell_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,A
 template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
 Apply_Reversion_Limiter_Face_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,int axis,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_ARRAYS_SCALAR& Z_forward_ghost,const T_FACE_ARRAYS_SCALAR& Z_backward_ghost,const T_FACE_ARRAYS_SCALAR& Z_min,const T_FACE_ARRAYS_SCALAR& Z_max)
 {
-    for(FACE_ITERATOR iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Face_Index();int axis=iterator.Axis();
         if((*face_mask)(axis,index)){
             Z(axis,index)=Z_forward_ghost(axis,index)+(T).5*(Z(axis,index)-Z_backward_ghost(axis,index));
@@ -166,7 +166,7 @@ Apply_Reversion_Limiter_Face_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,i
 template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
 Apply_Second_Order_Update_Face_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,int axis,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_ARRAYS_SCALAR& Z_forward_ghost,const T_FACE_ARRAYS_SCALAR& Z_backward_ghost)
 {
-    for(FACE_ITERATOR iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> index=iterator.Full_Index();
         if((*face_mask)(index)) Z(index)=Z_forward_ghost(index)+(T).5*(Z(index)-Z_backward_ghost(index));
         else Z(index)=Z_forward_ghost(index);}

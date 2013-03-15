@@ -5,7 +5,7 @@
 #ifndef __PLS_REFINEMENT_EXAMPLE__
 #define __PLS_REFINEMENT_EXAMPLE__
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
@@ -73,7 +73,7 @@ public:
     {return initial_time+(frame-first_frame)/frame_rate;}
 
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
-    {for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()) V_levelset(iterator.Full_Index())=fine_face_velocities(iterator.Full_Index());}
+    {for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) V_levelset(iterator.Full_Index())=fine_face_velocities(iterator.Full_Index());}
 
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) PHYSBAM_OVERRIDE
     {

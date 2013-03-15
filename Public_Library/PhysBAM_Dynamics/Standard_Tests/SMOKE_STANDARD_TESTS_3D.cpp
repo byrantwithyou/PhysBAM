@@ -2,8 +2,8 @@
 // Copyright 2006-2007, Andrew Selle, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
@@ -95,7 +95,7 @@ Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time)
     LOG::Time("Getting divergence");
     if(test_number==3 || test_number==4){
         T expansion=explosion_divergence*sin(time)/exp(time);
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) 
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) 
             if(source.Lazy_Inside(iterator.Location())) divergence(iterator.Cell_Index())=expansion;}
 }
 //#####################################################################
@@ -111,7 +111,7 @@ Get_Body_Force(ARRAY<T,FACE_INDEX<3> >& force,const T dt,const T time)
         if(time<=explosion_end_time){
             int add_count=0;VORTICITY_PARTICLES<TV >& vorticity_particles=vortex_particle_evolution->vorticity_particles;
             TV cell_upper=(T).5*fluids_parameters.grid->dX,cell_lower=-cell_upper;
-            for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+            for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
                 if(source.Lazy_Inside(iterator.Location()) && time>(T)1/24 && random.Get_Uniform_Number((T)0,(T)1)<(T).005){
                     LOG::cout<<"adding particle now have "<<vorticity_particles.Size()+1<<std::endl;
                     add_count++;int particle_id=vorticity_particles.Add_Element(); 

@@ -11,9 +11,9 @@
 #include <fstream>
 #include <iostream>
 
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
@@ -37,7 +37,6 @@ public:
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
     typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
     using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
 
@@ -237,7 +236,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
         U(i)(0) = rho; U(i)(1) = rho*u; U(i)(2) = rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}
 
     flux_face.Resize(grid.Domain_Indices(3));
-    for(FACE_ITERATOR iter(grid,3);iter.Valid();iter.Next())
+    for(FACE_ITERATOR<TV> iter(grid,3);iter.Valid();iter.Next())
         flux_face(iter.Full_Index()) = true;
 }
 //#####################################################################

@@ -8,7 +8,7 @@
 #define __VORTICITY_UNIFORM__
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
@@ -42,7 +42,7 @@ public:
 
     template<class T_FACE_LOOKUP_2>
     static void Vorticity(const GRID<TV>& grid,const T_FACE_LOOKUP_2& face_velocities_lookup,ARRAY<T_SPIN,TV_INT>& vorticity,ARRAY<T,TV_INT>& vorticity_magnitude)
-    {for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
+    {for(CELL_ITERATOR<TV> iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
         const typename T_FACE_LOOKUP_2::LOOKUP& lookup=face_velocities_lookup.Starting_Point_Cell(iterator.Cell_Index());lookup.Set_Reference_Point(iterator.Location());
         vorticity(index)=Vorticity(grid,lookup,index);vorticity_magnitude(index)=vorticity(index).Magnitude();}}
 };

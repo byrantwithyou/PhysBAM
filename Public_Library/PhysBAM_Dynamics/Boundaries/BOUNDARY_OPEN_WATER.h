@@ -20,7 +20,6 @@ class BOUNDARY_OPEN_WATER:public BOUNDARY<TV,typename TV::SCALAR>
     typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 public:
     typedef BOUNDARY<TV,T> BASE;
     using BASE::Constant_Extrapolation;using BASE::Fill_Single_Ghost_Region;using BASE::Find_Ghost_Regions;
@@ -65,7 +64,7 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAY
         for(int side=0;side<GRID<TV>::number_of_faces_per_cell;side++){
             RANGE<TV_INT>& region=regions(side);
             int axis=side/2,boundary=side&1?region.Minimum_Corner()[axis]-1:region.Maximum_Corner()[axis]+1;
-            if(open_boundary(side)) for(NODE_ITERATOR iterator(face_grid,region);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index(),boundary_node=node;boundary_node[axis]=boundary; 
+            if(open_boundary(side)) for(NODE_ITERATOR<TV> iterator(face_grid,region);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index(),boundary_node=node;boundary_node[axis]=boundary; 
                 if(side&1) if(u_ghost_component(boundary_node)<0) u_ghost_component(node)=attenuate_inflow*u_ghost_component(boundary_node);else u_ghost_component(node)=u_ghost_component(boundary_node);
                 else if(u_ghost_component(boundary_node)>0) u_ghost_component(node)=attenuate_inflow*u_ghost_component(boundary_node);else u_ghost_component(node)=u_ghost_component(boundary_node);}
             else if(Constant_Extrapolation(side)) Fill_Single_Ghost_Region(face_grid,u_ghost_component,side,regions(side));

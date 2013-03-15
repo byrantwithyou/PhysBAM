@@ -7,7 +7,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
@@ -87,18 +87,18 @@ Initialize(const T_ARRAYS_BASE& phi,ARRAYS_ND_BASE<bool,TV_INT>& done,ARRAYS_ND_
     assert(!seed_indices||!seed_done);
     if(seed_indices) for(int i=0;i<seed_indices->m;i++) done((*seed_indices)(i))=true;
     else if(seed_done) ARRAYS_ND_BASE<bool,TV_INT>::Put(*seed_done,done);
-    else for(NODE_ITERATOR iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(phi(iterator.Node_Index()) <= 0) done(iterator.Node_Index())=true;
+    else for(NODE_ITERATOR<TV> iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(phi(iterator.Node_Index()) <= 0) done(iterator.Node_Index())=true;
 
     // find neighbors of done nodes which have positive phi
     if(collision_aware_extrapolation){
-        for(NODE_ITERATOR iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Node_Index())){TV_INT index=iterator.Node_Index();
+        for(NODE_ITERATOR<TV> iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Node_Index())){TV_INT index=iterator.Node_Index();
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector) && phi(index-axis_vector) > 0 && Neighbor_Visible(axis,index-axis_vector))
                     Add_To_Heap(phi,heap,heap_length,close,index-axis_vector);
                 if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && !close(index+axis_vector) && phi(index+axis_vector) > 0 && Neighbor_Visible(axis,index))
                     Add_To_Heap(phi,heap,heap_length,close,index+axis_vector);}}}
     else{
-        for(NODE_ITERATOR iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Node_Index())){TV_INT index=iterator.Node_Index();
+        for(NODE_ITERATOR<TV> iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Node_Index())){TV_INT index=iterator.Node_Index();
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector) && phi(index-axis_vector) > 0)
                     Add_To_Heap(phi,heap,heap_length,close,index-axis_vector);

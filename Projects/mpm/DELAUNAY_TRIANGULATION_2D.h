@@ -6,9 +6,9 @@
 //#####################################################################
 #ifndef __DELAUNAY_TRIANGULATION_2D__
 #define __DELAUNAY_TRIANGULATION_2D__
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 namespace PhysBAM{
 template<class T>

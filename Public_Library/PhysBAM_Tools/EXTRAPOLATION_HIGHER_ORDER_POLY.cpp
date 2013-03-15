@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <climits>
 using namespace PhysBAM;
@@ -39,7 +39,7 @@ Extrapolate_Node(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)>
         neighbors.Append(it.index);
 
     RANGE<TV_INT> domain(grid.Domain_Indices());
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,1);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
         if(domain.Lazy_Inside_Half_Open(it.index) && inside_mask(it.index)) continue;
         distance(it.index)|=1;
         for(int d=0;d<TV::m;d++){
@@ -57,7 +57,7 @@ Extrapolate_Node(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)>
                 distance(id)|=4;}}
 
     VECTOR<ARRAY<TV_INT>,3> seed;
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int& a=distance(it.index),oo=-1;
         for(int o=0,m=1;o<order;o++,m|=1<<o)
             if((a&m)==0)
@@ -68,11 +68,11 @@ Extrapolate_Node(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)>
         a=~oo;
         seed(oo).Append(it.index);}
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost+1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+    for(NODE_ITERATOR<TV> it(grid,ghost+1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         distance(it.index)=ignore;
 
     ARRAY<TV_INT> next_outside,current,solve;
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int d=distance(it.index);
         if(d==ignore || d==inf) continue;
         for(int i=0;i<neighbors.m;i++){
@@ -119,7 +119,7 @@ Extrapolate_Node(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)>
         todo.Clean_Memory();
 
         if(o!=order-1)
-            for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost+1);it.Valid();it.Next()){
+            for(NODE_ITERATOR<TV> it(grid,ghost+1);it.Valid();it.Next()){
                 int& a=distance(it.index);
                 if(a>=0 && a<inf) a=(int)sqr(sqrt(a)+order_reduction_penalty);}}
 

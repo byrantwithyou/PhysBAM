@@ -21,7 +21,6 @@ class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM:public ADVECTION<T_GRID,
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
 public:
     const T_GRID_BASED_COLLISION_GEOMETRY& body_list;
     ARRAY<bool,TV_INT> &cell_valid_points_current,&cell_valid_points_next;

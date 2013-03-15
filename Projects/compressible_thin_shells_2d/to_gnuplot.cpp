@@ -2,8 +2,8 @@
 // Copyright 2010, Jon Gretarsson.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -55,7 +55,7 @@ int main(int argc,char* argv[])
         LOG::cout.precision(std::numeric_limits< double >::digits10);
         if(xcut >= 0){
             GRID<VECTOR<T,1> > cut_grid(grid.counts.Remove_Index(1),grid.domain.Remove_Dimension(1),grid.Is_MAC_Grid());
-            for(UNIFORM_GRID_ITERATOR_CELL<VECTOR<T,1> > iter(cut_grid);iter.Valid();iter.Next())
+            for(CELL_ITERATOR<VECTOR<T,1> > iter(cut_grid);iter.Valid();iter.Next())
                 LOG::cout<<iter.Location().x<<"\t"<<data(iter.Cell_Index().Insert(xcut,1))<<std::endl;}
         else if(opt_follow_transverse_velocity){
             T time;FILE_UTILITIES::Read_From_File<RW>(f+"time",time);
@@ -63,7 +63,7 @@ int main(int argc,char* argv[])
             T x_position=xstart+time*transverse_velocity;
             LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
             GRID<VECTOR<T,1> > cut_grid(grid.counts.Remove_Index(1),grid.domain.Remove_Dimension(1),grid.Is_MAC_Grid());
-            for(UNIFORM_GRID_ITERATOR_CELL<VECTOR<T,1> > iter(cut_grid,2);iter.Valid();iter.Next())
+            for(CELL_ITERATOR<VECTOR<T,1> > iter(cut_grid,2);iter.Valid();iter.Next())
                 LOG::cout<<iter.Location().x<<"\t"<<interpolation.Clamped_To_Array(grid, data,iter.Location().Insert(x_position,1))<<std::endl;}
         else if(surface_file != ""){
             OCTAVE_OUTPUT<T> octave_output(surface_file.c_str());

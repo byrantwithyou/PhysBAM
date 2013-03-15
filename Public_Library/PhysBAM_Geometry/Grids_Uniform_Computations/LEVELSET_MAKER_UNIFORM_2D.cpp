@@ -2,8 +2,8 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM_2D.h>
@@ -41,7 +41,7 @@ Compute_Level_Set(SEGMENTED_CURVE_2D<T>& curve,GRID<TV>& grid,int ghost_cells,AR
                 seed_indices.Append(it.index);}}}
 
     ARRAY<TV_INT> todo,next_todo;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
         if(phi(it.index)!=FLT_MAX)
             todo.Append(it.index);
     for(int layer=1;todo.m;layer++){
@@ -54,7 +54,7 @@ Compute_Level_Set(SEGMENTED_CURVE_2D<T>& curve,GRID<TV>& grid,int ghost_cells,AR
             Compute_Level_Set_Helper(index-TV_INT(0,1),next,next_todo,phi);}
         todo.Exchange(next_todo);}
 /*
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         VECTOR<T,3> color=phi(it.index)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0);
         if(done(it.index)) color/=(T)3;
         Add_Debug_Particle(grid.X(it.index),color);}*/

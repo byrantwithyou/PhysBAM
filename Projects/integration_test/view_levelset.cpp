@@ -5,7 +5,7 @@
 
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
         GRID<TV> grid(TV_INT()+50,RANGE<TV>::Centered_Box());
         ARRAY<T,TV_INT> phi(grid.Node_Indices());
         phi.Fill(1);
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,-1);it.Valid();it.Next())
+        for(NODE_ITERATOR<TV> it(grid,-1);it.Valid();it.Next())
             phi(it.index)=random.Get_Uniform_Number(-1,1);
         MARCHING_CUBES<TV>::Create_Surface(ts,grid,phi);}
     else{

@@ -5,7 +5,7 @@
 // Class WATER_STANDARD_TESTS_2D
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/FRAME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
@@ -217,13 +217,13 @@ template<class T_GRID> void WATER_STANDARD_TESTS_2D<T_GRID>::
 Get_Variable_Viscosity(ARRAY<T,VECTOR<int,2> >& variable_viscosity,const T time) const
 {
     if(test_number==13){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())
             variable_viscosity(iterator.Cell_Index())=(iterator.Location().x<.2)?(T)0:(T)1000;}
     else if(test_number==14){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())
             variable_viscosity(iterator.Cell_Index())=(iterator.Location().x<.5)?(T)0:(T)1000;}
     else if(test_number==15){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())
             variable_viscosity(iterator.Cell_Index())=(iterator.Location().x<.5)?(T)0:(T)1000;}
 }
 //#####################################################################

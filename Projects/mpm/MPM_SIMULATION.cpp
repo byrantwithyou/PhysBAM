@@ -4,16 +4,16 @@
 //#####################################################################
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
+#include <PhysBAM_Tools/Math_Tools/cbrt.h>
+#include <PhysBAM_Tools/Math_Tools/clamp.h>
+#include <PhysBAM_Tools/Math_Tools/Inverse.h>
+#include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Tools/Math_Tools/clamp.h>
-#include <PhysBAM_Tools/Math_Tools/cbrt.h>
-#include <PhysBAM_Tools/Math_Tools/pow.h>
-#include <PhysBAM_Tools/Math_Tools/Inverse.h>
 #include "MPM_SIMULATION.h"
 #include "MPM_SYSTEM.h"
 #include "MPM_VECTOR.h"

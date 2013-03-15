@@ -2,9 +2,9 @@
 // Copyright 2012, Craig Schroeder, Alexey Stomakhin, Russell Howes.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
@@ -103,7 +103,7 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>& ips,ANALYTIC_TEST
     Dump_Interface<T,TV>(ips);
     Flush_Frame<T,TV>("surfaces");
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(ips.grid);it.Valid();it.Next())
         Add_Debug_Particle(it.Location(),color_map[at.phi_color(it.Location())]);
     Flush_Frame<T,TV>("level set");
     
@@ -111,7 +111,7 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>& ips,ANALYTIC_TEST
     for(int c=0;c<ips.cdi->colors;c++){
         Dump_Interface<T,TV>(ips);
         sprintf(buff,"dofs u%d",c);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(ips.grid);it.Valid();it.Next()){
             int index=ips.cm_u->Get_Index(it.index,c);
             if(index>=0){
                 bool duplicated=false;
@@ -134,7 +134,7 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>& ips,ANALYTIC_TEST
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*T_FACE::Normal(V.face.X));}}
     
     Dump_Interface<T,TV>(ips);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(ips.grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
         if(c>=0){
             T f_volume=at.f_volume(it.Location(),c);
@@ -150,7 +150,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>& ips,const INTERFA
     for(int c=0;c<ips.cdi->colors;c++){
         Dump_Interface<T,TV>(ips);
         sprintf(buff,"%s u%d",title,c);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(ips.grid);it.Valid();it.Next()){
             int k=ips.cm_u->Get_Index(it.index,c);
             if(k>=0){
                 T u_value=v.u(c)(k);
@@ -166,7 +166,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>& ips,const ARRAY<T
     cm.Initialize_Colors(1e-12,1,true,true,true);
 
     Dump_Interface<T,TV>(ips);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(ips.grid);it.Valid();it.Next()){
         T u_value=u(it.index);
         Add_Debug_Particle(it.Location(),u_value==0?VECTOR<T,3>(0.25,0.25,0.25):(u_value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,u_value);}
@@ -188,7 +188,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     ARRAY<T,TV_INT> phi_value(grid.Node_Indices());
     ARRAY<int,TV_INT> phi_color(grid.Node_Indices());
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         phi_value(it.index)=at.phi_value(it.Location());
         phi_color(it.index)=at.phi_color(it.Location());}
         
@@ -267,14 +267,14 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     numer_u.Resize(ips.grid.Node_Indices());
     exact_u.Resize(ips.grid.Node_Indices());
     error_u.Resize(ips.grid.Node_Indices());
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
         if(c>=0){
             int k=ips.cm_u->Get_Index(it.index,c);
             assert(k>=0);
             numer_u(it.index)=sol.u(c)(k);}}
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
         if(c>=0){
             exact_u(it.index)=at.u(it.Location());
@@ -283,7 +283,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
             cnt_u++;}}
     avg_u/=cnt_u;
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
         if(c>=0){
             error_u(it.index)-=avg_u;
@@ -295,14 +295,14 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         numer_u.Resize(ips.grid.Domain_Indices());
         exact_u.Resize(ips.grid.Domain_Indices());
         error_u.Resize(ips.grid.Domain_Indices());
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             int c=at.phi_color(it.Location());
             if(c>=0){
                 int k=ips.cm_u->Get_Index(it.index,c);
                 assert(k>=0);
                 numer_u(it.index)=sol.u(c)(k);}}
         
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             int c=at.phi_color(it.Location());
             if(c>=0){
                 exact_u(it.index)=at.u(it.Location());
@@ -311,7 +311,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
                 cnt_u++;}}
         avg_u/=cnt_u;
         
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             int c=at.phi_color(it.Location());
             if(c>=0){
                 error_u(it.index)-=avg_u;

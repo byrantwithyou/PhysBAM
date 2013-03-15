@@ -7,9 +7,9 @@
 #ifndef __MPM_GRID_BASIS_FUNCTION__
 #define __MPM_GRID_BASIS_FUNCTION__
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class TV,int order>

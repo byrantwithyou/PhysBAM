@@ -14,7 +14,7 @@ template<class T_GRID,class T_FACE_LOOKUP>
 class AVERAGING_COLLIDABLE_BINARY_UNIFORM
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
+    typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_MAC_HELPER T_LINEAR_INTERPOLATION_MAC_HELPER;
 public:
@@ -43,7 +43,7 @@ public:
     return value;}
 
     T Cell_To_Face(const T_GRID& grid,const int axis,const TV_INT& face_index,const T_ARRAYS_SCALAR& u_cell) const // this never needs to set starting points doesn't use velocities
-    {FACE_ITERATOR iterator(grid,axis,face_index);
+    {FACE_ITERATOR<TV> iterator(grid,axis,face_index);
     TV_INT cell1,cell2;grid.Cells_Touching_Face(axis,face_index,cell1,cell2);
     if(body_list.Occupied_Face_Center(iterator)){
         T cell1_value=default_replacement_value,cell2_value=default_replacement_value;
@@ -53,7 +53,7 @@ public:
     else return (T).5*(u_cell(cell1)+u_cell(cell2));}
 
     T Cell_To_Face(const T_GRID& grid,const int axis,const TV_INT& face_index,const ARRAY<TV,TV_INT>& u_cell) const // this never needs to set starting points doesn't use velocities
-    {FACE_ITERATOR iterator(grid,axis,face_index);
+    {FACE_ITERATOR<TV> iterator(grid,axis,face_index);
     TV_INT cell1,cell2;grid.Cells_Touching_Face(axis,face_index,cell1,cell2);
     if(body_list.Occupied_Face_Center(iterator)){
         T cell1_value=default_replacement_value,cell2_value=default_replacement_value;
@@ -63,7 +63,7 @@ public:
     else return (T).5*(u_cell(cell1)[axis]+u_cell(cell2)[axis]);}
 
     TV Face_To_Face_Vector(const T_GRID& grid,const int side,const int axis,const TV_INT& face_index,const T_FACE_LOOKUP& u_face) const
-    {FACE_ITERATOR iterator(grid,axis,face_index);
+    {FACE_ITERATOR<TV> iterator(grid,axis,face_index);
     const typename T_FACE_LOOKUP::LOOKUP& lookup=u_face.Starting_Point_Face(side,axis,face_index);
     return AVERAGING_UNIFORM<T_GRID,T_FACE_LOOKUP>::Average_Face_To_Face_Vector_Helper(grid,iterator,lookup);}
 

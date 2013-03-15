@@ -32,11 +32,11 @@ Setup_Processing()
     LOG::cout<<"Rasterizing particles to grid..."<<std::endl;
     for(int p=0;p<particles.Size();p++){
         RANGE<VECTOR<int,3> > particle_box=particle_grid.Clamp_To_Cell(particle_boxes(p),1);
-        for(CELL_ITERATOR it(particle_grid,particle_box);it.Valid();it.Next())for(int n=0;n<8;n++){
+        for(CELL_ITERATOR<TV> it(particle_grid,particle_box);it.Valid();it.Next())for(int n=0;n<8;n++){
             T distance=REMOVED_PARTICLES_BLENDER_3D<T>::Get_Distance(ellipsoids(p).center,metrics(p),particle_grid.Node(it.Cell_Node_Index(n)));
             if(particle_blender->C(distance)>0){conservative_array(it.Cell_Index()).Append(p);break;}}}
     particle_array.Resize(particle_grid.Domain_Indices());
-    for(CELL_ITERATOR it(particle_grid);it.Valid();it.Next()){particle_array(it.Cell_Index())=conservative_array(it.Cell_Index());
+    for(CELL_ITERATOR<TV> it(particle_grid);it.Valid();it.Next()){particle_array(it.Cell_Index())=conservative_array(it.Cell_Index());
     for(int i=0;i<26;i++)particle_array(it.Cell_Index()).Append_Unique_Elements(conservative_array(particle_grid.One_Ring_Neighbor(it.Cell_Index(),i)));}
 }
 //#####################################################################

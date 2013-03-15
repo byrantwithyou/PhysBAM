@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_PACKAGE.h>
 #ifdef USE_PTHREADS
@@ -28,7 +28,6 @@ class THREADED_UNIFORM_GRID:public MPI_GRID<T_GRID>
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
     typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
     typedef typename T_ARRAYS_SCALAR::template REBIND<RANGE<TV_INT> >::TYPE T_ARRAYS_BOX_INT;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 public:
     typedef T_GRID GRID_T;
 
@@ -57,9 +56,9 @@ public:
     
     template<class T2> THREAD_PACKAGE Package_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const RANGE<TV_INT>& send_region) const
     {
-        int size=0;for(CELL_ITERATOR iterator(local_grid,send_region);iterator.Valid();iterator.Next()) size+=data.Pack_Size();
+        int size=0;for(CELL_ITERATOR<TV> iterator(local_grid,send_region);iterator.Valid();iterator.Next()) size+=data.Pack_Size();
         int position=0;THREAD_PACKAGE pack(size);pack.send_tid=rank;
-        for(CELL_ITERATOR iterator(local_grid,send_region);iterator.Valid();iterator.Next()) data.Pack(pack.buffer,position,iterator.Cell_Index());
+        for(CELL_ITERATOR<TV> iterator(local_grid,send_region);iterator.Valid();iterator.Next()) data.Pack(pack.buffer,position,iterator.Cell_Index());
         return pack;
     }
 
@@ -67,7 +66,7 @@ public:
     {
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
         for(int axis=0;axis<TV::dimension;axis++) if(domain.max_corner(axis)+local_to_global_offset(axis)==global_grid.Domain_Indices().max_corner(axis)) domain.max_corner(axis)++;
-        for(NODE_ITERATOR iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();global_data(node+local_to_global_offset)=local_data(node);}
+        for(NODE_ITERATOR<TV> iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();global_data(node+local_to_global_offset)=local_data(node);}
     }
 
     void Initialize(VECTOR<VECTOR<bool,2>,T_GRID::dimension>& domain_walls);

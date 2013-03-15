@@ -155,7 +155,7 @@ Insert_Into_Hashtable(const ID index)
 {
     assert(collision_bodies(index)->add_to_spatial_partition);
     GRID<TV> unused;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(unused,voxel_range(index));iterator.Valid();iterator.Next()) Add_To_Cell(iterator.Cell_Index(),index);
+    for(CELL_ITERATOR<TV> iterator(unused,voxel_range(index));iterator.Valid();iterator.Next()) Add_To_Cell(iterator.Cell_Index(),index);
 }
 //#####################################################################
 // Function Remove_From_Cell
@@ -187,7 +187,7 @@ template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOME
 Remove_If_Not_Still_Present(const RANGE<TV_INT>& old_locations,const RANGE<TV_INT>& new_locations,const ID index)
 {
     if(new_locations.Contains(old_locations)) return;GRID<TV> unused;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(unused,old_locations);iterator.Valid();iterator.Next()){TV_INT voxel=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(unused,old_locations);iterator.Valid();iterator.Next()){TV_INT voxel=iterator.Cell_Index();
         if(new_locations.Lazy_Outside(voxel)) Remove_From_Cell(voxel,index);}
 }
 //#####################################################################
@@ -197,7 +197,7 @@ template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOME
 Add_If_Newly_Present(const RANGE<TV_INT>& old_locations,const RANGE<TV_INT>& new_locations,const ID index)
 {
     if(old_locations.Contains(new_locations)) return;GRID<TV> unused;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(unused,new_locations);iterator.Valid();iterator.Next()){TV_INT voxel=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(unused,new_locations);iterator.Valid();iterator.Next()){TV_INT voxel=iterator.Cell_Index();
         if(old_locations.Lazy_Outside(voxel)) Add_To_Cell(voxel,index);}
 }
 //#####################################################################
@@ -209,7 +209,7 @@ Get_Potential_Collisions(const ID index,const RANGE<TV_INT>& range,ARRAY<ID>& ob
     object_indices.Remove_All();
     already_added.Initialize(collision_bodies.Size());
     GRID<TV> unused;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(unused,range);iterator.Valid();iterator.Next()){TV_INT voxel=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(unused,range);iterator.Valid();iterator.Next()){TV_INT voxel=iterator.Cell_Index();
         ARRAY<ID>* occupancy_list=0;
         if(hashtable.Get(voxel,occupancy_list)) for(int t=0;t<occupancy_list->m;t++){
             ID k=(*occupancy_list)(t);

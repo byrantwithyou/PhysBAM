@@ -7,10 +7,10 @@
 #ifndef __MPM_CONSTITUTIVE_MODEL__
 #define __MPM_CONSTITUTIVE_MODEL__
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM{
 

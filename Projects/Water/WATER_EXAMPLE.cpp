@@ -2,8 +2,8 @@
 // Copyright 2009, Michael Lentine, Avi Robinson-Mosher, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
@@ -45,7 +45,7 @@ template<class TV> void WATER_EXAMPLE<TV>::
 Initialize_Phi()
 {
     ARRAY<T,TV_INT>& phi=particle_levelset_evolution.phi;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
         const TV &X=iterator.Location();
         phi(iterator.Cell_Index())=X.y-(T)mac_grid.dX.Min()*5;}
         //phi(iterator.Cell_Index())=X.y-.9;}
@@ -70,14 +70,14 @@ Set_Boundary_Conditions(const T time)
         TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
         if(domain_boundary(axis)(axis_side)){
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index()+boundary_face_offset;
                 if(particle_levelset_evolution.phi(face+interior_cell_offset)<=0){
                     if(face_velocities.Component(axis).Valid_Index(face)){projection.elliptic_solver->psi_N.Component(axis)(face)=true;face_velocities.Component(axis)(face)=0;}}
                 else{TV_INT cell=face+exterior_cell_offset;projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}
-        else for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
+        else for(FACE_ITERATOR<TV> iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
             projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
         for(int i=0;i<sources.m;i++){
             if(time<=3 && sources(i)->Lazy_Inside(iterator.Location())){
                 projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
@@ -95,7 +95,7 @@ template<class TV> void WATER_EXAMPLE<TV>::
 Adjust_Phi_With_Sources(const T time)
 {
     if(time>3) return;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
         for(int i=0;i<sources.m;i++) particle_levelset_evolution.phi(index)=min(particle_levelset_evolution.phi(index),sources(i)->Extended_Phi(iterator.Location()));}
 }
 //#####################################################################
@@ -106,7 +106,7 @@ Adjust_Phi_With_Objects(const T time)
 {
     T tolerance=(T)9.8/24; // dt*gravity where dt=1/24 is based on the length of a frame
     for(int id=0;id<rigid_geometry_collection.particles.Size();id++){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
             TV_INT index=iterator.Cell_Index();TV location=mac_grid.X(index);
             if(particle_levelset_evolution.phi(index)<0 && rigid_geometry_collection.Rigid_Geometry(id).Implicit_Geometry_Extended_Value(location)<0){
                 TV V_fluid;
@@ -125,7 +125,7 @@ Extrapolate_Phi_Into_Objects(const T time)
 {
     for(int id=0;id<rigid_geometry_collection.particles.Size();id++){
         ARRAY<T,TV_INT> phi_object(mac_grid.Domain_Indices(3));
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
             phi_object(iterator.Cell_Index())=-rigid_geometry_collection.Rigid_Geometry(id).Implicit_Geometry_Extended_Value(iterator.Location());
         EXTRAPOLATION_UNIFORM<GRID<TV>,T> extrapolate(mac_grid,phi_object,particle_levelset_evolution.Particle_Levelset(0).levelset.phi,3);extrapolate.Set_Band_Width(3);extrapolate.Extrapolate();}
 }

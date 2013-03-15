@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Polynomials/QUADRATIC.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
@@ -77,7 +77,7 @@ template<class TV> typename TV::SCALAR LEVELSET<TV>::
 CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
 {
     T dt_convection=0;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         T local_V_norm=0;
         for(int axis=0;axis<TV::dimension;axis++)
             local_V_norm+=grid.one_over_dX[axis]*maxabs(face_velocities(axis,grid.First_Face_Index_In_Cell(axis,cell)),face_velocities(axis,grid.Second_Face_Index_In_Cell(axis,cell)));
@@ -91,7 +91,7 @@ template<class TV> typename TV::SCALAR LEVELSET<TV>::
 CFL(const ARRAY<TV,TV_INT>& velocity) const
 {
     T dt_convection=0;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         dt_convection=max(dt_convection,TV::Dot_Product(velocity(cell),grid.one_over_dX));}
     return 1/max(dt_convection,1/max_time_step);
 }
@@ -126,7 +126,7 @@ Compute_Gradient(ARRAY<TV,TV_INT>& gradient,const T time) const
     int ghost_cells=3;
     T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     gradient.Resize(grid.Domain_Indices(ghost_cells-1));
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         for(int axis=0;axis<TV::dimension;axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             gradient(cell_index)(axis)=(phi_ghost(cell_index+axis_vector)-phi_ghost(cell_index-axis_vector))*one_over_two_dx(axis);}}
@@ -181,7 +181,7 @@ Compute_Normals(const T time)
     boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
 
     if(!normals) normals=new ARRAY<TV,TV_INT>(grid.Domain_Indices(ghost_cells-1));
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next()){
         const TV_INT& cell = iterator.Cell_Index();
         int index=phi_ghost.Standard_Index(iterator.Cell_Index());
         TV& N((*normals)(cell));
@@ -290,7 +290,7 @@ Compute_Curvature(const T time)
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
 
     if(!curvature) curvature=new ARRAY<T,TV_INT>(grid.Domain_Indices(ghost_cells-1));
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next())
+    for(CELL_ITERATOR<TV> iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next())
         (*curvature)(iterator.Cell_Index())=Compute_Curvature(phi_ghost,iterator.Cell_Index());
 }
 //#####################################################################

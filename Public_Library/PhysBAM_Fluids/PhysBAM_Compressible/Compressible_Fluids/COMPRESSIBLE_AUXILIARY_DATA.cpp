@@ -2,8 +2,8 @@
 // Copyright 2009, Jon Gretarsson, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Computations/GRADIENT_UNIFORM.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
@@ -23,7 +23,6 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 
     STATIC_ASSERT((IS_SAME<T_ARRAYS,T_ARRAYS_DIMENSION_SCALAR>::value));
     STATIC_ASSERT((IS_SAME<T_ARRAYS_BOOL_INPUT,ARRAY<bool,TV_INT> >::value));
@@ -33,7 +32,7 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
     T_ARRAYS_SCALAR density(domain_indices),energy(domain_indices),internal_energy(domain_indices),temperature(domain_indices),
         pressure(domain_indices),entropy(domain_indices),enthalpy(domain_indices),speedofsound(domain_indices),
         machnumber(domain_indices),density_gradient(domain_indices),pressure_gradient(domain_indices);
-    for(CELL_ITERATOR iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         if(grid.Domain_Indices().Lazy_Inside_Half_Open(cell) && !psi(cell)) continue;
         density(cell)=EULER<T_GRID>::Get_Density(U,cell);
         pressure(cell)=eos.p(density(cell),EULER<T_GRID>::e(U(cell)));
@@ -53,7 +52,7 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
 
     T_FACE_ARRAYS_SCALAR density_flux(grid),momentum_flux(grid),energy_flux(grid);
     if(fluxes){
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT face_index=iterator.Face_Index();
             if(fluxes->Valid_Index(iterator.Full_Index())){int axis=iterator.Axis();
                 density_flux.Component(axis)(face_index)=fluxes->Component(axis)(face_index)(0);

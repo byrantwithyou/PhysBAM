@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Fluids/INCOMPRESSIBLE_FLUID_COLLECTION.h>
 using namespace PhysBAM;
@@ -49,7 +49,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
         FILE_UTILITIES::Read_From_File(stream_type,centered_velocity_filename,centered_velocities);
 
         TV_INT face_index,first_cell_index,second_cell_index;int axis;
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             face_index=iterator.Face_Index();axis=iterator.Axis();
             first_cell_index=iterator.First_Cell_Index();second_cell_index=iterator.Second_Cell_Index();
             face_velocities.Component(axis)(face_index)=

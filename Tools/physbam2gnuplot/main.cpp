@@ -2,8 +2,8 @@
 // Copyright 2009, Jon Gretarsson, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
@@ -16,9 +16,7 @@ template<class T_GRID,class RW>
 class PHYSBAM_TO_GNUPLOT_CONVERTER
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
-    typedef typename T_GRID::SCALAR T;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename T_GRID::SCALAR T;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     const std::string input_directory,output_directory;
     GNUPLOT_OUTPUT gnuplot_output;
@@ -52,7 +50,7 @@ private:
     std::string output_file=output_directory+"/"+file_name_prefix;
     T_TYPE data;FILE_UTILITIES::Read_From_File<RW>(input_file,data);
     if(convert_log){
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){T tmp=data(iterator.Cell_Index());
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){T tmp=data(iterator.Cell_Index());
             data(iterator.Cell_Index()) = log(tmp)/log((T)10);}}
     gnuplot_output.Write_Output_File(output_file,grid,data,frame);}
 };

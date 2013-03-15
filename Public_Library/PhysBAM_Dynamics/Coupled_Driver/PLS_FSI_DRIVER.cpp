@@ -4,9 +4,9 @@
 //#####################################################################
 // Class PLS_FSI_DRIVER
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
@@ -364,7 +364,7 @@ Extrapolate_Velocity_Across_Interface(T time,T dt)
         ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),false);
         ARRAYS_ND_BASE<T,TV_INT>& face_velocity=example.fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis);
         ARRAYS_ND_BASE<bool,TV_INT>& fixed_face=valid_faces.Component(axis);
-        for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
             TV_INT index=iterator.Face_Index();
             T phi1=phi_ghost(iterator.First_Cell_Index()),phi2=phi_ghost(iterator.Second_Cell_Index());
             phi_face(index)=(T).5*(phi1+phi2);
@@ -457,13 +457,13 @@ Advect_Fluid(const T dt,const int substep)
     particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time);
     PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=particle_levelset_evolution->Particle_Levelset(0);
     LINEAR_INTERPOLATION_UNIFORM<T_GRID,TV> interpolation;
-    if(pls.use_removed_positive_particles) for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
+    if(pls.use_removed_positive_particles) for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
         PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());
         for(int p=0;p<particles.Size();p++){
             TV X=particles.X(p),V=interpolation.Clamped_To_Array_Face(grid,face_velocities_ghost,X);
             if(-pls.levelset.Phi(X)>1.5*particles.radius(p)) V-=fluids_parameters.removed_positive_particle_buoyancy_constant*fluids_parameters.gravity_direction; // buoyancy
             particles.V(p)=V;}}
-    if(pls.use_removed_negative_particles) for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_negative_particles(iterator.Node_Index())){
+    if(pls.use_removed_negative_particles) for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_negative_particles(iterator.Node_Index())){
         PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_negative_particles(iterator.Node_Index());
         for(int p=0;p<particles.Size();p++) particles.V(p)+=dt*fluids_parameters.gravity*fluids_parameters.gravity_direction; // ballistic
         if(fluids_parameters.use_body_force) for(int p=0;p<particles.Size();p++)
@@ -618,16 +618,16 @@ Write_Output_Files(const int frame)
     int number_of_positive_particles=0,number_of_negative_particles=0,number_of_removed_positive_particles=0,number_of_removed_negative_particles=0;
     PARTICLE_LEVELSET_UNIFORM<T_GRID>* pls=0;
     pls=&example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(0);
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->positive_particles(iterator.Cell_Index()))
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls->positive_particles(iterator.Cell_Index()))
         number_of_positive_particles+=pls->positive_particles(iterator.Cell_Index())->Size();
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->negative_particles(iterator.Cell_Index()))
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls->negative_particles(iterator.Cell_Index()))
         number_of_negative_particles+=pls->negative_particles(iterator.Cell_Index())->Size();
     LOG::cout<<number_of_positive_particles<<" positive and "<<number_of_negative_particles<<" negative particles "<<std::endl;
     if(pls->use_removed_positive_particles)
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->removed_positive_particles(iterator.Cell_Index()))
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls->removed_positive_particles(iterator.Cell_Index()))
             number_of_removed_positive_particles+=pls->removed_positive_particles(iterator.Cell_Index())->Size();
     if(pls->use_removed_negative_particles)
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->removed_negative_particles(iterator.Cell_Index()))
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls->removed_negative_particles(iterator.Cell_Index()))
             number_of_removed_negative_particles+=pls->removed_negative_particles(iterator.Cell_Index())->Size();
     LOG::cout<<number_of_removed_positive_particles<<" positive and "<<number_of_removed_negative_particles<<" negative removed particles "<<std::endl;
 
@@ -654,7 +654,7 @@ Delete_Particles_Inside_Objects(const T time)
 template<class TV> template<class T_PARTICLES> void PLS_FSI_DRIVER<TV>::
 Delete_Particles_Inside_Objects(ARRAY<T_PARTICLES*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time)
 {
-    for(NODE_ITERATOR iterator(*example.fluids_parameters.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
+    for(NODE_ITERATOR<TV> iterator(*example.fluids_parameters.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         BLOCK_UNIFORM<T_GRID> block(*example.fluids_parameters.grid,block_index);
         COLLISION_GEOMETRY_ID body_id;int aggregate_id;
         T_PARTICLES& block_particles=*particles(block_index);

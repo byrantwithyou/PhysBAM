@@ -8,9 +8,9 @@
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID.h>
 #ifdef USE_MPI
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_PACKAGE.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #endif
@@ -77,7 +77,7 @@ MPI_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bo
     local_cell_index_to_global_column_index_map.Resize(local_grid.Domain_Indices(1));
     // first go through the interior and set what those n values will be
     offset=global_column_index_boundaries(rank+1).x;
-    for(CELL_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next()){
         local_cell_index_to_global_column_index_map(iterator.Cell_Index())=offset;
         offset++;}
     // now go through each of the boundaries and do those
@@ -93,10 +93,10 @@ MPI_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bo
                 for(int temp_axis=0;temp_axis<T_GRID::dimension;temp_axis++){
                     start_index[temp_axis]=boundaries(temp_axis)(proc_coordinates[temp_axis]);
                     end_index[temp_axis]=boundaries(temp_axis)(proc_coordinates[temp_axis]+1);}
-                CELL_ITERATOR my_iterator(local_grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,side);
+                CELL_ITERATOR<TV> my_iterator(local_grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,side);
                 int neighbor_side=axis_side==0?2*axis+1:2*axis;
                 T_GRID neighbor_grid=T_GRID(end_index-start_index+TV_INT::All_Ones_Vector(),RANGE<TV>(global_grid.X(start_index),global_grid.X(end_index))).Get_MAC_Grid();
-                for(CELL_ITERATOR neighbor_iterator(neighbor_grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,neighbor_side);neighbor_iterator.Valid();neighbor_iterator.Next(),my_iterator.Next()){
+                for(CELL_ITERATOR<TV> neighbor_iterator(neighbor_grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,neighbor_side);neighbor_iterator.Valid();neighbor_iterator.Next(),my_iterator.Next()){
                     TV_INT my_cell_index=my_iterator.Cell_Index();
                     local_cell_index_to_global_column_index_map(my_cell_index+axis_vector)=neighbor_iterator.Flat_Index()+start_column_index-1;}}}
 }
@@ -121,7 +121,7 @@ Initialize_Communicator(const bool manual,MPI::Group* group)
     if(!manual){ // setup cartesian communicator with the standard mpi function
         MPI::Cartcomm cartcomm=group?MPI::COMM_WORLD.Create(*group).Create_cart(T_GRID::dimension,&extents[1],&periodic[1],true):
             MPI::COMM_WORLD.Create_cart(T_GRID::dimension,&extents[1],&periodic[1],true);
-        for(NODE_ITERATOR iterator(process_grid);iterator.Valid();iterator.Next()){TV_INT process=iterator.Node_Index();
+        for(NODE_ITERATOR<TV> iterator(process_grid);iterator.Valid();iterator.Next()){TV_INT process=iterator.Node_Index();
             process_ranks(process)=cartcomm.Get_cart_rank(&(process-TV_INT::All_Ones_Vector())[1]);}
         *comm=cartcomm;}
     else{ // setup communicator manually to guarantee reasonable topology for SMP clusters
@@ -132,7 +132,7 @@ Initialize_Communicator(const bool manual,MPI::Group* group)
         // lay out process ranks on grid
         Fill_Process_Ranks(process_grid,process_ranks,axes);
         // fill in ghost process_ranks for periodic domains
-        if(periodic!=TV_BOOL()) for(NODE_ITERATOR iterator(process_grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
+        if(periodic!=TV_BOOL()) for(NODE_ITERATOR<TV> iterator(process_grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
             TV_INT node=iterator.Node_Index(),wrapped_node=node;
             for(int axis=0;axis<T_GRID::dimension;axis++) if(periodic[axis]) wrapped_node[axis]=(node[axis]+process_grid.Counts()[axis])%process_grid.Counts()[axis];
             process_ranks(node)=process_ranks(wrapped_node);}
@@ -141,7 +141,7 @@ Initialize_Communicator(const bool manual,MPI::Group* group)
         LOG::cout << "After Create comm " << std::endl;
     }
     all_coordinates.Resize(number_of_processes);
-    for(NODE_ITERATOR iterator(process_grid);iterator.Valid();iterator.Next())
+    for(NODE_ITERATOR<TV> iterator(process_grid);iterator.Valid();iterator.Next())
         all_coordinates(process_ranks(iterator.Node_Index())+1)=iterator.Node_Index();
     rank=comm->Get_rank();
     coordinates=all_coordinates(rank+1);
@@ -710,7 +710,7 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
             else face_domain.max_corner(axis)-=ghost_cells;
             if(axis2==axis) face_domain.min_corner(axis)++;
             else face_domain.max_corner(axis2)++;
-            for(FACE_ITERATOR iterator(local_grid,domain,axis2);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> cell=iterator.Full_Index();
+            for(FACE_ITERATOR<TV> iterator(local_grid,domain,axis2);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> cell=iterator.Full_Index();
                 ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >& local_weights=weights_to(cell);
                 for(int i=0;i<local_weights.m;i++){
                     if(!face_domain.Lazy_Inside_Half_Open(local_weights(i).x.index)) 
@@ -766,7 +766,7 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
             else face_domain.max_corner(axis)-=ghost_cells;
             if(axis2==axis) face_domain.min_corner(axis)++;
             else face_domain.max_corner(axis2)++;
-            for(FACE_ITERATOR iterator(local_grid,domain,axis2);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> cell=iterator.Full_Index();
+            for(FACE_ITERATOR<TV> iterator(local_grid,domain,axis2);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> cell=iterator.Full_Index();
                 ARRAY<PAIR<FACE_INDEX<TV::dimension>,int> >& local_weights=weights_from(cell);
                 for(int i=0;i<local_weights.m;i++){
                     if(!face_domain.Lazy_Inside_Half_Open(local_weights(i).x.index)) 
@@ -820,7 +820,7 @@ Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,A
         else ghost_domain.max_corner(axis)-=ghost_cells;
         if(side==0) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
-        for(CELL_ITERATOR iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             ARRAY<PAIR<TV_INT,T> >& local_weights=weights_to(cell);
             for(int i=0;i<local_weights.m;i++){
                 if(!ghost_domain.Lazy_Inside_Half_Open(local_weights(i).x)) 
@@ -868,7 +868,7 @@ Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARR
         else ghost_domain.max_corner(axis)-=ghost_cells;
         if(side==0) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
-        for(CELL_ITERATOR iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             ARRAY<PAIR<TV_INT,int> >& local_weights=weights_from(cell);
             for(int i=0;i<local_weights.m;i++)
                 if(!ghost_domain.Lazy_Inside_Half_Open(local_weights(i).x)){

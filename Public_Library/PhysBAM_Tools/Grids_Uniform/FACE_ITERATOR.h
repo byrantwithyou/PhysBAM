@@ -2,25 +2,25 @@
 // Copyright 2005-2008, Eran Guendelman, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class UNIFORM_GRID_ITERATOR_FACE
+// Class FACE_ITERATOR
 //#####################################################################
-#ifndef __UNIFORM_GRID_ITERATOR_FACE__
-#define __UNIFORM_GRID_ITERATOR_FACE__
+#ifndef __FACE_ITERATOR__
+#define __FACE_ITERATOR__
 
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/GRID_ITERATOR_BASE.h>
 
 namespace PhysBAM{
 
 template<class TV>
-class UNIFORM_GRID_ITERATOR_FACE:public UNIFORM_GRID_ITERATOR<TV>
+class FACE_ITERATOR:public GRID_ITERATOR_BASE<TV>
 {
 public:
     typedef typename GRID<TV>::REGION T_REGION;typedef VECTOR<int,TV::dimension> TV_INT;typedef typename TV::SCALAR T;
     typedef TV VECTOR_T;
-    using UNIFORM_GRID_ITERATOR<TV>::grid;using UNIFORM_GRID_ITERATOR<TV>::index;using UNIFORM_GRID_ITERATOR<TV>::region;using UNIFORM_GRID_ITERATOR<TV>::valid;
-    using UNIFORM_GRID_ITERATOR<TV>::Reset;using UNIFORM_GRID_ITERATOR<TV>::current_region;using UNIFORM_GRID_ITERATOR<TV>::Add_Region;
-    using UNIFORM_GRID_ITERATOR<TV>::Reset_Regions;
+    using GRID_ITERATOR_BASE<TV>::grid;using GRID_ITERATOR_BASE<TV>::index;using GRID_ITERATOR_BASE<TV>::region;using GRID_ITERATOR_BASE<TV>::valid;
+    using GRID_ITERATOR_BASE<TV>::Reset;using GRID_ITERATOR_BASE<TV>::current_region;using GRID_ITERATOR_BASE<TV>::Add_Region;
+    using GRID_ITERATOR_BASE<TV>::Reset_Regions;
 
 protected:
     T_REGION region_type;
@@ -32,19 +32,19 @@ protected:
 
 public:
     // axis_input==0 means iterate through faces in all dimensions
-    UNIFORM_GRID_ITERATOR_FACE(const GRID<TV>& grid_input,const int number_of_ghost_cells_input=0,const T_REGION& region_type_input=GRID<TV>::WHOLE_REGION,const int side_input=-1,
+    FACE_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells_input=0,const T_REGION& region_type_input=GRID<TV>::WHOLE_REGION,const int side_input=-1,
         int axis_input=-1);
 
-    UNIFORM_GRID_ITERATOR_FACE(const GRID<TV>& grid_input,const int axis_input,const TV_INT& face_index);
+    FACE_ITERATOR(const GRID<TV>& grid_input,const int axis_input,const TV_INT& face_index);
 
-    UNIFORM_GRID_ITERATOR_FACE(const GRID<TV>& grid_input,const RANGE<TV_INT>& explicit_region_input,const int axis_input);
+    FACE_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& explicit_region_input,const int axis_input);
 
 private:
     void Reset_Axis(const int axis_input);
     void Next_Helper();
 
 public:
-    void Next() PHYSBAM_ALWAYS_INLINE // overloads UNIFORM_GRID_ITERATOR::Next but we don't want that to be virtual to avoid virtual call overhead
+    void Next() PHYSBAM_ALWAYS_INLINE // overloads GRID_ITERATOR_BASE::Next but we don't want that to be virtual to avoid virtual call overhead
     {if(index(TV::dimension-1)<region.max_corner(TV::dimension-1)-1) index(TV::dimension-1)++;else Next_Helper();}
 
     int Axis() const

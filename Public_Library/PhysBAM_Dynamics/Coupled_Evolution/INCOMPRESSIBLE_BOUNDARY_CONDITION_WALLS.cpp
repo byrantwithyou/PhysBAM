@@ -2,8 +2,8 @@
 // Copyright 2009, Avi Robinson-Mosher, Craig Schroeder
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -29,15 +29,15 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
     for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
         if(mpi_boundary(axis)(axis_side)){
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid,1,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
+            for(FACE_ITERATOR<TV> iterator(grid,1,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
                 if(axis!=iterator.Axis()) psi_N(iterator.Full_Index())=true;}
         else if(walls(axis)(axis_side)){
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1,GRID<TV>::GHOST_REGION,side);iterator.Valid();iterator.Next()){
+            for(CELL_ITERATOR<TV> iterator(grid,1,GRID<TV>::GHOST_REGION,side);iterator.Valid();iterator.Next()){
                 psi_D(iterator.Cell_Index())=true;p(iterator.Cell_Index())=0;}
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 psi_N(iterator.Full_Index())=true;face_velocities(iterator.Axis(),iterator.Face_Index())=0;}}
         else
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1,GRID<TV>::GHOST_REGION,side);iterator.Valid();iterator.Next()){
+            for(CELL_ITERATOR<TV> iterator(grid,1,GRID<TV>::GHOST_REGION,side);iterator.Valid();iterator.Next()){
                 psi_D(iterator.Cell_Index())=true;p(iterator.Cell_Index())=0;}}
 }
 namespace PhysBAM{

@@ -27,15 +27,15 @@ Compress_Indices()
 {
     if(cdi.wrap)
         for(int c=0;c<cdi.colors;c++){
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(cdi.grid);it.Valid();it.Next()){
+            for(CELL_ITERATOR<TV> it(cdi.grid);it.Valid();it.Next()){
                 int i=cdi.Flatten(it.index);
                 if(compressed(c)(i)==-2) compressed(c)(i)=dofs(c)++;}
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(cdi.grid,cdi.padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next()){
+            for(CELL_ITERATOR<TV> it(cdi.grid,cdi.padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next()){
                 int i=cdi.Flatten(it.index);
                 if(compressed(c)(i)==-2) compressed(c)(i)=compressed(c)(cdi.remap(i));}}
     else
         for(int c=0;c<cdi.colors;c++)
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(cdi.grid,cdi.padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
+            for(CELL_ITERATOR<TV> it(cdi.grid,cdi.padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
                 int i=cdi.Flatten(it.index);
                 if(compressed(c)(i)==-2) compressed(c)(i)=dofs(c)++;}
     int total_dofs(0),offset(0);

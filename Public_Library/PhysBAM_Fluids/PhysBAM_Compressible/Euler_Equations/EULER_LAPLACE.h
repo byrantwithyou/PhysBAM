@@ -7,7 +7,7 @@
 #ifndef __EULER_LAPLACE__
 #define __EULER_LAPLACE__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
@@ -21,7 +21,6 @@ class EULER_LAPLACE:public T_LAPLACE
 {
     typedef typename T_LAPLACE::GRID_T T_GRID;typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename REBIND<T_ARRAYS_SCALAR,int>::TYPE T_ARRAYS_INT;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef typename T_GRID::INDEX INDEX;
 public:
     typedef T_LAPLACE BASE;
@@ -47,7 +46,7 @@ public:
     {assert(dt_is_set);dt_is_set=false;
 
     T_LAPLACE::Find_A(domain,A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){INDEX cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){INDEX cell_index=iterator.Cell_Index();
         int color=this->filled_region_colors(cell_index);
         if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
             int matrix_index=cell_index_to_matrix_index(cell_index);

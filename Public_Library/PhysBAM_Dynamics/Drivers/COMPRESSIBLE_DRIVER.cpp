@@ -2,8 +2,8 @@
 // Copyright 2009, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
@@ -157,7 +157,7 @@ Advect_Fluid(const T dt,const int substep)
     Write_Substep("before compressible explicit solve",substep,1);
     if(euler_solid_fluid_coupling_utilities.thinshell){
         euler_solid_fluid_coupling_utilities.uncovered_cells.Fill(false);
-        for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next())
             if(example.collision_bodies_affecting_fluid->Any_Simplex_Crossover(iterator.Location(),iterator.Location(),dt)) euler_solid_fluid_coupling_utilities.uncovered_cells(iterator.Cell_Index())=true;}
 
     euler_solid_fluid_coupling_utilities.Update_Cut_Out_Grid();
@@ -166,7 +166,7 @@ Advect_Fluid(const T dt,const int substep)
 
     // initialize p_advected to current eos pressure
     if(euler.timesplit && !euler.perform_rungekutta_for_implicit_part){
-        for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             euler.euler_projection.p_advected(cell_index)=euler.eos->p(compressible_fluid_collection.U(cell_index)(1),EULER<GRID<TV> >::e(compressible_fluid_collection.U,cell_index));}}
 
     RUNGEKUTTA<T_ARRAYS_DIMENSION_SCALAR> rungekutta_u(compressible_fluid_collection.U,example.rungekutta_order,dt,time);

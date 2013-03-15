@@ -8,8 +8,8 @@
 #ifdef USE_MPI
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_PACKAGE.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
@@ -195,7 +195,7 @@ Synchronize_Colors_Threaded()
         Resize_Helper(colors_copy(side),local_grid,boundary_regions(side));
         int index=-1;for(int i=0;i<mpi_grid.threaded_grid->buffers.m;i++) if(mpi_grid.threaded_grid->buffers(i).send_tid==mpi_grid.threaded_grid->side_neighbor_ranks(side) && mpi_grid.threaded_grid->buffers(i).recv_tid==mpi_grid.threaded_grid->rank) index=i;
         PHYSBAM_ASSERT(index>=0);int position=0;
-        for(CELL_ITERATOR iterator(local_grid,boundary_regions(side));iterator.Valid();iterator.Next()) colors_copy(side).Unpack(mpi_grid.threaded_grid->buffers(index).buffer,position,iterator.Cell_Index());
+        for(CELL_ITERATOR<TV> iterator(local_grid,boundary_regions(side));iterator.Valid();iterator.Next()) colors_copy(side).Unpack(mpi_grid.threaded_grid->buffers(index).buffer,position,iterator.Cell_Index());
         Find_Color_Matches(color_map,union_find,colors_copy(side),boundary_regions(side),global_color_offset);}}
     pthread_barrier_wait(mpi_grid.threaded_grid->barr);
     if(mpi_grid.threaded_grid->tid==1) mpi_grid.threaded_grid->buffers.m=0;
@@ -277,7 +277,7 @@ Find_Global_Colors(ARRAY<bool,VECTOR<int,1> >& color_is_global,const RANGE<TV_IN
     for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
         if(side_neighbor_ranks(side)!=proc_null){
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(local_grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Face_Index())){
+            for(FACE_ITERATOR<TV> iterator(local_grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Face_Index())){
                 color_is_global(colors(iterator.First_Cell_Index()))=true;
                 color_is_global(colors(iterator.Second_Cell_Index()))=true;}}}
 }
@@ -312,7 +312,7 @@ Find_Global_Colors_Helper::Apply(const T_MPI_GRID& mpi_grid,const T_GRID& local_
 template<class T_GRID> void FLOOD_FILL_MPI<T_GRID>::
 Translate_Local_Colors_To_Global_Colors(const ARRAY<int,VECTOR<int,1> >& color_map,T_ARRAYS_INT& colors_copy,const RANGE<TV_INT>& region,const int global_color_offset) const
 {
-    for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(local_grid,region);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         int new_color=color_map(colors(cell_index));colors_copy(cell_index)=new_color>0?new_color+global_color_offset:-2;}
 }
 //#####################################################################
@@ -321,7 +321,7 @@ Translate_Local_Colors_To_Global_Colors(const ARRAY<int,VECTOR<int,1> >& color_m
 template<class T_GRID> void FLOOD_FILL_MPI<T_GRID>::
 Find_Color_Matches(const ARRAY<int,VECTOR<int,1> >& color_map,UNION_FIND<>& union_find,T_ARRAYS_INT& colors_copy,const RANGE<TV_INT>& region,const int global_color_offset) const
 {
-    for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();if(colors_copy(cell_index)>0){
+    for(CELL_ITERATOR<TV> iterator(local_grid,region);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();if(colors_copy(cell_index)>0){
         int local_color=color_map(colors(cell_index));
         if(local_color>0) union_find.Union(global_color_offset+local_color,colors_copy(cell_index));}}
 }
@@ -331,7 +331,7 @@ Find_Color_Matches(const ARRAY<int,VECTOR<int,1> >& color_map,UNION_FIND<>& unio
 template<class T_GRID> void FLOOD_FILL_MPI<T_GRID>::
 Remap_Colors(ARRAY<int,VECTOR<int,1> >& color_map,const RANGE<TV_INT>&)
 {
-    for(CELL_ITERATOR iterator(local_grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(local_grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         int color=colors(cell_index);assert(color); // colors should either be -2 or nonnegative
         if(color_map(color)==0) color_map(color)=++number_of_regions;
         colors(cell_index)=color_map(color);}

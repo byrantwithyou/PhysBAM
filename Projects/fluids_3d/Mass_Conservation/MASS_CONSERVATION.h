@@ -35,8 +35,7 @@ class MASS_CONSERVATION:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input
 {
     typedef T_input T;typedef VECTOR<T,3> TV;
     typedef GRID<TV> T_GRID;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;typedef VECTOR<int,3> TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::fluids_parameters;
     using BASE::fluid_collection;using BASE::solids_parameters;using BASE::write_time;using BASE::write_frame_title;using BASE::data_directory;using BASE::abort_when_dt_below;
@@ -230,30 +229,30 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     T_GRID& grid=*fluids_parameters.grid;
 
     if(test_number==1 || test_number==2){
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV location=iterator.Location();
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=box.Signed_Distance(location);}}
     else if(test_number==3 || test_number==4){
         T radius=15,slot_width=5,slot_depth=(T)12.5;
         RANGE<TV> rect(zalesak_center.x-slot_width/2,zalesak_center.x+slot_width/2,0,zalesak_center.y-radius+slot_depth,0,zalesak_center.y-radius+slot_depth);
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV location=iterator.Location();
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=max((location-zalesak_center).Magnitude()-radius,-rect.Signed_Distance(location));}}
     else if(test_number==5 || test_number==6 || test_number==7 || test_number==8)
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV location=iterator.Location();
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=min(location.y-initial_water_level,source.Signed_Distance(location));}
 
     ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     if(test_number==7)
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
             if(iterator.Location().y>initial_water_level+grid.dX.Min()*2) face_velocities(axis,face)=source_velocity[axis];}
     else if(test_number==8){
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV location=iterator.Location();
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=min(fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index()),other_source.Signed_Distance(location));}
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
             if(iterator.Location().x<.5) face_velocities(axis,face)=source_velocity[axis];
             else face_velocities(axis,face)=-source_velocity[axis];}}
@@ -268,12 +267,12 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
             sources(i).center=random.Get_Uniform_Vector(grid.Domain());
             sources(i).radius=random.Get_Uniform_Number(radius_min,radius_max);
             velocities(i)=random.Get_Uniform_Vector(velocity_box);}
-         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV location=iterator.Location();TV_INT cell=iterator.Cell_Index();
             T& phi=fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index());
             phi=FLT_MAX;
             for(int i=0;i<drops;i++) phi=min(phi,sources(i).Signed_Distance(location));}
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV location=iterator.Location();TV_INT face=iterator.Face_Index();int axis=iterator.Axis();
             T phi=FLT_MAX;
             for(int i=0;i<drops;i++){
@@ -298,12 +297,12 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
     T_GRID& grid=*fluids_parameters.grid;
     ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     if(test_number==1)
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
             if(axis==1) face_velocities.Component(0)(face)=(T).5;
             else face_velocities.Component(1)(face)=(T)0;}
     else if(test_number==2)
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             face_velocities.Component(iterator.Axis())(iterator.Face_Index())=root_three_over_three;
     else if(test_number==3 || test_number==4){
         static bool initialized=false;
@@ -311,7 +310,7 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
         if(!initialized){
             stored_velocities.Resize(grid);
             stored_velocities.Component(2).Fill((T)0);
-            for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
                 int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();TV location=iterator.Location();
                 if(axis==1) stored_velocities.Component(axis)(face_index)=pi_over_314*(zalesak_velocity_center.y-location.y);
                 else if(axis==2) stored_velocities.Component(axis)(face_index)=pi_over_314*(location.x-zalesak_velocity_center.x);}
@@ -319,7 +318,7 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
             face_velocities=stored_velocities;}}
     else if (test_number==6){
         T time_reversal_factor=(T)cos((T)pi*time/period);
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT face_index=iterator.Face_Index();int axis=iterator.Axis();TV location=iterator.Location();
             T x=location.x,y=location.y,z=location.z;
             if(axis==1) face_velocities.Component(axis)(face_index)=(T)2*sqr(sin((T)pi*x))*sin((T)two_pi*y)*sin((T)two_pi*z)*time_reversal_factor;

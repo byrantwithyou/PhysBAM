@@ -17,7 +17,7 @@
 #ifndef __KANG__
 #define __KANG__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
@@ -73,8 +73,6 @@ template<class T_input>
 class KANG:public PLS_FSI_EXAMPLE<VECTOR<T_input,2> >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<bool,FACE_INDEX<2> > T_FACE_ARRAYS_BOOL;
 public:

@@ -8,7 +8,7 @@
 #define __ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM__
 
 #include <PhysBAM_Tools/Advection/ADVECTION.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/AVERAGING_COLLIDABLE_UNIFORM.h>
@@ -21,7 +21,6 @@ class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM:public ADVECTION<T_GRID,
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 public:
     T_GRID_BASED_COLLISION_GEOMETRY& body_list;
 private:
@@ -44,7 +43,7 @@ public:
         const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
         const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
     {T_FACE_ARRAYS_BOOL face_velocities_valid_mask_next(grid,3,false);
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT face=iterator.Face_Index();int axis=iterator.Axis();
         if(!body_list.Swept_Occupied_Face_Center(iterator)){
             TV interpolation_point=iterator.Location()-dt*averaging.Face_To_Face_Vector(grid,axis,face,face_velocities.Nested());
@@ -74,7 +73,7 @@ public:
                     Z_min->Component(axis)(face)=extrema.x;Z_max->Component(axis)(face)=extrema.y;}}}}
     T_FACE_ARRAYS_BOOL::Exchange(face_velocities_valid_mask,face_velocities_valid_mask_next);
     // ghost values should always be valid
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
+    for(FACE_ITERATOR<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
         face_velocities_valid_mask(iterator.Full_Index())=true;}
 
     T Compute_Revalidation_Value(const int axis,const TV& from,const TV& to,const T& current_invalid_value,const T& default_value)
@@ -85,7 +84,7 @@ public:
     void Average_To_Invalidated_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_values)
     {// average values collision aware in Gauss-Jacobi fashion
     typename TV::template REBIND<ARRAY<PAIR<TV_INT,bool> > >::TYPE face_invalid_indices; // index and bool true if entry has been validated on iteration
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(!face_velocities_valid_mask.Component(iterator.Axis())(iterator.Face_Index())) 
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(!face_velocities_valid_mask.Component(iterator.Axis())(iterator.Face_Index())) 
         face_invalid_indices[iterator.Axis()].Append(PAIR<TV_INT,bool>(iterator.Face_Index(),false));
     
     for(int arrays_axis=0;arrays_axis<T_GRID::dimension;arrays_axis++){
@@ -94,7 +93,7 @@ public:
         ARRAYS_ND_BASE<bool,TV_INT>& valid_points=face_velocities_valid_mask.Component(arrays_axis);T_ARRAYS_BASE& values=face_values.Component(arrays_axis);
         
         bool done=false;
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
             valid_points(iterator.index)=false; // don't average from boundaries
 
         while(!done){
@@ -123,7 +122,7 @@ public:
                 if(count){values(invalid_indices(k).x)=sum/(T)count;invalid_indices(k).y=true;done=false;}
                 else values(invalid_indices(k).x)=T();}
             if(!done) for(int k=invalid_indices.m-1;k>=0;k--) if(invalid_indices(k).y){valid_points(invalid_indices(k).x)=true;invalid_indices.Remove_Index_Lazy(k);}}
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
             valid_points(iterator.index)=true;}} // set valid for future advection
 
 //#####################################################################

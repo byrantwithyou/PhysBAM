@@ -2,7 +2,7 @@
 // Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
@@ -66,7 +66,7 @@ Initialize(const ARRAY<TRIANGLE_3D<T> >& elements)
     for(int i=0;i<elements.m;i++){
         RANGE<TV> box=elements(i).Bounding_Box().Thickened(thickness);
         RANGE<TV_INT> range(grid.Index(box.min_corner),grid.Index(box.max_corner)+1);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,range);it.Valid();it.Next())
+        for(PhysBAM::CELL_ITERATOR<TV> it(grid,range);it.Valid();it.Next())
             elements_in_cell.Get_Or_Insert(it.Cell_Index()).Append(i);}
 
     HASHTABLE<FACE_INDEX<TV::m> > boundary_faces;

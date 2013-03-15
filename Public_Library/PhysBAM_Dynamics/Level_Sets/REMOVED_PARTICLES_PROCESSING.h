@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/KD_TREE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ELLIPSOID.h>
 namespace PhysBAM{
@@ -23,8 +23,6 @@ class REMOVED_PARTICLES_PROCESSING:public NONCOPYABLE
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
-
     PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> particles;
     ARRAY<ELLIPSOID<T> > ellipsoids;
     ARRAY<SYMMETRIC_MATRIX<T,3> > metrics;
@@ -57,10 +55,10 @@ private:
 
     void Initialize(const GRID<TV>& grid,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& particles_array)
     {int number_of_particles=0;
-    for(CELL_ITERATOR it(grid,3);it.Valid();it.Next()) if(particles_array(it.Cell_Index())) number_of_particles+=particles_array(it.Cell_Index())->Size();
+    for(CELL_ITERATOR<TV> it(grid,3);it.Valid();it.Next()) if(particles_array(it.Cell_Index())) number_of_particles+=particles_array(it.Cell_Index())->Size();
     LOG::cout<<"Processing "<<number_of_particles<<" removed particles"<<std::endl;
     particles.Preallocate(number_of_particles);ellipsoids.Resize(number_of_particles);metrics.Resize(number_of_particles);
-    for(CELL_ITERATOR it(grid,3);it.Valid();it.Next()) if(particles_array(it.Cell_Index())) particles.Take(*particles_array(it.Cell_Index()));}
+    for(CELL_ITERATOR<TV> it(grid,3);it.Valid();it.Next()) if(particles_array(it.Cell_Index())) particles.Take(*particles_array(it.Cell_Index()));}
 
 //#####################################################################
 public:

@@ -2,8 +2,8 @@
 // Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
@@ -93,12 +93,12 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
     // lay out process ranks on grid
     Fill_Process_Ranks(process_grid,process_ranks,axes);
     // fill in ghost process_ranks for periodic domains
-    if(periodic!=TV_BOOL()) for(NODE_ITERATOR iterator(process_grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
+    if(periodic!=TV_BOOL()) for(NODE_ITERATOR<TV> iterator(process_grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
         TV_INT node=iterator.Node_Index(),wrapped_node=node;
         for(int axis=0;axis<T_GRID::dimension;axis++) if(periodic[axis]) wrapped_node[axis]=(node[axis]+process_grid.Counts()[axis])%process_grid.Counts()[axis];
         process_ranks(node)=process_ranks(wrapped_node);}
     all_coordinates.Resize(number_of_processes);
-    for(NODE_ITERATOR iterator(process_grid);iterator.Valid();iterator.Next())
+    for(NODE_ITERATOR<TV> iterator(process_grid);iterator.Valid();iterator.Next())
         all_coordinates(process_ranks(iterator.Node_Index())+1)=iterator.Node_Index();
     coordinates=all_coordinates(tid);
     LOG::cout<<"process_ranks = \n"<<process_ranks<<std::endl;
@@ -137,7 +137,7 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
     local_cell_index_to_global_column_index_map.Resize(local_grid.Domain_Indices(1));
     // first go through the interior and set what those n values will be
     offset=global_column_index_boundaries(tid).x;
-    for(CELL_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next()){
         local_cell_index_to_global_column_index_map(iterator.Cell_Index())=offset;
         offset++;}
     // now go through each of the boundaries and do those
@@ -153,10 +153,10 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
                 for(int temp_axis=0;temp_axis<T_GRID::dimension;temp_axis++){
                     start_index[temp_axis]=boundaries(temp_axis)(proc_coordinates[temp_axis]);
                     end_index[temp_axis]=boundaries(temp_axis)(proc_coordinates[temp_axis]+1);}
-                CELL_ITERATOR my_iterator(local_grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,side);
+                CELL_ITERATOR<TV> my_iterator(local_grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,side);
                 int neighbor_side=axis_side==0?2*axis+1:2*axis;
                 T_GRID neighbor_grid=T_GRID(end_index-start_index+TV_INT::All_Ones_Vector(),RANGE<TV>(global_grid.X(start_index),global_grid.X(end_index))).Get_MAC_Grid();
-                for(CELL_ITERATOR neighbor_iterator(neighbor_grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,neighbor_side);neighbor_iterator.Valid();neighbor_iterator.Next(),my_iterator.Next()){
+                for(CELL_ITERATOR<TV> neighbor_iterator(neighbor_grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,neighbor_side);neighbor_iterator.Valid();neighbor_iterator.Next(),my_iterator.Next()){
                     TV_INT my_cell_index=my_iterator.Cell_Index();
                     local_cell_index_to_global_column_index_map(my_cell_index+axis_vector)=neighbor_iterator.Flat_Index()+start_column_index-1;}}}
 }
@@ -234,7 +234,7 @@ Exchange_Boundary_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,
     for(int n=0;n<recv_regions.m;n++)if(neighbor_ranks(n)!=-1){int index=-1;
         for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         PHYSBAM_ASSERT(index>=0);int position=0;
-        for(CELL_ITERATOR iterator(local_grid,recv_regions(n));iterator.Valid();iterator.Next()) data.Unpack(buffers(index).buffer,position,iterator.Cell_Index());}
+        for(CELL_ITERATOR<TV> iterator(local_grid,recv_regions(n));iterator.Valid();iterator.Next()) data.Unpack(buffers(index).buffer,position,iterator.Cell_Index());}
     pthread_barrier_wait(barr);
     if(tid==1) buffers.m=0;
     pthread_barrier_wait(barr);
@@ -253,9 +253,9 @@ Exchange_Boundary_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const int
     for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(send_regions(axis),Face_Sentinels(axis),true,boundary_band,true);
     for(int n=0;n<send_regions(0).m;n++)if(all_neighbor_ranks(n)!=-1){
         ARRAY<RANGE<TV_INT> > send_regions_n(T_GRID::dimension);for(int axis=0;axis<T_GRID::dimension;axis++)send_regions_n(axis)=send_regions(axis)(n);
-        int size=0;for(int axis=0;axis<T_GRID::dimension;axis++) for(FACE_ITERATOR iterator(local_grid,send_regions_n(axis),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();
+        int size=0;for(int axis=0;axis<T_GRID::dimension;axis++) for(FACE_ITERATOR<TV> iterator(local_grid,send_regions_n(axis),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();
         int position=0;THREAD_PACKAGE pack(size);pack.send_tid=rank;pack.recv_tid=all_neighbor_ranks(n);
-        for(int axis=0;axis<T_GRID::dimension;axis++) for(FACE_ITERATOR iterator(local_grid,send_regions_n(axis),axis);iterator.Valid();iterator.Next()) 
+        for(int axis=0;axis<T_GRID::dimension;axis++) for(FACE_ITERATOR<TV> iterator(local_grid,send_regions_n(axis),axis);iterator.Valid();iterator.Next()) 
             data.data(axis).Pack(pack.buffer,position,iterator.Face_Index());
         pthread_mutex_lock(lock);
         buffers.Append(pack);
@@ -268,7 +268,7 @@ Exchange_Boundary_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const int
         ARRAY<RANGE<TV_INT> > recv_regions_n(T_GRID::dimension);for(int axis=0;axis<T_GRID::dimension;axis++)recv_regions_n(axis)=recv_regions(axis)(n);
         for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==all_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index>=0);int position=0;
-        for(int axis=0;axis<T_GRID::dimension;axis++) for(FACE_ITERATOR iterator(local_grid,recv_regions_n(axis),axis);iterator.Valid();iterator.Next())
+        for(int axis=0;axis<T_GRID::dimension;axis++) for(FACE_ITERATOR<TV> iterator(local_grid,recv_regions_n(axis),axis);iterator.Valid();iterator.Next())
             data.data(axis).Unpack(buffers(index).buffer,position,iterator.Face_Index());}
     pthread_barrier_wait(barr);
     if(tid==1) buffers.m=0;
@@ -286,9 +286,9 @@ Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const
     for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(VECTOR<int,1>(),VECTOR<int,1>()),false);
     // send and receive into temporary buffers
     for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=n/2;
-        int size=0;for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();
+        int size=0;for(FACE_ITERATOR<TV> iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();
         int position=0;THREAD_PACKAGE pack(size);pack.send_tid=rank;pack.recv_tid=side_neighbor_ranks(n);
-        for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) data.data(axis).Pack(pack.buffer,position,iterator.Face_Index());
+        for(FACE_ITERATOR<TV> iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) data.data(axis).Pack(pack.buffer,position,iterator.Face_Index());
         pthread_mutex_lock(lock);
         buffers.Append(pack);
         pthread_mutex_unlock(lock);}
@@ -299,7 +299,7 @@ Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const
         ARRAY<T2,FACE_INDEX<TV::dimension> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
         int index=-1;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index>=0);int position=0;
-        for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()){
             local_data.data(axis).Unpack(buffers(index).buffer,position,iterator.Face_Index());
             data(iterator.Full_Index())=data(iterator.Full_Index())*0.5+local_data(iterator.Full_Index())*0.5;}}
     pthread_barrier_wait(barr);
@@ -318,9 +318,9 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
     for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(VECTOR<int,1>(),VECTOR<int,1>()),false);
     // send and receive into temporary buffers
     for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=n/2;
-        int size=0;for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();
+        int size=0;for(FACE_ITERATOR<TV> iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();
         int position=0;THREAD_PACKAGE pack(size);pack.send_tid=rank;pack.recv_tid=side_neighbor_ranks(n);
-        for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) data.data(axis).Pack(pack.buffer,position,iterator.Face_Index());
+        for(FACE_ITERATOR<TV> iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) data.data(axis).Pack(pack.buffer,position,iterator.Face_Index());
         pthread_mutex_lock(lock);
         buffers.Append(pack);
         pthread_mutex_unlock(lock);}
@@ -331,7 +331,7 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
         ARRAY<T2,FACE_INDEX<TV::dimension> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
         int index=-1;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index>=0);int position=0;
-        for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()){
             local_data.data(axis).Unpack(buffers(index).buffer,position,iterator.Face_Index());
             assert(abs(data(iterator.Full_Index())-local_data(iterator.Full_Index()))<=tolerance);}}
     pthread_barrier_wait(barr);
@@ -345,7 +345,7 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
 template<class T_GRID> template<class T2> void THREADED_UNIFORM_GRID<T_GRID>::
 Sync_Scalar(const ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& local_data,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& global_data) const
 {
-    for(CELL_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();global_data(cell+local_to_global_offset)=local_data(cell);}
+    for(CELL_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();global_data(cell+local_to_global_offset)=local_data(cell);}
 }
 //#####################################################################
 // Function Distribute_Scalar
@@ -353,7 +353,7 @@ Sync_Scalar(const ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& local_data,ARRA
 template<class T_GRID> template<class T2> void THREADED_UNIFORM_GRID<T_GRID>::
 Distribute_Scalar(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& local_data,const ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& global_data) const
 {
-    for(CELL_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();local_data(cell)=global_data(cell+local_to_global_offset);}
+    for(CELL_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();local_data(cell)=global_data(cell+local_to_global_offset);}
 }
 //#####################################################################
 // Function Sync_Face_Scalar
@@ -363,7 +363,7 @@ Sync_Face_Scalar(const ARRAY<T2,FACE_INDEX<TV::dimension> >& local_data,ARRAY<T2
 {
     for(int axis=0;axis<TV::dimension;axis++){
         RANGE<TV_INT> domain=local_grid.Domain_Indices();if(domain.max_corner(axis)+local_to_global_offset(axis)==global_grid.Domain_Indices().max_corner(axis)) domain.max_corner(axis)++;
-        for(FACE_ITERATOR iterator(local_grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT face=iterator.Face_Index();
+        for(FACE_ITERATOR<TV> iterator(local_grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT face=iterator.Face_Index();
             global_data.Component(axis)(face+local_to_global_offset)=local_data.Component(axis)(face);}}
 }
 //#####################################################################
@@ -372,7 +372,7 @@ Sync_Face_Scalar(const ARRAY<T2,FACE_INDEX<TV::dimension> >& local_data,ARRAY<T2
 template<class T_GRID> template<class T2> void THREADED_UNIFORM_GRID<T_GRID>::
 Distribute_Face_Scalar(ARRAY<T2,FACE_INDEX<TV::dimension> >& local_data,const ARRAY<T2,FACE_INDEX<TV::dimension> >& global_data) const
 {
-    for(FACE_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
+    for(FACE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
         local_data.Component(axis)(face)=global_data.Component(axis)(face+local_to_global_offset);}
 }
 //#####################################################################

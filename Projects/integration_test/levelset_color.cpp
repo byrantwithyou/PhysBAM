@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -184,7 +184,7 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
         default: PHYSBAM_FATAL_ERROR();}
 
     als->Initialize();
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         phi_value(it.index)=als->Phi_Value(it.Location());
         phi_color(it.index)=als->Phi_Color(it.Location());}
 

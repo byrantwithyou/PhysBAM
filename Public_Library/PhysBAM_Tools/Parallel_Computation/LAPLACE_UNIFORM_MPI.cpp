@@ -9,8 +9,8 @@
 #ifdef USE_MPI
 #include <PhysBAM_Tools/Data_Structures/GRAPH.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_PACKAGE.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
@@ -117,7 +117,7 @@ Find_Matrix_Indices_In_Region(const int region_index,const RANGE<TV_INT>& region
 {
     if(region_index>=0) for(int color=0;color<filled_region_ranks.m;color++)partitions(color).ghost_indices(region_index).min_corner=filled_region_cell_count(color);
     else for(int color=0;color<filled_region_ranks.m;color++)partitions(color).interior_indices.min_corner=filled_region_cell_count(color);
-    for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){TV_INT c=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(local_grid,region);iterator.Valid();iterator.Next()){TV_INT c=iterator.Cell_Index();
         int color=filled_region_colors(c);if(color<1 || (!filled_region_touches_dirichlet(color)&&!solve_neumann_regions)) continue;
         int new_index=filled_region_cell_count(color)++;cell_index_to_matrix_index(c)=new_index;
         matrix_index_to_cell_index_array(color)(new_index)=c;}
@@ -135,13 +135,13 @@ Find_Boundary_Indices_In_Region(const int side,const RANGE<TV_INT>& region,T_ARR
     // count boundary indices
     ARRAY<int> counts(partitions.m);
     TV_INT face_offset=cell_side?TV_INT::Axis_Vector(axis):TV_INT();
-    for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Cell_Index()+face_offset)){
+    for(CELL_ITERATOR<TV> iterator(local_grid,region);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Cell_Index()+face_offset)){
         int color=filled_region_colors(iterator.Cell_Index());
         if(counts.Valid_Index(color)) counts(color)++;}
     // fill boundary indices
     for(int color=0;color<partitions.m;color++)partitions(color).boundary_indices(side).Resize(counts(color));
     counts.Fill(0);
-    for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Cell_Index()+face_offset)){
+    for(CELL_ITERATOR<TV> iterator(local_grid,region);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Cell_Index()+face_offset)){
         int color=filled_region_colors(iterator.Cell_Index());
         if(counts.Valid_Index(color)) partitions(color).boundary_indices(side)(counts(color)++)=cell_index_to_matrix_index(iterator.Cell_Index());}
 }

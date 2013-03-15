@@ -4,8 +4,8 @@
 //#####################################################################
 // Class COUPLING_UTILITIES
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
@@ -32,7 +32,7 @@ Extrapolate_Compressible_State_Into_Incompressible_Region(const T dt,const T tim
 {
     T_ARRAYS_SCALAR phi_ghost_negated(phi_ghost),entropy(phi_ghost,false),pressure(phi_ghost,false);ARRAY<TV,TV_INT> velocity(phi_ghost.Domain_Indices());
 
-    for(CELL_ITERATOR iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();T density=U_ghost(cell_index)(0);TV vel=EULER<T_GRID>::Get_Velocity(U_ghost,cell_index);
         T e=EULER<T_GRID>::e(U_ghost(cell_index));
         phi_ghost_negated(cell_index)*=-1;
@@ -45,7 +45,7 @@ Extrapolate_Compressible_State_Into_Incompressible_Region(const T dt,const T tim
     EXTRAPOLATION_UNIFORM<GRID<TV>,TV> extrapolate_velocity(grid,phi_ghost_negated,velocity,ghost_cells);extrapolate_velocity.Set_Band_Width(bandwidth);extrapolate_velocity.Extrapolate(time,false);
     // Find the tangential component and combine it with the normal component from the incompressible region
     TV one_over_two_dx=(T).5*grid.one_over_dX;
-    for(CELL_ITERATOR iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(phi_ghost_negated(cell_index)>0 && phi_ghost_negated(cell_index)<=bandwidth){
             TV v_ext,v_i,grad_phi,N,v_total;
@@ -68,7 +68,7 @@ template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
 Get_Dirichlet_Boundary_Conditions_For_Incompressible_Region(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR& U_dirichlet,const EOS<T>& euler_eos,const T incompressible_density,const T dt)
 {
     TV_INT cell_index;
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
         cell_index=iterator.Cell_Index();
         const EOS_GAMMA<T> *eos_gamma=dynamic_cast<const EOS_GAMMA<T>*>(&euler_eos);
         // TODO(kwatra): This does not look right. It seems to be calculating p=(gamma-1)e
@@ -83,7 +83,7 @@ Compute_Compressible_Incompressible_Face_Velocities(const T_GRID& face_grid,cons
     const T_ARRAYS_SCALAR& incompressible_phi,const T_ARRAYS_DIMENSION_SCALAR& U,const ARRAY<bool,TV_INT>& euler_psi,T_FACE_ARRAYS_SCALAR& compressible_face_velocities)
 {
     TV_INT first_cell_index,second_cell_index,compressible_cell_index;
-    for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){
         first_cell_index=iterator.First_Cell_Index();second_cell_index=iterator.Second_Cell_Index();
         bool first_cell_euler=face_grid.Inside_Domain(first_cell_index)&&euler_psi(first_cell_index),
              second_cell_euler=face_grid.Inside_Domain(second_cell_index)&&euler_psi(second_cell_index),
@@ -110,7 +110,7 @@ Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const T_G
     const T_ARRAYS_DIMENSION_SCALAR& U,const ARRAY<bool,TV_INT>& euler_psi,const T_ARRAYS_SCALAR& p_cell,T_FACE_ARRAYS_SCALAR& p_face)
 {
     TV_INT first_cell_index,second_cell_index,compressible_cell_index;
-    for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){
         first_cell_index=iterator.First_Cell_Index();second_cell_index=iterator.Second_Cell_Index();
         bool first_cell_euler=face_grid.Inside_Domain(first_cell_index)&&euler_psi(first_cell_index),
              second_cell_euler=face_grid.Inside_Domain(second_cell_index)&&euler_psi(second_cell_index),
@@ -152,7 +152,7 @@ template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
 Fill_Incompressible_Beta_Face(const T_GRID& grid,const T incompressible_density,const T_ARRAYS_SCALAR& incompressible_phi,
     T_FACE_ARRAYS_SCALAR& beta_face)
 {
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
         TV_INT face_index=iterator.Face_Index(),first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
         if((incompressible_phi(first_cell_index)+incompressible_phi(second_cell_index))*(T).5 < 0){
             beta_face.Component(axis)(face_index)=(T)1/incompressible_density;}}
@@ -174,10 +174,10 @@ Apply_Pressure_At_Incompressible_Faces(const T_GRID& face_grid,const T incompres
 {
     TV one_over_dx=face_grid.one_over_dX;
     // TODO(kwatra): check if we use incompressible->projection.p anywhere?
-    //for(CELL_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next())
+    //for(CELL_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next())
      //   if(!euler->psi(iterator.Cell_Index()))
       //      incompressible->projection.p(iterator.Cell_Index())=p_hat(iterator.Cell_Index())*(1/incompressible_density);
-    for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();
         TV_INT face_index=iterator.Face_Index(),first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
         if(!psi_N.Component(axis)(face_index) && (incompressible_phi(first_cell_index)<0 || incompressible_phi(second_cell_index)<0)){

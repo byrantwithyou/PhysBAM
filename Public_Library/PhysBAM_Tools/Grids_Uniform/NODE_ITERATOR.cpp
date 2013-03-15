@@ -2,16 +2,16 @@
 // Copyright 2005, Eran Guendelman, Geoffrey Irving, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class UNIFORM_GRID_ITERATOR_NODE
+// Class NODE_ITERATOR
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 using namespace PhysBAM;
 //#####################################################################
-// Function UNIFORM_GRID_ITERATOR_NODE
+// Function NODE_ITERATOR
 //#####################################################################
-template<class TV> UNIFORM_GRID_ITERATOR_NODE<TV>::
-UNIFORM_GRID_ITERATOR_NODE(const GRID<TV>& grid_input,const int number_of_ghost_cells,const T_REGION& region_type,const int side)
-    :UNIFORM_GRID_ITERATOR<TV>(grid_input)
+template<class TV> NODE_ITERATOR<TV>::
+NODE_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells,const T_REGION& region_type,const int side)
+    :GRID_ITERATOR_BASE<TV>(grid_input)
 {
     assert(-1<=side&&side<2*TV::dimension);assert(region_type!=GRID<TV>::BOUNDARY_INTERIOR_REGION);
     TV_INT counts=grid.Numbers_Of_Nodes(); // exact number of nodes (even if MAC)
@@ -48,19 +48,19 @@ UNIFORM_GRID_ITERATOR_NODE(const GRID<TV>& grid_input,const int number_of_ghost_
     Reset();
 }
 //#####################################################################
-// Function UNIFORM_GRID_ITERATOR_NODE
+// Function NODE_ITERATOR
 //#####################################################################
-template<class TV> UNIFORM_GRID_ITERATOR_NODE<TV>::
-UNIFORM_GRID_ITERATOR_NODE(const GRID<TV>& grid_input,const RANGE<TV_INT>& region_input)
-    :UNIFORM_GRID_ITERATOR<TV>(grid_input,region_input)
+template<class TV> NODE_ITERATOR<TV>::
+NODE_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& region_input)
+    :GRID_ITERATOR_BASE<TV>(grid_input,region_input)
 {
 }
 //#####################################################################
 namespace PhysBAM{
-template class UNIFORM_GRID_ITERATOR_NODE<VECTOR<float,1> >;
-template class UNIFORM_GRID_ITERATOR_NODE<VECTOR<float,2> >;
-template class UNIFORM_GRID_ITERATOR_NODE<VECTOR<float,3> >;
-template class UNIFORM_GRID_ITERATOR_NODE<VECTOR<double,1> >;
-template class UNIFORM_GRID_ITERATOR_NODE<VECTOR<double,2> >;
-template class UNIFORM_GRID_ITERATOR_NODE<VECTOR<double,3> >;
+template class NODE_ITERATOR<VECTOR<float,1> >;
+template class NODE_ITERATOR<VECTOR<float,2> >;
+template class NODE_ITERATOR<VECTOR<float,3> >;
+template class NODE_ITERATOR<VECTOR<double,1> >;
+template class NODE_ITERATOR<VECTOR<double,2> >;
+template class NODE_ITERATOR<VECTOR<double,3> >;
 }

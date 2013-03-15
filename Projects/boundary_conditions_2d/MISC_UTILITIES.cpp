@@ -1,7 +1,7 @@
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
@@ -21,7 +21,7 @@ using namespace PhysBAM;
 template<class T,class TV,int d>
 void Invalidate_Outside(const GRID<TV>& grid,int ghost,ARRAY<T,FACE_INDEX<d> >& u,const BOUNDARY_CONDITIONS<TV>& bc,T value)
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,ghost);it.Valid();it.Next()) if(!bc.Inside(grid.Face(it.Full_Index()))) u(it.Full_Index())=value;
+    for(FACE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()) if(!bc.Inside(grid.Face(it.Full_Index()))) u(it.Full_Index())=value;
 }
 
 template<class TV>
@@ -29,7 +29,7 @@ void Fill_Ghost_Cells(const GRID<TV>& grid,int ghost,int distance,ARRAY<typename
 {
     typedef typename TV::SCALAR T;
     ARRAY<bool,FACE_INDEX<TV::m> > inside(grid.Domain_Indices());
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next())
         inside(it.Full_Index())=bc.phi->Phi(it.Location())<=0;
     EXTRAPOLATION_HIGHER_ORDER<TV,T>(grid,*bc.phi,100,3,distance).Extrapolate_Face(inside,u);
 }
@@ -79,7 +79,7 @@ void Add_Advection(const OBJECTS_COMMON<TV>& obj,const PARAMETERS_COMMON<typenam
         Flush_Frame(u,"after extrapolation");}
     advection.Update_Advection_Equation_Face(obj.grid,u,u,u,boundary,param.dt,param.time);
     Flush_Frame(u,"after advection");
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(obj.grid,4);it.Valid();it.Next()) if(!obj.bc->Inside(it.Location())) u(it.Full_Index())=0;
+    for(FACE_ITERATOR<TV> it(obj.grid,4);it.Valid();it.Next()) if(!obj.bc->Inside(it.Location())) u(it.Full_Index())=0;
     Flush_Frame(u,"after clear ghost");
 }
 
@@ -128,7 +128,7 @@ void Second_Order_RE_Step(SIM_COMMON<TV>& sim,ARRAY<typename TV::SCALAR,FACE_IND
 template<class TV>
 void Dump_Error(const SIM_COMMON<TV>& sim,const ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >& u,ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >& u2)
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(sim.obj.grid,4);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(sim.obj.grid,4);it.Valid();it.Next()){
         if(sim.obj.bc->Inside(it.Location())) u2(it.Full_Index())=u(it.Full_Index())-sim.obj.bc->Analytic_Velocity(it.Location(),sim.param.time)(it.Axis());
         else u2(it.Full_Index())=0;}
     Flush_Frame(u2,"error");
@@ -187,7 +187,7 @@ void Dump_Error_Image(const SIM_COMMON<TV>& sim,const ARRAY<typename TV::SCALAR,
     ARRAY<VECTOR<T,3>,TV_INT> color_errors(image_grid.Domain_Indices());
     ERROR_COLOR_MAP<T> em(1e-12,1,true,true,true);
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(sim.obj.grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(sim.obj.grid);it.Valid();it.Next()){
         if(!sim.obj.bc->Inside(it.Location())) continue;
         T err=abs(u(it.Full_Index())-sim.obj.bc->Analytic_Velocity(it.Location(),sim.param.time)(it.Axis()));
         TV_INT index;

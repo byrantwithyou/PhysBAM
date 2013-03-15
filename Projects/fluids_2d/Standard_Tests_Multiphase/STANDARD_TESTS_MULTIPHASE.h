@@ -7,8 +7,8 @@
 #ifndef __STANDARD_TESTS_MULTIPHASE__
 #define __STANDARD_TESTS_MULTIPHASE__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE_2D.h>
 namespace PhysBAM{
@@ -18,8 +18,6 @@ class STANDARD_TESTS_MULTIPHASE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR
 {
     typedef T_input T;typedef VECTOR<T,2> TV;
 public:
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
-
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::fluid_collection;
@@ -75,7 +73,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_Phi() PHYSBAM_OVERRIDE
 {
-    for(int i=0;i<fluids_parameters.number_of_regions;i++)for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+    for(int i=0;i<fluids_parameters.number_of_regions;i++)for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
         fluids_parameters.particle_levelset_evolution_multiple->phis(i)(iterator.Cell_Index())=tests.Initial_Phi(i,iterator.Location());        
 }
 //#####################################################################
@@ -83,7 +81,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
-    for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis)(iterator.Face_Index())=tests.Initial_Velocity(iterator.Location())[axis];}
 }
 //#####################################################################
@@ -125,7 +123,7 @@ void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
     if(tests.test_number==16&&fabs(fluids_parameters.grid->domain.min_corner.y)<1e-5){
         ARRAY_VIEW<T,VECTOR<int,2> >& u=fluid_collection.incompressible_fluid_collection.face_velocities.Component(1);
         ARRAY_VIEW<bool,VECTOR<int,2> >& psi_N_u=fluids_parameters.incompressible_multiphase->projection.elliptic_solver->psi_N.Component(1);
-        for(CELL_ITERATOR iterator(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,2);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,2);iterator.Valid();iterator.Next()){
             //if(fluids_parameters.particle_levelset_evolution->Levelset(1).phi(iterator.Cell_Index())<=0){
             VECTOR<int,2> cell=iterator.Cell_Index();
             if(tests.armadillo->phi(cell+VECTOR<int,2>(0,1))<=0){

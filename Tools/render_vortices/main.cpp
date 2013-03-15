@@ -1,5 +1,5 @@
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -20,13 +20,13 @@ void Run(const STREAM_TYPE& stream_type,const std::string& file)
     ARRAY<T,FACE_INDEX<2> > uo;
     FILE_UTILITIES::Read_From_File(stream_type,file+"/mac_velocities",uo);
     ARRAY<T,FACE_INDEX<2> > u(grid,ghost);
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()) u(it.Full_Index())=uo(it.Full_Index());
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()) u(it.Full_Index())=uo(it.Full_Index());
 
     ARRAY<T,TV_INT> phi_array(grid.Domain_Indices(ghost));
 
     LEVELSET<TV> phi(grid,phi_array);
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,ghost);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
         T val=-FLT_MAX;
         TV X=it.Location();
         val=std::max(val,(T).5-X.Magnitude());
@@ -37,11 +37,11 @@ void Run(const STREAM_TYPE& stream_type,const std::string& file)
         phi_array(it.index)=val;}
 
     ARRAY<bool,FACE_INDEX<2> > inside(grid);
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next())
         inside(it.Full_Index())=phi.Phi(it.Location());
     EXTRAPOLATION_HIGHER_ORDER<TV,T>(grid,phi,100,3,ghost-1).Extrapolate_Face(inside,u);
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,ghost);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
         T du=u(FACE_INDEX<2>(1,it.index+TV_INT(1,0)))-u(FACE_INDEX<2>(1,it.index));
         T dv=u(FACE_INDEX<2>(2,it.index+TV_INT(0,1)))-u(FACE_INDEX<2>(2,it.index));
         T vor=du/grid.one_over_dX.x-dv/grid.one_over_dX.y;

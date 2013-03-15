@@ -2,10 +2,10 @@
 // Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
@@ -104,7 +104,7 @@ void Dump_System(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ANALYTIC_TEST<TV>&
     for(int c=0;c<iss.cdi->colors;c++){
         Dump_Interface<T,TV>(iss);
         sprintf(buff,"dofs %i %s",c,c>=0?"":names[-c-1]);
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(iss.grid);it.Valid();it.Next()){
+        for(FACE_ITERATOR<TV> it(iss.grid);it.Valid();it.Next()){
             int index=iss.cm_u(it.Axis())->Get_Index(it.index,c);
             if(index>=0){
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
@@ -114,7 +114,7 @@ void Dump_System(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ANALYTIC_TEST<TV>&
     for(int c=0;c<iss.cdi->colors;c++){
         Dump_Interface<T,TV>(iss);
         sprintf(buff,"dofs p %i %s",c,c>=0?"":names[-c-1]);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(iss.grid);it.Valid();it.Next()){
             int index=iss.cm_p->Get_Index(it.index,c);
             if(index>=0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));}
         Flush_Frame<T,TV>(buff);}
@@ -160,7 +160,7 @@ void Dump_Vector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const INTERFACE_ST
     for(int c=0;c<iss.cdi->colors;c++){
         Dump_Interface<T,TV>(iss);
         sprintf(buff,"%s %i",title,c);
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(iss.grid);it.Valid();it.Next()){
+        for(FACE_ITERATOR<TV> it(iss.grid);it.Valid();it.Next()){
             int index=iss.cm_u(it.Axis())->Get_Index(it.index,c);
             if(index>=0){
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
@@ -170,7 +170,7 @@ void Dump_Vector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const INTERFACE_ST
     for(int c=0;c<iss.cdi->colors;c++){
         Dump_Interface<T,TV>(iss);
         sprintf(buff,"%s p %i",title,c);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(iss.grid);it.Valid();it.Next()){
             int k=iss.cm_p->Get_Index(it.index,c);
             if(k>=0){
                 Add_Debug_Particle(it.Location(),v.p(c)(k)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0));
@@ -186,12 +186,12 @@ void Dump_Vector2(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const INTERFACE_S
         sprintf(buff,"%s %i",title,c);
         Dump_Interface<T,TV>(iss);
         ARRAY<T,FACE_INDEX<TV::m> > u(iss.grid);
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(iss.grid);it.Valid();it.Next()){
+        for(FACE_ITERATOR<TV> it(iss.grid);it.Valid();it.Next()){
             int i=it.Axis();
             int k=iss.cm_u(i)->Get_Index(it.index,c);
             if(k>=0) u(it.Full_Index())=v.u(i)(c)(k);}
 
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(iss.grid);it.Valid();it.Next()){
             int k=iss.cm_p->Get_Index(it.index,c);
             if(k>=0){
                 Add_Debug_Particle(it.Location(),v.p(c)(k)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0));
@@ -206,14 +206,14 @@ void Dump_u_p(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const ARRAY<T,FACE_IN
     char buff[100];
     Dump_Interface<T,TV>(iss);
     sprintf(buff,"%s",title);
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(iss.grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(iss.grid);it.Valid();it.Next()){
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(0.25,0.25,0.25));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(it.Axis())*u(it.Full_Index()));}
     Flush_Frame<T,TV>(buff);
 
     Dump_Interface<T,TV>(iss);
     sprintf(buff,"%s p",title);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(iss.grid);it.Valid();it.Next()){
         Add_Debug_Particle(it.Location(),p(it.index)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,p(it.index));}
     Flush_Frame<T,TV>(buff);
@@ -225,7 +225,7 @@ void Dump_u_p(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& u,const AR
     INTERPOLATED_COLOR_MAP<T> color_map;
     color_map.Initialize_Colors(1e-12,1,true,true,true);
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
         Add_Debug_Particle(it.Location(),color_map(p(it.index)));
 
     Dump_Frame(u,title);
@@ -266,7 +266,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     ARRAY<T,TV_INT> phi_value(grid.Node_Indices());
     ARRAY<int,TV_INT> phi_color(grid.Node_Indices());
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         phi_value(it.index)=at.phi_value(it.Location());
         phi_color(it.index)=at.phi_color(it.Location());}
     
@@ -292,7 +292,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         for(int c=0;c<iss.cdi->colors;c++) u(c).Resize(grid);
 
         for(int c=0;c<iss.cdi->colors;c++)
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+            for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
                 FACE_INDEX<TV::m> face(it.Full_Index()); 
                 u(c)(face)=at.u(it.Location(),c)(face.axis);}
         
@@ -330,7 +330,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     numer_u.Resize(iss.grid);
     exact_u.Resize(iss.grid);
     error_u.Resize(iss.grid);
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int i=it.Axis();
         int c=at.phi_color(it.Location());
         if(c<0) continue;
@@ -341,7 +341,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     numer_p.Resize(iss.grid.Domain_Indices());
     exact_p.Resize(iss.grid.Domain_Indices());
     error_p.Resize(iss.grid.Domain_Indices());
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
         if(c<0) continue;
         int k=iss.cm_p->Get_Index(it.index,c);
@@ -350,7 +350,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
 
     TV avg_u;
     TV_INT cnt_u;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
         if(c<0) continue;
         FACE_INDEX<TV::m> face(it.Full_Index()); 
@@ -362,7 +362,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     avg_u/=(TV)cnt_u;
 
     TV error_u_linf,error_u_l2;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
         if(c<0) continue;
         FACE_INDEX<TV::m> face(it.Full_Index()); 
@@ -375,7 +375,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
 
     T avg_p=0;
     int cnt_p=0;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
         if(c<0) continue;
         exact_p(it.index)=at.p(it.Location());
@@ -385,7 +385,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     avg_p/=cnt_p;
 
     T error_p_linf=0,error_p_l2=0;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         error_p(it.index)-=avg_p;
         error_p_linf=max(error_p_linf,abs(error_p(it.index)));
         error_p_l2+=sqr(error_p(it.index));}

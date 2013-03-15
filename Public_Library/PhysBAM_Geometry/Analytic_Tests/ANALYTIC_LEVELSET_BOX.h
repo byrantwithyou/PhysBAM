@@ -6,8 +6,8 @@
 //#####################################################################
 #ifndef __ANALYTIC_LEVELSET_BOX__
 #define __ANALYTIC_LEVELSET_BOX__
-#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SIGNED.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SIGNED.h>
 
 namespace PhysBAM{
 template<class TV>

@@ -5,7 +5,7 @@
 // Class EULER_FLUID_FORCES
 //#####################################################################
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
@@ -40,7 +40,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
     TV one_over_dx=grid.one_over_dX;T cell_size=grid.Cell_Size();
     TV_INT face_index,first_cell_index,second_cell_index;TV first_cell_location,second_cell_location;int axis;
     bool first_cell_inside_fluid,second_cell_inside_fluid;
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){axis=iterator.Axis();face_index=iterator.Face_Index();
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){axis=iterator.Axis();face_index=iterator.Face_Index();
         if(!solid_fluid_face.Component(axis)(face_index)) continue;
         first_cell_index=iterator.First_Cell_Index();second_cell_index=iterator.Second_Cell_Index();
         first_cell_inside_fluid=cells_inside_fluid.Valid_Index(first_cell_index) && cells_inside_fluid(first_cell_index);

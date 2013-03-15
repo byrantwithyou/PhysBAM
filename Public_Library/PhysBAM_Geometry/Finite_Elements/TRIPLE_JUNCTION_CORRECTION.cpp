@@ -4,8 +4,8 @@
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND_VIEW.h>
 #include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
 #include <PhysBAM_Tools/Math_Tools/integer_log.h>
@@ -76,7 +76,7 @@ void Dump_Interface(const GRID<TV>& grid,ARRAY_VIEW<T,TV_INT> p,const VECTOR<T,3
     T default_phi=(T)1.12349871352389e-10;
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         VECTOR<T,(1<<TV::m)> phi(p.Subset(bits+it.index));
         if(phi.Contains(default_phi)) continue;
         if(phi.Min()>=0 || phi.Max()<=0) continue;
@@ -100,7 +100,7 @@ Compute_Pairwise_Data()
 {
     pairwise_data.Resize(grid.Node_Indices(ghost));
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
         PAIRWISE_LEVEL_SET_DATA& data=pairwise_data(it.index);
         VECTOR<T,3> min(FLT_MAX,FLT_MAX,FLT_MAX);
         for(int i=0;i<phi.m;i++){
@@ -121,7 +121,7 @@ Compute_Pairwise_Data()
             exchange(data.trust.x,data.trust.y);
             data.phi=min.y;}}
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
         PAIRWISE_LEVEL_SET_DATA& data=pairwise_data(it.index);
         if(data.trust.Contains(-1)) continue;
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
@@ -141,7 +141,7 @@ Initialize_Pairwise_Level_Set()
             pairwise_phi(i)(j).Resize(grid.Node_Indices(extrap_width),false);
             pairwise_phi(i)(j).Fill(default_phi);}}
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
         PAIRWISE_LEVEL_SET_DATA& data=pairwise_data(it.index);
         if(data.trust.x>=0){
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(data.trust.y==1,data.trust.Sum()==2,data.trust.x==1)/(1+(data.phi<0)));
@@ -165,7 +165,7 @@ Fill_Valid_Region_With_Exprapolation()
         EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Node(grid,
             [&](const TV_INT& index){return pairwise_data(index).trust==k;},
             extrap_width,pairwise_phi(k.x)(k.y),3,extrap_width);
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+        for(NODE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
             int mask=(1<<k.x)|(1<<k.y);
             T& p=pairwise_phi(k.x)(k.y)(it.index);
             if((pairwise_data(it.index).valid_flags&mask)==mask){
@@ -276,7 +276,7 @@ One_Step_Triple_Junction_Correction()
 
     T max_move=(T).5*grid.dX.Max();
     HASHTABLE<TRIPLE<int,int,TV_INT>,T> total_size;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int mask=~0;
         for(int j=0;j<(1<<TV::m);j++)
             mask&=pairwise_data(bits(j)+it.index).valid_flags;
@@ -370,7 +370,7 @@ Update_Color_Level_Sets()
     combined_color.Resize(grid.Node_Indices(ghost));
 
     ARRAY<TV_INT> todo;
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
         int mask=pairwise_data(it.index).valid_flags;
         int num_bits=count_bits(mask);
         if(num_bits<2 || !pairwise_data(it.index).trust.Contains(-1)){
@@ -405,7 +405,7 @@ Update_Color_Level_Sets()
             Add_Debug_Object(VECTOR<TV,2>(grid.Node(index),grid.Node(neighbor)),VECTOR<T,3>(color==0,color==1,color==2)/3);
             Add_Debug_Particle(grid.Node(neighbor),VECTOR<T,3>(color==0,color==1,color==2)/3);}}
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next())
+    for(NODE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next())
         PHYSBAM_ASSERT(combined_color(it.index)>=0);
     Flush_Frame<TV>(__FUNCTION__);
 }
@@ -425,7 +425,7 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
 
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int full_mask=~0;
         for(int j=0;j<bits.m;j++){
             full_mask&=pairwise_data(bits(j)+it.index).valid_flags;}
@@ -627,14 +627,14 @@ Compute_Pairwise_Level_Set_Data()
 
     Fill_Valid_Region_With_Exprapolation();
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
         T p=pairwise_phi(0)(1)(it.index);
         if((pairwise_data(it.index).valid_flags&3)==3)
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
         T p=pairwise_phi(0)(1)(it.index);
         if((pairwise_data(it.index).valid_flags&3)==3)
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));

@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
@@ -52,7 +52,7 @@ Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T dens
     e_advection->Update_Advection_Equation_Cell(grid,e,e_ghost,face_velocities_ghost,*e_boundary,dt,time);
 
     TV one_over_two_DX=(T).5*Inverse(grid.dX);T one_over_dimension=1/T_GRID::dimension;
-    for(CELL_ITERATOR iterator(grid,0);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,0);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();MATRIX<T,TV::dimension> VX;
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
             VX.Column(axis)=one_over_two_DX[axis]*(V(cell+offset)-V(cell-offset));} // TODO: maybe change this to do a better difference for the derivative in the same axis as the face
@@ -67,13 +67,13 @@ Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T dens
     e_boundary->Fill_Ghost_Cells(grid,e,e_ghost,dt,time+dt,number_of_ghost_cells);
     if(external_strain_adjustment) external_strain_adjustment->Adjust_Strain(e_ghost,time);
     T epsilon=heaviside_bandwidth*grid.dX.Max();
-    for(CELL_ITERATOR iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         e_ghost(cell)*=1-LEVELSET_UTILITIES<T>::Heaviside(phi_ghost(cell),0*epsilon);} // surface boundary condition
 
     // update velocity due to strain at time n+1
     TV dt_elastic_modulus_over_density_over_two_DX=dt*elastic_modulus/density*one_over_two_DX;
     V.Fill(TV());
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
             V(cell)+=dt_elastic_modulus_over_density_over_two_DX[axis]*(e_ghost(cell+offset).Column(axis)-e_ghost(cell-offset).Column(axis));}}
 }
@@ -85,11 +85,11 @@ Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCA
 {
     if(!cfl_called) PHYSBAM_WARNING("Using strain without calling strain CFL");
     ARRAY<TV,TV_INT> V(grid.Domain_Indices(1));
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=0;axis<T_GRID::dimension;axis++)
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=0;axis<T_GRID::dimension;axis++)
         V(iterator.Cell_Index())[axis]=(T).5*(face_velocities_ghost.Component(axis)(iterator.First_Face_Index(axis))+face_velocities_ghost.Component(axis)(iterator.Second_Face_Index(axis)));
     Update_Strain_Equation_Helper_Cell_Centered(dt,time,density,(T)1.5,face_velocities_ghost,V,phi_ghost,number_of_ghost_cells);
     // apply the velocity update to the face velocities
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis(); // TODO: use a better difference as above
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis(); // TODO: use a better difference as above
         face_velocities.Component(axis)(iterator.Face_Index())+=(T).5*(V(iterator.First_Cell_Index())[axis]+V(iterator.Second_Cell_Index())[axis]);}
 }
 //#####################################################################
@@ -101,11 +101,11 @@ Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE
 {
     if(!cfl_called) PHYSBAM_WARNING("Using strain without calling strain CFL");
     ARRAY<TV,TV_INT> V(grid.Domain_Indices(1));
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=0;axis<T_GRID::dimension;axis++)
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=0;axis<T_GRID::dimension;axis++)
         V(iterator.Cell_Index())[axis]=(T).5*(face_velocities_ghost.Component(axis)(iterator.First_Face_Index(axis))+face_velocities_ghost.Component(axis)(iterator.Second_Face_Index(axis)));
     Update_Strain_Equation_Helper_Cell_Centered(dt,time,density,0,face_velocities_ghost,V,levelset.phis(region),number_of_ghost_cells);
     // apply the velocity update to the face velocities
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
         if(levelset.Inside_Region_Face(axis,iterator.Face_Index())==region)
             face_velocities.Component(axis)(iterator.Face_Index())+=(T).5*(V(iterator.First_Cell_Index())[axis]+V(iterator.Second_Cell_Index())[axis]);}// TODO: use a better difference as above
 }
@@ -116,7 +116,7 @@ template<class T_GRID> void FLUID_STRAIN_UNIFORM<T_GRID>::
 Extrapolate_Strain_Across_Interface(T_ARRAYS_SCALAR& phi_ghost,const T band_width)
 {
     T delta=band_width*grid.dX.Max();
-    for(CELL_ITERATOR iterator(grid,0);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(phi_ghost(cell)>=delta) e(cell)=SYMMETRIC_MATRIX<T,TV::m>();}
+    for(CELL_ITERATOR<TV> iterator(grid,0);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(phi_ghost(cell)>=delta) e(cell)=SYMMETRIC_MATRIX<T,TV::m>();}
     EXTRAPOLATION_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> > extrapolate(grid,phi_ghost,e,3);extrapolate.Set_Band_Width(band_width);extrapolate.Extrapolate();
 }
 //#####################################################################

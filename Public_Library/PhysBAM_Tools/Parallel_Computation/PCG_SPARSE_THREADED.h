@@ -7,8 +7,8 @@
 #ifndef __PCG_SPARSE_THREADED__
 #define __PCG_SPARSE_THREADED__
 
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <PhysBAM_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
@@ -22,7 +22,6 @@ class PCG_SPARSE_THREADED:public PCG_SPARSE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::dimension> TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef PCG_SPARSE<T> BASE;
 public:
     THREAD_QUEUE& thread_queue;

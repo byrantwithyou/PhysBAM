@@ -15,7 +15,7 @@ class BOUNDARY_REFLECTION_WATER:public BOUNDARY<TV,T2>
 {
     typedef typename TV::SCALAR T;
     typedef typename GRID<TV>::VECTOR_INT TV_INT;typedef typename GRID<TV>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;typedef typename GRID<TV>::FACE_ARRAYS_SCALAR T_FACE_ARRAYS_SCALAR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
+    typedef typename GRID<TV>::FACE_ARRAYS_SCALAR T_FACE_ARRAYS_SCALAR;
 public:
     typedef BOUNDARY<TV,T2> BASE;
     using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;
@@ -66,7 +66,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>
             int inward_sign=axis_side==0?1:-1;T dx=grid.DX()[axis],half_dx=(T).5*dx;
             int cell_boundary=Boundary(side,regions(side)),face_boundary=cell_boundary+axis_side;
             int reflection_times_two=2*cell_boundary+(axis_side==0?-1:1);
-            for(CELL_ITERATOR iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+            for(CELL_ITERATOR<TV> iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
                 TV_INT boundary_cell=cell,boundary_face=cell;boundary_cell[axis]=cell_boundary;boundary_face[axis]=face_boundary;
                 if((*phi)(boundary_cell) <= 0 && domain_indices.Lazy_Inside_Half_Open(boundary_cell) && inward_sign*V->Component(axis)(boundary_face) > tolerance){
                     TV_INT reflected_cell=cell;reflected_cell[axis]=reflection_times_two-cell[axis];

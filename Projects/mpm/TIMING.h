@@ -12,8 +12,8 @@
 #include <iomanip>
 #include <iostream>
 #ifdef _WIN32
-#include <windows.h>
 #include <stdio.h>
+#include <windows.h>
 namespace PhysBAM{
 class TIMING
 {
@@ -64,8 +64,8 @@ public:
 };
 }
 #else
-#include <sys/time.h>
 #include <stdio.h>
+#include <sys/time.h>
 #include <time.h>
 namespace PhysBAM{
 class TIMING

@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Advection/ADVECTION.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Computations/VORTICITY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
@@ -61,7 +61,7 @@ Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& a
         Extrapolate_Velocity_Across_Interface(face_velocities_to_advect_ghost_extrapolated,phi_for_pseudo_dirichlet_regions);
         advection->Update_Advection_Equation_Face(grid,face_velocities_liquid,face_velocities_to_advect_ghost_extrapolated,advection_face_velocities_ghost_extrapolated,*boundary,dt,time);
         advection->Update_Advection_Equation_Face(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,advection_face_velocities_ghost,*boundary,dt,time);
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
             int region1=projection.poisson_collidable->levelset_multiple->Inside_Region(iterator.First_Cell_Index());
             int region2=projection.poisson_collidable->levelset_multiple->Inside_Region(iterator.Second_Cell_Index());
             if(!(*pseudo_dirichlet_regions)(region1)||!(*pseudo_dirichlet_regions)(region2))
@@ -84,7 +84,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
         T_FACE_ARRAYS_SCALAR face_velocities_temp=face_velocities_ghost;
         for(int axis=0;axis<T_GRID::dimension;axis++){
             T_GRID face_grid=grid.Get_Face_Grid(axis);T_ARRAYS_SCALAR phi_face(face_grid.Domain_Indices(),false);T_ARRAYS_BASE& face_velocity=face_velocities_temp.Component(axis);
-            for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next())
+            for(FACE_ITERATOR<TV> iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next())
                 phi_face(iterator.Face_Index())=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
             int extrapolation_bandwidth=3;
             EXTRAPOLATION_UNIFORM<GRID<TV>,T>  extrapolate(face_grid,phi_face,face_velocity,number_of_ghost_cells);extrapolate.Set_Band_Width((T)extrapolation_bandwidth);
@@ -95,7 +95,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
     if(gravity) for(int axis=0;axis<T_GRID::dimension;axis++) if(downward_direction[axis]) face_velocities.Component(axis)+=dt*gravity*downward_direction[axis];
     
     // update body force
-    if(use_force) for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) 
+    if(use_force) for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) 
         face_velocities.Component(iterator.Axis())(iterator.Face_Index())+=dt*force.Component(iterator.Axis())(iterator.Face_Index());
 
     if((viscosity || use_variable_viscosity) && (!implicit_viscosity || use_explicit_part_of_implicit_viscosity))
@@ -105,7 +105,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
         T half_width=(T).5*number_of_interface_cells*grid.dX.Min();T dt_over_four=(T).25*dt;
         LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
         levelset_multiple.Compute_Normals();levelset_multiple.Compute_Curvature();
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT index=iterator.Face_Index();
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT index=iterator.Face_Index();
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
             int region_1,region_2;T phi_1,phi_2;levelset_multiple.Minimum_Regions(cell_1,cell_2,region_1,region_2,phi_1,phi_2);
             T sign=(region_1==region_2)?(T)1:(T)-1;
@@ -119,14 +119,14 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
         ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),false);
         Compute_Vorticity_Confinement_Force(grid,face_velocities_ghost,F);
         F*=dt*(T).5;F*=variable_vorticity_confinement;
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
             face_velocities.Component(axis)(iterator.Face_Index())+=F(iterator.First_Cell_Index())[axis]+F(iterator.Second_Cell_Index())[axis];}}
 
     if(vorticity_confinements.Count_Matches(0)!=vorticity_confinements.m){
         ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),false);
         Compute_Vorticity_Confinement_Force(grid,face_velocities_ghost,F);
         T half_dt=(T).5*dt;
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();
             if(pseudo_dirichlet_regions){
                 int region1=projection.poisson_collidable->levelset_multiple->Inside_Region(iterator.First_Cell_Index());
@@ -158,7 +158,7 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
     
     if(GFM && nonzero_surface_tension){
         LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;levelset_multiple.Compute_Curvature();
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
             int region_1,region_2;T phi_1,phi_2;levelset_multiple.Minimum_Regions(cell_1,cell_2,region_1,region_2,phi_1,phi_2);
             if(region_1!=region_2){
@@ -185,7 +185,7 @@ Calculate_Pressure_Jump(const T dt,const T time)
 {
     assert(projection.poisson_collidable->levelset_multiple);
     LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
         int region1=levelset_multiple.Inside_Region(cell1),region2=levelset_multiple.Inside_Region(cell2);
         const TRIPLE<T,T,T>& constants=projection.flame_speed_constants(region1,region2);
@@ -209,11 +209,11 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
         if(projection.flame){
             FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<T_GRID> face_velocities_fire(face_velocities,projection,projection.poisson_collidable->levelset_multiple);
             typename FIRE_INTERPOLATION_POLICY<T_GRID>::AVERAGING_FIRE_MULTIPHASE averaging;
-            for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
                 TV V=averaging.Face_To_Face_Vector(grid,iterator.Axis(),iterator.Face_Index(),face_velocities_fire);
                 dt_convection=max(dt_convection,TV::Dot_Product(grid.one_over_dX,abs(V)));}}
         else{
-            for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+            for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
                 T local_V_norm=0;for(int axis=0;axis<T_GRID::dimension;axis++){
                     TV_INT first_face_index=grid.First_Face_Index_In_Cell(axis,cell),second_face_index=grid.Second_Face_Index_In_Cell(axis,cell);
                     local_V_norm+=grid.one_over_dX[axis]*maxabs(face_velocities(axis,first_face_index),face_velocities(axis,second_face_index));}
@@ -231,7 +231,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
         LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;levelset_multiple.Compute_Curvature();
         int ghost_cells=1;
         levelset_multiple.Fill_Ghost_Cells(levelset_multiple.phis,0,ghost_cells);T kappa_cfl=0;
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
             int region_1,region_2;T phi_1,phi_2;levelset_multiple.Minimum_Regions(cell_1,cell_2,region_1,region_2,phi_1,phi_2);
             if(region_1!=region_2 && surface_tensions(region_1,region_2)){
@@ -261,9 +261,9 @@ Set_Dirichlet_Boundary_Conditions(ARRAY<T_ARRAYS_SCALAR>& phis,const ARRAY<bool>
 {
     LEVELSET_MULTIPLE<T_GRID> levelset_multiple(grid,phis);
     if(dirichlet_regions.Number_True()>0){
-        if(!pressures){for(CELL_ITERATOR iterator(projection.p_grid);iterator.Valid();iterator.Next()) if(dirichlet_regions(levelset_multiple.Inside_Region(iterator.Cell_Index()))){
+        if(!pressures){for(CELL_ITERATOR<TV> iterator(projection.p_grid);iterator.Valid();iterator.Next()) if(dirichlet_regions(levelset_multiple.Inside_Region(iterator.Cell_Index()))){
             projection.elliptic_solver->psi_D(iterator.Cell_Index())=true;projection.p(iterator.Cell_Index())=0;}}
-        else{for(CELL_ITERATOR iterator(projection.p_grid);iterator.Valid();iterator.Next()){
+        else{for(CELL_ITERATOR<TV> iterator(projection.p_grid);iterator.Valid();iterator.Next()){
             int region=levelset_multiple.Inside_Region(iterator.Cell_Index());
             if(dirichlet_regions(levelset_multiple.Inside_Region(iterator.Cell_Index()))){
                 projection.elliptic_solver->psi_D(iterator.Cell_Index())=true;projection.p(iterator.Cell_Index())=(*pressures)(region);}}}}
@@ -282,7 +282,7 @@ Add_Surface_Tension(LEVELSET<TV>& levelset,const T time)
     LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
     T_ARRAYS_SCALAR& phi=levelset.phi; 
 
-   if(collidable_solver.second_order_cut_cell_method) for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
+   if(collidable_solver.second_order_cut_cell_method) for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
         TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index(),face_index=iterator.Face_Index();int axis=iterator.Axis();
         if(!projection.elliptic_solver->psi_N.Component(axis)(face_index) && LEVELSET_UTILITIES<T>::Interface(phi(first_cell_index),phi(second_cell_index))){
             int region_1,region_2;T phi_1,phi_2;levelset_multiple.Minimum_Regions(first_cell_index,second_cell_index,region_1,region_2,phi_1,phi_2);
@@ -292,7 +292,7 @@ Add_Surface_Tension(LEVELSET<TV>& levelset,const T time)
             T curvature_at_interface=levelset.Compute_Curvature(location);
             collidable_solver.u_interface.Component(axis)(face_index)=-surface_tensions(region_1,region_2)*curvature_at_interface;}}
    else{
-       for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()) if(elliptic_solver.psi_D(iterator.Cell_Index()) && phi(iterator.Cell_Index()) < 5*grid.dX.Max()){
+       for(CELL_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()) if(elliptic_solver.psi_D(iterator.Cell_Index()) && phi(iterator.Cell_Index()) < 5*grid.dX.Max()){
            int minimum_region,second_minimum_region;T minimum_phi,second_minimum_phi;
            levelset_multiple.Two_Minimum_Regions(iterator.Cell_Index(),minimum_region,second_minimum_region,minimum_phi,second_minimum_phi);
            projection.p(iterator.Cell_Index())=-surface_tensions(minimum_region,second_minimum_region)*levelset.Compute_Curvature(phi,iterator.Cell_Index());}}
@@ -317,7 +317,7 @@ Compute_Vorticity_Confinement_Force(const T_GRID& grid,const T_FACE_ARRAYS_SCALA
     if(projection.flame){FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<T_GRID> face_velocities_lookup(face_velocities_ghost,projection,projection.poisson_collidable->levelset_multiple);
         VORTICITY_UNIFORM<TV>::Vorticity(grid,face_velocities_lookup,vorticity,vorticity_magnitude);}
     else VORTICITY_UNIFORM<TV>::Vorticity(grid,FACE_LOOKUP_UNIFORM<T_GRID>(face_velocities_ghost),vorticity,vorticity_magnitude);
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
         TV vortex_normal_vector=LEVELSET<TV>::Normal_At_Node(grid,vorticity_magnitude,iterator.Cell_Index());
         F(iterator.Cell_Index())=TV::Cross_Product(vortex_normal_vector,vorticity(iterator.Cell_Index()));}
 }

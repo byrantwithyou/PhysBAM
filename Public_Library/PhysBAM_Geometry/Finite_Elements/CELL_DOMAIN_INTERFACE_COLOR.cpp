@@ -2,8 +2,8 @@
 // Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -33,14 +33,14 @@ CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int col
                 int side=axis*2+s;
                 int sign=s?-1:1;
                 int diff=Flatten_Diff(sign*grid.counts(axis)*TV_INT::Axis_Vector(axis));
-                for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,padding,GRID<TV>::GHOST_REGION,side);it.Valid();it.Next()){
+                for(CELL_ITERATOR<TV> it(grid,padding,GRID<TV>::GHOST_REGION,side);it.Valid();it.Next()){
                     int f=Flatten(it.index);
                     remap(f)=remap(f+diff);}}}
 
     cell_location.Resize(flat_size);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,-padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid,-padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next())
         cell_location(Flatten(it.index))=-1;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(grid,padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next())
         cell_location(Flatten(it.index))=1;
 }
 //#####################################################################

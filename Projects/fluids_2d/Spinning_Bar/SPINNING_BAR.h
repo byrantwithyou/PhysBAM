@@ -15,7 +15,6 @@ class SPINNING_BAR:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> >
 {
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
@@ -116,7 +115,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     TV center=grid.Domain().Center();
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis)(iterator.Face_Index())=
             TV::Cross_Product(VECTOR<T,1>(angular_velocity),iterator.Location()-center)[axis];}

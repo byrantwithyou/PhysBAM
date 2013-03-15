@@ -2,18 +2,18 @@
 // Copyright 2005, Eran Guendelman, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class UNIFORM_GRID_ITERATOR
+// Class GRID_ITERATOR_BASE
 //#####################################################################
 // Serves as base for node and cell iterators
 //#####################################################################
-#ifndef __UNIFORM_GRID_ITERATOR__
-#define __UNIFORM_GRID_ITERATOR__
+#ifndef __GRID_ITERATOR_BASE__
+#define __GRID_ITERATOR_BASE__
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 
 namespace PhysBAM{
 
 template<class TV>
-class UNIFORM_GRID_ITERATOR
+class GRID_ITERATOR_BASE
 {
     typedef VECTOR<int,TV::dimension> TV_INT;
 protected:
@@ -23,8 +23,8 @@ protected:
     TV_INT index;
     bool valid;
 
-    UNIFORM_GRID_ITERATOR(const GRID<TV>& grid_input);
-    UNIFORM_GRID_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& region_input);
+    GRID_ITERATOR_BASE(const GRID<TV>& grid_input);
+    GRID_ITERATOR_BASE(const GRID<TV>& grid_input,const RANGE<TV_INT>& region_input);
 
     void Reset_Regions()
     {number_of_regions=0;}

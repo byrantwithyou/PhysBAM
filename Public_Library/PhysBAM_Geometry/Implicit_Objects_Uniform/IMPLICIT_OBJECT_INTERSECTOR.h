@@ -21,7 +21,6 @@ class IMPLICIT_OBJECT_INTERSECTOR
 private:
     typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::HYPERPLANE T_HYPERPLANE;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef VECTOR<int,TV::dimension+1> T_ELEMENT;typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension>::SIMPLEX T_SIMPLEX;
     typedef IMPLICIT_OBJECT<TV> BASE;
     
@@ -111,7 +110,7 @@ public:
     tets.Append(VECTOR<int,4>(first_midpoint,sixth_midpoint,second_midpoint,third_midpoint));}
 
     void Precompute_Nodal_Phis(const GRID<TV>& grid)
-    {grid_nodal_phis.Resize(grid.Node_Indices(3));for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) grid_nodal_phis(iterator.Node_Index())=Phi(iterator.Location());}
+    {grid_nodal_phis.Resize(grid.Node_Indices(3));for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) grid_nodal_phis(iterator.Node_Index())=Phi(iterator.Location());}
 
     T Extended_Phi(const TV& location) const
     {return implicit_object.Extended_Phi(location);}

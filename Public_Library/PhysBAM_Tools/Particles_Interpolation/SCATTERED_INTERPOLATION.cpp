@@ -5,8 +5,8 @@
 // Class SCATTERED_INTERPOLATION
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Particles_Interpolation/SCATTERED_INTERPOLATION.h>
 using namespace PhysBAM;
@@ -53,12 +53,12 @@ Transfer_With_Distance_Averaged_Weights(ARRAY_VIEW<const TV> domain,ARRAY_VIEW<c
 {
     typedef typename T_ARRAYS_T2::ELEMENT T2;
     assert(!grid.Is_MAC_Grid());
-    for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();TV X=iterator.Location();
+    for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();TV X=iterator.Location();
         grid_data(node)=T2();
         RANGE<TV_INT> index_box=Grid_Influence_Bounds(grid,X);
-        int count=0;for(CELL_ITERATOR cell_iterator(grid,index_box);cell_iterator.Valid();cell_iterator.Next()) count+=points_in_cell(cell_iterator.Cell_Index()).m;
+        int count=0;for(CELL_ITERATOR<TV> cell_iterator(grid,index_box);cell_iterator.Valid();cell_iterator.Next()) count+=points_in_cell(cell_iterator.Cell_Index()).m;
         bool found_data=false;ARRAY<T> weights(count);int weight_index=0;T product=(T)1;
-        for(CELL_ITERATOR cell_iterator(grid,index_box);cell_iterator.Valid();cell_iterator.Next()){TV_INT cell=cell_iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> cell_iterator(grid,index_box);cell_iterator.Valid();cell_iterator.Next()){TV_INT cell=cell_iterator.Cell_Index();
             const ARRAY<int>& point_indices=points_in_cell(cell);
             for(int indirect_index=0;indirect_index<point_indices.m;indirect_index++){
                 weight_index++;int k=point_indices(indirect_index);
@@ -67,7 +67,7 @@ Transfer_With_Distance_Averaged_Weights(ARRAY_VIEW<const TV> domain,ARRAY_VIEW<c
                     T distance=sqrt(distance_squared);found_data=true;weights(weight_index)=product;product*=distance;for(int l=1;l<weight_index;l++) if(weights(l)) weights(l)*=distance;}}}
         if(found_data){
             weight_index=0;T normalization=(T)0;
-            for(CELL_ITERATOR cell_iterator(grid,index_box);cell_iterator.Valid();cell_iterator.Next()){TV_INT cell=cell_iterator.Cell_Index();
+            for(CELL_ITERATOR<TV> cell_iterator(grid,index_box);cell_iterator.Valid();cell_iterator.Next()){TV_INT cell=cell_iterator.Cell_Index();
                 const ARRAY<int>& point_indices=points_in_cell(cell);
                 for(int indirect_index=0;indirect_index<point_indices.m;indirect_index++) if(weights(weight_index++) > 0){
                     int k=point_indices(indirect_index-1);grid_data(node)+=weights(weight_index-1)*range(k);normalization+=weights(weight_index-1);}}
@@ -83,10 +83,10 @@ Transfer_With_Tent_Weights(ARRAY_VIEW<const TV> domain,ARRAY_VIEW<const typename
 
     typedef typename T_ARRAYS_T2::ELEMENT T2;
     assert(!grid.Is_MAC_Grid());
-    for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();TV X=iterator.Location();
+    for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();TV X=iterator.Location();
         grid_data(node)=T2();int used_particles=0;
         RANGE<TV_INT> index_box=Grid_Influence_Bounds(grid,X);
-        for(CELL_ITERATOR cell_iterator(grid,index_box);cell_iterator.Valid();cell_iterator.Next()){TV_INT cell=cell_iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> cell_iterator(grid,index_box);cell_iterator.Valid();cell_iterator.Next()){TV_INT cell=cell_iterator.Cell_Index();
             const ARRAY<int>& point_indices=points_in_cell(cell);
             for(int indirect_index=0;indirect_index<point_indices.m;indirect_index++){
                 int k=point_indices(indirect_index);

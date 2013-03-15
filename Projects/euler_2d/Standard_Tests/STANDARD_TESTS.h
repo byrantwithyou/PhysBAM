@@ -13,8 +13,8 @@
 #include "math.h"
 
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
@@ -240,7 +240,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     fluids_parameters.euler->e_min=1e-6;
 
     //initialize grid variables
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T rho,u_vel,v_vel,p;
         if(test_number==1 || test_number==3 || test_number==4){
             if(grid.X(cell_index).x<=(T).08){rho=state_left(0);u_vel=state_left(1);v_vel=state_left(2);p=state_left(3);}
@@ -324,7 +324,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
         GRID<TV> *grid=new GRID<TV>(TV_INT(80,80),curve->bounding_box->Thickened((T).025));
         ARRAY<T,VECTOR<int,2> > *phi=new ARRAY<T,VECTOR<int,2> >(grid->Domain_Indices());
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*grid);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next())
             (*phi)(iterator.Cell_Index())=curve->Calculate_Signed_Distance(iterator.Location());
         LEVELSET_IMPLICIT_OBJECT<TV> *implicit_object=new LEVELSET_IMPLICIT_OBJECT<TV>(*grid,*phi);
         rigid_body.Add_Structure(*implicit_object);

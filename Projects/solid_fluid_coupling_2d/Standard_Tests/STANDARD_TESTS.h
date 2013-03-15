@@ -52,7 +52,7 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -90,8 +90,6 @@ template<class T_input>
 class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<bool,FACE_INDEX<2> > T_FACE_ARRAYS_BOOL;
 public:
@@ -454,7 +452,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         RANGE<TV_INT> domain_indices=fluids_parameters.grid->Domain_Indices();
         T volume=fluids_parameters.grid->Cell_Size();
         double kinetic_energy=0;
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             int simplex=test_43_triangulated_area->Inside(iterator.Location(),1e-4);
             FACE_INDEX<2> face_index=iterator.Full_Index();
             if(simplex!=0){
@@ -581,7 +579,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 
     if(test_number==43){
         // fluid velocities
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             FACE_INDEX<TV::dimension> face_index=iterator.Full_Index();
             fluid_collection.incompressible_fluid_collection.face_velocities(face_index)=Oscillating_Disk_Domain_Velocity_Sample(iterator.Location())(face_index.axis);
         }
@@ -614,25 +612,25 @@ void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_B
 {
     if(test_number==10 || test_number==11){
         // set left wall velocities
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             face_velocities(axis,face_index)=velocity_multiplier;
             psi_N(axis,face_index)=true;}}
     else if(test_number==12){
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             face_velocities(axis,face_index)=velocity_multiplier;
             psi_N(axis,face_index)=true;}
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,2);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,2);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             face_velocities(axis,face_index)=0;
             psi_N(axis,face_index)=true;}
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             face_velocities(axis,face_index)=0;
             psi_N(axis,face_index)=true;}}
     else if(test_number==13){
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             if(iterator.Location().y>(0.5-sin(velocity_angle)))
                 face_velocities(axis,face_index)=velocity_multiplier*cos(velocity_angle);
@@ -640,11 +638,11 @@ void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_B
                 face_velocities(axis,face_index)=-velocity_multiplier*cos(velocity_angle);
             if(iterator.Location().y>(0.5-sin(velocity_angle)) || iterator.Location().y<(0.5-sin(velocity_angle)-fluids_parameters.grid->DX()(1)))
                 psi_N(axis,face_index)=true;}
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,2);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,2);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             face_velocities(axis,face_index)=-velocity_multiplier*sin(velocity_angle);
             psi_N(axis,face_index)=true;}
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,1);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,1);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             if(iterator.Location().y<(0.5+sin(velocity_angle)))
                 face_velocities(axis,face_index)=-velocity_multiplier*cos(velocity_angle);
@@ -652,21 +650,21 @@ void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_B
                 face_velocities(axis,face_index)=velocity_multiplier*cos(velocity_angle);
             if(iterator.Location().y<(0.5+sin(velocity_angle)) || iterator.Location().y>(0.5+sin(velocity_angle)+fluids_parameters.grid->DX()(1)))
                 psi_N(axis,face_index)=true;}
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             face_velocities(axis,face_index)=velocity_multiplier*sin(velocity_angle);
             psi_N(axis,face_index)=true;}}
     else if(test_number==33){
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
             face_velocities(iterator.Full_Index())=velocity_multiplier;psi_N(iterator.Full_Index())=true;}}
     else if(test_number==35 || test_number==36)
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
             face_velocities(iterator.Full_Index())=velocity_multiplier;psi_N(iterator.Full_Index())=true;}
     else if(test_number==41){
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
             face_velocities(iterator.Full_Index())=1;psi_N(iterator.Full_Index())=true;}}
     else if(test_number==44){
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
             face_velocities(iterator.Full_Index())=1;psi_N(iterator.Full_Index())=true;}}
 }
 //#####################################################################
@@ -675,7 +673,7 @@ void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_B
 void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
 {
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid); it.Valid(); it.Next()){
+    for(FACE_ITERATOR<TV> it(*fluids_parameters.grid); it.Valid(); it.Next()){
         COLLISION_GEOMETRY_ID body_id;
         if(collision_bodies_affecting_fluid.Inside_Any_Body(it.Location(),body_id)) outside(it.Full_Index())=true;}
 }
@@ -685,7 +683,7 @@ void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
 void Mark_Outside(ARRAY<bool,TV_INT>& outside) PHYSBAM_OVERRIDE
 {
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid); it.Valid(); it.Next()){
+    for(CELL_ITERATOR<TV> it(*fluids_parameters.grid); it.Valid(); it.Next()){
         COLLISION_GEOMETRY_ID body_id;
         if(collision_bodies_affecting_fluid.Inside_Any_Body(it.Location(),body_id)) outside(it.index)=true;}
 }

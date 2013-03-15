@@ -7,8 +7,8 @@
 #ifndef __DENSITY_TARGETTING__
 #define __DENSITY_TARGETTING__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Images/IMAGE.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
@@ -22,9 +22,7 @@ class DENSITY_TARGETTING:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_inpu
 {
     typedef T_input T;
 public:
-    typedef VECTOR<T,2> TV;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef VECTOR<int,2> TV_INT;
+    typedef VECTOR<T,2> TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef VECTOR<int,2> TV_INT;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
@@ -278,7 +276,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
-    for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(iterator.Axis())(iterator.Face_Index())=T();
 }
 //#####################################################################
@@ -288,7 +286,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) phi(iterator.Cell_Index())=1;
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) phi(iterator.Cell_Index())=1;
 }
 //#####################################################################
 // Function Initial_Phi_Object
@@ -428,7 +426,7 @@ void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sources,const
         RANGE<TV> source_bounding_box=sources_bounding_box(s);
         RANGE<TV_INT> source_bounding_box_int=RANGE<TV_INT>(grid.Block_Index(TV(source_bounding_box.min_corner.x,source_bounding_box.min_corner.y),1),
                 grid.Block_Index(TV(source_bounding_box.max_corner.x,source_bounding_box.max_corner.y),1));
-        for(NODE_ITERATOR node_iterator(grid,source_bounding_box_int);node_iterator.Valid();node_iterator.Next()){
+        for(NODE_ITERATOR<TV> node_iterator(grid,source_bounding_box_int);node_iterator.Valid();node_iterator.Next()){
             TV location=node_iterator.Location();TV_INT block=grid.Block_Index(location,1);
             T target_density_factor=1;
             if(use_initial_targetting) target_density_factor=Target_Density_Factor(location,targetting_time_start+targetting_falloff_time);
@@ -449,7 +447,7 @@ void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sources,const
 void Create_Levelset_For_SPH(LEVELSET<TV> &levelset) const
 {
     GRID<TV>& grid=*fluids_parameters.grid;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) levelset.phi(iterator.Cell_Index())=fluids_parameters.sph_evolution->cell_weight(iterator.Cell_Index())>0?1:-1;
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) levelset.phi(iterator.Cell_Index())=fluids_parameters.sph_evolution->cell_weight(iterator.Cell_Index())>0?1:-1;
     levelset.Fast_Marching_Method();
 }
 //#####################################################################

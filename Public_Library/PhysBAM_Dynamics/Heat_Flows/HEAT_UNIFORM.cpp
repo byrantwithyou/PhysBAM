@@ -2,8 +2,8 @@
 // Copyright 2002-2006, Ronald Fedkiw, Geoffrey Irving, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Math_Tools/max.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
@@ -33,12 +33,12 @@ Euler_Step(const T dt,const T time)
 {
     TV kappa_over_DX2=kappa*sqr(grid.one_over_dX);
     laplace.f.Fill(0);
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(!laplace.psi_D(cell))
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(!laplace.psi_D(cell))
         for(int axis=0;axis<T_GRID::dimension;axis++){
             TV_INT face1=iterator.First_Face_Index(axis),face2=iterator.Second_Face_Index(axis),offset=TV_INT::Axis_Vector(axis);
             if(!laplace.psi_N.Component(axis)(face1)) laplace.f(cell)-=(Q(cell)-Q(cell-offset))*kappa_over_DX2[axis];
             if(!laplace.psi_N.Component(axis)(face2)) laplace.f(cell)+=(Q(cell+offset)-Q(cell))*kappa_over_DX2[axis];}}
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();Q(cell)+=dt*laplace.f(cell);}
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();Q(cell)+=dt*laplace.f(cell);}
 }
 //#####################################################################
 // Function CFL
@@ -56,7 +56,7 @@ CFL()
 template<class T_GRID> void HEAT_UNIFORM<T_GRID>::
 Backward_Euler_Calculate_Right_Hand_Side(const T dt,const T time)
 {
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();laplace.f(cell)=Q(cell);}
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();laplace.f(cell)=Q(cell);}
 }
 //#####################################################################
 // Function Backward_Euler_Step
@@ -75,7 +75,7 @@ template<class T_GRID> void HEAT_UNIFORM<T_GRID>::
 Crank_Nicolson_Calculate_Right_Hand_Side(const T dt,const T time)
 {
     TV half_dt_kappa_over_DX2=(T).5*dt*kappa*sqr(grid.one_over_dX);
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         laplace.f(cell)=Q(cell);
         if(!laplace.psi_D(cell)){
             for(int axis=0;axis<T_GRID::dimension;axis++){
@@ -84,7 +84,7 @@ Crank_Nicolson_Calculate_Right_Hand_Side(const T dt,const T time)
                 if(!laplace.psi_N.Component(axis)(face2)) laplace.f(cell)+=(Q(cell+offset)-Q(cell))*half_dt_kappa_over_DX2[axis];}}}
 
     if(laplace.second_order_cut_cell_method)
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index(),cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index(),cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
             if(!laplace.psi_N.Component(axis)(face) && LEVELSET_UTILITIES<T>::Interface(laplace.levelset->phi(cell1),laplace.levelset->phi(cell2))){
                 T theta=LEVELSET_UTILITIES<T>::Theta(laplace.levelset->phi(cell1),laplace.levelset->phi(cell2));
                 if(laplace.psi_D(cell1) && !laplace.psi_D(cell2)){

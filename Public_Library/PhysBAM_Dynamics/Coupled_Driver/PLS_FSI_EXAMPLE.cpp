@@ -3,10 +3,10 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -158,7 +158,7 @@ Add_To_Fluid_Simulation(DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_colli
 template<class TV_input> template<class GEOMETRY> void PLS_FSI_EXAMPLE<TV_input>::
 Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity)
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(source.Lazy_Inside(world_to_source.Homogeneous_Times(iterator.Location()))){
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(source.Lazy_Inside(world_to_source.Homogeneous_Times(iterator.Location()))){
         int axis=iterator.Axis();fluids_parameters.incompressible->projection.elliptic_solver->psi_N.Component(axis)(iterator.Face_Index())=true;
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis)(iterator.Face_Index())=constant_source_velocity[axis];}
 }
@@ -168,7 +168,7 @@ Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& worl
 template<class TV_input> template<class GEOMETRY> void PLS_FSI_EXAMPLE<TV_input>::
 Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity,const ARRAY<bool,FACE_INDEX<TV::m> >& invalid_mask)
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
         if(!invalid_mask(axis,face_index) && source.Lazy_Inside(world_to_source.Homogeneous_Times(iterator.Location()))){
             fluids_parameters.incompressible->projection.elliptic_solver->psi_N.Component(axis)(face_index)=true;
             fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis)(face_index)=constant_source_velocity[axis];}}
@@ -179,7 +179,7 @@ Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& worl
 template<class TV_input> template<class GEOMETRY> void PLS_FSI_EXAMPLE<TV_input>::
 Adjust_Phi_With_Source(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source)
 {
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){TV source_X=world_to_source.Homogeneous_Times(iterator.Location());
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){TV source_X=world_to_source.Homogeneous_Times(iterator.Location());
         if(source.Lazy_Inside(source_X)) 
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=min(fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index()),
                                                                                           source.Signed_Distance(source_X));}
@@ -192,7 +192,7 @@ Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORM
 {
     T bandwidth=3*fluids_parameters.grid->Minimum_Edge_Length();
     ARRAY<ARRAY<T,TV_INT> >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         TV source_X=world_to_source.Homogeneous_Times(iterator.Location());
         if(source.Inside(source_X,-bandwidth)){
             T source_signed_distance=source.Signed_Distance(source_X);
@@ -264,10 +264,10 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,const ARR
     GRID<TV>& grid=*fluids_parameters.grid;
     T maximum_fluid_speed=face_velocities.Max_Abs().Max(),maximum_particle_speed=0;
     PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0);
-    if(particle_levelset.use_removed_negative_particles) for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
+    if(particle_levelset.use_removed_negative_particles) for(CELL_ITERATOR<TV> iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=particle_levelset.removed_negative_particles(iterator.Cell_Index());
             if(particles) maximum_particle_speed=max(maximum_particle_speed,particles->V.Maximum_Magnitude());}
-    if(particle_levelset.use_removed_positive_particles) for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
+    if(particle_levelset.use_removed_positive_particles) for(CELL_ITERATOR<TV> iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=particle_levelset.removed_positive_particles(iterator.Cell_Index());
             if(particles) maximum_particle_speed=max(maximum_particle_speed,particles->V.Maximum_Magnitude());}
     T max_particle_collision_distance=0;
@@ -431,13 +431,13 @@ Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dime
     psi_N_value.Fill(0);
 
     GRID<TV>& grid=*fluids_parameters.grid;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,3,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid,3,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){
         psi_D(it.index)=true;
         /*Add_Debug_Particle(it.Location(), VECTOR<T,3>(1,0,0));*/}
     for(int d=0;d<TV::m;d++)
         for(int i=0;i<2;i++)
             if(fluids_parameters.domain_walls(d)(i))
-                for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,i+2*(d-1),-1);it.Valid();it.Next()){
+                for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,i+2*(d-1),-1);it.Valid();it.Next()){
                     psi_N(it.Full_Index())=true;
                     /*Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,0));*/}
 

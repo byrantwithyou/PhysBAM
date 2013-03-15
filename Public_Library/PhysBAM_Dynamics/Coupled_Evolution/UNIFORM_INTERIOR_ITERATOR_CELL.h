@@ -7,18 +7,18 @@
 #ifndef __UNIFORM_INTERIOR_ITERATOR_CELL__
 #define __UNIFORM_INTERIOR_ITERATOR_CELL__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 
 namespace PhysBAM{
 
 template<class TV> class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO;
 template<class TV>
-class UNIFORM_INTERIOR_ITERATOR_CELL:public UNIFORM_GRID_ITERATOR_CELL<TV>
+class UNIFORM_INTERIOR_ITERATOR_CELL:public CELL_ITERATOR<TV>
 {
 public:
     enum WORKAROUND {d=TV::dimension};
     typedef typename TV::SCALAR T;typedef VECTOR<int,d> TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> BASE;
+    typedef CELL_ITERATOR<TV> BASE;
     using BASE::Valid;using BASE::index;
 
     const ARRAY<bool,TV_INT>& outside_fluid;

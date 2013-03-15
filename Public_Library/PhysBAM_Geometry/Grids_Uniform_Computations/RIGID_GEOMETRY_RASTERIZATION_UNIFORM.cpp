@@ -5,9 +5,9 @@
 // Namespace RASTERIZATION
 //##################################################################### 
 #include <PhysBAM_Tools/Grids_Uniform/BLOCK_UNIFORM.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/OBJECTS_IN_CELL.h>
@@ -35,7 +35,7 @@ template<class T,class TV,class T_GRID> void Compute_Occupied_Blocks(const COLLI
     typedef typename REBIND<TV,int>::TYPE TV_INT;
     if(collision_geometry.Number_Of_Simplices()) Compute_Occupied_Blocks_Generic(collision_geometry,grid,occupied,with_body_motion,extra_thickness,body_thickness_factor);
     else{
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> node_iterator(grid,2);node_iterator.Valid();node_iterator.Next()){
+        for(NODE_ITERATOR<TV> node_iterator(grid,2);node_iterator.Valid();node_iterator.Next()){
             TV_INT block_index=node_iterator.Node_Index();BLOCK_UNIFORM<T_GRID> block(grid,block_index);
             for(int cell_index=0;cell_index<T_GRID::number_of_cells_per_block;cell_index++){TV_INT cell=block.Cell(cell_index);
                 if(collision_geometry.Implicit_Geometry_Extended_Value(grid.X(cell))<=extra_thickness){occupied(block_index)=true;break;}}}}
@@ -46,7 +46,7 @@ template<class T,class TV,class T_GRID> void Compute_Occupied_Blocks(const COLLI
 template<class TV,class T_GRID> void Rasterize_Box_Onto_Blocks(const T_GRID& grid,ARRAY<bool,VECTOR<int,TV::m> >& occupied,const RANGE<TV>& box)
 {
     TV DX_over_two=(typename TV::SCALAR).5*grid.dX;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,grid.Clamp_To_Cell(box.Translated(-DX_over_two),3));iterator.Valid();iterator.Next())
+    for(CELL_ITERATOR<TV> iterator(grid,grid.Clamp_To_Cell(box.Translated(-DX_over_two),3));iterator.Valid();iterator.Next())
         occupied(iterator.Cell_Index()+1)=true;
 }
 //#####################################################################
@@ -54,7 +54,7 @@ template<class TV,class T_GRID> void Rasterize_Box_Onto_Blocks(const T_GRID& gri
 //#####################################################################
 template<class TV,class T_GRID> void Rasterize_Box(const T_GRID& grid,OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>& objects_in_cell,const RANGE<TV>& box,const COLLISION_GEOMETRY_ID id)
 {
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,grid.Clamp_To_Cell(box,3));iterator.Valid();iterator.Next())
+    for(CELL_ITERATOR<TV> iterator(grid,grid.Clamp_To_Cell(box,3));iterator.Valid();iterator.Next())
         objects_in_cell.Add_Object_To_Cell(iterator.Cell_Index(),id);
 }
 //#####################################################################

@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -24,7 +24,7 @@ Print_Mass(std::string& input_directory,GRID<TV>& grid,int frame)
     if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);for(int i=0;i<last_frame;i++) Print_Mass(input_directory,grid,i);return;}
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     T total_density=0;ARRAY<T,TV_INT> density;FILE_UTILITIES::Read_From_File<T>(input_directory+"/"+f+"/density",density);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         total_density+=density(iterator.Cell_Index())*grid.dX.Min();}
     LOG::cout<<total_density<<std::endl;
 }
@@ -39,7 +39,7 @@ Print_Momentum(std::string& input_directory,GRID<TV>& grid,int frame)
     if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);for(int i=0;i<last_frame;i++) Print_Momentum(input_directory,grid,i);return;}
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     T total_l=0;ARRAY<T,FACE_INDEX<TV::dimension> > u;FILE_UTILITIES::Read_From_File<T>(input_directory+"/"+f+"/mac_velocities",u);
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         total_l+=u(iterator.Full_Index())*grid.dX(iterator.Axis());}
     LOG::cout<<total_l<<std::endl;
 }
@@ -57,7 +57,7 @@ Print_Energy(std::string& input_directory,GRID<TV>& grid,int frame)
     T total_k=0;ARRAY<T,FACE_INDEX<TV::dimension> > u;bool kinetic=false;
     if(FILE_UTILITIES::Frame_File_Exists(filename,frame)){kinetic=true;FILE_UTILITIES::Read_From_File<T>(input_directory+"/"+f+"/kinetic_energy",u);}
     else FILE_UTILITIES::Read_From_File<T>(input_directory+"/"+f+"/mac_velocities",u);
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         if(kinetic) total_k+=u(iterator.Full_Index())*grid.dX(iterator.Axis());
         else total_k+=.5*1000*u(iterator.Full_Index())*u(iterator.Full_Index())*grid.dX(iterator.Axis());}
     LOG::cout<<total_k<<std::endl;
@@ -75,7 +75,7 @@ Print_Density(std::string& input_directory,GRID<TV>& grid,int frame,const RANGE<
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     ARRAY<T,TV_INT> density;FILE_UTILITIES::Read_From_File<T>(input_directory+"/"+f+"/density",density);
     RANGE<TV_INT> cell_range;cell_range.min_corner=grid.Index(range.min_corner);cell_range.max_corner=grid.Index(range.max_corner);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,cell_range);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,cell_range);iterator.Valid();iterator.Next()){
         LOG::cout<<iterator.Location().x<<"\t"<<density(iterator.Cell_Index())<<std::endl;}
 }
 //#####################################################################

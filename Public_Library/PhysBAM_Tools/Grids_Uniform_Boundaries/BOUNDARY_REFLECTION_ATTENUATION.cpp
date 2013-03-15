@@ -5,7 +5,7 @@
 // Class BOUNDARY_REFLECTION_ATTENUATION
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_ATTENUATION.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -26,7 +26,7 @@ Fill_Single_Ghost_Region(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost
 {
     if(Constant_Extrapolation(side)){
         int axis=side/2,boundary=Boundary(side,region);
-        for(CELL_ITERATOR iterator(grid,region);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid,region);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index(),boundary_cell=cell_index;boundary_cell[axis]=boundary;
             T2 boundary_value=u_ghost(boundary_cell);
             u_ghost(cell_index)=Attenuate_To_Far_Field_Value(boundary_value,dt);}}

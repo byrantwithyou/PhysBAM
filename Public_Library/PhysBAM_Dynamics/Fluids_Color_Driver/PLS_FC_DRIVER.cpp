@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
@@ -122,7 +122,7 @@ Initialize()
         example.Read_Output_Files(example.restart);}
     else{
         example.Rebuild_Levelset_Color();
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells);it.Valid();it.Next())
+        for(FACE_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells);it.Valid();it.Next())
             example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
         example.prev_face_color.Fill(-9);
         example.particle_levelset_evolution_multiple.Make_Signed_Distance();
@@ -147,7 +147,7 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Update_Pls(T dt)
 {
     T maximum_fluid_speed=0;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         int c=example.face_color(it.Full_Index());
         if(c<0) continue;
         maximum_fluid_speed=max(maximum_fluid_speed,abs(example.face_velocities(c)(it.Full_Index())));}
@@ -278,7 +278,7 @@ No_Advection_And_BDF(T dt,bool first_step,int c)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Assert_Advection_CFL(const ARRAY<T,FACE_INDEX<TV::m> >& u,const ARRAY<int,FACE_INDEX<TV::m> >& color,int c,T dt) const
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next())
+    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next())
         if(color(it.Full_Index())==c){
             PHYSBAM_ASSERT(u(it.Full_Index())*dt<example.grid.dX(it.Axis())*example.number_of_ghost_cells);}
 }
@@ -401,7 +401,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         iss.Multiply(*iss.null_modes(i),*vectors(0));
         LOG::cout<<"null mode["<<i<<"] "<<iss.Convergence_Norm(*vectors(0))<<std::endl;}
     
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         int c=example.levelset_color.Color(it.Location());
         example.face_color(it.Full_Index())=c;
         if(c<0) continue;
@@ -409,7 +409,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         assert(k>=0);
         example.face_velocities(c)(it.Full_Index())=sol.u(it.Axis())(c)(k);}
     
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+    for(FACE_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
     vectors.Delete_Pointers_And_Clean_Memory();
     
@@ -425,10 +425,10 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color,int c)
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next())
+    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next())
         if(color(it.Full_Index())!=c)
             u(it.Full_Index())=1e20;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+    for(FACE_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         u(it.Full_Index())=1e20;
     
     const LEVELSET<TV>& phi=*example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(c);
@@ -539,7 +539,7 @@ Dump_Largest_Eigenvector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ARRAY<KRYL
             LOG::cout<<"eig approx "<<a<<"   dp "<<iss.Inner_Product(sol,tmp)<<std::endl;
             tmp=sol;}
 
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){
+        for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
             int c=example.levelset_color.Color(it.Location());
             example.face_color(it.Full_Index())=c;
             if(c<0) continue;

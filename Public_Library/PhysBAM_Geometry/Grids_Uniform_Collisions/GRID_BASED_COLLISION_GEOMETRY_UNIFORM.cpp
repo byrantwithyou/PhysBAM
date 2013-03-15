@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
@@ -71,13 +71,13 @@ Compute_Grid_Visibility()
     if(!collision_geometry_collection.bodies.m) return;
 
     // cell neighbors
-    for(FACE_ITERATOR iterator(grid,3,T_GRID::INTERIOR_REGION);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid,3,T_GRID::INTERIOR_REGION);iterator.Valid();iterator.Next()){
         TV_INT cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
         ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cells(cell1,cell2,collision_geometry_collection.bodies.m,objects);if(!objects.m) continue;
         if(collision_geometry_collection.Intersection_Between_Points(grid.Center(cell1),grid.Center(cell2),&objects)) cell_neighbors_visible(cell1)(iterator.Axis())=false;}
 
     // face neighbors
-    for(FACE_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT index=iterator.Face_Index();
+    for(FACE_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT index=iterator.Face_Index();
         for(int direction=0;direction<T_GRID::dimension;direction++){TV_INT direction_offset=TV_INT::Axis_Vector(direction);
             ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cells(iterator.Second_Cell_Index(),iterator.Second_Cell_Index()+direction_offset,collision_geometry_collection.bodies.m,objects);
             if(!objects.m) continue;
@@ -91,7 +91,7 @@ template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
 Compute_Psi_N(T_FACE_ARRAYS_BOOL& psi_N,T_FACE_ARRAYS_SCALAR* face_velocities) const
 {
     if(!collision_geometry_collection.bodies.m) return;
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
         ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cells(cell1,cell2,collision_geometry_collection.bodies.m,objects);if(!objects.m) continue;
         int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();COLLISION_GEOMETRY_ID body_id;int count=0;T velocity=0;
@@ -112,7 +112,7 @@ template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
 Compute_Psi_N_Zero_Velocity(T_FACE_ARRAYS_BOOL& psi_N,T_FACE_ARRAYS_SCALAR* face_velocities) const
 {
     if(!collision_geometry_collection.bodies.m) return;
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
         ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cells(cell1,cell2,collision_geometry_collection.bodies.m,objects);if(!objects.m) continue;
         int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();COLLISION_GEOMETRY_ID body_id;int count=0;
@@ -135,7 +135,7 @@ Compute_Simplices_In_Cell(ARRAY<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV_INT>&
         int n=body->Number_Of_Simplices();
         for(int e=0;e<n;e++){
             RANGE<TV> box=body->World_Space_Simplex(e).Bounding_Box().Thickened(thickness);
-            for(CELL_ITERATOR iterator(grid,grid.Clamp_To_Cell(box,ghost_cells+1));iterator.Valid();iterator.Next())
+            for(CELL_ITERATOR<TV> iterator(grid,grid.Clamp_To_Cell(box,ghost_cells+1));iterator.Valid();iterator.Next())
                 simplices_in_cell(iterator.Cell_Index()).Append(PAIR<COLLISION_GEOMETRY_ID,int>(i,e));}}
 }
 //#####################################################################

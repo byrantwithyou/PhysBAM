@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
@@ -66,18 +66,18 @@ Register_Nodes(boost::function<bool(const TV_INT& index)> inside_mask,ARRAY<VECT
             neighbors_inside.Append(index);}
 
     if(!periodic)
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,fill_width,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+        for(NODE_ITERATOR<TV> it(grid,fill_width,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
             node_to_index(it.index)=-1;
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         bool b=inside_mask(it.index);
         node_to_index(it.index)=-1-b;}
 
     if(!periodic)
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+        for(NODE_ITERATOR<TV> it(grid,1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
             Add_Neighbors(next_inside,neighbors_inside,it.index,-2,-4);
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         bool b=inside_mask(it.index);
         if(b) Add_Neighbors(next_outside,neighbors_outside,it.index,-1,-3);
         else Add_Neighbors(next_inside,neighbors_inside,it.index,-2,-4);}
@@ -207,7 +207,7 @@ Extrapolate_Node(boost::function<bool(const TV_INT& index)> inside_mask,ARRAYS_N
     for(int i=solve_indices(0).min_corner;i<solve_indices(0).max_corner;i++) u(index_to_node(i))=du[0](i);
     if(periodic)
         for(int a=0;a<TV::m;a++)
-            for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*a+1);it.Valid();it.Next()){
+            for(NODE_ITERATOR<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*a+1);it.Valid();it.Next()){
                 TV_INT itindex=it.index;
                 itindex(a)-=combine_ends(a);
                 TV_INT index=itindex;

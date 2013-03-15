@@ -2,9 +2,9 @@
 // Copyright 2005-2006, Eran Guendelman, Geoffrey Irving, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Parallel_Computation/LOCAL_GRID.h>
 using namespace PhysBAM;
@@ -59,7 +59,7 @@ Initialize()
 template<class T_GRID> template<class T_ARRAYS> void LOCAL_GRID<T_GRID>::
 Put(const T_ARRAYS& local_data,const RANGE<TV_INT>& region,T_ARRAYS& global_data) const
 {
-    CELL_ITERATOR local(grid,region),global(grid,region+offset);
+    CELL_ITERATOR<TV> local(grid,region),global(grid,region+offset);
     for(;local.Valid();local.Next(),global.Next()) if(global_data.Valid_Index(global.Cell_Index()) && local_data.Valid_Index(local.Cell_Index()))
         global_data(global.Cell_Index())=local_data(local.Cell_Index());
 }
@@ -81,7 +81,7 @@ template<class T_GRID> template<class T_ARRAYS> void LOCAL_GRID<T_GRID>::
 Get(const T_ARRAYS& global_data,T_ARRAYS& local_data) const
 {
     RANGE<TV_INT> region=local_data.Domain_Indices();
-    CELL_ITERATOR local(grid,region),global(grid,region+offset);
+    CELL_ITERATOR<TV> local(grid,region),global(grid,region+offset);
     for(;local.Valid();local.Next(),global.Next()) local_data(local.Cell_Index())=global_data(global.Cell_Index());
 }
 //#####################################################################
@@ -99,7 +99,7 @@ template<class T_GRID> template<class T_ARRAYS> typename T_GRID::VECTOR_T::SCALA
 Maximum_Error(const T_ARRAYS& local_data,const T_ARRAYS& global_data,const int bandwidth,TV_INT& index,const RANGE<TV_INT>& sentinels) const
 {
     RANGE<TV_INT> region=Interior_Region(sentinels).Thickened(bandwidth);
-    T max_error=0;CELL_ITERATOR local(grid,region),global(grid,region+offset);
+    T max_error=0;CELL_ITERATOR<TV> local(grid,region),global(grid,region+offset);
     for(;local.Valid();local.Next(),global.Next()) if(global_data.Valid_Index(global.Cell_Index()) && local_data.Valid_Index(local.Cell_Index())){
             T error=sqrt((T)Magnitude_Squared(global_data(global.Cell_Index())-local_data(local.Cell_Index())));
         if(max_error<error){max_error=error;index=local.Cell_Index();}}

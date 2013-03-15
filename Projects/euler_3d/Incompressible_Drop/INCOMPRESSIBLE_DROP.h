@@ -12,9 +12,9 @@
 #include <iostream>
 #include "math.h"
 
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Equations_Of_State/EOS_GAMMA.h>
@@ -135,9 +135,9 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(iterator.Axis())(iterator.Face_Index())=(T)0;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
         fluids_parameters.incompressible->projection.p(iterator.Cell_Index())=(T).5;
 }
 //#####################################################################
@@ -149,7 +149,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     ARRAY<T,VECTOR<int,3> >& phi=fluids_parameters.particle_levelset_evolution->phi;
     ARRAY<bool,VECTOR<int,3> > psi_cut_out(grid.Domain_Indices(),true);
     TV drop_center((T)-1,(T)0,(T)0);T drop_radius=(T).2;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         VECTOR<int,3> cell_index=iterator.Cell_Index();TV X=iterator.Location();
         phi(cell_index)=TV(X-drop_center).Magnitude()-drop_radius;
         if(phi(cell_index)>0) psi_cut_out(cell_index)=true;}
@@ -165,7 +165,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     EOS_GAMMA<T> *tmp_eos = dynamic_cast<EOS_GAMMA<T>*>(fluids_parameters.euler->eos);
 
     //initialize grid variables
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         T rho=(T)0.,u_vel=(T)0.,v_vel=(T)0.,w_vel=(T)0.,p=(T)0.;
         if(grid.X(cell_index).x<=-1.5){rho=(T)2.124;p=(T)1.5;}

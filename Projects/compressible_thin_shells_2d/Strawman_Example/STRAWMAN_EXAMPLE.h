@@ -1,8 +1,8 @@
 #ifndef __STRAWMAN_EXAMPLE__
 #define __STRAWMAN_EXAMPLE__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_CONSERVATIVE_ENO.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
@@ -92,11 +92,11 @@ public:
     {return initial_distance+solid_velocity*time;}
 
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next())
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             V_levelset(iterator.Full_Index())=fluid_velocity_field(iterator.Location(),time)(iterator.Axis());
     }
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next())
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             V_levelset(iterator.Full_Index())=fluid_velocity_field(iterator.Location(),time)(iterator.Axis());
     }
 
@@ -192,7 +192,7 @@ void Initialize()
     { // PLS
         T time=Time_At_Frame(0);
         collision_bodies_affecting_fluid.Compute_Psi_N_Zero_Velocity(face_valid_mask);
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
             face_valid_mask(iterator.Full_Index())=!face_valid_mask(iterator.Full_Index());
             face_velocities(iterator.Full_Index())=fluid_velocity_field(iterator.Location(),time)(iterator.Axis());}
         pls_boundary.Set_Velocity_Pointer(face_velocities);
@@ -223,7 +223,7 @@ void Initialize()
             pls_evolution->Particle_Levelset(0).Set_Band_Width(6);
         }
 
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next())
             pls_evolution->Particle_Levelset(0).levelset.phi(iterator.Cell_Index())=initial_phi(iterator.Location());
         pls_evolution->Make_Signed_Distance();
         pls_evolution->Fill_Levelset_Ghost_Cells(time);
@@ -234,7 +234,7 @@ void Initialize()
         pls_boundary.Use_Extrapolation_Mode(false);
     }
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
         rho(iterator.Cell_Index())=analytic_solution(iterator.Location(),(T)0);
         phi(iterator.Cell_Index())=initial_phi(iterator.Location());
         velocity(iterator.Cell_Index())=fluid_velocity_field(iterator.Location(),(T)0);}
@@ -249,7 +249,7 @@ void Fill_Solid_Cells(const T time,const T solid_boundary,T_ARRAY_SCALAR& rho,T_
     if(fill_ghost_region) num_ghost_cells=solid_clamped_tn.y+3;
 
     // Fill the ghost region
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,3,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();TV location=iterator.Location();
         rho(cell_index)=analytic_solution(location,time);
         velocity(cell_index)=fluid_velocity_field(location,time);
@@ -303,7 +303,7 @@ void Fill_Uncovered_Cells(const T& dt,const T& time,T_ARRAY_SCALAR& scalar_field
                     TV surface_normal=TV(0,(T)1);
                     SYMMETRIC_MATRIX<T,2> transform=SYMMETRIC_MATRIX<T,2>::Identity_Matrix() -
                         (T)2*SYMMETRIC_MATRIX<T,2>(surface_normal.x*surface_normal.x,surface_normal.x*surface_normal.y,surface_normal.y*surface_normal.y);
-                    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(stencil_grid,3);iterator.Valid();iterator.Next()){
+                    for(CELL_ITERATOR<TV> iterator(stencil_grid,3);iterator.Valid();iterator.Next()){
                         TV location=stencil_center+transform*iterator.Location();
                         stencil_velocity(iterator.Cell_Index())=fluid_velocity_field(location,time);
                         stencil_scalar_field_ghost(iterator.Cell_Index())=interpolation.Clamped_To_Array(grid,scalar_field_tmp,location);}
@@ -318,7 +318,7 @@ void Fill_Uncovered_Cells(const T& dt,const T& time,T_ARRAY_SCALAR& scalar_field
 //#####################################################################
 void Euler_Step(const T dt, const T time){
     const T solid_boundary=solid_position(time);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next())
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
         velocity(iterator.Cell_Index())=fluid_velocity_field(iterator.Location(),time);
 
     rigid_geometry_collection.particles.frame(1).t.y=solid_position(time);collision_bodies_affecting_fluid.Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,time);
@@ -334,7 +334,7 @@ void Euler_Step(const T dt, const T time){
     collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_fluid_speed+2*max_particle_collision_distance+(T).5*grid.dX.Max(),10);
     collision_bodies_affecting_fluid.Compute_Grid_Visibility();
     face_valid_mask.Fill(false); collision_bodies_affecting_fluid.Compute_Psi_N_Zero_Velocity(face_valid_mask);
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
         face_valid_mask(iterator.Full_Index())=!face_valid_mask(iterator.Full_Index());
         face_velocities(iterator.Full_Index())=fluid_velocity_field(iterator.Location(),time)(iterator.Axis());}
     pls_boundary.Use_Extrapolation_Mode(false);
@@ -351,7 +351,7 @@ void Euler_Step(const T dt, const T time){
     }
 
     if(method==ANALYTIC){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
             rho(iterator.Cell_Index())=analytic_solution(iterator.Location(),time);
             phi(iterator.Cell_Index())=initial_phi(iterator.Location()-time*velocity(iterator.Cell_Index()));}
         rigid_geometry_collection.particles.frame(1).t.y=solid_position(time+dt);
@@ -365,7 +365,7 @@ void Euler_Step(const T dt, const T time){
 
     Fill_Uncovered_Cells(dt,time,rho,rho_tmp);
     Fill_Uncovered_Cells(dt,time,phi,phi_tmp);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,3,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();TV location=iterator.Location(),t0_location=location-(time+dt)*velocity(cell_index);
         rho(cell_index)=analytic_solution(location,time+dt);
         phi(cell_index)=initial_phi(t0_location);}

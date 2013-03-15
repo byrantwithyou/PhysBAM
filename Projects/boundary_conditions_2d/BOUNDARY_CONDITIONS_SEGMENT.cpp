@@ -1,4 +1,4 @@
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include "BOUNDARY_CONDITIONS_SEGMENT.h"
@@ -38,7 +38,7 @@ Boundary_Condition(const TV& X,const TV& Y,T& theta,TV& value,T time) const
 template<class TV> void BOUNDARY_CONDITIONS_SEGMENT<TV>::
 Initialize_Velocity_Field(ARRAY<T,FACE_INDEX<TV::m> >& u,T time) const
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,2);it.Valid();it.Next())
+    for(FACE_ITERATOR<TV> it(grid,2);it.Valid();it.Next())
         u(it.Full_Index())=Analytic_Velocity(it.Location(),time)(it.Axis());
 }
 

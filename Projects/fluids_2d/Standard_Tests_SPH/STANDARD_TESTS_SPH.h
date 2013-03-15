@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __STANDARD_TESTS_SPH__
 #define __STANDARD_TESTS_SPH__
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Matrices/FRAME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
@@ -26,8 +26,6 @@ class STANDARD_TESTS_SPH:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_inpu
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
-
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::test_number;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::fluid_collection;using BASE::solid_body_collection;using BASE::parse_args;
@@ -195,16 +193,16 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 void Get_Object_Velocities(PROJECTION_UNIFORM<GRID<TV> >& projection,const T dt,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==1 && time<4)
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(iterator.Location().x<(T).7){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(iterator.Location().x<(T).7){
             fluids_parameters.incompressible->projection.elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;
             fluid_collection.incompressible_fluid_collection.face_velocities(iterator.Axis(),iterator.Face_Index())=0;}
     if(test_number==5){
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(sphere.Lazy_Inside(iterator.Location())){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(sphere.Lazy_Inside(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;
             fluid_collection.incompressible_fluid_collection.face_velocities(iterator.Axis(),iterator.Face_Index())=0;}
     }
     if(test_number==6){
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(rigid->Implicit_Geometry_Lazy_Inside(iterator.Location())){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(rigid->Implicit_Geometry_Lazy_Inside(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;
             fluid_collection.incompressible_fluid_collection.face_velocities(iterator.Axis(),iterator.Face_Index())=rigid->Pointwise_Object_Velocity(iterator.Location())[iterator.Axis()];}
     }   

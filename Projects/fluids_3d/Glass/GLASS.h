@@ -7,7 +7,7 @@
 #ifndef __GLASS__
 #define __GLASS__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
@@ -22,9 +22,8 @@ class GLASS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
 {
     typedef T_input T;
 public:
-    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
@@ -198,7 +197,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     ARRAY<T,VECTOR<int,3> >& phi=fluids_parameters.particle_levelset_evolution->phi;
     T initial_phi;
     LOG::cout<<"setting phi values"<<std::endl;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV X=iterator.Location();
         initial_phi=1;
         for(int s=0;s<sources.m;s++)initial_phi=min(initial_phi,sources(s).Signed_Distance(world_to_sources(s).Homogeneous_Times(X)));
@@ -267,7 +266,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 
     for(int s=0;s<sources.m;s++){
         RANGE<TV_INT> source_nodes(grid.Clamp_To_Cell(sources(s).Bounding_Box().Minimum_Corner()),grid.Clamp_To_Cell(sources(s).Bounding_Box().Maximum_Corner())+TV_INT::All_Ones_Vector());
-        for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
+        for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
             if(!removed_positive_particles(block)) continue;
             for(int p=0;p<removed_positive_particles(block)->Size();p++)
                 if(sources(s).Inside(removed_positive_particles(block)->X(p),-(T)1e-4)) removed_positive_particles(block)->Add_To_Deletion_List(p);
@@ -298,11 +297,10 @@ void Add_SPH_Particles_For_Sources(const T dt,const T time) PHYSBAM_OVERRIDE
     GRID<TV>& grid=fluids_parameters.particle_levelset_evolution->grid;
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& removed_negative_particles=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles;
     for(int s=0;s<sph_sources.m;s++){
-        typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
         RANGE<TV> source_bounding_box=sph_sources(s).Bounding_Box();
         RANGE<TV_INT> source_bounding_box_int=RANGE<TV_INT>(grid.Block_Index(TV(source_bounding_box.min_corner.x,source_bounding_box.min_corner.y,source_bounding_box.min_corner.z),1),
              grid.Block_Index(TV(source_bounding_box.max_corner.x,source_bounding_box.max_corner.y,source_bounding_box.max_corner.z),1));
-        for(NODE_ITERATOR node_iterator(grid,source_bounding_box_int);node_iterator.Valid();node_iterator.Next()){
+        for(NODE_ITERATOR<TV> node_iterator(grid,source_bounding_box_int);node_iterator.Valid();node_iterator.Next()){
             TV location=node_iterator.Location();TV_INT block=grid.Block_Index(location,1);
             BLOCK_UNIFORM<GRID<TV> > block_uniform(grid,block);
             RANGE<TV> block_bounding_box=block_uniform.Bounding_Box();

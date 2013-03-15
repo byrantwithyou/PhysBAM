@@ -4,8 +4,8 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parallel_Computation/LOCAL_GRID.h>
@@ -26,7 +26,7 @@ template<class T,class T_GRID,class RW>
 class MERGER
 {
 public:
-    typedef typename T_GRID::VECTOR_T TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
+    typedef typename T_GRID::VECTOR_T TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
     typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename T_FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
@@ -225,7 +225,7 @@ Scale_Cell_Data(T_ARRAYS_SCALAR& array)
 {
     T max_val=array.Max();
     if(max_val)
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             array(iterator.Cell_Index())=exp(-array(iterator.Cell_Index())/max_val);
 }
 //#####################################################################
@@ -317,10 +317,10 @@ Merge_Particles(const std::string& filename)
     for(int p=0;p<number_of_fluid_processes;p++){
         RANGE<TV_INT> region=local_grids(p)->Interior_Region(RANGE<TV_INT>(TV_INT(),TV_INT::All_Ones_Vector())),interior_region=region.Thickened(-1);
         // copy interior particles
-        {NODE_ITERATOR local(local_grids(p)->grid,interior_region),global(grid,interior_region+local_grids(p)->offset);
+        {NODE_ITERATOR<TV> local(local_grids(p)->grid,interior_region),global(grid,interior_region+local_grids(p)->offset);
         for(;local.Valid();local.Next(),global.Next())exchange(global_data(global.Node_Index()),local_data(p)(local.Node_Index()));}
         // merge boundary particles
-        {NODE_ITERATOR local(local_grids(p)->grid,region),global(grid,region+local_grids(p)->offset);
+        {NODE_ITERATOR<TV> local(local_grids(p)->grid,region),global(grid,region+local_grids(p)->offset);
         for(;local.Valid();local.Next(),global.Next()){
             T_PARTICLES *&from_particles=local_data(p)(local.Node_Index()),*&to_particles=global_data(global.Node_Index());
             if(!from_particles) continue;

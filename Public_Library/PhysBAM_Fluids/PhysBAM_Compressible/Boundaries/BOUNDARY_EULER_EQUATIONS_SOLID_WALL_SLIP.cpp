@@ -4,7 +4,7 @@
 //#####################################################################
 // Class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
@@ -133,12 +133,12 @@ Fill_Single_Ghost_Region(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u_ghost,c
         int boundary=Boundary(side,region_new);
         if(attenuate_dirichlet_cells){
             Fill_Single_Ghost_Region(grid,u_ghost,side,region_new); // extrapolate values first, so that eigenvectors calculated at boundary flux values are calculated correctly.
-            for(CELL_ITERATOR iterator(grid,region_new);iterator.Valid();iterator.Next()){
+            for(CELL_ITERATOR<TV> iterator(grid,region_new);iterator.Valid();iterator.Next()){
                 TV_INT cell=iterator.Cell_Index(),boundary_node=cell;boundary_node[axis]=boundary;TV_DIMENSION U_boundary;
                 Attenuate_To_Far_Field_Values_Using_Characteristics(u_ghost,boundary_node,side,U_boundary,dt);
                 u_ghost(cell)=U_boundary;}}
         else{
-            for(CELL_ITERATOR iterator(grid,region_new);iterator.Valid();iterator.Next()){
+            for(CELL_ITERATOR<TV> iterator(grid,region_new);iterator.Valid();iterator.Next()){
                 TV_INT cell=iterator.Cell_Index(),boundary_node=cell;boundary_node[axis]=boundary;
                 u_ghost(cell)=u_ghost(boundary_node);}}}
     else{
@@ -147,7 +147,7 @@ Fill_Single_Ghost_Region(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u_ghost,c
         if(grid.Is_MAC_Grid())
             reflection_times_two=2*boundary+(side&1?1:-1);
         else reflection_times_two=2*boundary+2;
-        for(CELL_ITERATOR iterator(grid,region);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(grid,region);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             TV_INT reflected_node=cell;reflected_node[axis]=reflection_times_two-cell[axis];
             T rho=u_ghost(reflected_node)(0);
             TV velocity=EULER<GRID<TV> >::Get_Velocity(u_ghost,reflected_node);velocity(axis)*=-1;
@@ -175,7 +175,7 @@ Apply_Boundary_Condition_Single_Side(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BAS
     int axis=side/2;
     int axis_side=side%2;
     if(!euler->mpi_grid||!euler->mpi_grid->Neighbor(axis,axis_side)){
-        if(!Constant_Extrapolation(side)) for(CELL_ITERATOR iterator(grid,0,GRID<TV>::BOUNDARY_INTERIOR_REGION,side);iterator.Valid();iterator.Next()){
+        if(!Constant_Extrapolation(side)) for(CELL_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_INTERIOR_REGION,side);iterator.Valid();iterator.Next()){
             TV_INT boundary_node=iterator.Cell_Index();
             T rho=u(boundary_node)(0);
             TV velocity=EULER<GRID<TV> >::Get_Velocity(u,boundary_node);

@@ -2,8 +2,8 @@
 // Copyright 2005-2006, Geoffrey Irving, Frank Losasso, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
@@ -53,7 +53,7 @@ Setup_Viscosity(const T dt)
     // set up internal levelset
     heat_poisson.Use_Internal_Level_Set(number_of_regions);
     T_AVERAGING averaging;const LEVELSET_MULTIPLE<T_GRID>& cell_centered_levelset_multiple=*projection_dynamics.poisson_collidable->levelset_multiple;
-    for(CELL_ITERATOR iterator(face_grid,2);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
+    for(CELL_ITERATOR<TV> iterator(face_grid,2);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
         for(int i=0;i<number_of_regions;i++) heat_poisson.levelset_multiple->phis(i)(cell_index)=averaging.Cell_To_Face(projection.p_grid,axis,p_face_index,cell_centered_levelset_multiple.phis(i));}
     heat_poisson.levelset_multiple->Project_Levelset(2);
 
@@ -69,7 +69,7 @@ Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities)
     IMPLICIT_VISCOSITY_UNIFORM<T_GRID>::Setup_Boundary_Conditions(face_velocities);
     // set neumann b.c. at zero viscosity faces
     POISSON_COLLIDABLE_UNIFORM<T_GRID>& heat_poisson=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<T_GRID>&>(*heat_solver);
-    for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){int face_axis=iterator.Axis();TV_INT face=iterator.Face_Index();
+    for(FACE_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){int face_axis=iterator.Axis();TV_INT face=iterator.Face_Index();
         if(!heat_poisson.beta_face(face_axis,face)) heat_poisson.psi_N(face_axis,face)=true;}
 }
 //#####################################################################
@@ -83,7 +83,7 @@ Calculate_Velocity_Jump()
     heat_poisson.Set_Jump_Multiphase();
     const ARRAY<TRIPLE<T,T,T> ,VECTOR<int,2> >& flame_speed_constants=projection_dynamics.flame_speed_constants;
     TV_INT axis_offset=TV_INT::Axis_Vector(axis);
-    for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index();TV_INT face_axis_offset=TV_INT::Axis_Vector(iterator.Axis());
+    for(FACE_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index();TV_INT face_axis_offset=TV_INT::Axis_Vector(iterator.Axis());
         int region_1=heat_poisson.levelset_multiple->Inside_Region(iterator.First_Cell_Index()),region_2=heat_poisson.levelset_multiple->Inside_Region(iterator.Second_Cell_Index());
         // [Vn]=M*[1/density] with M=-density_fuel*flame_speed, [1/density]=(1/density_fuel-1/density_products), flame_speed_constant.z=(-density_fuel*[1/density])
         int fuel_region=region_1,product_region=region_2;

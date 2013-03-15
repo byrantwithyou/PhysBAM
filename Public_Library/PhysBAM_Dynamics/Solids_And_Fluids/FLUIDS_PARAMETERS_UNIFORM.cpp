@@ -6,9 +6,9 @@
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
 #include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_WENO.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_MACCORMACK_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
@@ -254,7 +254,7 @@ Delete_Particles_Inside_Objects(const T time)
 template<class T_GRID> template<class T_PARTICLES> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
 Delete_Particles_Inside_Objects(typename T_ARRAYS_SCALAR::template REBIND<T_PARTICLES*>::TYPE& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time)
 {
-    for(NODE_ITERATOR iterator(*grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
+    for(NODE_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         BLOCK_UNIFORM<T_GRID> block(*grid,block_index);
         COLLISION_GEOMETRY_ID body_id;int aggregate_id;
         T_PARTICLES& block_particles=*particles(block_index);
@@ -331,7 +331,7 @@ Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>* elliptic_
     callbacks->Get_Source_Velocities(face_velocities,elliptic_solver->psi_N,time);
     callbacks->Get_Object_Velocities(elliptic_solver,face_velocities,dt,time);
 
-    if(solid_affects_fluid && !fluid_affects_solid) for(CELL_ITERATOR iterator(*grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    if(solid_affects_fluid && !fluid_affects_solid) for(CELL_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(elliptic_solver->All_Cell_Faces_Neumann(cell_index)){
             elliptic_solver->psi_D(cell_index)=true;
             elliptic_solver->u(cell_index)=(T)0;}}  // Never flag a solid cell as Dirichlet unless it's surrounded by Neumann BC
@@ -352,7 +352,7 @@ Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>& elliptic_solver,T_FACE_A
         if(domain_walls(axis)(axis_side)){
             if(number_of_regions>=2){
                 // TODO: clean this up. currently iterating over faces 1 grid cell out from boundary in order to get the corners as well. change iterators to give corners instead.
-                for(FACE_ITERATOR iterator(elliptic_solver.grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+                for(FACE_ITERATOR<TV> iterator(elliptic_solver.grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT boundary_face=iterator.Face_Index()+boundary_face_offset;
                     int region=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Inside_Region_Face(iterator.Axis(),boundary_face);
                     if(!dirichlet_regions(region) || (flood_fill_for_bubbles && incompressible_multiphase->levelset_for_dirichlet_regions->phi(boundary_face+interior_cell_offset)<=0)){
@@ -362,7 +362,7 @@ Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>& elliptic_solver,T_FACE_A
                         psi_D(cell)=true;elliptic_solver.u(cell)=0;}}}
             else{
                 // TODO: clean this up. currently iterating over faces 1 grid cell out from boundary in order to get the corners as well. change iterators to give corners instead.
-                for(FACE_ITERATOR iterator(elliptic_solver.grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+                for(FACE_ITERATOR<TV> iterator(elliptic_solver.grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT face=iterator.Face_Index()+boundary_face_offset;
                     if(!water || particle_levelset_evolution->phi(face+interior_cell_offset)<=0 || use_sph_for_removed_negative_particles){
                         if(face_velocities.Component(axis).Valid_Index(face)){
@@ -371,7 +371,7 @@ Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>& elliptic_solver,T_FACE_A
                         psi_D(cell)=true;elliptic_solver.u(cell)=0;}}}}
         else
             // TODO: clean this up. currently iterating over faces 1 grid cell out from boundary in order to get the corners as well. change iterators to give corners instead.
-            for(FACE_ITERATOR iterator(elliptic_solver.grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
+            for(FACE_ITERATOR<TV> iterator(elliptic_solver.grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
                 psi_D(cell)=true;elliptic_solver.u(cell)=0;}}
 }
 //#####################################################################
@@ -385,7 +385,7 @@ Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
         T_ARRAYS_SCALAR density_ghost(grid->Domain_Indices(number_of_ghost_cells),false),temperature_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
         density_container.boundary->Fill_Ghost_Cells_Cell(*grid,density_container.density,density_ghost,time,number_of_ghost_cells);
         temperature_container.boundary->Fill_Ghost_Cells_Cell(*grid,temperature_container.temperature,temperature_ghost,time,number_of_ghost_cells);
-        for(FACE_ITERATOR iterator(*grid,0,T_GRID::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
+        for(FACE_ITERATOR<TV> iterator(*grid,0,T_GRID::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
             T rho_atm=rho_bottom+(rho_top-rho_bottom)*(iterator.Location().y-grid->domain.min_corner.y)/(grid->domain.max_corner.y-grid->domain.min_corner.y);
             T face_density=(density_ghost(iterator.First_Cell_Index())+density_ghost(iterator.Second_Cell_Index()))/(T)2;
             T face_temperature=(temperature_ghost(iterator.First_Cell_Index())+temperature_ghost(iterator.Second_Cell_Index()))/(T)2;
@@ -398,7 +398,7 @@ Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
         temperature_container.boundary->Fill_Ghost_Cells_Cell(*grid,temperature_container.temperature,temperature_ghost,time,number_of_ghost_cells);
         LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple;
         ARRAY<T> one_over_densities(number_of_regions);for(int i=0;i<number_of_regions;i++) one_over_densities(i)=(T)1/densities(i);
-        for(FACE_ITERATOR iterator(*grid,0,T_GRID::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
+        for(FACE_ITERATOR<TV> iterator(*grid,0,T_GRID::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
             T temperature;
             int region=levelset_multiple.Inside_Region_Face(iterator.Axis(),iterator.Face_Index());
             if(fuel_region(region)) temperature=temperature_fuel;
@@ -431,13 +431,13 @@ Blend_In_External_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,cons
 {
     if(use_external_velocity){
         ARRAY<TV,TV_INT> V_blend(grid->Domain_Indices(1));T_ARRAYS_SCALAR blend(grid->Domain_Indices(1));callbacks->Get_External_Velocity(V_blend,blend,time);
-        for(FACE_ITERATOR iterator(*grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();T& face_velocity=face_velocities.Component(axis)(iterator.Face_Index());
+        for(FACE_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();T& face_velocity=face_velocities.Component(axis)(iterator.Face_Index());
             T b=(T).5*(blend(iterator.First_Cell_Index())+blend(iterator.Second_Cell_Index()));b=(T)1-pow(max((T)1-b,(T)0),dt);
             face_velocity=(1-b)*face_velocity+b*(T).5*(V_blend(iterator.First_Cell_Index())[axis]+V_blend(iterator.Second_Cell_Index())[axis]);}}
     if(kolmogorov){
         while(time>turbulence.time_end) turbulence.Advance_Turbulence();
         T b=(T)1-pow(max((T)1-kolmogorov,(T)0),dt),fraction=(time-turbulence.time_start)/(turbulence.time_end-turbulence.time_start);
-        for(FACE_ITERATOR iterator(*grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();T& face_velocity=face_velocities.Component(axis)(iterator.Face_Index());
+        for(FACE_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();T& face_velocity=face_velocities.Component(axis)(iterator.Face_Index());
             face_velocity=(1-b)*face_velocity+b*turbulence.Turbulent_Face_Velocity(axis,iterator.Location(),fraction);}}
 }
 //#####################################################################
@@ -495,7 +495,7 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;TV_INT offset=(axis_side==0?-1:1)*moving_grid_number_of_cells*TV_INT::Axis_Vector(axis);
         // loop over boundary region by looping over ghost region and shifting inwards
-        for(CELL_ITERATOR iterator(*grid,moving_grid_number_of_cells,T_GRID::GHOST_REGION,side);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(*grid,moving_grid_number_of_cells,T_GRID::GHOST_REGION,side);iterator.Valid();iterator.Next())
             if(particle_levelset_evolution->phi(iterator.Cell_Index()-offset)<=0){shift+=offset;break;}}
 
     Move_Grid(face_velocities,shift,time);
@@ -510,7 +510,7 @@ Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX
     assert(!smoke && !fire);
     if(adhesion_coefficient==1 && !adhesion_normal_strain) return;
     T epsilon=adhesion_half_bandwidth*grid->dX.Min();
-    for(CELL_ITERATOR iterator(*grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         T heaviside=LEVELSET_UTILITIES<T>::Heaviside(levelset_object.phi(cell),epsilon);
         e_ghost(cell)*=adhesion_coefficient+(1-adhesion_coefficient)*heaviside;
         if(adhesion_normal_strain && heaviside!=1) e_ghost(cell)+=(1-heaviside)*adhesion_normal_strain*SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(levelset_object.Normal(iterator.Location()));}
@@ -523,7 +523,7 @@ Combustion(const T dt,const T time)
 {
     PHYSBAM_DEBUG_WRITE_SUBSTEP("Before Combustion",0,1);
 
-    for(CELL_ITERATOR iterator(*grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T fuel_fraction=soot_fuel_container.density(cell_index);
         T cell_temperature=euler->Get_Temperature(cell_index);
         T rho=euler->U(cell_index)(0);
@@ -600,7 +600,7 @@ template<class T_GRID> template<class T_ARRAYS_PARTICLES> int FLUIDS_PARAMETERS_
 Total_Number_Of_Particles(const T_ARRAYS_PARTICLES& particles) const
 {
     int total=0;
-    for(CELL_ITERATOR iterator(*grid,3);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())) total+=particles(iterator.Cell_Index())->Size();
+    for(CELL_ITERATOR<TV> iterator(*grid,3);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())) total+=particles(iterator.Cell_Index())->Size();
     return total;
 }
 //#####################################################################

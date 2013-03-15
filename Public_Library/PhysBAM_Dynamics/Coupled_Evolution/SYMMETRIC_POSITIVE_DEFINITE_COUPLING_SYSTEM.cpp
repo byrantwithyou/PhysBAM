@@ -2,7 +2,7 @@
 // Copyright 2009, Nipun Kwatra, Jon Gretarsson, Avi Robinson-Mosher, Craig Schroeder
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Matrices/SYSTEM_MATRIX_HELPER.h>
@@ -169,7 +169,7 @@ Apply_Velocity_Update(const VECTOR_T& V,ARRAY<T,FACE_INDEX<TV::dimension> >& flu
         if(run_self_tests) Test_Incompressibility(fluid_velocity,dummy_array);
         index_map.Distribute(V.pressure,fluid_pressures);
         if(dt) fluid_pressures*=1/dt;
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(index_map.grid);it.Valid();it.Next())
+        for(FACE_ITERATOR<TV> it(index_map.grid);it.Valid();it.Next())
             if(index_map.face_indices(it.Full_Index())<0)
                 fluid_velocity(it.Full_Index())=0;}
 

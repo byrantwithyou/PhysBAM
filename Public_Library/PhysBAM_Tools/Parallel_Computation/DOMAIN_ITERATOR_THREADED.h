@@ -7,7 +7,7 @@
 #ifndef __DOMAIN_ITERATOR_THREADED__
 #define __DOMAIN_ITERATOR_THREADED__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Parallel_Computation/ITERATOR_TASK.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
@@ -57,7 +57,7 @@ public:
                 domains.Resize(split_per_dimension.Product());
                 GRID<TV> process_grid(split_per_dimension,RANGE<TV>::Centered_Box());
                 int count=0;
-                for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(process_grid);iterator.Valid();iterator.Next()){
+                for(NODE_ITERATOR<TV> iterator(process_grid);iterator.Valid();iterator.Next()){
                     TV_INT coordinates=iterator.Node_Index();
                     TV_INT start,end;
                     for(int axis=0;axis<TV::dimension;axis++){

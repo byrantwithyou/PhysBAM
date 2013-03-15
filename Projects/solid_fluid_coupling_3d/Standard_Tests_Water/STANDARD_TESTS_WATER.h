@@ -28,7 +28,7 @@
 #ifndef __STANDARD_TESTS_WATER__
 #define __STANDARD_TESTS_WATER__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Math_Tools/cube.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -63,8 +63,6 @@ class STANDARD_TESTS_WATER:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_in
 {
     typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef GRID<TV> T_GRID;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
@@ -668,17 +666,17 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 {
     T_GRID& grid=*fluids_parameters.grid;
     ARRAY<T,VECTOR<int,3> >& phi=fluids_parameters.particle_levelset_evolution->phi;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) phi(iterator.Cell_Index())=Initial_Phi(iterator.Location());
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) phi(iterator.Cell_Index())=Initial_Phi(iterator.Location());
 }
 //#####################################################################
 // Function Initialize_Velocities
 //#####################################################################
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
-    for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(iterator.Axis())(iterator.Face_Index())=water_tests.Initial_Velocity(iterator.Location())[iterator.Axis()];
 
-    if(test_number==18) for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+    if(test_number==18) for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(iterator.Axis())(iterator.Face_Index())=(iterator.Axis()==1?(T)1:(T)0);
 }
 //#####################################################################

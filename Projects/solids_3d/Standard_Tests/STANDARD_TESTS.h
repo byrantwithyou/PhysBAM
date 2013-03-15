@@ -59,9 +59,9 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -117,9 +117,6 @@ class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3>
 {
     typedef T_input T;
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
@@ -1072,12 +1069,12 @@ void Get_Initial_Data()
             for(T cell_size=1;;cell_size+=(T).01){
                 LOG::cout<<"trying cell_size = "<<cell_size<<std::endl;
                 grid=GRID<TV>(counts,RANGE<TV>(TV(),TV(counts))*cell_size+TV(0,base_height,0),true);
-                for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){VECTOR<int,3> I=iterator.Cell_Index();
+                for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){VECTOR<int,3> I=iterator.Cell_Index();
                     frames(I).r=ROTATION<TV>::From_Rotation_Vector(max_angle*random.template Get_Vector_In_Unit_Sphere<TV>());
                     frames(I).t=iterator.Location();}
                 int intersections;
                 for(int attempts=0;attempts<200;attempts++){intersections=0;
-                    for(FACE_ITERATOR iterator(grid,0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
+                    for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
                         VECTOR<int,3> I=iterator.First_Cell_Index(),J=iterator.Second_Cell_Index();
                         FRAME<TV> frame=frames(I).Inverse_Times(frames(J));
                         if(ORIENTED_BOX<TV>(panel_box,frame).Intersection(panel_box)){
@@ -1087,7 +1084,7 @@ void Get_Initial_Data()
                     if(!intersections) break;}
                 LOG::cout<<"intersections = "<<intersections<<std::endl;
                 if(!intersections){LOG::cout<<"final cell size = "<<cell_size<<std::endl;break;}}
-            for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){VECTOR<int,3> I=iterator.Cell_Index();
+            for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){VECTOR<int,3> I=iterator.Cell_Index();
                 tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(frames(I)));}
             TRIANGULATED_SURFACE<T>& merged_surface=*TRIANGULATED_SURFACE<T>::Create(particles);
             for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++)
@@ -1202,7 +1199,7 @@ void Get_Initial_Data()
                 for(int i=0;i<particle_indices.m;i++) grid_domain.Enlarge_To_Include_Point(particles.X(particle_indices(i)));
                 GRID<TV> new_grid(TV_INT(grid_domain.Thickened(2*thickness).Edge_Lengths()/(T).02),grid_domain.Thickened(2*thickness));
                 ARRAY<T,VECTOR<int,3> > new_phi(new_grid.Domain_Indices());new_phi.Fill(1e10);
-                for(CELL_ITERATOR iterator(new_grid);iterator.Valid();iterator.Next()){const VECTOR<int,3> &cell_index=iterator.Cell_Index();
+                for(CELL_ITERATOR<TV> iterator(new_grid);iterator.Valid();iterator.Next()){const VECTOR<int,3> &cell_index=iterator.Cell_Index();
                     for(int i=0;i<particle_indices.m;i++) new_phi(cell_index)=min(new_phi(cell_index),(iterator.Location()-deformable_body_collection.deformable_geometry.particles.X(particle_indices(i))).Magnitude()-thickness);}
                 LEVELSET_IMPLICIT_OBJECT<TV> implicit(new_grid,new_phi);
                 TV edges=new_grid.Domain().Edge_Lengths();
@@ -1397,7 +1394,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             INTERPOLATION_CURVE<T,T> height_falloff;
             height_falloff.Add_Control_Point(3,0);
             height_falloff.Add_Control_Point(4,1);
-            for(NODE_ITERATOR iterator(*wind_grid);iterator.Valid();iterator.Next()){VECTOR<int,3> I=iterator.Node_Index();TV X=iterator.Location();
+            for(NODE_ITERATOR<TV> iterator(*wind_grid);iterator.Valid();iterator.Next()){VECTOR<int,3> I=iterator.Node_Index();TV X=iterator.Location();
                 TV inward=wind_center-X;inward.y=0;
                 (*wind_V)(I)=height_falloff.Value(X.y)*((T).2*inward+TV(0,1,0));}
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;

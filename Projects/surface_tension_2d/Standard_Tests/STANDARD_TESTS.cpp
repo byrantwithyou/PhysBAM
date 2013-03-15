@@ -207,13 +207,13 @@ Initialize_Phi()
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
     if(test_number==1 || test_number==3){
         SPHERE<TV> object(TV((T).02*m,(T).02*m),(T).01*m);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
             TV X=it.Location();
             if(make_ellipse) X*=TV((T)1.1,(T).9);
             phi(it.index)=object.Signed_Distance(X);}}
     else if(test_number==2) phi.Fill(1);
     else if(test_number==4 || test_number==5){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
+        for(CELL_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
             TV dX=it.Location()-TV((T)(.5*m),(T)(.5*m));
             T distance=dX.Magnitude();
             T angle=atan2(dX.y,dX.x);
@@ -644,7 +644,7 @@ Rebuild_Surface()
     HASHTABLE<TV_INT,ARRAY<int> > used_cells;
     int next=1;
     const ARRAY<T,TV_INT>& phi=fluids_parameters.particle_levelset_evolution->Levelset(1).phi;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face=it.Full_Index();
         TV_INT cell1=face.First_Cell_Index(),cell2=face.Second_Cell_Index();
         T phi1=phi(cell1),phi2=phi(cell2);

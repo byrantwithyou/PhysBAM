@@ -15,25 +15,25 @@
 //   8. two ring hit each other
 //#####################################################################
 
-#include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
+#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
+#include <PhysBAM_Tools/Utilities/TIMER.h>
+#include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
-#include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
-#include <PhysBAM_Tools/Utilities/TIMER.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <omp.h>
-#include "TIMING.h"
+#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include "MPM_SIMULATION.h"
+#include "TIMING.h"
+#include <omp.h>
 
 using namespace PhysBAM;
 

@@ -2,8 +2,8 @@
 // Copyright 2009, Michael Lentine, Avi Robinson-Mosher, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
 #include <PhysBAM_Dynamics/Drivers/PLS_REFINEMENT_EXAMPLE.h>
@@ -77,7 +77,7 @@ Read_Output_Files(const int frame)
         ARRAY<T,TV_INT> phi_global(fine_mpi_grid->global_grid.Domain_Indices());
         LEVELSET<TV> levelset_global(fine_mpi_grid->global_grid,phi_global);        
         FILE_UTILITIES::Read_From_File(stream_type,my_output_directory+"/"+f+"/levelset",levelset_global);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(fine_mac_grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(fine_mac_grid);iterator.Valid();iterator.Next()){
             particle_levelset.levelset.phi(iterator.Cell_Index())=phi_global(fine_mpi_grid->global_grid.Clamped_Index(iterator.Location()));}}
     else FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
     if(write_debug_data){
@@ -93,7 +93,7 @@ Read_Output_Files(const int frame)
         if(split){
             ARRAY<T,TV_INT> p(coarse_mpi_grid->global_grid.Domain_Indices());
             FILE_UTILITIES::Read_From_File(stream_type,filename,p);
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(coarse_mac_grid);iterator.Valid();iterator.Next()){
+            for(CELL_ITERATOR<TV> iterator(coarse_mac_grid);iterator.Valid();iterator.Next()){
                 incompressible.projection.p(iterator.Cell_Index())=p(coarse_mpi_grid->global_grid.Clamped_Index(iterator.Location()));}}
         else FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible.projection.p);}
     filename=my_output_directory+"/"+f+"/mac_velocities";
@@ -102,7 +102,7 @@ Read_Output_Files(const int frame)
         if(split){
             ARRAY<T,FACE_INDEX<TV::dimension> > face_vel_global(fine_mpi_grid->global_grid,0,false);
             FILE_UTILITIES::Read_From_File(stream_type,filename,face_vel_global);
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(fine_mac_grid);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(fine_mac_grid);iterator.Valid();iterator.Next()){
                 TV cell_location=iterator.Location()+fine_mac_grid.DX()/2.*TV::Axis_Vector(iterator.Axis());
                 fine_face_velocities(iterator.Full_Index())=face_vel_global(FACE_INDEX<TV::dimension>(iterator.Axis(),fine_mpi_grid->global_grid.Clamped_Face_Index(cell_location)));}}
         else FILE_UTILITIES::Read_From_File(stream_type,filename,fine_face_velocities);}
@@ -112,7 +112,7 @@ Read_Output_Files(const int frame)
         if(split){
             ARRAY<T,FACE_INDEX<TV::dimension> > face_vel_global(coarse_mpi_grid->global_grid,0,false);
             FILE_UTILITIES::Read_From_File(stream_type,filename,face_vel_global);
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(coarse_mac_grid);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(coarse_mac_grid);iterator.Valid();iterator.Next()){
                 TV cell_location=iterator.Location()+coarse_mac_grid.DX()/2.*TV::Axis_Vector(iterator.Axis());
                 coarse_face_velocities(iterator.Full_Index())=face_vel_global(FACE_INDEX<TV::dimension>(iterator.Axis(),coarse_mpi_grid->global_grid.Clamped_Face_Index(cell_location)));}}
         else FILE_UTILITIES::Read_From_File(stream_type,filename,coarse_face_velocities);}

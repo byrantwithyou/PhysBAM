@@ -2,8 +2,8 @@
 // Copyright 2005, Geoffrey Irving, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Math_Tools/exchange.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Random_Numbers/NOISE.h>
@@ -170,7 +170,7 @@ Initialize_Bodies()
         LEVELSET<VECTOR<T,3> > armadillo_temp(armadillo_temp_grid,armadillo_temp_phi);
         FILE_UTILITIES::Read_From_File<float>(example.data_directory+"/Rigid_Bodies/armadillo_high_res.phi",armadillo_temp);
         armadillo=new LEVELSET<TV>(*(new T_GRID(*fluids_parameters.grid)),*(new T_ARRAYS_SCALAR(fluids_parameters.grid->Domain_Indices(0))));
-        for(CELL_ITERATOR iterator(*fluids_parameters.grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             VECTOR<T,3> vec(iterator.Location());exchange(vec.x,vec.z);
             if(T_GRID::dimension==3){armadillo->phi(cell)=armadillo_temp.Extended_Phi((vec-VECTOR<T,3>((T).5,(T).35,(T).5+(T).07*vec.y))*(T)145)/(T)145;}
             else{

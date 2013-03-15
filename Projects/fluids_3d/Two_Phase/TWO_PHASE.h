@@ -7,8 +7,8 @@
 #ifndef __TWO_PHASE__
 #define __TWO_PHASE__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE_3D.h>
 
@@ -26,7 +26,6 @@ class TWO_PHASE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
     typedef T_input T;
 public:
     typedef VECTOR<T,3> TV;typedef GRID<TV> T_GRID;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_GRID::VECTOR_INT TV_INT;
 
@@ -129,7 +128,7 @@ void Initialize_Advection()    PHYSBAM_OVERRIDE
 void Initialize_Phi() PHYSBAM_OVERRIDE
 {
     T radius=(T)1/(T)300;
-    for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         TV X=iterator.Location();
         fluids_parameters.particle_levelset_evolution_multiple->phis(1)(iterator.Cell_Index())=X.Magnitude()-radius;// center is at 0,0,0
         fluids_parameters.particle_levelset_evolution_multiple->phis(2)(iterator.Cell_Index())=radius-X.Magnitude();}
@@ -146,7 +145,7 @@ T Initial_Phi_Object(const TV& X) const
 //#####################################################################
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
-    for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(iterator.Axis())(iterator.Face_Index())=0;
 }
 //#####################################################################
@@ -177,7 +176,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
     RANGE<TV_INT> right_grid_cells=RANGE<TV_INT>(TV_INT(fluids_parameters.grid->counts.x-2,1,1),fluids_parameters.grid->Numbers_Of_Cells());
     for(int axis=0;axis<T_GRID::dimension;axis++){
         RANGE<TV_INT> right_grid_faces=right_grid_cells+RANGE<TV_INT>(TV_INT(),TV_INT::Axis_Vector(axis));
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid,right_grid_faces,axis);iterator.Valid();iterator.Next()){TV_INT face=iterator.Face_Index();
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,right_grid_faces,axis);iterator.Valid();iterator.Next()){TV_INT face=iterator.Face_Index();
             psi_N.Component(axis)(face)=true;face_velocities.Component(axis)(face)=axis==1?(T)-1:(T)0;}}
 }
 //#####################################################################

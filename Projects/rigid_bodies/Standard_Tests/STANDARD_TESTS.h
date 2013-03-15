@@ -43,7 +43,7 @@
 #define __STANDARD_TESTS__
 
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
@@ -1090,7 +1090,6 @@ void Drop_Cubes()
 void Build_Deforming_Sphere(KINEMATIC_COLLISION_BODY<GRID<TV> >* sphere,FRAME<TV>& frame,T time,bool update_positions,bool update_velocities)
 {
     typedef VECTOR<int,3> TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;
 
     T rate=1;
     T radius=rate*time+1;
@@ -1106,7 +1105,7 @@ void Build_Deforming_Sphere(KINEMATIC_COLLISION_BODY<GRID<TV> >* sphere,FRAME<TV
         LEVELSET_IMPLICIT_OBJECT<TV>* levelset=(LEVELSET_IMPLICIT_OBJECT<TV>*)sphere->implicit_object->object_space_implicit_object;
         sphere->Initialize_Implicit_Object_Levelset(cells,range);
 
-        for(NODE_ITERATOR iterator(levelset->levelset.grid);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(levelset->levelset.grid);iterator.Valid();iterator.Next())
             levelset->levelset.phi(iterator.Node_Index())=iterator.Location().Magnitude()-radius;
         levelset->levelset.Compute_Cell_Minimum_And_Maximum();
     }
@@ -1114,7 +1113,7 @@ void Build_Deforming_Sphere(KINEMATIC_COLLISION_BODY<GRID<TV> >* sphere,FRAME<TV
     {
         sphere->velocity_grid->Initialize(cells,range);
         sphere->velocity_field->Resize(sphere->velocity_grid->Domain_Indices());
-        for(NODE_ITERATOR iterator(*sphere->velocity_grid);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(*sphere->velocity_grid);iterator.Valid();iterator.Next())
             sphere->velocity_field->operator()(iterator.Node_Index())=rate*iterator.Location().Normalized();
     }
 }

@@ -5,8 +5,8 @@
 // Class DENSITY_CONTAINER
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Geometry/Advection_Collidable/ADVECTION_WRAPPER_COLLIDABLE_CELL.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Grid_Based_Fields/DENSITY_CONTAINER.h>
@@ -55,7 +55,7 @@ Fill_Beta_At_Faces(const T dt,const T time,T_FACE_ARRAYS_SCALAR& beta_face) cons
 {
     T_ARRAYS_SCALAR density_ghost(grid.Cell_Indices(1),false);
     boundary->Fill_Ghost_Cells(grid,density,density_ghost,dt,time,1);
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
         TV_INT face_index=iterator.Face_Index();
         TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
         T density_face=(density_ghost(first_cell_index)+density_ghost(second_cell_index))*(T).5;

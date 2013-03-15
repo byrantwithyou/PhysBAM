@@ -4,7 +4,7 @@
 //#####################################################################
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -246,7 +246,7 @@ int main(int argc,char* argv[])
                 
                 T x_min=x.Max();
                 T x_max=x.Min();
-                for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(multigrid_poisson.grid);iterator.Valid();iterator.Next())
+                for(NODE_ITERATOR<TV> iterator(multigrid_poisson.grid);iterator.Valid();iterator.Next())
                     if(multigrid_poisson.cell_type(iterator.Node_Index())==MULTIGRID_POISSON<T,3>::INTERIOR_CELL_TYPE){
                         x_min=min(x_min,x(iterator.Node_Index()));
                         x_max=max(x_max,x(iterator.Node_Index()));
@@ -304,7 +304,7 @@ int main(int argc,char* argv[])
         T radius_squared=radius*radius;
         LOG::cout<<"M"<<std::endl;
         // Set cell types
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
+        for(NODE_ITERATOR<TV> iterator(grid,0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
             const T_INDEX& index=iterator.Node_Index();
             if((iterator.Location()-circle_center).Magnitude_Squared()<radius_squared)
                 cell_type(index)=MULTIGRID_POISSON<T,d>::NEUMANN_CELL_TYPE;
@@ -313,22 +313,22 @@ int main(int argc,char* argv[])
         }
         
         LOG::cout<<"M"<<std::endl;
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next())
             cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,1);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,1);iterator.Valid();iterator.Next())
             cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,2);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,2);iterator.Valid();iterator.Next())
             cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::NEUMANN_CELL_TYPE;
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next())
             cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,4);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,4);iterator.Valid();iterator.Next())
             cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,5);iterator.Valid();iterator.Next())
+        for(NODE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,5);iterator.Valid();iterator.Next())
             cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
 
         {LOG::SCOPE scope("ICPCG Initialize");
         // set up pcg matrix
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid);iterator.Valid();iterator.Next()){
+        for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             const T_INDEX& index=iterator.Node_Index();
             if(cell_type(index)==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE)
                 index_ids(index)=interior_indices.Append(index);

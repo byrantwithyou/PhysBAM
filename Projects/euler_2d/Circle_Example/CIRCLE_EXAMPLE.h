@@ -12,8 +12,8 @@
 #include <iostream>
 #include "math.h"
 
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_ATTENUATION.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
@@ -50,7 +50,6 @@ public:
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_FLUID_COLLISION_GEOMETRY_LIST;
     typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*T_GRID::dimension> T_FACE_VECTOR_BOOL;
-    typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
 
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solids_fluids_parameters;
@@ -381,7 +380,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     if(transition_to_incompressible) fluids_parameters.euler->euler_projection.use_neumann_condition_for_outflow_boundaries=false;
 
     //initialize grid variables
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         T rho,u_vel,v_vel,p;
         if((grid.X(cell_index)-shock_center).Magnitude()<shock_radius){rho=state_inside(0);u_vel=state_inside(1);v_vel=state_inside(2);p=state_inside(3);}
@@ -404,7 +403,7 @@ void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
     LOG::cout<<"INITIALIZING DENSITY"<<std::endl;
     
     T_GRID& grid=*fluids_parameters.grid;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         T rho;
         if((grid.X(cell_index)-shock_center).Magnitude()<shock_radius) rho=state_inside(0); 
@@ -421,7 +420,7 @@ void Adjust_Soot_With_Sources(const T time) PHYSBAM_OVERRIDE
     LOG::cout<<"INITIALIZING SOOT"<<std::endl;
     
     T_GRID& grid=*fluids_parameters.grid;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         T soot;
         if((grid.X(cell_index)-shock_center).Magnitude()<shock_radius) soot=1; 
@@ -596,7 +595,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     elliptic_solver->psi_D(TV_INT(0,1))=true;
     //elliptic_solver->u(TV_INT(0,1))=state_outside(3);
 
-    //for(CELL_ITERATOR iterator(fluids_parameters.euler->grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
+    //for(CELL_ITERATOR<TV> iterator(fluids_parameters.euler->grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
      //   TV_INT cell_index=iterator.Cell_Index();
       //  elliptic_solver->u(cell_index)=state_outside(3);}
 

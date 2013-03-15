@@ -18,7 +18,7 @@ template<class T>
 class UNIFORM_REMOVED_PARTICLES_PROCESSING:public NONCOPYABLE
 {
 public:
-    typedef VECTOR<T,3> TV;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef UNIFORM_GRID_ITERATOR_NODE<TV> NODE_ITERATOR;typedef VECTOR<int,3> TV_INT;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 
     GRID<TV>& grid;
     GRID<TV>* sim_grid;

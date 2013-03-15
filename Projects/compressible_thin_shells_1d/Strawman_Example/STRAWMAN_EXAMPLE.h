@@ -1,7 +1,7 @@
 #ifndef __STRAWMAN_EXAMPLE__
 #define __STRAWMAN_EXAMPLE__
 
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_CONSERVATIVE_ENO.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -86,7 +86,7 @@ void Initialize()
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/first_frame",0,"\n");
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
         rho_fixed(iterator.Cell_Index())=analytic_solution(iterator.Location(),(T)0);
         rho_with_extrapolation(iterator.Cell_Index())=analytic_solution(iterator.Location(),(T)0);
         velocity(iterator.Cell_Index())=fluid_velocity_field(iterator.Location(),(T)0);}
@@ -101,7 +101,7 @@ void Fill_Solid_Cells(const T time,const T solid_boundary,ARRAY<T,TV_INT>& rho,A
     TV_INT solid_clamped_tn = grid.Index(TV(solid_boundary));
 
     // Fill the ghost region
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){
         if(iterator.Cell_Index().x < 0){TV_INT reference_point=TV_INT(1);  // Outflow boundary conditions on the left side
             rho_fixed(iterator.Cell_Index())=rho_fixed(reference_point);
             rho_with_extrapolation(iterator.Cell_Index())=rho_fixed(reference_point);}
@@ -133,7 +133,7 @@ void Euler_Step(const T dt, const T time){
     ADVECTION_CONSERVATIVE_ENO<GRID<TV>,T> advection_scheme;advection_scheme.Set_Order(1);
     BOUNDARY_LINEAR_EXTRAPOLATION<TV,T> boundary;
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next())
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
         velocity(iterator.Cell_Index())=fluid_velocity_field(iterator.Location(),time);
     const T solid_boundary=solid_position(time);
 
@@ -159,7 +159,7 @@ void Euler_Step(const T dt, const T time){
 
             TV surface_normal=TV((T)1);
             MATRIX<T,1> transform=MATRIX<T,1>::Identity_Matrix() - (T)2*MATRIX<T,1>(surface_normal.x*surface_normal.x);
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(stencil_grid,3);iterator.Valid();iterator.Next()){
+            for(CELL_ITERATOR<TV> iterator(stencil_grid,3);iterator.Valid();iterator.Next()){
                 TV location=stencil_center+transform*iterator.Location();
                 stencil_velocity(iterator.Cell_Index())=fluid_velocity_field(location,time);
                 stencil_data_ghost(iterator.Cell_Index())=rho_interpolation.Clamped_To_Array(grid,rho_tmp,location);}
@@ -203,7 +203,7 @@ void Write_Output_Files(const T& time,const std::string& frame_title)
     rigid_geometry_collection.Write(stream_type,output_directory,frame);
 
     ARRAY<T,TV_INT> rho_analytic(grid.Domain_Indices(3));
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
         rho_analytic(iterator.Cell_Index())=analytic_solution(iterator.Location(),time);}
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/analytic_rho",rho_analytic);
 

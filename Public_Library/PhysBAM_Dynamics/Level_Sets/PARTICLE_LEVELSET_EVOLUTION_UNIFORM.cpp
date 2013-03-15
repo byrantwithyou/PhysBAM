@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
@@ -124,16 +124,16 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const PARTICLE
     T_GRID mac_grid=grid.Get_MAC_Grid();
     T current_time=input_time;
     T_ARRAYS_RUNGEKUTTA rungekutta_particles(mac_grid.Domain_Indices(1));
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index()))
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index()))
         rungekutta_particles(iterator.Cell_Index())=new RUNGEKUTTA<ARRAY_VIEW<TV> >(particles(iterator.Cell_Index())->X,runge_kutta_order_particles,dt,current_time);
     for(int k=0;k<runge_kutta_order_particles;k++){
         if(k == 0 || !use_frozen_velocity) particle_levelset->levelset.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset->levelset,V,current_time);
         particle_levelset->Euler_Step_Particles_Wrapper(V,particles,particle_type,dt,current_time,false,k==0,false);
-        for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())
             if(particles(iterator.Cell_Index())){
                 rungekutta_particles(iterator.Cell_Index())->Next();
                 current_time=rungekutta_particles(iterator.Cell_Index())->time;}}
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())){
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())){
         PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles=*particles(iterator.Cell_Index());
         for(int k=0;k<cell_particles.Size();k++){
             TV velocity;
@@ -152,16 +152,16 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const 
     T_GRID mac_grid=grid.Get_MAC_Grid();
     T current_time=input_time;
     T_ARRAYS_RUNGEKUTTA rungekutta_particles;rungekutta_particles.Resize(mac_grid.Domain_Indices(1));
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index()))
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index()))
         rungekutta_particles(iterator.Cell_Index())=new RUNGEKUTTA<ARRAY_VIEW<TV> >(particles(iterator.Cell_Index())->X,runge_kutta_order_particles,dt,current_time);
     for(int k=0;k<runge_kutta_order_particles;k++){
         if(k == 1 || !use_frozen_velocity) particle_levelset->levelset.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset->levelset,V,current_time);
         particle_levelset->Euler_Step_Particles_Wrapper(V,particles,particle_type,dt,current_time,false,k==0,false);
-        for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())
             if(particles(iterator.Cell_Index())){
                 rungekutta_particles(iterator.Cell_Index())->Next();
                 current_time=rungekutta_particles(iterator.Cell_Index())->time;}}
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())){
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())){
         PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles=*particles(iterator.Cell_Index());
         for(int k=0;k<cell_particles.Size();k++){
             TV velocity;

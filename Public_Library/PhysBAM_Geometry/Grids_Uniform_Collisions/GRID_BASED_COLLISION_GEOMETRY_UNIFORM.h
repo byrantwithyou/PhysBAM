@@ -20,7 +20,6 @@ template <class T_GRID>
 class GRID_BASED_COLLISION_GEOMETRY_UNIFORM:public GRID_BASED_COLLISION_GEOMETRY<T_GRID>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<bool,TV::dimension> TV_BOOL;typedef VECTOR<int,TV::m> TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
@@ -47,10 +46,10 @@ public:
     bool Swept_Occupied_Cell_Center(const TV_INT& cell_index) const
     {return swept_occupied_blocks(cell_index);} // this will check the occupied block that is left,bottom,front of the current cell.
 
-    bool Occupied_Face_Center(FACE_ITERATOR& iterator) const
+    bool Occupied_Face_Center(FACE_ITERATOR<TV>& iterator) const
     {return occupied_blocks(iterator.Face_Node_Index(0));}
 
-    bool Swept_Occupied_Face_Center(FACE_ITERATOR& iterator) const
+    bool Swept_Occupied_Face_Center(FACE_ITERATOR<TV>& iterator) const
     {return swept_occupied_blocks(iterator.Face_Node_Index(0));}
 
     bool Inside_Any_Simplex_Of_Any_Body(const TV& location,COLLISION_GEOMETRY_ID& body_id,int& aggregate_id) const

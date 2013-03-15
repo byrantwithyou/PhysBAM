@@ -44,7 +44,7 @@ template<class TV> void SMOKE_EXAMPLE<TV>::
 CFL_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,T& dt)
 {
     T dt_convection=0;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mac_grid,domain);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(mac_grid,domain);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();T local_V_norm=0;
         for(int axis=0;axis<GRID<TV>::dimension;axis++)
             local_V_norm+=mac_grid.one_over_dX[axis]*maxabs(face_velocities(axis,mac_grid.First_Face_Index_In_Cell(axis,cell)),face_velocities(axis,mac_grid.Second_Face_Index_In_Cell(axis,cell)));
@@ -63,10 +63,10 @@ Set_Boundary_Conditions(const T time)
     for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(domain_boundary(axis)(axis_side)){
             TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);    
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
+            for(FACE_ITERATOR<TV> iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
                 TV_INT boundary_face=axis_side==0?iterator.Face_Index()+TV_INT::Axis_Vector(axis):iterator.Face_Index()-TV_INT::Axis_Vector(axis);
                 projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
         if(source.Lazy_Inside(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
             if(iterator.Axis()==1)face_velocities(iterator.Full_Index())=1;

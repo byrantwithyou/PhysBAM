@@ -10,8 +10,8 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <string>
 #include <map>
+#include <string>
 namespace PhysBAM{
 
 enum op_type {

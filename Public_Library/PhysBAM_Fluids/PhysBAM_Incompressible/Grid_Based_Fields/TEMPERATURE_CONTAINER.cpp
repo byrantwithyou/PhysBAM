@@ -5,8 +5,8 @@
 // Class TEMPERATURE_CONTAINER
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Math_Tools/cube.h>
 #include <PhysBAM_Geometry/Advection_Collidable/ADVECTION_WRAPPER_COLLIDABLE_CELL.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
@@ -50,7 +50,7 @@ Apply_Cooling(const T dt,const T time)
 {  
     if(!cooling_constant) return;
     T constant=3*cooling_constant*dt/sqr(sqr(hot_point-ambient_temperature));
-    for(CELL_ITERATOR iterator(grid,0);iterator.Valid();iterator.Next()) Apply_Individual_Cooling(temperature(iterator.Cell_Index()),constant);
+    for(CELL_ITERATOR<TV> iterator(grid,0);iterator.Valid();iterator.Next()) Apply_Individual_Cooling(temperature(iterator.Cell_Index()),constant);
 }
 // TODO: the following will go away once we figure out a way to merge all the iterators
 template<class T,class T_GRID> static void Apply_Cooling_Helper(TEMPERATURE_CONTAINER<T_GRID>& container,const T dt,const T time)

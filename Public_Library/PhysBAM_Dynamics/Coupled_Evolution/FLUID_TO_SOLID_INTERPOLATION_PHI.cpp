@@ -5,8 +5,8 @@
 // Class FLUID_TO_SOLID_INTERPOLATION_PHI
 //##################################################################### 
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
@@ -55,7 +55,7 @@ Setup_Mesh()
     GRID<TV> dual_grid(index_map.grid.Get_Regular_Grid());
     ARRAY<T,TV_INT> dual_phi(index_map.grid.Node_Indices(2));
     PHYSBAM_ASSERT(cut_order>=3 && cut_order<=4);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(dual_grid,1);it.Valid();it.Next())
+    for(CELL_ITERATOR<TV> it(dual_grid,1);it.Valid();it.Next())
         dual_phi(it.index)=Node_Average(it.index);
 
     T mx=0;
@@ -63,7 +63,7 @@ Setup_Mesh()
     HASHTABLE<TV_INT,ARRAY<int> > used_cells;
     HASHTABLE<FACE_INDEX<TV::m>,TV> HX;
     HASHTABLE<TV_INT,ARRAY<FACE_INDEX<TV::m> > > cut_faces;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(index_map.grid);it.Valid();it.Next()){
+    for(FACE_ITERATOR<TV> it(index_map.grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face=it.Full_Index();
         TV_INT a=TV_INT::Axis_Vector(1-it.Axis()),node0=it.index-a,node1=it.index,node2=it.index+a,node3=it.index+2*a;
         T phi1=dual_phi(node1),phi2=dual_phi(node2);

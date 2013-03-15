@@ -1,6 +1,6 @@
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -46,7 +46,7 @@ void Test(PARSE_ARGS& parse_args)
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid,"output");
     vo.debug_particles.edge_separation=(T).02;
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         TV X=it.Location();
         T r=phi_f(X);
         p(it.index)=r;
@@ -57,7 +57,7 @@ void Test(PARSE_ARGS& parse_args)
     EXTRAPOLATION_HIGHER_ORDER<TV,T>(grid,phi,iterations,order,ghost).Extrapolate_Cell(inside,x);
 
     T m=0;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         TV X(it.Location()),Y=X;
         T r=phi_f(X);
         T e=x(it.index)-f(X);

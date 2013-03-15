@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/POISSON_UNIFORM.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
@@ -28,7 +28,7 @@ template<class T_GRID> void POISSON_UNIFORM<T_GRID>::
 Find_Variable_beta()
 {
     if(beta_given_on_faces) return; // beta_right, beta_top, beta_back already set
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) 
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) 
         beta_face.Component(iterator.Axis())(iterator.Face_Index())=(T).5*(variable_beta(iterator.First_Cell_Index())+variable_beta(iterator.Second_Cell_Index())); 
 }
 //#####################################################################
@@ -40,7 +40,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
     TV_INT grid_counts=grid.counts;
     if(use_weighted_divergence)
-        for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
             int color=filled_region_colors(iterator.Cell_Index());
             if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){const TV_INT& cell_index=iterator.Cell_Index();
                 int matrix_index=cell_index_to_matrix_index(cell_index);
@@ -71,7 +71,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
                             else A.Set_Element(matrix_index,cell_index_to_matrix_index(cell_index+offset),element);}}}
                 A.Set_Element(matrix_index,matrix_index,diagonal);}} // set diagonal and right hand side
     else
-        for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
             int color=filled_region_colors(iterator.Cell_Index());
             if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){const TV_INT& cell_index=iterator.Cell_Index();
                 int matrix_index=cell_index_to_matrix_index(cell_index);

@@ -5,8 +5,8 @@
 // Class LAPLACE_UNIFORM  
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/LAPLACE_UNIFORM.h>
@@ -58,7 +58,7 @@ Solve(const T time,const bool solution_regions_already_computed)
     cell_index_to_matrix_index.Fill(-1);
     ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-2,number_of_regions);
     ARRAY<SPARSE_MATRIX_FLAT_NXN<T> > A_array(number_of_regions);ARRAY<ARRAY<T> > b_array(number_of_regions);
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(filled_region_colors(iterator.Cell_Index()))++;
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(filled_region_colors(iterator.Cell_Index()))++;
     for(int color=0;color<number_of_regions;color++) if(filled_region_touches_dirichlet(color)||solve_neumann_regions){
         matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color));}
     filled_region_cell_count.Fill(0); // reusing this array in order to make the indirection arrays
@@ -66,7 +66,7 @@ Solve(const T time,const bool solution_regions_already_computed)
     ARRAY<int,TV_INT> domain_index(grid.Domain_Indices(1),false);
     for(int i=0;i<threaded_iterator.domains.m;i++){
         RANGE<TV_INT> interior_domain(threaded_iterator.domains(i));interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
-        for(CELL_ITERATOR iterator(grid,interior_domain);iterator.Valid();iterator.Next()) domain_index(iterator.Cell_Index())=i;}
+        for(CELL_ITERATOR<TV> iterator(grid,interior_domain);iterator.Valid();iterator.Next()) domain_index(iterator.Cell_Index())=i;}
     ARRAY<ARRAY<INTERVAL<int> > > interior_indices(number_of_regions);
     ARRAY<ARRAY<ARRAY<INTERVAL<int> > > > ghost_indices(number_of_regions);
     for(int color=0;color<number_of_regions;color++){
@@ -81,7 +81,7 @@ Solve(const T time,const bool solution_regions_already_computed)
     for(int color=0;color<number_of_regions;color++) if(filled_region_cell_count(color)>0 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
         pcg.Enforce_Compatibility(!filled_region_touches_dirichlet(color)&&enforce_compatibility);
         Solve_Subregion(interior_indices(color),ghost_indices(color),matrix_index_to_cell_index_array(color),A_array(color),b_array(color),color,&domain_index);}
-    if(!solve_neumann_regions) for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
+    if(!solve_neumann_regions) for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
         int filled_region_color=filled_region_colors(iterator.Cell_Index());if(filled_region_color>0 && !filled_region_touches_dirichlet(filled_region_color)) u(iterator.Cell_Index())=0;}
 }
 //#####################################################################
@@ -103,7 +103,7 @@ template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
 Find_A_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<int> >& row_counts)
 {
     // TODO: this should be rewritten in terms of faces cause this got really hacky with MPI
-    for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         int color=filled_region_colors(cell_index);assert(color!=-1);
         if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
             int row_count=1;
@@ -120,7 +120,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
     T default_row_sum=-2*one_over_dx2.Sum_Abs(),r=0;
     TV_INT grid_counts=grid.counts;
-    for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         int color=filled_region_colors(cell_index);
         if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
             int matrix_index=cell_index_to_matrix_index(cell_index);
@@ -202,7 +202,7 @@ Compute_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,ARRAY
 template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
 Compute_Matrix_Indices(const RANGE<TV_INT>& domain,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
-    for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
         int color=filled_region_colors(iterator.Cell_Index());
         if(color>=0&&(filled_region_touches_dirichlet(color)||solve_neumann_regions)){
             matrix_index_to_cell_index_array(color)(filled_region_cell_count(color))=iterator.Cell_Index();
@@ -240,7 +240,7 @@ template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
 Build_Single_Solution_Region(ARRAY<bool,TV_INT>& solve)
 {
     number_of_regions=1;
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_colors(iterator.Cell_Index())=solve(iterator.Cell_Index())?0:-2;
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_colors(iterator.Cell_Index())=solve(iterator.Cell_Index())?0:-2;
     filled_region_touches_dirichlet.Resize(1);filled_region_touches_dirichlet(0)=true;
 }
 //#####################################################################
@@ -251,17 +251,17 @@ Find_Solution_Regions()
 {
     FLOOD_FILL<TV::m> flood_fill;
     // set domain boundary cells and cells with objects to uncolorable
-    for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()) filled_region_colors(iterator.Cell_Index())=-2;
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()) filled_region_colors(iterator.Cell_Index())=-2;
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         if(psi_D(iterator.Cell_Index()) || (!solve_single_cell_neumann_regions && All_Cell_Faces_Neumann(iterator.Cell_Index()))) filled_region_colors(iterator.Cell_Index())=-2;
         else filled_region_colors(iterator.Cell_Index())=-1;}
     filled_region_touches_dirichlet.Remove_All();
     // do the fill
     if(mpi_grid){
-        for(int axis=0;axis<T_GRID::dimension;axis++) for(int side=0;side<2;side++) for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION,2*axis+side);iterator.Valid();iterator.Next()){
+        for(int axis=0;axis<T_GRID::dimension;axis++) for(int side=0;side<2;side++) for(CELL_ITERATOR<TV> iterator(grid,1,T_GRID::GHOST_REGION,2*axis+side);iterator.Valid();iterator.Next()){
             for(int face=0;face<T_GRID::dimension;face++)if(face!=axis){
                 psi_N.Component(face)(iterator.Cell_Index())=true;psi_N.Component(face)(iterator.Cell_Index()+TV_INT::Axis_Vector(face))=true;}}
-        for(int axis=0;axis<T_GRID::dimension;axis++) for(int side=0;side<2;side++) for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION,2*axis+side);iterator.Valid();iterator.Next()){
+        for(int axis=0;axis<T_GRID::dimension;axis++) for(int side=0;side<2;side++) for(CELL_ITERATOR<TV> iterator(grid,1,T_GRID::GHOST_REGION,2*axis+side);iterator.Valid();iterator.Next()){
             if(!psi_N.Component(axis)(iterator.Cell_Index()+(1-side)*TV_INT::Axis_Vector(axis))&&!psi_D(iterator.Cell_Index()))filled_region_colors(iterator.Cell_Index())=-1;}}
     number_of_regions=flood_fill.Flood_Fill(filled_region_colors,psi_N,&filled_region_touches_dirichlet);
     // correct flood fill for distributed grids
@@ -284,7 +284,7 @@ Initialize_Grid(const T_GRID& mac_grid_input)
 template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
 Set_Neumann_Outer_Boundaries()
 {
-    for(FACE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION);iterator.Valid();iterator.Next()) psi_N.Component(iterator.Axis())(iterator.Face_Index())=true;
+    for(FACE_ITERATOR<TV> iterator(grid,0,T_GRID::BOUNDARY_REGION);iterator.Valid();iterator.Next()) psi_N.Component(iterator.Axis())(iterator.Face_Index())=true;
     pcg.Enforce_Compatibility();
 }
 //#####################################################################
@@ -293,7 +293,7 @@ Set_Neumann_Outer_Boundaries()
 template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
 Set_Dirichlet_Outer_Boundaries()
 {
-    for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()) psi_D(iterator.Cell_Index())=true;
+    for(CELL_ITERATOR<TV> iterator(grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()) psi_D(iterator.Cell_Index())=true;
 }
 //#####################################################################
 // Function Use_Psi_R

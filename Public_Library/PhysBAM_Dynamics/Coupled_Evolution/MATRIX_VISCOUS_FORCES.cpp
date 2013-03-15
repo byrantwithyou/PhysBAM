@@ -5,8 +5,8 @@
 // Class MATRIX_VISCOUS_FORCES
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h>
@@ -43,7 +43,7 @@ Compute(const T dt,const ARRAY<bool,FACE_INDEX<d> >& psi_N,T mu)
     last_id=VISCOUS_FORCE_ID();
     if(!mu) return;
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();
         TV_INT face_index=iterator.Face_Index();
         FACE_INDEX<d> this_face(iterator.Full_Index());

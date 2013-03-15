@@ -20,8 +20,7 @@ template<class T_GRID>
 class MULTIPHASE_FIRE_EXAMPLES_UNIFORM:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>
 {
     typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef UNIFORM_GRID_ITERATOR_FACE<TV> FACE_ITERATOR;typedef UNIFORM_GRID_ITERATOR_CELL<TV> CELL_ITERATOR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;using BASE::Adjust_Phi_With_Source;
@@ -178,11 +177,11 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
     flame_speed_multiplier.Fill(0);
 
     if(test_number==1){
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
             if((T).45<iterator.Location().x && iterator.Location().x<=(T).55  &&  (T_GRID::dimension==2 || ((T).45<iterator.Location().z && iterator.Location().z<=(T).55)))
                 flame_speed_multiplier.Component(iterator.Axis())(iterator.Face_Index())=1;}
     else if(test_number==2){
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
             if(time<sphere_drop_time && SPHERE<TV>(VECTOR<T,3>((T).25,(T).6,(T).75),(T).08).Lazy_Inside(iterator.Location()))
                 flame_speed_multiplier.Component(iterator.Axis())(iterator.Face_Index())=1;}
     else if(test_number==3){
@@ -195,7 +194,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
         T_ARRAYS_SCALAR& phi2=phis(2);
         //LEVELSET<TV> levelset2(fluids_parameters.grid,phi2);
         //levelset2.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.dX.Min());levelset2.Fast_Marching_Method();
-        for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<int,3> cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
             T face_phi1=(T).5*(phi1(cell1)+phi1(cell2)),face_phi2=(T).5*(phi2(cell1)+phi2(cell2));
             if(face_phi1<reaction_bandwidth_times_edge_length && face_phi2<reaction_bandwidth_times_edge_length){
@@ -208,7 +207,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
     BOUNDARY<TV,T> boundary;boundary.Fill_Ghost_Cells(*fluids_parameters.grid,fluids_parameters.temperature_container.temperature,temp_temperature,dt,time,3);
     SMOOTH::Smooth<T,TV::m>(temp_temperature,5,0);
     if(fluids_parameters.mpi_grid) fluids_parameters.mpi_grid->Exchange_Boundary_Cell_Data(temp_temperature,1);
-    for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         T face_temperature=(T).5*(temp_temperature(iterator.First_Cell_Index())+temp_temperature(iterator.Second_Cell_Index()));
         if(face_temperature>ignition_temperature) flame_speed_multiplier.Component(iterator.Axis())(iterator.Face_Index())=clamp((T).01*(face_temperature-ignition_temperature),(T)0,(T)1);}
 }
@@ -227,7 +226,7 @@ void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
     fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Get_Single_Levelset(fluids_parameters.fuel_region,levelset,false);
 
     T bandwidth=2*fluids_parameters.grid->dX.Min();
-    for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
         T cell_flame_speed_multiplier=0;
         for(int i=0;i<T_GRID::dimension;i++)
             cell_flame_speed_multiplier+=flame_speed_multiplier.Component(i)(iterator.First_Face_Index(i))+flame_speed_multiplier.Component(i)(iterator.Second_Face_Index(i));
@@ -246,18 +245,18 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     ARRAY<T_ARRAYS_SCALAR>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
 
     if(test_number==1){
-        for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
             phis(1)(iterator.Cell_Index())=iterator.Location().y-(T).2;
         phis(2).Copy(-1,phis(1));}
     if(test_number==2){
-        for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             TV X=iterator.Location();TV_INT cell=iterator.Cell_Index();
             phis(1)(cell)=X.y-(T).2;
             phis(2)(cell)=1;
             phis(3)(cell)=SPHERE<TV>(VECTOR<T,3>((T).25,(T).6,(T).75),(T).08).Signed_Distance(X);
             phis(4)(cell)=-min(phis(1)(cell),phis(2)(cell),phis(3)(cell));}}
     if(test_number==3){
-        for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<T,3> X=iterator.Location();VECTOR<int,3> cell=iterator.Cell_Index();
             phis(1)(cell)=1;
             phis(2)(cell)=1;
@@ -285,7 +284,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
         Adjust_Phi_With_Source(inner_cylinder2,2,MATRIX<T,4>::Identity_Matrix());
         ARRAY<ARRAY<T,VECTOR<int,3> > >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
         T reaction_seed_bandwidth=(T).5*reaction_bandwidth*fluids_parameters.grid->dX.Min();
-        for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<int,3> cell=iterator.Cell_Index();
             T band=max(fabs(phis(1)(cell)),fabs(phis(2)(cell)))-reaction_seed_bandwidth;
             int region1,region2;T min_phi1,min_phi2;

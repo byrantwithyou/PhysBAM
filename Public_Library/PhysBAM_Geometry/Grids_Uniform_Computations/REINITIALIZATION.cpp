@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
@@ -80,7 +80,7 @@ Euler_Step_Of_Reinitialization(LEVELSET<TV>& levelset,const ARRAY<T,TV_INT>& sig
                     else rhs(index)+=sqr(max(phi_minus(i),-phi_plus(i),(T)0));}}}
 
     T min_DX=grid.dX.Min();
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(signed_distance(cell)) <= half_band_width){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(signed_distance(cell)) <= half_band_width){
         phi(cell)-=dt*sign_phi(cell)*(sqrt(rhs(cell))-1);
         if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(cell),phi(cell))) phi(cell)=LEVELSET_UTILITIES<T>::Sign(phi_ghost(cell))*levelset.small_number*min_DX;}}
 
@@ -104,7 +104,7 @@ Reinitialize(LEVELSET<TV>& levelset,int time_steps,T time,T half_band_width,T ex
 
     ARRAY<T,TV_INT> sign_phi(grid.Domain_Indices()); // smeared out sign function
     T epsilon=sqr(grid.dX.Max());
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         sign_phi(cell)=phi(cell)/sqrt(sqr(phi(cell))+epsilon);}
 
     T dt=cfl*grid.dX.Min();
@@ -115,7 +115,7 @@ Reinitialize(LEVELSET<TV>& levelset,int time_steps,T time,T half_band_width,T ex
             levelset.boundary->Apply_Boundary_Condition(grid,phi,time);}
 
     T min_DX=grid.dX.Min();
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(signed_distance(cell)) <= large_band){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(signed_distance(cell)) <= large_band){
         if(abs(signed_distance(cell)) > half_band_width) phi(cell)=signed_distance(cell); // outer band - use the FMM solution
         else if(abs(signed_distance(cell)-phi(cell)) > min_DX) phi(cell)=signed_distance(cell);}} // inner band - use FMM if errors look big
 }
