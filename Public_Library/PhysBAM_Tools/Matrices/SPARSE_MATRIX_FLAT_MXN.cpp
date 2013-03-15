@@ -680,6 +680,38 @@ Fast_Sparse_Multiply(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,ARRAY<SPARSE_MATRIX_ENTRY
         Subtract_C_Times(l,-q(i).a,transpose.A.Array_View(transpose.offsets(q(i).j),transpose.offsets(q(i).j+1)-transpose.offsets(q(i).j)));
 }
 //#####################################################################
+// Function Row_Subset
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Row_Subset(const ARRAY<int>& rows)
+{
+    delete Q;
+    delete L;
+    Q=0;
+    L=0;
+    ARRAY<int> new_offsets;
+    ARRAY<SPARSE_MATRIX_ENTRY<T> > new_A;
+    new_offsets.Append(0);
+    for(int i=0;i<rows.m;i++){
+        INTERVAL<int> I(offsets(rows(i)),offsets(rows(i)+1));
+        new_offsets.Append(new_offsets.Last()+I.Size());
+        new_A.Append_Elements(A.Array_View(I));}
+    A.Exchange(new_A);
+    offsets.Exchange(new_offsets);
+    m=rows.m;
+}
+//#####################################################################
+// Function Column_Subset
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Column_Subset(const ARRAY<int>& cols)
+{
+    SPARSE_MATRIX_FLAT_MXN<T> tmp;
+    Transpose(tmp);
+    tmp.Row_Subset(cols);
+    tmp.Transpose(*this);
+}
+//#####################################################################
 template class SPARSE_MATRIX_FLAT_MXN<float>;
 template std::ostream& operator<<(std::ostream&,const SPARSE_MATRIX_FLAT_MXN<float>&);
 template class SPARSE_MATRIX_FLAT_MXN<double>;

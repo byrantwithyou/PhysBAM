@@ -93,6 +93,8 @@ public:
     void Get_Row(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q_i,int row);
     void Construct_Incomplete_LQ_Factorization(const int p_l=10,const int p_q=10,const T zero_tolerance=1e-8,const T zero_replacement=1e-8);
     void Fast_Sparse_Multiply(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,ARRAY<SPARSE_MATRIX_ENTRY<T> >& l);
+    void Row_Subset(const ARRAY<int>& rows);
+    void Column_Subset(const ARRAY<int>& cols);
 //#####################################################################
 };
 template<class T> std::ostream& operator<<(std::ostream& output_stream,const SPARSE_MATRIX_FLAT_MXN<T>& A);
