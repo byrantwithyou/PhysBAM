@@ -384,6 +384,24 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("Z-%d.txt",solve_id).c_str()).Write_Preconditioner("Z",iss,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%d.txt",solve_id).c_str()).Write_Projection("P",iss,*vectors(0));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
+
+    if(0){
+        INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> tmp;
+        iss.Resize_Vector(tmp);
+        ARRAY<KRYLOV_VECTOR_BASE<T>*> null,eigenvectors;
+        ARRAY<T> eigenvalues;
+        iss.Compute_Small_Eigenvectors(rhs,null,eigenvectors,eigenvalues,20,1e-10,200);
+        for(int i=0;i<null.m;i++){
+            iss.null_modes.Append(static_cast<INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>*>(null(i)));
+            tmp.Copy(1,*null(i));
+            tmp*=1/tmp.Max_Abs();
+            Dump_Vector(iss,tmp,"null mode");}
+        for(int i=0;i<eigenvectors.m;i++){
+            iss.null_modes.Append(static_cast<INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>*>(eigenvectors(i)));
+            tmp.Copy(1,*eigenvectors(i));
+            tmp*=1/tmp.Max_Abs();
+            Dump_Vector(iss,tmp,STRING_UTILITIES::string_sprintf("eigenvector (%g)",eigenvalues(i)).c_str());}}
+
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
 
     if(example.dump_matrix){
@@ -628,7 +646,6 @@ Dump_Largest_Eigenvector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ARRAY<KRYL
     KRYLOV_SOLVER<T>* solver=&mr;
 
     ARRAY<INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>*> evs;
-    ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > fv;
     RANDOM_NUMBERS<T> random;
 
     OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("ev-%d.txt",solve_id).c_str());
@@ -657,22 +674,43 @@ Dump_Largest_Eigenvector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ARRAY<KRYL
             LOG::cout<<"eig approx "<<a<<"   dp "<<iss.Inner_Product(sol,tmp)<<std::endl;
             tmp=sol;}
 
-        for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
-            int c=example.levelset_color.Color(it.Location());
-            example.face_color(it.Full_Index())=c;
-            if(c<0) continue;
-            int k=iss.cm_u(it.Axis())->Get_Index(it.index,c);
-            assert(k>=0);
-            example.face_velocities(c)(it.Full_Index())=sol.u(it.Axis())(c)(k);}
-
-        fv=example.face_velocities;
-        PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("eigenvector (%g)",a),0,1);
-        example.face_velocities=fv;
+        Dump_Vector(iss,sol,STRING_UTILITIES::string_sprintf("eigenvector (%g)",a).c_str());
         evs.Append(new INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>(sol));
         oo.Write(STRING_UTILITIES::string_sprintf("EV%d",j).c_str(),sol);
         oo.Write(STRING_UTILITIES::string_sprintf("ev%d",j).c_str(),a);}
 
     evs.Delete_Pointers_And_Clean_Memory();
+}
+//#####################################################################
+// Function Dump_Vector
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Dump_Vector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const KRYLOV_VECTOR_BASE<T>& u,const char* str) const
+{
+    const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v=static_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>&>(u);
+    ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > fv=example.face_velocities;
+    for(int i=0;i<example.face_velocities.m;i++)
+        for(int j=0;j<TV::m;j++)
+            example.face_velocities(i).Component(j).Fill(0);
+
+    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+        int c=example.face_color(it.Full_Index());
+        if(c<0) continue;
+        int k=iss.cm_u(it.Axis())->Get_Index(it.index,c);
+        assert(k>=0);
+        example.face_velocities(c)(it.Full_Index())=v.u(it.Axis())(c)(k);}
+
+    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+        int c=example.levelset_color.Color(it.Location());
+        if(c<0) continue;
+        int k=iss.cm_p->Get_Index(it.index,c);
+        assert(k>=0);
+        T p=v.p(c)(k);
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+
+    PHYSBAM_DEBUG_WRITE_SUBSTEP(str,0,1);
+    example.face_velocities=fv;
 }
 //#####################################################################
 namespace PhysBAM{

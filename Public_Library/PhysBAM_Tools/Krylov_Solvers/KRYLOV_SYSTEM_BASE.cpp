@@ -124,87 +124,103 @@ Precondition(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
     if(!preconditioner_commutes_with_projection){Project(z);Project_Nullspace(z);}
     return z;
 }
-
-template<class T>
-struct SQUARED_SYSTEM:public KRYLOV_SYSTEM_BASE<T>
+//#####################################################################
+// Function Compute_Nullspace
+//#####################################################################
+template<class T> void KRYLOV_SYSTEM_BASE<T>::
+Compute_Nullspace(const KRYLOV_VECTOR_BASE<T>& tmp,ARRAY<KRYLOV_VECTOR_BASE<T>*>& null,int max_null) const
 {
-public:
-    const KRYLOV_SYSTEM_BASE<T>& system;
-    mutable KRYLOV_VECTOR_BASE<T>* tmp;
-    mutable KRYLOV_VECTOR_BASE<T>* tmp2;
-
-    SQUARED_SYSTEM(const KRYLOV_SYSTEM_BASE<T>& system_input,const bool use_preconditioner,const bool preconditioner_commutes_with_projection)
-        :KRYLOV_SYSTEM_BASE<T>(use_preconditioner,preconditioner_commutes_with_projection),system(system_input),tmp(0),tmp2(0)
-    {}
-
-    virtual ~SQUARED_SYSTEM()
-    {delete tmp;delete tmp2;}
-
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const PHYSBAM_OVERRIDE
-    {
-        if(!tmp) tmp=x.Clone_Default();
-        if(!tmp2) tmp2=x.Clone_Default();
-        system.Multiply(x,*tmp);
-        const KRYLOV_VECTOR_BASE<T>& mr=system.Precondition(*tmp,*tmp2);
-        system.Multiply(mr,result);
-    }
-
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const PHYSBAM_OVERRIDE
-    {return system.Inner_Product(x,y);}
-
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
-    {return system.Convergence_Norm(x);}
-
-    void Project(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
-    {system.Project(x);}
-
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
-    {system.Set_Boundary_Conditions(x);}
-
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
-    {system.Project_Nullspace(x);}
-
-    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const PHYSBAM_OVERRIDE
-    {system.Precondition(r,z);}
-
-//#####################################################################
-};
-//#####################################################################
-// Function Nullspace_Check
-//#####################################################################
-template<class T> bool KRYLOV_SYSTEM_BASE<T>::
-Nullspace_Check(KRYLOV_VECTOR_BASE<T>& null) const
-{
-    KRYLOV_VECTOR_BASE<T>* x=null.Clone_Default();
-    KRYLOV_VECTOR_BASE<T>* b=null.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>* x=tmp.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>* b=tmp.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>* z=tmp.Clone_Default();
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
 
     RANDOM_NUMBERS<T> random;
-    int n=null.Raw_Size();
-    for(int i=0;i<n;i++)
-        null.Raw_Get(i)=random.Get_Uniform_Number(-1,1);
     MINRES<T> mr;
-//    cg.print_diagnostics=false;
-    Project(null);
-    T mg=sqrt(Inner_Product(null,null));
-    null*=1/mg;
+    for(int j=0;j<max_null;j++){
+        int n=z->Raw_Size();
+        for(int i=0;i<n;i++)
+            z->Raw_Get(i)=random.Get_Uniform_Number(-1,1);
+        Project(*z);
+        for(int i=0;i<null.m;i++)
+            z->Copy(-Inner_Product(*z,*null(i)),*null(i),*z);
+        T mg=sqrt(Inner_Product(*z,*z));
+        *z*=1/mg;
 
-    T tol=1e-6;
-    for(int i=0;tol>1e-16;i++){
-        *x*=(T)0;
-        *b*=(T)0;
-        Multiply(null,*b);
-        mr.Solve(*this,*x,*b,av,tol,0,100000);
-        tol/=1e9;
-        null-=*x;
-        Project(null);
-        mg=sqrt(Inner_Product(null,null));
-        null*=1/mg;
-        if(mg<1e-6) return false;
-        LOG::cout<<(1-mg)<<std::endl;}
+        T tol=1e-15,tol_working=sqrt(tol);
+        for(int i=0;i<3;i++){
+            *x*=(T)0;
+            *b*=(T)0;
+            Multiply(*z,*b);
+            mr.Solve(*this,*x,*b,av,tol_working,0,100000);
+            *z-=*x;
+            Project(*z);
+            for(int i=0;i<null.m;i++)
+                z->Copy(-Inner_Product(*z,*null(i)),*null(i),*z);
+            mg=sqrt(Inner_Product(*z,*z));
+            if(!mg) break;
+            *z*=1/mg;
+            LOG::cout<<"nullspace iteration "<<(1-mg)<<std::endl;
+            tol_working=tol;}
+        Multiply(*z,*b);
+        mg=Inner_Product(*z,*b);
+        if(abs(mg)>1e-10) break;
+        LOG::cout<<"nullspace eigenvalue "<<mg<<std::endl;
+        null.Append(z);
+        z=tmp.Clone_Default();}
     delete x;
     delete b;
-    return mg>1e-10;
+    delete z;
+}
+//#####################################################################
+// Function Compute_Small_Eigenvectors
+//#####################################################################
+template<class T> void KRYLOV_SYSTEM_BASE<T>::
+Compute_Small_Eigenvectors(const KRYLOV_VECTOR_BASE<T>& tmp,ARRAY<KRYLOV_VECTOR_BASE<T>*>& null,
+    ARRAY<KRYLOV_VECTOR_BASE<T>*>& eigenvectors,ARRAY<T>& eigenvalues,int max_eigen,T tol,int power_iter) const
+{
+//    Compute_Nullspace(tmp,null,max_eigen);
+
+    KRYLOV_VECTOR_BASE<T>* x=tmp.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>* z=tmp.Clone_Default();
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
+
+    RANDOM_NUMBERS<T> random;
+    MINRES<T> mr;
+    for(int j=null.m;j<max_eigen;j++){
+        int n=z->Raw_Size();
+        for(int i=0;i<n;i++)
+            z->Raw_Get(i)=random.Get_Uniform_Number(-1,1);
+        Project(*z);
+        for(int i=0;i<null.m;i++)
+            z->Copy(-Inner_Product(*z,*null(i)),*null(i),*z);
+        for(int i=0;i<eigenvectors.m;i++)
+            z->Copy(-Inner_Product(*z,*eigenvectors(i)),*eigenvectors(i),*z);
+        T mg=sqrt(Inner_Product(*z,*z)),last=0;
+        *z*=1/mg;
+
+        for(int i=0;i<power_iter;i++){
+            *x=*z;
+            mr.Solve(*this,*x,*z,av,1e-15,0,1000);
+            exchange(x,z);
+            Project(*z);
+            for(int i=0;i<null.m;i++)
+                z->Copy(-Inner_Product(*z,*null(i)),*null(i),*z);
+            for(int i=0;i<eigenvectors.m;i++)
+                z->Copy(-Inner_Product(*z,*eigenvectors(i)),*eigenvectors(i),*z);
+            mg=sqrt(Inner_Product(*z,*z));
+            *z*=1/mg;
+            LOG::cout<<"power method iter "<<1/mg<<std::endl;
+            if(abs(mg-last)/maxabs(mg,last,(T)1e-12)<(T)1e-6) break;
+            last=mg;}
+        mg=1/abs(mg);
+        if(mg>tol) break;
+        eigenvectors.Append(z);
+        eigenvalues.Append(mg);
+        LOG::cout<<"eigenvalue "<<mg<<std::endl;
+        z=tmp.Clone_Default();}
+    delete x;
+    delete z;
 }
 namespace PhysBAM{
 template class KRYLOV_SYSTEM_BASE<float>;

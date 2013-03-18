@@ -398,12 +398,15 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         Dump_Vector<T,TV>(iss,sol,"solution");
         Dump_u_p(iss,error_u,error_p,"error");
         Dump_u_p(iss.grid,error_u,error_p,"color mapped error");
-        if(null&&iss.Nullspace_Check(rhs)){
-            OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
-            iss.Multiply(rhs,*vectors(0));
-            LOG::cout<<"nullspace found: "<<sqrt(iss.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
-            rhs*=1/rhs.Max_Abs();
-            Dump_Vector2<T,TV>(iss,rhs,"extra null mode");}}
+        if(null){
+            ARRAY<KRYLOV_VECTOR_BASE<T>*> array;
+            iss.Compute_Nullspace(rhs,array,1);
+            if(array.m){
+                OCTAVE_OUTPUT<T>("n.txt").Write("n",*array(0));
+                iss.Multiply(*array(0),*vectors(0));
+                LOG::cout<<"Extra nullspace found: "<<sqrt(iss.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
+                *array(0)*=1/static_cast<INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>*>(array(0))->Max_Abs();
+                Dump_Vector<T,TV>(iss,*static_cast<INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>*>(array(0)),"extra null mode");}}}
 
     vectors.Delete_Pointers_And_Clean_Memory();
 }
