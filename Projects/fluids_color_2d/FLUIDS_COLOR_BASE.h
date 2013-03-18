@@ -225,7 +225,7 @@ public:
         dt/=refine;
         time_steps_per_frame*=refine;
         stored_last_frame=last_frame;
-        unit_mu=kg*pow<TV::m-2>(m)/s;
+        unit_mu=kg*pow<2-TV::m>(m)/s;
         unit_rho=kg/pow<TV::m>(m);
         unit_st=kg*pow<3-TV::m>(m)/(s*s);
         unit_p=kg*pow<2-TV::m>(m)/(s*s);
