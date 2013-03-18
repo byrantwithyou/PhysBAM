@@ -16,6 +16,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include "MPM_CONSTITUTIVE_MODEL.h"
+#include "MPM_LINEAR_BASIS.h"
 #include "MPM_CUBIC_B_SPLINE.h"
 #include "MPM_PARTICLES.h"
 namespace PhysBAM{
@@ -25,6 +26,7 @@ class MPM_SIMULATION
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
+    // enum WORKAROUND{basis_function_order=1,IN=basis_function_order+1};
     enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
     //#################################################################
     // need external input
@@ -63,6 +65,7 @@ public:
     ARRAY<TV_INT> influence_corner;
     ARRAY<ARRAY<T,TV_INT> > weight;
     ARRAY<ARRAY<TV,TV_INT> > grad_weight;
+    // MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function; 
     MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function; 
     MPM_CONSTITUTIVE_MODEL<TV> constitutive_model;
     ARRAY<T,TV_INT> node_mass;

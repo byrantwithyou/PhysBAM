@@ -142,11 +142,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         case 6:
             sim.grid.Initialize(TV_INT(2*grid_res+1,0.5*grid_res+1),RANGE<TV>(TV(-1,-0.25),TV(1,0.25)));
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.5,-0.12),TV(-0.1,0.12)),particle_exclude_radius);
-            sim.particles.V.Fill(TV(20,0));
+            sim.particles.V.Fill(TV(10,0));
 //            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.1,-0.12),TV(0.5,0.12)),particle_exclude_radius);
             sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0.3,0),.2),particle_exclude_radius);
             sim.particles.Reduce_X_As_A_Ball(SPHERE<TV>(TV(0.3,0),.1).Bounding_Box());
-            sim.particles.V-=TV(10,0);
+            sim.particles.V-=TV(5,0);
             sim.ground_level=-100;
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
