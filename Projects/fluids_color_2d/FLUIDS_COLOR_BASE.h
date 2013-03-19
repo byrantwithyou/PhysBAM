@@ -290,6 +290,7 @@ public:
                 omit_solve=true;
                 break;
             case 9:
+            case 106:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 {
                     T x0=(T).2,x1=(T).5,x2=(T).8,v0=1,v2=-1,u_mu0=mu0/unit_mu,u_mu1=mu1/unit_mu;
@@ -303,6 +304,7 @@ public:
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(1)*v1,du0,rho0/unit_rho));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(1)*v1,du1,rho1/unit_rho));
                     use_p_null_mode=true;
+                    if(test_number==106) use_level_set_method=true;
                 }
                 break;
             case 11:
