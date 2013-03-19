@@ -115,6 +115,7 @@ public:
                 use_p_null_mode=true;
                 break;
             case 2:
+            case 101:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_VORTEX<TV>((T).2,0,-4);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0/unit_mu,rho0/unit_rho));
