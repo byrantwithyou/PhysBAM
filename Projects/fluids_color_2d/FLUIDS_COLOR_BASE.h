@@ -165,6 +165,7 @@ public:
     bool override_rho1;
     bool override_mu0;
     bool override_mu1;
+    bool override_surface_tension;
     bool use_pls_over_levelset;
 
     ARRAY<ANALYTIC_VELOCITY<TV>*> analytic_velocity,initial_analytic_velocity;
@@ -177,7 +178,7 @@ public:
         :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),rho0(1),
         rho1(2),unit_mu(0),unit_rho(0),unit_st(0),unit_p(0),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),
         no_advection(false),refine(1),surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),
-        use_pls_over_levelset(false),analytic_initial_only(false),number_of_threads(1),override_output_directory(false)
+        override_surface_tension(false),use_pls_over_levelset(false),analytic_initial_only(false),number_of_threads(1),override_output_directory(false)
     {
         last_frame=16;
         parse_args.Extra(&test_number,"example number","example number to run");
@@ -194,6 +195,7 @@ public:
         parse_args.Add("-mu1",&mu1,&override_mu1,"viscosity","viscosity for second fluid region");
         parse_args.Add("-rho0",&rho0,&override_rho0,"density","density for first fluid region");
         parse_args.Add("-rho1",&rho1,&override_rho1,"density","density for second fluid region");
+        parse_args.Add("-surface_tension",&surface_tension,&override_surface_tension,"density","density for second fluid region");
         parse_args.Add("-m",&m,"scale","meter scale");
         parse_args.Add("-s",&s,"scale","second scale");
         parse_args.Add("-kg",&kg,"scale","kilogram scale");
@@ -408,11 +410,12 @@ public:
                 }
                 break;
             case 22:
-                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,1);
+            case 107:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m/100,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).005,(T).003,0,1);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
-                surface_tension=unit_st;
+                if(!override_surface_tension) surface_tension=(T)0.07197*unit_st;
                 use_p_null_mode=true;
                 use_level_set_method=true;
                 break;
