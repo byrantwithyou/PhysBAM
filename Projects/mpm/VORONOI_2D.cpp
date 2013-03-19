@@ -147,11 +147,6 @@ Initialize_With_A_Triangulated_Area(const TRIANGULATED_AREA<T>& ta)
             elements(p).Append(tri2node.Get_Or_Insert(a));
             elements(p).Append(edge2node.Get_Or_Insert(edge));}}
     
-    // tested - good
-    // LOG::cout<<X<<std::endl;
-    // LOG::cout<<type<<std::endl;
-    // LOG::cout<<elements<<std::endl;
-
     //*** for all boundary particle p
     for(int i=0;i<boundary_particles.m;i++){
         int p=boundary_particles(i);
@@ -199,11 +194,6 @@ Initialize_With_A_Triangulated_Area(const TRIANGULATED_AREA<T>& ta)
         PHYSBAM_ASSERT(ta.mesh.elements(selection)(0)==e2(1) || ta.mesh.elements(selection)(1)==e2(1) || ta.mesh.elements(selection)(2)==e2(1));
         elements(p).Append(edge2node.Get_Or_Insert(e2));}
 
-    // tested - good                    
-    // LOG::cout<<"\n"<<X<<std::endl;
-    // LOG::cout<<type<<std::endl;
-    // LOG::cout<<elements<<std::endl;
-
     //*** insert face nodes to fix stuff
     HASHTABLE<TV_INT,int> face_fixer;
     for(int i=0;i<boundary_particles.m;i++){
@@ -228,16 +218,48 @@ Initialize_With_A_Triangulated_Area(const TRIANGULATED_AREA<T>& ta)
                 int id=new_elements.Find(elements(p)(aa));
                 new_elements.Insert(f_index,id+1);}}
         elements(p)=new_elements;}
-                
-
-    // LOG::cout<<"\n"<<X<<std::endl;
-    // LOG::cout<<type<<std::endl;
-    // LOG::cout<<elements<<std::endl;
 
     Xm=X;
     Initialize_Neighbor_Cells();
     Build_Association();
 }
+
+//#####################################################################
+// Function Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers
+//#####################################################################
+template<class T> void VORONOI_2D<T>::
+Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(const TRIANGULATED_AREA<T>& ta,MPM_PARTICLES<TV>& mpm_particles)
+{
+    HASHTABLE<TV_INT,bool> triedge2type; // true-boundary,false-interior
+    ARRAY<bool> particle2type(ta.particles.number); // true-boundary,false-interior
+    HASHTABLE<TV_INT,int> edge_count;
+    for(int i=0;i<ta.mesh.elements.m;i++){
+        for(int j=0;j<3;j++){
+            int jp1=(j==2)?0:(j+1);
+            int a=ta.mesh.elements(i)(j);
+            int b=ta.mesh.elements(i)(jp1);
+            TV_INT edge(min(a,b),max(a,b));
+            if(edge_count.Get_Pointer(edge)==NULL) edge_count.Get_Or_Insert(edge)=1;
+            else edge_count.Get_Or_Insert(edge)++;}}
+    for(typename HASHTABLE<TV_INT,int>::ITERATOR it(edge_count);it.Valid();it.Next()){
+        if(it.Data()==1) triedge2type.Get_Or_Insert(it.Key())=true;
+        else{PHYSBAM_ASSERT(it.Data()==2);triedge2type.Get_Or_Insert(it.Key())=false;}}
+    particle2type.Fill(false);
+    for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(triedge2type);it.Valid();it.Next())
+        if(it.Data()==true) for(int d=0;d<2;d++) particle2type(it.Key()(d))=true;
+    
+    mpm_particles.Clean_Memory();
+    mpm_particles.Resize(ta.mesh.elements.m);
+    for(int i=0;i<ta.mesh.elements.m;i++){
+        TV barycenter;
+        for(int d=0;d<3;d++) barycenter+=ta.particles.X(ta.mesh.elements(i)(d));
+        barycenter*=(T)0.333333333333333;
+        mpm_particles.X(i)=barycenter;}
+    mpm_particles.Xm=mpm_particles.X;
+
+    
+}
+
 //#####################################################################
 // function Initialize_Neighbor_Cells
 //#####################################################################

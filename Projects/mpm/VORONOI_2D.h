@@ -37,6 +37,7 @@ public:
 
     void Initialize_With_A_Regular_Grid_Of_Particles(const GRID<TV>& grid);
     void Initialize_With_A_Triangulated_Area(const TRIANGULATED_AREA<T>& ta);
+    void Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(const TRIANGULATED_AREA<T>& ta,MPM_PARTICLES<TV>& mpm_particles);
     void Initialize_Neighbor_Cells();
     void Build_Association();
     void Build_Segments();
