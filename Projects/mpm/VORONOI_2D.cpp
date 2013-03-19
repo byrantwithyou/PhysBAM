@@ -250,14 +250,22 @@ Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers
     
     mpm_particles.Clean_Memory();
     mpm_particles.Resize(ta.mesh.elements.m);
+    elements.Resize(ta.mesh.elements.m);
     for(int i=0;i<ta.mesh.elements.m;i++){
         TV barycenter;
-        for(int d=0;d<3;d++) barycenter+=ta.particles.X(ta.mesh.elements(i)(d));
+        for(int d=0;d<3;d++){
+            barycenter+=ta.particles.X(ta.mesh.elements(i)(d));
+            elements(i).Append(ta.mesh.elements(i)(d));}
         barycenter*=(T)0.333333333333333;
         mpm_particles.X(i)=barycenter;}
     mpm_particles.Xm=mpm_particles.X;
 
+    for(int i=0;i<ta.particles.X.m;i++){
+        X.Append(ta.particles.X(i));
+        if(particle2type(i)) type.Append(1);
+        else type.Append(10);}
     
+    //TODO: Add face centers
 }
 
 //#####################################################################
