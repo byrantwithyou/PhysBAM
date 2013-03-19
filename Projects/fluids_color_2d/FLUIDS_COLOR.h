@@ -242,6 +242,21 @@ public:
                 use_p_null_mode=true;
                 use_level_set_method=true;
                 break;}
+            case 102:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T)pi,(T).6*(T)pi,1,0);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0/unit_mu,rho0/unit_rho),TV((T).2,(T).5)));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_VORTEX<TV>(mu1/unit_mu,rho1/unit_rho),TV((T).2,(T).5)));
+                use_p_null_mode=true;
+                use_level_set_method=true;
+                break;}
+            case 103:{
+                
+                break;}
+            case 110:{
+                
+                break;}
+
 
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
     }
