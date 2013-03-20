@@ -265,7 +265,38 @@ Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers
         if(particle2type(i)) type.Append(1);
         else type.Append(10);}
     
-    //TODO: Add face centers
+    HASHTABLE<TV_INT,int> face_fixer;
+    for(int i=0;i<ta.mesh.elements.m;i++){
+        for(int aa=0;aa<elements(i).m;aa++){
+            int bb=(aa==elements(i).m-1)?0:(aa+1);
+            TV_INT edge(min(elements(i)(aa),elements(i)(bb)),max(elements(i)(aa),elements(i)(bb)));
+            if((type(edge(0))==1 && type(edge(1))==1) || (type(edge(0))==10 && type(edge(1))==10) || (type(edge(0))==1 && type(edge(1))==10) || (type(edge(0))==10 && type(edge(1))==1)){
+                if(face_fixer.Get_Pointer(edge)==NULL){
+                    X.Append((T)0.5*(X(edge(0))+X(edge(1))));
+                    type.Append(100);
+                    face_fixer.Get_Or_Insert(edge)=X.m-1;}}}}
+
+    for(int i=0;i<ta.mesh.elements.m;i++){
+        ARRAY<int> new_elements=elements(i);
+        for(int aa=0;aa<elements(i).m;aa++){
+            int bb=(aa==elements(i).m-1)?0:(aa+1);
+            TV_INT edge(min(elements(i)(aa),elements(i)(bb)),max(elements(i)(aa),elements(i)(bb)));
+            if((type(edge(0))==1 && type(edge(1))==1) || (type(edge(0))==10 && type(edge(1))==10) || (type(edge(0))==1 && type(edge(1))==10) || (type(edge(0))==10 && type(edge(1))==1)){
+                int f_index=face_fixer.Get_Or_Insert(edge);
+                int id=new_elements.Find(elements(i)(aa));
+                new_elements.Insert(f_index,id+1);}}
+        elements(i)=new_elements;}
+
+    // for(int i=0;i<elements.m;i++){
+    //     PHYSBAM_ASSERT(elements(i).m==6);
+    //     LOG::cout<<type(elements(i)(0))<<" "<<type(elements(i)(1))<<" "<<type(elements(i)(2))<<" "<<type(elements(i)(3))<<" "<<type(elements(i)(4))<<" "<<type(elements(i)(5))<<std::endl;
+    // }
+    // exit(0);
+
+    Xm=X;
+    Initialize_Neighbor_Cells();
+    Build_Association();
+
 }
 
 //#####################################################################
@@ -283,6 +314,8 @@ Initialize_Neighbor_Cells()
             PHYSBAM_ASSERT(it.Data().m==2);
             neighbor_cells.Append(TRIPLE<int,int,bool>(it.Data()(0),it.Data()(1),true));}
     TIMING_END("");
+    // LOG::cout<<neighbor_cells<<std::endl;
+
 }
 //#####################################################################
 // Function Build_Association
@@ -330,34 +363,35 @@ Build_Boundary_Segments()
             else seg.Get_Or_Insert(TV_INT(second,first))++;}}
     for(typename HASHTABLE<TV_INT,int>::ITERATOR it(seg);it.Valid();it.Next()) if(it.Data()==1) boundary_segments.Append(it.Key());
 }
+
 //#####################################################################
 // Function Deform_Mesh_Using_Particle_Deformation
 //#####################################################################
 template<class T> void VORONOI_2D<T>::
-Deform_Mesh_Using_Particle_Deformation(const ARRAY_VIEW<TV>& particle_Xm,const ARRAY_VIEW<TV>& particle_X,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fe,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fp)
+Deform_Mesh_Using_Particle_Deformation(const ARRAY_VIEW<TV>& particle_Xm,const ARRAY_VIEW<TV>& particle_X,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fe,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fp,const bool constrain_face_centers)
 {
     X.Clean_Memory();X.Resize(Xm.m);
-    bool use_deformation_gradient=true;
-    bool use_average_world_space=false;
-    if(use_deformation_gradient){
-        ARRAY<TV> particle_b(particle_X.m);
-        ARRAY<MATRIX<T,TV::m> > particle_F(particle_X.m);
-        for(int i=0;i<particle_b.m;i++){
-            particle_F(i)=particle_Fe(i)*particle_Fp(i);
-            particle_b(i)=particle_X(i)-particle_F(i)*particle_Xm(i);}
-        for(int i=0;i<X.m;i++){
-            X(i)=TV();
-            for(int p=0;p<association(i).m;p++){
-                int particle=association(i)(p);
-                X(i)+=particle_F(particle)*Xm(i)+particle_b(particle);}
-            X(i)/=association(i).m;}}
-    else if(use_average_world_space){
-        for(int i=0;i<X.m;i++){
-            X(i)=TV();
-            for(int p=0;p<association(i).m;p++){
-                int particle=association(i)(p);
-                X(i)+=particle_X(particle);}
-            X(i)/=association(i).m;}}
+    ARRAY<TV> particle_b(particle_X.m);
+    ARRAY<MATRIX<T,TV::m> > particle_F(particle_X.m);
+    for(int i=0;i<particle_b.m;i++){
+        particle_F(i)=particle_Fe(i)*particle_Fp(i);
+        particle_b(i)=particle_X(i)-particle_F(i)*particle_Xm(i);}
+    for(int i=0;i<X.m;i++){
+        X(i)=TV();
+        for(int p=0;p<association(i).m;p++){
+            int particle=association(i)(p);
+            X(i)+=particle_F(particle)*Xm(i)+particle_b(particle);}
+        X(i)/=association(i).m;}
+    if(constrain_face_centers){
+        HASHTABLE<int,TV_INT> fc2parents;
+        for(int e=0;e<elements.m;e++){
+            for(int a=0;a<elements(e).m;a++){
+                int me=elements(e)(a);
+                int left=(a==0)?elements(e)(elements(e).m-1):elements(e)(a-1);
+                int right=(a==elements(e).m-1)?elements(e)(0):elements(e)(a+1);
+                if(type(me)==100) fc2parents.Get_Or_Insert(me)=TV_INT(left,right).Sorted();}}
+        for(typename HASHTABLE<int,TV_INT>::ITERATOR it(fc2parents);it.Valid();it.Next())
+            X(it.Key())=(T)0.5*(X(it.Data()(0))+X(it.Data()(1)));}
 }
 //#####################################################################
 // Function Crack
@@ -366,16 +400,38 @@ template<class T> void VORONOI_2D<T>::
 Crack(const ARRAY_VIEW<TV>& particle_X,const T threshold)
 {
     LOG::cout<<"crack start"<<std::endl;
+
     T threshold_squared=sqr(threshold);
     for(int nc=0;nc<neighbor_cells.m;nc++){
         TRIPLE<int,int,bool>& tr=neighbor_cells(nc);
+
+        // if(tr.z){
+        //     ARRAY<int> shared_nodes;shared_nodes.Find_Common_Elements(elements(tr.x),elements(tr.y));
+        //     if(shared_nodes.m!=3){
+        //         LOG::cout<<shared_nodes.m<<std::endl;
+        //         LOG::cout<<tr.x<<" "<<elements(tr.x)<<std::endl;
+        //         LOG::cout<<tr.y<<" "<<elements(tr.y)<<std::endl;
+        //         LOG::cout<<neighbor_cells(nc)<<std::endl;
+        //     }
+        //     PHYSBAM_ASSERT(shared_nodes.m==3);
+        // }
+
         if(tr.z && (particle_X(tr.x)-particle_X(tr.y)).Magnitude_Squared()>threshold_squared){
             ARRAY<int> shared_nodes;shared_nodes.Find_Common_Elements(elements(tr.x),elements(tr.y));
+
+            // if(shared_nodes.m!=3){
+            //     LOG::cout<<shared_nodes.m<<std::endl;
+            //     LOG::cout<<tr.x<<" "<<elements(tr.x)<<std::endl;
+            //     LOG::cout<<tr.y<<" "<<elements(tr.y)<<std::endl;
+            //     LOG::cout<<neighbor_cells(nc)<<std::endl;
+            // }
             PHYSBAM_ASSERT(shared_nodes.m==3);
+
             VECTOR<int,3> types(type(shared_nodes(0)),type(shared_nodes(1)),type(shared_nodes(2)));
             int sum=types.Sum();
             switch(sum){
                 case 120:{
+                    // LOG::cout<<"case 120"<<std::endl;
                     int f1=0,i1=0,i2=0;
                     for(int i=0;i<3;i++){
                         if(types(i)==100) f1=shared_nodes(i);
@@ -388,8 +444,16 @@ Crack(const ARRAY_VIEW<TV>& particle_X,const T threshold)
                     int f2=Xm.m-1;
                     for(int i=0;i<elements(tr.y).m;i++) if(elements(tr.y)(i)==f1) elements(tr.y)(i)=f2;
                     tr.z=false;
+
+
+                    // LOG::cout<<elements(6)<<std::endl;
+                    // LOG::cout<<elements(11)<<std::endl;
+                    // ARRAY<int> sn;sn.Find_Common_Elements(elements(6),elements(11));
+                    // LOG::cout<<sn.m<<std::endl;
+
                     break;}
                 case 111:{
+                    // LOG::cout<<"case 111"<<std::endl;
                     int f1=0,i1=0,b1=0;
                     for(int i=0;i<3;i++){
                         if(types(i)==100) f1=shared_nodes(i);
@@ -404,27 +468,44 @@ Crack(const ARRAY_VIEW<TV>& particle_X,const T threshold)
 
                     type.Append(1);Xm.Append(Xm(b1));
                     int b2=Xm.m-1;
-                    ARRAY<int> cells_share_b1;
-                    for(int i=0;i<elements.m;i++) if(elements(i).Contains(b1)) cells_share_b1.Append(i);
-                    ARRAY<int> groupA,groupB;
-                    groupA.Append(cells_share_b1(0));
-                    for(int i=1;i<cells_share_b1.m;i++){
-                        int this_cell=cells_share_b1(i);
-                        bool flag=false;
-                        for(int j=0;j<groupA.m;j++){
-                            int that_cell=groupA(j);
-                            int small_cell=(this_cell>that_cell)?that_cell:this_cell;
-                            int big_cell=(this_cell==small_cell)?that_cell:this_cell;
-                            if(neighbor_cells.Contains(TRIPLE<int,int,bool>(small_cell,big_cell,true))){
-                                flag=true;
-                                break;}}
-                        if(flag) groupA.Append(this_cell);
-                        else groupB.Append(this_cell);}
-                    for(int i=0;i<groupB.m;i++){
-                        int this_cell=groupB(i);
+
+                    ARRAY<int> csb;
+                    for(int i=0;i<elements.m;i++) if(elements(i).Contains(b1)) csb.Append(i);
+                    ARRAY<int> groupA;
+                    groupA.Append(csb(0));
+                    csb.Remove_Index_Lazy(0);
+                    for(int i=0;i<groupA.m;i++){
+                        ARRAY<int> new_members;
+                        for(int j=0;j<csb.m;j++){
+                            int small_cell=(groupA(i)>csb(j))?csb(j):groupA(i);
+                            int big_cell=(groupA(i)==small_cell)?csb(j):groupA(i);
+                            if(neighbor_cells.Contains(TRIPLE<int,int,bool>(small_cell,big_cell,true)))
+                                new_members.Append(csb(j));}
+                        for(int j=0;j<new_members.m;j++){
+                            groupA.Append(new_members(j));
+                            csb.Remove_Index_Lazy(csb.Find(new_members(j)));}}
+
+                    for(int i=0;i<groupA.m;i++){
+                        int this_cell=groupA(i);
                         for(int j=0;j<elements(this_cell).m;j++) if(elements(this_cell)(j)==b1) elements(this_cell)(j)=b2;}
+
+                    // LOG::cout<<elements(6)<<std::endl;
+                    // LOG::cout<<elements(11)<<std::endl;
+                    // ARRAY<int> sn;sn.Find_Common_Elements(elements(6),elements(11));
+                    // LOG::cout<<sn.m<<std::endl;
+
+
                     break;}
                 case 102:{
+                    // LOG::cout<<"case 102"<<std::endl;
+
+                    // {
+                    //     LOG::cout<<elements(6)<<std::endl;
+                    //     LOG::cout<<elements(11)<<std::endl;
+                    //     ARRAY<int> sn;sn.Find_Common_Elements(elements(6),elements(11));
+                    //     LOG::cout<<sn.m<<std::endl;
+                    // }
+
                     int f1=0,bfirst1=0,bsecond1=0;
                     for(int i=0;i<3;i++){
                         if(types(i)==100) f1=shared_nodes(i);
@@ -436,50 +517,76 @@ Crack(const ARRAY_VIEW<TV>& particle_X,const T threshold)
                     int f2=Xm.m-1;
                     for(int i=0;i<elements(tr.y).m;i++) if(elements(tr.y)(i)==f1) elements(tr.y)(i)=f2;
                     tr.z=false;
-                    
+
+                    // LOG::cout<<"CRACKING:"<<tr<<std::endl;
+                    // {
+                    //     LOG::cout<<elements(6)<<std::endl;
+                    //     LOG::cout<<elements(11)<<std::endl;
+                    //     ARRAY<int> sn;sn.Find_Common_Elements(elements(6),elements(11));
+                    //     LOG::cout<<sn.m<<std::endl;
+                    // }                    
+
                     type.Append(1);Xm.Append(Xm(bfirst1));
                     int bfirst2=Xm.m-1;
-                    ARRAY<int> cells_share_bfirst1;
-                    for(int i=0;i<elements.m;i++) if(elements(i).Contains(bfirst1)) cells_share_bfirst1.Append(i);
-                    ARRAY<int> groupA,groupB;
-                    groupA.Append(cells_share_bfirst1(0));
-                    for(int i=1;i<cells_share_bfirst1.m;i++){
-                        int this_cell=cells_share_bfirst1(i);
-                        bool flag=false;
-                        for(int j=0;j<groupA.m;j++){
-                            int that_cell=groupA(j);
-                            int small_cell=(this_cell>that_cell)?that_cell:this_cell;
-                            int big_cell=(this_cell==small_cell)?that_cell:this_cell;
-                            if(neighbor_cells.Contains(TRIPLE<int,int,bool>(small_cell,big_cell,true))){
-                                flag=true;
-                                break;}}
-                        if(flag) groupA.Append(this_cell);
-                        else groupB.Append(this_cell);}
-                    for(int i=0;i<groupB.m;i++){
-                        int this_cell=groupB(i);
+
+                    ARRAY<int> csbfirst;
+                    for(int i=0;i<elements.m;i++) if(elements(i).Contains(bfirst1)) csbfirst.Append(i);
+                    ARRAY<int> groupA;
+                    groupA.Append(csbfirst(0));
+                    csbfirst.Remove_Index_Lazy(0);
+                    for(int i=0;i<groupA.m;i++){
+                        ARRAY<int> new_members;
+                        for(int j=0;j<csbfirst.m;j++){
+                            int small_cell=(groupA(i)>csbfirst(j))?csbfirst(j):groupA(i);
+                            int big_cell=(groupA(i)==small_cell)?csbfirst(j):groupA(i);
+                            if(neighbor_cells.Contains(TRIPLE<int,int,bool>(small_cell,big_cell,true)))
+                                new_members.Append(csbfirst(j));}
+                        for(int j=0;j<new_members.m;j++){
+                            groupA.Append(new_members(j));
+                            csbfirst.Remove_Index_Lazy(csbfirst.Find(new_members(j)));}}
+
+                    for(int i=0;i<groupA.m;i++){
+                        int this_cell=groupA(i);
                         for(int j=0;j<elements(this_cell).m;j++) if(elements(this_cell)(j)==bfirst1) elements(this_cell)(j)=bfirst2;}
+
+                    // {
+                    //     LOG::cout<<elements(6)<<std::endl;
+                    //     LOG::cout<<elements(11)<<std::endl;
+                    //     ARRAY<int> sn;sn.Find_Common_Elements(elements(6),elements(11));
+                    //     LOG::cout<<sn.m<<std::endl;
+                    // }                    
 
                     type.Append(1);Xm.Append(Xm(bsecond1));
                     int bsecond2=Xm.m-1;
-                    ARRAY<int> cells_share_bsecond1;
-                    for(int i=0;i<elements.m;i++) if(elements(i).Contains(bsecond1)) cells_share_bsecond1.Append(i);
-                    ARRAY<int> groupC,groupD;
-                    groupC.Append(cells_share_bsecond1(0));
-                    for(int i=1;i<cells_share_bsecond1.m;i++){
-                        int this_cell=cells_share_bsecond1(i);
-                        bool flag=false;
-                        for(int j=0;j<groupC.m;j++){
-                            int that_cell=groupC(j);
-                            int small_cell=(this_cell>that_cell)?that_cell:this_cell;
-                            int big_cell=(this_cell==small_cell)?that_cell:this_cell;
-                            if(neighbor_cells.Contains(TRIPLE<int,int,bool>(small_cell,big_cell,true))){
-                                flag=true;
-                                break;}}
-                        if(flag) groupC.Append(this_cell);
-                        else groupD.Append(this_cell);}
-                    for(int i=0;i<groupD.m;i++){
-                        int this_cell=groupD(i);
+
+                    ARRAY<int> csbsecond;
+                    for(int i=0;i<elements.m;i++) if(elements(i).Contains(bsecond1)) csbsecond.Append(i);
+                    ARRAY<int> groupC;
+                    groupC.Append(csbsecond(0));
+                    csbsecond.Remove_Index_Lazy(0);
+                    for(int i=0;i<groupC.m;i++){
+                        ARRAY<int> new_members;
+                        for(int j=0;j<csbsecond.m;j++){
+                            int small_cell=(groupC(i)>csbsecond(j))?csbsecond(j):groupC(i);
+                            int big_cell=(groupC(i)==small_cell)?csbsecond(j):groupC(i);
+                            if(neighbor_cells.Contains(TRIPLE<int,int,bool>(small_cell,big_cell,true)))
+                                new_members.Append(csbsecond(j));}
+                        for(int j=0;j<new_members.m;j++){
+                            groupC.Append(new_members(j));
+                            csbsecond.Remove_Index_Lazy(csbsecond.Find(new_members(j)));}}
+
+                    // LOG::cout<<"groupC:"<<groupC<<std::endl;
+                    // LOG::cout<<"are 6 and 1  neighbors?"<<neighbor_cells<<std::endl;
+                    for(int i=0;i<groupC.m;i++){
+                        int this_cell=groupC(i);
                         for(int j=0;j<elements(this_cell).m;j++) if(elements(this_cell)(j)==bsecond1) elements(this_cell)(j)=bsecond2;}
+
+                    // LOG::cout<<elements(6)<<std::endl;
+                    // LOG::cout<<elements(11)<<std::endl;
+                    // ARRAY<int> sn;sn.Find_Common_Elements(elements(6),elements(11));
+                    // LOG::cout<<sn.m<<std::endl;
+                    
+
 
                     break;}    
                 default:

@@ -151,6 +151,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
+
     // Delaunay Triangulation
     TRIANGULATED_AREA<T> ta;
     if(use_delaunay){
@@ -168,15 +170,25 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     
     // voronoi reconstruction
     if(use_voronoi){
-        voronoi.Initialize_With_A_Triangulated_Area(ta);
+        // voronoi.Initialize_With_A_Triangulated_Area(ta);
+        voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
         voronoi.Build_Segments();
+        for(int i=0;i<voronoi.X.m;i++) {
+            if(voronoi.type(i)==1) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,0,0));
+            else if(voronoi.type(i)==10) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,1,0));
+            else if(voronoi.type(i)==100) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(0,0,1));}
         for(int s=0;s<voronoi.segments.m;s++){
             Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}
         for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
         Flush_Frame<TV>("voronoi cells");}
     if(use_voronoi_boundary){
-        voronoi.Initialize_With_A_Triangulated_Area(ta);
+        // voronoi.Initialize_With_A_Triangulated_Area(ta);
+        voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
         voronoi.Build_Boundary_Segments();
+        for(int i=0;i<voronoi.X.m;i++) {
+            if(voronoi.type(i)==1) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,0,0));
+            else if(voronoi.type(i)==10) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,1,0));
+            else if(voronoi.type(i)==100) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(0,0,1));}
         for(int s=0;s<voronoi.boundary_segments.m;s++){
             Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.boundary_segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}
         for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
@@ -253,7 +265,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     sim.mu0=sim.mu;
     sim.lambda0=sim.lambda;
 
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
 
     // Greg Turk
     if(use_turk){
@@ -322,7 +333,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.3);
                 voronoi.Build_Association();
                 voronoi.Build_Segments();
-                voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp);
+                voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp,true);
                 for(int s=0;s<voronoi.segments.m;s++){
                     Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
             if(use_voronoi_boundary){
