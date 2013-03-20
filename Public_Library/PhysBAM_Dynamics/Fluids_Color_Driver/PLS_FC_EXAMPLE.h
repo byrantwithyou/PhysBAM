@@ -59,12 +59,15 @@ public:
     bool use_level_set_method;
     bool use_pls;
     bool dump_largest_eigenvector;
+    bool save_pressure;
 
     GRID<TV> grid;
     PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >& particle_levelset_evolution_multiple;
     VECTOR<ARRAY<T,TV_INT>,num_bc> bc_phis; // 0=Neumann, 1=Dirichlet, 2=Slip
     ARRAY<int,FACE_INDEX<TV::dimension> > face_color,prev_face_color;
     ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > face_velocities,prev_face_velocities;
+    ARRAY<int,TV_INT> pressure_color;
+    ARRAY<T,TV_INT> pressure;
     ADVECTION<GRID<TV>,T>& advection_scalar;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
     BOUNDARY_MAC_GRID_PERIODIC<TV,int> boundary_int;

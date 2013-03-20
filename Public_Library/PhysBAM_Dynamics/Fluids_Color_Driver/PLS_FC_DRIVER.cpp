@@ -91,6 +91,9 @@ Initialize()
         example.prev_face_velocities(i).Resize(example.grid,example.number_of_ghost_cells);}
     for(int i=0;i<example.bc_phis.m;i++)
         example.bc_phis(i).Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
+    if(example.save_pressure){
+        example.pressure_color.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
+        example.pressure.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));}
 
     example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.number_of_colors,false);//false= we use positive and negative particles, not just negative
     example.particle_levelset_evolution_multiple.particle_levelset_multiple.Set_Band_Width(2*example.number_of_ghost_cells);
@@ -434,6 +437,15 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         example.boundary.Fill_Ghost_Faces(example.grid,example.face_velocities(c),example.face_velocities(c),0,example.number_of_ghost_cells);}
     example.boundary_int.Apply_Boundary_Condition_Face(example.grid,example.face_color,time+example.dt);
     example.boundary_int.Fill_Ghost_Faces(example.grid,example.face_color,example.face_color,0,example.number_of_ghost_cells);
+
+    if(example.save_pressure){
+        for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+            int c=example.levelset_color.Color(it.Location());
+            if(c<0) continue;
+            int k=iss.cm_p->Get_Index(it.index,c);
+            assert(k>=0);
+            example.pressure(it.index)=sol.p(c)(k)/dt;
+            example.pressure_color(it.index)=c;}}
 }
 //#####################################################################
 // Function Extrapolate_Velocity

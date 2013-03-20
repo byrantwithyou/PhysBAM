@@ -142,7 +142,7 @@ public:
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
     using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
     using BASE::particle_levelset_evolution_multiple;using BASE::face_color;using BASE::substeps_delay_frame;
-    using BASE::dump_largest_eigenvector;
+    using BASE::dump_largest_eigenvector;using BASE::save_pressure;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -242,6 +242,7 @@ public:
         use_advection=!no_advection;
 
         analytic_levelset=0;
+        save_pressure=true;
     }
 
     ~FLUIDS_COLOR_BASE()
@@ -548,18 +549,48 @@ public:
     void Velocity_Error(T time)
     {
         if(!analytic_velocity.m || analytic_initial_only) return;
-        T max_error=0,a=0,b=0;
+        T u_inf=0,u_2=0,p_inf=0,p_2=0,p_ave=0,a=0,b=0,pa=0,pb=0;
+        int num_u=0,num_p=0;
         for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             int c=levelset_color.Color(it.Location());
             if(c<0) continue;
             T A=face_velocities(c)(it.Full_Index()),B=analytic_velocity(c)->u(it.Location()/m,time/s)(it.Axis())*m/s;
             a=max(a,abs(A));
             b=max(b,abs(B));
-            max_error=max(max_error,abs(A-B));
+            u_inf=max(u_inf,abs(A-B));
+            u_2+=sqr(A-B);
+            num_u++;
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(A-B));}
-        LOG::cout<<"max_error "<<max_error<<"  "<<a<<"  "<<b<<std::endl;
+        if(num_u) u_2/=num_u;
+        u_2=sqrt(u_2);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("velocity error",0,1);
+        if(use_p_null_mode){
+            int cnt=0;
+            for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
+                int c=levelset_color.Color(it.Location());
+                if(c<0) continue;
+                T A=pressure(it.index),B=analytic_velocity(c)->p(it.Location()/m,time/s)*unit_p,D=A-B;
+                p_ave+=D;
+                cnt++;}
+            if(cnt) p_ave/=cnt;}
+        for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
+            int c=levelset_color.Color(it.Location());
+            if(c<0) continue;
+            T A=pressure(it.index),B=analytic_velocity(c)->p(it.Location()/m,time/s)*unit_p,D=A-B-p_ave;
+            pa=max(pa,abs(A));
+            pb=max(pb,abs(B));
+            p_inf=max(p_inf,abs(D));
+            p_2+=sqr(D);
+            num_p++;
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(D));}
+        if(num_p) p_2/=num_p;
+        p_2=sqrt(p_2);
+        char buff[1000];
+        sprintf(buff, "max_error %-22.16g %-22.16g %-22.16g %-22.16g  p %-22.16g %-22.16g %-22.16g %-22.16g", u_inf, u_2, a, b, p_inf, p_2, pa, pb);
+        LOG::cout<<buff<<std::endl;
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("pressure error",0,1);
     }
 
     void Dump_Analytic_Levelset(T time)
