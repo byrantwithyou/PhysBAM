@@ -83,6 +83,7 @@ public:
     using BASE::unit_rho;using BASE::unit_mu;using BASE::unit_st;using BASE::surface_tension;
     using BASE::override_rho0;using BASE::override_rho1;using BASE::override_mu0;using BASE::override_mu1;
     using BASE::test_analytic_diff;using BASE::Initialize_Common_Example;using BASE::After_Initialize_Example;
+    using BASE::use_discontinuous_velocity;
 
     T epsilon,radius;
     int mode;
@@ -104,6 +105,30 @@ public:
     ~FLUIDS_COLOR()
     {
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+    //
+    //   Tests:
+    //   1. Periodic decaying vortex, no interface
+    //   2. Translating and decaying vortex
+    //   3. In BASE class
+    //   4. In BASE class
+    //   5. Vortex with sphere boundary
+    //   6. Rotation with vortex stream boundary
+    //   7. In BASE class
+    //   8. Translating and decaying vortex
+    //   9. In BASE class
+    //   10. Constant velocity with vortex stream boundary
+    //   11-15. In BASE class
+    //   16. 
+    //  
+    //   101. Decaying vortex, identical to Test 2. Example 1 in the JCP paper.
+    //   102. Translating and decaying vortex, similar to Test 8. JCP Example 2.
+    //   103. Different velocity fields with embedded Neumann bc. JCP Example 3.
+    //   104. In BASE class. JCP Example 4 (2d).
+    //   105. In BASE class. JCP Example 5 (3d).
+    //   
+    ////////////////////////////////////////////////////////////////////////////
 
     void Initialize_Example()
     {
@@ -244,14 +269,21 @@ public:
                 break;}
             case 102:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
-                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T)pi,(T).6*(T)pi,1,0);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV((T)1.1*(T)pi,(T)pi),(T).6*(T)pi,1,0);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0/unit_mu,rho0/unit_rho),TV((T).2,(T).5)));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_VORTEX<TV>(mu1/unit_mu,rho1/unit_rho),TV((T).2,(T).5)));
                 use_p_null_mode=true;
                 use_level_set_method=true;
                 break;}
             case 103:{
-                
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*(T)pi*m,true);
+                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_SPHERE<TV>(TV::Axis_Vector(0)*.2*pi,(T).2*(T)pi,NEUMANN,0);
+                ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),1,1);
+                analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),(T).8*(T)pi,0,1)))->Add(ab)->Add(cd);
+                MATRIX<T,TV::m> du0;for(int i=0;i<TV::m;i++)du0(i,i)=1;du0(1,1)-=TV::m;
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*.2*pi,TV(),du0,rho0/unit_rho));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(mu1/unit_mu,rho1/unit_rho));
+                use_discontinuous_velocity=true;
                 break;}
             case 110:{
                 

@@ -473,8 +473,16 @@ public:
             
                 break;
             }
-            case 104:case 105:{
-                
+            case 104:
+            case 105:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*(T)pi*m,true);
+                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
+                ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),.8*(T)pi,1,SLIP);
+                analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV::Axis_Vector(0)*.2*pi,(T).2*(T)pi,0,1)))->Add(ab)->Add(cd);
+                MATRIX<T,TV::m> du0;for(int i=0;i<TV::m;i++)du0(i,i)=1;du0(1,1)-=TV::m;
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*.2*pi,TV(),du0,rho0/unit_rho));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),spin_count+1,rho1/unit_rho));
+                use_discontinuous_velocity=true;
                 break;}
 
             default: return false;}
