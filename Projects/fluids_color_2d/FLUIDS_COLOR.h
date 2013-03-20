@@ -83,7 +83,7 @@ public:
     using BASE::unit_rho;using BASE::unit_mu;using BASE::unit_st;using BASE::surface_tension;
     using BASE::override_rho0;using BASE::override_rho1;using BASE::override_mu0;using BASE::override_mu1;
     using BASE::test_analytic_diff;using BASE::Initialize_Common_Example;using BASE::After_Initialize_Example;
-    using BASE::use_discontinuous_velocity;
+    using BASE::use_discontinuous_velocity;using BASE::gravity;using BASE::analytic_initial_only;
 
     T epsilon,radius;
     int mode;
@@ -285,7 +285,26 @@ public:
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(mu1/unit_mu,rho1/unit_rho));
                 use_discontinuous_velocity=true;
                 break;}
-            case 110:{
+            case 111:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_ELLIPSOID<TV>(TV(0,-.7),TV(.5,.2),0,1);//new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).2,0,1);
+                gravity=TV::Axis_Vector(TV::m-1)*(-(T)9.8)*m/s/s;
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
+                analytic_initial_only=true;
+                use_level_set_method=true;
+                use_p_null_mode=true;
+
+                break;}
+            case 112:case 113:{
+                grid.Initialize(TV_INT(resolution,2*resolution),RANGE<TV>(TV(),TV(1,2))*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).2,0,1);
+                gravity=TV::Axis_Vector(TV::m-1)*(-(T)9.8)*m/s/s;
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
+                analytic_initial_only=true;
+                use_level_set_method=true;
+                use_p_null_mode=true;
                 
                 break;}
 

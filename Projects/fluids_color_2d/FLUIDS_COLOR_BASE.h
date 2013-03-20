@@ -167,6 +167,7 @@ public:
     bool override_mu1;
     bool override_surface_tension;
     bool use_pls_over_levelset;
+    TV gravity;
 
     ARRAY<ANALYTIC_VELOCITY<TV>*> analytic_velocity,initial_analytic_velocity;
     ANALYTIC_LEVELSET<TV>* analytic_levelset;
@@ -707,7 +708,7 @@ public:
     {
         if(analytic_velocity.m && analytic_levelset && !analytic_initial_only)
             return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s);
-        return TV();
+        return gravity;
     }
 
     TV Velocity_Jump(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
