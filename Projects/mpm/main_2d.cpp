@@ -20,6 +20,7 @@
 #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <PhysBAM_Geometry/Basic_Geometry/POLYGON.h>
 #include "DELAUNAY_TRIANGULATION_2D.h"
 #include "MPM_SIMULATION.h"
 #include "SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL.h"
@@ -86,6 +87,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     if(!use_output_directory) output_directory=STRING_UTILITIES::string_sprintf("MPM_%dD_test_%d",TV::m,test_number);
 
+    T object_density=1;
     T object_mass=1;
 
     // geometry setting
@@ -201,7 +203,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         exit(0);}
     switch(test_number){
         case 1:
-            object_mass=(T)1200*density_scale*RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12)).Size();
+            object_density=(T)1200*density_scale;
+            object_mass=object_density*RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12)).Size();
             ym*=(T)1e3;
             for(int p=0;p<sim.particles.number;p++){
                 T this_ym=0.7*ym/0.04*sqr(sim.particles.X(p)(0))+0.3*ym;
@@ -213,7 +216,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.yield_max=1.3;
             break;
         case 2:
-            object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size()*2;
+            object_density=(T)1200*density_scale;
+            object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size()*2;
             ym*=(T)1e5;
             sim.mu.Fill(ym/((T)2*((T)1+pr)));
             sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
@@ -222,7 +226,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.visco_tau.Fill(1000);
             break;
         case 3:
-            object_mass=(T)400*density_scale*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
+            object_density=(T)400*density_scale;
+            object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
             ym*=(T)140000;
             sim.mu.Fill(ym/((T)2*((T)1+pr)));
             sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
@@ -231,7 +236,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.yield_max=(T)1+(T)0.0075;
             break;
         case 4:
-            object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)).Size()-SPHERE<TV>(TV(0.1,0),0.04).Size());
+            object_density=(T)1200*density_scale;
+            object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)).Size()-SPHERE<TV>(TV(0.1,0),0.04).Size());
             ym*=(T)5e3;
             sim.mu.Fill(ym/((T)2*((T)1+pr)));
             sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
@@ -241,7 +247,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.yield_max=1.5;
             break;
         case 5:
-            object_mass=(T)1200*density_scale*(RANGE<TV>(TV(0,0),TV(0.1,0.5)).Size());
+            object_density=(T)1200*density_scale;
+            object_mass=object_density*(RANGE<TV>(TV(0,0),TV(0.1,0.5)).Size());
             ym*=(T)5e3;
             sim.mu.Fill(ym/((T)2*((T)1+pr)));
             sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
@@ -251,7 +258,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.yield_max=1.2;
             break;
         case 6:
-            object_mass=(T)1200*density_scale*(RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)).Size()-SPHERE<TV>(TV(0.1,0),0.04).Size());
+            object_density=(T)1200*density_scale;
+            object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)).Size()-SPHERE<TV>(TV(0.1,0),0.04).Size());
             ym*=(T)5e3;
             sim.mu.Fill(ym/((T)2*((T)1+pr)));
             sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
@@ -265,6 +273,16 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     sim.mu0=sim.mu;
     sim.lambda0=sim.lambda;
 
+    // use voronoi polygon to initialize particle mass and volume
+    // if(use_voronoi || use_voronoi_boundary){
+    //     sim.assigned_volume_externally=true;
+    //     for(int p=0;p<sim.particles.number;p++){
+    //         POLYGON<TV> poly(voronoi.elements(p).m);
+    //         for(int i=0;i<voronoi.elements(p).m;i++)
+    //             poly.X(i)=voronoi.Xm(voronoi.elements(p)(i));
+    //         T area=poly.Area();
+    //         sim.particles.volume(p)=area;
+    //         sim.particles.mass(p)=object_density*area;}}
 
     // Greg Turk
     if(use_turk){
@@ -293,7 +311,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         // Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(0,1,0));
     }
 
-    // collision objects
+    // draw collision objects
     for(int b=0;b<sim.rigid_ball.m;b++){
         for(int k=0;k<50;k++){
             T theta=k*2.0*3.14/50.0;
@@ -301,7 +319,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             Add_Debug_Particle(sim.rigid_ball(b).center+disp,VECTOR<T,3>(0,0,1));}}
     for(int i=0;i<50;i++) Add_Debug_Particle(TV(-1+i*0.04,sim.ground_level),VECTOR<T,3>(0,0,1));
 
-    // MPM particles
+    // draw MPM particles
     for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
 
     Flush_Frame<TV>("mpm");
@@ -312,7 +330,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Advance_One_Time_Step_Backward_Euler();
         TIMING_END("Current time step totally");
         if(f%frame_jump==0){
-            // MPM particles
+            // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
 
             // Zhu and Bridson
@@ -329,22 +347,22 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             }
 
             // voronoi reconstruction
-            if(use_voronoi){
-                voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.3);
-                voronoi.Build_Association();
-                voronoi.Build_Segments();
-                voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp,true);
-                for(int s=0;s<voronoi.segments.m;s++){
-                    Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
-            if(use_voronoi_boundary){
-                voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.3);
-                voronoi.Build_Association();
-                voronoi.Build_Boundary_Segments();
-                voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp);
-                for(int s=0;s<voronoi.boundary_segments.m;s++){
-                    Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.boundary_segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
+            // if(use_voronoi){
+            //     voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.3);
+            //     voronoi.Build_Association();
+            //     voronoi.Build_Segments();
+            //     voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp,true);
+            //     for(int s=0;s<voronoi.segments.m;s++){
+            //         Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
+            // if(use_voronoi_boundary){
+            //     voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.3);
+            //     voronoi.Build_Association();
+            //     voronoi.Build_Boundary_Segments();
+            //     voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp);
+            //     for(int s=0;s<voronoi.boundary_segments.m;s++){
+            //         Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.boundary_segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
             
-            // collision objects
+            // draw collision objects
             for(int b=0;b<sim.rigid_ball.m;b++){
                 for(int k=0;k<50;k++){
                     T theta=k*2.0*3.14/50.0;
@@ -358,6 +376,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
 int main(int argc,char *argv[])
 {
+    // ./mpm_2d -test 4 -gres 32 -pn 400000 -exclude 0.01 -delaunay -delaunay_maxl 0.03 -delaunay_mina 10 -voronoi -dt 1e-4 -fj 50
+
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Parse(true);
     Run_Simulation<VECTOR<double,2> >(parse_args);

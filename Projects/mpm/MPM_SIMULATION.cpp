@@ -26,7 +26,7 @@ using ::std::exp;
 //#####################################################################
 template<class TV> MPM_SIMULATION<TV>::
 MPM_SIMULATION()
-    :dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_visco_plasticity(false),use_plasticity_yield(false),use_plasticity_clamp(false),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0.5)
+    :assigned_volume_externally(false),dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_visco_plasticity(false),use_plasticity_yield(false),use_plasticity_clamp(false),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0.5)
 {}
 //#####################################################################
 // Destructor
@@ -74,7 +74,7 @@ Advance_One_Time_Step_Forward_Euler()
     Build_Weights_And_Grad_Weights();
     Build_Helper_Structures_For_Constitutive_Model();
     Rasterize_Particle_Data_To_The_Grid();
-    if(frame==0) Compute_Particle_Volumes_And_Densities();
+    if(frame==0 && !assigned_volume_externally) Compute_Particle_Volumes_And_Densities();
     Compute_Grid_Forces();
     if(use_gravity) Apply_Gravity_To_Grid_Forces();
     Update_Velocities_On_Grid();
@@ -101,7 +101,7 @@ Advance_One_Time_Step_Backward_Euler()
     Build_Weights_And_Grad_Weights();
     Build_Helper_Structures_For_Constitutive_Model();
     Rasterize_Particle_Data_To_The_Grid();
-    if(frame==0) Compute_Particle_Volumes_And_Densities();
+    if(frame==0 && !assigned_volume_externally) Compute_Particle_Volumes_And_Densities();
     Compute_Grid_Forces();
     if(use_gravity) Apply_Gravity_To_Grid_Forces();
     Update_Velocities_On_Grid();

@@ -32,6 +32,7 @@ public:
     // need external input
     //#################################################################
     bool PROFILING;
+    bool assigned_volume_externally;
     MPM_PARTICLES<TV> particles; // Resize(), X, V, mass, Fe, Fp
     GRID<TV> grid;    
     bool dump_matrix,test_system;
