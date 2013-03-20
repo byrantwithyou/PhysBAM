@@ -20,20 +20,16 @@ min="$1"
 max="$2"
 out="$3"
 shift 3
-L=""
 J=""
 OO=""
 for r in `seq $min $max` ; do
-    T=`mktemp`
     O=`mktemp -d`
-    echo "$((8*$r))" > $T
     [ $KP = 1 ] && echo OUTPUT $r $O
-    K=`$SLAVE -a -o $T -p $r -- "$@" -refine $r -o $O`
+    K=`$SLAVE -a -p $r -- "$@" -refine $r -o $O`
     J="$J -d $K"
     OO="$OO $O"
-    L="$L $T"
 done
-PPJ=`$SLAVE $J -p 100 -- /bin/bash ./post-process.sh "$out" $L`
+PPJ=`$SLAVE $J -p 100 -- /bin/bash ./plot-errors.sh "$out" $OO`
 [ $KP = 1 ] || $SLAVE -d $PPJ -p 100 -- /bin/bash -c "rm -r $OO" >/dev/null
 
 if [ $M = 1 ] ; then

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-base_name="$1"
-type="$2"
+echo "$@" >> args.txt
 
-shift 2
+base_name="$1"
+shift
 
 M=`mktemp`
 
@@ -17,16 +17,23 @@ M=`mktemp`
     done
 ) | sort -n > $M
 
+echo T >> args.txt
 CMD=""
-if [ "x$type" = "xeps" ] ; then
+UFILE=""
+PFILE=""
+if `echo "$base_name" | grep -q '\.eps$'` ; then
     CMD="set terminal postscript eps color"
-elif [ "x$type" = "xpng" ] ; then
+    UFILE="${base_name/.eps/-u.eps}"
+    PFILE="${base_name/.eps/-p.eps}"
+elif `echo $base_name | grep -q '\.png$'` ; then
     CMD="set terminal png"
+    UFILE="${base_name/.png/-u.png}"
+    PFILE="${base_name/.png/-p.png}"
 else
-    echo "unrecognized image type: $type"
+    echo "unrecognized image extension: $base_name" >> args.txt
     exit 1
 fi
-
-gnuplot -p -e "$CMD ; set output '$base_name-u.$type' ; plot '$M' u (log10(\$1)):(log10(\$3)) title 'L-inf error' , '$M' u (log10(\$1)):(log10(\$4)) title 'L-2 error' , -2*x , -2*x-1 , -x-2;"
-gnuplot -p -e "$CMD ; set output '$base_name-p.$type' ; plot '$M' u (log10(\$1)):(log10(\$8)) title 'L-inf error' , '$M' u (log10(\$1)):(log10(\$9)) title 'L-2 error' , -2*x , -2*x-1 , -x-2;"
+echo $UFILE $PFILE >> args.txt
+gnuplot -p -e "$CMD ; set output '$UFILE' ; plot '$M' u (log10(\$1)):(log10(\$3)) title 'L-inf error' , '$M' u (log10(\$1)):(log10(\$4)) title 'L-2 error' , -2*x , -2*x-1 , -x-2;"
+gnuplot -p -e "$CMD ; set output '$PFILE' ; plot '$M' u (log10(\$1)):(log10(\$8)) title 'L-inf error' , '$M' u (log10(\$1)):(log10(\$9)) title 'L-2 error' , -2*x , -2*x-1 , -x-2;"
 rm $M
