@@ -44,6 +44,7 @@ Initialize()
     TIMING_START;
     gravity_constant=TV();gravity_constant(1)=-(T)9.8;
     valid.Resize(particles.number);valid.Fill(true);
+    failed.Resize(particles.number);failed.Fill(false);
     mu.Resize(particles.number);mu0.Resize(particles.number);
     lambda.Resize(particles.number);lambda0.Resize(particles.number);
     visco_tau.Resize(particles.number);
@@ -357,11 +358,27 @@ Update_Deformation_Gradient()
                     grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
                 MATRIX<T,TV::m> Fe_hat=particles.Fe(p)+dt*grad_vp*particles.Fe(p);
                 MATRIX<T,TV::m> Fp_hat=particles.Fp(p);
+
+                if(failed(p)){
+                    particles.Fe(p)=Fe_hat;
+                    particles.Fp(p)=Fp_hat;
+                    continue;
+                }
+
                 MATRIX<T,TV::m> F=Fe_hat*Fp_hat;
                 MATRIX<T,TV::m> U_hat,V_hat;
                 DIAGONAL_MATRIX<T,TV::m> SIGMA_hat;
                 Fe_hat.Fast_Singular_Value_Decomposition(U_hat,SIGMA_hat,V_hat);
-                // if(SIGMA_hat.Min()<yield_min || SIGMA_hat.Max()>yield_max){valid(p)=false;continue;}
+
+                if(SIGMA_hat.Min()<yield_min || SIGMA_hat.Max()>yield_max){
+                    // valid(p)=false;
+                    // continue;}
+                    failed(p)=true;
+                    particles.Fe(p)=MATRIX<T,TV::m>::Identity_Matrix();
+                    particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();
+                    continue;
+                }
+
                 SIGMA_hat=SIGMA_hat.Clamp_Min(yield_min);
                 SIGMA_hat=SIGMA_hat.Clamp_Max(yield_max);
                 particles.Fe(p)=U_hat*SIGMA_hat.Times_Transpose(V_hat);

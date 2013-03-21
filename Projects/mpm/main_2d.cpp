@@ -244,7 +244,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.use_gravity=false;
             sim.use_plasticity_yield=true;
             sim.yield_min=-100;
-            sim.yield_max=1.5;
+            sim.yield_max=1.2;
             break;
         case 5:
             object_density=(T)1200*density_scale;
@@ -274,15 +274,15 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     sim.lambda0=sim.lambda;
 
     // use voronoi polygon to initialize particle mass and volume
-    // if(use_voronoi || use_voronoi_boundary){
-    //     sim.assigned_volume_externally=true;
-    //     for(int p=0;p<sim.particles.number;p++){
-    //         POLYGON<TV> poly(voronoi.elements(p).m);
-    //         for(int i=0;i<voronoi.elements(p).m;i++)
-    //             poly.X(i)=voronoi.Xm(voronoi.elements(p)(i));
-    //         T area=poly.Area();
-    //         sim.particles.volume(p)=area;
-    //         sim.particles.mass(p)=object_density*area;}}
+    if(use_voronoi || use_voronoi_boundary){
+        sim.assigned_volume_externally=true;
+        for(int p=0;p<sim.particles.number;p++){
+            POLYGON<TV> poly(voronoi.elements(p).m);
+            for(int i=0;i<voronoi.elements(p).m;i++)
+                poly.X(i)=voronoi.Xm(voronoi.elements(p)(i));
+            T area=poly.Area();
+            sim.particles.volume(p)=area;
+            sim.particles.mass(p)=object_density*area;}}
 
     // Greg Turk
     if(use_turk){
@@ -331,7 +331,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         TIMING_END("Current time step totally");
         if(f%frame_jump==0){
             // draw MPM particles
-            for(int i=0;i<sim.particles.X.m;i++) if(sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+            for(int i=0;i<sim.particles.X.m;i++){
+                if(!sim.failed(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+                else Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));}
 
             // Zhu and Bridson
             if(use_bridson){

@@ -61,6 +61,7 @@ public:
     //#################################################################
     TV gravity_constant;
     ARRAY<bool> valid;
+    ARRAY<bool> failed;
     ARRAY<T> Je;
     ARRAY<MATRIX<T,TV::m> > Re,Se;
     ARRAY<TV_INT> influence_corner;
