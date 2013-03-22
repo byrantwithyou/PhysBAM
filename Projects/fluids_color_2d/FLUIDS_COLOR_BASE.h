@@ -322,7 +322,7 @@ public:
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(1)*v1,du0,rho0/unit_rho));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(1)*v1,du1,rho1/unit_rho));
                     use_p_null_mode=true;
-                    if(test_number==106) use_level_set_method=true;
+//                    if(test_number==106) use_level_set_method=true;
                 }
                 break;
             case 11:
