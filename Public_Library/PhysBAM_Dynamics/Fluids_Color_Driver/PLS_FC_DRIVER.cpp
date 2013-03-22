@@ -388,24 +388,6 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("Z-%d.txt",solve_id).c_str()).Write_Preconditioner("Z",iss,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%d.txt",solve_id).c_str()).Write_Projection("P",iss,*vectors(0));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
-
-    if(0){
-        INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> tmp;
-        iss.Resize_Vector(tmp);
-        ARRAY<KRYLOV_VECTOR_BASE<T>*> null,eigenvectors;
-        ARRAY<T> eigenvalues;
-        iss.Compute_Small_Eigenvectors(rhs,null,eigenvectors,eigenvalues,20,1e-10,200);
-        for(int i=0;i<null.m;i++){
-            iss.null_modes.Append(static_cast<INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>*>(null(i)));
-            tmp.Copy(1,*null(i));
-            tmp*=1/tmp.Max_Abs();
-            Dump_Vector(iss,tmp,"null mode");}
-        for(int i=0;i<eigenvectors.m;i++){
-            iss.null_modes.Append(static_cast<INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>*>(eigenvectors(i)));
-            tmp.Copy(1,*eigenvectors(i));
-            tmp*=1/tmp.Max_Abs();
-            Dump_Vector(iss,tmp,STRING_UTILITIES::string_sprintf("eigenvector (%g)",eigenvalues(i)).c_str());}}
-
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
 
     if(example.dump_matrix){
@@ -578,6 +560,7 @@ Project_Ghost_Velocities(int project_width,int c)
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("Z-%d.txt",solve_id).c_str()).Write_Preconditioner("Z",iss,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%d.txt",solve_id).c_str()).Write_Projection("P",iss,*vectors(0));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
+    PHYSBAM_FATAL_ERROR();
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
 
     if(example.dump_matrix){
