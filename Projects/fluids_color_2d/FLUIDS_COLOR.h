@@ -110,7 +110,7 @@ public:
     //
     //   Tests:
     //   1. Periodic decaying vortex, no interface
-    //   2. Translating and decaying vortex
+    //   2. Translating and decaying vortex, interface
     //   3. In BASE class
     //   4. In BASE class
     //   5. Vortex with sphere boundary
@@ -120,13 +120,25 @@ public:
     //   9. In BASE class
     //   10. Constant velocity with vortex stream boundary
     //   11-15. In BASE class
-    //   16. 
-    //  
+    //   16. Translating and decaying vortex, boundary
+    //   17-18. In BASE class
+    //   19. Distorted vortex with boundary
+    //   20-22. In BASE class
+    //   23.
+    //   24-26. In BASE class
+    //   27. 
+    //   28. In BASE class
+    //   29.
+    //   30.
+    //
     //   101. Decaying vortex, identical to Test 2. Example 1 in the JCP paper.
     //   102. Translating and decaying vortex, similar to Test 8. JCP Example 2.
     //   103. Different velocity fields with embedded Neumann bc. JCP Example 3.
     //   104. In BASE class. JCP Example 4 (2d).
     //   105. In BASE class. JCP Example 5 (3d).
+    //   106. In BASE class. JCP Example 6, also Test 9.
+    //   107. In BASE class. JCP Example 7, also Test 22.
+    //
     //   
     ////////////////////////////////////////////////////////////////////////////
 
@@ -274,20 +286,27 @@ public:
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_VORTEX<TV>(mu0/unit_mu,rho0/unit_rho),vel));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE<TV>(new ANALYTIC_VELOCITY_VORTEX<TV>(mu1/unit_mu,rho1/unit_rho),vel));
                 use_level_set_method=true;
+                use_p_null_mode=true;
                 break;}
             case 103:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*(T)pi*m,true);
-                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_SPHERE<TV>(TV::Axis_Vector(0)*.2*pi,(T).2*(T)pi,NEUMANN,0);
-                ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),1,1);
-                analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),(T).8*(T)pi,0,1)))->Add(ab)->Add(cd);
-                MATRIX<T,TV::m> du0;for(int i=0;i<TV::m;i++)du0(i,i)=1;du0(1,1)-=TV::m;
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*.2*pi,TV(),du0,rho0/unit_rho));
+                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_SPHERE<TV>(TV::Axis_Vector(0)*.1*pi,(T).2*(T)pi,NEUMANN,0);
+               ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),1,1);
+                analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),(T).5*(T)pi,0,1)))->Add(ab)->Add(cd);
+                MATRIX<T,TV::m> du0;for(int i=0;i<TV::m;i++)du0(i,i)=-1;du0(1,1)+=TV::m;
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*.1*pi,TV(),du0,rho0/unit_rho));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX<TV>(mu1/unit_mu,rho1/unit_rho));
                 use_discontinuous_velocity=true;
                 break;}
             case 111:{
-                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
-                analytic_levelset=new ANALYTIC_LEVELSET_ELLIPSOID<TV>(TV(0,-.7),TV(.5,.2),0,1);//new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).2,0,1);
+                grid.Initialize(TV_INT(resolution,4*resolution),RANGE<TV>(TV(-1,0),TV(1,8))*m,true);
+                T top = (T)7,surface=(T)6,bottom=(T)1;
+                TV bubble_center((T)0,(T)1.5),bubble_radius((T).5,(T).2);
+                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*bottom,TV::Axis_Vector(1),SLIP,0);
+                ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*top,TV::Axis_Vector(1),1,SLIP);
+                ANALYTIC_LEVELSET<TV>* ef=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*surface,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
+                ANALYTIC_LEVELSET_SIGNED<TV>* gh=new ANALYTIC_LEVELSET_ELLIPSOID<TV>(bubble_center,bubble_radius,1,0);//new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).2,0,1);
+                analytic_levelset = (new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*surface,TV::Axis_Vector(0),0,1)))->Add(ef)->Add(gh);
                 gravity=TV::Axis_Vector(TV::m-1)*(-(T)9.8)*m/s/s;
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
