@@ -129,6 +129,20 @@ struct ANALYTIC_VELOCITY_TRANSLATE:public ANALYTIC_VELOCITY<TV>
 };
 
 template<class TV>
+struct ANALYTIC_VELOCITY_SHIFT_PRESSURE:public ANALYTIC_VELOCITY<TV>
+{
+    typedef typename TV::SCALAR T;
+    ANALYTIC_VELOCITY<TV>* av;
+    T dp;
+    ANALYTIC_VELOCITY_SHIFT_PRESSURE(ANALYTIC_VELOCITY<TV>* av,T dp): av(av),dp(dp) {}
+    ~ANALYTIC_VELOCITY_SHIFT_PRESSURE() {delete av;}
+    virtual TV u(const TV& X,T t) const {return av->u(X,t);}
+    virtual MATRIX<T,TV::m> du(const TV& X,T t) const {return av->du(X,t);}
+    virtual T p(const TV& X,T t) const {return av->p(X,t)+dp;}
+    virtual TV F(const TV& X,T t) const {return av->F(X,t);}
+};
+
+template<class TV>
 class FLUIDS_COLOR_BASE:public PLS_FC_EXAMPLE<TV>
 {
     typedef typename TV::SCALAR T;
@@ -414,12 +428,15 @@ public:
             case 22:
             case 107:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m/100,true);
-                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).005,(T).003,0,1);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
-                if(!override_surface_tension) surface_tension=(T)0.07197*unit_st;
-                use_p_null_mode=true;
-                use_level_set_method=true;
+                {
+                    T radius=(T).003,curvature=(TV::m-1)/radius;
+                    if(!override_surface_tension) surface_tension=(T)0.07197*unit_st;
+                    analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).005,radius,0,1);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_SHIFT_PRESSURE<TV>(new ANALYTIC_VELOCITY_CONST<TV>(TV()),(surface_tension*curvature)/unit_p));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
+                    use_p_null_mode=true;
+                    use_level_set_method=true;
+                }
                 break;
             case 24:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
@@ -569,6 +586,7 @@ public:
         if(use_p_null_mode){
             int cnt=0;
             for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
+//                if(levelset_color.Phi(it.Location())<grid.dX.Max()/2) continue;
                 int c=levelset_color.Color(it.Location());
                 if(c<0) continue;
                 T A=pressure(it.index),B=analytic_velocity(c)->p(it.Location()/m,time/s)*unit_p,D=A-B;
@@ -576,6 +594,7 @@ public:
                 cnt++;}
             if(cnt) p_ave/=cnt;}
         for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
+//            if(levelset_color.Phi(it.Location())<grid.dX.Max()/2) continue;
             int c=levelset_color.Color(it.Location());
             if(c<0) continue;
             T A=pressure(it.index),B=analytic_velocity(c)->p(it.Location()/m,time/s)*unit_p,D=A-B-p_ave;
