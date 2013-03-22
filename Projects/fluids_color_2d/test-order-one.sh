@@ -25,7 +25,7 @@ OO=""
 for r in `seq $min $max` ; do
     O=`mktemp -d`
     [ $KP = 1 ] && echo OUTPUT $r $O
-    K=`$SLAVE -a -p $r -- "$@" -refine $r -o $O`
+    K=`$SLAVE -p $r -- "$@" -refine $r -o $O`
     J="$J -d $K"
     OO="$OO $O"
 done
