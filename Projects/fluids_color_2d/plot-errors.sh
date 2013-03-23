@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "$@" >> args.txt
-
 base_name="$1"
 shift
 
@@ -17,7 +15,6 @@ M=`mktemp`
     done
 ) | sort -n > $M
 
-echo T >> args.txt
 CMD=""
 UFILE=""
 PFILE=""
@@ -30,10 +27,10 @@ elif `echo $base_name | grep -q '\.png$'` ; then
     UFILE="${base_name/.png/-u.png}"
     PFILE="${base_name/.png/-p.png}"
 else
-    echo "unrecognized image extension: $base_name" >> args.txt
+    echo "unrecognized image extension: $base_name"
     exit 1
 fi
-echo $UFILE $PFILE >> args.txt
+
 gnuplot -p -e "$CMD ; set output '$UFILE' ; plot '$M' u (log10(\$1)):(log10(\$3)) title 'L-inf error' , '$M' u (log10(\$1)):(log10(\$4)) title 'L-2 error' , -2*x , -2*x-1 , -x-2;"
 gnuplot -p -e "$CMD ; set output '$PFILE' ; plot '$M' u (log10(\$1)):(log10(\$8)) title 'L-inf error' , '$M' u (log10(\$1)):(log10(\$9)) title 'L-2 error' , -2*x , -2*x-1 , -x-2;"
 rm $M
