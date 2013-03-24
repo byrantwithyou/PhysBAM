@@ -506,6 +506,7 @@ public:
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*.2*pi,TV(),du0,rho0/unit_rho));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),spin_count+1,rho1/unit_rho));
                 use_discontinuous_velocity=true;
+                use_p_null_mode=true;
                 break;}
             case 108:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
