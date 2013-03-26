@@ -172,9 +172,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     
     // voronoi reconstruction
     if(use_voronoi){
-        voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
+        // voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
         // voronoi.Initialize_With_A_Triangulated_Area(ta);
-        // voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
+        voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
         voronoi.Build_Segments();
         for(int i=0;i<voronoi.X.m;i++) {
             if(voronoi.type(i)==1) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,0,0));
@@ -185,9 +185,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
         Flush_Frame<TV>("voronoi cells");}
     if(use_voronoi_boundary){
-        voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
+        // voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
         // voronoi.Initialize_With_A_Triangulated_Area(ta);
-        // voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
+        voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
         voronoi.Build_Boundary_Segments();
         for(int i=0;i<voronoi.X.m;i++) {
             if(voronoi.type(i)==1) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,0,0));
@@ -241,12 +241,15 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             object_density=(T)1200*density_scale;
             object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)).Size()-SPHERE<TV>(TV(0.1,0),0.04).Size());
             ym*=(T)5e3;
-            sim.mu.Fill(ym/((T)2*((T)1+pr)));
-            sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
+            for(int p=0;p<sim.particles.number;p++){
+                T alpha=0.3;
+                T this_ym=((T)1-alpha)/(T)0.04*ym*sqr(sim.particles.X(p)(1))+alpha*ym;
+                sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
+                sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
             sim.use_gravity=false;
-            sim.use_plasticity_yield=true;
+            sim.use_plasticity_yield=false;
             sim.yield_min=-100;
-            sim.yield_max=1.2;
+            sim.yield_max=1.3;
             break;
         case 5:
             object_density=(T)1200*density_scale;
@@ -334,7 +337,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
-                if(!sim.failed(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+                if(!sim.failed(i) && sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+                else if(sim.failed(i) && sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,1));
                 else Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));}
 
             // Zhu and Bridson
