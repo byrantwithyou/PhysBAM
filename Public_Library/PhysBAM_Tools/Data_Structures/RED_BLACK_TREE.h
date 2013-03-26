@@ -182,6 +182,7 @@ public:
     struct PREORDER_ITERATOR : public ITERATOR
     {
         using ITERATOR::node;
+        PREORDER_ITERATOR(ITERATOR it): ITERATOR(it) {}
         explicit PREORDER_ITERATOR(NODE* n=0): ITERATOR(n) {}
         explicit PREORDER_ITERATOR(RED_BLACK_TREE& tree): ITERATOR(tree) {}
         void Next() {node=static_cast<NODE*>(node->Preorder_Next());}
@@ -191,6 +192,7 @@ public:
     struct POSTORDER_ITERATOR : public ITERATOR
     {
         using ITERATOR::node;
+        POSTORDER_ITERATOR(ITERATOR it): ITERATOR(it) {}
         explicit POSTORDER_ITERATOR(NODE* n=0): ITERATOR(n) {if(node) node=static_cast<NODE*>(node->Far_Left_Leaf());}
         explicit POSTORDER_ITERATOR(RED_BLACK_TREE& tree): ITERATOR(tree) {if(node) node=static_cast<NODE*>(node->Far_Left_Leaf());}
         void Next() {node=static_cast<NODE*>(node->Postorder_Next());}
@@ -200,6 +202,7 @@ public:
     struct INORDER_ITERATOR : public ITERATOR
     {
         using ITERATOR::node;
+        INORDER_ITERATOR(ITERATOR it): ITERATOR(it) {}
         explicit INORDER_ITERATOR(NODE* n=0): ITERATOR(n) {if(node) node=static_cast<NODE*>(node->Far_Left());}
         explicit INORDER_ITERATOR(RED_BLACK_TREE& tree): ITERATOR(tree) {if(node) node=static_cast<NODE*>(node->Far_Left());}
         void Next() {node=static_cast<NODE*>(node->Inorder_Next());}
@@ -266,6 +269,32 @@ public:
                 if(!node->R){result=1;return ITERATOR(node);}
                 node=static_cast<NODE*>(node->R);}
             else{result=0;return ITERATOR(node);}}
+    }
+
+    ITERATOR Lower_Bound(const K& key) const
+    {
+        if(!core.root) return ITERATOR();
+        NODE* node=static_cast<NODE*>(core.root);
+        while(1){
+            if(node->key<key){
+                if(!node->R) return ITERATOR(node->Inorder_Next());
+                node=static_cast<NODE*>(node->R);}
+            else{
+                if(!node->L) return ITERATOR(node);
+                node=static_cast<NODE*>(node->L);}}
+    }
+
+    ITERATOR Upper_Bound(const K& key) const
+    {
+        if(!core.root) return ITERATOR();
+        NODE* node=static_cast<NODE*>(core.root);
+        while(1){
+            if(key<node->key){
+                if(!node->L) return ITERATOR(node);
+                node=static_cast<NODE*>(node->L);}
+            else{
+                if(!node->R) return ITERATOR(node->Inorder_Next());
+                node=static_cast<NODE*>(node->R);}}
     }
 
     void Print(std::ostream& o=LOG::cout) const
