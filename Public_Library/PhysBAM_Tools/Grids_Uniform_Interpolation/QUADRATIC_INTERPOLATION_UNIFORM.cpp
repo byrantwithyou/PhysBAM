@@ -48,7 +48,7 @@ Quadratic_Interpolation(const T2* x,T w)
 template<class TV,class T2> static T2
 From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const TV& X,const VECTOR<int,1>& index)
 {
-    TV w=(X-grid.Node(index))*grid.one_over_dX;
+    TV w=(X-grid.X(index))*grid.one_over_dX;
     return Quadratic_Interpolation(&u(index-1),w.x);
 }
 //#####################################################################
@@ -57,7 +57,7 @@ From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1>
 template<class TV,class T2> static T2
 From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const TV& X,const VECTOR<int,2>& index)
 {
-    TV w=(X-grid.Node(index))*grid.one_over_dX;
+    TV w=(X-grid.X(index))*grid.one_over_dX;
     const T2* b=&u(index-1);
     T2 x[3];
     for(int i=0;i<3;i++,b+=u.stride.x)
@@ -70,7 +70,7 @@ From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2>
 template<class TV,class T2> static T2
 From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const TV& X,const VECTOR<int,3>& index)
 {
-    TV w=(X-grid.Node(index))*grid.one_over_dX;
+    TV w=(X-grid.X(index))*grid.one_over_dX;
     int dx=u.stride.x;
     const T2* b=&u(index-1),*c=b;
     T2 x[3],y[3];
