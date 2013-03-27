@@ -207,9 +207,6 @@ public:
     VECTOR Unit_Orthogonal_Vector() const // roughly 6 mults, 2 adds, 1 div, 1 sqrt
     {return Orthogonal_Vector().Normalized();}
 
-    VECTOR Distinct_Vector() const
-    {return Axis_Vector(Arg_Abs_Min());}
-
     T Min() const
     {return min(x,y,z);}
 
@@ -224,9 +221,6 @@ public:
 
     int Arg_Max() const
     {return argmax(x,y,z);}
-
-    int Arg_Abs_Min() const
-    {return argmin(abs(x),abs(y),abs(z));}
 
     int Arg_Abs_Max() const
     {return argmax(abs(x),abs(y),abs(z));}
