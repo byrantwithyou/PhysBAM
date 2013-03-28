@@ -68,6 +68,18 @@ struct ANALYTIC_VELOCITY_VORTEX_NEW:public ANALYTIC_VELOCITY<TV>
     virtual TV F(const TV& X,T t) const {return TV(sin(X.x)*cos(X.y)*((T)2*nu*cos(l*t)-l*sin(l*t))+cos(l*t)*cos(l*t)*(au(0)*cos(X.x)*cos(X.y)-au(1)*sin(X.x)*sin(X.y))-au(0)*l*sin(l*t),-cos(X.x)*sin(X.y)*((T)2*nu*cos(l*t)-l*sin(l*t))+cos(l*t)*cos(l*t)*(au(0)*sin(X.x)*sin(X.y)-au(1)*cos(X.x)*cos(X.y))-au(1)*l*sin(l*t));}
 };
 
+template<class TV>
+struct ANALYTIC_VELOCITY_GRADED_ROTATION:public ANALYTIC_VELOCITY<TV>
+{
+    typedef typename TV::SCALAR T;
+    T r,nu,rho,scale;
+    ANALYTIC_VELOCITY_GRADED_ROTATION(T rad,T mu,T rho,T scale): r(rad),nu(mu/rho),rho(rho),scale(scale){}
+    virtual TV u(const TV& X,T t) const {T q=X.Magnitude_Squared()-sqr(r);return sqr(q)*scale*X.Rotate_Clockwise_90();}
+    virtual MATRIX<T,TV::m> du(const TV& X,T t) const {T txy=4*X.x*X.y,x2=sqr(X.x),y2=sqr(X.y),r2=sqr(r),q=x2+y2-r2;return scale*q*MATRIX<T,TV::m>(txy,-4*x2-q,4*y2+q,-txy);}
+    virtual T p(const TV& X,T t) const {return 0;}
+    virtual TV F(const TV& X,T t) const {return (T)8*nu*scale*(2*sqr(r)-3*X.Magnitude_Squared())*X.Rotate_Clockwise_90();}
+};
+
 template<class T>
 class FLUIDS_COLOR<VECTOR<T,2> >:public FLUIDS_COLOR_BASE<VECTOR<T,2> >
 {
@@ -84,6 +96,7 @@ public:
     using BASE::override_rho0;using BASE::override_rho1;using BASE::override_mu0;using BASE::override_mu1;
     using BASE::test_analytic_diff;using BASE::Initialize_Common_Example;using BASE::After_Initialize_Example;
     using BASE::use_discontinuous_velocity;using BASE::gravity;using BASE::analytic_initial_only;
+    using BASE::override_surface_tension;using BASE::unit_p;using BASE::use_advection;
 
     T epsilon,radius;
     int mode;
@@ -279,6 +292,19 @@ public:
                 use_p_null_mode=true;
                 use_level_set_method=true;
                 break;}
+            case 32:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+                {
+                    T radius=(T).6,curvature=(TV::m-1)/radius;
+                    if(!override_surface_tension) surface_tension=(T)1*unit_st;
+                    analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),radius,0,1);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_SHIFT_PRESSURE<TV>(new ANALYTIC_VELOCITY_GRADED_ROTATION<TV>(radius,mu0/unit_mu,rho0/unit_rho,12),(surface_tension*curvature)/unit_p));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
+                    use_p_null_mode=true;
+                    use_level_set_method=true;
+                    use_advection=false;
+                }
+                break;
             case 102:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV((T)1.1*(T)pi,(T)pi),(T).6*(T)pi,0,1);

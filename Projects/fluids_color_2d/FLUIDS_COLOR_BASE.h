@@ -171,7 +171,6 @@ public:
     int bc_type;
     bool bc_n,bc_d,bc_s;
     bool test_analytic_diff;
-    bool no_advection;
     int refine;
     static T Large_Phi() {return 1000;}
     T surface_tension;
@@ -193,7 +192,7 @@ public:
     FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),rho0(1),
         rho1(2),unit_mu(0),unit_rho(0),unit_st(0),unit_p(0),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),
-        no_advection(false),refine(1),surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),
+        refine(1),surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),
         override_surface_tension(false),use_pls_over_levelset(false),use_levelset_over_pls(false),analytic_initial_only(false),
         number_of_threads(1),override_output_directory(false)
     {
@@ -221,7 +220,7 @@ public:
         parse_args.Add("-bc_d",&bc_d,"use Dirichlet boundary conditions");
         parse_args.Add("-bc_s",&bc_s,"use slip boundary conditions");
         parse_args.Add("-test_diff",&test_analytic_diff,"test analytic derivatives");
-        parse_args.Add("-no_advect",&no_advection,"Disable advection");
+        parse_args.Add_Not("-no_advect",&use_advection,"Disable advection");
         parse_args.Add("-no_solve",&omit_solve,"Disable visocity and pressure solve");
         parse_args.Add_Not("-no_reduced_advect",&use_reduced_advection,"Peform reduced advection");
         parse_args.Add("-refine",&refine,"num","Refine space/time by this factor");
@@ -257,7 +256,6 @@ public:
         dt*=s;
         PHYSBAM_ASSERT(bc_n+bc_d+bc_s<2);
         bc_type=bc_n?NEUMANN:(bc_s?SLIP:DIRICHLET);
-        use_advection=!no_advection;
 
         analytic_levelset=0;
         save_pressure=true;
