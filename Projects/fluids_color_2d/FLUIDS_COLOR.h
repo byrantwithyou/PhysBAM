@@ -51,6 +51,22 @@ struct ANALYTIC_VELOCITY_VORTEX:public ANALYTIC_VELOCITY<TV>
     virtual T p(const TV& X,T t) const {return (T).25*rho*(cos(2*X.x)+cos(2*X.y))*exp(-4*nu*t);}
     virtual TV F(const TV& X,T t) const {return TV();}
 };
+template<class TV>
+struct ANALYTIC_VELOCITY_NEST:public ANALYTIC_VELOCITY<TV>
+{
+    typedef typename TV::SCALAR T;
+    
+    ANALYTIC_LEVELSET<TV>* al;
+    ARRAY<ANALYTIC_VELOCITY<TV>*> sub_vel;
+    ANALYTIC_VELOCITY_NEST(ANALYTIC_LEVELSET<TV>* ls): al(ls) {}
+    ANALYTIC_VELOCITY_NEST* Add(ANALYTIC_VELOCITY<TV>* vel){sub_vel.Append(vel);return this;}
+    virtual TV u(const TV& X,T t) const
+    {int c=0;al->phi(X,t,c);return sub_vel(c)->u(X,t);}
+    virtual MATRIX<T,TV::m> du(const TV& X,T t) const
+    {int c=0;al->phi(X,t,c);return sub_vel(c)->du(X,t);}
+    virtual T p(const TV& X,T t) const {int c=0;al->phi(X,t,c);return sub_vel(c)->p(X,t);}
+    virtual TV F(const TV& X,T t) const {int c=0;al->phi(X,t,c);return sub_vel(c)->F(X,t);}
+};
 
 template<class TV> //Reverses direction with cos(t), adds constant velocity
 struct ANALYTIC_VELOCITY_VORTEX_NEW:public ANALYTIC_VELOCITY<TV>
@@ -325,15 +341,17 @@ public:
                 use_discontinuous_velocity=true;
                 break;}
             case 111:{
-                grid.Initialize(TV_INT(resolution,4*resolution),RANGE<TV>(TV(-1,0),TV(1,8))*m,true);
-                T top = (T)7,surface=(T)6,bottom=(T)1;
+                grid.Initialize(TV_INT(resolution,2*resolution),RANGE<TV>(TV(-1,0),TV(1,4))*m,true);
+                T top = (T)3.5,surface=(T)3,bottom=(T)1;
                 TV bubble_center((T)0,(T)1.5),bubble_radius((T).5,(T).2);
-                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*bottom,TV::Axis_Vector(1),SLIP,0);
-                ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*top,TV::Axis_Vector(1),1,SLIP);
-                ANALYTIC_LEVELSET<TV>* ef=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*surface,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
-                ANALYTIC_LEVELSET_SIGNED<TV>* gh=new ANALYTIC_LEVELSET_ELLIPSOID<TV>(bubble_center,bubble_radius,1,0);//new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).2,0,1);
-                analytic_levelset = (new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*surface,TV::Axis_Vector(0),0,1)))->Add(ef)->Add(gh);
-                gravity=TV::Axis_Vector(TV::m-1)*(-(T)9.8)*m/s/s;
+//                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*bottom,TV::Axis_Vector(1),SLIP,0);
+                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*top,TV::Axis_Vector(1),1,SLIP);
+                ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),SLIP,SLIP);
+
+                ANALYTIC_LEVELSET_SIGNED<TV>* ef=new ANALYTIC_LEVELSET_ELLIPSOID<TV>(bubble_center,bubble_radius,1,0);//new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).2,0,1);
+                ANALYTIC_LEVELSET<TV>* gh=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*bottom,TV::Axis_Vector(1),0,1)))->Add(cd)->Add(ef);
+                analytic_levelset = (new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*surface,TV::Axis_Vector(1),0,1)))->Add(gh)->Add(ab);
+                gravity=TV::Axis_Vector(0)*(-(T)9.8)*m/s/s;
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
                 analytic_initial_only=true;
@@ -341,16 +359,22 @@ public:
                 use_p_null_mode=true;
 
                 break;}
-            case 112:case 113:{
-                grid.Initialize(TV_INT(resolution,2*resolution),RANGE<TV>(TV(),TV(1,2))*m,true);
-                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).2,0,1);
-                gravity=TV::Axis_Vector(TV::m-1)*(-(T)9.8)*m/s/s;
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
+            case 112:{
+                grid.Initialize(TV_INT(2*resolution,resolution),RANGE<TV>(TV(0,0),TV(8,4))*m,true);
+                T left = (T).5,right=(T)7.5;
+                TV cylinder_center((T)2,(T)2);//,bubble_radius((T).5,(T).2);
+                T cylinder_radius(.5);
+                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),DIRICHLET,DIRICHLET);
+                ANALYTIC_LEVELSET<TV>* ef=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),NEUMANN,NEUMANN);                
+                ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_SPHERE<TV>(cylinder_center,cylinder_radius,SLIP,0);//new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).2,0,1);
+                ANALYTIC_LEVELSET<TV>* gh=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*left,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
+                analytic_levelset = (new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*right,TV::Axis_Vector(0),0,1)))->Add(gh)->Add(ef);
+                ANALYTIC_VELOCITY_NEST<TV>* vel0= new ANALYTIC_VELOCITY_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(cylinder_center,cylinder_radius*1.5,0,1));
+                vel0->Add(new ANALYTIC_VELOCITY_CONST<TV>(TV(0,0)));
+                vel0->Add(new ANALYTIC_VELOCITY_CONST<TV>(TV(1,0)));                
+                analytic_velocity.Append(vel0);
                 analytic_initial_only=true;
-                use_level_set_method=true;
-                use_p_null_mode=true;
-                
+                use_p_null_mode=true;                
                 break;}
 
 

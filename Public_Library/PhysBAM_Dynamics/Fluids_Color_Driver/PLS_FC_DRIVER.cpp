@@ -41,7 +41,7 @@ namespace{
     }
 };
 //#####################################################################
-// Initialize
+// Constructor
 //#####################################################################
 template<class TV> PLS_FC_DRIVER<TV>::
 PLS_FC_DRIVER(PLS_FC_EXAMPLE<TV>& example)
@@ -50,7 +50,7 @@ PLS_FC_DRIVER(PLS_FC_EXAMPLE<TV>& example)
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }
 //#####################################################################
-// Initialize
+// Destructor
 //#####################################################################
 template<class TV> PLS_FC_DRIVER<TV>::
 ~PLS_FC_DRIVER()
@@ -58,7 +58,7 @@ template<class TV> PLS_FC_DRIVER<TV>::
     DEBUG_SUBSTEPS::Clear_Substep_Writer((void*)this);
 }
 //#####################################################################
-// Initialize
+// Execute_Main_Program
 //#####################################################################
 template<class TV> void PLS_FC_DRIVER<TV>::
 Execute_Main_Program()
