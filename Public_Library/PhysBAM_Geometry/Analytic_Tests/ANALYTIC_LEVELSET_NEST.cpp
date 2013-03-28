@@ -52,15 +52,14 @@ find(const TV& X,T t,int c,TV* N) const
     int in_color=-1,out_color=-1;
     ANALYTIC_LEVELSET<TV>* out_al=0,*in_al=0;
     bool in=false;
-    std::string st="";
     for(int i=0;i<sub_al.m;i++){
         T d=sub_al(i)->dist(X,t,c),e=al->dist(X,t,i);
         if(e<=0 && d<=0) in=true;
-        if(d<=0 && d>=in_dist){in_dist=d;in_al=sub_al(i);in_color=c;st+='a';in_sign=1;}
-        if(e>0 && d>0 && -e>=in_dist){in_dist=-e;in_al=al;in_color=i;st+='b';in_sign=-1;}
-        if(e<=0 && d<=0 && e>=in_dist){in_dist=e;in_al=al;in_color=i;st+='c';in_sign=1;}
-        if(d>0 && d<=out_dist){out_dist=d;out_al=sub_al(i);out_color=c;st+='d';out_sign=1;}
-        if(d<=0 && e>0 && e<=out_dist){out_dist=e;out_al=al;out_color=i;st+='e';out_sign=1;}}
+        if(d<=0 && d>=in_dist){in_dist=d;in_al=sub_al(i);in_color=c;in_sign=1;}
+        if(e>0 && d>0 && -e>=in_dist){in_dist=-e;in_al=al;in_color=i;in_sign=-1;}
+        if(e<=0 && d<=0 && e>=in_dist){in_dist=e;in_al=al;in_color=i;in_sign=1;}
+        if(d>0 && d<=out_dist){out_dist=d;out_al=sub_al(i);out_color=c;out_sign=1;}
+        if(d<=0 && e>0 && e<=out_dist){out_dist=e;out_al=al;out_color=i;out_sign=1;}}
     if(in){
         if(N) *N=in_sign*in_al->N(X,t,in_color);
         return in_dist;}
