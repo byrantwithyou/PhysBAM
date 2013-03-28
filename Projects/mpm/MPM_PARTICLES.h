@@ -37,6 +37,7 @@ public:
 
     ARRAY_VIEW<TV> Xm;
     ARRAY_VIEW<T> volume;
+    ARRAY_VIEW<VECTOR<TV,TV::m+1> > particle_domain;
     ARRAY_VIEW<MATRIX<T,TV::m> > Fe;
     ARRAY_VIEW<MATRIX<T,TV::m> > Fp;
     RANDOM_NUMBERS<T> rand_generator;

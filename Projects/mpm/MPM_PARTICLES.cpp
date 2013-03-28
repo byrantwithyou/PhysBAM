@@ -22,6 +22,7 @@ MPM_PARTICLES()
     Add_Array(ATTRIBUTE_ID_VOLUME,&volume);
     Add_Array(ATTRIBUTE_ID_FE,&Fe);
     Add_Array(ATTRIBUTE_ID_FP,&Fp);
+    Add_Array(ATTRIBUTE_ID_PARTICLE_DOMAIN,&particle_domain);
     rand_generator.Set_Seed(0);
 }
 //#####################################################################
@@ -51,7 +52,6 @@ Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
 template<class TV> void MPM_PARTICLES<TV>::
 Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box,const T exclude_radius)
 {
-    
     ARRAY<TV> sample_X;
     for(int n=0;n<N;n++){
         TV x;
@@ -264,6 +264,7 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_VOLUME,"volume");
     Register_Attribute_Name(ATTRIBUTE_ID_FE,"Fe");
     Register_Attribute_Name(ATTRIBUTE_ID_FP,"Fp");
+    Register_Attribute_Name(ATTRIBUTE_ID_PARTICLE_DOMAIN,"particle_domain");
     return 0;
 }
 int initialize_mpm_particles=Initialize_MPM_Particles();
