@@ -7,6 +7,8 @@
 
 #include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Grids_Uniform_Interpolation/CUBIC_MN_INTERPOLATION_UNIFORM.h>
+#include <PhysBAM_Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -728,8 +730,15 @@ public:
         Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
 
         if(surface_tension){
-            T k=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1)->Compute_Curvature(X);
-            TV n=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1)->Normal(X);
+            LEVELSET<TV>& ls=*particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(color1);
+            static T last_time=-1;
+            if(last_time!=time){
+                last_time=time;
+                ls.Compute_Curvature(time);
+                ls.Compute_Normals(time);}
+
+            T k=CUBIC_MN_INTERPOLATION_UNIFORM<GRID<TV>,T>().Clamped_To_Array(grid,*ls.curvature,X);
+            TV n=CUBIC_MN_INTERPOLATION_UNIFORM<GRID<TV>,TV>().Clamped_To_Array(grid,*ls.normals,X).Normalized();
             Add_Debug_Particle(X,VECTOR<T,3>(0,0,1));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*surface_tension*n);
             return k*surface_tension*n;}
