@@ -360,20 +360,26 @@ public:
 
                 break;}
             case 112:{
-                grid.Initialize(TV_INT(2*resolution,resolution),RANGE<TV>(TV(0,0),TV(8,4))*m,true);
-                T left = (T).5,right=(T)7.5;
-                TV cylinder_center((T)2,(T)2);//,bubble_radius((T).5,(T).2);
+                grid.Initialize(TV_INT(4*resolution,resolution),RANGE<TV>(TV(0,0),TV(16,4))*m,true);
+                T left = (T)1,right=(T)15;
+                TV cylinder_center((T)4,(T)2);//,bubble_radius((T).5,(T).2);
                 T cylinder_radius(.5);
                 ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),DIRICHLET,DIRICHLET);
                 ANALYTIC_LEVELSET<TV>* ef=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),NEUMANN,NEUMANN);                
-                ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_SPHERE<TV>(cylinder_center,cylinder_radius,SLIP,0);//new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).2,0,1);
+                ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_SPHERE<TV>(cylinder_center,cylinder_radius,SLIP,0);
                 ANALYTIC_LEVELSET<TV>* gh=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*left,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
                 analytic_levelset = (new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*right,TV::Axis_Vector(0),0,1)))->Add(gh)->Add(ef);
-                ANALYTIC_VELOCITY_NEST<TV>* vel0= new ANALYTIC_VELOCITY_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(cylinder_center,cylinder_radius*1.5,0,1));
+                //ANALYTIC_LEVELSET<TV>* ij=new ANALYTIC_LEVELSET_SPHERE<TV>(cylinder_center,cylinder_radius*1.6,0,1);
+                //ANALYTIC_LEVELSET<TV>* kl=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),DIRICHLET,DIRICHLET);
+                ANALYTIC_LEVELSET<TV>* mn=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*1.3,TV::Axis_Vector(0),0,1);
+                
+                ANALYTIC_VELOCITY_NEST<TV>* vel0= new ANALYTIC_VELOCITY_NEST<TV>(mn);
+                vel0->Add(new ANALYTIC_VELOCITY_CONST<TV>(TV(1,0)));
                 vel0->Add(new ANALYTIC_VELOCITY_CONST<TV>(TV(0,0)));
-                vel0->Add(new ANALYTIC_VELOCITY_CONST<TV>(TV(1,0)));                
                 analytic_velocity.Append(vel0);
-                analytic_initial_only=true;
+    //            analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV(1,0)));
+                //analytic_initial_only=true;
+                use_level_set_method=true;
                 use_p_null_mode=true;                
                 break;}
 
