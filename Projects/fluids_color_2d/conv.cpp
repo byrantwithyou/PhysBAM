@@ -34,12 +34,15 @@ int main(int argc,char *argv[])
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,TV::m> TV_INT;
 
+    TV X0(TV()+FLT_MAX);
     int frame=1;
     ARRAY<std::string> sim_dirs;
     PARSE_ARGS parse_args(argc,argv);
     LOG::Initialize_Logging(false,false,1<<30,true);
     LOG::cout<<parse_args.Print_Arguments()<<std::endl;
     parse_args.Add("-frame",&frame,"frame","Frame to test");
+    parse_args.Add("-x",&X0.x,"frame","Frame to test");
+    parse_args.Add("-y",&X0.y,"frame","Frame to test");
     parse_args.Extra_Optional(&sim_dirs,"sim dirs","simulation directories");
     parse_args.Parse();
 
@@ -95,6 +98,20 @@ int main(int argc,char *argv[])
 
     printf("order %g %g\n", -(Sy*Sx-sim_dirs.m*Sxy)/(-Sxx*sim_dirs.m+sqr(Sx)), -(Sz*Sx-sim_dirs.m*Sxz)/(-Sxx*sim_dirs.m+sqr(Sx)));
 
+    if(X0.Max()<FLT_MAX){
+        LOG::cout<<"sample at "<<X0<<std::endl;
+        int col=0;
+        for(int d=0;d<TV::m;d++){
+            ARRAY<T> values;
+            for(int i=0;i<sim_dirs.m;i++) values.Append(interp.Periodic(face_grids(i)(d),face_velocities(i)(col).Component(d),X0));
+            LOG::cout<<"u("<<d<<")  "<<values<<"    "<<Approx_Exact(res,values,2)<<std::endl;}
+
+        ARRAY<T> values,values2;
+        for(int i=0;i<sim_dirs.m;i++) values.Append(interp.Periodic(grids(i),levelsets(i)->phi,X0));
+        LOG::cout<<"level set  "<<values<<"    "<<Approx_Exact(res,values,2)<<std::endl;
+
+        for(int i=0;i<sim_dirs.m;i++) values2.Append(interp.Periodic(grids(i),pressures(i),X0));
+        LOG::cout<<"pressure  "<<values2<<"    "<<Approx_Exact(res,values2,2)<<std::endl;}
     LOG::Finish_Logging();
     return 0;
 }
