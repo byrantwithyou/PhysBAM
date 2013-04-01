@@ -6,6 +6,7 @@
 #define __ANALYTIC_VELOCITY__
 
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <boost/function.hpp>
 
 namespace PhysBAM{
 
@@ -169,6 +170,48 @@ struct ANALYTIC_VELOCITY_GRADED_ROTATION:public ANALYTIC_VELOCITY<TV>
     virtual T p(const TV& X,T t) const {return 0;}
     virtual TV F(const TV& X,T t) const {return (T)8*nu*scale*(2*sqr(r)-3*X.Magnitude_Squared())*X.Rotate_Clockwise_90();}
 };
-}
 
+template<class TV>
+struct ANALYTIC_VELOCITY_F:public ANALYTIC_VELOCITY<TV>
+{
+    typedef typename TV::SCALAR T;
+
+    T rho,mu;
+    bool use_advection;
+
+    ANALYTIC_VELOCITY_F(T rho,T mu,bool use_advection): rho(rho),mu(mu),use_advection(use_advection) {}
+    virtual TV Lu(const TV& X,T t) const=0;
+    virtual TV ut(const TV& X,T t) const=0;
+    virtual TV dp(const TV& X,T t) const=0;
+    virtual TV F(const TV& X,T t) const {TV f=rho*ut(X,t)+dp(X,t)-mu*Lu(X,t);if(use_advection) f+=rho*du(X,t)*u(X,t);return f;}
+};
+
+template<class TV>
+struct ANALYTIC_VELOCITY_ELLIPSE_FLOW:public ANALYTIC_VELOCITY_F<TV>
+{
+    typedef typename TV::SCALAR T;
+    T st;
+    bool sub_pj;
+    boost::function<T(T t)> a,da,dda;
+
+    ANALYTIC_VELOCITY_ELLIPSE_FLOW(T rho,T mu,bool use_advection,T st,bool sub_pj,boost::function<T(T t)> a,boost::function<T(T t)> da,boost::function<T(T t)> dda):
+        ANALYTIC_VELOCITY_F<TV>(rho,mu,use_advection),st(st),sub_pj(sub_pj),a(a),da(da),dda(dda) {}
+    virtual TV u(const TV& X,T t) const {return da(t)/a(t)*TV(X.x,-X.y);}
+    virtual MATRIX<T,TV::m> du(const TV& X,T t) const {return da(t)/a(t)*MATRIX<T,TV::m>(1,0,0,-1);}
+    virtual TV Lu(const TV& X,T t) const {return TV();}
+    virtual TV ut(const TV& X,T t) const {T b=a(t),c=da(t),d=dda(t),e=(d*b-c*c)/sqr(b);return e*TV(X.x,-X.y);}
+    virtual T p(const TV& X,T t) const
+    {
+        if(!sub_pj) return 0;
+        T a4=sqr(sqr(a(t))),x2=sqr(X.x),y2=sqr(X.y),z=a4*y2,w=a4*z+x2,e=-st*a4*pow(w,-(T)1.5);
+        return e*(x2+z);
+    }
+    virtual TV dp(const TV& X,T t) const
+    {
+        if(!sub_pj) return TV();
+        T a4=sqr(sqr(a(t))),x2=sqr(X.x),y2=sqr(X.y),z=a4*y2,w=a4*z+x2,e=-st*a4*pow(w,-(T)2.5);
+        return e*TV((2*w-3*(z+x2))*X.x,-(w+3*(a4-1)*x2)*a4*X.y);
+    }
+};
+}
 #endif
