@@ -33,6 +33,7 @@
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
+#include "ANALYTIC_VELOCITY.h"
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -40,109 +41,6 @@
 namespace PhysBAM{
 
 template<class TV> class FLUIDS_COLOR;
-
-template<class TV>
-struct ANALYTIC_VELOCITY
-{
-    typedef typename TV::SCALAR T;
-    virtual ~ANALYTIC_VELOCITY(){}
-    virtual TV u(const TV& X,T t) const=0;
-    virtual MATRIX<T,TV::m> du(const TV& X,T t) const=0;
-    virtual T p(const TV& X,T t) const=0;
-    virtual TV F(const TV& X,T t) const=0;
-};
-
-template<class TV>
-struct ANALYTIC_VELOCITY_CONST:public ANALYTIC_VELOCITY<TV>
-{
-    typedef typename TV::SCALAR T;
-    TV au;
-    T const_p;
-    ANALYTIC_VELOCITY_CONST(TV v): au(v),const_p(0) {}
-    virtual TV u(const TV& X,T t) const {return au;}
-    virtual MATRIX<T,TV::m> du(const TV& X,T t) const {return MATRIX<T,TV::m>();}
-    virtual T p(const TV& X,T t) const {return const_p;}
-    virtual TV F(const TV& X,T t) const {return TV();}
-};
-
-template<class TV>
-struct ANALYTIC_VELOCITY_ROTATION:public ANALYTIC_VELOCITY<TV>
-{
-    typedef typename TV::SCALAR T;
-    TV c;
-    typename TV::SPIN w;
-    T rho;
-    ANALYTIC_VELOCITY_ROTATION(TV cc,typename TV::SPIN ww,T rho): c(cc),w(ww),rho(rho){}
-    virtual TV u(const TV& X,T t) const {return w.Cross(X-c);}
-    virtual MATRIX<T,TV::m> du(const TV& X,T t) const {return MATRIX<T,TV::m>::Cross_Product_Matrix(w);}
-    virtual T p(const TV& X,T t) const {return (T).5*rho*u(X,t).Magnitude_Squared();}
-    virtual TV F(const TV& X,T t) const {return TV();}
-};
-
-template<class TV>
-struct ANALYTIC_VELOCITY_RAREFACTION:public ANALYTIC_VELOCITY<TV>
-{
-    typedef typename TV::SCALAR T;
-    ANALYTIC_VELOCITY_RAREFACTION(){}
-    virtual TV u(const TV& X,T t) const {return X.x/(t+1)*TV::Axis_Vector(0);}
-    virtual MATRIX<T,TV::m> du(const TV& X,T t) const {MATRIX<T,TV::m> M;M(0,0)=1/(t+1);return M;}
-    virtual T p(const TV& X,T t) const {return 0;}
-    virtual TV F(const TV& X,T t) const {return TV();}
-};
-
-template<class TV>
-struct ANALYTIC_VELOCITY_AFFINE:public ANALYTIC_VELOCITY<TV>
-{
-    typedef typename TV::SCALAR T;
-    TV v0;
-    MATRIX<T,TV::m> du0;
-    T rho;
-    ANALYTIC_VELOCITY_AFFINE(const TV& x0,const TV& v0,const MATRIX<T,TV::m>& du0,T rho): v0(v0-du0*x0),du0(du0),rho(rho) {}
-    virtual TV u(const TV& X,T t) const {return du0*X+v0;}
-    virtual MATRIX<T,TV::m> du(const TV& X,T t) const {return du0;}
-    virtual T p(const TV& X,T t) const {return 0;}
-    virtual TV F(const TV& X,T t) const {return rho*du0*(du0*X+v0);}
-};
-
-template<class TV>
-struct ANALYTIC_VELOCITY_QUADRATIC_X:public ANALYTIC_VELOCITY<TV>
-{
-    typedef typename TV::SCALAR T;
-    T a,b,c,mu;
-    ANALYTIC_VELOCITY_QUADRATIC_X(T a,T b,T c,T mu): a(a),b(b),c(c),mu(mu) {}
-    virtual TV u(const TV& X,T t) const {return TV::Axis_Vector(1)*((a*X.x+b)*X.x+c);}
-    virtual MATRIX<T,TV::m> du(const TV& X,T t) const {MATRIX<T,TV::m> M;M(1,0)=2*a*X.x+b;return M;}
-    virtual T p(const TV& X,T t) const {return 0;}
-    virtual TV F(const TV& X,T t) const {return -2*a*mu*TV::Axis_Vector(1);}
-};
-
-template<class TV>
-struct ANALYTIC_VELOCITY_TRANSLATE:public ANALYTIC_VELOCITY<TV>
-{
-    typedef typename TV::SCALAR T;
-    ANALYTIC_VELOCITY<TV>* av;
-    TV vel;
-    ANALYTIC_VELOCITY_TRANSLATE(ANALYTIC_VELOCITY<TV>* av,const TV& vel): av(av),vel(vel) {}
-    ~ANALYTIC_VELOCITY_TRANSLATE() {delete av;}
-    virtual TV u(const TV& X,T t) const {return av->u(X-vel*t,t)+vel;}
-    virtual MATRIX<T,TV::m> du(const TV& X,T t) const {return av->du(X-vel*t,t);}
-    virtual T p(const TV& X,T t) const {return av->p(X-vel*t,t);}
-    virtual TV F(const TV& X,T t) const {return av->F(X-vel*t,t);}
-};
-
-template<class TV>
-struct ANALYTIC_VELOCITY_SHIFT_PRESSURE:public ANALYTIC_VELOCITY<TV>
-{
-    typedef typename TV::SCALAR T;
-    ANALYTIC_VELOCITY<TV>* av;
-    T dp;
-    ANALYTIC_VELOCITY_SHIFT_PRESSURE(ANALYTIC_VELOCITY<TV>* av,T dp): av(av),dp(dp) {}
-    ~ANALYTIC_VELOCITY_SHIFT_PRESSURE() {delete av;}
-    virtual TV u(const TV& X,T t) const {return av->u(X,t);}
-    virtual MATRIX<T,TV::m> du(const TV& X,T t) const {return av->du(X,t);}
-    virtual T p(const TV& X,T t) const {return av->p(X,t)+dp;}
-    virtual TV F(const TV& X,T t) const {return av->F(X,t);}
-};
 
 template<class TV>
 class FLUIDS_COLOR_BASE:public PLS_FC_EXAMPLE<TV>

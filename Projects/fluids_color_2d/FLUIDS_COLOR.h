@@ -38,64 +38,6 @@
 
 namespace PhysBAM{
 
-template<class TV>
-struct ANALYTIC_VELOCITY_VORTEX:public ANALYTIC_VELOCITY<TV>
-{
-    typedef typename TV::SCALAR T;
-    T nu,rho;
-    ANALYTIC_VELOCITY_VORTEX(T mu,T rho): nu(mu/rho),rho(rho){}
-    virtual TV u(const TV& X,T t) const
-    {return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y))*exp(-2*nu*t);}
-    virtual MATRIX<T,TV::m> du(const TV& X,T t) const
-    {T c=cos(X.x)*cos(X.y),s=sin(X.x)*sin(X.y);return MATRIX<T,TV::m>(c,s,-s,-c)*exp(-2*nu*t);}
-    virtual T p(const TV& X,T t) const {return (T).25*rho*(cos(2*X.x)+cos(2*X.y))*exp(-4*nu*t);}
-    virtual TV F(const TV& X,T t) const {return TV();}
-};
-template<class TV>
-struct ANALYTIC_VELOCITY_NEST:public ANALYTIC_VELOCITY<TV>
-{
-    typedef typename TV::SCALAR T;
-    
-    ANALYTIC_LEVELSET<TV>* al;
-    ARRAY<ANALYTIC_VELOCITY<TV>*> sub_vel;
-    ANALYTIC_VELOCITY_NEST(ANALYTIC_LEVELSET<TV>* ls): al(ls) {}
-    ANALYTIC_VELOCITY_NEST* Add(ANALYTIC_VELOCITY<TV>* vel){sub_vel.Append(vel);return this;}
-    virtual TV u(const TV& X,T t) const
-    {int c=0;al->phi(X,t,c);return sub_vel(c)->u(X,t);}
-    virtual MATRIX<T,TV::m> du(const TV& X,T t) const
-    {int c=0;al->phi(X,t,c);return sub_vel(c)->du(X,t);}
-    virtual T p(const TV& X,T t) const {int c=0;al->phi(X,t,c);return sub_vel(c)->p(X,t);}
-    virtual TV F(const TV& X,T t) const {int c=0;al->phi(X,t,c);return sub_vel(c)->F(X,t);}
-};
-
-template<class TV> //Reverses direction with cos(t), adds constant velocity
-struct ANALYTIC_VELOCITY_VORTEX_NEW:public ANALYTIC_VELOCITY<TV>
-{
-    typedef typename TV::SCALAR T;
-    T nu,rho,l; //lambda is frequency of reversing, 0 doesn't reverse at all
-    TV au; //shift vector
-    T const_p;
-    ANALYTIC_VELOCITY_VORTEX_NEW(T mu,T rho,T lambda,TV v): nu(mu/rho),rho(rho),l(lambda),au(v),const_p(0){}
-    virtual TV u(const TV& X,T t) const
-    {return TV(sin(X.x)*cos(X.y)*cos(l*t),-cos(X.x)*sin(X.y)*cos(l*t))+au;}
-    virtual MATRIX<T,2> du(const TV& X,T t) const
-    {T c=cos(X.x)*cos(X.y)*cos(l*t),s=sin(X.x)*sin(X.y)*cos(l*t);return MATRIX<T,2>(c,s,-s,-c);}
-    virtual T p(const TV& X,T t) const {return const_p+(T).25*rho*cos(l*t)*cos(l*t)*(cos(2*X.x)+cos(2*X.y));}
-    virtual TV F(const TV& X,T t) const {return TV(sin(X.x)*cos(X.y)*((T)2*nu*cos(l*t)-l*sin(l*t))+cos(l*t)*cos(l*t)*(au(0)*cos(X.x)*cos(X.y)-au(1)*sin(X.x)*sin(X.y))-au(0)*l*sin(l*t),-cos(X.x)*sin(X.y)*((T)2*nu*cos(l*t)-l*sin(l*t))+cos(l*t)*cos(l*t)*(au(0)*sin(X.x)*sin(X.y)-au(1)*cos(X.x)*cos(X.y))-au(1)*l*sin(l*t));}
-};
-
-template<class TV>
-struct ANALYTIC_VELOCITY_GRADED_ROTATION:public ANALYTIC_VELOCITY<TV>
-{
-    typedef typename TV::SCALAR T;
-    T r,nu,rho,scale;
-    ANALYTIC_VELOCITY_GRADED_ROTATION(T rad,T mu,T rho,T scale): r(rad),nu(mu/rho),rho(rho),scale(scale){}
-    virtual TV u(const TV& X,T t) const {T q=X.Magnitude_Squared()-sqr(r);return sqr(q)*scale*X.Rotate_Clockwise_90();}
-    virtual MATRIX<T,TV::m> du(const TV& X,T t) const {T txy=4*X.x*X.y,x2=sqr(X.x),y2=sqr(X.y),r2=sqr(r),q=x2+y2-r2;return scale*q*MATRIX<T,TV::m>(txy,-4*x2-q,4*y2+q,-txy);}
-    virtual T p(const TV& X,T t) const {return 0;}
-    virtual TV F(const TV& X,T t) const {return (T)8*nu*scale*(2*sqr(r)-3*X.Magnitude_Squared())*X.Rotate_Clockwise_90();}
-};
-
 template<class T>
 class FLUIDS_COLOR<VECTOR<T,2> >:public FLUIDS_COLOR_BASE<VECTOR<T,2> >
 {
