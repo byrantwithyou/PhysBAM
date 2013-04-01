@@ -15,6 +15,7 @@
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_CONST.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_ELLIPSOID.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_LINE.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_MOVING_ELLIPSOID.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_NEST.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_ROTATE.h>
 #include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SCALE.h>
@@ -263,6 +264,22 @@ public:
                     use_advection=false;
                 }
                 break;
+            case 33:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+                {
+                    T outer_radius=(T).8,ellipse_mean_radius=(T).5;
+                    boost::function<T(T t)> a=[](T t){return (T)1;},da=[](T t){return (T)0;},dda=[](T t){return (T)0;};
+                    if(!override_surface_tension) surface_tension=(T)1*unit_st;
+                    ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_MOVING_ELLIPSOID<TV>(TV(),[=](T t){T r=a(t);return ellipse_mean_radius*TV(r,1/r);},0,1);
+                    ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),-4,-4);
+                    analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),outer_radius,0,1)))->Add(ab)->Add(cd);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ELLIPSE_FLOW<TV>(rho0/unit_rho,mu0/unit_mu,use_advection,surface_tension/unit_st,false,a,da,dda));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ELLIPSE_FLOW<TV>(rho1/unit_rho,mu1/unit_mu,use_advection,surface_tension/unit_st,true,a,da,dda));
+                    use_p_null_mode=true;
+                    use_level_set_method=true;
+                    use_advection=false;
+                }
+                break;
             case 102:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV((T)1.1*(T)pi,(T)pi),(T).6*(T)pi,0,1);
@@ -275,7 +292,7 @@ public:
             case 103:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*(T)pi*m,true);
                 ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_SPHERE<TV>(TV::Axis_Vector(0)*.2*pi,(T).2*(T)pi,NEUMANN,0);
-               ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),1,1);
+                ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),1,1);
                 analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),(T).8*(T)pi,0,1)))->Add(ab)->Add(cd);
                 MATRIX<T,TV::m> du0;for(int i=0;i<TV::m;i++)du0(i,i)=-1;du0(1,1)+=TV::m;
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE<TV>(TV::Axis_Vector(0)*.2*pi,TV(),du0,rho0/unit_rho));
