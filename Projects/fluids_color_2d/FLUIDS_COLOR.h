@@ -281,9 +281,8 @@ public:
                     analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),outer_radius,0,1)))->Add(ab)->Add(cd);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_ELLIPSE_FLOW<TV>(rho0/unit_rho,mu0/unit_mu,use_advection,surface_tension/unit_st,false,a,da,dda));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_ELLIPSE_FLOW<TV>(rho1/unit_rho,mu1/unit_mu,use_advection,surface_tension/unit_st,true,a,da,dda));
-                    use_p_null_mode=true;
+                    if(bc_type!=NEUMANN) use_p_null_mode=true;
                     use_level_set_method=true;
-                    use_advection=false;
                 }
                 break;
             case 102:{
