@@ -5,7 +5,10 @@
 #ifndef __ANALYTIC_VELOCITY__
 #define __ANALYTIC_VELOCITY__
 
+#include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 #include <boost/function.hpp>
 
 namespace PhysBAM{
@@ -19,6 +22,17 @@ struct ANALYTIC_VELOCITY
     virtual MATRIX<T,TV::m> du(const TV& X,T t) const=0;
     virtual T p(const TV& X,T t) const=0;
     virtual TV F(const TV& X,T t) const=0;
+    virtual void Test(const TV& X) const
+    {
+        RANDOM_NUMBERS<T> rand;
+        TV dX;
+        T e=1e-6,t=rand.Get_Uniform_Number(0,1);
+        rand.Fill_Uniform(dX,-e,e);
+        TV u0=u(X,t),u1=u((X+dX),t);
+        MATRIX<T,TV::m> du0=du(X,t),du1=du((X+dX),t);
+        T erru=((du0+du1)*dX/2-(u1-u0)).Magnitude()/e;
+        LOG::cout<<"analytic velocity diff test "<<erru<<std::endl;
+    }
 };
 
 template<class TV>
@@ -184,6 +198,31 @@ struct ANALYTIC_VELOCITY_F:public ANALYTIC_VELOCITY<TV>
     virtual TV ut(const TV& X,T t) const=0;
     virtual TV dp(const TV& X,T t) const=0;
     virtual TV F(const TV& X,T t) const {TV f=rho*ut(X,t)+dp(X,t)-mu*Lu(X,t);if(use_advection) f+=rho*du(X,t)*u(X,t);return f;}
+    virtual void Test(const TV& X) const
+    {
+        ANALYTIC_VELOCITY<TV>::Test(X);
+        RANDOM_NUMBERS<T> rand;
+        TV dX;
+        T e=1e-6,t=rand.Get_Uniform_Number(0,1),dt=rand.Get_Uniform_Number(-e,e);
+        rand.Fill_Uniform(dX,-e,e);
+        TV Lun=-(T)2*TV::m*u(X,t),Lue=Lu(X,t);
+        for(int i=0;i<TV::m;i++){
+            TV dX;
+            dX(i)=e;
+            Lun+=u(X-dX,t)+u(X+dX,t);}
+
+        T errLu=(Lun/sqr(e)-Lue).Magnitude();
+        LOG::cout<<"analytic L u diff test "<<errLu<<std::endl;
+
+        TV ua=u(X,t),ub=u(X,t+dt),dua=ut(X,t),dub=ut(X,t+dt);
+        T errut=((dua+dub)*dt/2-(ub-ua)).Magnitude()/e;
+        LOG::cout<<"analytic u_t diff test "<<errut<<std::endl;
+
+        T p0=p(X,t),p1=p((X+dX),t);
+        TV dp0=dp(X,t),dp1=dp((X+dX),t);
+        T errp=abs((dp0+dp1).Dot(dX)/2-(p1-p0))/e;
+        LOG::cout<<"analytic p diff test "<<errp<<std::endl;
+    }
 };
 
 template<class TV>

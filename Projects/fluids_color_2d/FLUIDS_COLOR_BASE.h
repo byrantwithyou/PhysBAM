@@ -583,25 +583,15 @@ public:
         Dump_Analytic_Levelset(0);
 
         if(test_analytic_diff){
+            analytic_levelset->Test(grid.domain);
             RANDOM_NUMBERS<T> rand;
-            TV X,dX;
-            T e=1e-6,t=rand.Get_Uniform_Number(0,1);
-            rand.Fill_Uniform(dX,-e,e);
+            TV X;
             int c=-4;
             do{
                 X=rand.Get_Uniform_Vector(grid.domain);
                 analytic_levelset->phi(X/m,0,c);}
             while(c<0);
-            TV u0=analytic_velocity(c)->u(X/m,t)*m/s,u1=analytic_velocity(c)->u((X+dX)/m,t)*m/s;
-            MATRIX<T,TV::m> du0=analytic_velocity(c)->du(X/m,t)/s,du1=analytic_velocity(c)->du((X+dX)/m,t)/s;
-            T erru=((du0+du1)*dX/2-(u1-u0)).Magnitude()/e;
-            int c0,c1;
-            T l0=analytic_levelset->phi(X/m,t/s,c0)*m,l1=analytic_levelset->phi((X+dX)/m,t/s,c1)*m;
-            if(c0>=0) l0=-l0;
-            if(c1>=0) l1=-l1;
-            TV dl0=analytic_levelset->N(X/m,t/s,c),dl1=analytic_levelset->N((X+dX)/m,t/s,c);
-            T errl=abs((dl0+dl1).Dot(dX)/2-(l1-l0))/e;
-            LOG::cout<<"analytic diff test "<<erru<<"  "<<errl<<std::endl;}
+            analytic_velocity(c)->Test(X);}
     }
 
     void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE
