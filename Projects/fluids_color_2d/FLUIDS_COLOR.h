@@ -267,8 +267,14 @@ public:
             case 33:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
                 {
-                    T outer_radius=(T).8,ellipse_mean_radius=(T).5;
-                    boost::function<T(T t)> a=[](T t){return (T)1;},da=[](T t){return (T)0;},dda=[](T t){return (T)0;};
+                    T outer_radius=(T).9,ellipse_mean_radius=(T).5;
+                    boost::function<T(T t)> a,da,dda;
+                    if(mode==0){a=[](T t){return (T)1;};da=[](T t){return (T)0;};dda=[](T t){return (T)0;};}
+                    else if(mode==1){a=[](T t){return (T)1.1;};da=[](T t){return (T)0;};dda=[](T t){return (T)0;};}
+                    else if(mode==2){a=[](T t){return t+1;};da=[](T t){return (T)1;};dda=[](T t){return (T)0;};}
+                    else if(mode==3){a=[](T t){return exp(t);};da=[](T t){return exp(t);};dda=[](T t){return exp(t);};}
+                    else if(mode==4){a=[](T t){return 1+(T).2*exp(-t);};da=[](T t){return -(T).2*exp(-t);};dda=[](T t){return (T).2*exp(-t);};}
+                    else PHYSBAM_FATAL_ERROR("need valid mode");
                     if(!override_surface_tension) surface_tension=(T)1*unit_st;
                     ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_MOVING_ELLIPSOID<TV>(TV(),[=](T t){T r=a(t);return ellipse_mean_radius*TV(r,1/r);},0,1);
                     ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),-4,-4);
