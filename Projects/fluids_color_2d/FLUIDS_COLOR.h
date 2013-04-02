@@ -301,15 +301,15 @@ public:
                 break;}
             case 111:{
                 grid.Initialize(TV_INT(resolution,2*resolution),RANGE<TV>(TV(-1,0),TV(1,4))*m,true);
-                T top = (T)3.5,surface=(T)3,bottom=(T)1;
+                T top = (T)3.5,bottom=(T).5;
                 TV bubble_center((T)0,(T)1.5),bubble_radius((T).5,(T).2);
 //                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*bottom,TV::Axis_Vector(1),SLIP,0);
-                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*top,TV::Axis_Vector(1),1,SLIP);
-                ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),SLIP,SLIP);
+//                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*top,TV::Axis_Vector(1),,DIRICHLET);
+                ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),DIRICHLET,DIRICHLET);
 
                 ANALYTIC_LEVELSET_SIGNED<TV>* ef=new ANALYTIC_LEVELSET_ELLIPSOID<TV>(bubble_center,bubble_radius,1,0);//new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).2,0,1);
                 ANALYTIC_LEVELSET<TV>* gh=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*bottom,TV::Axis_Vector(1),0,1)))->Add(cd)->Add(ef);
-                analytic_levelset = (new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*surface,TV::Axis_Vector(1),0,1)))->Add(gh)->Add(ab);
+                analytic_levelset = (new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*top,TV::Axis_Vector(1),0,1)))->Add(gh)->Add(cd);
                 gravity=TV::Axis_Vector(0)*(-(T)9.8)*m/s/s;
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
@@ -318,11 +318,30 @@ public:
                 use_p_null_mode=true;
 
                 break;}
+//            case 111:{
+//                grid.Initialize(TV_INT(resolution,2*resolution),RANGE<TV>(TV(-1,0),TV(1,4))*m,true);
+//                T top = (T)3.5,surface=(T)3,bottom=(T)1;
+//                TV bubble_center((T)0,(T)1.5),bubble_radius((T).5,(T).2);
+//                //                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*bottom,TV::Axis_Vector(1),SLIP,0);
+//                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*top,TV::Axis_Vector(1),1,SLIP);
+//                ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),SLIP,SLIP);
+//                
+//                ANALYTIC_LEVELSET_SIGNED<TV>* ef=new ANALYTIC_LEVELSET_ELLIPSOID<TV>(bubble_center,bubble_radius,1,0);//new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).2,0,1);
+//                ANALYTIC_LEVELSET<TV>* gh=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*bottom,TV::Axis_Vector(1),0,1)))->Add(cd)->Add(ef);
+//                analytic_levelset = (new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(1)*surface,TV::Axis_Vector(1),0,1)))->Add(gh)->Add(ab);
+//                gravity=TV::Axis_Vector(0)*(-(T)9.8)*m/s/s;
+//                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
+//                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
+//                analytic_initial_only=true;
+//                use_level_set_method=true;
+//                use_p_null_mode=true;
+//                
+//                break;}
             case 112:{
-                grid.Initialize(TV_INT(3*resolution,resolution),RANGE<TV>(TV(0,0),TV(12,4))*m,true);
+                grid.Initialize(TV_INT(2*resolution,resolution),RANGE<TV>(TV(0,0),TV(20,10))*m,true);
                 T left = (T)1,right=(T)11;
-                TV cylinder_center((T)3,(T)2);//,bubble_radius((T).5,(T).2);
-                T cylinder_radius(.4);
+                TV cylinder_center((T)4,(T)2);//,bubble_radius((T).5,(T).2);
+                T cylinder_radius(.5);
                 ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),DIRICHLET,DIRICHLET);
                 ANALYTIC_LEVELSET<TV>* ef=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),NEUMANN,NEUMANN);                
                 ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_SPHERE<TV>(cylinder_center,cylinder_radius,SLIP,0);
@@ -336,6 +355,24 @@ public:
                 use_level_set_method=true;
                 use_p_null_mode=true;                
                 break;}
+//            case 112:{ //This will be gone by tomorrow night!
+//                grid.Initialize(TV_INT(2*resolution,resolution),RANGE<TV>(TV(0,0),TV(20,10))*m,true);
+//                T left = (T)1,right=(T)19;
+//                TV cylinder_center((T)4,(T)5);//,bubble_radius((T).5,(T).2);
+//                T cylinder_radius(1);
+//                ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),DIRICHLET,DIRICHLET);
+//                ANALYTIC_LEVELSET<TV>* ef=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),NEUMANN,NEUMANN);                
+//                ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_SPHERE<TV>(cylinder_center,cylinder_radius,DIRICHLET,0);
+//                ANALYTIC_LEVELSET<TV>* gh=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*left,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
+//                analytic_levelset = (new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*right,TV::Axis_Vector(0),0,1)))->Add(gh)->Add(ef);
+//                ANALYTIC_LEVELSET<TV>* mn=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*1.3,TV::Axis_Vector(0),0,1);                
+//                ANALYTIC_VELOCITY_NEST<TV>* vel0= new ANALYTIC_VELOCITY_NEST<TV>(mn);
+//                vel0->Add(new ANALYTIC_VELOCITY_CONST<TV>(TV(1,0)));
+//                vel0->Add(new ANALYTIC_VELOCITY_CONST<TV>(TV(0,0)));
+//                analytic_velocity.Append(vel0);
+//                use_level_set_method=true;
+//                use_p_null_mode=true;                
+//                break;}
 
 
 
