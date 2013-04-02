@@ -338,9 +338,9 @@ public:
 //                
 //                break;}
             case 112:{
-                grid.Initialize(TV_INT(2*resolution,resolution),RANGE<TV>(TV(0,0),TV(20,10))*m,true);
+                grid.Initialize(TV_INT(2*resolution,resolution),RANGE<TV>(TV(0,0),TV(12,6))*m,true);
                 T left = (T)1,right=(T)11;
-                TV cylinder_center((T)4,(T)2);//,bubble_radius((T).5,(T).2);
+                TV cylinder_center((T)3.25,(T)3);//,bubble_radius((T).5,(T).2);
                 T cylinder_radius(.5);
                 ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),DIRICHLET,DIRICHLET);
                 ANALYTIC_LEVELSET<TV>* ef=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),NEUMANN,NEUMANN);                
