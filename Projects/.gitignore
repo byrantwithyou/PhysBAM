@@ -38,3 +38,5 @@ stokes/stokes_debug
 stokes/stokes
 boundary_conditions_2d/projection
 boundary_conditions_2d/projection3
+mpm/mpm_2d
+mpm/mpm_3d
