@@ -172,9 +172,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     
     // voronoi reconstruction
     if(use_voronoi){
-        voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
+        // voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
         // voronoi.Initialize_With_A_Triangulated_Area(ta);
-        // voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
+        voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
         voronoi.Build_Segments();
         for(int i=0;i<voronoi.X.m;i++) {
             if(voronoi.type(i)==1) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,0,0));
@@ -185,9 +185,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
         Flush_Frame<TV>("voronoi cells");}
     if(use_voronoi_boundary){
-        voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
+        // voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
         // voronoi.Initialize_With_A_Triangulated_Area(ta);
-        // voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
+        voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
         voronoi.Build_Boundary_Segments();
         for(int i=0;i<voronoi.X.m;i++) {
             if(voronoi.type(i)==1) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,0,0));
@@ -278,7 +278,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     sim.mu0=sim.mu;
     sim.lambda0=sim.lambda;
 
-    // use voronoi polygon to initialize particle mass and volume
+    // use voronoi polygon to initialize particle mass and volume and particle domain
     if(use_voronoi || use_voronoi_boundary){
         sim.assigned_volume_externally=true;
         for(int p=0;p<sim.particles.number;p++){
@@ -287,7 +287,13 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 poly.X(i)=voronoi.Xm(voronoi.elements(p)(i));
             T area=poly.Area();
             sim.particles.volume(p)=area;
-            sim.particles.mass(p)=object_density*area;}}
+            sim.particles.mass(p)=object_density*area;
+            if(poly.X.m==TV::m+1){ // triangle mesh
+                for(int i=0;i<poly.X.m;i++) sim.particles.particle_domain(p)(i)=poly.X(i);
+                if(!((poly.X(1)-poly.X(0)).x*(poly.X(2)-poly.X(0)).y-(poly.X(1)-poly.X(0)).y*(poly.X(2)-poly.X(0)).x>0)){
+                    TV temp=sim.particles.particle_domain(p)(1);
+                    sim.particles.particle_domain(p)(1)=sim.particles.particle_domain(p)(2);
+                    sim.particles.particle_domain(p)(2)=temp;}}}}
 
     // Greg Turk
     if(use_turk){
