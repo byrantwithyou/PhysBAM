@@ -279,8 +279,8 @@ public:
                     ANALYTIC_LEVELSET<TV>* ab=new ANALYTIC_LEVELSET_MOVING_ELLIPSOID<TV>(TV(),[=](T t){T r=a(t);return ellipse_mean_radius*TV(r,1/r);},0,1);
                     ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),-4,-4);
                     analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),outer_radius,0,1)))->Add(ab)->Add(cd);
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ELLIPSE_FLOW<TV>(rho0/unit_rho,mu0/unit_mu,use_advection,surface_tension/unit_st,false,a,da,dda));
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ELLIPSE_FLOW<TV>(rho1/unit_rho,mu1/unit_mu,use_advection,surface_tension/unit_st,true,a,da,dda));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ELLIPSE_FLOW<TV>(rho0/unit_rho,mu0/unit_mu,use_advection,surface_tension/unit_st,(mu1-mu0)/unit_mu,false,a,da,dda));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ELLIPSE_FLOW<TV>(rho1/unit_rho,mu1/unit_mu,use_advection,surface_tension/unit_st,(mu1-mu0)/unit_mu,true,a,da,dda));
                     if(bc_type!=NEUMANN) use_p_null_mode=true;
                     use_level_set_method=true;
                 }

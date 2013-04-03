@@ -229,12 +229,12 @@ template<class TV>
 struct ANALYTIC_VELOCITY_ELLIPSE_FLOW:public ANALYTIC_VELOCITY_F<TV>
 {
     typedef typename TV::SCALAR T;
-    T st;
+    T st,mu_j;
     bool sub_pj;
     boost::function<T(T t)> a,da,dda;
 
-    ANALYTIC_VELOCITY_ELLIPSE_FLOW(T rho,T mu,bool use_advection,T st,bool sub_pj,boost::function<T(T t)> a,boost::function<T(T t)> da,boost::function<T(T t)> dda):
-        ANALYTIC_VELOCITY_F<TV>(rho,mu,use_advection),st(st),sub_pj(sub_pj),a(a),da(da),dda(dda) {}
+    ANALYTIC_VELOCITY_ELLIPSE_FLOW(T rho,T mu,bool use_advection,T st,T mu_j,bool sub_pj,boost::function<T(T t)> a,boost::function<T(T t)> da,boost::function<T(T t)> dda):
+        ANALYTIC_VELOCITY_F<TV>(rho,mu,use_advection),st(st),mu_j(mu_j),sub_pj(sub_pj),a(a),da(da),dda(dda) {}
     virtual TV u(const TV& X,T t) const {return da(t)/a(t)*TV(X.x,-X.y);}
     virtual MATRIX<T,TV::m> du(const TV& X,T t) const {return da(t)/a(t)*MATRIX<T,TV::m>(1,0,0,-1);}
     virtual TV Lu(const TV& X,T t) const {return TV();}
@@ -242,14 +242,43 @@ struct ANALYTIC_VELOCITY_ELLIPSE_FLOW:public ANALYTIC_VELOCITY_F<TV>
     virtual T p(const TV& X,T t) const
     {
         if(!sub_pj) return 0;
-        T a4=sqr(sqr(a(t))),x2=sqr(X.x),y2=sqr(X.y),z=a4*y2,w=a4*z+x2,e=-st*a4*pow(w,-(T)1.5);
-        return e*(x2+z);
+        TV n=N(X,t);
+        return -st*K(X,t)-2*mu_j*n.Dot(du(X,t)*n);
     }
     virtual TV dp(const TV& X,T t) const
     {
         if(!sub_pj) return TV();
-        T a4=sqr(sqr(a(t))),x2=sqr(X.x),y2=sqr(X.y),z=a4*y2,w=a4*z+x2,e=-st*a4*pow(w,-(T)2.5);
+        return -st*dK(X,t)-4*mu_j*dN(X,t).Transpose_Times(du(X,t).Symmetric_Part()*N(X,t));
+    }
+    T K(const TV& X,T t) const
+    {
+        T a4=sqr(sqr(a(t))),x2=sqr(X.x),y2=sqr(X.y),z=a4*y2,w=a4*z+x2,e=a4*pow(w,-(T)1.5);
+        TV n=N(X,t);
+        return e*(x2+z);
+    }
+    TV dK(const TV& X,T t) const
+    {
+        T a4=sqr(sqr(a(t))),x2=sqr(X.x),y2=sqr(X.y),z=a4*y2,w=a4*z+x2,e=a4*pow(w,-(T)2.5);
         return e*TV((2*w-3*(z+x2))*X.x,-(w+3*(a4-1)*x2)*a4*X.y);
+    }
+    TV N(const TV& X,T t) const {return TV(X.x,sqr(sqr(a(t)))*X.y).Normalized();}
+    MATRIX<T,TV::m> dN(const TV& X,T t) const
+    {
+        T a4=sqr(sqr(a(t))),z=a4*X.y,x2=X.x*X.x,z2=z*z,xz=X.x*z,d2=x2+z2,d3=sqrt(d2)*d2;
+        return MATRIX<T,TV::m>(z2,-xz,-a4*xz,x2*a4)/d3;
+    }
+    virtual void Test(const TV& X) const
+    {
+        ANALYTIC_VELOCITY_F<TV>::Test(X);
+        RANDOM_NUMBERS<T> rand;
+        TV dX;
+        T e=1e-6,t=rand.Get_Uniform_Number(0,1);
+        rand.Fill_Uniform(dX,-e,e);
+        TV N0=N(X,t),N1=N((X+dX),t);
+        MATRIX<T,TV::m> dN0=dN(X,t),dN1=dN((X+dX),t);
+        T errN=((dN0+dN1)*dX/2-(N1-N0)).Magnitude()/e;
+        LOG::cout<<"analytic normal diff test "<<errN<<std::endl;
+        LOG::cout<<"analytic normal orthogonality test "<<dN0.Transpose_Times(N0)<<std::endl;
     }
 };
 }
