@@ -134,11 +134,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             break;
         case 5: // wall
             sim.grid.Initialize(TV_INT(6*grid_res+1,1*grid_res+1),RANGE<TV>(TV(-0.1,-0.2),TV(5.9,0.8)));
-            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.1*particle_res+1,0.5*particle_res+1),RANGE<TV>(TV(0,0),TV(0.1,0.5)));
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(0,0),TV(0.1,0.5)),particle_exclude_radius);
             sim.ground_level=0;
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.02,-0.02),TV(0.12,0.02)));
-            sim.dirichlet_velocity.Append(TV());
-            sim.rigid_ball.Append(SPHERE<TV>(TV(-0.1,0.25),0.05));
+            sim.rigid_ball.Append(SPHERE<TV>(TV(-0.1,0.25),0.02));
             sim.rigid_ball_velocity.Append(TV(50,0));
             break;
         case 6:
@@ -254,7 +252,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         case 5:
             object_density=(T)1200*density_scale;
             object_mass=object_density*(RANGE<TV>(TV(0,0),TV(0.1,0.5)).Size());
-            ym*=(T)5e3;
+            ym*=(T)5e5;
             sim.mu.Fill(ym/((T)2*((T)1+pr)));
             sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
             sim.use_gravity=true;
