@@ -14,7 +14,7 @@ struct DYNAMIC_COORD:public DYNAMIC_OP<T>
     DYNAMIC_COORD(): c(0) {}
     virtual DYNAMIC_OP<T>* New() const {return new DYNAMIC_COORD<T>;}
     virtual ~DYNAMIC_COORD() {}
-    virtual void Compute(const TV& X) {PHYSBAM_ASSERT(A.m==0 && c>=1 && c<=3);S=X(c);D=TV::Axis_Vector(c);}
+    virtual void Compute(const TV& X) {PHYSBAM_ASSERT(A.m==0 && c>=0 && c<3);S=X(c);D=TV::Axis_Vector(c);}
 };
 
 #define DYNAMIC_TEMPLATE(NAME) \
@@ -58,7 +58,7 @@ template<class T> void DYNAMIC_ADD<T>::Compute(const TV& X)
     S=A(0)->S;
     D=A(0)->D;
     H=A(0)->H;
-    for(int j=2;j<=A.m;j++){S+=A(j)->S;D+=A(j)->D;H+=A(j)->H;}
+    for(int j=1;j<A.m;j++){S+=A(j)->S;D+=A(j)->D;H+=A(j)->H;}
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_SUB);
@@ -73,7 +73,7 @@ template<class T> void DYNAMIC_SUB<T>::Compute(const TV& X)
         S=A(0)->S;
         D=A(0)->D;
         H=A(0)->H;
-        for(int j=2;j<=A.m;j++){S-=A(j)->S;D-=A(j)->D;H-=A(j)->H;}}
+        for(int j=1;j<A.m;j++){S-=A(j)->S;D-=A(j)->D;H-=A(j)->H;}}
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_MUL);
@@ -83,7 +83,7 @@ template<class T> void DYNAMIC_MUL<T>::Compute(const TV& X)
     S=A(0)->S;
     D=A(0)->D;
     H=A(0)->H;
-    for(int j=2;j<=A.m;j++){
+    for(int j=1;j<A.m;j++){
         H=A(j)->S*H+S*A(j)->H+MATRIX<T,3>::Outer_Product(A(j)->D,D)+MATRIX<T,3>::Outer_Product(D,A(j)->D);
         D=S*A(j)->D+A(j)->S*D;
         S*=A(j)->S;}
@@ -96,7 +96,7 @@ template<class T> void DYNAMIC_DIV<T>::Compute(const TV& X)
     S=A(0)->S;
     D=A(0)->D;
     H=A(0)->H;
-    for(int j=2;j<=A.m;j++){
+    for(int j=1;j<A.m;j++){
         T SI=1/A(j)->S;
         TV DI=-SI*SI*A(j)->D;
         MATRIX<T,3> HI=-SI*SI*A(j)->H-2*SI*MATRIX<T,3>::Outer_Product(DI,A(j)->D);
@@ -289,7 +289,7 @@ Parse(const char*& str)
     // Coordinate
     if(token=="x" || token=="y" || token=="z"){
         DYNAMIC_COORD<T>* op=new DYNAMIC_COORD<T>;
-        op->c=token[0]-'x'+1;
+        op->c=token[0]-'x';
         eval_list.Append(op);
         return op;}
 

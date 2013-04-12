@@ -411,7 +411,7 @@ Initialize_Boundary_Mesh_Of_Subset(TRIANGLE_MESH& boundary_mesh_of_subset,const 
             if(!Node_In_Tetrahedron(i,(*adjacent_elements)(t)(p))) adjacent_tets_per_face(0).Append((*adjacent_elements)(t)(p));
             else if(!Node_In_Tetrahedron(j,(*adjacent_elements)(t)(p))) adjacent_tets_per_face(1).Append((*adjacent_elements)(t)(p));
             else if(!Node_In_Tetrahedron(k,(*adjacent_elements)(t)(p))) adjacent_tets_per_face(2).Append((*adjacent_elements)(t)(p));
-            else adjacent_tets_per_face(4).Append((*adjacent_elements)(t)(p));
+            else adjacent_tets_per_face(3).Append((*adjacent_elements)(t)(p));
         for(int p=0;p<4;p++){
             bool lowest_index_tet=true,boundary_face=false;
             // For non-manifold meshes, add a boundary face only for the lowest indexed incident tet

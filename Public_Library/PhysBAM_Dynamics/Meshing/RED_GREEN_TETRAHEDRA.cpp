@@ -460,7 +460,7 @@ Add_Segment(ARRAY<int>& free_edge_indices,const int node1,const int node2)
     assert(segment_mesh.Segment(node1,node2)<0);
     int index;
     if(free_edge_indices.m == 0){ // no more empty spots
-        segment_mesh.elements.Append(VECTOR<int,2>(node1,node2));index=segment_mesh.elements.m;segment_midpoints.Append(0);}
+        index=segment_mesh.elements.Append(VECTOR<int,2>(node1,node2));segment_midpoints.Append(0);}
     else{
         index=free_edge_indices.Pop();assert(segment_midpoints(index)<0);segment_mesh.elements(index).Set(node1,node2);}
     (*segment_mesh.incident_elements)(node1).Append(index);(*segment_mesh.incident_elements)(node2).Append(index);
@@ -502,7 +502,7 @@ Rebuild_Object()
     int level,tet;for(level=0;level<meshes.m;level++) for(tet=0;tet<meshes(level)->elements.m;tet++) if(Leaf(level,tet)) number_of_leaves++;
     object.mesh.elements.Resize(number_of_leaves);
     leaf_levels_and_indices.Exact_Resize(number_of_leaves);
-    int index_into_tets=1;
+    int index_into_tets=0;
     for(level=0;level<meshes.m;level++) for(tet=0;tet<meshes(level)->elements.m;tet++) 
         if(Leaf(level,tet)){
             for(int i=0;i<4;i++) object.mesh.elements(index_into_tets)(i)=meshes(level)->elements(tet)(i);

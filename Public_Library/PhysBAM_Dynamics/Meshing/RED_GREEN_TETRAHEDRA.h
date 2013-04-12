@@ -47,7 +47,7 @@ public:
     {return (*children(level))(tet)(7) != 0;}
 
     bool Red(const int level,const int tet) const
-    {return level == 1 || Regularly_Refined(level-1,(*parent(level))(tet));}
+    {return level == 0 || Regularly_Refined(level-1,(*parent(level))(tet));}
 
 //#####################################################################
     void Initialize_Segment_Index_From_Midpoint_Index(); // TODO: check that this is correct
