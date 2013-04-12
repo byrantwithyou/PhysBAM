@@ -65,7 +65,7 @@ private:
     void Resolve_Stack();
     void Refine_If_Necessary(int const level,const int tet);
     void Regularly_Refine_Tet(const int level,const int tet);
-    void Get_Existing_Subindices(const int level,const int tet,ARRAY<int>& midpoints,ARRAY<int>& subedges);
+    void Get_Existing_Subindices(const int level,const int tet,VECTOR<int,6>& midpoints,VECTOR<int,24>& subedges);
     void Ensure_Level_Exists(const int level);
     void Delete_Children(const int level,const int tet,ARRAY<int>& deleted_tet_indices,ARRAY<int>& deleted_edge_indices);
     int Add_Midpoint(const int segment,const int level,const int tet);

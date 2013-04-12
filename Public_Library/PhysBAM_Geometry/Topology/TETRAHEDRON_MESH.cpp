@@ -406,7 +406,7 @@ Initialize_Boundary_Mesh_Of_Subset(TRIANGLE_MESH& boundary_mesh_of_subset,const 
     // check tetrahedra for out-of-subset neighbors 
     for(int t=0;t<elements.m;t++) if(subset(t)){
         int i,j,k,l;elements(t).Get(i,j,k,l);
-        ARRAY<ARRAY<int> > adjacent_tets_per_face(4);
+        VECTOR<ARRAY<int>,4> adjacent_tets_per_face;
         for(int p=0;p<(*adjacent_elements)(t).m;p++)
             if(!Node_In_Tetrahedron(i,(*adjacent_elements)(t)(p))) adjacent_tets_per_face(0).Append((*adjacent_elements)(t)(p));
             else if(!Node_In_Tetrahedron(j,(*adjacent_elements)(t)(p))) adjacent_tets_per_face(1).Append((*adjacent_elements)(t)(p));

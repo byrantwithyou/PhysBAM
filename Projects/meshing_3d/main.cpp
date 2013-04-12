@@ -19,7 +19,7 @@ int main(int argc,char **argv)
     typedef float RW;
     STREAM_TYPE stream_type((RW()));
 
-    std::string opt_out,opt_data,parameter_file;
+    std::string opt_out="meshing_data",opt_data,parameter_file;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-o",&opt_out,"dir","output directory");
     parse_args.Add("-d",&opt_data,"dir","data directory");

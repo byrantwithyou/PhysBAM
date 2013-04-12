@@ -103,7 +103,7 @@ Initialize_Optimization(const bool verbose)
     mesh.boundary_nodes=0; // we don't need it hanging off the mesh object any more
     if(verbose) LOG::cout<<"boundary layer has "<<layers(0)->m<<" nodes"<<std::endl;
     ARRAY<bool,VECTOR<int,1> > marked(0,mesh.number_nodes);for(int i=0;i<layers(0)->m;i++) marked((*layers(0))(i))=true;
-    for(int l=2;;l++){
+    for(int l=1;;l++){
         layers.Append(new ARRAY<int>);
         for(int i=0;i<layers(l-1)->m;i++){
             int j=(*layers(l-1))(i);
@@ -155,7 +155,7 @@ Optimize_Boundary_Layer(const T compression_fraction,const bool reverse)
 {
     Check_For_Interrupts();
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    ARRAY<TV> directions(4);ARRAY<int>& nodes=*layers(0);
+    ARRAY<TV> directions(5);ARRAY<int>& nodes=*layers(0);
     for(int i=0;i<nodes.m;i++){
         particles.X(nodes(i))-=compression_fraction*(*implicit_surface)(particles.X(nodes(i)))*boundary_mesh_normals(map_from_nodes_to_boundary_list(nodes(i)));
         Update_Dependent_Nodes(nodes(i));}
@@ -625,7 +625,7 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
         int node1=boundary_nodes(i);
         for(int j=0;j<(*subset_segment_mesh.neighbor_nodes)(node1).m;j++){
             int node2=(*subset_segment_mesh.neighbor_nodes)(node1)(j);
-            if(node1<node2 && node_on_boundary(node2) && !boundary_mesh.segment_mesh->Segment(node1,node2)) bad_segment_list.Append(VECTOR<int,2>(node1,node2));}}
+            if(node1<node2 && node_on_boundary(node2) && boundary_mesh.segment_mesh->Segment(node1,node2)<0) bad_segment_list.Append(VECTOR<int,2>(node1,node2));}}
     int number_bad_elements=bad_segment_list.m;
     if(number_bad_elements){
         if(verbose) LOG::cout<<"Subdividing "<<bad_segment_list.m<<" bad interior edges."<<std::endl;
@@ -656,7 +656,7 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
             int node1=boundary_nodes(i);
             for(int j=0;j<(*subset_segment_mesh.neighbor_nodes)(node1).m;j++){
                 int node2=(*subset_segment_mesh.neighbor_nodes)(node1)(j);
-                if(node1<node2 && node_on_boundary(node2) && !boundary_mesh.segment_mesh->Segment(node1,node2)) bad_segment_list.Append(VECTOR<int,2>(node1,node2));}}
+                if(node1<node2 && node_on_boundary(node2) && boundary_mesh.segment_mesh->Segment(node1,node2)<0) bad_segment_list.Append(VECTOR<int,2>(node1,node2));}}
         if(verbose) LOG::cout<<"Enveloping "<<bad_segment_list.m<<" bad interior edges."<<std::endl;
         number_bad_elements=bad_segment_list.m;
         for(int i=0;i<bad_segment_list.m;i++){

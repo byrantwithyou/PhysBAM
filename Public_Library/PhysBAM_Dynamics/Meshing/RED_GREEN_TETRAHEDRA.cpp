@@ -30,15 +30,15 @@ template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Refine_Simplex_List(const ARRAY<int>& tetrahedron_list)
 {
     object.particles.Preallocate(object.particles.Size()+6*tetrahedron_list.m);
-    for(int level=0;level<index_in_stack.m;level++) index_in_stack(level)->Fill(0);
+    for(int level=0;level<index_in_stack.m;level++) index_in_stack(level)->Fill(-1);
     for(int i=0;i<tetrahedron_list.m;i++){
         int level=leaf_levels_and_indices(tetrahedron_list(i))(0),tet=leaf_levels_and_indices(tetrahedron_list(i))(1);
         if(Red(level,tet)){
-            stack.Append(VECTOR<int,2>(level,tet));(*index_in_stack(level))(tet)=stack.m;
+            (*index_in_stack(level))(tet)=stack.Append(VECTOR<int,2>(level,tet));
             for(int j=0;j<6;j++){int s=(*meshes(level)->element_edges)(tet)(j);if(segment_midpoints(s)<0) Add_Midpoint(s,level,tet);}}
         else{ // Green
             int parent_index=(*parent(level))(tet);
-            stack.Append(VECTOR<int,2>(level-1,parent_index));(*index_in_stack(level-1))(parent_index)=stack.m;
+            (*index_in_stack(level-1))(parent_index)=stack.Append(VECTOR<int,2>(level-1,parent_index));
             for(int j=0;j<6;j++){int s=(*meshes(level-1)->element_edges)(parent_index)(j);if(segment_midpoints(s)<0) Add_Midpoint(s,level-1,parent_index);}}}
     Resolve_Stack();
     Rebuild_Object();
@@ -50,14 +50,14 @@ template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Subdivide_Segment_List(const ARRAY<VECTOR<int,2> >& segment_list)
 {
     object.particles.Preallocate(object.particles.Size()+4*segment_list.m);
-    for(int i=0;i<index_in_stack.m;i++) index_in_stack(i)->Fill(0);
+    for(int i=0;i<index_in_stack.m;i++) index_in_stack(i)->Fill(-1);
     for(int i=0;i<segment_list.m;i++){
         int node1,node2;segment_list(i).Get(node1,node2);
         int s,level,tet;
         if(Find_Edge_And_Test_If_Green(node1,node2,&s,&level,&tet)){
             // then we should refine the parent's segments instead - BUT if node1-node2 was a bisector, only subdivide that face!
             int parent_index=(*parent(level))(tet);
-            stack.Append(VECTOR<int,2>(level-1,parent_index));(*index_in_stack(level-1))(parent_index)=stack.m;
+            (*index_in_stack(level-1))(parent_index)=stack.Append(VECTOR<int,2>(level-1,parent_index));
             int a,b,c,d;meshes(level-1)->elements(parent_index).Get(a,b,c,d);
             int ab=(*meshes(level-1)->element_edges)(parent_index)(0),bc=(*meshes(level-1)->element_edges)(parent_index)(1),
                  ca=(*meshes(level-1)->element_edges)(parent_index)(2),ad=(*meshes(level-1)->element_edges)(parent_index)(3),
@@ -81,7 +81,7 @@ Subdivide_Segment_List(const ARRAY<VECTOR<int,2> >& segment_list)
             else for(int j=0;j<6;j++){ // this was an internal green edge, so subdivide all parent edges
                 s=(*meshes(level-1)->element_edges)(parent_index)(j);if(segment_midpoints(s)<0) Add_Midpoint(s,level-1,parent_index);}}
         else{PHYSBAM_ASSERT(s); // red edge
-            stack.Append(VECTOR<int,2>(level,tet));(*index_in_stack(level))(tet)=stack.m;if(segment_midpoints(s)<0) Add_Midpoint(s,level,tet);}}
+            (*index_in_stack(level))(tet)=stack.Append(VECTOR<int,2>(level,tet));if(segment_midpoints(s)<0) Add_Midpoint(s,level,tet);}}
 
     Resolve_Stack();
     Rebuild_Object();
@@ -137,7 +137,7 @@ Resolve_Stack()
 {
     while(stack.m){
         int level,tet;stack.Pop().Get(level,tet);
-        if(level>=0){PHYSBAM_ASSERT(tet);(*index_in_stack(level))(tet)=0;if(!Regularly_Refined(level,tet)) Refine_If_Necessary(level,tet);}}
+        if(level>=0){PHYSBAM_ASSERT(tet);(*index_in_stack(level))(tet)=-1;if(!Regularly_Refined(level,tet)) Refine_If_Necessary(level,tet);}}
 }
 //#####################################################################
 // Function Refine_If_Necessary
@@ -145,11 +145,13 @@ Resolve_Stack()
 template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Refine_If_Necessary(const int level,const int tet)
 {
+    VECTOR<int,6> midpoints;
+    VECTOR<int,24> subedges;
     // first check if we're already consistent, and don't need to refine at all.
-    ARRAY<int> midpoints(6),subedges(24);Get_Existing_Subindices(level,tet,midpoints,subedges);
+    Get_Existing_Subindices(level,tet,midpoints,subedges);
     int number_midpoints=(midpoints(0)!=-1)+(midpoints(1)!=-1)+(midpoints(2)!=-1)+(midpoints(3)!=-1)+(midpoints(4)!=-1)+(midpoints(5)!=-1);
     if(number_midpoints == 0) return;
-    int number_children=0;while(number_children < 8 && (*children(level))(tet)(number_children)) number_children++;
+    int number_children=0;while(number_children < 8 && (*children(level))(tet)(number_children)>=0) number_children++;
     switch(number_midpoints){
         case 1:if(number_children == 2) return;break;
         case 2:if(number_children == 4) return;break;
@@ -160,10 +162,10 @@ Refine_If_Necessary(const int level,const int tet)
 
     if(!Red(level,tet)){ // Green case - most likely refine parent unless we get lucky and can upgrade Green from 2 to 4
         int p=(*parent(level))(tet);
-        int number_children=0;while(number_children < 8 && (*children(level-1))(p)(number_children)) number_children++;
+        int number_children=0;while(number_children < 8 && (*children(level-1))(p)(number_children)>=0) number_children++;
         if(number_children < 4){ // try to update Green from 2 to 4
             Refine_If_Necessary(level-1,p); // re-refine the parent
-            int new_number_children=0;while(new_number_children < 8 && (*children(level-1))(p)(new_number_children)) new_number_children++;
+            int new_number_children=0;while(new_number_children < 8 && (*children(level-1))(p)(new_number_children)>=0) new_number_children++;
             if(new_number_children == number_children) Regularly_Refine_Tet(level-1,p);} // irregular refinement doesn't do anything, try regular
         else Regularly_Refine_Tet(level-1,p); // refine parent
         return;}
@@ -221,23 +223,23 @@ Refine_If_Necessary(const int level,const int tet)
         if(midpoints(1)<0 && midpoints(4)<0 && !segment_mesh.Segment(midpoints(5),j)) Add_Segment(free_edge_indices,midpoints(5),j);}
     // go ahead and create any missing edges along with the tets
     if(midpoints(0)>=0 && midpoints(1)>=0 && midpoints(2)>=0){ // if face ijk is subdivided but the other faces aren't
-        if(subedges(3)<0) Add_Segment(free_edge_indices,midpoints(0),midpoints(1));if(subedges(04)<0) Add_Segment(free_edge_indices,midpoints(1),midpoints(2));
-        if(subedges(5)<0) Add_Segment(free_edge_indices,midpoints(2),midpoints(0));
+        if(subedges(12)<0) Add_Segment(free_edge_indices,midpoints(0),midpoints(1));if(subedges(13)<0) Add_Segment(free_edge_indices,midpoints(1),midpoints(2));
+        if(subedges(14)<0) Add_Segment(free_edge_indices,midpoints(2),midpoints(0));
         Add_Tetrahedron(free_tet_indices,level+1,i,midpoints(0),midpoints(2),l,tet);Add_Tetrahedron(free_tet_indices,level+1,j,midpoints(1),midpoints(0),l,tet);
         Add_Tetrahedron(free_tet_indices,level+1,k,midpoints(2),midpoints(1),l,tet);Add_Tetrahedron(free_tet_indices,level+1,midpoints(0),midpoints(1),midpoints(2),l,tet);}
     else if(midpoints(0)>=0 && midpoints(3)>=0 && midpoints(4)>=0){ // if face ilj is subdivided but the other faces aren't
-        if(subedges(6)<0) Add_Segment(free_edge_indices,midpoints(0),midpoints(4));if(subedges(07)<0) Add_Segment(free_edge_indices,midpoints(4),midpoints(3));
-        if(subedges(8)<0) Add_Segment(free_edge_indices,midpoints(3),midpoints(0));
+        if(subedges(15)<0) Add_Segment(free_edge_indices,midpoints(0),midpoints(4));if(subedges(16)<0) Add_Segment(free_edge_indices,midpoints(4),midpoints(3));
+        if(subedges(17)<0) Add_Segment(free_edge_indices,midpoints(3),midpoints(0));
         Add_Tetrahedron(free_tet_indices,level+1,i,midpoints(3),midpoints(0),k,tet);Add_Tetrahedron(free_tet_indices,level+1,l,midpoints(4),midpoints(3),k,tet);
         Add_Tetrahedron(free_tet_indices,level+1,j,midpoints(0),midpoints(4),k,tet);Add_Tetrahedron(free_tet_indices,level+1,midpoints(0),midpoints(3),midpoints(4),k,tet);}
     else if(midpoints(2)>=0 && midpoints(3)>=0 && midpoints(5)>=0){ // if face ikl is subdivided but the other faces aren't
-        if(subedges(9)<0) Add_Segment(free_edge_indices,midpoints(2),midpoints(5));if(subedges(20)<0) Add_Segment(free_edge_indices,midpoints(5),midpoints(3));
-        if(subedges(21)<0) Add_Segment(free_edge_indices,midpoints(3),midpoints(2));
+        if(subedges(18)<0) Add_Segment(free_edge_indices,midpoints(2),midpoints(5));if(subedges(19)<0) Add_Segment(free_edge_indices,midpoints(5),midpoints(3));
+        if(subedges(20)<0) Add_Segment(free_edge_indices,midpoints(3),midpoints(2));
         Add_Tetrahedron(free_tet_indices,level+1,i,midpoints(2),midpoints(3),j,tet);Add_Tetrahedron(free_tet_indices,level+1,midpoints(3),midpoints(2),midpoints(5),j,tet);
         Add_Tetrahedron(free_tet_indices,level+1,midpoints(5),midpoints(2),k,j,tet);Add_Tetrahedron(free_tet_indices,level+1,l,midpoints(3),midpoints(5),j,tet);}
     else if(midpoints(1)>=0 && midpoints(4)>=0 && midpoints(5)>=0){ // if face jlk is subdivided but the other faces aren't
-        if(subedges(22)<0) Add_Segment(free_edge_indices,midpoints(1),midpoints(5));if(subedges(23)<0) Add_Segment(free_edge_indices,midpoints(5),midpoints(4));
-        if(subedges(24)<0) Add_Segment(free_edge_indices,midpoints(4),midpoints(1));
+        if(subedges(21)<0) Add_Segment(free_edge_indices,midpoints(1),midpoints(5));if(subedges(22)<0) Add_Segment(free_edge_indices,midpoints(5),midpoints(4));
+        if(subedges(23)<0) Add_Segment(free_edge_indices,midpoints(4),midpoints(1));
         Add_Tetrahedron(free_tet_indices,level+1,midpoints(1),j,midpoints(4),i,tet);Add_Tetrahedron(free_tet_indices,level+1,midpoints(1),midpoints(5),k,i,tet);
         Add_Tetrahedron(free_tet_indices,level+1,midpoints(1),midpoints(4),midpoints(5),i,tet);Add_Tetrahedron(free_tet_indices,level+1,midpoints(5),midpoints(4),l,i,tet);}
     else if(midpoints(0)>=0 && midpoints(5)>=0){ // if edges ij and kl are split
@@ -278,7 +280,9 @@ Regularly_Refine_Tet(const int level,const int tet)
     ARRAY<int> free_tet_indices,free_edge_indices;
     free_tet_indices.Preallocate(8);free_edge_indices.Preallocate(24);
     Delete_Children(level,tet,free_tet_indices,free_edge_indices);
-    ARRAY<int> midpoints(6),subedges(24);Get_Existing_Subindices(level,tet,midpoints,subedges);
+    VECTOR<int,6> midpoints;
+    VECTOR<int,24> subedges;
+    Get_Existing_Subindices(level,tet,midpoints,subedges);
     // there are three pairs of valid midpoints for the interior edge.  if possible, we would like to pick a pair that exists already.
     int first_midpoint_index,second_midpoint_index;
     ARRAY<VECTOR<int,6> >& element_edges=*meshes(level)->element_edges;
@@ -321,9 +325,8 @@ Regularly_Refine_Tet(const int level,const int tet)
 // midpoints (or 0 if no midpoint) listed in the edge order: ij,jk,ki,il,jl,kl (midpoints has m==6)
 // face-subedges listed in the order: i-ij,i-ki,i-il, j-ij,j-jk,j-jl, k-jk,k-ki,k-kl, l-il,l-jl,l-kl, ij-jk,jk-ki,ki-ij, ij-jl,jl-il,il-ij, ki-kl,kl-il,il-ki, jk-kl,kl-jl,jl-jk
 template<class T> void RED_GREEN_TETRAHEDRA<T>::
-Get_Existing_Subindices(const int level,const int tet,ARRAY<int>& midpoints,ARRAY<int>& subedges)
+Get_Existing_Subindices(const int level,const int tet,VECTOR<int,6>& midpoints,VECTOR<int,24>& subedges)
 {
-    PHYSBAM_ASSERT(midpoints.m == 6 && subedges.m == 24);
     for(int e=0;e<6;e++) midpoints(e)=segment_midpoints((*meshes(level)->element_edges)(tet)(e));
     int i,j,k,l;meshes(level)->elements(tet).Get(i,j,k,l);
     int ij=midpoints(0),jk=midpoints(1),ki=midpoints(2),il=midpoints(3),jl=midpoints(4),kl=midpoints(5);
@@ -357,7 +360,7 @@ Ensure_Level_Exists(const int level)
     meshes(level)->incident_elements=new ARRAY<ARRAY<int> >(object.particles.Size());
     meshes(level)->element_edges=new ARRAY<VECTOR<int,6> >();
     parent.Append(new ARRAY<int>(0));children.Append(new ARRAY<VECTOR<int,8> >());
-    index_in_stack.Append(new ARRAY<int>(0));leaf_number.Append(new ARRAY<int>(0));
+    index_in_stack.Append(new ARRAY<int>);leaf_number.Append(new ARRAY<int>);
 }
 //#####################################################################
 // Function Delete_Children
@@ -374,7 +377,7 @@ Delete_Children(const int level,const int tet,ARRAY<int>& deleted_tet_indices,AR
          ki=segment_midpoints((*meshes(level)->element_edges)(tet)(2)),il=segment_midpoints((*meshes(level)->element_edges)(tet)(3)),
          jl=segment_midpoints((*meshes(level)->element_edges)(tet)(4)),kl=segment_midpoints((*meshes(level)->element_edges)(tet)(5));
     // make the list of deleted tets (namely, the children) and zero out children
-    int p;for(p=0;p<8&&(*children(level))(tet)(p);p++){deleted_tet_indices.Append((*children(level))(tet)(p));(*children(level))(tet)(p)=0;}
+    int p;for(p=0;p<8&&(*children(level))(tet)(p)>=0;p++){deleted_tet_indices.Append((*children(level))(tet)(p));(*children(level))(tet)(p)=-1;}
     // get a list of edges to delete (begin by finding all children edges, then filter the red ones out)
     ARRAY<int> children_edges;children_edges.Preallocate(25);
     for(p=0;p<deleted_tet_indices.m;p++) for(int q=0;q<6;q++) // get a list of all children edges
@@ -404,9 +407,9 @@ Delete_Children(const int level,const int tet,ARRAY<int>& deleted_tet_indices,AR
     // then zero out occurances in the stack
     for(p=0;p<deleted_tet_indices.m;p++){
         int t=deleted_tet_indices(p);
-        if((*index_in_stack(level+1))(t)){
+        if((*index_in_stack(level+1))(t)>=0){
             stack((*index_in_stack(level+1))(t)).Set(0,0); // can't remove since it would screw up index_in_stack, mark as no longer relevent
-            (*index_in_stack(level+1))(t)=0;}}
+            (*index_in_stack(level+1))(t)=-1;}}
 }
 //#####################################################################
 // Function Add_Midpoint
@@ -426,24 +429,24 @@ Add_Midpoint(const int segment,const int level,const int tet)
     // add edge neighbors of tet to the stack if not already there
     int i;for(i=0;i<(*meshes(level)->incident_elements)(node1).m;i++){
         int s=(*meshes(level)->incident_elements)(node1)(i);
-        if(s != tet && !(*index_in_stack(level))(s)){
+        if(s != tet && (*index_in_stack(level))(s)<0){
             int a,b,c,d;meshes(level)->elements(s).Get(a,b,c,d);assert(a == node1 || b == node1 || c == node1 || d == node1);
             if(node2 == a || node2 == b || node2 == c || node2 == d){ // not incident on edge
-                stack.Append(VECTOR<int,2>(level,s));(*index_in_stack(level))(s)=stack.m;}}}
+                (*index_in_stack(level))(s)=stack.Append(VECTOR<int,2>(level,s));}}}
     // check previous level for tets incident on the edge
     if(level > 1 && node1 < meshes(level-1)->number_nodes) for(i=0;i<(*meshes(level-1)->incident_elements)(node1).m;i++){
         int s=(*meshes(level-1)->incident_elements)(node1)(i);
         if((*index_in_stack(level-1))(s)<0){
             int a,b,c,d;meshes(level-1)->elements(s).Get(a,b,c,d);
             if(node2 == a || node2 == b || node2 == c || node2 == d){ // not incident on edge
-                stack.Append(VECTOR<int,2>(level-1,s));(*index_in_stack(level-1))(s)=stack.m;}}}
+                (*index_in_stack(level-1))(s)=stack.Append(VECTOR<int,2>(level-1,s));}}}
     // check next level for tets incident on the edge
     if(level < meshes.m && node1 < meshes(level+1)->number_nodes) for(i=0;i<(*meshes(level+1)->incident_elements)(node1).m;i++){
         int s=(*meshes(level+1)->incident_elements)(node1)(i);
         if((*index_in_stack(level+1))(s)<0){
             int a,b,c,d;meshes(level+1)->elements(s).Get(a,b,c,d);assert(a == node1 || b == node1 || c == node1 || d == node1);
             if(node2 == a || node2 == b || node2 == c || node2 == d){ // not incident on edge
-                stack.Append(VECTOR<int,2>(level+1,s));(*index_in_stack(level+1))(s)=stack.m;}}}
+                (*index_in_stack(level+1))(s)=stack.Append(VECTOR<int,2>(level+1,s));}}}
     // finally make sure that number_nodes in the tet meshes and the segment mesh is up to date
     if(new_node > segment_mesh.number_nodes){
         segment_mesh.number_nodes=new_node;segment_mesh.incident_elements->Resize(new_node);}
@@ -479,14 +482,14 @@ Add_Tetrahedron(ARRAY<int>& free_tet_indices,const int level,const int i,const i
         tet_mesh.element_edges->Resize(index+1);children(level)->Resize(index+1);index_in_stack(level)->Resize(index+1);}
     else{
         index=free_tet_indices.Pop();tet_mesh.elements(index).Set(i,j,k,l);
-        (*parent(level))(index)=parent_index;for(int a=0;a<8;a++) (*children(level))(index)(a)=0;(*index_in_stack(level))(index)=0;}
+        (*parent(level))(index)=parent_index;for(int a=0;a<8;a++) (*children(level))(index)(a)=-1;(*index_in_stack(level))(index)=-1;}
     // create tet edges
     int ij=segment_mesh.Segment(i,j),jk=segment_mesh.Segment(j,k),ki=segment_mesh.Segment(k,i),il=segment_mesh.Segment(i,l),
          jl=segment_mesh.Segment(j,l),kl=segment_mesh.Segment(k,l);
     (*meshes(level)->element_edges)(index).Set(ij,jk,ki,il,jl,kl);
     // check if this new tet has a T-junction
     if(segment_midpoints(ij)>=0 || segment_midpoints(jk)>=0 || segment_midpoints(ki)>=0 || segment_midpoints(il)>=0 || segment_midpoints(jl)>=0 || 
-        segment_midpoints(kl)>=0){stack.Append(VECTOR<int,2>(level,index));(*index_in_stack(level))(index)=stack.m;}
+        segment_midpoints(kl)>=0){(*index_in_stack(level))(index)=stack.Append(VECTOR<int,2>(level,index));}
     // add tet to incident_tets
     int a;for(a=0;a<4;a++) (*tet_mesh.incident_elements)(tet_mesh.elements(index)(a)).Append(index);
     // add tet to parent's list of children
@@ -507,7 +510,7 @@ Rebuild_Object()
         if(Leaf(level,tet)){
             for(int i=0;i<4;i++) object.mesh.elements(index_into_tets)(i)=meshes(level)->elements(tet)(i);
             leaf_levels_and_indices(index_into_tets).Set(level,tet);(*leaf_number(level))(tet)=index_into_tets;index_into_tets++;}
-        else (*leaf_number(level))(tet)=0;
+        else (*leaf_number(level))(tet)=-1;
     object.mesh.number_nodes=object.particles.Size();
     object.Refresh_Auxiliary_Structures();
 }
@@ -646,7 +649,7 @@ Remove_Simplex_List(const ARRAY<int>& tetrahedron_list,ARRAY<HASHTABLE<int,int> 
         if(level>0) for(int i=0;i<children(level-1)->m;i++){for(int j=0;j<4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
             // really we just need the zeros at the end...bubble it?
             VECTOR<int,number_of_red_children>& child_list=(*children(level-1))(i);
-            for(int i=0;i<number_of_red_children;i++) if(child_list(i)==0) for(int j=i+1;j<number_of_red_children;j++) if(child_list(j)>0){exchange(child_list(j),child_list(i));break;}}
+            for(int i=0;i<number_of_red_children;i++) if(child_list(i)==-1) for(int j=i+1;j<number_of_red_children;j++) if(child_list(j)>=0){exchange(child_list(j),child_list(i));break;}}
         children(level)->Remove_Sorted_Indices_Lazy(level_tetrahedron_list(level));
         for(int i=0;i<leaf_levels_and_indices.m;i++) if(leaf_levels_and_indices(i)(0)==level) simplex_map.Get(leaf_levels_and_indices(i)(1),leaf_levels_and_indices(i)(1));
         leaf_number(level)->Remove_Sorted_Indices_Lazy(level_tetrahedron_list(level));}
