@@ -487,8 +487,8 @@ public:
     void Velocity_Error(T time)
     {
         if(!analytic_velocity.m || analytic_initial_only) return;
-        T u_inf=0,u_2=0,p_inf=0,p_2=0,p_ave=0,a=0,b=0,pa=0,pb=0;
-        int num_u=0,num_p=0;
+        T u_inf=0,u_2=0,p_inf=0,p_2=0,p_ave=0,a=0,b=0,pa=0,pb=0,l_inf=0,l_2=0;
+        int num_u=0,num_p=0,num_l=0;
         for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             int c=levelset_color.Color(it.Location());
             if(c<0) continue;
@@ -527,8 +527,21 @@ public:
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(D));}
         if(num_p) p_2/=num_p;
         p_2=sqrt(p_2);
+
+
+        for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
+            int c=-4;
+            T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
+            if(abs(p)>grid.dX.Max()*3) continue;
+            T e=levelset_color.color(it.index)!=(c==-4?bc_type:c)?abs(levelset_color.phi(it.index))+abs(p):abs(levelset_color.phi(it.index)-p);
+            l_inf=max(l_inf,e);
+            l_2+=sqr(e);
+            num_l++;}
+        if(num_l) l_2/=num_l;
+        l_2=sqrt(l_2);
+
         char buff[1000];
-        sprintf(buff, "max_error %-22.16g %-22.16g %-22.16g %-22.16g  p %-22.16g %-22.16g %-22.16g %-22.16g", u_inf, u_2, a, b, p_inf, p_2, pa, pb);
+        sprintf(buff, "max_error %-22.16g %-22.16g %-22.16g %-22.16g  p %-22.16g %-22.16g %-22.16g %-22.16g  l %-22.16g %-22.16g", u_inf, u_2, a, b, p_inf, p_2, pa, pb, l_inf, l_2);
         LOG::cout<<buff<<std::endl;
         PHYSBAM_DEBUG_WRITE_SUBSTEP("pressure error",0,1);
     }
