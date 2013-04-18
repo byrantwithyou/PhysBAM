@@ -293,7 +293,7 @@ Compute_dE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
     dg=H*dq;
     dh=((T)1-dq).Transpose_Times(u)+du.Transpose_Times(f-q);
     db=dg.Transpose_Times(u)+du.Transpose_Times(g);
-    base.dddE(q,simplex,&TT(1));
+    base.dddE(q,simplex,&TT(0));
     for(int i=0;i<d;i++) Tu+=u(i)*TT(i);
     uTu=Tu*u;
     dc=dq.Transpose_Times(uTu)+(T)2*du.Transpose_Times(Hu);
@@ -367,7 +367,7 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
     for(int i=0;i<d;i++) ddh+=(f(i)-q(i))*ddu(i)-ddq(i)*u(i);
     ddb=(T)2*dg.Transpose_Times(du).Symmetric_Part();
     for(int i=0;i<d;i++) ddb+=g(i)*ddu(i)+ddg(i)*u(i);
-    base.ddddE(q,simplex,&A(1)(1));
+    base.ddddE(q,simplex,&A(0)(0));
     ddc=(T)4*dq.Transpose_Times(Tu*du).Symmetric_Part()+(T)2*SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(du,H);
     for(int i=0;i<d;i++) for(int j=0;j<d;j++) ddc+=u(i)*u(j)*SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dq,A(i)(j));
     for(int i=0;i<d;i++) ddc+=uTu(i)*ddq(i)+(T)2*Hu(i)*ddu(i);
@@ -480,9 +480,9 @@ Test_it(const char* str, const VECTOR<T,2>& f, const VECTOR<T,2>& w, const VECTO
 template<class T> static void
 Test_it(const char* str, const VECTOR<T,3>& f, const MATRIX<T,3>& w, const MATRIX<T,3>& w_it)
 {
-    Print_Helper(str, (w.Column(2)-w.Column(3))/(f.y-f.z), w_it.Column(1));
-    Print_Helper(str, (w.Column(1)-w.Column(3))/(f.x-f.z), w_it.Column(2));
-    Print_Helper(str, (w.Column(1)-w.Column(2))/(f.x-f.y), w_it.Column(3));
+    Print_Helper(str, (w.Column(1)-w.Column(2))/(f.y-f.z), w_it.Column(0));
+    Print_Helper(str, (w.Column(0)-w.Column(2))/(f.x-f.z), w_it.Column(1));
+    Print_Helper(str, (w.Column(0)-w.Column(1))/(f.x-f.y), w_it.Column(2));
 }
 //#####################################################################
 // Function Test_Model_Helper
@@ -490,7 +490,7 @@ Test_it(const char* str, const VECTOR<T,3>& f, const MATRIX<T,3>& w, const MATRI
 template<class T> static void
 Test_it(const char* str, const VECTOR<T,2>& f, const MATRIX<T,2>& w, MATRIX<T,2,1> w_it)
 {
-    Print_Helper(str, (w.Column(1)-w.Column(2))/(f.x-f.y), w_it.Column(1));
+    Print_Helper(str, (w.Column(0)-w.Column(1))/(f.x-f.y), w_it.Column(0));
 }
 //#####################################################################
 // Function Test_Model
