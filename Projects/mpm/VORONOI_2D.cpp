@@ -368,7 +368,7 @@ Build_Boundary_Segments()
 // Function Deform_Mesh_Using_Particle_Deformation
 //#####################################################################
 template<class T> void VORONOI_2D<T>::
-Deform_Mesh_Using_Particle_Deformation(const ARRAY_VIEW<TV>& particle_Xm,const ARRAY_VIEW<TV>& particle_X,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fe,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fp,const bool constrain_face_centers)
+Deform_Mesh_Using_Particle_Deformation(const ARRAY_VIEW<TV>& particle_Xm,const ARRAY_VIEW<TV>& particle_X,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fe,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fp,const bool constrain_face_centers,const int deformation_averaging_steps)
 {
     X.Clean_Memory();X.Resize(Xm.m);
     ARRAY<TV> particle_b(particle_X.m);
@@ -376,6 +376,22 @@ Deform_Mesh_Using_Particle_Deformation(const ARRAY_VIEW<TV>& particle_Xm,const A
     for(int i=0;i<particle_b.m;i++){
         particle_F(i)=particle_Fe(i)*particle_Fp(i);
         particle_b(i)=particle_X(i)-particle_F(i)*particle_Xm(i);}
+    
+    // averaging F
+    for(int k=0;k<deformation_averaging_steps;k++){
+        ARRAY<MATRIX<T,TV::m> > particle_F_old(particle_F);
+        ARRAY<int> nNeighbors(particle_X.m);
+        nNeighbors.Fill(1);
+        for(int nc=0;nc<neighbor_cells.m;nc++){
+            TRIPLE<int,int,bool>& tr=neighbor_cells(nc);
+            if(tr.z){
+                particle_F(tr.x)+=particle_F_old(tr.y);
+                nNeighbors(tr.x)++;
+                particle_F(tr.y)+=particle_F_old(tr.x);
+                nNeighbors(tr.y)++;}}
+        for(int i=0;i<particle_F.m;i++)
+            particle_F(i)/=nNeighbors(i);}
+
     for(int i=0;i<X.m;i++){
         X(i)=TV();
         for(int p=0;p<association(i).m;p++){

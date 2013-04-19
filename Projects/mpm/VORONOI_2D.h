@@ -42,7 +42,7 @@ public:
     void Build_Association();
     void Build_Segments();
     void Build_Boundary_Segments();
-    void Deform_Mesh_Using_Particle_Deformation(const ARRAY_VIEW<TV>& particle_Xm,const ARRAY_VIEW<TV>& particle_X,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fe,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fp,const bool constrain_face_centers=true);
+    void Deform_Mesh_Using_Particle_Deformation(const ARRAY_VIEW<TV>& particle_Xm,const ARRAY_VIEW<TV>& particle_X,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fe,const ARRAY_VIEW<MATRIX<T,TV::m> >& particle_Fp,const bool constrain_face_centers=true,const int deformation_averaging_steps=0);
     void Crack(const ARRAY_VIEW<TV>& particle_X,const T threshold);
 //#####################################################################
 };

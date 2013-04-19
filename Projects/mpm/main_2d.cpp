@@ -240,12 +240,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)).Size()-SPHERE<TV>(TV(0.1,0),0.04).Size());
             ym*=(T)5e3;
             for(int p=0;p<sim.particles.number;p++){
-                T alpha=0.3;
+                T alpha=1;
                 T this_ym=((T)1-alpha)/(T)0.04*ym*sqr(sim.particles.X(p)(1))+alpha*ym;
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
             sim.use_gravity=false;
-            sim.use_plasticity_yield=false;
+            sim.use_plasticity_yield=true;
             sim.yield_min=-100;
             sim.yield_max=1.3;
             break;
@@ -360,17 +360,17 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
             // voronoi reconstruction
             if(use_voronoi){
-                voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.3);
+                voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.8);
                 voronoi.Build_Association();
                 voronoi.Build_Segments();
-                voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp,true);
+                voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp,true,3);
                 for(int s=0;s<voronoi.segments.m;s++){
                     Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
             if(use_voronoi_boundary){
                 voronoi.Crack(sim.particles.X,sim.grid.dX.Min()*1.3);
                 voronoi.Build_Association();
                 voronoi.Build_Boundary_Segments();
-                voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp);
+                voronoi.Deform_Mesh_Using_Particle_Deformation(sim.particles.Xm,sim.particles.X,sim.particles.Fe,sim.particles.Fp,true,1);
                 for(int s=0;s<voronoi.boundary_segments.m;s++){
                     Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.boundary_segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
             
