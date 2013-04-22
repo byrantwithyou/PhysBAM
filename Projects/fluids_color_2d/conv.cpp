@@ -80,7 +80,16 @@ int main(int argc,char *argv[])
     ARRAY<SIM_DATA<TV>*> sim_data;
 
     for(int i=0;i<sim_dirs.m;i++)
-        sim_data.Append(new SIM_DATA<TV>(stream_type,sim_dirs(i),frame));
+    {
+        try
+        {
+            sim_data.Append(new SIM_DATA<TV>(stream_type,sim_dirs(i),frame));
+        }
+        catch(...)
+        {
+            LOG::cout<<"Failed to load: "<<sim_dirs(i)<<std::endl;
+        }
+    }
 
     sim_data.Sort(compare_data<TV>);
     ARRAY<int> res;
@@ -96,9 +105,9 @@ int main(int argc,char *argv[])
         p_ave/=cnt;
         sim_data(i)->pressure.array-=p_ave;}
 
-    ARRAY<int> samples(sim_dirs.m);
-    ARRAY<T> u_linf(sim_dirs.m);
-    ARRAY<T> u_2(sim_dirs.m);
+    ARRAY<int> samples(sim_data.m);
+    ARRAY<T> u_linf(sim_data.m);
+    ARRAY<T> u_2(sim_data.m);
     CUBIC_MN_INTERPOLATION_UNIFORM<GRID<TV>,T> interp;
     const GRID<TV>& base_grid(sim_data(0)->grid);
     const ARRAY<T,TV_INT>& base_phi=sim_data(0)->phi;
@@ -106,17 +115,17 @@ int main(int argc,char *argv[])
         int col=base_phi(it.index)>0;
         for(int d=0;d<TV::m;d++){
             ARRAY<T> values;
-            for(int i=0;i<sim_dirs.m;i++){
+            for(int i=0;i<sim_data.m;i++){
                 values.Append(interp.Periodic(sim_data(i)->face_grids(d),sim_data(i)->face_velocities(col).Component(d),it.Location()));}
             T exact=Approx_Exact(res,values,2);
-            for(int i=0;i<sim_dirs.m;i++){
+            for(int i=0;i<sim_data.m;i++){
                 T v=abs(values(i)-exact);
                 samples(i)++;
                 u_linf(i)=std::max(u_linf(i),v);
                 u_2(i)+=sqr(v);}}}
 
     T Sx=0,Sy=0,Sz=0,Sxx=0,Sxy=0,Sxz=0;
-    for(int i=0;i<sim_dirs.m;i++){
+    for(int i=0;i<sim_data.m;i++){
         T u2=sqrt(u_2(i)/samples(i)),uinf=u_linf(i),x=log10((T)res(i)),y=log10(u2),z=log10(uinf);
         Sx+=x;
         Sy+=y;
@@ -126,7 +135,7 @@ int main(int argc,char *argv[])
         Sxz+=x*z;
         printf("%g %g\n", u2, uinf);}
 
-    printf("order %g %g\n", -(Sy*Sx-sim_dirs.m*Sxy)/(-Sxx*sim_dirs.m+sqr(Sx)), -(Sz*Sx-sim_dirs.m*Sxz)/(-Sxx*sim_dirs.m+sqr(Sx)));
+    printf("order %g %g\n", -(Sy*Sx-sim_data.m*Sxy)/(-Sxx*sim_data.m+sqr(Sx)), -(Sz*Sx-sim_data.m*Sxz)/(-Sxx*sim_data.m+sqr(Sx)));
 
     LOG::cout<<"DIRECT ORDER TEST"<<std::endl;
 
@@ -164,14 +173,14 @@ int main(int argc,char *argv[])
         int col=0;
         for(int d=0;d<TV::m;d++){
             ARRAY<T> values;
-            for(int i=0;i<sim_dirs.m;i++) values.Append(interp.Periodic(sim_data(i)->face_grids(d),sim_data(i)->face_velocities(col).Component(d),X0));
+            for(int i=0;i<sim_data.m;i++) values.Append(interp.Periodic(sim_data(i)->face_grids(d),sim_data(i)->face_velocities(col).Component(d),X0));
             LOG::cout<<"u("<<d<<")  "<<values<<"    "<<Approx_Exact(res,values,2)<<std::endl;}
 
         ARRAY<T> values,values2;
-        for(int i=0;i<sim_dirs.m;i++) values.Append(interp.Periodic(sim_data(i)->grid,sim_data(i)->levelset.phi,X0));
+        for(int i=0;i<sim_data.m;i++) values.Append(interp.Periodic(sim_data(i)->grid,sim_data(i)->levelset.phi,X0));
         LOG::cout<<"level set  "<<values<<"    "<<Approx_Exact(res,values,2)<<std::endl;
 
-        for(int i=0;i<sim_dirs.m;i++) values2.Append(interp.Periodic(sim_data(i)->grid,sim_data(i)->pressure,X0));
+        for(int i=0;i<sim_data.m;i++) values2.Append(interp.Periodic(sim_data(i)->grid,sim_data(i)->pressure,X0));
         LOG::cout<<"pressure  "<<values2<<"    "<<Approx_Exact(res,values2,2)<<std::endl;}
     LOG::Finish_Logging();
     return 0;
