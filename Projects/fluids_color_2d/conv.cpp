@@ -145,9 +145,9 @@ int main(int argc,char *argv[])
         T L2a=0,Linfa=0,L2b=0,Linfb=0;
         int cnt=0;
         for(CELL_ITERATOR<TV> it(sim_data(i)->grid,-1);it.Valid();it.Next()){
-            int col=sim_data(i)->phi(it.index)>0;
-            if(col!=(sim_data(a)->phi(it.index)>0)) continue;
-            if(col!=(sim_data(b)->phi(it.index)>0)) continue;
+            int col=sim_data(i)->levelset.Phi(it.Location())>0;
+            if(col!=(sim_data(a)->levelset.Phi(it.Location())>0)) continue;
+            if(col!=(sim_data(b)->levelset.Phi(it.Location())>0)) continue;
             for(int d=0;d<TV::m;d++){
                 T e0=interp.Periodic(sim_data(i)->face_grids(d),sim_data(i)->face_velocities(col).Component(d),it.Location());
                 T e1=interp.Periodic(sim_data(a)->face_grids(d),sim_data(a)->face_velocities(col).Component(d),it.Location());
@@ -158,6 +158,34 @@ int main(int argc,char *argv[])
                 L2b+=sqr(f1);
                 Linfa=max(Linfa,f0);
                 Linfb=max(Linfb,f1);}}
+        if(cnt)
+        {
+            L2a=sqrt(L2a/cnt);
+            L2b=sqrt(L2b/cnt);
+            printf("ORDER %3d %.3f %.3f\n", res(i), log(Linfa/Linfb)/log(2), log(L2a/L2b)/log(2));
+        }
+    }
+
+    LOG::cout<<"DIRECT ORDER PRESSURE TEST"<<std::endl;
+
+    for(int i=0;i<res.m;i++){
+        int a=res.Find(res(i)*2),b=res.Find(res(i)*4);
+        if(a<0 || b<0) continue;
+        T L2a=0,Linfa=0,L2b=0,Linfb=0;
+        int cnt=0;
+        for(CELL_ITERATOR<TV> it(sim_data(i)->grid,-1);it.Valid();it.Next()){
+            int col=sim_data(i)->levelset.Phi(it.Location())>0;
+            if(col!=(sim_data(a)->levelset.Phi(it.Location())>0)) continue;
+            if(col!=(sim_data(b)->levelset.Phi(it.Location())>0)) continue;
+            T e0=interp.Periodic(sim_data(i)->grid,sim_data(i)->pressure,it.Location());
+            T e1=interp.Periodic(sim_data(a)->grid,sim_data(a)->pressure,it.Location());
+            T e2=interp.Periodic(sim_data(b)->grid,sim_data(b)->pressure,it.Location());
+            T f0=abs(e1-e0),f1=abs(e2-e1);
+            cnt++;
+            L2a+=sqr(f0);
+            L2b+=sqr(f1);
+            Linfa=max(Linfa,f0);
+            Linfb=max(Linfb,f1);}
         if(cnt)
         {
             L2a=sqrt(L2a/cnt);
