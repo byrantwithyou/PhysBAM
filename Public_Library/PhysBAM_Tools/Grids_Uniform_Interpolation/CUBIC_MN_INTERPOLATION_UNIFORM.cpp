@@ -114,27 +114,67 @@ namespace{
 // Function From_Base_Node_Periodic
 //#####################################################################
 template<class T,class T_GRID,class T2,class T_FACE_LOOKUP> T2
+    From_Base_Node_Periodic(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,
+        const VECTOR<int,1>& index)
+{
+    VECTOR<T,1> alpha=(X-grid.X(index+1))*grid.one_over_dX;
+    T2 value[4];
+    VECTOR<int,1> I;
+    for(int a=0;a<4;a++){
+        I.x=index.x+a;
+        while(I.x<0) I.x+=grid.counts.x;
+        while(I.x>=grid.counts.x) I.x-=grid.counts.x;
+        value[a]=u(I);}
+    return cub.cubic_mn_interpolation.Cubic_MN(value[0],value[1],value[2],value[3],alpha.x);
+}
+//#####################################################################
+// Function From_Base_Node_Periodic
+//#####################################################################
+template<class T,class T_GRID,class T2,class T_FACE_LOOKUP> T2
     From_Base_Node_Periodic(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const VECTOR<T,2>& X,
         const VECTOR<int,2>& index)
 {
-    VECTOR<T,2> alpha=X-grid.X(index+VECTOR<int,2>::All_Ones_Vector());alpha*=grid.one_over_dX;
+    VECTOR<T,2> alpha=(X-grid.X(index+1))*grid.one_over_dX;
     T2 interpolated_in_x[4],value[4];
+    VECTOR<int,2> I;
     for(int b=0;b<4;b++){
+        I.y=index.y+b;
+        while(I.y<0) I.y+=grid.counts.y;
+        while(I.y>=grid.counts.y) I.y-=grid.counts.y;
         for(int a=0;a<4;a++){
-            int x=index.x+a-1,y=index.y+b-1;
-            while(x<0) x+=grid.counts.x;
-            if(x>=grid.counts.x)x=(x&(grid.counts.x-1));
-            while(y<0) y+=grid.counts.y;
-            if(y>=grid.counts.y)y=(y&(grid.counts.y-1));
-            value[a]=u(x+1,y+1);}
+            I.x=index.x+a;
+            while(I.x<0) I.x+=grid.counts.x;
+            while(I.x>=grid.counts.x) I.x-=grid.counts.x;
+            value[a]=u(I);}
         interpolated_in_x[b]=cub.cubic_mn_interpolation.Cubic_MN(value[0],value[1],value[2],value[3],alpha.x);}
     return cub.cubic_mn_interpolation.Cubic_MN(interpolated_in_x[0],interpolated_in_x[1],interpolated_in_x[2],interpolated_in_x[3],alpha.y);
 }
-template<class T,class TV,class T_GRID,class T2,class T_FACE_LOOKUP,int d> T2
-    From_Base_Node_Periodic(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,d> >& u,const VECTOR<T,d>& X,
-        const VECTOR<int,d>& index)
+//#####################################################################
+// Function From_Base_Node_Periodic
+//#####################################################################
+template<class T,class T_GRID,class T2,class T_FACE_LOOKUP> T2
+    From_Base_Node_Periodic(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,
+        const VECTOR<int,3>& index)
 {
-    PHYSBAM_FATAL_ERROR();
+    VECTOR<T,3> alpha=(X-grid.X(index+1))*grid.one_over_dX;
+    T2 interpolated_in_x[4],interpolated_in_y[4],value[4];
+    VECTOR<int,3> I;
+    for(int c=0;c<4;c++){
+        I.z=index.z+c;
+        while(I.z<0) I.z+=grid.counts.z;
+        while(I.z>=grid.counts.z) I.z-=grid.counts.z;
+        for(int b=0;b<4;b++){
+            I.y=index.y+b;
+            while(I.y<0) I.y+=grid.counts.y;
+            while(I.y>=grid.counts.y) I.y-=grid.counts.y;
+            for(int a=0;a<4;a++){
+                I.x=index.x+a;
+                while(I.x<0) I.x+=grid.counts.x;
+                while(I.x>=grid.counts.x) I.x-=grid.counts.x;
+                value[a]=u(I);}
+            interpolated_in_x[b]=cub.cubic_mn_interpolation.Cubic_MN(value[0],value[1],value[2],value[3],alpha.x);}
+        interpolated_in_y[c]=cub.cubic_mn_interpolation.Cubic_MN(interpolated_in_x[0],interpolated_in_x[1],interpolated_in_x[2],interpolated_in_x[3],alpha.y);}
+    return cub.cubic_mn_interpolation.Cubic_MN(interpolated_in_y[0],interpolated_in_y[1],interpolated_in_y[2],interpolated_in_y[3],alpha.z);
 }
 }
 //#####################################################################
