@@ -57,23 +57,19 @@ struct SIM_DATA
 template<class TV>
 bool compare_data(const SIM_DATA<TV>* a,const SIM_DATA<TV>* b) {return a->res<b->res;}
 
-int main(int argc,char *argv[])
+template<class TV>
+void Analyze(PARSE_ARGS& parse_args)
 {
-    typedef double T;
-    typedef double RW;
-    STREAM_TYPE stream_type((RW()));
-    typedef VECTOR<T,2> TV;
+    typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-
+    STREAM_TYPE stream_type((T()));
     TV X0(TV()+FLT_MAX);
     int frame=1;
     ARRAY<std::string> sim_dirs;
-    PARSE_ARGS parse_args(argc,argv);
-    LOG::Initialize_Logging(false,false,1<<30,true);
-    LOG::cout<<parse_args.Print_Arguments()<<std::endl;
     parse_args.Add("-frame",&frame,"frame","Frame to test");
-    parse_args.Add("-x",&X0.x,"frame","Frame to test");
-    parse_args.Add("-y",&X0.y,"frame","Frame to test");
+    parse_args.Add("-x",&X0.x,"value","point to test");
+    parse_args.Add("-y",&X0.y,"value","point to test");
+    if(TV::m==3) parse_args.Add("-z",&X0(TV::m-1),"value","point to test");
     parse_args.Extra_Optional(&sim_dirs,"sim dirs","simulation directories");
     parse_args.Parse();
 
@@ -210,6 +206,25 @@ int main(int argc,char *argv[])
 
         for(int i=0;i<sim_data.m;i++) values2.Append(interp.Periodic(sim_data(i)->grid,sim_data(i)->pressure,X0));
         LOG::cout<<"pressure  "<<values2<<"    "<<Approx_Exact(res,values2,2)<<std::endl;}
+}
+
+int main(int argc,char *argv[])
+{
+    bool use_3d=false,use_double=false;
+    PARSE_ARGS parse_args(argc,argv);
+    LOG::Initialize_Logging(false,false,1<<30,true);
+    LOG::cout<<parse_args.Print_Arguments()<<std::endl;
+    parse_args.Add("-3d",&use_3d,"analyze 3D data");
+    parse_args.Add("-double",&use_double,"analyze 3D data");
+    parse_args.Parse(true);
+
+    if(use_3d){
+        if(use_double) Analyze<VECTOR<double,3> >(parse_args);
+        else Analyze<VECTOR<float,3> >(parse_args);}
+    else{
+        if(use_double) Analyze<VECTOR<double,2> >(parse_args);
+        else Analyze<VECTOR<float,2> >(parse_args);}
+
     LOG::Finish_Logging();
     return 0;
 }
