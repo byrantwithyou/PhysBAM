@@ -109,6 +109,9 @@ public:
     static TV First_Two_Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,const TV& x3)
     {return MATRIX<T,2>(x1-x3,x2-x3).Robust_Solve_Linear_System(location-x3);}
 
+    VECTOR<T,3> Barycentric_Coordinates(const TV& location) const
+    {return Barycentric_Coordinates(location,X[0],X[1],X[2]);}
+
     static VECTOR<T,3> Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,const TV& x3)
     {TV w=First_Two_Barycentric_Coordinates(location,x1,x2,x3);return VECTOR<T,3>(w.x,w.y,1-w.x-w.y);}
 
