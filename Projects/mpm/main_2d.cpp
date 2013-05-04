@@ -129,6 +129,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.dirichlet_box.Append(RANGE<TV>(TV(-0.15,0.17),TV(0.15,0.23)));
             sim.dirichlet_velocity.Append(TV(0,0.2));
             break;
+        case 5: // simple example for debug
+            sim.grid.Initialize(TV_INT(5,4),RANGE<TV>(TV(-2,-1.5),TV(2,1.5)));
+            break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
@@ -229,6 +232,13 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.yield_min=-100;
             sim.yield_max=1.3;
             break;
+        case 5:
+            object_density=(T)400*density_scale;
+            object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
+            ym*=(T)1e6;
+            sim.mu.Fill(ym/((T)2*((T)1+pr)));
+            sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
+            break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
     for(int p=0;p<sim.particles.number;p++){
         sim.particles.mass(p)=object_mass/sim.particles.number;
@@ -239,6 +249,19 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     // projection init
     MPM_PROJECTION<TV> projection(sim);
+
+    // DEBUG: draw MAC grid
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
+        Add_Debug_Particle(projection.mac_grid.X(it.index),VECTOR<T,3>(1,0,0));} // cell centers: red
+    for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
+        TV location=iterator.Location();
+        int axis=iterator.Axis();
+        if(axis==0) Add_Debug_Particle((location),VECTOR<T,3>(0,1,0)); // x-axis aligned face centers: green
+        else if(axis==1) Add_Debug_Particle((location),VECTOR<T,3>(0,0,1));} // y-axis aligned face centers: blue
+  
+    Flush_Frame<TV>("MAC grid");        
+
+    exit(0);
 
     // use voronoi polygon to initialize particle mass and volume and particle domain
     if(use_voronoi || use_voronoi_boundary){
@@ -279,10 +302,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     if(use_bridson){
         recons_bridson.Initialize(particle_exclude_radius*2);
         recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,1);
-        // Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(1,0,0));
-        phi_bridson.array+=1;
-        // Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(0,1,0));
-    }
+        phi_bridson.array+=1;}
 
     // draw wall
     for(T x=sim.grid.domain.min_corner(0)+3.5*sim.grid.dX.Min();x<sim.grid.domain.max_corner(0)-3.5*sim.grid.dX.Min();x+=sim.grid.dX.Min()*0.2){
@@ -326,8 +346,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 ls.Fast_Marching_Method();
                 phi_bridson.array-=particle_exclude_radius*2;
                 ls.Fast_Marching_Method();
-                Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(0,1,0));
-            }
+                Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(0,1,0));}
 
             // voronoi reconstruction
             if(use_voronoi){

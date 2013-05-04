@@ -13,8 +13,10 @@ template<class TV> MPM_PROJECTION<TV>::
 MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     :sim(sim_in)
 {
-    mac_grid.Initialize(sim.grid.counts+1,RANGE<TV>(sim.grid.domain.min_corner-sim.grid.dX.Min()*0.5,sim.grid.domain.max_corner+sim.grid.dX.Min()*0.5),true);
+    // mac_grid=sim.grid.Get_MAC_Grid();
+    mac_grid.Initialize(sim.grid.numbers_of_cells+1,RANGE<TV>(sim.grid.domain.min_corner-sim.grid.dX*0.5,sim.grid.domain.max_corner+sim.grid.dX*0.5),true);
     face_velocities.Resize(mac_grid);
+    LOG::cout<<"mac_grid.counts = "<<mac_grid.counts<<std::endl; // count of cell centers
     cell_dirichlet.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts-1));
     cell_neumann.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts-1));
 }
