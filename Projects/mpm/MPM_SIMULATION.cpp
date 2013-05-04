@@ -245,16 +245,26 @@ Grid_Based_Body_Collisions()
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),grid.counts));it.Valid();it.Next()){
         if(node_mass(it.index)>min_mass){
             const TV& x=grid.Node(it.index);
-            if(x(1)<ground_level && node_V_star(it.index)(1)<(T)0){
-                TV vt(node_V_star(it.index));vt(1)=(T)0;
-                T vn=node_V_star(it.index)(1);
-                T vt_mag=vt.Magnitude();
-                if(vt_mag>eps){
-                    T impulse=friction_coefficient*vn/vt_mag;
-                    if(impulse<-(T)1) impulse=-(T)1;
-                    node_V_star(it.index)=vt*((T)1+impulse);}
-                else node_V_star(it.index)=vt;
-                // node_V_star(it.index)=TV();
+            for(int d=0;d<TV::m;d++){
+                T left_wall=grid.domain.min_corner(d)+3.5*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-3.5*grid.dX.Min();
+                if(x(d)<left_wall && node_V_star(it.index)(d)<(T)0){
+                    TV vt(node_V_star(it.index));vt(d)=(T)0;
+                    T vn=node_V_star(it.index)(d); // <0
+                    T vt_mag=vt.Magnitude();
+                    if(vt_mag>eps){
+                        T impulse=friction_coefficient*vn/vt_mag;
+                        if(impulse<-(T)1) impulse=-(T)1;
+                        node_V_star(it.index)=vt*((T)1+impulse);}
+                    else node_V_star(it.index)=vt;}
+                if(x(d)>right_wall && node_V_star(it.index)(d)>(T)0){
+                    TV vt(node_V_star(it.index));vt(d)=(T)0;
+                    T vn=node_V_star(it.index)(d); // >0
+                    T vt_mag=vt.Magnitude();
+                    if(vt_mag>eps){
+                        T impulse=-friction_coefficient*vn/vt_mag;
+                        if(impulse<-(T)1) impulse=-(T)1;
+                        node_V_star(it.index)=vt*((T)1+impulse);}
+                    else node_V_star(it.index)=vt;}
                 nodes_need_projection.Append(it.index);}
             for(int b=0;b<rigid_ball.m;b++){
                 if(rigid_ball(b).Lazy_Inside(x)){
@@ -434,16 +444,26 @@ Particle_Based_Body_Collisions()
     for(int p=0;p<particles.number;p++){
         if(valid(p)){
             TV& x=particles.X(p);
-            if(x(1)<=ground_level && particles.V(p)(1)<=(T)0){
-                TV vt(particles.V(p));vt(1)=(T)0;
-                T vn=particles.V(p)(1);
-                T vt_mag=vt.Magnitude();
-                if(vt_mag>eps){
-                    T impulse=friction_coefficient*vn/vt_mag;
-                    if(impulse<(T)-1) impulse=(T)-1;
-                    particles.V(p)=vt*(1+impulse);}
-                else particles.V(p)=vt;}
-                // particles.V(p)=TV();} // sticky
+            for(int d=0;d<TV::m;d++){
+                T left_wall=grid.domain.min_corner(d)+3.5*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-3.5*grid.dX.Min();
+                if(x(d)<=left_wall && particles.V(p)(d)<=(T)0){
+                    TV vt(particles.V(p));vt(d)=(T)0;
+                    T vn=particles.V(p)(d); // <0
+                    T vt_mag=vt.Magnitude();
+                    if(vt_mag>eps){
+                        T impulse=friction_coefficient*vn/vt_mag;
+                        if(impulse<(T)-1) impulse=(T)-1;
+                        particles.V(p)=vt*(1+impulse);}
+                    else particles.V(p)=vt;}
+                if(x(d)>=right_wall && particles.V(p)(d)>=(T)0){
+                    TV vt(particles.V(p));vt(d)=(T)0;
+                    T vn=particles.V(p)(d); // >0
+                    T vt_mag=vt.Magnitude();
+                    if(vt_mag>eps){
+                        T impulse=-friction_coefficient*vn/vt_mag;
+                        if(impulse<(T)-1) impulse=(T)-1;
+                        particles.V(p)=vt*(1+impulse);}
+                    else particles.V(p)=vt;}}
             for(int b=0;b<rigid_ball.m;b++){
                 if(rigid_ball(b).Lazy_Inside(x)){
                     TV n=rigid_ball(b).Normal(x);

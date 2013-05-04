@@ -52,7 +52,6 @@ public:
     bool use_gravity;
     T FLIP_alpha;
     T friction_coefficient;
-    T ground_level;
     ARRAY<RANGE<TV> > dirichlet_box;
     ARRAY<TV> dirichlet_velocity;
     ARRAY<SPHERE<TV> > rigid_ball;
