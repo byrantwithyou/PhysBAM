@@ -1,5 +1,0 @@
-# SConscript
-
-Import('env Automatic_Program')
-
-Automatic_Program(env,"divergence_free_2d",["main_2d.cpp","DIVERGENCE_FREE.cpp"])
