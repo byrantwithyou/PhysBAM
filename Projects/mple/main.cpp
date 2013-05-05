@@ -12,6 +12,7 @@ int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
+    MPLE_DRIVER<VECTOR<double,3> > a;
 
 
     return 0;

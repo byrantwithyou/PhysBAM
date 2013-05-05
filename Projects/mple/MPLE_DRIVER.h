@@ -18,18 +18,34 @@ class MPLE_DRIVER: public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
+    
+    enum WORKAROUND{ghost=3};
 
 public:
     
-    ARRAY<TV> data;
-    GRID<TV> grid;
-    ARRAY<T,TV_INT> u;
+    ARRAY<TV> w;             // data
+    GRID<TV> grid;           // grid
 
-    MPLE_DRIVER();
-    ~MPLE_DRIVER();
-
-    void Initialize();
+    ARRAY<T,TV_INT>* u;      // segmentation function
+    ARRAY<T,TV_INT>* u_new;  // new segmentations funtion
     
+    MPLE_DRIVER()
+    {
+        u=new ARRAY<T,TV_INT>;
+        u_new=new ARRAY<T,TV_INT>;
+    }
+
+    ~MPLE_DRIVER()
+    {
+        delete u;
+        delete u_new;
+    }
+
+    void Initialize()
+    {
+        u->Resize(grid.Node_Indices(ghost),false);
+        u_new->Resize(grid.Node_Indices(ghost),false);
+    }
 };
 }
 
