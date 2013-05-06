@@ -83,6 +83,7 @@ public:
 
     void Run()
     {
+        Initialize();
         for(int k=0;k<frames;k++){
             Advance_Frame();
             char buff[100];

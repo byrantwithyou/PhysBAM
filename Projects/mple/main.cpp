@@ -25,9 +25,10 @@ int main(int argc,char* argv[])
 
     MPLE_DRIVER<TV,w> mple;
     mple.grid.Initialize(TV_INT(50+1,50+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),mple.grid,"output");
+    std::string output_directory="output";
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),mple.grid,output_directory);
 
-    const int number_of_points=5; 
+    const int number_of_points=2; 
     const RANGE<TV> block(TV(-.1,-.1),TV(.1,.1));
     
     for(int i=0;i<number_of_points;i++){
