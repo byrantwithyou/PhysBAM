@@ -92,12 +92,12 @@ int main(int argc, char* argv[])
                             if((surface(i).face.X(r)-seg.X(s)).Magnitude()<1e-12)
                                 touch=true;
                     if(touch) continue;
-                    T a;
+                    VECTOR<T,2> a;
                     TV weights;
                     if(INTERSECTION::Intersects(seg,surface(i).face,a,weights,(T)0)){
 //                        printf("weights: %g %g %g   %g\n", weights.x, weights.y, weights.z, a);
-                        if(weights.Min()>1e-12 && a>1e-12 && 1-a>1e-12){
-                            printf("weights: %g %g %g   %g\n", weights.x, weights.y, weights.z, a);
+                        if(weights.Min()>1e-12 && a.x>1e-12 && a.y>1e-12){
+                            printf("weights: %g %g %g   %g\n", weights.x, weights.y, weights.z, a.x);
                             show=true;}}}
         if(0){
             if(!show){

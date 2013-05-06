@@ -11,6 +11,7 @@ namespace PhysBAM{
 namespace INTERSECTION{
 //#####################################################################
 template<class T> bool Intersects(const SEGMENT_2D<T>& segment1,const SEGMENT_2D<T>& segment2,const T thickness_over_two=0);
+template<class T> bool Intersects(const SEGMENT_2D<T>& segment1,const SEGMENT_2D<T>& segment2,VECTOR<T,2>& weights1,VECTOR<T,2>& weights2,const T thickness_over_two=0);
 //#####################################################################
 };
 };

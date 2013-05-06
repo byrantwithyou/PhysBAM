@@ -434,7 +434,7 @@ Find_Intersected_Segments_Triangles(SEGMENTED_CURVE<TV>& segments,TRIANGULATED_S
     if(triangles_intersected){triangles_intersected->Remove_All();triangles_intersected->Resize(surface.mesh.elements.m);}
     if(segment_weights){segment_weights->Remove_All();segment_weights->Resize(segments.mesh.elements.m);}
     if(triangle_weights){triangle_weights->Remove_All();triangle_weights->Resize(surface.mesh.elements.m);}
-    T segment_weight=0;
+    VECTOR<T,2> segment_weight;
     VECTOR<T,3> triangle_weight;
     for(int i=0;i<segments.mesh.elements.m;i++){
         SEGMENT_3D<T> segment(segments.particles.X.Subset(segments.mesh.elements(i)));
@@ -446,7 +446,7 @@ Find_Intersected_Segments_Triangles(SEGMENTED_CURVE<TV>& segments,TRIANGULATED_S
             if(INTERSECTION::Intersects(segment,surface.Get_Element(candidates(j)),segment_weight,triangle_weight,thickness_over_two)){
                 if(segments_intersected) (*segments_intersected)(i)=true;
                 if(triangles_intersected) (*triangles_intersected)(candidates(j))=true;
-                if(segment_weights) (*segment_weights)(i)=segment_weight;
+                if(segment_weights) (*segment_weights)(i)=segment_weight.x;
                 if(triangle_weights) (*triangle_weights)(candidates(j))=triangle_weight;}}
     if(!hierarchy_initialized){delete surface.hierarchy;surface.hierarchy=0;}
 }

@@ -12,7 +12,7 @@ namespace PhysBAM{
 namespace INTERSECTION{
 //#####################################################################
 template<class T> bool Intersects(const SEGMENT_3D<T>& segment,const TRIANGLE_3D<T>& triangle,const T thickness_over_two=0);
-template<class T> bool Intersects(const SEGMENT_3D<T>& segment,const TRIANGLE_3D<T>& triangle,T& a,VECTOR<T,3>& weights,const T thickness_over_two=0);
+template<class T> bool Intersects(const SEGMENT_3D<T>& segment,const TRIANGLE_3D<T>& triangle,VECTOR<T,2>& weights_segment,VECTOR<T,3>& weights,const T thickness_over_two=0);
 //#####################################################################
 };
 };
