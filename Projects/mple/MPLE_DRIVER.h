@@ -60,7 +60,7 @@ public:
     void Write(const char* title)
     {
         for(int i=0;i<points.m;i++){
-            Add_Debug_Particle(points(i).X,VECTOR<T,3>(1,0,0));
+            Add_Debug_Particle<TV>(points(i).X,VECTOR<T,3>(1,0,0));
             LOG::cout<<"X="<<points(i).X<<std::endl;}
         Flush_Frame<TV>(title);
     }
