@@ -59,7 +59,10 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
         pressure_image(it.index)=cm(interp.Periodic(grid,pressure,it.Location()));
     PNG_FILE<T>::Write(base_filename+".png",pressure_image);
 
-    EPS_FILE<T> eps_writer(base_filename+".eps",grid.domain);
+    EPS_FILE<T> eps_writer(base_filename+".eps",RANGE<TV>(TV(),TV(size)));
+    eps_writer.Use_Fixed_Bounding_Box(grid.domain);
+    eps_writer.cur_format.line_width=.01;
+
     ARRAY<LEVELSET<TV>*> levelsets;
     for(int i=0;;i++){
         LEVELSET<TV>* ls=new LEVELSET<TV>(grid,phi);
@@ -71,7 +74,8 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
         MARCHING_CUBES<TV>::Create_Surface(sc,levelsets(i)->grid,levelsets(i)->phi);
 
         for(int t=0;t<sc.mesh.elements.m;t++)
-            eps_writer.Draw_Object(VECTOR<TV,2>(sc.particles.X.Subset(sc.mesh.elements(t))));}
+            eps_writer.Draw_Object(sc.particles.X(sc.mesh.elements(t)(0)),sc.particles.X(sc.mesh.elements(t)(1)));
+    }
 }
 
 int main(int argc,char *argv[])
