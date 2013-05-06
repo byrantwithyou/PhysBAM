@@ -10,12 +10,13 @@
 
 using namespace PhysBAM;
 
-typedef double RW;
-typedef double T;
-typedef VECTOR<T,2> TV;
-typedef VECTOR<int,2> TV_INT;
-
 const int w=3;
+const int d=2;
+
+typedef float RW;
+typedef double T;
+typedef VECTOR<T,d> TV;
+typedef VECTOR<int,d> TV_INT;
 
 int main(int argc,char* argv[])
 {
@@ -25,10 +26,11 @@ int main(int argc,char* argv[])
 
     MPLE_DRIVER<TV,w> mple;
     mple.grid.Initialize(TV_INT(50+1,50+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
+
     std::string output_directory="output";
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),mple.grid,output_directory);
 
-    const int number_of_points=2; 
+    const int number_of_points=100; 
     const RANGE<TV> block(TV(-.1,-.1),TV(.1,.1));
     
     for(int i=0;i<number_of_points;i++){

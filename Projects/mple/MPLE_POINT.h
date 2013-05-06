@@ -31,7 +31,7 @@ public:
     {
         base_node=grid.Cell(X-(T).5*(w-2)*grid.DX(),ghost*2);
         const TV X_eval=X-grid.Node(base_node);
-        for(int k=1;k<=TV::m;k++){
+        for(int k=0;k<TV::m;k++){
             const T x=X_eval(k);
             const T one_over_h=(T)1/grid.DX()(k);
             Compute_Weights(x*one_over_h,one_over_h,k);}
@@ -43,30 +43,30 @@ private:
     {
         switch(w){
             case 2:{
-                weights(1)(k)=(T)1-x;
+                weights(0)(k)=(T)1-x;
                 x-=(T)1;
-                weights(2)(k)=(T)1+x;
+                weights(1)(k)=(T)1+x;
             } break;
             case 3:{
-                weights(1)(k)=(T).5*x*x-(T)1.5*x+(T)1.125;
+                weights(0)(k)=(T).5*x*x-(T)1.5*x+(T)1.125;
                 x-=(T)1;
-                weights(2)(k)=-x*x+(T).75;
+                weights(1)(k)=-x*x+(T).75;
                 x-=(T)1;
-                weights(3)(k)=(T).5*x*x+(T)1.5*x+(T)1.125;
+                weights(2)(k)=(T).5*x*x+(T)1.5*x+(T)1.125;
             } break;
             case 4:{
                 T x2,x3;
                 x2=x*x;x3=x2*x;
-                weights(1)(k)=-((T)1/6)*x3+x2-(T)2*x+(T)4/3;
+                weights(0)(k)=-((T)1/6)*x3+x2-(T)2*x+(T)4/3;
                 x-=(T)1;
                 x2=x*x;x3=x2*x;
-                weights(2)(k)=(T).5*x3-x2+(T)2/3;
+                weights(1)(k)=(T).5*x3-x2+(T)2/3;
                 x-=(T)1;
                 x2=x*x;x3=x2*x;
-                weights(3)(k)=-(T).5*x3-x2+(T)2/3;
+                weights(2)(k)=-(T).5*x3-x2+(T)2/3;
                 x-=(T)1;
                 x2=x*x;x3=x2*x;
-                weights(4)(k)=((T)1/6)*x3+x2+(T)2*x+(T)4/3;
+                weights(3)(k)=((T)1/6)*x3+x2+(T)2*x+(T)4/3;
             } break;
             default: PHYSBAM_FATAL_ERROR();}
     }
