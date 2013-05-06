@@ -29,29 +29,34 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
     typedef VECTOR<int,TV::m> TV_INT;
     STREAM_TYPE stream_type((T()));
     int frame=1;
-    bool depressurize;
+    T line_width=.01;
+    bool depressurize=false;
     std::string sim_dir,base_filename;
     TV_INT size(500,500);
     INTERVAL<T> pressure_interval=INTERVAL<T>::Empty_Box();
     TV normalize_point;
     T rho=(T)2;
     T dx=(T)2/(T)64;
-    bool normalize_pressure=false;
+    bool normalize_pressure=false,force_dims=true;
 
     parse_args.Add("-frame",&frame,"frame","Frame to draw");
     parse_args.Add("-size",&size,"size","Image size");
     parse_args.Add("-p_min",&pressure_interval.min_corner,"value","Pressure minimum for image");
     parse_args.Add("-p_max",&pressure_interval.max_corner,"value","Pressure maximum for image");
     parse_args.Add("-norm_point",&normalize_point,&normalize_pressure,"location","Point to center pressure");
-    parse_args.Add("-depressurize",&depressurize,"size","Subtract out hydrostatic pressure");
+    parse_args.Add("-depressurize",&depressurize,"Subtract out hydrostatic pressure");
     parse_args.Add("-rho",&rho,"rho","Density");
+    parse_args.Add("-line_width",&line_width,"line_width","Line Width");
     parse_args.Add("-dx",&dx,"dx","Spatial Resolution");
+    parse_args.Add("-force_dims",&force_dims,"Force y dimension so image is proportional to grid");
     parse_args.Extra(&sim_dir,"sim dir","simulation directory");
     parse_args.Extra(&base_filename,"filename","Base filename for output images");
     parse_args.Parse();
 
     GRID<TV> grid;
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/common/grid",sim_dir.c_str()),grid);
+    std::cout<<grid.domain<<size<<std::endl;
+    if(force_dims) size.y=(int)(grid.domain.Edge_Lengths().y/grid.domain.Edge_Lengths().x*size.x);
 
     ARRAY<T,TV_INT> pressure;
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/pressure",sim_dir.c_str(),frame),pressure);
@@ -74,7 +79,7 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
     {
         EPS_FILE<T> eps_writer(base_filename+".eps",RANGE<TV>(TV(),TV(size)));
         eps_writer.Use_Fixed_Bounding_Box(grid.domain);
-        eps_writer.cur_format.line_width=.01;
+        eps_writer.cur_format.line_width=line_width;
 
         for(int i=0;;i++){
             ARRAY<T,TV_INT>* phi=new ARRAY<T,TV_INT>;
@@ -132,7 +137,7 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
             T p=levelsets(i)->Extended_Phi(X);
             if(p<best){best=p;best_index=i;}}
         T p=interp.Periodic(grid,color_pressure(best_index),X)+p_shift;
-        p_range.Enlarge_To_Include_Point(p);
+        if(best<=0) p_range.Enlarge_To_Include_Point(p);else p=cm.mx;
         pressure_image(it.index)=cm(p);}
     PNG_FILE<T>::Write(base_filename+".png",pressure_image);
     LOG::cout<<"pressure range: "<<p_range<<std::endl;
