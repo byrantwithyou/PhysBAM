@@ -31,10 +31,15 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
     int frame=1;
     std::string sim_dir,base_filename;
     TV_INT size(500,500);
+    INTERVAL<T> pressure_interval=INTERVAL<T>::Empty_Box();
+    TV normalize_point;
+    bool normalize_pressure=false;
 
     parse_args.Add("-frame",&frame,"frame","Frame to draw");
-    parse_args.Add("-size_x",&size.x,"size","Image size");
-    parse_args.Add("-size_y",&size.y,"size","Image size");
+    parse_args.Add("-size",&size,"size","Image size");
+    parse_args.Add("-p_min",&pressure_interval.min_corner,"value","Pressure range for image");
+    parse_args.Add("-p_max",&pressure_interval.max_corner,"value","Pressure range for image");
+    parse_args.Add("-norm_point",&normalize_point,&normalize_pressure,"location","Pressure range for image");
     parse_args.Extra(&sim_dir,"sim dir","simulation directory");
     parse_args.Extra(&base_filename,"filename","Base filename for output images");
     parse_args.Parse();
@@ -44,12 +49,6 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
 
     ARRAY<T,TV_INT> pressure;
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/pressure",sim_dir.c_str(),frame),pressure);
-
-    INTERPOLATED_COLOR_MAP<T> cm;
-    cm.mn=pressure.Min();
-    cm.mx=pressure.Max();
-    cm.colors.Add_Control_Point(cm.mn,VECTOR<T,3>(0,0,0));
-    cm.colors.Add_Control_Point(cm.mx,VECTOR<T,3>(1,1,1));
 
     T max_phi=grid.domain.Edge_Lengths().Magnitude();
     ARRAY<T,TV_INT> best_phi(grid.Domain_Indices(),true,max_phi);
@@ -90,8 +89,26 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
         eho.periodic=true;
         eho.Extrapolate_Cell([&](const TV_INT& index){return best_color(index)==i && best_phi(index)<grid.dX.Max()*(T).01;},color_pressure(i));}
 
+    INTERPOLATED_COLOR_MAP<T> cm;
+    if(pressure_interval.Empty()) pressure_interval=INTERVAL<T>(pressure.Min(),pressure.Max());
+    cm.mn=pressure_interval.min_corner;
+    cm.mx=pressure_interval.max_corner;
+    cm.colors.Add_Control_Point(cm.mn,VECTOR<T,3>(0,0,0));
+    cm.colors.Add_Control_Point(cm.mx,VECTOR<T,3>(1,1,1));
+
+    INTERVAL<T> p_range=INTERVAL<T>::Empty_Box();
     ARRAY<VECTOR<T,3>,TV_INT> pressure_image(size);
     GRID<TV> image_grid(size,grid.domain,true);
+    T p_shift=0;
+    if(normalize_pressure){
+        T best=max_phi;
+        int best_index=-1;
+        for(int i=0;i<levelsets.m;i++){
+            T p=levelsets(i)->Extended_Phi(normalize_point);
+            if(p<best){best=p;best_index=i;}}
+        T p=interp.Periodic(grid,color_pressure(best_index),normalize_point);
+        p_shift=-p;}
+
     for(CELL_ITERATOR<TV> it(image_grid);it.Valid();it.Next()){
         T best=max_phi;
         int best_index=-1;
@@ -99,8 +116,11 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
         for(int i=0;i<levelsets.m;i++){
             T p=levelsets(i)->Extended_Phi(X);
             if(p<best){best=p;best_index=i;}}
-        pressure_image(it.index)=cm(interp.Periodic(grid,color_pressure(best_index),X));}
+        T p=interp.Periodic(grid,color_pressure(best_index),X)+p_shift;
+        p_range.Enlarge_To_Include_Point(p);
+        pressure_image(it.index)=cm(p);}
     PNG_FILE<T>::Write(base_filename+".png",pressure_image);
+    LOG::cout<<"pressure range: "<<p_range<<std::endl;
 
     int ret=system(STRING_UTILITIES::string_sprintf("convert %s.png %s.eps -composite %s-full.png",base_filename.c_str(),base_filename.c_str(),base_filename.c_str()).c_str());
     PHYSBAM_ASSERT(!ret);
