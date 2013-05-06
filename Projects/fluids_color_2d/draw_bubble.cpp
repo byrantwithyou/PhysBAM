@@ -2,7 +2,6 @@
 // Copyright 2013.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
@@ -59,23 +58,25 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
         pressure_image(it.index)=cm(interp.Periodic(grid,pressure,it.Location()));
     PNG_FILE<T>::Write(base_filename+".png",pressure_image);
 
-    EPS_FILE<T> eps_writer(base_filename+".eps",RANGE<TV>(TV(),TV(size)));
-    eps_writer.Use_Fixed_Bounding_Box(grid.domain);
-    eps_writer.cur_format.line_width=.01;
+    {
+        EPS_FILE<T> eps_writer(base_filename+".eps",RANGE<TV>(TV(),TV(size)));
+        eps_writer.Use_Fixed_Bounding_Box(grid.domain);
+        eps_writer.cur_format.line_width=.01;
 
-    ARRAY<LEVELSET<TV>*> levelsets;
-    for(int i=0;;i++){
-        LEVELSET<TV>* ls=new LEVELSET<TV>(grid,phi);
-        try{FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/%d/levelset_%d.gz",sim_dir.c_str(),frame,i),*ls);}
-        catch(...){delete ls;break;}
-        levelsets.Append(ls);
+        ARRAY<LEVELSET<TV>*> levelsets;
+        for(int i=0;;i++){
+            LEVELSET<TV>* ls=new LEVELSET<TV>(grid,phi);
+            try{FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/%d/levelset_%d.gz",sim_dir.c_str(),frame,i),*ls);}
+            catch(...){delete ls;break;}
+            levelsets.Append(ls);
 
-        SEGMENTED_CURVE_2D<T>& sc=*SEGMENTED_CURVE_2D<T>::Create();
-        MARCHING_CUBES<TV>::Create_Surface(sc,levelsets(i)->grid,levelsets(i)->phi);
+            SEGMENTED_CURVE_2D<T>& sc=*SEGMENTED_CURVE_2D<T>::Create();
+            MARCHING_CUBES<TV>::Create_Surface(sc,levelsets(i)->grid,levelsets(i)->phi);
 
-        for(int t=0;t<sc.mesh.elements.m;t++)
-            eps_writer.Draw_Object(sc.particles.X(sc.mesh.elements(t)(0)),sc.particles.X(sc.mesh.elements(t)(1)));
+            for(int t=0;t<sc.mesh.elements.m;t++)
+                eps_writer.Draw_Object(sc.particles.X(sc.mesh.elements(t)(0)),sc.particles.X(sc.mesh.elements(t)(1)));}
     }
+    system(STRING_UTILITIES::string_sprintf("convert %s.png %s.eps -composite %s-full.png",base_filename.c_str(),base_filename.c_str(),base_filename.c_str()).c_str());
 }
 
 int main(int argc,char *argv[])
@@ -90,4 +91,5 @@ int main(int argc,char *argv[])
     if(use_double) Draw_Bubble<VECTOR<double,2> >(parse_args);
     else Draw_Bubble<VECTOR<float,2> >(parse_args);
 }
+
 
