@@ -190,8 +190,7 @@ void Dump_Error_Image(const SIM_COMMON<TV>& sim,const ARRAY<typename TV::SCALAR,
     for(FACE_ITERATOR<TV> it(sim.obj.grid);it.Valid();it.Next()){
         if(!sim.obj.bc->Inside(it.Location())) continue;
         T err=abs(u(it.Full_Index())-sim.obj.bc->Analytic_Velocity(it.Location(),sim.param.time)(it.Axis()));
-        TV_INT index;
-        image_grid.Index(it.Location(),index);
+        TV_INT index=image_grid.Index(it.Location());
         if(err>errors(index)) errors(index)=err;}
 
     for(RANGE_ITERATOR<TV::m> it(errors.domain);it.Valid();it.Next())
