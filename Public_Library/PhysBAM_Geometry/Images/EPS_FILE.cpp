@@ -71,6 +71,9 @@ Stroke()
     if(effective_color!=cur_format.line_color){
         effective_color=cur_format.line_color;
         stream<<effective_color.x<<" "<<effective_color.y<<" "<<effective_color.z<<" setrgbcolor ";}
+    if(effective_line_width!=cur_format.line_width){
+        effective_line_width=cur_format.line_width;
+        stream<<effective_line_width<<" setlinewidth ";}
     Emit("stroke");
 }
 //#####################################################################
