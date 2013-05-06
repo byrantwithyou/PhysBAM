@@ -15,6 +15,7 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <PhysBAM_Geometry/Images/EPS_FILE.h>
+#include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_MULTIPLE_UNIFORM.h>
@@ -27,7 +28,6 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     STREAM_TYPE stream_type((T()));
-    ARRAY<T,TV_INT> phi;
     int frame=1;
     std::string sim_dir,base_filename;
     TV_INT size(500,500);
@@ -51,24 +51,29 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
     cm.colors.Add_Control_Point(cm.mn,VECTOR<T,3>(0,0,0));
     cm.colors.Add_Control_Point(cm.mx,VECTOR<T,3>(1,1,1));
 
-    ARRAY<VECTOR<T,3>,TV_INT> pressure_image(size);
-    GRID<TV> image_grid(size,grid.domain,true);
-    CUBIC_MN_INTERPOLATION_UNIFORM<GRID<TV>,T> interp;
-    for(CELL_ITERATOR<TV> it(image_grid);it.Valid();it.Next())
-        pressure_image(it.index)=cm(interp.Periodic(grid,pressure,it.Location()));
-    PNG_FILE<T>::Write(base_filename+".png",pressure_image);
+    T max_phi=grid.domain.Edge_Lengths().Magnitude();
+    ARRAY<T,TV_INT> best_phi(grid.Domain_Indices(),true,max_phi);
+    ARRAY<int,TV_INT> best_color(grid.Domain_Indices(),true,-1);
+    ARRAY<LEVELSET<TV>*> levelsets;
+    ARRAY<ARRAY<T,TV_INT>*> phis;
 
     {
         EPS_FILE<T> eps_writer(base_filename+".eps",RANGE<TV>(TV(),TV(size)));
         eps_writer.Use_Fixed_Bounding_Box(grid.domain);
         eps_writer.cur_format.line_width=.01;
 
-        ARRAY<LEVELSET<TV>*> levelsets;
         for(int i=0;;i++){
-            LEVELSET<TV>* ls=new LEVELSET<TV>(grid,phi);
+            ARRAY<T,TV_INT>* phi=new ARRAY<T,TV_INT>;
+            LEVELSET<TV>* ls=new LEVELSET<TV>(grid,*phi);
             try{FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/%d/levelset_%d.gz",sim_dir.c_str(),frame,i),*ls);}
             catch(...){delete ls;break;}
+            phis.Append(phi);
             levelsets.Append(ls);
+
+            for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
+                if(ls->phi(it.index)<best_phi(it.index)){
+                    best_phi(it.index)=ls->phi(it.index);
+                    best_color(it.index)=i;}
 
             SEGMENTED_CURVE_2D<T>& sc=*SEGMENTED_CURVE_2D<T>::Create();
             MARCHING_CUBES<TV>::Create_Surface(sc,levelsets(i)->grid,levelsets(i)->phi);
@@ -76,7 +81,31 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
             for(int t=0;t<sc.mesh.elements.m;t++)
                 eps_writer.Draw_Object(sc.particles.X(sc.mesh.elements(t)(0)),sc.particles.X(sc.mesh.elements(t)(1)));}
     }
-    system(STRING_UTILITIES::string_sprintf("convert %s.png %s.eps -composite %s-full.png",base_filename.c_str(),base_filename.c_str(),base_filename.c_str()).c_str());
+
+    CUBIC_MN_INTERPOLATION_UNIFORM<GRID<TV>,T> interp;
+    ARRAY<ARRAY<T,TV_INT> > color_pressure(levelsets.m);
+    for(int i=0;i<levelsets.m;i++){
+        color_pressure(i)=pressure;
+        EXTRAPOLATION_HIGHER_ORDER<TV,T> eho(grid,*levelsets(i),20,3,4);
+        eho.periodic=true;
+        eho.Extrapolate_Cell([&](const TV_INT& index){return best_color(index)==i && best_phi(index)<grid.dX.Max()*(T).01;},color_pressure(i));}
+
+    ARRAY<VECTOR<T,3>,TV_INT> pressure_image(size);
+    GRID<TV> image_grid(size,grid.domain,true);
+    for(CELL_ITERATOR<TV> it(image_grid);it.Valid();it.Next()){
+        T best=max_phi;
+        int best_index=-1;
+        TV X=it.Location();
+        for(int i=0;i<levelsets.m;i++){
+            T p=levelsets(i)->Extended_Phi(X);
+            if(p<best){best=p;best_index=i;}}
+        pressure_image(it.index)=cm(interp.Periodic(grid,color_pressure(best_index),X));}
+    PNG_FILE<T>::Write(base_filename+".png",pressure_image);
+
+    int ret=system(STRING_UTILITIES::string_sprintf("convert %s.png %s.eps -composite %s-full.png",base_filename.c_str(),base_filename.c_str(),base_filename.c_str()).c_str());
+    PHYSBAM_ASSERT(!ret);
+    phis.Delete_Pointers_And_Clean_Memory();
+    levelsets.Delete_Pointers_And_Clean_Memory();
 }
 
 int main(int argc,char *argv[])
