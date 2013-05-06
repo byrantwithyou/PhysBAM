@@ -8,11 +8,13 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include "MPLE_POINT.h"
+#include <omp.h>
 
 namespace PhysBAM{
 
@@ -31,6 +33,8 @@ public:
 
     ARRAY<T,TV_INT>* u;                // segmentation function
     ARRAY<T,TV_INT>* u_new;            // new segmentations funtion
+    ARRAY<TV,TV_INT> location;         // flat index to location
+    ARRAY<TV_INT,TV_INT> index;        // flat to vector index
 
     int frames;
     int timesteps;
@@ -52,16 +56,28 @@ public:
     {
         u->Resize(grid.Node_Indices(ghost),false);
         u_new->Resize(grid.Node_Indices(ghost),false);
+        location.Resize(grid.Node_Indices(ghost),false);
+        index.Resize(grid.Node_Indices(ghost),false);
+        
+        int k=0;
+        for(NODE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next(),k++){
+            location.array(k)=it.Location();
+            index.array(k)=it.Node_Index();}
 
+#pragma omp parallel for
+        for(int i=0;i<u->array.m;i++){
+            u->array(i)=0;
+            u_new->array(i)=0;}
+
+#pragma omp parallel for
         for(int i=0;i<points.m;i++)
             points(i).Update_Base_And_Weights(grid);
     }
 
     void Write(const char* title)
     {
-        for(int i=0;i<points.m;i++){
-            Add_Debug_Particle<TV>(points(i).X,VECTOR<T,3>(1,0,0));
-            LOG::cout<<"X="<<points(i).X<<std::endl;}
+        for(int i=0;i<points.m;i++)
+            Add_Debug_Particle<TV>(points(i).X,VECTOR<T,3>(0,.5,1));
         Flush_Frame<TV>(title);
     }
 

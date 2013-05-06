@@ -20,18 +20,22 @@ typedef VECTOR<int,d> TV_INT;
 
 int main(int argc,char* argv[])
 {
+    LOG::Initialize_Logging();
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
+
     RANDOM_NUMBERS<T> random;
     random.Set_Seed(0);
 
     MPLE_DRIVER<TV,w> mple;
-    mple.grid.Initialize(TV_INT(50+1,50+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
+    const RANGE<TV> domain(TV(-1,-1),TV(1,1));
+    const TV_INT counts(TV_INT(50,50));
+    mple.grid.Initialize(counts+1,domain);
 
     std::string output_directory="output";
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),mple.grid,output_directory);
 
-    const int number_of_points=100; 
-    const RANGE<TV> block(TV(-.1,-.1),TV(.1,.1));
+    const int number_of_points=500; 
+    const RANGE<TV> block(TV(-.3,-.3),TV(.3,.3));
     
     for(int i=0;i<number_of_points;i++){
         MPLE_POINT<TV,w> point;
@@ -40,5 +44,6 @@ int main(int argc,char* argv[])
 
     mple.Run();
 
+    LOG::Finish_Logging();
     return 0;
 }
