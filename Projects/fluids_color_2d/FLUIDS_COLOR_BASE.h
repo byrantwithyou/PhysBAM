@@ -617,6 +617,13 @@ public:
     {
         Level_Set_Error(time);
         Velocity_Error(time);
+
+        T max_u=0;
+        for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
+            int c=levelset_color.Color(it.Location());
+            if(c<0) continue;
+            max_u=std::max(max_u,abs(face_velocities(c)(it.Full_Index())));}
+        LOG::cout<<"max u "<<max_u<<std::endl;
     }
 
     MATRIX<T,TV::m> Stress(const TV& X,int color,T time)
