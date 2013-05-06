@@ -12,6 +12,8 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
+#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include "MPLE_POINT.h"
 #include <omp.h>
@@ -77,7 +79,14 @@ public:
     void Write(const char* title)
     {
         for(int i=0;i<points.m;i++)
-            Add_Debug_Particle<TV>(points(i).X,VECTOR<T,3>(0,.5,1));
+            Add_Debug_Particle<TV>(points(i).X,VECTOR<T,3>(1,0,0));
+        
+        for(int i=0;i<location.array.m;i++){
+            T value=u->array(i);
+            if(value){
+                Add_Debug_Particle(location.array(i),value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(0,.5,1));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,value);}}
+        
         Flush_Frame<TV>(title);
     }
 
