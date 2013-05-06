@@ -29,17 +29,23 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
     typedef VECTOR<int,TV::m> TV_INT;
     STREAM_TYPE stream_type((T()));
     int frame=1;
+    bool depressurize;
     std::string sim_dir,base_filename;
     TV_INT size(500,500);
     INTERVAL<T> pressure_interval=INTERVAL<T>::Empty_Box();
     TV normalize_point;
+    T rho=(T)2;
+    T dx=(T)2/(T)64;
     bool normalize_pressure=false;
 
     parse_args.Add("-frame",&frame,"frame","Frame to draw");
     parse_args.Add("-size",&size,"size","Image size");
-    parse_args.Add("-p_min",&pressure_interval.min_corner,"value","Pressure range for image");
-    parse_args.Add("-p_max",&pressure_interval.max_corner,"value","Pressure range for image");
-    parse_args.Add("-norm_point",&normalize_point,&normalize_pressure,"location","Pressure range for image");
+    parse_args.Add("-p_min",&pressure_interval.min_corner,"value","Pressure minimum for image");
+    parse_args.Add("-p_max",&pressure_interval.max_corner,"value","Pressure maximum for image");
+    parse_args.Add("-norm_point",&normalize_point,&normalize_pressure,"location","Point to center pressure");
+    parse_args.Add("-depressurize",&depressurize,"size","Subtract out hydrostatic pressure");
+    parse_args.Add("-rho",&rho,"rho","Density");
+    parse_args.Add("-dx",&dx,"dx","Spatial Resolution");
     parse_args.Extra(&sim_dir,"sim dir","simulation directory");
     parse_args.Extra(&base_filename,"filename","Base filename for output images");
     parse_args.Parse();
@@ -49,6 +55,15 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
 
     ARRAY<T,TV_INT> pressure;
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/pressure",sim_dir.c_str(),frame),pressure);
+
+    if(depressurize)
+    {
+        for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
+        {
+            pressure(it.index)+=rho*dx*it.index.y*9.8;
+        }
+    }
+
 
     T max_phi=grid.domain.Edge_Lengths().Magnitude();
     ARRAY<T,TV_INT> best_phi(grid.Domain_Indices(),true,max_phi);
