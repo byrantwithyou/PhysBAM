@@ -31,15 +31,19 @@ public:
     {
         base_node=grid.Cell(X-(T).5*(w-2)*grid.DX(),ghost*2);
         const TV X_eval=X-grid.Node(base_node);
+        const T one_over_dx=(T)1/grid.dX(0);
+        PHYSBAM_ASSERT(grid.dX.Min()==grid.dX.Max());
         for(int k=0;k<TV::m;k++){
             const T x=X_eval(k);
-            const T one_over_h=(T)1/grid.DX()(k);
-            Compute_Weights(x*one_over_h,one_over_h,k);}
+            Compute_Weights(x*one_over_dx,k);}
+        for(int i=0;i<w;i++)
+        for(int k=0;k<TV::m;k++)
+            weights(i)(k)*=one_over_dx;
     }
 
 private:
 
-    void Compute_Weights(T x,const T one_over_h,const int k)
+    void Compute_Weights(T x,const int k)
     {
         switch(w){
             case 2:{
