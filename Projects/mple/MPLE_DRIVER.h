@@ -10,6 +10,8 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include "MPLE_POINT.h"
 
 namespace PhysBAM{
@@ -30,10 +32,11 @@ public:
     ARRAY<T,TV_INT>* u;                // segmentation function
     ARRAY<T,TV_INT>* u_new;            // new segmentations funtion
 
+    int frames;
     int timesteps;
     T dt,mu,nu;
     
-    MPLE_DRIVER():timesteps(100),dt(1e-2),mu(1),nu(.1)
+    MPLE_DRIVER():frames(10),timesteps(10),dt(.1),mu(1),nu(.1)
     {
         u=new ARRAY<T,TV_INT>;
         u_new=new ARRAY<T,TV_INT>;
@@ -56,7 +59,35 @@ public:
 
     void Write(const char* title)
     {
-        
+        for(int i=0;i<points.m;i++){
+            Add_Debug_Particle(points(i).X,VECTOR<T,3>(1,0,0));
+            LOG::cout<<"X="<<points(i).X<<std::endl;}
+        Flush_Frame<TV>(title);
+    }
+
+    void Diffusion_Timestep()
+    {
+
+    }
+
+    void Threshold_Segmentation_Function()
+    {
+
+    }
+
+    void Advance_Frame()
+    {
+        for(int i=0;i<timesteps;i++) Diffusion_Timestep();
+        Threshold_Segmentation_Function();
+    }
+
+    void Run()
+    {
+        for(int k=0;k<frames;k++){
+            Advance_Frame();
+            char buff[100];
+            sprintf(buff,"Frame %d",k);
+            Write(buff);}
     }
 };
 }
