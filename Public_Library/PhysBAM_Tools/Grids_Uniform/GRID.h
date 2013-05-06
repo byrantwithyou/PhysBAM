@@ -187,11 +187,8 @@ public:
     TV_INT Index(const TV& location) const // returns the left, bottom and front indices on a regular grid
     {return TV_INT(floor((location-domain.min_corner)*one_over_dX-MAC_offset));} // note that "floor" is expensive
 
-    void Cell(const TV& location,TV_INT& index,const int number_of_ghost_cells) const // returns the left, bottom and front
-    {int number_of_ghost_cells_plus_one=number_of_ghost_cells+1;index=TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells_plus_one)-number_of_ghost_cells_plus_one;}
-
-    TV_INT Cell(const TV& location,const int number_of_ghost_cells) const // returns the left, bottom and front
-    {TV_INT index;Cell(location,index,number_of_ghost_cells);return index;}
+    TV_INT Cell(const TV& location) const // returns the left, bottom and front
+    {return Index(location);}
 
     RANGE<TV> Cell_Domain(const TV_INT& index) const
     {TV corner=domain.min_corner+TV(index+1)*dX;return RANGE<TV>(corner-dX,corner);}

@@ -120,7 +120,7 @@ Build_Scalar_Field(const ARRAY<TV>& Xbar,const ARRAY_VIEW<T>& m,const ARRAY_VIEW
     phi.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));phi.Fill(T(0));
     
     for(int i=0;i<Xbar.m;i++){
-        TV_INT particle_cell=grid.Cell(Xbar(i),0);
+        TV_INT particle_cell=grid.Index(Xbar(i));
         int layer=1;
         while(1){
             bool should_go_to_next_layer=false;

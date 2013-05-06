@@ -83,7 +83,7 @@ Ensure_Vertices_In_Correct_Cells()
     int vertex=0;
     TV_INT i;
     for(i.x=0;i.x<grid.counts.x-1;i.x++) for(i.y=0;i.y<grid.counts.y-1;i.y++) if(vertices(i)>=0){
-        TV_INT v=grid.Cell(geometry(vertex),0);
+        TV_INT v=grid.Index(geometry(vertex));
         if(i!=v){
             TV cell_center=grid.Center(i);TV offset=(T).5*grid.dX;
             geometry(vertex)=RANGE<TV>(cell_center-offset,cell_center+offset).Surface(geometry(vertex));}

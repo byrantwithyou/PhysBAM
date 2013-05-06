@@ -141,7 +141,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     particles_in_cell.Resize(grid.Domain_Indices(2));one_over_total_particle_cell_weight.Resize(sph_particles.Size());one_over_total_particle_face_weight.Resize(sph_particles.Size());
 
     for(int p=0;p<sph_particles.Size();p++){
-        RANGE<TV_INT> particle_cells(grid.Cell(sph_particles.X(p)-radius_vector,2),grid.Cell(sph_particles.X(p)+radius_vector,2));
+        RANGE<TV_INT> particle_cells(grid.Index(sph_particles.X(p)-radius_vector),grid.Index(sph_particles.X(p)+radius_vector));
         for(CELL_ITERATOR<TV> iterator(grid,particle_cells);iterator.Valid();iterator.Next()){
             TV_INT cell=iterator.Cell_Index();
             TV X_minus_Xp=grid.Center(cell)-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();

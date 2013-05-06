@@ -110,8 +110,8 @@ protected:
         int h = this->h()-Fl::box_dh(box());
 
         draw_box();
-        int left_pixel=pixel_grid.Cell(subrange.xmin,0).x;
-        int pixel_width=pixel_grid.Cell(subrange.xmax,0).x-left_pixel+1;
+        int left_pixel=pixel_grid.Index(subrange.xmin).x;
+        int pixel_width=pixel_grid.Index(subrange.xmax).x-left_pixel+1;
         draw_box(FL_UP_BOX,left_pixel+x,y,pixel_width,h,selection_color());
         draw_label(x,y,w,h);
     }

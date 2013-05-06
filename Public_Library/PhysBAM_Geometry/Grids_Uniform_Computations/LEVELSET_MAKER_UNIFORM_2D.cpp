@@ -25,8 +25,8 @@ Compute_Level_Set(SEGMENTED_CURVE_2D<T>& curve,GRID<TV>& grid,int ghost_cells,AR
     ARRAY<bool,TV_INT> done(grid.Domain_Indices(ghost_cells+1));
     for(int i=0;i<curve.mesh.elements.m;i++){
         SEGMENT_2D<T> segment(curve.particles.X(curve.mesh.elements(i).x),curve.particles.X(curve.mesh.elements(i).y));
-        RANGE<TV_INT> box(grid.Cell(segment.X.x,3));
-        box.Enlarge_To_Include_Point(grid.Cell(segment.X.y,3));
+        RANGE<TV_INT> box(grid.Index(segment.X.x));
+        box.Enlarge_To_Include_Point(grid.Index(segment.X.y));
         box=box.Intersect(box,grid.Domain_Indices(ghost_cells-1));
         if(box.Empty()) continue;
         for(RANGE_ITERATOR<TV::m> it(box.Thickened(1));it.Valid();it.Next()){

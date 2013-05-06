@@ -49,8 +49,8 @@ public:
     cells.Resize(grid.Get_MAC_Grid().Domain_Indices(),false,false);cells.Fill(0);initialized=true;
     for(int k=0;k<boxes_input.m;k++){
         RANGE<TV_INT> domain;
-        grid.Cell(boxes_input(k).x.Minimum_Corner(),domain.min_corner,0);
-        grid.Cell(boxes_input(k).x.Maximum_Corner(),domain.max_corner,0);
+        grid.Index(boxes_input(k).x.Minimum_Corner(),domain.min_corner);
+        grid.Index(boxes_input(k).x.Maximum_Corner(),domain.max_corner);
         domain.max_corner=TV_INT::Componentwise_Min(domain.max_corner,grid.numbers_of_cells);
         for(RANGE_ITERATOR<TV::m> it(domain);it.Valid();it.Next()){
             if(!cells(it.index))cells(it.index)=new ARRAY<DATA_T>;
@@ -93,24 +93,6 @@ bool Map_Intersection(RAY<VECTOR<T,3> >& ray,HELPER_T pointer) const
         if(index[axis]==end[axis])break;
         cross[axis]+=dt[axis];}
     return intersection;
-}
-//#####################################################################
-// Function Map_Inside
-//#####################################################################
-template<class HELPER_T>
-void Map_Inside(const VECTOR<T,3>& location,HELPER_T pointer) const
-{
-    int i,j,ij;grid.Cell(location,i,j,ij,0);if(cells(i,j,ij)) pointer->Callback(location,*cells(i,j,ij));
-}
-//#####################################################################
-// Function Map_Inside
-//#####################################################################
-template<class HELPER_T>
-void Map_Inside(const RANGE<VECTOR<T,3> >& box,HELPER_T pointer) const
-{
-    int i_min,j_min,ij_min,i_max,j_max,ij_max;
-    grid.Cell(box.Minimum_Corner(),i_min,j_min,ij_min,0);grid.Cell(box.Maximum_Corner(),i_max,j_max,ij_max,0);
-    for(int i=i_min;i<i_max;i++)for(int j=j_min;j<j_max;j++)for(int ij=ij_min;ij<ij_max;ij++) if(cells(i,j,ij)) pointer->Callback(box,*cells(i,j,ij));
 }
 //#####################################################################
 };

@@ -183,7 +183,7 @@ template<class T,class T_GRID,class T2,class T_FACE_LOOKUP> T2
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
 Periodic(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
-    return ::From_Base_Node_Periodic(*this,grid,u,X,grid.Cell(X,0)-TV_INT::All_Ones_Vector());
+    return ::From_Base_Node_Periodic(*this,grid,u,X,grid.Index(X)-1);
 }
 namespace PhysBAM{
 template class CUBIC_MN_INTERPOLATION_UNIFORM<GRID<VECTOR<float,1> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,1> > > >;

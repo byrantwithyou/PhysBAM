@@ -1180,7 +1180,7 @@ Reincorporate_Removed_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVE
         if(!particles) particles=Allocate_Particles(template_particles);
         // rasterize the velocity onto the velocity field
         if(V){
-            TV_INT cell_index=levelset.grid.Cell(removed_particles.X(k),0);
+            TV_INT cell_index=levelset.grid.Index(removed_particles.X(k));
             T r=removed_particles.radius(k);
             TV half_impulse;
             half_impulse = removed_particles.V(k)*mass_scaling*pow<TV::dimension>(r)*half_unit_sphere_size_over_cell_size;

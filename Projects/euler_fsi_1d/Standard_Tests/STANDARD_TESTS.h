@@ -417,7 +417,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         if(test_number==5) rect.Frame().t=TV(1.5);
         // else if(test_number==6) rect.Frame().t=TV(.9);
         // else rect.Frame().t=TV(.8);
-        rect.Frame().t=grid.X(grid.Cell(TV(1.3),0))+solid_position_delta*grid.DX();
+        rect.Frame().t=grid.X(grid.Index(TV(1.3)))+solid_position_delta*grid.DX();
         rect.Is_Kinematic()=false;
 
         Add_Volumetric_Body_To_Fluid_Simulation(rect,true,true);}
