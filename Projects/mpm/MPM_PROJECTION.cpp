@@ -50,7 +50,7 @@ Identify_Dirichlet_Cells()
     cell_dirichlet.Fill(false);
 #pragma omp parallel for
     for(int p=0;p<sim.particles.number;p++)
-        cell_dirichlet(sim.grid.Index(sim.particles.X(p)))=true;
+        cell_dirichlet(sim.grid.Cell(sim.particles.X(p),0))=true;
 }
 
 //#####################################################################

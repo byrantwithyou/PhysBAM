@@ -76,13 +76,13 @@ public:
     {return VECTOR<int,2>(in,out);}
 
     int Global(const int local)
-    {return frame_grid.Index(widget_grid.X(local-widget_range.min_corner)).x;}
+    {return frame_grid.Cell(widget_grid.X(local-widget_range.min_corner),0).x;}
 
     int Local(const int global)
-    {return widget_grid.Index(frame_grid.X(global)).x+widget_range.min_corner;}
+    {return widget_grid.Cell(frame_grid.X(global),0).x+widget_range.min_corner;}
 
     int Local_DX(const int global,const T scale=0)
-    {return widget_grid.Index(frame_grid.X(global)+frame_grid.dX.x*scale).x+widget_range.min_corner;}
+    {return widget_grid.Cell(frame_grid.X(global)+frame_grid.dX.x*scale,0).x+widget_range.min_corner;}
 
     int handle(int event)
     {int event_frame=PhysBAM::clamp(Global(Fl::event_x()),frame_range.min_corner,frame_range.max_corner);int real_frame=Local(frame);static int saved_frame;

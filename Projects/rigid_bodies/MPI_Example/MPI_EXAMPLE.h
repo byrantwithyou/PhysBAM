@@ -354,7 +354,7 @@ void Break_Levelset()
     GRID<TV> body_grid(counts,levelset.grid.Domain());
     TRIANGULATED_SURFACE<T>* surface=0;    
     for(CELL_ITERATOR<TV> iterator(body_grid);iterator.Valid();iterator.Next()){
-        TV_INT cell=levelset.grid.Index(iterator.Location());
+        TV_INT cell=levelset.grid.Cell(iterator.Location(),0);
         if(!phi.Valid_Index(cell)) continue;
         if(phi(cell)>0) continue;
         RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(solid_body_collection.rigid_body_collection);

@@ -654,7 +654,7 @@ void Create_Pattern(const int test_number)
             ARRAY<int,VECTOR<int,3> > regions(levelset_grid.Domain_Indices());regions.Fill(-1);
             ARRAY<TV_INT> neighbor_list;
             for(int s=0;s<seed_points.m;s++){
-                TV_INT cell_index=levelset_grid.Index(seed_points(s));
+                TV_INT cell_index=levelset_grid.Cell(seed_points(s),0);
                 regions(cell_index)=s;
                 for(int axis=0;axis<3;axis++) for(int side=-1;side<=1;side+=2){
                     TV_INT neighbor_index=cell_index+side*TV_INT::Axis_Vector(axis);

@@ -24,7 +24,7 @@ template<class TV,int order> void MPM_LINEAR_BASIS<TV,order>::
 Build_Weights_And_Grad_Weight_Over_Weights(const TV& X,const GRID<TV>& grid,TV_INT& influence_corner,VECTOR<TV,IN>& weight,VECTOR<TV,IN>& grad_weight_over_weight)
 {  
     static T eps=1e-5;
-    TV_INT my_corner=grid.Index(X);
+    TV_INT my_corner=grid.Cell(X,0);
     influence_corner=my_corner-1;
     for(int n=0;n<IN;n++){
         for(int d=0;d<TV::m;d++){

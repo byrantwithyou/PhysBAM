@@ -186,7 +186,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     else if(test_number==4){
         rho_initial=1;u_initial=3;p_initial=(T)1.;
         for(int i=0;i<grid.counts.x;i++){
-            TV_INT piston_face_index=grid.Index(TV(piston_initial_position));
+            TV_INT piston_face_index=grid.Cell(TV(piston_initial_position),0);
             if(i >=piston_face_index[0]) {rho_initial=(T)1.;p_initial=(T)1.;u_initial=(T)3.0;} else {rho_initial=(T)1.;p_initial=1.;u_initial=-(T)3.0;}
             U(i)(0)=rho_initial;U(i)(1)=rho_initial*u_initial;U(i)(2)=rho_initial*(tmp_eos->e_From_p_And_rho(p_initial,rho_initial)+sqr(u_initial)/(T)2.);}}
 }
@@ -201,20 +201,20 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
     T_FACE_ARRAYS_SCALAR& face_velocities=euler.euler_projection.face_velocities;
 
    T piston_position=piston_initial_position+piston_speed*time;
-   if(test_number==1){TV_INT face_index=euler.grid.Index(TV(piston_position));
+   if(test_number==1){TV_INT face_index=euler.grid.Cell(TV(piston_position),0);
        psi_N.Component(0)(face_index)=true;face_velocities.Component(0)(face_index)=piston_speed;}
    else if(test_number==2) for(FACE_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){
        int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();TV location=iterator.Location();
        if(location.x<=piston_position){psi_N.Component(axis)(face_index)=true;face_velocities.Component(axis)(face_index)=piston_speed;}}
    else if(test_number==4){
-       TV_INT piston_index=euler.grid.Index(TV(piston_position));
+       TV_INT piston_index=euler.grid.Cell(TV(piston_position),0);
        for(int i=-piston_width;i<=piston_width;i++){
            TV_INT cell_index(piston_index.x+i);
            euler.psi(cell_index)=false;
            for(int axis=0;axis<T_GRID::dimension;axis++){
                psi_N.Component(axis)(euler.grid.First_Face_Index_In_Cell(axis,cell_index))=true;face_velocities.Component(axis)(euler.grid.First_Face_Index_In_Cell(axis,cell_index))=0;
                psi_N.Component(axis)(euler.grid.Second_Face_Index_In_Cell(axis,cell_index))=true;face_velocities.Component(axis)(euler.grid.Second_Face_Index_In_Cell(axis,cell_index))=0;}}}
-   if(test_number==3){TV_INT face_index=euler.grid.Index(TV(piston_initial_position));
+   if(test_number==3){TV_INT face_index=euler.grid.Cell(TV(piston_initial_position),0);
        psi_N.Component(0)(face_index)=true;face_velocities.Component(0)(face_index)=piston_speed;}
 
    boundary_set_time=time;
