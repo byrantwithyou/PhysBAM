@@ -130,11 +130,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.dirichlet_velocity.Append(TV(0,0.2));
             break;
         case 5: // simple example for debug
-            sim.grid.Initialize(TV_INT(5,4),RANGE<TV>(TV(-2,-1.5),TV(2,1.5)));
+            sim.grid.Initialize(TV_INT(11,9),RANGE<TV>(TV(-5,-4),TV(5,4)));
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),GRID<TV>(sim.grid.numbers_of_cells+1,RANGE<TV>(sim.grid.domain.min_corner-sim.grid.dX*0.5,sim.grid.domain.max_corner+sim.grid.dX*0.5),true),output_directory);
+    // VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
 
     // Delaunay Triangulation
     TRIANGULATED_AREA<T> ta;
@@ -247,20 +248,33 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     sim.mu0=sim.mu;
     sim.lambda0=sim.lambda;
 
+    if(test_number==5){
+        for(int i=0;i<sim.grid.counts.x;i++)
+            for(int j=0;j<sim.grid.counts.y;j++)
+                sim.node_V(TV_INT(i,j)).Set(i*i,j*j);
+    }
+
     // projection init
     MPM_PROJECTION<TV> projection(sim);
+    projection.Interpolate_Velocities_To_Faces();
 
-    // DEBUG: draw MAC grid
+    // DEBUG: draw MAC cell center velocities
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
-        Add_Debug_Particle(projection.mac_grid.X(it.index),VECTOR<T,3>(1,0,0));} // cell centers: red
+        Add_Debug_Particle(projection.mac_grid.X(it.index),VECTOR<T,3>(1,0,0)); // cell centers: red
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));}
+
+    // draw MAC velocities
     for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
         TV location=iterator.Location();
         int axis=iterator.Axis();
-        if(axis==0) Add_Debug_Particle((location),VECTOR<T,3>(0,1,0)); // x-axis aligned face centers: green
-        else if(axis==1) Add_Debug_Particle((location),VECTOR<T,3>(0,0,1));} // y-axis aligned face centers: blue
-  
-    Flush_Frame<TV>("MAC grid");        
+        if(axis==0){
+            Add_Debug_Particle((location),VECTOR<T,3>(0,1,0)); // face centers with x component velocity: green
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(projection.face_velocities(iterator.Full_Index()),0));}
+        else if(axis==1){
+            Add_Debug_Particle((location),VECTOR<T,3>(0,0,1)); // face centers with y component velocity: blue
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(0,projection.face_velocities(iterator.Full_Index())));}}
 
+    Flush_Frame<TV>("MAC grid");        
     exit(0);
 
     // use voronoi polygon to initialize particle mass and volume and particle domain
