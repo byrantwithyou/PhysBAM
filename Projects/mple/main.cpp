@@ -28,13 +28,13 @@ int main(int argc,char* argv[])
 
     MPLE_DRIVER<TV,w> mple;
     const RANGE<TV> domain(TV(-.5,-.5),TV(.5,.5));
-    const TV_INT counts(TV_INT(50,50));
+    const TV_INT counts(TV_INT(25,25));
     mple.grid.Initialize(counts+1,domain);
 
     std::string output_directory="output";
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),mple.grid,output_directory);
 
-    const int number_of_points=1000; 
+    const int number_of_points=250; 
     const RANGE<TV> block(TV(-.3,-.3),TV(.3,.3));
     
     for(int i=0;i<number_of_points;i++){

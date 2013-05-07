@@ -44,7 +44,7 @@ public:
     T mu,nu,epsilon;
     T dt,one_over_dx_squared;
     
-    MPLE_DRIVER():frames(1000),timesteps(1),mu(.1),nu(.05){}
+    MPLE_DRIVER():frames(100),timesteps(10),mu(.1),nu(.1){}
 
     ~MPLE_DRIVER(){}
 
@@ -128,7 +128,8 @@ public:
     void Run()
     {
         Initialize();
-        for(int k=0;k<frames;k++){
+        Write("Frame 0");
+        for(int k=1;k<=frames;k++){
             Advance_Frame();
             char buff[100];
             sprintf(buff,"Frame %d",k);
