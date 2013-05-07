@@ -15,6 +15,7 @@
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include "MPLE_DOUBLE_WELL.h"
 #include "MPLE_ITERATOR.h"
 #include "MPLE_POINT.h"
 
@@ -35,15 +36,15 @@ public:
 
     ARRAY<T,TV_INT> u;                // segmentation function
     ARRAY<T,TV_INT> u_new;            // new segmentation funtion
-    ARRAY<TV,TV_INT> location;         // flat index to location
-    ARRAY<TV_INT,TV_INT> index;        // flat to vector index
+    ARRAY<TV,TV_INT> location;        // flat index to location
+    ARRAY<TV_INT,TV_INT> index;       // flat to vector index
     
     int frames;
     int timesteps;
-    T mu,nu;
+    T mu,nu,epsilon;
     T dt,one_over_dx_squared;
     
-    MPLE_DRIVER():frames(100),timesteps(10),mu(0.1),nu(.1){}
+    MPLE_DRIVER():frames(1000),timesteps(1),mu(.1),nu(.05){}
 
     ~MPLE_DRIVER(){}
 
@@ -66,7 +67,8 @@ public:
         for(int i=0;i<points.m;i++)
             points(i).Update_Base_And_Weights(grid);
 
-        dt=0.1*sqr(grid.dX(0));
+        dt=sqr(grid.dX(0))/(2*(TV::m+1));
+        epsilon=3*grid.dX(0);
         one_over_dx_squared=1/sqr(grid.dX(0));
         PHYSBAM_ASSERT(grid.dX.Min()==grid.dX.Max());
     }
@@ -95,15 +97,23 @@ public:
                 value+=u(this_node+TV_INT::Axis_Vector(k));
                 value+=u(this_node-TV_INT::Axis_Vector(k));}
             value-=u(this_node)*2*TV::m;
-            value*=dt*one_over_dx_squared;
-            value+=u(this_node);}
+            value*=epsilon*dt*one_over_dx_squared;
+            value+=u(this_node);
+            value-=(dt/epsilon)*MPLE_DOUBLE_WELL<T>::Gradient(u(this_node));
+        }
     }
 
     void Rasterization_Step()
     {
         for(int i=0;i<points.m;i++){
             for(MPLE_ITERATOR<TV,w> it(points(i));it.Valid();it.Next())
-                u_new(it.Node())+=mu*dt*it.Weight()*((1-2*nu)/nu-sqr(2*nu-1)/((1-nu)*nu)*u(it.Node()));}
+                u_new(it.Node())+=mu*dt*it.Weight()*((1-2*nu)/nu+sqr(2*nu-1)/((1-nu)*nu)*u(it.Node()));}
+    }
+
+    void Clamp_Step()
+    {
+        for(int i=0;i<u.array.m;i++)
+            if(u_new.array(i)<0) u_new.array(i)=0;
     }
 
     void Advance_Frame()
@@ -111,6 +121,7 @@ public:
         for(int i=0;i<timesteps;i++){
             Diffusion_Step();
             Rasterization_Step();
+            Clamp_Step();
             u.Exchange(u_new);}
     }
 

@@ -27,14 +27,14 @@ int main(int argc,char* argv[])
     random.Set_Seed(0);
 
     MPLE_DRIVER<TV,w> mple;
-    const RANGE<TV> domain(TV(-1,-1),TV(1,1));
+    const RANGE<TV> domain(TV(-.5,-.5),TV(.5,.5));
     const TV_INT counts(TV_INT(50,50));
     mple.grid.Initialize(counts+1,domain);
 
     std::string output_directory="output";
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),mple.grid,output_directory);
 
-    const int number_of_points=500; 
+    const int number_of_points=1000; 
     const RANGE<TV> block(TV(-.3,-.3),TV(.3,.3));
     
     for(int i=0;i<number_of_points;i++){
