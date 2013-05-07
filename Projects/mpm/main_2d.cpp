@@ -130,7 +130,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.dirichlet_velocity.Append(TV(0,0.2));
             break;
         case 5: // simple example for debug
-            sim.grid.Initialize(TV_INT(11,9),RANGE<TV>(TV(-5,-4),TV(5,4)));
+            sim.grid.Initialize(TV_INT(5,4),RANGE<TV>(TV(-4,-3),TV(4,3)));
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -257,6 +257,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // projection init
     MPM_PROJECTION<TV> projection(sim);
     projection.Interpolate_Velocities_To_Faces();
+    projection.Identify_Dirichlet_Cells();
+    projection.Extrapolate_Velocities_For_Dirichlet_Cells();
+
 
     // DEBUG: draw MAC cell center velocities
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){

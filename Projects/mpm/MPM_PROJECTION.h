@@ -30,6 +30,8 @@ public:
     void Identify_Dirichlet_Cells();
     void Identify_Neumann_Cells();
     void Interpolate_Velocities_To_Faces();
+    void Extrapolate_Velocities_For_Dirichlet_Cells();
+    void Solve_For_Pressure(const T dt,const T rho);
 
 };
 }
