@@ -13,7 +13,6 @@ template<class TV> MPM_PROJECTION<TV>::
 MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     :sim(sim_in)
 {
-    // mac_grid=sim.grid.Get_MAC_Grid();
     mac_grid.Initialize(sim.grid.numbers_of_cells+1,RANGE<TV>(sim.grid.domain.min_corner-sim.grid.dX*0.5,sim.grid.domain.max_corner+sim.grid.dX*0.5),true);
     face_velocities.Resize(mac_grid);
     LOG::cout<<"mac_grid.counts = "<<mac_grid.counts<<std::endl; // count of cell centers
@@ -75,42 +74,10 @@ Interpolate_Velocities_To_Faces()
         int axis=iterator.Axis(); // the axis of first_cell -> second_cell
         TV_INT first_cell=iterator.First_Cell_Index();
         TV_INT second_cell=iterator.Second_Cell_Index();        
-        if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis))
+        if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)) // only deal with non-boundary faces
             face_velocities(face_index)=0.5*(sim.node_V(first_cell)(axis)+sim.node_V(second_cell)(axis));
         LOG::cout<<"axis: "<<axis<<"first_cell: "<<first_cell<<"second_cell: "<<second_cell<<"v: "<<face_velocities(face_index)<<std::endl;}
 }
-
-// //#####################################################################
-// // Function Interpolate_Velocities_Nodes_To_Faces
-// //#####################################################################
-// template<class TV> void MPM_PROJECTION<TV>::
-// Interpolate_Velocities_Nodes_To_Faces()
-// {
-//     for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
-//         FACE_INDEX<TV::dimention> face_index=iterator.Full_Index();
-//         face_velocities(face_index)=(T)0;
-//         int axis=iterator.Axis();
-//         TV_INT second_cell=iterator.Second_Cell_Index();
-//         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(second_cell,second_cell+1));it.Valid();it.Next())
-//             face_velocities(face_index)+=sim.node_V(it.index)(axis);
-//         face_velocities(face_index)/=TV::dimension*2-2;
-//     }
-//     // Some example code of using FACE_ITERATOR..
-//     for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
-//         face_velocities(iterator.Full_Index())=0;
-//         RANGE<TV> dual_cell=iterator.Dual_Cell();
-//         TV location=iterator.Location();
-//         int axis=iterator.Axis();
-//         TV_INT face_index=iterator.Face_Index();
-//         for(int side=0;side<2;side++){
-//             TV_INT cell_index=face_index+(1-side)*TV_INT::Axis_Vector(axis);
-//         }
-//     }
-//     for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
-//         int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
-//         if(!psi_N.Component(axis)(face_index) && !(psi_D(first_cell) && psi_D(second_cell)))
-//             face_velocities.Component(axis)(face_index)-=poisson->beta_face.Component(axis)(face_index)*(p(second_cell)-p(first_cell))*one_over_dx[axis];}
-// }
 
 //#####################################################################
 template class MPM_PROJECTION<VECTOR<float,2> >;
