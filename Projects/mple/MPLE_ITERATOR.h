@@ -36,7 +36,7 @@ public:
     }
 
     bool Valid() const
-    {return index(1)<w;}
+    {return index(0)<w;}
 
     TV_INT Node() const
     {return point.base_node+index;}

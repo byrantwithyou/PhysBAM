@@ -33,32 +33,24 @@ public:
     ARRAY<MPLE_POINT<TV,w> > points;   // data
     GRID<TV> grid;                     // grid
 
-    ARRAY<T,TV_INT>* u;                // segmentation function
-    ARRAY<T,TV_INT>* u_new;            // new segmentation funtion
+    ARRAY<T,TV_INT> u;                // segmentation function
+    ARRAY<T,TV_INT> u_new;            // new segmentation funtion
     ARRAY<TV,TV_INT> location;         // flat index to location
     ARRAY<TV_INT,TV_INT> index;        // flat to vector index
     
     int frames;
     int timesteps;
-    T dt,mu,nu;
-    T one_over_dx_squared;
+    T mu,nu;
+    T dt,one_over_dx_squared;
     
-    MPLE_DRIVER():frames(10),timesteps(10),dt(.1),mu(1),nu(.1)
-    {
-        u=new ARRAY<T,TV_INT>;
-        u_new=new ARRAY<T,TV_INT>;
-    }
+    MPLE_DRIVER():frames(100),timesteps(10),mu(0.1),nu(.1){}
 
-    ~MPLE_DRIVER()
-    {
-        delete u;
-        delete u_new;
-    }
+    ~MPLE_DRIVER(){}
 
     void Initialize()
     {
-        u->Resize(grid.Node_Indices(ghost),false);
-        u_new->Resize(grid.Node_Indices(ghost),false);
+        u.Resize(grid.Node_Indices(ghost),false);
+        u_new.Resize(grid.Node_Indices(ghost),false);
         location.Resize(grid.Node_Indices(ghost),false);
         index.Resize(grid.Node_Indices(ghost),false);
         
@@ -67,13 +59,14 @@ public:
             location.array(k)=it.Location();
             index.array(k)=it.Node_Index();}
 
-        for(int i=0;i<u->array.m;i++){
-            u_new->array(i)=0;
-            u->array(i)=0;}
+        for(int i=0;i<u.array.m;i++){
+            u_new.array(i)=0;
+            u.array(i)=0;}
         
         for(int i=0;i<points.m;i++)
             points(i).Update_Base_And_Weights(grid);
 
+        dt=0.1*sqr(grid.dX(0));
         one_over_dx_squared=1/sqr(grid.dX(0));
         PHYSBAM_ASSERT(grid.dX.Min()==grid.dX.Max());
     }
@@ -84,7 +77,7 @@ public:
             Add_Debug_Particle<TV>(points(i).X,VECTOR<T,3>(1,0,0));
         
         for(int i=0;i<location.array.m;i++){
-            T value=u->array(i);
+            T value=u.array(i);
             if(value){
                 Add_Debug_Particle(location.array(i),value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(0,.5,1));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,value);}}
@@ -96,33 +89,21 @@ public:
     {
         for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             const TV_INT& this_node=it.Node_Index();
-            T& value=(*u_new)(this_node);
+            T& value=u_new(this_node);
             value=0;
             for(int k=0;k<TV::m;k++){
-                value+=(*u)(this_node+TV_INT::Axis_Vector(k));
-                value+=(*u)(this_node-TV_INT::Axis_Vector(k));}
-            value-=(*u)(this_node)*2*TV::m;
+                value+=u(this_node+TV_INT::Axis_Vector(k));
+                value+=u(this_node-TV_INT::Axis_Vector(k));}
+            value-=u(this_node)*2*TV::m;
             value*=dt*one_over_dx_squared;
-            value+=(*u)(this_node);}
+            value+=u(this_node);}
     }
 
     void Rasterization_Step()
     {
         for(int i=0;i<points.m;i++){
             for(MPLE_ITERATOR<TV,w> it(points(i));it.Valid();it.Next())
-                (*u)(it.Node())+=mu*dt*it.Weight();}
-    }
-
-    void Threshold_Segmentation_Function()
-    {
-
-    }
-
-    void Exchange_Arrays()
-    {
-        ARRAY<T,TV_INT>* tmp=u;
-        u=u_new;
-        u_new=tmp;
+                u_new(it.Node())+=mu*dt*it.Weight()*((1-2*nu)/nu-sqr(2*nu-1)/((1-nu)*nu)*u(it.Node()));}
     }
 
     void Advance_Frame()
@@ -130,8 +111,7 @@ public:
         for(int i=0;i<timesteps;i++){
             Diffusion_Step();
             Rasterization_Step();
-            Exchange_Arrays();}
-        Threshold_Segmentation_Function();
+            u.Exchange(u_new);}
     }
 
     void Run()
