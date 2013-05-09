@@ -3,6 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class MPM_PROJECTION
+// This scheme always assume the outmost boundary of the grid
+// is absolutely dirichlet. i.e., the grid domain is larger enough.
 //#####################################################################
 #ifndef __MPM_PROJECTION__
 #define __MPM_PROJECTION__
@@ -22,6 +24,8 @@ public:
     ARRAY<bool,TV_INT> cell_dirichlet;
     ARRAY<bool,TV_INT> cell_neumann;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
+    ARRAY<T,TV_INT> div_u;
+    ARRAY<T,TV_INT> pressure;
 
     MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in);
     ~MPM_PROJECTION();
@@ -30,9 +34,9 @@ public:
     void Identify_Dirichlet_Cells();
     void Identify_Neumann_Cells();
     void Interpolate_Velocities_To_Faces();
-    void Extrapolate_Velocities_For_Dirichlet_Cells();
+    void Build_Velocity_Divergence();
     void Solve_For_Pressure(const T dt,const T rho);
-
+    void Do_Projection(const T dt,const T rho);
 };
 }
 #endif

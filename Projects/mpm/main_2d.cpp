@@ -258,8 +258,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     MPM_PROJECTION<TV> projection(sim);
     projection.Interpolate_Velocities_To_Faces();
     projection.Identify_Dirichlet_Cells();
-    projection.Extrapolate_Velocities_For_Dirichlet_Cells();
-
 
     // DEBUG: draw MAC cell center velocities
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){

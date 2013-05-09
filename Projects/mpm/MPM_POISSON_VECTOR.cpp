@@ -77,7 +77,7 @@ Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv
 template<class TV> int MPM_POISSON_VECTOR<TV>::
 Raw_Size() const
 {
-    return Value(v.array.m)*TV::m;
+    return Value(v.array.m);
 }
 //#####################################################################
 // Function Raw_Get
@@ -85,7 +85,7 @@ Raw_Size() const
 template<class TV> typename TV::SCALAR& MPM_POISSON_VECTOR<TV>::
 Raw_Get(int i)
 {
-    return v.array(i/TV::m)(i%TV::m);
+    return v.array(i);
 }
 //#####################################################################
 // Function Clone_Default

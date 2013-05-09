@@ -17,7 +17,7 @@ class MPM_POISSON_VECTOR:public KRYLOV_VECTOR_BASE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
-    ARRAY<TV,TV_INT> v;
+    ARRAY<T,TV_INT> v;
 
     MPM_POISSON_VECTOR();
     virtual ~MPM_POISSON_VECTOR();
