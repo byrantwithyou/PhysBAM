@@ -83,7 +83,7 @@ public:
     void Initialize();
     void Advance_One_Time_Step_Forward_Euler();
     void Advance_One_Time_Step_Backward_Euler();
-protected:
+
     void Build_Weights_And_Grad_Weights();
     void Build_Helper_Structures_For_Constitutive_Model();
     void Rasterize_Particle_Data_To_The_Grid();
@@ -100,7 +100,7 @@ protected:
     void Update_Particle_Positions();
     void Update_Dirichlet_Box_Positions();
     void Update_Colliding_Object_Positions();
-private:
+
     T Get_Maximum_Node_Velocity() const;
     T Get_Maximum_Particle_Velocity() const;
 //#####################################################################

@@ -348,11 +348,18 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     for(int f=1;f<2900977;f++){
         TIMING_START;
-        LOG::cout<<"TIMESTEP "<<f<<std::endl;
+        LOG::cout<<"MPM TIMESTEP "<<f<<std::endl;
+
+        // MPM step
+        ARRAY<TV> X_before_MPM(sim.particles.X);
         sim.Advance_One_Time_Step_Backward_Euler();
-        TIMING_END("Current time step totally");
-        
+        ARRAY<TV> candidate_X_after_MPM(sim.particles.X);
+        ARRAY<TV> candidate_V_from_MPM; candidate_V_from_MPM.Copy(-1,X_before_MPM,candidate_X_after_MPM);
+
+        TIMING_END("Current MPM time step totally");
+
         // projection step
+        LOG::cout<<"PROJECTION TIMESTEP "<<f<<std::endl;
         if(use_projection){
             projection.Reinitialize();
             projection.Identify_Dirichlet_Cells();
