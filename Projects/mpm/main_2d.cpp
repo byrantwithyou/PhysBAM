@@ -265,25 +265,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     }
 
     // projection init
-    MPM_PROJECTION<TV> projection(sim);
-
-    // projection: initial visualization of the MAC grid velocities
-    if(use_projection){
-        projection.Interpolate_Velocities_To_Faces();
-        projection.Identify_Dirichlet_Cells();
-        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
-            Add_Debug_Particle(projection.mac_grid.X(it.index),VECTOR<T,3>(1,0,0)); // cell centers: red
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));}
-        for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
-            TV location=iterator.Location();
-            int axis=iterator.Axis();
-            if(axis==0){
-                Add_Debug_Particle((location),VECTOR<T,3>(0,0,0)); // face centers with x component velocity: green
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(projection.face_velocities(iterator.Full_Index()),0));}
-            else if(axis==1){
-                Add_Debug_Particle((location),VECTOR<T,3>(0,0,0)); // face centers with y component velocity: blue
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(0,projection.face_velocities(iterator.Full_Index())));}}
-        Flush_Frame<TV>("MAC grid");}
+    MPM_PROJECTION<TV> projection(sim,true);
 
     // use voronoi polygon to initialize particle mass and volume and particle domain
     if(use_voronoi || use_voronoi_boundary){
@@ -353,8 +335,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         // MPM step
         ARRAY<TV> X_before_MPM(sim.particles.X);
         sim.Advance_One_Time_Step_Backward_Euler();
-        ARRAY<TV> candidate_X_after_MPM(sim.particles.X);
-        ARRAY<TV> candidate_V_from_MPM; candidate_V_from_MPM.Copy(-1,X_before_MPM,candidate_X_after_MPM);
+        ARRAY<TV> candidate_V_from_MPM; candidate_V_from_MPM.Copy(sim.particles.V);
 
         TIMING_END("Current MPM time step totally");
 
@@ -362,12 +343,16 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         LOG::cout<<"PROJECTION TIMESTEP "<<f<<std::endl;
         if(use_projection){
             projection.Reinitialize();
+            projection.Load_New_Particle_Data(X_before_MPM,candidate_V_from_MPM);
             projection.Identify_Dirichlet_Cells();
-            projection.Interpolate_Velocities_To_Faces();
+            projection.Identify_Neumann_Cells();
+            projection.Generate_Face_Velocities();
             projection.Build_Velocity_Divergence();
-            projection.Solve_For_Pressure(1e-3,1);
-            projection.Do_Projection(1e-3,1);
-            projection.Send_Velocities_Back();}
+            projection.Solve_For_Pressure(sim.dt,1);
+            projection.Do_Projection(sim.dt,1);
+            // projection.Interpolate_Velocities_Back_To_Particles(sim.particles.V,(T)0.95);
+            // TODO: sim.particles.X=
+        }
 
         if(f%frame_jump==0){
             // draw MPM particles

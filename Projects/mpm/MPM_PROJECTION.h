@@ -20,6 +20,10 @@ class MPM_PROJECTION
 public:
     MPM_SIMULATION<TV>& sim;
 
+    bool independent_from_MPM;
+    ARRAY<TV> particle_X;
+    ARRAY<TV> particle_V;
+
     GRID<TV> mac_grid; // One cell wider than MPM grid so that MPM grid v lives on cell centers of mac_grid.
     ARRAY<bool,TV_INT> cell_dirichlet;
     ARRAY<bool,TV_INT> cell_neumann;
@@ -27,17 +31,18 @@ public:
     ARRAY<T,TV_INT> div_u;
     ARRAY<T,TV_INT> pressure;
 
-    MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in);
+    MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in,bool independent=true);
     ~MPM_PROJECTION();
 
     void Reinitialize();
+    void Load_New_Particle_Data(ARRAY<TV>& particle_X_in,ARRAY<TV>& particle_V_in);
     void Identify_Dirichlet_Cells();
     void Identify_Neumann_Cells();
-    void Interpolate_Velocities_To_Faces();
+    void Generate_Face_Velocities();
     void Build_Velocity_Divergence();
     void Solve_For_Pressure(const T dt,const T rho);
     void Do_Projection(const T dt,const T rho);
-    void Send_Velocities_Back();
+    void Send_Velocities_Back_To_MPM_Grid();
 };
 }
 #endif
