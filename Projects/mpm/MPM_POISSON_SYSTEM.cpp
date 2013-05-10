@@ -41,7 +41,8 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
             for(int d=0;d<TV::m;d++){
                 TV_INT left_index=it.index;left_index(d)--;
                 TV_INT right_index=it.index;right_index(d)++;
-                rr(it.index)-=xx(left_index)+xx(right_index);}
+                if(!proj.cell_dirichlet(left_index)) rr(it.index)-=xx(left_index);
+                if(!proj.cell_dirichlet(right_index)) rr(it.index)-=xx(right_index);}
             rr(it.index)*=one_over_h_square_or_cube;}
         else rr(it.index)=(T)0;}
 }
@@ -54,7 +55,7 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
     ARRAY<T,TV_INT>& xx=debug_cast<MPM_POISSON_VECTOR<TV>&>(x).v;
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),proj.mac_grid.counts));it.Valid();it.Next())
         if(proj.cell_dirichlet(it.index))
-            xx(it.index)=T();
+            xx(it.index)=T(0);
 }
 //#####################################################################
 // Function Inner_Product

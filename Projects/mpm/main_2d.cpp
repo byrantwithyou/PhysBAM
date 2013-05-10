@@ -54,6 +54,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     bool use_turk=false;
     bool use_bridson=false;
     bool use_delaunay=false;
+    bool use_projection=false;
     T delaunay_maximum_edge_length=(T)99999;
     T delaunay_minimum_angle=(T)0;
     sim.xi=(T)0;
@@ -83,6 +84,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-exclude",&particle_exclude_radius,"value","particle exclude radius when using pn");
     parse_args.Add("-rho",&density_scale,"value","scale object density");
     parse_args.Add("-profile",&sim.PROFILING,"print out timing statements");
+    parse_args.Add("-projection",&use_projection,"use poisson projection to enforce incompressibility");
     parse_args.Parse(true);
     parse_args.Parse();
 
@@ -110,11 +112,17 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.rigid_ball.Append(SPHERE<TV>(TV(0.09,-0.3),0.03));
             sim.rigid_ball_velocity.Append(TV());
             break;
-        case 3: // snow fall
-            sim.grid.Initialize(TV_INT(0.6*grid_res+1,0.8*grid_res+1),RANGE<TV>(TV(-0.3,-0.4),TV(0.3,0.4)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1)));
-            sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.3),0.05));
-            sim.rigid_ball_velocity.Append(TV());
+        case 3: // snow 
+            sim.grid.Initialize(TV_INT(1.0*grid_res+1,0.8*grid_res+1),RANGE<TV>(TV(-0.5,-0.4),TV(0.5,0.4)));
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.3,-0.1),TV(-0.1,0.1)));
+
+            sim.particles.Add_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(0.1,-0.1),TV(0.3,0.1)));
+            for(int p=0;p<sim.particles.number;p++){
+                if(sim.particles.X(p).x<0) sim.particles.V(p)=TV(2,0);
+                if(sim.particles.X(p).x>0) sim.particles.V(p)=TV(-2,0);}
+
+            // sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.3),0.05));
+            // sim.rigid_ball_velocity.Append(TV());
             // sim.rigid_ball.Append(SPHERE<TV>(TV(0.13,-0.3),0.05));
             // sim.rigid_ball_velocity.Append(TV());
             break;
@@ -134,8 +142,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),GRID<TV>(sim.grid.numbers_of_cells+1,RANGE<TV>(sim.grid.domain.min_corner-sim.grid.dX*0.5,sim.grid.domain.max_corner+sim.grid.dX*0.5),true),output_directory);
-    // VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
+    // VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),GRID<TV>(sim.grid.numbers_of_cells+1,RANGE<TV>(sim.grid.domain.min_corner-sim.grid.dX*0.5,sim.grid.domain.max_corner+sim.grid.dX*0.5),true),output_directory);
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
 
     // Delaunay Triangulation
     TRIANGULATED_AREA<T> ta;
@@ -212,12 +220,14 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         case 3:
             object_density=(T)400*density_scale;
             object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
-            ym*=(T)1e6;
-            sim.mu.Fill(ym/((T)2*((T)1+pr)));
-            sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
-            sim.use_plasticity_yield=true;
-            sim.yield_min=(T)1-(T)0.025;
-            sim.yield_max=(T)1+(T)0.0075;
+            ym*=0;
+            for(int p=0;p<sim.particles.number;p++){
+                T this_ym=ym;
+                sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
+                sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
+            // sim.use_plasticity_yield=true;
+            // sim.yield_min=(T)1-(T)0.025;
+            // sim.yield_max=(T)1+(T)0.0075;
             break;
         case 4:
             object_density=(T)1200*density_scale;
@@ -256,27 +266,24 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     // projection init
     MPM_PROJECTION<TV> projection(sim);
-    projection.Interpolate_Velocities_To_Faces();
-    projection.Identify_Dirichlet_Cells();
 
-    // DEBUG: draw MAC cell center velocities
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
-        Add_Debug_Particle(projection.mac_grid.X(it.index),VECTOR<T,3>(1,0,0)); // cell centers: red
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));}
-
-    // draw MAC velocities
-    for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
-        TV location=iterator.Location();
-        int axis=iterator.Axis();
-        if(axis==0){
-            Add_Debug_Particle((location),VECTOR<T,3>(0,1,0)); // face centers with x component velocity: green
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(projection.face_velocities(iterator.Full_Index()),0));}
-        else if(axis==1){
-            Add_Debug_Particle((location),VECTOR<T,3>(0,0,1)); // face centers with y component velocity: blue
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(0,projection.face_velocities(iterator.Full_Index())));}}
-
-    Flush_Frame<TV>("MAC grid");        
-    exit(0);
+    // projection: initial visualization of the MAC grid velocities
+    if(use_projection){
+        projection.Interpolate_Velocities_To_Faces();
+        projection.Identify_Dirichlet_Cells();
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
+            Add_Debug_Particle(projection.mac_grid.X(it.index),VECTOR<T,3>(1,0,0)); // cell centers: red
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));}
+        for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
+            TV location=iterator.Location();
+            int axis=iterator.Axis();
+            if(axis==0){
+                Add_Debug_Particle((location),VECTOR<T,3>(0,0,0)); // face centers with x component velocity: green
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(projection.face_velocities(iterator.Full_Index()),0));}
+            else if(axis==1){
+                Add_Debug_Particle((location),VECTOR<T,3>(0,0,0)); // face centers with y component velocity: blue
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(0,projection.face_velocities(iterator.Full_Index())));}}
+        Flush_Frame<TV>("MAC grid");}
 
     // use voronoi polygon to initialize particle mass and volume and particle domain
     if(use_voronoi || use_voronoi_boundary){
@@ -344,12 +351,38 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         LOG::cout<<"TIMESTEP "<<f<<std::endl;
         sim.Advance_One_Time_Step_Backward_Euler();
         TIMING_END("Current time step totally");
+        
+        // projection step
+        if(use_projection){
+            projection.Reinitialize();
+            projection.Identify_Dirichlet_Cells();
+            projection.Interpolate_Velocities_To_Faces();
+            projection.Build_Velocity_Divergence();
+            projection.Solve_For_Pressure(1e-3,1);
+            projection.Do_Projection(1e-3,1);
+            projection.Send_Velocities_Back();}
+
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
                 if(!sim.failed(i) && sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
                 else if(sim.failed(i) && sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,1));
                 else Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));}
+
+            // projection: visualize MAC grid velocities
+            if(use_projection){
+                // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
+                //     Add_Debug_Particle(projection.mac_grid.X(it.index),VECTOR<T,3>(1,0,0)); // cell centers: red
+                //     Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));}
+                for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
+                    TV location=iterator.Location();
+                    int axis=iterator.Axis();
+                    if(axis==0){
+                        Add_Debug_Particle((location),VECTOR<T,3>(0,0,0)); // face centers with x component velocity: green
+                        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(projection.face_velocities(iterator.Full_Index()),0));}
+                    else if(axis==1){
+                        Add_Debug_Particle((location),VECTOR<T,3>(0,0,0)); // face centers with y component velocity: blue
+                        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(0,projection.face_velocities(iterator.Full_Index())));}}}
 
             // Zhu and Bridson
             if(use_bridson){

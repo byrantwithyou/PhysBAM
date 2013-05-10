@@ -27,7 +27,7 @@ class MPM_SIMULATION
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     // enum WORKAROUND{basis_function_order=1,IN=basis_function_order+1};
-    enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
+    enum WORKAROUND{basis_function_order=1,IN=basis_function_order+1};
     //#################################################################
     // need external input
     //#################################################################
@@ -66,8 +66,8 @@ public:
     ARRAY<TV_INT> influence_corner;
     ARRAY<ARRAY<T,TV_INT> > weight;
     ARRAY<ARRAY<TV,TV_INT> > grad_weight;
-    // MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function; 
-    MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function; 
+    MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function; 
+    // MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function; 
     MPM_CONSTITUTIVE_MODEL<TV> constitutive_model;
     ARRAY<T,TV_INT> node_mass;
     ARRAY<TV,TV_INT> node_V;

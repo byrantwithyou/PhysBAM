@@ -19,13 +19,13 @@ MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     :sim(sim_in)
 {
     mac_grid.Initialize(sim.grid.numbers_of_cells+1,RANGE<TV>(sim.grid.domain.min_corner-sim.grid.dX*0.5,sim.grid.domain.max_corner+sim.grid.dX*0.5),true);
-    LOG::cout<<"grid.h = "<<sim.grid.dX.Min()<<std::endl;
-    LOG::cout<<"mac_grid.h = "<<mac_grid.dX.Min()<<std::endl;
+    // LOG::cout<<"grid.h = "<<sim.grid.dX.Min()<<std::endl;
+    // LOG::cout<<"mac_grid.h = "<<mac_grid.dX.Min()<<std::endl;
     face_velocities.Resize(mac_grid);
-    LOG::cout<<"mac_grid.counts = "<<mac_grid.counts<<std::endl; // count of cell centers
+    // LOG::cout<<"mac_grid.counts = "<<mac_grid.counts<<std::endl; // count of cell centers
     cell_dirichlet.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
-    LOG::cout<<"number of cells via mac_grid = "<<mac_grid.numbers_of_cells<<std::endl;
-    LOG::cout<<"number of cells via cell_dirichlet = "<<cell_dirichlet.Size()<<std::endl;
+    // LOG::cout<<"number of cells via mac_grid = "<<mac_grid.numbers_of_cells<<std::endl;
+    // LOG::cout<<"number of cells via cell_dirichlet = "<<cell_dirichlet.Size()<<std::endl;
     cell_neumann.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     div_u.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     pressure.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
@@ -86,8 +86,8 @@ Interpolate_Velocities_To_Faces()
         TV_INT first_cell=iterator.First_Cell_Index();
         TV_INT second_cell=iterator.Second_Cell_Index();        
         if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)) // only deal with non-boundary faces
-            face_velocities(face_index)=0.5*(sim.node_V(first_cell)(axis)+sim.node_V(second_cell)(axis));
-        LOG::cout<<"axis: "<<axis<<"first_cell: "<<first_cell<<"second_cell: "<<second_cell<<"v: "<<face_velocities(face_index)<<std::endl;}
+            face_velocities(face_index)=0.5*(sim.node_V(first_cell)(axis)+sim.node_V(second_cell)(axis));}
+        // LOG::cout<<"axis: "<<axis<<"first_cell: "<<first_cell<<"second_cell: "<<second_cell<<"v: "<<face_velocities(face_index)<<std::endl;}
 }
 
 //#####################################################################
@@ -115,31 +115,31 @@ template<class TV> void MPM_PROJECTION<TV>::
 Solve_For_Pressure(const T dt,const T rho)
 {
     // static int solve_id=-1;solve_id++;
-    // MPM_POISSON_SYSTEM<TV> system(debug_cast<MPM_PROJECTION<TV>&>(*this));
-    // MPM_POISSON_VECTOR<TV> rhs,x;
-    // ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
-    // rhs.v.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
-    // x.v.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
-    // KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
+    MPM_POISSON_SYSTEM<TV> system(debug_cast<MPM_PROJECTION<TV>&>(*this));
+    MPM_POISSON_VECTOR<TV> rhs,x;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
+    rhs.v.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
+    x.v.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
+    KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
     
-    // rhs.v.
-    // x.v=rhs.v; // x=dt/rho*p (for constant rho)
-    // if(test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
-    // CONJUGATE_GRADIENT<T> cg;
-    // CONJUGATE_RESIDUAL<T> cr;
-    // KRYLOV_SOLVER<T>* solver=&cg;
-    // solver->print_residuals=true;
+    rhs.v.Copy(-1,div_u);
+    x.v=rhs.v; // x=dt/rho*p (for constant rho)
+    system.Test_System(*vectors(0),*vectors(1),*vectors(2));
+    CONJUGATE_GRADIENT<T> cg;
+    CONJUGATE_RESIDUAL<T> cr;
+    KRYLOV_SOLVER<T>* solver=&cg;
+    solver->print_residuals=false;
     // if(dump_matrix){ // load M-1.txt;load m-1.txt;mm=reshape([m m]',rows(M),1);R=diag(mm)*M;max(max(abs(R-R')))
     //     LOG::cout<<"solve id "<<solve_id<<std::endl;
     //     OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
     //     OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("m-%i.txt",solve_id).c_str()).Write("m",node_mass.array);
     //     OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs);} 
-    // solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
+    solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
     // if(dump_matrix){
     //     LOG::cout<<"solve id "<<solve_id<<std::endl;
     //     OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",x);}
-    // pressure=x.v*rho/dt;
-    // vectors.Delete_Pointers_And_Clean_Memory();
+    pressure.Copy(rho/dt,x.v);
+    vectors.Delete_Pointers_And_Clean_Memory();
 }
 
 //#####################################################################
@@ -149,6 +149,8 @@ Solve_For_Pressure(const T dt,const T rho)
 template<class TV> void MPM_PROJECTION<TV>::
 Do_Projection(const T dt,const T rho)
 {
+    LOG::cout<<"Maximum velocity divergence before projection: "<<div_u.Max_Abs()<<std::endl;        
+
     T one_over_h=(T)1/mac_grid.dX.Min();
     for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_index=iterator.Full_Index();
@@ -158,6 +160,22 @@ Do_Projection(const T dt,const T rho)
         if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
             T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
             face_velocities(face_index)-=dt/rho*grad_p;}}
+
+    // check whether divergence free
+    Build_Velocity_Divergence();
+    LOG::cout<<"Maximum velocity divergence after projection: "<<div_u.Max_Abs()<<std::endl;
+}
+
+//#####################################################################
+// Function Send_Velocities_Back
+//#####################################################################
+template<class TV> void MPM_PROJECTION<TV>::
+Send_Velocities_Back()
+{
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next())
+        for(int axis=0;axis<TV::m;axis++)
+            sim.node_V(it.index)(axis)=0.5*(face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))
+                +face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index))));
 }
 
 //#####################################################################

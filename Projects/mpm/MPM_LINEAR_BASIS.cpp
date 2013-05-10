@@ -25,7 +25,7 @@ Build_Weights_And_Grad_Weight_Over_Weights(const TV& X,const GRID<TV>& grid,TV_I
 {  
     static T eps=1e-5;
     TV_INT my_corner=grid.Cell(X,0);
-    influence_corner=my_corner-1;
+    influence_corner=my_corner;
     for(int n=0;n<IN;n++){
         for(int d=0;d<TV::m;d++){
             T x=grid.one_over_dX(d)*(X(d)-(influence_corner(d)+n)*grid.dX(d)-grid.domain.min_corner(d));
