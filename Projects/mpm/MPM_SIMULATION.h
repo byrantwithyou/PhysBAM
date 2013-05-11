@@ -26,8 +26,8 @@ class MPM_SIMULATION
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
-    // enum WORKAROUND{basis_function_order=1,IN=basis_function_order+1};
     enum WORKAROUND{basis_function_order=1,IN=basis_function_order+1};
+    // enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
     //#################################################################
     // need external input
     //#################################################################

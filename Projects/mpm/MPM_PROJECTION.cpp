@@ -15,8 +15,8 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> MPM_PROJECTION<TV>::
-MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in,bool independent)
-    :sim(sim_in),independent_from_MPM(independent)
+MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
+    :sim(sim_in)
 {
     mac_grid.Initialize(sim.grid.numbers_of_cells+1,RANGE<TV>(sim.grid.domain.min_corner-sim.grid.dX*0.5,sim.grid.domain.max_corner+sim.grid.dX*0.5),true);
     face_velocities.Resize(mac_grid);
@@ -47,31 +47,18 @@ Reinitialize()
 }
 
 //#####################################################################
-// Function Load_New_Particle_Data
-//#####################################################################
-template<class TV> void MPM_PROJECTION<TV>::
-Load_New_Particle_Data(ARRAY<TV>& particle_X_in,ARRAY<TV>& particle_V_in)
-{
-    if(independent_from_MPM){
-        particle_X.Copy(particle_X_in);
-        particle_V.Copy(particle_V_in);}
-    else{
-        particle_X.Copy(sim.particles.X);
-        particle_V.Copy(sim.particles.V);}
-}
-
-//#####################################################################
 // Function Identify_Dirichlet_Cells
 //#####################################################################
 template<class TV> void MPM_PROJECTION<TV>::
 Identify_Dirichlet_Cells()
 {
-    // Cells without any particles are dirichlet cells
-    // (zero pressure, extrapolated face velocity).
+    // Criterion: the corresponding MAC cells of the nodes of the MPM cell that contain any particle are not dirichlet.
     cell_dirichlet.Fill(true);
 #pragma omp parallel for
-    for(int p=0;p<particle_X.m;p++)
-        cell_dirichlet(mac_grid.Cell(particle_X(p),0))=false;
+    for(int p=0;p<sim.particles.number;p++){
+        TV_INT MPM_cell=mac_grid.Cell(sim.particles.X(p),0);
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+2));it.Valid();it.Next())
+            cell_dirichlet(MPM_cell+it.index)=false;}
 }
 
 //#####################################################################
@@ -80,7 +67,13 @@ Identify_Dirichlet_Cells()
 template<class TV> void MPM_PROJECTION<TV>::
 Identify_Neumann_Cells()
 {
-    // TODO
+    // HMandatory wall : the third and fourth outmost MAC grid layer
+    cell_neumann.Fill(false);
+    // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+    //     for(int d=0;d<TV::m;d++){
+    //         if(it.index(d)==2 || it.index(d)==3 || it.index(d)==mac_grid.counts(d)-3 || it.index(d)==mac_grid.counts(d)-4){
+    //             cell_neumann(it.index)=true;
+    //             if(cell_dirichlet(it.index)) cell_dirichlet(it.index)=false;}}}
 }
 
 //#####################################################################
@@ -89,17 +82,23 @@ Identify_Neumann_Cells()
 template<class TV> void MPM_PROJECTION<TV>::
 Generate_Face_Velocities()
 {
-    if(independent_from_MPM){
-        // TODO: rasterize particle_V to face centers
-    }
-    else{
-        for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
-            FACE_INDEX<TV::m> face_index=iterator.Full_Index();
-            int axis=iterator.Axis(); // the axis of first_cell -> second_cell
-            TV_INT first_cell=iterator.First_Cell_Index();
-            TV_INT second_cell=iterator.Second_Cell_Index();        
-            if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)) // only deal with non-boundary faces
-                face_velocities(face_index)=0.5*(sim.node_V(first_cell)(axis)+sim.node_V(second_cell)(axis));}}
+    face_velocities.Fill((T)0);
+    ARRAY<int,FACE_INDEX<TV::dimension> > face_contributions;
+    face_contributions.Resize(mac_grid);
+    face_contributions.Fill(0);
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+        if(!cell_dirichlet(it.index)){
+            for(int axis=0;axis<TV::m;axis++){
+                FACE_INDEX<TV::m> first_face(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index));
+                FACE_INDEX<TV::m> second_face(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index));
+                face_velocities(first_face)+=sim.node_V(it.index)(axis);
+                face_velocities(second_face)+=sim.node_V(it.index)(axis);
+                face_contributions(first_face)++;
+                face_contributions(second_face)++;}}}
+    for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
+        FACE_INDEX<TV::m> face_index=iterator.Full_Index();
+        if(face_contributions(face_index)!=0)
+            face_velocities(face_index)/=face_contributions(face_index);}
 }
 
 //#####################################################################
@@ -120,6 +119,24 @@ Build_Velocity_Divergence()
 }
 
 //#####################################################################
+// Function Fix_RHS_Neumann_Cells
+//#####################################################################
+template<class TV> void MPM_PROJECTION<TV>::
+Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs)
+{
+    T one_over_h=(T)1/mac_grid.dX.Min();
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+mac_grid.counts));it.Valid();it.Next()){
+        if(!cell_dirichlet(it.index) && !cell_neumann(it.index)){ // cell is fluid
+            for(int d=0;d<TV::m;d++){
+                TV_INT left_index=it.index;left_index(d)--;
+                TV_INT right_index=it.index;right_index(d)++;
+                if(cell_neumann(left_index))
+                    rhs(it.index)-=one_over_h*face_velocities(FACE_INDEX<TV::m>(d,mac_grid.First_Face_Index_In_Cell(d,it.index)));
+                if(cell_neumann(right_index))
+                    rhs(it.index)+=one_over_h*face_velocities(FACE_INDEX<TV::m>(d,mac_grid.Second_Face_Index_In_Cell(d,it.index)));}}}
+}
+
+//#####################################################################
 // Function Solve_For_Pressure
 // The equation is -div(dt/rho*grad(p))=-div(u)
 //#####################################################################
@@ -133,6 +150,7 @@ Solve_For_Pressure(const T dt,const T rho)
     x.v.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
     rhs.v.Copy(-1,div_u);
+    Fix_RHS_Neumann_Cells(rhs.v);
     x.v=rhs.v; // x=dt/rho*p (for constant rho)
     system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
@@ -161,6 +179,12 @@ Do_Projection(const T dt,const T rho)
         if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
             T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
             face_velocities(face_index)-=dt/rho*grad_p;}}
+    // Enforce face velocities for neumann cells
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+        if(cell_neumann(it.index)){
+            for(int d=0;d<TV::m;d++){
+                face_velocities(FACE_INDEX<TV::m>(d,mac_grid.First_Face_Index_In_Cell(d,it.index)))=T(0);
+                face_velocities(FACE_INDEX<TV::m>(d,mac_grid.Second_Face_Index_In_Cell(d,it.index)))=T(0);}}}
     // check whether divergence free
     Build_Velocity_Divergence();
     LOG::cout<<"Maximum velocity divergence after projection: "<<div_u.Max_Abs()<<std::endl;
@@ -172,11 +196,16 @@ Do_Projection(const T dt,const T rho)
 template<class TV> void MPM_PROJECTION<TV>::
 Send_Velocities_Back_To_MPM_Grid()
 {
-    PHYSBAM_ASSERT(!independent_from_MPM);
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next())
-        for(int axis=0;axis<TV::m;axis++)
-            sim.node_V(it.index)(axis)=0.5*(face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))
-                +face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index))));
+    
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+        if(!cell_dirichlet(it.index)){
+            sim.node_V(it.index)=TV();
+            for(int axis=0;axis<TV::m;axis++){
+                FACE_INDEX<TV::m> first_face(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index));
+                FACE_INDEX<TV::m> second_face(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index));
+                sim.node_V(it.index)(axis)+=face_velocities(first_face);
+                sim.node_V(it.index)(axis)+=face_velocities(second_face);}
+            sim.node_V(it.index)/=2*TV::m;}}
 }
 
 //#####################################################################

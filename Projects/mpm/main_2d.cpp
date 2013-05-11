@@ -115,30 +115,16 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         case 3: // snow 
             sim.grid.Initialize(TV_INT(1.0*grid_res+1,0.8*grid_res+1),RANGE<TV>(TV(-0.5,-0.4),TV(0.5,0.4)));
             sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.3,-0.1),TV(-0.1,0.1)));
-
             sim.particles.Add_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(0.1,-0.1),TV(0.3,0.1)));
             for(int p=0;p<sim.particles.number;p++){
                 if(sim.particles.X(p).x<0) sim.particles.V(p)=TV(2,0);
                 if(sim.particles.X(p).x>0) sim.particles.V(p)=TV(-2,0);}
-
-            // sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.3),0.05));
-            // sim.rigid_ball_velocity.Append(TV());
-            // sim.rigid_ball.Append(SPHERE<TV>(TV(0.13,-0.3),0.05));
-            // sim.rigid_ball_velocity.Append(TV());
+            sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.2),0.05));
+            sim.rigid_ball_velocity.Append(TV());
             break;
         case 4: // notch
             sim.grid.Initialize(TV_INT(2*grid_res+1,2*grid_res+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
-            // sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res+1,0.4*particle_res+1),RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)),particle_exclude_radius);
-            // sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)));
-            sim.particles.Reduce_X_As_A_Ball(RANGE<TV>(TV(0.06,-0.04),TV(0.14,0.04)));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.15,-0.23),TV(0.15,-0.17)));
-            sim.dirichlet_velocity.Append(TV(0,-0.2));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.15,0.17),TV(0.15,0.23)));
-            sim.dirichlet_velocity.Append(TV(0,0.2));
-            break;
-        case 5: // simple example for debug
-            sim.grid.Initialize(TV_INT(5,4),RANGE<TV>(TV(-4,-3),TV(4,3)));
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.4,-0.2),TV(0.4,0.2)));
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -220,14 +206,15 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         case 3:
             object_density=(T)400*density_scale;
             object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
-            ym*=0;
+            ym*=1e5;
             for(int p=0;p<sim.particles.number;p++){
                 T this_ym=ym;
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
-            // sim.use_plasticity_yield=true;
-            // sim.yield_min=(T)1-(T)0.025;
-            // sim.yield_max=(T)1+(T)0.0075;
+            sim.use_gravity=true;
+            sim.use_plasticity_yield=true;
+            sim.yield_min=(T)1-(T)0.025;
+            sim.yield_max=(T)1+(T)0.0075;
             break;
         case 4:
             object_density=(T)1200*density_scale;
@@ -239,16 +226,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
             sim.use_gravity=false;
-            sim.use_plasticity_yield=true;
-            sim.yield_min=-100;
-            sim.yield_max=1.3;
-            break;
-        case 5:
-            object_density=(T)400*density_scale;
-            object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
-            ym*=(T)1e6;
-            sim.mu.Fill(ym/((T)2*((T)1+pr)));
-            sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
     for(int p=0;p<sim.particles.number;p++){
@@ -258,14 +235,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     sim.mu0=sim.mu;
     sim.lambda0=sim.lambda;
 
-    if(test_number==5){
-        for(int i=0;i<sim.grid.counts.x;i++)
-            for(int j=0;j<sim.grid.counts.y;j++)
-                sim.node_V(TV_INT(i,j)).Set(i*i,j*j);
-    }
-
     // projection init
-    MPM_PROJECTION<TV> projection(sim,true);
+    MPM_PROJECTION<TV> projection(sim);
 
     // use voronoi polygon to initialize particle mass and volume and particle domain
     if(use_voronoi || use_voronoi_boundary){
@@ -324,7 +295,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             Add_Debug_Particle(sim.rigid_ball(b).center+disp,VECTOR<T,3>(0,0,1));}}
 
     // draw MPM particles
-    for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+    for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
 
     Flush_Frame<TV>("mpm");
 
@@ -332,32 +303,38 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         TIMING_START;
         LOG::cout<<"MPM TIMESTEP "<<f<<std::endl;
 
-        // MPM step
-        ARRAY<TV> X_before_MPM(sim.particles.X);
-        sim.Advance_One_Time_Step_Backward_Euler();
-        ARRAY<TV> candidate_V_from_MPM; candidate_V_from_MPM.Copy(sim.particles.V);
-
-        TIMING_END("Current MPM time step totally");
-
-        // projection step
-        LOG::cout<<"PROJECTION TIMESTEP "<<f<<std::endl;
+        sim.Build_Weights_And_Grad_Weights();
+        sim.Build_Helper_Structures_For_Constitutive_Model();
+        sim.Rasterize_Particle_Data_To_The_Grid();
+        if(sim.frame==0 && !sim.assigned_volume_externally) sim.Compute_Particle_Volumes_And_Densities();
+        sim.Compute_Grid_Forces();
+        if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
+        sim.Update_Velocities_On_Grid();
+        sim.Grid_Based_Body_Collisions();
+        sim.Solve_The_Linear_System(); // so far sim.node_V is achieved via MPM
         if(use_projection){
             projection.Reinitialize();
-            projection.Load_New_Particle_Data(X_before_MPM,candidate_V_from_MPM);
             projection.Identify_Dirichlet_Cells();
             projection.Identify_Neumann_Cells();
-            projection.Generate_Face_Velocities();
-            projection.Build_Velocity_Divergence();
-            projection.Solve_For_Pressure(sim.dt,1);
-            projection.Do_Projection(sim.dt,1);
-            // projection.Interpolate_Velocities_Back_To_Particles(sim.particles.V,(T)0.95);
-            // TODO: sim.particles.X=
-        }
+            projection.Generate_Face_Velocities();}
+            // projection.Build_Velocity_Divergence();
+            // projection.Solve_For_Pressure(sim.dt,1);
+            // projection.Do_Projection(sim.dt,1);
+            // projection.Send_Velocities_Back_To_MPM_Grid();}
+        sim.Update_Deformation_Gradient();
+        sim.Update_Particle_Velocities();
+        sim.Particle_Based_Body_Collisions();
+        sim.Update_Particle_Positions();
+        sim.Update_Dirichlet_Box_Positions();
+        sim.Update_Colliding_Object_Positions();
+        sim.frame++;
+
+        TIMING_END("Current MPM time step totally");
 
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
-                if(!sim.failed(i) && sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+                if(!sim.failed(i) && sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
                 else if(sim.failed(i) && sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,1));
                 else Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));}
 
@@ -425,7 +402,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
 int main(int argc,char *argv[])
 {
-    // ./mpm_2d -test 3 -gres 80 -pn 5000 -dt 1e-3 -stiffness 0.05 -hardening 10
+    // ./mpm_2d -test 3 -gres 160 -pn 5000 -dt 1e-4 -fj 80 -hardening 10
 
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Parse(true);
