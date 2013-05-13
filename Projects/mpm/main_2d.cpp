@@ -93,6 +93,27 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     T object_density=1;
     T object_mass=1;
 
+
+    {
+        GRID<TV> g(TV_INT(4,3),RANGE<TV>(TV(-3,-2),TV(3,2)));
+        
+        for(int axis=0;axis<2;axis++){
+            for(int face=0;face<2;face++){
+                TV_INT node(2,1);
+                TV_INT face_index=g.Node_Face_Index(axis,node,face);
+                LOG::cout<<"node "<<node<<std::endl;
+                LOG::cout<<"axis "<<axis<<" face "<<face<<" face_index "<<face_index<<std::endl;}}
+        
+        for(int axis=0;axis<2;axis++){
+            for(int face=0;face<2;face++){
+                TV_INT node(3,1);
+                TV_INT face_index=g.Node_Face_Index(axis,node,face);
+                LOG::cout<<"node "<<node<<std::endl;
+                LOG::cout<<"axis "<<axis<<" face "<<face<<" face_index "<<face_index<<std::endl;}}
+    }
+
+
+
     // geometry setting
     switch(test_number){
         case 1: // stretching beam
@@ -316,11 +337,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             projection.Reinitialize();
             projection.Identify_Dirichlet_Cells();
             projection.Identify_Neumann_Cells();
-            projection.Generate_Face_Velocities();}
+            projection.Velocities_Corners_To_faces();
             // projection.Build_Velocity_Divergence();
             // projection.Solve_For_Pressure(sim.dt,1);
             // projection.Do_Projection(sim.dt,1);
-            // projection.Send_Velocities_Back_To_MPM_Grid();}
+            // projection.Velocities_Faces_To_Corners();
+        }
         sim.Update_Deformation_Gradient();
         sim.Update_Particle_Velocities();
         sim.Particle_Based_Body_Collisions();
@@ -340,17 +362,17 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
             // projection: visualize MAC grid velocities
             if(use_projection){
-                // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
-                //     Add_Debug_Particle(projection.mac_grid.X(it.index),VECTOR<T,3>(1,0,0)); // cell centers: red
-                //     Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));}
+                for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
+                    Add_Debug_Particle(projection.mac_grid.X(it.index),VECTOR<T,3>(1,0,0)); // cell centers: red
+                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));}
                 for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
                     TV location=iterator.Location();
                     int axis=iterator.Axis();
                     if(axis==0){
-                        Add_Debug_Particle((location),VECTOR<T,3>(0,0,0)); // face centers with x component velocity: green
+                        Add_Debug_Particle((location),VECTOR<T,3>(0,1,0)); // face centers with x component velocity: green
                         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(projection.face_velocities(iterator.Full_Index()),0));}
                     else if(axis==1){
-                        Add_Debug_Particle((location),VECTOR<T,3>(0,0,0)); // face centers with y component velocity: blue
+                        Add_Debug_Particle((location),VECTOR<T,3>(0,0,1)); // face centers with y component velocity: blue
                         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(0,projection.face_velocities(iterator.Full_Index())));}}}
 
             // Zhu and Bridson
@@ -403,6 +425,16 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 int main(int argc,char *argv[])
 {
     // ./mpm_2d -test 3 -gres 160 -pn 5000 -dt 1e-4 -fj 80 -hardening 10
+
+
+
+
+
+
+
+
+
+
 
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Parse(true);

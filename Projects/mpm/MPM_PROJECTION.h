@@ -20,7 +20,7 @@ class MPM_PROJECTION
 public:
     MPM_SIMULATION<TV>& sim;
 
-    GRID<TV> mac_grid; // One cell wider than MPM grid so that MPM grid v lives on cell centers of mac_grid.
+    GRID<TV> mac_grid;
     ARRAY<bool,TV_INT> cell_dirichlet;
     ARRAY<bool,TV_INT> cell_neumann;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
@@ -33,11 +33,11 @@ public:
     void Reinitialize();
     void Identify_Dirichlet_Cells();
     void Identify_Neumann_Cells();
-    void Generate_Face_Velocities();
+    void Velocities_Corners_To_faces();
     void Build_Velocity_Divergence();
     void Solve_For_Pressure(const T dt,const T rho);
     void Do_Projection(const T dt,const T rho);
-    void Send_Velocities_Back_To_MPM_Grid();
+    void Velocities_Faces_To_Corners();
 
     void Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs);
 };

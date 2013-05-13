@@ -18,7 +18,7 @@ template<class TV> MPM_PROJECTION<TV>::
 MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     :sim(sim_in)
 {
-    mac_grid.Initialize(sim.grid.numbers_of_cells+1,RANGE<TV>(sim.grid.domain.min_corner-sim.grid.dX*0.5,sim.grid.domain.max_corner+sim.grid.dX*0.5),true);
+    mac_grid.Initialize(sim.grid.numbers_of_cells,RANGE<TV>(sim.grid.domain.min_corner,sim.grid.domain.max_corner),true);
     face_velocities.Resize(mac_grid);
     cell_dirichlet.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     cell_neumann.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
@@ -52,13 +52,12 @@ Reinitialize()
 template<class TV> void MPM_PROJECTION<TV>::
 Identify_Dirichlet_Cells()
 {
-    // Criterion: the corresponding MAC cells of the nodes of the MPM cell that contain any particle are not dirichlet.
     cell_dirichlet.Fill(true);
 #pragma omp parallel for
     for(int p=0;p<sim.particles.number;p++){
-        TV_INT MPM_cell=mac_grid.Cell(sim.particles.X(p),0);
-        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+2));it.Valid();it.Next())
-            cell_dirichlet(MPM_cell+it.index)=false;}
+        PHYSBAM_ASSERT(mac_grid.Cell(sim.particles.X(p),0)==sim.grid.Cell(sim.particles.X(p),0));
+        TV_INT cell=mac_grid.Cell(sim.particles.X(p),0);
+        cell_dirichlet(cell)=false;}
 }
 
 //#####################################################################
@@ -77,28 +76,27 @@ Identify_Neumann_Cells()
 }
 
 //#####################################################################
-// Function Generate_Face_Velocities
+// Function Velocities_Corners_To_faces
 //#####################################################################
 template<class TV> void MPM_PROJECTION<TV>::
-Generate_Face_Velocities()
+Velocities_Corners_To_faces()
 {
-    face_velocities.Fill((T)0);
-    ARRAY<int,FACE_INDEX<TV::dimension> > face_contributions;
-    face_contributions.Resize(mac_grid);
-    face_contributions.Fill(0);
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
-        if(!cell_dirichlet(it.index)){
-            for(int axis=0;axis<TV::m;axis++){
-                FACE_INDEX<TV::m> first_face(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index));
-                FACE_INDEX<TV::m> second_face(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index));
-                face_velocities(first_face)+=sim.node_V(it.index)(axis);
-                face_velocities(second_face)+=sim.node_V(it.index)(axis);
-                face_contributions(first_face)++;
-                face_contributions(second_face)++;}}}
-    for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
-        FACE_INDEX<TV::m> face_index=iterator.Full_Index();
-        if(face_contributions(face_index)!=0)
-            face_velocities(face_index)/=face_contributions(face_index);}
+    
+
+    // face_velocities.Fill((T)0);
+    // if(TV::m==2){
+    //     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+    //         if(!cell_dirichlet(it.index)){
+    //             FACE_INDEX<TV::m> x_axis_first_face(0,mac_grid.First_Face_Index_In_Cell(0,it.index));
+    //             face_velocities(x_axis_first_face)=0.5*(sim.node_V(it.index)(0)+sim.node_V(it.index+TV::Axis_Vector(1))(0));
+    //             FACE_INDEX<TV::m> x_axis_second_face(0,mac_grid.Second_Face_Index_In_Cell(0,it.index));
+    //             face_velocities(x_axis_second_face)=0.5*(sim.node_V(it.index+TV::Axis_Vector(0))(0)+sim.node_V(it.index+TV::Axis_Vector(0)+TV::Axis_Vector(1))(0));
+    //             FACE_INDEX<TV::m> y_axis_first_face(1,mac_grid.First_Face_Index_In_Cell(1,it.index));
+    //             face_velocities(y_axis_first_face)=0.5*(sim.node_V(it.index)(1)+sim.node_V(it.index+TV::Axis_Vector(0))(1));
+    //             FACE_INDEX<TV::m> y_axis_second_face(1,mac_grid.Second_Face_Index_In_Cell(1,it.index));
+    //             face_velocities(y_axis_second_face)=0.5*(sim.node_V(it.index+TV::Axis_Vector(1))(1)+sim.node_V(it.index+TV::Axis_Vector(1)+TV::Axis_Vector(0))(1));}}}
+    // else if(TV::m==3)
+    //     PHYSBAM_FATAL_ERROR("3d not implemented");
 }
 
 //#####################################################################
@@ -191,21 +189,13 @@ Do_Projection(const T dt,const T rho)
 }
 
 //#####################################################################
-// Function Send_Velocities_Back_To_MPM_Grid
+// Function Velocities_Faces_To_Corners
 //#####################################################################
 template<class TV> void MPM_PROJECTION<TV>::
-Send_Velocities_Back_To_MPM_Grid()
+Velocities_Faces_To_Corners()
 {
-    
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
-        if(!cell_dirichlet(it.index)){
-            sim.node_V(it.index)=TV();
-            for(int axis=0;axis<TV::m;axis++){
-                FACE_INDEX<TV::m> first_face(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index));
-                FACE_INDEX<TV::m> second_face(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index));
-                sim.node_V(it.index)(axis)+=face_velocities(first_face);
-                sim.node_V(it.index)(axis)+=face_velocities(second_face);}
-            sim.node_V(it.index)/=2*TV::m;}}
+ 
+
 }
 
 //#####################################################################
