@@ -166,7 +166,7 @@ public:
     assert((unsigned)face<4&&(unsigned)axis<3);return node_index+face_from_node_offset[axis][face];}
 
     static TV_INT Node_Face_Index(const int axis,const VECTOR<int,2>& node_index,const int face)
-    {assert((unsigned)face<2);TV_INT index=node_index;index[1-axis]+=face-2;return index;}
+    {assert((unsigned)face<2);TV_INT index=node_index;index[1-axis]+=face-1;return index;}
 
     static TV_INT Node_Face_Index(const int axis,const VECTOR<int,1>& node_index,const int face)
     {assert(axis==0&&face==0);return node_index;}
