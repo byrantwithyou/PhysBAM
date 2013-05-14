@@ -39,12 +39,14 @@ public:
     ARRAY<TV,TV_INT> location;        // flat index to location
     ARRAY<TV_INT,TV_INT> index;       // flat to vector index
     
+    T cfl;
+    T frame_dt;
     int frames;
     int timesteps;
     T mu,nu,epsilon;
     T dt,one_over_dx_squared;
     
-    MPLE_DRIVER():frames(100),timesteps(10),mu(.1),nu(.1){}
+    MPLE_DRIVER():cfl((T)1),frame_dt((T)1/24),frames(100),mu(5e-4),nu(.05){}
 
     ~MPLE_DRIVER(){}
 
@@ -67,8 +69,9 @@ public:
         for(int i=0;i<points.m;i++)
             points(i).Update_Base_And_Weights(grid);
 
-        dt=sqr(grid.dX(0))/(2*(TV::m+1));
-        epsilon=3*grid.dX(0);
+        dt=cfl*sqr(grid.dX(0))/(2*(TV::m+1));
+        timesteps=(int)(frame_dt/dt);
+        epsilon=grid.dX(0);
         one_over_dx_squared=1/sqr(grid.dX(0));
         PHYSBAM_ASSERT(grid.dX.Min()==grid.dX.Max());
     }
@@ -116,8 +119,9 @@ public:
             if(u_new.array(i)<0) u_new.array(i)=0;
     }
 
-    void Advance_Frame()
+    void Advance_Frame(int frame)
     {
+        LOG::cout<<"Frame "<<frame<<std::endl;
         for(int i=0;i<timesteps;i++){
             Diffusion_Step();
             Rasterization_Step();
@@ -130,7 +134,7 @@ public:
         Initialize();
         Write("Frame 0");
         for(int k=1;k<=frames;k++){
-            Advance_Frame();
+            Advance_Frame(k);
             char buff[100];
             sprintf(buff,"Frame %d",k);
             Write(buff);}

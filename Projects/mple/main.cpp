@@ -4,13 +4,14 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include "MPLE_DRIVER.h"
 
 using namespace PhysBAM;
 
-const int w=4;
+const int w=2;
 const int d=2;
 
 typedef float RW;
@@ -23,25 +24,55 @@ int main(int argc,char* argv[])
     LOG::Initialize_Logging();
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Parse(true);
+
+    bool use_test=false;
+    int test_number=-1;
+    bool use_output_directory=false;
+    std::string output_directory="output";
+    MPLE_DRIVER<TV,w> mple;
     RANDOM_NUMBERS<T> random;
     random.Set_Seed(0);
-
-    MPLE_DRIVER<TV,w> mple;
-    const RANGE<TV> domain(TV(-.5,-.5),TV(.5,.5));
-    const TV_INT counts(TV_INT(25,25));
-    mple.grid.Initialize(counts+1,domain);
-
-    std::string output_directory="output";
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),mple.grid,output_directory);
-
-    const int number_of_points=250; 
-    const RANGE<TV> block(TV(-.3,-.3),TV(.3,.3));
+    int resolution=32;
+    int number_of_points=250;
     
-    for(int i=0;i<number_of_points;i++){
-        MPLE_POINT<TV,w> point;
-        point.X=random.Get_Uniform_Vector(block);
-        mple.points.Append(point);}
+    parse_args.Add("-test",&test_number,&use_test,"test","test number");
+    parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
+    parse_args.Add("-mu",&mple.mu,"mu","Source power");
+    parse_args.Add("-nu",&mple.nu,"nu","Small parameter");
+    parse_args.Add("-frames",&mple.frames,"frames","Number of frames");
+    parse_args.Add("-frame_dt",&mple.frame_dt,"frame_dt","Frame dt");
+    parse_args.Add("-cfl",&mple.cfl,"cfl","CFL number");
+    parse_args.Add("-resolution",&resolution,"resolution","Grid resolution");
+    parse_args.Add("-points",&number_of_points,"points","Number of sample points");
+    parse_args.Parse(true);
+    parse_args.Parse();
 
+    if(!use_test){LOG::cerr<<"Test number is required."<<std::endl;exit(-1);}
+    if(!use_output_directory) output_directory="output";
+
+    switch(test_number){
+        case 1:{
+            const RANGE<TV> domain(TV(-.75,-.75),TV(.75,.75));
+            const TV_INT counts(TV_INT(resolution,resolution));
+            mple.grid.Initialize(counts+1,domain);
+            const RANGE<TV> block(TV(-.3,-.3),TV(.3,.3));
+            for(int i=0;i<number_of_points;i++){
+                MPLE_POINT<TV,w> point;
+                point.X=random.Get_Uniform_Vector(block);
+                mple.points.Append(point);}}
+            break;
+        default:{LOG::cerr<<"Unknown test number"<<std::endl;exit(-1);}}
+
+    LOG::cout<<"### PARAMETERS ###"<<std::endl;
+    LOG::cout<<"cfl "<<mple.cfl<<std::endl;
+    LOG::cout<<"frame_dt "<<mple.frame_dt<<std::endl;
+    LOG::cout<<"frames "<<mple.frames<<std::endl;
+    LOG::cout<<"mu "<<mple.mu<<std::endl;
+    LOG::cout<<"nu "<<mple.nu<<std::endl;
+        
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),mple.grid,output_directory);
     mple.Run();
 
     LOG::Finish_Logging();
