@@ -23,7 +23,7 @@ int main(int argc,char* argv[])
     vector<string> tokens;
     desc.add_options()
         ("help,h","usage info")
-        ("priority,p",po::value<int>(&priority)->default_value(priority),"job priority [0, 100]")
+        ("priority,p",po::value<int>(&priority)->default_value(priority),"job priority")
         ("depends,d",po::value<vector<int> >(&deps),"depends on this job id")
         ("token,t",po::value<vector<string> >(&tokens),"command to run")
         ("name,n",po::value<string>(&name)->default_value(name),"batch queue name")
