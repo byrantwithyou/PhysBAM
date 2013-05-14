@@ -180,17 +180,17 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             break;
         case 3: // snow 
             sim.grid.Initialize(TV_INT(1.0*grid_res+1,0.8*grid_res+1),RANGE<TV>(TV(-0.5,-0.4),TV(0.5,0.4)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.3,-0.3),TV(-0.1,0.2)));
-            // sim.particles.Add_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(0.1,-0.1),TV(0.3,0.1)));
-            // for(int p=0;p<sim.particles.number;p++){
-            //     if(sim.particles.X(p).x<0) sim.particles.V(p)=TV(2,0);
-            //     if(sim.particles.X(p).x>0) sim.particles.V(p)=TV(-2,0);}
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.3,-0.1),TV(-0.1,0.1)));
+            sim.particles.Add_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(0.1,-0.05),TV(0.3,0.15)));
+            for(int p=0;p<sim.particles.number;p++){
+                if(sim.particles.X(p).x<0) sim.particles.V(p)=TV(2,0);
+                if(sim.particles.X(p).x>0) sim.particles.V(p)=TV(-2,0);}
             // sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.2),0.05));
             // sim.rigid_ball_velocity.Append(TV());
             break;
-        case 4: // notch
+        case 4: // stretched cube
             sim.grid.Initialize(TV_INT(2*grid_res+1,2*grid_res+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.4,-0.2),TV(0.4,0.2)));
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.2,-0.05),TV(0.2,0.05)));
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -273,9 +273,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         case 3:
             object_density=(T)400*density_scale;
             object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
-            ym*=1e5;
+            ym*=(T)5e3;
             for(int p=0;p<sim.particles.number;p++){
-                T this_ym=0;
+                T this_ym=ym;
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
             sim.use_gravity=true;
@@ -288,8 +288,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)).Size()-SPHERE<TV>(TV(0.1,0),0.04).Size());
             ym*=(T)5e3;
             for(int p=0;p<sim.particles.number;p++){
-                T alpha=1;
-                T this_ym=((T)1-alpha)/(T)0.04*ym*sqr(sim.particles.X(p)(1))+alpha*ym;
+                // T alpha=1;
+                // T this_ym=((T)1-alpha)/(T)0.04*ym*sqr(sim.particles.X(p)(1))+alpha*ym;
+                T this_ym=ym;
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
             sim.use_gravity=false;
@@ -301,6 +302,14 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();}
     sim.mu0=sim.mu;
     sim.lambda0=sim.lambda;
+
+    switch(test_number){
+        case 4:
+            for(int p=0;p<sim.particles.number;p++)
+                sim.particles.Fe(p)=MATRIX<T,TV::m>(2,0,0,0.5);
+        default:
+            break;
+    };
 
     // projection init
     MPM_PROJECTION<TV> projection(sim);
@@ -377,7 +386,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Compute_Grid_Forces();
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
         sim.Update_Velocities_On_Grid();
-        // sim.Grid_Based_Body_Collisions();
+        if(!use_projection) sim.Grid_Based_Body_Collisions();
         sim.Solve_The_Linear_System(); // so far sim.node_V is achieved via MPM
         if(use_projection){
             projection.Reinitialize();
