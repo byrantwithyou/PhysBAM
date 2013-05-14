@@ -82,7 +82,7 @@ else:
 env.Replace(ENV=os.environ) # do this here to allow SConstruct.options to change environment
 Help(variables.GenerateHelpText(env))
 if env["USE_OPENMP"]:
-    CXXFLAGS_EXTRA.Append('-fopenmp');
+    env.Append(CXXFLAGS_EXTRA='-fopenmp');
 
 ### improve performance
 if 'Decider' in dir(env): # if Decider exists, use it to avoid deprecation warnings
