@@ -358,7 +358,7 @@ public:
                 vel0->Add(new ANALYTIC_VELOCITY_CONST<TV>(TV(0,0)));
                 analytic_velocity.Append(vel0);
                 use_level_set_method=true;
-                use_p_null_mode=true;                
+                use_p_null_mode=false;                
                 break;}
 //            case 112:{ //This will be gone by tomorrow night!
 //                grid.Initialize(TV_INT(2*resolution,resolution),RANGE<TV>(TV(0,0),TV(20,10))*m,true);
