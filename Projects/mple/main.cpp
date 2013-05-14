@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Matrices/ROTATION.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
@@ -39,6 +40,7 @@ int main(int argc,char* argv[])
     
     parse_args.Add("-test",&test_number,&use_test,"test","test number");
     parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
+    parse_args.Add("-spread",&mple.spread,"spread","Interface spread int cells");
     parse_args.Add("-mu",&mple.mu,"mu","Source power");
     parse_args.Add("-nu",&mple.nu,"nu","Small parameter");
     parse_args.Add("-frames",&mple.frames,"frames","Number of frames");
@@ -58,9 +60,10 @@ int main(int argc,char* argv[])
             const TV_INT counts(TV_INT(resolution,resolution));
             mple.grid.Initialize(counts+1,domain);
             const RANGE<TV> block(TV(-.3,-.3),TV(.3,.3));
+            const ROTATION<TV> rotation=ROTATION<TV>::From_Angle(45);
             for(int i=0;i<number_of_points;i++){
                 MPLE_POINT<TV,w> point;
-                point.X=random.Get_Uniform_Vector(block);
+                point.X=rotation.Rotate(random.Get_Uniform_Vector(block));
                 mple.points.Append(point);}}
             break;
         default:{LOG::cerr<<"Unknown test number"<<std::endl;exit(-1);}}
