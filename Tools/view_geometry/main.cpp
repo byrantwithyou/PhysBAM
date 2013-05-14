@@ -161,7 +161,7 @@ template<class T> void Add_File(const std::string& filename,OPENGL_WORLD& world,
 //#################################################################
 template<class T> void Add_Box_File(const std::string& filename,OPENGL_WORLD& world,int number)
 {
-    typedef VECTOR<T,3> TV;
+//    typedef VECTOR<T,3> TV;
     try{
         // BOX<TV>* box=new BOX<TV>;
         // FILE_UTILITIES::Read_From_File<T>(filename,*box);

@@ -25,8 +25,8 @@ using namespace PhysBAM;
 int main(int argc,char* argv[])
 {
     typedef double T;
-    typedef float RW;
-    typedef VECTOR<T,2> TV;
+//    typedef float RW;
+//    typedef VECTOR<T,2> TV;
     PARSE_ARGS parse_args(argc,argv);
     
     /*bool use_extended_neohookean;

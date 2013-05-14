@@ -39,13 +39,10 @@ template<int i> struct INTS_EQUAL<i,i> {static const bool value=true;};
 template<class T1,class T2> struct IS_SAME {static const bool value=false;};
 template<class T> struct IS_SAME<T,T> {static const bool value=true;};
 
-template<class T1,class T2> struct ASSERT_SAME_HELPER;
-template<class T> struct ASSERT_SAME_HELPER<T,T>{};
+template<class T1,class T2> struct ASSERT_SAME_HELPER{static const bool value=false;};
+template<class T> struct ASSERT_SAME_HELPER<T,T>{static const bool value=true;};
 
-#define STATIC_ASSERT_SAME(T1,T2) \
-   typedef static_assert_test< \
-      sizeof(::PhysBAM::ASSERT_SAME_HELPER<T1,T2>)> \
-         PHYSBAM_JOIN(boost_static_assert_typedef_, __LINE__)
+#define STATIC_ASSERT_SAME(T1,T2) static_assert(::PhysBAM::ASSERT_SAME_HELPER<T1,T2>::value,"")
 
 template<class T> struct IS_CONST {static const bool value=false;};
 template<class T> struct IS_CONST<const T> {static const bool value=true;};

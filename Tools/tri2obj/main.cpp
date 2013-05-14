@@ -10,7 +10,7 @@ using namespace PhysBAM;
 
 template<class T,class RW> void Convert(const std::string& input_filename,const std::string& output_filename)
 {
-    typedef VECTOR<T,3> TV;
+//    typedef VECTOR<T,3> TV;
 
     TRIANGULATED_SURFACE<T>* triangulated_surface=0;FILE_UTILITIES::Create_From_File<RW>(input_filename,triangulated_surface);
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(output_filename,false);

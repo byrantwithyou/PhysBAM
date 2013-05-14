@@ -189,6 +189,7 @@ template<class TV>
 struct ANALYTIC_VELOCITY_F:public ANALYTIC_VELOCITY<TV>
 {
     typedef typename TV::SCALAR T;
+    using ANALYTIC_VELOCITY<TV>::u;using ANALYTIC_VELOCITY<TV>::du;using ANALYTIC_VELOCITY<TV>::p;
 
     T rho,mu;
     bool use_advection;

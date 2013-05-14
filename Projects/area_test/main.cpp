@@ -442,8 +442,8 @@ void Volume_From_Simplices_Test()
 int main(int argc,char *argv[])
 {
     typedef double T;
-    typedef double RW;
-    typedef VECTOR<T,2> TV;
+//    typedef double RW;
+//    typedef VECTOR<T,2> TV;
     LOG::cout<<std::setprecision(16);
 
 #if 0

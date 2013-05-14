@@ -135,9 +135,9 @@ void Derivative_Test()
 
 int main(int argc,char *argv[])
 {
-    typedef double T;
-    typedef double RW;
-    typedef VECTOR<T,3> TV;
+//    typedef double T;
+//    typedef double RW;
+//    typedef VECTOR<T,3> TV;
     LOG::cout<<std::setprecision(16);
 
 //    if(0)

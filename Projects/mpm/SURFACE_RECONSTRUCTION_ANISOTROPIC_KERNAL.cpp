@@ -52,11 +52,13 @@ Compute_Kernal_Centers_And_Transformation_And_Density(const ARRAY_VIEW<TV>& X,co
         buckets.Get_Or_Insert(TV_INT(floor(X(i)/r))).Append(i);
     // close pairs
     T r2=r*r;
+    RANGE<TV_INT> range(TV_INT()-1,TV_INT()+2);
     ARRAY<TRIPLE<int,int,T> > pairs;
     for(typename HASHTABLE<TV_INT,ARRAY<int> >::ITERATOR it(buckets);it.Valid();it.Next()){
         const ARRAY<int>& l0=it.Data();
-        for(RANGE_ITERATOR<TV::m> it2(RANGE<TV_INT>(it.Key()-1,it.Key()+2));it2.Valid();it2.Next()){
-            if(const ARRAY<int>* l1=buckets.Get_Pointer(it2.index)){
+        TV_INT key=it.Key();
+        for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
+            if(const ARRAY<int>* l1=buckets.Get_Pointer(it2.index+key)){
                 for(int i=0;i<l0.m;i++)
                     for(int j=0;j<l1->m;j++)
                         if(l0(i)<(*l1)(j)){

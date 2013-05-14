@@ -73,7 +73,7 @@ namespace
     unsigned long glVersion()
     {
         // If this fails...assume OpenGL version >= 1.2 ???
-        PHYSBAM_STATIC_ASSERT((sizeof( GLubyte ) == sizeof( char )));
+        static_assert((sizeof( GLubyte ) == sizeof( char )),"need GLubyte to be char");
         const char* p = reinterpret_cast< const char* >(glGetString(GL_VERSION));
         assert(p && *p);
         const unsigned long gl_version_major_number = std::strtoul(p, 0, 10);
