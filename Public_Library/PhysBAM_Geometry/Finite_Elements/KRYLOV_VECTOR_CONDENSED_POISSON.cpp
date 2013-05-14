@@ -120,12 +120,17 @@ Dot(const KRYLOV_VECTOR_CONDENSED_POISSON<TV>& w) const
 {
     T result=0;
 #ifdef USE_OPENMP
+    int number_of_threads;
+#pragma omp parallel    
+#pragma omp master    
+    number_of_threads=omp_get_num_threads();
+    ARRAY<T> result_per_thread(number_of_threads);
     result_per_thread.Fill(0);
 #pragma omp parallel for
         for(int i=0;i<v.m;i++){
             const int tid=omp_get_thread_num();
             result_per_thread(tid)+=v(i)*w.v(i);}
-    for(int tid=0;tid<threads;tid++)
+    for(int tid=0;tid<number_of_threads;tid++)
         result+=result_per_thread(tid);
 #else
         for(int i=0;i<v.m;i++)
@@ -139,6 +144,11 @@ Dot(const KRYLOV_VECTOR_CONDENSED_POISSON<TV>& w) const
 template<class TV> typename TV::SCALAR KRYLOV_VECTOR_CONDENSED_POISSON<TV>::Max_Abs() const
 {
 #ifdef USE_OPENMP
+    int number_of_threads;
+#pragma omp parallel    
+#pragma omp master    
+    number_of_threads=omp_get_num_threads();
+    ARRAY<T> result_per_thread(number_of_threads);
     result_per_thread.Fill(0);
 #pragma omp parallel for
         for(int i=0;i<v.m;i++){
@@ -147,7 +157,7 @@ template<class TV> typename TV::SCALAR KRYLOV_VECTOR_CONDENSED_POISSON<TV>::Max_
             T current=fabs(v(i));
             if(current>result) result=current;}
     T max_abs=0;
-    for(int tid=0;tid<threads;tid++)
+    for(int tid=0;tid<number_of_threads;tid++)
         max_abs=max(max_abs,result_per_thread(tid));
 #else
         T max_abs=v.Max_Abs();
