@@ -188,14 +188,11 @@ Intersection_List(const int box,const IMPLICIT_OBJECT<TV>& implicit_object,const
 }
 //#####################################################################
 namespace PhysBAM{
-#define INSTANTIATION_HELPER(T,d) \
-    template class BOX_HIERARCHY<VECTOR<T,d> >;
-
-INSTANTIATION_HELPER(float,1)
-INSTANTIATION_HELPER(float,2)
-INSTANTIATION_HELPER(float,3)
-INSTANTIATION_HELPER(double,1)
-INSTANTIATION_HELPER(double,2)
-INSTANTIATION_HELPER(double,3)
+template class BOX_HIERARCHY<VECTOR<float,1> >;
+template class BOX_HIERARCHY<VECTOR<float,2> >;
+template class BOX_HIERARCHY<VECTOR<float,3> >;
+template class BOX_HIERARCHY<VECTOR<double,1> >;
+template class BOX_HIERARCHY<VECTOR<double,2> >;
+template class BOX_HIERARCHY<VECTOR<double,3> >;
 }
 
