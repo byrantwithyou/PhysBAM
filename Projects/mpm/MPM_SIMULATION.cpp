@@ -26,7 +26,7 @@ using ::std::exp;
 //#####################################################################
 template<class TV> MPM_SIMULATION<TV>::
 MPM_SIMULATION()
-    :assigned_volume_externally(false),dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_visco_plasticity(false),use_plasticity_yield(false),use_plasticity_clamp(false),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0.5)
+    :assigned_volume_externally(false),dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_visco_plasticity(false),use_plasticity_yield(false),use_plasticity_clamp(false),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0)
 {}
 //#####################################################################
 // Destructor
@@ -246,7 +246,7 @@ Grid_Based_Body_Collisions()
         if(node_mass(it.index)>min_mass){
             const TV& x=grid.Node(it.index);
             for(int d=0;d<TV::m;d++){
-                T left_wall=grid.domain.min_corner(d)+3.5*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-3.5*grid.dX.Min();
+                T left_wall=grid.domain.min_corner(d)+4.5*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.5*grid.dX.Min();
                 if(x(d)<left_wall && node_V_star(it.index)(d)<(T)0){
                     TV vt(node_V_star(it.index));vt(d)=(T)0;
                     T vn=node_V_star(it.index)(d); // <0
@@ -445,7 +445,7 @@ Particle_Based_Body_Collisions()
         if(valid(p)){
             TV& x=particles.X(p);
             for(int d=0;d<TV::m;d++){
-                T left_wall=grid.domain.min_corner(d)+3.5*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-3.5*grid.dX.Min();
+                T left_wall=grid.domain.min_corner(d)+4.5*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.5*grid.dX.Min();
                 if(x(d)<=left_wall && particles.V(p)(d)<=(T)0){
                     TV vt(particles.V(p));vt(d)=(T)0;
                     T vn=particles.V(p)(d); // <0

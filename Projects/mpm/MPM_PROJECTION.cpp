@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include "MPM_POISSON_VECTOR.h"
@@ -68,11 +69,11 @@ Identify_Neumann_Cells()
 {
     // HMandatory wall : the third and fourth outmost MAC grid layer
     cell_neumann.Fill(false);
-    // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
-    //     for(int d=0;d<TV::m;d++){
-    //         if(it.index(d)==2 || it.index(d)==3 || it.index(d)==mac_grid.counts(d)-3 || it.index(d)==mac_grid.counts(d)-4){
-    //             cell_neumann(it.index)=true;
-    //             if(cell_dirichlet(it.index)) cell_dirichlet(it.index)=false;}}}
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+        for(int d=0;d<TV::m;d++){
+            if(it.index(d)==2 || it.index(d)==3 || it.index(d)==mac_grid.counts(d)-3 || it.index(d)==mac_grid.counts(d)-4){
+                cell_neumann(it.index)=true;
+                if(cell_dirichlet(it.index)) cell_dirichlet(it.index)=false;}}}
 }
 
 //#####################################################################
@@ -81,22 +82,23 @@ Identify_Neumann_Cells()
 template<class TV> void MPM_PROJECTION<TV>::
 Velocities_Corners_To_faces()
 {
-    
-
-    // face_velocities.Fill((T)0);
-    // if(TV::m==2){
-    //     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
-    //         if(!cell_dirichlet(it.index)){
-    //             FACE_INDEX<TV::m> x_axis_first_face(0,mac_grid.First_Face_Index_In_Cell(0,it.index));
-    //             face_velocities(x_axis_first_face)=0.5*(sim.node_V(it.index)(0)+sim.node_V(it.index+TV::Axis_Vector(1))(0));
-    //             FACE_INDEX<TV::m> x_axis_second_face(0,mac_grid.Second_Face_Index_In_Cell(0,it.index));
-    //             face_velocities(x_axis_second_face)=0.5*(sim.node_V(it.index+TV::Axis_Vector(0))(0)+sim.node_V(it.index+TV::Axis_Vector(0)+TV::Axis_Vector(1))(0));
-    //             FACE_INDEX<TV::m> y_axis_first_face(1,mac_grid.First_Face_Index_In_Cell(1,it.index));
-    //             face_velocities(y_axis_first_face)=0.5*(sim.node_V(it.index)(1)+sim.node_V(it.index+TV::Axis_Vector(0))(1));
-    //             FACE_INDEX<TV::m> y_axis_second_face(1,mac_grid.Second_Face_Index_In_Cell(1,it.index));
-    //             face_velocities(y_axis_second_face)=0.5*(sim.node_V(it.index+TV::Axis_Vector(1))(1)+sim.node_V(it.index+TV::Axis_Vector(1)+TV::Axis_Vector(0))(1));}}}
-    // else if(TV::m==3)
-    //     PHYSBAM_FATAL_ERROR("3d not implemented");
+    TV_INT nodes[TV::m*4-4];
+    face_velocities.Fill((T)0);
+    HASHTABLE<TV_INT,bool> node_dealt;
+    HASHTABLE<FACE_INDEX<TV::m>,int> face_parents_count;
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+        if(!cell_dirichlet(it.index)){
+            mac_grid.Nodes_In_Cell_From_Minimum_Corner_Node(it.index,nodes);
+            for(int i=0;i<TV::m*4-4;i++){
+                if(node_dealt.Get_Pointer(nodes[i])==NULL){
+                    node_dealt.Get_Or_Insert(nodes[i])=true;
+                    for(int axis=0;axis<TV::m;axis++){
+                        for(int face=0;face<TV::m*2-2;face++){
+                            FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,nodes[i],face));
+                            face_velocities(face_index)+=sim.node_V(nodes[i])(axis);
+                            face_parents_count.Get_Or_Insert(face_index)++;}}}}}}
+    for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(face_parents_count);it.Valid();it.Next())
+        if(it.Data()>1) face_velocities(it.Key())/=it.Data();
 }
 
 //#####################################################################
@@ -194,8 +196,22 @@ Do_Projection(const T dt,const T rho)
 template<class TV> void MPM_PROJECTION<TV>::
 Velocities_Faces_To_Corners()
 {
- 
-
+    TV_INT nodes[TV::m*4-4];
+    HASHTABLE<TV_INT,bool> node_dealt;
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+        if(!cell_dirichlet(it.index)){
+            mac_grid.Nodes_In_Cell_From_Minimum_Corner_Node(it.index,nodes);
+            for(int i=0;i<TV::m*4-4;i++){
+                if(node_dealt.Get_Pointer(nodes[i])==NULL){
+                    node_dealt.Get_Or_Insert(nodes[i])=true;
+                    sim.node_V(nodes[i])=TV();
+                    for(int axis=0;axis<TV::m;axis++){
+                        int contributor_count=TV::m*2-2;
+                        for(int face=0;face<TV::m*2-2;face++){
+                            FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,nodes[i],face));
+                            if(cell_neumann(face_index.First_Cell_Index()) || cell_neumann(face_index.Second_Cell_Index())) contributor_count--;
+                            else sim.node_V(nodes[i])(axis)+=face_velocities(face_index);}
+                        if(contributor_count>0) sim.node_V(nodes[i])(axis)/=contributor_count;}}}}}
 }
 
 //#####################################################################
