@@ -39,6 +39,7 @@ public:
 
     ARRAY<T,TV_INT> u;                // segmentation function
     ARRAY<T,TV_INT> u_new;            // new segmentation funtion
+    ARRAY<T,TV_INT> source;           // source
     ARRAY<TV,TV_INT> location;        // flat index to location
     ARRAY<TV_INT,TV_INT> index;       // flat to vector index
     
@@ -52,7 +53,7 @@ public:
     T mu,nu,epsilon;
     T dt,one_over_dx_squared;
     
-    MPLE_DRIVER():cfl((T)1),spread((T)1),frame_dt((T)1/24),frames(100),mu(5e-4),nu(.05){}
+    MPLE_DRIVER():cfl((T)1),spread((T)1),frame_dt((T).5),frames(100),mu(5e-4),nu(.05){}
 
     ~MPLE_DRIVER(){}
 
@@ -60,6 +61,7 @@ public:
     {
         u.Resize(grid.Node_Indices(),false);
         u_new.Resize(grid.Node_Indices(),false);
+        source.Resize(grid.Node_Indices(),false);
         location.Resize(grid.Node_Indices(),false);
         index.Resize(grid.Node_Indices(),false);
         array_m=u.array.m;
@@ -71,12 +73,17 @@ public:
 
         RANDOM_NUMBERS<T> random;
         random.Set_Seed(0);
-        for(int i=0;i<array_m;i++)
+        for(int i=0;i<array_m;i++){
             u.array(i)=random.Get_Uniform_Number(0,1);
+            source.array(i)=0;}
 
 #pragma omp parallel for        
         for(int i=0;i<points.m;i++)
             points(i).Update_Base_And_Weights(grid);
+
+        for(int i=0;i<points.m;i++){
+            for(MPLE_ITERATOR<TV,w> it(points(i));it.Valid();it.Next())
+                source(it.Node())+=mu*it.Weight();}
 
         dt=cfl*sqr(grid.dX(0))/(2*(TV::m+1));
         timesteps=(int)(frame_dt/dt);
@@ -99,10 +106,12 @@ public:
         Flush_Frame<TV>(title);
     }
 
-    void Diffusion_Step()
+    void Advance_Timestep()
     {
-#pragma omp parallel for        
-        for(int i=0;i<array_m;i++){
+#pragma omp parallel for schedule(guided)
+        for(int i=0;i<array_m;i++)
+        {
+            // diffusion
             const TV_INT& this_node=index.array(i);
             T& value=u_new.array(i);
             value=0;
@@ -114,30 +123,20 @@ public:
             value-=u.array(i)*2*TV::m;
             value*=epsilon*dt*one_over_dx_squared;
             value+=u.array(i);
-            value-=(dt/epsilon)*MPLE_DOUBLE_WELL<T>::Gradient(u.array(i));}
-    }
+            value-=(dt/epsilon)*MPLE_DOUBLE_WELL<T>::Gradient(u.array(i));
 
-    void Rasterization_Step()
-    {
-        for(int i=0;i<points.m;i++){
-            for(MPLE_ITERATOR<TV,w> it(points(i));it.Valid();it.Next())
-                u_new(it.Node())+=mu*dt*it.Weight()*((1-2*nu)/nu+sqr(2*nu-1)/((1-nu)*nu)*u(it.Node()));}
-    }
+            // rasterization
+            value+=dt*source.array(i)*((1-2*nu)/nu+sqr(2*nu-1)/((1-nu)*nu)*u.array(i));
 
-    void Clamp_Step()
-    {
-#pragma omp parallel for        
-        for(int i=0;i<array_m;i++)
-            if(u_new.array(i)<0) u_new.array(i)=0;
+            //clamp
+            if(value<0) value=0;}
     }
 
     void Advance_Frame(int frame)
     {
         LOG::cout<<"Frame "<<frame<<std::endl;
         for(int i=0;i<timesteps;i++){
-            Diffusion_Step();
-            Rasterization_Step();
-            Clamp_Step();
+            Advance_Timestep();
             u.Exchange(u_new);}
     }
 
