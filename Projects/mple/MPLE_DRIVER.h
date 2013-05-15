@@ -47,13 +47,14 @@ public:
     
     T cfl;
     T spread;
+    T rescale;
     T frame_dt;
     int frames;
     int timesteps;
     T mu,nu,epsilon;
     T dt,one_over_dx_squared;
     
-    MPLE_DRIVER():cfl((T)1),spread((T)1),frame_dt((T).5),frames(100),mu(5e-4),nu(.05){}
+    MPLE_DRIVER():cfl((T)1),spread((T)1),rescale((T)1),frame_dt((T).5),frames(100),mu(5e-4),nu(.05){}
 
     ~MPLE_DRIVER(){}
 
@@ -84,6 +85,15 @@ public:
         for(int i=0;i<points.m;i++){
             for(MPLE_ITERATOR<TV,w> it(points(i));it.Valid();it.Next())
                 source(it.Node())+=mu*it.Weight();}
+
+        T max_value=0;
+        for(int i=0;i<array_m;i++)
+            max_value=max(max_value,source.array(i));
+
+#pragma omp parallel for        
+        for(int i=0;i<array_m;i++){
+            source.array(i)*=rescale;
+            source.array(i)=min(source.array(i),max_value);}
 
         dt=cfl*sqr(grid.dX(0))/(2*(TV::m+1));
         timesteps=(int)(frame_dt/dt);
