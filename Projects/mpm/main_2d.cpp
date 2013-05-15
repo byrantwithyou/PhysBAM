@@ -180,11 +180,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             break;
         case 3: // snow 
             sim.grid.Initialize(TV_INT(1.0*grid_res+1,0.8*grid_res+1),RANGE<TV>(TV(-0.5,-0.4),TV(0.5,0.4)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.3,-0.1),TV(-0.1,0.1)));
-            sim.particles.Add_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(0.1,-0.05),TV(0.3,0.15)));
-            for(int p=0;p<sim.particles.number;p++){
-                if(sim.particles.X(p).x<0) sim.particles.V(p)=TV(2,0);
-                if(sim.particles.X(p).x>0) sim.particles.V(p)=TV(-2,0);}
+            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,0.2),TV(0,0.3)));
+            sim.particles.Add_X_As_A_Randomly_Sampled_Box(particle_count*2,RANGE<TV>(TV(0.1,-0.3),TV(0.4,0.3)));
+            // for(int p=0;p<sim.particles.number;p++){
+            //     if(sim.particles.X(p).x<0) sim.particles.V(p)=TV(2,0);
+            //     if(sim.particles.X(p).x>0) sim.particles.V(p)=TV(-2,0);}
             // sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.2),0.05));
             // sim.rigid_ball_velocity.Append(TV());
             break;
@@ -275,7 +275,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
             ym*=(T)5e3;
             for(int p=0;p<sim.particles.number;p++){
-                T this_ym=ym;
+                T this_ym=(sim.particles.Xm(p).x>0.05)?0:ym;
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
             sim.use_gravity=true;
@@ -411,7 +411,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
-                if(!sim.failed(i) && sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
+                if(!sim.failed(i) && sim.valid(i)){
+                    if(sim.particles.Xm(i).x>0.05)
+                        Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
+                    else
+                        Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));
+                }
                 else if(sim.failed(i) && sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,1));
                 else Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));}
 
