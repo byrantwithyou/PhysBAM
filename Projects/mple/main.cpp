@@ -41,6 +41,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-test",&test_number,&use_test,"test","test number");
     parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
     parse_args.Add("-spread",&mple.spread,"spread","Interface spread int cells");
+    parse_args.Add("-contour_value",&mple.contour_value,"contour value","Contour value");
     parse_args.Add("-mu",&mple.mu,"mu","Source power");
     parse_args.Add("-nu",&mple.nu,"nu","Small parameter");
     parse_args.Add("-frames",&mple.frames,"frames","Number of frames");

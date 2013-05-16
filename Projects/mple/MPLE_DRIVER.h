@@ -12,10 +12,13 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include "MPLE_DOUBLE_WELL.h"
 #include "MPLE_ITERATOR.h"
 #include "MPLE_POINT.h"
@@ -31,6 +34,7 @@ class MPLE_DRIVER: public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename MARCHING_CUBES<TV>::T_SURFACE T_SURFACE;
     
 public:
     
@@ -48,13 +52,14 @@ public:
     T cfl;
     T spread;
     T rescale;
+    T contour_value;
     T frame_dt;
     int frames;
     int timesteps;
     T mu,nu,epsilon;
     T dt,one_over_dx_squared;
     
-    MPLE_DRIVER():cfl((T)1),spread((T)1),rescale((T)1),frame_dt((T).5),frames(100),mu(5e-4),nu(.05){}
+    MPLE_DRIVER():cfl((T)1),spread((T)1),rescale((T)1),contour_value((T).5),frame_dt((T).5),frames(100),mu(5e-4),nu(.05){}
 
     ~MPLE_DRIVER(){}
 
@@ -102,6 +107,13 @@ public:
         PHYSBAM_ASSERT(grid.dX.Min()==grid.dX.Max());
     }
 
+    void Dump_Surface(SEGMENTED_CURVE_2D<T>& curve)
+    {
+        for(int i=0;i<curve.mesh.elements.m;i++){
+            VECTOR<int,2>& s=curve.mesh.elements(i);
+            Add_Debug_Object(VECTOR<VECTOR<T,2>,2>(curve.particles.X(s.x),curve.particles.X(s.y)),VECTOR<T,3>(0,.25,1));}
+    }
+
     void Write(const char* title)
     {
         for(int i=0;i<points.m;i++)
@@ -113,6 +125,10 @@ public:
                 Add_Debug_Particle(location.array(i),value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(0,.5,1));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,value);}}
         
+        T_SURFACE surface;
+        MARCHING_CUBES<TV>::Create_Surface(surface,grid,u,contour_value);
+        Dump_Surface(surface);
+
         Flush_Frame<TV>(title);
     }
 
@@ -139,7 +155,8 @@ public:
             value+=dt*source.array(i)*((1-2*nu)/nu+sqr(2*nu-1)/((1-nu)*nu)*u.array(i));
 
             //clamp
-            if(value<0) value=0;}
+            if(value<0) value=0;
+        }
     }
 
     void Advance_Frame(int frame)
