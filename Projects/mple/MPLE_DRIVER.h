@@ -147,7 +147,7 @@ public:
                 if(this_node(k)-1>=grid.Domain_Indices().min_corner(k))
                     value+=u(this_node-TV_INT::Axis_Vector(k));}
             value-=u.array(i)*2*TV::m;
-            value*=epsilon*dt*one_over_dx_squared;
+            value*=(T)2*epsilon*dt*one_over_dx_squared;
             value+=u.array(i);
             value-=(dt/epsilon)*MPLE_DOUBLE_WELL<T>::Gradient(u.array(i));
 
