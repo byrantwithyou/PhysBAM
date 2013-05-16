@@ -93,81 +93,14 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     T object_density=1;
     T object_mass=1;
 
-
-    // {
-    //     HASHTABLE<int,int> HT;
-    //     HT.Get_Or_Insert(2)++;
-    //     LOG::cout<<*HT.Get_Pointer(2)<<std::endl;
-
-    //     GRID<TV> g(TV_INT(4,3),RANGE<TV>(TV(-3,-2),TV(3,2)));
-        
-    //     for(int axis=0;axis<2;axis++){
-    //         for(int face=0;face<2;face++){
-    //             TV_INT node(2,1);
-    //             TV_INT face_index=g.Node_Face_Index(axis,node,face);
-    //             LOG::cout<<"node "<<node<<std::endl;
-    //             LOG::cout<<"axis "<<axis<<" face "<<face<<" face_index "<<face_index<<std::endl;}}
-
-    //     TV_INT nodes[4];
-    //     g.Nodes_In_Cell_From_Minimum_Corner_Node(TV_INT(1,0),nodes);
-    //     for(int k=0;k<4;k++) LOG::cout<<nodes[k]<<std::endl;
-        
-    //     for(int axis=0;axis<2;axis++){
-    //         for(int face=0;face<2;face++){
-    //             TV_INT node(3,1);
-    //             TV_INT face_index=g.Node_Face_Index(axis,node,face);
-    //             LOG::cout<<"node "<<node<<std::endl;
-    //             LOG::cout<<"axis "<<axis<<" face "<<face<<" face_index "<<face_index<<std::endl;}}
-    // }
-
-    // {
-    //     GRID<TV> g(TV_INT(4,3),RANGE<TV>(TV(-3,-2),TV(3,2)),true);
-        
-    //     for(int axis=0;axis<2;axis++){
-    //         for(int face=0;face<2;face++){
-    //             TV_INT node(2,1);
-    //             TV_INT face_index=g.Node_Face_Index(axis,node,face);
-    //             LOG::cout<<"node "<<node<<std::endl;
-    //             LOG::cout<<"axis "<<axis<<" face "<<face<<" face_index "<<face_index<<std::endl;}}
-
-    //     TV_INT nodes[4];
-    //     g.Nodes_In_Cell_From_Minimum_Corner_Node(TV_INT(1,0),nodes);
-    //     for(int k=0;k<4;k++) LOG::cout<<nodes[k]<<std::endl;
-        
-    //     for(int axis=0;axis<2;axis++){
-    //         for(int face=0;face<2;face++){
-    //             TV_INT node(3,1);
-    //             TV_INT face_index=g.Node_Face_Index(axis,node,face);
-    //             LOG::cout<<"node "<<node<<std::endl;
-    //             LOG::cout<<"axis "<<axis<<" face "<<face<<" face_index "<<face_index<<std::endl;}}
-    // }
-
-
-    // {
-    //     typedef VECTOR<T,3> TV3;
-    //     typedef VECTOR<int,3> TV_INT3;
-    
-    //     GRID<TV3> g(TV_INT3(3,3,3),RANGE<TV3>(TV3(-3,-3,-3),TV3(3,3,3)));
-        
-    //     for(int axis=0;axis<3;axis++){
-    //         for(int face=0;face<4;face++){
-    //             TV_INT3 node(2,1,1);
-    //             TV_INT3 face_index=g.Node_Face_Index(axis,node,face);
-    //             LOG::cout<<"node "<<node<<std::endl;
-    //             LOG::cout<<"axis "<<axis<<" face "<<face<<" face_index "<<face_index<<std::endl;}}
-    // }
-
-
-
     // geometry setting
     switch(test_number){
-        case 1: // stretching beam
-            sim.grid.Initialize(TV_INT(2*grid_res+1,0.5*grid_res+1),RANGE<TV>(TV(-1,-0.25),TV(1,0.25)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12)));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(0.16,-0.15),TV(0.25,0.15)));
-            sim.dirichlet_velocity.Append(TV(0.2,0));
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.25,-0.15),TV(-0.16,0.15)));
-            sim.dirichlet_velocity.Append(TV(-0.2,0));
+        case 1:
+            sim.grid.Initialize(TV_INT(1*grid_res+1,6*grid_res+1),RANGE<TV>(TV(-0.5,-0.6),TV(0.5,5.4)));
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.05,-0.4),TV(0.05,0.4)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.2,-0.2),TV(0.35,0.9)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.3,2),TV(-0.1,4.5)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0.1,3),0.12),particle_exclude_radius);
             break;
         case 2: // shit fall
             sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
@@ -178,7 +111,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.rigid_ball.Append(SPHERE<TV>(TV(0.09,-0.3),0.03));
             sim.rigid_ball_velocity.Append(TV());
             break;
-        case 3: // snow 
+        case 3:
             sim.grid.Initialize(TV_INT(1.0*grid_res+1,0.8*grid_res+1),RANGE<TV>(TV(-0.5,-0.4),TV(0.5,0.4)));
             sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,0.2),TV(0,0.3)));
             sim.particles.Add_X_As_A_Randomly_Sampled_Box(particle_count*2,RANGE<TV>(TV(0.1,-0.3),TV(0.4,0.3)));
@@ -187,10 +120,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             //     if(sim.particles.X(p).x>0) sim.particles.V(p)=TV(-2,0);}
             // sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.2),0.05));
             // sim.rigid_ball_velocity.Append(TV());
-            break;
-        case 4: // stretched cube
-            sim.grid.Initialize(TV_INT(2*grid_res+1,2*grid_res+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.2,-0.05),TV(0.2,0.05)));
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -249,16 +178,18 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         case 1:
             object_density=(T)1200*density_scale;
             object_mass=object_density*RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12)).Size();
-            ym*=(T)5e3;
+            ym*=(T)3e3;
             for(int p=0;p<sim.particles.number;p++){
-                // T this_ym=0.7*ym/0.04*sqr(sim.particles.X(p)(0))+0.3*ym;
                 T this_ym=ym;
                 sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
                 sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
-            sim.use_gravity=false;
+            sim.use_gravity=true;
             sim.use_plasticity_yield=false;
             sim.yield_min=-100;
             sim.yield_max=1.3;
+            sim.use_visco_plasticity=true;
+            sim.visco_nu=1e3;
+            sim.visco_tau.Fill(300);
             break;
         case 2:
             object_density=(T)1200*density_scale;
@@ -283,18 +214,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.yield_min=(T)1-(T)0.025;
             sim.yield_max=(T)1+(T)0.0075;
             break;
-        case 4:
-            object_density=(T)1200*density_scale;
-            object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.2),TV(0.1,0.2)).Size()-SPHERE<TV>(TV(0.1,0),0.04).Size());
-            ym*=(T)5e3;
-            for(int p=0;p<sim.particles.number;p++){
-                // T alpha=1;
-                // T this_ym=((T)1-alpha)/(T)0.04*ym*sqr(sim.particles.X(p)(1))+alpha*ym;
-                T this_ym=ym;
-                sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
-                sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
-            sim.use_gravity=false;
-            break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
     for(int p=0;p<sim.particles.number;p++){
         sim.particles.mass(p)=object_mass/sim.particles.number;
@@ -302,14 +221,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();}
     sim.mu0=sim.mu;
     sim.lambda0=sim.lambda;
-
-    switch(test_number){
-        case 4:
-            for(int p=0;p<sim.particles.number;p++)
-                sim.particles.Fe(p)=MATRIX<T,TV::m>(2,0,0,0.5);
-        default:
-            break;
-    };
 
     // projection init
     MPM_PROJECTION<TV> projection(sim);
@@ -386,7 +297,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Compute_Grid_Forces();
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
         sim.Update_Velocities_On_Grid();
-        if(!use_projection) sim.Grid_Based_Body_Collisions();
+        sim.Grid_Based_Body_Collisions();
         sim.Solve_The_Linear_System(); // so far sim.node_V is achieved via MPM
         if(use_projection){
             projection.Reinitialize();
@@ -411,11 +322,17 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
+
+
                 if(!sim.failed(i) && sim.valid(i)){
-                    if(sim.particles.Xm(i).x>0.05)
-                        Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
-                    else
+                    if(sim.particles.Xm(i).x>-0.051 && sim.particles.Xm(i).x<0.051 && sim.particles.Xm(i).y>-0.401 && sim.particles.Xm(i).y<0.401)
                         Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));
+                    else if(sim.particles.Xm(i).x>0.199 && sim.particles.Xm(i).x<0.351 && sim.particles.Xm(i).y>-0.201 && sim.particles.Xm(i).y<0.901)
+                        Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+                    else if(sim.particles.Xm(i).x>-0.301 && sim.particles.Xm(i).x<-0.099 && sim.particles.Xm(i).y>0.199 && sim.particles.Xm(i).y<4.501)
+                        Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
+                    else
+                        Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
                 }
                 else if(sim.failed(i) && sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,1));
                 else Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));}
