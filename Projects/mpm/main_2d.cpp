@@ -322,20 +322,15 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
-
-
-                if(!sim.failed(i) && sim.valid(i)){
-                    if(sim.particles.Xm(i).x>-0.051 && sim.particles.Xm(i).x<0.051 && sim.particles.Xm(i).y>-0.401 && sim.particles.Xm(i).y<0.401)
-                        Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));
-                    else if(sim.particles.Xm(i).x>0.199 && sim.particles.Xm(i).x<0.351 && sim.particles.Xm(i).y>-0.201 && sim.particles.Xm(i).y<0.901)
-                        Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-                    else if(sim.particles.Xm(i).x>-0.301 && sim.particles.Xm(i).x<-0.099 && sim.particles.Xm(i).y>0.199 && sim.particles.Xm(i).y<4.501)
-                        Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
-                    else
-                        Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
-                }
-                else if(sim.failed(i) && sim.valid(i)) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,1));
-                else Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));}
+                if(sim.particles.Xm(i).x>-0.051 && sim.particles.Xm(i).x<0.051 && sim.particles.Xm(i).y>-0.401 && sim.particles.Xm(i).y<0.401)
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));
+                else if(sim.particles.Xm(i).x>0.199 && sim.particles.Xm(i).x<0.351 && sim.particles.Xm(i).y>-0.201 && sim.particles.Xm(i).y<0.901)
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+                else if(sim.particles.Xm(i).x>-0.301 && sim.particles.Xm(i).x<-0.099 && sim.particles.Xm(i).y>0.199 && sim.particles.Xm(i).y<4.501)
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
+                else
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
+            }
 
             // projection: visualize MAC grid velocities
             // if(use_projection){

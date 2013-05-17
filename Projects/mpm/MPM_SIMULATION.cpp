@@ -43,8 +43,6 @@ Initialize()
     LOG::cout<<"Allocating Memories for Simulation..."<<std::endl;
     TIMING_START;
     gravity_constant=TV();gravity_constant(1)=-(T)9.8;
-    valid.Resize(particles.number);valid.Fill(true);
-    failed.Resize(particles.number);failed.Fill(false);
     mu.Resize(particles.number);mu0.Resize(particles.number);
     lambda.Resize(particles.number);lambda0.Resize(particles.number);
     visco_tau.Resize(particles.number);
@@ -156,17 +154,15 @@ Rasterize_Particle_Data_To_The_Grid()
     TIMING_START;
     node_mass.Fill(T(0));
     for(int p=0;p<particles.number;p++){
-        if(valid(p)){
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-                node_mass(influence_corner(p)+it.index)+=particles.mass(p)*weight(p)(it.index);}}}
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+            node_mass(influence_corner(p)+it.index)+=particles.mass(p)*weight(p)(it.index);}}
     //DEBUG check mass conservation
     // LOG::cout<<"[DEBUG] mass difference grid and particles: "<<node_mass.array.Sum()<<"-"<<particles.mass.Sum()<<"="<<node_mass.array.Sum()-particles.mass.Sum()<<std::endl;
     node_V.Fill(TV());
     for(int p=0;p<particles.number;p++){
-        if(valid(p)){
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-                TV_INT ind=influence_corner(p)+it.index;
-                if(node_mass(ind)>min_mass) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p)(it.index)/node_mass(ind);}}}
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+            TV_INT ind=influence_corner(p)+it.index;
+            if(node_mass(ind)>min_mass) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p)(it.index)/node_mass(ind);}}
     if(PROFILING) TIMING_END("Rasterize_Particle_Data_To_The_Grid");
 }
 //#####################################################################
@@ -196,11 +192,10 @@ Compute_Grid_Forces()
     TIMING_START;
     node_force.Fill(TV());
     for(int p=0;p<particles.number;p++){
-        if(valid(p)){
-            MATRIX<T,TV::m> B=particles.volume(p)*constitutive_model.Compute_dPsi_dFe(mu(p),lambda(p),particles.Fe(p),Re(p),Je(p)).Times_Transpose(particles.Fe(p));
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-                TV_INT ind=influence_corner(p)+it.index;
-                node_force(ind)-=B*grad_weight(p)(it.index);}}}
+        MATRIX<T,TV::m> B=particles.volume(p)*constitutive_model.Compute_dPsi_dFe(mu(p),lambda(p),particles.Fe(p),Re(p),Je(p)).Times_Transpose(particles.Fe(p));
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+            TV_INT ind=influence_corner(p)+it.index;
+            node_force(ind)-=B*grad_weight(p)(it.index);}}
     if(PROFILING) TIMING_END("Compute_Grid_Forces");
 }
 //#####################################################################
@@ -338,78 +333,58 @@ Update_Deformation_Gradient()
     if(use_visco_plasticity){
 #pragma omp parallel for
      for(int p=0;p<particles.number;p++){
-         if(valid(p)){
-             MATRIX<T,TV::m> grad_vp;
-             for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-                 TV_INT ind=influence_corner(p)+it.index;
-                 grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
-             MATRIX<T,TV::m> Fe_hat=particles.Fe(p)+dt*grad_vp*particles.Fe(p);
-             MATRIX<T,TV::m> Fp_hat=particles.Fp(p);
-             MATRIX<T,TV::m> F=Fe_hat*Fp_hat;
-             MATRIX<T,TV::m> U_hat,V_hat;
-             DIAGONAL_MATRIX<T,TV::m> Sigma;
-             Fe_hat.Fast_Singular_Value_Decomposition(U_hat,Sigma,V_hat);
-             T Pnorm=(constitutive_model.Compute_dPsi_dFe(mu(p),lambda(p),particles.Fe(p),Re(p),Je(p))).Frobenius_Norm();
-             T gamma=(T)0;
-             if(Pnorm>1e-10) gamma=clamp(dt*visco_nu*(Pnorm-visco_tau(p))/Pnorm,(T)0,(T)1);
-             T scale=Inverse(cbrt(Sigma.Determinant()));
-             DIAGONAL_MATRIX<T,TV::m> Middle;
-             for(int d=0;d<TV::m;d++) Middle(d,d)=pow(Sigma(d,d)*scale,gamma);
-             particles.Fp(p)=V_hat*Middle.Times_Transpose(V_hat)*Fp_hat;
-             particles.Fe(p)=F*particles.Fp(p).Inverse();
-             visco_tau(p)+=visco_kappa*gamma*Pnorm;}}}
+         MATRIX<T,TV::m> grad_vp;
+         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+             TV_INT ind=influence_corner(p)+it.index;
+             grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
+         MATRIX<T,TV::m> Fe_hat=particles.Fe(p)+dt*grad_vp*particles.Fe(p);
+         MATRIX<T,TV::m> Fp_hat=particles.Fp(p);
+         MATRIX<T,TV::m> F=Fe_hat*Fp_hat;
+         MATRIX<T,TV::m> U_hat,V_hat;
+         DIAGONAL_MATRIX<T,TV::m> Sigma;
+         Fe_hat.Fast_Singular_Value_Decomposition(U_hat,Sigma,V_hat);
+         T Pnorm=(constitutive_model.Compute_dPsi_dFe(mu(p),lambda(p),particles.Fe(p),Re(p),Je(p))).Frobenius_Norm();
+         T gamma=(T)0;
+         if(Pnorm>1e-10) gamma=clamp(dt*visco_nu*(Pnorm-visco_tau(p))/Pnorm,(T)0,(T)1);
+         T scale=Inverse(cbrt(Sigma.Determinant()));
+         DIAGONAL_MATRIX<T,TV::m> Middle;
+         for(int d=0;d<TV::m;d++) Middle(d,d)=pow(Sigma(d,d)*scale,gamma);
+         particles.Fp(p)=V_hat*Middle.Times_Transpose(V_hat)*Fp_hat;
+         particles.Fe(p)=F*particles.Fp(p).Inverse();
+         visco_tau(p)+=visco_kappa*gamma*Pnorm;}}
     else if(use_plasticity_yield){
 #pragma omp parallel for
         for(int p=0;p<particles.number;p++){
-            if(valid(p)){
-                MATRIX<T,TV::m> grad_vp;
-                for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-                    TV_INT ind=influence_corner(p)+it.index;
-                    grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
-                MATRIX<T,TV::m> Fe_hat=particles.Fe(p)+dt*grad_vp*particles.Fe(p);
-                MATRIX<T,TV::m> Fp_hat=particles.Fp(p);
-
-                // if(failed(p)){
-                //     particles.Fe(p)=Fe_hat;
-                //     particles.Fp(p)=Fp_hat;
-                //     continue;
-                // }
-
-                MATRIX<T,TV::m> F=Fe_hat*Fp_hat;
-                MATRIX<T,TV::m> U_hat,V_hat;
-                DIAGONAL_MATRIX<T,TV::m> SIGMA_hat;
-                Fe_hat.Fast_Singular_Value_Decomposition(U_hat,SIGMA_hat,V_hat);
-
-                // if(SIGMA_hat.Min()<yield_min || SIGMA_hat.Max()>yield_max){
-                //     valid(p)=false;
-                //     continue;}
-                //     failed(p)=true;
-                //     particles.Fe(p)=MATRIX<T,TV::m>::Identity_Matrix();
-                //     particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();
-                //     continue;
-                // }
-
-                SIGMA_hat=SIGMA_hat.Clamp_Min(yield_min);
-                SIGMA_hat=SIGMA_hat.Clamp_Max(yield_max);
-                particles.Fe(p)=U_hat*SIGMA_hat.Times_Transpose(V_hat);
-                particles.Fp(p)=V_hat*(SIGMA_hat.Inverse()).Times_Transpose(U_hat)*F;
-                if(use_plasticity_clamp){
-                    MATRIX<T,TV::m> Uphat,Vphat;
-                    DIAGONAL_MATRIX<T,TV::m> SIGMAphat;
-                    particles.Fp(p).Fast_Singular_Value_Decomposition(Uphat,SIGMAphat,Vphat);
-                    SIGMAphat.Clamp_Min(clamp_min);
-                    SIGMAphat.Clamp_Max(clamp_max);
-                    particles.Fp(p)=Uphat*SIGMAphat.Times_Transpose(Vphat);
-                    particles.Fe(p)=F*(particles.Fp(p).Inverse());}}}}
+            MATRIX<T,TV::m> grad_vp;
+            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+                TV_INT ind=influence_corner(p)+it.index;
+                grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
+            MATRIX<T,TV::m> Fe_hat=particles.Fe(p)+dt*grad_vp*particles.Fe(p);
+            MATRIX<T,TV::m> Fp_hat=particles.Fp(p);
+            MATRIX<T,TV::m> F=Fe_hat*Fp_hat;
+            MATRIX<T,TV::m> U_hat,V_hat;
+            DIAGONAL_MATRIX<T,TV::m> SIGMA_hat;
+            Fe_hat.Fast_Singular_Value_Decomposition(U_hat,SIGMA_hat,V_hat);
+            SIGMA_hat=SIGMA_hat.Clamp_Min(yield_min);
+            SIGMA_hat=SIGMA_hat.Clamp_Max(yield_max);
+            particles.Fe(p)=U_hat*SIGMA_hat.Times_Transpose(V_hat);
+            particles.Fp(p)=V_hat*(SIGMA_hat.Inverse()).Times_Transpose(U_hat)*F;
+            if(use_plasticity_clamp){
+                MATRIX<T,TV::m> Uphat,Vphat;
+                DIAGONAL_MATRIX<T,TV::m> SIGMAphat;
+                particles.Fp(p).Fast_Singular_Value_Decomposition(Uphat,SIGMAphat,Vphat);
+                SIGMAphat.Clamp_Min(clamp_min);
+                SIGMAphat.Clamp_Max(clamp_max);
+                particles.Fp(p)=Uphat*SIGMAphat.Times_Transpose(Vphat);
+                particles.Fe(p)=F*(particles.Fp(p).Inverse());}}}
     else{
 #pragma omp parallel for
         for(int p=0;p<particles.number;p++){
-            if(valid(p)){
-                MATRIX<T,TV::m> grad_vp;
-                for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-                    TV_INT ind=influence_corner(p)+it.index;
-                    grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
-                particles.Fe(p)=particles.Fe(p)+dt*grad_vp*particles.Fe(p);}}}
+            MATRIX<T,TV::m> grad_vp;
+            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+                TV_INT ind=influence_corner(p)+it.index;
+                grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
+            particles.Fe(p)=particles.Fe(p)+dt*grad_vp*particles.Fe(p);}}
     if(PROFILING) TIMING_END("Update_Deformation_Gradient");
 }
 //#####################################################################
@@ -421,15 +396,14 @@ Update_Particle_Velocities()
     TIMING_START;
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++){
-        if(valid(p)){
-            TV V_PIC;
-            TV V_FLIP=particles.V(p);
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-                TV_INT ind=influence_corner(p)+it.index;
-                T w=weight(p)(it.index);
-                V_PIC+=node_V(ind)*w;
-                V_FLIP+=(node_V(ind)-node_V_old(ind))*w;}
-            particles.V(p)=((T)1-FLIP_alpha)*V_PIC+FLIP_alpha*V_FLIP;}}
+        TV V_PIC;
+        TV V_FLIP=particles.V(p);
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+            TV_INT ind=influence_corner(p)+it.index;
+            T w=weight(p)(it.index);
+            V_PIC+=node_V(ind)*w;
+            V_FLIP+=(node_V(ind)-node_V_old(ind))*w;}
+        particles.V(p)=((T)1-FLIP_alpha)*V_PIC+FLIP_alpha*V_FLIP;}
     if(PROFILING) TIMING_END("Update_Particle_Velocities");
 }
 //#####################################################################
@@ -442,42 +416,41 @@ Particle_Based_Body_Collisions()
     static T eps=1e-8;
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++){
-        if(valid(p)){
-            TV& x=particles.X(p);
-            for(int d=0;d<TV::m;d++){
-                T left_wall=grid.domain.min_corner(d)+4.5*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.5*grid.dX.Min();
-                if(x(d)<=left_wall && particles.V(p)(d)<=(T)0){
-                    TV vt(particles.V(p));vt(d)=(T)0;
-                    T vn=particles.V(p)(d); // <0
+        TV& x=particles.X(p);
+        for(int d=0;d<TV::m;d++){
+            T left_wall=grid.domain.min_corner(d)+4.5*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.5*grid.dX.Min();
+            if(x(d)<=left_wall && particles.V(p)(d)<=(T)0){
+                TV vt(particles.V(p));vt(d)=(T)0;
+                T vn=particles.V(p)(d); // <0
+                T vt_mag=vt.Magnitude();
+                if(vt_mag>eps){
+                    T impulse=friction_coefficient*vn/vt_mag;
+                    if(impulse<(T)-1) impulse=(T)-1;
+                    particles.V(p)=vt*(1+impulse);}
+                else particles.V(p)=vt;}
+            if(x(d)>=right_wall && particles.V(p)(d)>=(T)0){
+                TV vt(particles.V(p));vt(d)=(T)0;
+                T vn=particles.V(p)(d); // >0
+                T vt_mag=vt.Magnitude();
+                if(vt_mag>eps){
+                    T impulse=-friction_coefficient*vn/vt_mag;
+                    if(impulse<(T)-1) impulse=(T)-1;
+                    particles.V(p)=vt*(1+impulse);}
+                else particles.V(p)=vt;}}
+        for(int b=0;b<rigid_ball.m;b++){
+            if(rigid_ball(b).Lazy_Inside(x)){
+                TV n=rigid_ball(b).Normal(x);
+                TV v_rel=particles.V(p)-rigid_ball_velocity(b);
+                T vn=TV::Dot_Product(v_rel,n);
+                if(vn<(T)0){
+                    TV vt=v_rel-n*vn;
                     T vt_mag=vt.Magnitude();
                     if(vt_mag>eps){
                         T impulse=friction_coefficient*vn/vt_mag;
                         if(impulse<(T)-1) impulse=(T)-1;
-                        particles.V(p)=vt*(1+impulse);}
-                    else particles.V(p)=vt;}
-                if(x(d)>=right_wall && particles.V(p)(d)>=(T)0){
-                    TV vt(particles.V(p));vt(d)=(T)0;
-                    T vn=particles.V(p)(d); // >0
-                    T vt_mag=vt.Magnitude();
-                    if(vt_mag>eps){
-                        T impulse=-friction_coefficient*vn/vt_mag;
-                        if(impulse<(T)-1) impulse=(T)-1;
-                        particles.V(p)=vt*(1+impulse);}
-                    else particles.V(p)=vt;}}
-            for(int b=0;b<rigid_ball.m;b++){
-                if(rigid_ball(b).Lazy_Inside(x)){
-                    TV n=rigid_ball(b).Normal(x);
-                    TV v_rel=particles.V(p)-rigid_ball_velocity(b);
-                    T vn=TV::Dot_Product(v_rel,n);
-                    if(vn<(T)0){
-                        TV vt=v_rel-n*vn;
-                        T vt_mag=vt.Magnitude();
-                        if(vt_mag>eps){
-                            T impulse=friction_coefficient*vn/vt_mag;
-                            if(impulse<(T)-1) impulse=(T)-1;
-                            particles.V(p)=vt*(1+impulse)+rigid_ball_velocity(b);}
-                        else particles.V(p)=vt+rigid_ball_velocity(b);}}}}}
-        if(PROFILING) TIMING_END("Particle_Based_Body_Collisions");
+                        particles.V(p)=vt*(1+impulse)+rigid_ball_velocity(b);}
+                    else particles.V(p)=vt+rigid_ball_velocity(b);}}}}
+    if(PROFILING) TIMING_END("Particle_Based_Body_Collisions");
 }
 //#####################################################################
 // Function Update_Particle_Positions
@@ -488,8 +461,7 @@ Update_Particle_Positions()
     TIMING_START;
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++)
-        if(valid(p))
-            particles.X(p)+=dt*particles.V(p);
+        particles.X(p)+=dt*particles.V(p);
     if(PROFILING) TIMING_END("Update_Particle_Positions");
 }
 //#####################################################################
@@ -534,9 +506,8 @@ Get_Maximum_Particle_Velocity() const
 {
     T max_particle_v=0;
     for(int i=0;i<particles.V.m;i++){
-        if(valid(i)){
-            T mag=particles.V(i).Magnitude();
-            if(mag>max_particle_v) max_particle_v=mag;}}
+        T mag=particles.V(i).Magnitude();
+        if(mag>max_particle_v) max_particle_v=mag;}
     return max_particle_v;
 }
 //#####################################################################
