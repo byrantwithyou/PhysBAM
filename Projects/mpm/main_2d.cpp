@@ -91,37 +91,55 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // geometry setting
     switch(test_number){
         case 1:{
-            sim.grid.Initialize(TV_INT(1*grid_res+1,6*grid_res+1),RANGE<TV>(TV(-0.5,-0.6),TV(0.5,5.4)));
-            // sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.05,-0.4),TV(0.05,0.4)),particle_exclude_radius);
-            // sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.2,-0.2),TV(0.35,0.9)),particle_exclude_radius);
-            // sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0.1,3),0.12),particle_exclude_radius);
-            int water_count=sim.particles.number;
+            sim.grid.Initialize(TV_INT(1.6*grid_res+1,6*grid_res+1),RANGE<TV>(TV(-0.8,-0.6),TV(0.8,5.4)));
+
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.3,0),TV(-0.1,5)),particle_exclude_radius);
-            int visco_count=sim.particles.number-water_count;
-            sim.particles.Set_Material_Properties(0,water_count,
-                (T)115.2*density_scale/sim.particles.number, // mass per particle
-                (0)*ym/((T)2*((T)1+pr)), // mu
-                (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
-            sim.particles.Set_Material_Properties(water_count,visco_count,
-                (T)115.2*density_scale/sim.particles.number, // mass per particle
+            int first_count=sim.particles.number;
+            sim.particles.Set_Material_Properties(0,first_count,
+                (T)115.2*density_scale/first_count, // mass per particle
                 (3e3)*ym/((T)2*((T)1+pr)), // mu
                 (3e3)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+            sim.particles.Set_Plasticity(0,first_count,
+                false,-1,1, // plasticity_yield
+                false,-1,1); // plasticity_clamp
+            sim.particles.Set_Visco_Plasticity(0,first_count,
+                true,700, // visco_nu
+                900, // visco_tau
+                0); // visco_kappa
+
+            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0.2,0.4),0.15),particle_exclude_radius);
+            int second_count=sim.particles.number-first_count;
+            sim.particles.Set_Material_Properties(first_count,second_count,
+                (T)115.2*density_scale/second_count, // mass per particle
+                (4e3)*ym/((T)2*((T)1+pr)), // mu
+                (4e3)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+            sim.particles.Set_Plasticity(first_count,second_count,
+                false,-1,1, // plasticity_yield
+                false,-1,1); // plasticity_clamp
+            sim.particles.Set_Visco_Plasticity(first_count,second_count,
+                false,700, // visco_nu
+                900, // visco_tau
+                0); // visco_kappa
+
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.1,0.6),TV(0.3,2)),particle_exclude_radius);
+            int third_count=sim.particles.number-first_count-second_count;
+            sim.particles.Set_Material_Properties(first_count+second_count,third_count,
+                (T)115.2*density_scale/third_count, // mass per particle
+                (0)*ym/((T)2*((T)1+pr)), // mu
+                (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+            sim.particles.Set_Plasticity(first_count+second_count,third_count,
+                false,-1,1, // plasticity_yield
+                false,-1,1); // plasticity_clamp
+            sim.particles.Set_Visco_Plasticity(first_count+second_count,third_count,
+                false,700, // visco_nu
+                900, // visco_tau
+                0); // visco_kappa
+
+            sim.use_gravity=true;
             sim.particles.Set_Initial_State(0,sim.particles.number,
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
                 TV()); // initial velocity
-            sim.particles.Set_Plasticity(0,sim.particles.number,
-                false,-1,1, // plasticity_yield
-                false,-1,1); // plasticity_clamp
-            sim.particles.Set_Visco_Plasticity(0,water_count,
-                false,1e3, // visco_nu
-                300, // visco_tau
-                0); // visco_kappa
-            sim.particles.Set_Visco_Plasticity(water_count,visco_count,
-                true,700, // visco_nu
-                900, // visco_tau
-                0); // visco_kappa
-            sim.use_gravity=true;
             break;}
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -253,14 +271,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
-                // if(sim.particles.Xm(i).x>-0.051 && sim.particles.Xm(i).x<0.051 && sim.particles.Xm(i).y>-0.401 && sim.particles.Xm(i).y<0.401)
-                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));
-                // else if(sim.particles.Xm(i).x>0.199 && sim.particles.Xm(i).x<0.351 && sim.particles.Xm(i).y>-0.201 && sim.particles.Xm(i).y<0.901)
-                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-                // else if(sim.particles.Xm(i).x>-0.301 && sim.particles.Xm(i).x<-0.099 && sim.particles.Xm(i).y>0.199 && sim.particles.Xm(i).y<4.501)
-                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
-                // else
+                if(sim.particles.Xm(i).x<0)
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
+                else if(sim.particles.Xm(i).y<0.55)
                     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
+                else
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
             }
 
             // projection: visualize MAC grid velocities
