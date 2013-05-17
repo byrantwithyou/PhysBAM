@@ -92,11 +92,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     switch(test_number){
         case 1:{
             sim.grid.Initialize(TV_INT(1*grid_res+1,6*grid_res+1),RANGE<TV>(TV(-0.5,-0.6),TV(0.5,5.4)));
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.05,-0.4),TV(0.05,0.4)),particle_exclude_radius);
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.2,-0.2),TV(0.35,0.9)),particle_exclude_radius);
-            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0.1,3),0.12),particle_exclude_radius);
+            // sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.05,-0.4),TV(0.05,0.4)),particle_exclude_radius);
+            // sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.2,-0.2),TV(0.35,0.9)),particle_exclude_radius);
+            // sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0.1,3),0.12),particle_exclude_radius);
             int water_count=sim.particles.number;
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.3,2),TV(-0.1,4.5)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.3,0),TV(-0.1,5)),particle_exclude_radius);
             int visco_count=sim.particles.number-water_count;
             sim.particles.Set_Material_Properties(0,water_count,
                 (T)115.2*density_scale/sim.particles.number, // mass per particle
@@ -119,7 +119,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 0); // visco_kappa
             sim.particles.Set_Visco_Plasticity(water_count,visco_count,
                 true,700, // visco_nu
-                600, // visco_tau
+                900, // visco_tau
                 0); // visco_kappa
             sim.use_gravity=true;
             break;}
@@ -253,13 +253,13 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
-                if(sim.particles.Xm(i).x>-0.051 && sim.particles.Xm(i).x<0.051 && sim.particles.Xm(i).y>-0.401 && sim.particles.Xm(i).y<0.401)
-                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));
-                else if(sim.particles.Xm(i).x>0.199 && sim.particles.Xm(i).x<0.351 && sim.particles.Xm(i).y>-0.201 && sim.particles.Xm(i).y<0.901)
-                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-                else if(sim.particles.Xm(i).x>-0.301 && sim.particles.Xm(i).x<-0.099 && sim.particles.Xm(i).y>0.199 && sim.particles.Xm(i).y<4.501)
-                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
-                else
+                // if(sim.particles.Xm(i).x>-0.051 && sim.particles.Xm(i).x<0.051 && sim.particles.Xm(i).y>-0.401 && sim.particles.Xm(i).y<0.401)
+                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));
+                // else if(sim.particles.Xm(i).x>0.199 && sim.particles.Xm(i).x<0.351 && sim.particles.Xm(i).y>-0.201 && sim.particles.Xm(i).y<0.901)
+                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+                // else if(sim.particles.Xm(i).x>-0.301 && sim.particles.Xm(i).x<-0.099 && sim.particles.Xm(i).y>0.199 && sim.particles.Xm(i).y<4.501)
+                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
+                // else
                     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
             }
 
