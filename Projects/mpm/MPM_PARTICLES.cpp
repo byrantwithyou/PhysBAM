@@ -27,6 +27,16 @@ MPM_PARTICLES()
     Add_Array(ATTRIBUTE_ID_LAMBDA,&lambda);
     Add_Array(ATTRIBUTE_ID_MU0,&mu0);
     Add_Array(ATTRIBUTE_ID_LAMBDA0,&lambda0);
+    Add_Array(ATTRIBUTE_ID_USE_PLASTICITY_YIELD,&use_plasticity_yield);
+    Add_Array(ATTRIBUTE_ID_USE_PLASTICITY_CLAMP,&use_plasticity_clamp);
+    Add_Array(ATTRIBUTE_ID_YIELD_MIN,&yield_min);
+    Add_Array(ATTRIBUTE_ID_YIELD_MAX,&yield_max);
+    Add_Array(ATTRIBUTE_ID_CLAMP_MIN,&clamp_min);
+    Add_Array(ATTRIBUTE_ID_CLAMP_MAX,&clamp_max);
+    Add_Array(ATTRIBUTE_ID_USE_VISCO_PLASTICITY,&use_visco_plasticity);
+    Add_Array(ATTRIBUTE_ID_VISCO_NU,&visco_nu);
+    Add_Array(ATTRIBUTE_ID_VISCO_TAU,&visco_tau);
+    Add_Array(ATTRIBUTE_ID_VISCO_KAPPA,&visco_kappa);
     rand_generator.Set_Seed(0);
 }
 //#####################################################################
@@ -89,6 +99,32 @@ Set_Initial_State(int start_index,int count,MATRIX<T,TV::m> Fe_in,MATRIX<T,TV::m
         Fp(i)=Fp_in;
         V(i)=V_in;}
 }
+//#####################################################################
+// Function Set_Plasticity
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Set_Plasticity(int start_index,int count,bool use_plasticity_yield_in,T yield_min_in,T yield_max_in,bool use_plasticity_clamp_in,T clamp_min_in,T clamp_max_in)
+{
+    for(int i=start_index;i<start_index+count;i++){
+        use_plasticity_yield(i)=use_plasticity_yield_in;
+        yield_min(i)=yield_min_in;
+        yield_max(i)=yield_max_in;
+        use_plasticity_clamp(i)=use_plasticity_clamp_in;
+        clamp_min(i)=clamp_min_in;
+        clamp_max(i)=clamp_max_in;}
+}
+//#####################################################################
+// Function Set_Visco_Plasticity
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Set_Visco_Plasticity(int start_index,int count,bool use_visco_plasticity_in,T visco_nu_in,T visco_tau_in,T visco_kappa_in)
+{
+    for(int i=start_index;i<start_index+count;i++){
+        use_visco_plasticity(i)=use_visco_plasticity_in;
+        visco_nu(i)=visco_nu_in;
+        visco_tau(i)=visco_tau_in;
+        visco_kappa(i)=visco_kappa_in;}
+}
 static int Initialize_MPM_Particles()
 {
     Register_Attribute_Name(ATTRIBUTE_ID_MATERIAL_COORDINATE,"Xm");
@@ -100,6 +136,16 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA,"lambda");
     Register_Attribute_Name(ATTRIBUTE_ID_MU0,"mu0");
     Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA0,"lambda0");
+    Register_Attribute_Name(ATTRIBUTE_ID_USE_PLASTICITY_YIELD,"use_plasticity_yield");
+    Register_Attribute_Name(ATTRIBUTE_ID_USE_PLASTICITY_CLAMP,"use_plasticity_clamp");
+    Register_Attribute_Name(ATTRIBUTE_ID_YIELD_MIN,"yield_min");
+    Register_Attribute_Name(ATTRIBUTE_ID_YIELD_MAX,"yield_max");
+    Register_Attribute_Name(ATTRIBUTE_ID_CLAMP_MIN,"clamp_min");
+    Register_Attribute_Name(ATTRIBUTE_ID_CLAMP_MAX,"clamp_max");
+    Register_Attribute_Name(ATTRIBUTE_ID_USE_VISCO_PLASTICITY,"use_visco_plasticity");
+    Register_Attribute_Name(ATTRIBUTE_ID_VISCO_NU,"visco_nu");
+    Register_Attribute_Name(ATTRIBUTE_ID_VISCO_TAU,"visco_tau");
+    Register_Attribute_Name(ATTRIBUTE_ID_VISCO_KAPPA,"visco_kappa");
     return 0;
 }
 int initialize_mpm_particles=Initialize_MPM_Particles();

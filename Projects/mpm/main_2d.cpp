@@ -58,7 +58,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     T delaunay_maximum_edge_length=(T)99999;
     T delaunay_minimum_angle=(T)0;
     sim.xi=(T)0;
-    sim.visco_kappa=(T)0;
     sim.PROFILING=false;
     parse_args.Add("-test",&test_number,"test","test number");
     parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
@@ -76,7 +75,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-stiffness",&ym,"value","scale stiffness");
     parse_args.Add("-poisson_ratio",&pr,"value","poisson's ratio");
     parse_args.Add("-hardening",&sim.xi,"value","harderning coefficient for normal plasticity");
-    parse_args.Add("-visco_hardening",&sim.visco_kappa,"value","harderning coefficient for visco plasticity");
     parse_args.Add("-flip",&sim.FLIP_alpha,"value","flip fraction");
     parse_args.Add("-gres",&grid_res,"value","grid resolution");
     parse_args.Add("-pres",&particle_res,"value","particle resolution");
@@ -106,13 +104,14 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
                 TV()); // initial velocity
+            sim.particles.Set_Plasticity(0,sim.particles.number,
+                false,-1,1, // plasticity_yield
+                false,-1,1); // plasticity_clamp
+            sim.particles.Set_Visco_Plasticity(0,sim.particles.number,
+                true,1e3, // visco_nu
+                300, // visco_tau
+                0); // visco_kappa
             sim.use_gravity=true;
-            sim.use_plasticity_yield=false;
-            sim.yield_min=-100;
-            sim.yield_max=1.3;
-            sim.use_visco_plasticity=true;
-            sim.visco_nu=1e3;
-            sim.visco_tau.Fill(300);
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -140,8 +139,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     
     // voronoi reconstruction
     if(use_voronoi){
-        // voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
-        // voronoi.Initialize_With_A_Triangulated_Area(ta);
         voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
         voronoi.Build_Segments();
         for(int i=0;i<voronoi.X.m;i++) {
@@ -153,8 +150,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
         Flush_Frame<TV>("voronoi cells");}
     if(use_voronoi_boundary){
-        // voronoi.Initialize_With_A_Regular_Grid_Of_Particles(GRID<TV>(TV_INT(0.4*particle_res+1,0.24*particle_res+1),RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12))));
-        // voronoi.Initialize_With_A_Triangulated_Area(ta);
         voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
         voronoi.Build_Boundary_Segments();
         for(int i=0;i<voronoi.X.m;i++) {
@@ -181,7 +176,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         recons.Build_Scalar_Field(xbar,sim.particles.mass,density,G,recons_grid,phi);
         T k;std::cin>>k;
         for(int i=0;i<phi.array.m;i++) phi.array(i)-=k;
-        // Dump_Levelset(recons_grid,phi,VECTOR<T,3>(0,0,1),VECTOR<T,3>(0,0,1));
     }
 
     // Zhu and Bridson
@@ -323,8 +317,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
 int main(int argc,char *argv[])
 {
-    // ./mpm_2d -test 3 -gres 160 -pn 5000 -dt 1e-4 -fj 80 -hardening 10
-
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Parse(true);
     Run_Simulation<VECTOR<double,2> >(parse_args);

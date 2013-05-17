@@ -41,6 +41,10 @@ public:
     ARRAY_VIEW<MATRIX<T,TV::m> > Fe;
     ARRAY_VIEW<MATRIX<T,TV::m> > Fp;
     ARRAY_VIEW<T> mu,lambda,mu0,lambda0;
+    ARRAY_VIEW<bool> use_plasticity_yield,use_plasticity_clamp;
+    ARRAY_VIEW<T> yield_min,yield_max,clamp_min,clamp_max;
+    ARRAY_VIEW<bool> use_visco_plasticity;
+    ARRAY_VIEW<T> visco_nu,visco_tau,visco_kappa;
 
     RANDOM_NUMBERS<T> rand_generator;
 
@@ -52,6 +56,8 @@ public:
     void Add_Randomly_Sampled_Implicit_Object(const IMPLICIT_OBJECT<TV>& object,const T exclude_radius=(T)999);
     void Set_Material_Properties(int start_index,int count,T mass_in,T mu_in,T lambda_in);
     void Set_Initial_State(int start_index,int count,MATRIX<T,TV::m> Fe_in,MATRIX<T,TV::m> Fp_in,TV V_in);
+    void Set_Plasticity(int start_index,int count,bool use_plasticity_yield_in,T yield_min_in,T yield_max_in,bool use_plasticity_clamp_in,T clamp_min_in,T clamp_max_in);
+    void Set_Visco_Plasticity(int start_index,int count,bool use_visco_plasticity_in,T visco_nu_in,T visco_tau_in,T visco_kappa_in);
 //#####################################################################
 };
 }

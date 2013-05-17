@@ -38,16 +38,6 @@ public:
     bool dump_matrix,test_system;
     T min_mass,min_rho;
     T dt;
-    bool use_visco_plasticity;
-    T visco_nu;
-    ARRAY<T> visco_tau;
-    T visco_kappa;
-    bool use_plasticity_yield;
-    T yield_min;
-    T yield_max;
-    bool use_plasticity_clamp;
-    T clamp_min;
-    T clamp_max;
     bool use_gravity;
     T FLIP_alpha;
     T friction_coefficient;
