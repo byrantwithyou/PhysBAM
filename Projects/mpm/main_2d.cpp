@@ -90,14 +90,20 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     // geometry setting
     switch(test_number){
-        case 1:
+        case 1:{
             sim.grid.Initialize(TV_INT(1*grid_res+1,6*grid_res+1),RANGE<TV>(TV(-0.5,-0.6),TV(0.5,5.4)));
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.05,-0.4),TV(0.05,0.4)),particle_exclude_radius);
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.2,-0.2),TV(0.35,0.9)),particle_exclude_radius);
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.3,2),TV(-0.1,4.5)),particle_exclude_radius);
             sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0.1,3),0.12),particle_exclude_radius);
-            sim.particles.Set_Material_Properties(0,sim.particles.number,
-                (T)12*density_scale/sim.particles.number, // mass per particle
+            int water_count=sim.particles.number;
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.3,2),TV(-0.1,4.5)),particle_exclude_radius);
+            int visco_count=sim.particles.number-water_count;
+            sim.particles.Set_Material_Properties(0,water_count,
+                (T)115.2*density_scale/sim.particles.number, // mass per particle
+                (0)*ym/((T)2*((T)1+pr)), // mu
+                (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+            sim.particles.Set_Material_Properties(water_count,visco_count,
+                (T)115.2*density_scale/sim.particles.number, // mass per particle
                 (3e3)*ym/((T)2*((T)1+pr)), // mu
                 (3e3)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
             sim.particles.Set_Initial_State(0,sim.particles.number,
@@ -107,12 +113,16 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.particles.Set_Plasticity(0,sim.particles.number,
                 false,-1,1, // plasticity_yield
                 false,-1,1); // plasticity_clamp
-            sim.particles.Set_Visco_Plasticity(0,sim.particles.number,
-                true,1e3, // visco_nu
+            sim.particles.Set_Visco_Plasticity(0,water_count,
+                false,1e3, // visco_nu
                 300, // visco_tau
                 0); // visco_kappa
+            sim.particles.Set_Visco_Plasticity(water_count,visco_count,
+                true,700, // visco_nu
+                600, // visco_tau
+                0); // visco_kappa
             sim.use_gravity=true;
-            break;
+            break;}
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
     sim.Initialize();
