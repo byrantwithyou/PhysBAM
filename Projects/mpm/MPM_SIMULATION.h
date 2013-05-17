@@ -33,13 +33,11 @@ public:
     // need external input
     //#################################################################
     bool PROFILING;
-    bool assigned_volume_externally;
     MPM_PARTICLES<TV> particles; // Resize(), X, V, mass, Fe, Fp
     GRID<TV> grid;    
     bool dump_matrix,test_system;
     T min_mass,min_rho;
     T dt;
-    ARRAY<T> mu,lambda,mu0,lambda0;
     bool use_visco_plasticity;
     T visco_nu;
     ARRAY<T> visco_tau;

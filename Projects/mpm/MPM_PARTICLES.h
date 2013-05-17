@@ -40,24 +40,18 @@ public:
     ARRAY_VIEW<VECTOR<TV,TV::m+1> > particle_domain;
     ARRAY_VIEW<MATRIX<T,TV::m> > Fe;
     ARRAY_VIEW<MATRIX<T,TV::m> > Fp;
+    ARRAY_VIEW<T> mu,lambda,mu0,lambda0;
+
     RANDOM_NUMBERS<T> rand_generator;
 
     MPM_PARTICLES();
     virtual ~MPM_PARTICLES();
 
-    void Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box);
-    void Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box,const T exclude_radius=(T)999);
-    void Initialize_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box);
-    void Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box);
-    void Add_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box);
-    void Add_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box);
-    void Reduce_X_In_A_Box(const RANGE<TV>& box);
-    void Reduce_X_As_A_Ball(const RANGE<TV>& square_box);
-    void Reduce_X_Where_Not_In_A_Ball(const SPHERE<TV>& ball);
-    void Reduce_X_Where_Not_In_A_Ball_But_In_A_Box(const SPHERE<TV>& ball,const RANGE<TV>& box);
     template<class T_OBJECT> void Add_Randomly_Sampled_Object(const T_OBJECT& object,const T exclude_radius=(T)999)
     {Add_Randomly_Sampled_Implicit_Object(ANALYTIC_IMPLICIT_OBJECT<T_OBJECT>(object),exclude_radius);}
     void Add_Randomly_Sampled_Implicit_Object(const IMPLICIT_OBJECT<TV>& object,const T exclude_radius=(T)999);
+    void Set_Material_Properties(int start_index,int count,T mass_in,T mu_in,T lambda_in);
+    void Set_Initial_State(int start_index,int count,MATRIX<T,TV::m> Fe_in,MATRIX<T,TV::m> Fp_in,TV V_in);
 //#####################################################################
 };
 }

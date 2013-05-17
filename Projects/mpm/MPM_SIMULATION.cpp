@@ -26,7 +26,7 @@ using ::std::exp;
 //#####################################################################
 template<class TV> MPM_SIMULATION<TV>::
 MPM_SIMULATION()
-    :assigned_volume_externally(false),dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_visco_plasticity(false),use_plasticity_yield(false),use_plasticity_clamp(false),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0.8)
+    :dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_visco_plasticity(false),use_plasticity_yield(false),use_plasticity_clamp(false),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0.8)
 {}
 //#####################################################################
 // Destructor
@@ -43,8 +43,6 @@ Initialize()
     LOG::cout<<"Allocating Memories for Simulation..."<<std::endl;
     TIMING_START;
     gravity_constant=TV();gravity_constant(1)=-(T)9.8;
-    mu.Resize(particles.number);mu0.Resize(particles.number);
-    lambda.Resize(particles.number);lambda0.Resize(particles.number);
     visco_tau.Resize(particles.number);
     Je.Resize(particles.number);
     Re.Resize(particles.number);
@@ -73,7 +71,7 @@ Advance_One_Time_Step_Forward_Euler()
     Build_Weights_And_Grad_Weights();
     Build_Helper_Structures_For_Constitutive_Model();
     Rasterize_Particle_Data_To_The_Grid();
-    if(frame==0 && !assigned_volume_externally) Compute_Particle_Volumes_And_Densities();
+    if(frame==0) Compute_Particle_Volumes_And_Densities();
     Compute_Grid_Forces();
     if(use_gravity) Apply_Gravity_To_Grid_Forces();
     Update_Velocities_On_Grid();
@@ -100,7 +98,7 @@ Advance_One_Time_Step_Backward_Euler()
     Build_Weights_And_Grad_Weights();
     Build_Helper_Structures_For_Constitutive_Model();
     Rasterize_Particle_Data_To_The_Grid();
-    if(frame==0 && !assigned_volume_externally) Compute_Particle_Volumes_And_Densities();
+    if(frame==0) Compute_Particle_Volumes_And_Densities();
     Compute_Grid_Forces();
     if(use_gravity) Apply_Gravity_To_Grid_Forces();
     Update_Velocities_On_Grid();
@@ -141,8 +139,8 @@ Build_Helper_Structures_For_Constitutive_Model()
     for(int p=0;p<particles.number;p++){
         constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),particles.Fp(p),Je(p),Re(p),Se(p));
         T lame_scale=exp(xi*(1-particles.Fp(p).Determinant()));
-        mu(p)=mu0(p)*lame_scale;
-        lambda(p)=lambda0(p)*lame_scale;}
+        particles.mu(p)=particles.mu0(p)*lame_scale;
+        particles.lambda(p)=particles.lambda0(p)*lame_scale;}
     if(PROFILING) TIMING_END("Build_Helper_Structures_For_Constitutive_Model");
 }
 //#####################################################################
@@ -192,7 +190,7 @@ Compute_Grid_Forces()
     TIMING_START;
     node_force.Fill(TV());
     for(int p=0;p<particles.number;p++){
-        MATRIX<T,TV::m> B=particles.volume(p)*constitutive_model.Compute_dPsi_dFe(mu(p),lambda(p),particles.Fe(p),Re(p),Je(p)).Times_Transpose(particles.Fe(p));
+        MATRIX<T,TV::m> B=particles.volume(p)*constitutive_model.Compute_dPsi_dFe(particles.mu(p),particles.lambda(p),particles.Fe(p),Re(p),Je(p)).Times_Transpose(particles.Fe(p));
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
             node_force(ind)-=B*grad_weight(p)(it.index);}}
@@ -343,7 +341,7 @@ Update_Deformation_Gradient()
          MATRIX<T,TV::m> U_hat,V_hat;
          DIAGONAL_MATRIX<T,TV::m> Sigma;
          Fe_hat.Fast_Singular_Value_Decomposition(U_hat,Sigma,V_hat);
-         T Pnorm=(constitutive_model.Compute_dPsi_dFe(mu(p),lambda(p),particles.Fe(p),Re(p),Je(p))).Frobenius_Norm();
+         T Pnorm=(constitutive_model.Compute_dPsi_dFe(particles.mu(p),particles.lambda(p),particles.Fe(p),Re(p),Je(p))).Frobenius_Norm();
          T gamma=(T)0;
          if(Pnorm>1e-10) gamma=clamp(dt*visco_nu*(Pnorm-visco_tau(p))/Pnorm,(T)0,(T)1);
          T scale=Inverse(cbrt(Sigma.Determinant()));

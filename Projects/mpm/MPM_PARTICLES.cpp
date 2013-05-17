@@ -23,6 +23,10 @@ MPM_PARTICLES()
     Add_Array(ATTRIBUTE_ID_FE,&Fe);
     Add_Array(ATTRIBUTE_ID_FP,&Fp);
     Add_Array(ATTRIBUTE_ID_PARTICLE_DOMAIN,&particle_domain);
+    Add_Array(ATTRIBUTE_ID_MU,&mu);
+    Add_Array(ATTRIBUTE_ID_LAMBDA,&lambda);
+    Add_Array(ATTRIBUTE_ID_MU0,&mu0);
+    Add_Array(ATTRIBUTE_ID_LAMBDA0,&lambda0);
     rand_generator.Set_Seed(0);
 }
 //#####################################################################
@@ -31,55 +35,6 @@ MPM_PARTICLES()
 template<class TV> MPM_PARTICLES<TV>::
 ~MPM_PARTICLES()
 {}
-//#####################################################################
-// Function Initialize_X_As_A_Grid
-//#####################################################################
-template<class TV> void MPM_PARTICLES<TV>::
-Initialize_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
-{
-    GRID<TV> grid(count,box);
-    ARRAY<TV> sample_X;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
-        TV x=grid.X(it.index);
-        sample_X.Append(x);}
-    Resize(sample_X.m);
-    X=sample_X;
-    Xm=X;
-}
-//#####################################################################
-// Function Initialize_X_As_A_Randomly_Sampled_Box
-//#####################################################################
-template<class TV> void MPM_PARTICLES<TV>::
-Initialize_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box,const T exclude_radius)
-{
-    ARRAY<TV> sample_X;
-    for(int n=0;n<N;n++){
-        TV x;
-        rand_generator.Fill_Uniform(x,box);
-        sample_X.Append(x);}
-    ARRAY<bool> should_go_away(sample_X.m);
-    if(exclude_radius<(T)100){
-        T exclude_radius2=exclude_radius*exclude_radius;
-        HASHTABLE<TV_INT,ARRAY<int> > buckets;
-        for(int i=0;i<sample_X.m;i++)
-            buckets.Get_Or_Insert(TV_INT(floor(sample_X(i)/exclude_radius))).Append(i);
-        for(int i=0;i<sample_X.m;i++){
-            if(!should_go_away(i)){
-                TV_INT my_cell=TV_INT(floor(sample_X(i)/exclude_radius));
-                TV_INT aaa=TV_INT(floor(sample_X(i)/exclude_radius)-1.0);
-                TV_INT bbb=TV_INT(floor(sample_X(i)/exclude_radius)+2.0);
-                for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(aaa,bbb));it.Valid();it.Next()){
-                     if(const ARRAY<int>* l1=buckets.Get_Pointer(it.index)){
-                         for(int j=0;j<l1->m;j++){
-                             if((*l1)(j)!=i && !should_go_away((*l1)(j)) && (sample_X(i)-sample_X((*l1)(j))).Magnitude_Squared()<exclude_radius2){
-                                 should_go_away((*l1)(j))=true;}}}}}}}
-    ARRAY<TV> filted_X;
-    for(int i=0;i<sample_X.m;i++)
-        if(!should_go_away(i)) filted_X.Append(sample_X(i));
-    Resize(filted_X.m);
-    X=filted_X;
-    Xm=X;
-}
 //#####################################################################
 // Function Add_Randomly_Sampled_Object
 //#####################################################################
@@ -113,150 +68,26 @@ Add_Randomly_Sampled_Implicit_Object(const IMPLICIT_OBJECT<TV>& object,const T e
         Xm(p)=new_X;}
 }
 //#####################################################################
-// Function Initialize_X_As_A_Ball
+// Function Set_Material_Properties
 //#####################################################################
 template<class TV> void MPM_PARTICLES<TV>::
-Initialize_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box)
+Set_Material_Properties(int start_index,int count,T mass_in,T mu_in,T lambda_in)
 {
-    GRID<TV> grid(count,square_box);
-    TV center=square_box.Center();
-    T r=0.5*((-square_box.min_corner+square_box.max_corner)(0));
-    ARRAY<TV> sample_X;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
-        TV x=grid.X(it.index);
-        if((x-center).Magnitude()<=r) sample_X.Append(x);}
-    Resize(sample_X.m);
-    X=sample_X;
-    Xm=X;
+    for(int i=start_index;i<start_index+count;i++){
+        mass(i)=mass_in;
+        mu(i)=mu_in;mu0(i)=mu_in;
+        lambda(i)=lambda_in;lambda0(i)=lambda_in;}
 }
 //#####################################################################
-// Function Add_X_As_A_Grid
+// Function Set_Initial_State
 //#####################################################################
 template<class TV> void MPM_PARTICLES<TV>::
-Add_X_As_A_Grid(const VECTOR<int,TV::m>& count,const RANGE<TV>& box)
+Set_Initial_State(int start_index,int count,MATRIX<T,TV::m> Fe_in,MATRIX<T,TV::m> Fp_in,TV V_in)
 {
-    GRID<TV> grid(count,box);
-    ARRAY<TV> old_X;
-    old_X.Resize(X.m);
-    for(int i=0;i<X.m;i++) old_X(i)=X(i);
-    ARRAY<TV> sample_X;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
-        TV x=grid.X(it.index);
-        sample_X.Append(x);}
-    old_X.Append_Elements(sample_X);
-    Resize(old_X.m);
-    X=old_X;
-    Xm=X;
-}
-//#####################################################################
-// Function Add_X_As_A_Randomly_Sampled_Box
-//#####################################################################
-template<class TV> void MPM_PARTICLES<TV>::
-Add_X_As_A_Randomly_Sampled_Box(const int N,const RANGE<TV>& box)
-{
-    ARRAY<TV> sample_X;
-    for(int n=0;n<N;n++){
-        TV x;
-        rand_generator.Fill_Uniform(x,box);
-        sample_X.Append(x);}
-    ARRAY<TV> old_X;
-    old_X.Resize(X.m);
-    for(int i=0;i<X.m;i++) old_X(i)=X(i);
-    old_X.Append_Elements(sample_X);
-    Resize(old_X.m);
-    X=old_X;
-    Xm=X;
-}
-//#####################################################################
-// Function Add_X_As_A_Ball
-//#####################################################################
-template<class TV> void MPM_PARTICLES<TV>::
-Add_X_As_A_Ball(const VECTOR<int,TV::m>& count,const RANGE<TV>& square_box)
-{
-    GRID<TV> grid(count,square_box);
-    TV center=square_box.Center();
-    T r=0.5*((-square_box.min_corner+square_box.max_corner)(0));
-    ARRAY<TV> old_X;
-    old_X.Resize(X.m);
-    for(int i=0;i<X.m;i++) old_X(i)=X(i);
-    ARRAY<TV> sample_X;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+count));it.Valid();it.Next()){
-        TV x=grid.X(it.index);
-        if((x-center).Magnitude()<=r) sample_X.Append(x);}
-    old_X.Append_Elements(sample_X);
-    Resize(old_X.m);
-    X=old_X;
-    Xm=X;
-}
-//#####################################################################
-// Function Reduce_X_As_A_Box
-//#####################################################################
-template<class TV> void MPM_PARTICLES<TV>::
-Reduce_X_In_A_Box(const RANGE<TV>& box)
-{
-    ARRAY<TV> old_X;
-    old_X.Resize(X.m);
-    for(int i=0;i<X.m;i++) old_X(i)=X(i);
-    ARRAY<TV> sample_X;
-    for(int i=0;i<old_X.m;i++)
-        if(!box.Lazy_Inside(old_X(i)))
-            sample_X.Append(old_X(i));
-    Resize(sample_X.m);
-    X=sample_X;
-    Xm=X;
-}
-//#####################################################################
-// Function Reduce_X_As_A_Ball
-//#####################################################################
-template<class TV> void MPM_PARTICLES<TV>::
-Reduce_X_As_A_Ball(const RANGE<TV>& square_box)
-{
-    ARRAY<TV> old_X;
-    old_X.Resize(X.m);
-    for(int i=0;i<X.m;i++) old_X(i)=X(i);
-    TV center=square_box.Center();
-    T r=0.5*((-square_box.min_corner+square_box.max_corner)(0));
-    ARRAY<TV> sample_X;
-    for(int i=0;i<old_X.m;i++)
-        if((old_X(i)-center).Magnitude()>r)
-            sample_X.Append(old_X(i));
-    Resize(sample_X.m);
-    X=sample_X;
-    Xm=X;
-}
-//#####################################################################
-// Function Reduce_X_Where_Not_In_A_Ball
-//#####################################################################
-template<class TV> void MPM_PARTICLES<TV>::
-Reduce_X_Where_Not_In_A_Ball(const SPHERE<TV>& ball)
-{
-    ARRAY<TV> old_X;
-    old_X.Resize(X.m);
-    for(int i=0;i<X.m;i++) old_X(i)=X(i);
-    ARRAY<TV> sample_X;
-    for(int i=0;i<old_X.m;i++)
-        if(ball.Lazy_Inside(old_X(i)))
-            sample_X.Append(old_X(i));
-    Resize(sample_X.m);
-    X=sample_X;
-    Xm=X;
-}
-//#####################################################################
-// Function Reduce_X_Where_Not_In_A_Ball_But_In_A_Box
-//#####################################################################
-template<class TV> void MPM_PARTICLES<TV>::
-Reduce_X_Where_Not_In_A_Ball_But_In_A_Box(const SPHERE<TV>& ball,const RANGE<TV>& box)
-{
-    ARRAY<TV> old_X;
-    old_X.Resize(X.m);
-    for(int i=0;i<X.m;i++) old_X(i)=X(i);
-    ARRAY<TV> sample_X;
-    for(int i=0;i<old_X.m;i++){
-        if(!ball.Lazy_Inside(old_X(i)) && box.Lazy_Inside(old_X(i))) continue;
-        sample_X.Append(old_X(i));}
-    Resize(sample_X.m);
-    X=sample_X;
-    Xm=X;
+    for(int i=start_index;i<start_index+count;i++){
+        Fe(i)=Fe_in;
+        Fp(i)=Fp_in;
+        V(i)=V_in;}
 }
 static int Initialize_MPM_Particles()
 {
@@ -265,6 +96,10 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_FE,"Fe");
     Register_Attribute_Name(ATTRIBUTE_ID_FP,"Fp");
     Register_Attribute_Name(ATTRIBUTE_ID_PARTICLE_DOMAIN,"particle_domain");
+    Register_Attribute_Name(ATTRIBUTE_ID_MU,"mu");
+    Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA,"lambda");
+    Register_Attribute_Name(ATTRIBUTE_ID_MU0,"mu0");
+    Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA0,"lambda0");
     return 0;
 }
 int initialize_mpm_particles=Initialize_MPM_Particles();

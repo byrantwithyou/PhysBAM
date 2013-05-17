@@ -28,7 +28,6 @@ public:
 
     virtual ~MPM_SYSTEM();
 
-    void Force(ARRAY<TV,TV_INT>& f) const;
     void Apply_Force_Derivatives(const ARRAY<TV,TV_INT>& du,ARRAY<TV,TV_INT>& df) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const PHYSBAM_OVERRIDE;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const PHYSBAM_OVERRIDE;

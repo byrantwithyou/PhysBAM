@@ -90,9 +90,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     if(!use_output_directory) output_directory=STRING_UTILITIES::string_sprintf("MPM_%dD_test_%d",TV::m,test_number);
 
-    T object_density=1;
-    T object_mass=1;
-
     // geometry setting
     switch(test_number){
         case 1:
@@ -101,29 +98,29 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.2,-0.2),TV(0.35,0.9)),particle_exclude_radius);
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.3,2),TV(-0.1,4.5)),particle_exclude_radius);
             sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0.1,3),0.12),particle_exclude_radius);
-            break;
-        case 2: // shit fall
-            sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
-            sim.particles.Initialize_X_As_A_Grid(TV_INT(0.2*particle_res+1,0.6*particle_res+1),RANGE<TV>(TV(-0.1,-0.5),TV(0.1,0.1)));
-            sim.particles.Add_X_As_A_Grid(TV_INT(0.2*particle_res+1,0.2*particle_res+1),RANGE<TV>(TV(-0.1,0.2),TV(0.1,0.4)));
-            sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.2),0.03));
-            sim.rigid_ball_velocity.Append(TV());
-            sim.rigid_ball.Append(SPHERE<TV>(TV(0.09,-0.3),0.03));
-            sim.rigid_ball_velocity.Append(TV());
-            break;
-        case 3:
-            sim.grid.Initialize(TV_INT(1.0*grid_res+1,0.8*grid_res+1),RANGE<TV>(TV(-0.5,-0.4),TV(0.5,0.4)));
-            sim.particles.Initialize_X_As_A_Randomly_Sampled_Box(particle_count,RANGE<TV>(TV(-0.1,0.2),TV(0,0.3)));
-            sim.particles.Add_X_As_A_Randomly_Sampled_Box(particle_count*2,RANGE<TV>(TV(0.1,-0.3),TV(0.4,0.3)));
-            // for(int p=0;p<sim.particles.number;p++){
-            //     if(sim.particles.X(p).x<0) sim.particles.V(p)=TV(2,0);
-            //     if(sim.particles.X(p).x>0) sim.particles.V(p)=TV(-2,0);}
-            // sim.rigid_ball.Append(SPHERE<TV>(TV(0,-0.2),0.05));
-            // sim.rigid_ball_velocity.Append(TV());
+            sim.particles.Set_Material_Properties(0,sim.particles.number,
+                (T)12*density_scale/sim.particles.number, // mass per particle
+                (3e3)*ym/((T)2*((T)1+pr)), // mu
+                (3e3)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+            sim.particles.Set_Initial_State(0,sim.particles.number,
+                MATRIX<T,TV::m>::Identity_Matrix(), // Fe
+                MATRIX<T,TV::m>::Identity_Matrix(), // Fp
+                TV()); // initial velocity
+            sim.use_gravity=true;
+            sim.use_plasticity_yield=false;
+            sim.yield_min=-100;
+            sim.yield_max=1.3;
+            sim.use_visco_plasticity=true;
+            sim.visco_nu=1e3;
+            sim.visco_tau.Fill(300);
             break;
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
-    // VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),GRID<TV>(sim.grid.numbers_of_cells+1,RANGE<TV>(sim.grid.domain.min_corner-sim.grid.dX*0.5,sim.grid.domain.max_corner+sim.grid.dX*0.5),true),output_directory);
+    sim.Initialize();
+    if(abs(sim.grid.dX(0)-sim.grid.dX(1))>(T)1e-10){
+        LOG::cout<<"grid not uniform! dx: "<<sim.grid.dX<<std::endl;
+        exit(0);}
+
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
 
     // Delaunay Triangulation
@@ -169,78 +166,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
         Flush_Frame<TV>("voronoi cell boundary");}
 
-    // material setting
-    sim.Initialize();
-    if(abs(sim.grid.dX(0)-sim.grid.dX(1))>(T)1e-10){
-        LOG::cout<<"grid dx: "<<sim.grid.dX<<std::endl;
-        exit(0);}
-    switch(test_number){
-        case 1:
-            object_density=(T)1200*density_scale;
-            object_mass=object_density*RANGE<TV>(TV(-0.2,-0.12),TV(0.2,0.12)).Size();
-            ym*=(T)3e3;
-            for(int p=0;p<sim.particles.number;p++){
-                T this_ym=ym;
-                sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
-                sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
-            sim.use_gravity=true;
-            sim.use_plasticity_yield=false;
-            sim.yield_min=-100;
-            sim.yield_max=1.3;
-            sim.use_visco_plasticity=true;
-            sim.visco_nu=1e3;
-            sim.visco_tau.Fill(300);
-            break;
-        case 2:
-            object_density=(T)1200*density_scale;
-            object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size()*2;
-            ym*=(T)1e5;
-            sim.mu.Fill(ym/((T)2*((T)1+pr)));
-            sim.lambda.Fill(ym*pr/(((T)1+pr)*((T)1-2*pr)));
-            sim.use_visco_plasticity=true;
-            sim.visco_nu=1e3;
-            sim.visco_tau.Fill(1000);
-            break;
-        case 3:
-            object_density=(T)400*density_scale;
-            object_mass=object_density*(RANGE<TV>(TV(-0.1,-0.1),TV(0.1,0.1))).Size();
-            ym*=(T)5e3;
-            for(int p=0;p<sim.particles.number;p++){
-                T this_ym=(sim.particles.Xm(p).x>0.05)?0:ym;
-                sim.mu(p)=(this_ym/((T)2*((T)1+pr)));
-                sim.lambda(p)=(this_ym*pr/(((T)1+pr)*((T)1-2*pr)));}
-            sim.use_gravity=true;
-            sim.use_plasticity_yield=false;
-            sim.yield_min=(T)1-(T)0.025;
-            sim.yield_max=(T)1+(T)0.0075;
-            break;
-        default: PHYSBAM_FATAL_ERROR("Missing test");};
-    for(int p=0;p<sim.particles.number;p++){
-        sim.particles.mass(p)=object_mass/sim.particles.number;
-        sim.particles.Fe(p)=MATRIX<T,TV::m>::Identity_Matrix();
-        sim.particles.Fp(p)=MATRIX<T,TV::m>::Identity_Matrix();}
-    sim.mu0=sim.mu;
-    sim.lambda0=sim.lambda;
-
     // projection init
     MPM_PROJECTION<TV> projection(sim);
-
-    // use voronoi polygon to initialize particle mass and volume and particle domain
-    if(use_voronoi || use_voronoi_boundary){
-        sim.assigned_volume_externally=true;
-        for(int p=0;p<sim.particles.number;p++){
-            POLYGON<TV> poly(voronoi.elements(p).m);
-            for(int i=0;i<voronoi.elements(p).m;i++)
-                poly.X(i)=voronoi.Xm(voronoi.elements(p)(i));
-            T area=poly.Area();
-            sim.particles.volume(p)=area;
-            sim.particles.mass(p)=object_density*area;
-            if(poly.X.m==TV::m+1){ // triangle mesh
-                for(int i=0;i<poly.X.m;i++) sim.particles.particle_domain(p)(i)=poly.X(i);
-                if(!((poly.X(1)-poly.X(0)).x*(poly.X(2)-poly.X(0)).y-(poly.X(1)-poly.X(0)).y*(poly.X(2)-poly.X(0)).x>0)){
-                    TV temp=sim.particles.particle_domain(p)(1);
-                    sim.particles.particle_domain(p)(1)=sim.particles.particle_domain(p)(2);
-                    sim.particles.particle_domain(p)(2)=temp;}}}}
 
     // Greg Turk
     if(use_turk){
@@ -293,7 +220,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Build_Weights_And_Grad_Weights();
         sim.Build_Helper_Structures_For_Constitutive_Model();
         sim.Rasterize_Particle_Data_To_The_Grid();
-        if(sim.frame==0 && !sim.assigned_volume_externally) sim.Compute_Particle_Volumes_And_Densities();
+        if(sim.frame==0) sim.Compute_Particle_Volumes_And_Densities();
         sim.Compute_Grid_Forces();
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
         sim.Update_Velocities_On_Grid();

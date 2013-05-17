@@ -25,18 +25,6 @@ template<class TV> MPM_SYSTEM<TV>::
 {
 }
 //#####################################################################
-// Function Force
-//#####################################################################
-template<class TV> void MPM_SYSTEM<TV>::
-Force(ARRAY<TV,TV_INT>& f) const
-{
-    f.Fill(TV());
-    for(int p=0;p<sim.particles.number;p++){
-        MATRIX<T,TV::m> B=sim.particles.volume(p)*sim.constitutive_model.Compute_dPsi_dFe(sim.mu(p),sim.lambda(p),sim.particles.Fe(p),sim.Re(p),sim.Je(p))*(sim.particles.Fe(p).Transposed());
-        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.IN));it.Valid();it.Next())
-            f(sim.influence_corner(p)+it.index)-=B*sim.grad_weight(p)(it.index);}
-}
-//#####################################################################
 // Function Apply_Force_Derivatives
 //#####################################################################
 template<class TV> void MPM_SYSTEM<TV>::
@@ -49,7 +37,7 @@ Apply_Force_Derivatives(const ARRAY<TV,TV_INT>& du,ARRAY<TV,TV_INT>& df) const
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.IN));it.Valid();it.Next())
             Cp+=MATRIX<T,TV::m>::Outer_Product(du(sim.influence_corner(p)+it.index),sim.grad_weight(p)(it.index));
         MATRIX<T,TV::m> Ep=Cp*sim.particles.Fe(p);
-        MATRIX<T,TV::m> Ap=sim.constitutive_model.Compute_d2Psi_dFe_dFe_Action_dF(sim.mu(p),sim.lambda(p),sim.particles.Fe(p),sim.Je(p),sim.Re(p),sim.Se(p),Ep);
+        MATRIX<T,TV::m> Ap=sim.constitutive_model.Compute_d2Psi_dFe_dFe_Action_dF(sim.particles.mu(p),sim.particles.lambda(p),sim.particles.Fe(p),sim.Je(p),sim.Re(p),sim.Se(p),Ep);
         MATRIX<T,TV::m> Gp=sim.particles.volume(p)*(Ap.Times_Transpose(sim.particles.Fe(p)));
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+sim.IN));it.Valid();it.Next()){
             df(sim.influence_corner(p)+it.index)-=Gp*sim.grad_weight(p)(it.index);}}
