@@ -58,8 +58,11 @@ public:
     int timesteps;
     T mu,nu,epsilon;
     T dt,one_over_dx_squared;
+    T cell_volume;
+    T one_over_cell_volume;
+    int threads;
     
-    MPLE_DRIVER():cfl((T)1),spread((T)1),rescale((T)1),contour_value((T).5),frame_dt((T).5),frames(100),mu(5e-4),nu(.05){}
+    MPLE_DRIVER():cfl((T)1),spread((T)1),rescale((T)1),contour_value((T).5),frame_dt((T)1/24),frames(100),mu(5e-4),nu(.05){}
 
     ~MPLE_DRIVER(){}
 
@@ -77,19 +80,18 @@ public:
             location.array(k)=it.Location();
             index.array(k)=it.Node_Index();}
 
-        RANDOM_NUMBERS<T> random;
-        random.Set_Seed(0);
         for(int i=0;i<array_m;i++){
-            u.array(i)=random.Get_Uniform_Number(0,1);
+            u.array(i)=0;
             source.array(i)=0;}
 
 #pragma omp parallel for        
         for(int i=0;i<points.m;i++)
             points(i).Update_Base_And_Weights(grid);
 
-        for(int i=0;i<points.m;i++){
-            for(MPLE_ITERATOR<TV,w> it(points(i));it.Valid();it.Next())
-                source(it.Node())+=mu*it.Weight();}
+        for(int i=0;i<points.m;i++)
+            for(MPLE_ITERATOR<TV,w> it(points(i));it.Valid();it.Next()){
+                source(it.Node())+=it.Weight();
+                u(it.Node())=1;}
 
         T max_value=0;
         for(int i=0;i<array_m;i++)
@@ -103,8 +105,16 @@ public:
         dt=cfl*sqr(grid.dX(0))/(2*(TV::m+1));
         timesteps=(int)(frame_dt/dt);
         epsilon=spread*grid.dX(0);
-        one_over_dx_squared=1/sqr(grid.dX(0));
+        one_over_dx_squared=(T)1/sqr(grid.dX(0));
+        cell_volume=grid.dX.Product();
+        one_over_cell_volume=(T)1/cell_volume;
         PHYSBAM_ASSERT(grid.dX.Min()==grid.dX.Max());
+
+#pragma omp parallel
+#pragma omp master
+        threads=omp_get_num_threads();
+
+        LOG::cout<<"Running on "<<threads<<" threads."<<std::endl;
     }
 
     void Dump_Surface(SEGMENTED_CURVE_2D<T>& curve)
@@ -134,6 +144,36 @@ public:
 
     void Advance_Timestep()
     {
+        // compute integral of u
+        ARRAY<T> int_u_per_thread(threads);
+#pragma omp parallel for
+        for(int i=0;i<array_m;i++)
+            int_u_per_thread(omp_get_thread_num())+=u.array(i);
+        T int_u=0;
+        for(int i=0;i<threads;i++)
+            int_u+=int_u_per_thread(i);
+        int_u*=cell_volume;
+
+        // compute integral of uw
+        ARRAY<T> int_uw_per_thread(threads);
+#pragma omp parallel for
+        for(int i=0;i<points.m;i++){
+            int tid=omp_get_thread_num();
+            for(MPLE_ITERATOR<TV,w> it(points(i));it.Valid();it.Next())
+                int_uw_per_thread(tid)+=u(it.Node())*it.Weight();}
+        T int_uw=0;
+        for(int i=0;i<threads;i++)
+            int_uw+=int_uw_per_thread(i);
+
+        // LOG::cout<<"u "<<int_u<<" "<<int_uw<<std::endl;
+
+        // T int_w=points.m;
+        // T int_1=grid.Domain_Indices().Size()*cell_volume;
+        T c1=int_uw/int_u;
+        // T c2=(int_w-int_uw)/(int_1-int_u);
+        
+        // LOG::cout<<"c "<<c1<<" "<<c2<<std::endl;
+
 #pragma omp parallel for schedule(guided)
         for(int i=0;i<array_m;i++)
         {
@@ -152,7 +192,7 @@ public:
             value-=(dt/epsilon)*MPLE_DOUBLE_WELL<T>::Gradient(u.array(i));
 
             // rasterization
-            value+=dt*source.array(i)*((1-2*nu)/nu+sqr(2*nu-1)/((1-nu)*nu)*u.array(i));
+            value+=dt*mu*(u.array(i)*source.array(i)*one_over_cell_volume+(source.array(i)*one_over_cell_volume-c1));
 
             //clamp
             if(value<0) value=0;
@@ -164,7 +204,9 @@ public:
         LOG::cout<<"Frame "<<frame<<std::endl;
         for(int i=0;i<timesteps;i++){
             Advance_Timestep();
-            u.Exchange(u_new);}
+            u.Exchange(u_new);
+            // Write("substep");
+        }
     }
 
     void Run()

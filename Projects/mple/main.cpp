@@ -12,7 +12,7 @@
 
 using namespace PhysBAM;
 
-const int w=2;
+const int w=4;
 const int d=2;
 
 typedef float RW;

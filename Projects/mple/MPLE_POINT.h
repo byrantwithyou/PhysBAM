@@ -36,9 +36,6 @@ public:
         for(int k=0;k<TV::m;k++){
             const T x=X_eval(k);
             Compute_Weights(x*one_over_dx,k);}
-        for(int i=0;i<w;i++)
-        for(int k=0;k<TV::m;k++)
-            weights(i)(k)*=one_over_dx;
     }
 
 private:
