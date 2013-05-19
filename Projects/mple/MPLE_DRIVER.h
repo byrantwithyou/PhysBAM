@@ -27,6 +27,30 @@
 #include <omp.h>
 #endif
 
+int omp_get_thread_num_helper()
+{
+    int tid;
+#ifdef USE_OPENMP
+    tid=omp_get_thread_num();
+#else
+    tid=0;
+#endif
+    return tid;
+}
+
+int omp_get_num_threads_helper()
+{
+    int threads;
+#ifdef USE_OPENMP
+#pragma omp parallel
+#pragma omp master
+    threads=omp_get_num_threads();
+#else
+    threads=1;
+#endif
+    return threads;
+}
+
 namespace PhysBAM{
 
 template<class TV,int w>
@@ -110,10 +134,7 @@ public:
         one_over_cell_volume=(T)1/cell_volume;
         PHYSBAM_ASSERT(grid.dX.Min()==grid.dX.Max());
 
-#pragma omp parallel
-#pragma omp master
-        threads=omp_get_num_threads();
-
+        threads=omp_get_num_threads_helper();
         LOG::cout<<"Running on "<<threads<<" threads."<<std::endl;
     }
 
@@ -147,8 +168,9 @@ public:
         // compute integral of u
         ARRAY<T> int_u_per_thread(threads);
 #pragma omp parallel for
-        for(int i=0;i<array_m;i++)
-            int_u_per_thread(omp_get_thread_num())+=u.array(i);
+        for(int i=0;i<array_m;i++){
+            int tid=omp_get_thread_num_helper();
+            int_u_per_thread(tid)+=u.array(i);}
         T int_u=0;
         for(int i=0;i<threads;i++)
             int_u+=int_u_per_thread(i);
@@ -158,7 +180,7 @@ public:
         ARRAY<T> int_uw_per_thread(threads);
 #pragma omp parallel for
         for(int i=0;i<points.m;i++){
-            int tid=omp_get_thread_num();
+            int tid=omp_get_thread_num_helper();
             for(MPLE_ITERATOR<TV,w> it(points(i));it.Valid();it.Next())
                 int_uw_per_thread(tid)+=u(it.Node())*it.Weight();}
         T int_uw=0;
