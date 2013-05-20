@@ -19,6 +19,7 @@
 #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include "MPLE_DOUBLE_WELL.h"
 #include "MPLE_ITERATOR.h"
 #include "MPLE_POINT.h"
@@ -138,11 +139,20 @@ public:
         LOG::cout<<"Running on "<<threads<<" threads."<<std::endl;
     }
 
-    void Dump_Surface(SEGMENTED_CURVE_2D<T>& curve)
+    void Dump_Surface(SEGMENTED_CURVE_2D<T>& surface)
     {
-        for(int i=0;i<curve.mesh.elements.m;i++){
-            VECTOR<int,2>& s=curve.mesh.elements(i);
-            Add_Debug_Object(VECTOR<VECTOR<T,2>,2>(curve.particles.X(s.x),curve.particles.X(s.y)),VECTOR<T,3>(0,.25,1));}
+        for(int i=0;i<surface.mesh.elements.m;i++){
+            VECTOR<int,2>& s=surface.mesh.elements(i);
+            Add_Debug_Object(VECTOR<VECTOR<T,2>,2>(surface.particles.X(s.x),surface.particles.X(s.y)),VECTOR<T,3>(0,.25,1));}
+    }
+
+    void Dump_Surface(TRIANGULATED_SURFACE<T>& surface)
+    {
+        // for(int i=0;i<surface.mesh.elements.m;i++){
+            // VECTOR<int,3>& s=surface.mesh.elements(i);
+            // Add_Debug_Object(VECTOR<VECTOR<T,3>,3>(surface.particles.X(s.x),surface.particles.X(s.y),surface.particles.X(s.z)),VECTOR<T,3>(0,.25,1),VECTOR<T,3>(0,.25,1));}
+        for(int i=0;i<surface.mesh.elements.m;i++)
+            Add_Debug_Object(VECTOR<TV,TV::m>(surface.particles.X.Subset(surface.mesh.elements(i))),TV(0,.25,1),TV(1,.25,0));
     }
 
     void Write(const char* title)
