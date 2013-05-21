@@ -141,6 +141,55 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
                 TV()); // initial velocity
             break;}
+
+        case 2:{ // intially stretched
+            sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
+
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.2,-0.2),TV(0.2,0.2)),particle_exclude_radius);
+            int first_count=sim.particles.number;
+            sim.particles.Set_Material_Properties(0,first_count,
+                (T)115.2*density_scale/first_count, // mass per particle
+                (3e3)*ym/((T)2*((T)1+pr)), // mu
+                (3e3)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+            sim.particles.Set_Plasticity(0,first_count,
+                false,-1,1, // plasticity_yield
+                false,-1,1); // plasticity_clamp
+            sim.particles.Set_Visco_Plasticity(0,first_count,
+                false,700, // visco_nu
+                900, // visco_tau
+                0); // visco_kappa
+            sim.use_gravity=false;
+            sim.particles.Set_Initial_State(0,sim.particles.number,
+                MATRIX<T,TV::m>(2,0,0,0.5), // Fe
+                MATRIX<T,TV::m>::Identity_Matrix(), // Fp
+                TV()); // initial velocity
+            for(int p=0;p<sim.particles.number;p++)
+                sim.particles.X(p)=MATRIX<T,TV::m>(2,0,0,0.5)*sim.particles.Xm(p);
+            break;}
+
+        case 3:{ // free fall
+            sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
+
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.2,-0.2),TV(0.2,0.2)),particle_exclude_radius);
+            int first_count=sim.particles.number;
+            sim.particles.Set_Material_Properties(0,first_count,
+                (T)115.2*density_scale/first_count, // mass per particle
+                (3e3)*ym/((T)2*((T)1+pr)), // mu
+                (3e3)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+            sim.particles.Set_Plasticity(0,first_count,
+                false,-1,1, // plasticity_yield
+                false,-1,1); // plasticity_clamp
+            sim.particles.Set_Visco_Plasticity(0,first_count,
+                false,700, // visco_nu
+                900, // visco_tau
+                0); // visco_kappa
+            sim.use_gravity=true;
+            sim.particles.Set_Initial_State(0,sim.particles.number,
+                MATRIX<T,TV::m>::Identity_Matrix(), // Fe
+                MATRIX<T,TV::m>::Identity_Matrix(), // Fp
+                TV()); // initial velocity
+            break;}
+
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
     sim.Initialize();
@@ -241,24 +290,29 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
         sim.Build_Weights_And_Grad_Weights();
         sim.Build_Helper_Structures_For_Constitutive_Model();
+        LOG::cout<<"Momentum - particles:"<<sim.Get_Total_Momentum_On_Particles()<<std::endl;
         sim.Rasterize_Particle_Data_To_The_Grid();
+        LOG::cout<<"Momentum - grid (before linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
         if(sim.frame==0) sim.Compute_Particle_Volumes_And_Densities();
         sim.Compute_Grid_Forces();
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
         sim.Update_Velocities_On_Grid();
         sim.Grid_Based_Body_Collisions();
         sim.Solve_The_Linear_System(); // so far sim.node_V is achieved via MPM
+        LOG::cout<<"Momentum - grid (after linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
         if(use_projection){
             projection.Reinitialize();
             projection.Identify_Dirichlet_Cells();
             projection.Identify_Neumann_Cells();
             projection.Identify_Nodes_Of_Non_Dirichlet_Cells();
-            projection.Velocities_Corners_To_Faces();
-            projection.Build_Velocity_Divergence();
-            projection.Solve_For_Pressure(sim.dt,1);
-            projection.Do_Projection(sim.dt,1);
-            projection.Velocities_Faces_To_Corners(); // this step modifies sim.node_V
+            projection.Velocities_Corners_To_Faces_MPM_Style();
+            // projection.Build_Velocity_Divergence();
+            // projection.Solve_For_Pressure(sim.dt,1);
+            // projection.Do_Projection(sim.dt,1);
+            projection.Velocities_Faces_To_Corners_MPM_Style(); // this step modifies sim.node_V
+            LOG::cout<<"Momentum - grid (after projection):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
         }
+
         sim.Update_Deformation_Gradient();
         sim.Update_Particle_Velocities();
         sim.Particle_Based_Body_Collisions();
@@ -272,12 +326,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
-                if(sim.particles.Xm(i).x<0)
+                // if(sim.particles.Xm(i).x<0)
                     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
-                else if(sim.particles.Xm(i).y<0.55)
-                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
-                else
-                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
+                // else if(sim.particles.Xm(i).y<0.55)
+                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
+                // else
+                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
             }
 
             // projection: visualize MAC grid velocities

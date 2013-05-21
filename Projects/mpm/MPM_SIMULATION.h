@@ -90,6 +90,8 @@ public:
 
     T Get_Maximum_Node_Velocity() const;
     T Get_Maximum_Particle_Velocity() const;
+    TV Get_Total_Momentum_On_Nodes() const;
+    TV Get_Total_Momentum_On_Particles() const;
 //#####################################################################
 };
 }

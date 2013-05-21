@@ -44,6 +44,7 @@ public:
     void Solve_For_Pressure(const T dt,const T rho);       // step 7
     void Do_Projection(const T dt,const T rho);            // step 8
     void Velocities_Faces_To_Corners();                    // step 9
+    void Velocities_Faces_To_Corners_MPM_Style();          // step 9 - alternate
 
     void Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs);      // called by Solve_For_Pressure
 };

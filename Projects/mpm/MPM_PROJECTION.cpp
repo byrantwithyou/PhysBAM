@@ -231,22 +231,31 @@ Do_Projection(const T dt,const T rho)
 template<class TV> void MPM_PROJECTION<TV>::
 Velocities_Faces_To_Corners()
 {
-    TV_INT nodes[TV::m*4-4];
-    HASHTABLE<TV_INT,bool> node_dealt;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
-        if(!cell_dirichlet(it.index)){
-            mac_grid.Nodes_In_Cell_From_Minimum_Corner_Node(it.index,nodes);
-            for(int i=0;i<TV::m*4-4;i++){
-                if(node_dealt.Get_Pointer(nodes[i])==NULL){
-                    node_dealt.Get_Or_Insert(nodes[i])=true;
-                    sim.node_V(nodes[i])=TV();
-                    for(int axis=0;axis<TV::m;axis++){
-                        int contributor_count=TV::m*2-2;
-                        for(int face=0;face<TV::m*2-2;face++){
-                            FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,nodes[i],face));
-                            if(cell_neumann(face_index.First_Cell_Index()) || cell_neumann(face_index.Second_Cell_Index())) contributor_count--;
-                            else sim.node_V(nodes[i])(axis)+=face_velocities(face_index);}
-                        if(contributor_count>0) sim.node_V(nodes[i])(axis)/=contributor_count;}}}}}
+    for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(nodes_non_dirichlet_cells);it.Valid();it.Next()){
+        TV_INT node=it.Key();
+        sim.node_V(node)=TV();
+        for(int axis=0;axis<TV::m;axis++){
+            int contributor_count=TV::m*2-2;
+            for(int face=0;face<TV::m*2-2;face++){
+                FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,node,face));
+                if(cell_neumann(face_index.First_Cell_Index()) || cell_neumann(face_index.Second_Cell_Index())) contributor_count--;
+                else sim.node_V(node)(axis)+=face_velocities(face_index);}
+            if(contributor_count>0) sim.node_V(node)(axis)/=contributor_count;}}
+}
+
+//#####################################################################
+// Function Velocities_Faces_To_Corners_MPM_Style
+//#####################################################################
+template<class TV> void MPM_PROJECTION<TV>::
+Velocities_Faces_To_Corners_MPM_Style()
+{
+    for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(nodes_non_dirichlet_cells);it.Valid();it.Next()){
+        TV_INT node=it.Key();
+        sim.node_V(node)=TV();
+        for(int axis=0;axis<TV::m;axis++){
+            for(int face=0;face<TV::m*2-2;face++){
+                FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,node,face));
+                sim.node_V(node)(axis)+=0.5*face_velocities(face_index);}}}
 }
 
 //#####################################################################

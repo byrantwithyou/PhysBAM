@@ -504,6 +504,28 @@ Get_Maximum_Particle_Velocity() const
     return max_particle_v;
 }
 //#####################################################################
+// Function Get_Total_Momentum_On_Nodes
+//#####################################################################
+template<class TV> TV MPM_SIMULATION<TV>::
+Get_Total_Momentum_On_Nodes() const
+{
+    TV momen;
+    for(int i=0;i<node_V.array.m;i++)
+        momen+=node_mass.array(i)*node_V.array(i);
+    return momen;
+}
+//#####################################################################
+// Function Get_Total_Momentum_On_Particles
+//#####################################################################
+template<class TV> TV MPM_SIMULATION<TV>::
+Get_Total_Momentum_On_Particles() const
+{
+    TV momen;
+    for(int i=0;i<particles.V.m;i++)
+        momen+=particles.mass(i)*particles.V(i);
+    return momen;
+}
+//#####################################################################
 template class MPM_SIMULATION<VECTOR<float,2> >;
 template class MPM_SIMULATION<VECTOR<float,3> >;
 template class MPM_SIMULATION<VECTOR<double,2> >;
