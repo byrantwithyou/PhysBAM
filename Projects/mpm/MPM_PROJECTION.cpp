@@ -20,7 +20,7 @@ MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     :sim(sim_in)
 {
     mac_grid.Initialize(sim.grid.numbers_of_cells,RANGE<TV>(sim.grid.domain.min_corner,sim.grid.domain.max_corner),true);
-    face_velocities.Resize(mac_grid);
+    face_velocities.Resize(mac_grid);face_masses.Resize(mac_grid);face_momenta.Resize(mac_grid);
     cell_dirichlet.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     cell_neumann.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     div_u.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
@@ -41,6 +41,8 @@ template<class TV> void MPM_PROJECTION<TV>::
 Reinitialize()
 {
     face_velocities.Fill((T)0);
+    face_masses.Fill((T)0);
+    face_momenta.Fill((T)0);
     cell_dirichlet.Fill(false);
     cell_neumann.Fill(false);
     div_u.Fill((T)0);
@@ -77,10 +79,10 @@ Identify_Neumann_Cells()
 }
 
 //#####################################################################
-// Function Velocities_Corners_To_faces
+// Function Velocities_Corners_To_Faces
 //#####################################################################
 template<class TV> void MPM_PROJECTION<TV>::
-Velocities_Corners_To_faces()
+Velocities_Corners_To_Faces()
 {
     TV_INT nodes[TV::m*4-4];
     face_velocities.Fill((T)0);
@@ -99,6 +101,17 @@ Velocities_Corners_To_faces()
                             face_parents_count.Get_Or_Insert(face_index)++;}}}}}}
     for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(face_parents_count);it.Valid();it.Next())
         if(it.Data()>1) face_velocities(it.Key())/=it.Data();
+}
+
+//#####################################################################
+// Function Velocities_Corners_To_Faces_MPM_Style
+//#####################################################################
+template<class TV> void MPM_PROJECTION<TV>::
+Velocities_Corners_To_Faces_MPM_Style()
+{
+    face_velocities.Fill((T)0);
+    face_masses.Fill((T)0);
+    face_momenta.Fill((T)0);
 }
 
 //#####################################################################

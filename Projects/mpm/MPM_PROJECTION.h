@@ -24,22 +24,25 @@ public:
     ARRAY<bool,TV_INT> cell_dirichlet;
     ARRAY<bool,TV_INT> cell_neumann;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_masses;
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_momenta;
     ARRAY<T,TV_INT> div_u;
     ARRAY<T,TV_INT> pressure;
 
     MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in);
     ~MPM_PROJECTION();
 
-    void Reinitialize();
-    void Identify_Dirichlet_Cells();
-    void Identify_Neumann_Cells();
-    void Velocities_Corners_To_faces();
-    void Build_Velocity_Divergence();
-    void Solve_For_Pressure(const T dt,const T rho);
-    void Do_Projection(const T dt,const T rho);
-    void Velocities_Faces_To_Corners();
+    void Reinitialize();                                   // step 1
+    void Identify_Dirichlet_Cells();                       // step 2 
+    void Identify_Neumann_Cells();                         // step 3
+    void Velocities_Corners_To_Faces();                    // step 4
+    void Velocities_Corners_To_Faces_MPM_Style();          // step 4 - alternate
+    void Build_Velocity_Divergence();                      // step 5 
+    void Solve_For_Pressure(const T dt,const T rho);       // step 6
+    void Do_Projection(const T dt,const T rho);            // step 7
+    void Velocities_Faces_To_Corners();                    // step 8
 
-    void Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs);
+    void Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs);      // called by Solve_For_Pressure
 };
 }
 #endif
