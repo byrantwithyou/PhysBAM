@@ -7,10 +7,14 @@
 #define __MPLE_DRIVER__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Fourier_Transforms/FFT_2D.h>
+#include <PhysBAM_Tools/Fourier_Transforms/FFT_3D.h>
+#include <PhysBAM_Tools/Fourier_Transforms/FFT_POLICY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Tools/Vectors/COMPLEX.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -60,19 +64,25 @@ class MPLE_DRIVER: public NONCOPYABLE
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef typename MARCHING_CUBES<TV>::T_SURFACE T_SURFACE;
-    
+    typedef typename FFT_POLICY<TV>::FFT T_FFT;    
+
 public:
     
-    ARRAY<MPLE_POINT<TV,w> > points;   // data
-    GRID<TV> grid;                     // grid
+    ARRAY<MPLE_POINT<TV,w> > points;     // data
+    GRID<TV> grid;                       // grid
 
-    ARRAY<T,TV_INT> u;                // segmentation function
-    ARRAY<T,TV_INT> u_new;            // new segmentation funtion
-    ARRAY<T,TV_INT> source;           // source
-    ARRAY<TV,TV_INT> location;        // flat index to location
-    ARRAY<TV_INT,TV_INT> index;       // flat to vector index
+    ARRAY<T,TV_INT> u;                   // segmentation function
+    ARRAY<T,TV_INT> force;               // force
+    ARRAY<COMPLEX<T>,TV_INT> fft;        // fft representation
+    ARRAY<T,TV_INT> source;              // source
+    ARRAY<TV,TV_INT> location;           // flat index to location
+    ARRAY<TV_INT,TV_INT> index;          // flat to vector index
+    ARRAY<TV_INT,TV_INT> fft_index;      // flat to vector index
+
+    T_FFT* transform;
     
     int array_m;
+    int fft_array_m;
     
     T cfl;
     T spread;
@@ -87,23 +97,37 @@ public:
     T one_over_cell_volume;
     int threads;
     
-    MPLE_DRIVER():cfl((T)1),spread((T)1),rescale((T)1),contour_value((T).5),frame_dt((T)1/24),frames(100),mu(5e-4),nu(.05){}
+    MPLE_DRIVER():transform(0),cfl((T)1),spread((T)1),rescale((T)1),contour_value((T).5),frame_dt((T)1/24),frames(100),mu(5e-4),nu(.05){}
 
-    ~MPLE_DRIVER(){}
+    ~MPLE_DRIVER()
+    {delete transform;}
 
     void Initialize()
     {
+        RANGE<TV_INT> fft_range(RANGE<TV_INT>(TV_INT(),grid.Node_Indices().Edge_Lengths()));
+        fft_range.max_corner(TV::m-1)/=2;
+        fft_range.max_corner(TV::m-1)++;
+
         u.Resize(grid.Node_Indices(),false);
-        u_new.Resize(grid.Node_Indices(),false);
+        fft.Resize(fft_range,false);
+        fft_index.Resize(fft_range,false);
+        force.Resize(grid.Node_Indices(),false);
         source.Resize(grid.Node_Indices(),false);
         location.Resize(grid.Node_Indices(),false);
         index.Resize(grid.Node_Indices(),false);
-        array_m=u.array.m;
+        array_m=location.array.m;
+
+        transform=new T_FFT(grid);
 
         int k=0;
         for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next(),k++){
             location.array(k)=it.Location();
             index.array(k)=it.Node_Index();}
+
+        k=0;
+        for(RANGE_ITERATOR<TV_INT::m> it(fft_range);it.Valid();it.Next(),k++)
+        {fft_index.array(k)=it.index;}
+        fft_array_m=fft_index.array.m;
 
         for(int i=0;i<array_m;i++){
             u.array(i)=0;
@@ -137,7 +161,7 @@ public:
 
         threads=omp_get_num_threads_helper();
         LOG::cout<<"Running on "<<threads<<" threads."<<std::endl;
-    }
+    }        
 
     void Dump_Surface(SEGMENTED_CURVE_2D<T>& surface)
     {
@@ -148,9 +172,6 @@ public:
 
     void Dump_Surface(TRIANGULATED_SURFACE<T>& surface)
     {
-        // for(int i=0;i<surface.mesh.elements.m;i++){
-            // VECTOR<int,3>& s=surface.mesh.elements(i);
-            // Add_Debug_Object(VECTOR<VECTOR<T,3>,3>(surface.particles.X(s.x),surface.particles.X(s.y),surface.particles.X(s.z)),VECTOR<T,3>(0,.25,1),VECTOR<T,3>(0,.25,1));}
         for(int i=0;i<surface.mesh.elements.m;i++)
             Add_Debug_Object(VECTOR<TV,TV::m>(surface.particles.X.Subset(surface.mesh.elements(i))),TV(0,.25,1),TV(1,.25,0));
     }
@@ -173,7 +194,7 @@ public:
         Flush_Frame<TV>(title);
     }
 
-    void Advance_Timestep()
+    void Compute_Force()
     {
         // compute integral of u
         ARRAY<T> int_u_per_thread(threads);
@@ -197,48 +218,57 @@ public:
         for(int i=0;i<threads;i++)
             int_uw+=int_uw_per_thread(i);
 
-        // LOG::cout<<"u "<<int_u<<" "<<int_uw<<std::endl;
-
-        // T int_w=points.m;
-        // T int_1=grid.Domain_Indices().Size()*cell_volume;
         T c1=int_uw/int_u;
-        // T c2=(int_w-int_uw)/(int_1-int_u);
-        
-        // LOG::cout<<"c "<<c1<<" "<<c2<<std::endl;
 
 #pragma omp parallel for schedule(guided)
+        for(int i=0;i<array_m;i++){
+            force.array(i)=
+                u.array(i)-
+                (dt/epsilon)*MPLE_DOUBLE_WELL<T>::Gradient(u.array(i))+
+                dt*mu*(u.array(i)*source.array(i)*one_over_cell_volume+(source.array(i)*one_over_cell_volume-c1));}
+    }
+
+    void Transform_Force()
+    {
+        transform->Transform(force,fft);
+    }
+
+    TV Index(const TV_INT& input)
+    {
+        TV result;
+        for(int i=0;i<TV::m;i++){
+            if(input(i)<grid.Counts()(i)/2+1) result(i)=input(i);
+            else result(i)=input(i)-grid.Counts()(i);}
+        return result;
+    }
+
+    void Compute_Transformed_U()
+    {
+#pragma omp parallel for
+        for(int i=0;i<fft_array_m;i++){
+            fft.array(i)*=(T)1/(1+dt*2*epsilon*(Index(fft_index.array(i))/grid.domain.Edge_Lengths()*(2*M_PI)).Magnitude_Squared());}
+    }
+
+    void Update_U()
+    {transform->Inverse_Transform(fft,u);}
+
+    void Clamp_U()
+    {
+#pragma omp parallel for
         for(int i=0;i<array_m;i++)
-        {
-            // diffusion
-            const TV_INT& this_node=index.array(i);
-            T& value=u_new.array(i);
-            value=0;
-            for(int k=0;k<TV::m;k++){
-                if(this_node(k)+1<grid.Domain_Indices().max_corner(k))
-                    value+=u(this_node+TV_INT::Axis_Vector(k));
-                if(this_node(k)-1>=grid.Domain_Indices().min_corner(k))
-                    value+=u(this_node-TV_INT::Axis_Vector(k));}
-            value-=u.array(i)*2*TV::m;
-            value*=(T)2*epsilon*dt*one_over_dx_squared;
-            value+=u.array(i);
-            value-=(dt/epsilon)*MPLE_DOUBLE_WELL<T>::Gradient(u.array(i));
-
-            // rasterization
-            value+=dt*mu*(u.array(i)*source.array(i)*one_over_cell_volume+(source.array(i)*one_over_cell_volume-c1));
-
-            //clamp
-            if(value<0) value=0;
-        }
+            u.array(i)=max(u.array(i),(T)0);
     }
 
     void Advance_Frame(int frame)
     {
         LOG::cout<<"Frame "<<frame<<std::endl;
         for(int i=0;i<timesteps;i++){
-            Advance_Timestep();
-            u.Exchange(u_new);
-            // Write("substep");
-        }
+            Compute_Force();
+            Transform_Force();
+            Compute_Transformed_U();
+            Update_U();
+            Clamp_U();
+            Write("substep");}
     }
 
     void Run()
