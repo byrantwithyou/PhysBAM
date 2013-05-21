@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include "MPM_POISSON_VECTOR.h"
@@ -45,6 +44,7 @@ Reinitialize()
     face_momenta.Fill((T)0);
     cell_dirichlet.Fill(false);
     cell_neumann.Fill(false);
+    nodes_non_dirichlet_cells.Clean_Memory();
     div_u.Fill((T)0);
     pressure.Fill((T)0);
 }
@@ -79,26 +79,35 @@ Identify_Neumann_Cells()
 }
 
 //#####################################################################
+// Function Identify_Nodes_Of_Non_Dirichlet_Cells
+//#####################################################################
+template<class TV> void MPM_PROJECTION<TV>::
+Identify_Nodes_Of_Non_Dirichlet_Cells()
+{
+    nodes_non_dirichlet_cells.Clean_Memory();
+    TV_INT nodes[TV::m*4-4];
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+        if(!cell_dirichlet(it.index)){
+            mac_grid.Nodes_In_Cell_From_Minimum_Corner_Node(it.index,nodes);
+            for(int i=0;i<TV::m*4-4;i++)
+                nodes_non_dirichlet_cells.Get_Or_Insert(nodes[i])=true;}}
+}
+
+//#####################################################################
 // Function Velocities_Corners_To_Faces
 //#####################################################################
 template<class TV> void MPM_PROJECTION<TV>::
 Velocities_Corners_To_Faces()
 {
-    TV_INT nodes[TV::m*4-4];
     face_velocities.Fill((T)0);
-    HASHTABLE<TV_INT,bool> node_dealt;
     HASHTABLE<FACE_INDEX<TV::m>,int> face_parents_count;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
-        if(!cell_dirichlet(it.index)){
-            mac_grid.Nodes_In_Cell_From_Minimum_Corner_Node(it.index,nodes);
-            for(int i=0;i<TV::m*4-4;i++){
-                if(node_dealt.Get_Pointer(nodes[i])==NULL){
-                    node_dealt.Get_Or_Insert(nodes[i])=true;
-                    for(int axis=0;axis<TV::m;axis++){
-                        for(int face=0;face<TV::m*2-2;face++){
-                            FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,nodes[i],face));
-                            face_velocities(face_index)+=sim.node_V(nodes[i])(axis);
-                            face_parents_count.Get_Or_Insert(face_index)++;}}}}}}
+    for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(nodes_non_dirichlet_cells);it.Valid();it.Next()){
+        TV_INT node=it.Key();
+        for(int axis=0;axis<TV::m;axis++){
+            for(int face=0;face<TV::m*2-2;face++){
+                FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,node,face));
+                face_velocities(face_index)+=sim.node_V(node)(axis);
+                face_parents_count.Get_Or_Insert(face_index)++;}}}
     for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(face_parents_count);it.Valid();it.Next())
         if(it.Data()>1) face_velocities(it.Key())/=it.Data();
 }
@@ -112,6 +121,19 @@ Velocities_Corners_To_Faces_MPM_Style()
     face_velocities.Fill((T)0);
     face_masses.Fill((T)0);
     face_momenta.Fill((T)0);
+    ARRAY<FACE_INDEX<TV::m> > faces_got_rasterized;
+    for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(nodes_non_dirichlet_cells);it.Valid();it.Next()){
+        TV_INT node=it.Key();
+        for(int axis=0;axis<TV::m;axis++){
+            for(int face=0;face<TV::m*2-2;face++){
+                FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,node,face));
+                faces_got_rasterized.Append(face_index);
+                face_masses(face_index)+=0.5*sim.node_mass(node);
+                face_momenta(face_index)+=0.5*sim.node_mass(node)*sim.node_V(node)(axis);}}}
+    for(int i=0;i<faces_got_rasterized.m;i++){
+        FACE_INDEX<TV::m> face_index=faces_got_rasterized(i);
+        if(face_masses(face_index)>sim.min_mass)
+            face_velocities(face_index)=face_momenta(face_index)/face_masses(face_index);}
 }
 
 //#####################################################################

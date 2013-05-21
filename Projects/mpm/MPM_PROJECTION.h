@@ -10,6 +10,7 @@
 #define __MPM_PROJECTION__
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include "MPM_SIMULATION.h"
 namespace PhysBAM{
 template<class TV>
@@ -23,6 +24,7 @@ public:
     GRID<TV> mac_grid;
     ARRAY<bool,TV_INT> cell_dirichlet;
     ARRAY<bool,TV_INT> cell_neumann;
+    HASHTABLE<TV_INT,bool> nodes_non_dirichlet_cells;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_masses;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_momenta;
@@ -35,12 +37,13 @@ public:
     void Reinitialize();                                   // step 1
     void Identify_Dirichlet_Cells();                       // step 2 
     void Identify_Neumann_Cells();                         // step 3
-    void Velocities_Corners_To_Faces();                    // step 4
-    void Velocities_Corners_To_Faces_MPM_Style();          // step 4 - alternate
-    void Build_Velocity_Divergence();                      // step 5 
-    void Solve_For_Pressure(const T dt,const T rho);       // step 6
-    void Do_Projection(const T dt,const T rho);            // step 7
-    void Velocities_Faces_To_Corners();                    // step 8
+    void Identify_Nodes_Of_Non_Dirichlet_Cells();          // step 4
+    void Velocities_Corners_To_Faces();                    // step 5
+    void Velocities_Corners_To_Faces_MPM_Style();          // step 5 - alternate
+    void Build_Velocity_Divergence();                      // step 6 
+    void Solve_For_Pressure(const T dt,const T rho);       // step 7
+    void Do_Projection(const T dt,const T rho);            // step 8
+    void Velocities_Faces_To_Corners();                    // step 9
 
     void Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs);      // called by Solve_For_Pressure
 };

@@ -252,6 +252,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             projection.Reinitialize();
             projection.Identify_Dirichlet_Cells();
             projection.Identify_Neumann_Cells();
+            projection.Identify_Nodes_Of_Non_Dirichlet_Cells();
             projection.Velocities_Corners_To_Faces();
             projection.Build_Velocity_Divergence();
             projection.Solve_For_Pressure(sim.dt,1);
