@@ -306,9 +306,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             projection.Identify_Neumann_Cells();
             projection.Identify_Nodes_Of_Non_Dirichlet_Cells();
             projection.Velocities_Corners_To_Faces_MPM_Style();
-            // projection.Build_Velocity_Divergence();
-            // projection.Solve_For_Pressure(sim.dt,1);
-            // projection.Do_Projection(sim.dt,1);
+            projection.Build_Velocity_Divergence();
+            projection.Solve_For_Pressure(sim.dt,1);
+            projection.Do_Projection(sim.dt,1);
             projection.Velocities_Faces_To_Corners_MPM_Style(); // this step modifies sim.node_V
             LOG::cout<<"Momentum - grid (after projection):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
         }
@@ -326,12 +326,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
-                // if(sim.particles.Xm(i).x<0)
+                if(sim.particles.Xm(i).x<0)
                     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
-                // else if(sim.particles.Xm(i).y<0.55)
-                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
-                // else
-                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
+                else if(sim.particles.Xm(i).y<0.55)
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
+                else
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
             }
 
             // projection: visualize MAC grid velocities
