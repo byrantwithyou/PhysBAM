@@ -94,25 +94,6 @@ Identify_Nodes_Of_Non_Dirichlet_Cells()
 }
 
 //#####################################################################
-// Function Velocities_Corners_To_Faces
-//#####################################################################
-template<class TV> void MPM_PROJECTION<TV>::
-Velocities_Corners_To_Faces()
-{
-    face_velocities.Fill((T)0);
-    HASHTABLE<FACE_INDEX<TV::m>,int> face_parents_count;
-    for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(nodes_non_dirichlet_cells);it.Valid();it.Next()){
-        TV_INT node=it.Key();
-        for(int axis=0;axis<TV::m;axis++){
-            for(int face=0;face<TV::m*2-2;face++){
-                FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,node,face));
-                face_velocities(face_index)+=sim.node_V(node)(axis);
-                face_parents_count.Get_Or_Insert(face_index)++;}}}
-    for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(face_parents_count);it.Valid();it.Next())
-        if(it.Data()>1) face_velocities(it.Key())/=it.Data();
-}
-
-//#####################################################################
 // Function Velocities_Corners_To_Faces_MPM_Style
 //#####################################################################
 template<class TV> void MPM_PROJECTION<TV>::
@@ -223,24 +204,6 @@ Do_Projection(const T dt,const T rho)
     // check whether divergence free
     Build_Velocity_Divergence();
     LOG::cout<<"Maximum velocity divergence after projection: "<<div_u.Max_Abs()<<std::endl;
-}
-
-//#####################################################################
-// Function Velocities_Faces_To_Corners
-//#####################################################################
-template<class TV> void MPM_PROJECTION<TV>::
-Velocities_Faces_To_Corners()
-{
-    for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(nodes_non_dirichlet_cells);it.Valid();it.Next()){
-        TV_INT node=it.Key();
-        sim.node_V(node)=TV();
-        for(int axis=0;axis<TV::m;axis++){
-            int contributor_count=TV::m*2-2;
-            for(int face=0;face<TV::m*2-2;face++){
-                FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,node,face));
-                if(cell_neumann(face_index.First_Cell_Index()) || cell_neumann(face_index.Second_Cell_Index())) contributor_count--;
-                else sim.node_V(node)(axis)+=face_velocities(face_index);}
-            if(contributor_count>0) sim.node_V(node)(axis)/=contributor_count;}}
 }
 
 //#####################################################################
