@@ -298,9 +298,25 @@ public:
         Clamp_U();
     }
 
+    void Dump_Points()
+    {
+        FILE_UTILITIES::Create_Directory(output_directory);
+        std::ofstream out(str(boost::format("%s/particles")%output_directory));
+        for(int i=0;i<points.m;i++){
+            const MPLE_POINT<TV,w>& point=points(i);
+            out<<"sphere{<";
+            for(int j=0;j<TV::m;j++){
+                out<<point.X(j);
+                if(j<TV::m-1) out<<",";}
+            out<<">sphere_radius}"<<std::endl;
+        }
+        out.close();
+    }
+    
     void Run()
     {
         Initialize();
+        Dump_Points();
         Write(0);
         for(int k=1;k<=frames;k++){
             Advance_Frame(k);
