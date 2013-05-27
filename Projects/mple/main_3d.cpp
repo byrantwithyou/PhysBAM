@@ -48,6 +48,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-frame_dt",&mple.frame_dt,"frame_dt","Frame dt");
     parse_args.Add("-cfl",&mple.cfl,"cfl","CFL number");
     parse_args.Add("-rescale",&mple.rescale,"rescale","Rescale and clamp source");
+    parse_args.Add("-identity",&mple.identity,"identity","Identity scale");
     parse_args.Add("-resolution",&resolution,"resolution","Grid resolution");
     parse_args.Add("-points",&number_of_points,"points","Number of sample points");
     parse_args.Parse(true);

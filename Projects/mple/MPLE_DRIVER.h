@@ -87,6 +87,7 @@ public:
     T cfl;
     T spread;
     T rescale;
+    T identity;
     T contour_value;
     T frame_dt;
     int frames;
@@ -97,7 +98,7 @@ public:
     T one_over_cell_volume;
     int threads;
     
-    MPLE_DRIVER():transform(0),cfl((T)1),spread((T)1),rescale((T)1),contour_value((T).5),frame_dt((T)1/24),frames(100),mu(5e-4),nu(.05){}
+    MPLE_DRIVER():transform(0),cfl((T)1),spread((T)1),rescale((T)1),identity((T)0),contour_value((T).5),frame_dt((T)1/24),frames(100),mu(5e-4),nu(.05){}
 
     ~MPLE_DRIVER()
     {delete transform;}
@@ -223,7 +224,7 @@ public:
 #pragma omp parallel for schedule(guided)
         for(int i=0;i<array_m;i++){
             force.array(i)=
-                u.array(i)-
+                (identity+1)*u.array(i)-
                 (dt/epsilon)*MPLE_DOUBLE_WELL<T>::Gradient(u.array(i))+
                 dt*mu*(u.array(i)*source.array(i)*one_over_cell_volume+(source.array(i)*one_over_cell_volume-c1));}
     }
@@ -246,7 +247,7 @@ public:
     {
 #pragma omp parallel for
         for(int i=0;i<fft_array_m;i++){
-            fft.array(i)*=(T)1/(1+dt*2*epsilon*(Index(fft_index.array(i))/grid.domain.Edge_Lengths()*(2*M_PI)).Magnitude_Squared());}
+            fft.array(i)*=(T)1/(identity+1+dt*2*epsilon*(Index(fft_index.array(i))/grid.domain.Edge_Lengths()*(2*M_PI)).Magnitude_Squared());}
     }
 
     void Update_U()
