@@ -54,10 +54,11 @@ int main(int argc,char* argv[])
 
     if(!use_test){LOG::cerr<<"Test number is required."<<std::endl;exit(-1);}
     if(!use_output_directory) output_directory="output";
+    mple.output_directory=output_directory;
 
     switch(test_number){
         case 1:{
-            const RANGE<TV> domain(TV(-.75,-.75,-.75),TV(.75,.75,.75));
+            const RANGE<TV> domain(TV(-.6,-.6,-.6),TV(.6,.6,.6));
             const TV_INT counts(TV_INT(resolution,resolution,resolution));
             mple.grid.Initialize(counts+1,domain);
             const RANGE<TV> block(TV(-.3,-.3,-.3),TV(.3,.3,.3));

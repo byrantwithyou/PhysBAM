@@ -1,0 +1,1 @@
+./mple_3d -test 1 -cfl 5 -frames 50 -resolution 50 -mu .001 -spread 2 -points 50000 -contour_value 0.5

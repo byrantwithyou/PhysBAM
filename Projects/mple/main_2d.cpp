@@ -54,6 +54,7 @@ int main(int argc,char* argv[])
 
     if(!use_test){LOG::cerr<<"Test number is required."<<std::endl;exit(-1);}
     if(!use_output_directory) output_directory="output";
+    mple.output_directory=output_directory;
 
     switch(test_number){
         case 1:{

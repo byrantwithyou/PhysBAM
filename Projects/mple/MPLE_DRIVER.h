@@ -27,6 +27,8 @@
 #include "MPLE_DOUBLE_WELL.h"
 #include "MPLE_ITERATOR.h"
 #include "MPLE_POINT.h"
+#include <boost/format.hpp>
+#include <fstream>
 
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -84,6 +86,7 @@ public:
     int array_m;
     int fft_array_m;
     
+    std::string output_directory;
     T cfl;
     T spread;
     T rescale;
@@ -96,7 +99,7 @@ public:
     T one_over_cell_volume;
     int threads;
     
-    MPLE_DRIVER():transform(0),cfl((T)1),spread((T)1),rescale((T)1),identity((T)0),contour_value((T).5),frames(100),mu(5e-4){}
+    MPLE_DRIVER():transform(0),output_directory("output"),cfl((T)1),spread((T)1),rescale((T)1),identity((T)0),contour_value((T).5),frames(100),mu(5e-4){}
 
     ~MPLE_DRIVER()
     {delete transform;}
@@ -161,21 +164,47 @@ public:
         LOG::cout<<"Running on "<<threads<<" threads."<<std::endl;
     }        
 
-    void Dump_Surface(SEGMENTED_CURVE_2D<T>& surface)
+    void Dump_Surface(SEGMENTED_CURVE_2D<T>& surface,std::ofstream& out)
     {
         for(int i=0;i<surface.mesh.elements.m;i++){
             VECTOR<int,2>& s=surface.mesh.elements(i);
             Add_Debug_Object(VECTOR<VECTOR<T,2>,2>(surface.particles.X(s.x),surface.particles.X(s.y)),VECTOR<T,3>(0,.25,1));}
     }
 
-    void Dump_Surface(TRIANGULATED_SURFACE<T>& surface)
+    void Emit_Vector(std::ofstream& out,const VECTOR<T,3>& v, const char* str="")
     {
-        for(int i=0;i<surface.mesh.elements.m;i++)
-            Add_Debug_Object(VECTOR<TV,TV::m>(surface.particles.X.Subset(surface.mesh.elements(i))),TV(0,.25,1),TV(1,.25,0));
+        out<<"<"<<v(0);
+        for(int i=1;i<3;i++) out<<","<<v(i);
+        out<<">"<<str;
     }
 
-    void Write(const char* title)
+    void Dump_Surface(TRIANGULATED_SURFACE<T>& surface,std::ofstream& out)
     {
+        surface.Update_Vertex_Normals();
+        for(int i=0;i<surface.mesh.elements.m;i++){
+            out<<"smooth_triangle{";
+            VECTOR<TV,3> X(surface.particles.X.Subset(surface.mesh.elements(i)));
+            VECTOR<TV,3> N;
+            Add_Debug_Object(X,TV(0,.25,1),TV(1,.25,0));
+            if(surface.face_vertex_normals) N=(*surface.face_vertex_normals)(i);
+            else N=VECTOR<TV,3>(surface.vertex_normals->Subset(surface.mesh.elements(i)));
+            Emit_Vector(out,X(0),",");
+            Emit_Vector(out,N(0),",");
+            Emit_Vector(out,X(1),",");
+            Emit_Vector(out,N(1),",");
+            Emit_Vector(out,X(2),",");
+            Emit_Vector(out,N(2),"");
+            out<<"}"<<std::endl;;}
+    }
+
+    void Write(const int frame)
+    {
+        char buff[100];
+        sprintf(buff,"Frame %d",frame);
+
+        FILE_UTILITIES::Create_Directory(output_directory);
+        FILE_UTILITIES::Create_Directory(str(boost::format("%s/%d")%output_directory%frame));
+
         for(int i=0;i<points.m;i++)
             Add_Debug_Particle<TV>(points(i).X,VECTOR<T,3>(1,0,0));
         
@@ -187,9 +216,11 @@ public:
         
         T_SURFACE surface;
         MARCHING_CUBES<TV>::Create_Surface(surface,grid,u,contour_value);
-        Dump_Surface(surface);
+        std::ofstream out(str(boost::format("%s/%d/surface")%output_directory%frame));
+        Dump_Surface(surface,out);
+        out.close();
 
-        Flush_Frame<TV>(title);
+        Flush_Frame<TV>(buff);
     }
 
     void Compute_Force()
@@ -265,18 +296,15 @@ public:
         Compute_Transformed_U();
         Update_U();
         Clamp_U();
-        Write("substep");
     }
 
     void Run()
     {
         Initialize();
-        Write("Frame 0");
+        Write(0);
         for(int k=1;k<=frames;k++){
             Advance_Frame(k);
-            char buff[100];
-            sprintf(buff,"Frame %d",k);
-            Write(buff);}
+            Write(k);}
     }
 };
 }
