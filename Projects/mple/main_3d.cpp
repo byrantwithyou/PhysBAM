@@ -43,9 +43,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-spread",&mple.spread,"spread","Interface spread int cells");
     parse_args.Add("-contour_value",&mple.contour_value,"contour value","Contour value");
     parse_args.Add("-mu",&mple.mu,"mu","Source power");
-    parse_args.Add("-nu",&mple.nu,"nu","Small parameter");
     parse_args.Add("-frames",&mple.frames,"frames","Number of frames");
-    parse_args.Add("-frame_dt",&mple.frame_dt,"frame_dt","Frame dt");
     parse_args.Add("-cfl",&mple.cfl,"cfl","CFL number");
     parse_args.Add("-rescale",&mple.rescale,"rescale","Rescale and clamp source");
     parse_args.Add("-identity",&mple.identity,"identity","Identity scale");
@@ -73,10 +71,8 @@ int main(int argc,char* argv[])
 
     LOG::cout<<"### PARAMETERS ###"<<std::endl;
     LOG::cout<<"cfl "<<mple.cfl<<std::endl;
-    LOG::cout<<"frame_dt "<<mple.frame_dt<<std::endl;
     LOG::cout<<"frames "<<mple.frames<<std::endl;
     LOG::cout<<"mu "<<mple.mu<<std::endl;
-    LOG::cout<<"nu "<<mple.nu<<std::endl;
         
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),mple.grid,output_directory);
     mple.Run();

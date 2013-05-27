@@ -89,16 +89,14 @@ public:
     T rescale;
     T identity;
     T contour_value;
-    T frame_dt;
     int frames;
-    int timesteps;
-    T mu,nu,epsilon;
+    T mu,epsilon;
     T dt,one_over_dx_squared;
     T cell_volume;
     T one_over_cell_volume;
     int threads;
     
-    MPLE_DRIVER():transform(0),cfl((T)1),spread((T)1),rescale((T)1),identity((T)0),contour_value((T).5),frame_dt((T)1/24),frames(100),mu(5e-4),nu(.05){}
+    MPLE_DRIVER():transform(0),cfl((T)1),spread((T)1),rescale((T)1),identity((T)0),contour_value((T).5),frames(100),mu(5e-4){}
 
     ~MPLE_DRIVER()
     {delete transform;}
@@ -153,7 +151,6 @@ public:
             source.array(i)=min(source.array(i),max_value);}
 
         dt=cfl*sqr(grid.dX(0))/(2*(TV::m+1));
-        timesteps=(int)(frame_dt/dt);
         epsilon=spread*grid.dX(0);
         one_over_dx_squared=(T)1/sqr(grid.dX(0));
         cell_volume=grid.dX.Product();
@@ -263,13 +260,12 @@ public:
     void Advance_Frame(int frame)
     {
         LOG::cout<<"Frame "<<frame<<std::endl;
-        for(int i=0;i<timesteps;i++){
-            Compute_Force();
-            Transform_Force();
-            Compute_Transformed_U();
-            Update_U();
-            Clamp_U();
-            Write("substep");}
+        Compute_Force();
+        Transform_Force();
+        Compute_Transformed_U();
+        Update_U();
+        Clamp_U();
+        Write("substep");
     }
 
     void Run()
