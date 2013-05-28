@@ -4,13 +4,13 @@
 #default{finish{ambient 0.2 diffuse 0.6}}
 
 camera{
-  location <6,3,3>
+  location <3,5,3>
   look_at <0,0,0>
   up <0,1,0>
   angle 15   
 }
 
-#declare sphere_radius=.005;
+#declare sphere_radius=.002;
 
 union{
 
@@ -31,7 +31,7 @@ union{
 #emit sim_surface
 
   texture{
-    pigment{color rgbt <1,1,1,0>}
+    pigment{color rgbt <0,.5,1,0>}
     finish{
       ambient 0.2
       diffuse .75
