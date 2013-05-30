@@ -20,10 +20,9 @@ class MPM_POISSON_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 public:
+    MPM_PROJECTION<TV>& proj;
 
-    const MPM_PROJECTION<TV>& proj;
-
-    MPM_POISSON_SYSTEM(const MPM_PROJECTION<TV>& proj);
+    MPM_POISSON_SYSTEM(MPM_PROJECTION<TV>& proj);
     virtual ~MPM_POISSON_SYSTEM();
 
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const PHYSBAM_OVERRIDE;

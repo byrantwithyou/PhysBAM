@@ -69,13 +69,12 @@ Identify_Dirichlet_Cells()
 template<class TV> void MPM_PROJECTION<TV>::
 Identify_Neumann_Cells()
 {
-    // HMandatory wall : the third and fourth outmost MAC grid layer
     cell_neumann.Fill(false);
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
-        for(int d=0;d<TV::m;d++){
-            if(it.index(d)==2 || it.index(d)==3 || it.index(d)==mac_grid.counts(d)-3 || it.index(d)==mac_grid.counts(d)-4){
-                cell_neumann(it.index)=true;
-                if(cell_dirichlet(it.index)) cell_dirichlet(it.index)=false;}}}
+    // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+    //     for(int d=0;d<TV::m;d++){
+    //         if(it.index(d)==2 || it.index(d)==3 || it.index(d)==mac_grid.counts(d)-3 || it.index(d)==mac_grid.counts(d)-4){
+    //             cell_neumann(it.index)=true;
+    //             if(cell_dirichlet(it.index)) cell_dirichlet(it.index)=false;}}}
 }
 
 //#####################################################################
@@ -157,7 +156,7 @@ Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs)
 // The equation is -div(dt/rho*grad(p))=-div(u)
 //#####################################################################
 template<class TV> void MPM_PROJECTION<TV>::
-Solve_For_Pressure(const T dt,const T rho)
+Solve_For_Pressure()
 {
     MPM_POISSON_SYSTEM<TV> system(debug_cast<MPM_PROJECTION<TV>&>(*this));
     MPM_POISSON_VECTOR<TV> rhs,x;
@@ -165,16 +164,16 @@ Solve_For_Pressure(const T dt,const T rho)
     rhs.v.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     x.v.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
-    rhs.v.Copy(-1,div_u);
+    rhs.v.Copy(-(T)1.0,div_u);
     Fix_RHS_Neumann_Cells(rhs.v);
-    x.v=rhs.v; // x=dt/rho*p (for constant rho)
+    x.v=rhs.v;
     system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=false;
     solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
-    pressure.Copy(rho/dt,x.v);
+    pressure=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
 }
 
@@ -183,7 +182,7 @@ Solve_For_Pressure(const T dt,const T rho)
 // The equation is u=u-dt/rho*grad(p)
 //#####################################################################
 template<class TV> void MPM_PROJECTION<TV>::
-Do_Projection(const T dt,const T rho)
+Do_Projection()
 {
     LOG::cout<<"Maximum velocity divergence before projection: "<<div_u.Max_Abs()<<std::endl;        
     T one_over_h=(T)1/mac_grid.dX.Min();
@@ -194,7 +193,7 @@ Do_Projection(const T dt,const T rho)
         TV_INT second_cell=iterator.Second_Cell_Index();        
         if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
             T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
-            face_velocities(face_index)-=dt/rho*grad_p;}}
+            if(face_masses(face_index)>sim.min_mass) face_velocities(face_index)-=sim.dt/face_masses(face_index)*grad_p;}}
     // Enforce face velocities for neumann cells
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
         if(cell_neumann(it.index)){

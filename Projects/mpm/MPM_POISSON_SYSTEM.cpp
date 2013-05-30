@@ -3,29 +3,30 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Math_Tools/cube.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <iomanip>
 #include "MPM_PROJECTION.h"
 #include "MPM_POISSON_SYSTEM.h"
 #include "MPM_POISSON_VECTOR.h"
-using namespace PhysBAM;
+namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> MPM_POISSON_SYSTEM<TV>::
-MPM_POISSON_SYSTEM(const MPM_PROJECTION<TV>& proj)
+MPM_POISSON_SYSTEM(MPM_PROJECTION<TV>& proj)
     :BASE(false,true),proj(proj)
-{
-}
+{}
 //#####################################################################
 // Destructor
 //#####################################################################
 template<class TV> MPM_POISSON_SYSTEM<TV>::
 ~MPM_POISSON_SYSTEM()
-{
-}
+{}
 //#####################################################################
 // Function Multiply
 //#####################################################################
@@ -39,23 +40,21 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
         if(proj.cell_dirichlet(it.index) || proj.cell_neumann(it.index))
             rr(it.index)=(T)0;
         else{ // cell is fluid
-            rr(it.index)=2*TV::m*xx(it.index);
+            rr(it.index)=(T)0;
             for(int d=0;d<TV::m;d++){
-                TV_INT left_index=it.index;left_index(d)--;
-                TV_INT right_index=it.index;right_index(d)++;
-                if(proj.cell_dirichlet(left_index)) 
-                    rr(it.index)-=0;
-                else if(proj.cell_neumann(left_index))
-                    rr(it.index)-=xx(it.index);
-                else
-                    rr(it.index)-=xx(left_index);
-                if(proj.cell_dirichlet(right_index)) 
-                    rr(it.index)-=0;
-                else if(proj.cell_neumann(right_index))
-                    rr(it.index)-=xx(it.index);
-                else
-                    rr(it.index)-=xx(right_index);}
-            rr(it.index)*=one_over_h_square_or_cube;}}
+                TV_INT left_cell_index=it.index;left_cell_index(d)--;
+                TV_INT right_cell_index=it.index;right_cell_index(d)++;
+                FACE_INDEX<TV::m> left_face_index(d,proj.mac_grid.First_Face_Index_In_Cell(d,it.index));
+                if(proj.face_masses(left_face_index)>proj.sim.min_mass){
+                    if(proj.cell_dirichlet(left_cell_index)) rr(it.index)+=xx(it.index)/proj.face_masses(left_face_index);
+                    else if(proj.cell_neumann(left_cell_index)) rr(it.index)+=(xx(it.index)-xx(left_cell_index))/proj.face_masses(left_face_index); // TODO
+                    else rr(it.index)+=(xx(it.index)-xx(left_cell_index))/proj.face_masses(left_face_index);}
+                FACE_INDEX<TV::m> right_face_index(d,proj.mac_grid.Second_Face_Index_In_Cell(d,it.index));
+                if(proj.face_masses(right_face_index)>proj.sim.min_mass){
+                    if(proj.cell_dirichlet(right_cell_index)) rr(it.index)+=xx(it.index)/proj.face_masses(right_face_index);
+                    else if(proj.cell_neumann(right_cell_index)) rr(it.index)+=(xx(it.index)-xx(right_cell_index))/proj.face_masses(right_face_index); // TODO
+                    else rr(it.index)+=(xx(it.index)-xx(right_cell_index))/proj.face_masses(right_face_index);}}
+            rr(it.index)*=proj.sim.dt*one_over_h_square_or_cube;}}
 }
 //#####################################################################
 // Function Project
@@ -74,7 +73,6 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> double MPM_POISSON_SYSTEM<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const
 {
-    // TODO: ask Craig whether this is correct
     const ARRAY<T,TV_INT>& xx=debug_cast<const MPM_POISSON_VECTOR<TV>&>(x).v;
     const ARRAY<T,TV_INT>& yy=debug_cast<const MPM_POISSON_VECTOR<TV>&>(y).v;
     double r=0;
@@ -111,7 +109,7 @@ template<class TV> void MPM_POISSON_SYSTEM<TV>::
 Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
 {
 }
-namespace PhysBAM{
+//#####################################################################
 template class MPM_POISSON_SYSTEM<VECTOR<float,2> >;
 template class MPM_POISSON_SYSTEM<VECTOR<float,3> >;
 template class MPM_POISSON_SYSTEM<VECTOR<double,2> >;

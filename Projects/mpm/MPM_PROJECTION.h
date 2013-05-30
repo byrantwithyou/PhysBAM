@@ -40,8 +40,8 @@ public:
     void Identify_Nodes_Of_Non_Dirichlet_Cells();          // step 4
     void Velocities_Corners_To_Faces_MPM_Style();          // step 5
     void Build_Velocity_Divergence();                      // step 6 
-    void Solve_For_Pressure(const T dt,const T rho);       // step 7
-    void Do_Projection(const T dt,const T rho);            // step 8
+    void Solve_For_Pressure();                             // step 7
+    void Do_Projection();                               // step 8
     void Velocities_Faces_To_Corners_MPM_Style();          // step 9
 
     void Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs);      // called by Solve_For_Pressure
