@@ -114,6 +114,9 @@ Velocities_Corners_To_Faces_MPM_Style()
         FACE_INDEX<TV::m> face_index=faces_got_rasterized(i);
         if(face_masses(face_index)>sim.min_mass)
             face_velocities(face_index)=face_momenta(face_index)/face_masses(face_index);}
+    
+    // Assuming uniform density
+    // face_masses.Fill((T)1);
 }
 
 //#####################################################################
