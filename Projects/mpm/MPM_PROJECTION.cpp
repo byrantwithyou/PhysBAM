@@ -56,11 +56,10 @@ template<class TV> void MPM_PROJECTION<TV>::
 Identify_Dirichlet_Cells()
 {
     cell_dirichlet.Fill(true);
-#pragma omp parallel for
     for(int p=0;p<sim.particles.number;p++){
-        PHYSBAM_ASSERT(mac_grid.Cell(sim.particles.X(p),0)==sim.grid.Cell(sim.particles.X(p),0));
         TV_INT cell=mac_grid.Cell(sim.particles.X(p),0);
-        cell_dirichlet(cell)=false;}
+        cell_dirichlet(cell)=false;
+    }
 }
 
 //#####################################################################
@@ -70,11 +69,7 @@ template<class TV> void MPM_PROJECTION<TV>::
 Identify_Neumann_Cells()
 {
     cell_neumann.Fill(false);
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
-        for(int d=0;d<TV::m;d++){
-            if(it.index(d)==2 || it.index(d)==3 || it.index(d)==mac_grid.counts(d)-3 || it.index(d)==mac_grid.counts(d)-4){
-                cell_neumann(it.index)=true;
-                if(cell_dirichlet(it.index)) cell_dirichlet(it.index)=false;}}}
+    // Can mannually do this in main function
 }
 
 //#####################################################################
