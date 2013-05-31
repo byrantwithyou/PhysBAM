@@ -305,7 +305,7 @@ Solve_The_Linear_System()
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cg;
-    solver->print_residuals=true;
+    solver->print_residuals=false;
     if(dump_matrix){ // load M-1.txt;load m-1.txt;mm=reshape([m m]',rows(M),1);R=diag(mm)*M;max(max(abs(R-R')))
         LOG::cout<<"solve id "<<solve_id<<std::endl;
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
@@ -511,7 +511,8 @@ Get_Total_Momentum_On_Nodes() const
 {
     TV momen;
     for(int i=0;i<node_V.array.m;i++)
-        momen+=node_mass.array(i)*node_V.array(i);
+        if(node_mass.array(i)>min_mass)
+            momen+=node_mass.array(i)*node_V.array(i);
     return momen;
 }
 //#####################################################################
