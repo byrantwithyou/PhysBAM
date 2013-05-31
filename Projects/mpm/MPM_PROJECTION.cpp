@@ -70,11 +70,11 @@ template<class TV> void MPM_PROJECTION<TV>::
 Identify_Neumann_Cells()
 {
     cell_neumann.Fill(false);
-    // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
-    //     for(int d=0;d<TV::m;d++){
-    //         if(it.index(d)==2 || it.index(d)==3 || it.index(d)==mac_grid.counts(d)-3 || it.index(d)==mac_grid.counts(d)-4){
-    //             cell_neumann(it.index)=true;
-    //             if(cell_dirichlet(it.index)) cell_dirichlet(it.index)=false;}}}
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+        for(int d=0;d<TV::m;d++){
+            if(it.index(d)==2 || it.index(d)==3 || it.index(d)==mac_grid.counts(d)-3 || it.index(d)==mac_grid.counts(d)-4){
+                cell_neumann(it.index)=true;
+                if(cell_dirichlet(it.index)) cell_dirichlet(it.index)=false;}}}
 }
 
 //#####################################################################
@@ -223,6 +223,21 @@ Velocities_Faces_To_Corners_MPM_Style()
                 sim.node_V(node)(axis)+=0.5*face_velocities(face_index);}}}
 }
 
+//#####################################################################
+// Function Get_Total_Momentum_On_Faces
+//#####################################################################
+template<class TV> TV MPM_PROJECTION<TV>::
+Get_Total_Momentum_On_Faces() const
+{
+    TV momen;
+    for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
+        FACE_INDEX<TV::m> face_index=iterator.Full_Index();
+        int axis=iterator.Axis();
+        momen(axis)+=face_masses(face_index)*face_velocities(face_index);}
+    return momen;
+}
+    
+    
 //#####################################################################
 template class MPM_PROJECTION<VECTOR<float,2> >;
 template class MPM_PROJECTION<VECTOR<float,3> >;
