@@ -450,7 +450,9 @@ def Automatic_Program(env,name='',sources=None):
         executable_target_path=os.path.join(env['INSTALL_PATH'],'bin',install_name)
     else:
         executable_target_path=os.path.join(Dir('.').srcnode().abspath,install_name)
-    if not env['shared']: env_link.Append(LINKFLAGS='-rdynamic')
+    ### Mac OS X does not support -rdynamic    
+    if sys.platform!="darwin":
+        if not env['shared']: env_link.Append(LINKFLAGS='-rdynamic')
     if env['install_programs']:
         if env['shared'] and env['wrapper']:
             rpath_save=env_link['RPATH']
