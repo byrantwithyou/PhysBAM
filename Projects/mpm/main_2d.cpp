@@ -184,9 +184,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.4,-0.5),TV(-0.1,0.3)),particle_exclude_radius);
             int first_count=sim.particles.number;
             sim.particles.Set_Material_Properties(0,first_count,
-                (T)5*115.2*density_scale/first_count, // mass per particle
-                (0)*ym/((T)2*((T)1+pr)), // mu
-                (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+                (T)115.2*density_scale/first_count, // mass per particle
+                (10)*ym/((T)2*((T)1+pr)), // mu
+                (10)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
             sim.particles.Set_Plasticity(0,first_count,
                 false,-1,1, // plasticity_yield
                 false,-1,1); // plasticity_clamp
@@ -195,30 +195,44 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 900, // visco_tau
                 0); // visco_kappa
             
-            // sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.1,-0.5),TV(0.4,0.3)),particle_exclude_radius);
-            // int second_count=sim.particles.number-first_count;
-            // sim.particles.Set_Material_Properties(first_count,second_count,
-            //     (T)115.2*density_scale/second_count, // mass per particle
-            //     (0)*ym/((T)2*((T)1+pr)), // mu
-            //     (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
-            // sim.particles.Set_Plasticity(first_count,second_count,
-            //     false,-1,1, // plasticity_yield
-            //     false,-1,1); // plasticity_clamp
-            // sim.particles.Set_Visco_Plasticity(first_count,second_count,
-            //     false,700, // visco_nu
-            //     900, // visco_tau
-            //     0); // visco_kappa
-            
-            // sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.08,0.35),TV(0.08,0.5)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.1,-0.5),TV(0.4,0.3)),particle_exclude_radius);
+            int second_count=sim.particles.number-first_count;
+            sim.particles.Set_Material_Properties(first_count,second_count,
+                (T)5*115.2*density_scale/second_count, // mass per particle
+                (100)*ym/((T)2*((T)1+pr)), // mu
+                (100)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+            sim.particles.Set_Plasticity(first_count,second_count,
+                false,-1,1, // plasticity_yield
+                false,-1,1); // plasticity_clamp
+            sim.particles.Set_Visco_Plasticity(first_count,second_count,
+                false,700, // visco_nu
+                900, // visco_tau
+                0); // visco_kappa
+
+            // sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.4,0.5),TV(-0.1,1.3)),particle_exclude_radius);
             // int third_count=sim.particles.number-first_count-second_count;
             // sim.particles.Set_Material_Properties(first_count+second_count,third_count,
-            //     (T)6*115.2*density_scale/third_count, // mass per particle
-            //     (4e3)*ym/((T)2*((T)1+pr)), // mu
-            //     (4e3)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+            //     (T)3*115.2*density_scale/second_count, // mass per particle
+            //     (0)*ym/((T)2*((T)1+pr)), // mu
+            //     (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
             // sim.particles.Set_Plasticity(first_count+second_count,third_count,
             //     false,-1,1, // plasticity_yield
             //     false,-1,1); // plasticity_clamp
             // sim.particles.Set_Visco_Plasticity(first_count+second_count,third_count,
+            //     false,700, // visco_nu
+            //     900, // visco_tau
+            //     0); // visco_kappa
+
+            // sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.1,0.5),TV(0.4,1.3)),particle_exclude_radius);
+            // int forth_count=sim.particles.number-first_count-second_count-third_count;
+            // sim.particles.Set_Material_Properties(first_count+second_count+third_count,forth_count,
+            //     (T)4*115.2*density_scale/second_count, // mass per particle
+            //     (0)*ym/((T)2*((T)1+pr)), // mu
+            //     (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+            // sim.particles.Set_Plasticity(first_count+second_count+third_count,forth_count,
+            //     false,-1,1, // plasticity_yield
+            //     false,-1,1); // plasticity_clamp
+            // sim.particles.Set_Visco_Plasticity(first_count+second_count+third_count,forth_count,
             //     false,700, // visco_nu
             //     900, // visco_tau
             //     0); // visco_kappa
@@ -347,23 +361,21 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             
             projection.Identify_Neumann_Cells();
             for(int x=3;x<projection.mac_grid.counts.x-3;x++){
-                projection.cell_neumann(TV_INT(x,3))=true;projection.cell_dirichlet(TV_INT(x,3))=false;}
+                projection.cell_neumann(TV_INT(x,3))=true;
+                projection.cell_dirichlet(TV_INT(x,3))=false;
+                projection.neumann_cell_normal_axis(TV_INT(x,3))=1;}
             for(int x=3;x<projection.mac_grid.counts.x-3;x++){
-                projection.cell_neumann(TV_INT(x,projection.mac_grid.counts.y-4))=true;projection.cell_dirichlet(TV_INT(x,projection.mac_grid.counts.y-4))=false;}
+                projection.cell_neumann(TV_INT(x,projection.mac_grid.counts.y-4))=true;
+                projection.cell_dirichlet(TV_INT(x,projection.mac_grid.counts.y-4))=false;
+                projection.neumann_cell_normal_axis(TV_INT(x,projection.mac_grid.counts.y-4))=1;}
             for(int y=3;y<projection.mac_grid.counts.y-3;y++){
-                projection.cell_neumann(TV_INT(3,y))=true;projection.cell_dirichlet(TV_INT(3,y))=false;}
+                projection.cell_neumann(TV_INT(3,y))=true;
+                projection.cell_dirichlet(TV_INT(3,y))=false;
+                projection.neumann_cell_normal_axis(TV_INT(3,y))=0;}
             for(int y=3;y<projection.mac_grid.counts.y-3;y++){
-                projection.cell_neumann(TV_INT(projection.mac_grid.counts.x-4,y))=true;projection.cell_dirichlet(TV_INT(projection.mac_grid.counts.x-4,y))=false;}
-
-            for(int x=4;x<projection.mac_grid.counts.x-4;x++){
-                projection.cell_neumann(TV_INT(x,4))=true;projection.cell_dirichlet(TV_INT(x,4))=false;}
-            for(int x=4;x<projection.mac_grid.counts.x-4;x++){
-                projection.cell_neumann(TV_INT(x,projection.mac_grid.counts.y-5))=true;projection.cell_dirichlet(TV_INT(x,projection.mac_grid.counts.y-5))=false;}
-            for(int y=4;y<projection.mac_grid.counts.y-4;y++){
-                projection.cell_neumann(TV_INT(4,y))=true;projection.cell_dirichlet(TV_INT(4,y))=false;}
-            for(int y=4;y<projection.mac_grid.counts.y-4;y++){
-                projection.cell_neumann(TV_INT(projection.mac_grid.counts.x-5,y))=true;projection.cell_dirichlet(TV_INT(projection.mac_grid.counts.x-5,y))=false;}
-
+                projection.cell_neumann(TV_INT(projection.mac_grid.counts.x-4,y))=true;
+                projection.cell_dirichlet(TV_INT(projection.mac_grid.counts.x-4,y))=false;
+                projection.neumann_cell_normal_axis(TV_INT(projection.mac_grid.counts.x-4,y))=0;}
             
             projection.Identify_Nodes_Of_Non_Dirichlet_Cells();
             projection.Velocities_Corners_To_Faces_MPM_Style();
@@ -389,10 +401,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
-                if(sim.particles.Xm(i).y<0.17)
+                if(sim.particles.Xm(i).y<0.4 && sim.particles.Xm(i).x<0)
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
+                else if(sim.particles.Xm(i).y<0.4 && sim.particles.Xm(i).x>0)
                     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
-//                else if(sim.particles.Xm(i).x>0)
-//                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
+                else if(sim.particles.Xm(i).y>0.4 && sim.particles.Xm(i).x<0)
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
                 else
                     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));
             }

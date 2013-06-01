@@ -24,11 +24,13 @@ public:
     GRID<TV> mac_grid;
     ARRAY<bool,TV_INT> cell_dirichlet;
     ARRAY<bool,TV_INT> cell_neumann;
+    ARRAY<int,TV_INT> neumann_cell_normal_axis;
     HASHTABLE<TV_INT,bool> nodes_non_dirichlet_cells;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_masses;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_momenta;
     ARRAY<T,TV_INT> div_u;
+    T max_div;
     ARRAY<T,TV_INT> pressure;
 
     MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in);

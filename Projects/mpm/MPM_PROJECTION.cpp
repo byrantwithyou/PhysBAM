@@ -22,6 +22,7 @@ MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     face_velocities.Resize(mac_grid);face_masses.Resize(mac_grid);face_momenta.Resize(mac_grid);
     cell_dirichlet.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     cell_neumann.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
+    neumann_cell_normal_axis.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     div_u.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     pressure.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
 }
@@ -46,6 +47,7 @@ Reinitialize()
     cell_neumann.Fill(false);
     nodes_non_dirichlet_cells.Clean_Memory();
     div_u.Fill((T)0);
+    max_div=(T)0;
     pressure.Fill((T)0);
 }
 
@@ -69,7 +71,6 @@ template<class TV> void MPM_PROJECTION<TV>::
 Identify_Neumann_Cells()
 {
     cell_neumann.Fill(false);
-    // Can mannually do this in main function
 }
 
 //#####################################################################
@@ -120,6 +121,7 @@ Velocities_Corners_To_Faces_MPM_Style()
 template<class TV> void MPM_PROJECTION<TV>::
 Build_Velocity_Divergence()
 {
+    max_div=(T)0;
     div_u.Fill((T)0);
     T one_over_h=(T)1/mac_grid.dX.Min();
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
@@ -128,7 +130,9 @@ Build_Velocity_Divergence()
                 div_u(it.index)+=face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))
                     -face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)));
             div_u(it.index)*=one_over_h;}
-        else div_u(it.index)=(T)0;} // dirichlet p cells
+        else div_u(it.index)=(T)0; // dirichlet p cells
+        if(!cell_neumann(it.index) && abs(div_u(it.index))>max_div) // record maximum divergence on non neumann cells
+            max_div=abs(div_u(it.index));}
 }
 
 //#####################################################################
@@ -182,7 +186,7 @@ Solve_For_Pressure()
 template<class TV> void MPM_PROJECTION<TV>::
 Do_Projection()
 {
-    LOG::cout<<"Maximum velocity divergence before projection: "<<div_u.Max_Abs()<<std::endl;        
+    LOG::cout<<"Maximum velocity divergence before projection: "<<max_div<<std::endl;        
     T one_over_h=(T)1/mac_grid.dX.Min();
     for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_index=iterator.Full_Index();
@@ -190,17 +194,18 @@ Do_Projection()
         TV_INT first_cell=iterator.First_Cell_Index();
         TV_INT second_cell=iterator.Second_Cell_Index();        
         if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
-            T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
-            if(face_masses(face_index)>sim.min_mass) face_velocities(face_index)-=sim.dt/face_masses(face_index)*grad_p;}}
+            if(!cell_neumann(first_cell) && !cell_neumann(second_cell)){
+                T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
+                if(face_masses(face_index)>sim.min_mass) face_velocities(face_index)-=sim.dt/face_masses(face_index)*grad_p;}}}
     // Enforce face velocities for neumann cells
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
         if(cell_neumann(it.index)){
-            for(int d=0;d<TV::m;d++){
-                face_velocities(FACE_INDEX<TV::m>(d,mac_grid.First_Face_Index_In_Cell(d,it.index)))=T(0);
-                face_velocities(FACE_INDEX<TV::m>(d,mac_grid.Second_Face_Index_In_Cell(d,it.index)))=T(0);}}}
+            int d=neumann_cell_normal_axis(it.index);
+            face_velocities(FACE_INDEX<TV::m>(d,mac_grid.First_Face_Index_In_Cell(d,it.index)))=T(0);
+            face_velocities(FACE_INDEX<TV::m>(d,mac_grid.Second_Face_Index_In_Cell(d,it.index)))=T(0);}}
     // check whether divergence free
     Build_Velocity_Divergence();
-    LOG::cout<<"Maximum velocity divergence after projection: "<<div_u.Max_Abs()<<std::endl;
+    LOG::cout<<"Maximum velocity divergence after projection: "<<max_div<<std::endl;
 }
 
 //#####################################################################
@@ -231,7 +236,6 @@ Get_Total_Momentum_On_Faces() const
         momen(axis)+=face_masses(face_index)*face_velocities(face_index);}
     return momen;
 }
-    
     
 //#####################################################################
 template class MPM_PROJECTION<VECTOR<float,2> >;
