@@ -16,8 +16,8 @@
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include "MPM_CONSTITUTIVE_MODEL.h"
-#include "MPM_LINEAR_BASIS.h"
 #include "MPM_CUBIC_B_SPLINE.h"
+#include "MPM_LINEAR_BASIS.h"
 #include "MPM_PARTICLES.h"
 namespace PhysBAM{
 template<class TV>

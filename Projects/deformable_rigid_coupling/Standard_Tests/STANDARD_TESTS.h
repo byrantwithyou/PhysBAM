@@ -43,7 +43,6 @@
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
@@ -52,6 +51,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/BINDING_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/INCOMPRESSIBLE_FINITE_VOLUME.h>
@@ -338,7 +338,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(dynamic_subsampling) Initialize_Dynamic_Subsampling();
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -360,7 +360,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     T damping=(T).01;
     if(test_number==8) damping=(T).03;
     if(test_number==19) damping=(T).1;
-    for(int i=0;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
+    for(int i=0;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
         if(test_number==12 || test_number==21) solid_body_collection.Add_Force(Create_Tet_Springs(*tetrahedralized_volume,(T)stiffness/(1+sqrt((T)2)),(T)3));
         else
             if(test_number==8 || test_number==14){
@@ -370,25 +370,25 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 solid_body_collection.Add_Force(fv);}
             else solid_body_collection.Add_Force(Create_Finite_Volume(*tetrahedralized_volume,new NEO_HOOKEAN<T,3>(stiffness,(T).45,damping,(T).25),true,(T).1));}
 
-    for(int i=0;SEGMENTED_CURVE<TV>* segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>*>(i);i++){
+    for(int i=0;SEGMENTED_CURVE<TV>* segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>*>(i);i++){
         solid_body_collection.Add_Force(Create_Edge_Springs(*segmented_curve,(T)stiffness/(1+sqrt((T)2)),(T)3));}
     
-    for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
+    for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
         T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
         solid_body_collection.Add_Force(Create_Edge_Springs(*triangulated_surface,linear_stiffness,linear_damping));
         T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
         solid_body_collection.Add_Force(Create_Bending_Springs(*triangulated_surface,bending_stiffness,bending_damping));
         PHYSBAM_DEBUG_PRINT("Spring stiffnesses",linear_stiffness,linear_damping,bending_stiffness,bending_damping);}
 
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
-        deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures(i));
-        if(solids_parameters.triangle_collision_parameters.perform_self_collision && (!dynamic_cast<FREE_PARTICLES<TV>*>(deformable_body_collection.deformable_geometry.structures(i))))
-            solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(i));}
+    for(int i=0;i<deformable_body_collection.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.structures(i))){
+        deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.structures(i));
+        if(solids_parameters.triangle_collision_parameters.perform_self_collision && (!dynamic_cast<FREE_PARTICLES<TV>*>(deformable_body_collection.structures(i))))
+            solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.structures(i));}
 
     if(test_number==8){
         // collide structures with the ground only
         deformable_body_collection.collisions.Use_Structure_Collide_Collision_Body(true);
-        for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++)
+        for(int s=0;s<deformable_body_collection.structures.m;s++)
             deformable_body_collection.collisions.structure_collide_collision_body(s).Set(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(ground->particle_index));}
 
     // correct mass
@@ -641,7 +641,7 @@ void Sliding_Test()
     rigid_body->Twist().linear=rigid_body->Frame().r.Rotate(TV(-initial_speed_down_ramp2,0,0));
     rigid_body->name=STRING_UTILITIES::string_sprintf("box 2 mu=%.2f",mu);
 
-    FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
+    FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();solid_body_collection.deformable_body_collection.Add_Structure(&free_particles);
     int particle_rest=solid_body_collection.deformable_body_collection.particles.Add_Element(),particle_fall=solid_body_collection.deformable_body_collection.particles.Add_Element();
     solid_body_collection.deformable_body_collection.particles.mass(particle_rest)=1;solid_body_collection.deformable_body_collection.particles.mass(particle_fall)=1;
     solid_body_collection.deformable_body_collection.particles.X(particle_rest)=TV(0,0,(T).8);solid_body_collection.deformable_body_collection.particles.X(particle_fall)=TV(0,(T).2,(T)1.4);
@@ -1014,7 +1014,7 @@ void Ring_Drop()
         object->mesh.Initialize_Segment_Mesh();
         SEGMENTED_CURVE<TV>* segmented_curve=SEGMENTED_CURVE<TV>::Create(deformable_body_collection.particles);
         segmented_curve->mesh.elements=object->mesh.segment_mesh->elements;
-        deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);
+        deformable_body_collection.Add_Structure(segmented_curve);
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*object,ring_mass/object->Total_Volume());}
 
     // Deformable spheres
@@ -1031,7 +1031,7 @@ void Ring_Drop()
         object->mesh.Initialize_Segment_Mesh();
         SEGMENTED_CURVE<TV>* segmented_curve=SEGMENTED_CURVE<TV>::Create(deformable_body_collection.particles);
         segmented_curve->mesh.elements=object->mesh.segment_mesh->elements;
-        deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);
+        deformable_body_collection.Add_Structure(segmented_curve);
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*object,ring_mass/object->Total_Volume());}
 
     tests.Add_Ground(mu,(T)0,(T).5,(T)3);
@@ -1068,7 +1068,7 @@ void Cubes_Friction()
     RIGID_BODY_STATE<TV> state(frame,twist);
     tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(5,5,5),RANGE<TV>(TV(-(T)1,-(T)1,-(T)1),TV((T)1,(T)1,(T)1))*box_size),false,&state);
 
-    FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
+    FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();solid_body_collection.deformable_body_collection.Add_Structure(&free_particles);
     int particle_rest=solid_body_collection.deformable_body_collection.particles.Add_Element();
     solid_body_collection.deformable_body_collection.particles.mass(particle_rest)=1;
     solid_body_collection.deformable_body_collection.particles.X(particle_rest)=TV(0,0,(T).4);
@@ -1420,19 +1420,19 @@ void Initialize_Dynamic_Subsampling()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
 
-    for(int i=0;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
+    for(int i=0;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
         tetrahedralized_volume->Update_Number_Nodes();
         if(!tetrahedralized_volume->triangulated_surface) tetrahedralized_volume->Initialize_Triangulated_Surface();
         surface_elements.Append_Elements(tetrahedralized_volume->triangulated_surface->mesh.elements);}
 
-    for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
+    for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
         triangulated_surface->Update_Number_Nodes();
         surface_elements.Append_Elements(triangulated_surface->mesh.elements);}
 
     surface_elements.Flattened().Get_Unique(surface_particles);
 
     FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create(deformable_body_collection.particles);
-    deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
+    deformable_body_collection.Add_Structure(&free_particles);
 
     old_number_particles=deformable_body_collection.particles.Size();
     triangle_free_particles.Resize(surface_elements.m);
@@ -1508,7 +1508,7 @@ void Update_Subsamples()
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
-    FREE_PARTICLES<TV>& free_particles=deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
+    FREE_PARTICLES<TV>& free_particles=deformable_body_collection.template Find_Structure<FREE_PARTICLES<TV>&>();
 
     ARRAY<BINDING<TV>*> new_binding_list;
     ARRAY<VECTOR<int,2> > new_soft_bindings;
@@ -1552,7 +1552,7 @@ void Update_Subsamples()
     soft_bindings.Clamp_Particles_To_Embedded_Positions();soft_bindings.Clamp_Particles_To_Embedded_Velocities();
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
     
     // correct mass
     binding_list.Clear_Hard_Bound_Particles(particles.mass);
@@ -1609,12 +1609,12 @@ void Sphere_Fall()
     object.mesh.Initialize_Segment_Mesh();
     SEGMENTED_CURVE<TV>* segmented_curve=SEGMENTED_CURVE<TV>::Create(deformable_body_collection.particles);
     segmented_curve->mesh.elements=object.mesh.segment_mesh->elements;
-    deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);
+    deformable_body_collection.Add_Structure(segmented_curve);
     tests.Add_Ground();
 
     // add structures and rigid bodies to collisions
-    if(automatically_add_to_collision_structures) deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    if(automatically_add_to_collision_structures) deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
     solid_body_collection.deformable_body_collection.particles.mass*=100;
 }
 //#####################################################################

@@ -7,7 +7,6 @@
 #include <PhysBAM_Tools/Arrays/CONSTANT_ARRAY.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
@@ -144,7 +143,7 @@ Test_Matrix() const
     ARRAY<T,FORCE_AGGREGATE_ID> aggregate(size),aggregate2(size);
     random.Fill_Uniform(aggregate,-1,1);
 
-    int number=solid_body_collection.deformable_body_collection.deformable_geometry.particles.number;
+    int number=solid_body_collection.deformable_body_collection.particles.number;
     ARRAY<TV> V(number),V2(number),V3(number),V4(number),V5(number);
     random.Fill_Uniform(V,-1,1);
 

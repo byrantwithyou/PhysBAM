@@ -9,7 +9,6 @@
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
@@ -216,11 +215,11 @@ Initialize_Bodies()
         ether_drag->Use_Constant_Wind(ether_drag_wind);//}
 
     //hairs
-    deformable_body_collection.deformable_geometry.Add_Structure(&edges);
-    deformable_body_collection.deformable_geometry.Add_Structure(&fixed_edges);
-    deformable_body_collection.deformable_geometry.Add_Structure(&extra_edges);
-    deformable_body_collection.deformable_geometry.Add_Structure(&bending_edges);
-    deformable_body_collection.deformable_geometry.Add_Structure(&torsion_edges);
+    deformable_body_collection.Add_Structure(&edges);
+    deformable_body_collection.Add_Structure(&fixed_edges);
+    deformable_body_collection.Add_Structure(&extra_edges);
+    deformable_body_collection.Add_Structure(&bending_edges);
+    deformable_body_collection.Add_Structure(&torsion_edges);
     FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/%s/fixed_nodes_start",data_directory.c_str(),sim_folder.c_str()),fixed_nodes_start);
     FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/%s/fixed_nodes_end",data_directory.c_str(),sim_folder.c_str()),fixed_nodes_end);
 

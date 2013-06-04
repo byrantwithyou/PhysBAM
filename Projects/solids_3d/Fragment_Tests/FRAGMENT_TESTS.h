@@ -61,7 +61,7 @@ void Get_Initial_Data()
     int count=1;
 
     if(use_single_mesh){
-        SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+        SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve);
         for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
             for(int ij=1;ij<hair_layout_grid.counts.z;ij++){
                 particles.X(count)=hair_layout_grid.X(TV_INT(i,j,ij));
@@ -71,7 +71,7 @@ void Get_Initial_Data()
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,density);}
     else{
         for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
-            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve);
             for(int ij=1;ij<hair_layout_grid.counts.z;ij++){
                 particles.X(count)=hair_layout_grid.X(TV_INT(i,j,ij));
                 segmented_curve.mesh.elements.Append(VECTOR<int,2>(count,count+1));count++;}
@@ -80,11 +80,11 @@ void Get_Initial_Data()
             particles.X(count)=hair_layout_grid.X(TV_INT(i,j,hair_layout_grid.counts.z));count++;}}
     //RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T)1,(T)0.15);sphere_body.Frame().t=TV(0,(T)-1.2,0);
 
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -131,8 +131,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data();
 
     // make forces
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
-        if(SEGMENTED_CURVE<TV>* curve=dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
+    for(int i=0;i<deformable_body_collection.structures.m;i++){
+        if(SEGMENTED_CURVE<TV>* curve=dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.structures(i))){
             ARRAY<int>& referenced_nodes=*new ARRAY<int>; // hey craig, look a memory leak.  hi, andy, fix this one, too.
             curve->mesh.elements.Flattened().Get_Unique(referenced_nodes);
             solid_body_collection.Add_Force(Create_Edge_Springs(*curve,100/(1+sqrt((T)2)),(T)3));

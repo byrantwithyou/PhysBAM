@@ -16,8 +16,8 @@
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
@@ -388,8 +388,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         tests.Set_Mass_Of_Particles(segmented_curve,solid_mass/segmented_curve.Total_Size(),false);
         
         // correct number nodes
-        for(int i=0;i<solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++){
-            solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();}
+        for(int i=0;i<solid_body_collection.deformable_body_collection.structures.m;i++){
+            solid_body_collection.deformable_body_collection.structures(i)->Update_Number_Nodes();}
 
         // correct mass
         solid_body_collection.deformable_body_collection.particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
@@ -402,7 +402,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         LOG::cout<<"mass="<<solid_body_collection.deformable_body_collection.particles.mass<<std::endl;
         LOG::cout<<"spring_stiffness="<<spring_stiffness<<", spring_overdamping_fraction="<<spring_overdamping_fraction<<std::endl;
 
-        solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&point_simplices_1d);
+        solid_body_collection.deformable_body_collection.Add_Structure(&point_simplices_1d);
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(point_simplices_1d);
         Add_To_Fluid_Simulation(deformable_collisions);}
     else if(simulate_rigids){

@@ -71,7 +71,6 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
@@ -82,6 +81,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/SPLINE_MODEL.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/AXIAL_BENDING_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/BINDING_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/COLLISION_AREA_PENALTY_FORCE.h>
@@ -783,7 +783,7 @@ void Get_Initial_Data()
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(
                 data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/tetrahedralized_volume.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,1000);
             FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/bindings",binding_list);
-            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve);
             constrained_particle=segmented_curve.particles.Add_Element();
             particles.mass(constrained_particle)=1;particles.X(constrained_particle)=TV(0,5,0);
             suspended_particle=4531;
@@ -823,14 +823,14 @@ void Get_Initial_Data()
             TRIANGULATED_SURFACE<T>* triangulated_surface=TRIANGULATED_SURFACE<T>::Create(particles);
             for(int t=0;t<tetrahedralized_volume.triangulated_surface->mesh.elements.m;t++)
                 triangulated_surface->mesh.elements.Append(VECTOR<int,3>::Map(child_particles,tetrahedralized_volume.triangulated_surface->mesh.elements(t)));
-            deformable_body_collection.deformable_geometry.Add_Structure(triangulated_surface);
+            deformable_body_collection.Add_Structure(triangulated_surface);
             automatically_add_to_collision_structures=false;
-            deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures.Last());
+            deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.structures.Last());
             tests.Add_Ground();
             break;}
         case 21:{
             TRIANGULATED_SURFACE<T>& triangulated_surface=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)1.0,(T)0))));
-            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve);
             constrained_particles.Resize(2);int last_particle;
             for(int fragment(0);fragment<2;fragment++){last_particle=0;
                 for(T z=(T)-.25;z<=(T).25;z+=(T).02){
@@ -856,7 +856,7 @@ void Get_Initial_Data()
             break;}
         case 22:{
             tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)1.5,(T)0))));
-            FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
+            FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();deformable_body_collection.Add_Structure(&free_particles);
             T sphere_radius=(T).25;
             for(T y=-sphere_radius;y<=sphere_radius;y+=(T).01){
                 T y_magnitude=abs(y);T disc_radius=sqrt((sphere_radius*sphere_radius)-(y_magnitude*y_magnitude));
@@ -884,7 +884,7 @@ void Get_Initial_Data()
                     particles.X(offset+p)=old_surface.particles.X(p);particles.mass(offset+p)=(T)0;
                     binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,offset+p,rigid_body_collection,body.particle_index,particles.X(offset+p)));}
                 surface.Update_Number_Nodes();//surface.density=body.Mass()/surface.Total_Area();
-                deformable_body_collection.deformable_geometry.Add_Structure(&surface);}
+                deformable_body_collection.Add_Structure(&surface);}
             tests.Add_Ground();
             tests.Add_Gravity();
             break;}
@@ -902,26 +902,26 @@ void Get_Initial_Data()
         case 25:{
             // from left, most free particles
             tests.Create_Cloth_Panel(1,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)1,(T).75,0),ROTATION<TV>((T)(-pi/8),TV(0,0,1)))),&cloth_ramp_particles);
-            FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
+            FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();deformable_body_collection.Add_Structure(&free_particles);
             int new_free_node=particles.Add_Element();particles.X(new_free_node)=TV(0,(T)1.2,0);free_particles.nodes.Append(new_free_node);
             int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;particles.mass(new_free_node)=aspect_ratio*sqr(side_length)/(m*n);
             // 2nd
             {tests.Create_Cloth_Panel(1,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)1,(T).75,(T)1.5),ROTATION<TV>((T)(-pi/8),TV(0,0,1)))),&cloth_ramp_particles);
-            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve);
             int new_edge_node1=segmented_curve.particles.Add_Element();int new_edge_node2=segmented_curve.particles.Add_Element();
             static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=particles.mass(new_free_node);
             segmented_curve.particles.X(new_edge_node1)=TV(0,(T)1.2,(T)1.5-(T).45*side_length);segmented_curve.particles.X(new_edge_node2)=TV(0,(T)1.2,(T)1.5+(T).45*side_length);
             segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_edge_node1,new_edge_node2));}
             // 3rd
             {tests.Create_Cloth_Panel(1,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)1,(T).75,(T)3),ROTATION<TV>((T)(-pi/8),TV(0,0,1)))),&cloth_ramp_particles);
-            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve);
             int new_edge_node1=segmented_curve.particles.Add_Element();int new_edge_node2=segmented_curve.particles.Add_Element();
             static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=particles.mass(new_free_node);
             segmented_curve.particles.X(new_edge_node1)=TV((T)-.45*side_length,(T)1.35,(T)3);segmented_curve.particles.X(new_edge_node2)=TV((T).45*side_length,(T)1.35,(T)3);
             segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_edge_node1,new_edge_node2));}
             // 4th
             {tests.Create_Cloth_Panel(1,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)1,(T).75,(T)4.5),ROTATION<TV>((T)(-pi/8),TV(0,0,1)))),&cloth_ramp_particles);
-            TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&surface);
+            TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);deformable_body_collection.Add_Structure(&surface);
             int new_tri_node1=particles.Add_Element(),new_tri_node2=particles.Add_Element(),new_tri_node3=particles.Add_Element();
             particles.mass(new_tri_node1)=particles.mass(new_tri_node2)=particles.mass(new_tri_node3)=particles.mass(new_free_node);
             particles.X(new_tri_node1)=TV(0,(T)1.2,(T)4.5-(T).45*side_length);
@@ -943,7 +943,7 @@ void Get_Initial_Data()
             TRIANGULATED_SURFACE<T>& triangulated_surface=embedding.material_surface;
             RED_GREEN_TRIANGLES<TV> redgreen(triangulated_surface);
             for(int level=0;level<number_of_boundary_refinements;level++) redgreen.Refine_Simplex_List(IDENTITY_ARRAY<>(triangulated_surface.mesh.elements.m));
-            deformable_body_collection.deformable_geometry.Add_Structure(&embedding);
+            deformable_body_collection.Add_Structure(&embedding);
             Bind_Redgreen_Segment_Midpoints(redgreen);
             // create soft bindings for all embedded particles
 //            tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
@@ -955,14 +955,14 @@ void Get_Initial_Data()
             RIGID_BODY<TV>& cylinder_body=tests.Add_Rigid_Body("cylinder",(T).95,(T)0);cylinder_body.Frame().t=TV(0,(T)1.5,0);
             RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T)4,(T)0);sphere_body.Frame().t=TV(0,(T)1.75,(T)5.5);
             ARRAY<int> sphere_particles,cylinder_particles;
-            deformable_body_collection.deformable_geometry.Add_Structure(cylinder_body.simplicial_object->Append_Particles_And_Create_Copy(deformable_body_collection.particles,&cylinder_particles));
-            deformable_body_collection.deformable_geometry.Add_Structure(sphere_body.simplicial_object->Append_Particles_And_Create_Copy(deformable_body_collection.particles,&sphere_particles));
+            deformable_body_collection.Add_Structure(cylinder_body.simplicial_object->Append_Particles_And_Create_Copy(deformable_body_collection.particles,&cylinder_particles));
+            deformable_body_collection.Add_Structure(sphere_body.simplicial_object->Append_Particles_And_Create_Copy(deformable_body_collection.particles,&sphere_particles));
             for(int i=0;i<cylinder_particles.m;i++) deformable_body_collection.particles.X(cylinder_particles(i))=cylinder_body.World_Space_Point(deformable_body_collection.particles.X(cylinder_particles(i)));
             for(int i=0;i<sphere_particles.m;i++) deformable_body_collection.particles.X(sphere_particles(i))=sphere_body.World_Space_Point(deformable_body_collection.particles.X(sphere_particles(i)));
-            SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*((TRIANGULATED_SURFACE<T>*)deformable_body_collection.deformable_geometry.structures(0)),density);
-            SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*((TRIANGULATED_SURFACE<T>*)deformable_body_collection.deformable_geometry.structures(1)),density);
+            SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*((TRIANGULATED_SURFACE<T>*)deformable_body_collection.structures(0)),density);
+            SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*((TRIANGULATED_SURFACE<T>*)deformable_body_collection.structures(1)),density);
             automatically_add_to_collision_structures=false;
-            deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+            deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
             T protection_thickness=(T)atof(getenv("PROTECTION_THICKNESS"));
             LOG::cout<<"Protection thickness "<<protection_thickness<<std::endl;
             deformable_body_collection.collisions.use_protectors=true;deformable_body_collection.collisions.protection_thickness=protection_thickness;
@@ -975,7 +975,7 @@ void Get_Initial_Data()
             // The tet's 6th point (front most) stops by frame 40 at position 0.378322 -0.274866 1
             RIGID_BODY<TV>& ground=tests.Add_Rigid_Body("ground",(T)1,(T).4);ground.Frame().r=ROTATION<TV>((T)(-pi/5),TV(0,0,1));ground.is_static=true;
             ground.coefficient_of_friction=(T).6; // used .9 for stopping case
-            FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
+            FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();deformable_body_collection.Add_Structure(&free_particles);
             int particle1=particles.Add_Element();free_particles.nodes.Append(particle1);
             particles.mass(particle1)=1;particles.X(particle1)=TV(0,(T).1,0);particles.V(particle1)=ground.Frame().r.Rotate(TV(0,0,0));
             int particle2=particles.Add_Element();free_particles.nodes.Append(particle2);
@@ -994,7 +994,7 @@ void Get_Initial_Data()
             TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
             tetrahedralized_volume->mesh.elements.Append(VECTOR<int,4>(2,3,4,5));
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*tetrahedralized_volume,density);
-            deformable_body_collection.deformable_geometry.Add_Structure(tetrahedralized_volume); 
+            deformable_body_collection.Add_Structure(tetrahedralized_volume); 
             tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1,2),ROTATION<TV>((T)pi/2,TV(0,0,1))),
                     TWIST<TV>(ground.Frame().r.Rotate(TV(1,0,0)),typename TV::SPIN())));}
             break;
@@ -1033,24 +1033,24 @@ void Get_Initial_Data()
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("skinnycyllink",(T).5,(T).3);rigid_body.Frame().t=TV(0,(T)0.075,0);rigid_body.Frame().r=ROTATION<TV>((T)pi/2,TV(1,0,0));}
             break;
         case 33:{
-            FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
+            FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();deformable_body_collection.Add_Structure(&free_particles);
             int new_free_node=particles.Add_Element();particles.X(new_free_node)=TV((T).225*side_length,(T).025,0);particles.V(new_free_node)=TV(0,(T)-1.5,0);
             free_particles.nodes.Append(new_free_node);
             int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;particles.mass(new_free_node)=aspect_ratio*sqr(side_length)/(m*n);            
-            TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&surface);
+            TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);deformable_body_collection.Add_Structure(&surface);
             int new_tri_node1=particles.Add_Element(),new_tri_node2=particles.Add_Element(),new_tri_node3=particles.Add_Element();
             particles.mass(new_tri_node1)=particles.mass(new_tri_node2)=particles.mass(new_tri_node3)=particles.mass(new_free_node);
             particles.X(new_tri_node1)=TV(0,0,(T)-.45*side_length);particles.X(new_tri_node2)=TV(0,0,(T).45*side_length);particles.X(new_tri_node3)=TV((T).45*side_length,0,0);
             surface.mesh.elements.Append(VECTOR<int,3>(new_tri_node1,new_tri_node2,new_tri_node3));}
             break;
         case 34:{
-            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve);
             int new_edge_node1=segmented_curve.particles.Add_Element();int new_edge_node2=segmented_curve.particles.Add_Element();
             int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
             static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=aspect_ratio*sqr(side_length)/(m*n);
             segmented_curve.particles.X(new_edge_node1)=TV((T)-.45,0,0);segmented_curve.particles.X(new_edge_node2)=TV((T).45,0,0);
             segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_edge_node1,new_edge_node2));
-            SEGMENTED_CURVE<TV>& segmented_curve2=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve2);
+            SEGMENTED_CURVE<TV>& segmented_curve2=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve2);
             int new_edge_node3=segmented_curve2.particles.Add_Element();int new_edge_node4=segmented_curve2.particles.Add_Element();
             static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve2.particles).mass(new_edge_node3)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve2.particles).mass(new_edge_node4)=aspect_ratio*sqr(side_length)/(m*n);
             segmented_curve2.particles.X(new_edge_node3)=TV(0,(T).025,(T)-.45);segmented_curve2.particles.X(new_edge_node4)=TV(0,(T).025,(T).45);
@@ -1087,9 +1087,9 @@ void Get_Initial_Data()
             for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){VECTOR<int,3> I=iterator.Cell_Index();
                 tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(frames(I)));}
             TRIANGULATED_SURFACE<T>& merged_surface=*TRIANGULATED_SURFACE<T>::Create(particles);
-            for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++)
-                merged_surface.mesh.elements.Append_Elements(dynamic_cast<TRIANGULATED_SURFACE<T>&>(*deformable_body_collection.deformable_geometry.structures(s)).mesh.elements);
-            deformable_body_collection.deformable_geometry.structures.Clean_Memory();deformable_body_collection.deformable_geometry.Add_Structure(&merged_surface);
+            for(int s=0;s<deformable_body_collection.structures.m;s++)
+                merged_surface.mesh.elements.Append_Elements(dynamic_cast<TRIANGULATED_SURFACE<T>&>(*deformable_body_collection.structures(s)).mesh.elements);
+            deformable_body_collection.structures.Clean_Memory();deformable_body_collection.Add_Structure(&merged_surface);
             LOG::Stat("total elements",merged_surface.mesh.elements.m);
             tests.Add_Ground((T).3,2);
             break;}
@@ -1104,7 +1104,7 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 38:
-            {SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);const int strands=25,strand_segments=50;
+            {SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve);const int strands=25,strand_segments=50;
                 hair_layout_grid.Initialize(TV_INT(strands,strands,strand_segments),RANGE<TV>(TV((T)-.5,0,0),TV((T).5,1,2)));particles.Add_Elements(hair_layout_grid.Numbers_Of_Nodes().Product());
             int count=1;
             for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
@@ -1163,7 +1163,7 @@ void Get_Initial_Data()
             {TRIANGULATED_SURFACE<T>& surface=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,2,0))));
             RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("box",1,0);rigid_body->is_static=true;
             ARRAY<int> referenced_particles;surface.mesh.elements.Flattened().Get_Unique(referenced_particles);
-            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve);
             for(int i=0;i<referenced_particles.m;i++){int p=referenced_particles(i);
                 int rigid_p=particles.Add_Element();
                 TV object_space_surface=rigid_body->implicit_object->Closest_Point_On_Boundary(rigid_body->Object_Space_Point(particles.X(p)));
@@ -1183,7 +1183,7 @@ void Get_Initial_Data()
             body.Frame().t.x=num_volumes*2+5;body.Frame().t.y=height/2;body.Twist().linear.x=-50;
             for(int n=0;n<num_volumes;n++){
                 //Create curve
-                SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+                SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve);
                 ARRAY<int> particle_indices;
                 int base_particle=0;
                 for(int j=0;j<num_particles;j++){
@@ -1200,7 +1200,7 @@ void Get_Initial_Data()
                 GRID<TV> new_grid(TV_INT(grid_domain.Thickened(2*thickness).Edge_Lengths()/(T).02),grid_domain.Thickened(2*thickness));
                 ARRAY<T,VECTOR<int,3> > new_phi(new_grid.Domain_Indices());new_phi.Fill(1e10);
                 for(CELL_ITERATOR<TV> iterator(new_grid);iterator.Valid();iterator.Next()){const VECTOR<int,3> &cell_index=iterator.Cell_Index();
-                    for(int i=0;i<particle_indices.m;i++) new_phi(cell_index)=min(new_phi(cell_index),(iterator.Location()-deformable_body_collection.deformable_geometry.particles.X(particle_indices(i))).Magnitude()-thickness);}
+                    for(int i=0;i<particle_indices.m;i++) new_phi(cell_index)=min(new_phi(cell_index),(iterator.Location()-deformable_body_collection.particles.X(particle_indices(i))).Magnitude()-thickness);}
                 LEVELSET_IMPLICIT_OBJECT<TV> implicit(new_grid,new_phi);
                 TV edges=new_grid.Domain().Edge_Lengths();
                 TV edge_cells_float=TV((T)x_edge,(T)x_edge*edges.y/edges.x,(T)x_edge*edges.z/edges.x);
@@ -1213,7 +1213,7 @@ void Get_Initial_Data()
                 volume_appended->Update_Number_Nodes();
                 volume_appended->Initialize_Hierarchy();
                 SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*volume,1,true);
-                deformable_body_collection.deformable_geometry.Add_Structure(volume_appended);
+                deformable_body_collection.Add_Structure(volume_appended);
                 ARRAY<int> volume_elements;volume_appended->mesh.elements.Flattened().Get_Unique(volume_elements);
                 for(int i=0;i<volume_elements.m;i++){int p=volume_elements(i);
                     if(particles.X(p).y<=particles.X(base_particle).y+1e-4){
@@ -1274,21 +1274,21 @@ void Get_Initial_Data()
                 TETRAHEDRALIZED_VOLUME<T>* new_volume=0;
                 ARRAY<int> surface_particle_map;
                 tests.Create_Regular_Embedded_Surface(binding_list,soft_bindings,*surface,density,512,1e-3,surface_particle_map,&new_surface,&new_volume,false);
-                deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures.Last());
-                solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures.Last());}
+                deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.structures.Last());
+                solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.structures.Last());}
             tests.Add_Ground();
             break;}
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
     // add structures and rigid bodies to collisions
-    if(automatically_add_to_collision_structures) deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    if(automatically_add_to_triangle_collisions) solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    if(automatically_add_to_collision_structures) deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    if(automatically_add_to_triangle_collisions) solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
     //solid_body_collection.deformable_body_collection.collisions.Use_Structure_Skip_Collision_Body();
     //solid_body_collection.deformable_body_collection.collisions.Use_Structure_Skip_Collision_Body();
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -1314,18 +1314,18 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(spring_force);}
         case 16:
         case 18:{
-            SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>();
+            SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
             solid_body_collection.Add_Force(Create_Edge_Springs(deformable_body_collection.particles,segmented_curve.mesh,(T)2e4));}
         case 1:
         case 2:
         case 15:{
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             break;}
         case 3:
         case 4:{
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<EMBEDDED_MATERIAL_SURFACE<TV,3>&>().embedded_object.simplicial_object;
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<EMBEDDED_MATERIAL_SURFACE<TV,3>&>().embedded_object.simplicial_object;
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
             solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             if(use_forces_for_drift){
@@ -1341,7 +1341,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 14:
         case 22:
         case 45:{
-            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
+            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             if(triangulated_surface.mesh.elements.m != cloth_triangles){
                 LOG::cerr<<"we got "<<triangulated_surface.mesh.elements.m<<" and expected "<<cloth_triangles<<" with side_length="<<side_length<<std::endl;
                 PHYSBAM_FATAL_ERROR();}
@@ -1366,7 +1366,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-            for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.deformable_geometry.structures(i))){
+            for(int i=0;i<deformable_body_collection.structures.m;i++) if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.structures(i))){
                 if(surface->mesh.elements.m != cloth_triangles) PHYSBAM_FATAL_ERROR();
                 solid_body_collection.Add_Force(Create_Edge_Springs(*surface,linear_stiffness,linear_damping)); // were *2 and *10
                 solid_body_collection.Add_Force(Create_Bending_Springs(*surface,bending_stiffness,bending_damping));
@@ -1378,7 +1378,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-            for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.deformable_geometry.structures(i))){
+            for(int i=0;i<deformable_body_collection.structures.m;i++) if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.structures(i))){
                 if(surface->mesh.elements.m != cloth_triangles) PHYSBAM_FATAL_ERROR();
                 solid_body_collection.Add_Force(Create_Edge_Springs(*surface,linear_stiffness,linear_damping)); // were *2 and *10
                 solid_body_collection.Add_Force(Create_Bending_Springs(*surface,bending_stiffness,bending_damping));
@@ -1399,7 +1399,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 (*wind_V)(I)=height_falloff.Value(X.y)*((T).2*inward+TV(0,1,0));}
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-            for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.deformable_geometry.structures(i))){
+            for(int i=0;i<deformable_body_collection.structures.m;i++) if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.structures(i))){
                 if(surface->mesh.elements.m != 100*cloth_triangles) PHYSBAM_FATAL_ERROR();
                 solid_body_collection.Add_Force(Create_Edge_Springs(*surface,linear_stiffness,linear_damping)); // were *2 and *10
                 solid_body_collection.Add_Force(Create_Bending_Springs(*surface,bending_stiffness,bending_damping));
@@ -1407,7 +1407,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 drag->Use_Linear_Normal_Viscosity(17);drag->Use_Spatially_Varying_Wind(0,*wind_grid,*wind_V);}
             break;}
         case 36:{
-            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
+            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             if(triangulated_surface.mesh.elements.m != cloth_triangles){
                 LOG::cerr<<"we got "<<triangulated_surface.mesh.elements.m<<" and expected "<<cloth_triangles<<" with side_length="<<side_length<<std::endl;
                 PHYSBAM_FATAL_ERROR();}
@@ -1424,7 +1424,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             //solid_body_collection.Add_Force(bend);
             break;
         case 32:{
-            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
+            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             if(triangulated_surface.mesh.elements.m != cloth_triangles) PHYSBAM_FATAL_ERROR();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
             LINEAR_SPRINGS<TV>* edge_springs=Create_Edge_Springs(triangulated_surface,stiffness_multiplier*10/(1+sqrt((T)2)),
@@ -1440,14 +1440,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 7:
         case 8:
         case 9:{
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             if(test_number==6) solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             solid_body_collection.Add_Force(Create_Quasistatic_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e5,(T).45)));
             break;}
         case 19:
         case 29:{
             for(int i=0;i<((parameter>=2)?1:2);i++){
-                TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>(i);
+                TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>(i);
                 solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
                 solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,stiffness_multiplier*2/(1+sqrt((T)2)),
                     damping_multiplier*2));
@@ -1465,18 +1465,18 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                     solid_body_collection.Add_Force(bend);}}
             break;}
         case 20:{
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
-            //TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
+            //TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             //solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_surface,new NEO_HOOKEAN_2D<T>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(deformable_body_collection.particles,binding_segment_mesh);
             spring_force->visual_restlength.Fill((T)0);spring_force->Clamp_Restlength(1);
             solid_body_collection.Add_Force(spring_force);
             break;}
         case 21:{
-            SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>();
-            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
+            SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
+            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(segmented_curve,(T)1);
             spring_force->Clamp_Restlength((T).05);solid_body_collection.Add_Force(spring_force);
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
@@ -1489,7 +1489,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 24:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             // fvm
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             T internal_poissons_ratio=test_24_poissons_ratio<(T).5?test_24_poissons_ratio:0;
             INCOMPRESSIBLE_FINITE_VOLUME<TV,3>* fvm=Create_Incompressible_Finite_Volume(tetrahedralized_volume);
             fvm->mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
@@ -1500,11 +1500,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 25:
         case 33:
         case 34:{
-            for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
+            for(int i=0;i<deformable_body_collection.structures.m;i++){
                 LINEAR_SPRINGS<TV>* spring_force=0;
-                if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.deformable_geometry.structures(i)))
+                if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.structures(i)))
                     spring_force=Create_Edge_Springs(*surface,(T)1);
-                else if(SEGMENTED_CURVE<TV>* curve=dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i)))
+                else if(SEGMENTED_CURVE<TV>* curve=dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.structures(i)))
                     spring_force=Create_Edge_Springs(*curve,(T)1);
                 if(spring_force){
                     spring_force->Clamp_Restlength((T).05);
@@ -1512,14 +1512,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             if(test_number==25) solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));}
             break;
         case 26:{
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
             solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
             break;}
         case 27:{
-            for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
+            for(int i=0;i<deformable_body_collection.structures.m;i++){
                 LINEAR_SPRINGS<TV>* spring_force=0;
-                if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.deformable_geometry.structures(i))){
+                if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.structures(i))){
                     spring_force=Create_Edge_Springs(*surface,(T)1e4);
                     spring_force->Clamp_Restlength((T).05);
                     solid_body_collection.Add_Force(spring_force);}}
@@ -1527,12 +1527,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;
         case 28:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>()){
+            if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>()){
                 //solid_body_collection.Add_Force(Create_Edge_Springs(*tetrahedralized_volume,
                 //    stiffness_multiplier*10000/(1+sqrt((T)2)),damping_multiplier*10));
                 solid_body_collection.Add_Force(Create_Finite_Volume(*tetrahedralized_volume,new ROTATED_LINEAR<T,3>((T)1e4,(T).3,(T).1)));
             }
-            if(TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>()){
+            if(TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>*>()){
                 T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
                 solid_body_collection.Add_Force(Create_Edge_Springs(*triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
                 T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
@@ -1541,17 +1541,17 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 37:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) if(TETRAHEDRALIZED_VOLUME<T>* structure=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(i)))
+            for(int i=0;i<deformable_body_collection.structures.m;i++) if(TETRAHEDRALIZED_VOLUME<T>* structure=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(i)))
                 solid_body_collection.Add_Force(Create_Finite_Volume(*structure,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             break;}
         case 38:{
-            SEGMENTED_CURVE<TV>& curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>();
+            SEGMENTED_CURVE<TV>& curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
             solid_body_collection.Add_Force(Create_Edge_Springs(curve,100/(1+sqrt((T)2)),(T)3));
             solid_body_collection.Add_Force(Create_Segment_Bending_Springs(curve,100/(1+sqrt((T)2)),(T)3));
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 47:{
-            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
+            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
 
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
@@ -1562,7 +1562,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(Create_Axial_Bending_Springs(triangulated_surface,(T).01,axial_bending_stiffness,axial_bending_damping));
             break;}
         case 48:{
-            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
+            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             tests.Add_Gravity();
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
             solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
@@ -1571,7 +1571,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(Create_Axial_Bending_Springs(triangulated_surface,(T).01,bending_stiffness,bending_damping));
             break;}
         case 41:{
-            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
+            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
             //INCOMPRESSIBLE_FINITE_VOLUME<TV,2>* fvm=Create_Incompressible_Finite_Volume(triangulated_surface,new SPLINE_MODEL<T,2>((T)2e4,(T)0,(T).5,(T)7));
             //fvm->max_cg_iterations=50;
@@ -1587,8 +1587,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         }
             break;
         case 42:{
-            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
-            SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>();
+            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
+            SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
             solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)1000,(T)2)); // were *2 and *10
             LINEAR_SPRINGS<TV>* stick_springs=Create_Edge_Springs(segmented_curve,(T)1000,(T)2);
@@ -1596,11 +1596,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(stick_springs);}
             break;
         case 44:{
-            for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) if(TETRAHEDRALIZED_VOLUME<T>* structure=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(i)))
+            for(int i=0;i<deformable_body_collection.structures.m;i++) if(TETRAHEDRALIZED_VOLUME<T>* structure=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(i)))
                 solid_body_collection.Add_Force(Create_Finite_Volume(*structure,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             break;}
         case 46:{
-            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>(0);
+            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>(0);
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
             solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,stiffness_multiplier*2/(1+sqrt((T)2)),
                     damping_multiplier*2));
@@ -1609,19 +1609,19 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
             break;}
         case 49:{
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             break;}
         case 50:{
             for(int i=0;i<parameter;i++){
-                TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
+                TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
                 solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
                 solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));}
             break;}
         case 51:{
             for(int i=0;i<parameter;i++){
-                TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
+                TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
                 solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
                 solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));}
             break;}
@@ -1659,7 +1659,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     if(substitute_springs){
         solid_body_collection.deformable_body_collection.deformables_forces.Delete_Pointers_And_Clean_Memory();
-        TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+        TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         if(tetrahedralized_volume.mesh.elements.m){
             T linear_stiffness=stiffness_multiplier*1e4,linear_damping=damping_multiplier*1;
             DEFORMABLES_FORCES<TV>* altitude_springs=Create_Altitude_Springs(tetrahedralized_volume,(T)linear_stiffness/(1+sqrt((T)2)),(T)linear_damping);
@@ -1765,7 +1765,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         V.Subset(constrained_particles(0)).Fill(TV());
         V.Subset(constrained_particles(1)).Fill(TV());}
     else if(test_number==22){
-        FREE_PARTICLES<TV>& free_particles=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
+        FREE_PARTICLES<TV>& free_particles=solid_body_collection.deformable_body_collection.template Find_Structure<FREE_PARTICLES<TV>&>();
         V.Subset(free_particles.nodes).Fill(TV());}
     else if(test_number==25){
         V.Subset(cloth_ramp_particles).Fill(TV());}
@@ -1821,7 +1821,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         V.Subset(constrained_particles(0)).Fill(TV());
         V.Subset(constrained_particles(1)).Fill(TV());}
     else if(test_number==22){
-        FREE_PARTICLES<TV>& free_particles=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
+        FREE_PARTICLES<TV>& free_particles=solid_body_collection.deformable_body_collection.template Find_Structure<FREE_PARTICLES<TV>&>();
         V.Subset(free_particles.nodes).Fill(TV());}
     else if(test_number==25){
         V.Subset(cloth_ramp_particles).Fill(TV());}

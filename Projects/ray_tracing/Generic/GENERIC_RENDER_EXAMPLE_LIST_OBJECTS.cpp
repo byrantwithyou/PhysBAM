@@ -6,12 +6,13 @@
 #include <PhysBAM_Tools/Arrays/IDENTITY_ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/TRIANGLES_OF_MATERIAL.h>
@@ -174,7 +175,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 object->Update_Transform(current_transform*rigid_body_collection.Rigid_Body(id).Frame().Matrix());}
             LOG::cout<<"Processed Rigid Body "<<id<<std::endl;}}
     else if(type=="Deformable_Object"){
-        DEFORMABLE_GEOMETRY_COLLECTION<TV>& deformable_body_collection=*new DEFORMABLE_GEOMETRY_COLLECTION<TV>(*new GEOMETRY_PARTICLES<TV>);
+        DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=*new DEFORMABLE_BODY_COLLECTION<TV>(0,*new COLLISION_GEOMETRY_COLLECTION<TV>);
         int local_frame=parameters.Get_Parameter("Frame",frame);
         bool split_object=parameters.Get_Parameter("Split_Object",false);
         std::string sample_locations_filename=parameters.Get_Parameter("Sample_Locations_File",std::string("unknown"));
@@ -186,7 +187,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         int static_frame=FILE_UTILITIES::File_Exists(static_frame_prefix+frame_string+"deformable_object_structures")?frame:-1;
         std::string free_particles_geometry=parameters.Get_Parameter("Free_Particles_Geometry",std::string("Null")); // object to use instead of an extra object
         std::string free_particles_range=parameters.Get_Parameter("Free_Particles_Range",std::string("<unknown>"));
-        deformable_body_collection.Read(STREAM_TYPE(RW()),prefix,static_frame_prefix,local_frame,static_frame,true);
+        deformable_body_collection.Read(STREAM_TYPE(RW()),prefix,static_frame_prefix,local_frame,static_frame,true,true);
         if(range!="<unknown>") STRING_UTILITIES::Parse_Integer_List(range,integer_list);
         else integer_list=IDENTITY_ARRAY<>(deformable_body_collection.structures.m);
         if(split_object){

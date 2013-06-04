@@ -43,7 +43,6 @@
 #include <PhysBAM_Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Images/EPS_FILE.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
@@ -67,6 +66,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/RC_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/RC2_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
@@ -455,7 +455,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             particles.mass(b)=1;
             particles.mass(c)=1;
             ta->mesh.elements.Append(VECTOR<int,3>(a,b,c));
-            solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
+            solid_body_collection.deformable_body_collection.Add_Structure(ta);
             contrail_colors.Append(VECTOR<T,3>(1,0,0));
             contrail.Resize(contrail_colors.m);
             break;}
@@ -471,7 +471,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             particles.mass(b)=1;
             particles.mass(c)=1;
             ta->mesh.elements.Append(VECTOR<int,3>(a,b,c));
-            solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
+            solid_body_collection.deformable_body_collection.Add_Structure(ta);
             break;}
         case 33:{
             TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
@@ -480,7 +480,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             for(int i=0;i<5;i++) ta->mesh.elements.Append(VECTOR<int,3>(i,i+1,i+2));
             ta->Update_Number_Nodes();
             ta->mesh.Make_Orientations_Consistent();
-            solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
+            solid_body_collection.deformable_body_collection.Add_Structure(ta);
             particles.mass.Fill(1);
             break;}
         case 100:{
@@ -506,7 +506,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 ta->mesh.elements.Append(VECTOR<int,3>(3,4,5));
                 ta->mesh.elements.Append(VECTOR<int,3>(6,7,8));}
             particles.mass.Fill(1);
-            solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
+            solid_body_collection.deformable_body_collection.Add_Structure(ta);
             contrail_colors.Append(VECTOR<T,3>(1,0,0));
             contrail_colors.Append(VECTOR<T,3>(0,1,0));
             contrail_colors.Append(VECTOR<T,3>(0,0,1));
@@ -516,11 +516,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
     // add structures and rigid bodies to collisions
-    solid_body_collection.deformable_body_collection.collisions.collision_structures.Append_Elements(solid_body_collection.deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(solid_body_collection.deformable_body_collection.deformable_geometry.structures);
+    solid_body_collection.deformable_body_collection.collisions.collision_structures.Append_Elements(solid_body_collection.deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(solid_body_collection.deformable_body_collection.structures);
 
     // correct number nodes
-    for(int i=0;i<solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++) solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<solid_body_collection.deformable_body_collection.structures.m;i++) solid_body_collection.deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -533,12 +533,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 25:
         case 26:
         case 27: case 270: case 30: case 31: case 32: case 33:{
-            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e2,poissons_ratio,(T).05);
             if(test_number==32) particles.X(0).x=stretch;
             break;}
         case 100:{
-            for(int i=0;TRIANGULATED_AREA<T>* triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>*>(i);i++)
+            for(int i=0;TRIANGULATED_AREA<T>* triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>*>(i);i++)
                 Add_Constitutive_Model(*triangulated_area,(T)1e2,poissons_ratio,(T).05);
             if(parameter==1) Place_Triangle(1,3,.1,.2,1.2,TV(4.1,0));
             else if(parameter==2){
@@ -554,32 +554,32 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 16:
         case 23:
         case 13:{
-            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             if(test_number==13){RANDOM_NUMBERS<T> rand;rand.Set_Seed(12345);rand.Fill_Uniform(particles.X,-1,1);}
             break;}
         case 22:{
-            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             break;}
         case 14:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             
-            TRIANGULATED_AREA<T>& triangulated_area1=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(0);
+            TRIANGULATED_AREA<T>& triangulated_area1=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>(0);
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new COROTATED_QUARTIC<T,2>((T)2e4,poissons_ratio,(T).01)));
 
-            TRIANGULATED_AREA<T>& triangulated_area2=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
+            TRIANGULATED_AREA<T>& triangulated_area2=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new NEO_HOOKEAN_COROTATED_BLEND<T,2>((T)2e4,poissons_ratio,(T).01)));
 
-            TRIANGULATED_AREA<T>& triangulated_area3=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(2);
+            TRIANGULATED_AREA<T>& triangulated_area3=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>(2);
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area3,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)2e4,poissons_ratio,(T).01)));
 
-            TRIANGULATED_AREA<T>& triangulated_area4=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(3);
+            TRIANGULATED_AREA<T>& triangulated_area4=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>(3);
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area4,new NEO_HOOKEAN<T,2>((T)2e4,poissons_ratio,(T).01)));
             break;}
         case 17:{
-            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
 
             RANDOM_NUMBERS<T> rand;
@@ -587,26 +587,26 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             rand.Fill_Uniform(particles.X,-1,1);
             break;}
         case 18:{
-            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             RANDOM_NUMBERS<T> rand;rand.Set_Seed(12345);
             rand.Fill_Uniform(particles.X,0,0);
             break;}
         case 19:{
-            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             break;}
         case 20:{
-            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e5,poissons_ratio,(T).01);
             break;}
         case 21:{
-            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             break;}
         case 28:{
-            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e5,poissons_ratio,(T).01);
             break;}
         case 29: break;

@@ -3,11 +3,11 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
-#include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
-#include "MPM_POISSON_VECTOR.h"
+#include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include "MPM_POISSON_SYSTEM.h"
+#include "MPM_POISSON_VECTOR.h"
 #include "MPM_PROJECTION.h"
 namespace PhysBAM{
 

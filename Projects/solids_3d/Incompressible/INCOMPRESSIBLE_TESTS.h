@@ -35,7 +35,6 @@
 #include <PhysBAM_Tools/Parallel_Computation/MPI_WORLD.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
@@ -46,6 +45,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/SPLINE_MODEL.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/BINDING_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/INCOMPRESSIBLE_FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
@@ -187,7 +187,7 @@ void Collide_With_Soft_Bound_Surface_Copy(TETRAHEDRALIZED_VOLUME<T>& volume,bool
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create(deformable_body_collection.particles);
     surface->mesh.Initialize_Mesh(volume.triangulated_surface->mesh);
     tests.Substitute_Soft_Bindings_For_Nodes(*surface,solid_body_collection.deformable_body_collection.soft_bindings);
-    deformable_body_collection.deformable_geometry.Add_Structure(surface);
+    deformable_body_collection.Add_Structure(surface);
     if(rigid_body_soft) deformable_body_collection.collisions.collision_structures.Append(surface);
     else deformable_body_collection.collisions.collision_structures.Append(&volume);
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(surface);
@@ -439,7 +439,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 11:{
             last_frame=(int)(10*frame_rate);
             solids_parameters.cfl=(T)10.0;
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             GRID<TV> mattress_grid(TV_INT(5,10,5),RANGE<TV>(TV((T)-.25,(T).8,(T)-.30),TV((T).25,(T)5.10,(T).30)));
             tetrahedralized_volume.Initialize_Cube_Mesh_And_Particles(mattress_grid);
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(tetrahedralized_volume,1000,true);
@@ -470,9 +470,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)5.1,0))),true,false,1000);
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)7.2,0))),true,false,1000);
             TETRAHEDRALIZED_VOLUME<T>& merged_surface=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
-            for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++){TETRAHEDRALIZED_VOLUME<T>*ts=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(s));
+            for(int s=0;s<deformable_body_collection.structures.m;s++){TETRAHEDRALIZED_VOLUME<T>*ts=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(s));
                 if(ts) merged_surface.mesh.elements.Append_Elements(ts->mesh.elements);}
-            deformable_body_collection.deformable_geometry.structures.Clean_Memory();deformable_body_collection.deformable_geometry.Add_Structure(&merged_surface);
+            deformable_body_collection.structures.Clean_Memory();deformable_body_collection.Add_Structure(&merged_surface);
             tests.Add_Ground(0);
 
             use_gravity=true;
@@ -580,9 +580,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 tori_initial_states.Append(RIGID_BODY_STATE<TV>(FRAME<TV>(new_center,orientation),TWIST<TV>(TV(),angular_velocity)));
                 tests.Create_Tetrahedralized_Volume(torus_filename,tori_initial_states.Last(),true,false,1000,1);}
             TETRAHEDRALIZED_VOLUME<T>& merged_surface=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
-            for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++){TETRAHEDRALIZED_VOLUME<T>*ts=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(s));
+            for(int s=0;s<deformable_body_collection.structures.m;s++){TETRAHEDRALIZED_VOLUME<T>*ts=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(s));
                 if(ts) merged_surface.mesh.elements.Append_Elements(ts->mesh.elements);}
-            deformable_body_collection.deformable_geometry.structures.Clean_Memory();deformable_body_collection.deformable_geometry.Add_Structure(&merged_surface);
+            deformable_body_collection.structures.Clean_Memory();deformable_body_collection.Add_Structure(&merged_surface);
             // rigid bodies
             if(test_number==18){
                 for(int i=0;i<16;i++){T a=i*(T)pi/8;
@@ -632,7 +632,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
         solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
         automatically_add_to_collision_structures=false;
-        for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(i)))
+        for(int i=0;i<deformable_body_collection.structures.m;i++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(i)))
             Collide_With_Soft_Bound_Surface_Copy(*volume,rigid_body_soft);}
 
     if(use_volumetric_self_collisions && solids_parameters.triangle_collision_parameters.perform_self_collision){
@@ -651,11 +651,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // add structures and rigid bodies to collisions
     if(automatically_add_to_collision_structures){
-        deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-        solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);}
+        deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+        solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);}
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -675,11 +675,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,binding_stiffness,(T)1));}
         else if(use_tet_collisions){
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(s)))
+            for(int s=0;s<deformable_body_collection.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(s)))
                 tests.Initialize_Tetrahedron_Collisions(s,*volume,solids_parameters.triangle_collision_parameters);}
         else if(self_collide_with_interior_nodes){
             FREE_PARTICLES<TV>& interior=*FREE_PARTICLES<TV>::Create(particles);
-            for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(s))){
+            for(int s=0;s<deformable_body_collection.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(s))){
                 if(!volume->mesh.node_on_boundary) volume->mesh.Initialize_Node_On_Boundary();
                 ARRAY<int> nodes;volume->mesh.elements.Flattened().Get_Unique(nodes);
                 for(int i=0;i<nodes.m;i++)if(!(*volume->mesh.node_on_boundary)(nodes(i))) interior.nodes.Append(nodes(i));}
@@ -704,9 +704,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     LOG::Stat("use_neumann",use_neumann);
     LOG::Stat("minimum_volume_recovery_time_scale",minimum_volume_recovery_time_scale);
     LOG::Stat("max_cg_iterations",max_cg_iterations);
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
-        TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(i));
-        TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.deformable_geometry.structures(i));
+    for(int i=0;i<deformable_body_collection.structures.m;i++){
+        TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(i));
+        TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.structures(i));
         if(volume){LOG::SCOPE scope("mesh statistics","mesh statistics");volume->Print_Statistics(LOG::cout);}
         Add_Incompressible_Force(volume);
         Add_Incompressible_Force(surface);}}
@@ -746,7 +746,7 @@ void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
         ARRAY<TV> X_save(particles.X);
         ARRAY<T> mass_save(particles.mass);
         FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/deformable_body_collection_particles."+FILE_UTILITIES::Number_To_String(frame),particles);
-        TETRAHEDRALIZED_VOLUME<T>& volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+        TETRAHEDRALIZED_VOLUME<T>& volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         int particles_per_torus=volume.mesh.number_nodes/tori_initial_states.m;
         if(volume.mesh.number_nodes%particles_per_torus!=0 || particles.Size()%particles_per_torus!=0) PHYSBAM_FATAL_ERROR();
         int number_of_tori_read=particles.Size()/particles_per_torus;

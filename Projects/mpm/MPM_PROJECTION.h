@@ -8,9 +8,9 @@
 //#####################################################################
 #ifndef __MPM_PROJECTION__
 #define __MPM_PROJECTION__
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include "MPM_SIMULATION.h"
 namespace PhysBAM{
 template<class TV>

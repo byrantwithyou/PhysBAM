@@ -89,10 +89,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
       case 1:Deformable_Segment();break;
       case 2:Rigid_Particle_Segment();break;}
 
-    deformable_body_collection.deformable_geometry.Add_Structure(new SEGMENTED_CURVE<TV>(segment_mesh,particles));
+    deformable_body_collection.Add_Structure(new SEGMENTED_CURVE<TV>(segment_mesh,particles));
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);

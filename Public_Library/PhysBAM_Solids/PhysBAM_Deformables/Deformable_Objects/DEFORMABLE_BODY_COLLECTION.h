@@ -28,6 +28,7 @@ template<class TV> class DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES;
 template<class TV> class MPI_SOLIDS;
 template<class TV> class DEFORMABLES_FORCES;
 template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
+template<class TV> class STRUCTURE;
 
 template<class TV>
 class DEFORMABLE_BODY_COLLECTION:public NONCOPYABLE
@@ -36,9 +37,20 @@ class DEFORMABLE_BODY_COLLECTION:public NONCOPYABLE
     typedef typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA T_FREQUENCY_DEFORMABLE;
 public:
     DEFORMABLE_PARTICLES<TV>& particles;
-    DEFORMABLE_GEOMETRY_COLLECTION<TV>& deformable_geometry;
+    ARRAY<STRUCTURE<TV>*> structures;
+
+    int Add_Structure(STRUCTURE<TV>* structure)
+    {return structures.Append(structure);}
+
+    template<class T_STRUCTURE> T_STRUCTURE
+    Find_Structure(const int index=0)
+    {return Find_Type<T_STRUCTURE>(structures,index);}
+
+    template<class T_STRUCTURE> const T_STRUCTURE
+    Find_Structure(const int index=0) const
+    {return Find_Type<T_STRUCTURE>(structures,index);}
+
     bool simulate; // TODO: use one of those per fragment
-    bool owns_data;
 
     // These are pruned for MPI.
     ARRAY<int> simulated_particles;
@@ -82,11 +94,11 @@ public:
 
 //#####################################################################
     void Set_CFL_Number(const T cfl_number_input=.5);
-    void Read(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int static_frame,const bool include_static_variables,const bool read_from_every_process);
-    void Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int static_frame,const bool include_static_variables,const bool write_from_every_process) const;
     int Add_Force(DEFORMABLES_FORCES<TV>* force);
     void Initialize(TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collisions_parameters);
     void Update_Collision_Penalty_Forces_And_Derivatives();
+    void Read_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame);
+    void Write_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame) const;
     void Read_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame);
     void Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame) const;
     void Update_Simulated_Particles();
@@ -106,11 +118,8 @@ public:
 
     void Test_Energy(const T time);
     void Test_Force_Derivatives(const T time);
-    //void Setup_Set_Velocity_From_Positions(const T time,const bool is_position_update,const bool reset_alphas);
-    void Read(const STREAM_TYPE,const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,
-        const bool read_from_every_process);
-    void Write(const STREAM_TYPE,const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,
-        const bool write_from_every_process) const;
+    void Read(const STREAM_TYPE,const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,const bool read_from_every_process);
+    void Write(const STREAM_TYPE,const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,const bool write_from_every_process) const;
 //#####################################################################
 };
 }

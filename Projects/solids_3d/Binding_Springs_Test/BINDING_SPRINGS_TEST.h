@@ -101,7 +101,7 @@ void Get_Initial_Data()
 
     // correct number nodes
     spring_segment_mesh.Set_Number_Nodes(particles.Size());
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -195,7 +195,7 @@ void Stability_Test()
     segmented_curve1.mesh.elements.Append(VECTOR<int,2>(1,2));
     spring_segment_mesh.elements.Append(VECTOR<int,2>(1,2));
 
-    deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve1);
+    deformable_body_collection.Add_Structure(&segmented_curve1);
 }
 //#####################################################################
 // Function Segments
@@ -224,8 +224,8 @@ void Segments()
     spring_segment_mesh.elements.Append(VECTOR<int,2>(2,5));
     spring_segment_mesh.elements.Append(VECTOR<int,2>(3,6));
 
-    deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve1);
-    deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve2);
+    deformable_body_collection.Add_Structure(&segmented_curve1);
+    deformable_body_collection.Add_Structure(&segmented_curve2);
 }
 //#####################################################################
 // Function Sphere
@@ -243,8 +243,8 @@ void Sphere()
 
     for(int i=0;i<sphere_particles;i++) spring_segment_mesh.elements.Append(VECTOR<int,2>(i,i+sphere_particles));
 
-    deformable_body_collection.deformable_geometry.Add_Structure(&sphere1);
-    deformable_body_collection.deformable_geometry.Add_Structure(&sphere2);
+    deformable_body_collection.Add_Structure(&sphere1);
+    deformable_body_collection.Add_Structure(&sphere2);
 }
 //#####################################################################
 // Function Falling_Sphere
@@ -263,7 +263,7 @@ void Falling_Sphere()
     // duplicate surface
     tetrahedralized_volume.Update_Number_Nodes();tetrahedralized_volume.Initialize_Triangulated_Surface();
     TRIANGULATED_SURFACE<T>& drifted_surface=tests.Create_Drifted_Surface(*tetrahedralized_volume.triangulated_surface,solid_body_collection.deformable_body_collection.soft_bindings);
-    deformable_body_collection.deformable_geometry.Add_Structure(&drifted_surface);
+    deformable_body_collection.Add_Structure(&drifted_surface);
     spring_segment_mesh.elements.Append_Elements(solid_body_collection.deformable_body_collection.soft_bindings.bindings);
 
     tests.Add_Ground();
@@ -285,7 +285,7 @@ void Embedded_Sphere()
     
     // duplicate surface
     TRIANGULATED_SURFACE<T>& drifted_surface=tests.Create_Drifted_Surface(embedding.material_surface,solid_body_collection.deformable_body_collection.soft_bindings);
-    deformable_body_collection.deformable_geometry.Add_Structure(&drifted_surface);
+    deformable_body_collection.Add_Structure(&drifted_surface);
     drifted_surface.particles.X.Subset(solid_body_collection.deformable_body_collection.soft_bindings.bindings.Project(1)).Project(1)+=1;
     spring_segment_mesh.elements.Append_Elements(solid_body_collection.deformable_body_collection.soft_bindings.bindings);
 
@@ -354,12 +354,12 @@ void Embedded_Segments()
     SEGMENTED_CURVE<TV>& segmented_curve1=*SEGMENTED_CURVE<TV>::Create(particles);
     segmented_curve1.mesh.elements.Append(VECTOR<int,2>(1,2));
     segmented_curve1.mesh.elements.Append(VECTOR<int,2>(2,3));
-    deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve1);
+    deformable_body_collection.Add_Structure(&segmented_curve1);
 
     solid_body_collection.deformable_body_collection.soft_bindings.Add_Binding(VECTOR<int,2>(6,4),false);
     solid_body_collection.deformable_body_collection.soft_bindings.Add_Binding(VECTOR<int,2>(7,5),false);
     solid_body_collection.deformable_body_collection.soft_bindings.Initialize_Binding_Mesh();
-    deformable_body_collection.deformable_geometry.Add_Structure(new SEGMENTED_CURVE<TV>(*solid_body_collection.deformable_body_collection.soft_bindings.binding_mesh,particles));
+    deformable_body_collection.Add_Structure(new SEGMENTED_CURVE<TV>(*solid_body_collection.deformable_body_collection.soft_bindings.binding_mesh,particles));
     
     spring_segment_mesh.elements.Append_Elements(solid_body_collection.deformable_body_collection.soft_bindings.bindings);
 }

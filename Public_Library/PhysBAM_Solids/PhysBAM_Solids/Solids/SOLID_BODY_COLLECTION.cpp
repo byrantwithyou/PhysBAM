@@ -326,7 +326,7 @@ Read(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,con
         PHYSBAM_ASSERT(prefix.substr(position)==old_suffix);
         local_prefix.replace(position,std::string::npos,new_suffix);}
     if(read_deformable_body){
-        deformable_body_collection.Read(stream_type,local_prefix,frame,static_frame,include_static_variables,read_from_every_process);}
+        deformable_body_collection.Read(stream_type,local_prefix,local_prefix,frame,static_frame,include_static_variables,read_from_every_process);}
     if(read_rigid_body){
         rigid_body_collection.Read(stream_type,local_prefix,frame,needs_init,needs_destroy);}
 }
@@ -339,7 +339,7 @@ Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,co
     if(write_deformable_body){
         int static_frame=include_static_variables?frame:-1;
         bool write_static_variables=include_static_variables || frame==first_frame;
-        deformable_body_collection.Write(stream_type,prefix,frame,static_frame,write_static_variables,write_from_every_process);
+        deformable_body_collection.Write(stream_type,prefix,prefix,frame,static_frame,write_static_variables,write_from_every_process);
         ARRAY<FORCE_DATA<TV> > spring_data_list;
         for(int i=0;i<solids_forces.m;i++) solids_forces(i)->Add_Force_Data(spring_data_list);
         for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->Add_Force_Data(spring_data_list);

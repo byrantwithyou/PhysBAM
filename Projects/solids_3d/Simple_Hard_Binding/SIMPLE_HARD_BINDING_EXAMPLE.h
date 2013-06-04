@@ -143,7 +143,7 @@ void Subsample_Surface()
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
-    FREE_PARTICLES<TV>& free_particles=deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
+    FREE_PARTICLES<TV>& free_particles=deformable_body_collection.template Find_Structure<FREE_PARTICLES<TV>&>();
 
     // Sprinkle more points on the boundary
     for(int i=0;i<subsamples*surface->mesh.elements.m;i++){
@@ -171,10 +171,10 @@ void Get_Initial_Data()
     tetrahedralized_volume.triangulated_surface->mesh.Initialize_Incident_Elements();
     surface=tetrahedralized_volume.triangulated_surface;
     tetrahedralized_volume.triangulated_surface=0;tetrahedralized_volume.mesh.boundary_mesh=0;
-//    deformable_body_collection.deformable_geometry.Add_Structure(&tetrahedralized_volume);
+//    deformable_body_collection.Add_Structure(&tetrahedralized_volume);
 
     FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create(particles);
-    deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
+    deformable_body_collection.Add_Structure(&free_particles);
     
     if(!dynamic_subsampling) Subsample_Surface();
     else Initialize_Redgreen();
@@ -185,10 +185,10 @@ void Get_Initial_Data()
     // add structures and rigid bodies to collisions
     if(subsamples==0) deformable_body_collection.collisions.collision_structures.Append(&tetrahedralized_volume);
     else deformable_body_collection.collisions.collision_structures.Append(&free_particles);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(particles.mass);
@@ -204,7 +204,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     Get_Initial_Data();
 
-    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
     solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
     solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).475,(T).01,(T).25),
         true,(T).1));
@@ -309,7 +309,7 @@ void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
-    FREE_PARTICLES<TV>& free_particles=deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
+    FREE_PARTICLES<TV>& free_particles=deformable_body_collection.template Find_Structure<FREE_PARTICLES<TV>&>();
     ARRAY<VECTOR<int,3> >& surface_elements=surface->mesh.elements;
 
     ARRAY<BINDING<TV>*> new_binding_list;
@@ -353,7 +353,7 @@ void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
     for(int b=0;b<new_soft_bindings.m;b++) soft_bindings.Add_Binding(new_soft_bindings(b),true);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
     
     // correct mass
     binding_list.Clear_Hard_Bound_Particles(particles.mass);

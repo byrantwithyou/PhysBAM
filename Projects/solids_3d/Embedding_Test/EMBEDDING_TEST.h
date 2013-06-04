@@ -85,7 +85,7 @@ void Get_Initial_Data()
         particles.X(tet_parts[1])=TV((T)-0.433013,(T)-0.018620,(T)0.750000);
         particles.X(tet_parts[2])=TV((T)0.866025,(T)-0.018620,(T)0.000000);
         particles.X(tet_parts[3])=TV((T)0.000000,(T)1.000000,(T)0.000000);
-        surface.mesh.elements.Append(tri_parts);//deformable_body_collection.deformable_geometry.Add_Structure(&surface);
+        surface.mesh.elements.Append(tri_parts);//deformable_body_collection.Add_Structure(&surface);
         TETRAHEDRON<T> tet(particles.X.Subset(tet_parts));
         for(int i=0;i<tri_parts.m;i++){
             TV point=particles.X(tri_parts(i));
@@ -103,12 +103,12 @@ void Get_Initial_Data()
             particles.mass(target_particle)=1; // TODO: make this work for zero mass
             curve.mesh.elements.Append(VECTOR<int,2>(6,7));
             //if(!use_zero_length_springs) curve.mesh.elements.Append(VECTOR<int,2>(1,7));
-            deformable_body_collection.deformable_geometry.Add_Structure(&curve);}
-        deformable_body_collection.deformable_geometry.Add_Structure(&curve2);
-        volume.mesh.elements.Append(tet_parts);deformable_body_collection.deformable_geometry.Add_Structure(&volume);
+            deformable_body_collection.Add_Structure(&curve);}
+        deformable_body_collection.Add_Structure(&curve2);
+        volume.mesh.elements.Append(tet_parts);deformable_body_collection.Add_Structure(&volume);
         e_surface.mesh.elements.Append(etri_parts);
         //tests.Substitute_Soft_Bindings_For_Embedded_Nodes(e_surface,soft_bindings);
-        deformable_body_collection.deformable_geometry.Add_Structure(&e_surface);}
+        deformable_body_collection.Add_Structure(&e_surface);}
     else if(test_number==2){
         TRIANGULATED_SURFACE<T>& temporary_surface=*TRIANGULATED_SURFACE<T>::Create();
         FILE_UTILITIES::Read_From_File<T>(data_directory+"/Rigid_Bodies/sphere.tri",temporary_surface);
@@ -129,8 +129,8 @@ void Get_Initial_Data()
         T density=TV::dimension==1?1:TV::dimension==2?100:1000;
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*surface,density);
 
-        deformable_body_collection.deformable_geometry.Add_Structure(volume);
-        //deformable_body_collection.deformable_geometry.Add_Structure(surface);
+        deformable_body_collection.Add_Structure(volume);
+        //deformable_body_collection.Add_Structure(surface);
 
         ARRAY<int> tri_particles;
         TRIANGULATED_SURFACE<T>* esurface=(TRIANGULATED_SURFACE<T>::Create(particles));
@@ -154,7 +154,7 @@ void Get_Initial_Data()
             for(int k=0;k<3;k++) nodes[k]=hard_to_soft.Get(nodes[k]);
             esurface->mesh.elements.Append(nodes);}
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*esurface,density);
-        deformable_body_collection.deformable_geometry.Add_Structure(esurface);
+        deformable_body_collection.Add_Structure(esurface);
     }
     else if(test_number==3){
         TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);
@@ -185,9 +185,9 @@ void Get_Initial_Data()
         }
         else curve.mesh.elements.Append(VECTOR<int,2>(3,7));
         curve.mesh.elements.Append(VECTOR<int,2>(7,8));
-        deformable_body_collection.deformable_geometry.Add_Structure(&curve);
-        surface.mesh.elements.Append(tri_parts);deformable_body_collection.deformable_geometry.Add_Structure(&surface);
-        volume.mesh.elements.Append(tet_parts);deformable_body_collection.deformable_geometry.Add_Structure(&volume);
+        deformable_body_collection.Add_Structure(&curve);
+        surface.mesh.elements.Append(tri_parts);deformable_body_collection.Add_Structure(&surface);
+        volume.mesh.elements.Append(tet_parts);deformable_body_collection.Add_Structure(&volume);
         constrained_point=9;
     }
     if(test_number==4){
@@ -207,7 +207,7 @@ void Get_Initial_Data()
         particles.X(tet_parts[1])=TV((T)-0.433013,(T)-0.018620,(T)0.750000);
         particles.X(tet_parts[2])=TV((T)0.866025,(T)-0.018620,(T)0.000000);
         particles.X(tet_parts[3])=TV((T)0.000000,(T)1.000000,(T)0.000000);
-        surface.mesh.elements.Append(tri_parts);//deformable_body_collection.deformable_geometry.Add_Structure(&surface);
+        surface.mesh.elements.Append(tri_parts);//deformable_body_collection.Add_Structure(&surface);
         TETRAHEDRON<T> tet(particles.X.Subset(tet_parts));
         for(int i=0;i<tri_parts.m;i++){
             TV point=particles.X(tri_parts(i));
@@ -228,14 +228,14 @@ void Get_Initial_Data()
         curve.mesh.elements.Append(VECTOR<int,2>(7,8));
         curve.mesh.elements.Append(VECTOR<int,2>(1,7));
             //if(!use_zero_length_springs) curve.mesh.elements.Append(VECTOR<int,2>(1,7));
-        deformable_body_collection.deformable_geometry.Add_Structure(&curve);
-        volume.mesh.elements.Append(tet_parts);deformable_body_collection.deformable_geometry.Add_Structure(&volume);
+        deformable_body_collection.Add_Structure(&curve);
+        volume.mesh.elements.Append(tet_parts);deformable_body_collection.Add_Structure(&volume);
         e_surface.mesh.elements.Append(etri_parts);
         //tests.Substitute_Soft_Bindings_For_Embedded_Nodes(e_surface,soft_bindings);
-        deformable_body_collection.deformable_geometry.Add_Structure(&e_surface);}
+        deformable_body_collection.Add_Structure(&e_surface);}
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
 
     // correct mass
@@ -272,11 +272,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data();
     
     if(test_number==1){
-        TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+        TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,tetrahedralized_volume.mesh,0));
         solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
         if(false && target_position){
-            SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>();
+            SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
             LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(segmented_curve,100/(1+sqrt((T)2)),(T)1);
             ARRAY<T> restlengths(segmented_curve.mesh.elements.m);restlengths.Fill((T).5);
             //spring_force->Set_Restlength(restlengths);
@@ -293,7 +293,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             springs->Set_Overdamping_Fraction(1);
             solid_body_collection.Add_Force(springs);}}
     else if(test_number==2){
-        TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+        TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,tetrahedralized_volume.mesh,0));
         solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
         soft_bindings.Initialize_Binding_Mesh();
@@ -306,10 +306,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             spring_force->Clamp_Restlength((T).01);
             spring_force->Set_Overdamping_Fraction(2);}}
     if(test_number==3 || test_number==4){
-        TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+        TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,tetrahedralized_volume.mesh,0));
         solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
-        SEGMENTED_CURVE<TV>& curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>();
+        SEGMENTED_CURVE<TV>& curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
         LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(curve,100/(1+sqrt((T)2)),(T)1);
         spring_force->Clamp_Restlength((T).1);
         solid_body_collection.Add_Force(spring_force);}

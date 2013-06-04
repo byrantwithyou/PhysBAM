@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
@@ -714,7 +714,7 @@ Test_Matrix() const
     fluid_poisson->Test_Matrix(print_poisson_matrix);
     fluid_interpolation->Test_Matrix();
     if(!leakproof_solve) solid_forces->Test_Matrix();
-    int number=solid_system->solid_body_collection.deformable_body_collection.deformable_geometry.particles.number;
+    int number=solid_system->solid_body_collection.deformable_body_collection.particles.number;
     int rigid_number=solid_system->solid_body_collection.rigid_body_collection.rigid_geometry_collection.particles.number;
     solid_interpolation->Test_Matrix(number,rigid_number);
     if(use_viscous_forces) fluid_viscous_forces->Test_Matrix();

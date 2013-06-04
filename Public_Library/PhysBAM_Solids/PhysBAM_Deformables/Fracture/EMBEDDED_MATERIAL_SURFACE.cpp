@@ -5,7 +5,6 @@
 // Class EMBEDDED_MATERIAL_SURFACE
 //##################################################################### 
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
@@ -97,10 +96,10 @@ Update_Binding_List_From_Embedding(DEFORMABLE_BODY_COLLECTION<TV>& deformable_bo
     BINDING_LIST<TV>& binding_list=deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=deformable_body_collection.soft_bindings;
     binding_list.Clean_Memory();soft_bindings.Clean_Memory();
-    FREE_PARTICLES<TV>* free_particles=deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>*>();
+    FREE_PARTICLES<TV>* free_particles=deformable_body_collection.template Find_Structure<FREE_PARTICLES<TV>*>();
     if(!free_particles){
         free_particles=new FREE_PARTICLES<TV>;
-        deformable_body_collection.deformable_geometry.Add_Structure(free_particles);
+        deformable_body_collection.Add_Structure(free_particles);
         deformable_body_collection.collisions.collision_structures.Append(free_particles);}
     else free_particles->nodes.Remove_All();
     for(int p=0;p<embedded_particles.active_indices.m;p++) binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(particles),embedded_particles.active_indices(p),

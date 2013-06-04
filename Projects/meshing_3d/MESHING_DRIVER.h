@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Dynamics/Meshing/TETRAHEDRAL_MESHING.h>
@@ -57,7 +56,7 @@ void Execute_Main_Program()
 {  
     example.tetrahedral_meshing.Create_Initial_Mesh(example.bcc_lattice_cell_size,example.use_adaptive_refinement,example.max_subdivision_levels,true,false,example.use_aggressive_tet_pruning);
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=example.tetrahedral_meshing.solid_body_collection.deformable_body_collection;
-    LOG::cout<<"tetrahedrons = "<<deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh.elements.m<<std::endl;
+    LOG::cout<<"tetrahedrons = "<<deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh.elements.m<<std::endl;
     LOG::cout<<"particles = "<<deformable_body_collection.particles.Size()<<std::endl;
 
     if(example.use_optimization){
@@ -67,7 +66,7 @@ void Execute_Main_Program()
         example.tetrahedral_meshing.Initialize_Dynamics();
         example.tetrahedral_meshing.Create_Final_Mesh_With_Dynamics(example.time_step,example.number_of_force_steps,example.number_of_velocity_steps);}
     example.tetrahedral_meshing.Snap_Nodes_To_Level_Set_Boundary();
-    FILE_UTILITIES::Write_To_File(example.stream_type,example.tetrahedral_meshing.output_directory,deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>());
+    FILE_UTILITIES::Write_To_File(example.stream_type,example.tetrahedral_meshing.output_directory,deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>());
 }
 //##############################################################################
 };

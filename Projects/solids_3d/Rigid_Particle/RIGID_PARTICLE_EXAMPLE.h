@@ -80,7 +80,7 @@ virtual void Get_Initial_Data()
         particles.mass(i)=1;
         particles.X(i)=TV((T)i,initial_height,0);
         if(i>1) segmented_curve.mesh.elements.Append(VECTOR<int,2>(i,i-1));}
-    deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+    deformable_body_collection.Add_Structure(&segmented_curve);
 
     // rigid bodies
     for(int i=0;i<3;i++){
@@ -123,7 +123,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data();
 
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>();
+    SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
 
     solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
 

@@ -7,7 +7,7 @@
 #ifndef __OPENGL_FREE_PARTICLES__
 #define __OPENGL_FREE_PARTICLES__
 
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_POINTS_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_POINTS_3D.h>
 namespace PhysBAM{
@@ -22,9 +22,9 @@ class OPENGL_FREE_PARTICLES:public OPENGL_POLICY<TV_input>::OPENGL_POINTS
     typedef TV_input TV;typedef typename TV::SCALAR T;typedef typename OPENGL_POLICY<TV>::OPENGL_POINTS BASE;
     using BASE::points;
 public:
-    DEFORMABLE_GEOMETRY_COLLECTION<TV>& deformable_geometry_collection;
+    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
 
-    OPENGL_FREE_PARTICLES(DEFORMABLE_GEOMETRY_COLLECTION<TV>& deformable_geometry_collection,INDIRECT_ARRAY<ARRAY_VIEW<TV> >& points,const OPENGL_COLOR& color=OPENGL_COLOR::White(),const T point_size=5);
+    OPENGL_FREE_PARTICLES(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,INDIRECT_ARRAY<ARRAY_VIEW<TV> >& points,const OPENGL_COLOR& color=OPENGL_COLOR::White(),const T point_size=5);
     ~OPENGL_FREE_PARTICLES(){}
 
 //#####################################################################

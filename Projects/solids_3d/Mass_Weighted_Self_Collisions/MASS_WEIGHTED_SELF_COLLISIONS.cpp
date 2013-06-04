@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
@@ -78,8 +77,8 @@ Initialize_Bodies()
             FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create(particles);
             particles.X(3)=surface.Get_Element(0).Center()+TV(0,(T)-.01,0);
             free_particles.nodes.Append(3);
-            deformable_body_collection.deformable_geometry.Add_Structure(&surface);
-            deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
+            deformable_body_collection.Add_Structure(&surface);
+            deformable_body_collection.Add_Structure(&free_particles);
         }break;
         case 2:{
             particles.Add_Elements(4);
@@ -90,7 +89,7 @@ Initialize_Bodies()
             SEGMENTED_CURVE<TV>& curve=*SEGMENTED_CURVE<TV>::Create(particles);
             curve.mesh.elements.Append(VECTOR<int,2>(0,1));
             curve.mesh.elements.Append(VECTOR<int,2>(2,3));
-            deformable_body_collection.deformable_geometry.Add_Structure(&curve);
+            deformable_body_collection.Add_Structure(&curve);
         }break;
         case 3:{
             particles.Add_Elements(4);
@@ -101,7 +100,7 @@ Initialize_Bodies()
             SEGMENTED_CURVE<TV>& curve=*SEGMENTED_CURVE<TV>::Create(particles);
             curve.mesh.elements.Append(VECTOR<int,2>(0,1));
             curve.mesh.elements.Append(VECTOR<int,2>(2,3));
-            deformable_body_collection.deformable_geometry.Add_Structure(&curve);
+            deformable_body_collection.Add_Structure(&curve);
         }break;
         case 4:{
             int max=5;
@@ -120,8 +119,8 @@ Initialize_Bodies()
                 particles.X(4*i+3)=surface.Get_Element(i+1).Center()+TV(0,(T).01,0);
                 free_particles.nodes.Append(4*i+3);
             }
-            deformable_body_collection.deformable_geometry.Add_Structure(&surface);
-            deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
+            deformable_body_collection.Add_Structure(&surface);
+            deformable_body_collection.Add_Structure(&free_particles);
         }break;
     }
 
@@ -137,30 +136,30 @@ Initialize_Bodies()
 
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
     solid_body_collection.collision_body_list.Add_Bodies(*solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list);
 
     // number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
     
     // Forces
     switch(test_number){
         case 1:{
-            TRIANGULATED_SURFACE<T>& surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>(0);
+            TRIANGULATED_SURFACE<T>& surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>(0);
             //solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,false));
             solid_body_collection.Add_Force(Create_Edge_Springs(surface,(T)1000,(T)2)); // were *2 and *10
         }break;
         case 2:{
-            SEGMENTED_CURVE<TV>& curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
+            SEGMENTED_CURVE<TV>& curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
             solid_body_collection.Add_Force(Create_Edge_Springs(curve,(T)1000,(T)2)); // were *2 and *10
         }break;
         case 3:{
-            SEGMENTED_CURVE<TV>& curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
+            SEGMENTED_CURVE<TV>& curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
             solid_body_collection.Add_Force(Create_Edge_Springs(curve,(T)1000,(T)2)); // were *2 and *10
         }break;
         case 4:{
-            TRIANGULATED_SURFACE<T>& surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>(0);
+            TRIANGULATED_SURFACE<T>& surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>(0);
             //solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,false));
             solid_body_collection.Add_Force(Create_Edge_Springs(surface,(T)1000,(T)2)); // were *2 and *10
         }break;

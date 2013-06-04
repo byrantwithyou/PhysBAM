@@ -61,13 +61,13 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <PhysBAM_Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SEGMENT_BENDING_SPRINGS.h>
@@ -747,7 +747,7 @@ void Balloon()
     TV balloon_initial_position=TV((T).5,light_sphere_initial_height);
     int vertices=50;
     deformable_object_id=THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Circle_Deformable_Object(solid_body_collection.deformable_body_collection,vertices,balloon_initial_position,balloon_initial_radius);
-    SEGMENTED_CURVE_2D<T>& segmented_curve=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE_2D<T>&>(deformable_object_id);
+    SEGMENTED_CURVE_2D<T>& segmented_curve=solid_body_collection.deformable_body_collection.template Find_Structure<SEGMENTED_CURVE_2D<T>&>(deformable_object_id);
     SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,(T)2,true);
 
     T cut_sphere_radius=(T).1;
@@ -837,12 +837,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 4:{
              deformable_object_id=THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Circle_Deformable_Object(deformable_body_collection,10,TV((T).5,(T).7),(T).25);
-             SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.deformable_geometry.structures(deformable_object_id));
+             SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.structures(deformable_object_id));
              SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,(T)2000);
              break;}
         case 5:{
             deformable_object_id=THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Deformable_Object(deformable_body_collection,100,TV((T).2,(T).5),TV((T).8,(T).5));
-            SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.deformable_geometry.structures(deformable_object_id));
+            SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.structures(deformable_object_id));
             THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Set_Mass(segmented_curve,50);
             break;}
         case 6:{
@@ -963,11 +963,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         default: LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -978,11 +978,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     T solid_gravity=(T)9.8;
     switch(test_number){
         case 1:{
-//            SEGMENTED_CURVE_2D<T>* segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>*>(deformable_body_collection.deformable_geometry.structures(deformable_circle_id));assert(segmented_curve);
+//            SEGMENTED_CURVE_2D<T>* segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>*>(deformable_body_collection.structures(deformable_circle_id));assert(segmented_curve);
 //            fluids_parameters.collision_bodies_affecting_fluid->Add_Body(new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(*segmented_curve));
 //            solid_body_collection.Add_Force(Create_Edge_Springs(particles,rigid_body_collection,*segmented_curve));
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             triangulated_area.Initialize_Hierarchy();
             DEFORMABLES_FORCES<TV>* spring=Create_Edge_Springs(triangulated_area,(T)7/(1+sqrt((T)2)),(T)10);
             solid_body_collection.Add_Force(spring);
@@ -1005,7 +1005,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 10:
         case 11:{
             Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
-            TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             triangulated_area.Initialize_Hierarchy();
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>((T)1e3,(T).45,(T).01)));
             DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_area.Get_Boundary_Object());
@@ -1017,7 +1017,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solids_tests.Add_Ground();
             solid_gravity=(T).75;
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.deformable_geometry.structures(deformable_object_id));
+            SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.structures(deformable_object_id));
             segmented_curve.Initialize_Hierarchy();
             fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(segmented_curve),0,true);
             solid_body_collection.Add_Force(Create_Edge_Springs(segmented_curve));
@@ -1031,7 +1031,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             for(int i=0;i<rigid_body_count;i++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-i+1));
             break;}
         case 8:{
-            SEGMENTED_CURVE_2D<T>& segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE_2D<T>&>(deformable_object_id);
+            SEGMENTED_CURVE_2D<T>& segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE_2D<T>&>(deformable_object_id);
             segmented_curve.Initialize_Hierarchy();
             fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(segmented_curve),0,true);
             T linear_stiffness=stiffness_multiplier*(T).5/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
@@ -1055,7 +1055,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
             Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
             
-            // TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            // TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             // triangulated_area.Initialize_Hierarchy();
             // solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>((T)1e3,(T).45,(T).01)));
             // DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_area.Get_Boundary_Object());
@@ -1143,7 +1143,7 @@ void Deformable_Uniform_Flow_Test()
         particles.V(i)=TV(0,.2);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1240,11 +1240,11 @@ void Flexible_Beam_Test()
             particles.mass(i)=FLT_MAX;
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1254,7 +1254,7 @@ void Flexible_Beam_Test()
 
     //T solid_gravity=(T)9.8;
     //solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-        //deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+        //deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
     triangulated_area.Initialize_Hierarchy();
     DEFORMABLES_FORCES<TV>* spring=Create_Edge_Springs(triangulated_area,(T)400/(1+sqrt((T)2)),(T)2);
     solid_body_collection.Add_Force(spring);
@@ -1288,11 +1288,11 @@ void Vibrating_Circle()
     TRIANGULATED_AREA<T>& triangulated_area=solids_tests.Create_Triangulated_Object(data_directory+"/Triangulated_Areas/circle-216.tri2d",RIGID_BODY_STATE<TV>(),true,true,(T).25);
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1340,11 +1340,11 @@ void Refine_Circle()
     particles.mass.Fill((T)100/particles.mass.m);
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1523,11 +1523,11 @@ void Oscillating_Disk()
       TRIANGULATED_AREA<T>& triangulated_area=solids_tests.Create_Triangulated_Object(circle_file,RIGID_BODY_STATE<TV>(),true,true,(T).2);*/
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1594,11 +1594,11 @@ void Flexible_Filament_Test()
             particles.mass(i)=FLT_MAX;
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1608,7 +1608,7 @@ void Flexible_Filament_Test()
 
     //T solid_gravity=(T)9.8;
     //solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-        //deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+        //deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
     triangulated_area.Initialize_Hierarchy();
     DEFORMABLES_FORCES<TV>* spring=Create_Edge_Springs(triangulated_area,(T)100/(1+sqrt((T)2)),(T)2);
     spring->compute_half_forces=true;
@@ -1640,11 +1640,11 @@ void Simple_Fluid_Test()
     velocity_multiplier=.25;
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1673,11 +1673,11 @@ void Coupled_Viscosity_Test()
     solids_parameters.use_post_cg_constraints=true;
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();

@@ -84,7 +84,7 @@ virtual void Get_Initial_Data()
 
     tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,
         RIGID_BODY_STATE<TV>(FRAME<TV>(TV(),ROTATION<TV>::From_Euler_Angles(0,0,0))));
-    TRIANGULATED_SURFACE<T>& master_triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
+    TRIANGULATED_SURFACE<T>& master_triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
     number_of_master_particles=particles.Size();
 
     for(int i=2;i<=3;i++){
@@ -95,7 +95,7 @@ virtual void Get_Initial_Data()
         embedding.material_surface_mesh.Initialize_Mesh_With_Particle_Offset(master_triangulated_surface.mesh,particle_offset);
         if(i==3) for(int t=0;t<embedding.material_surface_mesh.elements.m;t++){ // invert 2nd side of drifted surface
             VECTOR<int,3>& element=embedding.material_surface_mesh.elements(t);element=VECTOR<int,3>(element.y,element.x,element.z);}
-        deformable_body_collection.deformable_geometry.Add_Structure(&embedding);
+        deformable_body_collection.Add_Structure(&embedding);
     }
 
     for(int i=0;i<2;i++){
@@ -103,14 +103,14 @@ virtual void Get_Initial_Data()
         rigid_body.Frame().t=TV::Axis_Vector(2)*(T)(2*i-3)*sphere_x_position;
         rigid_body.Is_Kinematic()=true;}
 
-    LOG::cout<<"deformable_body_collection.deformable_geometry.structures.m="<<deformable_body_collection.deformable_geometry.structures.m<<std::endl;
+    LOG::cout<<"deformable_body_collection.structures.m="<<deformable_body_collection.structures.m<<std::endl;
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    //solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    //solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(&master_triangulated_surface);
 
     // correct mass
@@ -139,7 +139,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     Get_Initial_Data();
 
-    TRIANGULATED_SURFACE<T>& master_triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>(1);
+    TRIANGULATED_SURFACE<T>& master_triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>(1);
     solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,master_triangulated_surface.mesh,0));
     solid_body_collection.Add_Force(Create_Edge_Springs(master_triangulated_surface,(T)1e2,(T)2));
     solid_body_collection.Add_Force(Create_Altitude_Springs(master_triangulated_surface,(T)1e2,(T)2));

@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/INTERRUPTS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
@@ -66,7 +65,7 @@ Initialize(IMPLICIT_OBJECT<TV>* implicit_surface_input)
     implicit_surface=implicit_surface_input;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=TETRAHEDRALIZED_VOLUME<T>::Create(deformable_body_collection.particles);
-    deformable_body_collection.deformable_geometry.Add_Structure(tetrahedralized_volume);
+    deformable_body_collection.Add_Structure(tetrahedralized_volume);
     level_set_forces_and_velocities=new LEVEL_SET_FORCES_AND_VELOCITIES<TV>(*tetrahedralized_volume,*implicit_surface);
     solid_body_collection.example_forces_and_velocities=level_set_forces_and_velocities;
     solid_body_collection.rigid_body_collection.rigids_example_forces_and_velocities=level_set_forces_and_velocities;
@@ -79,7 +78,7 @@ template<class T> void TETRAHEDRAL_MESHING<T>::
 Snap_Nodes_To_Level_Set_Boundary(const int iterations)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    TETRAHEDRON_MESH& mesh=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
+    TETRAHEDRON_MESH& mesh=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     if(!mesh.boundary_nodes) mesh.Initialize_Boundary_Nodes();
     for(int t=0;t<mesh.boundary_nodes->m;t++) for(int k=0;k<iterations;k++){
         int node=(*mesh.boundary_nodes)(t);TV X=deformable_body_collection.particles.X(node);
@@ -93,7 +92,7 @@ Snap_Nodes_To_Level_Set_Boundary(const int iterations)
 template<class T> void TETRAHEDRAL_MESHING<T>::
 Initialize_Optimization(const bool verbose)
 {
-    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
+    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     mesh.Initialize_Incident_Elements();if(!boundary_mesh) mesh.Initialize_Boundary_Mesh();else mesh.boundary_mesh=boundary_mesh;
     mesh.boundary_mesh->Initialize_Neighbor_Nodes();mesh.boundary_mesh->Initialize_Incident_Elements();
     mesh.Initialize_Boundary_Nodes(); // assumes that Initialize_Boundary_Nodes will use boundary_mesh
@@ -196,7 +195,7 @@ Optimize_Interior_Layer(const int layer,const bool reverse)
 template<class T> void TETRAHEDRAL_MESHING<T>::
 Search_For_Best_Position(const int node,const ARRAY<TV>& directions,bool include_boundary_terms)
 {
-    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
+    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     T best_quality=Quality_Of_Worst_Dependent_Tetrahedron(node);if(include_boundary_terms) best_quality+=Quality_Of_Worst_Dependent_Boundary_Triangle(node);
     if(use_global_quality_criteria_for_early_exit){
@@ -234,7 +233,7 @@ Search_For_Best_Position(const int node,const ARRAY<TV>& directions,bool include
 template<class T> T TETRAHEDRAL_MESHING<T>::
 Quality_Of_Worst_Incident_Tetrahedron(const int node)
 {
-    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
+    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     PLANE<T> p;TV xi,xj,xk,xl,n1,n2,n3,n4;T worst_quality=1;
     for(int s=0;s<(*mesh.incident_elements)(node).m;s++){
@@ -256,7 +255,7 @@ Quality_Of_Worst_Incident_Tetrahedron(const int node)
 template<class T> T TETRAHEDRAL_MESHING<T>::
 Quality_Of_Worst_Incident_Boundary_Triangle(const int node)
 {
-    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
+    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     TRIANGLE_3D<T> triangle;T worst_quality=1;
     for(int s=0;s<(*mesh.boundary_mesh->incident_elements)(node).m;s++){
@@ -295,7 +294,7 @@ Quality_Of_Worst_Dependent_Boundary_Triangle(const int node)
 template<class T> void TETRAHEDRAL_MESHING<T>::
 Compute_Boundary_Mesh_Normals()
 {
-    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
+    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     boundary_mesh_normals.Fill(TV());PLANE<T> p;
     for(int t=0;t<mesh.boundary_mesh->elements.m;t++){
@@ -325,7 +324,7 @@ template<class T> void TETRAHEDRAL_MESHING<T>::
 Initialize_Dynamics()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
     TETRAHEDRON_MESH& mesh=tetrahedralized_volume.mesh;
     mesh.Initialize_Adjacent_Elements();if(!boundary_mesh) mesh.Initialize_Boundary_Mesh();else mesh.boundary_mesh=boundary_mesh;
     mesh.Initialize_Boundary_Nodes();
@@ -395,7 +394,7 @@ Advance_Dynamics(const T time,const T stopping_time,const bool verbose)
         solids_evolution->Advance_One_Time_Step_Velocity(dt,new_time,true);new_time+=dt;}
 
     if(verbose){int index=-1;
-        TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+        TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         LOG::cout<<" maxPhi="<<tetrahedralized_volume.Maximum_Magnitude_Phi_On_Boundary(*implicit_surface,&index)<<"("<<index<<")";
         index=deformable_body_collection.particles.V.Arg_Maximum_Magnitude();
         LOG::cout<<"  maxV="<<deformable_body_collection.particles.V(index).Magnitude()<<"("<<index<<")";
@@ -444,7 +443,7 @@ template<class T> void TETRAHEDRAL_MESHING<T>::
 Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refinement,const int max_subdivision_levels,const bool discard_to_get_nice_topology,const bool verbose,
     const bool use_aggressive_tet_pruning_globally,const ARRAY<RANGE<TV> >* bounding_boxes_for_aggressive_pruning)
 {
-    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
     TETRAHEDRON_MESH& mesh=tetrahedralized_volume.mesh;
     DEFORMABLE_PARTICLES<TV>& particles=dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(tetrahedralized_volume.particles);
 
@@ -559,7 +558,7 @@ Tetrahedron_Refinement_Criteria(const int index) const
         int extra_criteria=(*extra_refinement_criteria)(index);
         if(extra_criteria) return extra_criteria>0;}
 
-    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
     GEOMETRY_PARTICLES<TV>& particles=tetrahedralized_volume.particles;
 
     int i,j,k,l;tetrahedralized_volume.mesh.elements(index).Get(i,j,k,l);
@@ -596,7 +595,7 @@ Tetrahedron_Refinement_Criteria(const int index) const
 template<class T> void TETRAHEDRAL_MESHING<T>::
 Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep_tet_flag,const bool verbose)
 {
-    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
+    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     keep_tet_flag.Resize(mesh.elements.m,false,false);keep_tet_flag.Fill(false);
     Envelope_Interior_Nodes(keep_tet_flag);
@@ -682,7 +681,7 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
 template<class T> void TETRAHEDRAL_MESHING<T>::
 Envelope_Interior_Nodes(ARRAY<bool>& keep_tet_flag)
 {
-    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
+    TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
 
     keep_tet_flag.Resize(mesh.elements.m);keep_tet_flag.Fill(false);
@@ -701,7 +700,7 @@ template<class T> void TETRAHEDRAL_MESHING<T>::
 Write_Output_Files(const int frame)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
     FILE_UTILITIES::Create_Directory(output_directory);
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
     FILE_UTILITIES::Create_Directory(output_directory+"/"+f);

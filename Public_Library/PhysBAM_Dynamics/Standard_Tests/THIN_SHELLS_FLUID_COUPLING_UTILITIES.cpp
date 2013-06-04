@@ -9,7 +9,6 @@
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -29,7 +28,7 @@ template<class T> int THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::
 Add_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,2> >& deformable_body_collection,const int number_of_vertices,const VECTOR<T,2>& start_position,const VECTOR<T,2>& end_position)
 {
     SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create(deformable_body_collection.particles);
-    int index=deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+    int index=deformable_body_collection.Add_Structure(&segmented_curve);
     SEGMENT_MESH& mesh=segmented_curve.mesh;
     GEOMETRY_PARTICLES<VECTOR<T,2> >& particles=segmented_curve.particles;
     mesh.Initialize_Straight_Mesh(number_of_vertices);
@@ -46,7 +45,7 @@ template<class T> int THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::
 Add_Circle_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,2> >& deformable_body_collection,const int number_of_vertices,const VECTOR<T,2>& center,const T radius)
 {
     SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create(deformable_body_collection.particles);
-    int index=deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+    int index=deformable_body_collection.Add_Structure(&segmented_curve);
     SEGMENT_MESH& mesh=segmented_curve.mesh;
     GEOMETRY_PARTICLES<VECTOR<T,2> >& particles=segmented_curve.particles;
     mesh.Initialize_Straight_Mesh(number_of_vertices,true);
@@ -64,7 +63,7 @@ template<class T> int THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::
 Add_Grid_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,2> >& deformable_body_collection,const GRID<VECTOR<T,2> >& grid,const int edge_subdivision)
 {
     SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create(deformable_body_collection.particles);
-    int index=deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
+    int index=deformable_body_collection.Add_Structure(&segmented_curve);
     SEGMENT_MESH& mesh=segmented_curve.mesh;
     GEOMETRY_PARTICLES<VECTOR<T,2> >& particles=segmented_curve.particles;
     mesh.number_nodes=grid.counts.x*grid.counts.y+(edge_subdivision-1)*((grid.counts.x-1)*grid.counts.y+(grid.counts.y-1)*grid.counts.x);
@@ -101,7 +100,7 @@ Add_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,3> >& deformable_body_
     const int constraint_mode)
 {
     TRIANGULATED_SURFACE<T>& triangulated_surface=*TRIANGULATED_SURFACE<T>::Create(deformable_body_collection.particles);
-    int index=deformable_body_collection.deformable_geometry.Add_Structure(&triangulated_surface);
+    int index=deformable_body_collection.Add_Structure(&triangulated_surface);
     TRIANGLE_MESH& mesh=triangulated_surface.mesh;
     GEOMETRY_PARTICLES<VECTOR<T,3> >& particles=triangulated_surface.particles;
 
@@ -130,7 +129,7 @@ Add_Deformable_Object_From_File(const STREAM_TYPE stream_type,DEFORMABLE_BODY_CO
     const MATRIX<T,4>& transform,PLANE<T>* enslaved_halfplane)
 {
     TRIANGULATED_SURFACE<T>& triangulated_surface=*TRIANGULATED_SURFACE<T>::Create(deformable_body_collection.particles);
-    int index=deformable_body_collection.deformable_geometry.Add_Structure(&triangulated_surface);
+    int index=deformable_body_collection.Add_Structure(&triangulated_surface);
     DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles=dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles);
 
     particles.Store_Velocity(false);particles.Store_Mass(false); // need to do this before reading it in

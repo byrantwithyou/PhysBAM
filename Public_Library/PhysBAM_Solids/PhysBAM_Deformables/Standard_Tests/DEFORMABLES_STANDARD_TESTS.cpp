@@ -17,7 +17,6 @@
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_MAKER.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/RANGE_TESSELLATION.h>
@@ -67,10 +66,10 @@ Add_Gravity()
 template<class TV> template<class T_STRUCTURE> T_STRUCTURE& DEFORMABLES_STANDARD_TESTS<TV>::
 Copy_And_Add_Structure(T_STRUCTURE& structure,ARRAY<int>* particle_indices)
 {
-    deformable_body_collection.deformable_geometry.Add_Structure(structure.Append_Particles_And_Create_Copy(deformable_body_collection.particles,particle_indices));
-    deformable_body_collection.deformable_geometry.structures.Last()->Update_Number_Nodes();
+    deformable_body_collection.Add_Structure(structure.Append_Particles_And_Create_Copy(deformable_body_collection.particles,particle_indices));
+    deformable_body_collection.structures.Last()->Update_Number_Nodes();
     delete &structure;
-    return dynamic_cast<T_STRUCTURE&>(*deformable_body_collection.deformable_geometry.structures.Last());
+    return dynamic_cast<T_STRUCTURE&>(*deformable_body_collection.structures.Last());
 }
 //#####################################################################
 // Function Set_Initial_Particle_Configuration
@@ -554,7 +553,7 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<TV>& binding_list,SOFT_BIND
             binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(binding_list.particles,hb,pa,we));
             soft_bindings.Add_Binding(VECTOR<int,2>(sb,hb),true);
             free_particles->nodes.Append(sb);}
-        deformable_body_collection.deformable_geometry.Add_Structure(free_particles);}
+        deformable_body_collection.Add_Structure(free_particles);}
 
     TRIANGULATED_SURFACE<T>& new_s=Copy_And_Add_Structure(surface,&surface_particle_map);
     if(new_surface) *new_surface=&new_s;
@@ -591,10 +590,10 @@ Create_Regular_Embedded_Surface(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>
 template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
 Mark_Hard_Bindings_With_Free_Particles()
 {
-    FREE_PARTICLES<TV>* free_particles=deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>*>();
+    FREE_PARTICLES<TV>* free_particles=deformable_body_collection.template Find_Structure<FREE_PARTICLES<TV>*>();
     if(!free_particles){
         free_particles=FREE_PARTICLES<TV>::Create();
-        deformable_body_collection.deformable_geometry.Add_Structure(free_particles);}
+        deformable_body_collection.Add_Structure(free_particles);}
     for(int i=0;i<deformable_body_collection.binding_list.bindings.m;i++)
         free_particles->nodes.Append(deformable_body_collection.binding_list.bindings(i)->particle_index);
 }

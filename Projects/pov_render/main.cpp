@@ -7,10 +7,11 @@
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDING.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -22,7 +23,7 @@ typedef double T;
 typedef VECTOR<T,3> TV;
 
 HASHTABLE<PAIR<std::string,int>,RIGID_BODY_COLLECTION<TV>*> rigid_body_collection_cache;
-HASHTABLE<PAIR<std::string,int>,DEFORMABLE_GEOMETRY_COLLECTION<TV>*> deformable_geometry_collection_cache;
+HASHTABLE<PAIR<std::string,int>,DEFORMABLE_BODY_COLLECTION<TV>*> deformable_geometry_collection_cache;
 
 RIGID_BODY_COLLECTION<TV>& Load_Rigid_Body_Collection(const std::string& location,int frame)
 {
@@ -33,12 +34,12 @@ RIGID_BODY_COLLECTION<TV>& Load_Rigid_Body_Collection(const std::string& locatio
     return *rigid_body_collection;
 }
 
-DEFORMABLE_GEOMETRY_COLLECTION<TV>& Load_Deformable_Geometry_Collection(const std::string& location,int frame)
+DEFORMABLE_BODY_COLLECTION<TV>& Load_Deformable_Geometry_Collection(const std::string& location,int frame)
 {
-    DEFORMABLE_GEOMETRY_COLLECTION<TV>*& deformable_geometry_collection=deformable_geometry_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
+    DEFORMABLE_BODY_COLLECTION<TV>*& deformable_geometry_collection=deformable_geometry_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
     if(deformable_geometry_collection) return *deformable_geometry_collection;
-    deformable_geometry_collection=new DEFORMABLE_GEOMETRY_COLLECTION<TV>(*new GEOMETRY_PARTICLES<TV>);
-    deformable_geometry_collection->Read(STREAM_TYPE(RW()),location,location,frame,-1,true);
+    deformable_geometry_collection=new DEFORMABLE_BODY_COLLECTION<TV>(0,*new COLLISION_GEOMETRY_COLLECTION<TV>);
+    deformable_geometry_collection->Read(STREAM_TYPE(RW()),location,location,frame,-1,true,true);
     return *deformable_geometry_collection;
 }
 
@@ -141,7 +142,7 @@ void Emit_Rigid_Body_Frame(std::ofstream& fout,const HASHTABLE<std::string,std::
 
 void Emit_Deformable_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
 {
-    DEFORMABLE_GEOMETRY_COLLECTION<TV>& collection=Load_Deformable_Geometry_Collection(options.Get("location"),frame);
+    DEFORMABLE_BODY_COLLECTION<TV>& collection=Load_Deformable_Geometry_Collection(options.Get("location"),frame);
     STRUCTURE<TV>* structure=collection.structures(atoi(options.Get("index").c_str()));
     TRIANGULATED_SURFACE<T>* ts=0;
 

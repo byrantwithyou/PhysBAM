@@ -189,8 +189,9 @@ Merge(const int frame)
         solid_body_collection->rigid_body_collection.rigid_geometry_collection.structure_list.Fill_Needs_Write();
         solid_body_collection->rigid_body_collection.Write(STREAM_TYPE(RW()),output_directory,frame);
         bool include_static_frame=frame==0;
-        solid_body_collection->deformable_body_collection.Read(STREAM_TYPE(RW()),STRING_UTILITIES::string_sprintf("%s/1/",input_directory.c_str()),frame,-1,include_static_frame,false);
-        solid_body_collection->deformable_body_collection.Write(STREAM_TYPE(RW()),output_directory+"/",frame,-1,include_static_frame,false);}
+        std::string prefix=STRING_UTILITIES::string_sprintf("%s/1/",input_directory.c_str());
+        solid_body_collection->deformable_body_collection.Read(STREAM_TYPE(RW()),prefix,prefix,frame,-1,include_static_frame,false);
+        solid_body_collection->deformable_body_collection.Write(STREAM_TYPE(RW()),output_directory+"/",output_directory+"/",frame,-1,include_static_frame,false);}
     local_grids.Delete_Pointers_And_Clean_Memory();
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/last_frame",frame,"\n");
 }

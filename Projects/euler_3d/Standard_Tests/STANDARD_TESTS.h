@@ -21,7 +21,6 @@
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Tessellation/RANGE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -1108,12 +1107,12 @@ void Finalize_Deformable_Bodies()
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
     //solid_body_collection.collision_body_list.Add_Bodies(*rigid_body_collection.rigid_geometry_collection.collision_body_list);
 
     // correct number nodes
-    for(int i=0;i<solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++) solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<solid_body_collection.deformable_body_collection.structures.m;i++) solid_body_collection.deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1122,7 +1121,7 @@ void Finalize_Deformable_Bodies()
     solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
 
     // Add forces
-    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
     solid_body_collection.Add_Force(Create_Edge_Springs(tetrahedralized_volume,(T)1e4,(T)5));
     solid_body_collection.Add_Force(Create_Altitude_Springs(tetrahedralized_volume,(T)1e4));
 
@@ -1131,7 +1130,7 @@ void Finalize_Deformable_Bodies()
     triangulated_surface.mesh.Initialize_Incident_Elements();
     triangulated_surface.mesh.Initialize_Adjacent_Elements();
 
-    solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&triangulated_surface);
+    solid_body_collection.deformable_body_collection.Add_Structure(&triangulated_surface);
     DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* deformable_collisions=new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_surface);
     if(test_number == 13 || test_number == 19)
         deformable_objects_to_simulate.Append(deformable_collisions);

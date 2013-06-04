@@ -18,9 +18,9 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/MASS_PROPERTIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -266,13 +266,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     else if(test_number==2){
         TRIANGULATED_AREA<T>& top_boundary=tests.Create_Mattress(GRID<TV>(TV_INT(101,26),RANGE<TV>(TV(0,(T).5),TV((T)1,(T).75))),true,0,(T)3.1538,true);
         SEGMENTED_CURVE_2D<T>& top_boundary_curve=top_boundary.Get_Boundary_Object();
-        solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&top_boundary_curve); // TODO(jontg): Necessary?
+        solid_body_collection.deformable_body_collection.Add_Structure(&top_boundary_curve); // TODO(jontg): Necessary?
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& top_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(top_boundary_curve);
         top_collisions.object.Initialize_Hierarchy();Add_To_Fluid_Simulation(top_collisions);
 
         TRIANGULATED_AREA<T>& bottom_boundary=tests.Create_Mattress(GRID<TV>(TV_INT(101,26),RANGE<TV>(TV(0,0),TV((T)1,(T).25))),true,0,(T)3.1538);
         SEGMENTED_CURVE_2D<T>& bottom_boundary_curve=bottom_boundary.Get_Boundary_Object();
-        solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&bottom_boundary_curve); // TODO(jontg): Necessary?
+        solid_body_collection.deformable_body_collection.Add_Structure(&bottom_boundary_curve); // TODO(jontg): Necessary?
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& bottom_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(bottom_boundary_curve);
         bottom_collisions.object.Initialize_Hierarchy();Add_To_Fluid_Simulation(bottom_collisions);
 
@@ -289,8 +289,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         TRIANGULATED_AREA<T>& deformable_circle=tests.Create_Triangulated_Object(data_directory+"/Triangulated_Areas/circle-216.tri2d",RIGID_GEOMETRY_STATE<TV>(FRAME<TV>(TV((T).15,(T).05))),true,false,(T).05);
 
         // correct number nodes
-        for(int i=0;i<solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++){
-            solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();}
+        for(int i=0;i<solid_body_collection.deformable_body_collection.structures.m;i++){
+            solid_body_collection.deformable_body_collection.structures(i)->Update_Number_Nodes();}
 
         // correct mass
         solid_body_collection.deformable_body_collection.particles.Compute_Auxiliary_Attributes(
@@ -301,7 +301,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
         boundary=&deformable_circle.Get_Boundary_Object();
 
-        solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(boundary);
+        solid_body_collection.deformable_body_collection.Add_Structure(boundary);
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(*boundary);
         deformable_collisions.object.Initialize_Hierarchy();
         Add_To_Fluid_Simulation(deformable_collisions);}

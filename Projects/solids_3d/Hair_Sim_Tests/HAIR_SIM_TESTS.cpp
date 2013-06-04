@@ -20,7 +20,6 @@
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED_EULERIAN.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
@@ -264,9 +263,9 @@ Initialize_Bodies()
         COLLISION_GEOMETRY_COLLECTION<TV> guide_list;
         guide_object1=new DEFORMABLE_BODY_COLLECTION<TV>(solid_body_collection.example_forces_and_velocities,guide_list);
         guide_object2=new DEFORMABLE_BODY_COLLECTION<TV>(solid_body_collection.example_forces_and_velocities,guide_list);
-        guide_object1->Read(stream_type,guide_sim_folder+"/",0,-1,1,solids_parameters.write_from_every_process);
-        guide_object2->Read(stream_type,guide_sim_folder+"/",1,-1,0,solids_parameters.write_from_every_process);
-        SEGMENTED_CURVE<TV>& guide_edges=guide_object1->deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
+        guide_object1->Read(stream_type,guide_sim_folder+"/",guide_sim_folder+"/",0,-1,1,solids_parameters.write_from_every_process);
+        guide_object2->Read(stream_type,guide_sim_folder+"/",guide_sim_folder+"/",1,-1,0,solids_parameters.write_from_every_process);
+        SEGMENTED_CURVE<TV>& guide_edges=guide_object1->template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
         particles.Add_Elements(guide_edges.particles.Size());
         for(int i=0;i<guide_edges.mesh.elements.m;i++){sim_guide_edges.mesh.elements.Append(guide_edges.mesh.elements(i)+VECTOR<int,2>(offset,offset));}
         for(int i=0;i<guide_edges.particles.Size();i++){particles.X(offset+i)=guide_edges.particles.X(i);particles.V(offset+i)=static_cast<DEFORMABLE_PARTICLES<TV>&>(guide_edges.particles).V(i);}
@@ -511,14 +510,14 @@ Initialize_Bodies()
         solid_body_collection.Add_Force(guide_adhesion);
     }
     //hairs
-    deformable_body_collection.deformable_geometry.Add_Structure(&edges);
+    deformable_body_collection.Add_Structure(&edges);
     if(use_guide){
-        deformable_body_collection.deformable_geometry.Add_Structure(&sim_guide_edges);
-        deformable_body_collection.deformable_geometry.Add_Structure(&sim_guide_tet_edges);}
-    deformable_body_collection.deformable_geometry.Add_Structure(&fixed_edges);
-    deformable_body_collection.deformable_geometry.Add_Structure(&extra_edges);
-    deformable_body_collection.deformable_geometry.Add_Structure(&bending_edges);
-    deformable_body_collection.deformable_geometry.Add_Structure(&torsion_edges);
+        deformable_body_collection.Add_Structure(&sim_guide_edges);
+        deformable_body_collection.Add_Structure(&sim_guide_tet_edges);}
+    deformable_body_collection.Add_Structure(&fixed_edges);
+    deformable_body_collection.Add_Structure(&extra_edges);
+    deformable_body_collection.Add_Structure(&bending_edges);
+    deformable_body_collection.Add_Structure(&torsion_edges);
     //Bindings
     ARRAY<TV> bindings1,bindings2; // Will be populated into ones to apply after MPI setup
     if(use_deforming_levelsets){
@@ -660,7 +659,7 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
         T alpha=frame-(T)(int)frame;
         if(frame>current_frame){
             guide_object1=guide_object2;
-            guide_object2->Read(stream_type,guide_sim_folder+"/",++current_frame,-1,0,solids_parameters.write_from_every_process);}
+            guide_object2->Read(stream_type,guide_sim_folder+"/",guide_sim_folder+"/",++current_frame,-1,0,solids_parameters.write_from_every_process);}
         if(guide_object1) for (int i=1;i<=guide_object1->particles.Size();i++) {V(offset+i)=(1-alpha)*guide_object1->particles.V(i)+alpha*guide_object2->particles.V(i);}}
 }
 //#####################################################################
@@ -683,7 +682,7 @@ Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
         T alpha=frame-(T)(int)frame;
         if(frame>current_frame){
             guide_object1=guide_object2;
-            guide_object2->Read(stream_type,guide_sim_folder+"/",++current_frame,-1,0,solids_parameters.write_from_every_process);}
+            guide_object2->Read(stream_type,guide_sim_folder+"/",guide_sim_folder+"/",++current_frame,-1,false,solids_parameters.write_from_every_process);}
         if(guide_object1) for (int i=1;i<=guide_object1->particles.Size();i++) {X(offset+i)=(1-alpha)*guide_object1->particles.X(i)+alpha*guide_object2->particles.X(i);}}
 }
 //#####################################################################

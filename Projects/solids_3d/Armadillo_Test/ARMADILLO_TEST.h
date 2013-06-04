@@ -80,10 +80,10 @@ void Get_Initial_Data()
 
     TETRAHEDRALIZED_VOLUME<T>& volume=*(TETRAHEDRALIZED_VOLUME<T>*)temp_volume.Append_Particles_And_Create_Copy(particles);
     delete &temp_volume;
-    deformable_body_collection.deformable_geometry.Add_Structure(&volume);
+    deformable_body_collection.Add_Structure(&volume);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     if(use_bindings){
         // compute the embedding
@@ -113,7 +113,7 @@ void Get_Initial_Data()
                 for(int k=0;k<nodes.m;k++) nodes[k]=hard_to_soft.Get(nodes[k]);}}}
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
         
     // set constrained nodes
     ARRAY<int> tet_nodes;volume.mesh.elements.Flattened().Get_Unique(tet_nodes);
@@ -128,7 +128,7 @@ void Get_Initial_Data()
 
     // add to collision structures
     deformable_body_collection.collisions.collision_structures.Append(&surface);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
 
     // correct mass
     //binding_list.Distribute_Mass_To_Parents(particles.mass.array);
@@ -180,8 +180,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data();
 
     // make forces
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
-        if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(i))){
+    for(int i=0;i<deformable_body_collection.structures.m;i++){
+        if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(i))){
             ARRAY<int>& referenced_nodes=*new ARRAY<int>; // hey craig, look a memory leak.  cool andy, why don't you fix it?
             volume->mesh.elements.Flattened().Get_Unique(referenced_nodes);
             for(int i=referenced_nodes.m;i>=1;i--) if(constrained_nodes.Contains(referenced_nodes(i))) referenced_nodes.Remove_Index_Lazy(i);

@@ -161,7 +161,7 @@ TETRAHEDRALIZED_VOLUME<T>& Create_Deformable_Mattress()
     ARRAY<int> parent_map;Create_Duplicate_Mesh(mattress.triangulated_surface->mesh,embedding.material_surface_mesh,parent_map);
     delete mattress.triangulated_surface;mattress.triangulated_surface=0;
     redgreen=new RED_GREEN_TRIANGLES<TV>(embedding.material_surface);
-    deformable_body_collection.deformable_geometry.Add_Structure(&embedding);
+    deformable_body_collection.Add_Structure(&embedding);
 
     // refine duplicate mattress surface
     for(int i=0;i<refinement_level;i++){
@@ -236,7 +236,7 @@ void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
-    TETRAHEDRALIZED_VOLUME<T>& mattress=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+    TETRAHEDRALIZED_VOLUME<T>& mattress=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
 
     bool initialized_tet_hierarchy=false;
     for(int b=0;b<soft_bindings.bindings.m;b++){
@@ -316,10 +316,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     ground_id=tests.Add_Ground().particle_index;
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // collisions
-    EMBEDDING<TV>& embedding=deformable_body_collection.deformable_geometry.template Find_Structure<EMBEDDING<TV>&>();
+    EMBEDDING<TV>& embedding=deformable_body_collection.template Find_Structure<EMBEDDING<TV>&>();
     deformable_body_collection.collisions.collision_structures.Append(&embedding);
     deformable_body_collection.collisions.collision_structures.Append(&mattress);
 

@@ -566,14 +566,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
             // light cloth
             deformable_object_id=THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Deformable_Object(deformable_body_collection,100,TV((T).2,(T)1.15),TV((T)1,(T)1.15));
-            SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.deformable_geometry.structures(deformable_object_id));
+            SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.structures(deformable_object_id));
             THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Set_Mass(segmented_curve,10);
             segmented_curve.Initialize_Hierarchy();
             break;}
         case 8:{
             // balloon
             deformable_object_id=THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Deformable_Object(deformable_body_collection,100,TV((T).4,light_sphere_initial_height),TV((T).6,(T)light_sphere_initial_height));
-            SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.deformable_geometry.structures(deformable_object_id));
+            SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.structures(deformable_object_id));
             THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Set_Mass(segmented_curve,10);
             left_fixed_index=1;right_fixed_index=segmented_curve.particles.Size();
             break;}
@@ -677,11 +677,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         default: LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -694,7 +694,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 #endif
     switch(test_number){
         case 1:{
-            TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             std::cout<<"Setting density "<<solid_density<<std::endl;
             solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_area,(T)5e2/(1+sqrt((T)2)),(T)10));
             solid_body_collection.Add_Force(Create_Altitude_Springs(triangulated_area,(T)5e2));
@@ -720,7 +720,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 7:{
             // Set up cloth forces
-            SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.deformable_geometry.structures(deformable_object_id));
+            SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.structures(deformable_object_id));
             segmented_curve.Initialize_Hierarchy();
             solid_body_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)3e4,(T)1,false,(T).1,true,(T)0,true,true));
             solid_body_collection.Add_Force(Create_Segment_Bending_Springs(segmented_curve,(T)2/(1+sqrt((T)2)),(T)2,false,(T).1,true,(T)0,true,true));
@@ -731,7 +731,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solids_tests.Add_Ground();
             break;}
         case 8:{
-            SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.deformable_geometry.structures(deformable_object_id));
+            SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.structures(deformable_object_id));
             segmented_curve.Initialize_Hierarchy();
             solid_body_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)2e3,(T)4,false,(T).1,true,(T)0,true,true));
             solid_body_collection.Add_Force(Create_Segment_Bending_Springs(segmented_curve,(T)2/(1+sqrt((T)2)),(T)2,false,(T).1,true,(T)0,true,true));
@@ -760,7 +760,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
             Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
             
-            // TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            // TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             // triangulated_area.Initialize_Hierarchy();
             // solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>((T)1e3,(T).45,(T).01)));
             // DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_area.Get_Boundary_Object());

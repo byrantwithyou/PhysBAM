@@ -423,12 +423,12 @@ Initialize_Bodies()
         default: LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
     // add structures and rigid bodies to collisions
-    if(test_number!=3) deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    if(test_number!=3) deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
     use_pls_evolution_for_structure=false;//use_massless_structure;
 
     // correct number nodes
-    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -437,7 +437,7 @@ Initialize_Bodies()
     solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
 
     SEGMENTED_CURVE_2D<T>* curve=rebuild_curve;
-    if(!curve) curve=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE_2D<T>*>();
+    if(!curve) curve=solid_body_collection.deformable_body_collection.template Find_Structure<SEGMENTED_CURVE_2D<T>*>();
     if(curve){
         SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(*curve,fluids_parameters.surface_tension);
         solid_body_collection.Add_Force(stf);
@@ -931,7 +931,7 @@ Initialize_Surface_Particles(int number)
     particles.Add_Elements(number_surface_particles);
     rebuild_curve=SEGMENTED_CURVE_2D<T>::Create(particles);
     free_particles=FREE_PARTICLES<TV>::Create(particles);
-    solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(free_particles);
+    solid_body_collection.deformable_body_collection.Add_Structure(free_particles);
     free_particles->nodes=IDENTITY_ARRAY<>(number_surface_particles);
 }
 //#####################################################################

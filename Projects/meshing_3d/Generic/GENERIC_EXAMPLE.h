@@ -282,7 +282,7 @@ public:
     {return 0;}
 
     int Extra_Refinement_Criteria(const int tet_index) const
-    {TETRAHEDRALIZED_VOLUME<T> &target_volume=tetrahedral_meshing.solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+    {TETRAHEDRALIZED_VOLUME<T> &target_volume=tetrahedral_meshing.solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
      if(!target_volume.tetrahedron_list)target_volume.Update_Tetrahedron_List();
      TV centroid=target_volume.Centroid(tet_index);
      if(variable_max_edge_length_tetsurf_field){
