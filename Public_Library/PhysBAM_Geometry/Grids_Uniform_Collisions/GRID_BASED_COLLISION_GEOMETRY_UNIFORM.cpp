@@ -19,7 +19,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/RIGID_GEOMETRY_RASTERIZATION_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/RIGID_BODY_RASTERIZATION_UNIFORM.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

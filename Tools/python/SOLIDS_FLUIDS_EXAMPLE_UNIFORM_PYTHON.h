@@ -104,11 +104,11 @@ public:
     void Collide_All_Bodies()
     {// add structures and rigid bodies to collisions
     solids_parameters.solid_body_collection.deformable_body_collection.collisions.collision_structures.Append_Elements(solids_parameters.solid_body_collection.deformable_body_collection.deformable_geometry.structures);
-    solids_parameters.collision_body_list.Add_Bodies(solids_parameters.solid_body_collection.rigid_body_collection.rigid_geometry_collection);
+    solids_parameters.collision_body_list.Add_Bodies(solids_parameters.solid_body_collection.rigid_body_collection);
     solids_parameters.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(solids_parameters.solid_body_collection.deformable_body_collection.deformable_geometry.structures);}
 
     void Collide_Rigid_Bodies()
-    {solids_parameters.collision_body_list.Add_Bodies(solids_parameters.solid_body_collection.rigid_body_collection.rigid_geometry_collection);}
+    {solids_parameters.collision_body_list.Add_Bodies(solids_parameters.solid_body_collection.rigid_body_collection);}
 
     void Collide_Segmented_Curve(SEGMENTED_CURVE<TV>& curve)
     {// add structures and rigid bodies to collisions

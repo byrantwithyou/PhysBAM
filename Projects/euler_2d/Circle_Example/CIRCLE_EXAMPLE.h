@@ -434,7 +434,7 @@ void Set_Rigid_Body_Parameters(int rigid_body_index,TV position,T mass,bool is_k
 {
     rigid_body_collection.Rigid_Body(rigid_body_index).Set_Coefficient_Of_Restitution((T)1);
     rigid_body_collection.Rigid_Body(rigid_body_index).coefficient_of_friction=(T)1;
-    rigid_body_collection.rigid_body_particle.frame(rigid_body_index).t=position;
+    rigid_body_collection.rigid_body_particles.frame(rigid_body_index).t=position;
     rigid_body_collection.Rigid_Body(rigid_body_index).Set_Mass(mass);
     rigid_body_collection.Rigid_Body(rigid_body_index).Is_Kinematic()=is_kinematic;
     rigid_body_collection.Rigid_Body(rigid_body_index).simplicial_object->mesh.Initialize_Adjacent_Elements();
@@ -517,7 +517,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                     break;
             default:PHYSBAM_FATAL_ERROR("wrong test number");}
 
-        fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);}
+        fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);}
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
 
     if(use_solids_gravity) solid_body_collection.Add_Force(new GRAVITY<TV>(solid_body_collection.deformable_body_collection.particles,rigid_body_collection,true,true,solid_gravity));
@@ -549,7 +549,7 @@ void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==3){
         T_GRID& grid=fluids_parameters.euler->grid;
-        TV velocity=rigid_body_collection.rigid_body_particle.twist(sphere).linear;
+        TV velocity=rigid_body_collection.rigid_body_particles.twist(sphere).linear;
         T rigid_dt_denominator=abs(velocity.x)/grid.dX.x+abs(velocity.y)/grid.dX.y;
         if(rigid_dt_denominator>(T)1e-8) dt=min(dt,1/rigid_dt_denominator);}
 }

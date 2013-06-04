@@ -12,10 +12,6 @@
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED_EULERIAN.h>
@@ -31,6 +27,10 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_TET_SPRINGS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
@@ -377,7 +377,7 @@ Initialize_Bodies()
         LINEAR_TET_SPRINGS<T> *guide_tet_springs=Create_Tet_Springs(*sim_guide_volume,guide_altitude_stiffness,overdamping_fraction,false,(T).1,true,(T).1,true,(T)0,true);
         guide_tet_springs->Clamp_Restlength(restlength_clamp);
         solid_body_collection.Add_Force(guide_tet_springs);}
-    SPARSE_UNION_FIND<> particle_connectivity(particles.Size()+rigid_body_collection.rigid_body_particle.Size());
+    SPARSE_UNION_FIND<> particle_connectivity(particles.Size()+rigid_body_collection.rigid_body_particles.Size());
     HAIR_ID next_segment_id(0);
     PHYSBAM_FATAL_ERROR();
 #if 0
@@ -458,7 +458,7 @@ Initialize_Bodies()
         current_levelset++;
         head=&tests.Add_Rigid_Body(rigid_model,(T)1,(T)0,true);
         //head->is_static=true
-        rigid_body_collection.rigid_body_particle.kinematic(head->particle_index)=true;
+        rigid_body_collection.rigid_body_particles.kinematic(head->particle_index)=true;
         init_frame=head->Frame();
         implicit_rigid_body=head;}
 
@@ -529,7 +529,7 @@ Initialize_Bodies()
 
     // parallel
     if(solid_body_collection.deformable_body_collection.mpi_solids){
-        solid_body_collection.deformable_body_collection.mpi_solids->KD_Tree_Partition_Subset(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,spring_id_to_particle,particles.X);
+        solid_body_collection.deformable_body_collection.mpi_solids->KD_Tree_Partition_Subset(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection,spring_id_to_particle,particles.X);
         ARRAY<PARTITION_ID>& partition_id_from_particle_index=solid_body_collection.deformable_body_collection.mpi_solids->partition_id_from_particle_index;
         ARRAY<ARRAY<int>,PARTITION_ID>& particles_of_partition=solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition;
 
@@ -583,7 +583,7 @@ Initialize_Bodies()
     if(use_deforming_levelsets) Compute_Binding_Velocities();
 
     // collisions
-    solid_body_collection.collision_body_list.Add_Bodies(*rigid_body_collection.rigid_geometry_collection.collision_body_list);
+    solid_body_collection.collision_body_list.Add_Bodies(*rigid_body_collection.collision_body_list);
     solid_body_collection.deformable_body_collection.collisions.collision_structures.Append(&edges);
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(&edges);
 }

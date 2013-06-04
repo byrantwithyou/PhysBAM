@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Vectors/VECTOR_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
@@ -29,7 +29,7 @@ template<class TV> void Write_Substep_Helper(void* writer,const std::string& tit
 //#####################################################################
 template<class TV> WATER_DRIVER<TV>::
 WATER_DRIVER(WATER_EXAMPLE<TV>& example)
-    :example(example),kinematic_evolution(example.rigid_geometry_collection,true),thread_queue(example.thread_queue)
+    :example(example),kinematic_evolution(example.rigid_body_collection,true),thread_queue(example.thread_queue)
 {
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }
@@ -65,8 +65,8 @@ Initialize()
     
     // initialize collision objects
     kinematic_evolution.Get_Current_Kinematic_Keyframes(1/example.frame_rate,time);
-    kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time);
-    kinematic_evolution.Set_External_Velocities(example.rigid_geometry_collection.particles.twist,time,time);
+    kinematic_evolution.Set_External_Positions(example.rigid_body_collection.rigid_body_particles.frame,time);
+    kinematic_evolution.Set_External_Velocities(example.rigid_body_collection.rigid_body_particles.twist,time,time);
 
     example.phi_boundary_water.Set_Velocity_Pointer(example.face_velocities);
 
@@ -97,7 +97,7 @@ Initialize()
     if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> > *refine=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >*>(&example.projection)){
         refine->boundary=example.boundary;
         refine->phi_boundary=example.phi_boundary;}
-    example.rigid_geometry_collection.Update_Kinematic_Particles();
+    example.rigid_body_collection.Update_Kinematic_Particles();
 
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.domain_boundary);
     example.phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
@@ -213,13 +213,13 @@ Advance_To_Target_Time(const T target_time)
 
         // kinematic_update
         LOG::Time("Kinematic Evolution");
-        kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time);
-        kinematic_evolution.Set_External_Velocities(example.rigid_geometry_collection.particles.twist,time,time);
-        for(int i=0;i<example.rigid_geometry_collection.kinematic_rigid_geometry.m;i++){
-            RIGID_GEOMETRY<TV>& rigid_geometry=example.rigid_geometry_collection.Rigid_Geometry(i);            
-            rigid_geometry.Frame().t+=dt*rigid_geometry.Twist().linear;
-            rigid_geometry.Frame().r=ROTATION<TV>::From_Rotation_Vector(dt*rigid_geometry.Twist().angular)*rigid_geometry.Frame().r;rigid_geometry.Frame().r.Normalize();}
-        kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time+dt);
+        kinematic_evolution.Set_External_Positions(example.rigid_body_collection.rigid_body_particles.frame,time);
+        kinematic_evolution.Set_External_Velocities(example.rigid_body_collection.rigid_body_particles.twist,time,time);
+        for(int i=0;i<example.rigid_body_collection.kinematic_rigid_bodies.m;i++){
+            RIGID_BODY<TV>& rigid_body=example.rigid_body_collection.Rigid_Body(i);            
+            rigid_body.Frame().t+=dt*rigid_body.Twist().linear;
+            rigid_body.Frame().r=ROTATION<TV>::From_Rotation_Vector(dt*rigid_body.Twist().angular)*rigid_body.Frame().r;rigid_body.Frame().r.Normalize();}
+        kinematic_evolution.Set_External_Positions(example.rigid_body_collection.rigid_body_particles.frame,time+dt);
 
         LOG::Time("Compute Occupied Blocks");
         T maximum_fluid_speed=example.face_velocities.Max_Abs().Max();
@@ -258,7 +258,7 @@ Advance_To_Target_Time(const T target_time)
         //Add Forces 0%
         LOG::Time("Forces");
         example.incompressible.Advance_One_Time_Step_Forces(example.face_velocities,dt,time,true,0,example.number_of_ghost_cells);
-        kinematic_evolution.Set_External_Velocities(example.rigid_geometry_collection.particles.twist,time+dt,time+dt);
+        kinematic_evolution.Set_External_Velocities(example.rigid_body_collection.rigid_body_particles.twist,time+dt,time+dt);
 
         //Modify Levelset with Particles 15% (Parallelizedish)
         LOG::Time("Modify Levelset");

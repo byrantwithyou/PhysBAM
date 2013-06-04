@@ -11,8 +11,8 @@
 #include <PhysBAM_Tools/Matrices/MATRIX_POLICY.h>
 namespace PhysBAM{
 
-template<class TV> class RIGID_GEOMETRY_COLLECTION;
-template<class TV> class RIGID_GEOMETRY_STATE;
+template<class TV> class RIGID_BODY_COLLECTION;
+template<class TV> class RIGID_BODY_STATE;
 
 template<class TV>
 class KINEMATIC_EVOLUTION
@@ -21,12 +21,12 @@ class KINEMATIC_EVOLUTION
     typedef typename TV::SPIN T_SPIN;
     enum WORKAROUND {d=TV::m};
 public:
-    RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection;
-    ARRAY<RIGID_GEOMETRY_STATE<TV> > kinematic_current_state; // TODO: These are sparse; compact them
-    ARRAY<RIGID_GEOMETRY_STATE<TV> > kinematic_next_state;
+    RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
+    ARRAY<RIGID_BODY_STATE<TV> > kinematic_current_state; // TODO: These are sparse; compact them
+    ARRAY<RIGID_BODY_STATE<TV> > kinematic_next_state;
     bool use_kinematic_keyframes;
 
-    KINEMATIC_EVOLUTION(RIGID_GEOMETRY_COLLECTION<TV>& rigid_body_collection_input,bool use_kinematic_keyframes_input);
+    KINEMATIC_EVOLUTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,bool use_kinematic_keyframes_input);
     virtual ~KINEMATIC_EVOLUTION();
 
 //#####################################################################

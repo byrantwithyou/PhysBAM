@@ -512,7 +512,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             //RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y+(grid.domain.max_corner.y-grid.domain.min_corner.y)*(T).75,(T)1.5*grid.domain.max_corner.y);
             RANGE<TV> world(TV(grid.domain.min_corner.x,(T).75),TV(grid.domain.max_corner.x,(T)1.5));
 
-            first_coupled_rigid_body=rigid_body_collection.rigid_body_particle.Size()+1;
+            first_coupled_rigid_body=rigid_body_collection.rigid_body_particles.Size()+1;
             RANDOM_NUMBERS<T> random;
             random.Set_Seed(1234);
 
@@ -706,16 +706,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_id));
             break;}
         case 4:{
-            for(int i=first_coupled_rigid_body;i<=rigid_body_collection.rigid_body_particle.Size();i++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(i));
+            for(int i=first_coupled_rigid_body;i<=rigid_body_collection.rigid_body_particles.Size();i++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(i));
             solids_tests.Add_Ground();
             break;}
         case 5:
         case 2:{
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
             solids_tests.Add_Ground();
             break;}
         case 6:{
-            for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(p));
+            for(int p=0;p<rigid_body_collection.rigid_body_particles.Size();p++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(p));
             solids_tests.Add_Ground();
             break;}
         case 7:{
@@ -750,15 +750,15 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 12:{
             // solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+            // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
             break;}
         case 13:{
             // solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
-            Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+            // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1));
+            Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
             
             // TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             // triangulated_area.Initialize_Hierarchy();

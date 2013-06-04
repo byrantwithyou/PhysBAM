@@ -266,10 +266,10 @@ T Initial_Phi_Object(const VECTOR<T,3>& X) const
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {    
     lighthouse=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/lighthouse",(T)2,true,true,false);
-    rigid_body_collection.rigid_body_particle.frame(lighthouse).t=VECTOR<T,3>((T)25,(T)-2,(T)30);rigid_body_collection.Rigid_Body(lighthouse).Is_Kinematic()=true;
+    rigid_body_collection.rigid_body_particles.frame(lighthouse).t=VECTOR<T,3>((T)25,(T)-2,(T)30);rigid_body_collection.Rigid_Body(lighthouse).Is_Kinematic()=true;
     cove=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/cove",(T)1,true,true,false);
-    rigid_body_collection.rigid_body_particle.frame(cove).t=VECTOR<T,3>((T)-80,(T)11,(T)40);rigid_body_collection.Rigid_Body(cove).Is_Kinematic()=true;
-    inaccurate_union.collision_bodies.Add_Bodies(rigid_body_collection.rigid_geometry_collection);
+    rigid_body_collection.rigid_body_particles.frame(cove).t=VECTOR<T,3>((T)-80,(T)11,(T)40);rigid_body_collection.Rigid_Body(cove).Is_Kinematic()=true;
+    inaccurate_union.collision_bodies.Add_Bodies(rigid_body_collection);
     fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(&inaccurate_union,0,false);
 }
 //#####################################################################

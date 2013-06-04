@@ -41,7 +41,7 @@ template<class TV> SOLIDS_EVOLUTION<TV>::
 SOLIDS_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input)
     :solid_body_collection(solid_body_collection_input),solids_parameters(solids_parameters_input),rigid_body_collisions(0),rigid_deformable_collisions(0),time(0),
     solids_evolution_callbacks(&solids_evolution_callbacks_default),
-    kinematic_evolution(solid_body_collection.rigid_body_collection,solids_parameters.rigid_body_evolution_parameters.rigid_geometry_evolution_parameters.use_kinematic_keyframes)
+    kinematic_evolution(solid_body_collection.rigid_body_collection,solids_parameters.rigid_body_evolution_parameters.use_kinematic_keyframes)
 {}
 //#####################################################################
 // Destructor
@@ -65,7 +65,7 @@ Euler_Step_Position(const T dt,const T time)
     for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++)
         Euler_Step_Position(dt,time,solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i)); // TODO: avoid unnecessary Update_Angular_Velocity
     Set_External_Positions(deformable_body_collection.particles.X,time+dt);
-    kinematic_evolution.Set_External_Positions(solid_body_collection.rigid_body_collection.rigid_body_particle.frame,time+dt);
+    kinematic_evolution.Set_External_Positions(solid_body_collection.rigid_body_collection.rigid_body_particles.frame,time+dt);
     solid_body_collection.rigid_body_collection.Update_Angular_Velocity(); // Note: Possibly remove as we restore velocities right after this function.
     solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Positions();
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions();
@@ -73,7 +73,7 @@ Euler_Step_Position(const T dt,const T time)
          mpi_solids->Exchange_Force_Boundary_Data_Global(deformable_body_collection.particles.X);
          mpi_solids->Exchange_Binding_Boundary_Data_Global(deformable_body_collection.particles.X);
 /*      TODO: exchange rigid body particles data
-        mpi_solids->Exchange_Boundary_Data_Global(solid_body_collection.rigid_body_collection.rigid_body_particle.frame);
+        mpi_solids->Exchange_Boundary_Data_Global(solid_body_collection.rigid_body_collection.rigid_body_particles.frame);
         TODO: update angular velocity for received boundary data*/
 }
 }
@@ -90,10 +90,10 @@ Save_Position(ARRAY<TV>& X,ARRAY<FRAME<TV> >& rigid_frame)
     const ARRAY<int>& simulated_rigid_body_particles=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles;
     X.Resize(particles.Size(),false,false);
     X.Subset(simulated_particles)=particles.X.Subset(simulated_particles);
-    rigid_frame.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
-    rigid_frame.Subset(simulated_rigid_body_particles)=rigid_body_collection.rigid_body_particle.frame.Subset(simulated_rigid_body_particles);
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) if(rigid_body_collection.Is_Active(i)){
-        if(!rigid_body_collection.Rigid_Body(i).Is_Simulated())rigid_frame(i)=rigid_body_collection.rigid_body_particle.frame(i);}
+    rigid_frame.Resize(rigid_body_collection.rigid_body_particles.Size(),false,false);
+    rigid_frame.Subset(simulated_rigid_body_particles)=rigid_body_collection.rigid_body_particles.frame.Subset(simulated_rigid_body_particles);
+    for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++) if(rigid_body_collection.Is_Active(i)){
+        if(!rigid_body_collection.Rigid_Body(i).Is_Simulated())rigid_frame(i)=rigid_body_collection.rigid_body_particles.frame(i);}
 }
 //#####################################################################
 // Function Restore_Position
@@ -106,12 +106,12 @@ Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const FRAME<TV> > rigid_frame
     const ARRAY<int>& simulated_particles=solid_body_collection.deformable_body_collection.simulated_particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     const ARRAY<int>& simulated_rigid_body_particles=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles;
-    PHYSBAM_ASSERT(X.Size()==particles.Size());PHYSBAM_ASSERT(rigid_frame.Size()==rigid_body_collection.rigid_body_particle.Size());
+    PHYSBAM_ASSERT(X.Size()==particles.Size());PHYSBAM_ASSERT(rigid_frame.Size()==rigid_body_collection.rigid_body_particles.Size());
     particles.X.Subset(simulated_particles)=X.Subset(simulated_particles);
-    rigid_body_collection.rigid_body_particle.frame.Subset(simulated_rigid_body_particles)=rigid_frame.Subset(simulated_rigid_body_particles);
+    rigid_body_collection.rigid_body_particles.frame.Subset(simulated_rigid_body_particles)=rigid_frame.Subset(simulated_rigid_body_particles);
     for(int i=0;i<simulated_rigid_body_particles.m;i++) rigid_body_collection.Rigid_Body(simulated_rigid_body_particles(i)).Update_Angular_Velocity();
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
-        if(!body.Is_Simulated()){rigid_body_collection.rigid_body_particle.frame(i)=rigid_frame(i);body.Update_Angular_Velocity();}}
+    for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
+        if(!body.Is_Simulated()){rigid_body_collection.rigid_body_particles.frame(i)=rigid_frame(i);body.Update_Angular_Velocity();}}
 }
 //#####################################################################
 // Function Restore_Position
@@ -336,7 +336,7 @@ Euler_Step_Position(const T dt,const T time,const int p)
 {
     RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
     if(rigid_body.is_static) return;
-    else if(solid_body_collection.rigid_body_collection.rigid_body_particle.kinematic(p)){
+    else if(solid_body_collection.rigid_body_collection.rigid_body_particles.kinematic(p)){
         kinematic_evolution.Set_External_Positions(rigid_body.Frame(),time+dt,p);}
     else{
         rigid_body.Frame().t+=dt*rigid_body.Twist().linear;
@@ -349,7 +349,7 @@ template<class TV> void SOLIDS_EVOLUTION<TV>::
 Clamp_Velocities()
 {
     const ARRAY<int>& dynamic_rigid_body_particles=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles;
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     T max_linear_velocity_squared=sqr(solids_parameters.rigid_body_evolution_parameters.max_rigid_body_linear_velocity),max_angular_velocity_squared=sqr(solids_parameters.rigid_body_evolution_parameters.max_rigid_body_angular_velocity);
     for(int i=0;i<dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
         T magnitude_squared=rigid_body_particles.twist(p).linear.Magnitude_Squared();
@@ -365,11 +365,11 @@ Clamp_Velocities()
 template<class TV> void SOLIDS_EVOLUTION<TV>::
 Initialize_World_Space_Masses()
 {
-    world_space_rigid_mass.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.Size(),false,false);
-    world_space_rigid_mass_inverse.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.Size(),false,false);
+    world_space_rigid_mass.Resize(solid_body_collection.rigid_body_collection.rigid_body_particles.Size(),false,false);
+    world_space_rigid_mass_inverse.Resize(solid_body_collection.rigid_body_collection.rigid_body_particles.Size(),false,false);
     for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
-        world_space_rigid_mass(p)=solid_body_collection.rigid_body_collection.State(p).World_Space_Rigid_Mass(RIGID_BODY_MASS<TV>(solid_body_collection.rigid_body_collection.rigid_body_particle.mass(p),solid_body_collection.rigid_body_collection.rigid_body_particle.inertia_tensor(p)));
-        world_space_rigid_mass_inverse(p)=solid_body_collection.rigid_body_collection.State(p).World_Space_Rigid_Mass_Inverse(RIGID_BODY_MASS<TV>(solid_body_collection.rigid_body_collection.rigid_body_particle.mass(p),solid_body_collection.rigid_body_collection.rigid_body_particle.inertia_tensor(p)));}
+        world_space_rigid_mass(p)=solid_body_collection.rigid_body_collection.State(p).World_Space_Rigid_Mass(RIGID_BODY_MASS<TV>(solid_body_collection.rigid_body_collection.rigid_body_particles.mass(p),solid_body_collection.rigid_body_collection.rigid_body_particles.inertia_tensor(p)));
+        world_space_rigid_mass_inverse(p)=solid_body_collection.rigid_body_collection.State(p).World_Space_Rigid_Mass_Inverse(RIGID_BODY_MASS<TV>(solid_body_collection.rigid_body_collection.rigid_body_particles.mass(p),solid_body_collection.rigid_body_collection.rigid_body_particles.inertia_tensor(p)));}
 }
 //#####################################################################
 namespace PhysBAM{

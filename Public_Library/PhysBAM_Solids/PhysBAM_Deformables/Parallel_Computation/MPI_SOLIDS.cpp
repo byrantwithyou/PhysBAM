@@ -12,12 +12,12 @@
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/HAIR_ID.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Parallel_Computation/MPI_SOLIDS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <stdexcept>
 #ifdef USE_MPI
 #include <PhysBAM_Tools/Parallel_Computation/MPI_PACKAGE.h>
@@ -529,13 +529,13 @@ Debug_Reduce_Array_Sum(ARRAY_VIEW<const T_DATA> local_values) const // sends all
 // Function Simple_Partition
 //#####################################################################
 template<class TV> void MPI_SOLIDS<TV>::
-Simple_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,ARRAY_VIEW<const TV> X,const VECTOR<int,TV::m>& counts)
+Simple_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY_VIEW<const TV> X,const VECTOR<int,TV::m>& counts)
 {
     PHYSBAM_ASSERT(counts.Product()==number_of_ranks);
     particles_of_partition.Resize(Number_Of_Partitions());
     RANGE<TV> box=RANGE<TV>::Bounding_Box(X);box.Change_Size(1e-6);GRID<TV> grid(counts+1,box);
     partition_id_from_particle_index.Remove_All();
-    partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.Size()+rigid_geometry_collection_input.particles.Size());
+    partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.Size()+rigid_body_collection_input.particles.Size());
     for(int p=0;p<X.Size();p++){
         VECTOR<int,TV::m> cell=grid.Clamp_To_Cell(X(p));
         int cell_number=cell[0]-1;for(int i=1;i<TV::m;i++) cell_number=cell_number*counts[i]+cell[i]-1;
@@ -554,7 +554,7 @@ template<class T_ARRAY,class T> void KD_Tree_Partition_Helper(const T_ARRAY& loc
         KD_Tree_Partition_Helper(local_p_to_global_p,*node.right,depth+1,target_depth,partition,particle_of_partition);}
 }
 template<class TV> void MPI_SOLIDS<TV>::
-KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,ARRAY_VIEW<const TV> X)
+KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY_VIEW<const TV> X)
 {
     int height=integer_log(number_of_ranks);
     if(1<<height!=number_of_ranks)
@@ -566,7 +566,7 @@ KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_inp
     for(PARTITION_ID i(0);i<particles_of_partition.Size();i++) LOG::cout<<particles_of_partition(i).Size()<<", ";
     LOG::cout<<std::endl;
     partition_id_from_particle_index.Remove_All();
-    partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.Size()+rigid_geometry_collection_input.particles.Size());
+    partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.Size()+rigid_body_collection_input.particles.Size());
     for(PARTITION_ID i(0);i<particles_of_partition.Size();i++){
         INDIRECT_ARRAY<ARRAY<PARTITION_ID> > partition_subset(partition_id_from_particle_index,particles_of_partition(i));
         if(partition_id_from_particle_index.Size()) partition_subset.Fill(i);}
@@ -575,7 +575,7 @@ KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_inp
 // Function KD_Tree_Partition_Subset
 //#####################################################################
 template<class TV> template<class ID> void MPI_SOLIDS<TV>::
-KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,const ARRAY<int,ID>& nodes,ARRAY_VIEW<const TV> X)
+KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const ARRAY<int,ID>& nodes,ARRAY_VIEW<const TV> X)
 {
     int height=integer_log(number_of_ranks);
     if(1<<height!=number_of_ranks)
@@ -589,7 +589,7 @@ KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collect
     for(PARTITION_ID i(0);i<particles_of_partition.Size();i++) LOG::cout<<particles_of_partition(i).Size()<<", ";
     LOG::cout<<std::endl;
     partition_id_from_particle_index.Remove_All();
-    partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.Size()+rigid_geometry_collection_input.particles.Size());
+    partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.Size()+rigid_body_collection_input.particles.Size());
     for(PARTITION_ID i(0);i<particles_of_partition.Size();i++){
         INDIRECT_ARRAY<ARRAY<PARTITION_ID> > partition_subset(partition_id_from_particle_index,particles_of_partition(i));
         partition_subset.Fill(i);}
@@ -754,9 +754,9 @@ template<class TV> void MPI_SOLIDS<TV>::Gather_Repulsion_Inputs(ARRAY_VIEW<TV> X
     ARRAY<ARRAY<int>,PARTITION_ID>& receive_particles) const {PHYSBAM_NOT_IMPLEMENTED();}
 template<class TV> void MPI_SOLIDS<TV>::Scatter_Repulsion_Outputs(ARRAY_VIEW<TV> X_self_collision_free,ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> V,ARRAY<ARRAY<int>,PARTITION_ID>& send_particles,
     ARRAY<ARRAY<int>,PARTITION_ID>& receive_particles) const {PHYSBAM_NOT_IMPLEMENTED();}
-template<class TV> void MPI_SOLIDS<TV>::Simple_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,ARRAY_VIEW<const TV> X,const VECTOR<int,TV::m>& counts){PHYSBAM_NOT_IMPLEMENTED();}
-template<class TV> void MPI_SOLIDS<TV>::KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,ARRAY_VIEW<const TV> X){PHYSBAM_NOT_IMPLEMENTED();}
-template<class TV> template<class ID> void MPI_SOLIDS<TV>::KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,const ARRAY<int,ID>& nodes,ARRAY_VIEW<const TV> X){PHYSBAM_NOT_IMPLEMENTED();}
+template<class TV> void MPI_SOLIDS<TV>::Simple_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY_VIEW<const TV> X,const VECTOR<int,TV::m>& counts){PHYSBAM_NOT_IMPLEMENTED();}
+template<class TV> void MPI_SOLIDS<TV>::KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY_VIEW<const TV> X){PHYSBAM_NOT_IMPLEMENTED();}
+template<class TV> template<class ID> void MPI_SOLIDS<TV>::KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const ARRAY<int,ID>& nodes,ARRAY_VIEW<const TV> X){PHYSBAM_NOT_IMPLEMENTED();}
 template<class TV> template<class T_ARRAY_PAIR> void MPI_SOLIDS<TV>::Distribute_Repulsion_Pairs(const T_ARRAY_PAIR& pairs,ARRAY<ARRAY<int>,PARTITION_ID>& send_particles,
     ARRAY<ARRAY<int>,PARTITION_ID>& receive_particles,T_ARRAY_PAIR& my_boundary_pairs,T_ARRAY_PAIR& my_internal_pairs) const {PHYSBAM_NOT_IMPLEMENTED();}
 template<class TV> void MPI_SOLIDS<TV>::Print_Diagnostics() const{PHYSBAM_NOT_IMPLEMENTED();}
@@ -851,7 +851,7 @@ template<class TV> void MPI_SOLIDS<TV>::Barrier() const {PHYSBAM_NOT_IMPLEMENTED
         ARRAY<ARRAY<int>,PARTITION_ID>&,ARRAY<REPULSION_PAIR<P(V)> >&,ARRAY<REPULSION_PAIR<P(V)> >&) const; \
     template void MPI_SOLIDS<P(V)>::All_Gather_Intersecting_Pairs<P(V::dimension+1),P(V::dimension*2-2)>(HASHTABLE<VECTOR<int,P(V::dimension+1)>,void>&, \
         HASHTABLE<VECTOR<int,P(V::dimension*2-2)>,void>&); \
-    template void MPI_SOLIDS<P(V)>::KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<P(V)>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<P(V)>& rigid_geometry_collection_input,const ARRAY<int,HAIR_ID>& nodes,ARRAY_VIEW<const P(V)> X); \
+    template void MPI_SOLIDS<P(V)>::KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<P(V)>& deformable_body_collection_input,RIGID_BODY_COLLECTION<P(V)>& rigid_body_collection_input,const ARRAY<int,HAIR_ID>& nodes,ARRAY_VIEW<const P(V)> X); \
     INSTANTIATION_HELPER(P(V),T); \
     INSTANTIATION_HELPER(P(V),int); \
     INSTANTIATION_HELPER_ALL2(P(V),int,2,2); \

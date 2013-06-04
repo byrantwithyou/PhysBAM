@@ -88,12 +88,12 @@ Set_Global_Boundary_Conditions(VECTOR_T& V,ARRAY<TV>& X_save,ARRAY<FRAME<TV> >& 
     solids_evolution.kinematic_evolution.Set_External_Velocities(V.rigid_V.array,current_velocity_time+dt,current_position_time);
     // TODO: make Solve_Velocities_for_PD take rigid_V.array and call that instead
     if(arb){
-        PHYSBAM_ASSERT(ARRAY_VIEW<TWIST<TV> >::Same_Array(V.rigid_V.array,solid_body_collection.rigid_body_collection.rigid_body_particle.twist));
+        PHYSBAM_ASSERT(ARRAY_VIEW<TWIST<TV> >::Same_Array(V.rigid_V.array,solid_body_collection.rigid_body_collection.rigid_body_particles.twist));
         arb->Apply_Poststabilization(test_system,print_matrix); // Do not project out pd directions here
         if(arb->Has_Actuators() && arb->constrain_pd_directions){
             arb->Compute_Position_Based_State(dt,current_velocity_time);arb->Solve_Velocities_for_PD(current_velocity_time,dt,solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);}}
     if(velocity_update){
-        PHYSBAM_ASSERT(ARRAY_VIEW<TV>::Same_Array(V.V.array,solid_body_collection.deformable_body_collection.particles.V) && ARRAY_VIEW<TWIST<TV> >::Same_Array(V.rigid_V.array,solid_body_collection.rigid_body_collection.rigid_body_particle.twist));
+        PHYSBAM_ASSERT(ARRAY_VIEW<TV>::Same_Array(V.V.array,solid_body_collection.deformable_body_collection.particles.V) && ARRAY_VIEW<TWIST<TV> >::Same_Array(V.rigid_V.array,solid_body_collection.rigid_body_collection.rigid_body_particles.twist));
         if(solids_parameters.use_post_cg_constraints){// TODO: may just want to call Apply_Constraints in this case too
             if(solids_evolution.solids_parameters.use_rigid_deformable_contact && solid_body_collection.deformable_body_collection.collisions.collisions_on)
                 solids_evolution.rigid_deformable_collisions->Set_Collision_Velocities(V.V.array,V.rigid_V.array,X_save,rigid_frame_save,rigid_velocity_save,rigid_angular_momentum_save,V_save);
@@ -177,8 +177,8 @@ template<class TV> GENERALIZED_MASS<TV>::
 GENERALIZED_MASS(SOLID_BODY_COLLECTION<TV>& solid_body_collection)
     :mass(solid_body_collection.deformable_body_collection.particles.mass,solid_body_collection.deformable_body_collection.dynamic_particles),
     one_over_mass(solid_body_collection.deformable_body_collection.particles.one_over_mass,solid_body_collection.deformable_body_collection.dynamic_particles),
-    rigid_mass(solid_body_collection.rigid_body_collection.rigid_body_particle.mass,solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles),
-    rigid_inertia_tensor(solid_body_collection.rigid_body_collection.rigid_body_particle.inertia_tensor,solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles),
+    rigid_mass(solid_body_collection.rigid_body_collection.rigid_body_particles.mass,solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles),
+    rigid_inertia_tensor(solid_body_collection.rigid_body_collection.rigid_body_particles.inertia_tensor,solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles),
     world_space_rigid_mass_inverse(world_space_rigid_mass_inverse_full,rigid_inertia_tensor.indices)
 {
     Initialize_World_Space_Masses(solid_body_collection);

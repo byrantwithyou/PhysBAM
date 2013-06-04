@@ -187,7 +187,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solids_parameters.rigid_body_evolution_parameters.correct_evolution_energy=true;
     solids_parameters.rigid_body_collision_parameters.collision_iterations=10;
     solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-    solids_parameters.rigid_body_evolution_parameters.rigid_geometry_evolution_parameters.use_kinematic_keyframes=false;
+    solids_parameters.rigid_body_evolution_parameters.use_kinematic_keyframes=false;
     solids_parameters.rigid_body_collision_parameters.rigid_collisions_use_particle_partition=false;
     solids_parameters.rigid_body_collision_parameters.rigid_collisions_use_triangle_hierarchy=false;
     solids_parameters.rigid_body_collision_parameters.use_fracture_particle_optimization=false;
@@ -283,7 +283,7 @@ void Prescore_Pillar()
     for(int i=0;i<94;i++){
         if(i==90) continue;
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(STRING_UTILITIES::string_sprintf("Fractured_Pillar/fragment.%02d",i),1,(T).5);(void)rigid_body;
-        if(rigid_body.Mass()<(T)1e-5) rigid_body_collection.rigid_body_particle.Remove_Body(rigid_body.particle_index);}
+        if(rigid_body.Mass()<(T)1e-5) rigid_body_collection.rigid_body_particles.Remove_Body(rigid_body.particle_index);}
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
     (void)ground;
@@ -295,7 +295,7 @@ void Single_Cube()
 {
     solid_body_collection.print_diagnostics=false;
     solid_body_collection.print_residuals=false;
-    rigid_body_collection.rigid_geometry_collection.always_create_structure=true;
+    rigid_body_collection.always_create_structure=true;
     solids_parameters.rigid_body_collision_parameters.use_fracture_pattern=true;
 
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,(T).5,true,use_nonanalytic_levelsets);(void)rigid_body;
@@ -361,10 +361,10 @@ void Sphere_Pillar()
         rigid_body.Update_Bounding_Box();T_ORIENTED_BOX oriented_box=rigid_body.Oriented_Bounding_Box();
         T min_side_length=FLT_MAX;TV saved_frame=rigid_body.Frame().t;
         for(int dim=0;dim<TV::m;dim++) min_side_length=min(min_side_length,oriented_box.edges.Column(dim).Magnitude());
-        rigid_body_collection.rigid_body_particle.Remove_Body(rigid_body.particle_index);
+        rigid_body_collection.rigid_body_particles.Remove_Body(rigid_body.particle_index);
         RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",min_side_length/(T)2.5,(T).5,true,use_nonanalytic_levelsets);sphere.Frame().t=saved_frame;
-        if(sphere.Mass()<(T)1e-5) rigid_body_collection.rigid_body_particle.Remove_Body(sphere.particle_index);}
-    rigid_body_collection.rigid_geometry_collection.Destroy_Unreferenced_Geometry();
+        if(sphere.Mass()<(T)1e-5) rigid_body_collection.rigid_body_particles.Remove_Body(sphere.particle_index);}
+    rigid_body_collection.Destroy_Unreferenced_Geometry();
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
     (void)ground;
@@ -640,7 +640,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 void Create_Pattern(const int test_number)
 {
     RANGE<TV> domain;int count=100;TV_INT pattern_center;
-    rigid_body_collection.rigid_geometry_collection.always_create_structure=true;
+    rigid_body_collection.always_create_structure=true;
 
     // Load in bodies and compute domain
     switch(test_number){
@@ -729,7 +729,7 @@ void Create_Pattern(const int test_number)
 
     LEVELSET_MAKER<T> levelset_maker;
     levelset_maker.Verbose_Mode();
-    for(int i=int(1);i<=rigid_body_collection.rigid_body_particle.Size();i++){
+    for(int i=int(1);i<=rigid_body_collection.rigid_body_particles.Size();i++){
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(i);
         LEVELSET_IMPLICIT_OBJECT<TV>* fragment_implicit_object=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         TV_INT min_corner_index=grid.Clamped_Index(rigid_body.axis_aligned_bounding_box.min_corner)-TV_INT::All_Ones_Vector();grid.Clamp(min_corner_index);
@@ -1112,7 +1112,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     else if(test_number==10 && frame==10)
         solids_parameters.rigid_body_collision_parameters.use_fracture_pattern=true;
     else if(test_number==12){
-        if(rigid_body_collection.rigid_body_particle.frame(6).t.y<=5 && rigid_body_collection.Rigid_Body(5).is_static){
+        if(rigid_body_collection.rigid_body_particles.frame(6).t.y<=5 && rigid_body_collection.Rigid_Body(5).is_static){
             for(int id=int(1);id<=int(5);id++)
               rigid_body_collection.Rigid_Body(id).is_static=false;
             rigid_body_collection.Rigid_Body(int(1)).fracture_threshold=(T)3.0;

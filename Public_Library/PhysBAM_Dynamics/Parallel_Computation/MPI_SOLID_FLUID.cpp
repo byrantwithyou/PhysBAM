@@ -63,7 +63,7 @@ template<class T> void Exchange_Solid_Positions_And_Velocities_Helper(const MPI_
 {
     int tag=mpi.Get_Unique_Tag();
     DEFORMABLE_PARTICLES<VECTOR<T,1> >& particles=solid_body_collection.deformable_body_collection.particles;
-    RIGID_BODY_PARTICLES<VECTOR<T,1> >& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
+    RIGID_BODY_PARTICLES<VECTOR<T,1> >& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     if(mpi.Solid_Node()){
         ARRAY<ARRAY<char> > send_buffers(mpi.fluid_ranks.n);ARRAY<MPI::Request> requests;
         for(int i=0;i<mpi.fluid_ranks.n;i++){
@@ -86,7 +86,7 @@ Exchange_Solid_Positions_And_Velocities(SOLID_BODY_COLLECTION<TV>& solid_body_co
 {
     int tag=Get_Unique_Tag();
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     if(Solid_Node()){
         ARRAY<ARRAY<char> > send_buffers(fluid_ranks.n);ARRAY<MPI::Request> requests;
         for(int i=0;i<fluid_ranks.n;i++){

@@ -261,7 +261,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number==1){
         int sphere=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/circle",(T).05,true,true,false);
         rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Restitution((T)1);rigid_body_collection.Rigid_Body(sphere).coefficient_of_friction=(T)1;
-        rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;rigid_body_collection.rigid_body_particle.frame(sphere).t=TV((T).15,(T).05);
+        rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;rigid_body_collection.rigid_body_particles.frame(sphere).t=TV((T).15,(T).05);
         rigid_body_collection.Rigid_Body(sphere).Set_Mass(pi*.05*.05*10.77);}
     else if(test_number==2){
         TRIANGULATED_AREA<T>& top_boundary=tests.Create_Mattress(GRID<TV>(TV_INT(101,26),RANGE<TV>(TV(0,(T).5),TV((T)1,(T).75))),true,0,(T)3.1538,true);
@@ -286,7 +286,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         solid_body_collection.Add_Force(Create_Edge_Springs(top_boundary,(T)1.5e5*spring_factor,(T)0));solid_body_collection.Add_Force(Create_Edge_Springs(bottom_boundary,(T)1.5e5*spring_factor,(T)0));
         solid_body_collection.Add_Force(Create_Altitude_Springs(top_boundary,(T)1.5e5*spring_factor));solid_body_collection.Add_Force(Create_Altitude_Springs(bottom_boundary,(T)1.5e5*spring_factor));}
     else if(test_number==3){
-        TRIANGULATED_AREA<T>& deformable_circle=tests.Create_Triangulated_Object(data_directory+"/Triangulated_Areas/circle-216.tri2d",RIGID_GEOMETRY_STATE<TV>(FRAME<TV>(TV((T).15,(T).05))),true,false,(T).05);
+        TRIANGULATED_AREA<T>& deformable_circle=tests.Create_Triangulated_Object(data_directory+"/Triangulated_Areas/circle-216.tri2d",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T).15,(T).05))),true,false,(T).05);
 
         // correct number nodes
         for(int i=0;i<solid_body_collection.deformable_body_collection.structures.m;i++){
@@ -334,14 +334,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         int sphere=rigid_body.particle_index;
         rigid_body.Frame().r=ROTATION<TV>::From_Angle((T)pi/4);
         rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Restitution((T)1);rigid_body_collection.Rigid_Body(sphere).coefficient_of_friction=(T)1;
-        rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;rigid_body_collection.rigid_body_particle.frame(sphere).t=TV((T).15,(T).04);
+        rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;rigid_body_collection.rigid_body_particles.frame(sphere).t=TV((T).15,(T).04);
         
         MASS_PROPERTIES<TV> mass_properties(*curve,true);
         mass_properties.Set_Density((T).1077);
         rigid_body_collection.Rigid_Body(sphere).Mass()=mass_properties.Mass();
         rigid_body_collection.Rigid_Body(sphere).Inertia_Tensor()=DIAGONAL_MATRIX<T,1>(mass_properties.Inertia_Tensor());}
 
-    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);
+    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
     if(fluids_parameters.use_slip){
         for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
         for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
@@ -391,7 +391,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     T rotation=0;
     TV position(0,0),velocity(0,0);
     if(test_number==1 || test_number==4){
-        RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
+        RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particles;
         int rigid_body_index=0;
         position=rigid_body_particles.frame(rigid_body_index).t;
         velocity=rigid_body_particles.twist(rigid_body_index).linear;

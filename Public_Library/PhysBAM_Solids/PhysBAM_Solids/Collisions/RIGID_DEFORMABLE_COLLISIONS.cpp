@@ -13,9 +13,6 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
@@ -37,6 +34,9 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_INTERSECTIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_PARTICLE_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_SKIP_COLLISION_CHECK.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGIDS_COLLISION_CALLBACKS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/SOLVE_CONTACT.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_MESH.h>
@@ -168,10 +168,10 @@ Get_Objects_Intersecting_Particle(const int particle_index,ARRAY<ELEMENT>& trian
     // check all candidate rigid bodies
     if(ARRAY<RIGID_COLLISION_GEOMETRY<TV>*>* rigid_bodies_candidates=particle_rigid_body_candidates.Get_Pointer(particle_index)){
         for(int i=0;i<rigid_bodies_candidates->m;i++){
-            const RIGID_GEOMETRY<TV>& rigid_geometry=(*rigid_bodies_candidates)(i)->rigid_geometry;
-            if(rigid_geometry.Implicit_Geometry_Lazy_Inside(location,solids_parameters.rigid_body_collision_parameters.collision_body_thickness)){
-                bodies.Append(rigid_geometry.particle_index);
-                T phi_value;TV normal=rigid_geometry.Implicit_Geometry_Normal(location,phi_value);
+            const RIGID_BODY<TV>& rigid_body=(*rigid_bodies_candidates)(i)->rigid_body;
+            if(rigid_body.Implicit_Geometry_Lazy_Inside(location,solids_parameters.rigid_body_collision_parameters.collision_body_thickness)){
+                bodies.Append(rigid_body.particle_index);
+                T phi_value;TV normal=rigid_body.Implicit_Geometry_Normal(location,phi_value);
                 body_distances.Append(-phi_value*normal);}}}
 
     Get_Point_Surface_Element_Pairs_Helper(*this,particle_index,triangles,weights,particle_distances);
@@ -216,7 +216,7 @@ Get_Rigid_And_Tetrahedron_Collision_Bodies()
         COLLISION_GEOMETRY<TV>* collision_body=deformable_body_collection.collisions.collision_body_list.bodies(i);
         if(dynamic_cast<TETRAHEDRON_COLLISION_BODY<T>*>(collision_body)) tetrahedron_collision_bodies.Append(collision_body);
         else if(RIGID_COLLISION_GEOMETRY<TV>* body=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_body))
-            if(solid_body_collection.rigid_body_collection.Is_Active(body->rigid_geometry.particle_index))
+            if(solid_body_collection.rigid_body_collection.Is_Active(body->rigid_body.particle_index))
                 rigid_collision_bodies.Append(collision_body);}
 }
 //#####################################################################
@@ -289,7 +289,7 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<FRAME<TV> >& rigid_frame_sa
     ARRAY<TV>& rigid_velocity_difference,ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN> &rigid_angular_momentum_save,ARRAY<TV>& X_save,ARRAY<TV>& V_save)
 {
     solid_body_collection.deformable_body_collection.binding_list.Update_Neighbor_Bindings();
-    rigid_body_collisions.rigid_body_particle_intersections.Remove_All();
+    rigid_body_collisions.rigid_body_particles_intersections.Remove_All();
     particles_collided_with_rigid_body.Remove_All();
     Get_Rigid_And_Tetrahedron_Collision_Bodies();
 
@@ -304,7 +304,7 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<FRAME<TV> >& rigid_frame_sa
 
     V_save-=deformable_body_collection.particles.V;
     if(!kinematic_rigid_bodies_only)
-        rigid_body_collisions.rigid_body_particle_intersections.Remove_All();
+        rigid_body_collisions.rigid_body_particles_intersections.Remove_All();
     particles_collided_with_rigid_body.Remove_All();
     Get_Rigid_And_Tetrahedron_Collision_Bodies();
 
@@ -327,8 +327,8 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<FRAME<TV> >& rigid_frame_sa
                 rigid_body_collisions.added_bodies(0).Remove_All();rigid_body_collisions.added_bodies(1).Remove_All();
                 int id_1=pairs(j)(0),id_2=pairs(j)(1);
                 if(rigid_body_collisions.Update_Collision_Pair(id_1,id_2,dt,time,false)){
-                    rigid_body_collisions.spatial_partition->Update_Body(solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(id_1));
-                    rigid_body_collisions.spatial_partition->Update_Body(solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(id_2));
+                    rigid_body_collisions.spatial_partition->Update_Body(solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(id_1));
+                    rigid_body_collisions.spatial_partition->Update_Body(solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(id_2));
                     need_another_iteration=true;}
                 rigid_body_collisions.Clean_Up_Fractured_Items_From_Lists(pairs,j,false);}}
 
@@ -337,7 +337,7 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<FRAME<TV> >& rigid_frame_sa
         if(solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions && rigid_collision_bodies.m){
             deformable_body_collection.collisions.Compute_Candidate_Nodes_For_Collision_Body_Collisions(rigid_collision_bodies);
             for(COLLISION_GEOMETRY_ID collision_body_id(0);collision_body_id<rigid_collision_bodies.m;collision_body_id++){
-                RIGID_BODY<TV>& rigid_body=dynamic_cast<RIGID_BODY<TV>&>(dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>&>(*rigid_collision_bodies(collision_body_id)).rigid_geometry);
+                RIGID_BODY<TV>& rigid_body=dynamic_cast<RIGID_BODY<TV>&>(dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>&>(*rigid_collision_bodies(collision_body_id)).rigid_body);
                 for(int j=0;j<deformable_body_collection.collisions.collision_body_candidate_nodes(collision_body_id).m;j++){
                     int k=deformable_body_collection.collisions.collision_body_candidate_nodes(collision_body_id)(j);
                     if(Update_Rigid_Deformable_Collision_Pair(rigid_body,k,dt,time,X_save,V_save,rigid_frame_save,rigid_angular_momentum_difference,
@@ -628,7 +628,7 @@ Set_Collision_Velocities(ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > twist,ARRAY<TV>
     ARRAY_VIEW<const TV> X(solids_parameters.use_trapezoidal_rule_for_velocities?ARRAY_VIEW<const TV>(X_save)
         :ARRAY_VIEW<const TV>(deformable_body_collection.particles.X)); // n+1 positions
     ARRAY_VIEW<const FRAME<TV> > rigid_frame(solids_parameters.use_trapezoidal_rule_for_velocities?ARRAY_VIEW<const FRAME<TV> >(rigid_frame_save)
-        :ARRAY_VIEW<const FRAME<TV> >(solid_body_collection.rigid_body_collection.rigid_body_particle.frame)); // n+1 frames
+        :ARRAY_VIEW<const FRAME<TV> >(solid_body_collection.rigid_body_collection.rigid_body_particles.frame)); // n+1 frames
     ARRAY<PRECOMPUTE_CONTACT_PROJECTION*> precompute_boundary_list;
     for(int body=0;body<precompute_contact_projections.m;body++){
         PRECOMPUTE_CONTACT_PROJECTION& precompute=*precompute_contact_projections(body),*precompute_boundary=0;const int rigid_p=precompute.rigid_body.particle_index;
@@ -695,7 +695,7 @@ Initialize_All_Contact_Projections()
         // rigid/deformable
         precompute_contact_projections.Delete_Pointers_And_Clean_Memory();
         for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
-            if(solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Contains(p)){
+            if(solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Contains(p)){
                 RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
                 if(rigid_body.Has_Infinite_Inertia()) continue;
                 if(HASHTABLE<int>* particles=particles_contacting_rigid_body.Get_Pointer(rigid_body.particle_index)) if(particles->Size()){
@@ -708,7 +708,7 @@ Initialize_All_Contact_Projections()
 
         // set up static and kinematic bodies
         for(int i=0;i<solid_body_collection.rigid_body_collection.static_and_kinematic_rigid_bodies.m;i++){int p=solid_body_collection.rigid_body_collection.static_and_kinematic_rigid_bodies(i);
-            if(solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Contains(p)){
+            if(solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Contains(p)){
                 RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
                 PRECOMPUTE_CONTACT_PROJECTION* precompute=0;
                 if(HASHTABLE<int>* particles=particles_contacting_rigid_body.Get_Pointer(rigid_body.particle_index)){

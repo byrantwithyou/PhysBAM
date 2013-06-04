@@ -82,9 +82,9 @@ Initialize_Bodies()
 {
     if(test_number==2){
         int id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/sphere",(T).125,true,true,false);
-        rigid_body_collection.rigid_body_particle.frame(id).t=TV((T).5,(T).75,(T).5);
+        rigid_body_collection.rigid_body_particles.frame(id).t=TV((T).5,(T).75,(T).5);
         rigid_body_collection.Rigid_Body(id).is_static=true;
-        fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);}
+        fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);}
 }
 //#####################################################################
 // Function Get_Divergence

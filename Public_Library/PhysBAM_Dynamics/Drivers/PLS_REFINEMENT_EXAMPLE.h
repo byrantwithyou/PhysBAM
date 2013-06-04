@@ -13,8 +13,8 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Solids_Geometry_Evolution/RIGID_GEOMETRY_EXAMPLE_VELOCITIES.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Forces_And_Torques/RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
@@ -24,7 +24,7 @@ namespace PhysBAM{
 template<class T_GRID> class LEVELSET_MULTIPLE;
 
 template<class TV_input>
-class PLS_REFINEMENT_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV_input> >,public RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV_input>
+class PLS_REFINEMENT_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV_input> >,public RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV_input>
 {
     typedef TV_input TV;typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
@@ -63,7 +63,7 @@ public:
     //ARRAY<T,TV_INT> density,temperature;
     ARRAY<T,TV_INT> coarse_phi;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary,non_mpi_boundary;
-    RIGID_GEOMETRY_COLLECTION<TV> rigid_geometry_collection;
+    RIGID_BODY_COLLECTION<TV> rigid_body_collection;
     T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;
 
     PLS_REFINEMENT_EXAMPLE(const STREAM_TYPE stream_type_input);

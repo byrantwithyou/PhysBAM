@@ -65,7 +65,7 @@ Update_Simulated_Particles()
     rigid_body_collection.Update_Simulated_Particles();
     deformable_body_collection.Update_Simulated_Particles(*example_forces_and_velocities);
     int particles_number=deformable_body_collection.particles.Size();
-    int rigid_particles_number=rigid_body_collection.rigid_body_particle.Size();
+    int rigid_particles_number=rigid_body_collection.rigid_body_particles.Size();
 
     ARRAY<bool> particle_is_simulated(particles_number);
     particle_is_simulated.Subset(deformable_body_collection.simulated_particles).Fill(true);
@@ -176,7 +176,7 @@ Update_CFL()
         frequency.Resize(deformable_body_collection.particles.Size(),false,false);
         frequency.Subset(deformable_body_collection.simulated_particles).Fill(T_FREQUENCY_DEFORMABLE());
 
-        rigid_frequency.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
+        rigid_frequency.Resize(rigid_body_collection.rigid_body_particles.Size(),false,false);
         rigid_frequency.Subset(rigid_body_collection.simulated_rigid_body_particles).Fill(T_FREQUENCY_RIGID());
 
         for(int i=0;i<solids_forces.m;i++){solids_forces(i)->Initialize_CFL(frequency,rigid_frequency);solids_forces(i)->Validate_CFL();}
@@ -357,7 +357,7 @@ template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Add_All_Forces(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time,const bool damping_only)
 {
     if(!damping_only) Add_Velocity_Independent_Forces(F_full,rigid_F_full,time);
-    Add_Velocity_Dependent_Forces(deformable_body_collection.particles.V,rigid_body_collection.rigid_body_particle.twist,F_full,rigid_F_full,time);
+    Add_Velocity_Dependent_Forces(deformable_body_collection.particles.V,rigid_body_collection.rigid_body_particles.twist,F_full,rigid_F_full,time);
 }
 //#####################################################################
 // Function Add_Force

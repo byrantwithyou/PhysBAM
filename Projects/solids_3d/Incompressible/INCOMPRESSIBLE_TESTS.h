@@ -259,9 +259,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 1:{
             last_frame=(int)(8*frame_rate);
             body=&tests.Add_Rigid_Body("box",(T)2,(T)0);body->Frame().t.z=4;
-            rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             body=&tests.Add_Rigid_Body("box",(T)2,(T)0);body->Frame().t.z=-4;
-            rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             curve.Add_Control_Point((T)0,TV(0,0,(T)4));
             curve.Add_Control_Point((T).2,TV(0,0,(T)0));
@@ -288,9 +288,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 2:{
             last_frame=(int)(8*frame_rate);
             body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->Frame().t.z=11;
-            rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->Frame().t.z=-11;
-            rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             curve.Add_Control_Point((T)0,TV(0,0,(T)11));
             curve.Add_Control_Point((T)4,TV(0,0,(T)10));
@@ -304,9 +304,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 3:{
             last_frame=(int)(8*frame_rate);
             body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->Frame().t.z=11;
-            rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->Frame().t.z=-11;
-            rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             int N=32;
             for(int i=0;i<N;i++){
@@ -320,9 +320,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 4:{
             last_frame=(int)(2*frame_rate);
             body=&tests.Add_Rigid_Body("box",(T)1,(T)0);body->Frame().t.z=11;
-            rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             body=&tests.Add_Rigid_Body("box",(T)1,(T)0);body->Frame().t.z=-11;
-            rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             curve.Add_Control_Point((T)0,TV(0,0,(T)3));
             curve.Add_Control_Point((T)hittime,TV(0,0,(T)1));
@@ -344,9 +344,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 6:{
             last_frame=(int)(8*frame_rate);
             body=&tests.Add_Rigid_Body("box",(T)3,(T)0);body->Frame().t.z=5;
-            rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             body=&tests.Add_Rigid_Body("box",(T)3,(T)0);body->Frame().t.z=-5;
-            rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             curve.Add_Control_Point((T)0,TV(0,0,(T)5));
             curve.Add_Control_Point((T)3,TV(0,0,(T)3));
@@ -688,7 +688,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     if(solid_body_collection.deformable_body_collection.mpi_solids){
         if(power_of_two(solid_body_collection.deformable_body_collection.mpi_solids->number_of_ranks))
-            solid_body_collection.deformable_body_collection.mpi_solids->KD_Tree_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,ARRAY<TV>(particles.X));
+            solid_body_collection.deformable_body_collection.mpi_solids->KD_Tree_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection,ARRAY<TV>(particles.X));
         else{LOG::cout<<"needs 2 or 4 procs"<<std::endl;PHYSBAM_FATAL_ERROR();}}
     
     LOG::cout<<"number of particles: "<<deformable_body_collection.particles.Size()<<std::endl;

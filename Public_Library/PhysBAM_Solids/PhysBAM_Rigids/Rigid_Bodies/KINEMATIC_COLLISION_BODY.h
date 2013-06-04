@@ -33,7 +33,7 @@ public:
     KINEMATIC_COLLISION_BODY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,bool create_collision_geometry,T_GRID *initial_velocity_grid=0,ARRAY<TV,TV_INT> *initial_velocity_field=0)
         :BASE(rigid_body_collection,create_collision_geometry),velocity_grid(initial_velocity_grid),velocity_field(initial_velocity_field)
     {
-        rigid_body_collection.rigid_body_particle.kinematic(particle_index)=true;
+        rigid_body_collection.rigid_body_particles.kinematic(particle_index)=true;
         LEVELSET_IMPLICIT_OBJECT<TV>* levelset=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         levelset->levelset.grid.Initialize(TV_INT::All_Ones_Vector(),RANGE<TV>::Unit_Box());
         levelset->levelset.phi.Resize(levelset->levelset.grid.Domain_Indices());

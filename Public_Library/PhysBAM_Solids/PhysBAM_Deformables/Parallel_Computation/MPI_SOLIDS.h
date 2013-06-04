@@ -19,7 +19,7 @@ class SEGMENT_MESH;
 class MPI_PACKAGE;
 template<class T> class TRIANGLE_REPULSIONS;
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
-template<class TV> class RIGID_GEOMETRY_COLLECTION;
+template<class TV> class RIGID_BODY_COLLECTION;
 
 template<class TV>
 class MPI_SOLIDS:public NONCOPYABLE
@@ -137,8 +137,8 @@ public:
     template<class T> void Exchange_Force_Boundary_Data(ARRAY<T>& array) const
     {Exchange_Force_Boundary_Data(ARRAY_VIEW<T>(array));}
 
-    void KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,const ARRAY<TV>& X)
-    {KD_Tree_Partition(deformable_body_collection_input,rigid_geometry_collection_input,ARRAY_VIEW<const TV>(X));}
+    void KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const ARRAY<TV>& X)
+    {KD_Tree_Partition(deformable_body_collection_input,rigid_body_collection_input,ARRAY_VIEW<const TV>(X));}
 
 //#####################################################################
     void Barrier() const;
@@ -177,9 +177,9 @@ public:
         ARRAY<ARRAY<int>,PARTITION_ID>& receive_particles) const;
     void Scatter_Repulsion_Outputs(ARRAY_VIEW<TV> X_self_collision_free,ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> V,ARRAY<ARRAY<int>,PARTITION_ID>& send_particles,
         ARRAY<ARRAY<int>,PARTITION_ID>& receive_particles) const;
-    void Simple_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,ARRAY_VIEW<const TV> X,const VECTOR<int,TV::m>& counts);
-    void KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,ARRAY_VIEW<const TV> X);
-    template<class ID> void KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,const ARRAY<int,ID>& nodes,ARRAY_VIEW<const TV> X);
+    void Simple_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY_VIEW<const TV> X,const VECTOR<int,TV::m>& counts);
+    void KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY_VIEW<const TV> X);
+    template<class ID> void KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const ARRAY<int,ID>& nodes,ARRAY_VIEW<const TV> X);
     void Print_Diagnostics() const;
 private:
     const MPI::Intracomm& Comm() const;

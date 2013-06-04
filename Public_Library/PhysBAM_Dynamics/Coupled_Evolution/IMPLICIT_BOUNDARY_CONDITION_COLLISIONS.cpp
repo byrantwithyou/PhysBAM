@@ -62,7 +62,7 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
                         if(simplex.Inside(iterator.Location(),collision_thickness_over_two)){
                             psi_D(iterator.Cell_Index())=true;p(iterator.Cell_Index())=p_inside_solid;}}}}
         else if(RIGID_COLLISION_GEOMETRY_BASE<TV>* object=dynamic_cast<RIGID_COLLISION_GEOMETRY_BASE<TV>*>(&collision_geometry_collection(i))){
-            RIGID_BODY<TV>& rigid_body=dynamic_cast<RIGID_BODY<TV>&>(object->rigid_geometry);
+            RIGID_BODY<TV>& rigid_body=dynamic_cast<RIGID_BODY<TV>&>(object->rigid_body);
             if(!rigid_body.simplicial_object->mesh.incident_elements) rigid_body.simplicial_object->mesh.Initialize_Incident_Elements();
             if(!rigid_body.simplicial_object->mesh.adjacent_elements) rigid_body.simplicial_object->mesh.Initialize_Adjacent_Elements();
             object->Update_Bounding_Box();

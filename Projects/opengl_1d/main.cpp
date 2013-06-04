@@ -157,7 +157,7 @@ Initialize_Components_And_Key_Bindings()
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T,RW>(grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Magenta()),
             "u",'\0',BASIC_VISUALIZATION::OWNED | BASIC_VISUALIZATION::SELECTABLE);
-    filename=basedir+"/%d/rigid_geometry_particles";
+    filename=basedir+"/%d/rigid_body_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_RIGID_BODIES_1D<T>* rigid_body_component=new OPENGL_COMPONENT_RIGID_BODIES_1D<T>(basedir);
         Add_Component(rigid_body_component,"Rigid Bodies",'5',BASIC_VISUALIZATION::OWNED);

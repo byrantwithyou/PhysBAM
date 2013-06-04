@@ -225,7 +225,7 @@ Initialize_Bodies()
 
     PHYSBAM_FATAL_ERROR();
 #if 0
-    SPARSE_UNION_FIND<> particle_connectivity(particles.Size()+rigid_body_collection.rigid_body_particle.Size());
+    SPARSE_UNION_FIND<> particle_connectivity(particles.Size()+rigid_body_collection.rigid_body_particles.Size());
     particle_to_spring_id.Resize(particles.Size());
     edge_springs->Add_Fragment_Connectivity(particle_connectivity);extra_edge_springs->Add_Fragment_Connectivity(particle_connectivity);
     if(torsion_springs) torsion_springs->Add_Fragment_Connectivity(particle_connectivity);bending_springs->Add_Fragment_Connectivity(particle_connectivity);//guide_springs->Add_Fragment_Connectivity(union_find);}

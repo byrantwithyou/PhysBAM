@@ -6,7 +6,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <PhysBAM_Tools/Parallel_Computation/BOUNDARY_MPI.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_DRIVER.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_EXAMPLE.h>
 
@@ -23,7 +23,7 @@ template<class TV> void Write_Substep_Helper(void* writer,const std::string& tit
 //#####################################################################
 template<class TV> INCOMPRESSIBLE_DRIVER<TV>::
 INCOMPRESSIBLE_DRIVER(INCOMPRESSIBLE_EXAMPLE<TV>& example)
-    :example(example),kinematic_evolution(example.rigid_geometry_collection,true)
+    :example(example),kinematic_evolution(example.rigid_body_collection,true)
 {
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }
@@ -60,8 +60,8 @@ Initialize()
     // initialize collision objects
     example.Initialize_Bodies();
     kinematic_evolution.Get_Current_Kinematic_Keyframes(1/example.frame_rate,time);
-    kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time);
-    kinematic_evolution.Set_External_Velocities(example.rigid_geometry_collection.particles.twist,time,time);
+    kinematic_evolution.Set_External_Positions(example.rigid_body_collection.rigid_body_particles.frame,time);
+    kinematic_evolution.Set_External_Velocities(example.rigid_body_collection.rigid_body_particles.twist,time,time);
 
     // mpi
     if(example.mpi_grid) example.mpi_grid->Initialize(example.domain_boundary);
@@ -152,7 +152,7 @@ Add_Forces(const T dt,const T time)
         example.Get_Body_Force(example.incompressible.force,density_ghost,dt,time);}
     example.incompressible.Advance_One_Time_Step_Forces(example.face_velocities,dt,time,true,0,example.number_of_ghost_cells);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
-    kinematic_evolution.Set_External_Velocities(example.rigid_geometry_collection.particles.twist,time+dt,time+dt);
+    kinematic_evolution.Set_External_Velocities(example.rigid_body_collection.rigid_body_particles.twist,time+dt,time+dt);
 }
 //#####################################################################
 // Project
@@ -186,13 +186,13 @@ Advance_To_Target_Time(const T target_time)
         LOG::cout<<"dt is "<<dt<<std::endl;
 
         // kinematic_update
-        kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time);
-        kinematic_evolution.Set_External_Velocities(example.rigid_geometry_collection.particles.twist,time,time);
-        for(int i=0;i<example.rigid_geometry_collection.kinematic_rigid_geometry.m;i++){
-            RIGID_GEOMETRY<TV>& rigid_geometry=example.rigid_geometry_collection.Rigid_Geometry(i);            
-            rigid_geometry.Frame().t+=dt*rigid_geometry.Twist().linear;
-            rigid_geometry.Frame().r=ROTATION<TV>::From_Rotation_Vector(dt*rigid_geometry.Twist().angular)*rigid_geometry.Frame().r;rigid_geometry.Frame().r.Normalize();}
-        kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time+dt);
+        kinematic_evolution.Set_External_Positions(example.rigid_body_collection.rigid_body_particles.frame,time);
+        kinematic_evolution.Set_External_Velocities(example.rigid_body_collection.rigid_body_particles.twist,time,time);
+        for(int i=0;i<example.rigid_body_collection.kinematic_rigid_bodies.m;i++){
+            RIGID_BODY<TV>& rigid_body=example.rigid_body_collection.Rigid_Body(i);            
+            rigid_body.Frame().t+=dt*rigid_body.Twist().linear;
+            rigid_body.Frame().r=ROTATION<TV>::From_Rotation_Vector(dt*rigid_body.Twist().angular)*rigid_body.Frame().r;rigid_body.Frame().r.Normalize();}
+        kinematic_evolution.Set_External_Positions(example.rigid_body_collection.rigid_body_particles.frame,time+dt);
 
         RUNGEKUTTA<ARRAY<T,TV_INT> > rungekutta_scalar(example.density,example.order,dt,time);
         for(RUNGEKUTTA<ARRAY<T,FACE_INDEX<TV::dimension> > > rungekutta_u(example.face_velocities,example.order,dt,time);rungekutta_u.Valid();){

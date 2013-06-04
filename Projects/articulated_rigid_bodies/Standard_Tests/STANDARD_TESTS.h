@@ -870,7 +870,7 @@ void Test_System_Prestabilization(const JOINT_ID joint_id)
 //#####################################################################
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     if(test_number==25 || test_number==26){
         ODE_SOLVER<T,VECTOR<T,2> > rk;
         nonlinear_pendulum.y_not=rk.Runge_Kutta_4(nonlinear_pendulum,nonlinear_pendulum.y_not,0,(T)1.0/frame_rate,50);

@@ -720,7 +720,7 @@ void Get_Initial_Data()
             tests.Add_Ground();
             RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",(T).25,(T)0);
             body.Frame().t.z=(T).5;
-            if(test_number==5) rigid_body_collection.rigid_body_particle.kinematic(body.particle_index)=true;
+            if(test_number==5) rigid_body_collection.rigid_body_particles.kinematic(body.particle_index)=true;
             if(test_number==45){
                 body.is_static=true;body.Frame().t=TV(.75,.2,.5);
                 deformable_body_collection.collisions.thickness_table=new HASHTABLE<int,T>();
@@ -759,7 +759,7 @@ void Get_Initial_Data()
             tests.Add_Ground((T).1);
             RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T).25,(T)1);
             sphere_body.Frame().t=TV(0,(T).30,0);
-            rigid_body_collection.rigid_body_particle.kinematic(sphere_body.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(sphere_body.particle_index)=true;
             RIGID_BODY<TV>& body=tests.Add_Rigid_Body("cut_pyramid",(T).1,(T).1);
             body.Frame().t=TV((T)-.65,(T).05,(T).65);body.Frame().r=ROTATION<TV>((T)-pi/2,TV(1,0,0))*body.Frame().r;
             body.is_static=true;}
@@ -1636,7 +1636,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             case 51:
             case 24:{
                 VECTOR<int,3> processes_per_dimension(2,1,1);
-                solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,processes_per_dimension);
+                solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection,particles.X,processes_per_dimension);
                 //solid_body_collection.deformable_body_collection.mpi_solids->KD_Tree_Partition(solids_parameters.deformable_body_collection,particles.X.array);
                 break;}
             case 5:
@@ -1651,7 +1651,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             case 45:{
                 LOG::cout<<"particles.Size()="<<particles.Size()<<std::endl;
                 //solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection,particles.X.array,VECTOR<int,3>(4,1,1));
-                solid_body_collection.deformable_body_collection.mpi_solids->KD_Tree_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,ARRAY<TV>(particles.X));
+                solid_body_collection.deformable_body_collection.mpi_solids->KD_Tree_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection,ARRAY<TV>(particles.X));
                 FILE_UTILITIES::Write_To_File<T>(output_directory+"/particles_of_partition",solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition);
                 break;}
             default:

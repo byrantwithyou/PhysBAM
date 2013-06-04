@@ -2,7 +2,7 @@
 // Copyright 2009, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <PhysBAM_Tools/Matrices/FRAME.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Particles/PARTICLES.h>
@@ -34,7 +34,7 @@ static int Initialize_Geometry_Particle()
 {
     Register_Attribute_Name(ATTRIBUTE_ID_FRAME,"frame");
     Register_Attribute_Name(ATTRIBUTE_ID_TWIST,"twist");
-    Register_Attribute_Name(ATTRIBUTE_ID_RIGID_GEOMETRY,"rigid_geometry");
+    Register_Attribute_Name(ATTRIBUTE_ID_RIGID_BODY,"rigid_body");
     Register_Attribute_Name(ATTRIBUTE_ID_X,"X");
     Register_Attribute_Name(ATTRIBUTE_ID_V,"V");
     Register_Attribute_Name(ATTRIBUTE_ID_STRUCTURE_IDS,"structure_ids");
@@ -51,6 +51,8 @@ static int Initialize_Geometry_Particle()
     #define READ_WRITE_SCALAR_HELPER(T) \
         Register_Attribute_Sample<T>(); \
         Register_Attribute_Sample<VECTOR<T,0> >(); \
+        Register_Attribute_Sample<DIAGONAL_MATRIX<T,1> >(); \
+        Register_Attribute_Sample<DIAGONAL_MATRIX<T,2> >(); \
         Register_Attribute_Sample<DIAGONAL_MATRIX<T,3> >(); \
         Register_Attribute_Sample<MATRIX<T,1,1> >(); \
         Register_Attribute_Sample<MATRIX<T,0,0> >(); \

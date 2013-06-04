@@ -10,7 +10,6 @@
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

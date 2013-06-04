@@ -121,7 +121,7 @@ public:
     //    LOG::cout<<"cluster parent "<<iterator.Key()<<std::endl; 
     //    for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<iterator.Data().children.Size();j++)
     //        LOG::cout<<"   constituent "<<iterator.Data().children(j)<<std::endl;}
-    //for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
+    //for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
     //    LOG::cout<<"rigid "<<i<<" -> "<<(i<=bindings.binding_index.m?bindings.binding_index(i).x:0)<<std::endl;}
     return parents_to_rebuild.m>0;}
 

@@ -155,7 +155,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     rect.Frame().t=domain.Minimum_Corner()+TV((T).8*grid_size.x,(T).5*grid_size.y);
     rect.Is_Kinematic()=false;
 
-    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);
+    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 
     VECTOR<T,T_GRID::dimension+2>& solid_state=fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state;
     EOS_GAMMA<T> *tmp_eos=dynamic_cast<EOS_GAMMA<T>*>(fluids_parameters.euler->eos);

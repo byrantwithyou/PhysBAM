@@ -186,7 +186,7 @@ Merge(const int frame)
         if(merge_removed_particle_times) Merge_Lists<ARRAY<PAIR<int,T> > >(f+"removed_particle_times");}
     if(merge_solid_fluid){
         solid_body_collection->rigid_body_collection.Read(STREAM_TYPE(RW()),STRING_UTILITIES::string_sprintf("%s/1/",input_directory.c_str()),frame,&needs_init);
-        solid_body_collection->rigid_body_collection.rigid_geometry_collection.structure_list.Fill_Needs_Write();
+        solid_body_collection->rigid_body_collection.structure_list.Fill_Needs_Write();
         solid_body_collection->rigid_body_collection.Write(STREAM_TYPE(RW()),output_directory,frame);
         bool include_static_frame=frame==0;
         std::string prefix=STRING_UTILITIES::string_sprintf("%s/1/",input_directory.c_str());

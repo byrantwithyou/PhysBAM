@@ -11,10 +11,10 @@
 #include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
 
 namespace PhysBAM{
@@ -36,7 +36,7 @@ class STRAWMAN_EXAMPLE
     T initial_distance;          // d0
     T solid_velocity;            // vS
 
-    RIGID_GEOMETRY_COLLECTION<TV> rigid_geometry_collection;
+    RIGID_BODY_COLLECTION<TV> rigid_body_collection;
 
     inline TV fluid_velocity_field(const TV& X,const T& time) const
     {return TV(-X(2)/(initial_distance+solid_velocity*time));}
@@ -51,7 +51,7 @@ class STRAWMAN_EXAMPLE
     STRAWMAN_EXAMPLE(const int resolution=100)
         : stream_type(T()),resolution(resolution),frame(0),grid(TV_INT(resolution),RANGE<TV>(TV((T)-1),TV(0)),true),
         velocity(grid.Domain_Indices(3)),rho_with_extrapolation(grid.Domain_Indices(3)),rho_fixed(grid.Domain_Indices(3)),
-                 rho_tmp(grid.Domain_Indices(3)),initial_distance((T)-.5),solid_velocity((T)-1),rigid_geometry_collection(0)
+         rho_tmp(grid.Domain_Indices(3)),initial_distance((T)-.5),solid_velocity((T)-1),rigid_body_collection(0,0)
     {output_directory=STRING_UTILITIES::string_sprintf("Strawman_Example/Solution_Resolution_%d",resolution);}
 
 //#####################################################################
@@ -60,10 +60,10 @@ class STRAWMAN_EXAMPLE
 void Initialize()
 {
     // All this just to get a stupid line...
-    RIGID_GEOMETRY<TV>& rigid_geometry=*new RIGID_GEOMETRY<TV>(rigid_geometry_collection,true);
+    RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
     ANALYTIC_IMPLICIT_OBJECT<POINT_SIMPLEX_1D<T> >& implicit_structure=
         *new ANALYTIC_IMPLICIT_OBJECT<POINT_SIMPLEX_1D<T> >(POINT_SIMPLEX_1D<T>(TV(0),true));
-    rigid_geometry.Add_Structure(implicit_structure);
+    rigid_body.Add_Structure(implicit_structure);
 
     GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
     POINT_SIMPLICES_1D<T>& segmented_curve=*POINT_SIMPLICES_1D<T>::Create(particles);
@@ -73,13 +73,13 @@ void Initialize()
     segmented_curve.mesh.elements.Append(TV_INT(1));segmented_curve.mesh.directions(1)=false;
     segmented_curve.mesh.elements.Append(TV_INT(2));segmented_curve.mesh.directions(2)=true;
     segmented_curve.Update_Point_Simplex_List();
-    rigid_geometry.Add_Structure(segmented_curve);
-    rigid_geometry_collection.Add_Rigid_Geometry(&rigid_geometry,stream_type,"",(T)1,false,false,false,false);
+    rigid_body.Add_Structure(segmented_curve);
+    rigid_body_collection.Add_Rigid_Body(&rigid_body,stream_type,"",(T)1,false,false,false,false);
 
-    rigid_geometry_collection.particles.structure_ids(1)=VECTOR<int,3>();
-    rigid_geometry_collection.particles.structure_ids(1)(1)=rigid_geometry_collection.structure_list.Add_Element(rigid_geometry.structures(1));
-    rigid_geometry_collection.particles.structure_ids(1)(2)=rigid_geometry_collection.structure_list.Add_Element(rigid_geometry.structures(2));
-    rigid_geometry_collection.Update_Kinematic_Particles();
+    rigid_body_collection.rigid_body_particles.structure_ids(1)=VECTOR<int,3>();
+    rigid_body_collection.rigid_body_particles.structure_ids(1)(1)=rigid_body_collection.structure_list.Add_Element(rigid_body.structures(1));
+    rigid_body_collection.rigid_body_particles.structure_ids(1)(2)=rigid_body_collection.structure_list.Add_Element(rigid_body.structures(2));
+    rigid_body_collection.Update_Kinematic_Particles();
 
     FILE_UTILITIES::Create_Directory(output_directory);
     FILE_UTILITIES::Create_Directory(output_directory+"/common");
@@ -199,8 +199,8 @@ void Write_Output_Files(const T& time,const std::string& frame_title)
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/rho_fixed",rho_fixed);
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/center_velocities",velocity);
 
-    rigid_geometry_collection.particles.frame(1).t.x=solid_position(time);
-    rigid_geometry_collection.Write(stream_type,output_directory,frame);
+    rigid_body_collection.rigid_body_particles.frame(1).t.x=solid_position(time);
+    rigid_body_collection.Write(stream_type,output_directory,frame);
 
     ARRAY<T,TV_INT> rho_analytic(grid.Domain_Indices(3));
     for(CELL_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next()){

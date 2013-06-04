@@ -288,7 +288,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE{
                 solids_evolution->rigid_body_collisions->collision_manager=new RIGID_BODY_COLLISION_MANAGER_HASH;}
             RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager=dynamic_cast<RIGID_BODY_COLLISION_MANAGER_HASH*>(solids_evolution->rigid_body_collisions->collision_manager);
             assert(collision_manager);
-            for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.Size();i++) 
+            for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particles.Size();i++) 
                 if(i==ground->particle_index){
                     collision_manager->hash.Insert(PAIR<int,int>(i,ground->particle_index));
                     collision_manager->hash.Insert(PAIR<int,int>(ground->particle_index,i));}}

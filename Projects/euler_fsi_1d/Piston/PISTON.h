@@ -248,8 +248,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     rigid_body->Is_Kinematic()=true;
     piston=rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);
 
-    inaccurate_union->collision_bodies.Add_Bodies(rigid_body_collection.rigid_geometry_collection);
-    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);
+    inaccurate_union->collision_bodies.Add_Bodies(rigid_body_collection);
+    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 
     VECTOR<T,T_GRID::dimension+2>& solid_state=fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state;
     EOS_GAMMA<T> *tmp_eos=dynamic_cast<EOS_GAMMA<T>*>(fluids_parameters.euler->eos);

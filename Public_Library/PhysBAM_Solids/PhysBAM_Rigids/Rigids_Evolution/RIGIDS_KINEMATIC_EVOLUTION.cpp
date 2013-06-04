@@ -8,7 +8,7 @@
 using namespace PhysBAM;
 template<class TV> RIGIDS_KINEMATIC_EVOLUTION<TV>::
 RIGIDS_KINEMATIC_EVOLUTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,bool use_kinematic_keyframes_input)
-    :BASE(rigid_body_collection_input.rigid_geometry_collection,use_kinematic_keyframes_input),rigid_body_collection(rigid_body_collection_input)
+    :BASE(rigid_body_collection_input,use_kinematic_keyframes_input),rigid_body_collection(rigid_body_collection_input)
 {
 }
 template<class TV> RIGIDS_KINEMATIC_EVOLUTION<TV>::
@@ -21,7 +21,7 @@ template<class TV> RIGIDS_KINEMATIC_EVOLUTION<TV>::
 template<class TV> void RIGIDS_KINEMATIC_EVOLUTION<TV>::
 Set_External_Velocities(TWIST<TV>& twist,const T time,const int id)
 {
-    assert(rigid_body_collection.rigid_body_particle.kinematic(id));
+    assert(rigid_body_collection.rigid_body_particles.kinematic(id));
     BASE::Set_External_Velocities(twist,time,id);
 }
 //#####################################################################
@@ -31,7 +31,7 @@ template<class TV> void RIGIDS_KINEMATIC_EVOLUTION<TV>::
 Set_Kinematic_Velocities(TWIST<TV>& twist,const T frame_dt,const T time,const int id)
 {
     RIGID_BODY<TV>* rigid_body=&rigid_body_collection.Rigid_Body(id);
-    assert(rigid_body_collection.rigid_body_particle.kinematic(id));
+    assert(rigid_body_collection.rigid_body_particles.kinematic(id));
     int index=rigid_body->particle_index;
     int new_id=id;
     if(rigid_body_collection.rigid_body_cluster_bindings.Is_Parent(index)){
@@ -47,7 +47,7 @@ template<class TV> void RIGIDS_KINEMATIC_EVOLUTION<TV>::
 Set_External_Positions(FRAME<TV>& frame,const T time,const int id)
 {
     RIGID_BODY<TV>* rigid_body=&rigid_body_collection.Rigid_Body(id);
-    assert(rigid_body_collection.rigid_body_particle.kinematic(id));
+    assert(rigid_body_collection.rigid_body_particles.kinematic(id));
     int new_id=id;
     int index=rigid_body->particle_index;
     if(rigid_body_collection.rigid_body_cluster_bindings.Is_Parent(index)){

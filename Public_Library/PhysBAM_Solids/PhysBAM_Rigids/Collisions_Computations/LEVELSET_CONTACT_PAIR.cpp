@@ -6,7 +6,6 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Matrices/FRAME.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_INTERSECTIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_PARTICLE_INTERSECTION.h>
@@ -57,10 +56,10 @@ bool Update_Levelset_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisio
                 TV location=body1.World_Space_Point(intersection.particle_location);
                 // use extended normal so it's defined if we're outside the body in the old configuration
                 TV normal=rigid_body_collisions.use_parent_normal?body_parent2.implicit_object->Extended_Normal(location):body2.implicit_object->Extended_Normal(location);
-                TV relative_velocity=RIGID_GEOMETRY<TV>::Relative_Velocity_At_Geometry1_Particle(body_parent1,body_parent2,location,intersection.particle_index);
+                TV relative_velocity=RIGID_BODY<TV>::Relative_Velocity_At_Geometry1_Particle(body_parent1,body_parent2,location,intersection.particle_index);
 
                 if(TV::Dot_Product(relative_velocity,normal)<0){ // approaching in *old configuration*
-                    //TODO: need to add pair to rigid_body_particle_intersections if separating?
+                    //TODO: need to add pair to rigid_body_particles_intersections if separating?
                     smallest_value=phi;smallest_index=i;collision_location=location;collision_normal=normal;collision_relative_velocity=relative_velocity;}}}
         if(smallest_index>=0){
             if(parent_id_1!=id_1) collision_callbacks.Exchange_Frame(id_1);

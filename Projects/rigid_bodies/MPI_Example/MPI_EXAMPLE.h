@@ -18,8 +18,8 @@
 #define __MPI_EXAMPLE__
 
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Geometry/Tessellation/RANGE_TESSELLATION.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Forces_And_Torques/RIGID_GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
@@ -318,7 +318,7 @@ void Many_Sphere_Test()
     last_frame=300;
      VECTOR<T,3> num_bodies=TV(40,200,40);
      for(int i=0;i<num_bodies.x;i++) for(int j=0;j<num_bodies.y;j++) for(int k=0;k<num_bodies.z;k++){
-        RIGID_BODY_PARTICLES<TV>& particles=solid_body_collection.rigid_body_collection.rigid_body_particle;    
+        RIGID_BODY_PARTICLES<TV>& particles=solid_body_collection.rigid_body_collection.rigid_body_particles;    
         RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(solid_body_collection.rigid_body_collection);
         T radius=1;TV center;
         T offset=.1,offset2=.1;if(j%2==0){offset=-.1;offset2=-.1;}
@@ -330,8 +330,8 @@ void Many_Sphere_Test()
         SPHERE<TV> sphere(TV(0,0,0),radius);
         rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(sphere));
         solid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
-        solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body),rigid_body.particle_index,true);
-        solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->Get_Collision_Geometry(rigid_body.particle_index)->add_to_spatial_partition=true;}
+        solid_body_collection.rigid_body_collection.collision_body_list->Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body),rigid_body.particle_index,true);
+        solid_body_collection.rigid_body_collection.collision_body_list->Get_Collision_Geometry(rigid_body.particle_index)->add_to_spatial_partition=true;}
     tests.Add_Ground((T).5,0,0);
     RIGID_GRAVITY<TV> *gravity=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,true);
     solid_body_collection.rigid_body_collection.Add_Force(gravity);
@@ -344,7 +344,7 @@ void Break_Levelset()
     typedef VECTOR<int,TV::dimension> TV_INT;
     ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> children;
     ARRAY<int>* referenced_rigid_particles=new ARRAY<int>;
-    RIGID_BODY_PARTICLES<TV>& particles=solid_body_collection.rigid_body_collection.rigid_body_particle;    
+    RIGID_BODY_PARTICLES<TV>& particles=solid_body_collection.rigid_body_collection.rigid_body_particles;    
     GRID<TV>& grid=*new GRID<TV>;
     ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >;
     LEVELSET<TV> levelset(grid,phi);
@@ -371,8 +371,8 @@ void Break_Levelset()
         if(!surface) surface=TESSELLATION::Generate_Triangles(box);
         rigid_body.Add_Structure(*surface);  
         solid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
-        solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body),rigid_body.particle_index,true);
-        solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->Get_Collision_Geometry(rigid_body.particle_index)->add_to_spatial_partition=true;}
+        solid_body_collection.rigid_body_collection.collision_body_list->Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body),rigid_body.particle_index,true);
+        solid_body_collection.rigid_body_collection.collision_body_list->Get_Collision_Geometry(rigid_body.particle_index)->add_to_spatial_partition=true;}
     tests.Add_Ground((T).5,-2,0);
     
     solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));

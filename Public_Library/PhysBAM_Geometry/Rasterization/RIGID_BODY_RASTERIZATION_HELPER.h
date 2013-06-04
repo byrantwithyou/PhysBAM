@@ -4,17 +4,17 @@
 //#####################################################################
 // Namespace RASTERIZATION
 //##################################################################### 
-#ifndef __RIGID_GEOMETRY_RASTERIZATION_HELPER__
-#define __RIGID_GEOMETRY_RASTERIZATION_HELPER__
+#ifndef __RIGID_BODY_RASTERIZATION_HELPER__
+#define __RIGID_BODY_RASTERIZATION_HELPER__
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/RIGID_GEOMETRY_RASTERIZATION_UNIFORM.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/RIGID_BODY_RASTERIZATION_UNIFORM.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 namespace PhysBAM{
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template<class T_GRID,class COLLISION_GEOMETRY_ID> class OBJECTS_IN_CELL;
@@ -23,21 +23,21 @@ namespace RASTERIZATION{
 //#####################################################################
 // Function Prepare_For_World_Space_Simplex_Bounding_Box
 //#####################################################################
-template<class T> void Prepare_For_World_Space_Simplex_Bounding_Box(const RIGID_GEOMETRY<VECTOR<T,1> >& rigid_geometry)
+template<class T> void Prepare_For_World_Space_Simplex_Bounding_Box(const RIGID_BODY<VECTOR<T,1> >& rigid_body)
 {}
 //#####################################################################
 // Function Prepare_For_World_Space_Simplex_Bounding_Box
 //#####################################################################
-template<class T> void Prepare_For_World_Space_Simplex_Bounding_Box(const RIGID_GEOMETRY<VECTOR<T,2> >& rigid_geometry)
+template<class T> void Prepare_For_World_Space_Simplex_Bounding_Box(const RIGID_BODY<VECTOR<T,2> >& rigid_body)
 {
-    if(!rigid_geometry.simplicial_object->segment_list) const_cast<RIGID_GEOMETRY<VECTOR<T,2> >&>(rigid_geometry).simplicial_object->Update_Segment_List();
+    if(!rigid_body.simplicial_object->segment_list) const_cast<RIGID_BODY<VECTOR<T,2> >&>(rigid_body).simplicial_object->Update_Segment_List();
 }
 //#####################################################################
 // Function Prepare_For_World_Space_Simplex_Bounding_Box
 //#####################################################################
-template<class T> void Prepare_For_World_Space_Simplex_Bounding_Box(const RIGID_GEOMETRY<VECTOR<T,3> >& rigid_geometry)
+template<class T> void Prepare_For_World_Space_Simplex_Bounding_Box(const RIGID_BODY<VECTOR<T,3> >& rigid_body)
 {
-    if(!rigid_geometry.simplicial_object->triangle_list) const_cast<RIGID_GEOMETRY<VECTOR<T,3> >&>(rigid_geometry).simplicial_object->Update_Triangle_List();
+    if(!rigid_body.simplicial_object->triangle_list) const_cast<RIGID_BODY<VECTOR<T,3> >&>(rigid_body).simplicial_object->Update_Triangle_List();
 }
 //#####################################################################
 // Function Rasterize_Object_Generic
@@ -47,7 +47,7 @@ template<class TV,class T_GRID> void Rasterize_Object_Generic(const COLLISION_GE
 {
     const RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry;
     rigid_collision_geometry=dynamic_cast<const RIGID_COLLISION_GEOMETRY<TV>*>(&collision_geometry);
-    if(rigid_collision_geometry) Prepare_For_World_Space_Simplex_Bounding_Box(rigid_collision_geometry->rigid_geometry);
+    if(rigid_collision_geometry) Prepare_For_World_Space_Simplex_Bounding_Box(rigid_collision_geometry->rigid_body);
     if(collision_geometry.Number_Of_Simplices())
         for(int t=0;t<collision_geometry.Number_Of_Simplices();t++){
             typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;
@@ -77,7 +77,7 @@ Compute_Occupied_Blocks_Generic(const COLLISION_GEOMETRY<TV>& collision_geometry
 {
     const RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry;
     rigid_collision_geometry=dynamic_cast<const RIGID_COLLISION_GEOMETRY<TV>*>(&collision_geometry);
-    if(rigid_collision_geometry) Prepare_For_World_Space_Simplex_Bounding_Box(rigid_collision_geometry->rigid_geometry);
+    if(rigid_collision_geometry) Prepare_For_World_Space_Simplex_Bounding_Box(rigid_collision_geometry->rigid_body);
     for(int t=0;t<collision_geometry.Number_Of_Simplices();t++){
         typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;
         T_SIMPLEX simplex=collision_geometry.World_Space_Simplex(t);

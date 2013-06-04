@@ -7,35 +7,37 @@
 #ifndef __RIGID_BODY_STATE__
 #define __RIGID_BODY_STATE__
 
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_STATE.h>
+#include <PhysBAM_Tools/Matrices/FRAME.h>
+#include <PhysBAM_Tools/Vectors/TWIST.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_MASS.h>
 namespace PhysBAM{
 
 template<class TV>
-class RIGID_BODY_STATE:public RIGID_GEOMETRY_STATE<TV>
+class RIGID_BODY_STATE
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
-    typedef RIGID_GEOMETRY_STATE<TV> BASE;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
-    using BASE::frame;using BASE::twist;using BASE::Object_Space_Vector;using BASE::World_Space_Vector;
+    T time;
+    FRAME<TV> frame;
+    TWIST<TV> twist;
     T_SPIN angular_momentum;
 
     RIGID_BODY_STATE()
-        :BASE(),angular_momentum()
+        :time(0)
     {}
 
     RIGID_BODY_STATE(const FRAME<TV>& frame_input)
-       :BASE(frame_input),angular_momentum()
+        :time(0),frame(frame_input)
     {}
 
     RIGID_BODY_STATE(const FRAME<TV>& frame_input,const TWIST<TV>& twist_input)
-       :BASE(frame_input,twist_input),angular_momentum()
+        :time(0),frame(frame_input),twist(twist_input)
     {}
 
     template<class TV2> explicit RIGID_BODY_STATE(const RIGID_BODY_STATE<TV2>& state_input)
-        :BASE(state_input),angular_momentum(state_input.angular_momentum)
+        :time(state_input.time),frame(state_input.frame),twist(state_input.twist),angular_momentum(state_input.angular_momentum)
     {}
 
     SYMMETRIC_MATRIX<T,0> World_Space_Inertia_Tensor(const DIAGONAL_MATRIX<T,0> moment_of_inertia) const // relative to the center of mass
@@ -87,6 +89,26 @@ public:
 
     template<class RW> void Write(std::ostream& output) const
     {char version=1;Write_Binary<RW>(output,version,time,frame,twist.linear,angular_momentum,twist.angular);}
+
+    static void Compute_Velocity_Between_States(const RIGID_BODY_STATE& state1,const RIGID_BODY_STATE& state2,RIGID_BODY_STATE& result_state)
+    {T one_over_dt=1/(state2.time-state1.time);
+    result_state.twist.linear=one_over_dt*(state2.frame.t-state1.frame.t);
+    result_state.twist.angular=one_over_dt*(state2.frame.r*state1.frame.r.Inverse()).Rotation_Vector();}
+
+    TV Object_Space_Point(const TV& world_space_point) const
+    {return frame.Inverse_Times(world_space_point);}
+
+    TV Object_Space_Vector(const TV& world_space_vector) const
+    {return frame.r.Inverse_Rotate(world_space_vector);}
+
+    TV World_Space_Point(const TV& object_space_point) const
+    {return frame*object_space_point;}
+
+    TV World_Space_Vector(const TV& object_space_vector) const
+    {return frame.r.Rotate(object_space_vector);}
+
+    TV Pointwise_Object_Velocity(const TV& X) const
+    {return twist.linear+TV::Cross_Product(twist.angular,X-frame.t);}
 
 //#####################################################################
 };

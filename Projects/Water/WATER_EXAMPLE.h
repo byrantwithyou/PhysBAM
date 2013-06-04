@@ -22,7 +22,7 @@ template<class T_GRID> class LEVELSET_MULTIPLE_UNIFORM;
 
 //TODO: Should adventually derive off of a incompressible project
 template<class TV>
-class WATER_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >,RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV>
+class WATER_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >,RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
@@ -56,7 +56,7 @@ public:
     BOUNDARY<TV,T> *boundary,*phi_boundary;
     T_BOUNDARY_PHI_WATER phi_boundary_water;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
-    RIGID_GEOMETRY_COLLECTION<TV> rigid_geometry_collection;
+    RIGID_BODY_COLLECTION<TV> rigid_body_collection;
     T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;
     ARRAY<IMPLICIT_OBJECT<TV>*> sources;
 

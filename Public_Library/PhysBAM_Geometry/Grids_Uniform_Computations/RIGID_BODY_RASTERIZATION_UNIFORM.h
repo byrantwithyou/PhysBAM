@@ -4,8 +4,8 @@
 //#####################################################################
 // Namespace RASTERIZATION
 //##################################################################### 
-#ifndef __RIGID_GEOMETRY_RASTERIZATION_UNIFORM__
-#define __RIGID_GEOMETRY_RASTERIZATION_UNIFORM__
+#ifndef __RIGID_BODY_RASTERIZATION_UNIFORM__
+#define __RIGID_BODY_RASTERIZATION_UNIFORM__
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
 
 namespace PhysBAM{

@@ -50,7 +50,7 @@ Compute_Position_Based_State(const T dt,const T time)
     if(!global_post_stabilization) return;
 
     // build global poststabilization matrix
-    ARRAY<ARRAY<PAIR<int,bool> >,int> joints_on_rigid_body(rigid_body_collection.rigid_body_particle.Size()); // stores joint id and whether it's parent for joint.
+    ARRAY<ARRAY<PAIR<int,bool> >,int> joints_on_rigid_body(rigid_body_collection.rigid_body_particles.Size()); // stores joint id and whether it's parent for joint.
     ARRAY<TV> joint_location(joint_mesh.joints.m);
     ARRAY<MATRIX_MXN<T> > joint_constraint_matrix(joint_mesh.joints.m),joint_muscle_control_matrix(joint_mesh.joints.m);
     joint_constrained_dimensions.Resize(joint_mesh.joints.m);joint_constrained_dimensions.Fill(0);

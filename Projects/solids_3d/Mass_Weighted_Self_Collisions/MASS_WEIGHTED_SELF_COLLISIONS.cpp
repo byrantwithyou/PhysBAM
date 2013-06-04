@@ -138,7 +138,7 @@ Initialize_Bodies()
     // add structures and rigid bodies to collisions
     deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
-    solid_body_collection.collision_body_list.Add_Bodies(*solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list);
+    solid_body_collection.collision_body_list.Add_Bodies(*solid_body_collection.rigid_body_collection.collision_body_list);
 
     // number nodes
     for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();

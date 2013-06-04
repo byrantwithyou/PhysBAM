@@ -65,7 +65,7 @@ public:
     ARRAY<FRAME<TV> > displacement;
     // TODO: make this per superfragment once rigid bodies can be in more than one superfragment
 public:
-    HASHTABLE<TRIPLE<int,int,TV> > rigid_body_particle_intersections; // elements are body1,body2,body1_location
+    HASHTABLE<TRIPLE<int,int,TV> > rigid_body_particles_intersections; // elements are body1,body2,body1_location
     bool store_collision_intersections_for_projection;
     bool use_static_body_masses;
     bool use_parent_normal;

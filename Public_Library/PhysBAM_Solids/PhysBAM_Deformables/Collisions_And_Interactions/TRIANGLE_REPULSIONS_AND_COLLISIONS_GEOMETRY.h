@@ -34,7 +34,7 @@ public:
     ARRAY<STRUCTURE_INTERACTION_GEOMETRY<TV>*> structure_geometries;
     ARRAY<VECTOR<int,2> > interacting_structure_pairs;
     ARRAY<TV> X_self_collision_free,V_self_collision_free;
-    //ARRAY<RIGID_BODY_STATE<TV> > rigid_body_particle_state_collision_free;
+    //ARRAY<RIGID_BODY_STATE<TV> > rigid_body_particles_state_collision_free;
     ARRAY<bool> modified_full;
     HASHTABLE<VECTOR<int,d+1> > intersecting_point_face_pairs;
     HASHTABLE<VECTOR<int,2*d-2> > intersecting_edge_edge_pairs;

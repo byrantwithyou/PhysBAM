@@ -564,8 +564,8 @@ void Bounding_Edge_From_Endpoints(int i,const TV& p1,const TV& p2,typename VBC::
     plane_types[i]=t;
 
     int id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/ground",len/200);
-    solid_body_collection.rigid_body_collection.rigid_body_particle.frame(id).t=planes[i].x1;
-    solid_body_collection.rigid_body_collection.rigid_body_particle.frame(id).r=ROTATION<VECTOR<T,2> >::From_Rotated_Vector(TV(0,1),planes[i].normal);
+    solid_body_collection.rigid_body_collection.rigid_body_particles.frame(id).t=planes[i].x1;
+    solid_body_collection.rigid_body_collection.rigid_body_particles.frame(id).r=ROTATION<VECTOR<T,2> >::From_Rotated_Vector(TV(0,1),planes[i].normal);
     solid_body_collection.rigid_body_collection.Rigid_Body(id).is_static=true;
 }
 //#####################################################################

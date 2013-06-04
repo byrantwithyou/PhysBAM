@@ -14,7 +14,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) con
     if(!gravity) return;
     TV acceleration=gravity*downward_direction;
     for(ELEMENT_ITERATOR iterator(force_rigid_body_particles);iterator.Valid();iterator.Next()){
-        int p=iterator.Data();rigid_F(p).linear+=rigid_body_collection.rigid_body_particle.mass(p)*acceleration;}
+        int p=iterator.Data();rigid_F(p).linear+=rigid_body_collection.rigid_body_particles.mass(p)*acceleration;}
 }
 //#####################################################################
 // Function Potential_Energy
@@ -25,7 +25,7 @@ Potential_Energy(const T time) const
     T potential_energy=0;
     TV acceleration=gravity*downward_direction;
     for(ELEMENT_ITERATOR iterator(force_rigid_body_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
-        potential_energy-=rigid_body_collection.rigid_body_particle.mass(p)*TV::Dot_Product(rigid_body_collection.rigid_body_particle.frame(p).t,acceleration);}
+        potential_energy-=rigid_body_collection.rigid_body_particles.mass(p)*TV::Dot_Product(rigid_body_collection.rigid_body_particles.frame(p).t,acceleration);}
     return potential_energy;
 }
 //#####################################################################

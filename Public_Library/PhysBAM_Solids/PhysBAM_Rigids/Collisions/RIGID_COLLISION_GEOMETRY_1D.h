@@ -8,10 +8,10 @@
 #define __RIGID_COLLISION_GEOMETRY_1D__
 
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
 namespace PhysBAM{
 
-template<class TV> class RIGID_GEOMETRY;
+template<class TV> class RIGID_BODY;
 template<class TV> class RIGID_COLLISION_GEOMETRY;
 
 template<class T_input>
@@ -21,9 +21,9 @@ class RIGID_COLLISION_GEOMETRY<VECTOR<T_input,1> >:public RIGID_COLLISION_GEOMET
     typedef VECTOR<T,1> TV;
     typedef RIGID_COLLISION_GEOMETRY_BASE<TV> BASE;
 public:
-    using BASE::saved_states;using BASE::rigid_geometry;using BASE::collision_thickness;
+    using BASE::saved_states;using BASE::rigid_body;using BASE::collision_thickness;
 
-    RIGID_COLLISION_GEOMETRY(RIGID_GEOMETRY<TV>& rigid_body_input);
+    RIGID_COLLISION_GEOMETRY(RIGID_BODY<TV>& rigid_body_input);
     ~RIGID_COLLISION_GEOMETRY();
 
 //#####################################################################

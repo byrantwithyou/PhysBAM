@@ -7,10 +7,9 @@
 #include <PhysBAM_Tools/Particles/PARTICLES_FORWARD.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <fstream>
 #include <iostream>
@@ -26,14 +25,12 @@ void Dump_Rigid_Baody_Simplicial_Object_Particles(const STREAM_TYPE& stream_type
     RIGID_BODY_COLLECTION<TV> rigid_body_collection(0,0);
     rigid_body_collection.Read(stream_type,basedir,0,&needs_init);
     rigid_body_collection.Read(stream_type,basedir,frame,&needs_init);
-    
-    RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection=rigid_body_collection.rigid_geometry_collection;
-    RIGID_GEOMETRY<TV>& rigid_geometry=rigid_geometry_collection.Rigid_Geometry(rigid_body_id);
+    RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(rigid_body_id);
 
-    *output_stream<<"Number of Particles="<<rigid_geometry.simplicial_object->particles.Size()<<std::endl;
-    for(int t=0;t<rigid_geometry.simplicial_object->particles.Size();t++){
-        TV X=rigid_geometry.simplicial_object->particles.X(t);
-        *output_stream<<"X("<<t<<")="<<rigid_geometry.Frame()*X<<std::endl;}
+    *output_stream<<"Number of Particles="<<rigid_body.simplicial_object->particles.Size()<<std::endl;
+    for(int t=0;t<rigid_body.simplicial_object->particles.Size();t++){
+        TV X=rigid_body.simplicial_object->particles.X(t);
+        *output_stream<<"X("<<t<<")="<<rigid_body.Frame()*X<<std::endl;}
 }
 int main(int argc,char *argv[])
 {

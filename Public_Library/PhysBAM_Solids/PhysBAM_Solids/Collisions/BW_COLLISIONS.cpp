@@ -37,7 +37,7 @@ template<class TV> void BW_COLLISIONS<TV>::
 Detect_Cloth_Body_Contact()
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
 
     // Detect cloth/body constraints
     for(int rb=0;rb<rigid_body_particles.Size();rb++){

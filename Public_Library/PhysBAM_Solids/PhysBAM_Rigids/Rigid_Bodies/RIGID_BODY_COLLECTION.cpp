@@ -3,11 +3,15 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_1D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
@@ -33,12 +37,18 @@ struct ALLOCATE_BODY_HELPER:public ALLOCATE_HELPER<TV>
 //#####################################################################
 template<class TV> RIGID_BODY_COLLECTION<TV>::
 RIGID_BODY_COLLECTION(RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>* rigids_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input)
-    :rigid_geometry_collection(rigid_body_particle,rigids_example_forces_and_velocities_input,collision_body_list_input,new ALLOCATE_BODY_HELPER<TV>(*this)),
+    :rigid_body_particles(*new RIGID_BODY_PARTICLES<TV>()),collision_body_list(collision_body_list_input),structure_list(*new STRUCTURE_LIST<TV,int>),always_create_structure(false),
+    structure_hash(*new HASHTABLE<std::string,int>),frame_list_key(0),frame_list_active(0),check_stale(false),last_read_key(-1),last_read_active(-1),
+    allocate_helper(new ALLOCATE_BODY_HELPER<TV>(*this)),rigid_body_example_velocities(rigids_example_forces_and_velocities_input),owns_collision_body_list(false),
     articulated_rigid_body(*new ARTICULATED_RIGID_BODY<TV>(*this)),
     rigid_body_cluster_bindings(*new RIGID_BODY_CLUSTER_BINDINGS<TV>(*this,articulated_rigid_body)),rigids_example_forces_and_velocities(rigids_example_forces_and_velocities_input),
-    dynamic_rigid_body_particles(0),static_rigid_bodies(rigid_geometry_collection.static_rigid_geometry),kinematic_rigid_bodies(rigid_geometry_collection.kinematic_rigid_geometry),
-    static_and_kinematic_rigid_bodies(0),print_diagnostics(false),print_residuals(false),print_energy(false),iterations_used_diagnostic(0)
-{}
+    dynamic_rigid_body_particles(0),print_diagnostics(false),print_residuals(false),print_energy(false),iterations_used_diagnostic(0)
+{
+    if(!allocate_helper) allocate_helper=new ALLOCATE_BODY_HELPER<TV>(*this);
+    if(!collision_body_list){
+        collision_body_list=new COLLISION_GEOMETRY_COLLECTION<TV>;
+        owns_collision_body_list=true;}
+}
 //#####################################################################
 // Destructor
 //#####################################################################
@@ -48,6 +58,9 @@ template<class TV> RIGID_BODY_COLLECTION<TV>::
     rigids_forces.Delete_Pointers_And_Clean_Memory();
     delete &articulated_rigid_body;
     delete &rigid_body_cluster_bindings;
+    delete &rigid_body_particles;
+    delete &structure_hash;delete allocate_helper;delete &structure_list;
+    if(owns_collision_body_list) delete collision_body_list;
 }
 //#####################################################################
 // Function Rigid_Body
@@ -55,7 +68,7 @@ template<class TV> RIGID_BODY_COLLECTION<TV>::
 template<class TV> RIGID_BODY<TV>& RIGID_BODY_COLLECTION<TV>::
 Rigid_Body(const int particle_index)
 {
-    return *debug_cast<RIGID_BODY<TV>*>(rigid_body_particle.rigid_geometry(particle_index));
+    return *rigid_body_particles.rigid_body(particle_index);
 }
 //#####################################################################
 // Function Rigid_Body
@@ -63,7 +76,7 @@ Rigid_Body(const int particle_index)
 template<class TV> const RIGID_BODY<TV>& RIGID_BODY_COLLECTION<TV>::
 Rigid_Body(const int particle_index) const
 {
-    return *debug_cast<RIGID_BODY<TV>*>(rigid_body_particle.rigid_geometry(particle_index));
+    return *rigid_body_particles.rigid_body(particle_index);
 }
 //#####################################################################
 // Function Add_Rigid_Body
@@ -73,11 +86,11 @@ template<class TV> int RIGID_BODY_COLLECTION<TV>::
 Add_Rigid_Body(RIGID_BODY<TV>* rigid_body,const int simplicial_boundary_id,const int implicit_object_id,const int simplicial_interior_id)
 {
     int id=rigid_body->particle_index;
-    if(simplicial_boundary_id>=0) rigid_body_particle.structure_ids(id)(0)=simplicial_boundary_id;
-    if(implicit_object_id>=0) rigid_body_particle.structure_ids(id)(1)=implicit_object_id;
-    if(simplicial_interior_id>=0) rigid_body_particle.structure_ids(id)(2)=simplicial_interior_id;
-    for(int i=0;i<rigid_body_particle.structure_ids(id).m;i++)
-        if(rigid_body_particle.structure_ids(id)(i)>=0 && !rigid_geometry_collection.structure_list.Element(rigid_body_particle.structure_ids(id)(i)))
+    if(simplicial_boundary_id>=0) rigid_body_particles.structure_ids(id)(0)=simplicial_boundary_id;
+    if(implicit_object_id>=0) rigid_body_particles.structure_ids(id)(1)=implicit_object_id;
+    if(simplicial_interior_id>=0) rigid_body_particles.structure_ids(id)(2)=simplicial_interior_id;
+    for(int i=0;i<rigid_body_particles.structure_ids(id).m;i++)
+        if(rigid_body_particles.structure_ids(id)(i)>=0 && !structure_list.Element(rigid_body_particles.structure_ids(id)(i)))
             PHYSBAM_FATAL_ERROR();
     return id;
 }
@@ -90,8 +103,8 @@ Add_Rigid_Body_And_Geometry(RIGID_BODY<TV>* rigid_body)
 {
     int id=rigid_body->particle_index;
     assert(rigid_body->structures.m<=3);
-    rigid_body_particle.structure_ids(id)=VECTOR<int,3>(-1,-1,-1);
-    for(int s=0;s<rigid_body->structures.m;s++) rigid_body_particle.structure_ids(id)(s)=rigid_geometry_collection.structure_list.Add_Element(rigid_body->structures(s));
+    rigid_body_particles.structure_ids(id)=VECTOR<int,3>(-1,-1,-1);
+    for(int s=0;s<rigid_body->structures.m;s++) rigid_body_particles.structure_ids(id)(s)=structure_list.Add_Element(rigid_body->structures(s));
     return id;
 }
 //#####################################################################
@@ -121,7 +134,43 @@ Add_Rigid_Body(const STREAM_TYPE stream_type,const bool thin_shell,const std::st
     if(scaling_factor!=1) rigid_body->Rescale(scaling_factor);
     rigid_body->Update_Angular_Velocity();
 
-    int id=rigid_geometry_collection.Add_Rigid_Geometry(rigid_body,stream_type,basename,scaling_factor,read_simplicial_boundary,read_implicit_object,read_simplicial_interior,read_rgd_file);
+    int id=Add_Rigid_Body(rigid_body,stream_type,basename,scaling_factor,read_simplicial_boundary,read_implicit_object,read_simplicial_interior,read_rgd_file);
+    return id;
+}
+//#####################################################################
+// Function Add_Rigid_Body
+//#####################################################################
+template<class TV> int RIGID_BODY_COLLECTION<TV>::
+Add_Rigid_Body(RIGID_BODY<TV>* rigid_body,STREAM_TYPE stream_type,const std::string& basename,const T scaling_factor,
+    const bool read_simplicial_boundary,const bool read_implicit_object,const bool read_simplicial_interior,const bool read_rgd_file)
+{
+    int id=rigid_body->particle_index;
+
+    // structures
+    ARRAY<int> structure_ids;
+    TV structure_center=rigid_body_particles.frame(id).t;
+    if(TV::dimension==2){
+        if(read_simplicial_boundary && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".curve2d",scaling_factor,structure_center))
+            LOG::cout<<"Note: No curve2d file for "<<basename<<std::endl;
+        if(read_implicit_object && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".phi2d",scaling_factor,structure_center))
+            LOG::cout<<"Note: No phi2d file for "<<basename<<std::endl;
+        if(read_simplicial_interior && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".tri2d",scaling_factor,structure_center))
+            LOG::cout<<"Note: No tri2d file for "<<basename<<std::endl;}
+    else{
+        if(read_simplicial_boundary && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".tri",scaling_factor,structure_center))
+            LOG::cout<<"Note: No tri file for "<<basename<<std::endl;
+        if(read_implicit_object && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".phi",scaling_factor,structure_center) && 
+            !Find_Or_Read_Structure(stream_type,structure_ids,basename+".oct",scaling_factor,structure_center))
+            LOG::cout<<"Note: No phi or oct file for "<<basename<<std::endl;
+        if(read_simplicial_interior && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".tet",scaling_factor,structure_center))
+            LOG::cout<<"Note: No tet file for "<<basename<<std::endl;}
+    assert(structure_ids.m<=3);
+    rigid_body_particles.structure_ids(id)=VECTOR<int,3>(-1,-1,-1);
+    for(int i=0;i<structure_ids.m;i++){
+        if(structure_ids(i)>=0){
+            rigid_body_particles.structure_ids(id)(i)=structure_ids(i);
+            Rigid_Body(id).Add_Structure(*structure_list.Element(structure_ids(i)));}}
+
     return id;
 }
 //#####################################################################
@@ -130,7 +179,7 @@ Add_Rigid_Body(const STREAM_TYPE stream_type,const bool thin_shell,const std::st
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Update_Angular_Velocity()
 {
-    for(int p=0;p<rigid_body_particle.Size();p++) if(Is_Active(p)) Rigid_Body(p).Update_Angular_Velocity();
+    for(int p=0;p<rigid_body_particles.Size();p++) if(Is_Active(p)) Rigid_Body(p).Update_Angular_Velocity();
 }
 //#####################################################################
 // Function Update_Angular_Momentum
@@ -138,40 +187,23 @@ Update_Angular_Velocity()
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Update_Angular_Momentum()
 {
-    for(int p=0;p<rigid_body_particle.Size();p++) if(Is_Active(p)) Rigid_Body(p).Update_Angular_Momentum();
+    for(int p=0;p<rigid_body_particles.Size();p++) if(Is_Active(p)) Rigid_Body(p).Update_Angular_Momentum();
 }
 //#####################################################################
 // Function Update_Angular_Velocity
 //#####################################################################
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
-Update_Angular_Velocity(const ARRAY<int>& rigid_body_particles)
+Update_Angular_Velocity(const ARRAY<int>& particle_indices)
 {
-    for(int i=0;i<rigid_body_particles.m;i++) Rigid_Body(rigid_body_particles(i)).Update_Angular_Velocity();
+    for(int i=0;i<particle_indices.m;i++) Rigid_Body(particle_indices(i)).Update_Angular_Velocity();
 }
 //#####################################################################
 // Function Update_Angular_Momentum
 //#####################################################################
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
-Update_Angular_Momentum(const ARRAY<int>& rigid_body_particles)
+Update_Angular_Momentum(const ARRAY<int>& particle_indices)
 {
-    for(int i=0;i<rigid_body_particles.m;i++) Rigid_Body(rigid_body_particles(i)).Update_Angular_Momentum();
-}
-//#####################################################################
-// Function Read
-//#####################################################################
-template<class TV> void RIGID_BODY_COLLECTION<TV>::
-Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,ARRAY<int>* needs_init,ARRAY<int>* needs_destroy)
-{
-    rigid_geometry_collection.Read(stream_type,directory,frame,needs_init,needs_destroy);
-}
-//#####################################################################
-// Function Write
-//#####################################################################
-template<class TV> void RIGID_BODY_COLLECTION<TV>::
-Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const
-{
-    rigid_geometry_collection.Write(stream_type,directory,frame);
-    articulated_rigid_body.Write(stream_type,directory,frame);
+    for(int i=0;i<particle_indices.m;i++) Rigid_Body(particle_indices(i)).Update_Angular_Momentum();
 }
 //#####################################################################
 // Function Update_Simulated_Particles
@@ -179,10 +211,10 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Update_Simulated_Particles()
 {
-    int rigid_particles_number=rigid_body_particle.Size();
+    int rigid_particles_number=rigid_body_particles.Size();
 
     ARRAY<bool> particle_is_simulated(rigid_particles_number);
-    INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> simulated_subset=particle_is_simulated.Subset(rigid_body_particle.deletion_list);
+    INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> simulated_subset=particle_is_simulated.Subset(rigid_body_particles.deletion_list);
     simulated_subset.Fill(false);
     for(int i=0;i<rigid_particles_number;i++)
         if(Is_Active(i) && Rigid_Body(i).Is_Simulated()) // TODO: Can't everything be defaulted to true?
@@ -204,7 +236,7 @@ Update_Simulated_Particles()
     static_rigid_bodies.Remove_All();kinematic_rigid_bodies.Remove_All();static_and_kinematic_rigid_bodies.Remove_All();
     for(int p=0;p<rigid_particles_number;p++) if(Is_Active(p)){RIGID_BODY<TV>& rigid_body=Rigid_Body(p);
         if(rigid_body.is_static){static_rigid_bodies.Append(p);static_and_kinematic_rigid_bodies.Append(p);}
-        if(rigid_body_particle.kinematic(p)){kinematic_rigid_bodies.Append(p);static_and_kinematic_rigid_bodies.Append(p);}}
+        if(rigid_body_particles.kinematic(p)){kinematic_rigid_bodies.Append(p);static_and_kinematic_rigid_bodies.Append(p);}}
 
     ARRAY<bool> rigid_particle_is_simulated(rigid_particles_number);
     rigid_particle_is_simulated.Subset(simulated_rigid_body_particles).Fill(true);
@@ -235,7 +267,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VI
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T scale,const T time) const
 {
-    assert(rigid_F_full.Size()==rigid_body_particle.Size());
+    assert(rigid_F_full.Size()==rigid_body_particles.Size());
     rigid_F_full.Subset(dynamic_rigid_body_particles).Fill(TWIST<TV>()); // note we zero here because we will scale the forces below
     bool added=false;
     for(int k=0;k<rigids_forces.m;k++) if(rigids_forces(k)->use_implicit_velocity_independent_forces){
@@ -282,7 +314,7 @@ CFL_Rigid(const RIGID_BODY_EVOLUTION_PARAMETERS<TV>& rigid_body_evolution_parame
 {
     static T static_min_bounding_box_width=FLT_MAX;
     T min_bounding_box_width=FLT_MAX;
-    for(int i=0;i<rigid_body_particle.Size();i++) if(Is_Active(i)){
+    for(int i=0;i<rigid_body_particles.Size();i++) if(Is_Active(i)){
             const RANGE<TV>& box=Rigid_Body(i).Object_Space_Bounding_Box();
             TV edge_lengths=box.Edge_Lengths();min_bounding_box_width=min(min_bounding_box_width,edge_lengths.Min());}
     if(min_bounding_box_width!=static_min_bounding_box_width){
@@ -292,7 +324,7 @@ CFL_Rigid(const RIGID_BODY_EVOLUTION_PARAMETERS<TV>& rigid_body_evolution_parame
     T max_distance_per_time_step=rigid_body_evolution_parameters.max_rigid_body_linear_movement_fraction_per_time_step*min_bounding_box_width;
     T dt=FLT_MAX;
     bool no_active_bodies=true;
-    for(int p=0;p<rigid_body_particle.Size();p++) if(Is_Active(p)){
+    for(int p=0;p<rigid_body_particles.Size();p++) if(Is_Active(p)){
         dt=min(dt,Rigid_Body(p).CFL(max_distance_per_time_step,rigid_body_evolution_parameters.max_rigid_body_rotation_per_time_step,verbose_dt));
         no_active_bodies=false;}
     if(no_active_bodies) return FLT_MAX; // don't apply rigid dt bounds if there aren't any active rigid bodies
@@ -310,6 +342,182 @@ Add_Force(RIGIDS_FORCES<TV>* force)
     rigids_forces.Append(force);
     force->Set_CFL_Number((T).5);
     return rigids_forces.m;
+}
+//#####################################################################
+// Function Update_Kinematic_Particles
+//#####################################################################
+template<class TV> void RIGID_BODY_COLLECTION<TV>::
+Update_Kinematic_Particles()
+{
+    static_rigid_bodies.Remove_All();
+    kinematic_rigid_bodies.Remove_All();
+    for(int p=0;p<rigid_body_particles.Size();p++)
+        if(Is_Active(p)){
+            RIGID_BODY<TV>& rigid_body=Rigid_Body(p);
+            if(rigid_body.is_static) static_rigid_bodies.Append(p);
+            else kinematic_rigid_bodies.Append(p);}
+}
+//#####################################################################
+// Function Register_Analytic_Replacement_Structure
+//#####################################################################
+template<class TV> bool RIGID_BODY_COLLECTION<TV>::
+Register_Analytic_Replacement_Structure(const std::string& filename,const T scaling_factor,STRUCTURE<TV>* structure)
+{
+    std::string hashname=STRING_UTILITIES::string_sprintf("%s@%.6f",filename.c_str(),scaling_factor); // mangle hash name
+    if(structure_hash.Contains(hashname)) return false;
+    int id=structure?structure_list.Add_Element(structure):0;
+    structure_hash.Insert(hashname,id);
+    return true;
+}
+template<class T> void
+Wrap_Structure_Helper(STRUCTURE<VECTOR<T,1> >*& structure,const VECTOR<T,1>& center)
+{}
+template<class TV> void
+Wrap_Structure_Helper(STRUCTURE<TV>*& structure,const TV& center)
+{   // TODO(jontg): This shouldn't be necessary
+}
+//#####################################################################
+// Function Find_Or_Read_Structure
+//#####################################################################
+template<class TV> bool RIGID_BODY_COLLECTION<TV>::
+Find_Or_Read_Structure(const STREAM_TYPE stream_type,ARRAY<int>& structure_ids,const std::string& filename,const T scaling_factor,const TV& center)
+{
+    int id;
+    if(!FILE_UTILITIES::File_Exists(filename)) return false;
+    std::string hashname=STRING_UTILITIES::string_sprintf("%s@%.6f",filename.c_str(),scaling_factor); // mangle hash name
+    if(!always_create_structure&&structure_hash.Get(hashname,id)){ // already read in
+        if(!structure_list.Is_Active(id)) PHYSBAM_FATAL_ERROR();} // // only works if the referenced geometry is still in memory
+    else{ // read in for the first time
+        STRUCTURE<TV>* structure=0;
+        if(!stream_type.use_doubles)
+            structure=STRUCTURE<TV>::template Create_From_File<float>(filename);
+        else
+            structure=STRUCTURE<TV>::template Create_From_File<double>(filename);
+        if(scaling_factor!=1){
+            Wrap_Structure_Helper(structure,center);
+            structure->Rescale(scaling_factor);}
+        id=structure_list.Add_Element(structure);
+        if(!always_create_structure) structure_hash.Insert(hashname,id);}
+    structure_ids.Append(id);
+    return true;
+}
+//#####################################################################
+// Function Destroy_Unreferenced_Geometry
+//#####################################################################
+template<class TV> void RIGID_BODY_COLLECTION<TV>::
+Destroy_Unreferenced_Geometry() 
+{
+    ARRAY<bool> referenced(structure_list.Number_Of_Active_Elements());
+    for(int i=0;i<rigid_body_particles.Size();i++) for(int j=0;j<rigid_body_particles.structure_ids(i).m;j++) if(rigid_body_particles.structure_ids(i)(j)>=0)
+        referenced(structure_list.Element_Index(rigid_body_particles.structure_ids(i)(j)))=true;
+    for(int i=structure_list.Number_Of_Active_Elements()-1;i>=0;i--) if(!referenced(i)) structure_list.Remove_Element(structure_list.Active_Element_Id(i));
+}
+//#####################################################################
+// Function Destroy_Unreferenced_Geometry
+//#####################################################################
+template<class TV> RIGID_BODY<TV>* RIGID_BODY_COLLECTION<TV>::
+New_Body(int index)
+{
+    return allocate_helper->Create(index);
+}
+//#####################################################################
+// Function Read
+//#####################################################################
+template<class TV> void RIGID_BODY_COLLECTION<TV>::
+Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,ARRAY<int>* needs_init,ARRAY<int>* needs_destroy)
+{
+    if(stream_type.use_doubles) structure_list.template Read<double>(directory,"rigid_body_structure_",frame);
+    else structure_list.template Read<float>(directory,"rigid_body_structure_",frame);
+    ARRAY<RIGID_BODY<TV>*> bodies(rigid_body_particles.rigid_body);
+    rigid_body_particles.rigid_body.Fill(0);
+    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_particles",directory.c_str(),frame),rigid_body_particles);
+    while(rigid_body_particles.rigid_body.m<bodies.m) delete bodies.Pop();
+    rigid_body_particles.rigid_body.Prefix(bodies.m)=bodies;
+
+    ARRAY<int> needs_init_default;
+    if(needs_init) needs_init->Remove_All();
+    if(needs_destroy) needs_destroy->Remove_All();
+    char version;int next_id=0;ARRAY<int> active_ids;int local_frame=frame;
+    std::string active_list_name=STRING_UTILITIES::string_sprintf("%s/common/rigid_body_active_ids_list",directory.c_str(),frame);
+    std::string active_name=STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_active_ids",directory.c_str(),frame);
+    if(FILE_UTILITIES::File_Exists(active_list_name)){
+        if(!frame_list_active){frame_list_active=new ARRAY<int>;FILE_UTILITIES::Read_From_File(stream_type,active_list_name,*frame_list_active);}
+        local_frame=(*frame_list_active)(frame_list_active->Binary_Search(frame));}
+    if(last_read_active!=local_frame && FILE_UTILITIES::File_Exists(active_name)){
+        FILE_UTILITIES::Read_From_File(stream_type,active_name,version,next_id,active_ids);
+        last_read_active=local_frame;PHYSBAM_ASSERT(version==1);
+        if(needs_destroy) for(int i=next_id;i<rigid_body_particles.Size();i++) if(!rigid_body_particles.rigid_body(i)) needs_destroy->Append(i);
+        rigid_body_particles.Resize(next_id);}
+    else{
+        for(int id=0;id<rigid_body_particles.Size();id++) if(Is_Active(id)) active_ids.Append(id);
+        next_id=rigid_body_particles.Size();}
+    if(rigid_body_particles.rigid_body.Subset(active_ids).Contains(0)){ // don't need to re-read these things if we will not be initializing any newly-active bodies
+        std::string key_file_list=STRING_UTILITIES::string_sprintf("%s/common/rigid_body_key_list",directory.c_str());
+        std::string key_file=STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_key",directory.c_str(),frame);
+        char version;
+        if(FILE_UTILITIES::File_Exists(key_file_list)){
+            if(!frame_list_key){frame_list_key=new ARRAY<int>;FILE_UTILITIES::Read_From_File(stream_type,key_file_list,*frame_list_key);}
+            local_frame=(*frame_list_key)(frame_list_key->Binary_Search(frame));}
+        if(last_read_key!=local_frame && FILE_UTILITIES::File_Exists(key_file)){
+            FILE_UTILITIES::Read_From_File(stream_type,key_file,version,rigid_body_particles.structure_ids);
+            last_read_active=local_frame;PHYSBAM_ASSERT(version==2 || version==3);}
+
+        try{
+            std::istream* input=FILE_UTILITIES::Safe_Open_Input(directory+"/common/rigid_body_names",false);
+            int num;*input>>num;input->ignore(INT_MAX,'\n');
+            rigid_body_names.Resize(num);
+            for(int i=0;i<rigid_body_names.Size();i++) std::getline(*input,rigid_body_names(i));
+            delete input;}
+        catch(FILESYSTEM_ERROR&){
+            LOG::cerr<<"Did not find rigid body names."<<std::endl;
+            rigid_body_names.Clean_Memory();}}
+
+    ARRAY<bool> exists(next_id);exists.Subset(active_ids).Fill(true);
+    for(int i=0;i<exists.m;i++) if(!exists(i) && Is_Active(i)) Deactivate_Body(i);
+    if(active_ids.m>0){
+        for(int i=0;i<active_ids.m;i++){int p=active_ids(i);
+            // initialize new rigid body with given id, and initialize geometry
+            if(!rigid_body_particles.rigid_body(p)){
+                if(needs_init) needs_init->Append(p);
+                RIGID_BODY<TV>* rigid_body=New_Body(p);
+                if(p<rigid_body_names.Size()) rigid_body->name=rigid_body_names(p);
+                for(int s=0;s<rigid_body_particles.structure_ids(p).m;s++)
+                    if(rigid_body_particles.structure_ids(p)(s)>=0)
+                        rigid_body->Add_Structure(*structure_list.Element(rigid_body_particles.structure_ids(p)(s)));}
+            if(Is_Active(p) && rigid_body_particles.structure_ids(p)==VECTOR<int,3>(-1,-1,-1)) Deactivate_Body(p);}}
+}
+//#####################################################################
+// Function Write
+//#####################################################################
+template<class TV> void RIGID_BODY_COLLECTION<TV>::
+Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const
+{
+    articulated_rigid_body.Write(stream_type,directory,frame);
+    if(stream_type.use_doubles) structure_list.template Write<double>(directory,"rigid_body_structure_",frame);
+    else structure_list.template Write<float>(directory,"rigid_body_structure_",frame);
+    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_particles",directory.c_str(),frame),rigid_body_particles);
+
+    // update names
+    rigid_body_names.Resize(rigid_body_particles.Size());
+    ARRAY<int> active_ids;
+    for(int id=0;id<rigid_body_particles.Size();id++) if(Is_Active(id)){active_ids.Append(id);rigid_body_names(id)=Rigid_Body(id).name;}
+    if(active_ids.m>0 && !(check_stale && is_stale_active)){
+        if(check_stale){
+            if(!frame_list_active) frame_list_active=new ARRAY<int>;frame_list_active->Append(frame);
+            FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/common/rigid_body_active_ids_list",directory.c_str()),*frame_list_active);
+            is_stale_active=false;}
+        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_active_ids",directory.c_str(),frame),(char)1,rigid_body_particles.Size(),active_ids);}
+    std::ostream* output=FILE_UTILITIES::Safe_Open_Output(directory+"/common/rigid_body_names",false);
+    *output<<rigid_body_names.Size()<<std::endl;
+    for(int i=0;i<rigid_body_names.Size();i++) *output<<rigid_body_names(i)<<std::endl;
+    delete output;
+    char version=3;
+    if(rigid_body_particles.structure_ids.m>0 && !(check_stale && is_stale_key)){
+        if(check_stale){
+            if(!frame_list_key) frame_list_key=new ARRAY<int>;frame_list_key->Append(frame);
+            FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/common/rigid_body_key_list",directory.c_str()),*frame_list_key);
+            is_stale_key=false;}
+        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_key",directory.c_str(),frame),version,rigid_body_particles.structure_ids);}
 }
 //#####################################################################
 template class RIGID_BODY_COLLECTION<VECTOR<float,1> >;

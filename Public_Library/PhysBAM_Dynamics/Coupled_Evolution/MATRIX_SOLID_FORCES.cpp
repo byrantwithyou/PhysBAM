@@ -147,7 +147,7 @@ Test_Matrix() const
     ARRAY<TV> V(number),V2(number),V3(number),V4(number),V5(number);
     random.Fill_Uniform(V,-1,1);
 
-    int rigid_number=solid_body_collection.rigid_body_collection.rigid_geometry_collection.particles.number;
+    int rigid_number=solid_body_collection.rigid_body_collection.rigid_body_particles.number;
     ARRAY<TWIST<TV> > twist(rigid_number),twist2(rigid_number),twist3(rigid_number),twist4(rigid_number),twist5(rigid_number);
     random.Fill_Uniform(twist,-1,1);
 

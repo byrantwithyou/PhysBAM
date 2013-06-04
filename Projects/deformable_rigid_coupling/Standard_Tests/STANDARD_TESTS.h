@@ -389,7 +389,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         // collide structures with the ground only
         deformable_body_collection.collisions.Use_Structure_Collide_Collision_Body(true);
         for(int s=0;s<deformable_body_collection.structures.m;s++)
-            deformable_body_collection.collisions.structure_collide_collision_body(s).Set(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(ground->particle_index));}
+            deformable_body_collection.collisions.structure_collide_collision_body(s).Set(rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(ground->particle_index));}
 
     // correct mass
     //binding_list.Distribute_Mass_To_Parents();
@@ -819,7 +819,7 @@ void Floppy_Fish()
     else tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",fish_state,true,false,1000,(T)1);
 
     // binding the deformable particles to the rigid bodies
-    for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
+    for(int p=0;p<rigid_body_collection.rigid_body_particles.Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
     ground=&tests.Add_Ground(friction,0,0);
 
@@ -981,7 +981,7 @@ void Ring_Drop()
         RANGE<TV> box(-TV((T)4.5,(T)4.5,(T)1),TV((T)4.5,(T)4.5,(T)1));
         FRAME<TV> frame=Find_Placement(random,box*scale,bounding_boxes,world,true);
         tests.Make_Lathe_Chain(frame,scale,mu);
-        int last=solid_body_collection.rigid_body_collection.rigid_body_particle.Size();
+        int last=solid_body_collection.rigid_body_collection.rigid_body_particles.Size();
         T d=max((T)0,bounding_boxes.Last().Center().y-world.min_corner.y),clamp_time=d<h?0:base_t+(d-h)/maximum_fall_speed;
         for(int id=last-5;id<=last;id++){
             solid_body_collection.rigid_body_collection.Rigid_Body(id).Set_Mass(ring_mass/6);
@@ -1163,7 +1163,7 @@ void Sidewinding()
     tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/snake_8K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(center,snake_rotation)),false,false,1000,(T).5);
 
     // binding the deformable particles to the rigid bodies
-    for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
+    for(int p=0;p<rigid_body_collection.rigid_body_particles.Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
 //     {RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",(T).3,friction);
 //     rigid_body.Frame().t=TV((T)0,(T).3,-10);
@@ -1264,7 +1264,7 @@ void Add_Maggot(const T scale,const RIGID_BODY_STATE<TV>& state,const std::strin
     tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_"+resolution+"K.tet",state,false,false,1000,(T)1.2*scale);
 
     // binding the deformable particles to the rigid bodies
-    for(int p=rigid_body_collection.rigid_body_particle.Size()-number_of_joints;p<=rigid_body_collection.rigid_body_particle.Size();p++){
+    for(int p=rigid_body_collection.rigid_body_particles.Size()-number_of_joints;p<=rigid_body_collection.rigid_body_particles.Size();p++){
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(p);
         rigid_body.Twist().angular=state.twist.angular;
         rigid_body.Twist().linear=state.Pointwise_Object_Velocity(rigid_body.Frame().t);

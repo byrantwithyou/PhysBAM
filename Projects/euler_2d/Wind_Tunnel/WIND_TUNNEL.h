@@ -218,11 +218,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         rect.is_static=true;}
     else if(test_number==3){
         square=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/square",(T).1,true,true,false);
-        rigid_body_collection.rigid_body_particle.frame(square).t=TV((T)1.25,(T).55);
+        rigid_body_collection.rigid_body_particles.frame(square).t=TV((T)1.25,(T).55);
         rigid_body_collection.Rigid_Body(square).Is_Kinematic()=true;}
     else return;
 
-    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);
+    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 
     fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state=EULER<T_GRID>::Get_Euler_State_From_rho_velocity_And_internal_energy(rho_initial,TV(u_vel_initial,v_vel_initial),
         fluids_parameters.euler->eos->e_From_p_And_rho(p_initial,rho_initial));

@@ -50,7 +50,6 @@
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
@@ -60,6 +59,7 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER_HASH.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_INTERSECTIONS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Forces_And_Torques/RIGID_ETHER_DRAG.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Forces_And_Torques/RIGID_GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/KINEMATIC_COLLISION_BODY.h>
@@ -105,9 +105,9 @@ public:
     ~STANDARD_TESTS()
     {if(test_number==21){
         T angle=parameter*(T)pi/40;
-        T y=solid_body_collection.rigid_body_collection.rigid_body_particle.frame(0).t.y,yanalytic=-(T)5./14*(T)9.8*sqr((T)last_frame/24)*sqr(sin(angle));
-        T ke=solid_body_collection.rigid_body_collection.Rigid_Body(0).Kinetic_Energy(),pe=y*solid_body_collection.rigid_body_collection.rigid_body_particle.mass(0)*(T)9.8;
-        T omega=solid_body_collection.rigid_body_collection.rigid_body_particle.twist(0).angular.z,speed=solid_body_collection.rigid_body_collection.rigid_body_particle.twist(0).linear.Magnitude();
+        T y=solid_body_collection.rigid_body_collection.rigid_body_particles.frame(0).t.y,yanalytic=-(T)5./14*(T)9.8*sqr((T)last_frame/24)*sqr(sin(angle));
+        T ke=solid_body_collection.rigid_body_collection.Rigid_Body(0).Kinetic_Energy(),pe=y*solid_body_collection.rigid_body_collection.rigid_body_particles.mass(0)*(T)9.8;
+        T omega=solid_body_collection.rigid_body_collection.rigid_body_particles.twist(0).angular.z,speed=solid_body_collection.rigid_body_collection.rigid_body_particles.twist(0).linear.Magnitude();
         LOG::cout<<"ERROR in y for angle "<<angle<<"  ("<<(angle*180/(T)pi)<<" degrees):  "<<(1-y/yanalytic)<<std::endl;
         LOG::cout<<"SLIPPAGE  "<<omega/speed<<std::endl;LOG::cout<<"PE = "<<pe<<"    KE = "<<ke<<std::endl;}}
 
@@ -203,10 +203,10 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==31){
         if(parameter==4 && time>=(T).4999 && time<=(T).5001){
-            solid_body_collection.rigid_body_collection.rigid_geometry_collection.Reactivate_Geometry(1);
+            solid_body_collection.rigid_body_collection.Reactivate_Body(1);
             solid_body_collection.rigid_body_collection.Update_Simulated_Particles();}
         if(parameter==3 && time>=(T).4999 && time<=(T).5001){
-            solid_body_collection.rigid_body_collection.rigid_body_particle.Remove_Body(0);
+            solid_body_collection.rigid_body_collection.rigid_body_particles.Remove_Body(0);
             solid_body_collection.rigid_body_collection.Update_Simulated_Particles();}}
 }
 //#####################################################################
@@ -508,7 +508,7 @@ void Ring_Test()
         random_placement.Set_Angular_Speed_Range(0,1);
         Random_Scene_Generator("Rings_Test/ring_revolve",1000,11111,random_placement,solid_body_collection.rigid_body_collection,tests);}
 
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.Size();i++){
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particles.Size();i++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(i);
         rigid_body.Set_Coefficient_Of_Restitution(epsilon);
         rigid_body.coefficient_of_friction=mu;
@@ -546,7 +546,7 @@ void Bone_Test()
     random_placement.Set_Fixed_Scale(3);
     Random_Scene_Generator(filenames,12345,random_placement,solid_body_collection.rigid_body_collection,tests);
     T mass_scale=10;
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.Size();i++){
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particles.Size();i++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(i);
         rigid_body.Set_Mass(rigid_body.Mass()*mass_scale);
         rigid_body.Set_Coefficient_Of_Restitution(epsilon);
@@ -1033,7 +1033,7 @@ void Removed_Bodies()
         bodies(i)->Frame().t=TV(0,i,0);
         bodies(i)->Set_Coefficient_Of_Restitution((T).5);
         bodies(i)->name=STRING_UTILITIES::string_sprintf("box-%i",i);}
-    for(int i=1;i<=20;i+=2) solid_body_collection.rigid_body_collection.rigid_body_particle.Remove_Body(bodies(i)->particle_index);
+    for(int i=1;i<=20;i+=2) solid_body_collection.rigid_body_collection.rigid_body_particles.Remove_Body(bodies(i)->particle_index);
     tests.Add_Ground();
 }
 //#####################################################################
@@ -1153,7 +1153,7 @@ void Cluster_Fracture()
     //cluster_fracture_callbacks->allowed_compresive_strain=-.001;
     //rigid_bindings.callbacks=cluster_fracture_callbacks;
     for(int i=0;i<num_bodies;i++){
-        RIGID_BODY_PARTICLES<TV>& particles=solid_body_collection.rigid_body_collection.rigid_body_particle;    
+        RIGID_BODY_PARTICLES<TV>& particles=solid_body_collection.rigid_body_collection.rigid_body_particles;    
         RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(solid_body_collection.rigid_body_collection);
         children.Append(rigid_body.particle_index);
         referenced_rigid_particles->Append(rigid_body.particle_index);
@@ -1168,8 +1168,8 @@ void Cluster_Fracture()
         rigid_body.Add_Structure(*surface);  
         //if(i==1) rigid_body.is_static=true;
         solid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
-        solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body),rigid_body.particle_index,true);
-        solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->Get_Collision_Geometry(rigid_body.particle_index)->add_to_spatial_partition=true;}
+        solid_body_collection.rigid_body_collection.collision_body_list->Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body),rigid_body.particle_index,true);
+        solid_body_collection.rigid_body_collection.collision_body_list->Get_Collision_Geometry(rigid_body.particle_index)->add_to_spatial_partition=true;}
     istream.close();
     tests.Add_Ground((T).5,0,0);
     
@@ -1188,8 +1188,8 @@ void Sphere_Sanity_Tests()
     int n=3;
     if(parameter==2) n=0;
     for(int i=0;i<n;i++) tests.Add_Rigid_Body("sphere",1,1).Frame().t.x=(T)3*i;
-    if(parameter==3) solid_body_collection.rigid_body_collection.rigid_body_particle.Remove_Body(2);
-    if(parameter==4) solid_body_collection.rigid_body_collection.rigid_geometry_collection.Deactivate_Geometry(1);
+    if(parameter==3) solid_body_collection.rigid_body_collection.rigid_body_particles.Remove_Body(2);
+    if(parameter==4) solid_body_collection.rigid_body_collection.Deactivate_Body(1);
 }
 //#####################################################################
 // Function Collision_Contact_Pairs_Test

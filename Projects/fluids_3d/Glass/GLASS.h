@@ -233,10 +233,10 @@ T Initial_Phi_Object(const VECTOR<T,3>& X) const
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     glass=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/glass_cylinder",(T).03,true,true,false);
-    rigid_body_collection.rigid_body_particle.frame(glass).t=VECTOR<T,3>(0,(T)0.06,0);
+    rigid_body_collection.rigid_body_particles.frame(glass).t=VECTOR<T,3>(0,(T)0.06,0);
     rigid_body_collection.Rigid_Body(glass).Is_Kinematic()=true;
 
-    inaccurate_union.collision_bodies.Add_Bodies(rigid_body_collection.rigid_geometry_collection);
+    inaccurate_union.collision_bodies.Add_Bodies(rigid_body_collection);
     fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(&inaccurate_union,0,false);
 }
 //#####################################################################

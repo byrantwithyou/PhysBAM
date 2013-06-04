@@ -7,59 +7,65 @@
 #ifndef __OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D__
 #define __OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D__
 
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_2D.h>
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Data_Structures/PAIR.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SELECTION.h>
+#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_VECTOR_FIELD_2D.h>
+#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 namespace PhysBAM{
 
+template<class T> class OPENGL_SEGMENTED_CURVE_2D;
+template<class T> class OPENGL_TRIANGULATED_AREA;
+template<class T> class OPENGL_LEVELSET_2D;
+template<class T> class OPENGL_AXES;
 template<class TV> class ARTICULATED_RIGID_BODY;
 template<class TV> class RIGID_BODY_COLLECTION;
+
 template<class T,class RW=T>
-class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D : public OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_2D<T,RW>
+class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D:public OPENGL_COMPONENT
 {
 protected:
     typedef VECTOR<T,2> TV;
-    typedef OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_2D<T,RW> BASE;
 
-    using BASE::basedir;
-    using BASE::frame_loaded;
-    using BASE::valid;
-    using BASE::show_object_names;
-    using BASE::output_positions;
-    using BASE::draw_velocity_vectors;
-    using BASE::draw_individual_axes;
-    using BASE::draw_node_velocity_vectors;
-    using BASE::draw_segmented_curve;
-    using BASE::draw_triangulated_area;
-    using BASE::draw_implicit_curve;
-    using BASE::needs_init;
-    using BASE::needs_destroy;
-    using BASE::has_init_destroy_information;
-
+    std::string basedir;
+    int frame_loaded;
+    bool valid;
+    bool show_object_names;
+    bool output_positions;
+    bool draw_velocity_vectors;
+    bool draw_individual_axes;
+    bool draw_node_velocity_vectors;
+    bool draw_segmented_curve;
+    bool draw_triangulated_area;
+    bool draw_implicit_curve;
+    bool has_init_destroy_information;
+    ARRAY<int> needs_init,needs_destroy;
     bool draw_articulation_points;
     bool draw_forces_and_torques;
     bool draw_linear_muscles;
-public:
-    using BASE::frame;using BASE::draw;using BASE::is_animation;using BASE::slice;
-    using BASE::rigid_geometry_collection;
+    bool need_destroy_rigid_body_collection;
 
+public:
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body;
-protected:
-    using BASE::opengl_segmented_curve;
-    using BASE::opengl_triangulated_area;
-    using BASE::opengl_levelset;
-    using BASE::extra_components;
-    using BASE::opengl_axes;
-    using BASE::draw_object;
-    using BASE::use_object_bounding_box;
-    using BASE::positions;
-    using BASE::velocity_vectors;
-    using BASE::node_positions;
-    using BASE::node_velocity_vectors;
-    using BASE::velocity_field;
-    using BASE::node_velocity_field;
-    using BASE::current_selection;
+    ARRAY<int> colors;
 
-    bool need_destroy_rigid_body_collection;
+protected:
+    ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*,int> opengl_segmented_curve;
+    ARRAY<OPENGL_TRIANGULATED_AREA<T>*,int> opengl_triangulated_area;
+    ARRAY<OPENGL_LEVELSET_2D<T>*,int> opengl_levelset;
+    ARRAY<ARRAY<OPENGL_COMPONENT*>,int> extra_components;
+    ARRAY<OPENGL_AXES<T>*,int> opengl_axes;
+    ARRAY<bool,int> draw_object;
+    ARRAY<bool,int> use_object_bounding_box;
+    ARRAY<VECTOR<T,2> > positions;
+    ARRAY<VECTOR<T,2> > velocity_vectors;
+    ARRAY<VECTOR<T,2> > node_positions;
+    ARRAY<VECTOR<T,2> > node_velocity_vectors;
+    OPENGL_VECTOR_FIELD_2D<ARRAY<TV> > velocity_field;
+    OPENGL_VECTOR_FIELD_2D<ARRAY<TV> > node_velocity_field;
+    OPENGL_SELECTION* current_selection;
     ARRAY<VECTOR<T,2> > articulation_points;
     ARRAY<PAIR<VECTOR<T,2>,T>,int> forces_and_torques;
 
@@ -68,29 +74,79 @@ public:
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D();
     
+    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
+    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
+    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
+
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     virtual OPENGL_SELECTION *Get_Selection(GLuint *buffer, int buffer_size);
     void Highlight_Selection(OPENGL_SELECTION *selection) PHYSBAM_OVERRIDE;
+    void Clear_Highlight() PHYSBAM_OVERRIDE;
     void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
 
+    void Read_Hints(const std::string& filename);
+
+    void Set_Draw_Object(int i, bool draw_it);  // Need to call Reinitialize after changing draw objects
+    bool Get_Draw_Object(int i) const;
+    void Set_Object_Color(int i, const OPENGL_COLOR &color);
+    void Set_Use_Object_Bounding_Box(int i, bool use_it);
+    void Set_Vector_Size(double size);
+
+    void Toggle_Velocity_Vectors();
+    void Toggle_Individual_Axes();
+    void Toggle_Output_Positions();
+    void Toggle_Show_Object_Names();
+    void Toggle_Node_Velocity_Vectors();
+    void Toggle_Draw_Mode();
+    void Increase_Vector_Size();
+    void Decrease_Vector_Size();
     void Read_Articulated_Information(const std::string& filename);
 
     void Toggle_Articulation_Points();
     void Toggle_Linear_Muscles();
     void Toggle_Forces_And_Torques();
 
+    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Velocity_Vectors, "Toggle velocity vectors");
+    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Individual_Axes, "Toggle individual axes");
+    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Output_Positions, "Toggle output positions");
+    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Show_Object_Names, "Toggle show object names");
+    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Node_Velocity_Vectors, "Toggle node velocity vectors");
+    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Draw_Mode, "Toggle draw mode");
+    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Increase_Vector_Size, "Increase vector size");
+    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Decrease_Vector_Size, "Decrease vector size");
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Articulation_Points, "Toggle articulation points");
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Linear_Muscles, "Toggle linear muscles");
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Forces_And_Torques, "Toggle forces and torques");
 
 public:
-    virtual void Reinitialize(const bool force=false,const bool read_geoemtry=true);    // Needs to be called after some state changes
+    virtual void Reinitialize(const bool force=false,const bool read_geometry=true);    // Needs to be called after some state changes
 protected:
-    using BASE::Create_Geometry;
-    using BASE::Update_Geometry;
-    using BASE::Destroy_Geometry;
+    void Set_Draw_Mode(const int mode);
+    int Get_Draw_Mode() const;
+    void Create_Geometry(const int id);
+    void Update_Geometry(const int id);
+    void Destroy_Geometry(const int id);
     virtual void Update_Object_Labels();
+};
+
+template<class T>
+class OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_2D : public OPENGL_SELECTION
+{
+public:
+    int body_id;
+    OPENGL_SELECTION *body_selection;
+
+    OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_2D(OPENGL_OBJECT *object,const int body_id,OPENGL_SELECTION* body_selection)
+        :OPENGL_SELECTION(OPENGL_SELECTION::COMPONENT_RIGID_BODIES_2D,object),body_id(body_id),body_selection(body_selection)
+    {}
+
+    virtual OPENGL_SELECTION::TYPE Actual_Type() const 
+    {return body_selection->Actual_Type();}
+
+    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
@@ -117,7 +173,6 @@ public:
 
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
-
 }
 
 #endif

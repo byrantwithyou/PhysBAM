@@ -257,11 +257,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     sphere=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/sphere",(T).25,true,true,false);
     rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Restitution((T)1);rigid_body_collection.Rigid_Body(sphere).coefficient_of_friction=(T)1;
-    rigid_body_collection.rigid_body_particle.frame(sphere).t=solid_initial_position;rigid_body_collection.Rigid_Body(sphere).Set_Mass(solid_mass);
+    rigid_body_collection.rigid_body_particles.frame(sphere).t=solid_initial_position;rigid_body_collection.Rigid_Body(sphere).Set_Mass(solid_mass);
     rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;
     rigid_body_collection.Rigid_Body(sphere).simplicial_object->mesh.Initialize_Adjacent_Elements();
 
-    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);
+    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 }
 void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {

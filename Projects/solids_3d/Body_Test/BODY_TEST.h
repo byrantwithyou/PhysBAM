@@ -6,14 +6,14 @@
 #define __BODY_TEST__
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/BINDING_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_S3D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 namespace PhysBAM{
@@ -39,9 +39,9 @@ public:
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     {
         COLLISION_GEOMETRY_ID body1_collision_geometry_id=
-            solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(body1->particle_index);
+            solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(body1->particle_index);
         COLLISION_GEOMETRY_ID ground_collision_geometry_id=
-            solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(ground->particle_index);
+            solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(ground->particle_index);
         if(time*24.0 > 10 && body1_collision_geometry_id && time*24.0 < 25){
             LOG::cout<<"removing body "<<std::endl;
             solid_body_collection.collision_body_list.Remove_Body(body1_collision_geometry_id);}

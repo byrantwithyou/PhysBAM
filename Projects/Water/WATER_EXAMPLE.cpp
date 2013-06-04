@@ -5,7 +5,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
@@ -21,7 +21,7 @@ WATER_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads,int refi
     cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),//incompressible_fluid_collection(mac_grid),
     thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),
     projection(refine>1?*new PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >(mac_grid,particle_levelset_evolution.Particle_Levelset(0).levelset,refine):*new PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >(mac_grid,false,false,false,false,thread_queue)),
-    particle_levelset_evolution(mac_grid,number_of_ghost_cells,false),incompressible(mac_grid,projection),boundary(0),rigid_geometry_collection(this),collision_bodies_affecting_fluid(mac_grid)
+    particle_levelset_evolution(mac_grid,number_of_ghost_cells,false),incompressible(mac_grid,projection),boundary(0),rigid_body_collection(this,0),collision_bodies_affecting_fluid(mac_grid)
 {
     incompressible.Set_Custom_Advection(advection_scalar);
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
@@ -83,10 +83,10 @@ Set_Boundary_Conditions(const T time)
                 projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
                 if((TV::dimension==2 && iterator.Axis()==1)|| (TV::dimension==3 && iterator.Axis()==3)) face_velocities(iterator.Full_Index())=-1;
                 else face_velocities(iterator.Full_Index())=0;}}
-        for(int i=0;i<rigid_geometry_collection.particles.Size();i++){
-            if(rigid_geometry_collection.particles.rigid_geometry(i)->Implicit_Geometry_Lazy_Inside(iterator.Location())){
+        for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
+            if(rigid_body_collection.rigid_body_particles.rigid_body(i)->Implicit_Geometry_Lazy_Inside(iterator.Location())){
                 projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
-                face_velocities(iterator.Full_Index())=rigid_geometry_collection.particles.twist(i).linear(iterator.Axis());}}}
+                face_velocities(iterator.Full_Index())=rigid_body_collection.rigid_body_particles.twist(i).linear(iterator.Axis());}}}
 }
 //#####################################################################
 // Adjust_Phi_With_Sources
@@ -105,17 +105,17 @@ template<class TV> void WATER_EXAMPLE<TV>::
 Adjust_Phi_With_Objects(const T time)
 {
     T tolerance=(T)9.8/24; // dt*gravity where dt=1/24 is based on the length of a frame
-    for(int id=0;id<rigid_geometry_collection.particles.Size();id++){
+    for(int id=0;id<rigid_body_collection.rigid_body_particles.Size();id++){
         for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
             TV_INT index=iterator.Cell_Index();TV location=mac_grid.X(index);
-            if(particle_levelset_evolution.phi(index)<0 && rigid_geometry_collection.Rigid_Geometry(id).Implicit_Geometry_Extended_Value(location)<0){
+            if(particle_levelset_evolution.phi(index)<0 && rigid_body_collection.Rigid_Body(id).Implicit_Geometry_Extended_Value(location)<0){
                 TV V_fluid;
                 for(int i=0;i<TV::dimension;i++) V_fluid(i)=(face_velocities(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i)))+face_velocities(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i))))/2.;
-                TV V_object=rigid_geometry_collection.Rigid_Geometry(id).Pointwise_Object_Velocity(location); // velocity object should be spatially varying
+                TV V_object=rigid_body_collection.Rigid_Body(id).Pointwise_Object_Velocity(location); // velocity object should be spatially varying
                 TV V_relative=V_fluid-V_object;
-                TV normal=rigid_geometry_collection.Rigid_Geometry(id).Implicit_Geometry_Normal(location);
+                TV normal=rigid_body_collection.Rigid_Body(id).Implicit_Geometry_Normal(location);
                 T VN=TV::Dot_Product(V_relative,normal),magnitude=V_relative.Magnitude();
-                if(VN > max(tolerance,(T).1*magnitude)) particle_levelset_evolution.phi(index)=-rigid_geometry_collection.Rigid_Geometry(id).Implicit_Geometry_Extended_Value(location);}}}
+                if(VN > max(tolerance,(T).1*magnitude)) particle_levelset_evolution.phi(index)=-rigid_body_collection.Rigid_Body(id).Implicit_Geometry_Extended_Value(location);}}}
 }
 //#####################################################################
 // Extrapolate_Phi_Into_Objects
@@ -123,10 +123,10 @@ Adjust_Phi_With_Objects(const T time)
 template<class TV> void WATER_EXAMPLE<TV>::
 Extrapolate_Phi_Into_Objects(const T time)
 {
-    for(int id=0;id<rigid_geometry_collection.particles.Size();id++){
+    for(int id=0;id<rigid_body_collection.rigid_body_particles.Size();id++){
         ARRAY<T,TV_INT> phi_object(mac_grid.Domain_Indices(3));
         for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
-            phi_object(iterator.Cell_Index())=-rigid_geometry_collection.Rigid_Geometry(id).Implicit_Geometry_Extended_Value(iterator.Location());
+            phi_object(iterator.Cell_Index())=-rigid_body_collection.Rigid_Body(id).Implicit_Geometry_Extended_Value(iterator.Location());
         EXTRAPOLATION_UNIFORM<GRID<TV>,T> extrapolate(mac_grid,phi_object,particle_levelset_evolution.Particle_Levelset(0).levelset.phi,3);extrapolate.Set_Band_Width(3);extrapolate.Extrapolate();}
 }
 //#####################################################################
@@ -176,7 +176,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
-    rigid_geometry_collection.Write(stream_type,output_directory,frame);
+    rigid_body_collection.Write(stream_type,output_directory,frame);
 }
 //#####################################################################
 // Read_Output_Files
@@ -197,7 +197,7 @@ Read_Output_Files(const int frame)
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible.projection.p);}
     filename=output_directory+"/"+f+"/mac_velocities";
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,face_velocities);}
-    rigid_geometry_collection.Read(stream_type,output_directory,frame);
+    rigid_body_collection.Read(stream_type,output_directory,frame);
 }
 //#####################################################################
 namespace PhysBAM{

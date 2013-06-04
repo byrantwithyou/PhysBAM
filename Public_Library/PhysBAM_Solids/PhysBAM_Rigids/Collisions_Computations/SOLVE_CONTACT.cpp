@@ -101,13 +101,13 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
         if(Solve_Projected_Gauss_Seidel(rigid_body_collection,collision_callbacks,pairs,rigid_body_collisions.pairs_processed_by_contact,rigid_body_collisions.desired_separation_distance,parameters.contact_proximity,dt,parameters.projected_gauss_seidel_tolerance,iteration_maximum))
         {
             /*LOG::cout << "----- end states -----" << std::endl;
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++)
+            for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
             {
                 LOG::cout << "twist " << i << " " << rigid_body_collection.Rigid_Body(i).Twist() << std::endl;
             }*/
 
             LOG::SCOPE scope_reevolve("reevolving bodies");
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++)
+            for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
             {
                 if(rigid_body_collection.Is_Active(i))
                 {
@@ -202,7 +202,7 @@ void Update_Contact_Pair_Helper(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions
     int parent_id_2=rigid_body_cluster_bindings.Get_Parent(body2).particle_index;
     RIGID_BODY<TV>& parent_body_1=rigid_body_collection.Rigid_Body(parent_id_1);
     RIGID_BODY<TV>& parent_body_2=rigid_body_collection.Rigid_Body(parent_id_2);
-    rigid_body_collisions.rigid_body_particle_intersections.Set(Tuple(body1.particle_index,body2.particle_index,collision_location));
+    rigid_body_collisions.rigid_body_particles_intersections.Set(Tuple(body1.particle_index,body2.particle_index,collision_location));
     RIGID_BODY<TV>::Apply_Collision_Impulse(parent_body_1,parent_body_2,body1.Frame().r,body2.Frame().r,collision_location,collision_normal,collision_relative_velocity,
         -1+epsilon_scale,RIGID_BODY<TV>::Coefficient_Of_Friction(parent_body_1,parent_body_2),false,rolling_friction,correct_contact_energy,mpi_one_ghost);
     collision_callbacks.Save_Position(parent_id_1);collision_callbacks.Save_Position(parent_id_2); // fix saved values & re-evolve bodies
@@ -357,7 +357,7 @@ void Push_Out(RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks,RIGID_BODY_COL
     PROJECTED_GAUSS_SEIDEL::Solve(rigid_body_collection,contacts,tolerance,iteration_maximum);
 
     for(int i=0;i<rigid_body_collection.simulated_rigid_body_particles.m;i++)
-        if(!rigid_body_collection.rigid_body_particle.kinematic(rigid_body_collection.simulated_rigid_body_particles(i)))
+        if(!rigid_body_collection.rigid_body_particles.kinematic(rigid_body_collection.simulated_rigid_body_particles(i)))
             collision_callbacks.Euler_Step_Position(i,1,0); //should pass the actual time.
 
     //restore linear velocity/update rotational velocity

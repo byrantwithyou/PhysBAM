@@ -9,8 +9,8 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/GRID_BASED_COLLISION_GEOMETRY.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/RIGID_GEOMETRY_RASTERIZATION_UNIFORM.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/RIGID_BODY_RASTERIZATION_UNIFORM.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -29,18 +29,18 @@ template<class T_GRID> GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
 // Function Add_Bodies
 //##################################################################### 
 template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
-Add_Bodies(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection)
+Add_Bodies(RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
 {
-    for(int i=0;i<rigid_geometry_collection.particles.Size();i++) if(rigid_geometry_collection.Is_Active(i))
-        collision_geometry_collection.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_geometry_collection.Rigid_Geometry(i)),i,true);
+    for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++) if(rigid_body_collection.Is_Active(i))
+        collision_geometry_collection.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body_collection.Rigid_Body(i)),i,true);
 }
 //##################################################################### 
 // Function Add_Bodies
 //##################################################################### 
 template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
-Add_Body(RIGID_GEOMETRY<TV>& rigid_geometry)
+Add_Body(RIGID_BODY<TV>& rigid_body)
 {
-    collision_geometry_collection.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_geometry),rigid_geometry.particle_index,true);
+    collision_geometry_collection.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body),rigid_body.particle_index,true);
 }
 //##################################################################### 
 // Function Rasterize_Objects

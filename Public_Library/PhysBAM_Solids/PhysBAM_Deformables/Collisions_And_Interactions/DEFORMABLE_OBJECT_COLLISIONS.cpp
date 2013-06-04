@@ -10,11 +10,6 @@
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_PARTICLE_STATE.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
@@ -23,6 +18,11 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_MATERIAL_SURFACE.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -335,7 +335,7 @@ Adjust_Point_For_Collision(RIGID_COLLISION_GEOMETRY<TV>& body,int p,COLLISION_PA
 {
     TV X=deformable_body_collection.binding_list.X(p),normal=body.Implicit_Geometry_Normal(X);
     TV V_rel=deformable_body_collection.binding_list.V(p)-body.Pointwise_Object_Velocity(X);
-    if(local_coefficient_of_friction<0) local_coefficient_of_friction=body.rigid_geometry.coefficient_of_friction;
+    if(local_coefficient_of_friction<0) local_coefficient_of_friction=body.rigid_body.coefficient_of_friction;
     TV impulse=PhysBAM::Compute_Collision_Impulse(normal,deformable_body_collection.binding_list.Impulse_Factor(p),V_rel,(T)0,local_coefficient_of_friction,0);
     deformable_body_collection.binding_list.Apply_Impulse(p,impulse);
     // set collision state

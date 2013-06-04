@@ -269,9 +269,9 @@ Compute(int ghost_cells,const T dt_input,const T current_velocity_time,const T_F
 
     if(!leakproof_solve && solid_node){
         temporary_velocities.Resize(solid_system->solid_body_collection.deformable_body_collection.particles.Size());
-        temporary_twists.Resize(solid_system->solid_body_collection.rigid_body_collection.rigid_geometry_collection.particles.Size());
+        temporary_twists.Resize(solid_system->solid_body_collection.rigid_body_collection.rigid_body_particles.Size());
         pressure_impulses.Resize(solid_system->solid_body_collection.deformable_body_collection.particles.Size());
-        pressure_impulses_twist.Resize(solid_system->solid_body_collection.rigid_body_collection.rigid_geometry_collection.particles.Size());
+        pressure_impulses_twist.Resize(solid_system->solid_body_collection.rigid_body_collection.rigid_body_particles.Size());
         solid_forces->Compute(dt,current_velocity_time);}
 
     if(use_preconditioner) Compute_Lambda_Diagonal_Preconditioner();
@@ -715,7 +715,7 @@ Test_Matrix() const
     fluid_interpolation->Test_Matrix();
     if(!leakproof_solve) solid_forces->Test_Matrix();
     int number=solid_system->solid_body_collection.deformable_body_collection.particles.number;
-    int rigid_number=solid_system->solid_body_collection.rigid_body_collection.rigid_geometry_collection.particles.number;
+    int rigid_number=solid_system->solid_body_collection.rigid_body_collection.rigid_body_particles.number;
     solid_interpolation->Test_Matrix(number,rigid_number);
     if(use_viscous_forces) fluid_viscous_forces->Test_Matrix();
 

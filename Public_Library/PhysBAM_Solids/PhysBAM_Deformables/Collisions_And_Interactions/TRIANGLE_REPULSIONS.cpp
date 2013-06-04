@@ -233,7 +233,7 @@ Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs)
 
 // TODO: this is broken
 //    for(int i=0;i<geometry.deformable_body_collection.rigid_body_particles.Size();i++){
-//        geometry.deformable_body_collection.rigid_body_particles.Frame(i)=geometry.rigid_body_particle_state_collision_free(i).frame;
+//        geometry.deformable_body_collection.rigid_body_particles.Frame(i)=geometry.rigid_body_particles_state_collision_free(i).frame;
 //        geometry.deformable_body_collection.rigid_body_particles.Euler_Step_Position(VECTOR<int,1>(i),dt);}
     return repulsions;
 }

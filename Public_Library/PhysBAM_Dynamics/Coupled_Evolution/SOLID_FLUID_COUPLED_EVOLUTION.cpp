@@ -136,7 +136,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particles;
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
 
     if(solids){
@@ -670,7 +670,7 @@ Set_Dirichlet_Boundary_Conditions(const T time)
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Compute_W(const T current_position_time)
 {
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
@@ -687,10 +687,10 @@ Compute_W(const T current_position_time)
                 mesh=&deformable->object.mesh;
             else if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(&body)){
                 ++rigid_body_count;
-                const RIGID_GEOMETRY<TV>& rigid_geometry=rigid_collision_geometry->rigid_geometry;
-                if(dynamic_cast<const RIGID_BODY<TV>&>(rigid_geometry).Has_Infinite_Inertia() || !fluids_parameters.fluid_affects_solid){
-                    kinematic_rigid_bodies.Append(rigid_geometry.particle_index);}
-                const T_THIN_SHELL* thin_shell=rigid_geometry.simplicial_object;
+                const RIGID_BODY<TV>& rigid_body=rigid_collision_geometry->rigid_body;
+                if(dynamic_cast<const RIGID_BODY<TV>&>(rigid_body).Has_Infinite_Inertia() || !fluids_parameters.fluid_affects_solid){
+                    kinematic_rigid_bodies.Append(rigid_body.particle_index);}
+                const T_THIN_SHELL* thin_shell=rigid_body.simplicial_object;
                 if(!thin_shell) PHYSBAM_NOT_IMPLEMENTED();
                 mesh=&thin_shell->mesh;}
             else PHYSBAM_FATAL_ERROR();
@@ -776,8 +776,8 @@ Compute_W(const T current_position_time)
                     for(int i=0;i<clipped_simplices_thin_shell.m;i++) total_weight+=clipped_simplices_thin_shell(i).Size();
                     overall_weight+=total_weight;
                     if(total_weight){
-                        const RIGID_GEOMETRY<TV>& rigid_geometry=rigid_collision_geometry->rigid_geometry;
-                        rigid_dual_cell_weights.Append(PAIR<int,T>(rigid_geometry.particle_index,total_weight));}}
+                        const RIGID_BODY<TV>& rigid_body=rigid_collision_geometry->rigid_body;
+                        rigid_dual_cell_weights.Append(PAIR<int,T>(rigid_body.particle_index,total_weight));}}
                 else PHYSBAM_FATAL_ERROR();}
             else{ // TODO: non-simplicial volumetric rigid body
                 PHYSBAM_NOT_IMPLEMENTED();
@@ -896,7 +896,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors)
 {
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     ARRAY<ARRAY<int> > row_counts(colors),kinematic_row_counts(colors);
     ARRAY<int> rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_particles.Size());
     rigid_body_particles_to_dynamic_rigid_body_particles_map.Subset(kinematic_rigid_bodies)=IDENTITY_ARRAY<int>(kinematic_rigid_bodies.m);
@@ -1086,7 +1086,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<ARRAY<T> >& right_hand_side,const ARRAY<INTERVAL<int> >& interior_regions,const int colors)
 {
     POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson=Get_Poisson();
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection);
     for(int i=0;i<colors;i++)
@@ -1110,7 +1110,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_FACE_ARRAYS_SCALAR& face_velocities)
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson=*Get_Poisson();
 
     // TODO: it is possible that we will end up with strange face weight behavior in cells on domain boundaries, depending on how we're setting up our Ws.

@@ -648,9 +648,9 @@ Initialize_Components_And_Key_Bindings()
         deformable_objects_component->Set_Vector_Size(.01);
         deformable_objects_component->selectable=true;
         // TODO: what the hell?
-        if(!FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_geometry_particles",start_frame)){
+        if(!FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
             }}
-    if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_geometry_particles",start_frame)){
+    if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
         //if(deformable_objects_component) rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODIES_2D<T>(deformable_objects_component->solid_body_collection.rigid_body_collection,basedir);
         //else rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODIES_2D<T>(basedir);
         rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>(basedir);

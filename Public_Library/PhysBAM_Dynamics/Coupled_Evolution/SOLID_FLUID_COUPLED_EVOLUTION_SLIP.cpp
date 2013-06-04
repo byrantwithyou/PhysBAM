@@ -140,7 +140,7 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
         for(COLLISION_GEOMETRY_ID p(0);p<fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Size();++p){
             ARRAY<int> added_bodies(0);
             if(RIGID_COLLISION_GEOMETRY<TV>* rigid_body_wrapper=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies(p))){
-                int rigid_particle_index=rigid_body_wrapper->rigid_geometry.particle_index;
+                int rigid_particle_index=rigid_body_wrapper->rigid_body.particle_index;
                 if(!solid_body_collection.rigid_body_collection.Is_Active(rigid_particle_index)){
                     LOG::cout<<"THIS DOESN'T MAKE SENSE"<<std::endl;
                     DEBUG_UTILITIES::Debug_Breakpoint();
@@ -163,19 +163,19 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
                                                                 solids_parameters.rigid_body_collision_parameters.use_fracture_particle_optimization,true);
 
                     LOG::cout<<"Added "<<added_bodies.m<<" to the simulation"<<std::endl;
-                    removed_bodies.Append(solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(rigid_particle_index));
-                    solid_body_collection.rigid_body_collection.rigid_body_particle.Remove_Body(rigid_particle_index);
+                    removed_bodies.Append(solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(rigid_particle_index));
+                    solid_body_collection.rigid_body_collection.rigid_body_particles.Remove_Body(rigid_particle_index);
                     for(int i=0;i<added_bodies.m;i++){
-                        COLLISION_GEOMETRY<TV>* collision_body=&(*solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list)(
-                                solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(added_bodies(i)));
+                        COLLISION_GEOMETRY<TV>* collision_body=&(*solid_body_collection.rigid_body_collection.collision_body_list)(
+                                solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(added_bodies(i)));
                         fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(collision_body,added_bodies(i),false);
                         collision_body->Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,time+dt);}
 
                     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Solid_Node())
                         rigids_evolution_callbacks.End_Fracture(rigid_particle_index,added_bodies);
                     for(int i=0;i<added_bodies.m;i++){
-                        COLLISION_GEOMETRY<TV>* collision_body=&(*solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list)(
-                                solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(added_bodies(i)));
+                        COLLISION_GEOMETRY<TV>* collision_body=&(*solid_body_collection.rigid_body_collection.collision_body_list)(
+                                solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(added_bodies(i)));
                         collision_body->Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,time);}
 
                     all_added_bodies.Append_Elements(added_bodies);}}}
@@ -184,7 +184,7 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
             for(int i=0;i<removed_bodies.m;i++)
                 fluids_parameters.collision_bodies_affecting_fluid->Remove_Body(removed_bodies(i));
 
-            solid_body_collection.rigid_body_collection.rigid_geometry_collection.Destroy_Unreferenced_Geometry();
+            solid_body_collection.rigid_body_collection.Destroy_Unreferenced_Geometry();
             solid_body_collection.rigid_body_collection.Update_Simulated_Particles();
             rigid_body_collisions->Initialize_Data_Structures(true);
             for(int i=0;i<all_added_bodies.m;i++){
@@ -283,7 +283,7 @@ Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T cu
 {
     static int solve_id=-1;solve_id++;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     EULER_PROJECTION_UNIFORM<T_GRID>& euler_projection=fluids_parameters.euler->euler_projection;
     bool solids=Simulate_Solids();
     bool fluids=Simulate_Fluids();
@@ -625,7 +625,7 @@ Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const COLLISION_AWARE_INDEX_
     ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_velocities)
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
 
     psi_N=psi_N_domain;
 

@@ -413,7 +413,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             box1.is_static=true;
             box2.is_static=false;
             kinematic_id=box2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box2.particle_index)=true;
             curve.Add_Control_Point(0,FRAME<TV>(TV(0,12)));
             curve.Add_Control_Point(5,FRAME<TV>(TV(0,10)));
             curve.Add_Control_Point(6,FRAME<TV>(TV(0,10)));
@@ -429,7 +429,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             box1.is_static=true;
             box2.is_static=false;
             kinematic_id=box2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box2.particle_index)=true;
             curve.Add_Control_Point(0,FRAME<TV>(TV(0,2)));
             curve.Add_Control_Point(5,FRAME<TV>(TV(0,0)));
             curve.Add_Control_Point(6,FRAME<TV>(TV(0,0)));
@@ -450,7 +450,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             //box1.is_static=true;
             box2.is_static=false;
             kinematic_id=box2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box2.particle_index)=true;
             curve.Add_Control_Point(0,FRAME<TV>(TV(0,12)));
             curve.Add_Control_Point(5,FRAME<TV>(TV(0,0)));
             curve.Add_Control_Point(6,FRAME<TV>(TV(0,0)));
@@ -581,7 +581,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
     if(solid_body_collection.deformable_body_collection.mpi_solids){
-        solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,processes_per_dimension);
+        solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection,particles.X,processes_per_dimension);
         switch(test_number){
             case 1:
             case 24: 

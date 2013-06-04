@@ -116,11 +116,11 @@ Add_Rigid_Body(const std::string& name,const T scaling_factor,const T friction,c
         if(implicit){
             if(TV::m==3){
                 STRUCTURE<TV>* structure=choice<TV::m-2>(implicit,TESSELLATION::Generate_Triangles(*implicit));
-                if(!rigid_body_collection.rigid_geometry_collection.Register_Analytic_Replacement_Structure(basename+".tri",scaling_factor,structure))
+                if(!rigid_body_collection.Register_Analytic_Replacement_Structure(basename+".tri",scaling_factor,structure))
                     delete structure;}
             else
                 read_simplicial=false;
-            if(!rigid_body_collection.rigid_geometry_collection.Register_Analytic_Replacement_Structure(basename+(TV::m==3?".phi":".phi2d"),scaling_factor,implicit))
+            if(!rigid_body_collection.Register_Analytic_Replacement_Structure(basename+(TV::m==3?".phi":".phi2d"),scaling_factor,implicit))
                 delete implicit;}}
     int id=rigid_body_collection.Add_Rigid_Body(example.stream_type,basename,scaling_factor,read_simplicial,read_implicit);
     RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(id);
@@ -138,7 +138,7 @@ Add_Ground(const T friction,const T height,const T coefficient_of_restitution,co
     RIGID_BODY<TV>& ground=Add_Rigid_Body("ground",scale,friction);
     ground.Frame().t.y=height;
     ground.is_static=true;
-    ground.rigid_body_collection.rigid_geometry_collection.collision_body_list->Get_Collision_Geometry(ground.particle_index)->add_to_spatial_partition=false;
+    ground.rigid_body_collection.collision_body_list->Get_Collision_Geometry(ground.particle_index)->add_to_spatial_partition=false;
     ground.Set_Coefficient_Of_Restitution(coefficient_of_restitution);
     ground.name="ground";
     return ground;

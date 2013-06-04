@@ -14,6 +14,39 @@ template<class TV> RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>::
 ~RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES()
 {}
 //#####################################################################
+// Function Set_External_Positions
+//#####################################################################
+template<class TV> void RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>::
+Set_External_Positions(ARRAY_VIEW<FRAME<TV> > rotation,const T time)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Set_External_Velocities
+//#####################################################################
+template<class TV> void RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>::
+Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Set_Kinematic_Positions
+//#####################################################################
+template<class TV> void RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>::
+Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Set_Kinematic_Velocities
+//#####################################################################
+template<class TV> bool RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>::
+Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+    return false;
+}
+//#####################################################################
 // Function Add_External_Forces
 //#####################################################################
 template<class TV> void RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>::

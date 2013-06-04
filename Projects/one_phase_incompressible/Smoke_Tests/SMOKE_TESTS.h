@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Vectors/Dot_Product.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_EXAMPLE.h>
 
@@ -39,7 +39,7 @@ class SMOKE_TESTS:public INCOMPRESSIBLE_EXAMPLE<TV>
 
 public:
     using BASE::mac_grid; using BASE::incompressible;using BASE::projection;using BASE::output_directory;using BASE::mpi_grid;using BASE::domain_boundary;
-    using BASE::face_velocities;using BASE::last_frame;using BASE::write_substeps_level;using BASE::rigid_geometry_collection;using BASE::boundary_scalar;using BASE::density;
+    using BASE::face_velocities;using BASE::last_frame;using BASE::write_substeps_level;using BASE::rigid_body_collection;using BASE::boundary_scalar;using BASE::density;
     using BASE::boundary;using BASE::restart;using BASE::temperature;
 
     SMOKE_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
@@ -99,19 +99,19 @@ public:
                 use_collisions=true;
                 if(TV::dimension==2) model_file_name="../../Public_Data/Rigid_Bodies_2D/circle";
                 else model_file_name="../../Public_Data/Rigid_Bodies/sphere";
-                rigid_particle_id=rigid_geometry_collection.Add_Rigid_Geometry(stream_type,model_file_name,T(.07),true,true,true,true);
-                rigid_geometry_collection.particles.frame(rigid_particle_id).t=TV::Constant_Vector(T(.25));
-                rigid_geometry_collection.particles.frame(rigid_particle_id).t(1)=0.5;
-                rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->is_static=true;
+                rigid_particle_id=rigid_body_collection.Add_Rigid_Body(stream_type,model_file_name,T(.07),true,true,true,true);
+                rigid_body_collection.rigid_body_particles.frame(rigid_particle_id).t=TV::Constant_Vector(T(.25));
+                rigid_body_collection.rigid_body_particles.frame(rigid_particle_id).t(1)=0.5;
+                rigid_body_collection.rigid_body_particles.rigid_body(rigid_particle_id)->is_static=true;
                 break;
             case 3:
                 use_collisions=true;
                 if(TV::dimension==2) model_file_name="../../Public_Data/Rigid_Bodies_2D/circle";
                 else model_file_name="../../Public_Data/Rigid_Bodies/sphere";
-                rigid_particle_id=rigid_geometry_collection.Add_Rigid_Geometry(stream_type,model_file_name,T(.1),true,true,true,true);
-                rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->is_static=false;
+                rigid_particle_id=rigid_body_collection.Add_Rigid_Body(stream_type,model_file_name,T(.1),true,true,true,true);
+                rigid_body_collection.rigid_body_particles.rigid_body(rigid_particle_id)->is_static=false;
                 break;}
-        rigid_geometry_collection.Update_Kinematic_Particles();
+        rigid_body_collection.Update_Kinematic_Particles();
     }
     
     void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
@@ -166,10 +166,10 @@ public:
             if(iterator.Axis()==1)face_velocities(iterator.Full_Index())=1;
             else face_velocities(iterator.Full_Index())=0;}
         if(use_collisions){
-            int first_cell_in_solid=rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(iterator.First_Cell_Center()),second_cell_in_solid=rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(iterator.Second_Cell_Center());
+            int first_cell_in_solid=rigid_body_collection.rigid_body_particles.rigid_body(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(iterator.First_Cell_Center()),second_cell_in_solid=rigid_body_collection.rigid_body_particles.rigid_body(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(iterator.Second_Cell_Center());
             if(first_cell_in_solid+second_cell_in_solid==1 || (test_number==3 && first_cell_in_solid+second_cell_in_solid==2)){
                 projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
-                TV rigid_velocity=RIGID_GEOMETRY<TV>::Pointwise_Object_Velocity(rigid_geometry_collection.particles.twist(rigid_particle_id),rigid_geometry_collection.particles.frame(rigid_particle_id).t,iterator.Location());
+                TV rigid_velocity=RIGID_BODY<TV>::Pointwise_Object_Velocity(rigid_body_collection.rigid_body_particles.twist(rigid_particle_id),rigid_body_collection.rigid_body_particles.frame(rigid_particle_id).t,iterator.Location());
                 TV fluid_velocity;
                 fluid_velocity(iterator.Axis())=face_velocities.Component(iterator.Axis())(iterator.Face_Index());
                 for(int i=1;i<TV::dimension;i++){int axis=(iterator.Axis()-1+i)%TV::dimension+1;
@@ -178,12 +178,12 @@ public:
                         +face_velocities.Component(axis)(iterator.Face_Index()-TV_INT::Axis_Vector(iterator.Axis()))
                         +face_velocities.Component(axis)(iterator.Face_Index()+TV_INT::Axis_Vector(axis))
                         +face_velocities.Component(axis)(iterator.Face_Index()+TV_INT::Axis_Vector(axis)-TV_INT::Axis_Vector(iterator.Axis())))*0.25;}
-                TV rigid_normal=rigid_geometry_collection.Rigid_Geometry(rigid_particle_id).Implicit_Geometry_Normal(iterator.Location());
+                TV rigid_normal=rigid_body_collection.Rigid_Body(rigid_particle_id).Implicit_Geometry_Normal(iterator.Location());
                 T projected_velocity=Dot_Product(rigid_normal,fluid_velocity-rigid_velocity);
                 if(projected_velocity<0) face_velocities.Component(iterator.Axis())(iterator.Face_Index())=(fluid_velocity-rigid_normal*projected_velocity)(iterator.Axis());}
             else if(first_cell_in_solid+second_cell_in_solid==2 && test_number==2){
                 projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
-                face_velocities.Component(iterator.Axis())(iterator.Face_Index())=RIGID_GEOMETRY<TV>::Pointwise_Object_Velocity(rigid_geometry_collection.particles.twist(rigid_particle_id),rigid_geometry_collection.particles.frame(rigid_particle_id).t,iterator.Location())(iterator.Axis());}}}}
+                face_velocities.Component(iterator.Axis())(iterator.Face_Index())=RIGID_BODY<TV>::Pointwise_Object_Velocity(rigid_body_collection.rigid_body_particles.twist(rigid_particle_id),rigid_body_collection.rigid_body_particles.frame(rigid_particle_id).t,iterator.Location())(iterator.Axis());}}}}
 
     void Initialize_Fields()
     {for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) face_velocities(iterator.Full_Index())=0;
@@ -193,7 +193,7 @@ public:
     {for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
         if(Source_Box_Lazy_Inside(iterator.Location())) density(iterator.Cell_Index())=1;
     for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
-        if(use_collisions && rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(iterator.Location())) density(iterator.Cell_Index())=0;}
+        if(use_collisions && rigid_body_collection.rigid_body_particles.rigid_body(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(iterator.Location())) density(iterator.Cell_Index())=0;}
     
     void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::dimension> >& force,const ARRAY<T,TV_INT>& density_ghost,const T dt,const T time)
     {

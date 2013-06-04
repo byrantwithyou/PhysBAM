@@ -257,7 +257,7 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
     typedef TWIST<TV> T_TWIST;
     const int d=TV::dimension;
 
-    int n_bodies=rigid_body_collection.rigid_body_particle.Size();
+    int n_bodies=rigid_body_collection.rigid_body_particles.Size();
     int n_contacts=contacts.m;
 
     T maximum_residual=2*tolerance+1;

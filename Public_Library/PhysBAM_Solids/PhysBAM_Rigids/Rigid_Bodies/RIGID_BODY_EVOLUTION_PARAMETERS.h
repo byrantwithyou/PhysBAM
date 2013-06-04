@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_EVOLUTION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 namespace PhysBAM{
 
 template<class TV>
@@ -17,6 +17,7 @@ class RIGID_BODY_EVOLUTION_PARAMETERS:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
 public:
+    bool use_kinematic_keyframes;
     bool simulate_rigid_bodies;
     bool write_rigid_bodies;
     T rigid_body_ether_viscosity;
@@ -29,7 +30,6 @@ public:
     T rigid_cfl;
     T rigid_minimum_dt;
     T rigid_maximum_dt;
-    RIGID_GEOMETRY_EVOLUTION_PARAMETERS rigid_geometry_evolution_parameters;
     bool correct_evolution_energy;
     T residual_push_out_depth;
     bool correct_contact_energy;

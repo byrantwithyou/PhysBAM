@@ -650,7 +650,7 @@ void Get_Initial_Data()
             bottom_box.is_static=true;
             top_box.is_static=false;
             kinematic_id=top_box.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(top_box.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(top_box.particle_index)=true;
             curve.Add_Control_Point(0,FRAME<TV>(TV(0,(T)2,0)));
             curve.Add_Control_Point(1,FRAME<TV>(TV(0,(T)1,0)));
             curve.Add_Control_Point(2,FRAME<TV>(TV(0,(T)1,0)));
@@ -701,7 +701,7 @@ void Get_Initial_Data()
             box1.is_static=true;
             box2.is_static=false;
             kinematic_id=box2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box2.particle_index)=true;
             curve.Add_Control_Point(0,FRAME<TV>(TV(0,11,0)));
             curve.Add_Control_Point(5,FRAME<TV>(TV(0,8,0)));
             curve.Add_Control_Point(6,FRAME<TV>(TV(0,8,0)));
@@ -740,7 +740,7 @@ void Get_Initial_Data()
             box_top.coefficient_of_friction=0;
 
             kinematic_id=box_top.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(box_top.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box_top.particle_index)=true;
             curve.Add_Control_Point(0,FRAME<TV>(TV(0,2,0)));
             curve.Add_Control_Point(10,FRAME<TV>(TV(0,0,0)));
             last_frame=300;
@@ -765,9 +765,9 @@ void Get_Initial_Data()
             cylinder1.is_static=false;
             cylinder2.is_static=false;
             kinematic_id= cylinder1.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(cylinder1.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(cylinder1.particle_index)=true;
             kinematic_id2=cylinder2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(cylinder2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(cylinder2.particle_index)=true;
             T period=10.0;T start=0.0;T radius=6.0;int pts=75;T freq=.25;
             for(int ind=0;ind<pts;ind++){
                 curve.Add_Control_Point(start+freq*ind,FRAME<TV>(TV(radius*sin(2.0*pi*freq*ind/period),radius*cos(2.0*pi*freq*ind/period),0)));
@@ -789,7 +789,7 @@ void Get_Initial_Data()
             sphere.is_static=false;
             tests.Add_Ground();
             kinematic_id=sphere.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(sphere.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(sphere.particle_index)=true;
             curve.Add_Control_Point(0,FRAME<TV>(TV(0,0.5,-10)));
             curve.Add_Control_Point(20,FRAME<TV>(TV(0,0.5,90)));
 
@@ -860,9 +860,9 @@ void Get_Initial_Data()
             torus2.coefficient_of_friction=0.05;
 
             kinematic_id=torus1.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(torus1.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(torus1.particle_index)=true;
             kinematic_id2=torus2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(torus2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(torus2.particle_index)=true;
 
             T x_start=11.2;
             T x_stop =15;
@@ -895,11 +895,11 @@ void Get_Initial_Data()
             cylinder.coefficient_of_friction=0;
  
             kinematic_id=gear1.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(gear1.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(gear1.particle_index)=true;
             kinematic_id2=gear2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(gear2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(gear2.particle_index)=true;
             kinematic_id3=cylinder.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(cylinder.particle_index)=true;
              
             T angular_velocity=1;
             T scale=1;
@@ -945,17 +945,17 @@ void Get_Initial_Data()
             gear6.coefficient_of_friction=input_friction;
             
             kinematic_id=gear1.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(gear1.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(gear1.particle_index)=true;
             kinematic_id2=gear2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(gear2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(gear2.particle_index)=true;
             kinematic_id3=gear3.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(gear3.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(gear3.particle_index)=true;
             kinematic_id4=gear4.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(gear4.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(gear4.particle_index)=true;
             kinematic_id5=gear5.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(gear5.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(gear5.particle_index)=true;
             kinematic_id6=gear6.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(gear6.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(gear6.particle_index)=true;
             
             T angular_velocity=1;T gear_dx;
             if (gears_of_pain) gear_dx=(T).377;else gear_dx=(T).4;
@@ -994,14 +994,14 @@ void Get_Initial_Data()
             
             /* box3.coefficient_of_friction=.5;
              kinematic_id3=box3.particle_index;
-             rigid_body_collection.rigid_body_particle.kinematic(box3.particle_index)=true;
+             rigid_body_collection.rigid_body_particles.kinematic(box3.particle_index)=true;
              curve3.Add_Control_Point(0,FRAME<TV>(TV(0,3.0*scale,-1.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
              curve3.Add_Control_Point(.1,FRAME<TV>(TV(0,3.0*scale,-1.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
              curve3.Add_Control_Point(.11,FRAME<TV>(TV(0,3.0*scale,-3.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));*/
             
             box0.coefficient_of_friction=.05;
             kinematic_id8=box0.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(box0.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box0.particle_index)=true;
             curve8.Add_Control_Point(0,FRAME<TV>(TV(0,4.0*scale,-0.0*scale)));
             curve8.Add_Control_Point(1.5+hand_scale,FRAME<TV>(TV(0,4.0*scale,-0.0*scale),ROTATION<TV>(0*(T)pi/2.0,TV(1,0,0))));
             curve8.Add_Control_Point(1.53+hand_scale,FRAME<TV>(TV(0,3.1*scale,-1.0*scale),ROTATION<TV>((T)pi/2.0,TV(1,0,0))));
@@ -1011,7 +1011,7 @@ void Get_Initial_Data()
             cylinder.Frame().t=TV(0,5.0*scale,0*scale);
             cylinder.is_static=false;
             kinematic_id7=cylinder.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(cylinder.particle_index)=true;
             curve7.Add_Control_Point(0,FRAME<TV>(TV(0,5.0*scale,0*scale)));
             curve7.Add_Control_Point(drop_time,FRAME<TV>(TV(0,5.0*scale,0*scale)));
             curve7.Add_Control_Point(drop_time+(T)1,FRAME<TV>(TV(0,2.0*scale,0*scale)));
@@ -1028,7 +1028,7 @@ void Get_Initial_Data()
             cylinder.is_static=false;
             cylinder.coefficient_of_friction=1e8;
             kinematic_id=cylinder.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(cylinder.particle_index)=true;
             for(int i=0;i<128;i++) curve.Add_Control_Point(i,FRAME<TV>(TV(-25+i*velocity,radius*1.05,0),ROTATION<TV>(-i*velocity/radius,TV(0,0,1))));
 
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,2,0)));
@@ -1238,14 +1238,14 @@ void Get_Initial_Data()
             kinematic_id7=box7.particle_index;
             box8.is_static=false;
             kinematic_id8=box8.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(box1.particle_index)=true;
-            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
-            rigid_body_collection.rigid_body_particle.kinematic(box3.particle_index)=true;
-            rigid_body_collection.rigid_body_particle.kinematic(box4.particle_index)=true;
-            rigid_body_collection.rigid_body_particle.kinematic(box5.particle_index)=true;
-            rigid_body_collection.rigid_body_particle.kinematic(box6.particle_index)=true;
-            rigid_body_collection.rigid_body_particle.kinematic(box7.particle_index)=true;
-            rigid_body_collection.rigid_body_particle.kinematic(box8.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box1.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box3.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box4.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box5.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box6.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box7.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box8.particle_index)=true;
             
              
             
@@ -1494,9 +1494,9 @@ void Get_Initial_Data()
             gear1.coefficient_of_friction=2;
             gear2.coefficient_of_friction=2;
             kinematic_id=gear1.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(gear1.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(gear1.particle_index)=true;
             kinematic_id2=gear2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(gear2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(gear2.particle_index)=true;
             T angular_velocity=1;
 
             for(int i=0;i<60;i++){
@@ -2031,7 +2031,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     if(solid_body_collection.deformable_body_collection.mpi_solids){
         VECTOR<int,3> processes_per_dimension(2,1,1);
-        deformable_body_collection.mpi_solids->Simple_Partition(deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,processes_per_dimension);}
+        deformable_body_collection.mpi_solids->Simple_Partition(deformable_body_collection,solid_body_collection.rigid_body_collection,particles.X,processes_per_dimension);}
 
     for(int i=0;i<deformable_body_collection.structures.m;i++){
         deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.structures(i));

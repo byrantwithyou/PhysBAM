@@ -1692,11 +1692,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Solids_Geometry\RIGID_GEOMETRY.cpp"
+				RelativePath="..\Solids_Geometry\RIGID_BODY.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Solids_Geometry\RIGID_GEOMETRY.h"
+				RelativePath="..\Solids_Geometry\RIGID_BODY.h"
 				>
 			</File>
 			<File

@@ -26,7 +26,7 @@ template<class TV> void RIGID_POINTWISE_FORCE<TV>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated)
 {
     if(influence_all_rigid_body_particles){
-        ARRAY<int> all_rigid=Get_Rigid_Body_Particle_List(IDENTITY_ARRAY<>(rigid_body_collection.rigid_body_particle.Size()));
+        ARRAY<int> all_rigid=Get_Rigid_Body_Particle_List(IDENTITY_ARRAY<>(rigid_body_collection.rigid_body_particles.Size()));
         force_rigid_body_particles.Update(all_rigid,particle_is_simulated);}
     else if(influenced_rigid_body_particles) force_rigid_body_particles.Update(*influenced_rigid_body_particles,particle_is_simulated);
 }

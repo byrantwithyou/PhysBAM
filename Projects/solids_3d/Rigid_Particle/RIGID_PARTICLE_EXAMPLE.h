@@ -85,11 +85,11 @@ virtual void Get_Initial_Data()
     // rigid bodies
     for(int i=0;i<3;i++){
         solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/subdivided_box",(T)1.0);
-        rigid_body_collection.rigid_body_particle.frame(i).t=TV((T)5*i+(T).5,initial_height,0);
-        rigid_body_collection.rigid_body_particle.frame(i).r=ROTATION<TV>::From_Rotation_Vector(TV());
+        rigid_body_collection.rigid_body_particles.frame(i).t=TV((T)5*i+(T).5,initial_height,0);
+        rigid_body_collection.rigid_body_particles.frame(i).r=ROTATION<TV>::From_Rotation_Vector(TV());
         rigid_body_collection.Rigid_Body(i).coefficient_of_friction=0;
         rigid_body_collection.Rigid_Body(i).Set_Coefficient_Of_Restitution((T).5);
-        T mass_scale_factor=10/rigid_body_collection.rigid_body_particle.mass(i);
+        T mass_scale_factor=10/rigid_body_collection.rigid_body_particles.mass(i);
         rigid_body_collection.Rigid_Body(i).Set_Rigid_Mass(rigid_body_collection.Rigid_Body(i).Rigid_Mass()*mass_scale_factor);
         solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,5*i,rigid_body_collection,i,TV((T)-.5,0,0)));
         solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,5*i+1,rigid_body_collection,i,TV((T).5,0,0)));}
@@ -153,7 +153,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T veloc
 //#####################################################################
 void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE
 {
-    if(id==ground_id) frame.t.x=solid_body_collection.rigid_body_collection.rigid_body_particle.frame(2).t.x;
+    if(id==ground_id) frame.t.x=solid_body_collection.rigid_body_collection.rigid_body_particles.frame(2).t.x;
 }
 //#####################################################################
 };

@@ -139,7 +139,7 @@ void Ring_Test()
     random_placement.Set_Angular_Speed_Range(0,1);
     Random_Scene_Generator("Rings_Test/ring_revolve",400,11111,random_placement,solid_body_collection.rigid_body_collection,tests);
     
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.Size();i++){
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particles.Size();i++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(i);
         rigid_body.Set_Coefficient_Of_Restitution(epsilon);
         rigid_body.coefficient_of_friction=mu;
@@ -174,7 +174,7 @@ void Bone_Test()
     random_placement.Set_Fixed_Scale(3);
     Random_Scene_Generator("Bones/Cranium_Resized",400,11111,random_placement,solid_body_collection.rigid_body_collection,tests);
     
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.Size();i++){
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particles.Size();i++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(i);
         rigid_body.Set_Coefficient_Of_Restitution(epsilon);
         rigid_body.coefficient_of_friction=mu;

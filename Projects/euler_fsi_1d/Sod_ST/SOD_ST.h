@@ -330,7 +330,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         else rect.Frame().t=grid.X(TV_INT((T).7*TV(grid.counts)))+grid.DX()/(T)2+scaling_factor/(T)2+epsilon;
         rect.Is_Kinematic()=false;
 
-        fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);}
+        fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);}
 }
 //#####################################################################
 // Function Intialize_Euler_State

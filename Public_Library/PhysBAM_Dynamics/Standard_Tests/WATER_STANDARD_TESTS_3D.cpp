@@ -325,16 +325,16 @@ Initialize_Bodies()
 {
     if(test_number==4){
         sphere=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/sphere",(T).1,true,true,false);
-        rigid_body_collection.rigid_body_particle.frame(sphere).t=TV((T)1.25,(T).55,(T).5);
-        rigid_body_collection.rigid_body_particle.kinematic(sphere)=true;}
+        rigid_body_collection.rigid_body_particles.frame(sphere).t=TV((T)1.25,(T).55,(T).5);
+        rigid_body_collection.rigid_body_particles.kinematic(sphere)=true;}
     else if (test_number==20){
         sphere=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/sphere",(T).1,true,true,false);
-        rigid_body_collection.rigid_body_particle.frame(sphere).t=TV((T).8,(T).1,(T).5);
-        rigid_body_collection.rigid_body_particle.kinematic(sphere)=true;}
+        rigid_body_collection.rigid_body_particles.frame(sphere).t=TV((T).8,(T).1,(T).5);
+        rigid_body_collection.rigid_body_particles.kinematic(sphere)=true;}
     if(use_inaccurate_body_collisions){
-        inaccurate_union.collision_bodies.Add_Bodies(rigid_body_collection.rigid_geometry_collection);
+        inaccurate_union.collision_bodies.Add_Bodies(rigid_body_collection);
         fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(&inaccurate_union,0,false);}
-    else fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);
+    else fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 }
 //#####################################################################
 // Function Update_Sources
@@ -385,7 +385,7 @@ template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::
 Limit_Dt(T& dt,const T time)
 {
     if(test_number==4 || test_number==20){
-        TV velocity=rigid_body_collection.rigid_body_particle.twist(sphere).linear;
+        TV velocity=rigid_body_collection.rigid_body_particles.twist(sphere).linear;
         T rigid_dt_denominator=abs(velocity.x)/grid.dX.x+abs(velocity.y)/grid.dX.y+abs(velocity.z)/grid.dX.z;
         if(rigid_dt_denominator>1e-8) dt=min(dt,1/rigid_dt_denominator);}
 }

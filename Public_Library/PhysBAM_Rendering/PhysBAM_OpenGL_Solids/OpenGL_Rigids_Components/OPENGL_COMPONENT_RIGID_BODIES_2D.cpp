@@ -123,7 +123,7 @@ Reinitialize(const bool force)
 
         if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/arb_info",basedir.c_str(),frame)))
             Read_Articulated_Information(STRING_UTILITIES::string_sprintf("%s/%d/arb_info",basedir.c_str(),frame));
-        int max_number_of_bodies(max(opengl_segmented_curve.Size(),rigid_body_collection.rigid_body_particle.Size()));
+        int max_number_of_bodies(max(opengl_segmented_curve.Size(),rigid_body_collection.rigid_body_particles.Size()));
         // only enlarge array as we read in more geometry to memory
         opengl_segmented_curve.Resize(max_number_of_bodies);
         opengl_triangulated_area.Resize(max_number_of_bodies);
@@ -139,10 +139,10 @@ Reinitialize(const bool force)
             Create_Geometry(id);}
 
         // Update active bodies / remove inactive bodies
-        for(int id=0;id<rigid_body_collection.rigid_body_particle.Size();id++){
+        for(int id=0;id<rigid_body_collection.rigid_body_particles.Size();id++){
             if(rigid_body_collection.Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
-        for(int id=rigid_body_collection.rigid_body_particle.Size();id<opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
+        for(int id=rigid_body_collection.rigid_body_particles.Size();id<opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
 
         frame_loaded=frame;
         valid=true;
@@ -236,12 +236,12 @@ Update_Object_Labels()
         node_velocity_vectors.Resize(number_of_drawn_bodies*4);}
 
     int idx=0;
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
+    for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
         if(draw_object(i)){
             if(draw_velocity_vectors || draw_node_velocity_vectors){idx++;
                 if(draw_velocity_vectors){
-                    positions(idx)=rigid_body_collection.rigid_body_particle.frame(i).t;
-                    velocity_vectors(idx)=rigid_body_collection.rigid_body_particle.twist(i).linear;}
+                    positions(idx)=rigid_body_collection.rigid_body_particles.frame(i).t;
+                    velocity_vectors(idx)=rigid_body_collection.rigid_body_particles.twist(i).linear;}
                 if(draw_node_velocity_vectors){
                     //only valid for squares . . .
                     RIGID_BODY<TV>* rigid_body=&rigid_body_collection.Rigid_Body(i);
@@ -260,7 +260,7 @@ Update_Object_Labels()
             if(opengl_segmented_curve(i)){
                 if(output_positions){
                     rigid_body_collection.Rigid_Body(i).Update_Angular_Velocity();
-                    opengl_segmented_curve(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f %.3f> [w=%.3f]",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particle.frame(i).t.x,rigid_body_collection.rigid_body_particle.frame(i).t.y,rigid_body_collection.rigid_body_particle.twist(i).angular.x));}
+                    opengl_segmented_curve(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f %.3f> [w=%.3f]",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particles.frame(i).t.x,rigid_body_collection.rigid_body_particles.frame(i).t.y,rigid_body_collection.rigid_body_particles.twist(i).angular.x));}
                 else opengl_segmented_curve(i)->Set_Name(rigid_body_collection.Rigid_Body(i).name);}}}
 }
 //#####################################################################
@@ -304,27 +304,27 @@ Display(const int in_color) const
 
         if(draw_segmented_curve){
             glPushName(1);
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
+            for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
                 glPushName(Value(i));
                 if(draw_object(i) && opengl_segmented_curve(i)) opengl_segmented_curve(i)->Display(in_color);
                 glPopName();}
             glPopName();}
         if(draw_triangulated_area){
             glPushName(2);
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
+            for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
                 glPushName(Value(i));
                 if(draw_object(i) && opengl_triangulated_area(i)) opengl_triangulated_area(i)->Display(in_color);
                 glPopName();}
             glPopName();}
         if(draw_implicit_curve){
             glPushName(3);
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
+            for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
                 glPushName(Value(i));
                 if(draw_object(i) && opengl_levelset(i)) opengl_levelset(i)->Display(in_color);
                 glPopName();}
             glPopName();}
         if(draw_individual_axes)
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++)
+            for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
                 if(draw_object(i) && opengl_axes(i)) opengl_axes(i)->Display(in_color);
 
         // Articulated rigid bodies
@@ -373,16 +373,16 @@ Display(const int in_color) const
             if(draw_velocity_vectors) velocity_field.Display(in_color);
             if(draw_node_velocity_vectors) node_velocity_field.Display(in_color);
 
-            if(draw_forces_and_torques && forces_and_torques.Size()==rigid_body_collection.rigid_body_particle.Size()){
+            if(draw_forces_and_torques && forces_and_torques.Size()==rigid_body_collection.rigid_body_particles.Size()){
                 T scale=(T)velocity_field.size/24;
                 OPENGL_COLOR::Yellow().Send_To_GL_Pipeline();
                 OpenGL_Begin(GL_LINES);
                 for(int i=0;i<forces_and_torques.Size();i++)
-                    OPENGL_SHAPES::Draw_Arrow(rigid_body_collection.rigid_body_particle.frame(i).t,rigid_body_collection.rigid_body_particle.frame(i).t+scale*forces_and_torques(i).x);
+                    OPENGL_SHAPES::Draw_Arrow(rigid_body_collection.rigid_body_particles.frame(i).t,rigid_body_collection.rigid_body_particles.frame(i).t+scale*forces_and_torques(i).x);
                 OpenGL_End();
                 for(int i=0;i<forces_and_torques.Size();i++){
                     std::string label=STRING_UTILITIES::string_sprintf("F=%.3f %.3f, T=%.3f",forces_and_torques(i).x.x,forces_and_torques(i).x.y,forces_and_torques(i).y);
-                    OpenGL_String(rigid_body_collection.rigid_body_particle.frame(i).t+scale*forces_and_torques(i).x,label);}}
+                    OpenGL_String(rigid_body_collection.rigid_body_particles.frame(i).t+scale*forces_and_torques(i).x,label);}}
 
             for(int i=0;i<extra_components.Size();i++)
                 for(int j=0;j<extra_components(i).m;j++)
@@ -390,9 +390,9 @@ Display(const int in_color) const
 
             if(show_object_names){
                 glColor3f(1,1,1);
-                for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++)
+                for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
                     if(draw_object(i) && rigid_body_collection.Rigid_Body(i).name.length())
-                        OpenGL_String(rigid_body_collection.rigid_body_particle.frame(i).t,rigid_body_collection.Rigid_Body(i).name);}}
+                        OpenGL_String(rigid_body_collection.rigid_body_particles.frame(i).t,rigid_body_collection.Rigid_Body(i).name);}}
         glPopAttrib();}
 }
 //#####################################################################

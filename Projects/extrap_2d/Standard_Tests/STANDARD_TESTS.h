@@ -374,7 +374,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             box1.is_static=true;
             box2.is_static=false;
             kinematic_id=box2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box2.particle_index)=true;
             curve.Add_Control_Point(0,FRAME<TV>(TV(0,12)));
             curve.Add_Control_Point(5,FRAME<TV>(TV(0,10)));
             curve.Add_Control_Point(6,FRAME<TV>(TV(0,10)));
@@ -390,7 +390,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             box1.is_static=true;
             box2.is_static=false;
             kinematic_id=box2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box2.particle_index)=true;
             curve.Add_Control_Point(0,FRAME<TV>(TV(0,2)));
             curve.Add_Control_Point(5,FRAME<TV>(TV(0,0)));
             curve.Add_Control_Point(6,FRAME<TV>(TV(0,0)));
@@ -411,7 +411,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             //box1.is_static=true;
             box2.is_static=false;
             kinematic_id=box2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box2.particle_index)=true;
             curve.Add_Control_Point(0,FRAME<TV>(TV(0,12)));
             curve.Add_Control_Point(5,FRAME<TV>(TV(0,0)));
             curve.Add_Control_Point(6,FRAME<TV>(TV(0,0)));
@@ -433,8 +433,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             box2.is_static=false;
             kinematic_id=box1.particle_index;
             kinematic_id2=box2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(box1.particle_index)=true;
-            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box1.particle_index)=true;
+            rigid_body_collection.rigid_body_particles.kinematic(box2.particle_index)=true;
             for (int ind=0;ind<20;ind++){
                 curve.Add_Control_Point(ind+4,FRAME<TV>(TV(-5*sin(2.0*pi*ind/5.0),-5*cos(2.0*pi*ind/5.0))));
                 curve2.Add_Control_Point(ind+4,FRAME<TV>(TV(5*sin(2.0*pi*ind/5.0),5*cos(2.0*pi*ind/5.0))));
@@ -616,7 +616,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(ether_drag) solid_body_collection.Add_Force(new ETHER_DRAG<GRID<TV> >(particles,rigid_body_collection,true,true,ether_drag,0));
 
     if(solid_body_collection.deformable_body_collection.mpi_solids)
-        solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,VECTOR<int,2>(2,1));
+        solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection,particles.X,VECTOR<int,2>(2,1));
     solid_body_collection.Update_Simulated_Particles();
 
     if(!semi_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;

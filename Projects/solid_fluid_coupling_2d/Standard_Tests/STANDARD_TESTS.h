@@ -434,10 +434,10 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         evolution->Output_Iterators(this->stream_type,output_directory.c_str(),frame);}
     if(test_number==40){
         T v=fluid_collection.incompressible_fluid_collection.face_velocities(FACE_INDEX<2>(2,fluids_parameters.grid->counts/2));
-        if(solid_body_collection.rigid_body_collection.rigid_body_particle.frame.m>=3) v=solid_body_collection.rigid_body_collection.rigid_body_particle.twist(2).linear.y;
+        if(solid_body_collection.rigid_body_collection.rigid_body_particles.frame.m>=3) v=solid_body_collection.rigid_body_collection.rigid_body_particles.twist(2).linear.y;
         LOG::cout<<"middle-velocity "<<v<<"   error from analytic solution "<<(v/analytic_solution-1)<<std::endl;}
     if(test_number==32){
-        LOG::cout<<"solid-velocity "<<solid_body_collection.rigid_body_collection.rigid_body_particle.twist.Last().linear.y<<std::endl;}
+        LOG::cout<<"solid-velocity "<<solid_body_collection.rigid_body_collection.rigid_body_particles.twist.Last().linear.y<<std::endl;}
     if(test_number==41){
         ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
         LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interp;
@@ -502,7 +502,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 //#####################################################################
 void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    if(test_number==40 && solid_body_collection.rigid_body_collection.rigid_body_particle.frame.m>=3) solid_body_collection.rigid_body_collection.rigid_body_particle.frame(2).t=TV(.5,.5)*scale_length;
+    if(test_number==40 && solid_body_collection.rigid_body_collection.rigid_body_particles.frame.m>=3) solid_body_collection.rigid_body_collection.rigid_body_particles.frame(2).t=TV(.5,.5)*scale_length;
 }
 //#####################################################################
 // Function Set_External_Velocities
@@ -998,13 +998,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 2:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            //Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1),true,true);
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+            //Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1),true,true);
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
             solids_tests.Add_Ground();
             break;}
         case 10:
         case 11:{
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
             TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             triangulated_area.Initialize_Hierarchy();
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>((T)1e3,(T).45,(T).01)));
@@ -1024,11 +1024,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 6:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+            Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
             break;}
         case 7:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            for(int i=0;i<rigid_body_count;i++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-i+1));
+            for(int i=0;i<rigid_body_count;i++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-i+1));
             break;}
         case 8:{
             SEGMENTED_CURVE_2D<T>& segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE_2D<T>&>(deformable_object_id);
@@ -1045,15 +1045,15 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 12:{
             // solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+            // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
             break;}
         case 13:{
             // solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
             // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1));
-            Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+            Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
             
             // TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             // triangulated_area.Initialize_Hierarchy();
@@ -1064,12 +1064,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 20:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            //Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1),true,true);
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+            //Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1),true,true);
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
             break;}
         case 30:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
             solids_tests.Add_Ground();
             break;}
         case 31: break;
@@ -1114,7 +1114,7 @@ void Uniform_Flow_Test()
     rigid_body.Set_Mass((T)pi*sqr(radius)*(T)density*mass_multiplier);
 
 //    solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,(T)9.8));
-    Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+    Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
     solids_tests.Add_Ground();
 }
 //#####################################################################
@@ -1195,7 +1195,7 @@ void Falling_Rigid_Circle_Test()
         rigid_body_collection.Rigid_Body(b).is_static=true;}
 
     solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity*scale_length));
-    Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+    Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
 
     PHYSBAM_ASSERT(fluids_parameters.viscosity);
     LOG::cout<<"VISCOSITY "<<fluids_parameters.viscosity<<std::endl;
@@ -1399,7 +1399,7 @@ void Analytic_Test()
         solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity*scale_length));
         Add_Volumetric_Body_To_Fluid_Simulation(rigid_body);}
 
-    T solid_mass=use_solid?solid_body_collection.rigid_body_collection.rigid_body_particle.mass(2):0;
+    T solid_mass=use_solid?solid_body_collection.rigid_body_collection.rigid_body_particles.mass(2):0;
     T rho=fluids_parameters.density;
     TV size=fluids_parameters.grid->domain.Edge_Lengths();
     size.x=(size.x-solid_width)/2;
@@ -1585,7 +1585,7 @@ void Flexible_Filament_Test()
     GRID<TV> filament_grid(TV_INT(20,5),RANGE<TV>(TV((T).5,(T).475),TV((T)1.25,(T).525)));
     TRIANGULATED_AREA<T>& triangulated_area=solids_tests.Create_Mattress(filament_grid,true,0,200);
     //GRID<VECTOR<T,1> > filament_grid(10,RANGE<VECTOR<T,1> >(VECTOR<T,1>(.5),VECTOR<T,1>(1)));
-    //RIGID_GEOMETRY_STATE<TV> state;
+    //RIGID_BODY_STATE<TV> state;
     //state.frame.t.x=1;
     //state.frame.t.y=.5;
     //SEGMENTED_CURVE_2D<T>& segmented_curve=solids_tests.Create_Segmented_Curve(filament_grid,state,200);
@@ -1709,7 +1709,7 @@ void Sanity_Test_Stokes_No_Viscosity()
     rigid_body.name="circle";
     rigid_body.is_static=true;
 
-    Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
+    Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
 }
 //#####################################################################
 // Function Limit_Dt

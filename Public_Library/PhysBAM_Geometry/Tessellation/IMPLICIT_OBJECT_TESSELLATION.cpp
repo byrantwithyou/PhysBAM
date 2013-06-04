@@ -25,7 +25,6 @@
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Tessellation/BOUNDED_HORIZONTAL_PLANE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/BOWL_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/CYLINDER_TESSELLATION.h>
@@ -40,6 +39,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 
 namespace PhysBAM{
 namespace TESSELLATION{
@@ -77,7 +77,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const IMPLI
 template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const IMPLICIT_OBJECT_COMBINED_EULERIAN<VECTOR<T,3> >* implicit)
 {PHYSBAM_NOT_IMPLEMENTED();}
 
-template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,3>,RIGID_GEOMETRY<VECTOR<T,3> > >* implicit)
+template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,3>,RIGID_BODY<VECTOR<T,3> > >* implicit)
 { // TODO(jontg): Better way to templatize this?
     TRIANGULATED_SURFACE<T>* surface=Generate_Triangles(*implicit->object_space_implicit_object);
     for(int i=0;i<surface->particles.Size();i++) surface->particles.X(i)=implicit->World_Space_Point(surface->particles.X(i));
@@ -104,7 +104,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(IMPLICIT_OBJECT<VE
     else if(const IMPLICIT_OBJECT_COMBINED<TV>* implicit=dynamic_cast<const IMPLICIT_OBJECT_COMBINED<TV>*>(&implicit_input)) return Generate_Triangles_Helper(implicit); 
     else if(const IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>* implicit=dynamic_cast<const IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>*>(&implicit_input)) return Generate_Triangles_Helper(implicit); 
     else if(const IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* implicit=dynamic_cast<const IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(&implicit_input)) return Generate_Triangles_Helper(implicit); 
-    else if(const IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_GEOMETRY<TV> >* implicit=dynamic_cast<const IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_GEOMETRY<TV> >*>(&implicit_input)) return Generate_Triangles_Helper(implicit); 
+    else if(const IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_BODY<TV> >* implicit=dynamic_cast<const IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_BODY<TV> >*>(&implicit_input)) return Generate_Triangles_Helper(implicit); 
     else if(const ANALYTIC_IMPLICIT_OBJECT<PLANE<T> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<PLANE<T> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<RING<T> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<RING<T> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<BOWL<T> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<BOWL<T> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);

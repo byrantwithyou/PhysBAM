@@ -159,12 +159,12 @@ void Make_Block_Chain(TV shift,ROTATION<TV> orient,int& num_joints,int& num_bodi
     num_joints+=12;num_bodies+=12;
 
     //set velocities
-    arb->rigid_body_collection.rigid_body_particle.angular_momentum(3)=TV(10,0,0);
-    arb->rigid_body_collection.rigid_body_particle.angular_momentum(9)=TV(-10,20,0);
-    arb->rigid_body_collection.rigid_body_particle.angular_momentum(5)=TV(10,10,0);
-    arb->rigid_body_collection.rigid_body_particle.angular_momentum(2)=TV(5,0,10);
-    arb->rigid_body_collection.rigid_body_particle.angular_momentum(1)=TV(0,0,0);
-    arb->rigid_body_collection.rigid_body_particle.angular_momentum(8)=TV(2,0,10);
+    arb->rigid_body_collection.rigid_body_particles.angular_momentum(3)=TV(10,0,0);
+    arb->rigid_body_collection.rigid_body_particles.angular_momentum(9)=TV(-10,20,0);
+    arb->rigid_body_collection.rigid_body_particles.angular_momentum(5)=TV(10,10,0);
+    arb->rigid_body_collection.rigid_body_particles.angular_momentum(2)=TV(5,0,10);
+    arb->rigid_body_collection.rigid_body_particles.angular_momentum(1)=TV(0,0,0);
+    arb->rigid_body_collection.rigid_body_particles.angular_momentum(8)=TV(2,0,10);
 }
 //#####################################################################
 };

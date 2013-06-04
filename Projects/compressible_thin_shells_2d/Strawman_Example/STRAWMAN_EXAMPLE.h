@@ -18,10 +18,10 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
@@ -70,7 +70,7 @@ public:
     T solid_velocity;            // vS
     T fluid_tangential_velocity; // u
 
-    RIGID_GEOMETRY_COLLECTION<TV> rigid_geometry_collection;
+    RIGID_BODY_COLLECTION<TV> rigid_body_collection;
     T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID> *pls_evolution;
     T_BOUNDARY_PHI_WATER pls_boundary;
@@ -103,7 +103,7 @@ public:
   public:
     STRAWMAN_EXAMPLE()
         :BASE(STREAM_TYPE(T())),resolution(100),order(1),frame(0),fill_ghost_region(true),initial_distance((T)-.5),solid_velocity((T)-1),
-        fluid_tangential_velocity(0),rigid_geometry_collection(0),collision_bodies_affecting_fluid(grid),pls_evolution(0),
+        fluid_tangential_velocity(0),rigid_body_collection(0,0),collision_bodies_affecting_fluid(grid),pls_evolution(0),
         opt_analytic(false),opt_extrapolation(false),opt_gfm(false),opt_new_gfm(false)
     {}
 
@@ -161,9 +161,9 @@ virtual void Parse_Options() PHYSBAM_OVERRIDE
 void Initialize()
 {
     { // All this just to get a line...
-        RIGID_GEOMETRY<TV>& rigid_geometry=*new RIGID_GEOMETRY<TV>(rigid_geometry_collection,true);
+        RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
         ANALYTIC_IMPLICIT_OBJECT<LINE_2D<T> >& implicit_structure=*new ANALYTIC_IMPLICIT_OBJECT<LINE_2D<T> >(LINE_2D<T>(TV(0,1),TV(0,0)));
-        rigid_geometry.Add_Structure(implicit_structure);
+        rigid_body.Add_Structure(implicit_structure);
 
         GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
         SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create(particles);
@@ -171,17 +171,17 @@ void Initialize()
         segmented_curve.mesh.number_nodes=2;segmented_curve.mesh.elements.Preallocate(1);
         segmented_curve.mesh.elements.Append(TV_INT(1,2));
         segmented_curve.Update_Segment_List();
-        rigid_geometry.Add_Structure(segmented_curve);
-        rigid_geometry_collection.Add_Rigid_Geometry(&rigid_geometry,stream_type,"",(T)1,false,false,false,false);
+        rigid_body.Add_Structure(segmented_curve);
+        rigid_body_collection.Add_Rigid_Body(&rigid_body,stream_type,"",(T)1,false,false,false,false);
 
-        rigid_geometry_collection.particles.structure_ids(1)=VECTOR<int,3>();
-        rigid_geometry_collection.particles.structure_ids(1)(1)=rigid_geometry_collection.structure_list.Add_Element(rigid_geometry.structures(1));
-        rigid_geometry_collection.particles.structure_ids(1)(2)=rigid_geometry_collection.structure_list.Add_Element(rigid_geometry.structures(2));
-        rigid_geometry_collection.Update_Kinematic_Particles();
-        rigid_geometry_collection.particles.frame(1).t.y=solid_position((T)0);
+        rigid_body_collection.rigid_body_particles.structure_ids(1)=VECTOR<int,3>();
+        rigid_body_collection.rigid_body_particles.structure_ids(1)(1)=rigid_body_collection.structure_list.Add_Element(rigid_body.structures(1));
+        rigid_body_collection.rigid_body_particles.structure_ids(1)(2)=rigid_body_collection.structure_list.Add_Element(rigid_body.structures(2));
+        rigid_body_collection.Update_Kinematic_Particles();
+        rigid_body_collection.rigid_body_particles.frame(1).t.y=solid_position((T)0);
 
         collision_bodies_affecting_fluid.Initialize_Grids();
-        collision_bodies_affecting_fluid.Add_Bodies(rigid_geometry_collection);
+        collision_bodies_affecting_fluid.Add_Bodies(rigid_body_collection);
 
         collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
         collision_bodies_affecting_fluid.Rasterize_Objects();
@@ -321,8 +321,8 @@ void Euler_Step(const T dt, const T time){
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
         velocity(iterator.Cell_Index())=fluid_velocity_field(iterator.Location(),time);
 
-    rigid_geometry_collection.particles.frame(1).t.y=solid_position(time);collision_bodies_affecting_fluid.Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,time);
-    rigid_geometry_collection.particles.frame(1).t.y=solid_position(time+dt);collision_bodies_affecting_fluid.Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,time+dt);
+    rigid_body_collection.rigid_body_particles.frame(1).t.y=solid_position(time);collision_bodies_affecting_fluid.Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,time);
+    rigid_body_collection.rigid_body_particles.frame(1).t.y=solid_position(time+dt);collision_bodies_affecting_fluid.Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,time+dt);
     collision_bodies_affecting_fluid.Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
     collision_bodies_affecting_fluid.Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE);
     collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
@@ -354,7 +354,7 @@ void Euler_Step(const T dt, const T time){
         for(CELL_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
             rho(iterator.Cell_Index())=analytic_solution(iterator.Location(),time);
             phi(iterator.Cell_Index())=initial_phi(iterator.Location()-time*velocity(iterator.Cell_Index()));}
-        rigid_geometry_collection.particles.frame(1).t.y=solid_position(time+dt);
+        rigid_body_collection.rigid_body_particles.frame(1).t.y=solid_position(time+dt);
         return;}
 
     boundary.Fill_Ghost_Cells(grid,rho,rho_tmp,dt,time,3);
@@ -389,7 +389,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
 
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/center_velocities",velocity);
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/mac_velocities",face_velocities);
-    rigid_geometry_collection.Write(stream_type,output_directory,frame);
+    rigid_body_collection.Write(stream_type,output_directory,frame);
 
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/density",rho);
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/phi",phi);

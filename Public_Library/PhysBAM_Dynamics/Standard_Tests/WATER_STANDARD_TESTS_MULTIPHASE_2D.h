@@ -84,10 +84,10 @@ void Initialize_Bodies()
     WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,WATER_STANDARD_TESTS_2D<T_GRID> >::Initialize_Bodies();
     if(test_number==15){
         int ground=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/ground",(T).1,true,true,false);
-        rigid_body_collection.rigid_body_particle.frame(ground).t=TV((T).1,0);
-        rigid_body_collection.rigid_body_particle.frame(ground).r=ROTATION<TV>::From_Angle((T)pi/8);
-        rigid_body_collection.rigid_body_particle.kinematic(ground)=true;}
-    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);
+        rigid_body_collection.rigid_body_particles.frame(ground).t=TV((T).1,0);
+        rigid_body_collection.rigid_body_particles.frame(ground).r=ROTATION<TV>::From_Angle((T)pi/8);
+        rigid_body_collection.rigid_body_particles.kinematic(ground)=true;}
+    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 }
 //#####################################################################
 };

@@ -62,7 +62,7 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,const ARRAY<bool>& rigid_par
     else if(influenced_particles) force_particles.Update(*influenced_particles,particle_is_simulated);
 
     if(influence_all_rigid_body_particles){
-        ARRAY<int> all_rigid=Get_Rigid_Body_Particle_List(IDENTITY_ARRAY<>(rigid_body_collection.rigid_body_particle.Size()));
+        ARRAY<int> all_rigid=Get_Rigid_Body_Particle_List(IDENTITY_ARRAY<>(rigid_body_collection.rigid_body_particles.Size()));
         force_rigid_body_particles.Update(all_rigid,rigid_particle_is_simulated);}
     else if(influenced_rigid_body_particles) force_rigid_body_particles.Update(*influenced_rigid_body_particles,rigid_particle_is_simulated);
 }

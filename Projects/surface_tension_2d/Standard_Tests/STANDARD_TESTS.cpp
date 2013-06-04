@@ -769,7 +769,7 @@ FSI_Analytic_Test()
     solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity*m));
     Add_Volumetric_Body_To_Fluid_Simulation(rigid_body);
 
-    T solid_mass=solid_body_collection.rigid_body_collection.rigid_body_particle.mass(3);
+    T solid_mass=solid_body_collection.rigid_body_collection.rigid_body_particles.mass(3);
     T rho=fluids_parameters.density;
     TV size=fluids_parameters.grid->domain.Edge_Lengths();
     size.x=(size.x-solid_width)/2;

@@ -4,7 +4,7 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include "WATER_DRIVER.h"
 #include "WATER_EXAMPLE.h"
 
@@ -52,8 +52,8 @@ void Add_Sphere(WATER_EXAMPLE<VECTOR<T,2> >* example)
     STREAM_TYPE stream_type((RW()));
     std::string model_file_name="../../Public_Data/Rigid_Bodies_2D/circle";
     T radius=0.1;
-    int rigid_particle_id=example->rigid_geometry_collection.Add_Rigid_Geometry(stream_type,model_file_name,radius,true,true,true,true);
-    example->rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->is_static=false;
+    int rigid_particle_id=example->rigid_body_collection.Add_Rigid_Body(stream_type,model_file_name,radius,true,true,true,true);
+    example->rigid_body_collection.rigid_body_particles.rigid_body(rigid_particle_id)->is_static=false;
 }
 
 template<class T>
@@ -63,8 +63,8 @@ void Add_Sphere(WATER_EXAMPLE<VECTOR<T,3> >* example)
     STREAM_TYPE stream_type((RW()));
     std::string model_file_name="../../Public_Data/Rigid_Bodies/sphere";
     T radius=0.1;
-    int rigid_particle_id=example->rigid_geometry_collection.Add_Rigid_Geometry(stream_type,model_file_name,radius,true,true,true,true);
-    example->rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->is_static=false;
+    int rigid_particle_id=example->rigid_body_collection.Add_Rigid_Body(stream_type,model_file_name,radius,true,true,true,true);
+    example->rigid_body_collection.rigid_body_particles.rigid_body(rigid_particle_id)->is_static=false;
 }
 
 int main(int argc,char *argv[])

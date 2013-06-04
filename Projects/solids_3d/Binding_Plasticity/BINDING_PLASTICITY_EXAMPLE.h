@@ -355,8 +355,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     // set the surface of the embedding geometry to collide with the base and ground only
     deformable_body_collection.collisions.Use_Structure_Collide_Collision_Body();
     HASHTABLE<COLLISION_GEOMETRY_ID,void>& structure_collide_collision_body=deformable_body_collection.collisions.structure_collide_collision_body(1);
-    structure_collide_collision_body.Insert(solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(ground_id));
-    structure_collide_collision_body.Insert(solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(base_id));
+    structure_collide_collision_body.Insert(solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(ground_id));
+    structure_collide_collision_body.Insert(solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(base_id));
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities

@@ -205,7 +205,7 @@ void Random_Scene_Generator(const ARRAY<std::string>& filenames,const int random
     random_numbers.Set_Seed(random_seed);
     
     int i;
-    int start_body=rigid_body_collection.rigid_body_particle.Size()+1;
+    int start_body=rigid_body_collection.rigid_body_particles.Size()+1;
     for(i=0;i<filenames.m;i++){// create all the objects to get their bounding boxes
         T scale=random_placement.Random_Scale(random_numbers);
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(filenames(i),scale,1);
@@ -215,7 +215,7 @@ void Random_Scene_Generator(const ARRAY<std::string>& filenames,const int random
     RIGID_BODY_INTERSECTIONS<TV> intersections(rigid_body_collection);
     LOG::cout<<"Resolving random scene collisions...";
     
-    for(int i=start_body;i<=rigid_body_collection.rigid_body_particle.Size();i++) if(rigid_body_collection.Is_Active(i)){
+    for(int i=start_body;i<=rigid_body_collection.rigid_body_particles.Size();i++) if(rigid_body_collection.Is_Active(i)){
         rigid_body_collection.Rigid_Body(i).Update_Bounding_Box();
         std::cout<<i<<" "<<std::flush;
         bool found_collision=true;int counter=0;

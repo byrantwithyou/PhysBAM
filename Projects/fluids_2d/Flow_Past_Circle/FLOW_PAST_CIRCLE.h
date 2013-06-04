@@ -141,7 +141,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     RIGID_BODY<TV>& rigid_body=solids_tests.Add_Analytic_Sphere(circle.radius,fluids_parameters.density,7);
     rigid_body.Frame().t=circle.center;
     rigid_body.is_static=true;
-    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(solid_body_collection.rigid_body_collection.rigid_geometry_collection);
+    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(solid_body_collection.rigid_body_collection);
     fluids_parameters.incompressible_iterations=1000;
 }
 //#####################################################################

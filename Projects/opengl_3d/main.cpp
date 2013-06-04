@@ -275,7 +275,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('Z',deformable_objects_component->Highlight_Particle_CB());
         if(slice_manager.slice) slice_manager.Add_Object(deformable_objects_component);}
 
-    if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_geometry_particles",start_frame)){
+    if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
         OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>* rigid_bodies_component=0;
         //if(deformable_objects_component) rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>(deformable_objects_component->solid_body_collection.rigid_body_collection,basedir,true);
         //else rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>(basedir,true);

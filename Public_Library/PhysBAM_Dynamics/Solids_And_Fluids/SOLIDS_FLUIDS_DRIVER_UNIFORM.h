@@ -40,7 +40,7 @@ public:
     bool Simulate_Solids() const
     {SOLIDS_PARAMETERS<TV>& solids_parameters=example.solids_parameters;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=example.solid_body_collection.deformable_body_collection;
-    return (deformable_body_collection.simulate && deformable_body_collection.particles.Size()) || (solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies && example.solid_body_collection.rigid_body_collection.rigid_body_particle.Size());}
+    return (deformable_body_collection.simulate && deformable_body_collection.particles.Size()) || (solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies && example.solid_body_collection.rigid_body_collection.rigid_body_particles.Size());}
 
     bool Simulate_Incompressible_Fluids() const
     {const FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;

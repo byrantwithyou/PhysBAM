@@ -7,8 +7,8 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Dynamics/Forces_And_Torques/EULER_FLUID_FORCES.h>
 using ::std::sqrt;
 using namespace PhysBAM;
@@ -54,10 +54,10 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
             const COLLISION_GEOMETRY<TV>& collision_body=collision_bodies_affecting_fluid->collision_geometry_collection(body_id);
             if(const RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<const RIGID_COLLISION_GEOMETRY<TV>*>(&collision_body)){
                 // apply force and torque to this body from the pressure flux times area
-                const RIGID_GEOMETRY<TV>& rigid_geometry=rigid_collision_geometry->rigid_geometry;
-                int rigid_body_index=rigid_geometry.particle_index;
+                const RIGID_BODY<TV>& rigid_body=rigid_collision_geometry->rigid_body;
+                int rigid_body_index=rigid_body.particle_index;
                 T face_area=cell_size*one_over_dx[axis],face_pressure=pressure_at_faces.Component(axis)(face_index);
-                TV center_of_mass=rigid_geometry.Frame().t,force=face_area*face_pressure*direction*TV::Axis_Vector(axis);
+                TV center_of_mass=rigid_body.Frame().t,force=face_area*face_pressure*direction*TV::Axis_Vector(axis);
                 rigid_F(rigid_body_index).linear+=force;
                 rigid_F(rigid_body_index).angular+=TV::Cross_Product(location-center_of_mass,force);}
             else PHYSBAM_FATAL_ERROR("deformable part not implemented");}}

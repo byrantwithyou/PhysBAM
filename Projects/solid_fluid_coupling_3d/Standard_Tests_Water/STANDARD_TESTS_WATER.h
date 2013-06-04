@@ -559,7 +559,7 @@ void Floppy_Fish()
         fish=&solids_tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",fish_state,true,false,flesh_density,scale);}
 
     // binding the deformable particles to the rigid bodies
-    for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) solids_tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
+    for(int p=0;p<rigid_body_collection.rigid_body_particles.Size();p++) solids_tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
     if(fish){
         fish->Update_Number_Nodes();fish->Initialize_Triangulated_Surface();
@@ -916,7 +916,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             RANGE<TV> world(grid.domain.min_corner,grid.domain.max_corner+TV(0,(T).04,0));
 
             // slide all the rigid body walls down
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) rigid_body_collection.rigid_body_particle.frame(i).t.y-=(T).75;
+            for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++) rigid_body_collection.rigid_body_particles.frame(i).t.y-=(T).75;
 
             RANDOM_NUMBERS<T> random;
 
@@ -990,7 +990,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     // add structures and rigid bodies to collisions
     deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
-    solid_body_collection.collision_body_list.Add_Bodies(*rigid_body_collection.rigid_geometry_collection.collision_body_list);
+    solid_body_collection.collision_body_list.Add_Bodies(*rigid_body_collection.collision_body_list);
 
     // correct number nodes
     for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
@@ -1075,7 +1075,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number==9){
         deformable_body_collection.collisions.Use_Structure_Collide_Collision_Body(true);
         for(int s=0;s<deformable_body_collection.structures.m;s++) for(int r=0;r<rigid_bodies_to_collide_against.m;r++)
-            deformable_body_collection.collisions.structure_collide_collision_body(s).Set(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(rigid_bodies_to_collide_against(r)));
+            deformable_body_collection.collisions.structure_collide_collision_body(s).Set(rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(rigid_bodies_to_collide_against(r)));
         for(int i=0;i<solid_body_collection.solids_forces.m;i++)
             solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;}
 }

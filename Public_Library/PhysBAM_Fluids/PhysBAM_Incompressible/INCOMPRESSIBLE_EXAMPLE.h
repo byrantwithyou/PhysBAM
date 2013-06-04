@@ -10,15 +10,15 @@
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Solids_Geometry_Evolution/RIGID_GEOMETRY_EXAMPLE_VELOCITIES.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Forces_And_Torques/RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 //#include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Fluid_Evolution/INCOMPRESSIBLE_FLUID_EVOLUTION.h>
 //#include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Fluids/INCOMPRESSIBLE_FLUID_COLLECTION.h>
 namespace PhysBAM{
 
 template<class TV>
-class INCOMPRESSIBLE_EXAMPLE:public RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV>
+class INCOMPRESSIBLE_EXAMPLE:public RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
@@ -51,7 +51,7 @@ public:
     BOUNDARY<TV,T> *boundary;
     ARRAY<T,TV_INT> density,temperature;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;    
-    RIGID_GEOMETRY_COLLECTION<TV> rigid_geometry_collection;
+    RIGID_BODY_COLLECTION<TV> rigid_body_collection;
 
     INCOMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~INCOMPRESSIBLE_EXAMPLE();

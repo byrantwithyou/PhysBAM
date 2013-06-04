@@ -237,8 +237,8 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
         id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).coefficient_of_friction=coefficient_of_friction;
-        rigid_body_collection.rigid_body_particle.frame(id).t=VECTOR<T,2>(fluids_parameters.grid->domain.min_corner.x,center.y);
-        rigid_body_collection.rigid_body_particle.frame(id).r=ROTATION<VECTOR<T,2> >::From_Angle(-(T)pi/2);
+        rigid_body_collection.rigid_body_particles.frame(id).t=VECTOR<T,2>(fluids_parameters.grid->domain.min_corner.x,center.y);
+        rigid_body_collection.rigid_body_particles.frame(id).r=ROTATION<VECTOR<T,2> >::From_Angle(-(T)pi/2);
         rigid_body_collection.Rigid_Body(id).name="left wall";
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -247,8 +247,8 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
         id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).coefficient_of_friction=coefficient_of_friction;
-        rigid_body_collection.rigid_body_particle.frame(id).t=VECTOR<T,2>(fluids_parameters.grid->domain.max_corner.x,center.y);
-        rigid_body_collection.rigid_body_particle.frame(id).r=ROTATION<VECTOR<T,2> >::From_Angle((T)pi/2);
+        rigid_body_collection.rigid_body_particles.frame(id).t=VECTOR<T,2>(fluids_parameters.grid->domain.max_corner.x,center.y);
+        rigid_body_collection.rigid_body_particles.frame(id).r=ROTATION<VECTOR<T,2> >::From_Angle((T)pi/2);
         rigid_body_collection.Rigid_Body(id).name="right wall";
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -257,7 +257,7 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
         id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).coefficient_of_friction=coefficient_of_friction;
-        rigid_body_collection.rigid_body_particle.frame(id).t=VECTOR<T,2>(center.x,fluids_parameters.grid->domain.min_corner.y);
+        rigid_body_collection.rigid_body_particles.frame(id).t=VECTOR<T,2>(center.x,fluids_parameters.grid->domain.min_corner.y);
         rigid_body_collection.Rigid_Body(id).name="bottom wall";
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -266,8 +266,8 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
         id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).coefficient_of_friction=coefficient_of_friction;
-        rigid_body_collection.rigid_body_particle.frame(id).t=VECTOR<T,2>(center.x,fluids_parameters.grid->domain.max_corner.y);
-        rigid_body_collection.rigid_body_particle.frame(id).r=ROTATION<VECTOR<T,2> >::From_Angle((T)pi);
+        rigid_body_collection.rigid_body_particles.frame(id).t=VECTOR<T,2>(center.x,fluids_parameters.grid->domain.max_corner.y);
+        rigid_body_collection.rigid_body_particles.frame(id).r=ROTATION<VECTOR<T,2> >::From_Angle((T)pi);
         rigid_body_collection.Rigid_Body(id).name="top wall";
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -1130,7 +1130,7 @@ FSI_Analytic_Test()
     solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity*m));
     Add_Volumetric_Body_To_Fluid_Simulation(rigid_body);
 
-    T solid_mass=solid_body_collection.rigid_body_collection.rigid_body_particle.mass(2);
+    T solid_mass=solid_body_collection.rigid_body_collection.rigid_body_particles.mass(2);
     T rho=fluids_parameters.density;
     TV size=fluids_parameters.grid->domain.Edge_Lengths();
     size.x=(size.x-solid_width)/2;
@@ -1148,7 +1148,7 @@ Postprocess_Frame(const int frame)
 {
     if(test_number==6){
         T v=fluid_collection.incompressible_fluid_collection.face_velocities(FACE_INDEX<2>(2,fluids_parameters.grid->counts/2));
-        if(solid_body_collection.rigid_body_collection.rigid_body_particle.frame.m>=3) v=solid_body_collection.rigid_body_collection.rigid_body_particle.twist(2).linear.y;
+        if(solid_body_collection.rigid_body_collection.rigid_body_particles.frame.m>=3) v=solid_body_collection.rigid_body_collection.rigid_body_particles.twist(2).linear.y;
         LOG::cout<<"middle-velocity "<<v<<"   error from analytic solution "<<(v/analytic_solution-1)<<std::endl;}
     if(test_number==10 || test_number==9){ 
         ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
@@ -1179,7 +1179,7 @@ Postprocess_Frame(const int frame)
 template<class T> void SURFACE_TENSION<T>::
 Postprocess_Substep(const T dt,const T time)
 {
-    if(test_number==6 && solid_body_collection.rigid_body_collection.rigid_body_particle.frame.m>=3) solid_body_collection.rigid_body_collection.rigid_body_particle.frame(2).t=TV(.5,.5)*m;
+    if(test_number==6 && solid_body_collection.rigid_body_collection.rigid_body_particles.frame.m>=3) solid_body_collection.rigid_body_collection.rigid_body_particles.frame(2).t=TV(.5,.5)*m;
     if(test_number==4 || test_number==5){
         // location test
         TV p((T)((.5+circle_radius)*m),(T)(.5*m));

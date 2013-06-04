@@ -14,7 +14,6 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -87,7 +86,7 @@ Compute(const int ghost_cells)
                     row.deformable_weights.Append(DEFORMABLE_WEIGHT(element(i),cosine*simplex_weight(i)));}
             else if(RIGID_COLLISION_GEOMETRY<TV>* rigid_body_wrapper=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(&body)){
                 for(int i=0;i<clipped_simplices.m;i++) area+=clipped_simplices(i).Size();
-                row.rigid_weights.Append(RIGID_WEIGHT(rigid_body_wrapper->rigid_geometry.particle_index,cosine*area,iterator.Location()-dynamic_cast<RIGID_BODY<TV>&>(rigid_body_wrapper->rigid_geometry).Frame().t));}
+                row.rigid_weights.Append(RIGID_WEIGHT(rigid_body_wrapper->rigid_body.particle_index,cosine*area,iterator.Location()-dynamic_cast<RIGID_BODY<TV>&>(rigid_body_wrapper->rigid_body).Frame().t));}
             else PHYSBAM_FATAL_ERROR("OMGWTFBBQ");
 
             accumulated_normal+=normal*area;

@@ -471,7 +471,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
     T position(0),velocity(0);
     if(test_number==2 || test_number==10 || test_number==5){
-        RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
+        RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particles;
         int rigid_body_index=1;
         position=rigid_body_particles.frame(rigid_body_index).t.x;
         velocity=rigid_body_particles.twist(rigid_body_index).linear.x;}
@@ -502,7 +502,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==2 || test_number==10 || test_number==5){
-        RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
+        RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particles;
         int rigid_body_index=1;
         T velocity=rigid_body_particles.twist(rigid_body_index).linear.x;
         LOG::cout<<"KINETIC ENERGY = "<<(T).5*solid_mass*velocity*velocity<<std::endl;

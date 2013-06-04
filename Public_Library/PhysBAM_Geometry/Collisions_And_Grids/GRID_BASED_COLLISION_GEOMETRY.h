@@ -9,11 +9,11 @@
 
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/OBJECTS_IN_CELL.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 namespace PhysBAM{
 
 template <class T_GRID>
@@ -67,8 +67,8 @@ public:
     {return collision_geometry_collection.Is_Active(id);}
 
 //#####################################################################
-    void Add_Bodies(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection);
-    void Add_Body(RIGID_GEOMETRY<TV>& rigid_geometry);
+    void Add_Bodies(RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
+    void Add_Body(RIGID_BODY<TV>& rigid_body);
     virtual void Rasterize_Objects();
     bool Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,
         const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;

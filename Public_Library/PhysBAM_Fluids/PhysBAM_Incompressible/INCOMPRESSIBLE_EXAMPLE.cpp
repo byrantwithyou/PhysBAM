@@ -16,7 +16,7 @@ INCOMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
     restart(0),write_debug_data(false),analytic_test(false),order(1),output_directory("output"),
     number_of_ghost_cells(3),cfl((T).9),use_viscosity(false),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),//incompressible_fluid_collection(mac_grid),
-    projection(mac_grid),incompressible(mac_grid,projection),boundary(0),rigid_geometry_collection(this)
+    projection(mac_grid),incompressible(mac_grid,projection),boundary(0),rigid_body_collection(this,0)
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
     PROCESS_UTILITIES::Set_Backtrace(true);
@@ -56,7 +56,7 @@ Write_Output_Files(const int frame)
     else{
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/density",density);}
-    rigid_geometry_collection.Write(stream_type,output_directory,frame);
+    rigid_body_collection.Write(stream_type,output_directory,frame);
     PHYSBAM_FATAL_ERROR("Cannot read doubles");
 }
 template<class TV> void INCOMPRESSIBLE_EXAMPLE<TV>::
@@ -69,7 +69,7 @@ Read_Output_Files(const int frame)
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,face_velocities);}
     filename=output_directory+"/"+f+"/pressure";
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible.projection.p);}
-    rigid_geometry_collection.Read(stream_type,output_directory,frame);
+    rigid_body_collection.Read(stream_type,output_directory,frame);
 }
 //#####################################################################
 namespace PhysBAM{

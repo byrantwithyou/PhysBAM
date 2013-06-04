@@ -7,10 +7,10 @@
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
-#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -47,7 +47,7 @@ Scene_Bounding_Box()
     RANGE<TV> scene_bounding_box;
     for(ID i(0);i<collision_bodies.Size();i++){
         if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_bodies(i)))
-            if(!rigid_collision_geometry->rigid_geometry.rigid_geometry_collection.Is_Active(rigid_collision_geometry->rigid_geometry.particle_index)) continue;
+            if(!rigid_collision_geometry->rigid_body.rigid_body_collection.Is_Active(rigid_collision_geometry->rigid_body.particle_index)) continue;
         if(collision_bodies(i) && collision_bodies(i)->add_to_spatial_partition)
             scene_bounding_box=RANGE<TV>::Combine(scene_bounding_box,collision_bodies(i)->Axis_Aligned_Bounding_Box());}
     return scene_bounding_box;
@@ -61,7 +61,7 @@ Average_Bounding_Box_Size()
     T average_size=0;int count=0;
     for(ID i(0);i<collision_bodies.Size();i++) if(collision_bodies(i)){
         if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_bodies(i)))
-            if(!rigid_collision_geometry->rigid_geometry.rigid_geometry_collection.Is_Active(rigid_collision_geometry->rigid_geometry.particle_index)) continue;
+            if(!rigid_collision_geometry->rigid_body.rigid_body_collection.Is_Active(rigid_collision_geometry->rigid_body.particle_index)) continue;
         if(collision_bodies(i)->add_to_spatial_partition){count++;TV size=collision_bodies(i)->Axis_Aligned_Bounding_Box().Edge_Lengths();average_size+=size.Sum();}}
     if(!count) return 0;
     return average_size/(TV::dimension*count)+2*collision_body_thickness;
@@ -75,7 +75,7 @@ Maximum_Bounding_Box_Size()
     T max_size=0;
     for(ID i(0);i<collision_bodies.Size();i++) if(collision_bodies(i)){
         if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_bodies(i)))
-            if(!rigid_collision_geometry->rigid_geometry.rigid_geometry_collection.Is_Active(rigid_collision_geometry->rigid_geometry.particle_index)) continue;
+            if(!rigid_collision_geometry->rigid_body.rigid_body_collection.Is_Active(rigid_collision_geometry->rigid_body.particle_index)) continue;
         if(collision_bodies(i)->add_to_spatial_partition){TV size=collision_bodies(i)->Axis_Aligned_Bounding_Box().Edge_Lengths();max_size=max(max_size,size.Max());}}
     return max_size+2*collision_body_thickness;
 }
@@ -88,7 +88,7 @@ Compute_Voxel_Size(const SPATIAL_PARTITION_VOXEL_SIZE_HEURISTIC heuristic,const 
     reinitialize_counter=max(reinitialize_counter,0);
     for(ID i(0);i<collision_bodies.Size();i++) if(collision_bodies(i)){
         if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_bodies(i)))
-            if(!rigid_collision_geometry->rigid_geometry.rigid_geometry_collection.Is_Active(rigid_collision_geometry->rigid_geometry.particle_index)) continue;
+            if(!rigid_collision_geometry->rigid_body.rigid_body_collection.Is_Active(rigid_collision_geometry->rigid_body.particle_index)) continue;
         collision_bodies(i)->Update_Bounding_Box();}
     if(heuristic==SPATIAL_PARTITION_SCENE_SIZE) voxel_size=Scene_Bounding_Box_Size()/number_of_boxes;
     else if(heuristic==SPATIAL_PARTITION_MAX_BOX_SIZE) voxel_size=voxel_size_scale_factor*Maximum_Bounding_Box_Size();
@@ -113,7 +113,7 @@ Reinitialize()
     bodies_not_in_partition.Remove_All();
     for(ID i(0);i<collision_bodies.Size();i++) if(collision_bodies(i)){
         if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_bodies(i)))
-            if(!rigid_collision_geometry->rigid_geometry.rigid_geometry_collection.Is_Active(rigid_collision_geometry->rigid_geometry.particle_index)) continue;
+            if(!rigid_collision_geometry->rigid_body.rigid_body_collection.Is_Active(rigid_collision_geometry->rigid_body.particle_index)) continue;
         if(collision_bodies(i)->add_to_spatial_partition){
             collision_bodies(i)->Update_Bounding_Box();
             voxel_range(i)=Voxel_Range(i);

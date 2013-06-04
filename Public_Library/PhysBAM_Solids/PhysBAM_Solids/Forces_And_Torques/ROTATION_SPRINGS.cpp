@@ -34,7 +34,7 @@ Update_Position_Based_State(const T time)
     states.Remove_All();
     for(int s=0;s<mesh.elements.m;s++){
         int parent,child;mesh.elements(s).Get(parent,child);
-        const FRAME<TV> &q_world_parent=rigid_body_collection.rigid_body_particle.frame(parent),&q_world_child=rigid_body_collection.rigid_body_particle.frame(child); // q_a_b means frame from b to a
+        const FRAME<TV> &q_world_parent=rigid_body_collection.rigid_body_particles.frame(parent),&q_world_child=rigid_body_collection.rigid_body_particles.frame(child); // q_a_b means frame from b to a
         const FRAME<TV> &q_joint_parent=object_to_joint_frames(s)[0],&q_joint_child=object_to_joint_frames(s)[1];
         QUATERNION<T> q1=(q_world_parent.r*q_joint_parent.Inverse().r).Quaternion(); // parent joint to world
         QUATERNION<T> q2=(q_world_child.r*q_joint_child.Inverse().r).Quaternion(); // child joint to world

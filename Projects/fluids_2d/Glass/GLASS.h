@@ -239,7 +239,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);
+    fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 }
 //#####################################################################
 // Function Construct_Levelsets_For_Objects

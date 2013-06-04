@@ -14,7 +14,7 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 namespace PhysBAM{
 
-template<class TV> class RIGID_GEOMETRY;
+template<class TV> class RIGID_BODY;
 
 template<class TV>
 class RIGID_COLLISION_GEOMETRY_BASE:public COLLISION_GEOMETRY<TV>
@@ -27,10 +27,10 @@ public:
     using BASE::collision_thickness;
 
     typedef TV VECTOR_T;
-    RIGID_GEOMETRY<TV>& rigid_geometry;
+    RIGID_BODY<TV>& rigid_body;
     ARRAY<PAIR<FRAME<TV>,T> > saved_states;
 
-    RIGID_COLLISION_GEOMETRY_BASE(RIGID_GEOMETRY<TV>& rigid_geometry_input);
+    RIGID_COLLISION_GEOMETRY_BASE(RIGID_BODY<TV>& rigid_body_input);
     virtual ~RIGID_COLLISION_GEOMETRY_BASE();
 
 //#####################################################################

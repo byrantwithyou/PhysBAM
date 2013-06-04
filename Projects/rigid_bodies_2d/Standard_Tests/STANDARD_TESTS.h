@@ -185,7 +185,7 @@ void Kinematic()
     rigid_body=&tests.Add_Rigid_Body(boxfile,baseboxsize,stack_mu);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.1);
     rigid_body->name="base box";
-    solid_body_collection.rigid_body_collection.rigid_body_particle.kinematic(rigid_body->particle_index)=true;
+    solid_body_collection.rigid_body_collection.rigid_body_particles.kinematic(rigid_body->particle_index)=true;
     kinematic_body_id=rigid_body->particle_index;
 
     TV t0(0,baseboxsize),t1(0,baseboxsize+(T)17.5);
@@ -212,7 +212,7 @@ void Test_Example()
 {
     RECTANGULAR_RANDOM_PLACEMENT<TV> random_placement(RANGE<TV>(TV(-20,1),TV(20,100)));
     Random_Scene_Generator("circle", 100, 1234, random_placement,solid_body_collection.rigid_body_collection,tests);
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.Size();i++)
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particles.Size();i++)
         solid_body_collection.rigid_body_collection.Rigid_Body(i).Set_Coefficient_Of_Restitution((T)0.5);
 
     RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("circle",(T)1,(T).1);
@@ -385,12 +385,12 @@ void Cluster()
     referenced_rigid_particles->Append(rigid_body_cluster_test->particle_index);
     solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
 
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.Size();i++){
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particles.Size();i++){
         LOG::cout<<"Rigid body index "<<i<<solid_body_collection.rigid_body_collection.Rigid_Body(i).name<<std::endl;
         LOG::cout<<"    FRAME  "<<solid_body_collection.rigid_body_collection.Rigid_Body(i).Frame()<<std::endl;
-        LOG::cout<<"    MASS  "<<solid_body_collection.rigid_body_collection.rigid_body_particle.mass(i)<<std::endl;
-        LOG::cout<<"    INERTIA TENSOR  "<<solid_body_collection.rigid_body_collection.rigid_body_particle.inertia_tensor(i)<<std::endl;
-        LOG::cout<<"    TWIST  "<<solid_body_collection.rigid_body_collection.rigid_body_particle.twist(i)<<std::endl;
+        LOG::cout<<"    MASS  "<<solid_body_collection.rigid_body_collection.rigid_body_particles.mass(i)<<std::endl;
+        LOG::cout<<"    INERTIA TENSOR  "<<solid_body_collection.rigid_body_collection.rigid_body_particles.inertia_tensor(i)<<std::endl;
+        LOG::cout<<"    TWIST  "<<solid_body_collection.rigid_body_collection.rigid_body_particles.twist(i)<<std::endl;
         LOG::cout<<"    cluster parent "<<((i<=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.binding_index.m && solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.binding_index(i).Size()>0)?solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.binding_index(i)(1).x:0)<<std::endl;
     }                                                 
 }

@@ -68,8 +68,10 @@ Set_Consistent_Child_Frame(JOINT_ID joint_id)
 template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Initialize_Breadth_First_Directed_Graph(const int root)
 {
-    delete breadth_first_directed_graph;breadth_first_directed_graph=new DIRECTED_GRAPH<int>(rigid_body_collection.rigid_body_particle.Size());
-    joint_mesh.undirected_graph.Breadth_First_Directed_Graph(root,*breadth_first_directed_graph);breadth_first_directed_graph->Generate_Levels();
+    delete breadth_first_directed_graph;
+    breadth_first_directed_graph=new DIRECTED_GRAPH<int>(rigid_body_collection.rigid_body_particles.Size());
+    joint_mesh.undirected_graph.Breadth_First_Directed_Graph(root,*breadth_first_directed_graph);
+    breadth_first_directed_graph->Generate_Levels();
 }
 //#####################################################################
 // Function Update_With_Breadth_First_Directed_Graph
@@ -188,10 +190,10 @@ template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Store_Velocities_And_Momenta()
 {
     ARRAY<int>& dynamic_rigid_body_particles=rigid_body_collection.dynamic_rigid_body_particles;
-    linear_velocities_save.Resize(rigid_body_collection.rigid_body_particle.Size());angular_momenta_save.Resize(rigid_body_collection.rigid_body_particle.Size());
-    angular_momenta_save.Subset(dynamic_rigid_body_particles)=rigid_body_collection.rigid_body_particle.angular_momentum.Subset(dynamic_rigid_body_particles);
+    linear_velocities_save.Resize(rigid_body_collection.rigid_body_particles.Size());angular_momenta_save.Resize(rigid_body_collection.rigid_body_particles.Size());
+    angular_momenta_save.Subset(dynamic_rigid_body_particles)=rigid_body_collection.rigid_body_particles.angular_momentum.Subset(dynamic_rigid_body_particles);
     for(int i=0;i<dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
-        linear_velocities_save(p)=rigid_body_collection.rigid_body_particle.twist(p).linear;}
+        linear_velocities_save(p)=rigid_body_collection.rigid_body_particles.twist(p).linear;}
 }
 //#####################################################################
 // Function Restore_Velocities_And_Momenta
@@ -200,9 +202,9 @@ template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Restore_Velocities_And_Momenta()
 {
     ARRAY<int>& dynamic_rigid_body_particles=rigid_body_collection.dynamic_rigid_body_particles;
-    rigid_body_collection.rigid_body_particle.angular_momentum.Subset(dynamic_rigid_body_particles)=angular_momenta_save.Subset(dynamic_rigid_body_particles);
+    rigid_body_collection.rigid_body_particles.angular_momentum.Subset(dynamic_rigid_body_particles)=angular_momenta_save.Subset(dynamic_rigid_body_particles);
     for(int i=0;i<dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
-        rigid_body_collection.rigid_body_particle.twist(p).linear=linear_velocities_save(p);}
+        rigid_body_collection.rigid_body_particles.twist(p).linear=linear_velocities_save(p);}
     rigid_body_collection.Update_Angular_Velocity(dynamic_rigid_body_particles);
 }
 //#####################################################################
@@ -624,7 +626,7 @@ Apply_Poststabilization_With_CG(T dt,bool correct_position,bool test_system,bool
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("BP-%i.txt",solve_id).c_str()).Write_Projection("BP",system,*vectors(0));}}
 
     if(correct_position){for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)) rhs.v(j)=-Joint_Error(j)/dt;}
-    else{system.Scatter(rigid_body_collection.rigid_body_particle.twist,rhs.v);rhs*=-(T)1;}
+    else{system.Scatter(rigid_body_collection.rigid_body_particles.twist,rhs.v);rhs*=-(T)1;}
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs);
 
     CONJUGATE_RESIDUAL<T> cr;
@@ -639,7 +641,7 @@ Apply_Poststabilization_With_CG(T dt,bool correct_position,bool test_system,bool
     system.intermediate_twists.Fill(TWIST<TV>());
     system.Gather(x.v,system.intermediate_twists);
     system.Inverse_Mass(system.intermediate_twists);
-    rigid_body_collection.rigid_body_particle.twist+=system.intermediate_twists;
+    rigid_body_collection.rigid_body_particles.twist+=system.intermediate_twists;
     rigid_body_collection.Update_Angular_Momentum();
     vectors.Delete_Pointers_And_Clean_Memory();
 }

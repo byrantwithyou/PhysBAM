@@ -18,7 +18,7 @@ PLS_REFINEMENT_EXAMPLE(const STREAM_TYPE stream_type_input)
     fine_mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),coarse_mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),fine_mpi_grid(0),coarse_mpi_grid(0),
     projection(coarse_mac_grid),particle_levelset_evolution(fine_mac_grid,number_of_ghost_cells,false),incompressible(fine_mac_grid,projection),boundary(0),boundary_coarse(0),phi_boundary(0),
     //projection(coarse_mac_grid,false,false,true,true),particle_levelset_evolution(fine_mac_grid),incompressible(fine_mac_grid,projection),boundary(0),
-    rigid_geometry_collection(this),collision_bodies_affecting_fluid(fine_mac_grid)
+    rigid_body_collection(this,0),collision_bodies_affecting_fluid(fine_mac_grid)
 {
     incompressible.Set_Custom_Advection(advection_scalar);
     for(int i=0;i<TV::dimension;i++){non_mpi_boundary(i)(0)=true;non_mpi_boundary(i)(1)=true;}

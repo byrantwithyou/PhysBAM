@@ -75,7 +75,7 @@ Copy_And_Add_Structure(T_STRUCTURE& structure,ARRAY<int>* particle_indices)
 // Function Set_Initial_Particle_Configuration
 //#####################################################################
 template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
-Set_Initial_Particle_Configuration(GEOMETRY_PARTICLES<TV>& particles,const RIGID_GEOMETRY_STATE<TV>& state,const bool relative_to_box_center)
+Set_Initial_Particle_Configuration(GEOMETRY_PARTICLES<TV>& particles,const RIGID_BODY_STATE<TV>& state,const bool relative_to_box_center)
 {
     LOG::cout<<"Deformable body - Total Particles : "<<particles.Size()<<std::endl;
     particles.Store_Velocity();
@@ -89,7 +89,7 @@ Set_Initial_Particle_Configuration(GEOMETRY_PARTICLES<TV>& particles,const RIGID
 // Function Create_Segmented_Curve
 //#####################################################################
 template<class TV> typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<TV>::
-Create_Segmented_Curve(const GRID<VECTOR<T,1> >& square_grid,const RIGID_GEOMETRY_STATE<TV>& initial_state,const T density)
+Create_Segmented_Curve(const GRID<VECTOR<T,1> >& square_grid,const RIGID_BODY_STATE<TV>& initial_state,const T density)
 {
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_SEGMENTED_CURVE& segmented_curve=*T_SEGMENTED_CURVE::Create(particles);
@@ -105,7 +105,7 @@ Create_Segmented_Curve(const GRID<VECTOR<T,1> >& square_grid,const RIGID_GEOMETR
 // Function Create_Segmented_Curve
 //#####################################################################
 template<class TV> typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<TV>::
-Create_Segmented_Curve(const int m,const RIGID_GEOMETRY_STATE<TV>& initial_state,const T initial_radius,const T density)
+Create_Segmented_Curve(const int m,const RIGID_BODY_STATE<TV>& initial_state,const T initial_radius,const T density)
 {
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_SEGMENTED_CURVE& segmented_curve=*T_SEGMENTED_CURVE::Create(particles);
@@ -121,7 +121,7 @@ Create_Segmented_Curve(const int m,const RIGID_GEOMETRY_STATE<TV>& initial_state
 // Function Create_Tetrahedralized_Volume
 //#####################################################################
 template<class TV> TETRAHEDRALIZED_VOLUME<typename TV::SCALAR>& DEFORMABLES_STANDARD_TESTS<TV>::
-Create_Tetrahedralized_Volume(const std::string& filename,const RIGID_GEOMETRY_STATE<TV>& initial_state,const bool relative_to_box_center,const bool use_constant_mass,const T density,const T scale)
+Create_Tetrahedralized_Volume(const std::string& filename,const RIGID_BODY_STATE<TV>& initial_state,const bool relative_to_box_center,const bool use_constant_mass,const T density,const T scale)
 {
     PHYSBAM_ASSERT(scale>0);
     PHYSBAM_ASSERT(density>0);
@@ -140,7 +140,7 @@ Create_Tetrahedralized_Volume(const std::string& filename,const RIGID_GEOMETRY_S
 // Function Create_Triangulated_Object
 //#####################################################################
 template<class TV> typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::TRIANGULATED_OBJECT& DEFORMABLES_STANDARD_TESTS<TV>::
-Create_Triangulated_Object(const GRID<TV>& square_grid,const RIGID_GEOMETRY_STATE<TV>& initial_state,const T density)
+Create_Triangulated_Object(const GRID<TV>& square_grid,const RIGID_BODY_STATE<TV>& initial_state,const T density)
 {
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_TRIANGULATED_OBJECT& triangulated_object=*T_TRIANGULATED_OBJECT::Create(particles);
@@ -157,7 +157,7 @@ Create_Triangulated_Object(const GRID<TV>& square_grid,const RIGID_GEOMETRY_STAT
 // Function Create_Triangulated_Object
 //#####################################################################
 template<class TV> typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::TRIANGULATED_OBJECT& DEFORMABLES_STANDARD_TESTS<TV>::
-Create_Triangulated_Object(const std::string& filename,const RIGID_GEOMETRY_STATE<TV>& initial_state,const bool relative_to_box_center,const bool use_constant_mass,const T scale)
+Create_Triangulated_Object(const std::string& filename,const RIGID_BODY_STATE<TV>& initial_state,const bool relative_to_box_center,const bool use_constant_mass,const T scale)
 {
     PHYSBAM_ASSERT(scale>0);
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
@@ -176,7 +176,7 @@ Create_Triangulated_Object(const std::string& filename,const RIGID_GEOMETRY_STAT
 // Function Create_Segmented_Curve
 //#####################################################################
 template<class TV> typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<TV>::
-Create_Segmented_Curve(const std::string& filename,const RIGID_GEOMETRY_STATE<TV>& initial_state,const bool relative_to_box_center,const bool use_constant_mass)
+Create_Segmented_Curve(const std::string& filename,const RIGID_BODY_STATE<TV>& initial_state,const bool relative_to_box_center,const bool use_constant_mass)
 {
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_SEGMENTED_CURVE& segmented_curve=*T_SEGMENTED_CURVE::Create(particles);
@@ -193,7 +193,7 @@ Create_Segmented_Curve(const std::string& filename,const RIGID_GEOMETRY_STATE<TV
 // Function Create_Mattress
 //#####################################################################
 template<class TV> TRIANGULATED_AREA<typename TV::SCALAR>& DEFORMABLES_STANDARD_TESTS<TV>::
-Create_Mattress(const GRID<VECTOR<T,2> >& mattress_grid,const bool use_constant_mass,const RIGID_GEOMETRY_STATE<TV>* initial_state,const T density,const bool reverse_triangles)
+Create_Mattress(const GRID<VECTOR<T,2> >& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>* initial_state,const T density,const bool reverse_triangles)
 {
     PHYSBAM_ASSERT(density>0);
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
@@ -212,7 +212,7 @@ Create_Mattress(const GRID<VECTOR<T,2> >& mattress_grid,const bool use_constant_
 // Function Create_Mattress
 //#####################################################################
 template<class TV> TETRAHEDRALIZED_VOLUME<typename TV::SCALAR>& DEFORMABLES_STANDARD_TESTS<TV>::
-Create_Mattress(const GRID<VECTOR<T,3> >& mattress_grid,const bool use_constant_mass,const RIGID_GEOMETRY_STATE<TV>* initial_state,const T density)
+Create_Mattress(const GRID<VECTOR<T,3> >& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>* initial_state,const T density)
 {
     PHYSBAM_ASSERT(density>0);
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
@@ -230,7 +230,7 @@ Create_Mattress(const GRID<VECTOR<T,3> >& mattress_grid,const bool use_constant_
 // Function Create_Embedded_Tetrahedralized_Volume
 //#####################################################################
 template<class TV> template<class T_SHAPE> EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<typename TV::SCALAR>& DEFORMABLES_STANDARD_TESTS<TV>::
-Create_Embedded_Tetrahedralized_Volume(const T_SHAPE& shape,const RIGID_GEOMETRY_STATE<TV>& initial_state,const bool relative_to_box_center)
+Create_Embedded_Tetrahedralized_Volume(const T_SHAPE& shape,const RIGID_BODY_STATE<TV>& initial_state,const bool relative_to_box_center)
 {
     DEFORMABLE_PARTICLES<TV>& particles=*(new DEFORMABLE_PARTICLES<TV>());
     EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>& embedding=*EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>::Create(particles);
@@ -372,7 +372,7 @@ Set_Mass_Of_Particles(const T_OBJECT& object,const T density,const bool use_cons
 // Function Create_Cloth_Panel
 //#####################################################################
 template<class TV> TRIANGULATED_SURFACE<typename TV::SCALAR>& DEFORMABLES_STANDARD_TESTS<TV>::
-Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_GEOMETRY_STATE<TV>* initial_state,
+Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_BODY_STATE<TV>* initial_state,
     TRIANGULATED_SURFACE_CLIPPING_HELPER<T> *clipping_function,ARRAY<int>* particle_indices)
 {
     DEFORMABLE_PARTICLES<TV>& particles=*(new DEFORMABLE_PARTICLES<TV>());
@@ -600,20 +600,20 @@ Mark_Hard_Bindings_With_Free_Particles()
 //#####################################################################
 #define INSTANTIATION_HELPER_1D(T) \
     template DEFORMABLES_STANDARD_TESTS<VECTOR<T,1> >::DEFORMABLES_STANDARD_TESTS(EXAMPLE<VECTOR<T,1> >&,DEFORMABLE_BODY_COLLECTION<VECTOR<T,1> >&); \
-    template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,1> >::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<VECTOR<T,1> >::Create_Segmented_Curve(const GRID<VECTOR<T,1> >&,const RIGID_GEOMETRY_STATE<VECTOR<T,1> >&,const T); \
+    template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,1> >::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<VECTOR<T,1> >::Create_Segmented_Curve(const GRID<VECTOR<T,1> >&,const RIGID_BODY_STATE<VECTOR<T,1> >&,const T); \
     template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,1> >::Add_Gravity();
 
 #define INSTANTIATION_HELPER_2D(T) \
     INSTANTIATION_HELPER_ALL(T,2) \
-    template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,2> >::TRIANGULATED_OBJECT& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Create_Triangulated_Object(const GRID<VECTOR<T,2> >&,const RIGID_GEOMETRY_STATE<VECTOR<T,2> >&,const T);
+    template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,2> >::TRIANGULATED_OBJECT& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Create_Triangulated_Object(const GRID<VECTOR<T,2> >&,const RIGID_BODY_STATE<VECTOR<T,2> >&,const T);
 
 #define INSTANTIATION_HELPER_ALL(T,d) \
     template DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::DEFORMABLES_STANDARD_TESTS(EXAMPLE<VECTOR<T,d> >&,DEFORMABLE_BODY_COLLECTION<VECTOR<T,d> >&); \
-    template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Set_Initial_Particle_Configuration(GEOMETRY_PARTICLES<VECTOR<T,d> >&,const RIGID_GEOMETRY_STATE<VECTOR<T,d> >&,const bool); \
-    template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,d> >::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Create_Segmented_Curve(const GRID<VECTOR<T,1> >&,const RIGID_GEOMETRY_STATE<VECTOR<T,d> >&,const T); \
-    template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,d> >::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Create_Segmented_Curve(const int,const RIGID_GEOMETRY_STATE<VECTOR<T,d> >&,const T,const T); \
-    template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,d> >::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Create_Segmented_Curve(const std::string&,const RIGID_GEOMETRY_STATE<VECTOR<T,d> >&,const bool,const bool); \
-    template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,d> >::TRIANGULATED_OBJECT& DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Create_Triangulated_Object(const std::string&,const RIGID_GEOMETRY_STATE<VECTOR<T,d> >&,const bool,const bool,const T); \
+    template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Set_Initial_Particle_Configuration(GEOMETRY_PARTICLES<VECTOR<T,d> >&,const RIGID_BODY_STATE<VECTOR<T,d> >&,const bool); \
+    template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,d> >::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Create_Segmented_Curve(const GRID<VECTOR<T,1> >&,const RIGID_BODY_STATE<VECTOR<T,d> >&,const T); \
+    template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,d> >::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Create_Segmented_Curve(const int,const RIGID_BODY_STATE<VECTOR<T,d> >&,const T,const T); \
+    template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,d> >::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Create_Segmented_Curve(const std::string&,const RIGID_BODY_STATE<VECTOR<T,d> >&,const bool,const bool); \
+    template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,d> >::TRIANGULATED_OBJECT& DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Create_Triangulated_Object(const std::string&,const RIGID_BODY_STATE<VECTOR<T,d> >&,const bool,const bool,const T); \
     template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Substitute_Soft_Bindings_For_Nodes(TRIANGULATED_SURFACE<T>&,SOFT_BINDINGS<VECTOR<T,d> >&,HASHTABLE<int,int>*,const bool,const bool); \
     template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Add_Gravity();
 
@@ -621,19 +621,19 @@ Mark_Hard_Bindings_With_Free_Particles()
     INSTANTIATION_HELPER_1D(T) \
     INSTANTIATION_HELPER_2D(T) \
     INSTANTIATION_HELPER_ALL(T,3) \
-    template TETRAHEDRALIZED_VOLUME<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Tetrahedralized_Volume(const std::string&,const RIGID_GEOMETRY_STATE<VECTOR<T,3> >&,const bool,const bool,const T,const T); \
-    template TRIANGULATED_AREA<VECTOR<T,2>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Create_Mattress(const GRID<VECTOR<T,2> >&,const bool,const RIGID_GEOMETRY_STATE<VECTOR<T,2> >*,const T,const bool); \
-    template TETRAHEDRALIZED_VOLUME<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Mattress(const GRID<VECTOR<T,3> >&,const bool,const RIGID_GEOMETRY_STATE<VECTOR<T,3> >*,const T); \
+    template TETRAHEDRALIZED_VOLUME<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Tetrahedralized_Volume(const std::string&,const RIGID_BODY_STATE<VECTOR<T,3> >&,const bool,const bool,const T,const T); \
+    template TRIANGULATED_AREA<VECTOR<T,2>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Create_Mattress(const GRID<VECTOR<T,2> >&,const bool,const RIGID_BODY_STATE<VECTOR<T,2> >*,const T,const bool); \
+    template TETRAHEDRALIZED_VOLUME<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Mattress(const GRID<VECTOR<T,3> >&,const bool,const RIGID_BODY_STATE<VECTOR<T,3> >*,const T); \
     template LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Read_Or_Initialize_Implicit_Surface(const std::string&,TRIANGULATED_SURFACE<T>&) const; \
     template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Initialize_Tetrahedron_Collisions(const int,TETRAHEDRALIZED_VOLUME<T>&,TRIANGLE_COLLISION_PARAMETERS<VECTOR<T,3> >&,TRIANGULATED_SURFACE<T>*); \
     template TRIANGULATED_SURFACE<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Drifted_Surface(const TRIANGULATED_SURFACE<T>&,SOFT_BINDINGS<VECTOR<T,3> >&,const bool) const; \
-    template EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Embedded_Tetrahedralized_Volume(const SPHERE<VECTOR<T,3> >&,const RIGID_GEOMETRY_STATE<VECTOR<T,3> >&,const bool); \
-    template EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Embedded_Tetrahedralized_Volume(const TORUS<T>&,const RIGID_GEOMETRY_STATE<VECTOR<T,3> >&,const bool); \
+    template EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Embedded_Tetrahedralized_Volume(const SPHERE<VECTOR<T,3> >&,const RIGID_BODY_STATE<VECTOR<T,3> >&,const bool); \
+    template EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Embedded_Tetrahedralized_Volume(const TORUS<T>&,const RIGID_BODY_STATE<VECTOR<T,3> >&,const bool); \
     template TETRAHEDRALIZED_VOLUME<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Copy_And_Add_Structure(TETRAHEDRALIZED_VOLUME<T>&,ARRAY<int>*); \
     template TRIANGULATED_SURFACE<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Copy_And_Add_Structure(TRIANGULATED_SURFACE<T>&,ARRAY<int>*); \
     template TRIANGULATED_AREA<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Copy_And_Add_Structure(TRIANGULATED_AREA<T>&,ARRAY<int>*); \
     template SEGMENTED_CURVE<VECTOR<T,2> >& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Copy_And_Add_Structure(SEGMENTED_CURVE<VECTOR<T,2> >&,ARRAY<int>*); \
-    template TRIANGULATED_SURFACE<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Cloth_Panel(const int,const T,const T,const RIGID_GEOMETRY_STATE<VECTOR<T,3> >*, \
+    template TRIANGULATED_SURFACE<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Cloth_Panel(const int,const T,const T,const RIGID_BODY_STATE<VECTOR<T,3> >*, \
         TRIANGULATED_SURFACE_CLIPPING_HELPER<T>*,ARRAY<int>*); \
     template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Set_Mass_Of_Particles<SEGMENTED_CURVE<VECTOR<T,2> > >(SEGMENTED_CURVE<VECTOR<T,2> > const&,T,bool);
 

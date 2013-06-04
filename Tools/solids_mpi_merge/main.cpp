@@ -88,14 +88,14 @@ Merge_Rigid_Data(const int frame)
     for(int p=0;p<number_of_processes;p++){
         local_rigid_collections(p)=new RIGID_BODY_COLLECTION<TV>(0,0);
         local_rigid_collections(p)->Read(STREAM_TYPE(RW()),STRING_UTILITIES::string_sprintf("%s/%d/",input_directory.c_str(),p),frame,&needs_init);
-        local_rigid_collections(p)->rigid_geometry_collection.structure_list.Fill_Needs_Write();
-        rigid_body_collection.rigid_body_particle.Add_Elements(local_rigid_collections(p)->rigid_body_particle.Size());
-        colors.Resize(local_rigid_collections(p)->rigid_body_particle.Size());
-        for(int i=0;i<local_rigid_collections(p)->rigid_body_particle.Size();i++){
-            if(!local_rigid_collections(p)->rigid_body_particle.rigid_geometry(i)) continue;
-            if(!local_rigid_collections(p)->rigid_geometry_collection.Is_Active(i)) continue;
+        local_rigid_collections(p)->structure_list.Fill_Needs_Write();
+        rigid_body_collection.rigid_body_particles.Add_Elements(local_rigid_collections(p)->rigid_body_particles.Size());
+        colors.Resize(local_rigid_collections(p)->rigid_body_particles.Size());
+        for(int i=0;i<local_rigid_collections(p)->rigid_body_particles.Size();i++){
+            if(!local_rigid_collections(p)->rigid_body_particles.rigid_body(i)) continue;
+            if(!local_rigid_collections(p)->Is_Active(i)) continue;
             colors(i)=p;
-            rigid_body_collection.rigid_body_particle.Copy_Element(local_rigid_collections(p)->rigid_body_particle,i,i);
+            rigid_body_collection.rigid_body_particles.Copy_Element(local_rigid_collections(p)->rigid_body_particles,i,i);
             rigid_body_collection.Add_Rigid_Body_And_Geometry(&local_rigid_collections(p)->Rigid_Body(i));}}
     rigid_body_collection.Write(STREAM_TYPE(RW()),output_directory,frame);
     return true;
