@@ -163,19 +163,19 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
                                                                 solids_parameters.rigid_body_collision_parameters.use_fracture_particle_optimization,true);
 
                     LOG::cout<<"Added "<<added_bodies.m<<" to the simulation"<<std::endl;
-                    removed_bodies.Append(solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(rigid_particle_index));
+                    removed_bodies.Append(solid_body_collection.collision_body_list.geometry_id_to_collision_geometry_id.Get(rigid_particle_index));
                     solid_body_collection.rigid_body_collection.rigid_body_particles.Remove_Body(rigid_particle_index);
                     for(int i=0;i<added_bodies.m;i++){
-                        COLLISION_GEOMETRY<TV>* collision_body=&(*solid_body_collection.rigid_body_collection.collision_body_list)(
-                                solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(added_bodies(i)));
+                        COLLISION_GEOMETRY<TV>* collision_body=&solid_body_collection.collision_body_list(
+                                solid_body_collection.collision_body_list.geometry_id_to_collision_geometry_id.Get(added_bodies(i)));
                         fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(collision_body,added_bodies(i),false);
                         collision_body->Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,time+dt);}
 
                     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Solid_Node())
                         rigids_evolution_callbacks.End_Fracture(rigid_particle_index,added_bodies);
                     for(int i=0;i<added_bodies.m;i++){
-                        COLLISION_GEOMETRY<TV>* collision_body=&(*solid_body_collection.rigid_body_collection.collision_body_list)(
-                                solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(added_bodies(i)));
+                        COLLISION_GEOMETRY<TV>* collision_body=&solid_body_collection.collision_body_list(
+                                solid_body_collection.collision_body_list.geometry_id_to_collision_geometry_id.Get(added_bodies(i)));
                         collision_body->Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,time);}
 
                     all_added_bodies.Append_Elements(added_bodies);}}}
