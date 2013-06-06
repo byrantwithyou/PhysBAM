@@ -91,43 +91,27 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // geometry setting
     switch(test_number){
         case 1:{ // all materials together
-            sim.grid.Initialize(TV_INT(1.6*grid_res+1,2*grid_res+1),RANGE<TV>(TV(-0.8,-0.6),TV(0.8,1.4)));
+            sim.grid.Initialize(TV_INT(0.6*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.3,-0.6),TV(0.3,0.6)));
 
-            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0,0.9),0.1),particle_exclude_radius);
-            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(-0.5,0.8),0.1),particle_exclude_radius);
-            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0.4,0.75),0.12),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0,-0.4),0.1),particle_exclude_radius);
             int first_count=sim.particles.number;
             sim.particles.Set_Material_Properties(0,first_count,
-                (T)200*density_scale/1000, // mass per particle
-                (3e4)*ym/((T)2*((T)1+pr)), // mu
-                (3e4)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+                (T)200*density_scale/first_count, // mass per particle
+                (9000)*ym/((T)2*((T)1+pr)), // mu
+                (9000)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
             sim.particles.Set_Plasticity(0,first_count,
                 false,-1,1, // plasticity_yield
                 false,-1,1); // plasticity_clamp
             sim.particles.Set_Visco_Plasticity(0,first_count,
                 false,100, // visco_nu
-                2400, // visco_tau
+                5000, // visco_tau
                 0); // visco_kappa
-
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.65,-0.45),TV(0.65,0.15)),particle_exclude_radius);
-            int second_count=sim.particles.number-first_count;
-            sim.particles.Set_Material_Properties(first_count,second_count,
-                (T)30*density_scale/1000, // mass per particle
-                (0)*ym/((T)2*((T)1+pr)), // mu
-                (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
-            sim.particles.Set_Plasticity(first_count,second_count,
-                false,-1,1, // plasticity_yield
-                false,-1,1); // plasticity_clamp
-            sim.particles.Set_Visco_Plasticity(first_count,second_count,
-                false,700, // visco_nu
-                900, // visco_tau
-                0); // visco_kappa
-
-            sim.use_gravity=true;
-            sim.particles.Set_Initial_State(0,sim.particles.number,
+            sim.particles.Set_Initial_State(0,first_count,
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
                 TV()); // initial velocity
+
+            sim.use_gravity=true;
             break;}
 
         case 2:{ // intially stretched
@@ -208,34 +192,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 false,700, // visco_nu
                 900, // visco_tau
                 0); // visco_kappa
-
-            // sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.4,0.5),TV(-0.1,1.3)),particle_exclude_radius);
-            // int third_count=sim.particles.number-first_count-second_count;
-            // sim.particles.Set_Material_Properties(first_count+second_count,third_count,
-            //     (T)3*115.2*density_scale/second_count, // mass per particle
-            //     (0)*ym/((T)2*((T)1+pr)), // mu
-            //     (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
-            // sim.particles.Set_Plasticity(first_count+second_count,third_count,
-            //     false,-1,1, // plasticity_yield
-            //     false,-1,1); // plasticity_clamp
-            // sim.particles.Set_Visco_Plasticity(first_count+second_count,third_count,
-            //     false,700, // visco_nu
-            //     900, // visco_tau
-            //     0); // visco_kappa
-
-            // sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.1,0.5),TV(0.4,1.3)),particle_exclude_radius);
-            // int forth_count=sim.particles.number-first_count-second_count-third_count;
-            // sim.particles.Set_Material_Properties(first_count+second_count+third_count,forth_count,
-            //     (T)4*115.2*density_scale/second_count, // mass per particle
-            //     (0)*ym/((T)2*((T)1+pr)), // mu
-            //     (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
-            // sim.particles.Set_Plasticity(first_count+second_count+third_count,forth_count,
-            //     false,-1,1, // plasticity_yield
-            //     false,-1,1); // plasticity_clamp
-            // sim.particles.Set_Visco_Plasticity(first_count+second_count+third_count,forth_count,
-            //     false,700, // visco_nu
-            //     900, // visco_tau
-            //     0); // visco_kappa
             
             sim.use_gravity=true;
             sim.particles.Set_Initial_State(0,sim.particles.number,
@@ -342,7 +298,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     for(int f=1;f<2900977;f++){
         TIMING_START;
         LOG::cout<<"MPM TIMESTEP "<<f<<std::endl;
-
         sim.Build_Weights_And_Grad_Weights();
         sim.Build_Helper_Structures_For_Constitutive_Model();
         LOG::cout<<"Momentum - particles:"<<sim.Get_Total_Momentum_On_Particles()<<std::endl;
@@ -363,19 +318,28 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             for(int x=3;x<projection.mac_grid.counts.x-3;x++){
                 projection.cell_neumann(TV_INT(x,3))=true;
                 projection.cell_dirichlet(TV_INT(x,3))=false;
-                projection.neumann_cell_normal_axis(TV_INT(x,3))=1;}
+                projection.neumann_cell_normal_axis(TV_INT(x,3))=2;}
             for(int x=3;x<projection.mac_grid.counts.x-3;x++){
                 projection.cell_neumann(TV_INT(x,projection.mac_grid.counts.y-4))=true;
                 projection.cell_dirichlet(TV_INT(x,projection.mac_grid.counts.y-4))=false;
-                projection.neumann_cell_normal_axis(TV_INT(x,projection.mac_grid.counts.y-4))=1;}
+                projection.neumann_cell_normal_axis(TV_INT(x,projection.mac_grid.counts.y-4))=-2;}
             for(int y=3;y<projection.mac_grid.counts.y-3;y++){
                 projection.cell_neumann(TV_INT(3,y))=true;
                 projection.cell_dirichlet(TV_INT(3,y))=false;
-                projection.neumann_cell_normal_axis(TV_INT(3,y))=0;}
+                projection.neumann_cell_normal_axis(TV_INT(3,y))=1;}
             for(int y=3;y<projection.mac_grid.counts.y-3;y++){
                 projection.cell_neumann(TV_INT(projection.mac_grid.counts.x-4,y))=true;
                 projection.cell_dirichlet(TV_INT(projection.mac_grid.counts.x-4,y))=false;
-                projection.neumann_cell_normal_axis(TV_INT(projection.mac_grid.counts.x-4,y))=0;}
+                projection.neumann_cell_normal_axis(TV_INT(projection.mac_grid.counts.x-4,y))=-1;}
+            
+            // for(int y=3;y<projection.mac_grid.counts.y-3;y++){
+            //     projection.cell_neumann(TV_INT(38,y))=true;
+            //     projection.cell_dirichlet(TV_INT(38,y))=false;
+            //     projection.neumann_cell_normal_axis(TV_INT(38,y))=1;}
+            // for(int y=3;y<projection.mac_grid.counts.y-3;y++){
+            //     projection.cell_neumann(TV_INT(57,y))=true;
+            //     projection.cell_dirichlet(TV_INT(57,y))=false;
+            //     projection.neumann_cell_normal_axis(TV_INT(57,y))=-1;}
             
             projection.Identify_Nodes_Of_Non_Dirichlet_Cells();
             projection.Velocities_Corners_To_Faces_MPM_Style();
@@ -390,7 +354,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
         sim.Update_Deformation_Gradient();
         sim.Update_Particle_Velocities();
-        sim.Particle_Based_Body_Collisions();
+        // sim.Particle_Based_Body_Collisions();
         sim.Update_Particle_Positions();
         sim.Update_Dirichlet_Box_Positions();
         sim.Update_Colliding_Object_Positions();
@@ -401,14 +365,14 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
-                if(sim.particles.Xm(i).y<0.4 && sim.particles.Xm(i).x<0)
-                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
-                else if(sim.particles.Xm(i).y<0.4 && sim.particles.Xm(i).x>0)
+                // if(sim.particles.Xm(i).y<0.4 && sim.particles.Xm(i).x<0)
+                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
+                // else if(sim.particles.Xm(i).y<0.4 && sim.particles.Xm(i).x>0)
+                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
+                // else if(sim.particles.Xm(i).y>0.4 && sim.particles.Xm(i).x<0)
+                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
+                // else
                     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
-                else if(sim.particles.Xm(i).y>0.4 && sim.particles.Xm(i).x<0)
-                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
-                else
-                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));
             }
 
             // projection: visualize MAC grid velocities
@@ -463,12 +427,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                     Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.boundary_segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
 
             // draw wall
-            for(T x=sim.grid.domain.min_corner(0)+4.5*sim.grid.dX.Min();x<sim.grid.domain.max_corner(0)-4.5*sim.grid.dX.Min();x+=sim.grid.dX.Min()*0.2){
-                Add_Debug_Particle(TV(x,sim.grid.domain.min_corner(1)+4.5*sim.grid.dX.Min()),VECTOR<T,3>(0,0,1));
-                Add_Debug_Particle(TV(x,sim.grid.domain.max_corner(1)-4.5*sim.grid.dX.Min()),VECTOR<T,3>(0,0,1));}
-            for(T y=sim.grid.domain.min_corner(1)+4.5*sim.grid.dX.Min();y<sim.grid.domain.max_corner(1)-4.5*sim.grid.dX.Min();y+=sim.grid.dX.Min()*0.2){
-                Add_Debug_Particle(TV(sim.grid.domain.min_corner(0)+4.5*sim.grid.dX.Min(),y),VECTOR<T,3>(0,0,1));
-                Add_Debug_Particle(TV(sim.grid.domain.max_corner(0)-4.5*sim.grid.dX.Min(),y),VECTOR<T,3>(0,0,1));}
+            for(T x=sim.grid.domain.min_corner(0)+4.01*sim.grid.dX.Min();x<sim.grid.domain.max_corner(0)-4.01*sim.grid.dX.Min();x+=sim.grid.dX.Min()*0.2){
+                Add_Debug_Particle(TV(x,sim.grid.domain.min_corner(1)+4.01*sim.grid.dX.Min()),VECTOR<T,3>(0,0,1));
+                Add_Debug_Particle(TV(x,sim.grid.domain.max_corner(1)-4.01*sim.grid.dX.Min()),VECTOR<T,3>(0,0,1));}
+            for(T y=sim.grid.domain.min_corner(1)+4.01*sim.grid.dX.Min();y<sim.grid.domain.max_corner(1)-4.01*sim.grid.dX.Min();y+=sim.grid.dX.Min()*0.2){
+                Add_Debug_Particle(TV(sim.grid.domain.min_corner(0)+4.01*sim.grid.dX.Min(),y),VECTOR<T,3>(0,0,1));
+                Add_Debug_Particle(TV(sim.grid.domain.max_corner(0)-4.01*sim.grid.dX.Min(),y),VECTOR<T,3>(0,0,1));}
             
             // draw collision objects
             for(int b=0;b<sim.rigid_ball.m;b++){

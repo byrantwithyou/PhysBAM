@@ -238,7 +238,7 @@ Grid_Based_Body_Collisions()
         if(node_mass(it.index)>min_mass){
             const TV& x=grid.Node(it.index);
             for(int d=0;d<TV::m;d++){
-                T left_wall=grid.domain.min_corner(d)+4.5*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.5*grid.dX.Min();
+                T left_wall=grid.domain.min_corner(d)+4.01*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.01*grid.dX.Min();
                 if(x(d)<left_wall && node_V_star(it.index)(d)<(T)0){
                     TV vt(node_V_star(it.index));vt(d)=(T)0;
                     T vn=node_V_star(it.index)(d); // <0
@@ -411,7 +411,7 @@ Particle_Based_Body_Collisions()
     for(int p=0;p<particles.number;p++){
         TV& x=particles.X(p);
         for(int d=0;d<TV::m;d++){
-            T left_wall=grid.domain.min_corner(d)+4.5*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.5*grid.dX.Min();
+            T left_wall=grid.domain.min_corner(d)+4.01*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.01*grid.dX.Min();
             if(x(d)<=left_wall && particles.V(p)(d)<=(T)0){
                 TV vt(particles.V(p));vt(d)=(T)0;
                 T vn=particles.V(p)(d); // <0

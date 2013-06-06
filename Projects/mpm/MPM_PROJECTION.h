@@ -24,7 +24,7 @@ public:
     GRID<TV> mac_grid;
     ARRAY<bool,TV_INT> cell_dirichlet;
     ARRAY<bool,TV_INT> cell_neumann;
-    ARRAY<int,TV_INT> neumann_cell_normal_axis;
+    ARRAY<int,TV_INT> neumann_cell_normal_axis; // +-1 +-2 +-3
     HASHTABLE<TV_INT,bool> nodes_non_dirichlet_cells;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_masses;

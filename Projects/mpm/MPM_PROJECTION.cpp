@@ -201,8 +201,17 @@ Do_Projection()
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
         if(cell_neumann(it.index)){
             int d=neumann_cell_normal_axis(it.index);
-            face_velocities(FACE_INDEX<TV::m>(d,mac_grid.First_Face_Index_In_Cell(d,it.index)))=T(0);
-            face_velocities(FACE_INDEX<TV::m>(d,mac_grid.Second_Face_Index_In_Cell(d,it.index)))=T(0);}}
+            int axis=abs(d)-1;
+            if(face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))*d<0)
+                face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))=T(0);
+            if(face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))*d<0)
+                face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))=T(0);
+            // for(int dd=0;dd<TV::m;dd++){
+            //     if(dd!=axis){
+            //         face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))=T(0);
+            //         face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))=T(0);}}
+        }
+    }
     // check whether divergence free
     Build_Velocity_Divergence();
     LOG::cout<<"Maximum velocity divergence after projection: "<<max_div<<std::endl;
