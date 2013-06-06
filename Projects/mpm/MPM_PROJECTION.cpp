@@ -98,14 +98,15 @@ Velocities_Corners_To_Faces_MPM_Style()
     face_masses.Fill((T)0);
     face_momenta.Fill((T)0);
     ARRAY<FACE_INDEX<TV::m> > faces_got_rasterized;
+    T weight=(TV::m==2)?0.5:0.25;
     for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(nodes_non_dirichlet_cells);it.Valid();it.Next()){
         TV_INT node=it.Key();
         for(int axis=0;axis<TV::m;axis++){
             for(int face=0;face<TV::m*2-2;face++){
                 FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,node,face));
                 faces_got_rasterized.Append(face_index);
-                face_masses(face_index)+=0.5*sim.node_mass(node);
-                face_momenta(face_index)+=0.5*sim.node_mass(node)*sim.node_V(node)(axis);}}}
+                face_masses(face_index)+=weight*sim.node_mass(node);
+                face_momenta(face_index)+=weight*sim.node_mass(node)*sim.node_V(node)(axis);}}}
     for(int i=0;i<faces_got_rasterized.m;i++){
         FACE_INDEX<TV::m> face_index=faces_got_rasterized(i);
         if(face_masses(face_index)>sim.min_mass)
@@ -174,7 +175,7 @@ Solve_For_Pressure()
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=false;
-    solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
+    solver->Solve(system,x,rhs,vectors,(T)1e-12,0,1000);
     pressure=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
 }
@@ -206,10 +207,13 @@ Do_Projection()
                 face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))=T(0);
             if(face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))*d<0)
                 face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))=T(0);
-            // for(int dd=0;dd<TV::m;dd++){
-            //     if(dd!=axis){
-            //         face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))=T(0);
-            //         face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))=T(0);}}
+//            for(int dd=0;dd<TV::m;dd++){
+//                if(dd!=axis){
+//                     face_velocities(FACE_INDEX<TV::m>(dd,mac_grid.First_Face_Index_In_Cell(dd,it.index)))=T(0);
+//                    face_velocities(FACE_INDEX<TV::m>(dd,mac_grid.Second_Face_Index_In_Cell(dd,it.index)))=T(0);}}
+  
+            
+            
         }
     }
     // check whether divergence free
@@ -223,13 +227,14 @@ Do_Projection()
 template<class TV> void MPM_PROJECTION<TV>::
 Velocities_Faces_To_Corners_MPM_Style()
 {
+    T weight=(TV::m==2)?0.5:0.25;
     for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(nodes_non_dirichlet_cells);it.Valid();it.Next()){
         TV_INT node=it.Key();
         sim.node_V(node)=TV();
         for(int axis=0;axis<TV::m;axis++){
             for(int face=0;face<TV::m*2-2;face++){
                 FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,node,face));
-                sim.node_V(node)(axis)+=0.5*face_velocities(face_index);}}}
+                sim.node_V(node)(axis)+=weight*face_velocities(face_index);}}}
 }
 
 //#####################################################################

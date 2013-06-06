@@ -91,16 +91,16 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // geometry setting
     switch(test_number){
         case 1:{ // all materials together
-            sim.grid.Initialize(TV_INT(0.6*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.3,-0.6),TV(0.3,0.6)));
+            sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
 
-            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0,-0.4),0.1),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.2,-0.1),TV(0.2,0.1)),particle_exclude_radius);
             int first_count=sim.particles.number;
             sim.particles.Set_Material_Properties(0,first_count,
                 (T)200*density_scale/first_count, // mass per particle
                 (9000)*ym/((T)2*((T)1+pr)), // mu
                 (9000)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
             sim.particles.Set_Plasticity(0,first_count,
-                false,-1,1, // plasticity_yield
+                true,-1000,1.001, // plasticity_yield
                 false,-1,1); // plasticity_clamp
             sim.particles.Set_Visco_Plasticity(0,first_count,
                 false,100, // visco_nu
@@ -110,6 +110,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
                 TV()); // initial velocity
+            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.3,-0.15),TV(-0.18,0.15)));
+            sim.dirichlet_velocity.Append(TV());
+            sim.dirichlet_box.Append(RANGE<TV>(TV(0.18,-0.15),TV(0.3,0.15)));
+            sim.dirichlet_velocity.Append(TV(0.05,0));
+            
 
             sim.use_gravity=true;
             break;}
@@ -142,18 +147,18 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         case 3:{ // free fall
             sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
 
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.2,0.1),TV(0.2,0.5)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.05,-0.4),TV(0.05,0.45)),particle_exclude_radius);
             int first_count=sim.particles.number;
             sim.particles.Set_Material_Properties(0,first_count,
                 (T)115.2*density_scale/first_count, // mass per particle
-                (3e3)*ym/((T)2*((T)1+pr)), // mu
-                (3e3)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+                (0)*ym/((T)2*((T)1+pr)), // mu
+                (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
             sim.particles.Set_Plasticity(0,first_count,
                 false,-1,1, // plasticity_yield
                 false,-1,1); // plasticity_clamp
             sim.particles.Set_Visco_Plasticity(0,first_count,
-                false,700, // visco_nu
-                900, // visco_tau
+                false,70, // visco_nu
+                1000, // visco_tau
                 0); // visco_kappa
             sim.use_gravity=true;
             sim.particles.Set_Initial_State(0,sim.particles.number,
@@ -162,45 +167,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 TV()); // initial velocity
             break;}
             
-        case 4:{ // multi-phase dam break
-            sim.grid.Initialize(TV_INT(1.2*grid_res+1,2.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,1.6)));
-                        
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.4,-0.5),TV(-0.1,0.3)),particle_exclude_radius);
-            int first_count=sim.particles.number;
-            sim.particles.Set_Material_Properties(0,first_count,
-                (T)115.2*density_scale/first_count, // mass per particle
-                (10)*ym/((T)2*((T)1+pr)), // mu
-                (10)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
-            sim.particles.Set_Plasticity(0,first_count,
-                false,-1,1, // plasticity_yield
-                false,-1,1); // plasticity_clamp
-            sim.particles.Set_Visco_Plasticity(0,first_count,
-                false,700, // visco_nu
-                900, // visco_tau
-                0); // visco_kappa
-            
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(0.1,-0.5),TV(0.4,0.3)),particle_exclude_radius);
-            int second_count=sim.particles.number-first_count;
-            sim.particles.Set_Material_Properties(first_count,second_count,
-                (T)5*115.2*density_scale/second_count, // mass per particle
-                (100)*ym/((T)2*((T)1+pr)), // mu
-                (100)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
-            sim.particles.Set_Plasticity(first_count,second_count,
-                false,-1,1, // plasticity_yield
-                false,-1,1); // plasticity_clamp
-            sim.particles.Set_Visco_Plasticity(first_count,second_count,
-                false,700, // visco_nu
-                900, // visco_tau
-                0); // visco_kappa
-            
-            sim.use_gravity=true;
-            sim.particles.Set_Initial_State(0,sim.particles.number,
-                MATRIX<T,TV::m>::Identity_Matrix(), // Fe
-                MATRIX<T,TV::m>::Identity_Matrix(), // Fp
-                TV()); // initial velocity
-            break;}
-
-
+     
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
     sim.Initialize();

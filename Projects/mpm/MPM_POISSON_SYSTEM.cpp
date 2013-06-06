@@ -35,7 +35,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 {
     ARRAY<T,TV_INT>& rr=debug_cast<MPM_POISSON_VECTOR<TV>&>(result).v;
     const ARRAY<T,TV_INT>& xx=debug_cast<const MPM_POISSON_VECTOR<TV>&>(x).v;
-    T one_over_h_square_or_cube=(TV::m==2)?sqr((T)1/proj.mac_grid.dX.Min()):cube((T)1/proj.mac_grid.dX.Min());
+    T one_over_h_square=sqr((T)1/proj.mac_grid.dX.Min());
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+proj.mac_grid.counts));it.Valid();it.Next()){
         if(proj.cell_dirichlet(it.index) || proj.cell_neumann(it.index))
             rr(it.index)=(T)0;
@@ -54,7 +54,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
                     if(proj.cell_dirichlet(right_cell_index)) rr(it.index)+=xx(it.index)/proj.face_masses(right_face_index);
                     else if(proj.cell_neumann(right_cell_index)) rr(it.index)+=T(0);
                     else rr(it.index)+=(xx(it.index)-xx(right_cell_index))/proj.face_masses(right_face_index);}}
-            rr(it.index)*=proj.sim.dt*one_over_h_square_or_cube;}}
+            rr(it.index)*=proj.sim.dt*one_over_h_square;}}
 }
 //#####################################################################
 // Function Project

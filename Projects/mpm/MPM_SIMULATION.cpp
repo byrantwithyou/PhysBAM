@@ -247,7 +247,9 @@ Grid_Based_Body_Collisions()
                         T impulse=friction_coefficient*vn/vt_mag;
                         if(impulse<-(T)1) impulse=-(T)1;
                         node_V_star(it.index)=vt*((T)1+impulse);}
-                    else node_V_star(it.index)=vt;}
+                    else node_V_star(it.index)=vt;
+                    // node_V_star(it.index)=TV(); // sticky
+                }
                 if(x(d)>right_wall && node_V_star(it.index)(d)>(T)0){
                     TV vt(node_V_star(it.index));vt(d)=(T)0;
                     T vn=node_V_star(it.index)(d); // >0
@@ -256,7 +258,9 @@ Grid_Based_Body_Collisions()
                         T impulse=-friction_coefficient*vn/vt_mag;
                         if(impulse<-(T)1) impulse=-(T)1;
                         node_V_star(it.index)=vt*((T)1+impulse);}
-                    else node_V_star(it.index)=vt;}
+                    else node_V_star(it.index)=vt;
+                    // node_V_star(it.index)=TV(); // sticky
+                }
                 nodes_need_projection.Append(it.index);}
             for(int b=0;b<rigid_ball.m;b++){
                 if(rigid_ball(b).Lazy_Inside(x)){
@@ -420,7 +424,9 @@ Particle_Based_Body_Collisions()
                     T impulse=friction_coefficient*vn/vt_mag;
                     if(impulse<(T)-1) impulse=(T)-1;
                     particles.V(p)=vt*(1+impulse);}
-                else particles.V(p)=vt;}
+                else particles.V(p)=vt;
+                // particles.V(p)=TV(); // sticky
+            }
             if(x(d)>=right_wall && particles.V(p)(d)>=(T)0){
                 TV vt(particles.V(p));vt(d)=(T)0;
                 T vn=particles.V(p)(d); // >0
@@ -429,7 +435,10 @@ Particle_Based_Body_Collisions()
                     T impulse=-friction_coefficient*vn/vt_mag;
                     if(impulse<(T)-1) impulse=(T)-1;
                     particles.V(p)=vt*(1+impulse);}
-                else particles.V(p)=vt;}}
+                else particles.V(p)=vt;
+                // particles.V(p)=TV(); // sticky
+            }
+        }
         for(int b=0;b<rigid_ball.m;b++){
             if(rigid_ball(b).Lazy_Inside(x)){
                 TV n=rigid_ball(b).Normal(x);
