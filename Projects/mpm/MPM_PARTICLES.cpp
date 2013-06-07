@@ -37,6 +37,7 @@ MPM_PARTICLES()
     Add_Array(ATTRIBUTE_ID_VISCO_NU,&visco_nu);
     Add_Array(ATTRIBUTE_ID_VISCO_TAU,&visco_tau);
     Add_Array(ATTRIBUTE_ID_VISCO_KAPPA,&visco_kappa);
+    Add_Array(ATTRIBUTE_ID_COMPRESS,&compress);
     rand_generator.Set_Seed(0);
 }
 //#####################################################################
@@ -81,12 +82,13 @@ Add_Randomly_Sampled_Implicit_Object(const IMPLICIT_OBJECT<TV>& object,const T e
 // Function Set_Material_Properties
 //#####################################################################
 template<class TV> void MPM_PARTICLES<TV>::
-Set_Material_Properties(int start_index,int count,T mass_in,T mu_in,T lambda_in)
+Set_Material_Properties(int start_index,int count,T mass_in,T mu_in,T lambda_in,bool compress_in)
 {
     for(int i=start_index;i<start_index+count;i++){
         mass(i)=mass_in;
         mu(i)=mu_in;mu0(i)=mu_in;
-        lambda(i)=lambda_in;lambda0(i)=lambda_in;}
+        lambda(i)=lambda_in;lambda0(i)=lambda_in;
+        compress(i)=compress_in;}
 }
 //#####################################################################
 // Function Set_Initial_State
@@ -146,6 +148,7 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_VISCO_NU,"visco_nu");
     Register_Attribute_Name(ATTRIBUTE_ID_VISCO_TAU,"visco_tau");
     Register_Attribute_Name(ATTRIBUTE_ID_VISCO_KAPPA,"visco_kappa");
+    Register_Attribute_Name(ATTRIBUTE_ID_COMPRESS,"compress");
     return 0;
 }
 int initialize_mpm_particles=Initialize_MPM_Particles();

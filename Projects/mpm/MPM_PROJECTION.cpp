@@ -113,7 +113,7 @@ Velocities_Corners_To_Faces_MPM_Style()
             face_velocities(face_index)=face_momenta(face_index)/face_masses(face_index);}
     
     // Assuming uniform density
-    face_masses.Fill((T)1);
+    // face_masses.Fill((T)1);
 }
 
 //#####################################################################

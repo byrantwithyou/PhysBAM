@@ -83,7 +83,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.particles.Set_Material_Properties(0,first_count,
                                                   (T)115.2*density_scale/first_count, // mass per particle
                                                   (3000*100)*ym/((T)2*((T)1+pr)), // mu
-                                                  (3000*100)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+                                                  (3000*100)*ym*pr/(((T)1+pr)*((T)1-2*pr)), // lambda
+                                                  false); // compress
             sim.particles.Set_Plasticity(0,first_count,
                                          false,-1000,1.001, // plasticity_yield
                                          false,-1,1); // plasticity_clamp
