@@ -44,7 +44,6 @@ public:
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_masses;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_momenta;
-    ARRAY<bool,FACE_INDEX<TV::dimension> > face_affected;    
     ARRAY<bool,TV_INT> cell_dirichlet;
     ARRAY<bool,TV_INT> cell_neumann;
     ARRAY<T,TV_INT> div_u;
@@ -60,6 +59,7 @@ public:
     void Initialize();
     void Reinitialize();
     void Weights();
+    void Rasterize();
 //#####################################################################
 };
 }

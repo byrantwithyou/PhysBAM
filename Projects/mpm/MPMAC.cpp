@@ -22,7 +22,6 @@ Initialize()
     face_velocities.Resize(mac_grid);
     face_masses.Resize(mac_grid);
     face_momenta.Resize(mac_grid);
-    face_affected.Resize(mac_grid);
     cell_dirichlet.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     cell_neumann.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     div_u.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
@@ -32,6 +31,8 @@ Initialize()
         weight[d].Resize(particles.number);
         for(int p=0;p<particles.number;p++)
             weight[d](p).Resize(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));}
+    min_mass=particles.mass.Min()*(T)1e-5;
+    frame=0;
 }
 
 //#####################################################################
@@ -43,7 +44,6 @@ Reinitialize()
     face_velocities.Fill((T)0);
     face_masses.Fill((T)0);
     face_momenta.Fill((T)0);
-    face_affected.Fill(false);
     cell_dirichlet.Fill(false);
     cell_neumann.Fill(false);
     div_u.Fill((T)0);
@@ -62,6 +62,17 @@ Weights()
             grid_basis_function.Build_Weights_Exact(particles.X(p),face_grid[axis],influence_corner[axis](p),weight[axis](p));
 }
 
+//#####################################################################
+// Function Rasterize();
+//#####################################################################
+template<class TV> void MPMAC<TV>::
+Rasterize()
+{
+    for(int p=0;p<particles.number;p++){
+        for(int axis=0;axis<TV::m;axis++){
+        }}
+        
+}
 
 //#####################################################################
 template class MPMAC<VECTOR<float,2> >;
