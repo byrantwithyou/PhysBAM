@@ -214,7 +214,7 @@ Do_Projection()
         TV_INT first_cell=iterator.First_Cell_Index();
         TV_INT second_cell=iterator.Second_Cell_Index();        
         if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
-            if(!cell_neumann(first_cell) && !cell_neumann(second_cell) && (cell_incompressible(first_cell) || cell_incompressible(second_cell))){
+            if(!cell_neumann(first_cell) && !cell_neumann(second_cell) && cell_incompressible(first_cell) && cell_incompressible(second_cell)){
                 T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
                 if(face_masses(face_index)>sim.min_mass) face_velocities(face_index)-=sim.dt/face_masses(face_index)*grad_p;}}}
     // Enforce face velocities for neumann cells

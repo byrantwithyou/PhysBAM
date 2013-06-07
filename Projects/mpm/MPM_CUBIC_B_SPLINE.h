@@ -24,6 +24,13 @@ public:
 
     MPM_CUBIC_B_SPLINE();
     ~MPM_CUBIC_B_SPLINE();
+
+    void Build_Weights(const TV& X,const GRID<TV>& grid,TV_INT& influence_corner,VECTOR<TV,IN>& weight) PHYSBAM_OVERRIDE {
+        // TODO
+    }
+    void Build_Weights_Exact(const TV& X,const GRID<TV>& grid,TV_INT& influence_corner,ARRAY<T,TV_INT>& weight) PHYSBAM_OVERRIDE {
+        // TODO
+    }
     
     void Build_Weights_And_Grad_Weight_Over_Weights(const TV& X,const GRID<TV>& grid,TV_INT& influence_corner,VECTOR<TV,IN>& weight,VECTOR<TV,IN>& grad_weight_over_weight) PHYSBAM_OVERRIDE;
     void Build_Weights_And_Grad_Weights_Exact(const TV& X,const GRID<TV>& grid,TV_INT& influence_corner,ARRAY<T,TV_INT>& weight,ARRAY<TV,TV_INT>& grad_weight) PHYSBAM_OVERRIDE;

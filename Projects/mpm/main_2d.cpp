@@ -118,7 +118,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 (T)50*density_scale/1000, // mass per particle
                 30000*ym/((T)2*((T)1+pr)), // mu
                 30000*ym*pr/(((T)1+pr)*((T)1-2*pr)), // lambda
-                false); // compress
+                true); // compress
             sim.particles.Set_Plasticity(c1,c2,
                 false,-1000,1.2, // plasticity_yield
                 false,-1,1); // plasticity_clamp
@@ -323,14 +323,18 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(f%frame_jump==0){
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
-                // if(sim.particles.Xm(i).y<0.4 && sim.particles.Xm(i).x<0)
+                if(sim.particles.Xm(i).y<0.02)
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
+                else
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
+                    
                 //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
                 // else if(sim.particles.Xm(i).y<0.4 && sim.particles.Xm(i).x>0)
                 //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
                 // else if(sim.particles.Xm(i).y>0.4 && sim.particles.Xm(i).x<0)
                 //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
                 // else
-                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
+
             }
 
             // projection: visualize MAC grid velocities
