@@ -77,20 +77,19 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // geometry setting
     switch(test_number){
         case 1:{ // all materials together
-            sim.grid.Initialize(TV_INT(1.2*grid_res+1,2.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,1.6,0.6)));
-            
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.1,-0.3,-0.1),TV(0.1,1.3,0.1)),particle_exclude_radius);
+            sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
+            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0,0,0),0.15),particle_exclude_radius);
             int first_count=sim.particles.number;
             sim.particles.Set_Material_Properties(0,first_count,
-                                                  (T)200*density_scale/first_count, // mass per particle
-                                                  (0)*ym/((T)2*((T)1+pr)), // mu
-                                                  (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+                                                  (T)115.2*density_scale/first_count, // mass per particle
+                                                  (3000*100)*ym/((T)2*((T)1+pr)), // mu
+                                                  (3000*100)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
             sim.particles.Set_Plasticity(0,first_count,
                                          false,-1000,1.001, // plasticity_yield
                                          false,-1,1); // plasticity_clamp
             sim.particles.Set_Visco_Plasticity(0,first_count,
-                                               false,100, // visco_nu
-                                               5000, // visco_tau
+                                               true,70, // visco_nu
+                                               8000, // visco_tau
                                                0); // visco_kappa
             sim.particles.Set_Initial_State(0,first_count,
 //                                            MATRIX<T,TV::m>(2,0,0,0,1,0,0,0,0.5), // Fe
@@ -117,11 +116,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     
     // Zhu and Bridson
     SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON<TV> recons_bridson;
-    GRID<TV> recons_bridson_grid(TV_INT()+(grid_res*2+1),sim.grid.domain);
+    GRID<TV> recons_bridson_grid(TV_INT()+(grid_res*8+1),sim.grid.domain);
     ARRAY<T,TV_INT> phi_bridson;
     if(use_bridson){
-        recons_bridson.Initialize(particle_exclude_radius*2);
-        recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,1);
+        recons_bridson.Initialize(particle_exclude_radius*3);
+        recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,0);
         phi_bridson.array+=1;}
 
     // draw MPM particles
@@ -139,7 +138,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Compute_Grid_Forces();
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
         sim.Update_Velocities_On_Grid();
-        // sim.Grid_Based_Body_Collisions();
+        sim.Grid_Based_Body_Collisions();
         sim.Solve_The_Linear_System(); // so far sim.node_V is achieved via MPM
         if(use_projection){
             projection.Reinitialize();
@@ -157,7 +156,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                     projection.neumann_cell_normal_axis(TV_INT(x,y,projection.mac_grid.counts.z-4))=-3;}}
             for(int x=3;x<projection.mac_grid.counts.x-3;x++){
                 for(int z=3;z<projection.mac_grid.counts.z-3;z++){
-                    for(int y=1;y<=3;y++){
+                    for(int y=3;y<=3;y++){
                         projection.cell_neumann(TV_INT(x,y,z))=true;
                         projection.cell_dirichlet(TV_INT(x,y,z))=false;
                         projection.neumann_cell_normal_axis(TV_INT(x,y,z))=2;}}}
@@ -186,7 +185,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         }
         sim.Update_Deformation_Gradient();
         sim.Update_Particle_Velocities();
-        // sim.Particle_Based_Body_Collisions();
+        sim.Particle_Based_Body_Collisions();
         sim.Update_Particle_Positions();
         sim.Update_Dirichlet_Box_Positions();
         sim.Update_Colliding_Object_Positions();
@@ -207,7 +206,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 //            
             // Zhu and Bridson
             if(use_bridson){
-                recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,1);
+                recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,0);
                 Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(1,0,0));
 //                LEVELSET<TV> ls(recons_bridson_grid,phi_bridson,0);
 //                ls.Fast_Marching_Method();

@@ -93,14 +93,14 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         case 1:{ // all materials together
             sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
 
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.2,-0.1),TV(0.2,0.1)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.45,-0.45),TV(0.45,0)),particle_exclude_radius);
             int first_count=sim.particles.number;
             sim.particles.Set_Material_Properties(0,first_count,
-                (T)200*density_scale/first_count, // mass per particle
-                (9000)*ym/((T)2*((T)1+pr)), // mu
-                (9000)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
+                (T)200*density_scale/1000, // mass per particle
+                (0)*ym/((T)2*((T)1+pr)), // mu
+                (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
             sim.particles.Set_Plasticity(0,first_count,
-                true,-1000,1.001, // plasticity_yield
+                false,-1000,1.001, // plasticity_yield
                 false,-1,1); // plasticity_clamp
             sim.particles.Set_Visco_Plasticity(0,first_count,
                 false,100, // visco_nu
@@ -110,63 +110,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
                 TV()); // initial velocity
-            sim.dirichlet_box.Append(RANGE<TV>(TV(-0.3,-0.15),TV(-0.18,0.15)));
-            sim.dirichlet_velocity.Append(TV());
-            sim.dirichlet_box.Append(RANGE<TV>(TV(0.18,-0.15),TV(0.3,0.15)));
-            sim.dirichlet_velocity.Append(TV(0.05,0));
-            
-
+ 
             sim.use_gravity=true;
             break;}
 
-        case 2:{ // intially stretched
-            sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
-
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.2,-0.2),TV(0.2,0.2)),particle_exclude_radius);
-            int first_count=sim.particles.number;
-            sim.particles.Set_Material_Properties(0,first_count,
-                (T)115.2*density_scale/first_count, // mass per particle
-                (3e3)*ym/((T)2*((T)1+pr)), // mu
-                (3e3)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
-            sim.particles.Set_Plasticity(0,first_count,
-                false,-1,1, // plasticity_yield
-                false,-1,1); // plasticity_clamp
-            sim.particles.Set_Visco_Plasticity(0,first_count,
-                false,700, // visco_nu
-                900, // visco_tau
-                0); // visco_kappa
-            sim.use_gravity=false;
-            sim.particles.Set_Initial_State(0,sim.particles.number,
-                MATRIX<T,TV::m>(2,0,0,0.5), // Fe
-                MATRIX<T,TV::m>::Identity_Matrix(), // Fp
-                TV()); // initial velocity
-            for(int p=0;p<sim.particles.number;p++)
-                sim.particles.X(p)=MATRIX<T,TV::m>(2,0,0,0.5)*sim.particles.Xm(p);
-            break;}
-
-        case 3:{ // free fall
-            sim.grid.Initialize(TV_INT(1.2*grid_res+1,1.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
-
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.05,-0.4),TV(0.05,0.45)),particle_exclude_radius);
-            int first_count=sim.particles.number;
-            sim.particles.Set_Material_Properties(0,first_count,
-                (T)115.2*density_scale/first_count, // mass per particle
-                (0)*ym/((T)2*((T)1+pr)), // mu
-                (0)*ym*pr/(((T)1+pr)*((T)1-2*pr))); // lambda
-            sim.particles.Set_Plasticity(0,first_count,
-                false,-1,1, // plasticity_yield
-                false,-1,1); // plasticity_clamp
-            sim.particles.Set_Visco_Plasticity(0,first_count,
-                false,70, // visco_nu
-                1000, // visco_tau
-                0); // visco_kappa
-            sim.use_gravity=true;
-            sim.particles.Set_Initial_State(0,sim.particles.number,
-                MATRIX<T,TV::m>::Identity_Matrix(), // Fe
-                MATRIX<T,TV::m>::Identity_Matrix(), // Fp
-                TV()); // initial velocity
-            break;}
-            
+                
      
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
@@ -235,11 +183,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     // Zhu and Bridson
     SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON<TV> recons_bridson;
-    GRID<TV> recons_bridson_grid(TV_INT()+(grid_res*8+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
+    GRID<TV> recons_bridson_grid(TV_INT()+(grid_res*8+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
     ARRAY<T,TV_INT> phi_bridson;
     if(use_bridson){
-        recons_bridson.Initialize(particle_exclude_radius*2);
-        recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,1);
+        recons_bridson.Initialize(particle_exclude_radius*4);
+        recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,0);
         phi_bridson.array+=1;}
 
     // draw wall
@@ -367,7 +315,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
             // Zhu and Bridson
             if(use_bridson){
-                recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,1);
+                recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,0);
                 Dump_Levelset(recons_bridson_grid,phi_bridson,VECTOR<T,3>(1,0,0));
                 LEVELSET<TV> ls(recons_bridson_grid,phi_bridson,0);
                 ls.Fast_Marching_Method();
