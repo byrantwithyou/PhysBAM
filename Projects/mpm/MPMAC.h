@@ -42,14 +42,16 @@ public:
     GRID<TV> mac_grid;
     GRID<TV> face_grid[TV::m];
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_old;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_masses;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_momenta;
     ARRAY<bool,TV_INT> cell_dirichlet;
     ARRAY<bool,TV_INT> cell_neumann;
+    ARRAY<int,TV_INT> neumann_cell_normal_axis; // +-1 +-2 +-3
     ARRAY<T,TV_INT> div_u;
+    T max_div;
     ARRAY<T,TV_INT> pressure;
     MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function;
-
     ARRAY<TV_INT> influence_corner[TV::m];
     ARRAY<ARRAY<T,TV_INT> > weight[TV::m];
 
@@ -60,6 +62,15 @@ public:
     void Reinitialize();
     void Weights();
     void Rasterize();
+    void Advection();
+    void Identify_Dirichlet();
+    void Identify_Neumann();
+    void Build_Velocity_Divergence();
+    void Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs);
+    void Solve_For_Pressure();
+    void Do_Projection();
+    void Update_Particle_Velocities();
+    void Update_Particle_Positions();
 //#####################################################################
 };
 }

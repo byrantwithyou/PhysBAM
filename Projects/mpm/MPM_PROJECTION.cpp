@@ -75,7 +75,6 @@ Identify_Neumann_Cells()
     cell_neumann.Fill(false);
 }
 
-
 //#####################################################################
 // Function Identify_Incompressible_Cells
 //#####################################################################
