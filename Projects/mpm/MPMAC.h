@@ -41,12 +41,15 @@ public:
     bool uniform_density;
 
     T min_mass;
+    T min_volume;
     int frame;
     GRID<TV> mac_grid;
     GRID<TV> face_grid[TV::m];
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_old;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_masses;
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_volumes;
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_densities;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_momenta;
     ARRAY<bool,TV_INT> cell_dirichlet;
     ARRAY<bool,TV_INT> cell_neumann;
