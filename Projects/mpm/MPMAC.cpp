@@ -98,7 +98,10 @@ Advection()
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),face_grid[1].counts));it.Valid();it.Next()){
             FACE_INDEX<TV::m> face_ind(1,it.index);
             if(face_masses(face_ind)>min_mass){
-                face_velocities(face_ind)+=dt*(-9.8);}}}
+                face_velocities(face_ind)+=dt*(-9.8);
+            }
+        }
+    }
 }
 
 //#####################################################################
@@ -110,6 +113,14 @@ Identify_Dirichlet()
     for(int p=0;p<particles.number;p++){
         TV_INT cell=mac_grid.Cell(particles.X(p),0);
         cell_dirichlet(cell)=false;}
+    
+//    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+//        T total_mass=(T)0;
+//        for(int d=0;d<TV::m;d++){
+//            total_mass+=face_masses(FACE_INDEX<TV::m>(d,mac_grid.First_Face_Index_In_Cell(d,it.index)));
+//            total_mass+=face_masses(FACE_INDEX<TV::m>(d,mac_grid.Second_Face_Index_In_Cell(d,it.index)));}
+//        if(total_mass>min_mass*1e2)
+//            cell_dirichlet(it.index)=false;}
 }
 
 //#####################################################################
@@ -154,10 +165,10 @@ Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs)
             for(int d=0;d<TV::m;d++){
                 TV_INT left_index=it.index;left_index(d)--;
                 TV_INT right_index=it.index;right_index(d)++;
-                if(cell_neumann(left_index))
-                    rhs(it.index)-=one_over_h*face_velocities(FACE_INDEX<TV::m>(d,mac_grid.First_Face_Index_In_Cell(d,it.index)));
-                if(cell_neumann(right_index))
-                    rhs(it.index)+=one_over_h*face_velocities(FACE_INDEX<TV::m>(d,mac_grid.Second_Face_Index_In_Cell(d,it.index)));}}}
+                if(cell_neumann(left_index)){
+                        rhs(it.index)-=one_over_h*face_velocities(FACE_INDEX<TV::m>(d,mac_grid.First_Face_Index_In_Cell(d,it.index)));}
+                if(cell_neumann(right_index)){
+                        rhs(it.index)+=one_over_h*face_velocities(FACE_INDEX<TV::m>(d,mac_grid.Second_Face_Index_In_Cell(d,it.index)));}}}}
 }
 
 //#####################################################################
@@ -184,6 +195,14 @@ Solve_For_Pressure()
     solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
     pressure=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
+    
+    T max_pressure_on_dirichlet=0;
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+mac_grid.counts));it.Valid();it.Next()){
+        if(cell_dirichlet(it.index))
+            if(sqr(pressure(it.index)>max_pressure_on_dirichlet))
+                max_pressure_on_dirichlet=sqr(pressure(it.index));}
+    LOG::cout<<"max_pressure_on_dirichlet "<<max_pressure_on_dirichlet<<std::endl;
+    
 }
 
 //#####################################################################
@@ -202,9 +221,15 @@ Do_Projection()
             int axis=iterator.Axis();
             TV_INT first_cell=iterator.First_Cell_Index();
             TV_INT second_cell=iterator.Second_Cell_Index();
-            if(cell_dirichlet(first_cell)) {PHYSBAM_ASSERT(pressure(first_cell)==T(0));}
-            if(cell_dirichlet(second_cell)) {PHYSBAM_ASSERT(pressure(second_cell)==T(0));}
             if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
+                if(cell_dirichlet(first_cell)){
+                    if(sqr(pressure(first_cell))>1e-4){
+                        LOG::cout<<pressure(first_cell)<<std::endl;
+                        PHYSBAM_FATAL_ERROR();}}
+                if(cell_dirichlet(second_cell)){
+                    if(sqr(pressure(second_cell))>1e-4){
+                        LOG::cout<<pressure(second_cell)<<std::endl;
+                        PHYSBAM_FATAL_ERROR();}}
                 if(!cell_neumann(first_cell) && !cell_neumann(second_cell)){
                     T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
                     if(face_masses(face_index)>min_mass) face_velocities(face_index)-=dt/face_masses(face_index)*grad_p;}}}}
@@ -224,8 +249,10 @@ Do_Projection()
         if(cell_neumann(it.index)){
             int d=neumann_cell_normal_axis(it.index);
             int axis=abs(d)-1;
-            face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))=T(0);
-            face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))=T(0);}}
+            // if(face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))*d<0)
+                face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))=T(0);
+            // if(face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))*d<0)
+                face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))=T(0);}}
     // check whether divergence free
     Build_Velocity_Divergence();
     LOG::cout<<"Maximum velocity divergence after projection: "<<max_div<<std::endl;

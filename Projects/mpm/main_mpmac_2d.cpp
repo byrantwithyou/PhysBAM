@@ -62,10 +62,17 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.grid.Initialize(TV_INT(2.2*grid_res+1,2.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(1.6,1.6)));
             sim.uniform_density=false;
             
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1,-1.4),TV(0,0.5)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.3,-1.3),TV(1.3,0)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0,0.8),0.2),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0,1.1),0.05),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(-0.8,0.8),0.2),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0.8,0.8),0.2),particle_exclude_radius);
+
+    
+            
             int c1=sim.particles.number;
             sim.particles.Set_Material_Properties(0,c1,
-                (T)200/1000, // mass per particle
+                (T)2/1000, // mass per particle
                 0, // mu
                 0, // lambda
                 false); // compress
@@ -127,6 +134,13 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.cell_neumann(TV_INT(sim.mac_grid.counts.x-4,y))=true;
             sim.cell_dirichlet(TV_INT(sim.mac_grid.counts.x-4,y))=false;
             sim.neumann_cell_normal_axis(TV_INT(sim.mac_grid.counts.x-4,y))=-1;}
+        
+//        for(int x=3;x<sim.mac_grid.counts.x/2;x++){
+//            for(int y=sim.mac_grid.counts.y/2-3;y<=sim.mac_grid.counts.y/2-3;y++){
+//                sim.cell_neumann(TV_INT(x,y))=true;
+//                sim.cell_dirichlet(TV_INT(x,y))=false;
+//                sim.neumann_cell_normal_axis(TV_INT(x,y))=2;}}
+        
         sim.Build_Velocity_Divergence();
         sim.Solve_For_Pressure();
         sim.Do_Projection();

@@ -21,6 +21,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include "MPM_PARTICLES.h"
 #include "MPM_LINEAR_BASIS.h"
+#include "MPM_CUBIC_B_SPLINE.h"
 namespace PhysBAM{
 template<class TV>
 class MPMAC
@@ -29,6 +30,7 @@ class MPMAC
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     enum WORKAROUND{basis_function_order=1,IN=basis_function_order+1};
+    // enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
 
     // set externally
     MPM_PARTICLES<TV> particles;
@@ -52,7 +54,10 @@ public:
     ARRAY<T,TV_INT> div_u;
     T max_div;
     ARRAY<T,TV_INT> pressure;
+    
     MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function;
+    // MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function;
+    
     ARRAY<TV_INT> influence_corner[TV::m];
     ARRAY<ARRAY<T,TV_INT> > weight[TV::m];
     ARRAY<ARRAY<TV,TV_INT> > grad_weight[TV::m];
