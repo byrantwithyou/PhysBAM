@@ -181,7 +181,7 @@ Solve_For_Pressure()
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=false;
-    solver->Solve(system,x,rhs,vectors,(T)1e-12,0,1000);
+    solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
     pressure=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
 }
@@ -201,7 +201,9 @@ Do_Projection()
             FACE_INDEX<TV::m> face_index=iterator.Full_Index();
             int axis=iterator.Axis();
             TV_INT first_cell=iterator.First_Cell_Index();
-            TV_INT second_cell=iterator.Second_Cell_Index();        
+            TV_INT second_cell=iterator.Second_Cell_Index();
+            if(cell_dirichlet(first_cell)) {PHYSBAM_ASSERT(pressure(first_cell)==T(0));}
+            if(cell_dirichlet(second_cell)) {PHYSBAM_ASSERT(pressure(second_cell)==T(0));}
             if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
                 if(!cell_neumann(first_cell) && !cell_neumann(second_cell)){
                     T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
@@ -257,13 +259,13 @@ Particle_Based_Body_Collisions()
 {
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++){
-        TV& x=particles.X(p);
+        TV x=particles.X(p)+dt*particles.V(p); // candidate position
         for(int d=0;d<TV::m;d++){
             T left_wall=grid.domain.min_corner(d)+4.01*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.01*grid.dX.Min();
-            if(x(d)<=left_wall && particles.V(p)(d)<=(T)0){
+            if(x(d)<=left_wall){
                 TV vt(particles.V(p));vt(d)=(T)0;
                 particles.V(p)=vt;}
-            if(x(d)>=right_wall && particles.V(p)(d)>=(T)0){
+            if(x(d)>=right_wall){
                 TV vt(particles.V(p));vt(d)=(T)0;
                 particles.V(p)=vt;}}}
 }
@@ -275,8 +277,11 @@ template<class TV> void MPMAC<TV>::
 Update_Particle_Positions()
 {
 #pragma omp parallel for
-    for(int p=0;p<particles.number;p++)
-        particles.X(p)+=dt*particles.V(p);
+    for(int p=0;p<particles.number;p++){
+        if(dt*particles.V(p).Max_Mag()>grid.dX.Min()){
+            LOG::cout<<"breaking CFL"<<std::endl;
+            PHYSBAM_FATAL_ERROR();}
+        particles.X(p)+=dt*particles.V(p);}
 }
 
 //#####################################################################
@@ -292,7 +297,19 @@ Get_Total_Momentum_On_Faces() const
         momen(axis)+=face_masses(face_index)*face_velocities(face_index);}
     return momen;
 }
-
+    
+//#####################################################################
+// Function Get_Total_Momentum_On_Particles
+//#####################################################################
+template<class TV> TV MPMAC<TV>::
+Get_Total_Momentum_On_Particles() const
+{
+    TV momen;
+    for(int p=0;p<particles.number;p++)
+        momen+=particles.mass(p)*particles.V(p);
+    return momen;
+}
+    
 //#####################################################################
 template class MPMAC<VECTOR<float,2> >;
 template class MPMAC<VECTOR<float,3> >;

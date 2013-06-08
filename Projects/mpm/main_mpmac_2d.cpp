@@ -59,13 +59,13 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // geometry setting
     switch(test_number){
         case 1:{ // all materials together
-            sim.grid.Initialize(TV_INT(1.2*grid_res+1,2.2*grid_res+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,1.6)));
+            sim.grid.Initialize(TV_INT(2.2*grid_res+1,2.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(1.6,1.6)));
             sim.uniform_density=false;
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.45,-0.4),TV(0.45,0)),particle_exclude_radius);
-            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0,0.5),0.1),particle_exclude_radius);
+            
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1,-1.4),TV(0,0.5)),particle_exclude_radius);
             int c1=sim.particles.number;
             sim.particles.Set_Material_Properties(0,c1,
-                (T)20/1000, // mass per particle
+                (T)200/1000, // mass per particle
                 0, // mu
                 0, // lambda
                 false); // compress
@@ -79,8 +79,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.particles.Set_Initial_State(0,c1,
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
-                TV()); // initial velocity
- 
+                TV(0,0)); // initial velocity
+            
             sim.use_gravity=true;
 
             break;}
@@ -104,6 +104,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         LOG::cout<<"MPM TIMESTEP "<<f<<std::endl;
         sim.Reinitialize();
         sim.Weights();
+        LOG::cout<<"Total momentum on particles before rasterize: "<<sim.Get_Total_Momentum_On_Particles()<<std::endl;
         sim.Rasterize();
         LOG::cout<<"Total momentum on faces after rasterize: "<<sim.Get_Total_Momentum_On_Faces()<<std::endl;
         sim.Advection();
@@ -129,7 +130,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Build_Velocity_Divergence();
         sim.Solve_For_Pressure();
         sim.Do_Projection();
+        LOG::cout<<"Total momentum on faces after projection: "<<sim.Get_Total_Momentum_On_Faces()<<std::endl;
         sim.Update_Particle_Velocities();
+        LOG::cout<<"Total momentum on particles after interpolating back: "<<sim.Get_Total_Momentum_On_Particles()<<std::endl;
         sim.Particle_Based_Body_Collisions();
         sim.Update_Particle_Positions();
 

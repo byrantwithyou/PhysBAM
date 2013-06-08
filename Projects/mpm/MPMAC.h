@@ -77,7 +77,7 @@ public:
     void Update_Particle_Positions();
 
     TV Get_Total_Momentum_On_Faces() const;
-
+    TV Get_Total_Momentum_On_Particles() const;
 //#####################################################################
 };
 }
