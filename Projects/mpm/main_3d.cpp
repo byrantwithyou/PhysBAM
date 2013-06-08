@@ -135,7 +135,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Build_Weights_And_Grad_Weights();
         sim.Build_Helper_Structures_For_Constitutive_Model();
         sim.Rasterize_Particle_Data_To_The_Grid();
-        if(sim.frame==0) sim.Compute_Particle_Volumes_And_Densities();
+        if(sim.frame==0) sim.Compute_Particle_Volumes_And_Densities(0,sim.particles.number);
         sim.Compute_Grid_Forces();
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
         sim.Update_Velocities_On_Grid();

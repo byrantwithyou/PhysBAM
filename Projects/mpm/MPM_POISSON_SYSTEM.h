@@ -21,6 +21,7 @@ class MPM_POISSON_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 public:
     MPM_PROJECTION<TV>& proj;
+    ARRAY<T,TV_INT> jacobi_scales;
 
     MPM_POISSON_SYSTEM(MPM_PROJECTION<TV>& proj);
     virtual ~MPM_POISSON_SYSTEM();

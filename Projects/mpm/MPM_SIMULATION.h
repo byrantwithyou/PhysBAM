@@ -26,8 +26,8 @@ class MPM_SIMULATION
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
-    // enum WORKAROUND{basis_function_order=1,IN=basis_function_order+1};
-    enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
+    enum WORKAROUND{basis_function_order=1,IN=basis_function_order+1};
+    // enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
 
     //#################################################################
     // need external input
@@ -47,16 +47,19 @@ public:
     ARRAY<TV> rigid_ball_velocity;
     T xi;
     //#################################################################
+    T min_volume;
+    T min_density;
     TV gravity_constant;
     ARRAY<T> Je;
     ARRAY<MATRIX<T,TV::m> > Re,Se;
     ARRAY<TV_INT> influence_corner;
     ARRAY<ARRAY<T,TV_INT> > weight;
     ARRAY<ARRAY<TV,TV_INT> > grad_weight;
-    // MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function;
-    MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function;
+    MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function;
+    // MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function;
     MPM_CONSTITUTIVE_MODEL<TV> constitutive_model;
     ARRAY<T,TV_INT> node_mass;
+    ARRAY<T,TV_INT> node_volume;
     ARRAY<TV,TV_INT> node_V;
     ARRAY<TV,TV_INT> node_V_star;
     ARRAY<TV,TV_INT> node_V_old;
@@ -68,13 +71,14 @@ public:
     ~MPM_SIMULATION();
 
     void Initialize();
+    void Resize_For_New_Particle_Data();
     void Advance_One_Time_Step_Forward_Euler();
     void Advance_One_Time_Step_Backward_Euler();
 
     void Build_Weights_And_Grad_Weights();
     void Build_Helper_Structures_For_Constitutive_Model();
     void Rasterize_Particle_Data_To_The_Grid();
-    void Compute_Particle_Volumes_And_Densities();
+    void Compute_Particle_Volumes_And_Densities(int starting_index,int count);
     void Compute_Grid_Forces();
     void Apply_Gravity_To_Grid_Forces();
     void Update_Velocities_On_Grid();

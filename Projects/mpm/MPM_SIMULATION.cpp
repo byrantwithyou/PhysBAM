@@ -53,13 +53,34 @@ Initialize()
         weight(p).Resize(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));
         grad_weight(p).Resize(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));}
     node_mass.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
+    node_volume.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     node_V.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     node_V_star.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     node_V_old.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     node_force.Resize(RANGE<TV_INT>(TV_INT(),grid.counts));
     frame=0;
     min_mass=particles.mass.Min()*(T)1e-5;
+    min_volume=(T)1e-7;
+    min_density=(T)1e-7;
     if(PROFILING) TIMING_END("");
+}
+//#####################################################################
+// Function Resize_For_New_Particle_Data
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Resize_For_New_Particle_Data()
+{
+    Je.Resize(particles.number);
+    Re.Resize(particles.number);
+    Se.Resize(particles.number);
+    influence_corner.Resize(particles.number);
+    weight.Resize(particles.number);
+    grad_weight.Resize(particles.number);
+    for(int p=0;p<particles.number;p++){
+        weight(p).Resize(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));
+        grad_weight(p).Resize(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));}
+    min_mass=particles.mass.Min()*(T)1e-5;
+    min_volume=(T)1e-7;
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Forward_Euler
@@ -70,7 +91,7 @@ Advance_One_Time_Step_Forward_Euler()
     Build_Weights_And_Grad_Weights();
     Build_Helper_Structures_For_Constitutive_Model();
     Rasterize_Particle_Data_To_The_Grid();
-    if(frame==0) Compute_Particle_Volumes_And_Densities();
+    if(frame==0) Compute_Particle_Volumes_And_Densities(0,particles.number);
     Compute_Grid_Forces();
     if(use_gravity) Apply_Gravity_To_Grid_Forces();
     Update_Velocities_On_Grid();
@@ -97,7 +118,7 @@ Advance_One_Time_Step_Backward_Euler()
     Build_Weights_And_Grad_Weights();
     Build_Helper_Structures_For_Constitutive_Model();
     Rasterize_Particle_Data_To_The_Grid();
-    if(frame==0) Compute_Particle_Volumes_And_Densities();
+    if(frame==0) Compute_Particle_Volumes_And_Densities(0,particles.number);
     Compute_Grid_Forces();
     if(use_gravity) Apply_Gravity_To_Grid_Forces();
     Update_Velocities_On_Grid();
@@ -150,9 +171,11 @@ Rasterize_Particle_Data_To_The_Grid()
 {
     TIMING_START;
     node_mass.Fill(T(0));
+    node_volume.Fill(T(0));
     for(int p=0;p<particles.number;p++){
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-            node_mass(influence_corner(p)+it.index)+=particles.mass(p)*weight(p)(it.index);}}
+            node_mass(influence_corner(p)+it.index)+=particles.mass(p)*weight(p)(it.index);
+            node_volume(influence_corner(p)+it.index)+=(T)1.0*weight(p)(it.index);}}
     //DEBUG check mass conservation
     // LOG::cout<<"[DEBUG] mass difference grid and particles: "<<node_mass.array.Sum()<<"-"<<particles.mass.Sum()<<"="<<node_mass.array.Sum()-particles.mass.Sum()<<std::endl;
     node_V.Fill(TV());
@@ -166,18 +189,22 @@ Rasterize_Particle_Data_To_The_Grid()
 // Function Compute_Particle_Volumes_And_Densities
 //#####################################################################
 template<class TV> void MPM_SIMULATION<TV>::
-Compute_Particle_Volumes_And_Densities()
+Compute_Particle_Volumes_And_Densities(int starting_index,int count)
 {
     TIMING_START;
     T one_over_cell_volume=grid.one_over_dX.Product();
-    ARRAY<T> particles_density(particles.number);
-    particles_density.Fill(T(0));
-    particles.volume.Fill(T(0));
-    for(int p=0;p<particles.number;p++){
+    ARRAY<T> particles_density(count);
+#pragma omp parallel for
+    for(int p=starting_index;p<starting_index+count;p++){
+        particles_density(p-starting_index)=(T)0;
+        particles.volume(p)=(T)0;}
+#pragma omp parallel for
+    for(int p=starting_index;p<starting_index+count;p++){
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
-            particles_density(p)+=node_mass(ind)*weight(p)(it.index)*one_over_cell_volume;}
-        if(particles_density(p)>min_rho) particles.volume(p)=particles.mass(p)/particles_density(p);}
+            particles_density(p-starting_index)+=node_mass(ind)*weight(p)(it.index)*one_over_cell_volume;}
+        if(particles_density(p-starting_index)>min_rho) particles.volume(p)=particles.mass(p)/particles_density(p-starting_index);
+        else PHYSBAM_FATAL_ERROR();}
     if(PROFILING) TIMING_END("Compute_Particle_Volumes_And_Densities");
 }
 //#####################################################################
@@ -377,7 +404,7 @@ Update_Deformation_Gradient()
                  particles.Fp(p)=Uphat*SIGMAphat.Times_Transpose(Vphat);
                  particles.Fe(p)=F*(particles.Fp(p).Inverse());}}
          else{
-             MATRIX<T,TV::m> grad_vp;
+             MATRIX<T,TV::m> grad_vp;grad_vp*=(T)0;
              for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
                  TV_INT ind=influence_corner(p)+it.index;
                  grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
@@ -413,30 +440,18 @@ Particle_Based_Body_Collisions()
     static T eps=1e-8;
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++){
-        TV& x=particles.X(p);
+        TV x=particles.X(p)+dt*particles.V(p); // candidate position
         for(int d=0;d<TV::m;d++){
-            T left_wall=grid.domain.min_corner(d)+4.01*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.01*grid.dX.Min();
-            if(x(d)<=left_wall && particles.V(p)(d)<=(T)0){
-                TV vt(particles.V(p));vt(d)=(T)0;
-                T vn=particles.V(p)(d); // <0
-                T vt_mag=vt.Magnitude();
-                if(vt_mag>eps){
-                    T impulse=friction_coefficient*vn/vt_mag;
-                    if(impulse<(T)-1) impulse=(T)-1;
-                    particles.V(p)=vt*(1+impulse);}
-                else particles.V(p)=vt;
-                // particles.V(p)=TV(); // sticky
+            T left_wall=grid.domain.min_corner(d)+4.2*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.2*grid.dX.Min();
+            if(x(d)<=left_wall){
+                // TV vt(particles.V(p));vt(d)=(T)0;
+                // particles.V(p)=vt;
+                particles.V(p)*=-0.5;
             }
-            if(x(d)>=right_wall && particles.V(p)(d)>=(T)0){
-                TV vt(particles.V(p));vt(d)=(T)0;
-                T vn=particles.V(p)(d); // >0
-                T vt_mag=vt.Magnitude();
-                if(vt_mag>eps){
-                    T impulse=-friction_coefficient*vn/vt_mag;
-                    if(impulse<(T)-1) impulse=(T)-1;
-                    particles.V(p)=vt*(1+impulse);}
-                else particles.V(p)=vt;
-                // particles.V(p)=TV(); // sticky
+            if(x(d)>=right_wall){
+                // TV vt(particles.V(p));vt(d)=(T)0;
+                // particles.V(p)=vt;
+                particles.V(p)*=-0.5;
             }
         }
         for(int b=0;b<rigid_ball.m;b++){
@@ -462,8 +477,11 @@ Update_Particle_Positions()
 {
     TIMING_START;
 #pragma omp parallel for
-    for(int p=0;p<particles.number;p++)
-        particles.X(p)+=dt*particles.V(p);
+    for(int p=0;p<particles.number;p++){
+        if(dt*particles.V(p).Max_Mag()>grid.dX.Min()){
+            LOG::cout<<"breaking CFL"<<std::endl;
+            PHYSBAM_FATAL_ERROR();}
+        particles.X(p)+=dt*particles.V(p);}
     if(PROFILING) TIMING_END("Update_Particle_Positions");
 }
 //#####################################################################

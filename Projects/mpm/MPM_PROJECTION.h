@@ -29,6 +29,8 @@ public:
     HASHTABLE<TV_INT,bool> nodes_non_dirichlet_cells;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_masses;
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_volumes;
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_densities;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_momenta;
     ARRAY<T,TV_INT> div_u;
     T max_div;
