@@ -221,8 +221,8 @@ Do_Projection()
         if(cell_neumann(it.index)){
             int d=neumann_cell_normal_axis(it.index);
             int axis=abs(d)-1;
-                face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))=T(0);
-                face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))=T(0);
+            face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))=T(0);
+            face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))=T(0);
         }
     }
     // check whether divergence free

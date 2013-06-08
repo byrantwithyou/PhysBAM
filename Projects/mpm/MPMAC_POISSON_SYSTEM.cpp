@@ -36,25 +36,46 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
     ARRAY<T,TV_INT>& rr=debug_cast<MPMAC_POISSON_VECTOR<TV>&>(result).v;
     const ARRAY<T,TV_INT>& xx=debug_cast<const MPMAC_POISSON_VECTOR<TV>&>(x).v;
     T one_over_h_square=sqr((T)1/proj.mac_grid.dX.Min());
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+proj.mac_grid.counts));it.Valid();it.Next()){
-        if(proj.cell_dirichlet(it.index) || proj.cell_neumann(it.index))
-            rr(it.index)=(T)0;
-        else{ // cell is fluid
-            rr(it.index)=(T)0;
-            for(int d=0;d<TV::m;d++){
-                TV_INT left_cell_index=it.index;left_cell_index(d)--;
-                TV_INT right_cell_index=it.index;right_cell_index(d)++;
-                FACE_INDEX<TV::m> left_face_index(d,proj.mac_grid.First_Face_Index_In_Cell(d,it.index));
-                if(proj.face_masses(left_face_index)>proj.min_mass){
-                    if(proj.cell_dirichlet(left_cell_index)) rr(it.index)+=xx(it.index)/proj.face_masses(left_face_index);
-                    else if(proj.cell_neumann(left_cell_index)) rr(it.index)+=T(0);
-                    else rr(it.index)+=(xx(it.index)-xx(left_cell_index))/proj.face_masses(left_face_index);}
-                FACE_INDEX<TV::m> right_face_index(d,proj.mac_grid.Second_Face_Index_In_Cell(d,it.index));
-                if(proj.face_masses(right_face_index)>proj.min_mass){
-                    if(proj.cell_dirichlet(right_cell_index)) rr(it.index)+=xx(it.index)/proj.face_masses(right_face_index);
-                    else if(proj.cell_neumann(right_cell_index)) rr(it.index)+=T(0);
-                    else rr(it.index)+=(xx(it.index)-xx(right_cell_index))/proj.face_masses(right_face_index);}}
-            rr(it.index)*=proj.dt*one_over_h_square;}}
+    if(!proj.uniform_density){
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+proj.mac_grid.counts));it.Valid();it.Next()){
+            if(proj.cell_dirichlet(it.index) || proj.cell_neumann(it.index))
+                rr(it.index)=(T)0;
+            else{ // cell is fluid
+                rr(it.index)=(T)0;
+                for(int d=0;d<TV::m;d++){
+                    TV_INT left_cell_index=it.index;left_cell_index(d)--;
+                    TV_INT right_cell_index=it.index;right_cell_index(d)++;
+                    FACE_INDEX<TV::m> left_face_index(d,proj.mac_grid.First_Face_Index_In_Cell(d,it.index));
+                    if(proj.face_masses(left_face_index)>proj.min_mass){
+                        if(proj.cell_dirichlet(left_cell_index)) rr(it.index)+=xx(it.index)/proj.face_masses(left_face_index);
+                        else if(proj.cell_neumann(left_cell_index)) rr(it.index)+=T(0);
+                        else rr(it.index)+=(xx(it.index)-xx(left_cell_index))/proj.face_masses(left_face_index);}
+                    FACE_INDEX<TV::m> right_face_index(d,proj.mac_grid.Second_Face_Index_In_Cell(d,it.index));
+                    if(proj.face_masses(right_face_index)>proj.min_mass){
+                        if(proj.cell_dirichlet(right_cell_index)) rr(it.index)+=xx(it.index)/proj.face_masses(right_face_index);
+                        else if(proj.cell_neumann(right_cell_index)) rr(it.index)+=T(0);
+                        else rr(it.index)+=(xx(it.index)-xx(right_cell_index))/proj.face_masses(right_face_index);}}
+                rr(it.index)*=proj.dt*one_over_h_square;}}}
+    else{
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+proj.mac_grid.counts));it.Valid();it.Next()){
+            if(proj.cell_dirichlet(it.index) || proj.cell_neumann(it.index))
+                rr(it.index)=(T)0;
+            else{ // cell is fluid
+                rr(it.index)=(T)0;
+                for(int d=0;d<TV::m;d++){
+                    TV_INT left_cell_index=it.index;left_cell_index(d)--;
+                    TV_INT right_cell_index=it.index;right_cell_index(d)++;
+                    FACE_INDEX<TV::m> left_face_index(d,proj.mac_grid.First_Face_Index_In_Cell(d,it.index));
+                    if(proj.face_masses(left_face_index)>proj.min_mass){
+                        if(proj.cell_dirichlet(left_cell_index)) rr(it.index)+=xx(it.index);
+                        else if(proj.cell_neumann(left_cell_index)) rr(it.index)+=T(0);
+                        else rr(it.index)+=(xx(it.index)-xx(left_cell_index));}
+                    FACE_INDEX<TV::m> right_face_index(d,proj.mac_grid.Second_Face_Index_In_Cell(d,it.index));
+                    if(proj.face_masses(right_face_index)>proj.min_mass){
+                        if(proj.cell_dirichlet(right_cell_index)) rr(it.index)+=xx(it.index);
+                        else if(proj.cell_neumann(right_cell_index)) rr(it.index)+=T(0);
+                        else rr(it.index)+=(xx(it.index)-xx(right_cell_index));}}
+                rr(it.index)*=proj.dt*one_over_h_square;}}}
 }
 //#####################################################################
 // Function Project

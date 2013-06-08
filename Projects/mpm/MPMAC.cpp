@@ -31,8 +31,10 @@ Initialize()
     for(int d=0;d<TV::m;d++){
         influence_corner[d].Resize(particles.number);
         weight[d].Resize(particles.number);
-        for(int p=0;p<particles.number;p++)
-            weight[d](p).Resize(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));}
+        grad_weight[d].Resize(particles.number);
+        for(int p=0;p<particles.number;p++){
+            weight[d](p).Resize(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));
+            grad_weight[d](p).Resize(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));}}
     min_mass=particles.mass.Min()*(T)1e-5;
     frame=0;
 }
@@ -63,7 +65,7 @@ Weights()
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++)
         for(int axis=0;axis<TV::m;axis++)
-            grid_basis_function.Build_Weights_Exact(particles.X(p),face_grid[axis],influence_corner[axis](p),weight[axis](p));
+            grid_basis_function.Build_Weights_And_Grad_Weights_Exact(particles.X(p),face_grid[axis],influence_corner[axis](p),weight[axis](p),grad_weight[axis](p));
 }
 
 //#####################################################################
@@ -81,8 +83,8 @@ Rasterize()
                 face_momenta(face_ind)+=weight[axis](p)(it.index)*particles.mass(p)*particles.V(p)(axis);}}}
     for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_ind=iterator.Full_Index();
-        if(face_masses(face_ind)>min_mass)
-            face_velocities(face_ind)=face_momenta(face_ind)/face_masses(face_ind);}
+        if(face_masses(face_ind)>min_mass){
+            face_velocities(face_ind)=face_momenta(face_ind)/face_masses(face_ind);}}
 }
 
 //#####################################################################
@@ -193,15 +195,28 @@ Do_Projection()
 {
     LOG::cout<<"Maximum velocity divergence before projection: "<<max_div<<std::endl;        
     T one_over_h=(T)1/mac_grid.dX.Min();
-    for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
-        FACE_INDEX<TV::m> face_index=iterator.Full_Index();
-        int axis=iterator.Axis();
-        TV_INT first_cell=iterator.First_Cell_Index();
-        TV_INT second_cell=iterator.Second_Cell_Index();        
-        if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
-            if(!cell_neumann(first_cell) && !cell_neumann(second_cell)){
-                T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
-                if(face_masses(face_index)>min_mass) face_velocities(face_index)-=dt/face_masses(face_index)*grad_p;}}}
+
+    if(!uniform_density){
+        for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
+            FACE_INDEX<TV::m> face_index=iterator.Full_Index();
+            int axis=iterator.Axis();
+            TV_INT first_cell=iterator.First_Cell_Index();
+            TV_INT second_cell=iterator.Second_Cell_Index();        
+            if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
+                if(!cell_neumann(first_cell) && !cell_neumann(second_cell)){
+                    T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
+                    if(face_masses(face_index)>min_mass) face_velocities(face_index)-=dt/face_masses(face_index)*grad_p;}}}}
+    else{
+        for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
+            FACE_INDEX<TV::m> face_index=iterator.Full_Index();
+            int axis=iterator.Axis();
+            TV_INT first_cell=iterator.First_Cell_Index();
+            TV_INT second_cell=iterator.Second_Cell_Index();        
+            if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
+                if(!cell_neumann(first_cell) && !cell_neumann(second_cell)){
+                    T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
+                    if(face_masses(face_index)>min_mass) face_velocities(face_index)-=dt*grad_p;}}}}
+
     // Enforce face velocities for neumann cells
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
         if(cell_neumann(it.index)){
@@ -235,6 +250,25 @@ Update_Particle_Velocities()
 }
 
 //#####################################################################
+// Function Particle_Based_Body_Collisions
+//#####################################################################
+template<class TV> void MPMAC<TV>::
+Particle_Based_Body_Collisions()
+{
+#pragma omp parallel for
+    for(int p=0;p<particles.number;p++){
+        TV& x=particles.X(p);
+        for(int d=0;d<TV::m;d++){
+            T left_wall=grid.domain.min_corner(d)+4.01*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.01*grid.dX.Min();
+            if(x(d)<=left_wall && particles.V(p)(d)<=(T)0){
+                TV vt(particles.V(p));vt(d)=(T)0;
+                particles.V(p)=vt;}
+            if(x(d)>=right_wall && particles.V(p)(d)>=(T)0){
+                TV vt(particles.V(p));vt(d)=(T)0;
+                particles.V(p)=vt;}}}
+}
+
+//#####################################################################
 // Function Update_Particle_Positions
 //#####################################################################
 template<class TV> void MPMAC<TV>::
@@ -243,6 +277,20 @@ Update_Particle_Positions()
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++)
         particles.X(p)+=dt*particles.V(p);
+}
+
+//#####################################################################
+// Function Get_Total_Momentum_On_Faces
+//#####################################################################
+template<class TV> TV MPMAC<TV>::
+Get_Total_Momentum_On_Faces() const
+{
+    TV momen;
+    for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
+        FACE_INDEX<TV::m> face_index=iterator.Full_Index();
+        int axis=iterator.Axis();
+        momen(axis)+=face_masses(face_index)*face_velocities(face_index);}
+    return momen;
 }
 
 //#####################################################################

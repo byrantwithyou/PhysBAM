@@ -36,6 +36,7 @@ public:
     T dt;
     bool use_gravity;
     T FLIP_alpha;
+    bool uniform_density;
 
     T min_mass;
     int frame;
@@ -54,6 +55,8 @@ public:
     MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function;
     ARRAY<TV_INT> influence_corner[TV::m];
     ARRAY<ARRAY<T,TV_INT> > weight[TV::m];
+    ARRAY<ARRAY<TV,TV_INT> > grad_weight[TV::m];
+
 
     MPMAC(){};
     ~MPMAC(){};
@@ -70,7 +73,11 @@ public:
     void Solve_For_Pressure();
     void Do_Projection();
     void Update_Particle_Velocities();
+    void Particle_Based_Body_Collisions();
     void Update_Particle_Positions();
+
+    TV Get_Total_Momentum_On_Faces() const;
+
 //#####################################################################
 };
 }
