@@ -94,7 +94,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.grid.Initialize(TV_INT(3.2*grid_res+1,3.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(1.6,1.6)));
             
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.4,1.2),TV(-1.2,1.4)),particle_exclude_radius);
-
             int c1=sim.particles.number;
             sim.particles.Set_Material_Properties(0,c1,
                 (T)8/1000, // mass per particle
@@ -111,7 +110,27 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.particles.Set_Initial_State(0,c1,
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
-                TV(1,0)); // initial velocity
+                TV(1.2,-1)); // initial velocity
+
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(1.2,1.2),TV(1.4,1.4)),particle_exclude_radius);
+            int c2=sim.particles.number-c1;
+            sim.particles.Set_Material_Properties(c1,c2,
+                (T)8/1000, // mass per particle
+                0, // mu
+                0, // lambda
+                false); // compress
+            sim.particles.Set_Plasticity(c1,c2,
+                false,-1000,1.2, // plasticity_yield
+                false,-1,1); // plasticity_clamp
+            sim.particles.Set_Visco_Plasticity(c1,c2,
+                false,100, // visco_nu
+                5000, // visco_tau
+                0); // visco_kappa
+            sim.particles.Set_Initial_State(c1,c2,
+                MATRIX<T,TV::m>::Identity_Matrix(), // Fe
+                MATRIX<T,TV::m>::Identity_Matrix(), // Fp
+                TV(-1,-1.1)); // initial velocity
+
  
             sim.use_gravity=true;
 
@@ -245,12 +264,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     for(int f=1;f<2900977;f++){
 
-        int c1=0,c2=0;
-        if(f%200==0){
+        int c1=0,c2=0,c3=0,c4=0;
+        if(f%220==0 && f<=11000){
             c1=sim.particles.number;
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.4,1.2),TV(-1.2,1.4)),particle_exclude_radius);
             c2=sim.particles.number-c1;
-
             sim.particles.Set_Material_Properties(c1,c2,
                 (T)8/1000, // mass per particle
                 0, // mu
@@ -266,11 +284,31 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.particles.Set_Initial_State(c1,c2,
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
-                TV(1,0)); // initial velocity
+                TV(1.2,-1)); // initial velocity
+
+            c3=sim.particles.number;
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(1.2,1.2),TV(1.4,1.4)),particle_exclude_radius);
+            c4=sim.particles.number-c3;
+            sim.particles.Set_Material_Properties(c3,c4,
+                (T)8/1000, // mass per particle
+                0, // mu
+                0, // lambda
+                false); // compress
+            sim.particles.Set_Plasticity(c3,c4,
+                false,-1000,1.2, // plasticity_yield
+                false,-1,1); // plasticity_clamp
+            sim.particles.Set_Visco_Plasticity(c3,c4,
+                false,100, // visco_nu
+                5000, // visco_tau
+                0); // visco_kappa
+            sim.particles.Set_Initial_State(c3,c4,
+                MATRIX<T,TV::m>::Identity_Matrix(), // Fe
+                MATRIX<T,TV::m>::Identity_Matrix(), // Fp
+                TV(-1,-1.1)); // initial velocity
+
 
             sim.Resize_For_New_Particle_Data();
         }
-
 
         TIMING_START;
         LOG::cout<<"MPM TIMESTEP "<<f<<std::endl;
@@ -280,57 +318,13 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Rasterize_Particle_Data_To_The_Grid();
         LOG::cout<<"Momentum - grid (before linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
 
-
         if(sim.frame==0) sim.Compute_Particle_Volumes_And_Densities(0,sim.particles.number);
 
-        if(f%200==0) sim.Compute_Particle_Volumes_And_Densities(c1,c2);
-
-        // if(f==1673){
-        //     LOG::cout<<sim.particles.volume<<std::endl; // no nan
-        // }
-
-
-        // if(f==1673){
-        //     LOG::cout<<sim.grad_weight<<std::endl;  // no nan
-        // }
-
-        LOG::cout<<sim.particles.Fe(21)<<std::endl;
-
-
-        // if(f==1673){
-        //     for(int p=0;p<sim.particles.number;p++){
-        //         MATRIX<T,TV::m> B=sim.constitutive_model.Compute_dPsi_dFe(sim.particles.mu(p),sim.particles.lambda(p),sim.particles.Fe(p),sim.Re(p),sim.Je(p));
-
-        //         LOG::cout<<" p "<<p<<" mu "<<sim.particles.mu(p)<<
-        //             " lambda "<<sim.particles.lambda(p)<<
-        //             " Fe "<<sim.particles.Fe(p)<<   // huge Fe gives nan B
-        //             " Re "<<sim.Re(p)<<
-        //             " Je "<<sim.Je(p)<<
-        //             " B " <<B<<" ";}
-
-
-
-        //     LOG::cout<<std::endl;
-                
-        // }
+        if(f%220==0 && f<=11000) sim.Compute_Particle_Volumes_And_Densities(c1,c2+c4);
 
         sim.Compute_Grid_Forces();
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
-
-        // if(f==1673){
-            // LOG::cout<<sim.node_V<<std::endl; // no nan
-            // LOG::cout<<sim.node_mass<<std::endl; // no nan
-            // LOG::cout<<sim.node_force<<std::endl; // has nan
-        // }
-
-
         sim.Update_Velocities_On_Grid();
-
-        // if(f==1673){
-        //     LOG::cout<<sim.node_V_star<<std::endl; // has nan
-
-        // }
-
         // sim.Grid_Based_Body_Collisions();
         sim.Solve_The_Linear_System(); // so far sim.node_V is achieved via MPM
         LOG::cout<<"Momentum - grid (after linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
@@ -360,16 +354,18 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                     projection.cell_dirichlet(TV_INT(x,y))=false;
                     projection.neumann_cell_normal_axis(TV_INT(x,y))=-1;}}
 
-            for(int x=3;x<projection.mac_grid.counts.x/2;x++){
+            // for(int x=3;x<projection.mac_grid.counts.x*2/5;x++){
+            //     for(int y=projection.mac_grid.counts.y/2-3;y<=projection.mac_grid.counts.y/2+3;y++){
+            //         projection.cell_neumann(TV_INT(x,y))=true;
+            //         projection.cell_dirichlet(TV_INT(x,y))=false;
+            //         projection.neumann_cell_normal_axis(TV_INT(x,y))=2;}}
+
+            for(int x=projection.mac_grid.counts.x/2+20;x<=projection.mac_grid.counts.x-5;x++){
                 for(int y=projection.mac_grid.counts.y/2-3;y<=projection.mac_grid.counts.y/2+3;y++){
                     projection.cell_neumann(TV_INT(x,y))=true;
                     projection.cell_dirichlet(TV_INT(x,y))=false;
                     projection.neumann_cell_normal_axis(TV_INT(x,y))=2;}}
-            // for(int x=projection.mac_grid.counts.x*3/4;x<=projection.mac_grid.counts.x*3/4+3;x++){
-            //     for(int y=10;y<=projection.mac_grid.counts.y-10;y++){
-            //         projection.cell_neumann(TV_INT(x,y))=true;
-            //         projection.cell_dirichlet(TV_INT(x,y))=false;
-            //         projection.neumann_cell_normal_axis(TV_INT(x,y))=-1;}}
+
             
             projection.Identify_Incompressible_Cells();
             projection.Identify_Nodes_Of_Non_Dirichlet_Cells();
@@ -385,10 +381,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
         sim.Update_Deformation_Gradient();
 
-        // if(f==1672)
-        //     LOG::cout<<sim.grad_weight<<std::endl;
-
-
         sim.Update_Particle_Velocities();
         // sim.Particle_Based_Body_Collisions();
         sim.Update_Particle_Positions();
@@ -402,17 +394,10 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
             // draw MPM particles
             for(int i=0;i<sim.particles.X.m;i++){
-                if(i==21)
-                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,0));
-                else
-                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
-                    
-                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
-                // else if(sim.particles.Xm(i).y<0.4 && sim.particles.Xm(i).x>0)
-                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
-                // else if(sim.particles.Xm(i).y>0.4 && sim.particles.Xm(i).x<0)
-                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,0));
+                // if(sim.particles.Xm(i).x>0)
+                //     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,0,1));
                 // else
+                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
 
             }
 
@@ -470,12 +455,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                     Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.boundary_segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}}
 
             // draw wall
-            for(T x=sim.grid.domain.min_corner(0)+4.2*sim.grid.dX.Min();x<sim.grid.domain.max_corner(0)-4.2*sim.grid.dX.Min();x+=sim.grid.dX.Min()*0.2){
-                Add_Debug_Particle(TV(x,sim.grid.domain.min_corner(1)+4.2*sim.grid.dX.Min()),VECTOR<T,3>(0,0,1));
-                Add_Debug_Particle(TV(x,sim.grid.domain.max_corner(1)-4.2*sim.grid.dX.Min()),VECTOR<T,3>(0,0,1));}
-            for(T y=sim.grid.domain.min_corner(1)+4.2*sim.grid.dX.Min();y<sim.grid.domain.max_corner(1)-4.2*sim.grid.dX.Min();y+=sim.grid.dX.Min()*0.2){
-                Add_Debug_Particle(TV(sim.grid.domain.min_corner(0)+4.2*sim.grid.dX.Min(),y),VECTOR<T,3>(0,0,1));
-                Add_Debug_Particle(TV(sim.grid.domain.max_corner(0)-4.2*sim.grid.dX.Min(),y),VECTOR<T,3>(0,0,1));}
+            // for(T x=sim.grid.domain.min_corner(0)+4.2*sim.grid.dX.Min();x<sim.grid.domain.max_corner(0)-4.2*sim.grid.dX.Min();x+=sim.grid.dX.Min()*0.2){
+            //     Add_Debug_Particle(TV(x,sim.grid.domain.min_corner(1)+4.2*sim.grid.dX.Min()),VECTOR<T,3>(0,0,1));
+            //     Add_Debug_Particle(TV(x,sim.grid.domain.max_corner(1)-4.2*sim.grid.dX.Min()),VECTOR<T,3>(0,0,1));}
+            // for(T y=sim.grid.domain.min_corner(1)+4.2*sim.grid.dX.Min();y<sim.grid.domain.max_corner(1)-4.2*sim.grid.dX.Min();y+=sim.grid.dX.Min()*0.2){
+            //     Add_Debug_Particle(TV(sim.grid.domain.min_corner(0)+4.2*sim.grid.dX.Min(),y),VECTOR<T,3>(0,0,1));
+            //     Add_Debug_Particle(TV(sim.grid.domain.max_corner(0)-4.2*sim.grid.dX.Min(),y),VECTOR<T,3>(0,0,1));}
             
             // draw collision objects
             for(int b=0;b<sim.rigid_ball.m;b++){
