@@ -41,6 +41,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     int frame_jump=20;
     int grid_res=16,particle_res=32,particle_count=100;
     T particle_exclude_radius=0;
+    sim.uniform_density=false;
     
     parse_args.Add("-test",&test_number,"test","test number");
     parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
@@ -51,6 +52,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-pres",&particle_res,"value","particle resolution");
     parse_args.Add("-pn",&particle_count,"value","particle number");
     parse_args.Add("-exclude",&particle_exclude_radius,"value","particle exclude radius when using pn");
+    parse_args.Add("-uniform_rho",&sim.uniform_density,"value","whether use momentum fixed flip");
+
     parse_args.Parse(true);
     parse_args.Parse();
 
@@ -59,11 +62,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // geometry setting
     switch(test_number){
         case 1:{ // all materials together
-            sim.grid.Initialize(TV_INT(10.2*grid_res+1,3.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(8.6,1.6)));
-            sim.uniform_density=false;
+            sim.grid.Initialize(TV_INT(4.2*grid_res+1,3.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(2.6,1.6)));
             
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.48,-1.48),TV(8.48,-1.3)),particle_exclude_radius);
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.48,-1.3),TV(-0.5,0.4)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.45,-1.2),TV(-0.5,0.8)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.45,-1.45),TV(2.45,-1.21)),particle_exclude_radius);
+
             int c1=sim.particles.number;
             sim.particles.Set_Material_Properties(0,c1,
                 (T)8/1000, // mass per particle
@@ -150,23 +153,27 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         LOG::cout<<"Total momentum on faces after advection: "<<sim.Get_Total_Momentum_On_Faces()<<std::endl;
         sim.Identify_Dirichlet();
         sim.Identify_Neumann();
-        for(int x=3;x<sim.mac_grid.counts.x-3;x++){
-            sim.cell_neumann(TV_INT(x,3))=true;
-            sim.cell_dirichlet(TV_INT(x,3))=false;
-            sim.neumann_cell_normal_axis(TV_INT(x,3))=2;}
-        for(int x=3;x<sim.mac_grid.counts.x-3;x++){
-            sim.cell_neumann(TV_INT(x,sim.mac_grid.counts.y-4))=true;
-            sim.cell_dirichlet(TV_INT(x,sim.mac_grid.counts.y-4))=false;
-            sim.neumann_cell_normal_axis(TV_INT(x,sim.mac_grid.counts.y-4))=-2;}
-        for(int y=3;y<sim.mac_grid.counts.y-3;y++){
-            sim.cell_neumann(TV_INT(3,y))=true;
-            sim.cell_dirichlet(TV_INT(3,y))=false;
-            sim.neumann_cell_normal_axis(TV_INT(3,y))=1;}
-        for(int y=3;y<sim.mac_grid.counts.y-3;y++){
-            sim.cell_neumann(TV_INT(sim.mac_grid.counts.x-4,y))=true;
-            sim.cell_dirichlet(TV_INT(sim.mac_grid.counts.x-4,y))=false;
-            sim.neumann_cell_normal_axis(TV_INT(sim.mac_grid.counts.x-4,y))=-1;}
         
+        for(int x=3;x<sim.mac_grid.counts.x-3;x++){
+            for(int y=2;y<=4;y++){
+                sim.cell_neumann(TV_INT(x,y))=true;
+                sim.cell_dirichlet(TV_INT(x,y))=false;
+                sim.neumann_cell_normal_axis(TV_INT(x,y))=2;}}
+        for(int x=3;x<sim.mac_grid.counts.x-3;x++){
+            for(int y=sim.mac_grid.counts.y-5;y<=sim.mac_grid.counts.y-3;y++){
+                sim.cell_neumann(TV_INT(x,y))=true;
+                sim.cell_dirichlet(TV_INT(x,y))=false;
+                sim.neumann_cell_normal_axis(TV_INT(x,y))=-2;}}
+        for(int x=2;x<=4;x++){
+            for(int y=3;y<sim.mac_grid.counts.y-3;y++){
+                sim.cell_neumann(TV_INT(x,y))=true;
+                sim.cell_dirichlet(TV_INT(x,y))=false;
+                sim.neumann_cell_normal_axis(TV_INT(x,y))=1;}}
+        for(int x=sim.mac_grid.counts.x-5;x<=sim.mac_grid.counts.x-3;x++){
+            for(int y=3;y<sim.mac_grid.counts.y-3;y++){
+                sim.cell_neumann(TV_INT(x,y))=true;
+                sim.cell_dirichlet(TV_INT(x,y))=false;
+                sim.neumann_cell_normal_axis(TV_INT(x,y))=-1;}}
 //        for(int x=3;x<sim.mac_grid.counts.x/2;x++){
 //            for(int y=sim.mac_grid.counts.y/2-3;y<=sim.mac_grid.counts.y/2+3;y++){
 //                sim.cell_neumann(TV_INT(x,y))=true;
