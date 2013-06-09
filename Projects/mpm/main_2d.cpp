@@ -350,7 +350,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             projection.Solve_For_Pressure();
             projection.Do_Projection();
             LOG::cout<<"Momentum - face (after projection):"<<projection.Get_Total_Momentum_On_Faces()<<std::endl;
-            projection.Velocities_Faces_To_Corners_MPM_Style(); // this step modifies sim.node_V
+            projection.Velocities_Faces_To_Corners_MPM_Style((T)0.9); // this step modifies sim.node_V
             LOG::cout<<"Momentum - grid (after projection):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
         }
 

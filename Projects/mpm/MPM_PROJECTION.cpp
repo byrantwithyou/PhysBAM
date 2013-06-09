@@ -20,6 +20,7 @@ MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
 {
     mac_grid.Initialize(sim.grid.numbers_of_cells,RANGE<TV>(sim.grid.domain.min_corner,sim.grid.domain.max_corner),true);
     face_velocities.Resize(mac_grid);
+    face_velocities_old.Resize(mac_grid);
     face_masses.Resize(mac_grid);
     face_momenta.Resize(mac_grid);
     face_volumes.Resize(mac_grid);
@@ -46,6 +47,7 @@ template<class TV> void MPM_PROJECTION<TV>::
 Reinitialize()
 {
     face_velocities.Fill((T)0);
+    face_velocities_old.Fill((T)0);
     face_masses.Fill((T)0);
     face_momenta.Fill((T)0);
     face_volumes.Fill((T)0);
@@ -140,6 +142,7 @@ Velocities_Corners_To_Faces_MPM_Style()
             face_velocities(face_index)=face_momenta(face_index)/face_masses(face_index);
         if(face_volumes(face_index)>sim.min_volume)
             face_densities(face_index)=face_masses(face_index)/face_volumes(face_index);}
+    face_velocities_old=face_velocities; // for FLIPing back
 }
 
 //#####################################################################
@@ -236,8 +239,12 @@ Do_Projection()
         if(cell_neumann(it.index)){
             int d=neumann_cell_normal_axis(it.index);
             int axis=abs(d)-1;
-            face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))=T(0);
-            face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))=T(0);
+            FACE_INDEX<TV::m> first_face(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index));
+            FACE_INDEX<TV::m> second_face(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index));
+            face_velocities(first_face)=T(0);
+            face_velocities(second_face)=T(0);
+            // face_velocities_old(first_face)=T(0);
+            // face_velocities_old(second_face)=T(0);
         }
     }
     // check whether divergence free
@@ -249,16 +256,19 @@ Do_Projection()
 // Function Velocities_Faces_To_Corners_MPM_Style
 //#####################################################################
 template<class TV> void MPM_PROJECTION<TV>::
-Velocities_Faces_To_Corners_MPM_Style()
+Velocities_Faces_To_Corners_MPM_Style(T FLIP_alpha)
 {
     T weight=(TV::m==2)?0.5:0.25;
     for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(nodes_non_dirichlet_cells);it.Valid();it.Next()){
         TV_INT node=it.Key();
-        sim.node_V(node)=TV();
+        TV V_FLIP=sim.node_V(node);
+        TV V_PIC;
         for(int axis=0;axis<TV::m;axis++){
             for(int face=0;face<TV::m*2-2;face++){
                 FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,node,face));
-                sim.node_V(node)(axis)+=weight*face_velocities(face_index);}}}
+                V_PIC(axis)+=weight*face_velocities(face_index);
+                V_FLIP(axis)+=weight*(face_velocities(face_index)-face_velocities_old(face_index));}}
+        sim.node_V(node)=((T)1-FLIP_alpha)*V_PIC+FLIP_alpha*V_FLIP;}
 }
 
 //#####################################################################

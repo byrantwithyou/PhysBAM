@@ -28,6 +28,7 @@ public:
     ARRAY<int,TV_INT> neumann_cell_normal_axis; // +-1 +-2 +-3
     HASHTABLE<TV_INT,bool> nodes_non_dirichlet_cells;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_old;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_masses;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_volumes;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_densities;
@@ -39,16 +40,16 @@ public:
     MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in);
     ~MPM_PROJECTION();
 
-    void Reinitialize();                                   // step 1
-    void Identify_Dirichlet_Cells();                       // step 2 
-    void Identify_Neumann_Cells();                         // step 3
+    void Reinitialize();                                   
+    void Identify_Dirichlet_Cells();                       
+    void Identify_Neumann_Cells();                         
     void Identify_Incompressible_Cells();
-    void Identify_Nodes_Of_Non_Dirichlet_Cells();          // step 4
-    void Velocities_Corners_To_Faces_MPM_Style();          // step 5
-    void Build_Velocity_Divergence();                      // step 6 
-    void Solve_For_Pressure();                             // step 7
-    void Do_Projection();                                  // step 8
-    void Velocities_Faces_To_Corners_MPM_Style();          // step 9
+    void Identify_Nodes_Of_Non_Dirichlet_Cells();         
+    void Velocities_Corners_To_Faces_MPM_Style();          
+    void Build_Velocity_Divergence();                      
+    void Solve_For_Pressure();                            
+    void Do_Projection();                                  
+    void Velocities_Faces_To_Corners_MPM_Style(T FLIP_alpha=T(0));         
 
     void Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs);      // called by Solve_For_Pressure
     
