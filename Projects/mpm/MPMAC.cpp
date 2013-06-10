@@ -234,10 +234,10 @@ Do_Projection()
                     T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
                     
                     // mass based density
-                    // if(face_masses(face_index)>min_mass) face_velocities(face_index)-=dt/face_masses(face_index)*grad_p;}}}}
+                    if(face_masses(face_index)>min_mass) face_velocities(face_index)-=dt/face_masses(face_index)*grad_p;}}}}
                     
                     // volume based density
-                    if(face_volumes(face_index)>min_volume) face_velocities(face_index)-=dt/face_densities(face_index)*grad_p;}}}}
+                    // if(face_volumes(face_index)>min_volume) face_velocities(face_index)-=dt/face_densities(face_index)*grad_p;}}}}
     
     else{
         for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){

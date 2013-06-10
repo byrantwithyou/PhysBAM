@@ -62,10 +62,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // geometry setting
     switch(test_number){
         case 1:{ // all materials together
-            sim.grid.Initialize(TV_INT(4.2*grid_res+1,3.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(2.6,1.6)));
+            sim.grid.Initialize(TV_INT(3.2*grid_res+1,5.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(1.6,3.6)));
             
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.45,-1.2),TV(-0.5,0.8)),particle_exclude_radius);
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.45,-1.45),TV(2.45,-1.21)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.45,-1.45),TV(-0.8,0.8)),particle_exclude_radius);
 
             int c1=sim.particles.number;
             sim.particles.Set_Material_Properties(0,c1,
@@ -141,7 +140,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     Flush_Frame<TV>("mpmac");
 
-    for(int f=1;f<2900977;f++){
+    for(int f=1;f<=26640;f++){
         TIMING_START;
         LOG::cout<<"MPM TIMESTEP "<<f<<std::endl;
         sim.Reinitialize();
@@ -193,7 +192,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         LOG::cout<<"Total momentum on faces after projection: "<<sim.Get_Total_Momentum_On_Faces()<<std::endl;
         sim.Update_Particle_Velocities();
         LOG::cout<<"Total momentum on particles after interpolating back: "<<sim.Get_Total_Momentum_On_Particles()<<std::endl;
-        sim.Particle_Based_Body_Collisions();
+        // sim.Particle_Based_Body_Collisions();
         sim.Update_Particle_Positions();
 
         sim.frame++;

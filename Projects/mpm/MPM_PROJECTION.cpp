@@ -204,7 +204,7 @@ Solve_For_Pressure()
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=false;
-    solver->Solve(system,x,rhs,vectors,(T)1e-12,0,1000);
+    solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
     pressure=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
 }
@@ -228,10 +228,10 @@ Do_Projection()
                 T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
 
                 // mass based density
-                // if(face_masses(face_index)>sim.min_mass) face_velocities(face_index)-=sim.dt/face_masses(face_index)*grad_p;}}}
+                if(face_masses(face_index)>sim.min_mass) face_velocities(face_index)-=sim.dt/face_masses(face_index)*grad_p;}}}
 
                 // volume based density
-                if(face_densities(face_index)>sim.min_density) face_velocities(face_index)-=sim.dt/face_densities(face_index)*grad_p;}}}
+                // if(face_densities(face_index)>sim.min_density) face_velocities(face_index)-=sim.dt/face_densities(face_index)*grad_p;}}}
 
 
     // Enforce face velocities for neumann cells

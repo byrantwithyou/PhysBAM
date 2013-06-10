@@ -91,10 +91,10 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // geometry setting
     switch(test_number){
         case 1:{ // all materials together
-            sim.grid.Initialize(TV_INT(4.2*grid_res+1,3.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(2.6,1.6)));
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.45,-1.2),TV(-0.5,0.8)),particle_exclude_radius);
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.45,-1.45),TV(2.45,-1.21)),particle_exclude_radius);
-
+            sim.grid.Initialize(TV_INT(3.2*grid_res+1,5.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(1.6,3.6)));
+            
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.45,-1.45),TV(-0.8,0.8)),particle_exclude_radius);
+            
             int c1=sim.particles.number;
             sim.particles.Set_Material_Properties(0,c1,
                                                   (T)8/1000, // mass per particle
@@ -112,6 +112,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                                             MATRIX<T,TV::m>::Identity_Matrix(), // Fe
                                             MATRIX<T,TV::m>::Identity_Matrix(), // Fp
                                             TV(0,0)); // initial velocity
+            
                         sim.use_gravity=true;
 
             break;}
@@ -242,7 +243,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     Flush_Frame<TV>("mpm");
 
-    for(int f=1;f<2900977;f++){
+    for(int f=1;f<=26640;f++){
 
 //        int c1=0,c2=0,c3=0,c4=0;
 //        if(f%220==0 && f<=11000){
@@ -302,7 +303,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
 //        if(f%220==0 && f<=11000) sim.Compute_Particle_Volumes_And_Densities(c1,c2+c4);
 
-        sim.Compute_Grid_Forces();
+        
+        // FOR WATER ONLY
+        // sim.Compute_Grid_Forces();
+        sim.node_force.Fill(TV());       
+        
+        
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
         sim.Update_Velocities_On_Grid();
         // sim.Grid_Based_Body_Collisions();
@@ -350,7 +356,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             projection.Solve_For_Pressure();
             projection.Do_Projection();
             LOG::cout<<"Momentum - face (after projection):"<<projection.Get_Total_Momentum_On_Faces()<<std::endl;
-            projection.Velocities_Faces_To_Corners_MPM_Style((T)0.9); // this step modifies sim.node_V
+            projection.Velocities_Faces_To_Corners_MPM_Style((T)0.95); // this step modifies sim.node_V
             LOG::cout<<"Momentum - grid (after projection):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
         }
 
