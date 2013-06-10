@@ -53,10 +53,14 @@ public:
     ARRAY<T,FACE_INDEX<TV::dimension> > face_momenta;
     ARRAY<bool,TV_INT> cell_dirichlet;
     ARRAY<bool,TV_INT> cell_neumann;
+    ARRAY<TV_INT> list_of_dirichlet_cells;
+    ARRAY<TV_INT> list_of_neumann_cells;
+    ARRAY<TV_INT> list_of_fluid_cells;
     ARRAY<int,TV_INT> neumann_cell_normal_axis; // +-1 +-2 +-3
     ARRAY<T,TV_INT> div_u;
     T max_div;
     ARRAY<T,TV_INT> pressure;
+
     
     MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function;
     // MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function;
@@ -76,6 +80,7 @@ public:
     void Advection();
     void Identify_Dirichlet();
     void Identify_Neumann();
+    void Classify_Cells();
     void Build_Velocity_Divergence();
     void Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs);
     void Solve_For_Pressure();

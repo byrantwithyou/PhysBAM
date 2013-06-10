@@ -56,6 +56,9 @@ Reinitialize()
     face_momenta.Fill((T)0);
     cell_dirichlet.Fill(true);
     cell_neumann.Fill(false);
+    list_of_dirichlet_cells.Clean_Memory();
+    list_of_neumann_cells.Clean_Memory();
+    list_of_fluid_cells.Clean_Memory();
     div_u.Fill((T)0);
     pressure.Fill((T)0);
     max_div=(T)0;
@@ -131,6 +134,23 @@ Identify_Neumann()
 {
     cell_neumann.Fill(false);
     // Do it outside
+}
+
+//#####################################################################
+// Function Classify_Cells
+//#####################################################################
+template<class TV> void MPMAC<TV>::
+Classify_Cells()
+{
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+        if(cell_dirichlet(it.index)){
+            PHYSBAM_ASSERT(!cell_neumann(it.index));
+            list_of_dirichlet_cells.Append(it.index);}
+        else if(cell_neumann(it.index)){
+            list_of_neumann_cells.Append(it.index);}
+        else{
+            list_of_fluid_cells.Append(it.index);}}
+    PHYSBAM_ASSERT(list_of_fluid_cells.m+list_of_dirichlet_cells.m+list_of_neumann_cells.m==mac_grid.counts.Product());
 }
 
 //#####################################################################

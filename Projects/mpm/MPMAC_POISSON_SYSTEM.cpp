@@ -36,6 +36,68 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
     ARRAY<T,TV_INT>& rr=debug_cast<MPMAC_POISSON_VECTOR<TV>&>(result).v;
     const ARRAY<T,TV_INT>& xx=debug_cast<const MPMAC_POISSON_VECTOR<TV>&>(x).v;
     T one_over_h_square=sqr((T)1/proj.mac_grid.dX.Min());
+
+// #pragma omp parallel for schedule(static)
+//     for(int i=0;i<rr.array.m;i++){
+//         rr.array(i)=(T)0;}
+//     if(!proj.uniform_density){
+// #pragma omp parallel for schedule(static)
+//         for(int i=0;i<proj.list_of_fluid_cells.m;i++){
+//             TV_INT index=proj.list_of_fluid_cells(i);
+//             for(int d=0;d<TV::m;d++){
+//                 TV_INT left_cell_index=index;left_cell_index(d)--;
+//                 TV_INT right_cell_index=index;right_cell_index(d)++;
+//                 FACE_INDEX<TV::m> left_face_index(d,proj.mac_grid.First_Face_Index_In_Cell(d,index));
+//                 FACE_INDEX<TV::m> right_face_index(d,proj.mac_grid.Second_Face_Index_In_Cell(d,index));
+//                 if(proj.face_masses(left_face_index)>proj.min_mass){
+//                     // mass based scaling
+//                     if(proj.cell_dirichlet(left_cell_index)) rr(index)+=xx(index)/proj.face_masses(left_face_index);
+//                     else if(proj.cell_neumann(left_cell_index)) rr(index)+=T(0);
+//                     else rr(index)+=(xx(index)-xx(left_cell_index))/proj.face_masses(left_face_index);}
+//                     // volume based scaling
+//                     // if(proj.cell_dirichlet(left_cell_index)) rr(index)+=xx(index)/proj.face_densities(left_face_index);
+//                     // else if(proj.cell_neumann(left_cell_index)) rr(index)+=T(0);
+//                     // else rr(index)+=(xx(index)-xx(left_cell_index))/proj.face_densities(left_face_index);}
+//                 if(proj.face_masses(right_face_index)>proj.min_mass){
+//                     // mass based scaling
+//                     if(proj.cell_dirichlet(right_cell_index)) rr(index)+=xx(index)/proj.face_masses(right_face_index);
+//                     else if(proj.cell_neumann(right_cell_index)) rr(index)+=T(0);
+//                     else rr(index)+=(xx(index)-xx(right_cell_index))/proj.face_masses(right_face_index);}}
+//                     // volume based scaling
+//                     // if(proj.cell_dirichlet(right_cell_index)) rr(index)+=xx(index)/proj.face_densities(right_face_index);
+//                     // else if(proj.cell_neumann(right_cell_index)) rr(index)+=T(0);
+//                     // else rr(index)+=(xx(index)-xx(right_cell_index))/proj.face_densities(right_face_index);}}
+//             rr(index)*=proj.dt*one_over_h_square;}}
+//     else{
+// #pragma omp parallel for schedule(static)
+//         for(int i=0;i<proj.list_of_fluid_cells.m;i++){
+//             TV_INT index=proj.list_of_fluid_cells(i);
+//             for(int d=0;d<TV::m;d++){
+//                 TV_INT left_cell_index=index;left_cell_index(d)--;
+//                 TV_INT right_cell_index=index;right_cell_index(d)++;
+//                 FACE_INDEX<TV::m> left_face_index(d,proj.mac_grid.First_Face_Index_In_Cell(d,index));
+//                 FACE_INDEX<TV::m> right_face_index(d,proj.mac_grid.Second_Face_Index_In_Cell(d,index));
+//                 if(proj.face_masses(left_face_index)>proj.min_mass){
+//                     // mass based scaling
+//                     if(proj.cell_dirichlet(left_cell_index)) rr(index)+=xx(index);
+//                     else if(proj.cell_neumann(left_cell_index)) rr(index)+=T(0);
+//                     else rr(index)+=(xx(index)-xx(left_cell_index));}
+//                     // volume based scaling
+//                     // if(proj.cell_dirichlet(left_cell_index)) rr(index)+=xx(index);
+//                     // else if(proj.cell_neumann(left_cell_index)) rr(index)+=T(0);
+//                     // else rr(index)+=(xx(index)-xx(left_cell_index));}
+//                 if(proj.face_masses(right_face_index)>proj.min_mass){
+//                     // mass based scaling
+//                     if(proj.cell_dirichlet(right_cell_index)) rr(index)+=xx(index);
+//                     else if(proj.cell_neumann(right_cell_index)) rr(index)+=T(0);
+//                     else rr(index)+=(xx(index)-xx(right_cell_index));}}
+//                     // volume based scaling
+//                     // if(proj.cell_dirichlet(right_cell_index)) rr(index)+=xx(index);
+//                     // else if(proj.cell_neumann(right_cell_index)) rr(index)+=T(0);
+//                     // else rr(index)+=(xx(index)-xx(right_cell_index));}}
+//             rr(index)*=proj.dt*one_over_h_square;}}
+
+
     if(!proj.uniform_density){
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+proj.mac_grid.counts));it.Valid();it.Next()){
             if(proj.cell_dirichlet(it.index) || proj.cell_neumann(it.index))

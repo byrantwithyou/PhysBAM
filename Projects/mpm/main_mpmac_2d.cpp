@@ -200,6 +200,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     Flush_Frame<TV>("mpmac");
 
+    T total_time_for_solve=(T)0;
     for(int f=1;f<=26640;f++){
         TIMING_START;
         LOG::cout<<"MPM TIMESTEP "<<f<<std::endl;
@@ -240,6 +241,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 sim.neumann_cell_normal_axis(TV_INT(x,y))=-1;}}
         
         T Timing_neumann=TIMING_GET;
+        sim.Classify_Cells();
+        T Timing_classify=TIMING_GET;
         sim.Build_Velocity_Divergence();
         T Timing_build_velocity_div=TIMING_GET;
         sim.Solve_For_Pressure();
@@ -254,7 +257,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Update_Particle_Positions();
         T Timing_update_p=TIMING_GET;
         sim.frame++;
-        T Timing_total=Timing_reinit+Timing_weights+Timing_rasterize+Timing_advection+Timing_dirichlet+Timing_neumann+Timing_build_velocity_div+Timing_solve+Timing_proj+Timing_update_v+Timing_update_p;
+        T Timing_total=Timing_reinit+Timing_weights+Timing_rasterize+Timing_advection+Timing_dirichlet+Timing_neumann+Timing_classify+Timing_build_velocity_div+Timing_solve+Timing_proj+Timing_update_v+Timing_update_p;
         
         LOG::cout<<std::setw(20)<<"reinit "<<std::setw(10)<<Timing_reinit<<std::setw(10)<<Timing_reinit/Timing_total*100.0<<"%"<<std::endl;
         LOG::cout<<std::setw(20)<<"weights "<<std::setw(10)<<Timing_weights<<std::setw(10)<<Timing_weights/Timing_total*100.0<<"%"<<std::endl;
@@ -262,11 +265,16 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         LOG::cout<<std::setw(20)<<"advection "<<std::setw(10)<<Timing_advection<<std::setw(10)<<Timing_advection/Timing_total*100.0<<"%"<<std::endl;
         LOG::cout<<std::setw(20)<<"dirichlet "<<std::setw(10)<<Timing_dirichlet<<std::setw(10)<<Timing_dirichlet/Timing_total*100.0<<"%"<<std::endl;
         LOG::cout<<std::setw(20)<<"neumann "<<std::setw(10)<<Timing_neumann<<std::setw(10)<<Timing_neumann/Timing_total*100.0<<"%"<<std::endl;
+        LOG::cout<<std::setw(20)<<"classify "<<std::setw(10)<<Timing_classify<<std::setw(10)<<Timing_classify/Timing_total*100.0<<"%"<<std::endl;
         LOG::cout<<std::setw(20)<<"build_velocity_div "<<std::setw(10)<<Timing_build_velocity_div<<std::setw(10)<<Timing_build_velocity_div/Timing_total*100.0<<"%"<<std::endl;
         LOG::cout<<std::setw(20)<<"solve "<<std::setw(10)<<Timing_solve<<std::setw(10)<<Timing_solve/Timing_total*100.0<<"%"<<std::endl;
         LOG::cout<<std::setw(20)<<"proj "<<std::setw(10)<<Timing_proj<<std::setw(10)<<Timing_proj/Timing_total*100.0<<"%"<<std::endl;
         LOG::cout<<std::setw(20)<<"update_v "<<std::setw(10)<<Timing_update_v<<std::setw(10)<<Timing_update_v/Timing_total*100.0<<"%"<<std::endl;
         LOG::cout<<std::setw(20)<<"update_p "<<std::setw(10)<<Timing_update_p<<std::setw(10)<<Timing_update_p/Timing_total*100.0<<"%"<<std::endl;
+
+        total_time_for_solve+=Timing_solve;
+        LOG::cout<<"Total time spent in this simulation for CG: "<<total_time_for_solve<<std::endl;
+
         if(f%frame_jump==0){
             for(int i=0;i<sim.particles.X.m;i++){
                 if(i>=air)
