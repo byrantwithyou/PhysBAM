@@ -8,6 +8,7 @@
 #define __TIMING__
 #define TIMING_START ::PhysBAM::TIMING timing;timing.Start();
 #define TIMING_END(x) timing.Print(x);
+#define TIMING_GET timing.Get_And_Restart(); // milliseconds
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <iomanip>
 #include <iostream>
@@ -48,6 +49,13 @@ public:
         LOG::cout<<_name<<" took "<<time<<" milliseconds"<<std::endl;
         fflush(stdout);
         Restart();
+    }
+
+    float Get_And_Restart()
+    {
+        float time=Elapsed();
+        Restart();
+        return time;
     }
 
     static inline TIMING Now() 
@@ -95,6 +103,13 @@ public:
         LOG::cout<<_name<<" took "<<time<<" milliseconds"<<std::endl;
         fflush(stdout);
         Restart();
+    }
+    
+    float Get_And_Restart()
+    {
+        float time=Elapsed();
+        Restart();
+        return time;
     }
 
     static inline TIMING Now() 

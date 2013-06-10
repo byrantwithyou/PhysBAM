@@ -196,13 +196,12 @@ Solve_For_Pressure()
     pressure=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
     
-    T max_pressure_on_dirichlet=0;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+mac_grid.counts));it.Valid();it.Next()){
-        if(cell_dirichlet(it.index))
-            if(sqr(pressure(it.index)>max_pressure_on_dirichlet))
-                max_pressure_on_dirichlet=sqr(pressure(it.index));}
-    LOG::cout<<"max_pressure_on_dirichlet "<<max_pressure_on_dirichlet<<std::endl;
-    
+    // T max_pressure_on_dirichlet=0;
+    // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+mac_grid.counts));it.Valid();it.Next()){
+    //     if(cell_dirichlet(it.index))
+    //         if(sqr(pressure(it.index)>max_pressure_on_dirichlet))
+    //             max_pressure_on_dirichlet=sqr(pressure(it.index));}
+    // LOG::cout<<"max_pressure_on_dirichlet "<<max_pressure_on_dirichlet<<std::endl;
 }
 
 //#####################################################################
@@ -212,7 +211,7 @@ Solve_For_Pressure()
 template<class TV> void MPMAC<TV>::
 Do_Projection()
 {
-    LOG::cout<<"Maximum velocity divergence before projection: "<<max_div<<std::endl;        
+    T old_max_divergence=max_div;
     T one_over_h=(T)1/mac_grid.dX.Min();
 
     if(!uniform_density){
@@ -232,10 +231,10 @@ Do_Projection()
                         PHYSBAM_FATAL_ERROR();}}
                 if(!cell_neumann(first_cell) && !cell_neumann(second_cell)){
                     T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
-                    
+
                     // mass based density
                     if(face_masses(face_index)>min_mass) face_velocities(face_index)-=dt/face_masses(face_index)*grad_p;}}}}
-                    
+
                     // volume based density
                     // if(face_volumes(face_index)>min_volume) face_velocities(face_index)-=dt/face_densities(face_index)*grad_p;}}}}
     
@@ -259,7 +258,7 @@ Do_Projection()
             face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))=T(0);}}
     // check whether divergence free
     Build_Velocity_Divergence();
-    LOG::cout<<"Maximum velocity divergence after projection: "<<max_div<<std::endl;
+    LOG::cout<<"Maximum velocity divergence changed by projection: "<<old_max_divergence<<" -> "<<max_div<<std::endl;
 }
 
 //#####################################################################

@@ -62,7 +62,6 @@ Initialize()
     min_mass=particles.mass.Min()*(T)1e-5;
     min_volume=(T)1e-7;
     min_density=(T)1e-7;
-    if(PROFILING) TIMING_END("");
 }
 //#####################################################################
 // Function Resize_For_New_Particle_Data
@@ -146,7 +145,6 @@ Build_Weights_And_Grad_Weights()
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++){
         grid_basis_function.Build_Weights_And_Grad_Weights_Exact(particles.X(p),grid,influence_corner(p),weight(p),grad_weight(p));}
-    if(PROFILING) TIMING_END("Build_Weights_And_Grad_Weights");
 }
 //#####################################################################
 // Function Build_Helper_Structures_For_Constitutive_Model
@@ -161,7 +159,6 @@ Build_Helper_Structures_For_Constitutive_Model()
         T lame_scale=exp(xi*(1-particles.Fp(p).Determinant()));
         particles.mu(p)=particles.mu0(p)*lame_scale;
         particles.lambda(p)=particles.lambda0(p)*lame_scale;}
-    if(PROFILING) TIMING_END("Build_Helper_Structures_For_Constitutive_Model");
 }
 //#####################################################################
 // Function Rasterize_Particle_Data_To_The_Grid
@@ -183,7 +180,6 @@ Rasterize_Particle_Data_To_The_Grid()
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
             if(node_mass(ind)>min_mass) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p)(it.index)/node_mass(ind);}}
-    if(PROFILING) TIMING_END("Rasterize_Particle_Data_To_The_Grid");
 }
 //#####################################################################
 // Function Compute_Particle_Volumes_And_Densities
@@ -205,7 +201,6 @@ Compute_Particle_Volumes_And_Densities(int starting_index,int count)
             particles_density(p-starting_index)+=node_mass(ind)*weight(p)(it.index)*one_over_cell_volume;}
         if(particles_density(p-starting_index)>min_rho) particles.volume(p)=particles.mass(p)/particles_density(p-starting_index);
         else PHYSBAM_FATAL_ERROR();}
-    if(PROFILING) TIMING_END("Compute_Particle_Volumes_And_Densities");
 }
 //#####################################################################
 // Function Compute_Grid_Forces
@@ -220,7 +215,6 @@ Compute_Grid_Forces()
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
             node_force(ind)-=B*grad_weight(p)(it.index);}}
-    if(PROFILING) TIMING_END("Compute_Grid_Forces");
 }
 //#####################################################################
 // Function Apply_Gravity_To_Grid_Forces
@@ -232,7 +226,6 @@ Apply_Gravity_To_Grid_Forces()
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),grid.counts));it.Valid();it.Next())
         if(node_mass(it.index)>=min_mass)
             node_force(it.index)+=node_mass(it.index)*gravity_constant;
-    if(PROFILING) TIMING_END("Apply_Gravity_To_Grid_Forces");
 }
 //#####################################################################
 // Function Update_Velocities_On_Grid
@@ -251,7 +244,6 @@ Update_Velocities_On_Grid()
                     node_V_star(it.index)=dirichlet_velocity(b);
                     nodes_need_projection.Append(it.index);
                     break;}}}
-    if(PROFILING) TIMING_END("Update_Velocities_On_Grid");
 }
 //#####################################################################
 // Function Grid_Based_Body_Collisions
@@ -304,7 +296,6 @@ Grid_Based_Body_Collisions()
                         else node_V_star(it.index)=vt+rigid_ball_velocity(b);
                         nodes_need_projection.Append(it.index);
                         break;}}}}}
-    if(PROFILING) TIMING_END("Grid_Based_Body_Collisions");
 }
 //#####################################################################
 // Function Solve_The_Linear_System_Explicit
@@ -314,7 +305,6 @@ Solve_The_Linear_System_Explicit()
 {
     TIMING_START;
     node_V_old=node_V;node_V=node_V_star;
-    if(PROFILING) TIMING_END("Solve_The_Linear_System_Explicit");
 }
 //#####################################################################
 // Function Solve_The_Linear_System
@@ -349,7 +339,6 @@ Solve_The_Linear_System()
     node_V_old=node_V;
     node_V=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
-    if(PROFILING) TIMING_END("Solve_The_Linear_System");
 }
 //#####################################################################
 // Function Update_Deformation_Gradient
@@ -409,7 +398,6 @@ Update_Deformation_Gradient()
                  TV_INT ind=influence_corner(p)+it.index;
                  grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
              particles.Fe(p)=particles.Fe(p)+dt*grad_vp*particles.Fe(p);}}
-     if(PROFILING) TIMING_END("Update_Deformation_Gradient");
 }
 //#####################################################################
 // Function Update_Particle_Velocities
@@ -428,7 +416,6 @@ Update_Particle_Velocities()
             V_PIC+=node_V(ind)*w;
             V_FLIP+=(node_V(ind)-node_V_old(ind))*w;}
         particles.V(p)=((T)1-FLIP_alpha)*V_PIC+FLIP_alpha*V_FLIP;}
-    if(PROFILING) TIMING_END("Update_Particle_Velocities");
 }
 //#####################################################################
 // Function Particle_Based_Body_Collisions
@@ -467,7 +454,6 @@ Particle_Based_Body_Collisions()
                         if(impulse<(T)-1) impulse=(T)-1;
                         particles.V(p)=vt*(1+impulse)+rigid_ball_velocity(b);}
                     else particles.V(p)=vt+rigid_ball_velocity(b);}}}}
-    if(PROFILING) TIMING_END("Particle_Based_Body_Collisions");
 }
 //#####################################################################
 // Function Update_Particle_Positions
@@ -482,7 +468,6 @@ Update_Particle_Positions()
             LOG::cout<<"breaking CFL"<<std::endl;
             PHYSBAM_FATAL_ERROR();}
         particles.X(p)+=dt*particles.V(p);}
-    if(PROFILING) TIMING_END("Update_Particle_Positions");
 }
 //#####################################################################
 // Function Update_Dirichlet_Box_Positions
@@ -493,7 +478,6 @@ Update_Dirichlet_Box_Positions()
     TIMING_START;
     for(int b=0;b<dirichlet_box.m;b++)
         dirichlet_box(b)+=dt*dirichlet_velocity(b);
-    if(PROFILING) TIMING_END("Update_Particle_Positions");
 }
 //#####################################################################
 // Function Update_Colliding_Object_Positions
@@ -504,7 +488,6 @@ Update_Colliding_Object_Positions()
     TIMING_START;
     for(int b=0;b<rigid_ball.m;b++)
         rigid_ball(b).center+=dt*rigid_ball_velocity(b);
-    if(PROFILING) TIMING_END("Update_Particle_Positions");
 }
 //#####################################################################
 // Function Get_Maximum_Node_Velocity

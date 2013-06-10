@@ -50,7 +50,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     bool use_bridson=false;
     bool use_projection=false;
     sim.xi=(T)0;
-    sim.PROFILING=false;
     parse_args.Add("-test",&test_number,"test","test number");
     parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
     parse_args.Add("-dt",&sim.dt,"dt","dt");
@@ -67,7 +66,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-pn",&particle_count,"value","particle number");
     parse_args.Add("-exclude",&particle_exclude_radius,"value","particle exclude radius when using pn");
     parse_args.Add("-rho",&density_scale,"value","scale object density");
-    parse_args.Add("-profile",&sim.PROFILING,"print out timing statements");
     parse_args.Add("-projection",&use_projection,"use poisson projection to enforce incompressibility");
     parse_args.Parse(true);
     parse_args.Parse();

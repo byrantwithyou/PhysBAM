@@ -138,17 +138,17 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         case 3:{ // droplet with air surroundings
             sim.grid.Initialize(TV_INT(3.2*grid_res+1,3.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(1.6,1.6)));
             
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.2,-1.2),TV(1.2,1.2)),particle_exclude_radius);
-            sim.particles.Delete_Particles_In_Object_Lazy(RANGE<TV>(TV(-1.2,-1.2),TV(1.2,-0.9)));
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.46,-1.46),TV(1.46,1.46)),particle_exclude_radius);
+            sim.particles.Delete_Particles_In_Object_Lazy(RANGE<TV>(TV(-1.46,-1.46),TV(1.46,-0.9)));
             sim.particles.Delete_Particles_In_Object_Lazy(SPHERE<TV>(TV(0,1),0.2));
             int c1=sim.particles.number;
             sim.particles.Set_Material_Properties(0,c1,
-                                                  (T)0.1/1000.0, // mass per particle
+                                                  (T)1/1000.0, // mass per particle
                                                   0, // mu
                                                   0, // lambda
                                                   false); // compress
             sim.particles.Set_Plasticity(0,c1,
-                                         false,-1000,1.2, // plasticity_yield
+                                         false,-1000,1.46, // plasticity_yield
                                          false,-1,1); // plasticity_clamp
             sim.particles.Set_Visco_Plasticity(0,c1,
                                                false,100, // visco_nu
@@ -160,11 +160,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                                             TV(0,0)); // initial velocity
             
             air=c1;
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.2,-1.2),TV(1.2,-0.9)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.46,-1.46),TV(1.46,-0.9)),particle_exclude_radius);
             sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0,1),0.2),particle_exclude_radius);
             int c2=sim.particles.number-c1;
             sim.particles.Set_Material_Properties(c1,c2,
-                                                  (T)100/1000.0, // mass per particle
+                                                  (T)1000/1000.0, // mass per particle
                                                   0, // mu
                                                   0, // lambda
                                                   false); // compress
@@ -204,13 +204,18 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         TIMING_START;
         LOG::cout<<"MPM TIMESTEP "<<f<<std::endl;
         sim.Reinitialize();
+        T Timing_reinit=TIMING_GET;
         sim.Weights();
-        LOG::cout<<"Total momentum on particles before rasterize: "<<sim.Get_Total_Momentum_On_Particles()<<std::endl;
+        T Timing_weights=TIMING_GET;
+        // LOG::cout<<"Total momentum on particles before rasterize: "<<sim.Get_Total_Momentum_On_Particles()<<std::endl;
         sim.Rasterize();
-        LOG::cout<<"Total momentum on faces after rasterize: "<<sim.Get_Total_Momentum_On_Faces()<<std::endl;
+        T Timing_rasterize=TIMING_GET;
+        // LOG::cout<<"Total momentum on faces after rasterize: "<<sim.Get_Total_Momentum_On_Faces()<<std::endl;
         sim.Advection();
-        LOG::cout<<"Total momentum on faces after advection: "<<sim.Get_Total_Momentum_On_Faces()<<std::endl;
+        T Timing_advection=TIMING_GET;
+        // LOG::cout<<"Total momentum on faces after advection: "<<sim.Get_Total_Momentum_On_Faces()<<std::endl;
         sim.Identify_Dirichlet();
+        T Timing_dirichlet=TIMING_GET;
         sim.Identify_Neumann();
         
         for(int x=3;x<sim.mac_grid.counts.x-3;x++){
@@ -234,26 +239,38 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 sim.cell_dirichlet(TV_INT(x,y))=false;
                 sim.neumann_cell_normal_axis(TV_INT(x,y))=-1;}}
         
-        
+        T Timing_neumann=TIMING_GET;
         sim.Build_Velocity_Divergence();
+        T Timing_build_velocity_div=TIMING_GET;
         sim.Solve_For_Pressure();
+        T Timing_solve=TIMING_GET;
         sim.Do_Projection();
-        LOG::cout<<"Total momentum on faces after projection: "<<sim.Get_Total_Momentum_On_Faces()<<std::endl;
+        T Timing_proj=TIMING_GET;
+        // LOG::cout<<"Total momentum on faces after projection: "<<sim.Get_Total_Momentum_On_Faces()<<std::endl;
         sim.Update_Particle_Velocities();
-        LOG::cout<<"Total momentum on particles after interpolating back: "<<sim.Get_Total_Momentum_On_Particles()<<std::endl;
+        T Timing_update_v=TIMING_GET;
+        // LOG::cout<<"Total momentum on particles after interpolating back: "<<sim.Get_Total_Momentum_On_Particles()<<std::endl;
         // sim.Particle_Based_Body_Collisions();
         sim.Update_Particle_Positions();
-
+        T Timing_update_p=TIMING_GET;
         sim.frame++;
-
-        TIMING_END("Current MPM time step totally");
-
+        T Timing_total=Timing_reinit+Timing_weights+Timing_rasterize+Timing_advection+Timing_dirichlet+Timing_neumann+Timing_build_velocity_div+Timing_solve+Timing_proj+Timing_update_v+Timing_update_p;
+        
+        LOG::cout<<std::setw(20)<<"reinit "<<std::setw(10)<<Timing_reinit<<std::setw(10)<<Timing_reinit/Timing_total*100.0<<"%"<<std::endl;
+        LOG::cout<<std::setw(20)<<"weights "<<std::setw(10)<<Timing_weights<<std::setw(10)<<Timing_weights/Timing_total*100.0<<"%"<<std::endl;
+        LOG::cout<<std::setw(20)<<"rasterize"<<std::setw(10)<<Timing_rasterize<<std::setw(10)<<Timing_rasterize/Timing_total*100.0<<"%"<<std::endl;
+        LOG::cout<<std::setw(20)<<"advection "<<std::setw(10)<<Timing_advection<<std::setw(10)<<Timing_advection/Timing_total*100.0<<"%"<<std::endl;
+        LOG::cout<<std::setw(20)<<"dirichlet "<<std::setw(10)<<Timing_dirichlet<<std::setw(10)<<Timing_dirichlet/Timing_total*100.0<<"%"<<std::endl;
+        LOG::cout<<std::setw(20)<<"neumann "<<std::setw(10)<<Timing_neumann<<std::setw(10)<<Timing_neumann/Timing_total*100.0<<"%"<<std::endl;
+        LOG::cout<<std::setw(20)<<"build_velocity_div "<<std::setw(10)<<Timing_build_velocity_div<<std::setw(10)<<Timing_build_velocity_div/Timing_total*100.0<<"%"<<std::endl;
+        LOG::cout<<std::setw(20)<<"solve "<<std::setw(10)<<Timing_solve<<std::setw(10)<<Timing_solve/Timing_total*100.0<<"%"<<std::endl;
+        LOG::cout<<std::setw(20)<<"proj "<<std::setw(10)<<Timing_proj<<std::setw(10)<<Timing_proj/Timing_total*100.0<<"%"<<std::endl;
+        LOG::cout<<std::setw(20)<<"update_v "<<std::setw(10)<<Timing_update_v<<std::setw(10)<<Timing_update_v/Timing_total*100.0<<"%"<<std::endl;
+        LOG::cout<<std::setw(20)<<"update_p "<<std::setw(10)<<Timing_update_p<<std::setw(10)<<Timing_update_p/Timing_total*100.0<<"%"<<std::endl;
         if(f%frame_jump==0){
             for(int i=0;i<sim.particles.X.m;i++){
                 if(i>=air)
                     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(39.0,64.0,139.0)/255.0);
-//                else if(sim.particles.Xm(i).x<0.51)
-//                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
                 else
                     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(1,1,1));
             }
@@ -268,8 +285,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
             Flush_Frame<TV>("mpm");}
         LOG::cout<<std::endl;}
-
-    
 }
 
 int main(int argc,char *argv[])
