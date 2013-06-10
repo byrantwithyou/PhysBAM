@@ -58,7 +58,6 @@ template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>:
 ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D()
 {
     delete color_map;
-    delete &deformable_body_collection;
     delete color_map_relative_velocity;
     segmented_curve_objects.Delete_Pointers_And_Clean_Memory();
     triangulated_surface_objects.Delete_Pointers_And_Clean_Memory();

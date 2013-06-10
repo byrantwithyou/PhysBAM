@@ -66,9 +66,8 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(RIGID_BODY_COLLECTION<TV>& rigid_body_
 template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D()
 {
-    if(need_destroy_rigid_body_collection){
-        delete &rigid_body_collection;}
-    delete front_color_map;delete back_color_map;
+    delete front_color_map;
+    delete back_color_map;
     opengl_triangulated_surface.Delete_Pointers_And_Clean_Memory();
     opengl_tetrahedralized_volume.Delete_Pointers_And_Clean_Memory();
     opengl_levelset.Delete_Pointers_And_Clean_Memory();
