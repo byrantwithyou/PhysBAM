@@ -192,7 +192,7 @@ Solve_For_Pressure()
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=false;
-    solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
+    solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000000);
     pressure=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
     

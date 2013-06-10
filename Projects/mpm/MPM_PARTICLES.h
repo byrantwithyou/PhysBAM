@@ -55,6 +55,13 @@ public:
     template<class T_OBJECT> void Add_Randomly_Sampled_Object(const T_OBJECT& object,const T exclude_radius=(T)999)
     {Add_Randomly_Sampled_Implicit_Object(ANALYTIC_IMPLICIT_OBJECT<T_OBJECT>(object),exclude_radius);}
     void Add_Randomly_Sampled_Implicit_Object(const IMPLICIT_OBJECT<TV>& object,const T exclude_radius=(T)999);
+    template<class T_OBJECT> void Delete_Particles_In_Object_Lazy(const T_OBJECT& object)
+    {
+        ARRAY<TV> new_Xm;
+        for(int i=0;i<this->number;i++) if(!object.Lazy_Inside(Xm(i))) new_Xm.Append(Xm(i));
+        this->Resize(new_Xm.m);
+        X=Xm=new_Xm;
+    }
     void Set_Material_Properties(int start_index,int count,T mass_in,T mu_in,T lambda_in,bool compress_in);
     void Set_Initial_State(int start_index,int count,MATRIX<T,TV::m> Fe_in,MATRIX<T,TV::m> Fp_in,TV V_in);
     void Set_Plasticity(int start_index,int count,bool use_plasticity_yield_in,T yield_min_in,T yield_max_in,bool use_plasticity_clamp_in,T clamp_min_in,T clamp_max_in);

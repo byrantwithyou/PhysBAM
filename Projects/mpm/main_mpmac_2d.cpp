@@ -59,6 +59,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     if(!use_output_directory) output_directory=STRING_UTILITIES::string_sprintf("MPMAC_%dD_test_%d",TV::m,test_number);
 
+    int air=0;
     // geometry setting
     switch(test_number){
         case 1:{ // dam break
@@ -91,7 +92,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         case 2:{ // ralyeigh taylor
             sim.grid.Initialize(TV_INT(3.2*grid_res+1,3.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(1.6,1.6)));
             
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.465,-1.465),TV(1.465,-0.5)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.46,-1.46),TV(1.46,-0.5)),particle_exclude_radius);
             int c1=sim.particles.number;
             sim.particles.Set_Material_Properties(0,c1,
                                                   (T)8/1000, // mass per particle
@@ -110,10 +111,60 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                                             MATRIX<T,TV::m>::Identity_Matrix(), // Fp
                                             TV(0,0)); // initial velocity
             
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.465,-0.49),TV(1.465,0.49)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.46,-0.49),TV(1.46,0.49)),particle_exclude_radius);
             int c2=sim.particles.number-c1;
             sim.particles.Set_Material_Properties(c1,c2,
-                                                  (T)40/1000, // mass per particle
+                                                  (T)12/1000, // mass per particle
+                                                  0, // mu
+                                                  0, // lambda
+                                                  false); // compress
+            sim.particles.Set_Plasticity(c1,c2,
+                                         false,-1000,1.2, // plasticity_yield
+                                         false,-1,1); // plasticity_clamp
+            sim.particles.Set_Visco_Plasticity(c1,c2,
+                                               false,100, // visco_nu
+                                               5000, // visco_tau
+                                               0); // visco_kappa
+            sim.particles.Set_Initial_State(c1,c2,
+                                            MATRIX<T,TV::m>::Identity_Matrix(), // Fe
+                                            MATRIX<T,TV::m>::Identity_Matrix(), // Fp
+                                            TV(0,0)); // initial velocity
+            
+            
+            sim.use_gravity=true;
+            
+            break;}
+            
+        case 3:{ // droplet with air surroundings
+            sim.grid.Initialize(TV_INT(3.2*grid_res+1,3.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(1.6,1.6)));
+            
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.2,-1.2),TV(1.2,1.2)),particle_exclude_radius);
+            sim.particles.Delete_Particles_In_Object_Lazy(RANGE<TV>(TV(-1.2,-1.2),TV(1.2,-0.9)));
+            sim.particles.Delete_Particles_In_Object_Lazy(SPHERE<TV>(TV(0,1),0.2));
+            int c1=sim.particles.number;
+            sim.particles.Set_Material_Properties(0,c1,
+                                                  (T)0.1/1000.0, // mass per particle
+                                                  0, // mu
+                                                  0, // lambda
+                                                  false); // compress
+            sim.particles.Set_Plasticity(0,c1,
+                                         false,-1000,1.2, // plasticity_yield
+                                         false,-1,1); // plasticity_clamp
+            sim.particles.Set_Visco_Plasticity(0,c1,
+                                               false,100, // visco_nu
+                                               5000, // visco_tau
+                                               0); // visco_kappa
+            sim.particles.Set_Initial_State(0,c1,
+                                            MATRIX<T,TV::m>::Identity_Matrix(), // Fe
+                                            MATRIX<T,TV::m>::Identity_Matrix(), // Fp
+                                            TV(0,0)); // initial velocity
+            
+            air=c1;
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.2,-1.2),TV(1.2,-0.9)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0,1),0.2),particle_exclude_radius);
+            int c2=sim.particles.number-c1;
+            sim.particles.Set_Material_Properties(c1,c2,
+                                                  (T)100/1000.0, // mass per particle
                                                   0, // mu
                                                   0, // lambda
                                                   false); // compress
@@ -199,7 +250,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
         if(f%frame_jump==0){
             for(int i=0;i<sim.particles.X.m;i++){
-                if(sim.particles.Xm(i).y<-0.495)
+                if(i>=air)
                     Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(39.0,64.0,139.0)/255.0);
 //                else if(sim.particles.Xm(i).x<0.51)
 //                    Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
