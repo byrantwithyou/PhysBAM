@@ -15,6 +15,7 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
@@ -58,9 +59,10 @@ Force(const VECTOR_T& V,VECTOR_T& F) const
 
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(V.V.array,V.rigid_V.array);
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(V.V.array);
-    if(!velocity_update || !solids_evolution.solids_parameters.implicit_solve_parameters.use_half_fully_implicit) solid_body_collection.Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,dt,current_velocity_time+dt);
+    if(!velocity_update || !solids_evolution.solids_parameters.implicit_solve_parameters.use_half_fully_implicit)
+        solid_body_collection.solid_force_collection.Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,dt,current_velocity_time+dt);
     // we don't inherit velocity dependent forces to the drifted particles (contrary to the explicit velocity independent ones) because that would compromise symmetry
-    solid_body_collection.Add_Velocity_Dependent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,current_velocity_time+dt);
+    solid_body_collection.solid_force_collection.Add_Velocity_Dependent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,current_velocity_time+dt);
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(F.V.array);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(F.V.array,F.rigid_V.array);
     solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(F.rigid_V.array);

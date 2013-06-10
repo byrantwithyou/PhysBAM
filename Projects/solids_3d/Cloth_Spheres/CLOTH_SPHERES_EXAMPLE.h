@@ -140,17 +140,17 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data();
 
     TRIANGULATED_SURFACE<T>& master_triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>(1);
-    solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,master_triangulated_surface.mesh,0));
-    solid_body_collection.Add_Force(Create_Edge_Springs(master_triangulated_surface,(T)1e2,(T)2));
-    solid_body_collection.Add_Force(Create_Altitude_Springs(master_triangulated_surface,(T)1e2,(T)2));
-    solid_body_collection.Add_Force(Create_Bending_Elements(master_triangulated_surface,(T)3e-3));
+    solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,master_triangulated_surface.mesh,0));
+    solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(master_triangulated_surface,(T)1e2,(T)2));
+    solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(master_triangulated_surface,(T)1e2,(T)2));
+    solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Elements(master_triangulated_surface,(T)3e-3));
 
     for(int i=0;i<number_of_master_particles;i++){
         soft_bindings.Add_Binding(VECTOR<int,2>(number_of_master_particles+i,i),false);
         soft_bindings.Add_Binding(VECTOR<int,2>(2*number_of_master_particles+i,i),false);}
     soft_bindings.Initialize_Binding_Mesh();
     BINDING_SPRINGS<TV>& binding_springs=*Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,(T)1e3,(T)1);
-    solid_body_collection.Add_Force(&binding_springs);
+    solid_body_collection.solid_force_collection.Add_Force(&binding_springs);
     binding_stiffness.Resize(soft_bindings.bindings.m);binding_stiffness.Fill((T)5e2);
     binding_springs.Set_Stiffness(binding_stiffness);
     binding_springs.Set_Overdamping_Fraction((T)1);
@@ -191,7 +191,7 @@ void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
 
     T critical_distance=(T).01;
 
-    BINDING_SPRINGS<TV>& binding_springs=solid_body_collection.template Find_Force<BINDING_SPRINGS<TV>&>();
+    BINDING_SPRINGS<TV>& binding_springs=solid_body_collection.solid_force_collection.template Find_Force<BINDING_SPRINGS<TV>&>();
     binding_stiffness.Resize(soft_bindings.bindings.m);
     for(int b=0;b<soft_bindings.bindings.m;b++){
         TV& X1=particles.X(soft_bindings.bindings(b)(1));

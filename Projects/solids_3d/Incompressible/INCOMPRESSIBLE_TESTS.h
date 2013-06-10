@@ -672,7 +672,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             soft_bindings.use_impulses_for_collisions.Fill(false);
             soft_bindings.Initialize_Binding_Mesh();
             LOG::Stat("binding stiffness",binding_stiffness);
-            solid_body_collection.Add_Force(Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,binding_stiffness,(T)1));}
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,binding_stiffness,(T)1));}
         else if(use_tet_collisions){
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             for(int s=0;s<deformable_body_collection.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(s)))
@@ -692,7 +692,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         else{LOG::cout<<"needs 2 or 4 procs"<<std::endl;PHYSBAM_FATAL_ERROR();}}
     
     LOG::cout<<"number of particles: "<<deformable_body_collection.particles.Size()<<std::endl;
-    if(use_gravity) solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+    if(use_gravity) solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
     {LOG::SCOPE scope("creating finite volume","creating finite volume");
     LOG::Stat("use_neohookean",use_neohookean);
     LOG::Stat("youngs_modulus",youngs_modulus);
@@ -724,8 +724,8 @@ void Add_Incompressible_Force(T_OBJECT* object)
     if(use_neohookean) constitutive_model=new NEO_HOOKEAN<T,d>(youngs_modulus,internal_poissons_ratio,hardening_deformation,hardening_strength);
     else constitutive_model=new SPLINE_MODEL<T,d>(youngs_modulus,internal_poissons_ratio,hardening_deformation,hardening_strength);
     INCOMPRESSIBLE_FINITE_VOLUME<TV,d>& fvm=*Create_Incompressible_Finite_Volume(*object);
-    solid_body_collection.Add_Force(&fvm);
-    solid_body_collection.Add_Force(Create_Finite_Volume(*object,constitutive_model));
+    solid_body_collection.solid_force_collection.Add_Force(&fvm);
+    solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(*object,constitutive_model));
     fvm.mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
     fvm.merge_at_boundary=merge_at_boundary;
     fvm.minimum_volume_recovery_time_scale=minimum_volume_recovery_time_scale;
@@ -784,7 +784,7 @@ void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
-    if(BINDING_SPRINGS<TV>* binding_springs=solid_body_collection.template Find_Force<BINDING_SPRINGS<TV>*>()){
+    if(BINDING_SPRINGS<TV>* binding_springs=solid_body_collection.solid_force_collection.template Find_Force<BINDING_SPRINGS<TV>*>()){
         T critical_distance=(T).01;
         T base_stiffness=binding_springs->constant_stiffness;
         ARRAY<T>& stiffness=binding_springs->stiffness;stiffness.Resize(soft_bindings.bindings.m);

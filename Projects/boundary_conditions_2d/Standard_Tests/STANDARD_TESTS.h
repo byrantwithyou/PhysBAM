@@ -34,8 +34,10 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
@@ -364,9 +366,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
 
-    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
-    for(int k=0;k<deformable_body_collection.deformables_forces.m;k++) deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
-    for(int i=0;i<rigid_body_collection.rigids_forces.m;i++) rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->compute_half_forces=true;
+    for(int k=0;k<deformable_body_collection.deformable_force_collection.deformables_forces.m;k++) deformable_body_collection.deformable_force_collection.deformables_forces(k)->compute_half_forces=true;
+    for(int i=0;i<rigid_body_collection.rigid_force_collection.rigids_forces.m;i++) rigid_body_collection.rigid_force_collection.rigids_forces(i)->compute_half_forces=true;
 }
 //#####################################################################
 // Function Mark_Outside

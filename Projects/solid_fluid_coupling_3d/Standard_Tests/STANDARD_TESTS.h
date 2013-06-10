@@ -28,8 +28,10 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SEGMENT_BENDING_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/TRIANGLE_BENDING_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
@@ -396,7 +398,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
-    solid_body_collection.Set_CFL_Number(10);
+    solid_body_collection.solid_force_collection.Set_CFL_Number(10);
 
     if(test_number==1){
         RIGID_BODY<TV>& rigid_body=solids_tests.Add_Rigid_Body("sphere",(T).1,(T)0);
@@ -456,32 +458,32 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     T solid_gravity=(T)9.8;
     if(test_number==1){
         solids_tests.Add_Ground();
-        solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
+        solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
         Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_id));}
     else if(test_number==2){
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(tetrahedralized_volume,2000);
         tetrahedralized_volume.Initialize_Hierarchy();
-        solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)4e5,(T).45,(T).01)));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)4e5,(T).45,(T).01)));
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(tetrahedralized_volume.Get_Boundary_Object());
         deformable_collisions.object.Initialize_Hierarchy();
         Add_To_Fluid_Simulation(deformable_collisions);
     }
     else if(test_number==3){
         solid_gravity=(T)9.8;
-        solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
+        solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
         solids_tests.Add_Ground();
         TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
         T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
-        solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
+        solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
         T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-        solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
         triangulated_surface.Initialize_Hierarchy();
         fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_surface),0,true);}
     else if(test_number==4 || test_number==5){
         TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
-        solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)5,(T)3,false,(T).1,true,(T)0,true,true));
-        solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,5/(1+sqrt((T)2)),(T)1,false,(T).1,true,(T)0,true,true));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)5,(T)3,false,(T).1,true,(T)0,true,true));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(triangulated_surface,5/(1+sqrt((T)2)),(T)1,false,(T).1,true,(T)0,true,true));
 
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_surface);
         deformable_collisions.object.Initialize_Hierarchy();
@@ -493,9 +495,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         //solids_tests.Add_Ground();
     }
 
-    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
-    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->compute_half_forces=true;
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces(k)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces(i)->compute_half_forces=true;
 }
 //#####################################################################
 };

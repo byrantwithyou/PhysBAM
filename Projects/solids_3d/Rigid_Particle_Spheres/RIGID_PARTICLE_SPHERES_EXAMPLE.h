@@ -118,7 +118,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     implicit_zero_rest_length_springs.Set_Overdamping_Fraction(overdamping_fraction);
     implicit_zero_rest_length_springs.use_implicit_velocity_independent_forces=true;*/
 
-    solid_body_collection.Add_Force(&implicit_zero_rest_length_springs);
+    solid_body_collection.solid_force_collection.Add_Force(&implicit_zero_rest_length_springs);
 }
 //#####################################################################
 // Function Deformable_Segment

@@ -62,6 +62,7 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
@@ -146,7 +147,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-prunestacks",&prune_stacks_from_contact,"Do something quick for stacks during contact");
     parse_args->Add("-velocityprune",&prune_contact_using_velocity,"Let collisions handle pairs with high velocity");
     parse_args->Add_Not("-noanalytic",&solids_parameters.rigid_body_collision_parameters.use_analytic_collisions,"disable analytic collisions");
-    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+    parse_args->Add("-print_energy",&solid_body_collection.solid_force_collection.print_energy,"print energy statistics");
     parse_args->Add("-noanalyticlevelsets",&use_nonanalytic_levelsets,"prevent usage of analytic levelsets");
     parse_args->Add("-createpattern",&createpattern,"create a fracture pattern");
 }

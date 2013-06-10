@@ -14,6 +14,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include "MASS_WEIGHTED_SELF_COLLISIONS.h"
 using namespace PhysBAM;
 //#####################################################################
@@ -147,21 +148,21 @@ Initialize_Bodies()
     switch(test_number){
         case 1:{
             TRIANGULATED_SURFACE<T>& surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>(0);
-            //solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,false));
-            solid_body_collection.Add_Force(Create_Edge_Springs(surface,(T)1000,(T)2)); // were *2 and *10
+            //solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,false));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(surface,(T)1000,(T)2)); // were *2 and *10
         }break;
         case 2:{
             SEGMENTED_CURVE<TV>& curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
-            solid_body_collection.Add_Force(Create_Edge_Springs(curve,(T)1000,(T)2)); // were *2 and *10
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(curve,(T)1000,(T)2)); // were *2 and *10
         }break;
         case 3:{
             SEGMENTED_CURVE<TV>& curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
-            solid_body_collection.Add_Force(Create_Edge_Springs(curve,(T)1000,(T)2)); // were *2 and *10
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(curve,(T)1000,(T)2)); // were *2 and *10
         }break;
         case 4:{
             TRIANGULATED_SURFACE<T>& surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>(0);
-            //solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,false));
-            solid_body_collection.Add_Force(Create_Edge_Springs(surface,(T)1000,(T)2)); // were *2 and *10
+            //solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,false));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(surface,(T)1000,(T)2)); // were *2 and *10
         }break;
     }
 }

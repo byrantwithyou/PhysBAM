@@ -71,6 +71,7 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Bindings/RIGID_BODY_BINDING.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
@@ -153,7 +154,7 @@ public:
         BASE::Register_Options();
         ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
         parse_args->Add("-parameter",&parameter,"value","general use parameter");
-        parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+        parse_args->Add("-print_energy",&solid_body_collection.solid_force_collection.print_energy,"print energy statistics");
         parse_args->Add_Not("-disable_prestab",&arb.use_prestab,"disable prestabilization");
         parse_args->Add_Not("-disable_poststab",&arb.use_poststab,"disable poststabilization");
         parse_args->Add("-use_krylov_poststab",&arb.use_krylov_poststab,"use krylov poststabilization");

@@ -29,8 +29,10 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
@@ -288,7 +290,7 @@ First_Order_Time_Step(int substep,T dt)
 
     if(example.use_kang) old_phi=fluids_parameters.particle_levelset_evolution->Levelset(0).phi;
 
-    example.solid_body_collection.Print_Energy(time,1);
+    example.solid_body_collection.solid_force_collection.Print_Energy(time,1);
     collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
     collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);  // static occupied blocks
     // swept occupied blocks
@@ -315,8 +317,8 @@ First_Order_Time_Step(int substep,T dt)
     
 
     example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
-    example.solid_body_collection.Update_Position_Based_State(time+dt,true);
-//    example.solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<VECTOR<T,2> >*>()->Dump_Curvatures();
+    example.solid_body_collection.solid_force_collection.Update_Position_Based_State(time+dt,true);
+//    example.solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<SURFACE_TENSION_FORCE<VECTOR<T,2> >*>()->Dump_Curvatures();
     if(slip){
         slip->two_phase=example.two_phase;
         slip->Solve(face_velocities,dt,time,time+dt,false,false);}
@@ -586,9 +588,9 @@ Compute_Dt(const T time,const T target_time,bool& done)
 
     // solids dt
     T solids_dt=FLT_MAX;
-    if(solids_evolution.Use_CFL()) solids_dt=min(solids_dt,example.solid_body_collection.CFL(solids_parameters.verbose_dt));
+    if(solids_evolution.Use_CFL()) solids_dt=min(solids_dt,example.solid_body_collection.solid_force_collection.CFL(solids_parameters.verbose_dt));
     solids_dt=min(solids_dt,solids_evolution_callbacks->Constraints_CFL());
-    solids_dt=min(solids_dt,example.solid_body_collection.rigid_body_collection.CFL_Rigid(solids_parameters.rigid_body_evolution_parameters,solids_parameters.verbose_dt));
+    solids_dt=min(solids_dt,example.solid_body_collection.rigid_body_collection.rigid_force_collection.CFL_Rigid(solids_parameters.rigid_body_evolution_parameters,solids_parameters.verbose_dt));
     solids_evolution_callbacks->Limit_Solids_Dt(solids_dt,time);
 
     if(example.fixed_dt){fluids_dt=example.fixed_dt;solids_dt=example.fixed_dt;}

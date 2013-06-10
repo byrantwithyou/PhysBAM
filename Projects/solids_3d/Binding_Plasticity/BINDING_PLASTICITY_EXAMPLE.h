@@ -337,16 +337,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     // binding springs
     solid_body_collection.deformable_body_collection.soft_bindings.Initialize_Binding_Mesh();
     spring_force=Create_Edge_Binding_Springs(deformable_body_collection.particles,*solid_body_collection.deformable_body_collection.soft_bindings.binding_mesh,(T)1e5,(T)1);
-    solid_body_collection.Add_Force(spring_force);
-    solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-    solid_body_collection.Add_Force(Create_Finite_Volume(mattress,new NEO_HOOKEAN<T,3>((T)5e6,(T).45,(T).01,(T).25),true,(T).1));
+    solid_body_collection.solid_force_collection.Add_Force(spring_force);
+    solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+    solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(mattress,new NEO_HOOKEAN<T,3>((T)5e6,(T).45,(T).01,(T).25),true,(T).1));
 
     // create an elastic force on the drifted surface
-    solid_body_collection.Add_Force(Create_Edge_Springs(embedding.material_surface,(T)1e4,(T)1));
+    solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(embedding.material_surface,(T)1e4,(T)1));
     TRIANGLE_BENDING_ELEMENTS<T>* bend=Create_Bending_Elements(embedding.material_surface,(T)1e4);
     bend->Set_Area_Cutoff_From_Triangulated_Surface(embedding.material_surface,(T).1);
     bend->use_force_differential=false;
-    solid_body_collection.Add_Force(bend);
+    solid_body_collection.solid_force_collection.Add_Force(bend);
 
     solid_body_collection.Update_Simulated_Particles();
 

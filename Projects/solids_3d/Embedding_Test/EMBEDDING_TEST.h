@@ -273,8 +273,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     
     if(test_number==1){
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-        solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,tetrahedralized_volume.mesh,0));
-        solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
+        solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,tetrahedralized_volume.mesh,0));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
         if(false && target_position){
             SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
             LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(segmented_curve,100/(1+sqrt((T)2)),(T)1);
@@ -282,37 +282,37 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             //spring_force->Set_Restlength(restlengths);
             spring_force->Clamp_Restlength((T).1);
             spring_force->Set_Overdamping_Fraction(3);
-            solid_body_collection.Add_Force(spring_force);}
+            solid_body_collection.solid_force_collection.Add_Force(spring_force);}
         soft_bindings.Initialize_Binding_Mesh();
         soft_bindings.binding_mesh->elements.Append(VECTOR<int,2>(7,8));
         soft_bindings.use_impulses_for_collisions.Fill(false);
-        if(use_zero_length_springs) solid_body_collection.Add_Force(Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,(T)1e2,(T)1));
+        if(use_zero_length_springs) solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,(T)1e2,(T)1));
         else{
             LINEAR_SPRINGS<TV>* springs=Create_Edge_Springs(particles,*soft_bindings.binding_mesh,(T)1e1,(T)1);
             springs->Clamp_Restlength((T).1);
             springs->Set_Overdamping_Fraction(1);
-            solid_body_collection.Add_Force(springs);}}
+            solid_body_collection.solid_force_collection.Add_Force(springs);}}
     else if(test_number==2){
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-        solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,tetrahedralized_volume.mesh,0));
-        solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
+        solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,tetrahedralized_volume.mesh,0));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
         soft_bindings.Initialize_Binding_Mesh();
         if(use_zero_length_springs){
             soft_bindings.use_impulses_for_collisions.Fill(false);
             LOG::cout<<"stiffness "<<stiffness<<std::endl;
-            //solid_body_collection.Add_Force(Create_Edge_Binding_Springs(*soft_bindings.binding_mesh,particles,stiffness,(T)3));}
+            //solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Binding_Springs(*soft_bindings.binding_mesh,particles,stiffness,(T)3));}
             LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(particles,*soft_bindings.binding_mesh,stiffness,(T)3);
-            solid_body_collection.Add_Force(spring_force);
+            solid_body_collection.solid_force_collection.Add_Force(spring_force);
             spring_force->Clamp_Restlength((T).01);
             spring_force->Set_Overdamping_Fraction(2);}}
     if(test_number==3 || test_number==4){
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-        solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,tetrahedralized_volume.mesh,0));
-        solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
+        solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,tetrahedralized_volume.mesh,0));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
         SEGMENTED_CURVE<TV>& curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
         LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(curve,100/(1+sqrt((T)2)),(T)1);
         spring_force->Clamp_Restlength((T).1);
-        solid_body_collection.Add_Force(spring_force);}
+        solid_body_collection.solid_force_collection.Add_Force(spring_force);}
 }
 //#####################################################################
 // Function Set_External_Velocities

@@ -23,6 +23,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Intersections/RAY_SEGMENTED_CURVE_2D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SURFACE_TENSION_FORCE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
@@ -309,7 +310,7 @@ Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T cu
     if(coupled_system->fluid_to_solid_interpolation)
         if(FLUID_TO_SOLID_INTERPOLATION_CUT<TV>* temp_interpolate=dynamic_cast<FLUID_TO_SOLID_INTERPOLATION_CUT<TV>*>(coupled_system->fluid_to_solid_interpolation)){
             temp_interpolate->Setup_Before_Compute(coupled_system->index_map.boundary_condition_collection.psi_D,coupled_system->index_map.boundary_condition_collection.psi_N);
-            if(SURFACE_TENSION_FORCE<VECTOR<T,2> >* force=solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<VECTOR<T,2> >*>()) force->Dump_Curvatures();}
+            if(SURFACE_TENSION_FORCE<VECTOR<T,2> >* force=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<SURFACE_TENSION_FORCE<VECTOR<T,2> >*>()) force->Dump_Curvatures();}
 
     coupled_system->debug_velocity=&incompressible_face_velocities;
     coupled_system->debug_generalized_velocity=&V;

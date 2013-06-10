@@ -690,14 +690,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
     
 #if 1
-    solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
+    solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
 #endif
     switch(test_number){
         case 1:{
             TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             std::cout<<"Setting density "<<solid_density<<std::endl;
-            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_area,(T)5e2/(1+sqrt((T)2)),(T)10));
-            solid_body_collection.Add_Force(Create_Altitude_Springs(triangulated_area,(T)5e2));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_area,(T)5e2/(1+sqrt((T)2)),(T)10));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(triangulated_area,(T)5e2));
             DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_area.Get_Boundary_Object());
             deformable_collisions.object.Initialize_Hierarchy();
             Add_To_Fluid_Simulation(deformable_collisions);
@@ -722,8 +722,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             // Set up cloth forces
             SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.structures(deformable_object_id));
             segmented_curve.Initialize_Hierarchy();
-            solid_body_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)3e4,(T)1,false,(T).1,true,(T)0,true,true));
-            solid_body_collection.Add_Force(Create_Segment_Bending_Springs(segmented_curve,(T)2/(1+sqrt((T)2)),(T)2,false,(T).1,true,(T)0,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)3e4,(T)1,false,(T).1,true,(T)0,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Segment_Bending_Springs(segmented_curve,(T)2/(1+sqrt((T)2)),(T)2,false,(T).1,true,(T)0,true,true));
             DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(segmented_curve);
 
             Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(heavy_sphere_index));
@@ -733,8 +733,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 8:{
             SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.structures(deformable_object_id));
             segmented_curve.Initialize_Hierarchy();
-            solid_body_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)2e3,(T)4,false,(T).1,true,(T)0,true,true));
-            solid_body_collection.Add_Force(Create_Segment_Bending_Springs(segmented_curve,(T)2/(1+sqrt((T)2)),(T)2,false,(T).1,true,(T)0,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)2e3,(T)4,false,(T).1,true,(T)0,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Segment_Bending_Springs(segmented_curve,(T)2/(1+sqrt((T)2)),(T)2,false,(T).1,true,(T)0,true,true));
             DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(segmented_curve);
             Add_To_Fluid_Simulation(deformable_collisions);
             solids_tests.Add_Ground();
@@ -749,20 +749,20 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 if(rigid_body_to_add.thin_shell) Add_Thin_Shell_To_Fluid_Simulation(rigid_body_to_add); else Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_to_add);}
             break;}
         case 12:{
-            // solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
+            // solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
             // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1));
             Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1));
             Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
             break;}
         case 13:{
-            // solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
+            // solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
             // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1));
             Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()-1));
             Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
             
             // TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             // triangulated_area.Initialize_Hierarchy();
-            // solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>((T)1e3,(T).45,(T).01)));
+            // solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>((T)1e3,(T).45,(T).01)));
             // DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_area.Get_Boundary_Object());
             // deformable_collisions.object.Initialize_Hierarchy();
             // Add_To_Fluid_Simulation(deformable_collisions,true,false);

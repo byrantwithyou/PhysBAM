@@ -125,10 +125,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
 
-    solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+    solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
 
-    solid_body_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)1e2,(T)1));
-    //solid_body_collection.Add_Force(Create_Bending_Elements(segmented_curve,(T)1e1,(T)1));
+    solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)1e2,(T)1));
+    //solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Elements(segmented_curve,(T)1e1,(T)1));
 
     solid_body_collection.Update_Simulated_Particles();
 

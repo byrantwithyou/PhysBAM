@@ -27,6 +27,7 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER_LAPLACE.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
@@ -207,7 +208,7 @@ Initialize_Solid_Fluid_Coupling_After_Grid_Initialization()
             EULER_FLUID_FORCES<T_GRID>* euler_fluid_forces=new EULER_FLUID_FORCES<T_GRID>(euler.grid,euler_solid_fluid_coupling_utilities.pressure_at_faces,euler_solid_fluid_coupling_utilities.solid_fluid_face_time_n,
                 euler_solid_fluid_coupling_utilities.cells_inside_fluid_time_n,euler_solid_fluid_coupling_utilities.collision_bodies_affecting_fluid,
                 solid_body_collection.deformable_body_collection.particles,solid_body_collection.rigid_body_collection);
-            solid_body_collection.Add_Force(euler_fluid_forces);}}
+            solid_body_collection.solid_force_collection.Add_Force(euler_fluid_forces);}}
 
     if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(solids_evolution))
         coupled_evolution->Setup_Boundary_Condition_Collection();

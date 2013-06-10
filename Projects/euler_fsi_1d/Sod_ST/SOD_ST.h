@@ -299,7 +299,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         // correct mass
         solid_body_collection.deformable_body_collection.particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
 
-        solid_body_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)10,(T)1.5));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)10,(T)1.5));
 
         POINT_SIMPLICES_1D<T>& point_simplices_1d=segmented_curve.Get_Boundary_Object();
 

@@ -23,6 +23,7 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/WIND_DRAG_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include "HAIR_STRAND_TESTS.h"
 
 /* STRAND TESTS
@@ -186,32 +187,32 @@ Initialize_Bodies()
     // Forces
     //################################################################
     bool strain_limit=false,use_implicit=false;
-    solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
+    solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
 
     LINEAR_SPRINGS<TV>* edge_springs=Create_Edge_Springs(edges,edge_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
     edge_springs->Clamp_Restlength(restlength_clamp);
-    solid_body_collection.Add_Force(edge_springs);
+    solid_body_collection.solid_force_collection.Add_Force(edge_springs);
     LINEAR_SPRINGS<TV>* extra_edge_springs=Create_Edge_Springs(extra_edges,edge_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
     extra_edge_springs->Clamp_Restlength(restlength_clamp);
-    solid_body_collection.Add_Force(extra_edge_springs);
+    solid_body_collection.solid_force_collection.Add_Force(extra_edge_springs);
     LINEAR_SPRINGS<TV>* bending_springs=Create_Edge_Springs(bending_edges,bending_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
     bending_springs->Clamp_Restlength(restlength_clamp);
-    solid_body_collection.Add_Force(bending_springs);
+    solid_body_collection.solid_force_collection.Add_Force(bending_springs);
     LINEAR_SPRINGS<TV>* torsion_springs=Create_Edge_Springs(torsion_edges,torsion_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
     torsion_springs->Clamp_Restlength(restlength_clamp);
-    solid_body_collection.Add_Force(torsion_springs);
+    solid_body_collection.solid_force_collection.Add_Force(torsion_springs);
     LINEAR_TET_SPRINGS<T> *tet_springs=Create_Tet_Springs(*volume,altitude_stiffness,overdamping_fraction,false,(T).1,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
     tet_springs->Clamp_Restlength(restlength_clamp);
-    solid_body_collection.Add_Force(tet_springs);
+    solid_body_collection.solid_force_collection.Add_Force(tet_springs);
     // drag forces
 #if 0
     if(test_number>1 && test_number<8){
-        WIND_DRAG_3D<T>* drag=new WIND_DRAG_3D<T>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,volume->Get_Boundary_Object());solid_body_collection.Add_Force(drag);
+        WIND_DRAG_3D<T>* drag=new WIND_DRAG_3D<T>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,volume->Get_Boundary_Object());solid_body_collection.solid_force_collection.Add_Force(drag);
         drag->Use_Linear_Normal_Viscosity(1);drag->Use_Constant_Wind(0,TV());}
 #endif
     //if(test_number==8){
         ETHER_DRAG<GRID<TV> >* ether_drag=new ETHER_DRAG<GRID<TV> >(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true);
-        solid_body_collection.Add_Force(ether_drag);
+        solid_body_collection.solid_force_collection.Add_Force(ether_drag);
         ether_drag->Use_Constant_Wind(ether_drag_wind);//}
 
     //hairs
@@ -242,7 +243,7 @@ Initialize_Bodies()
         int max_connections=1;
         segment_adhesion=new SEGMENT_ADHESION<TV>(particles,edges.mesh,particle_to_spring_id,solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.intersecting_edge_edge_pairs);
         segment_adhesion->Set_Parameters(adhesion_stiffness,(T)10,adhesion_start_radius,adhesion_stop_radius,max_connections);
-        solid_body_collection.Add_Force(segment_adhesion);
+        solid_body_collection.solid_force_collection.Add_Force(segment_adhesion);
         segment_adhesion->Write_State(stream_type,output_directory+"/adhesion.0");
         segment_adhesion->Update_Partitions(false,solid_body_collection.deformable_body_collection.mpi_solids,output_directory);}
 
@@ -445,7 +446,7 @@ Update_Time_Varying_Material_Properties(const T time)
     //start wind
     if(test_number>=6 && test_number<8){
         if(time>wind_start_time){
-            WIND_DRAG_3D<T>& drag=solid_body_collection.template Find_Force<WIND_DRAG_3D<T>&>();
+            WIND_DRAG_3D<T>& drag=solid_body_collection.solid_force_collection.template Find_Force<WIND_DRAG_3D<T>&>();
             drag.Use_Linear_Normal_Viscosity(17);drag.Use_Constant_Wind(0,TV(0,0,(T)-1.));}}
     //stop wind
     if(test_number==7){
@@ -453,7 +454,7 @@ Update_Time_Varying_Material_Properties(const T time)
             INTERPOLATION_CURVE<T,TV> wind_stop;
             wind_stop.Add_Control_Point(wind_stop_time-(T).3,TV(0,0,(T)-.25));
             wind_stop.Add_Control_Point(wind_stop_time,TV());
-            WIND_DRAG_3D<T>& drag=solid_body_collection.template Find_Force<WIND_DRAG_3D<T>&>();
+            WIND_DRAG_3D<T>& drag=solid_body_collection.solid_force_collection.template Find_Force<WIND_DRAG_3D<T>&>();
             drag.Use_Linear_Normal_Viscosity(0);drag.Use_Constant_Wind(0,TV());}}
 }
 //#####################################################################

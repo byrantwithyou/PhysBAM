@@ -67,8 +67,10 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_CLUSTER_CONSTITUENT_ID.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
@@ -137,7 +139,7 @@ public:
         parse_args->Add("-small_block_mass",&small_block_mass,"value","mass for small blocks in plank test");
         parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
         parse_args->Add_Not("-noanalytic",&solids_parameters.rigid_body_collision_parameters.use_analytic_collisions,"disable analytic collisions");
-        parse_args->Add("-print_energy",&solid_body_collection.rigid_body_collection.print_energy,"print energy statistics");
+        parse_args->Add("-print_energy",&solid_body_collection.rigid_body_collection.rigid_force_collection.print_energy,"print energy statistics");
     }
     void Parse_Options() PHYSBAM_OVERRIDE
     {
@@ -263,7 +265,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     // add forces
     if(test_number==16){
         rigid_body_particles_with_ether_drag.Append(1);
-        solid_body_collection.Add_Force(new RIGID_ETHER_DRAG<GRID<TV> >(solid_body_collection.rigid_body_collection,&rigid_body_particles_with_ether_drag,(T).5,(T).5));}
+        solid_body_collection.solid_force_collection.Add_Force(new RIGID_ETHER_DRAG<GRID<TV> >(solid_body_collection.rigid_body_collection,&rigid_body_particles_with_ether_drag,(T).5,(T).5));}
     else if(test_number==17){
         for(int i=2;i<=3;i++){
             PHYSBAM_NOT_IMPLEMENTED("RIGID_BODY_BASIC_FORCES is obsolete");
@@ -272,7 +274,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //             basic_forces->Set_Wind_Density((T).1);
 //             basic_forces->Use_Constant_Wind(0,TV(1,0,0));
         }}
-    if(test_number!=23 && test_number!=26 && test_number!=27 && test_number!=28) solid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,true));
+    if(test_number!=23 && test_number!=26 && test_number!=27 && test_number!=28) solid_body_collection.solid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,true));
 }
 //#####################################################################
 // Function Bounce
@@ -914,7 +916,7 @@ void Cluster_Cluster_Interaction()
     referenced_rigid_particles->Append(rigid_body_6->particle_index);
     referenced_rigid_particles->Append(rigid_body_7->particle_index);
     referenced_rigid_particles->Append(rigid_body_8->particle_index);
-    solid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
+    solid_body_collection.solid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
     //solids_parameters.rigid_body_collision_parameters.use_push_out=false;
 }
 //#####################################################################
@@ -983,7 +985,7 @@ void Cluster_Cluster_Interaction_Kinematic()
     referenced_rigid_particles->Append(rigid_body_2->particle_index);
     referenced_rigid_particles->Append(rigid_body_5->particle_index);
     referenced_rigid_particles->Append(rigid_body_6->particle_index);
-    solid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
+    solid_body_collection.solid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
     //solids_parameters.rigid_body_collision_parameters.use_push_out=false;
 }
 //#####################################################################
@@ -1019,7 +1021,7 @@ void Push_Out()
     referenced_rigid_particles->Append(rigid_body_1->particle_index);
     referenced_rigid_particles->Append(rigid_body_2->particle_index);
     referenced_rigid_particles->Append(rigid_body_3->particle_index);
-    solid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
+    solid_body_collection.solid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
 }
 //#####################################################################
 // Function Removed_Bodies
@@ -1082,7 +1084,7 @@ void Drop_Cubes()
     
     tests.Add_Ground(0,0,0);
 
-    solid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,(ARRAY<int>*)0));
+    solid_body_collection.solid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,(ARRAY<int>*)0));
 }
 //#####################################################################
 // Function Build_Deforming_Sphere
@@ -1177,7 +1179,7 @@ void Cluster_Fracture()
     //RIGID_BODY<TV>* rigid_body_cluster=&rigid_body_collection.Rigid_Body(cluster_particle);
     //rigid_body_cluster->name="cluster");
     
-    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
+    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
 }
 //#####################################################################
 // Function Sphere_Sanity_Tests

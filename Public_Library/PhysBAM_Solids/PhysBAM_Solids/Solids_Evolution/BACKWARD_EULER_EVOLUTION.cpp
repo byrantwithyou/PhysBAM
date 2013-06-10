@@ -16,6 +16,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/BACKWARD_EULER_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
@@ -47,9 +48,9 @@ public:
     void Multiply(const KRYLOV_VECTOR_BASE<T>& bdV,KRYLOV_VECTOR_BASE<T>& bdF) const PHYSBAM_OVERRIDE
     {const KRYLOV_VECTOR_T& dV=debug_cast<const KRYLOV_VECTOR_T&>(bdV);KRYLOV_VECTOR_T& dF=debug_cast<KRYLOV_VECTOR_T&>(bdF);
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(dV.v.array);
-    solid_body_collection.Force_Differential(dV.v.array,dF.v.array,time);
+    solid_body_collection.solid_force_collection.Force_Differential(dV.v.array,dF.v.array,time);
     dF.v*=dt; // include embedded particles
-    solid_body_collection.Add_Velocity_Dependent_Forces(dV.v.array,rigid_dV,dF.v.array,rigid_dF,time);
+    solid_body_collection.solid_force_collection.Add_Velocity_Dependent_Forces(dV.v.array,rigid_dV,dF.v.array,rigid_dF,time);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(dF.v.array);
     for(int p=0;p<dV.v.Size();p++) dF.v(p)=dV.v(p)-dt*one_over_mass(p)*dF.v(p);}
 
@@ -99,7 +100,8 @@ One_Newton_Step_Backward_Euler(const T dt,const T time,ARRAY_VIEW<const TV> V_sa
 
     F.v.Fill(TV());
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();
-    solid_body_collection.Add_All_Forces(F.v.array,rigid_F_full,time);example_forces_and_velocities.Add_External_Forces(F.v.array,time);
+    solid_body_collection.solid_force_collection.Add_All_Forces(F.v.array,rigid_F_full,time);
+    example_forces_and_velocities.Add_External_Forces(F.v.array,time);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(F.v.array);
     for(int p=0;p<B.v.Size();p++) B.v.array(p)=V_save(p)-V.array(p)+dt*one_over_mass(p)*F.v.array(p);
 
@@ -124,10 +126,11 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) // TOD
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
 
-    solid_body_collection.Enforce_Definiteness(true);example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
+    solid_body_collection.solid_force_collection.Enforce_Definiteness(true);
+    example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
     example_forces_and_velocities.Set_External_Velocities(particles.V,time+dt,time+dt);
     Euler_Step_Position(dt,time); // initial guess
-    solid_body_collection.Update_Position_Based_State(time+dt,false);
+    solid_body_collection.solid_force_collection.Update_Position_Based_State(time+dt,false);
 
     ARRAY<TV> V_save(particles.V.Subset(solid_body_collection.deformable_body_collection.dynamic_particles));
     ARRAY<TWIST<TV> > rigid_R_full;
@@ -145,11 +148,11 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) // TOD
         V+=dV;
         for(int p=0;p<X.Size();p++) X(p)+=dt*dV(p);
         binding_list.Clamp_Particles_To_Embedded_Positions();
-        solid_body_collection.Update_Position_Based_State(time+dt,false);
+        solid_body_collection.solid_force_collection.Update_Position_Based_State(time+dt,false);
         // compute residual
         R.array.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Fill(TV());
 
-        solid_body_collection.Add_All_Forces(R.array,rigid_R_full,time+dt);
+        solid_body_collection.solid_force_collection.Add_All_Forces(R.array,rigid_R_full,time+dt);
         example_forces_and_velocities.Add_External_Forces(R.array,time+dt);
         binding_list.Distribute_Force_To_Parents(R.array);
         INDIRECT_ARRAY<ARRAY_VIEW<T> > one_over_mass(particles.one_over_mass,solid_body_collection.deformable_body_collection.dynamic_particles);

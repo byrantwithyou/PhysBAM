@@ -29,6 +29,7 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <limits>
@@ -144,9 +145,9 @@ Initialize_Deformable_Objects(const T frame_rate,const bool restart)
         solids_parameters.deformable_object_collision_parameters.spatial_partition_number_of_cells,
         solids_parameters.deformable_object_collision_parameters.spatial_partition_voxel_size_scale_factor);
 
-    solid_body_collection.Set_CFL_Number(solids_parameters.cfl);
+    solid_body_collection.solid_force_collection.Set_CFL_Number(solids_parameters.cfl);
     solid_body_collection.Update_Time_Varying_Material_Properties(time);
-    solid_body_collection.Update_Position_Based_State(time,true);
+    solid_body_collection.solid_force_collection.Update_Position_Based_State(time,true);
 }
 //#####################################################################
 // Function Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions
@@ -199,7 +200,7 @@ Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,i
         for(int p=0;p<particles.Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
     else{particles.V=V_save;return false;} // restore all the unmodified velocities
     solid_body_collection.example_forces_and_velocities->Update_Time_Varying_Material_Properties(time);
-    solid_body_collection.Update_Position_Based_State(time,false);
+    solid_body_collection.solid_force_collection.Update_Position_Based_State(time,false);
 
     return true;
 }

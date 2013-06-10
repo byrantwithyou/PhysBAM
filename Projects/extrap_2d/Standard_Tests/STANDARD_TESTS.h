@@ -70,9 +70,11 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
@@ -174,14 +176,14 @@ public:
     void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     {
         if(test_forces){
-            solid_body_collection.deformable_body_collection.Test_Energy(time);
-            solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
+            solid_body_collection.deformable_body_collection.deformable_force_collection.Test_Energy(time);
+            solid_body_collection.deformable_body_collection.deformable_force_collection.Test_Force_Derivatives(time);}
     }
     void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     {
         if (dump_sv)
         {
-            FINITE_VOLUME<TV,2>& force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
+            FINITE_VOLUME<TV,2>& force_field=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
             ARRAY<DIAGONAL_MATRIX<T,2> >& sv=force_field.Fe_hat;
             
             for (int i=0;i<sv.m;i++)
@@ -191,7 +193,7 @@ public:
         }
         if(scatter_plot) Update_Scatter_Plot();
         if(energy_profile_plot){
-            FINITE_VOLUME<TV,2>& force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
+            FINITE_VOLUME<TV,2>& force_field=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
             for(int i=0;i<force_field.Fe_hat.m;i++) Add_Debug_Particle(force_field.Fe_hat(i).To_Vector(),VECTOR<T,3>(1,1,0));}
     }
 
@@ -230,7 +232,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-stiffen",&stiffness_multiplier,"","stiffness multiplier for various tests");
     parse_args->Add("-dampen",&damping_multiplier,"","damping multiplier for various tests");
     parse_args->Add("-residuals",&opt_residuals,"print residuals during timestepping");
-    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+    parse_args->Add("-print_energy",&solid_body_collection.solid_force_collection.print_energy,"print energy statistics");
     parse_args->Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"value","CG tolerance for backward Euler");
     parse_args->Add_Not("-use_be",&solids_parameters.use_trapezoidal_rule_for_velocities,"use backward euler");
     parse_args->Add("-print_matrix",&print_matrix,"print_matrix");
@@ -555,7 +557,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 23:
         case 13:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             if(test_number==13){RANDOM_NUMBERS<T> rand;rand.Set_Seed(12345);rand.Fill_Uniform(particles.X,-1,1);}
             break;}
@@ -564,19 +566,19 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             break;}
         case 14:{
-            solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             
             TRIANGULATED_AREA<T>& triangulated_area1=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>(0);
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new COROTATED_QUARTIC<T,2>((T)2e4,poissons_ratio,(T).01)));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new COROTATED_QUARTIC<T,2>((T)2e4,poissons_ratio,(T).01)));
 
             TRIANGULATED_AREA<T>& triangulated_area2=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new NEO_HOOKEAN_COROTATED_BLEND<T,2>((T)2e4,poissons_ratio,(T).01)));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new NEO_HOOKEAN_COROTATED_BLEND<T,2>((T)2e4,poissons_ratio,(T).01)));
 
             TRIANGULATED_AREA<T>& triangulated_area3=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>(2);
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area3,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)2e4,poissons_ratio,(T).01)));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(triangulated_area3,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)2e4,poissons_ratio,(T).01)));
 
             TRIANGULATED_AREA<T>& triangulated_area4=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>(3);
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area4,new NEO_HOOKEAN<T,2>((T)2e4,poissons_ratio,(T).01)));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(triangulated_area4,new NEO_HOOKEAN<T,2>((T)2e4,poissons_ratio,(T).01)));
             break;}
         case 17:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
@@ -602,7 +604,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 21:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             break;}
         case 28:{
@@ -613,16 +615,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
-    if(ether_drag) solid_body_collection.Add_Force(new ETHER_DRAG<GRID<TV> >(particles,rigid_body_collection,true,true,ether_drag,0));
+    if(ether_drag) solid_body_collection.solid_force_collection.Add_Force(new ETHER_DRAG<GRID<TV> >(particles,rigid_body_collection,true,true,ether_drag,0));
 
     if(solid_body_collection.deformable_body_collection.mpi_solids)
         solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection,particles.X,VECTOR<int,2>(2,1));
     solid_body_collection.Update_Simulated_Particles();
 
-    if(!semi_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(!semi_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
-        solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(!semi_implicit) for(int i=0;i<solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(!semi_implicit) for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(!semi_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces.m;i++)
+        solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(!semi_implicit) for(int i=0;i<solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 
     if(scatter_plot) Init_Scatter_Plot();
 
@@ -839,7 +841,7 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
         nh->use_constant_ife=use_constant_ife;}
     //std::cout << "Lambda= " << icm->constant_lambda << std::cout;
     //std::cout << "Mu   =" << icm->constant_mu << std::cout;
-    solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,icm));
+    solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(triangulated_area,icm));
 
     if(plot_energy_density) Plot_Energy_Density(icm,stiffness);
     if(primary_contour) Primary_Contour(*icm);
@@ -967,7 +969,7 @@ void Primary_Contour(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
 void Init_Scatter_Plot()
 {
     int s=0;
-    for(int f=0;FINITE_VOLUME<TV,2>* force=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>*>(f);f++){
+    for(int f=0;FINITE_VOLUME<TV,2>* force=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,2>*>(f);f++){
         force->Update_Position_Based_State(0,true);
         s+=force->Fe_hat.m;}
 
@@ -981,7 +983,7 @@ void Init_Scatter_Plot()
 //#####################################################################
 void Update_Scatter_Plot()
 {
-    for(int f=0,k=0;FINITE_VOLUME<TV,2>* force=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>*>(f);f++){
+    for(int f=0,k=0;FINITE_VOLUME<TV,2>* force=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,2>*>(f);f++){
         for(int i=0;i<force->Fe_hat.m;i++){
             if(!use_contrails) contrail(k).Remove_All();
             contrail(k++).Append(force->Fe_hat(i).To_Vector());}}
@@ -1114,10 +1116,10 @@ void Plot_Energy_Landscape()
             T y=2*sigma_range*j/image_size+1.2e-5;
             particles.X(3)=TV(-x,y);
             particles.X(5)=TV(x,y);
-            solid_body_collection.Update_Position_Based_State(0,false);
+            solid_body_collection.solid_force_collection.Update_Position_Based_State(0,false);
             T ke,pe;
-            solid_body_collection.Compute_Energy(0,ke,pe);
-            solid_body_collection.Add_Velocity_Independent_Forces(F,TW,0);
+            solid_body_collection.solid_force_collection.Compute_Energy(0,ke,pe);
+            solid_body_collection.solid_force_collection.Add_Velocity_Independent_Forces(F,TW,0);
             E.Append(ke+pe);
             X.Append(particles.X(5));
             N.Append(F(5).Normalized());
@@ -1145,7 +1147,7 @@ void Plot_Contour_Landscape(int frame)
     if(test_number==31) out<<"tristretch"<<std::endl;
 
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    FINITE_VOLUME<TV,2>& fv=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
+    FINITE_VOLUME<TV,2>& fv=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=fv.isotropic_model;
     bool is_neo=dynamic_cast<NEO_HOOKEAN<T,2>*>(icm) || dynamic_cast<RC2_EXTRAPOLATED<T,2>*>(icm);
     T min=-image_size/2,max=image_size/2;
@@ -1175,7 +1177,7 @@ void Energy_Profile_Plot(int frame)
 
     if(this->write_first_frame && frame==this->first_frame) FILE_UTILITIES::Write_To_Text_File(dual_directory+"/common/first_frame",frame,"\n");
 
-    ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>().isotropic_model;
+    ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,2>&>().isotropic_model;
     if(!energy_mesh){
         energy_particles.Store_Velocity(true);
         TRIANGULATED_AREA<T> ta(*new TRIANGLE_MESH,*new GEOMETRY_PARTICLES<TV>);

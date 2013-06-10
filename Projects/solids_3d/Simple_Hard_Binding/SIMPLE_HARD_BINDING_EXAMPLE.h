@@ -205,8 +205,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data();
 
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-    solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
-    solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).475,(T).01,(T).25),
+    solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
+    solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).475,(T).01,(T).25),
         true,(T).1));
     solid_body_collection.Update_Simulated_Particles();
     solid_body_collection.deformable_body_collection.soft_bindings.Clamp_Particles_To_Embedded_Positions(false);

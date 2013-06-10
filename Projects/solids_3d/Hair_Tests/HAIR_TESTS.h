@@ -129,25 +129,25 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     // make forces
     switch(test_number){
         case 1:{ // initialize very weak forces
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             for(int i=0;i<deformable_body_collection.structures.m;i++){
                 if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.structures(i))){
-                    solid_body_collection.Add_Force(Create_Edge_Springs(*surface,1/(1+sqrt((T)2)),(T)3,strain_limit));
-                    solid_body_collection.Add_Force(Create_Bending_Springs(*surface,1/(1+sqrt((T)2)),(T)3,strain_limit));}}
-            if(variant==2) solid_body_collection.Add_Force(Create_Altitude_Springs(*volume,(T)10/(1+sqrt((T)2)),(T)3,true,(T).1,strain_limit));
-            if(variant==3) solid_body_collection.Add_Force(Create_Tet_Springs(*volume,10/(1+sqrt((T)2)),(T)3,false,(T).1,strain_limit));
+                    solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(*surface,1/(1+sqrt((T)2)),(T)3,strain_limit));
+                    solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(*surface,1/(1+sqrt((T)2)),(T)3,strain_limit));}}
+            if(variant==2) solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(*volume,(T)10/(1+sqrt((T)2)),(T)3,true,(T).1,strain_limit));
+            if(variant==3) solid_body_collection.solid_force_collection.Add_Force(Create_Tet_Springs(*volume,10/(1+sqrt((T)2)),(T)3,false,(T).1,strain_limit));
         }break;
         case 2:{
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             /*for(int i=0;i<deformable_body_collection.structures.m;i++){
                 if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(i))){
-                    solid_body_collection.Add_Force(Create_Edge_Springs(*volume,1/(1+sqrt((T)2)),(T)3));
-                    solid_body_collection.Add_Force(Create_Bending_Springs(volume->Get_Boundary_Object(),1/(1+sqrt((T)2)),(T)3));}}
+                    solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(*volume,1/(1+sqrt((T)2)),(T)3));
+                    solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(volume->Get_Boundary_Object(),1/(1+sqrt((T)2)),(T)3));}}
             */
-            solid_body_collection.Add_Force(Create_Edge_Springs(*volume,0/(1+sqrt((T)2)),(T)3));
-            //solid_body_collection.Add_Force(Create_Bending_Springs(volume->Get_Boundary_Object(),0/(1+sqrt((T)2)),(T)3));
-            if(variant==2) solid_body_collection.Add_Force(Create_Altitude_Springs(*volume,0/(1+sqrt((T)2)),(T)3,false,(T).1,false));
-            if(variant==3) solid_body_collection.Add_Force(Create_Tet_Springs(*volume,0/(1+sqrt((T)2)),(T)3,false,(T).1,false));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(*volume,0/(1+sqrt((T)2)),(T)3));
+            //solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(volume->Get_Boundary_Object(),0/(1+sqrt((T)2)),(T)3));
+            if(variant==2) solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(*volume,0/(1+sqrt((T)2)),(T)3,false,(T).1,false));
+            if(variant==3) solid_body_collection.solid_force_collection.Add_Force(Create_Tet_Springs(*volume,0/(1+sqrt((T)2)),(T)3,false,(T).1,false));
         }break;
     }
 }
@@ -160,28 +160,28 @@ void Update_Time_Varying_Material_Properties(const T time)
     switch(test_number) {
         case 1:{
             if(time>(T)2){ // up stiffness!
-                LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.template Find_Force<LINEAR_SPRINGS<TV>*>();
+                LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.solid_force_collection.template Find_Force<LINEAR_SPRINGS<TV>*>();
                 linear_springs->Set_Stiffness((T)10000);
                 linear_springs->Set_Overdamping_Fraction((T)3);
-                if(LINEAR_ALTITUDE_SPRINGS_3D<T>* alt_springs=solid_body_collection.template Find_Force<LINEAR_ALTITUDE_SPRINGS_3D<T>*>()){
+                if(LINEAR_ALTITUDE_SPRINGS_3D<T>* alt_springs=solid_body_collection.solid_force_collection.template Find_Force<LINEAR_ALTITUDE_SPRINGS_3D<T>*>()){
                     alt_springs->Set_Stiffness((T)10000);alt_springs->Set_Overdamping_Fraction((T)3);}
-                if(LINEAR_TET_SPRINGS<T>* tet_springs=solid_body_collection.template Find_Force<LINEAR_TET_SPRINGS<T>*>()){
+                if(LINEAR_TET_SPRINGS<T>* tet_springs=solid_body_collection.solid_force_collection.template Find_Force<LINEAR_TET_SPRINGS<T>*>()){
                     tet_springs->Set_Stiffness((T)10000);tet_springs->Set_Overdamping_Fraction((T)3);}
-                TRIANGLE_BENDING_SPRINGS<T>* bending_springs=solid_body_collection.template Find_Force<TRIANGLE_BENDING_SPRINGS<T>*>();
+                TRIANGLE_BENDING_SPRINGS<T>* bending_springs=solid_body_collection.solid_force_collection.template Find_Force<TRIANGLE_BENDING_SPRINGS<T>*>();
                 bending_springs->Set_Stiffness((T)10000);
                 bending_springs->Set_Overdamping_Fraction((T)3);
             }
         }break;
         case 2:{
             if(time>(T)2){ // up stiffness!
-                LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.template Find_Force<LINEAR_SPRINGS<TV>*>();
+                LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.solid_force_collection.template Find_Force<LINEAR_SPRINGS<TV>*>();
                 linear_springs->Set_Stiffness((T)100);
                 linear_springs->Set_Overdamping_Fraction((T)3);
-                if(LINEAR_ALTITUDE_SPRINGS_3D<T>* alt_springs=solid_body_collection.template Find_Force<LINEAR_ALTITUDE_SPRINGS_3D<T>*>()){
+                if(LINEAR_ALTITUDE_SPRINGS_3D<T>* alt_springs=solid_body_collection.solid_force_collection.template Find_Force<LINEAR_ALTITUDE_SPRINGS_3D<T>*>()){
                     alt_springs->Set_Stiffness((T)100);alt_springs->Set_Overdamping_Fraction((T)3);}
-                if(LINEAR_TET_SPRINGS<T>* tet_springs=solid_body_collection.template Find_Force<LINEAR_TET_SPRINGS<T>*>()){
+                if(LINEAR_TET_SPRINGS<T>* tet_springs=solid_body_collection.solid_force_collection.template Find_Force<LINEAR_TET_SPRINGS<T>*>()){
                     tet_springs->Set_Stiffness((T)100);tet_springs->Set_Overdamping_Fraction((T)3);}
-                //TRIANGLE_BENDING_SPRINGS<T>* bending_springs=solid_body_collection.template Find_Force<TRIANGLE_BENDING_SPRINGS<T>*>();
+                //TRIANGLE_BENDING_SPRINGS<T>* bending_springs=solid_body_collection.solid_force_collection.template Find_Force<TRIANGLE_BENDING_SPRINGS<T>*>();
                 //bending_springs->Set_Stiffness((T)100);
                 //bending_springs->Set_Overdamping_Fraction((T)3);
             }

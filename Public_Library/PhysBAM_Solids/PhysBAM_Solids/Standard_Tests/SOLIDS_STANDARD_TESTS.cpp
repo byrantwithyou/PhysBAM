@@ -19,6 +19,7 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Bindings/RIGID_BODY_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 using namespace PhysBAM;
@@ -38,7 +39,7 @@ template<class TV> void SOLIDS_STANDARD_TESTS<TV>::
 Add_Gravity()
 {
     // add gravity on all deformable particles and on all rigid body particles
-    solid_body_collection.Add_Force(new GRAVITY<TV>(solid_body_collection.deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+    solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(solid_body_collection.deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
 }
 //#####################################################################
 // Function Bind_Particles_In_Rigid_Body

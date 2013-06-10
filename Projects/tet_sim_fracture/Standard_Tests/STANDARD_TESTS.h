@@ -41,6 +41,7 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/FRACTURE_OBJECT.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/FRACTURE_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
@@ -171,7 +172,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     particles.Compute_Auxiliary_Attributes(soft_bindings);soft_bindings.Set_Mass_From_Effective_Mass();
 
     // disable strain rate CFL for all forces
-    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
+    for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
 
     for(int i=0;i<deformable_body_collection.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.structures(i))){
         deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.structures(i));
@@ -232,7 +233,7 @@ void Plastic_Mattress(int nx,int ny,int nz,const ROTATION<TV>& rot,const RANGE<T
     SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(tetrahedralized_volume,1000);
 
     if(false) plasticity_model=new SIMPLE_PLASTICITY<T,3>(tetrahedralized_volume.mesh.elements.m,2,2);
-    solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new ROTATED_LINEAR<T,3>((T)1e6,(T).3,(T).02),true,(T).1,true,true,false,plasticity_model));
+    solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new ROTATED_LINEAR<T,3>((T)1e6,(T).3,(T).02),true,(T).1,true,true,false,plasticity_model));
 
     // initialize_fracture_tetrahedralized_volume
     fracture_object=new FRACTURE_TETRAHEDRALIZED_VOLUME<T>(embedded_object);
@@ -265,7 +266,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
         total=fracture_object->embedded_object.Fraction_Of_Elements_With_Embedded_Subelements();
     LOG::cout<<"PERCENT_OF_BROKEN_ELEMENTS = "<<one_cut<<" "<<two_cuts<<" "<<three_cuts<<", with total = "<<total<<std::endl;
 
-    FINITE_VOLUME<TV,3>& finite_volume=solid_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+    FINITE_VOLUME<TV,3>& finite_volume=solid_body_collection.solid_force_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
     ARRAY<VECTOR<T,2> > min_max_stress_eigenvalues(finite_volume.strain_measure.mesh_object.mesh.elements.m);
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& isotropic_model=dynamic_cast<ISOTROPIC_CONSTITUTIVE_MODEL<T,3>&>(finite_volume.constitutive_model);
     for(int t=0;t<finite_volume.strain_measure.mesh_object.mesh.elements.m;t++){

@@ -40,6 +40,7 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER_LAPLACE.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER_PROJECTION_UNIFORM.h>
@@ -174,15 +175,15 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         B.rigid_V.array.Fill(TWIST<TV>());
         solid_body_collection.example_forces_and_velocities->Add_External_Forces(B.V.array,current_velocity_time+dt);
         solid_body_collection.example_forces_and_velocities->Add_External_Forces(B.rigid_V.array,current_velocity_time+dt);
-        solid_body_collection.Add_Velocity_Independent_Forces(B.V.array,B.rigid_V.array,current_velocity_time+dt); // this is a nop for binding forces
+        solid_body_collection.solid_force_collection.Add_Velocity_Independent_Forces(B.V.array,B.rigid_V.array,current_velocity_time+dt); // this is a nop for binding forces
         solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B.V.array,B.rigid_V.array);
         solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(rigid_B_full);
         if(solid_body_collection.deformable_body_collection.soft_bindings.Need_Bindings_Mapped()){
             solid_body_collection.deformable_body_collection.soft_bindings.Map_Forces_From_Parents(B.V.array,B.rigid_V.array);
             solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(B.V.array);
-            for(int k=0;k<solid_body_collection.solids_forces.m;k++){
-                if(dynamic_cast<BINDING_SPRINGS<TV>*>(solid_body_collection.solids_forces(k)))
-                    solid_body_collection.solids_forces(k)->Add_Force_Differential(particles.X,B.V.array,current_velocity_time+dt);}
+            for(int k=0;k<solid_body_collection.solid_force_collection.solids_forces.m;k++){
+                if(dynamic_cast<BINDING_SPRINGS<TV>*>(solid_body_collection.solid_force_collection.solids_forces(k)))
+                    solid_body_collection.solid_force_collection.solids_forces(k)->Add_Force_Differential(particles.X,B.V.array,current_velocity_time+dt);}
             solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B.V.array);}
 
         // TODO: Make sure this runs for the solid node of an MPI coupled sim

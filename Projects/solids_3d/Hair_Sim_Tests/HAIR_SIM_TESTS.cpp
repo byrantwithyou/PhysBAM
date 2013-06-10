@@ -38,6 +38,7 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/WIND_DRAG_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include "HAIR_SIM_TESTS.h"
 
 template<class T> int round_number(const T x)
@@ -350,33 +351,33 @@ Initialize_Bodies()
     //################################################################
     bool strain_limit=false;
     ARRAY<int> tet_node_list;
-    solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,&active_particles,NULL));
+    solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,&active_particles,NULL));
     PHYSBAM_DEBUG_PRINT("Parameters",overdamping_fraction,edge_stiffness);
     //LINEAR_SPRINGS<TV>* guide_springs=Create_Edge_Springs(sim_guide_edges,edge_stiffness,overdamping_fraction);
     LINEAR_SPRINGS<TV>* edge_springs=Create_Edge_Springs(edges,edge_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
     edge_springs->Clamp_Restlength(restlength_clamp);
-    solid_body_collection.Add_Force(edge_springs);
+    solid_body_collection.solid_force_collection.Add_Force(edge_springs);
     LINEAR_SPRINGS<TV>* extra_edge_springs=Create_Edge_Springs(extra_edges,edge_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
     extra_edge_springs->Clamp_Restlength(restlength_clamp);
-    solid_body_collection.Add_Force(extra_edge_springs);
+    solid_body_collection.solid_force_collection.Add_Force(extra_edge_springs);
     LINEAR_SPRINGS<TV>* bending_springs=Create_Edge_Springs(bending_edges,bending_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
 
     LINEAR_SPRINGS<TV>* torsion_springs=0;
     bending_springs->Clamp_Restlength(restlength_clamp);
-    solid_body_collection.Add_Force(bending_springs);
+    solid_body_collection.solid_force_collection.Add_Force(bending_springs);
     torsion_springs=Create_Edge_Springs(torsion_edges,torsion_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
     torsion_springs->Clamp_Restlength(restlength_clamp);
-    solid_body_collection.Add_Force(torsion_springs);
+    solid_body_collection.solid_force_collection.Add_Force(torsion_springs);
     LINEAR_TET_SPRINGS<T> *tet_springs=Create_Tet_Springs(*volume,altitude_stiffness,overdamping_fraction,false,(T).1,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
     tet_springs->Clamp_Restlength(restlength_clamp);
-    solid_body_collection.Add_Force(tet_springs);
+    solid_body_collection.solid_force_collection.Add_Force(tet_springs);
     if(use_guide){
         LINEAR_SPRINGS<TV>* guide_edge_springs=Create_Edge_Springs(sim_guide_tet_edges,guide_edge_stiffness,overdamping_fraction);
         extra_edge_springs->Clamp_Restlength(restlength_clamp);
-        solid_body_collection.Add_Force(guide_edge_springs);
+        solid_body_collection.solid_force_collection.Add_Force(guide_edge_springs);
         LINEAR_TET_SPRINGS<T> *guide_tet_springs=Create_Tet_Springs(*sim_guide_volume,guide_altitude_stiffness,overdamping_fraction,false,(T).1,true,(T).1,true,(T)0,true);
         guide_tet_springs->Clamp_Restlength(restlength_clamp);
-        solid_body_collection.Add_Force(guide_tet_springs);}
+        solid_body_collection.solid_force_collection.Add_Force(guide_tet_springs);}
     SPARSE_UNION_FIND<> particle_connectivity(particles.Size()+rigid_body_collection.rigid_body_particles.Size());
     HAIR_ID next_segment_id(0);
     PHYSBAM_FATAL_ERROR();
@@ -398,16 +399,16 @@ Initialize_Bodies()
     if(use_adhesion){
         segment_adhesion=new SEGMENT_ADHESION<TV>(particles,edges.mesh,particle_to_spring_id,solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.intersecting_edge_edge_pairs);
         segment_adhesion->Set_Parameters(adhesion_stiffness,(T)10,adhesion_start_radius,adhesion_stop_radius,max_connections);
-        solid_body_collection.Add_Force(segment_adhesion);
+        solid_body_collection.solid_force_collection.Add_Force(segment_adhesion);
         if(restart) segment_adhesion->Read_State(stream_type,output_directory+STRING_UTILITIES::string_sprintf("/adhesion.%d",restart_frame));
         else segment_adhesion->Write_State(stream_type,output_directory+"/adhesion.0");}
     // drag forces
     ETHER_DRAG<GRID<TV> >* ether_drag=new ETHER_DRAG<GRID<TV> >(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,&active_particles,NULL);
-    solid_body_collection.Add_Force(ether_drag);
+    solid_body_collection.solid_force_collection.Add_Force(ether_drag);
     ether_drag->Use_Constant_Wind(20);
     PHYSBAM_ASSERT(!use_wind);
     //WIND_DRAG_3D<T>* drag=new WIND_DRAG_3D<T>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,volume->Get_Boundary_Object());
-    //solid_body_collection.Add_Force(drag);
+    //solid_body_collection.solid_force_collection.Add_Force(drag);
     //if(use_wind) {drag->Use_Linear_Normal_Viscosity(17);drag->Use_Constant_Wind(0,TV(0,(T).5,(T)-1.));}
     //else {drag->Use_Linear_Normal_Viscosity(1);drag->Use_Constant_Wind(0,TV());}
 
@@ -507,7 +508,7 @@ Initialize_Bodies()
         guide_adhesion->Set_Parameters(guide_stiffness,(T)10,guide_thickness,max_connections);
         guide_adhesion->Update_Springs(true);
         guide_adhesion->Write_State(stream_type,output_directory+"/adhesion.0");
-        solid_body_collection.Add_Force(guide_adhesion);
+        solid_body_collection.solid_force_collection.Add_Force(guide_adhesion);
     }
     //hairs
     deformable_body_collection.Add_Structure(&edges);
@@ -711,21 +712,21 @@ Update_Time_Varying_Material_Properties(const T time)
     //    INTERPOLATION_CURVE<T,TV> wind_stop;
     //    wind_stop.Add_Control_Point(wind_drag_off,TV(0,(T).1,(T)-2.));
     //    wind_stop.Add_Control_Point(wind_drag_ramp_off,TV());
-    //    WIND_DRAG_3D<T>& drag=solid_body_collection.template Find_Force<WIND_DRAG_3D<T>&>();
+    //    WIND_DRAG_3D<T>& drag=solid_body_collection.solid_force_collection.template Find_Force<WIND_DRAG_3D<T>&>();
     //    drag.Use_Linear_Normal_Viscosity(0);drag.Use_Constant_Wind(0,TV());}
     if(time>ether_drag_off){
         INTERPOLATION_CURVE<T,T> wind_viscosity;
         wind_viscosity.Add_Control_Point(ether_drag_off,20);
         wind_viscosity.Add_Control_Point(ether_drag_ramp_off,0);
-        ETHER_DRAG<GRID<TV> >& drag=solid_body_collection.template Find_Force<ETHER_DRAG<GRID<TV> >&>();
+        ETHER_DRAG<GRID<TV> >& drag=solid_body_collection.solid_force_collection.template Find_Force<ETHER_DRAG<GRID<TV> >&>();
         drag.Use_Constant_Wind(wind_viscosity.Value(time));}
     if(use_drag&&time>start_time){
-        ETHER_DRAG<GRID<TV> >& drag=solid_body_collection.template Find_Force<ETHER_DRAG<GRID<TV> >&>();
+        ETHER_DRAG<GRID<TV> >& drag=solid_body_collection.solid_force_collection.template Find_Force<ETHER_DRAG<GRID<TV> >&>();
         drag.Use_Constant_Wind(drag_viscosity);}
     //start wind
     if(test_number%3!=1){
         if(time>wind_start_time){
-            WIND_DRAG_3D<T>& drag=solid_body_collection.template Find_Force<WIND_DRAG_3D<T>&>();
+            WIND_DRAG_3D<T>& drag=solid_body_collection.solid_force_collection.template Find_Force<WIND_DRAG_3D<T>&>();
             drag.Use_Linear_Normal_Viscosity(17);drag.Use_Constant_Wind(0,TV(0,0,(T)-1.));}}
     //stop wind
     if(test_number%3==0){
@@ -733,7 +734,7 @@ Update_Time_Varying_Material_Properties(const T time)
             INTERPOLATION_CURVE<T,TV> wind_stop;
             wind_stop.Add_Control_Point(wind_stop_time-(T).3,TV(0,0,(T)-.25));
             wind_stop.Add_Control_Point(wind_stop_time,TV());
-            WIND_DRAG_3D<T>& drag=solid_body_collection.template Find_Force<WIND_DRAG_3D<T>&>();
+            WIND_DRAG_3D<T>& drag=solid_body_collection.solid_force_collection.template Find_Force<WIND_DRAG_3D<T>&>();
             drag.Use_Linear_Normal_Viscosity(0);drag.Use_Constant_Wind(0,TV());}}
 }
 //#####################################################################

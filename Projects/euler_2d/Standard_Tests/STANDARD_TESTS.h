@@ -8,10 +8,6 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
-#include <fstream>
-#include <iostream>
-#include "math.h"
-
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
@@ -23,6 +19,8 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/MASS_PROPERTIES.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.h>
@@ -33,6 +31,9 @@
 #include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.h>
+#include <fstream>
+#include <iostream>
+#include "math.h"
 
 namespace PhysBAM{
 
@@ -283,8 +284,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         original_position=solid_body_collection.deformable_body_collection.particles.X(50);
 
         solid_body_collection.deformable_body_collection.particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
-        solid_body_collection.Add_Force(Create_Edge_Springs(top_boundary,(T)1.5e5*spring_factor,(T)0));solid_body_collection.Add_Force(Create_Edge_Springs(bottom_boundary,(T)1.5e5*spring_factor,(T)0));
-        solid_body_collection.Add_Force(Create_Altitude_Springs(top_boundary,(T)1.5e5*spring_factor));solid_body_collection.Add_Force(Create_Altitude_Springs(bottom_boundary,(T)1.5e5*spring_factor));}
+        solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(top_boundary,(T)1.5e5*spring_factor,(T)0));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(bottom_boundary,(T)1.5e5*spring_factor,(T)0));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(top_boundary,(T)1.5e5*spring_factor));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(bottom_boundary,(T)1.5e5*spring_factor));}
     else if(test_number==3){
         TRIANGULATED_AREA<T>& deformable_circle=tests.Create_Triangulated_Object(data_directory+"/Triangulated_Areas/circle-216.tri2d",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T).15,(T).05))),true,false,(T).05);
 
@@ -296,8 +299,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         solid_body_collection.deformable_body_collection.particles.Compute_Auxiliary_Attributes(
             solid_body_collection.deformable_body_collection.soft_bindings);
         
-        solid_body_collection.Add_Force(Create_Edge_Springs(deformable_circle,(T).3,(T)1.5));
-        solid_body_collection.Add_Force(Create_Altitude_Springs(deformable_circle,(T).3));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(deformable_circle,(T).3,(T)1.5));
+        solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(deformable_circle,(T).3));
 
         boundary=&deformable_circle.Get_Boundary_Object();
 
@@ -343,9 +346,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
     if(fluids_parameters.use_slip){
-        for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
-        for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
-        for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;}
+        for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->compute_half_forces=true;
+        for(int k=0;k<solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces(k)->compute_half_forces=true;
+        for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces(i)->compute_half_forces=true;}
 
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
 

@@ -23,6 +23,7 @@ template<class TV> class RIGID_BODY_EVOLUTION_PARAMETERS;
 template<class TV> struct ALLOCATE_HELPER{virtual RIGID_BODY<TV>* Create(int index=0)=0;virtual ~ALLOCATE_HELPER(){}};
 template<class TV,class ID> class STRUCTURE_LIST;
 template<class TV> class STRUCTURE;
+template<class TV> class RIGID_FORCE_COLLECTION;
 
 template<class TV>
 class RIGID_BODY_COLLECTION:public NONCOPYABLE
@@ -31,6 +32,7 @@ class RIGID_BODY_COLLECTION:public NONCOPYABLE
 public:
     typedef int HAS_TYPED_READ_WRITE;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles;
+    RIGID_FORCE_COLLECTION<TV>& rigid_force_collection;
     COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list;
     STRUCTURE_LIST<TV,int>& structure_list;
     bool always_create_structure;
@@ -50,11 +52,9 @@ public:
     ARRAY<int> simulated_rigid_body_particles;
     ARRAY<int> dynamic_rigid_body_particles;
     ARRAY<int> static_rigid_bodies,kinematic_rigid_bodies,static_and_kinematic_rigid_bodies;
-    ARRAY<RIGIDS_FORCES<TV>*> rigids_forces;
     
     bool print_diagnostics;
     bool print_residuals;
-    bool print_energy;
     int iterations_used_diagnostic;
 
     RIGID_BODY<TV>* New_Body(int index);
@@ -97,16 +97,6 @@ public:
     void Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
     void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const; // TODO: optionally skip certain kinds of structures in output
     void Update_Simulated_Particles();
-
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const;
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const;
-    void Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T scale,const T time) const;
-
-    void Update_Position_Based_State(const T time);
-    void Compute_Energy(const T time,T& kinetic_energy,T& potential_energy) const;
-    void Print_Energy(const T time,const int step) const;
-    T CFL_Rigid(const RIGID_BODY_EVOLUTION_PARAMETERS<TV>& rigid_body_evolution_parameters,const bool verbose_dt);
-    int Add_Force(RIGIDS_FORCES<TV>* force);
 
     void Update_Kinematic_Particles();
     bool Register_Analytic_Replacement_Structure(const std::string& filename,const T scaling_factor,STRUCTURE<TV>* structure); // passing in zero skips reading

@@ -29,6 +29,7 @@ template<class TV> class MPI_SOLIDS;
 template<class TV> class DEFORMABLES_FORCES;
 template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
 template<class TV> class STRUCTURE;
+template<class TV> class DEFORMABLE_FORCE_COLLECTION;
 
 template<class TV>
 class DEFORMABLE_BODY_COLLECTION:public NONCOPYABLE
@@ -38,6 +39,7 @@ class DEFORMABLE_BODY_COLLECTION:public NONCOPYABLE
 public:
     DEFORMABLE_PARTICLES<TV>& particles;
     ARRAY<STRUCTURE<TV>*> structures;
+    DEFORMABLE_FORCE_COLLECTION<TV>& deformable_force_collection;
 
     int Add_Structure(STRUCTURE<TV>* structure)
     {return structures.Append(structure);}
@@ -58,17 +60,11 @@ public:
 
     BINDING_LIST<TV>& binding_list;
     SOFT_BINDINGS<TV>& soft_bindings;
-    ARRAY<DEFORMABLES_FORCES<TV>*> deformables_forces;
 
     MPI_SOLIDS<TV>* mpi_solids;
-    ARRAY<T_FREQUENCY_DEFORMABLE> frequency; // hertz for deformable CFL
-    T cfl_number;
-    T cfl_elastic,cfl_damping;
-    bool implicit_damping;
 
     bool print_diagnostics;
     bool print_residuals;
-    bool print_energy;
     int iterations_used_diagnostic;
 
     DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>* deformables_example_forces_and_velocities;
@@ -84,17 +80,7 @@ public:
     DEFORMABLE_BODY_COLLECTION(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>* deformables_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list);
     virtual ~DEFORMABLE_BODY_COLLECTION();
 
-    template<class T_FORCE> T_FORCE
-    Find_Force(const int index=0)
-    {return Find_Type<T_FORCE>(deformables_forces,index);}
-
-    template<class T_FORCE> const T_FORCE
-    Find_Force(const int index=0) const
-    {return Find_Type<T_FORCE>(deformables_forces,index);}
-
 //#####################################################################
-    void Set_CFL_Number(const T cfl_number_input=.5);
-    int Add_Force(DEFORMABLES_FORCES<TV>* force);
     void Initialize(TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collisions_parameters);
     void Update_Collision_Penalty_Forces_And_Derivatives();
     void Read_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame);
@@ -104,20 +90,7 @@ public:
     void Update_Simulated_Particles();
     void Update_Simulated_Particles(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities);
     void Set_Mpi_Solids(MPI_SOLIDS<TV>* mpi_solids);
-    void Update_CFL();
-    T CFL(const bool verbose=false);
-    T CFL_Elastic_And_Damping();
-    T CFL_Elastic();
-    T CFL_Damping();
-    T CFL_Strain_Rate();
 
-    void Update_Position_Based_State(const T time,const bool is_position_update);
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F_full,const T time) const;
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T time) const;
-    void Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T scale,const T time) const;
-
-    void Test_Energy(const T time);
-    void Test_Force_Derivatives(const T time);
     void Read(const STREAM_TYPE,const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,const bool read_from_every_process);
     void Write(const STREAM_TYPE,const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,const bool write_from_every_process) const;
 //#####################################################################

@@ -31,6 +31,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/DEFORMABLE_GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
@@ -58,7 +59,7 @@ template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
 Add_Gravity()
 {
     // add gravity on all deformable particles
-    deformable_body_collection.Add_Force(new DEFORMABLE_GRAVITY<TV>(deformable_body_collection.particles,true,true));
+    deformable_body_collection.deformable_force_collection.Add_Force(new DEFORMABLE_GRAVITY<TV>(deformable_body_collection.particles,true,true));
 }
 //#####################################################################
 // Function Copy_And_Add_Structure

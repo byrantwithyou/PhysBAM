@@ -96,10 +96,12 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_MATERIAL_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Bindings/RIGID_BODY_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/WIND_DRAG_3D.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/BACKWARD_EULER_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
@@ -241,8 +243,8 @@ public:
     void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     {
         if(test_forces){
-            solid_body_collection.deformable_body_collection.Test_Energy(time);
-            solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
+            solid_body_collection.deformable_body_collection.deformable_force_collection.Test_Energy(time);
+            solid_body_collection.deformable_body_collection.deformable_force_collection.Test_Force_Derivatives(time);}
     }
     void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Self_Collisions_Begin_Callback(const T time,const int substep) PHYSBAM_OVERRIDE {}
@@ -308,7 +310,7 @@ void Register_Options()
     parse_args->Add("-noattractions",&opt_noattractions,"disable attractions on repulsion pair inversions");
     parse_args->Add("-attractionthreshold",&solids_parameters.triangle_collision_parameters.repulsion_pair_attractions_threshold,"value","threshold for attractions of inverted repulsion pairs");
     parse_args->Add("-clothcfl",&cloth_cfl,"value","Cloth CFL");
-    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+    parse_args->Add("-print_energy",&solid_body_collection.solid_force_collection.print_energy,"print energy statistics");
     parse_args->Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"tol","CG tolerance for backward Euler");
     parse_args->Add("-fully_implicit",&fully_implicit,"use fully implicit forces");
     parse_args->Add("-half_fully_implicit",&solids_parameters.implicit_solve_parameters.use_half_fully_implicit,"use fully implicit forces for position update");
@@ -1311,27 +1313,27 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 17:{
             LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(deformable_body_collection.particles,binding_segment_mesh,1e5);
             spring_force->Clamp_Restlength(1);
-            solid_body_collection.Add_Force(spring_force);}
+            solid_body_collection.solid_force_collection.Add_Force(spring_force);}
         case 16:
         case 18:{
             SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
-            solid_body_collection.Add_Force(Create_Edge_Springs(deformable_body_collection.particles,segmented_curve.mesh,(T)2e4));}
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(deformable_body_collection.particles,segmented_curve.mesh,(T)2e4));}
         case 1:
         case 2:
         case 15:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             break;}
         case 3:
         case 4:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<EMBEDDED_MATERIAL_SURFACE<TV,3>&>().embedded_object.simplicial_object;
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
-            solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             if(use_forces_for_drift){
                 soft_bindings.use_impulses_for_collisions.Fill(false);
                 soft_bindings.Initialize_Binding_Mesh();
-                solid_body_collection.Add_Force(Create_Edge_Binding_Springs(deformable_body_collection.particles,*soft_bindings.binding_mesh,(T)1e6,(T)1));}
+                solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Binding_Springs(deformable_body_collection.particles,*soft_bindings.binding_mesh,(T)1e6,(T)1));}
             break;}
         case 5:
         case 10:
@@ -1345,49 +1347,49 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             if(triangulated_surface.mesh.elements.m != cloth_triangles){
                 LOG::cerr<<"we got "<<triangulated_surface.mesh.elements.m<<" and expected "<<cloth_triangles<<" with side_length="<<side_length<<std::endl;
                 PHYSBAM_FATAL_ERROR();}
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
-            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
             if(fully_implicit){
                 if(use_axial){
                     T axial_bending_stiffness=axial_bending_stiffness_multiplier*2/(1+sqrt((T)2)),axial_bending_damping=axial_bending_damping_multiplier*8;
-                    solid_body_collection.Add_Force(Create_Axial_Bending_Springs(triangulated_surface,(T).01,axial_bending_stiffness,axial_bending_damping));}
+                    solid_body_collection.solid_force_collection.Add_Force(Create_Axial_Bending_Springs(triangulated_surface,(T).01,axial_bending_stiffness,axial_bending_damping));}
                 T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-                solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
+                solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
                 PHYSBAM_DEBUG_PRINT("Spring stiffnesses",linear_stiffness,linear_damping,bending_stiffness,bending_damping);}
             else{
-                if(!no_altitude_springs) solid_body_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,stiffness_multiplier*2*4/(1+sqrt((T)2)),damping_multiplier*4));
+                if(!no_altitude_springs) solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,stiffness_multiplier*2*4/(1+sqrt((T)2)),damping_multiplier*4));
                 TRIANGLE_BENDING_ELEMENTS<T>* bend=Create_Bending_Elements(triangulated_surface);
                 bend->Set_Area_Cutoff_From_Triangulated_Surface(triangulated_surface,(T).1);
                 bend->use_force_differential=false;
-                solid_body_collection.Add_Force(bend);}
+                solid_body_collection.solid_force_collection.Add_Force(bend);}
             break;}
         case 30:{
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
             for(int i=0;i<deformable_body_collection.structures.m;i++) if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.structures(i))){
                 if(surface->mesh.elements.m != cloth_triangles) PHYSBAM_FATAL_ERROR();
-                solid_body_collection.Add_Force(Create_Edge_Springs(*surface,linear_stiffness,linear_damping)); // were *2 and *10
-                solid_body_collection.Add_Force(Create_Bending_Springs(*surface,bending_stiffness,bending_damping));
+                solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(*surface,linear_stiffness,linear_damping)); // were *2 and *10
+                solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(*surface,bending_stiffness,bending_damping));
                 WIND_DRAG_3D<T>* drag=new WIND_DRAG_3D<T>(*surface,solid_body_collection.rigid_body_collection);
-                solid_body_collection.Add_Force(drag);
+                solid_body_collection.solid_force_collection.Add_Force(drag);
                 drag->Use_Linear_Normal_Viscosity((T).001);drag->Use_Constant_Wind(0,TV((T).001,(T).0001,(T).001));}
             break;}
         case 31:{
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
             for(int i=0;i<deformable_body_collection.structures.m;i++) if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.structures(i))){
                 if(surface->mesh.elements.m != cloth_triangles) PHYSBAM_FATAL_ERROR();
-                solid_body_collection.Add_Force(Create_Edge_Springs(*surface,linear_stiffness,linear_damping)); // were *2 and *10
-                solid_body_collection.Add_Force(Create_Bending_Springs(*surface,bending_stiffness,bending_damping));
+                solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(*surface,linear_stiffness,linear_damping)); // were *2 and *10
+                solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(*surface,bending_stiffness,bending_damping));
                 WIND_DRAG_3D<T>* drag=new WIND_DRAG_3D<T>(*surface,solid_body_collection.rigid_body_collection);
-                solid_body_collection.Add_Force(drag);
+                solid_body_collection.solid_force_collection.Add_Force(drag);
                 drag->Use_Linear_Normal_Viscosity(17);drag->Use_Constant_Wind(0,TV((T).001,1,(T).2));}
             break;}
         case 35:{
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             GRID<TV>* wind_grid=new GRID<TV>(TV_INT()+20,RANGE<TV>::Bounding_Box(particles.X));
             ARRAY<TV,VECTOR<int,3> >* wind_V=new ARRAY<TV,VECTOR<int,3> >(wind_grid->Domain_Indices());
             TV wind_center=wind_grid->Domain().Center();
@@ -1401,9 +1403,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
             for(int i=0;i<deformable_body_collection.structures.m;i++) if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.structures(i))){
                 if(surface->mesh.elements.m != 100*cloth_triangles) PHYSBAM_FATAL_ERROR();
-                solid_body_collection.Add_Force(Create_Edge_Springs(*surface,linear_stiffness,linear_damping)); // were *2 and *10
-                solid_body_collection.Add_Force(Create_Bending_Springs(*surface,bending_stiffness,bending_damping));
-                WIND_DRAG_3D<T>* drag=new WIND_DRAG_3D<T>(*surface,solid_body_collection.rigid_body_collection);solid_body_collection.Add_Force(drag);
+                solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(*surface,linear_stiffness,linear_damping)); // were *2 and *10
+                solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(*surface,bending_stiffness,bending_damping));
+                WIND_DRAG_3D<T>* drag=new WIND_DRAG_3D<T>(*surface,solid_body_collection.rigid_body_collection);solid_body_collection.solid_force_collection.Add_Force(drag);
                 drag->Use_Linear_Normal_Viscosity(17);drag->Use_Spatially_Varying_Wind(0,*wind_grid,*wind_V);}
             break;}
         case 36:{
@@ -1411,91 +1413,91 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             if(triangulated_surface.mesh.elements.m != cloth_triangles){
                 LOG::cerr<<"we got "<<triangulated_surface.mesh.elements.m<<" and expected "<<cloth_triangles<<" with side_length="<<side_length<<std::endl;
                 PHYSBAM_FATAL_ERROR();}
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0,(T)64));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0,(T)64));
             T linear_stiffness=40,linear_damping=2;
-            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
             //T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-            //solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
+            //solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
             PHYSBAM_DEBUG_PRINT("Spring stiffnesses",linear_stiffness,linear_damping);}
-            //if(!no_altitude_springs) solid_body_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,stiffness_multiplier*2*4/(1+sqrt((T)2)),damping_multiplier*4));
+            //if(!no_altitude_springs) solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,stiffness_multiplier*2*4/(1+sqrt((T)2)),damping_multiplier*4));
             //TRIANGLE_BENDING_ELEMENTS<T>* bend=Create_Bending_Elements(triangulated_surface);
             //bend->Set_Area_Cutoff_From_Triangulated_Surface(triangulated_surface,(T).1);
             //bend->use_force_differential=false;
-            //solid_body_collection.Add_Force(bend);
+            //solid_body_collection.solid_force_collection.Add_Force(bend);
             break;
         case 32:{
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             if(triangulated_surface.mesh.elements.m != cloth_triangles) PHYSBAM_FATAL_ERROR();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
             LINEAR_SPRINGS<TV>* edge_springs=Create_Edge_Springs(triangulated_surface,stiffness_multiplier*10/(1+sqrt((T)2)),
                 damping_multiplier*20); // were *2 and *10
             //edge_springs->restlength*=(T).9;edge_springs->visual_restlength=edge_springs->restlength;
             //edge_springs->Set_Overdamping_Fraction(damping_multiplier*10/(1+sqrt((T)2))); // put it under more tension with cylinder
-            solid_body_collection.Add_Force(edge_springs);
-            solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,2/(1+sqrt((T)2)),(T)8));
+            solid_body_collection.solid_force_collection.Add_Force(edge_springs);
+            solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(triangulated_surface,2/(1+sqrt((T)2)),(T)8));
             ETHER_DRAG<GRID<TV> >* drag=new ETHER_DRAG<GRID<TV> >(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true,0);
-            solid_body_collection.Add_Force(drag);}
+            solid_body_collection.solid_force_collection.Add_Force(drag);}
             break;
         case 6:
         case 7:
         case 8:
         case 9:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            if(test_number==6) solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            solid_body_collection.Add_Force(Create_Quasistatic_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e5,(T).45)));
+            if(test_number==6) solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Quasistatic_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e5,(T).45)));
             break;}
         case 19:
         case 29:{
             for(int i=0;i<((parameter>=2)?1:2);i++){
                 TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>(i);
-                solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
-                solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,stiffness_multiplier*2/(1+sqrt((T)2)),
+                solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
+                solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_surface,stiffness_multiplier*2/(1+sqrt((T)2)),
                     damping_multiplier*2));
                 if(fully_implicit){
                     if(use_axial){
                         T axial_bending_stiffness=axial_bending_stiffness_multiplier*2/(1+sqrt((T)2)),axial_bending_damping=axial_bending_damping_multiplier*8;
-                        solid_body_collection.Add_Force(Create_Axial_Bending_Springs(triangulated_surface,(T).01,axial_bending_stiffness,axial_bending_damping));}
+                        solid_body_collection.solid_force_collection.Add_Force(Create_Axial_Bending_Springs(triangulated_surface,(T).01,axial_bending_stiffness,axial_bending_damping));}
                     T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-                    solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));}
+                    solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));}
                 else{
-                    if(!no_altitude_springs) solid_body_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,stiffness_multiplier*2*4/(1+sqrt((T)2)),damping_multiplier*4));
+                    if(!no_altitude_springs) solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,stiffness_multiplier*2*4/(1+sqrt((T)2)),damping_multiplier*4));
                     TRIANGLE_BENDING_ELEMENTS<T>* bend=Create_Bending_Elements(triangulated_surface);
                     bend->Set_Area_Cutoff_From_Triangulated_Surface(triangulated_surface,(T).1);
                     bend->use_force_differential=false;
-                    solid_body_collection.Add_Force(bend);}}
+                    solid_body_collection.solid_force_collection.Add_Force(bend);}}
             break;}
         case 20:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             //TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
-            //solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_surface,new NEO_HOOKEAN_2D<T>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
+            //solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(triangulated_surface,new NEO_HOOKEAN_2D<T>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(deformable_body_collection.particles,binding_segment_mesh);
             spring_force->visual_restlength.Fill((T)0);spring_force->Clamp_Restlength(1);
-            solid_body_collection.Add_Force(spring_force);
+            solid_body_collection.solid_force_collection.Add_Force(spring_force);
             break;}
         case 21:{
             SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(segmented_curve,(T)1);
-            spring_force->Clamp_Restlength((T).05);solid_body_collection.Add_Force(spring_force);
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)3,2));
-            if(!no_altitude_springs) solid_body_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,2*4/(1+sqrt((T)2)),(T)4));
-            solid_body_collection.Add_Force(Create_Bending_Elements(triangulated_surface));
+            spring_force->Clamp_Restlength((T).05);solid_body_collection.solid_force_collection.Add_Force(spring_force);
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)3,2));
+            if(!no_altitude_springs) solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,2*4/(1+sqrt((T)2)),(T)4));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Elements(triangulated_surface));
             break;}
         case 23:{
             break;}
         case 24:{
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             // fvm
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             T internal_poissons_ratio=test_24_poissons_ratio<(T).5?test_24_poissons_ratio:0;
             INCOMPRESSIBLE_FINITE_VOLUME<TV,3>* fvm=Create_Incompressible_Finite_Volume(tetrahedralized_volume);
             fvm->mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
             if(test_24_poissons_ratio<(T).5) fvm->disable_projection=true;
-            solid_body_collection.Add_Force(fvm);
-            solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e4,internal_poissons_ratio,(T).01,(T).25)));
+            solid_body_collection.solid_force_collection.Add_Force(fvm);
+            solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e4,internal_poissons_ratio,(T).01,(T).25)));
             break;}
         case 25:
         case 33:
@@ -1508,13 +1510,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                     spring_force=Create_Edge_Springs(*curve,(T)1);
                 if(spring_force){
                     spring_force->Clamp_Restlength((T).05);
-                    solid_body_collection.Add_Force(spring_force);}}
-            if(test_number==25) solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));}
+                    solid_body_collection.solid_force_collection.Add_Force(spring_force);}}
+            if(test_number==25) solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));}
             break;
         case 26:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
-            solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
             break;}
         case 27:{
             for(int i=0;i<deformable_body_collection.structures.m;i++){
@@ -1522,108 +1524,108 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.structures(i))){
                     spring_force=Create_Edge_Springs(*surface,(T)1e4);
                     spring_force->Clamp_Restlength((T).05);
-                    solid_body_collection.Add_Force(spring_force);}}
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));}
+                    solid_body_collection.solid_force_collection.Add_Force(spring_force);}}
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));}
             break;
         case 28:{
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>()){
-                //solid_body_collection.Add_Force(Create_Edge_Springs(*tetrahedralized_volume,
+                //solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(*tetrahedralized_volume,
                 //    stiffness_multiplier*10000/(1+sqrt((T)2)),damping_multiplier*10));
-                solid_body_collection.Add_Force(Create_Finite_Volume(*tetrahedralized_volume,new ROTATED_LINEAR<T,3>((T)1e4,(T).3,(T).1)));
+                solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(*tetrahedralized_volume,new ROTATED_LINEAR<T,3>((T)1e4,(T).3,(T).1)));
             }
             if(TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>*>()){
                 T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
-                solid_body_collection.Add_Force(Create_Edge_Springs(*triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
+                solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(*triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
                 T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-                solid_body_collection.Add_Force(Create_Bending_Springs(*triangulated_surface,bending_stiffness,bending_damping));}
-            //solid_body_collection.template Find_Force<FINITE_VOLUME_3D<T>&>().strain_measure.Initialize_Rest_State_To_Equilateral_Tetrahedrons((T).1);
+                solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(*triangulated_surface,bending_stiffness,bending_damping));}
+            //solid_body_collection.solid_force_collection.template Find_Force<FINITE_VOLUME_3D<T>&>().strain_measure.Initialize_Rest_State_To_Equilateral_Tetrahedrons((T).1);
             break;}
         case 37:{
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             for(int i=0;i<deformable_body_collection.structures.m;i++) if(TETRAHEDRALIZED_VOLUME<T>* structure=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(i)))
-                solid_body_collection.Add_Force(Create_Finite_Volume(*structure,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
+                solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(*structure,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             break;}
         case 38:{
             SEGMENTED_CURVE<TV>& curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
-            solid_body_collection.Add_Force(Create_Edge_Springs(curve,100/(1+sqrt((T)2)),(T)3));
-            solid_body_collection.Add_Force(Create_Segment_Bending_Springs(curve,100/(1+sqrt((T)2)),(T)3));
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(curve,100/(1+sqrt((T)2)),(T)3));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Segment_Bending_Springs(curve,100/(1+sqrt((T)2)),(T)3));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 47:{
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
 
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
-            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-            solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
             T axial_bending_stiffness=axial_bending_stiffness_multiplier*2/(1+sqrt((T)2)),axial_bending_damping=axial_bending_damping_multiplier*8;
-            solid_body_collection.Add_Force(Create_Axial_Bending_Springs(triangulated_surface,(T).01,axial_bending_stiffness,axial_bending_damping));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Axial_Bending_Springs(triangulated_surface,(T).01,axial_bending_stiffness,axial_bending_damping));
             break;}
         case 48:{
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             tests.Add_Gravity();
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
-            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-            //solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
-            solid_body_collection.Add_Force(Create_Axial_Bending_Springs(triangulated_surface,(T).01,bending_stiffness,bending_damping));
+            //solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Axial_Bending_Springs(triangulated_surface,(T).01,bending_stiffness,bending_damping));
             break;}
         case 41:{
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
             //INCOMPRESSIBLE_FINITE_VOLUME<TV,2>* fvm=Create_Incompressible_Finite_Volume(triangulated_surface,new SPLINE_MODEL<T,2>((T)2e4,(T)0,(T).5,(T)7));
             //fvm->max_cg_iterations=50;
-            //solid_body_collection.Add_Force(fvm);
-            //solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_surface,new SPLINE_MODEL<T,2>((T)2e4))); // ,(T)0,(T)0.01,(T)0.25)));
+            //solid_body_collection.solid_force_collection.Add_Force(fvm);
+            //solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(triangulated_surface,new SPLINE_MODEL<T,2>((T)2e4))); // ,(T)0,(T)0.01,(T)0.25)));
             
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
-            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-            solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
-            //solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)1000,(T)4)); // were *2 and *10
-            //solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,(T)1000,(T)4)); // were *2 and *10
+            solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
+            //solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)1000,(T)4)); // were *2 and *10
+            //solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(triangulated_surface,(T)1000,(T)4)); // were *2 and *10
         }
             break;
         case 42:{
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>&>();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
-            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)1000,(T)2)); // were *2 and *10
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)1000,(T)2)); // were *2 and *10
             LINEAR_SPRINGS<TV>* stick_springs=Create_Edge_Springs(segmented_curve,(T)1000,(T)2);
             stick_springs->visual_restlength.Fill((T)0.01);stick_springs->Clamp_Restlength((T).01);
-            solid_body_collection.Add_Force(stick_springs);}
+            solid_body_collection.solid_force_collection.Add_Force(stick_springs);}
             break;
         case 44:{
             for(int i=0;i<deformable_body_collection.structures.m;i++) if(TETRAHEDRALIZED_VOLUME<T>* structure=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(i)))
-                solid_body_collection.Add_Force(Create_Finite_Volume(*structure,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
+                solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(*structure,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             break;}
         case 46:{
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>(0);
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
-            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,stiffness_multiplier*2/(1+sqrt((T)2)),
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_surface,stiffness_multiplier*2/(1+sqrt((T)2)),
                     damping_multiplier*2));
-            //if(!no_altitude_springs) solid_body_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,stiffness_multiplier*2*4/(1+sqrt((T)2)),damping_multiplier*4));
+            //if(!no_altitude_springs) solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,stiffness_multiplier*2*4/(1+sqrt((T)2)),damping_multiplier*4));
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-            solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
             break;}
         case 49:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
+            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             break;}
         case 50:{
             for(int i=0;i<parameter;i++){
                 TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
-                solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-                solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));}
+                solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+                solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));}
             break;}
         case 51:{
             for(int i=0;i<parameter;i++){
                 TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
-                solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-                solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));}
+                solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+                solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));}
             break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
@@ -1658,19 +1660,19 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}}
 
     if(substitute_springs){
-        solid_body_collection.deformable_body_collection.deformables_forces.Delete_Pointers_And_Clean_Memory();
+        solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces.Delete_Pointers_And_Clean_Memory();
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         if(tetrahedralized_volume.mesh.elements.m){
             T linear_stiffness=stiffness_multiplier*1e4,linear_damping=damping_multiplier*1;
             DEFORMABLES_FORCES<TV>* altitude_springs=Create_Altitude_Springs(tetrahedralized_volume,(T)linear_stiffness/(1+sqrt((T)2)),(T)linear_damping);
-            solid_body_collection.Add_Force(altitude_springs);
+            solid_body_collection.solid_force_collection.Add_Force(altitude_springs);
             DEFORMABLES_FORCES<TV>* edge_springs=Create_Edge_Springs(tetrahedralized_volume,(T)linear_stiffness/(1+sqrt((T)2)),(T)linear_damping);
-            solid_body_collection.Add_Force(edge_springs);}}
+            solid_body_collection.solid_force_collection.Add_Force(edge_springs);}}
 
-    if(fully_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(fully_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
-        solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(fully_implicit) for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(fully_implicit) for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(fully_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces.m;i++)
+        solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(fully_implicit) for(int i=0;i<deformable_body_collection.deformable_force_collection.deformables_forces.m;i++) deformable_body_collection.deformable_force_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 }
 //#####################################################################
 // Function Read_Output_Files_Solids
@@ -1698,7 +1700,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 //#####################################################################
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
-    if(LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.template Find_Force<LINEAR_SPRINGS<TV>*>())
+    if(LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.solid_force_collection.template Find_Force<LINEAR_SPRINGS<TV>*>())
         linear_springs->Print_Deformation_Statistics();
 }
 //#####################################################################
@@ -1711,10 +1713,10 @@ void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE
             INTERPOLATION_CURVE<T,TV> wind_stop;
             wind_stop.Add_Control_Point(test_30_wind_off-(T).3,TV((T).001,1,(T)-.25));
             wind_stop.Add_Control_Point(test_30_wind_off,TV());
-            WIND_DRAG_3D<T>& drag=solid_body_collection.template Find_Force<WIND_DRAG_3D<T>&>();
+            WIND_DRAG_3D<T>& drag=solid_body_collection.solid_force_collection.template Find_Force<WIND_DRAG_3D<T>&>();
             drag.Use_Linear_Normal_Viscosity(0);drag.Use_Constant_Wind(0,TV());}
         else if(time>test_30_friction_off){
-            WIND_DRAG_3D<T>& drag=solid_body_collection.template Find_Force<WIND_DRAG_3D<T>&>();
+            WIND_DRAG_3D<T>& drag=solid_body_collection.solid_force_collection.template Find_Force<WIND_DRAG_3D<T>&>();
             drag.Use_Linear_Normal_Viscosity(20);drag.Use_Constant_Wind(0,TV((T).001,1,(T)-.25));}}
     else if(test_number==32){
         if(time>test_32_wind_drag_on){
@@ -1722,7 +1724,7 @@ void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE
             INTERPOLATION_CURVE<T,T> wind_viscosity;
             wind_viscosity.Add_Control_Point(test_32_wind_drag_on,0);
             wind_viscosity.Add_Control_Point(test_32_wind_drag_ramp_off,20);
-            ETHER_DRAG<GRID<TV> >& drag=solid_body_collection.template Find_Force<ETHER_DRAG<GRID<TV> >&>();
+            ETHER_DRAG<GRID<TV> >& drag=solid_body_collection.solid_force_collection.template Find_Force<ETHER_DRAG<GRID<TV> >&>();
             drag.Use_Constant_Wind(wind_viscosity.Value(time));}}
 }
 //#####################################################################
