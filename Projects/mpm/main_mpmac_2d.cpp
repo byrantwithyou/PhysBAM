@@ -63,9 +63,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // geometry setting
     switch(test_number){
         case 1:{ // dam break
-            sim.grid.Initialize(TV_INT(3.2*grid_res+1,5.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(1.6,3.6)));
+            sim.grid.Initialize(TV_INT(3.2*grid_res+1,3.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(1.6,1.6)));
             
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.45,-1.45),TV(-0.8,0.8)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.3,-1.3),TV(-0.8,0.8)),particle_exclude_radius);
 
             int c1=sim.particles.number;
             sim.particles.Set_Material_Properties(0,c1,
@@ -110,7 +110,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                                             MATRIX<T,TV::m>::Identity_Matrix(), // Fe
                                             MATRIX<T,TV::m>::Identity_Matrix(), // Fp
                                             TV(0,0)); // initial velocity
-            
+            air=c1;
+
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.46,-0.49),TV(1.46,0.49)),particle_exclude_radius);
             int c2=sim.particles.number-c1;
             sim.particles.Set_Material_Properties(c1,c2,

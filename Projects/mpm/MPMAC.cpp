@@ -207,7 +207,7 @@ Solve_For_Pressure()
     rhs.v.Copy(-(T)1.0,div_u);
     Fix_RHS_Neumann_Cells(rhs.v);
     x.v=rhs.v;
-    system.Test_System(*vectors(0),*vectors(1),*vectors(2));
+    // system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cg;
