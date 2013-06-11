@@ -40,7 +40,6 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGIDS_NEWMARK_COLLISION_CALLBACKS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
@@ -86,7 +85,7 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
     solid_body_collection.example_forces_and_velocities->Add_External_Forces(B_full,current_velocity_time+dt);
     solid_body_collection.example_forces_and_velocities->Add_External_Forces(rigid_B_full,current_velocity_time+dt);
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(particles.V);
-    solid_body_collection.solid_force_collection.Add_Velocity_Independent_Forces(B_full,rigid_B_full,current_velocity_time+dt); // this is a nop for binding forces
+    solid_body_collection.Add_Velocity_Independent_Forces(B_full,rigid_B_full,current_velocity_time+dt); // this is a nop for binding forces
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B_full,rigid_B_full);
     solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(rigid_B_full);
@@ -96,9 +95,8 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
         solid_body_collection.deformable_body_collection.soft_bindings.Map_Forces_From_Parents(B_full,rigid_B_full);
         solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(B_full);
         if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
-        for(int k=0;k<solid_body_collection.solid_force_collection.solids_forces.m;k++)
-            if(dynamic_cast<BINDING_SPRINGS<TV>*>(&*solid_body_collection.solid_force_collection.solids_forces(k)))
-                solid_body_collection.solid_force_collection.solids_forces(k)->Add_Force_Differential(particles.X,B_full,current_velocity_time+dt);
+        for(int k=0;k<solid_body_collection.solids_forces.m;k++) if(dynamic_cast<BINDING_SPRINGS<TV>*>(&*solid_body_collection.solids_forces(k)))
+            solid_body_collection.solids_forces(k)->Add_Force_Differential(particles.X,B_full,current_velocity_time+dt);
         if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
         solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B_full,rigid_B_full);}
 
@@ -326,8 +324,8 @@ Backward_Euler_Step_Velocity(const T dt,const T time)
 template<class TV> void NEWMARK_EVOLUTION<TV>::
 Make_Incompressible(const T dt,const bool correct_volume)
 {
-    for(int f=0;f<solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces.m;f++)
-        if(INCOMPRESSIBLE_FINITE_VOLUME_BASE<TV>* fvm=dynamic_cast<INCOMPRESSIBLE_FINITE_VOLUME_BASE<TV>*>(&*solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces(f))){
+    for(int f=0;f<solid_body_collection.deformable_body_collection.deformables_forces.m;f++)
+        if(INCOMPRESSIBLE_FINITE_VOLUME_BASE<TV>* fvm=dynamic_cast<INCOMPRESSIBLE_FINITE_VOLUME_BASE<TV>*>(&*solid_body_collection.deformable_body_collection.deformables_forces(f))){
             fvm->Set_Neumann_Boundary_Conditions(&solid_body_collection.deformable_body_collection.collisions.particle_states,repulsions);
             fvm->Make_Incompressible(dt,correct_volume);
             Diagnostics(dt,time,1,0,700,"make incompressible");}
@@ -363,7 +361,7 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
         if(solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions) solid_body_collection.deformable_body_collection.collisions.Activate_Collisions(false);}
 
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(solid_body_collection.deformable_body_collection.particles.X);
-    solid_body_collection.solid_force_collection.Update_Position_Based_State(time+dt,true);
+    solid_body_collection.Update_Position_Based_State(time+dt,true);
 
     // get momentum difference for v^n -> v^{n+1/2} udpate
     if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
@@ -546,7 +544,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt/2);
 
         if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(solid_body_collection.deformable_body_collection.particles.X);
-        solid_body_collection.solid_force_collection.Update_Position_Based_State(time+dt/2,(solids_parameters.allow_altitude_spring_change_between_updates?true:false));
+        solid_body_collection.Update_Position_Based_State(time+dt/2,(solids_parameters.allow_altitude_spring_change_between_updates?true:false));
         Make_Incompressible(dt,false); // make velocity divergence free
         if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
         Trapezoidal_Step_Velocity(dt,time);
@@ -563,7 +561,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
 
         if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(solid_body_collection.deformable_body_collection.particles.X);
-        solid_body_collection.solid_force_collection.Update_Position_Based_State(time+dt,(solids_parameters.allow_altitude_spring_change_between_updates?true:false));
+        solid_body_collection.Update_Position_Based_State(time+dt,(solids_parameters.allow_altitude_spring_change_between_updates?true:false));
         Make_Incompressible(dt,false); // make velocity divergence free
         if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
         Backward_Euler_Step_Velocity(dt,time); // TODO: Tamar & Craig, do you need post stab?
@@ -660,7 +658,7 @@ template<class TV> void NEWMARK_EVOLUTION<TV>::
 Diagnostics(const T dt,const T time,const int velocity_time,const int position_time,int step,const char* description)
 {
     static const char* time_table[]={"n","(n+1/2)","(n+1)","(n+3/2)","(n+2)"};
-    solid_body_collection.solid_force_collection.Print_Energy(time+position_time*(T).5*time,step);
+    solid_body_collection.Print_Energy(time+position_time*(T).5*time,step);
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Finished step %i (%s).  State: x^%s  v^%s.   dt=%f time=%f",step,description,
         time_table[position_time],time_table[velocity_time],dt,time),2,3);
 }

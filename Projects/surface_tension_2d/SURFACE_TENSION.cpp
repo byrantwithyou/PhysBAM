@@ -3,8 +3,6 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLECTION.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/MATRIX_FLUID_GRADIENT_CUT.h>
@@ -75,7 +73,7 @@ Register_Options()
     parse_args->Add("-dt",&exact_dt,"dt","use this constand dt");
     parse_args->Add("-explicit_solid",&no_implicit_solid,"explicit solids");
     parse_args->Add("-build_surface",&rebuild_surface,"rebuild surface");
-    parse_args->Add("-print_energy",&solid_body_collection.solid_force_collection.print_energy,"print energy statistics");
+    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
     parse_args->Add("-surface_tension",&fluids_parameters.surface_tension,"coeff","surface tension coefficient");
     parse_args->Add("-cut_cell",&fluids_parameters.second_order_cut_cell_method,"use second order cut cell");
     parse_args->Add("-oscillation_mode",&oscillation_mode,"modes","number of oscillation nodes");
@@ -349,8 +347,8 @@ template<class T> void SURFACE_TENSION<T>::
 Preprocess_Substep(const T dt,const T time)
 {
     current_dt=dt;
-    if(SURFACE_TENSION_FORCE<TV>* force=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<SURFACE_TENSION_FORCE<TV>*>()) force->dt=dt;
-    if(LINEAR_POINT_ATTRACTION<TV>* force=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<LINEAR_POINT_ATTRACTION<TV>*>()) force->dt=dt;
+    if(SURFACE_TENSION_FORCE<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<TV>*>()) force->dt=dt;
+    if(LINEAR_POINT_ATTRACTION<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<LINEAR_POINT_ATTRACTION<TV>*>()) force->dt=dt;
 
     if(test_number==4 || test_number==5){
         Test_Analytic_Velocity(time);
@@ -442,14 +440,14 @@ Initialize_Bodies()
     if(!curve) curve=solid_body_collection.deformable_body_collection.template Find_Structure<SEGMENTED_CURVE_2D<T>*>();
     if(curve){
         SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(*curve,fluids_parameters.surface_tension);
-        solid_body_collection.solid_force_collection.Add_Force(stf);
+        solid_body_collection.Add_Force(stf);
         stf->apply_explicit_forces=true;
         stf->apply_implicit_forces=implicit_solid;
         fluids_parameters.surface_tension=0;}
 
-    for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->compute_half_forces=true;
-    for(int k=0;k<solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces(k)->compute_half_forces=true;
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces(i)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
 }
 //#####################################################################
 // Function Kang_Circle
@@ -508,7 +506,7 @@ Kang_Circle(bool use_surface)
 //    solids_parameters.write_static_variables_every_frame=true;
     use_massless_structure=use_surface;
 
-    solid_body_collection.solid_force_collection.Set_CFL_Number(10);
+    solid_body_collection.Set_CFL_Number(10);
 
 //    fluids_parameters.second_order_cut_cell_method=false;
     fluids_parameters.use_particle_levelset=true;
@@ -553,7 +551,7 @@ Oscillating_Circle(bool use_surface)
 //    solids_parameters.write_static_variables_every_frame=true;
     use_massless_structure=use_surface;
 
-    solid_body_collection.solid_force_collection.Set_CFL_Number(10);
+    solid_body_collection.Set_CFL_Number(10);
 
     fluids_parameters.use_particle_levelset=true;
 
@@ -577,7 +575,7 @@ Oscillating_Circle(bool use_surface)
             T scale=circle_radius+circle_perturbation*cos(oscillation_mode*angle);
             X=TV(.5,.5)+X*scale;}
         solid_body_collection.deformable_body_collection.particles.mass.Fill((T)1);
-        solid_body_collection.solid_force_collection.Add_Force(stf);
+        solid_body_collection.Add_Force(stf);
         stf->apply_explicit_forces=true;
         stf->apply_implicit_forces=implicit_solid;
         particle_segments.Resize(area->particles.X.m);
@@ -615,7 +613,7 @@ Sine_Wave()
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     use_massless_structure=true;
-    solid_body_collection.solid_force_collection.Set_CFL_Number(10);
+    solid_body_collection.Set_CFL_Number(10);
     fluids_parameters.use_particle_levelset=true;
 
     SPHERE<TV> object(TV((T).02*m,(T).02*m),(T).01*m);
@@ -1030,12 +1028,12 @@ Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T curren
         system.fluid_gradient=gradient;    
         fsi->fluid_mass=&system.fluid_mass;
         fsi->gradient=gradient;
-        SURFACE_TENSION_FORCE<TV>* force=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<SURFACE_TENSION_FORCE<TV>*>();
+        SURFACE_TENSION_FORCE<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<TV>*>();
         if(!force) return;
         force->Update_Position_Based_State(current_position_time,true);}
 
     if(rebuild_surface){
-        SURFACE_TENSION_FORCE<TV>* force=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<SURFACE_TENSION_FORCE<TV>*>();
+        SURFACE_TENSION_FORCE<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<TV>*>();
         if(!force) return;
 
         SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>& system=dynamic_cast<SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>&>(coupled_system);
@@ -1118,7 +1116,7 @@ FSI_Analytic_Test()
     fluids_parameters.second_order_cut_cell_method=true;
     fluids_parameters.use_levelset_viscosity=true;
     PHYSBAM_ASSERT(fluids_parameters.use_slip);
-    solid_body_collection.solid_force_collection.Set_CFL_Number(10);
+    solid_body_collection.Set_CFL_Number(10);
 
     for(int b=0;b<2;b++){
         Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(b));
@@ -1129,7 +1127,7 @@ FSI_Analytic_Test()
     rigid_body.Set_Coefficient_Of_Restitution((T)0);
     rigid_body.Set_Mass(solid_density*solid_width);
 
-    solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity*m));
+    solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity*m));
     Add_Volumetric_Body_To_Fluid_Simulation(rigid_body);
 
     T solid_mass=solid_body_collection.rigid_body_collection.rigid_body_particles.mass(2);

@@ -191,7 +191,7 @@ void Pyramid_Of_Boxes()
 
     tests.Add_Ground(1, -10);
     last_frame = 400;
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
 }
 //#####################################################################
 // Function Stacked_Boxes
@@ -218,7 +218,7 @@ void Stacked_Boxes() {
 
     tests.Add_Ground(1, -10);
     last_frame = 250;
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
 }
 //#####################################################################
 // Function Partition_Test
@@ -244,7 +244,7 @@ void Contact_Test_1() {
             rigid_body->Frame().t = TV(i*4,j*2,0);}}
 
     tests.Add_Ground(1, -1);
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
 }
 //#####################################################################
 // Function Contact_Test_2
@@ -260,7 +260,7 @@ void Contact_Test_2() {
         width--;}
 
     tests.Add_Ground(1, -1);
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
 }
 //#####################################################################
 // Function Simple_Collision_Test
@@ -334,7 +334,7 @@ void Many_Sphere_Test()
         solid_body_collection.rigid_body_collection.collision_body_list->Get_Collision_Geometry(rigid_body.particle_index)->add_to_spatial_partition=true;}
     tests.Add_Ground((T).5,0,0);
     RIGID_GRAVITY<TV> *gravity=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,true);
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(gravity);
+    solid_body_collection.rigid_body_collection.Add_Force(gravity);
 }
 //#####################################################################
 // Function Cluster_Fracture
@@ -375,7 +375,7 @@ void Break_Levelset()
         solid_body_collection.rigid_body_collection.collision_body_list->Get_Collision_Geometry(rigid_body.particle_index)->add_to_spatial_partition=true;}
     tests.Add_Ground((T).5,-2,0);
     
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
 }
 //#####################################################################
 // Function Postprocess_Frame

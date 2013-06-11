@@ -8,6 +8,10 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
+#include <fstream>
+#include <iostream>
+#include "math.h"
+
 #include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
@@ -37,11 +41,9 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGIDS_NEWMARK_COLLISION_CALLBACKS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.h>
@@ -54,9 +56,6 @@
 #include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION_SLIP.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.h>
-#include <fstream>
-#include <iostream>
-#include "math.h"
 
 namespace PhysBAM{
 
@@ -1123,8 +1122,8 @@ void Finalize_Deformable_Bodies()
 
     // Add forces
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-    solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(tetrahedralized_volume,(T)1e4,(T)5));
-    solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(tetrahedralized_volume,(T)1e4));
+    solid_body_collection.Add_Force(Create_Edge_Springs(tetrahedralized_volume,(T)1e4,(T)5));
+    solid_body_collection.Add_Force(Create_Altitude_Springs(tetrahedralized_volume,(T)1e4));
 
     // Add to fluid simulation
     TRIANGULATED_SURFACE<T>& triangulated_surface=tetrahedralized_volume.Get_Boundary_Object();
@@ -1189,12 +1188,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
     else Add_Ground(true);
 
-    if(use_solids_gravity) solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(solid_body_collection.deformable_body_collection.particles,rigid_body_collection,true,true,solid_gravity));
+    if(use_solids_gravity) solid_body_collection.Add_Force(new GRAVITY<TV>(solid_body_collection.deformable_body_collection.particles,rigid_body_collection,true,true,solid_gravity));
 
     // Half forces for SPD
-    for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->compute_half_forces=true;
-    for(int k=0;k<solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces(k)->compute_half_forces=true;
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces(i)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
 }
 void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {

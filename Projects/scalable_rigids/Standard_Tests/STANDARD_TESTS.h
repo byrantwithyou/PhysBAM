@@ -19,7 +19,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -88,7 +87,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     BASE::Register_Options();
     parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
     parse_args->Add_Not("-noanalytic",&solids_parameters.rigid_body_collision_parameters.use_analytic_collisions,"disable analytic collisions");
-    parse_args->Add("-print_energy",&solid_body_collection.rigid_body_collection.rigid_force_collection.print_energy,"print energy statistics");
+    parse_args->Add("-print_energy",&solid_body_collection.rigid_body_collection.print_energy,"print energy statistics");
 }
 //#####################################################################
 // Function Parse_Options

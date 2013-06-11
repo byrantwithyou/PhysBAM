@@ -185,17 +185,17 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             ARRAY<int>& referenced_nodes=*new ARRAY<int>; // hey craig, look a memory leak.  cool andy, why don't you fix it?
             volume->mesh.elements.Flattened().Get_Unique(referenced_nodes);
             for(int i=referenced_nodes.m;i>=1;i--) if(constrained_nodes.Contains(referenced_nodes(i))) referenced_nodes.Remove_Index_Lazy(i);
-            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(*volume,(T)100,(T)3));
-            solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(*volume,(T)100,(T)3));
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,solid_body_collection.rigid_body_collection,&referenced_nodes,0));}}
+            solid_body_collection.Add_Force(Create_Edge_Springs(*volume,(T)100,(T)3));
+            solid_body_collection.Add_Force(Create_Altitude_Springs(*volume,(T)100,(T)3));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(particles,solid_body_collection.rigid_body_collection,&referenced_nodes,0));}}
     if(use_soft_bindings){
         soft_bindings.Initialize_Binding_Mesh();
         if(use_edge_springs){
             LINEAR_SPRINGS<TV>* linear_springs=Create_Edge_Springs(particles,*soft_bindings.binding_mesh,(T)1,(T)3);
-            solid_body_collection.solid_force_collection.Add_Force(linear_springs);
+            solid_body_collection.Add_Force(linear_springs);
             linear_springs->Clamp_Restlength((T)1e-2);}
         if(use_binding_springs){
-            solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,(T)1000,(T)3));}}
+            solid_body_collection.Add_Force(Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,(T)1000,(T)3));}}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes

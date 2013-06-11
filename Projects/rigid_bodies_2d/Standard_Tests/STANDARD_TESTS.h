@@ -30,7 +30,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS_SIMPLE_FRACTURE.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Standard_Tests/RIGIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
@@ -204,7 +203,7 @@ void Kinematic()
     last_frame=(int)(15*frame_rate);
 
     // add forces
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,true));
 }
 //#####################################################################
 // Function Test_Example
@@ -231,7 +230,7 @@ void Test_Example()
     last_frame=200;
 
     // add forces
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,true));
 }
 //#####################################################################
 // Function Pyramid_Of_Boxes
@@ -264,7 +263,7 @@ void Pyramid_Of_Boxes()
 
     tests.Add_Ground(1, -10);
     last_frame = 400;
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
 }
 //#####################################################################
 // Function Stacked_Boxes
@@ -291,7 +290,7 @@ void Stacked_Boxes() {
 
     tests.Add_Ground(1, -10);
     last_frame = 250;
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
 }
 //#####################################################################
 // Function Partition_Test
@@ -384,7 +383,7 @@ void Cluster()
     referenced_rigid_particles->Append(rigid_body_3->particle_index);
     referenced_rigid_particles->Append(rigid_body_4->particle_index);
     referenced_rigid_particles->Append(rigid_body_cluster_test->particle_index);
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
 
     for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particles.Size();i++){
         LOG::cout<<"Rigid body index "<<i<<solid_body_collection.rigid_body_collection.Rigid_Body(i).name<<std::endl;
@@ -405,7 +404,7 @@ void Contact_Test_1() {
             rigid_body->Frame().t = TV(i*4,j*2);}}
 
     tests.Add_Ground(1, -1);
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
 }
 //#####################################################################
 // Function Contact_Test_2
@@ -421,7 +420,7 @@ void Contact_Test_2() {
         width--;}
 
     tests.Add_Ground(1, -1);
-    solid_body_collection.rigid_body_collection.rigid_force_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
 }
 //#####################################################################
 // Function Simple_Collision_Test

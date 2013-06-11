@@ -130,7 +130,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(solid_body_collection.deformable_body_collection.soft_bindings.bindings.m) spring_force=Create_Edge_Binding_Springs(particles,spring_segment_mesh,stiffness,overdamping_fraction);
     else spring_force=Create_Edge_Zero_Length_Springs(particles,spring_segment_mesh,stiffness,overdamping_fraction);
 
-    solid_body_collection.solid_force_collection.Add_Force(spring_force);
+    solid_body_collection.Add_Force(spring_force);
 
     solid_body_collection.Update_Simulated_Particles();
 
@@ -171,7 +171,7 @@ LINEAR_SPRINGS<TV>* Create_Zero_Length_Linear_Springs(const T youngs_modulus,con
 //#####################################################################
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
-    if(LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.solid_force_collection.template Find_Force<LINEAR_SPRINGS<TV>*>())
+    if(LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.template Find_Force<LINEAR_SPRINGS<TV>*>())
         linear_springs->Print_Deformation_Statistics();
 
 /*    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
@@ -257,8 +257,8 @@ void Falling_Sphere()
 
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",
         RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,1000);
-    solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
-    solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
+    solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
+    solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
 
     // duplicate surface
     tetrahedralized_volume.Update_Number_Nodes();tetrahedralized_volume.Initialize_Triangulated_Surface();
@@ -308,8 +308,8 @@ void Falling_Embedded_Sphere()
 
     // add forces
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=embedding.embedded_object.simplicial_object;
-    solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
-    solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),
+    solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
+    solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),
         true,(T).1));
 
     spring_segment_mesh.elements.Append_Elements(solid_body_collection.deformable_body_collection.soft_bindings.bindings);

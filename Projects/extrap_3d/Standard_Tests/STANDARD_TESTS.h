@@ -93,13 +93,11 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Bindings/RIGID_BODY_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
@@ -265,7 +263,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-stiffen",&stiffness_multiplier,"multiplier","stiffness multiplier for various tests");
     parse_args->Add("-dampen",&damping_multiplier,"multiplier","damping multiplier for various tests");
     parse_args->Add("-residuals",&use_residuals,"print residuals during timestepping");
-    parse_args->Add("-print_energy",&solid_body_collection.solid_force_collection.print_energy,"print energy statistics");
+    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
     parse_args->Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"tolerance","CG tolerance for backward Euler");
     parse_args->Add("-use_be",&use_be,"use backward euler");
     parse_args->Add("-print_matrix",&print_matrix,"print Krylov matrix");
@@ -1607,7 +1605,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 5:
         case 6:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            if(test_number!=80) solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            if(test_number!=80) solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             if(test_number==80) particles.X.template Project<T,&TV::x>()*=-(T).97;
             if(test_number==80) particles.X.template Project<T,&TV::y>()*=(T).98;
@@ -1618,12 +1616,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 4: {
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).45,(T).01);
             break;}
         case 7:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             for(int i=0;i<deformable_body_collection.particles.X.m;i++) deformable_body_collection.particles.X(i).y=3;
             break;}
@@ -1635,12 +1633,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
                 Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
                 if(bools[i-1]) *bools[i-1]=false;}
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 11:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)5e4,(T).45,(T).01);
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 17:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
@@ -1684,7 +1682,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 29:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)0e2,(T).45,(T).01);
             forces_are_removed=true;
             break;}
@@ -1692,7 +1690,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 30:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).40,(T).01);
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             for(int i=0;i<deformable_body_collection.particles.X.m;i++){ deformable_body_collection.particles.V(i).x=(T)60;deformable_body_collection.particles.V(i).y=0;deformable_body_collection.particles.V(i).z=0;}
             break;}
         case 31:{
@@ -1767,16 +1765,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume6,youngs_modulus,poissons_ratio,damping);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume7=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(6);
             Add_Constitutive_Model(tetrahedralized_volume7,youngs_modulus,poissons_ratio,damping);
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            solid_body_collection.solid_force_collection.template Find_Force<GRAVITY<TV>&>().gravity=g;
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=g;
             break;}
         case 43:
         case 33:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,1e4,0.35,0.005);
 
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            solid_body_collection.solid_force_collection.template Find_Force<GRAVITY<TV>&>().gravity=0;
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=0;
             break;}
         case 58:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(0);
@@ -1788,7 +1786,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 //Add_Constitutive_Model(tetrahedralized_volume3,1e4,0.4,0.005);
             }
              
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 34:{
             T youngs_modulus=1e5;
@@ -1796,7 +1794,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             T damping=0.1;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 35:{
             T youngs_modulus=2e5;
@@ -1810,12 +1808,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume3,youngs_modulus,poissons_ratio,damping);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume4=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(3);
             Add_Constitutive_Model(tetrahedralized_volume4,youngs_modulus,poissons_ratio,damping);
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 36:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).45,(T).01);
-            //solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            //solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             for(int i=0;i<deformable_body_collection.particles.X.m/2;i++){ deformable_body_collection.particles.V(i).x=(T)1;deformable_body_collection.particles.V(i).y=0;deformable_body_collection.particles.V(i).z=0;}
             break;}
         case 37:{
@@ -1826,7 +1824,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping,0.4,50);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
             Add_Constitutive_Model(tetrahedralized_volume2,youngs_modulus,poissons_ratio,damping,0.4,50);
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             int m=mattress_grid.counts.x;
             int n=mattress_grid.counts.y;
             int mn=mattress_grid.counts.z;
@@ -1856,7 +1854,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                     particles.V(i+m*j+m*n*ij+(p-1)*m*n*mn)=TV(-3*sin(sin(127*p)*j/(T)n),-5*cos(sin(384*p)*4*ij/(T)mn)*2+5*sin(385*p),-6*sin(3*i*sin(457*p)/(T)m));
                 }
             }
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 39:{
             T youngs_modulus=1e4;
@@ -1866,7 +1864,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping,0.4,50);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
             Add_Constitutive_Model(tetrahedralized_volume2,youngs_modulus,poissons_ratio,damping,0.4,50);
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             int m=mattress_grid.counts.x;
             int n=mattress_grid.counts.y;
             int mn=mattress_grid.counts.z;
@@ -1885,7 +1883,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping,0.4,50);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
             Add_Constitutive_Model(tetrahedralized_volume2,youngs_modulus,poissons_ratio,damping,0.4,50);
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             int m=mattress_grid.counts.x;
             int n=mattress_grid.counts.y;
             int mn=mattress_grid.counts.z;
@@ -1917,7 +1915,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 Add_Constitutive_Model(tetrahedralized_volume,youngs_modulus,poissons_ratio,damping,0.4,50);
             }
             
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;
         }
         case 42:{
@@ -1944,7 +1942,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                     particles.V(index) += TV(0,particles.X(index).z-jello_centers(p).z,-(particles.X(index).y-jello_centers(p).y))*(cos(413*p));
                 }
             }
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 52:{
             T youngs_modulus=1e4;
@@ -1955,7 +1953,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(k);
                 Add_Constitutive_Model(tetrahedralized_volume,youngs_modulus,poissons_ratio,damping,0.4,50);
             }
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 44:{
             T youngs_modulus=4e5;
@@ -1965,7 +1963,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping,0.4,50);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
             Add_Constitutive_Model(tetrahedralized_volume2,youngs_modulus,poissons_ratio,damping,0.4,50);
-            solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             int m=mattress_grid.counts.x;
             int n=mattress_grid.counts.y;
             int mn=mattress_grid.counts.z;
@@ -2029,7 +2027,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
 
-    if(ether_drag) solid_body_collection.solid_force_collection.Add_Force(new ETHER_DRAG<GRID<TV> >(particles,solid_body_collection.rigid_body_collection,true,true,ether_drag,0));
+    if(ether_drag) solid_body_collection.Add_Force(new ETHER_DRAG<GRID<TV> >(particles,solid_body_collection.rigid_body_collection,true,true,ether_drag,0));
 
     if(solid_body_collection.deformable_body_collection.mpi_solids){
         VECTOR<int,3> processes_per_dimension(2,1,1);
@@ -2040,10 +2038,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         if(solids_parameters.triangle_collision_parameters.perform_self_collision)
             solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.structures(i));}
 
-    if(!semi_implicit) for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(!semi_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces.m;i++)
-        solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(!semi_implicit) for(int i=0;i<deformable_body_collection.deformable_force_collection.deformables_forces.m;i++) deformable_body_collection.deformable_force_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(!semi_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(!semi_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
+        solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(!semi_implicit) for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 }
 
 //#####################################################################
@@ -2266,13 +2264,13 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
     if(test_forces){
-        solid_body_collection.deformable_body_collection.deformable_force_collection.Test_Energy(time);
-        solid_body_collection.deformable_body_collection.deformable_force_collection.Test_Force_Derivatives(time);}
-    if(test_number==10 || test_number==11) solid_body_collection.solid_force_collection.template Find_Force<GRAVITY<TV>&>().gravity=10*time;
+        solid_body_collection.deformable_body_collection.Test_Energy(time);
+        solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
+    if(test_number==10 || test_number==11) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=10*time;
     if(test_number==33)
     {
         TETRAHEDRALIZED_VOLUME<T>& tet_volume= solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-        FINITE_VOLUME<TV,3>& fvm=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+        FINITE_VOLUME<TV,3>& fvm=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
         
         int number_of_vertices=solid_body_collection.deformable_body_collection.collisions.check_collision.m;
         for(int i=0;i<number_of_vertices;i++) solid_body_collection.deformable_body_collection.collisions.check_collision(i)=false;
@@ -2281,12 +2279,12 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             if(fvm.Fe_hat(t).x11<3)
                 for(int i=0;i<4;i++) solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=true;
 
-        if (time >=1 ) solid_body_collection.solid_force_collection.template Find_Force<GRAVITY<TV>&>().gravity=9.8;
+        if (time >=1 ) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=9.8;
     }
     if(test_number==58)
     {
         solid_body_collection.deformable_body_collection.collisions.check_collision.Fill(true);
-        for(int f=0;FINITE_VOLUME<TV,3>* fvm=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++)
+        for(int f=0;FINITE_VOLUME<TV,3>* fvm=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++)
             for(int t=0;t<fvm->Fe_hat.m;t++){
                // LOG::cout << "booya " << stretch_cutoff << std::endl;
                 if(fvm->Fe_hat(t).x11>=stretch_cutoff)
@@ -2299,7 +2297,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     if(test_number==31)
     {
         // TETRAHEDRALIZED_VOLUME<T>& tet_volume=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-        // FINITE_VOLUME<TV,3>& fvm=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+        // FINITE_VOLUME<TV,3>& fvm=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
 
         // int number_of_vertices=solid_body_collection.deformable_body_collection.collisions.check_collision.m;
         // for(int i=0;i<number_of_vertices;i++) solid_body_collection.deformable_body_collection.collisions.check_collision(i)=true;
@@ -2349,21 +2347,21 @@ void Update_Time_Varying_Material_Properties(const T time)
     //std::cout << "3rd critical time frame Frame" << (1>0) << " " << time << " " << critical3 << " " << (time>critical3) << " " << std::endl;
 
         if(time>critical && time<critical2) {
-            FINITE_VOLUME<TV,3>& fv=deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+            FINITE_VOLUME<TV,3>& fv=deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
             CONSTITUTIVE_MODEL<T,3>& icm=fv.constitutive_model;
             T young=pow(10.0,start_young + (time-critical)/(critical2-critical)*(end_young-start_young));
             icm.Update_Lame_Constants(young,pois,(T).01);
             forces_are_removed=false;
         }
     if(time>critical && rebound_time < 1e-6){
-        FINITE_VOLUME<TV,3>& fv=deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+        FINITE_VOLUME<TV,3>& fv=deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
         CONSTITUTIVE_MODEL<T,3>& icm=fv.constitutive_model;
         icm.Update_Lame_Constants(pow(10.0,end_young),pois,(T).01);
         forces_are_removed=false;
     }
     if(time>critical3 && self_collision_flipped==false){
         self_collision_flipped=true;
-        FINITE_VOLUME<TV,3>& fv=deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+        FINITE_VOLUME<TV,3>& fv=deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
         CONSTITUTIVE_MODEL<T,3>& icm=fv.constitutive_model;
         T young=pow(10.0,end_young-rebound_drop);
         icm.Update_Lame_Constants(young,pois,(T).01);
@@ -2380,7 +2378,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     
     //if (true)
     //{
-        FINITE_VOLUME<TV,3>& force_field=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+        FINITE_VOLUME<TV,3>& force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
         ARRAY<DIAGONAL_MATRIX<T,3> >& sv=force_field.Fe_hat;
         T Jmin=(T)1;T s1=(T)0;T s2=(T)0;T s3=(T)0;
 
@@ -2398,7 +2396,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     if(test_number==29)
         LOG::cout << "Self collisions enabled=" << solids_parameters.triangle_collision_parameters.perform_self_collision << " " << time << std::endl;
     if(dump_sv){
-        for(int f=0;FINITE_VOLUME<TV,3>* force_field=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++){
+        for(int f=0;FINITE_VOLUME<TV,3>* force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++){
             ARRAY<DIAGONAL_MATRIX<T,3> >& sv=force_field->Fe_hat;
             for(int i=0;i<sv.m;i++){
                 svout << sv(i).x11 << " " << sv(i).x22 << " " << sv(i).x33 << std::endl;
@@ -2555,7 +2553,7 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
         NEO_HOOKEAN<T,3>* nh=new NEO_HOOKEAN<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff);
         icm=nh;
         nh->use_constant_ife=use_constant_ife;}
-    solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,icm));
+    solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,icm));
     if(test_model_only) Test_Model(*icm);
 }
 
@@ -2729,7 +2727,7 @@ void Plot_Contour_Landscape(int frame)
     std::ofstream out(buff);
 
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    FINITE_VOLUME<TV,3>& fv=solid_body_collection.deformable_body_collection.deformable_force_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+    FINITE_VOLUME<TV,3>& fv=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm=fv.isotropic_model;
     bool is_neo=dynamic_cast<NEO_HOOKEAN<T,3>*>(icm);
     T min=-image_size/2,max=image_size/2;

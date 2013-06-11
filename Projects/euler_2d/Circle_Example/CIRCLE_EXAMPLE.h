@@ -23,7 +23,6 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_2D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
@@ -483,8 +482,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         // correct mass
         solid_body_collection.deformable_body_collection.particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
         
-        solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(triangulated_area,(T)1,(T)1.5));
-        solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(triangulated_area,(T)1));
+        solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_area,(T)1,(T)1.5));
+        solid_body_collection.Add_Force(Create_Altitude_Springs(triangulated_area,(T)1));
 
         SEGMENTED_CURVE_2D<T>& segmented_curve=triangulated_area.Get_Boundary_Object();
 
@@ -521,11 +520,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);}
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
 
-    if(use_solids_gravity) solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(solid_body_collection.deformable_body_collection.particles,rigid_body_collection,true,true,solid_gravity));
+    if(use_solids_gravity) solid_body_collection.Add_Force(new GRAVITY<TV>(solid_body_collection.deformable_body_collection.particles,rigid_body_collection,true,true,solid_gravity));
 
-    for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->compute_half_forces=true;
-    for(int k=0;k<solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces(k)->compute_half_forces=true;
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces(i)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
 }
 //#####################################################################
 // Function Set_Kinematic_Positions

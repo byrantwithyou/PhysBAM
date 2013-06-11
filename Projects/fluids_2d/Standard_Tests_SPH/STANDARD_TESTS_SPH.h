@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Matrices/FRAME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <PhysBAM_Dynamics/Particles/SPH_PARTICLES.h>
@@ -55,7 +54,7 @@ public:
     void Initialize_Velocities() PHYSBAM_OVERRIDE {}
     void Initialize_Bodies() PHYSBAM_OVERRIDE
     {
-        solid_body_collection.solid_force_collection.Add_Force(new GRAVITY<TV>(solid_body_collection.deformable_body_collection.particles,
+        solid_body_collection.Add_Force(new GRAVITY<TV>(solid_body_collection.deformable_body_collection.particles,
                 solid_body_collection.rigid_body_collection,true,true));
     }
     void Construct_Levelsets_For_Objects(const T time){}

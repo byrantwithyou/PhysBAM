@@ -19,7 +19,6 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/BW_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/BW_BACKWARD_EULER_SYSTEM.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
@@ -56,8 +55,8 @@ Force(const VECTOR_T& V,VECTOR_T& F) const
 {
     F.V.array.Subset(solid_body_collection.deformable_body_collection.simulated_particles).Fill(TV());
     F.rigid_V.array.Subset(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles).Fill(TWIST<TV>());
-    solid_body_collection.solid_force_collection.Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,dt,time);
-    solid_body_collection.solid_force_collection.Add_Velocity_Dependent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,time);
+    solid_body_collection.Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,dt,time);
+    solid_body_collection.Add_Velocity_Dependent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,time);
 }
 //#####################################################################
 // Function Multiply

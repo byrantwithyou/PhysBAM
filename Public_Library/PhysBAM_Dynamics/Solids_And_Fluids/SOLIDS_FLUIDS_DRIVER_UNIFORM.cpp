@@ -24,9 +24,7 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER_LAPLACE.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
@@ -334,7 +332,7 @@ Initialize()
 
         TV solid_momentum;T solid_kinetic_energy,solid_potential_energy;
         example.solid_body_collection.Compute_Linear_Momentum(solid_momentum);
-        example.solid_body_collection.solid_force_collection.Compute_Energy(time,solid_kinetic_energy,solid_potential_energy);
+        example.solid_body_collection.Compute_Energy(time,solid_kinetic_energy,solid_potential_energy);
 
         for(int i=0;i<T_GRID::dimension;i++) euler->initial_total_conserved_quantity[i+1]+=solid_momentum[i];
         euler->initial_total_conserved_quantity[T_GRID::dimension+1]+=(solid_kinetic_energy+solid_potential_energy);}
@@ -1261,7 +1259,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
             TV solid_momentum;T solid_kinetic_energy,solid_potential_energy;
             euler->Compute_Total_Conserved_Quantity(true,dt,new_total_conserved_quantity);
             example.solid_body_collection.Compute_Linear_Momentum(solid_momentum);
-            example.solid_body_collection.solid_force_collection.Compute_Energy(time,solid_kinetic_energy,solid_potential_energy);
+            example.solid_body_collection.Compute_Energy(time,solid_kinetic_energy,solid_potential_energy);
 
             for(int i=0;i<T_GRID::dimension;i++) new_total_conserved_quantity[i+1]+=solid_momentum[i];
             new_total_conserved_quantity[T_GRID::dimension+1]+=(solid_kinetic_energy+solid_potential_energy);
@@ -1362,10 +1360,9 @@ Compute_Dt(const T time,const T target_time,bool& done)
 
     // solids dt
     T solids_dt=FLT_MAX;
-    if(solids_evolution.Use_CFL()) solids_dt=min(solids_dt,example.solid_body_collection.solid_force_collection.CFL(solids_parameters.verbose_dt));
+    if(solids_evolution.Use_CFL()) solids_dt=min(solids_dt,example.solid_body_collection.CFL(solids_parameters.verbose_dt));
     solids_dt=min(solids_dt,solids_evolution_callbacks->Constraints_CFL());
-    if(solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies)
-        solids_dt=min(solids_dt,example.solid_body_collection.rigid_body_collection.rigid_force_collection.CFL_Rigid(solids_parameters.rigid_body_evolution_parameters,solids_parameters.verbose_dt));
+    if(solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies) solids_dt=min(solids_dt,example.solid_body_collection.rigid_body_collection.CFL_Rigid(solids_parameters.rigid_body_evolution_parameters,solids_parameters.verbose_dt));
     solids_evolution_callbacks->Limit_Solids_Dt(solids_dt,time);
     if(example.solid_body_collection.deformable_body_collection.mpi_solids)
         solids_dt=example.solid_body_collection.deformable_body_collection.mpi_solids->Reduce_Min_Global(solids_dt);

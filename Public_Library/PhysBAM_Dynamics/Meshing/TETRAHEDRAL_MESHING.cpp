@@ -26,7 +26,6 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
@@ -70,7 +69,7 @@ Initialize(IMPLICIT_OBJECT<TV>* implicit_surface_input)
     level_set_forces_and_velocities=new LEVEL_SET_FORCES_AND_VELOCITIES<TV>(*tetrahedralized_volume,*implicit_surface);
     solid_body_collection.example_forces_and_velocities=level_set_forces_and_velocities;
     solid_body_collection.rigid_body_collection.rigids_example_forces_and_velocities=level_set_forces_and_velocities;
-    solid_body_collection.solid_force_collection.Set_CFL_Number(solids_parameters.cfl);
+    solid_body_collection.Set_CFL_Number(solids_parameters.cfl);
 }
 //#####################################################################
 // Function Snap_Nodes_To_Level_Set_Boundary
@@ -342,13 +341,13 @@ Initialize_Dynamics()
     solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(deformable_body_collection.particles.mass);
     solid_body_collection.deformable_body_collection.particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
     if(dynamic_ether_viscosity!=0)
-        solid_body_collection.solid_force_collection.Add_Force(new ETHER_DRAG<GRID<TV> >(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(tetrahedralized_volume.particles),
+        solid_body_collection.Add_Force(new ETHER_DRAG<GRID<TV> >(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(tetrahedralized_volume.particles),
                 solid_body_collection.rigid_body_collection,true,true,dynamic_ether_viscosity));
-    if(use_finite_volume) solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,
+    if(use_finite_volume) solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,
         new ROTATED_LINEAR<T,3>(youngs_modulus,poissons_ratio,Rayleigh_coefficient)));
     else if(use_masses_and_springs){
-        solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(tetrahedralized_volume,edge_spring_stiffness,edge_spring_overdamping_fraction));
-        solid_body_collection.solid_force_collection.Add_Force(Create_Altitude_Springs(tetrahedralized_volume,altitude_spring_stiffness,
+        solid_body_collection.Add_Force(Create_Edge_Springs(tetrahedralized_volume,edge_spring_stiffness,edge_spring_overdamping_fraction));
+        solid_body_collection.Add_Force(Create_Altitude_Springs(tetrahedralized_volume,altitude_spring_stiffness,
             altitude_spring_overdamping_fraction,true,(T).1,true,(T).1,true,(T)0,false));}
     solid_body_collection.Update_Simulated_Particles();
     solids_evolution->Initialize_Rigid_Bodies((T)24,false);    
@@ -383,12 +382,12 @@ Advance_Dynamics(const T time,const T stopping_time,const bool verbose)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     // prepare for force computation
-    solid_body_collection.solid_force_collection.Update_Position_Based_State(time,true);
+    solid_body_collection.Update_Position_Based_State(time,true);
 
     T new_time=time;
     int substep=0;bool done=false;
     while(!done){substep++;
-        T dt=solid_body_collection.solid_force_collection.CFL();
+        T dt=solid_body_collection.CFL();
         if(new_time+dt>=stopping_time){dt=stopping_time-new_time;done=true;}else if(new_time+2*dt>=stopping_time) dt=(T).51*(stopping_time-new_time);
         if(verbose) LOG::cout<<"dt="<<dt<<"   substep="<<substep<<std::endl;
         solids_evolution->Advance_One_Time_Step_Position(dt,new_time,true);
@@ -719,7 +718,7 @@ Write_Output_Files(const int frame)
     tetrahedralized_volume.Print_Statistics(*output);
     int index;
     *output<<"max_phi = "<<tetrahedralized_volume.Maximum_Magnitude_Phi_On_Boundary(*implicit_surface,&index);*output<<" ("<<index<<")"<<std::endl;
-    LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.solid_force_collection.template Find_Force<LINEAR_SPRINGS<TV>*>();
+    LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.template Find_Force<LINEAR_SPRINGS<TV>*>();
     if(linear_springs){*output<<"max_edge_compression = "<<linear_springs->Maximum_Compression_Or_Expansion_Fraction(&index);*output<<" ("<<index<<")"<<std::endl;}
     delete output;}
     // write last frame

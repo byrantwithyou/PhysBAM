@@ -3,8 +3,6 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLECTION.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/MATRIX_FLUID_GRADIENT_CUT.h>
@@ -59,7 +57,7 @@ Register_Options()
     parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"Enable preconditioner");
     parse_args->Add("-max_dt",&max_dt,"value","Use dt no larger than this");
     parse_args->Add("-dt",&exact_dt,"value","Use exactly this dt");
-    parse_args->Add("-print_energy",&solid_body_collection.solid_force_collection.print_energy,"print energy statistics");
+    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
     parse_args->Add("-surface_tension",&fluids_parameters.surface_tension,"value","Surface tension coefficient");
     parse_args->Add("-oscillation_mode",&oscillation_mode,"mode","Oscillation mode for oscillation test");
     parse_args->Add("-make_ellipse",&make_ellipse,"Use ellipse for initial configuration instead of circle");
@@ -347,11 +345,10 @@ Initialize_Bodies()
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
     solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
 
-    for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->compute_half_forces=true;
-    for(int k=0;k<solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces.m;k++)
-        solid_body_collection.deformable_body_collection.deformable_force_collection.deformables_forces(k)->compute_half_forces=true;
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces.m;i++)
-        solid_body_collection.rigid_body_collection.rigid_force_collection.rigids_forces(i)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++)
+        solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
 }
 //#####################################################################
 // Function Kang_Circle
@@ -371,7 +368,7 @@ Kang_Circle()
         fluids_parameters.outside_density=(T)1*kg/(m*m);}
     fluids_parameters.cfl=(T).9;
 
-    solid_body_collection.solid_force_collection.Set_CFL_Number(10);
+    solid_body_collection.Set_CFL_Number(10);
 
     fluids_parameters.use_particle_levelset=true;
 }
@@ -476,7 +473,7 @@ Oscillating_Circle()
     (*fluids_parameters.grid).Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
     fluids_parameters.cfl=(T).9;
 
-    solid_body_collection.solid_force_collection.Set_CFL_Number(10);
+    solid_body_collection.Set_CFL_Number(10);
 
     fluids_parameters.use_particle_levelset=true;
 

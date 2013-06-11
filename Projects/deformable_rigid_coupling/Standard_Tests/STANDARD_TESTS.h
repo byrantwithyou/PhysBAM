@@ -74,13 +74,11 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/RIGID_JOINT.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Bindings/RIGID_BODY_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_FORCE_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
@@ -201,7 +199,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-n",&num_objects_multiplier,"scale","multiplier for number of objects in drop test");
     parse_args->Add("-mass",&ring_mass,"mass","mass of objects in drop test");
     parse_args->Add("-sp",&solids_parameters.deformable_object_collision_parameters.use_spatial_partition_for_levelset_collision_objects,"Use spatial partition for collision body collisions");
-    parse_args->Add("-print_energy",&solid_body_collection.solid_force_collection.print_energy,"print energy statistics");
+    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
     parse_args->Add("-fully_implicit",&fully_implicit,"use fully implicit forces");
     parse_args->Add("-project_nullspace",&project_nullspace,"project out nullspace");
     parse_args->Add("-binding_springs",&use_forces_for_drift,"use binding springs for drift particles");
@@ -363,23 +361,23 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number==8) damping=(T).03;
     if(test_number==19) damping=(T).1;
     for(int i=0;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
-        if(test_number==12 || test_number==21) solid_body_collection.solid_force_collection.Add_Force(Create_Tet_Springs(*tetrahedralized_volume,(T)stiffness/(1+sqrt((T)2)),(T)3));
+        if(test_number==12 || test_number==21) solid_body_collection.Add_Force(Create_Tet_Springs(*tetrahedralized_volume,(T)stiffness/(1+sqrt((T)2)),(T)3));
         else
             if(test_number==8 || test_number==14){
                 FINITE_VOLUME<TV,3>* fv=Create_Finite_Volume(*tetrahedralized_volume,new NEO_HOOKEAN<T,3>(stiffness,(T).45,damping,(T).25),true,(T).1,
                     true,false,true,(PLASTICITY_MODEL<T,3>*)0,true);
                 fv->density=(T)1000;
-                solid_body_collection.solid_force_collection.Add_Force(fv);}
-            else solid_body_collection.solid_force_collection.Add_Force(Create_Finite_Volume(*tetrahedralized_volume,new NEO_HOOKEAN<T,3>(stiffness,(T).45,damping,(T).25),true,(T).1));}
+                solid_body_collection.Add_Force(fv);}
+            else solid_body_collection.Add_Force(Create_Finite_Volume(*tetrahedralized_volume,new NEO_HOOKEAN<T,3>(stiffness,(T).45,damping,(T).25),true,(T).1));}
 
     for(int i=0;SEGMENTED_CURVE<TV>* segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>*>(i);i++){
-        solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(*segmented_curve,(T)stiffness/(1+sqrt((T)2)),(T)3));}
+        solid_body_collection.Add_Force(Create_Edge_Springs(*segmented_curve,(T)stiffness/(1+sqrt((T)2)),(T)3));}
     
     for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
         T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
-        solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Springs(*triangulated_surface,linear_stiffness,linear_damping));
+        solid_body_collection.Add_Force(Create_Edge_Springs(*triangulated_surface,linear_stiffness,linear_damping));
         T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
-        solid_body_collection.solid_force_collection.Add_Force(Create_Bending_Springs(*triangulated_surface,bending_stiffness,bending_damping));
+        solid_body_collection.Add_Force(Create_Bending_Springs(*triangulated_surface,bending_stiffness,bending_damping));
         PHYSBAM_DEBUG_PRINT("Spring stiffnesses",linear_stiffness,linear_damping,bending_stiffness,bending_damping);}
 
     for(int i=0;i<deformable_body_collection.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.structures(i))){
@@ -403,13 +401,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number!=1) tests.Add_Gravity();
 
     // disable strain rate CFL for all forces
-    for(int i=0;i<rigid_body_collection.rigid_force_collection.rigids_forces.m;i++) rigid_body_collection.rigid_force_collection.rigids_forces(i)->limit_time_step_by_strain_rate=false;
-    for(int i=0;i<deformable_body_collection.deformable_force_collection.deformables_forces.m;i++) deformable_body_collection.deformable_force_collection.deformables_forces(i)->limit_time_step_by_strain_rate=false;
-    for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
+    for(int i=0;i<rigid_body_collection.rigids_forces.m;i++) rigid_body_collection.rigids_forces(i)->limit_time_step_by_strain_rate=false;
+    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->limit_time_step_by_strain_rate=false;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
 
-    for(int i=0;i<rigid_body_collection.rigid_force_collection.rigids_forces.m;i++) rigid_body_collection.rigid_force_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
-    for(int i=0;i<deformable_body_collection.deformable_force_collection.deformables_forces.m;i++) deformable_body_collection.deformable_force_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
-    for(int i=0;i<solid_body_collection.solid_force_collection.solids_forces.m;i++) solid_body_collection.solid_force_collection.solids_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
+    for(int i=0;i<rigid_body_collection.rigids_forces.m;i++) rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
+    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
 }
 //#####################################################################
 // Function Advance_One_Time_Step_End_Callback
@@ -1223,7 +1221,7 @@ void Row_Of_Spheres()
     tetrahedralized_volume=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(2,0,0))),true,true,1000);
     fvm=Create_Incompressible_Finite_Volume(*tetrahedralized_volume);
     fvm->mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
-    solid_body_collection.solid_force_collection.Add_Force(fvm);
+    solid_body_collection.Add_Force(fvm);
 
     rigid_body=&tests.Add_Rigid_Body("sphere",(T)1,(T).2);
     rigid_body->Frame().t=TV(4,0,0);
@@ -1234,7 +1232,7 @@ void Row_Of_Spheres()
     tetrahedralized_volume=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(6,0,0))),true,true,1000);
     fvm=Create_Incompressible_Finite_Volume(*tetrahedralized_volume);
     fvm->mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
-    solid_body_collection.solid_force_collection.Add_Force(fvm);
+    solid_body_collection.Add_Force(fvm);
 
     rigid_body=&tests.Add_Rigid_Body("sphere",(T)1,(T).2);
     rigid_body->Frame().t=TV(8,0,0);
@@ -1658,7 +1656,7 @@ void Two_Way_Tori()
     if(use_forces_for_drift){
         soft_bindings.use_impulses_for_collisions.Fill(false);
         soft_bindings.Initialize_Binding_Mesh();
-        solid_body_collection.solid_force_collection.Add_Force(Create_Edge_Binding_Springs(solid_body_collection.deformable_body_collection.particles,*soft_bindings.binding_mesh,(T)1e6,(T)1));}
+        solid_body_collection.Add_Force(Create_Edge_Binding_Springs(solid_body_collection.deformable_body_collection.particles,*soft_bindings.binding_mesh,(T)1e6,(T)1));}
 }
 //#####################################################################
 };
