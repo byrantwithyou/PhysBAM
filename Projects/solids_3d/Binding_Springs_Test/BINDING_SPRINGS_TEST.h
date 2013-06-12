@@ -39,7 +39,7 @@ public:
     T overdamping_fraction;
 
     BINDING_SPRINGS_TEST(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),stiffness(1100),overdamping_fraction(0)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),stiffness(1100),overdamping_fraction(0)
     {
     }
 

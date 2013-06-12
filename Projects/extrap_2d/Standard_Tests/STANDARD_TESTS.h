@@ -91,7 +91,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solids_evolution;
-    using BASE::parse_args;using BASE::test_number;
+    using BASE::parse_args;using BASE::test_number;using BASE::data_directory;
 
     std::ofstream svout;
 
@@ -147,7 +147,7 @@ public:
     bool project_nullspace,opt_residuals;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
         use_extended_neohookean2(false),use_extended_neohookean3(false),use_int_j_neo(false),use_rc_ext(false),use_rc2_ext(false),use_extended_neohookean_refined(false),
         use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),use_corotated_fixed(false),use_corot_blend(false),
         use_corot_quartic(false),dump_sv(false),kinematic_id(0),kinematic_id2(0),print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),

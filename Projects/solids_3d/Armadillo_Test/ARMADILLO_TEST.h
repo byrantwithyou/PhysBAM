@@ -42,7 +42,7 @@ public:
     bool use_binding_springs;
 
     ARMADILLO_TEST(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),use_bindings(false),use_soft_bindings(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),use_bindings(false),use_soft_bindings(false),
         use_impulses(false),use_edge_springs(false),use_binding_springs(false)
     {
     }

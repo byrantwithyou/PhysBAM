@@ -98,7 +98,7 @@ public:
     using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;using BASE::parse_args;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),small_block_mass(1),parameter(0),collision_manager(0)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),small_block_mass(1),parameter(0),collision_manager(0)
     {
     }
 

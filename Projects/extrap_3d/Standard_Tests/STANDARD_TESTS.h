@@ -181,7 +181,7 @@ public:
     bool use_dump_sv;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),semi_implicit(false),test_forces(false),
         use_extended_neohookean(false),use_extended_neohookean2(false),use_extended_neohookean3(false),use_int_j_neo(false),
         use_rc_ext(false),use_rc2_ext(false),use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),
         use_extended_neohookean_smooth(false),use_extended_svk(false),use_svk(false),use_corotated(false),use_corotated_fixed(false),

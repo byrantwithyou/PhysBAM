@@ -41,7 +41,7 @@ public:
     RIGID_BODY<TV> *ground;
 
     ARB_EXAMPLE(const STREAM_TYPE stream_type,const int test_number_input=1)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),add_ground(true),ground(0)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),add_ground(true),ground(0)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;

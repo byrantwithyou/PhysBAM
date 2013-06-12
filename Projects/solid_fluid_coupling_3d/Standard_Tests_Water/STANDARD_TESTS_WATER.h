@@ -111,7 +111,7 @@ public:
     STANDARD_TESTS_WATER(const STREAM_TYPE stream_type)
         :BASE(stream_type,solid_node?0:1,fluids_parameters.WATER),
         water_tests(*this,fluids_parameters,solid_body_collection.rigid_body_collection),
-        solids_tests(*this,solid_body_collection),deformable_object_id(0),solid_density((T)2000),stiffness_ratio(1),light_sphere_index(0),heavy_sphere_index(0),
+        solids_tests(stream_type,output_directory,data_directory,solid_body_collection),deformable_object_id(0),solid_density((T)2000),stiffness_ratio(1),light_sphere_index(0),heavy_sphere_index(0),
         light_sphere_initial_height((T)1.75),heavy_sphere_initial_height((T)1.75),light_sphere_drop_time((T)1),heavy_sphere_drop_time((T)1.5),balloon_initial_radius((T)0),
         initial_fluid_height((T)0),boat_mass((T)7),implicit_springs(false),world_to_source(MATRIX<T,4>::Identity_Matrix()),bodies(5),sub_test(1),fish_levelset(0),
         opt_iterations(false),spout_stop_time(0),ball_initial_height(0),spout_radius(0)

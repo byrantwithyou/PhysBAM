@@ -44,7 +44,7 @@ public:
     typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
     typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
-    using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Add_To_Fluid_Simulation;
+    using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Add_To_Fluid_Simulation;using BASE::data_directory;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
@@ -90,7 +90,7 @@ public:
     T one_over_c_incompressible;
 
     SOD_ST(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(*this,solid_body_collection),
+        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(stream_type,output_directory,data_directory,solid_body_collection),
         rigid_body_collection(solid_body_collection.rigid_body_collection),solid_mass(1),write_transparency_output(false),
         transition_to_incompressible(false),eos_smooth_transition(0),eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).5),timesplit(false),
         implicit_rk(false),use_sound_speed_based_cfl(false),multiplication_factor_for_sound_speed_based_dt(false),exact(false),

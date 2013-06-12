@@ -81,7 +81,7 @@ public:
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.SMOKE),
         smoke_tests(*this,fluids_parameters,fluid_collection.incompressible_fluid_collection,solid_body_collection.rigid_body_collection),
-        solids_tests(*this,solid_body_collection),deformable_circle_id(0),rigid_body_id(0),velocity_multiplier((T)1),number_side_panels(40),aspect_ratio((T)1.1),side_length((T).5),
+        solids_tests(stream_type,output_directory,data_directory,solid_body_collection),deformable_circle_id(0),rigid_body_id(0),velocity_multiplier((T)1),number_side_panels(40),aspect_ratio((T)1.1),side_length((T).5),
         stiffness_multiplier((T)1),damping_multiplier((T)1),bending_stiffness_multiplier((T)1),bending_damping_multiplier((T)1),heavy_sphere_drop_time((T)1.5),source_velocity((T)0,(T).5,(T)0),
         run_self_tests(false),print_poisson_matrix(false),print_index_map(false),print_matrix(false),print_each_matrix(false),output_iterators(false)
     {

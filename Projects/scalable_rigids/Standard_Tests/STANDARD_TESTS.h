@@ -45,7 +45,7 @@ public:
     using BASE::fluids_parameters;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),parameter(0)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),parameter(0)
     {
     }
 

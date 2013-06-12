@@ -106,7 +106,7 @@ public:
     NONLINEAR_PENDULUM nonlinear_pendulum;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),peak_force(10),parameter(3),use_prestab_iterations(false)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),peak_force(10),parameter(3),use_prestab_iterations(false)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         fluids_parameters.simulate=false;

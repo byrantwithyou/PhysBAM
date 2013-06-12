@@ -52,7 +52,7 @@ public:
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;
-    using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
+    using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::data_directory;
     using BASE::solids_evolution;using BASE::Add_To_Fluid_Simulation;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -107,7 +107,7 @@ public:
    ***************/
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(*this,solid_body_collection),
+        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(stream_type,output_directory,data_directory,solid_body_collection),
         rigid_body_collection(solid_body_collection.rigid_body_collection),solid_mass(1),solid_position_delta(0),eos_smooth_transition(0),
         run_self_tests(false),print_poisson_matrix(false),print_index_map(false),print_matrix(false),print_rhs(false),print_each_matrix(false),
         output_iterators(false),eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).5),timesplit(false),

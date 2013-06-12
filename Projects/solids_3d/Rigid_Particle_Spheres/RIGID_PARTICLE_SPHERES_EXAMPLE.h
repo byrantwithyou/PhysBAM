@@ -34,7 +34,7 @@ public:
     SEGMENT_MESH segment_mesh;
 
     RIGID_PARTICLE_SPHERES_EXAMPLE(const STREAM_TYPE stream_type):
-        BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection)
+        BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection)
     {
     }
 

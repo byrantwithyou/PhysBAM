@@ -105,7 +105,7 @@ public:
     ARRAY<RIGID_BODY_STATE<TV> > tori_initial_states;
 
     INCOMPRESSIBLE_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),test_poissons_ratio((T).5),hittime(1),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),test_poissons_ratio((T).5),hittime(1),
         minimum_volume_recovery_time_scale(0),high_resolution(false),stiffen(1),max_cg_iterations(20),solids_cg_tolerance((T)1e-3),
         ground_friction(0),merge_at_boundary(false),tori_m(2),tori_n(2),tori_mn(2),tori_base_height((T)1.5),tori_max_angular_velocity(2)
     {

@@ -54,6 +54,7 @@ public:
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::mpi_world; // silence -Woverloaded-virtual
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
     using BASE::Add_To_Fluid_Simulation;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::Add_Thin_Shell_To_Fluid_Simulation;using BASE::Adjust_Phi_With_Source;
+    using BASE::data_directory;
 
     WATER_STANDARD_TESTS_2D<GRID<TV> > water_tests;
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
@@ -83,7 +84,7 @@ public:
 
     STANDARD_TESTS_WATER(const STREAM_TYPE stream_type)
         :BASE(stream_type,solid_node?0:1,fluids_parameters.WATER),water_tests(*this,fluids_parameters,solid_body_collection.rigid_body_collection),
-        solids_tests(*this,solid_body_collection),deformable_object_id(0),solid_density(1),light_sphere_index(0),lightish_sphere_index(0),neutral_sphere_index(0),
+        solids_tests(stream_type,output_directory,data_directory,solid_body_collection),deformable_object_id(0),solid_density(1),light_sphere_index(0),lightish_sphere_index(0),neutral_sphere_index(0),
         heavy_sphere_index(0),light_sphere_initial_height((T)2),heavy_sphere_initial_height((T)2.25),light_sphere_drop_time((T).7),heavy_sphere_drop_time((T)1.25),
         left_fixed_index(0),right_fixed_index(0),bodies(5),solid_scale((T).02),velocity_multiplier(1),mass_multiplier(1),flow_particles(false)
     {

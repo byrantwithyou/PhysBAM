@@ -44,7 +44,7 @@ public:
     FRAME<TV> parent_to_joint[10];
 
     TANK_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),turn_in_place(false),start_on_fridge(false)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),turn_in_place(false),start_on_fridge(false)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;

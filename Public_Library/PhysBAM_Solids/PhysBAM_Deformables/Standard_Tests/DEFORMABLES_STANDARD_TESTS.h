@@ -18,7 +18,6 @@ template<class TV> class SOFT_BINDINGS;
 template<class TV> class DEFORMABLE_PARTICLES;
 template<class TV> class GEOMETRY_PARTICLES;
 template<class TV> class LEVELSET_IMPLICIT_OBJECT;
-template<class TV> class EXAMPLE;
 template<class T> class EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE;
 template<class TV> class BINDING_LIST;
 template<class TV,class T_PARTICLES> class PARTICLES_SUBSET;
@@ -43,10 +42,11 @@ protected:
     typedef typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::TRIANGULATED_OBJECT T_TRIANGULATED_OBJECT;
     typedef typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::SEGMENTED_CURVE T_SEGMENTED_CURVE;
 public:
-    EXAMPLE<TV>& example;
+    STREAM_TYPE stream_type;
+    std::string output_directory;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
 
-    DEFORMABLES_STANDARD_TESTS(EXAMPLE<TV>& example_input,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input);
+    DEFORMABLES_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& output_directory,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input);
     virtual ~DEFORMABLES_STANDARD_TESTS();
 
     TRIANGULATED_AREA<T>& Create_Mattress(const GRID<TV>& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>& initial_state)

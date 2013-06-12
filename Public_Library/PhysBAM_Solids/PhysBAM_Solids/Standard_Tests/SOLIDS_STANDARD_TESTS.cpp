@@ -26,8 +26,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> SOLIDS_STANDARD_TESTS<TV>::
-SOLIDS_STANDARD_TESTS(EXAMPLE<TV>& example_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input)
-    :BASE(example_input,solid_body_collection_input.deformable_body_collection),RIGIDS_STANDARD_TESTS<TV>(example_input,solid_body_collection_input.rigid_body_collection),
+SOLIDS_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& output_directory,const std::string& data_directory,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input)
+    :BASE(stream_type,output_directory,solid_body_collection_input.deformable_body_collection),RIGIDS_STANDARD_TESTS<TV>(stream_type,data_directory,solid_body_collection_input.rigid_body_collection),
     solid_body_collection(solid_body_collection_input)
 {
 }
@@ -237,11 +237,9 @@ Create_Rigid_Body_From_Triangulated_Area(TRIANGULATED_AREA<T>& triangulated_area
 }
 //#####################################################################
 #define INSTANTIATION_HELPER2_1D(T) \
-    template SOLIDS_STANDARD_TESTS<VECTOR<T,1> >::SOLIDS_STANDARD_TESTS(EXAMPLE<VECTOR<T,1> >&,SOLID_BODY_COLLECTION<VECTOR<T,1> >&); \
     template void SOLIDS_STANDARD_TESTS<VECTOR<T,1> >::Add_Gravity();
 
 #define INSTANTIATION_HELPER2_ALL(T,d) \
-    template SOLIDS_STANDARD_TESTS<VECTOR<T,d> >::SOLIDS_STANDARD_TESTS(EXAMPLE<VECTOR<T,d> >&,SOLID_BODY_COLLECTION<VECTOR<T,d> >&); \
     template void SOLIDS_STANDARD_TESTS<VECTOR<T,d> >::Bind_Particles_In_Rigid_Body(RIGID_BODY<VECTOR<T,d> >& rigid_body); \
     template void SOLIDS_STANDARD_TESTS<VECTOR<T,d> >::Bind_Unbound_Particles_In_Rigid_Body(RIGID_BODY<VECTOR<T,d> >& rigid_body,const ARRAY_VIEW<int>& particles_array); \
     template void SOLIDS_STANDARD_TESTS<VECTOR<T,d> >::Bind_Unbound_Particles_In_Rigid_Body(RIGID_BODY<VECTOR<T,d> >& rigid_body,const ARRAY<int>& particles_array); \
@@ -253,7 +251,6 @@ Create_Rigid_Body_From_Triangulated_Area(TRIANGULATED_AREA<T>& triangulated_area
     template void SOLIDS_STANDARD_TESTS<VECTOR<T,3> >::PD_Curl(const T,const FRAME<VECTOR<T,3> >&,const T,const int,const bool,const T);
 
 INSTANTIATION_HELPER2(float);
-template SOLIDS_STANDARD_TESTS<VECTOR<float,2> >::SOLIDS_STANDARD_TESTS(EXAMPLE<VECTOR<float,2> >&,SOLID_BODY_COLLECTION<VECTOR<float,2> >&);
 template void SOLIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Gravity();
 template void SOLIDS_STANDARD_TESTS<VECTOR<float,2> >::Bind_Unbound_Particles_In_Rigid_Body<ARRAY<int,int> >(RIGID_BODY<VECTOR<float,2> >&,ARRAY<int,int> const&);
 template RIGID_BODY<VECTOR<float,3> >* SOLIDS_STANDARD_TESTS<VECTOR<float,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<float>&,
@@ -261,10 +258,21 @@ template RIGID_BODY<VECTOR<float,3> >* SOLIDS_STANDARD_TESTS<VECTOR<float,3> >::
 template RIGID_BODY<VECTOR<float,3> >* SOLIDS_STANDARD_TESTS<VECTOR<float,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<float>&,
     RIGID_BODY_COLLECTION<VECTOR<float,3> >&,float,int);
 INSTANTIATION_HELPER2(double);
-template SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::SOLIDS_STANDARD_TESTS(EXAMPLE<VECTOR<double,2> >&,SOLID_BODY_COLLECTION<VECTOR<double,2> >&);
 template void SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Gravity();
 template void SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::Bind_Unbound_Particles_In_Rigid_Body<ARRAY<int,int> >(RIGID_BODY<VECTOR<double,2> >&,ARRAY<int,int> const&);
 template RIGID_BODY<VECTOR<double,3> >* SOLIDS_STANDARD_TESTS<VECTOR<double,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<double>&,
     RIGID_BODY_COLLECTION<VECTOR<double,3> >&,double);
 template RIGID_BODY<VECTOR<double,3> >* SOLIDS_STANDARD_TESTS<VECTOR<double,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<double>&,
     RIGID_BODY_COLLECTION<VECTOR<double,3> >&,double,int);
+template SOLIDS_STANDARD_TESTS<VECTOR<double,1> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<double,1> >&);
+template SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<double,2> >&);
+template SOLIDS_STANDARD_TESTS<VECTOR<double,3> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<double,3> >&);
+template SOLIDS_STANDARD_TESTS<VECTOR<float,1> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<float,1> >&);
+template SOLIDS_STANDARD_TESTS<VECTOR<float,2> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<float,2> >&);
+template SOLIDS_STANDARD_TESTS<VECTOR<float,3> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<float,3> >&);
+
+
+
+
+
+

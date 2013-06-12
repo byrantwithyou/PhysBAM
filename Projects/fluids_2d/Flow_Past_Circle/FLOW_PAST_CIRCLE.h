@@ -37,7 +37,7 @@ public:
     bool shed,opt_enlarge;
     
     FLOW_PAST_CIRCLE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,0,fluids_parameters.SMOKE),solids_tests(*this,solid_body_collection.rigid_body_collection),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,0,fluids_parameters.SMOKE),solids_tests(stream_type,data_directory,solid_body_collection.rigid_body_collection),
         levelset_object(*fluids_parameters.grid,phi_object),circle(TV((T)2,(T)2),(T).5),shed(false),opt_enlarge(false)
     {
         //fluids_parameters.cfl=0.75;

@@ -206,7 +206,7 @@ public:
     bool opt_residuals;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),parameter(0),use_forces_for_drift(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),parameter(0),use_forces_for_drift(false),
         number_side_panels(40),aspect_ratio((T)1.7),side_length((T)1.0),cloth_triangles(INT_MAX),constrained_particle(0),
         suspended_particle(0),drifting_particle(0),test_24_poissons_ratio((T).5),no_altitude_springs(false),stiffness_multiplier(1),
         damping_multiplier(1),bending_stiffness_multiplier(1),bending_damping_multiplier(1),planar_damping_multiplier(1),

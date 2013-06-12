@@ -77,7 +77,7 @@ public:
     ***************/
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(*this,solid_body_collection),boundary(0),spring_factor(1),rigid_body_collection(solid_body_collection.rigid_body_collection),
+        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(stream_type,output_directory,data_directory,solid_body_collection),boundary(0),spring_factor(1),rigid_body_collection(solid_body_collection.rigid_body_collection),
         eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).6),timesplit(false),exact(false),use_slip(false)
     {}
     

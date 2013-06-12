@@ -113,7 +113,7 @@ public:
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.SMOKE),
-        solids_tests(*this,solid_body_collection),velocity_multiplier(1),mass_multiplier(1),stiffness_multiplier((T)1),damping_multiplier((T)1),
+        solids_tests(stream_type,output_directory,data_directory,solid_body_collection),velocity_multiplier(1),mass_multiplier(1),stiffness_multiplier((T)1),damping_multiplier((T)1),
         bending_stiffness_multiplier((T)1),bending_damping_multiplier((T)1),parameter(0),boundary_offset(0),extra_cells(0),base_resolution(4),run_self_tests(false),
         print_poisson_matrix(false),print_index_map(false),print_matrix(false),print_each_matrix(false),output_iterators(false),
         use_eno_advection(false),angle(0),outside_tolerance(0),viscosity_only(false),use_maccormack(false)

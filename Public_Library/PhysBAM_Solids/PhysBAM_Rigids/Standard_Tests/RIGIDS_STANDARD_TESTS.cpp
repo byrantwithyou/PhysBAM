@@ -4,7 +4,6 @@
 //#####################################################################
 // Class RIGIDS_STANDARD_TESTS
 //#####################################################################
-#include <PhysBAM_Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BOWL.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
@@ -37,8 +36,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> RIGIDS_STANDARD_TESTS<TV>::
-RIGIDS_STANDARD_TESTS(EXAMPLE<TV>& example_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
-    :example(example_input),rigid_body_collection(rigid_body_collection_input)
+RIGIDS_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& data_directory,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
+    :stream_type(stream_type),data_directory(data_directory),rigid_body_collection(rigid_body_collection_input)
 {
 }
 //#####################################################################
@@ -105,7 +104,7 @@ static IMPLICIT_OBJECT<TV>* Add_Analytic_Ground(const TV&,const T scaling_factor
 template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
 Add_Rigid_Body(const std::string& name,const T scaling_factor,const T friction,const bool read_implicit,const bool always_read_object)
 {
-    std::string rigid_directory=example.data_directory+"/Rigid_Bodies"+(TV::m==3?"":"_2D"),basename=rigid_directory+"/"+name;
+    std::string rigid_directory=data_directory+"/Rigid_Bodies"+(TV::m==3?"":"_2D"),basename=rigid_directory+"/"+name;
     bool read_simplicial=true;
     if(!always_read_object){
         IMPLICIT_OBJECT<TV>* implicit=0;
@@ -122,7 +121,7 @@ Add_Rigid_Body(const std::string& name,const T scaling_factor,const T friction,c
                 read_simplicial=false;
             if(!rigid_body_collection.Register_Analytic_Replacement_Structure(basename+(TV::m==3?".phi":".phi2d"),scaling_factor,implicit))
                 delete implicit;}}
-    int id=rigid_body_collection.Add_Rigid_Body(example.stream_type,basename,scaling_factor,read_simplicial,read_implicit);
+    int id=rigid_body_collection.Add_Rigid_Body(stream_type,basename,scaling_factor,read_simplicial,read_implicit);
     RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(id);
     rigid_body.coefficient_of_friction=friction;
     rigid_body.name=name;
@@ -337,38 +336,48 @@ Connect_With_Point_Joint(RIGID_BODY<TV>& parent,RIGID_BODY<TV>& child,const TV& 
     return joint->id_number;
 }
 //#####################################################################
-#define INSTANTIATION_HELPER_1D(T) \
-    template RIGID_BODY<VECTOR<T,1> >& RIGIDS_STANDARD_TESTS<VECTOR<T,1> >::Add_Analytic_Box(VECTOR<T,1> const&); \
-    template RIGIDS_STANDARD_TESTS<VECTOR<T,1> >::RIGIDS_STANDARD_TESTS(EXAMPLE<VECTOR<T,1> >&,RIGID_BODY_COLLECTION<VECTOR<T,1> >&);
-
-#define INSTANTIATION_HELPER_ALL(T,d) \
-    template RIGIDS_STANDARD_TESTS<VECTOR<T,d> >::RIGIDS_STANDARD_TESTS(EXAMPLE<VECTOR<T,d> >&,RIGID_BODY_COLLECTION<VECTOR<T,d> >&); \
-    template RIGID_BODY<VECTOR<T,d> >& RIGIDS_STANDARD_TESTS<VECTOR<T,d> >::Add_Rigid_Body(const std::string&,const T,const T,const bool,const bool); \
-    template RIGID_BODY<VECTOR<T,d> >& RIGIDS_STANDARD_TESTS<VECTOR<T,d> >::Add_Ground(const T,const T,const T,const T);
-
-#define INSTANTIATION_HELPER(T) \
-    INSTANTIATION_HELPER_1D(T) \
-    INSTANTIATION_HELPER_ALL(T,2) \
-    INSTANTIATION_HELPER_ALL(T,3) \
-    template RIGID_BODY<VECTOR<T,2> >& RIGIDS_STANDARD_TESTS<VECTOR<T,2> >::Add_Analytic_Box(VECTOR<T,2> const&,int); \
-    template RIGID_BODY<VECTOR<T,3> >& RIGIDS_STANDARD_TESTS<VECTOR<T,3> >::Add_Analytic_Box(VECTOR<T,3> const&); \
-    template RIGID_BODY<VECTOR<T,3> >& RIGIDS_STANDARD_TESTS<VECTOR<T,3> >::Add_Analytic_Torus(const T,const T,int,int); \
-    template RIGID_BODY<VECTOR<T,3> >& RIGIDS_STANDARD_TESTS<VECTOR<T,3> >::Add_Analytic_Cylinder(const T,const T,int,int); \
-    template void RIGIDS_STANDARD_TESTS<VECTOR<T,3> >::Make_Lathe_Chain(const FRAME<VECTOR<T,3> >&,const T,const T,const T);
-
-INSTANTIATION_HELPER(float);
-template JOINT_ID RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Connect_With_Point_Joint(RIGID_BODY<VECTOR<float,3> >&,RIGID_BODY<VECTOR<float,3> >&,VECTOR<float,3> const&);
-template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Sphere(float,float,int);
-template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Sphere(float,float,int);
-template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Smooth_Gear(VECTOR<float,2> const&,int,int);
-template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Smooth_Gear(VECTOR<float,3> const&,int,int);
-template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Shell(float,float,float,int);
-template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Bowl(float,float,float,int,int);
-INSTANTIATION_HELPER(double);
+namespace PhysBAM{
 template JOINT_ID RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Connect_With_Point_Joint(RIGID_BODY<VECTOR<double,3> >&,RIGID_BODY<VECTOR<double,3> >&,VECTOR<double,3> const&);
-template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Sphere(double,double,int);
-template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Sphere(double,double,int);
-template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Smooth_Gear(VECTOR<double,2> const&,int,int);
-template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Smooth_Gear(VECTOR<double,3> const&,int,int);
-template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Shell(double,double,double,int);
+template RIGID_BODY<VECTOR<double,1> >& RIGIDS_STANDARD_TESTS<VECTOR<double,1> >::Add_Analytic_Box(VECTOR<double,1> const&);
+template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Box(VECTOR<double,2> const&,int);
+template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Ground(double,double,double,double);
+template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Rigid_Body(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,double,double,bool,bool);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Bowl(double,double,double,int,int);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Box(VECTOR<double,3> const&);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Cylinder(double,double,int,int);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Shell(double,double,double,int);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Smooth_Gear(VECTOR<double,3> const&,int,int);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Sphere(double,double,int);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Torus(double,double,int,int);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Ground(double,double,double,double);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Rigid_Body(std::string const&,double,double,bool,bool);
+template void RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Make_Lathe_Chain(FRAME<VECTOR<double,3> > const&,double,double,double);
+template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Smooth_Gear(VECTOR<double,2> const&,int,int);
+template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Sphere(double,double,int);
+template RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::RIGIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,RIGID_BODY_COLLECTION<VECTOR<double,2> >&);
+template JOINT_ID RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Connect_With_Point_Joint(RIGID_BODY<VECTOR<float,3> >&,RIGID_BODY<VECTOR<float,3> >&,VECTOR<float,3> const&);
+template RIGID_BODY<VECTOR<float,1> >& RIGIDS_STANDARD_TESTS<VECTOR<float,1> >::Add_Analytic_Box(VECTOR<float,1> const&);
+template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Box(VECTOR<float,2> const&,int);
+template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Ground(float,float,float,float);
+template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Rigid_Body(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,float,float,bool,bool);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Bowl(float,float,float,int,int);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Box(VECTOR<float,3> const&);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Cylinder(float,float,int,int);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Shell(float,float,float,int);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Smooth_Gear(VECTOR<float,3> const&,int,int);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Sphere(float,float,int);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Torus(float,float,int,int);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Ground(float,float,float,float);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Rigid_Body(std::string const&,float,float,bool,bool);
+template void RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Make_Lathe_Chain(FRAME<VECTOR<float,3> > const&,float,float,float);
+template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Smooth_Gear(VECTOR<float,2> const&,int,int);
+template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Sphere(float,float,int);
+template RIGIDS_STANDARD_TESTS<VECTOR<double,1> >::RIGIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,RIGID_BODY_COLLECTION<VECTOR<double,1> >&);
+template RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::RIGIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,RIGID_BODY_COLLECTION<VECTOR<double,3> >&);
+template RIGIDS_STANDARD_TESTS<VECTOR<float,1> >::RIGIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,RIGID_BODY_COLLECTION<VECTOR<float,1> >&);
+template RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::RIGIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,RIGID_BODY_COLLECTION<VECTOR<float,2> >&);
+template RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::RIGIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,RIGID_BODY_COLLECTION<VECTOR<float,3> >&);
+}
+
+
+

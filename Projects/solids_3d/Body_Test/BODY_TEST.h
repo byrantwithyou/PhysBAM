@@ -33,7 +33,7 @@ public:
     RIGID_BODY<TV>* ground;
 
     BODY_TEST(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection)
     {
     }
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE

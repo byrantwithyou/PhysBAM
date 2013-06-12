@@ -159,7 +159,7 @@ public:
 
     STANDARD_TESTS(const STREAM_TYPE stream_type,const bool incompressible_input)
         :BASE(stream_type,0,incompressible_input?fluids_parameters.SMOKE:fluids_parameters.COMPRESSIBLE),
-        solid_tests(*this,solid_body_collection),eno_scheme(2),eno_order(2),rk_order(3),cfl_number((T).6),fp(0),weak_shock(false),
+        solid_tests(stream_type,output_directory,data_directory,solid_body_collection),eno_scheme(2),eno_order(2),rk_order(3),cfl_number((T).6),fp(0),weak_shock(false),
         timesplit(false),use_slip(false),use_incompressible_gravity(false),faster_frame_rate(false),exact(false),no_soot(false),
         no_solids_gravity(false),createpattern(false),solid_mass((T).0625),
         rigid_body_collection(solid_body_collection.rigid_body_collection),fracture_walls(false),collision_manager(0),

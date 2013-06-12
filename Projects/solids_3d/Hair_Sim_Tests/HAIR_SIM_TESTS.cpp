@@ -51,7 +51,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_input> HAIR_SIM_TESTS<T_input>::
 HAIR_SIM_TESTS(const STREAM_TYPE stream_type)
-    :BASE(stream_type,0,fluids_parameters.NONE),start_time(2.),tests(*this,solid_body_collection),segment_adhesion(0),guide_adhesion(0),guide_object1(0),guide_object2(0),current_levelset(0)
+    :BASE(stream_type,0,fluids_parameters.NONE),start_time(2.),tests(stream_type,output_directory,data_directory,solid_body_collection),segment_adhesion(0),guide_adhesion(0),guide_object1(0),guide_object2(0),current_levelset(0)
 {
 }
 //#####################################################################

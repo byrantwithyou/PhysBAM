@@ -24,13 +24,12 @@ class SOLIDS_STANDARD_TESTS:public DEFORMABLES_STANDARD_TESTS<TV>,public RIGIDS_
     typedef typename BASE::T T;
     typedef typename BASE::T_TRIANGULATED_OBJECT T_TRIANGULATED_OBJECT;
     typedef typename BASE::T_SEGMENTED_CURVE T_SEGMENTED_CURVE;
-    using BASE::example;
 public:
     using BASE::Create_Mattress;using BASE::Create_Cloth_Panel;using BASE::Substitute_Soft_Bindings_For_Nodes;
     using BASE::Initialize_Implicit_Surface;using RIGIDS_STANDARD_TESTS<TV>::Add_Rigid_Body;
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
 
-    SOLIDS_STANDARD_TESTS(EXAMPLE<TV>& example_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input);
+    SOLIDS_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& output_directory,const std::string& data_directory,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input);
     virtual ~SOLIDS_STANDARD_TESTS(){}
 
     TRIANGULATED_AREA<T>& Create_Mattress(const GRID<TV>& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>& initial_state)

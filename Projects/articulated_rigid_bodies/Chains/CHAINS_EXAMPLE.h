@@ -38,7 +38,7 @@ public:
     bool use_rigid_deformable_evolution_old;
 
     CHAINS_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),arb(0),tests(*this,solid_body_collection),square1(0),square2(0),num_poles(5),num_rings(20),selection(0),
+        :BASE(stream_type,0,fluids_parameters.NONE),arb(0),tests(stream_type,output_directory,data_directory,solid_body_collection),square1(0),square2(0),num_poles(5),num_rings(20),selection(0),
         use_rigid_deformable_evolution_old(false)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;

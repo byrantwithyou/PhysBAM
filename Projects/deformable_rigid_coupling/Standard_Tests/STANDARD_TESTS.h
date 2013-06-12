@@ -139,7 +139,7 @@ public:
     using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;using BASE::parse_args;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),parameter(1),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),parameter(1),
         rigid_body_collection(solid_body_collection.rigid_body_collection),number_of_joints(2),subsamples(8),refinement_distance((T).2),dynamic_subsampling(false),
         temporarily_disable_dynamic_subsampling(false),old_number_particles(0),ring_mass(10000),num_objects_multiplier((T)1),fish_mattress(false),fully_implicit(false),
         use_forces_for_drift(false),project_nullspace(false)

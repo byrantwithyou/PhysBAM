@@ -71,7 +71,7 @@ public:
     FRACTURE_OBJECT<TV,3>* fracture_object;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fracture_object(0)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),fracture_object(0)
     {
     }
 

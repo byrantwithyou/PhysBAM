@@ -4,7 +4,6 @@
 //#####################################################################
 // Class DEFORMABLES_STANDARD_TESTS
 //#####################################################################
-#include <PhysBAM_Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
@@ -40,8 +39,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> DEFORMABLES_STANDARD_TESTS<TV>::
-DEFORMABLES_STANDARD_TESTS(EXAMPLE<TV>& example_input,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input)
-    :example(example_input),deformable_body_collection(deformable_body_collection_input)
+DEFORMABLES_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& output_directory,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input)
+    :stream_type(stream_type),output_directory(output_directory),deformable_body_collection(deformable_body_collection_input)
 {
 }
 //#####################################################################
@@ -127,7 +126,7 @@ Create_Tetrahedralized_Volume(const std::string& filename,const RIGID_BODY_STATE
     PHYSBAM_ASSERT(density>0);
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
-    FILE_UTILITIES::Read_From_File(example.stream_type,filename,tetrahedralized_volume);
+    FILE_UTILITIES::Read_From_File(stream_type,filename,tetrahedralized_volume);
     tetrahedralized_volume.Rescale(scale);
     LOG::cout<<"Adding Tetrahedralized Volume - Tetrahedra = "<<tetrahedralized_volume.mesh.elements.m<<std::endl;
     Set_Mass_Of_Particles(tetrahedralized_volume,density,use_constant_mass);
@@ -162,7 +161,7 @@ Create_Triangulated_Object(const std::string& filename,const RIGID_BODY_STATE<TV
     PHYSBAM_ASSERT(scale>0);
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_TRIANGULATED_OBJECT& triangulated_object=*T_TRIANGULATED_OBJECT::Create(particles);
-    FILE_UTILITIES::Read_From_File(example.stream_type,filename,triangulated_object);
+    FILE_UTILITIES::Read_From_File(stream_type,filename,triangulated_object);
     triangulated_object.Rescale(scale);
     LOG::cout<<"Adding Triangulated Object - Triangles = "<<triangulated_object.mesh.elements.m<<std::endl;
     T density=TV::dimension==1?1:TV::dimension==2?100:1000;
@@ -180,7 +179,7 @@ Create_Segmented_Curve(const std::string& filename,const RIGID_BODY_STATE<TV>& i
 {
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_SEGMENTED_CURVE& segmented_curve=*T_SEGMENTED_CURVE::Create(particles);
-    FILE_UTILITIES::Read_From_File(example.stream_type,filename,segmented_curve);
+    FILE_UTILITIES::Read_From_File(stream_type,filename,segmented_curve);
     LOG::cout<<"Adding Segmented Curve - Segments = "<<segmented_curve.mesh.elements.m<<std::endl;
     T density=TV::dimension==1?1:TV::dimension==2?100:1000;
     Set_Mass_Of_Particles(segmented_curve,density,use_constant_mass);
@@ -301,11 +300,11 @@ Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,TRIANGU
 {
     if(FILE_UTILITIES::File_Exists(levelset_filename)){
         LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
-        FILE_UTILITIES::Read_From_File(example.stream_type,levelset_filename,undeformed_levelset);
+        FILE_UTILITIES::Read_From_File(stream_type,levelset_filename,undeformed_levelset);
         return &undeformed_levelset;}
     LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Initialize_Implicit_Surface(undeformed_triangulated_surface,100);
-    FILE_UTILITIES::Create_Directory(example.output_directory);
-    FILE_UTILITIES::Write_To_File(example.stream_type,levelset_filename,undeformed_levelset);
+    FILE_UTILITIES::Create_Directory(output_directory);
+    FILE_UTILITIES::Write_To_File(stream_type,levelset_filename,undeformed_levelset);
     return &undeformed_levelset;
 }
 //#####################################################################
@@ -323,7 +322,7 @@ Initialize_Tetrahedron_Collisions(const int id_number,TETRAHEDRALIZED_VOLUME<T>&
     DEFORMABLE_PARTICLES<TV>& undeformed_particles=*deformable_body_collection.particles.Clone();
     TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(triangulated_surface->mesh,undeformed_particles));
     undeformed_triangulated_surface.Update_Triangle_List();undeformed_triangulated_surface.Initialize_Hierarchy();
-    std::string levelset_filename=STRING_UTILITIES::string_sprintf("%s/common/deformable_body_undeformed_levelset_%d.phi",example.output_directory.c_str(),id_number);
+    std::string levelset_filename=STRING_UTILITIES::string_sprintf("%s/common/deformable_body_undeformed_levelset_%d.phi",output_directory.c_str(),id_number);
     LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Read_Or_Initialize_Implicit_Surface(levelset_filename,undeformed_triangulated_surface);
     deformable_body_collection.collisions.collision_body_list.Add_Body(new TETRAHEDRON_COLLISION_BODY<T>(tetrahedralized_volume,undeformed_triangulated_surface,undeformed_levelset,triangulated_surface),0,true);
 }
@@ -599,7 +598,6 @@ Mark_Hard_Bindings_With_Free_Particles()
 }
 //#####################################################################
 #define INSTANTIATION_HELPER_1D(T) \
-    template DEFORMABLES_STANDARD_TESTS<VECTOR<T,1> >::DEFORMABLES_STANDARD_TESTS(EXAMPLE<VECTOR<T,1> >&,DEFORMABLE_BODY_COLLECTION<VECTOR<T,1> >&); \
     template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,1> >::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<VECTOR<T,1> >::Create_Segmented_Curve(const GRID<VECTOR<T,1> >&,const RIGID_BODY_STATE<VECTOR<T,1> >&,const T); \
     template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,1> >::Add_Gravity();
 
@@ -608,7 +606,6 @@ Mark_Hard_Bindings_With_Free_Particles()
     template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,2> >::TRIANGULATED_OBJECT& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Create_Triangulated_Object(const GRID<VECTOR<T,2> >&,const RIGID_BODY_STATE<VECTOR<T,2> >&,const T);
 
 #define INSTANTIATION_HELPER_ALL(T,d) \
-    template DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::DEFORMABLES_STANDARD_TESTS(EXAMPLE<VECTOR<T,d> >&,DEFORMABLE_BODY_COLLECTION<VECTOR<T,d> >&); \
     template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Set_Initial_Particle_Configuration(GEOMETRY_PARTICLES<VECTOR<T,d> >&,const RIGID_BODY_STATE<VECTOR<T,d> >&,const bool); \
     template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,d> >::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Create_Segmented_Curve(const GRID<VECTOR<T,1> >&,const RIGID_BODY_STATE<VECTOR<T,d> >&,const T); \
     template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,d> >::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<VECTOR<T,d> >::Create_Segmented_Curve(const int,const RIGID_BODY_STATE<VECTOR<T,d> >&,const T,const T); \
@@ -659,3 +656,9 @@ template LEVELSET_IMPLICIT_OBJECT<VECTOR<double,3> >* DEFORMABLES_STANDARD_TESTS
 template DEFORMABLES_STANDARD_TESTS<VECTOR<double,1> >::~DEFORMABLES_STANDARD_TESTS();
 template DEFORMABLES_STANDARD_TESTS<VECTOR<double,2> >::~DEFORMABLES_STANDARD_TESTS();
 template DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::~DEFORMABLES_STANDARD_TESTS();
+template DEFORMABLES_STANDARD_TESTS<VECTOR<double,1> >::DEFORMABLES_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,DEFORMABLE_BODY_COLLECTION<VECTOR<double,1> >&);
+template DEFORMABLES_STANDARD_TESTS<VECTOR<double,2> >::DEFORMABLES_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,DEFORMABLE_BODY_COLLECTION<VECTOR<double,2> >&);
+template DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::DEFORMABLES_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,DEFORMABLE_BODY_COLLECTION<VECTOR<double,3> >&);
+template DEFORMABLES_STANDARD_TESTS<VECTOR<float,1> >::DEFORMABLES_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,DEFORMABLE_BODY_COLLECTION<VECTOR<float,1> >&);
+template DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::DEFORMABLES_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,DEFORMABLE_BODY_COLLECTION<VECTOR<float,2> >&);
+template DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::DEFORMABLES_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,DEFORMABLE_BODY_COLLECTION<VECTOR<float,3> >&);

@@ -11,7 +11,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{
 
-template<class TV> class EXAMPLE;
 template<class TV> class RIGID_BODY;
 template<class TV> class RIGID_BODY_COLLECTION;
 
@@ -20,10 +19,11 @@ class RIGIDS_STANDARD_TESTS
 {
     typedef typename TV::SCALAR T;
 public:
-    EXAMPLE<TV>& example;
+    STREAM_TYPE stream_type;
+    std::string data_directory;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
 
-    RIGIDS_STANDARD_TESTS(EXAMPLE<TV>& example_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);
+    RIGIDS_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& data_directory,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);
 
 //#####################################################################
     RIGID_BODY<TV>& Add_Rigid_Body(const std::string& name,const T scaling_factor,const T friction,const bool read_implicit=true,const bool always_read_object=false);

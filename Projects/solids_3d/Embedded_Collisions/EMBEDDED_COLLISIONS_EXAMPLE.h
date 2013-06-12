@@ -40,7 +40,7 @@ public:
     T sphere_scale;
 
     EMBEDDED_COLLISIONS_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),redgreen(0),maximum_number_of_boundary_refinements(4),refinement_ratio(.5),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),redgreen(0),maximum_number_of_boundary_refinements(4),refinement_ratio(.5),
         sphere_scale(.5)
     {
     }

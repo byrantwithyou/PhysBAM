@@ -17,7 +17,7 @@ template<class TV> void Add_Debug_Particle(const TV& X){Add_Debug_Particle(X,VEC
 #endif
 template<class T> STANDARD_TESTS<T>::
 STANDARD_TESTS(const STREAM_TYPE stream_type)
-    :BASE(stream_type,1,fluids_parameters.WATER),solids_tests(*this,solid_body_collection),run_self_tests(false),print_poisson_matrix(false),print_index_map(false),
+    :BASE(stream_type,1,fluids_parameters.WATER),solids_tests(stream_type,output_directory,data_directory,solid_body_collection),run_self_tests(false),print_poisson_matrix(false),print_index_map(false),
     print_matrix(false),print_each_matrix(false),use_full_ic(false),output_iterators(false),use_viscous_forces(false),max_dt(0),exact_dt(0),current_dt(0),implicit_solid(false),
     front_tracked_structure(0),rebuild_curve(0),deformable_collisions(0),fsi(0),number_surface_particles(0),rebuild_surface(false),free_particles(0),psi_D(0),
     circle_radius(0),circle_perturbation((T).05),oscillation_mode(2),use_massless_structure(false),coupled_particles(0),make_ellipse(false),m(1),s(1),kg(1),solid_refinement(7),

@@ -33,7 +33,7 @@ public:
     int variant;
 
     HAIR_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),variant(1)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),variant(1)
     {
     }
 

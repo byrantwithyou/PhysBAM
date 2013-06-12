@@ -35,7 +35,7 @@ class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,1>
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
-    using BASE::parse_args;using BASE::test_number;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
+    using BASE::parse_args;using BASE::test_number;using BASE::Set_External_Positions;using BASE::data_directory; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
 
@@ -43,7 +43,7 @@ public:
     INTERPOLATION_CURVE<T,FRAME<TV> > curve;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection)
     {
         fluids_parameters.simulate=false;
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
