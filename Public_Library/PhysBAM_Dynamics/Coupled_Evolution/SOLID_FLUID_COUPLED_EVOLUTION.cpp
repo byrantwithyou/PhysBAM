@@ -187,8 +187,9 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
         // TODO: Make sure this runs for the solid node of an MPI coupled sim
         Initialize_World_Space_Masses();
-        solid_system=new BACKWARD_EULER_SYSTEM<TV>(*this,solid_body_collection,dt,current_velocity_time,current_position_time,
-            &solid_body_collection.rigid_body_collection.articulated_rigid_body,(velocity_update && solids_parameters.enforce_repulsions_in_cg)?repulsions:0,mpi_solids,velocity_update);
+        solid_system=new BACKWARD_EULER_SYSTEM<TV>(this,solid_body_collection,dt,current_velocity_time,current_position_time,
+            &solid_body_collection.rigid_body_collection.articulated_rigid_body,(velocity_update && solids_parameters.enforce_repulsions_in_cg)?repulsions:0,mpi_solids,velocity_update,
+            (!velocity_update || !solids_parameters.implicit_solve_parameters.use_half_fully_implicit));
         
         if(solid_system->arb->constrain_pd_directions){
             for(int i=0;i<B.rigid_V.Size();i++) B.rigid_V(i)=mass.world_space_rigid_mass_inverse(i)*B.rigid_V(i);

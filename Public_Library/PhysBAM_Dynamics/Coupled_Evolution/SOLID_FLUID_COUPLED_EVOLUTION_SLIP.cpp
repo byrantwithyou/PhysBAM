@@ -218,8 +218,9 @@ Setup_Solids(const T dt,const T current_velocity_time,const T current_position_t
 
     if(!leakproof_solve){
         //if(!solids) return 0; // do nothing
-        BACKWARD_EULER_SYSTEM<TV>* system=new BACKWARD_EULER_SYSTEM<TV>(*this,solid_body_collection,dt,current_velocity_time,current_position_time,
-            &solid_body_collection.rigid_body_collection.articulated_rigid_body,(velocity_update && solids_parameters.enforce_repulsions_in_cg)?repulsions:0,mpi_solids,velocity_update);
+        BACKWARD_EULER_SYSTEM<TV>* system=new BACKWARD_EULER_SYSTEM<TV>(this,solid_body_collection,dt,current_velocity_time,current_position_time,
+            &solid_body_collection.rigid_body_collection.articulated_rigid_body,(velocity_update && solids_parameters.enforce_repulsions_in_cg)?repulsions:0,mpi_solids,velocity_update,
+            (!velocity_update || !solids_parameters.implicit_solve_parameters.use_half_fully_implicit));
         Prepare_Backward_Euler_System(*system,dt,current_velocity_time,current_position_time,velocity_update);
         if(solids_fluids_parameters.mpi_solid_fluid) solids_fluids_parameters.mpi_solid_fluid->Exchange_Solid_Positions_And_Velocities(solid_body_collection); // TODO: only need to exchange velocities
         return system;}

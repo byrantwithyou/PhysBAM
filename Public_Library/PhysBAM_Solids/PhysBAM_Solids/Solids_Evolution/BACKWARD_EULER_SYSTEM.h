@@ -39,6 +39,7 @@ public:
 
     void Initialize_World_Space_Masses(const SOLID_BODY_COLLECTION<TV>& solid_body_collection);
     void Inverse_Multiply(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,bool include_static) const;
+    void Multiply(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,bool include_static) const;
 };
 //#####################################################################
 // Class BACKWARD_EULER_SYSTEM
@@ -52,7 +53,7 @@ class BACKWARD_EULER_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 public:
     typedef GENERALIZED_VELOCITY<TV> VECTOR_T;
 
-    SOLIDS_EVOLUTION<TV>& solids_evolution;
+    SOLIDS_EVOLUTION<TV>* solids_evolution;
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     T dt,current_velocity_time,current_position_time;
     ARTICULATED_RIGID_BODY<TV>* arb;
@@ -60,6 +61,7 @@ public:
     TRIANGLE_REPULSIONS<TV>* repulsions;
     bool velocity_update;
     int project_nullspace_frequency;
+    bool fully_implicit;
     struct PROJECTION_DATA
     {
         PROJECTION_DATA(SOLID_BODY_COLLECTION<TV>& solid_body_collection)
@@ -74,9 +76,9 @@ public:
     };
     PROJECTION_DATA projection_data;
 
-    BACKWARD_EULER_SYSTEM(SOLIDS_EVOLUTION<TV>& solids_evolution_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection,const T dt,const T current_velocity_time,
-        const T current_position_time,ARTICULATED_RIGID_BODY<TV>* arb_input,TRIANGLE_REPULSIONS<TV>* repulsions_input,MPI_SOLIDS<TV>* mpi_solids,const bool velocity_update_input);
-
+    BACKWARD_EULER_SYSTEM(SOLIDS_EVOLUTION<TV>* solids_evolution_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection,const T dt,const T current_velocity_time,
+        const T current_position_time,ARTICULATED_RIGID_BODY<TV>* arb_input,TRIANGLE_REPULSIONS<TV>* repulsions_input,MPI_SOLIDS<TV>* mpi_solids,const bool velocity_update_input,bool fully_implicit);
+    
     virtual ~BACKWARD_EULER_SYSTEM();
 
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE

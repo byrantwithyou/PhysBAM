@@ -24,13 +24,13 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> BACKWARD_EULER_SYSTEM<TV>::
-BACKWARD_EULER_SYSTEM(SOLIDS_EVOLUTION<TV>& solids_evolution_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection,const T dt,const T current_velocity_time,
-    const T current_position_time,ARTICULATED_RIGID_BODY<TV>* arb_input,TRIANGLE_REPULSIONS<TV>* repulsions_input,MPI_SOLIDS<TV>* mpi_solids,const bool velocity_update_input)
+BACKWARD_EULER_SYSTEM(SOLIDS_EVOLUTION<TV>* solids_evolution_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection,const T dt,const T current_velocity_time,
+    const T current_position_time,ARTICULATED_RIGID_BODY<TV>* arb_input,TRIANGLE_REPULSIONS<TV>* repulsions_input,MPI_SOLIDS<TV>* mpi_solids,const bool velocity_update_input,bool fully_implicit)
     :KRYLOV_SYSTEM_BASE<typename TV::SCALAR>(false,true),solids_evolution(solids_evolution_input),solid_body_collection(solid_body_collection),
     dt(dt),current_velocity_time(current_velocity_time),current_position_time(current_position_time),//mass(deformable_object),
-    arb(arb_input),mpi_solids(mpi_solids),repulsions(repulsions_input),velocity_update(velocity_update_input),project_nullspace_frequency(INT_MAX),projection_data(solid_body_collection)
+    arb(arb_input),mpi_solids(mpi_solids),repulsions(repulsions_input),velocity_update(velocity_update_input),project_nullspace_frequency(INT_MAX),
+    fully_implicit(fully_implicit),projection_data(solid_body_collection)
 {
-    if(!solids_evolution.solids_parameters.enforce_poststabilization_in_cg) arb=0;
     if(repulsions) repulsions->Set_Collision_Pairs(projection_data.point_face_precomputed,projection_data.edge_edge_precomputed,projection_data.point_face_pairs,projection_data.edge_edge_pairs,(T)1);
     if(arb) arb->Initialize_Poststabilization_Projection();
     // TODO: compare enforcing constraints at n+1/2 and n+1
@@ -58,7 +58,7 @@ Force(const VECTOR_T& V,VECTOR_T& F) const
 
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(V.V.array,V.rigid_V.array);
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(V.V.array);
-    if(!velocity_update || !solids_evolution.solids_parameters.implicit_solve_parameters.use_half_fully_implicit) solid_body_collection.Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,dt,current_velocity_time+dt);
+    if(fully_implicit) solid_body_collection.Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,dt,current_velocity_time+dt);
     // we don't inherit velocity dependent forces to the drifted particles (contrary to the explicit velocity independent ones) because that would compromise symmetry
     solid_body_collection.Add_Velocity_Dependent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,current_velocity_time+dt);
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(F.V.array);
@@ -83,20 +83,22 @@ template<class TV> void BACKWARD_EULER_SYSTEM<TV>::
 Set_Global_Boundary_Conditions(VECTOR_T& V,ARRAY<TV>& X_save,ARRAY<FRAME<TV> >& rigid_frame_save,
     ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_save,ARRAY<TV>& V_save,bool test_system,bool print_matrix) const
 {
-    SOLIDS_PARAMETERS<TV>& solids_parameters=solids_evolution.solids_parameters;
-    solids_evolution.Set_External_Velocities(V.V.array,current_velocity_time+dt,current_position_time);
-    solids_evolution.kinematic_evolution.Set_External_Velocities(V.rigid_V.array,current_velocity_time+dt,current_position_time);
+    if(!solids_evolution) return;
+    SOLIDS_PARAMETERS<TV>& solids_parameters=solids_evolution->solids_parameters;
+    solids_evolution->Set_External_Velocities(V.V.array,current_velocity_time+dt,current_position_time);
+    solids_evolution->kinematic_evolution.Set_External_Velocities(V.rigid_V.array,current_velocity_time+dt,current_position_time);
     // TODO: make Solve_Velocities_for_PD take rigid_V.array and call that instead
     if(arb){
         PHYSBAM_ASSERT(ARRAY_VIEW<TWIST<TV> >::Same_Array(V.rigid_V.array,solid_body_collection.rigid_body_collection.rigid_body_particles.twist));
         arb->Apply_Poststabilization(test_system,print_matrix); // Do not project out pd directions here
         if(arb->Has_Actuators() && arb->constrain_pd_directions){
-            arb->Compute_Position_Based_State(dt,current_velocity_time);arb->Solve_Velocities_for_PD(current_velocity_time,dt,solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);}}
+            arb->Compute_Position_Based_State(dt,current_velocity_time);
+            arb->Solve_Velocities_for_PD(current_velocity_time,dt,solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);}}
     if(velocity_update){
         PHYSBAM_ASSERT(ARRAY_VIEW<TV>::Same_Array(V.V.array,solid_body_collection.deformable_body_collection.particles.V) && ARRAY_VIEW<TWIST<TV> >::Same_Array(V.rigid_V.array,solid_body_collection.rigid_body_collection.rigid_body_particles.twist));
         if(solids_parameters.use_post_cg_constraints){// TODO: may just want to call Apply_Constraints in this case too
-            if(solids_evolution.solids_parameters.use_rigid_deformable_contact && solid_body_collection.deformable_body_collection.collisions.collisions_on)
-                solids_evolution.rigid_deformable_collisions->Set_Collision_Velocities(V.V.array,V.rigid_V.array,X_save,rigid_frame_save,rigid_velocity_save,rigid_angular_momentum_save,V_save);
+            if(solids_evolution->solids_parameters.use_rigid_deformable_contact && solid_body_collection.deformable_body_collection.collisions.collisions_on)
+                solids_evolution->rigid_deformable_collisions->Set_Collision_Velocities(V.V.array,V.rigid_V.array,X_save,rigid_frame_save,rigid_velocity_save,rigid_angular_momentum_save,V_save);
             if(repulsions) repulsions->Adjust_Velocity_For_Self_Repulsion_Using_History(dt,false,false);}}
 }
 //#####################################################################
@@ -105,25 +107,26 @@ Set_Global_Boundary_Conditions(VECTOR_T& V,ARRAY<TV>& X_save,ARRAY<FRAME<TV> >& 
 template<class TV> void BACKWARD_EULER_SYSTEM<TV>::
 Project(KRYLOV_VECTOR_BASE<T>& BV) const
 {
+    if(!solids_evolution) return;
     VECTOR_T& V=debug_cast<VECTOR_T&>(BV);
     // Applying the projections in this order is equivalent to repeating Zero_Out_Enslaved_Velocity_Nodes after Poststabilization_Projection, which is a (mass) symmetric projection.
-    solids_evolution.Zero_Out_Enslaved_Velocity_Nodes(V.V.array,current_velocity_time+dt,current_position_time);
-    solids_evolution.Zero_Out_Enslaved_Velocity_Nodes(V.rigid_V.array,current_velocity_time+dt,current_position_time);
+    solids_evolution->Zero_Out_Enslaved_Velocity_Nodes(V.V.array,current_velocity_time+dt,current_position_time);
+    solids_evolution->Zero_Out_Enslaved_Velocity_Nodes(V.rigid_V.array,current_velocity_time+dt,current_position_time);
     if(!velocity_update){if(arb) arb->Poststabilization_Projection(V.rigid_V.array,true);return;}
-    for(int i=0;i<solids_evolution.solids_parameters.implicit_solve_parameters.cg_projection_iterations;i++){
+    for(int i=0;i<solids_evolution->solids_parameters.implicit_solve_parameters.cg_projection_iterations;i++){
         int middle_projection=1;
-        if(solids_evolution.solids_parameters.use_rigid_deformable_contact && solid_body_collection.deformable_body_collection.collisions.collisions_on){
-            solids_evolution.rigid_deformable_collisions->Project_Contact_Pairs(V.V.array,V.rigid_V.array);middle_projection=2;}
+        if(solids_evolution->solids_parameters.use_rigid_deformable_contact && solid_body_collection.deformable_body_collection.collisions.collisions_on){
+            solids_evolution->rigid_deformable_collisions->Project_Contact_Pairs(V.V.array,V.rigid_V.array);middle_projection=2;}
         // TODO: arb projections should also project out changes in pd controlled directions
         if(arb){arb->Poststabilization_Projection(V.rigid_V.array,true);middle_projection=3;}
         if(projection_data.point_face_precomputed.m || projection_data.edge_edge_precomputed.m){
             TRIANGLE_REPULSIONS<TV>::Project_All_Moving_Constraints(projection_data.point_face_precomputed,projection_data.edge_edge_precomputed,V.V.array);middle_projection=4;}
         if(arb && middle_projection!=3) arb->Poststabilization_Projection(V.rigid_V.array,true);
-        if(solids_evolution.solids_parameters.use_rigid_deformable_contact && solid_body_collection.deformable_body_collection.collisions.collisions_on && middle_projection!=2)
-            solids_evolution.rigid_deformable_collisions->Project_Contact_Pairs(V.V.array,V.rigid_V.array);
+        if(solids_evolution->solids_parameters.use_rigid_deformable_contact && solid_body_collection.deformable_body_collection.collisions.collisions_on && middle_projection!=2)
+            solids_evolution->rigid_deformable_collisions->Project_Contact_Pairs(V.V.array,V.rigid_V.array);
         if(middle_projection!=1){
-            solids_evolution.Zero_Out_Enslaved_Velocity_Nodes(V.V.array,current_velocity_time+dt,current_position_time);
-            solids_evolution.Zero_Out_Enslaved_Velocity_Nodes(V.rigid_V.array,current_velocity_time+dt,current_position_time);}}
+            solids_evolution->Zero_Out_Enslaved_Velocity_Nodes(V.V.array,current_velocity_time+dt,current_position_time);
+            solids_evolution->Zero_Out_Enslaved_Velocity_Nodes(V.rigid_V.array,current_velocity_time+dt,current_position_time);}}
 }
 //#####################################################################
 // Function Inner_Product
@@ -209,6 +212,16 @@ Inverse_Multiply(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,b
 {
     for(int i=0;i<F.V.Size();i++) F.V(i)=one_over_mass(i)*V.V(i);
     for(int i=0;i<F.rigid_V.Size();i++) F.rigid_V(i)=world_space_rigid_mass_inverse(i)*V.rigid_V(i);
+    if(include_static) F.kinematic_and_static_rigid_V*=0;
+}
+//#####################################################################
+// Function Multiply
+//#####################################################################
+template<class TV> void GENERALIZED_MASS<TV>::
+Multiply(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,bool include_static) const
+{
+    for(int i=0;i<F.V.Size();i++) F.V(i)=mass(i)*V.V(i);
+    for(int i=0;i<F.rigid_V.Size();i++) F.rigid_V(i)=world_space_rigid_mass(i)*V.rigid_V(i);
     if(include_static) F.kinematic_and_static_rigid_V*=0;
 }
 //#####################################################################
