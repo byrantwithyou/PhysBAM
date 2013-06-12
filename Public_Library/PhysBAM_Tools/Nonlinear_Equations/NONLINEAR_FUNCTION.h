@@ -111,6 +111,7 @@ public:
 //#####################################################################
     virtual void Compute(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const=0;
     virtual T operator()(const KRYLOV_VECTOR_BASE<T>& x) const {T E=0;Compute(x,0,0,&E);return E;}
+    void Test(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>& h) const;
 //#####################################################################
 };
 
