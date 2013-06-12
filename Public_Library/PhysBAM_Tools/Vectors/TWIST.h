@@ -79,8 +79,11 @@ public:
     void Set_Vector(const VECTOR<T,dimension>& vector)
     {vector.Extract(linear,angular);}
 
+    T Dot(const TWIST& v) const
+    {return TV::Dot_Product(linear,v.linear)+T_SPIN::Dot_Product(angular,v.angular);};
+
     static T Dot_Product(const TWIST& v1,const TWIST& v2)
-    {return TV::Dot_Product(v1.linear,v2.linear)+T_SPIN::Dot_Product(v1.angular,v2.angular);};
+    {return v1.Dot(v2);}
 
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,linear,angular);}
