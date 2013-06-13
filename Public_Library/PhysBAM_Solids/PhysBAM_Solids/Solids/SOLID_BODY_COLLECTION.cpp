@@ -120,7 +120,9 @@ Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<cons
     const T time) const
 {
     assert(V_full.Size()==deformable_body_collection.particles.Size() && F_full.Size()==deformable_body_collection.particles.Size());
+    assert(rigid_F_full.Size()==rigid_body_collection.rigid_body_particles.Size());
     F_full.Subset(deformable_body_collection.dynamic_particles).Fill(TV()); // note we zero here because we will scale the forces below
+    rigid_F_full.Subset(rigid_body_collection.dynamic_rigid_body_particles).Fill(TWIST<TV>()); // note we zero here because we will scale the forces below
     bool added_d=false,added_r=false;
     for(int k=0;k<solids_forces.m;k++) if(solids_forces(k)->use_implicit_velocity_independent_forces){
         solids_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,rigid_V_full,F_full,rigid_F_full,time);added_r=added_d=true;}
