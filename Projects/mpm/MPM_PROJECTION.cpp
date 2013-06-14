@@ -27,7 +27,6 @@ MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     face_densities.Resize(mac_grid);
     cell_dirichlet.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     cell_neumann.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
-    cell_incompressible.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     neumann_cell_normal_axis.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     div_u.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     pressure.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
@@ -54,7 +53,6 @@ Reinitialize()
     face_densities.Fill((T)0);
     cell_dirichlet.Fill(false);
     cell_neumann.Fill(false);
-    cell_incompressible.Fill(false);
     nodes_non_dirichlet_cells.Clean_Memory();
     div_u.Fill((T)0);
     max_div=(T)0;
@@ -81,22 +79,6 @@ template<class TV> void MPM_PROJECTION<TV>::
 Identify_Neumann_Cells()
 {
     cell_neumann.Fill(false);
-}
-
-//#####################################################################
-// Function Identify_Incompressible_Cells
-//#####################################################################
-template<class TV> void MPM_PROJECTION<TV>::
-Identify_Incompressible_Cells()
-{
-    cell_incompressible.Fill(false);
-    for(int p=0;p<sim.particles.number;p++){
-        TV_INT cell=mac_grid.Cell(sim.particles.X(p),0);
-        if(!sim.particles.compress(p))
-            cell_incompressible(cell)=true;}
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
-        if(cell_dirichlet(it.index) || cell_neumann(it.index))
-            cell_incompressible(it.index)=true;}
 }
 
 //#####################################################################
@@ -224,7 +206,7 @@ Do_Projection()
         TV_INT first_cell=iterator.First_Cell_Index();
         TV_INT second_cell=iterator.Second_Cell_Index();        
         if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
-            if(!cell_neumann(first_cell) && !cell_neumann(second_cell) && cell_incompressible(first_cell) && cell_incompressible(second_cell)){
+            if(!cell_neumann(first_cell) && !cell_neumann(second_cell)){
                 T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
 
                 // mass based density

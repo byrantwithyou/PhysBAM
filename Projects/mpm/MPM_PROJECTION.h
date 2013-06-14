@@ -24,7 +24,6 @@ public:
     GRID<TV> mac_grid;
     ARRAY<bool,TV_INT> cell_dirichlet;
     ARRAY<bool,TV_INT> cell_neumann;
-    ARRAY<bool,TV_INT> cell_incompressible;
     ARRAY<int,TV_INT> neumann_cell_normal_axis; // +-1 +-2 +-3
     HASHTABLE<TV_INT,bool> nodes_non_dirichlet_cells;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
@@ -43,7 +42,6 @@ public:
     void Reinitialize();                                   
     void Identify_Dirichlet_Cells();                       
     void Identify_Neumann_Cells();                         
-    void Identify_Incompressible_Cells();
     void Identify_Nodes_Of_Non_Dirichlet_Cells();         
     void Velocities_Corners_To_Faces_MPM_Style();          
     void Build_Velocity_Divergence();                      
