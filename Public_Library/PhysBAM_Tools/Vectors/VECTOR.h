@@ -590,5 +590,16 @@ template<class T> struct HASH_REDUCE<VECTOR<T,4> >
 {static int H(const VECTOR<T,4>& key){return int_hash(int_hash(HASH_REDUCE<T>::H(key[0]),HASH_REDUCE<T>::H(key[1])),HASH_REDUCE<T>::H(key[2]),HASH_REDUCE<T>::H(key[3]));}};
 template<class T,int d> struct HASH_REDUCE<VECTOR<T,d> >
 {static int H(const VECTOR<T,d>& key){return Hash_Reduce_Array_Helper(key);}};
+template<class T,int d>
+inline std::istream& operator>>(std::istream& input,VECTOR<T,d>& v)
+{
+    FILE_UTILITIES::Ignore(input,'(');
+    FILE_UTILITIES::Ignore(input,'[');
+    for(int i=0;i<d;i++) input>>v(i);
+    FILE_UTILITIES::Ignore(input,']');
+    FILE_UTILITIES::Ignore(input,')');
+    return input;
+}
+
 }
 #endif

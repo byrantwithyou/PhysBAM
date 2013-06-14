@@ -506,8 +506,5 @@ wrap(const VECTOR<T,3>& v,const VECTOR<T,3>& vmin,const VECTOR<T,3>& vmax)
 {return VECTOR<T,3>(wrap(v.x,vmin.x,vmax.x),wrap(v.y,vmin.y,vmax.y),wrap(v.z,vmin.z,vmax.z));}
 
 //#####################################################################
-template<class T>
-inline std::istream& operator>>(std::istream& input,VECTOR<T,3>& v)
-{FILE_UTILITIES::Ignore(input,'[');input>>v.x>>v.y>>v.z;FILE_UTILITIES::Ignore(input,']');return input;}
 }
 #endif

@@ -468,8 +468,5 @@ template<class T> inline bool
 in_bounds(const VECTOR<T,1>& v,const VECTOR<T,1>& vmin,const VECTOR<T,1>& vmax)
 {return in_bounds(v.x,vmin.x,vmax.x);}
 //#####################################################################
-template<class T>
-inline std::istream& operator>>(std::istream& input,VECTOR<T,1>& v)
-{FILE_UTILITIES::Ignore(input,'[');input>>v.x;FILE_UTILITIES::Ignore(input,']');return input;}
 }
 #endif

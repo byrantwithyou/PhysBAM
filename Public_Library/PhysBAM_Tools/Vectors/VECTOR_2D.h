@@ -515,8 +515,5 @@ template<class T> inline VECTOR<T,2>
 wrap(const VECTOR<T,2>& v,const VECTOR<T,2>& vmin,const VECTOR<T,2>& vmax)
 {return VECTOR<T,2>(wrap(v.x,vmin.x,vmax.x),wrap(v.y,vmin.y,vmax.y));}
 //#####################################################################
-template<class T>
-inline std::istream& operator>>(std::istream& input,VECTOR<T,2>& v)
-{FILE_UTILITIES::Ignore(input,'[');input>>v.x>>v.y;FILE_UTILITIES::Ignore(input,']');return input;}
 }
 #endif

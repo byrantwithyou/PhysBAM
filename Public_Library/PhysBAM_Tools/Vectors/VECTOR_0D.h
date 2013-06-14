@@ -213,9 +213,6 @@ operator/(const T&,const VECTOR<T,0>& v)
 {return v;}
 
 //#####################################################################
-template<class T>
-inline std::istream& operator>>(std::istream& input,VECTOR<T,0>&)
-{if(input.peek()=='[') input.get();if(input.peek()==']') input.get();return input;}
 }
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #endif
