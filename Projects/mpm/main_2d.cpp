@@ -169,7 +169,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.dirichlet_box.Append(RANGE<TV>(TV(-0.3,0.22),TV(0.3,0.3)));
         sim.dirichlet_velocity.Append(TV(0,0.1));
 
-
         sim.Initialize();
 
 
