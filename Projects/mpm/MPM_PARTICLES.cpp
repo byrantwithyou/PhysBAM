@@ -27,6 +27,7 @@ MPM_PARTICLES()
     Add_Array(ATTRIBUTE_ID_LAMBDA,&lambda);
     Add_Array(ATTRIBUTE_ID_MU0,&mu0);
     Add_Array(ATTRIBUTE_ID_LAMBDA0,&lambda0);
+    Add_Array(ATTRIBUTE_ID_PRESSURE,&pressure);
     Add_Array(ATTRIBUTE_ID_USE_PLASTICITY_YIELD,&use_plasticity_yield);
     Add_Array(ATTRIBUTE_ID_USE_PLASTICITY_CLAMP,&use_plasticity_clamp);
     Add_Array(ATTRIBUTE_ID_YIELD_MIN,&yield_min);
@@ -138,6 +139,7 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA,"lambda");
     Register_Attribute_Name(ATTRIBUTE_ID_MU0,"mu0");
     Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA0,"lambda0");
+    Register_Attribute_Name(ATTRIBUTE_ID_PRESSURE,"pressure");
     Register_Attribute_Name(ATTRIBUTE_ID_USE_PLASTICITY_YIELD,"use_plasticity_yield");
     Register_Attribute_Name(ATTRIBUTE_ID_USE_PLASTICITY_CLAMP,"use_plasticity_clamp");
     Register_Attribute_Name(ATTRIBUTE_ID_YIELD_MIN,"yield_min");

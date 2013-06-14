@@ -35,6 +35,7 @@ public:
     ARRAY<T,TV_INT> div_u;
     T max_div;
     ARRAY<T,TV_INT> pressure;
+    ARRAY<T,TV_INT> pressure_rasterized;
 
     MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in);
     ~MPM_PROJECTION();

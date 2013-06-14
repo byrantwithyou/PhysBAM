@@ -28,6 +28,7 @@ MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     neumann_cell_normal_axis.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     div_u.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     pressure.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
+    pressure_rasterized.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
 }
 
 //#####################################################################
@@ -53,6 +54,7 @@ Reinitialize()
     div_u.Fill((T)0);
     max_div=(T)0;
     pressure.Fill((T)0);
+    pressure_rasterized.Fill((T)0);
 }
 
 //#####################################################################
