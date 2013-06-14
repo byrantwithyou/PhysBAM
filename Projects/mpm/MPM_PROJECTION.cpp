@@ -27,7 +27,7 @@ MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     cell_neumann.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     neumann_cell_normal_axis.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     div_u.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
-    pressure.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
+    pressure_unknown.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     pressure_rasterized.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
 }
 
@@ -53,7 +53,7 @@ Reinitialize()
     nodes_non_dirichlet_cells.Clean_Memory();
     div_u.Fill((T)0);
     max_div=(T)0;
-    pressure.Fill((T)0);
+    pressure_unknown.Fill((T)0);
     pressure_rasterized.Fill((T)0);
 }
 
@@ -180,7 +180,7 @@ Solve_For_Pressure()
     KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=false;
     solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
-    pressure=x.v;
+    pressure_unknown=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
 }
 
@@ -200,7 +200,7 @@ Do_Projection()
         TV_INT second_cell=iterator.Second_Cell_Index();        
         if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
             if(!cell_neumann(first_cell) && !cell_neumann(second_cell)){
-                T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
+                T grad_p=(pressure_unknown(second_cell)-pressure_unknown(first_cell))*one_over_h;
                 if(face_masses(face_index)>sim.min_mass) face_velocities(face_index)-=sim.dt/face_masses(face_index)*grad_p;}}}
     // Enforce face velocities for neumann cells
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){

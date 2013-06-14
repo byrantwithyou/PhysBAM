@@ -79,22 +79,22 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             sim.particles.Add_Randomly_Sampled_Object(SPHERE<TV>(TV(0,0,0),0.15),particle_exclude_radius);
             int first_count=sim.particles.number;
             sim.particles.Set_Material_Properties(0,first_count,
-                                                  (T)115.2*density_scale/first_count, // mass per particle
-                                                  (3000*100)*ym/((T)2*((T)1+pr)), // mu
-                                                  (3000*100)*ym*pr/(((T)1+pr)*((T)1-2*pr)), // lambda
-                                                  false); // compress
+                (T)115.2*density_scale/first_count, // mass per particle
+                (3000*100)*ym/((T)2*((T)1+pr)), // mu
+                (3000*100)*ym*pr/(((T)1+pr)*((T)1-2*pr)), // lambda
+                false,0); // compress, pressure
             sim.particles.Set_Plasticity(0,first_count,
-                                         false,-1000,1.001, // plasticity_yield
-                                         false,-1,1); // plasticity_clamp
+                false,-1000,1.001, // plasticity_yield
+                false,-1,1); // plasticity_clamp
             sim.particles.Set_Visco_Plasticity(0,first_count,
-                                               true,70, // visco_nu
-                                               8000, // visco_tau
-                                               0); // visco_kappa
+                true,70, // visco_nu
+                8000, // visco_tau
+                0); // visco_kappa
             sim.particles.Set_Initial_State(0,first_count,
 //                                            MATRIX<T,TV::m>(2,0,0,0,1,0,0,0,0.5), // Fe
-                                            MATRIX<T,TV::m>::Identity_Matrix(),
-                                            MATRIX<T,TV::m>::Identity_Matrix(), // Fp
-                                            TV()); // initial velocity
+                MATRIX<T,TV::m>::Identity_Matrix(),
+                MATRIX<T,TV::m>::Identity_Matrix(), // Fp
+                TV()); // initial velocity
 //            for(int p=0;p<sim.particles.number;p++)
 //                sim.particles.X(p)=MATRIX<T,TV::m>(2,0,0,0,1,0,0,0,0.5)*sim.particles.Xm(p);
 //            

@@ -63,7 +63,7 @@ public:
         this->Resize(new_Xm.m);
         X=Xm=new_Xm;
     }
-    void Set_Material_Properties(int start_index,int count,T mass_in,T mu_in,T lambda_in,bool compress_in);
+    void Set_Material_Properties(int start_index,int count,T mass_in,T mu_in,T lambda_in,bool compress_in,bool pressure_in);
     void Set_Initial_State(int start_index,int count,MATRIX<T,TV::m> Fe_in,MATRIX<T,TV::m> Fp_in,TV V_in);
     void Set_Plasticity(int start_index,int count,bool use_plasticity_yield_in,T yield_min_in,T yield_max_in,bool use_plasticity_clamp_in,T clamp_min_in,T clamp_max_in);
     void Set_Visco_Plasticity(int start_index,int count,bool use_visco_plasticity_in,T visco_nu_in,T visco_tau_in,T visco_kappa_in);

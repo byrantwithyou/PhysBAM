@@ -97,7 +97,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 (T)8/1000, // mass per particle
                 0, // mu
                 0, // lambda
-                false); // compress
+                false,0); // compress, pressure
             sim.particles.Set_Plasticity(0,c1,
                 false,-1000,1.2, // plasticity_yield
                 false,-1,1); // plasticity_clamp
@@ -162,7 +162,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                  (T)200*density_scale/1000, // mass per particle
                 thisE/((T)2*((T)1+pr)), // mu
                 thisE*pr/(((T)1+pr)*((T)1-2*pr)), // lambda
-                false); // compress
+                false,0); // compress,pressure
         }
         sim.dirichlet_box.Append(RANGE<TV>(TV(-0.3,-0.3),TV(0.3,-0.22)));
         sim.dirichlet_velocity.Append(TV(0,-0.1));
