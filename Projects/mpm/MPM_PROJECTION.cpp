@@ -23,8 +23,6 @@ MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     face_velocities_old.Resize(mac_grid);
     face_masses.Resize(mac_grid);
     face_momenta.Resize(mac_grid);
-    face_volumes.Resize(mac_grid);
-    face_densities.Resize(mac_grid);
     cell_dirichlet.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     cell_neumann.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     neumann_cell_normal_axis.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
@@ -49,8 +47,6 @@ Reinitialize()
     face_velocities_old.Fill((T)0);
     face_masses.Fill((T)0);
     face_momenta.Fill((T)0);
-    face_volumes.Fill((T)0);
-    face_densities.Fill((T)0);
     cell_dirichlet.Fill(false);
     cell_neumann.Fill(false);
     nodes_non_dirichlet_cells.Clean_Memory();
@@ -105,8 +101,6 @@ Velocities_Corners_To_Faces_MPM_Style()
     face_velocities.Fill((T)0);
     face_masses.Fill((T)0);
     face_momenta.Fill((T)0);
-    face_volumes.Fill((T)0);
-    face_densities.Fill((T)0);
     ARRAY<FACE_INDEX<TV::m> > faces_got_rasterized;
     T weight=(TV::m==2)?0.5:0.25;
     for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(nodes_non_dirichlet_cells);it.Valid();it.Next()){
@@ -116,14 +110,11 @@ Velocities_Corners_To_Faces_MPM_Style()
                 FACE_INDEX<TV::m> face_index(axis,mac_grid.Node_Face_Index(axis,node,face));
                 faces_got_rasterized.Append(face_index);
                 face_masses(face_index)+=weight*sim.node_mass(node);
-                face_volumes(face_index)+=weight*sim.node_volume(node);
                 face_momenta(face_index)+=weight*sim.node_mass(node)*sim.node_V(node)(axis);}}}
     for(int i=0;i<faces_got_rasterized.m;i++){
         FACE_INDEX<TV::m> face_index=faces_got_rasterized(i);
         if(face_masses(face_index)>sim.min_mass)
-            face_velocities(face_index)=face_momenta(face_index)/face_masses(face_index);
-        if(face_volumes(face_index)>sim.min_volume)
-            face_densities(face_index)=face_masses(face_index)/face_volumes(face_index);}
+            face_velocities(face_index)=face_momenta(face_index)/face_masses(face_index);}
     face_velocities_old=face_velocities; // for FLIPing back
 }
 
@@ -208,14 +199,7 @@ Do_Projection()
         if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
             if(!cell_neumann(first_cell) && !cell_neumann(second_cell)){
                 T grad_p=(pressure(second_cell)-pressure(first_cell))*one_over_h;
-
-                // mass based density
                 if(face_masses(face_index)>sim.min_mass) face_velocities(face_index)-=sim.dt/face_masses(face_index)*grad_p;}}}
-
-                // volume based density
-                // if(face_densities(face_index)>sim.min_density) face_velocities(face_index)-=sim.dt/face_densities(face_index)*grad_p;}}}
-
-
     // Enforce face velocities for neumann cells
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
         if(cell_neumann(it.index)){
