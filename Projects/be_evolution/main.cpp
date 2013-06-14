@@ -5,6 +5,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED_FIXED.h>
@@ -125,6 +126,8 @@ public:
     void Advance_One_Time_Step_Position(const T dt)
     {
         NEWTONS_METHOD<T> nm;
+        nm.max_iterations=1000;
+
         MINIMIZATION_OBJECTIVE<TV> obj(solid_body_collection,dt,time);
         KRYLOV_VECTOR_BASE<T>* x0 = obj.x0.Clone_Default();
         *x0=obj.x0;
@@ -151,12 +154,17 @@ int main(int argc,char* argv[])
     VIEWER_OUTPUT<TV> vo(stream_type,grid,output_directory);
     SIMULATION<TV> simulation;
     SOLIDS_STANDARD_TESTS<TV> tests(stream_type,getenv("PHYSBAM_DATA_DIRECTORY"),simulation.solid_body_collection);
-    GRID<TV> cube_grid(TV_INT()+3,RANGE<TV>::Centered_Box());
+    GRID<TV> cube_grid(TV_INT()+6,RANGE<TV>::Centered_Box());
     TETRAHEDRALIZED_VOLUME<T>& tv=tests.Create_Mattress(cube_grid);
     simulation.solid_body_collection.Add_Force(Create_Finite_Volume(tv,new COROTATED_FIXED<T,3>(1e6,0.3,0)));
     for(int i=0;i<simulation.solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
         simulation.solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
-    simulation.solid_body_collection.deformable_body_collection.particles.X(0).x+=.1;
+
+
+    RANDOM_NUMBERS<T> random;
+    random.Fill_Uniform(simulation.solid_body_collection.deformable_body_collection.particles.X,-1,1);
+
+
     simulation.solid_body_collection.Update_Simulated_Particles();
 
     T dt=.1;
