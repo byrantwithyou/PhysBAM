@@ -238,8 +238,9 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
 // Function Dot
 //#####################################################################
 template<class TV> typename TV::SCALAR INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
-Dot(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v) const
+Dot(const KRYLOV_VECTOR_BASE<T>& bv) const
 {
+    const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>&>(bv);
     T dot=0;
 #pragma omp parallel
 #pragma omp single

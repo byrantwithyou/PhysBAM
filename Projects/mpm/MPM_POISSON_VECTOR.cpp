@@ -72,6 +72,14 @@ Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv
     v.Copy(c1,debug_cast<const MPM_POISSON_VECTOR&>(bv1).v,debug_cast<const MPM_POISSON_VECTOR&>(bv2).v);
 }
 //#####################################################################
+// Function Dot
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_POISSON_VECTOR<TV>::
+Dot(const KRYLOV_VECTOR_BASE<T>& bv) const
+{
+    return v.array.Dot(debug_cast<const MPM_POISSON_VECTOR&>(bv).v.array);
+}
+//#####################################################################
 // Function Raw_Size
 //#####################################################################
 template<class TV> int MPM_POISSON_VECTOR<TV>::

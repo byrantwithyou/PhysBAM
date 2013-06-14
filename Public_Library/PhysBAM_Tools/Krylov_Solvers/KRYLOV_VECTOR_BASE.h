@@ -26,6 +26,7 @@ public:
     virtual KRYLOV_VECTOR_BASE& operator*=(const T a)=0;
     virtual void Copy(const T c,const KRYLOV_VECTOR_BASE& bv)=0;
     virtual void Copy(const T c1,const KRYLOV_VECTOR_BASE& bv1,const KRYLOV_VECTOR_BASE& bv2)=0;
+    virtual T Dot(const KRYLOV_VECTOR_BASE& bv) const=0;
     virtual int Raw_Size() const=0;
     virtual T& Raw_Get(int i)=0;
     const T& Raw_Get(int i) const;

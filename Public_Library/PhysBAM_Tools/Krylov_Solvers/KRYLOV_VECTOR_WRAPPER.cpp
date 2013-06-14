@@ -86,6 +86,14 @@ Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2
 {
     v.Copy(c,dynamic_cast<const KRYLOV_VECTOR_WRAPPER&>(bv1).v,dynamic_cast<const KRYLOV_VECTOR_WRAPPER&>(bv2).v);
 }
+//#####################################################################
+// Function Dot
+//#####################################################################
+template<class T,class TV> T KRYLOV_VECTOR_WRAPPER<T,TV>::
+Dot(const KRYLOV_VECTOR_BASE<T>& bv) const
+{
+    return v.Dot(dynamic_cast<const KRYLOV_VECTOR_WRAPPER&>(bv).v);
+}
 namespace{
 inline int Raw_Size_Helper(const float& p){return 1;}
 inline int Raw_Size_Helper(const double& p){return 1;}

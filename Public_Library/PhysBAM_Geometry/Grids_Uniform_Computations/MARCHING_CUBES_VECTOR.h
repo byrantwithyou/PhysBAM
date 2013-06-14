@@ -43,6 +43,9 @@ public:
     void Copy(const T c1,const BASE& bv1,const BASE& bv2) PHYSBAM_OVERRIDE
     {x=debug_cast<const MARCHING_CUBES_VECTOR&>(bv1).x*c1+debug_cast<const MARCHING_CUBES_VECTOR&>(bv2).x;}
 
+    T Dot(const KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE
+    {return x.Dot(debug_cast<const MARCHING_CUBES_VECTOR&>(bv).x);}
+
     int Raw_Size() const PHYSBAM_OVERRIDE
     {return x.m*TV::m;}
 

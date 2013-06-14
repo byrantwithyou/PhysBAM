@@ -87,6 +87,18 @@ Copy(const T c1,const BASE& bv1,const BASE& bv2)
     for(int i=0;i<v1.pressure.m;i++) pressure(i).Copy(c1,v1.pressure(i),v2.pressure(i));
 }
 //#####################################################################
+// Function Dot
+//#####################################################################
+template<class TV> typename TV::SCALAR PRESSURE_VELOCITY_VECTOR<TV>::
+Dot(const BASE& bv) const
+{
+    const PRESSURE_VELOCITY_VECTOR& v=debug_cast<const PRESSURE_VELOCITY_VECTOR&>(bv);
+    assert(pressure.m==v.pressure.m);
+    T x=solid_velocity.Dot(v.solid_velocity);
+    for(int i=0;i<v.pressure.m;i++) x+=pressure(i).Dot(v.pressure(i));
+    return x;
+}
+//#####################################################################
 // Function Raw_Size
 //#####################################################################
 template<class TV> int PRESSURE_VELOCITY_VECTOR<TV>::

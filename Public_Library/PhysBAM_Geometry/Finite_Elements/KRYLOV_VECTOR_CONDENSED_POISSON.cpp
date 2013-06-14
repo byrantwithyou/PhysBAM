@@ -116,8 +116,9 @@ Resize(const KRYLOV_VECTOR_BASE<typename TV::SCALAR>& w)
 // Function Dot
 //#####################################################################
 template<class TV> typename TV::SCALAR KRYLOV_VECTOR_CONDENSED_POISSON<TV>::
-Dot(const KRYLOV_VECTOR_CONDENSED_POISSON<TV>& w) const
+Dot(const KRYLOV_VECTOR_BASE<typename TV::SCALAR>& bw) const
 {
+    const KRYLOV_VECTOR_CONDENSED_POISSON& w=debug_cast<const KRYLOV_VECTOR_CONDENSED_POISSON&>(bw);
     T result=0;
 #ifdef USE_OPENMP
     int number_of_threads;

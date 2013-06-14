@@ -40,6 +40,7 @@ public:
     BASE& operator*=(const T a) PHYSBAM_OVERRIDE;
     void Copy(const T c,const BASE& bv) PHYSBAM_OVERRIDE;
     void Copy(const T c1,const BASE& bv1,const BASE& bv2) PHYSBAM_OVERRIDE;
+    T Dot(const KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE;
     void Pack(ARRAY<T> &velocities) const;
     void Unpack(ARRAY<T> &velocities);
     void Unpack_And_Add(ARRAY<T> &velocities);

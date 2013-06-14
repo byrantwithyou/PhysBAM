@@ -206,8 +206,9 @@ Zero_Out()
 // Function Dot
 //#####################################################################
 template<class TV> typename TV::SCALAR INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
-Dot(const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v) const
+Dot(const KRYLOV_VECTOR_BASE<T>& bv) const
 {
+    const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>&>(bv);
     T result=0;
 #ifdef USE_OPENMP
     result_per_thread.Fill(0);

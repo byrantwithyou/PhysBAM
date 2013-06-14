@@ -73,6 +73,14 @@ Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv
     v=c1*debug_cast<const ARTICULATED_VECTOR&>(bv1).v+debug_cast<const ARTICULATED_VECTOR&>(bv2).v;
 }
 //#####################################################################
+// Function Dot
+//#####################################################################
+template<class TV> typename TV::SCALAR ARTICULATED_VECTOR<TV>::
+Dot(const KRYLOV_VECTOR_BASE<T>& bv) const
+{
+    return v.Dot(debug_cast<const ARTICULATED_VECTOR&>(bv).v);
+}
+//#####################################################################
 // Function Raw_Size
 //#####################################################################
 template<class TV> int ARTICULATED_VECTOR<TV>::
