@@ -7,8 +7,8 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigids_Evolution/RIGIDS_KINEMATIC_EVOLUTION.h>
 using namespace PhysBAM;
 template<class TV> RIGIDS_KINEMATIC_EVOLUTION<TV>::
-RIGIDS_KINEMATIC_EVOLUTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,bool use_kinematic_keyframes_input)
-    :BASE(rigid_body_collection_input,use_kinematic_keyframes_input),rigid_body_collection(rigid_body_collection_input)
+RIGIDS_KINEMATIC_EVOLUTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>& rigid_body_example_velocities,bool use_kinematic_keyframes_input)
+    :BASE(rigid_body_collection_input,rigid_body_example_velocities,use_kinematic_keyframes_input),rigid_body_collection(rigid_body_collection_input)
 {
 }
 template<class TV> RIGIDS_KINEMATIC_EVOLUTION<TV>::

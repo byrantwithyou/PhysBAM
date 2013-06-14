@@ -103,7 +103,7 @@ public:
   public:
     STRAWMAN_EXAMPLE()
         :BASE(STREAM_TYPE(T())),resolution(100),order(1),frame(0),fill_ghost_region(true),initial_distance((T)-.5),solid_velocity((T)-1),
-        fluid_tangential_velocity(0),rigid_body_collection(0,0),collision_bodies_affecting_fluid(grid),pls_evolution(0),
+        fluid_tangential_velocity(0),rigid_body_collection(0),collision_bodies_affecting_fluid(grid),pls_evolution(0),
         opt_analytic(false),opt_extrapolation(false),opt_gfm(false),opt_new_gfm(false)
     {}
 
@@ -129,9 +129,9 @@ virtual void Register_Options() PHYSBAM_OVERRIDE
 //#####################################################################
 virtual void Parse_Options() PHYSBAM_OVERRIDE
 {
+    BASE::Parse_Options();
     last_frame=200;
     frame_rate=(T)400;
-    BASE::Parse_Options();
     if(opt_analytic) method=ANALYTIC;
     else if(opt_extrapolation) method=EXTRAPOLATION;
     else if(opt_gfm) method=GFM;

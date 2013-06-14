@@ -19,7 +19,7 @@ using namespace PhysBAM;
 template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
 OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(const std::string& prefix,const int start_frame)
     :OPENGL_COMPONENT("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),display_mode(0),draw_velocities(false),velocity_scale(0.025),
-    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,collision_body_list)),
+    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),
     velocity_field(deformable_body_collection.particles.V,deformable_body_collection.particles.X),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
     collision_body_list(*new COLLISION_GEOMETRY_COLLECTION<TV>)
 {

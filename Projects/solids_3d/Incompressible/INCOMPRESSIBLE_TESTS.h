@@ -105,7 +105,7 @@ public:
     ARRAY<RIGID_BODY_STATE<TV> > tori_initial_states;
 
     INCOMPRESSIBLE_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),test_poissons_ratio((T).5),hittime(1),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),test_poissons_ratio((T).5),hittime(1),
         minimum_volume_recovery_time_scale(0),high_resolution(false),stiffen(1),max_cg_iterations(20),solids_cg_tolerance((T)1e-3),
         ground_friction(0),merge_at_boundary(false),tori_m(2),tori_n(2),tori_mn(2),tori_base_height((T)1.5),tori_max_angular_velocity(2)
     {
@@ -153,6 +153,7 @@ void Register_Options()
 void Parse_Options()
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     LOG::cout<<"Running Incompressible Test Number "<<test_number<<std::endl;
     output_directory=STRING_UTILITIES::string_sprintf("Incompressible/Test_%d",test_number);
     if(frame_rate!=24) output_directory+=STRING_UTILITIES::string_sprintf("_fr%g",frame_rate);
@@ -676,7 +677,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         else if(use_tet_collisions){
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             for(int s=0;s<deformable_body_collection.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(s)))
-                tests.Initialize_Tetrahedron_Collisions(s,*volume,solids_parameters.triangle_collision_parameters);}
+                tests.Initialize_Tetrahedron_Collisions(s,output_directory,*volume,solids_parameters.triangle_collision_parameters);}
         else if(self_collide_with_interior_nodes){
             FREE_PARTICLES<TV>& interior=*FREE_PARTICLES<TV>::Create(particles);
             for(int s=0;s<deformable_body_collection.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(s))){

@@ -20,11 +20,11 @@ public:
     typedef SOLIDS_EVOLUTION<TV> BASE;
     using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::Euler_Step_Position;
 private:
-    using BASE::B_full;using BASE::rigid_B_full;using BASE::krylov_vectors;
+    using BASE::B_full;using BASE::rigid_B_full;using BASE::krylov_vectors;using BASE::example_forces_and_velocities;
     mutable ARRAY<TV> dV_full;
 public:
 
-    BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input);
+    BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities);
 
     bool Use_CFL() const PHYSBAM_OVERRIDE
     {return true;}

@@ -106,7 +106,7 @@ public:
     NONLINEAR_PENDULUM nonlinear_pendulum;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),peak_force(10),parameter(3),use_prestab_iterations(false)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),peak_force(10),parameter(3),use_prestab_iterations(false)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         fluids_parameters.simulate=false;
@@ -166,6 +166,7 @@ public:
     {
         ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
         BASE::Parse_Options();
+        tests.data_directory=data_directory;
         output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
         if(arb.use_krylov_poststab) arb.use_poststab_in_cg=false;
         if(use_prestab_iterations) solids_parameters.rigid_body_collision_parameters.contact_iterations=arb.max_iterations;

@@ -13,6 +13,7 @@ namespace PhysBAM{
 
 template<class TV> class RIGID_BODY_COLLECTION;
 template<class TV> class RIGID_BODY_STATE;
+template<class TV> class RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES;
 
 template<class TV>
 class KINEMATIC_EVOLUTION
@@ -24,9 +25,10 @@ public:
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     ARRAY<RIGID_BODY_STATE<TV> > kinematic_current_state; // TODO: These are sparse; compact them
     ARRAY<RIGID_BODY_STATE<TV> > kinematic_next_state;
+    RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>& rigid_body_example_velocities;
     bool use_kinematic_keyframes;
 
-    KINEMATIC_EVOLUTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,bool use_kinematic_keyframes_input);
+    KINEMATIC_EVOLUTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>& rigid_body_example_velocities,bool use_kinematic_keyframes_input);
     virtual ~KINEMATIC_EVOLUTION();
 
 //#####################################################################

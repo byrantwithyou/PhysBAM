@@ -47,7 +47,7 @@ class SOLID_FLUID_COUPLED_EVOLUTION:public NEWMARK_EVOLUTION<TV_input>
     typedef FIELD_PROJECTOR<SPARSE_MATRIX_ENTRY<T>,T,&SPARSE_MATRIX_ENTRY<T>::a> T_PROJECTED_VALUE;
 protected:
     typedef NEWMARK_EVOLUTION<TV> BASE;
-    using BASE::solid_body_collection;using BASE::solids_parameters;
+    using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::example_forces_and_velocities;
     using BASE::B_full;using BASE::rigid_B_full;using BASE::repulsions;using BASE::rigid_deformable_collisions;using BASE::Initialize_World_Space_Masses;
     using BASE::world_space_rigid_mass_inverse;using BASE::world_space_rigid_mass;using BASE::solids_evolution_callbacks;using BASE::krylov_vectors;
     using BASE::X_save;using BASE::rigid_frame_save;using BASE::V_save;using BASE::rigid_velocity_save;using BASE::rigid_angular_momentum_save;
@@ -109,7 +109,8 @@ public:
     {return ((solids_fluids_parameters.mpi_solid_fluid || solid_body_collection.deformable_body_collection.simulate) && solid_body_collection.deformable_body_collection.particles.Size()) || ((solids_fluids_parameters.mpi_solid_fluid || solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies) && solid_body_collection.rigid_body_collection.rigid_body_particles.Size());}
 
     SOLID_FLUID_COUPLED_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,
-        FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection_input,SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters);
+        EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input,FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_input,
+        FLUID_COLLECTION<TV>& fluid_collection_input,SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters);
     virtual ~SOLID_FLUID_COUPLED_EVOLUTION();
 
 //#####################################################################

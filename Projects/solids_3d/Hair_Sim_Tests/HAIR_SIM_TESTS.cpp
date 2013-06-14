@@ -51,7 +51,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_input> HAIR_SIM_TESTS<T_input>::
 HAIR_SIM_TESTS(const STREAM_TYPE stream_type)
-    :BASE(stream_type,0,fluids_parameters.NONE),start_time(2.),tests(stream_type,output_directory,data_directory,solid_body_collection),segment_adhesion(0),guide_adhesion(0),guide_object1(0),guide_object2(0),current_levelset(0)
+    :BASE(stream_type,0,fluids_parameters.NONE),start_time(2.),tests(stream_type,data_directory,solid_body_collection),segment_adhesion(0),guide_adhesion(0),guide_object1(0),guide_object2(0),current_levelset(0)
 {
 }
 //#####################################################################
@@ -73,6 +73,7 @@ template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Parse_Options()
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
 
     std::string parameter_file=data_directory+"/"+sim_folder+"/"+param_file;
     if(!FILE_UTILITIES::File_Exists(parameter_file)){
@@ -261,8 +262,8 @@ Initialize_Bodies()
     offset=particles.Size();
     if(!guide_sim_folder.empty()) {
         COLLISION_GEOMETRY_COLLECTION<TV> guide_list;
-        guide_object1=new DEFORMABLE_BODY_COLLECTION<TV>(solid_body_collection.example_forces_and_velocities,guide_list);
-        guide_object2=new DEFORMABLE_BODY_COLLECTION<TV>(solid_body_collection.example_forces_and_velocities,guide_list);
+        guide_object1=new DEFORMABLE_BODY_COLLECTION<TV>(guide_list);
+        guide_object2=new DEFORMABLE_BODY_COLLECTION<TV>(guide_list);
         guide_object1->Read(stream_type,guide_sim_folder+"/",guide_sim_folder+"/",0,-1,1,solids_parameters.write_from_every_process);
         guide_object2->Read(stream_type,guide_sim_folder+"/",guide_sim_folder+"/",1,-1,0,solids_parameters.write_from_every_process);
         SEGMENTED_CURVE<TV>& guide_edges=guide_object1->template Find_Structure<SEGMENTED_CURVE<TV>&>(0);

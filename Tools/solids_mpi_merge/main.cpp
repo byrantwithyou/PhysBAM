@@ -34,7 +34,7 @@ public:
     bool print_max_errors;
 
     MERGER(const int number_of_processes_input,const std::string& input_directory_input,const std::string& output_directory_input,const bool print_max_errors)
-        :number_of_processes(number_of_processes_input),input_directory(input_directory_input),output_directory(output_directory_input),rigid_body_collection(0,0),merge_rigids(true),print_max_errors(print_max_errors)
+        :number_of_processes(number_of_processes_input),input_directory(input_directory_input),output_directory(output_directory_input),rigid_body_collection(0),merge_rigids(true),print_max_errors(print_max_errors)
     {
     }
 
@@ -86,7 +86,7 @@ Merge_Rigid_Data(const int frame)
     //int current_index=0;
     local_rigid_collections.Resize(number_of_processes);
     for(int p=0;p<number_of_processes;p++){
-        local_rigid_collections(p)=new RIGID_BODY_COLLECTION<TV>(0,0);
+        local_rigid_collections(p)=new RIGID_BODY_COLLECTION<TV>(0);
         local_rigid_collections(p)->Read(STREAM_TYPE(RW()),STRING_UTILITIES::string_sprintf("%s/%d/",input_directory.c_str(),p),frame,&needs_init);
         local_rigid_collections(p)->structure_list.Fill_Needs_Write();
         rigid_body_collection.rigid_body_particles.Add_Elements(local_rigid_collections(p)->rigid_body_particles.Size());

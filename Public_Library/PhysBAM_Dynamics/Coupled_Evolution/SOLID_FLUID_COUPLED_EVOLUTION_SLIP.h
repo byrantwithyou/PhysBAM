@@ -101,7 +101,8 @@ public:
     bool use_full_ic;
 
     SOLID_FLUID_COUPLED_EVOLUTION_SLIP(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,
-        FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input,SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection_input);
+        EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input,
+        SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection_input);
     virtual ~SOLID_FLUID_COUPLED_EVOLUTION_SLIP();
 
     bool Cell_To_Cell_Visible(const int axis,const TV_INT& first_cell,const TV_INT& second_cell) const

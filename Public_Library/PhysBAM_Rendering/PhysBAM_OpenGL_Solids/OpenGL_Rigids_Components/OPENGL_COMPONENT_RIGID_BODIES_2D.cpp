@@ -31,7 +31,7 @@ template<class T,class RW> OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
 OPENGL_COMPONENT_RIGID_BODIES_2D(const std::string& basedir_input)
     :OPENGL_COMPONENT("Rigid Bodies 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_individual_axes(false),draw_node_velocity_vectors(false),draw_articulation_points(false),draw_segmented_curve(true),draw_triangulated_area(false),draw_implicit_curve(false),
-    draw_forces_and_torques(false),draw_linear_muscles(false),rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0,0)),articulated_rigid_body(0),
+    draw_forces_and_torques(false),draw_linear_muscles(false),rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),articulated_rigid_body(0),
     velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),0.25,true,true),node_velocity_field(node_velocity_vectors,node_positions,OPENGL_COLOR::Magenta(),0.25,true,true),
     current_selection(0),need_destroy_rigid_body_collection(true)
 {

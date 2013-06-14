@@ -79,7 +79,7 @@ public:
     ***************/
 
     WIND_TUNNEL(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(stream_type,output_directory,data_directory,solid_body_collection),rigid_body_collection(solid_body_collection.rigid_body_collection),
+        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(stream_type,data_directory,solid_body_collection),rigid_body_collection(solid_body_collection.rigid_body_collection),
         rho_left(0),u_left(0),v_left(0),p_left(0),woodward_fix_entropy(false),woodward_fix_enthalpy(true),isobaric_fix_only_6_cells(true),
         eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).6),timesplit(false),implicit_rk(false),exact(false)
     {
@@ -107,6 +107,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
 
     timesplit=timesplit && !exact;
     //grid

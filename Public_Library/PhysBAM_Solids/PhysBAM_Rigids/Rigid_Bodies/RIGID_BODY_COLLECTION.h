@@ -41,7 +41,6 @@ public:
     bool check_stale;
     int last_read_key,last_read_active;
     ALLOCATE_HELPER<TV>* allocate_helper;
-    RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>* rigid_body_example_velocities;    
     bool owns_collision_body_list;
 
     ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body;
@@ -59,7 +58,7 @@ public:
 
     RIGID_BODY<TV>* New_Body(int index);
 
-    RIGID_BODY_COLLECTION(RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>* rigids_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input);
+    RIGID_BODY_COLLECTION(COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input);
     virtual ~RIGID_BODY_COLLECTION();
 
     RIGID_BODY_STATE<TV> State(const int particle) const

@@ -38,10 +38,11 @@ template<class TV> SOLIDS_EVOLUTION_CALLBACKS<TV> SOLIDS_EVOLUTION<TV>::solids_e
 // Constructor
 //#####################################################################
 template<class TV> SOLIDS_EVOLUTION<TV>::
-SOLIDS_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input)
+SOLIDS_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities)
     :solid_body_collection(solid_body_collection_input),solids_parameters(solids_parameters_input),rigid_body_collisions(0),rigid_deformable_collisions(0),time(0),
     solids_evolution_callbacks(&solids_evolution_callbacks_default),
-    kinematic_evolution(solid_body_collection.rigid_body_collection,solids_parameters.rigid_body_evolution_parameters.use_kinematic_keyframes)
+    kinematic_evolution(solid_body_collection.rigid_body_collection,example_forces_and_velocities,solids_parameters.rigid_body_evolution_parameters.use_kinematic_keyframes),
+    example_forces_and_velocities(example_forces_and_velocities)
 {}
 //#####################################################################
 // Destructor
@@ -145,7 +146,7 @@ Initialize_Deformable_Objects(const T frame_rate,const bool restart)
         solids_parameters.deformable_object_collision_parameters.spatial_partition_voxel_size_scale_factor);
 
     solid_body_collection.Set_CFL_Number(solids_parameters.cfl);
-    solid_body_collection.Update_Time_Varying_Material_Properties(time);
+    example_forces_and_velocities.Update_Time_Varying_Material_Properties(time);
     solid_body_collection.Update_Position_Based_State(time,true);
 }
 //#####################################################################
@@ -198,7 +199,7 @@ Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,i
     else if(repulsions_found){ // repulsions only, restore velocities for unmodified and apply velocity delta otherwise
         for(int p=0;p<particles.Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
     else{particles.V=V_save;return false;} // restore all the unmodified velocities
-    solid_body_collection.example_forces_and_velocities->Update_Time_Varying_Material_Properties(time);
+    example_forces_and_velocities.Update_Time_Varying_Material_Properties(time);
     solid_body_collection.Update_Position_Based_State(time,false);
 
     return true;
@@ -225,7 +226,7 @@ Postprocess_Frame(const int frame)
 template<class TV> void SOLIDS_EVOLUTION<TV>::
 Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
 {
-    solid_body_collection.example_forces_and_velocities->Set_External_Positions(X,time);
+    example_forces_and_velocities.Set_External_Positions(X,time);
 }
 //#####################################################################
 // Function Set_External_Velocities
@@ -234,7 +235,7 @@ template<class TV> void SOLIDS_EVOLUTION<TV>::
 Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
 {
     if(!solids_parameters.use_rigid_deformable_contact && solid_body_collection.deformable_body_collection.collisions.collisions_on) solid_body_collection.deformable_body_collection.collisions.Set_Collision_Velocities(V);
-    solid_body_collection.example_forces_and_velocities->Set_External_Velocities(V,velocity_time,current_position_time);
+    example_forces_and_velocities.Set_External_Velocities(V,velocity_time,current_position_time);
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -243,7 +244,7 @@ template<class TV> void SOLIDS_EVOLUTION<TV>::
 Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
 {
     if(!solids_parameters.use_rigid_deformable_contact && solid_body_collection.deformable_body_collection.collisions.collisions_on) solid_body_collection.deformable_body_collection.collisions.Zero_Out_Collision_Velocities(V);
-    solid_body_collection.example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(V,velocity_time,current_position_time);
+    example_forces_and_velocities.Zero_Out_Enslaved_Velocity_Nodes(V,velocity_time,current_position_time);
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -252,7 +253,7 @@ template<class TV> void SOLIDS_EVOLUTION<TV>::
 Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time)
 {
     twist.Subset(solid_body_collection.rigid_body_collection.static_and_kinematic_rigid_bodies).Fill(TWIST<TV>());
-    solid_body_collection.example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(twist,velocity_time,current_position_time);
+    example_forces_and_velocities.Zero_Out_Enslaved_Velocity_Nodes(twist,velocity_time,current_position_time);
 }
 template<class T>
 inline int Correct_Orientation_For_Kinetic_Energy_Using_Direction(RIGID_BODY<VECTOR<T,3> >& rigid_body,const T KE0,const VECTOR<T,3>& direction,const bool use_extrema)

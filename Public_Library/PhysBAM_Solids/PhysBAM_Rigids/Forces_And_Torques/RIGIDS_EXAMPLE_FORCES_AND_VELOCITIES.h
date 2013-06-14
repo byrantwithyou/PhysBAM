@@ -32,7 +32,6 @@ public:
     virtual bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id); // Return true if twist was set
     virtual void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time);
     virtual void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time); // or zero out components of their velocities
-    virtual void Set_Rigid_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated);
 //#####################################################################
 };
 }

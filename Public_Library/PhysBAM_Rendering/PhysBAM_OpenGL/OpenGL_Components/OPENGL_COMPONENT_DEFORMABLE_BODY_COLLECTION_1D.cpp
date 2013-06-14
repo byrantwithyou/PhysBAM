@@ -23,7 +23,7 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(const std::string& prefix,const i
     :OPENGL_COMPONENT("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),display_mode(0),
     incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
     collision_body_list(*new COLLISION_GEOMETRY_COLLECTION<TV>),
-    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,collision_body_list)),real_selection(0),
+    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),real_selection(0),
     color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map())
 {
     // check for per frame particles

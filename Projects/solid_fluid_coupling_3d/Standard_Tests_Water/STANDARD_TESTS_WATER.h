@@ -111,7 +111,7 @@ public:
     STANDARD_TESTS_WATER(const STREAM_TYPE stream_type)
         :BASE(stream_type,solid_node?0:1,fluids_parameters.WATER),
         water_tests(*this,fluids_parameters,solid_body_collection.rigid_body_collection),
-        solids_tests(stream_type,output_directory,data_directory,solid_body_collection),deformable_object_id(0),solid_density((T)2000),stiffness_ratio(1),light_sphere_index(0),heavy_sphere_index(0),
+        solids_tests(stream_type,data_directory,solid_body_collection),deformable_object_id(0),solid_density((T)2000),stiffness_ratio(1),light_sphere_index(0),heavy_sphere_index(0),
         light_sphere_initial_height((T)1.75),heavy_sphere_initial_height((T)1.75),light_sphere_drop_time((T)1),heavy_sphere_drop_time((T)1.5),balloon_initial_radius((T)0),
         initial_fluid_height((T)0),boat_mass((T)7),implicit_springs(false),world_to_source(MATRIX<T,4>::Identity_Matrix()),bodies(5),sub_test(1),fish_levelset(0),
         opt_iterations(false),spout_stop_time(0),ball_initial_height(0),spout_radius(0)
@@ -163,6 +163,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    solids_tests.data_directory=data_directory;
     water_tests.Initialize(Water_Test_Number(test_number),resolution);
 
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
@@ -565,7 +566,7 @@ void Floppy_Fish()
         fish->Update_Number_Nodes();fish->Initialize_Triangulated_Surface();
         TRIANGULATED_SURFACE<T>& triangulated_surface=*fish->triangulated_surface;
         triangulated_surface.Update_Triangle_List();triangulated_surface.Initialize_Hierarchy();
-        fish_levelset=solids_tests.Read_Or_Initialize_Implicit_Surface(STRING_UTILITIES::string_sprintf("%s/fish_undeformed_levelset.phi",output_directory.c_str()),triangulated_surface);}
+        fish_levelset=solids_tests.Read_Or_Initialize_Implicit_Surface(STRING_UTILITIES::string_sprintf("%s/fish_undeformed_levelset.phi",output_directory.c_str()),output_directory,triangulated_surface);}
 }
 //#####################################################################
 // Function Water_Test_Number
@@ -1007,7 +1008,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 15:
         case 3:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            solids_tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
+            solids_tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             //solid_body_collection.Add_Force(Create_Edge_Springs(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume,stiffness_ratio*20,(T)3));
             //solid_body_collection.Add_Force(Create_Tet_Springs(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume,stiffness_ratio*10,(T)3));
             bool limit_time_step_by_strain_rate=false;

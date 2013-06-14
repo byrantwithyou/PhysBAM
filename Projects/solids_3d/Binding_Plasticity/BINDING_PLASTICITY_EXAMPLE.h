@@ -58,7 +58,7 @@ public:
     INTERPOLATION_CURVE<T,T> angle_curve;
 
     BINDING_PLASTICITY_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),redgreen(0),refinement_level(3),spring_force(0),plastic_yield_threshold((T).07),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),redgreen(0),refinement_level(3),spring_force(0),plastic_yield_threshold((T).07),
         letters_initial_height(10),letters_scale(3),base_scale((T)2.5),base_thickness((T).5*base_scale),stamp_depth((T).2),final_time(2),letters_frames_save(8),base_id(0),ground_id(0),
         handle_id(0),version(2)
     {
@@ -92,6 +92,7 @@ void Register_Options()
 void Parse_Options()
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
 } 
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

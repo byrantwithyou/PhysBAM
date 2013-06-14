@@ -22,7 +22,7 @@ template<class T_GRID> class LEVELSET_MULTIPLE_UNIFORM;
 
 //TODO: Should adventually derive off of a incompressible project
 template<class TV>
-class WATER_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >,RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>
+class WATER_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >,public RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;

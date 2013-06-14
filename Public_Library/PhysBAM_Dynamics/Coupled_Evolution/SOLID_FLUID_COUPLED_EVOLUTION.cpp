@@ -65,9 +65,10 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> SOLID_FLUID_COUPLED_EVOLUTION<TV>::
-SOLID_FLUID_COUPLED_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_input,
+SOLID_FLUID_COUPLED_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,
+    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input,FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_input,
     FLUID_COLLECTION<TV>& fluid_collection_input,SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters_input)
-    :NEWMARK_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input),rigid_body_count(0),print_matrix_rhs_and_solution(false),
+    :NEWMARK_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input,example_forces_and_velocities_input),rigid_body_count(0),print_matrix_rhs_and_solution(false),
     collision_bodies(*fluids_parameters_input.collision_bodies_affecting_fluid),dual_cell_weights(*fluids_parameters_input.grid),
     rigid_body_dual_cell_weights(*fluids_parameters_input.grid),dual_cell_fluid_volume(*fluids_parameters_input.grid),
     dual_cell_contains_solid(*fluids_parameters_input.grid,1),fluids_parameters(fluids_parameters_input),fluid_collection(fluid_collection_input),
@@ -172,8 +173,8 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
         B.V.array.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Fill(TV());
         B.rigid_V.array.Fill(TWIST<TV>());
-        solid_body_collection.example_forces_and_velocities->Add_External_Forces(B.V.array,current_velocity_time+dt);
-        solid_body_collection.example_forces_and_velocities->Add_External_Forces(B.rigid_V.array,current_velocity_time+dt);
+        example_forces_and_velocities.Add_External_Forces(B.V.array,current_velocity_time+dt);
+        example_forces_and_velocities.Add_External_Forces(B.rigid_V.array,current_velocity_time+dt);
         solid_body_collection.Add_Velocity_Independent_Forces(B.V.array,B.rigid_V.array,current_velocity_time+dt); // this is a nop for binding forces
         solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B.V.array,B.rigid_V.array);
         solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(rigid_B_full);

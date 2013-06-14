@@ -21,7 +21,7 @@ WATER_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads,int refi
     cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),//incompressible_fluid_collection(mac_grid),
     thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),
     projection(refine>1?*new PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >(mac_grid,particle_levelset_evolution.Particle_Levelset(0).levelset,refine):*new PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >(mac_grid,false,false,false,false,thread_queue)),
-    particle_levelset_evolution(mac_grid,number_of_ghost_cells,false),incompressible(mac_grid,projection),boundary(0),rigid_body_collection(this,0),collision_bodies_affecting_fluid(mac_grid)
+    particle_levelset_evolution(mac_grid,number_of_ghost_cells,false),incompressible(mac_grid,projection),boundary(0),rigid_body_collection(0),collision_bodies_affecting_fluid(mac_grid)
 {
     incompressible.Set_Custom_Advection(advection_scalar);
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}

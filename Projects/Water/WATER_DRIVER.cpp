@@ -29,7 +29,7 @@ template<class TV> void Write_Substep_Helper(void* writer,const std::string& tit
 //#####################################################################
 template<class TV> WATER_DRIVER<TV>::
 WATER_DRIVER(WATER_EXAMPLE<TV>& example)
-    :example(example),kinematic_evolution(example.rigid_body_collection,true),thread_queue(example.thread_queue)
+    :example(example),kinematic_evolution(example.rigid_body_collection,example,true),thread_queue(example.thread_queue)
 {
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }

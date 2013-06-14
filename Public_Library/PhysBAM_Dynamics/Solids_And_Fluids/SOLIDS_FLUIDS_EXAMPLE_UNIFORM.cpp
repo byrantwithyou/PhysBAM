@@ -167,14 +167,14 @@ Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization()
 {
     fluids_parameters.use_poisson=true;
     if(fluids_parameters.use_slip){
-        SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=new SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>(solids_parameters,solid_body_collection,fluids_parameters,solids_fluids_parameters,
-            fluid_collection);
+        SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=new SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>(solids_parameters,solid_body_collection,*this,
+            fluids_parameters,solids_fluids_parameters,fluid_collection);
         delete solids_evolution;
         solids_evolution=coupled_evolution;
         fluids_parameters.Set_Projection(coupled_evolution);}
     else{
         delete solids_evolution;
-        solids_evolution=new SOLID_FLUID_COUPLED_EVOLUTION<TV>(solids_parameters,solid_body_collection,fluids_parameters,fluid_collection,solids_fluids_parameters);}
+        solids_evolution=new SOLID_FLUID_COUPLED_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this,fluids_parameters,fluid_collection,solids_fluids_parameters);}
     // TODO: set up anything that needs to be set up for solid_affects_fluid only case
 }
 //#####################################################################

@@ -63,14 +63,6 @@ Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_t
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 //#####################################################################
-// Function Set_Rigid_Particle_Is_Simulated
-//#####################################################################
-template<class TV> void RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>::
-Set_Rigid_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated)
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-}
-//#####################################################################
 namespace PhysBAM{
 template class RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<float,1> >;
 template class RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<float,2> >;

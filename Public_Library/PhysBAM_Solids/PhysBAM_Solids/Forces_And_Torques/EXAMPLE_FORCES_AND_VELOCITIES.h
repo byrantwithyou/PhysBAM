@@ -20,9 +20,9 @@ class EXAMPLE_FORCES_AND_VELOCITIES:public RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<
     typedef RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV> RIGIDS_BASE;
 public:
     using DEFORMABLES_BASE::Add_External_Forces;using DEFORMABLES_BASE::Set_External_Positions;using DEFORMABLES_BASE::Set_External_Velocities;
-    using DEFORMABLES_BASE::Zero_Out_Enslaved_Position_Nodes;using DEFORMABLES_BASE::Zero_Out_Enslaved_Velocity_Nodes;using DEFORMABLES_BASE::Set_Deformable_Particle_Is_Simulated;
+    using DEFORMABLES_BASE::Zero_Out_Enslaved_Position_Nodes;using DEFORMABLES_BASE::Zero_Out_Enslaved_Velocity_Nodes;
     using RIGIDS_BASE::Add_External_Forces;using RIGIDS_BASE::Set_External_Positions;using RIGIDS_BASE::Set_External_Velocities;using RIGIDS_BASE::Set_Kinematic_Positions;
-    using RIGIDS_BASE::Set_Kinematic_Velocities;using RIGIDS_BASE::Zero_Out_Enslaved_Velocity_Nodes;using RIGIDS_BASE::Set_Rigid_Particle_Is_Simulated;
+    using RIGIDS_BASE::Set_Kinematic_Velocities;using RIGIDS_BASE::Zero_Out_Enslaved_Velocity_Nodes;
 
     EXAMPLE_FORCES_AND_VELOCITIES()
     {}

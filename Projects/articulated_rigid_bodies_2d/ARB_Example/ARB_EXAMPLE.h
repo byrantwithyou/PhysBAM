@@ -41,7 +41,7 @@ public:
     RIGID_BODY<TV> *ground;
 
     ARB_EXAMPLE(const STREAM_TYPE stream_type,const int test_number_input=1)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),add_ground(true),ground(0)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),add_ground(true),ground(0)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
@@ -65,6 +65,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     output_directory=STRING_UTILITIES::string_sprintf("ARB_Example/output_%d",test_number);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}

@@ -49,8 +49,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> NEWMARK_EVOLUTION<TV>::
-NEWMARK_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input)
-    :SOLIDS_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input),rigids_evolution_callbacks(*new RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>(*this)),repulsions(0),
+NEWMARK_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input)
+    :SOLIDS_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input,example_forces_and_velocities_input),rigids_evolution_callbacks(*new RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>(*this)),repulsions(0),
     use_existing_contact(false),print_matrix(false)
 {
 }
@@ -82,8 +82,8 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
     KRYLOV_SOLVER<T>::Ensure_Size(krylov_vectors,V_all,1); // Ensure Finish_Backward_Euler_Step can run successfully
 
     B_full.Subset(solid_body_collection.deformable_body_collection.simulated_particles).Fill(TV());rigid_B_full.Fill(TWIST<TV>());
-    solid_body_collection.example_forces_and_velocities->Add_External_Forces(B_full,current_velocity_time+dt);
-    solid_body_collection.example_forces_and_velocities->Add_External_Forces(rigid_B_full,current_velocity_time+dt);
+    example_forces_and_velocities.Add_External_Forces(B_full,current_velocity_time+dt);
+    example_forces_and_velocities.Add_External_Forces(rigid_B_full,current_velocity_time+dt);
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(particles.V);
     solid_body_collection.Add_Velocity_Independent_Forces(B_full,rigid_B_full,current_velocity_time+dt); // this is a nop for binding forces
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
@@ -124,7 +124,7 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
         saved_pd=rigid_body_particles.twist;
         solid_body_collection.rigid_body_collection.articulated_rigid_body.Poststabilization_Projection(saved_pd,true);
         saved_pd=rigid_body_particles.twist-saved_pd;}
-    if(!velocity_update) solid_body_collection.example_forces_and_velocities->Add_External_Impulses_Before(B_full,current_position_time,(T)2*dt); // 2*dt is position dt TODO: what time?
+    if(!velocity_update) example_forces_and_velocities.Add_External_Impulses_Before(B_full,current_position_time,(T)2*dt); // 2*dt is position dt TODO: what time?
 }
 //#####################################################################
 // Function Finish_Backward_Euler_Step
@@ -161,7 +161,7 @@ Finish_Backward_Euler_Step(KRYLOV_SYSTEM_BASE<T>& system,const T dt,const T curr
 
             // No friction for these, so reproject them.
             solid_body_collection.rigid_body_collection.articulated_rigid_body.Poststabilization_Projection(rigid_body_particles.twist,true);
-            solid_body_collection.example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(particles.V,current_position_time,current_position_time);
+            example_forces_and_velocities.Zero_Out_Enslaved_Velocity_Nodes(particles.V,current_position_time,current_position_time);
             Zero_Out_Enslaved_Velocity_Nodes(rigid_body_particles.twist,current_position_time,current_position_time);
             
             if(solid_body_collection.rigid_body_collection.articulated_rigid_body.Has_Actuators() && solid_body_collection.rigid_body_collection.articulated_rigid_body.constrain_pd_directions){
@@ -170,7 +170,7 @@ Finish_Backward_Euler_Step(KRYLOV_SYSTEM_BASE<T>& system,const T dt,const T curr
             Diagnostics(dt,current_position_time,0,0,610,"After undo projections");}}
     rigid_body_collection.Update_Angular_Momentum();
 
-    if(!velocity_update) solid_body_collection.example_forces_and_velocities->Add_External_Impulses(particles.V,current_position_time,(T)2*dt); // 2*dt is for
+    if(!velocity_update) example_forces_and_velocities.Add_External_Impulses(particles.V,current_position_time,(T)2*dt); // 2*dt is for
 
     solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Velocities();
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(); // TODO: MPI safe?
@@ -341,7 +341,6 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
     PHYSBAM_ASSERT(solids_parameters.use_post_cg_constraints || !solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg);
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Advance_One_Time_Step_Position Start dt=%f time=%f",dt,time),2,2);
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
-    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*solid_body_collection.example_forces_and_velocities;
     ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body=solid_body_collection.rigid_body_collection.articulated_rigid_body; // Needn't be a pointer
     const bool advance_rigid_bodies=true; //solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m!=0;  TODO: Fix this.
 
@@ -526,7 +525,6 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Advance_One_Time_Step_Velocity Start dt=%f time=%f",dt,time),2,2);
 
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
-    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*solid_body_collection.example_forces_and_velocities;
     ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body=solid_body_collection.rigid_body_collection.articulated_rigid_body;
     const bool advance_rigid_bodies=true; //solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m!=0;  TODO: Fix this.
 
@@ -820,8 +818,7 @@ Initialize_Rigid_Bodies(const T frame_rate, const bool restart)
     RIGID_BODY_COLLISIONS<TV>::Adjust_Bounding_Boxes(rigid_body_collection);
     // rigid body collisions
     if(!rigid_body_collisions)
-        rigid_body_collisions=new RIGID_BODY_COLLISIONS<TV>(rigid_body_collection,solids_parameters.rigid_body_collision_parameters,rigids_evolution_callbacks,
-            *solid_body_collection.example_forces_and_velocities);
+        rigid_body_collisions=new RIGID_BODY_COLLISIONS<TV>(rigid_body_collection,solids_parameters.rigid_body_collision_parameters,rigids_evolution_callbacks,example_forces_and_velocities);
     rigid_body_collisions->spatial_partition->Compute_Voxel_Size(solids_parameters.rigid_body_collision_parameters.rigid_collisions_spatial_partition_voxel_size_heuristic,
         solids_parameters.rigid_body_collision_parameters.rigid_collisions_spatial_partition_number_of_cells,solids_parameters.rigid_body_collision_parameters.rigid_collisions_spatial_partition_voxel_size_scale_factor);
     rigid_body_collisions->verbose=solids_parameters.verbose;

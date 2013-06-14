@@ -16,7 +16,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_1D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Forces_And_Torques/RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -36,12 +35,12 @@ struct ALLOCATE_BODY_HELPER:public ALLOCATE_HELPER<TV>
 // Constructor
 //#####################################################################
 template<class TV> RIGID_BODY_COLLECTION<TV>::
-RIGID_BODY_COLLECTION(RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>* rigids_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input)
+RIGID_BODY_COLLECTION(COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input)
     :rigid_body_particles(*new RIGID_BODY_PARTICLES<TV>()),collision_body_list(collision_body_list_input),structure_list(*new STRUCTURE_LIST<TV,int>),always_create_structure(false),
     structure_hash(*new HASHTABLE<std::string,int>),frame_list_key(0),frame_list_active(0),check_stale(false),last_read_key(-1),last_read_active(-1),
-    allocate_helper(new ALLOCATE_BODY_HELPER<TV>(*this)),rigid_body_example_velocities(rigids_example_forces_and_velocities_input),owns_collision_body_list(false),
+    allocate_helper(new ALLOCATE_BODY_HELPER<TV>(*this)),owns_collision_body_list(false),
     articulated_rigid_body(*new ARTICULATED_RIGID_BODY<TV>(*this)),
-    rigid_body_cluster_bindings(*new RIGID_BODY_CLUSTER_BINDINGS<TV>(*this,articulated_rigid_body)),rigids_example_forces_and_velocities(rigids_example_forces_and_velocities_input),
+    rigid_body_cluster_bindings(*new RIGID_BODY_CLUSTER_BINDINGS<TV>(*this,articulated_rigid_body)),
     dynamic_rigid_body_particles(0),print_diagnostics(false),print_residuals(false),print_energy(false),iterations_used_diagnostic(0)
 {
     if(!allocate_helper) allocate_helper=new ALLOCATE_BODY_HELPER<TV>(*this);
@@ -219,7 +218,6 @@ Update_Simulated_Particles()
     for(int i=0;i<rigid_particles_number;i++)
         if(Is_Active(i) && Rigid_Body(i).Is_Simulated()) // TODO: Can't everything be defaulted to true?
             particle_is_simulated(i)=true;
-    rigids_example_forces_and_velocities->Set_Rigid_Particle_Is_Simulated(particle_is_simulated);
     for(int i=0;i<rigid_particles_number;i++)
         if(!Is_Active(i) || !Rigid_Body(i).Is_Simulated())
             particle_is_simulated(i)=false;

@@ -22,6 +22,7 @@ template<class TV,bool world_space> class RIGID_BODY_MASS;
 template<class TV> class RIGID_BODY_STATE;
 template<class TV> class SOLID_BODY_COLLECTION;
 template<class TV> class GRID;
+template<class TV> class EXAMPLE_FORCES_AND_VELOCITIES;
 
 template<class TV>
 class SOLIDS_EVOLUTION:public NONCOPYABLE
@@ -47,8 +48,9 @@ private:
     static SOLIDS_EVOLUTION_CALLBACKS<TV> solids_evolution_callbacks_default;
 public:
     RIGIDS_KINEMATIC_EVOLUTION<TV> kinematic_evolution;
+    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities;
 
-    SOLIDS_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input);
+    SOLIDS_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities);
     virtual ~SOLIDS_EVOLUTION();
 
     void Set_Solids_Evolution_Callbacks(SOLIDS_EVOLUTION_CALLBACKS<TV>& solids_evolution_callbacks_input)

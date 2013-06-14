@@ -18,7 +18,7 @@ using namespace PhysBAM;
 #endif
 template<class T> KANG<T>::
 KANG(const STREAM_TYPE stream_type)
-    :BASE(stream_type,1),solids_tests(stream_type,output_directory,data_directory,solid_body_collection),output_iterators(false),max_dt(0),exact_dt(0),
+    :BASE(stream_type,1),solids_tests(stream_type,data_directory,solid_body_collection),output_iterators(false),max_dt(0),exact_dt(0),
     circle_radius(0),circle_perturbation((T).05),oscillation_mode(2),make_ellipse(false),
     omega(0),laplace_number(0),uleft(0),uright(0)
 {
@@ -70,6 +70,7 @@ template<class T> void KANG<T>::
 Parse_Options()
 {
     BASE::Parse_Options();
+    solids_tests.data_directory=data_directory;
     last_frame=100;
     frame_rate=24;
 

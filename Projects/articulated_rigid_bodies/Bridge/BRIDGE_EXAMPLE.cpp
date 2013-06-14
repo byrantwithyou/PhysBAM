@@ -28,7 +28,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> BRIDGE_EXAMPLE<T>::
 BRIDGE_EXAMPLE(const STREAM_TYPE stream_type)
-    :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),box1(0),box2(0),start_rolling(100),num_rolling_frames(1000),start_drop(2000),num_rungs(10),
+    :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),box1(0),box2(0),start_rolling(100),num_rolling_frames(1000),start_drop(2000),num_rungs(10),
     selection(0)
 {
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
@@ -57,6 +57,7 @@ template<class T> void BRIDGE_EXAMPLE<T>::
 Parse_Options()
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     output_directory=STRING_UTILITIES::string_sprintf("Bridge/%s%s",output_directory.c_str(),(selection==0?"_blocks":"_lathe_chains"));
 }
 //#####################################################################

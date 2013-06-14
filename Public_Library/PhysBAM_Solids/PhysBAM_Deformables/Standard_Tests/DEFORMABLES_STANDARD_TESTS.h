@@ -43,10 +43,9 @@ protected:
     typedef typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::SEGMENTED_CURVE T_SEGMENTED_CURVE;
 public:
     STREAM_TYPE stream_type;
-    std::string output_directory;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
 
-    DEFORMABLES_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& output_directory,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input);
+    DEFORMABLES_STANDARD_TESTS(STREAM_TYPE stream_type,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input);
     virtual ~DEFORMABLES_STANDARD_TESTS();
 
     TRIANGULATED_AREA<T>& Create_Mattress(const GRID<TV>& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>& initial_state)
@@ -88,9 +87,9 @@ public:
     Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bindings,HASHTABLE<int,int>* persistent_soft_bindings=0,const bool embedded_only=false,
         const bool use_impulses_for_collisions=true);
     LEVELSET_IMPLICIT_OBJECT<TV>* Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface,int max_res) const;
-    LEVELSET_IMPLICIT_OBJECT<TV>* Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const;
-    void Initialize_Tetrahedron_Collisions(const int id_number,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters,
-        TRIANGULATED_SURFACE<T>* triangulated_surface=0);
+    LEVELSET_IMPLICIT_OBJECT<TV>* Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,const std::string& output_directory,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const;
+    void Initialize_Tetrahedron_Collisions(const int id_number,const std::string& output_directory,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,
+        TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters,TRIANGULATED_SURFACE<T>* triangulated_surface=0);
     TRIANGULATED_SURFACE<T>& Create_Drifted_Surface(const TRIANGULATED_SURFACE<T>& triangulated_surface,SOFT_BINDINGS<TV>& soft_bindings,const bool use_impulses_for_collisions=false) const;
     template <class T_OBJECT> static void Set_Mass_Of_Particles(const T_OBJECT& volume,const T density,const bool use_constant_mass=false);
     void PD_Curl(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p,const int number_of_joints,const bool parent_static=true,const T friction=.5);

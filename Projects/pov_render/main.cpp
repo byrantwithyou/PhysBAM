@@ -29,7 +29,7 @@ RIGID_BODY_COLLECTION<TV>& Load_Rigid_Body_Collection(const std::string& locatio
 {
     RIGID_BODY_COLLECTION<TV>*& rigid_body_collection=rigid_body_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
     if(rigid_body_collection) return *rigid_body_collection;
-    rigid_body_collection=new RIGID_BODY_COLLECTION<TV>(0,0);
+    rigid_body_collection=new RIGID_BODY_COLLECTION<TV>(0);
     rigid_body_collection->Read(STREAM_TYPE(RW()),location,frame); // TODO: only load implicit surfaces if load_implicit_surfaces
     return *rigid_body_collection;
 }
@@ -38,7 +38,7 @@ DEFORMABLE_BODY_COLLECTION<TV>& Load_Deformable_Geometry_Collection(const std::s
 {
     DEFORMABLE_BODY_COLLECTION<TV>*& deformable_geometry_collection=deformable_geometry_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
     if(deformable_geometry_collection) return *deformable_geometry_collection;
-    deformable_geometry_collection=new DEFORMABLE_BODY_COLLECTION<TV>(0,*new COLLISION_GEOMETRY_COLLECTION<TV>);
+    deformable_geometry_collection=new DEFORMABLE_BODY_COLLECTION<TV>(*new COLLISION_GEOMETRY_COLLECTION<TV>);
     deformable_geometry_collection->Read(STREAM_TYPE(RW()),location,location,frame,-1,true,true);
     return *deformable_geometry_collection;
 }

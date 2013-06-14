@@ -113,7 +113,7 @@ public:
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.SMOKE),
-        solids_tests(stream_type,output_directory,data_directory,solid_body_collection),velocity_multiplier(1),mass_multiplier(1),stiffness_multiplier((T)1),damping_multiplier((T)1),
+        solids_tests(stream_type,data_directory,solid_body_collection),velocity_multiplier(1),mass_multiplier(1),stiffness_multiplier((T)1),damping_multiplier((T)1),
         bending_stiffness_multiplier((T)1),bending_damping_multiplier((T)1),parameter(0),boundary_offset(0),extra_cells(0),base_resolution(4),run_self_tests(false),
         print_poisson_matrix(false),print_index_map(false),print_matrix(false),print_each_matrix(false),output_iterators(false),
         use_eno_advection(false),angle(0),outside_tolerance(0),viscosity_only(false),use_maccormack(false)
@@ -157,8 +157,6 @@ public:
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
-    void Set_Deformable_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
-    void Set_Rigid_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
     void Post_Initialization() PHYSBAM_OVERRIDE {}
     void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
@@ -196,6 +194,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    solids_tests.data_directory=data_directory;
     last_frame=100;
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
 

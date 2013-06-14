@@ -42,7 +42,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_input> HAIR_STRAND_TESTS<T_input>::
 HAIR_STRAND_TESTS(const STREAM_TYPE stream_type)
-    :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),use_adhesion(false),reset(false)
+    :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),use_adhesion(false),reset(false)
 {
 }
 //#####################################################################
@@ -61,6 +61,8 @@ Register_Options()
 template<class T_input> void HAIR_STRAND_TESTS<T_input>::
 Parse_Options()
 {
+    BASE::Parse_Options();
+    tests.data_directory=data_directory;
     std::string parameter_file=data_directory+"/"+sim_folder+"/"+param_file;
     LOG::cout<<"PARAM FILE is "<<parameter_file<<std::endl;
     parameter_list.Begin_Parse(parameter_file);

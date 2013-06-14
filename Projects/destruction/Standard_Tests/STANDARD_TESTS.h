@@ -103,7 +103,7 @@ public:
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),parameter(0),prune_stacks_from_contact(false),prune_contact_using_velocity(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),parameter(0),prune_stacks_from_contact(false),prune_contact_using_velocity(false),
         use_nonanalytic_levelsets(false),rigid_body_collection(solid_body_collection.rigid_body_collection),createpattern(false)
     {
     }
@@ -156,6 +156,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
 
     if(createpattern){

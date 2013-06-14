@@ -37,7 +37,7 @@ Get_Mass_Properties(PARSE_ARGS& parse_args)
     FILE_UTILITIES::Read_From_File<RW>(filename,surface);
     surface.Update_Triangle_List();
 
-    RIGID_BODY_COLLECTION<TV> rigid_body_collection(0,0);
+    RIGID_BODY_COLLECTION<TV> rigid_body_collection(0);
     RIGID_BODY<TV> rigid_body(rigid_body_collection);
     rigid_body.surface_roughness=(T)1e-8;
     SYMMETRIC_MATRIX<T,3> world_space_inertia_tensor;

@@ -133,7 +133,7 @@ Initialize()
         example.kang_poisson_viscosity->test_system=example.test_system;}
     else{
         example.fluids_parameters.use_poisson=true;
-        coupled_evolution=new SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>(example.solids_parameters,example.solid_body_collection,
+        coupled_evolution=new SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>(example.solids_parameters,example.solid_body_collection,example,
             example.fluids_parameters,example.solids_fluids_parameters,example.fluid_collection);
         delete example.solids_evolution;
         example.solids_evolution=coupled_evolution;
@@ -279,7 +279,6 @@ First_Order_Time_Step(int substep,T dt)
 {
     FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
-    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*example.solid_body_collection.example_forces_and_velocities;
     SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* slip=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(example.solids_evolution);
     T_GRID& grid=*fluids_parameters.grid;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
@@ -314,7 +313,7 @@ First_Order_Time_Step(int substep,T dt)
         Write_Substep("apply stored explicit viscosity",substep,1);}
     
 
-    example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
+    example.solids_evolution->example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
     example.solid_body_collection.Update_Position_Based_State(time+dt,true);
 //    example.solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<VECTOR<T,2> >*>()->Dump_Curvatures();
     if(slip){
@@ -397,7 +396,6 @@ Advance_To_Target_Time(const T target_time)
     FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
     SOLIDS_EVOLUTION_CALLBACKS<TV>* solids_evolution_callbacks=example.solids_evolution->solids_evolution_callbacks;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
-    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*example.solid_body_collection.example_forces_and_velocities;
 
     bool done=false;for(int substep=1;!done;substep++){
         LOG::SCOPE scope("SUBSTEP","substep %d",substep);
@@ -409,7 +407,7 @@ Advance_To_Target_Time(const T target_time)
 
         First_Order_Time_Step(substep,dt);
 
-        example_forces_and_velocities.Advance_One_Time_Step_End_Callback(dt,time);
+        example.solids_evolution->example_forces_and_velocities.Advance_One_Time_Step_End_Callback(dt,time);
         solids_evolution_callbacks->Postprocess_Solids_Substep(example.solids_evolution->time,substep);
         example.Postprocess_Substep(dt,time);
         Write_Substep(STRING_UTILITIES::string_sprintf("END Substep %d",substep),substep,0);}

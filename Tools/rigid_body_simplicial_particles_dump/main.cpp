@@ -22,7 +22,7 @@ void Dump_Rigid_Baody_Simplicial_Object_Particles(const STREAM_TYPE& stream_type
     const int rigid_body_id)
 {
     ARRAY<int> needs_init,needs_destroy;
-    RIGID_BODY_COLLECTION<TV> rigid_body_collection(0,0);
+    RIGID_BODY_COLLECTION<TV> rigid_body_collection(0);
     rigid_body_collection.Read(stream_type,basedir,0,&needs_init);
     rigid_body_collection.Read(stream_type,basedir,frame,&needs_init);
     RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(rigid_body_id);

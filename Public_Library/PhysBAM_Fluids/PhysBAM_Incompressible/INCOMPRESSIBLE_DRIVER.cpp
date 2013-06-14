@@ -23,7 +23,7 @@ template<class TV> void Write_Substep_Helper(void* writer,const std::string& tit
 //#####################################################################
 template<class TV> INCOMPRESSIBLE_DRIVER<TV>::
 INCOMPRESSIBLE_DRIVER(INCOMPRESSIBLE_EXAMPLE<TV>& example)
-    :example(example),kinematic_evolution(example.rigid_body_collection,true)
+    :example(example),kinematic_evolution(example.rigid_body_collection,example,true)
 {
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }

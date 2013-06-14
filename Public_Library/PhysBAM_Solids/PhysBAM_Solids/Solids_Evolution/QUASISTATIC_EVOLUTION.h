@@ -18,14 +18,14 @@ class QUASISTATIC_EVOLUTION:public SOLIDS_EVOLUTION<TV>
     typedef typename TV::SCALAR T;
 public:
     typedef SOLIDS_EVOLUTION<TV> BASE;
-    using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::Set_External_Positions;
+    using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::Set_External_Positions;using BASE::example_forces_and_velocities;
 private:
     using BASE::krylov_vectors;using BASE::B_full;using BASE::rigid_B_full;
     ARRAY<TV> dX_full;
 public:
     bool balance_external_forces_only;
 
-    QUASISTATIC_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input);
+    QUASISTATIC_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities);
 
     bool Use_CFL() const PHYSBAM_OVERRIDE
     {return false;}

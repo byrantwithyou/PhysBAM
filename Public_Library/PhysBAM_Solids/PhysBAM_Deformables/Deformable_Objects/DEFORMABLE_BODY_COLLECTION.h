@@ -71,7 +71,6 @@ public:
     bool print_energy;
     int iterations_used_diagnostic;
 
-    DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>* deformables_example_forces_and_velocities;
     TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& triangle_repulsions_and_collisions_geometry;
     TRIANGLE_REPULSIONS<TV>& triangle_repulsions;
     TRIANGLE_COLLISIONS<TV>& triangle_collisions;
@@ -81,7 +80,7 @@ public:
     bool use_nonembedded_self_collision; // TODO: have one of these per fragment
     bool check_stale;
 
-    DEFORMABLE_BODY_COLLECTION(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>* deformables_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list);
+    DEFORMABLE_BODY_COLLECTION(COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list);
     virtual ~DEFORMABLE_BODY_COLLECTION();
 
     template<class T_FORCE> T_FORCE
@@ -102,7 +101,6 @@ public:
     void Read_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame);
     void Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame) const;
     void Update_Simulated_Particles();
-    void Update_Simulated_Particles(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities);
     void Set_Mpi_Solids(MPI_SOLIDS<TV>* mpi_solids);
     void Update_CFL();
     T CFL(const bool verbose=false);

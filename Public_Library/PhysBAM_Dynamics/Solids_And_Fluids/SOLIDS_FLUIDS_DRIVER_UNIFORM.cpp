@@ -554,7 +554,7 @@ Setup_Solids(const T time,const int substep)
     if(solids_parameters.deformable_object_collision_parameters.use_spatial_partition_for_levelset_collision_objects) // TODO - ANDY - why is this needed??? TODO: move this to the right places inside solids evolution 
         example.solid_body_collection.collision_body_list.Update_Spatial_Partition(solids_parameters.deformable_object_collision_parameters.spatial_partition_voxel_size_heuristic,
             solids_parameters.deformable_object_collision_parameters.spatial_partition_number_of_cells,solids_parameters.deformable_object_collision_parameters.spatial_partition_voxel_size_scale_factor);
-    example.solid_body_collection.Update_Time_Varying_Material_Properties(time);
+    example.Update_Time_Varying_Material_Properties(time);
 }
 //#####################################################################
 // Function Setup_Fluids

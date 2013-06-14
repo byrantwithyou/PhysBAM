@@ -34,7 +34,7 @@ public:
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     MESH_EXAMPLE(const STREAM_TYPE stream_type):
-        BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection)
+        BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
@@ -58,6 +58,7 @@ public:
     void Parse_Options() PHYSBAM_OVERRIDE
     {
         BASE::Parse_Options();
+        tests.data_directory=data_directory;
         output_directory="Mesh/output";
     }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}

@@ -12,7 +12,6 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/SOLIDS_FORCES.h>
 namespace PhysBAM{
 
-template<class TV> class EXAMPLE_FORCES_AND_VELOCITIES;
 template<class TV> class DEFORMALBLE_OBJECT_COLLISIONS;
 template<class TV> class SOLIDS_PARAMETERS;
 template<class TV> class RIGID_BODY_COLLECTION;
@@ -33,7 +32,6 @@ public:
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     ARRAY<SOLIDS_FORCES<TV>*> solids_forces;
-    EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities;
     T cfl_number;
     T cfl_elastic,cfl_damping;
 private:
@@ -47,7 +45,7 @@ public:
     bool simulate;
     int iterations_used_diagnostic;
 
-    SOLID_BODY_COLLECTION(EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities_input);
+    SOLID_BODY_COLLECTION();
     virtual ~SOLID_BODY_COLLECTION();
 
     void Print_Diagnostics(const bool print_diagnostics_input=true)
@@ -76,7 +74,6 @@ public:
     int Add_Force(SOLIDS_FORCES<TV>* force);
     int Add_Force(DEFORMABLES_FORCES<TV>* force);
     int Add_Force(RIGIDS_FORCES<TV>* force);
-    void Update_Time_Varying_Material_Properties(const T time);
     void Update_CFL();
     T CFL(const bool verbose=false);
     T CFL_Elastic_And_Damping();

@@ -84,7 +84,7 @@ public:
 
     STANDARD_TESTS_WATER(const STREAM_TYPE stream_type)
         :BASE(stream_type,solid_node?0:1,fluids_parameters.WATER),water_tests(*this,fluids_parameters,solid_body_collection.rigid_body_collection),
-        solids_tests(stream_type,output_directory,data_directory,solid_body_collection),deformable_object_id(0),solid_density(1),light_sphere_index(0),lightish_sphere_index(0),neutral_sphere_index(0),
+        solids_tests(stream_type,data_directory,solid_body_collection),deformable_object_id(0),solid_density(1),light_sphere_index(0),lightish_sphere_index(0),neutral_sphere_index(0),
         heavy_sphere_index(0),light_sphere_initial_height((T)2),heavy_sphere_initial_height((T)2.25),light_sphere_drop_time((T).7),heavy_sphere_drop_time((T)1.25),
         left_fixed_index(0),right_fixed_index(0),bodies(5),solid_scale((T).02),velocity_multiplier(1),mass_multiplier(1),flow_particles(false)
     {
@@ -138,6 +138,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    solids_tests.data_directory=data_directory;
     water_tests.Initialize(Water_Test_Number(test_number),resolution);
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     last_frame=1000;

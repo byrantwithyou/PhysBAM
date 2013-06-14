@@ -18,6 +18,7 @@
 namespace PhysBAM{
 template<class TV> class SOLIDS_EVOLUTION;
 template<class TV> class BW_COLLISIONS;
+template<class TV> class EXAMPLE_FORCES_AND_VELOCITIES;
 //#####################################################################
 // Class BW_BACKWARD_EULER_SYSTEM
 //#####################################################################
@@ -30,12 +31,14 @@ public:
 
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     BW_COLLISIONS<TV>& bw_collisions;
+    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities;
     T dt,time;
 
     ARRAY<TV> F_full,B_full;
     ARRAY<TWIST<TV> > rigid_F_full,rigid_B_full;
 
-    BW_BACKWARD_EULER_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BW_COLLISIONS<TV>& bw_collisions_input,const T dt_input,const T time_input);
+    BW_BACKWARD_EULER_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BW_COLLISIONS<TV>& bw_collisions_input,
+        EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities,const T dt_input,const T time_input);
 
     virtual ~BW_BACKWARD_EULER_SYSTEM();
 

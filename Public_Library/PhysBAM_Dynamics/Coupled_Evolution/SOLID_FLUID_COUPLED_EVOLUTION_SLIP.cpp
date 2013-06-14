@@ -74,8 +74,9 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
 SOLID_FLUID_COUPLED_EVOLUTION_SLIP(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input,SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection_input)
-    :NEWMARK_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input),
+    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input,
+    SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection_input)
+    :NEWMARK_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input,example_forces_and_velocities_input),
     PROJECTION_DYNAMICS_UNIFORM<T_GRID>(*fluids_parameters_input.grid,fluids_parameters_input.fire,false,false,fluids_parameters_input.use_poisson),
     collision_bodies(*fluids_parameters_input.collision_bodies_affecting_fluid),
     fluids_parameters(fluids_parameters_input),solids_fluids_parameters(solids_fluids_parameters_input),fluid_collection(fluid_collection_input),

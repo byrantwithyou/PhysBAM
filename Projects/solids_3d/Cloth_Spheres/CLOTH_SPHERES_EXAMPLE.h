@@ -36,7 +36,7 @@ public:
     ARRAY<COLLISION_GEOMETRY_ID> collision_body_ids;
 
     CLOTH_SPHERES_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),sphere_scale((T).5),sphere_x_position((T).7),aspect_ratio((T)1.0),side_length(2),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),sphere_scale((T).5),sphere_x_position((T).7),aspect_ratio((T)1.0),side_length(2),
         number_side_panels(150)
     {
     }
@@ -72,6 +72,7 @@ void Register_Options()
 void Parse_Options()
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

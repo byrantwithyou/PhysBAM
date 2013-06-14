@@ -18,7 +18,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 using namespace PhysBAM;
@@ -26,11 +25,11 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> SOLID_BODY_COLLECTION<TV>::
-SOLID_BODY_COLLECTION(EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities_input)
+SOLID_BODY_COLLECTION()
     :collision_body_list(*new COLLISION_GEOMETRY_COLLECTION<TV>),
-    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(example_forces_and_velocities_input,collision_body_list)),
-    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(example_forces_and_velocities_input,&collision_body_list)),
-    example_forces_and_velocities(example_forces_and_velocities_input),print_energy(false),simulate(true),iterations_used_diagnostic(0)
+    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),
+    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(&collision_body_list)),
+    print_energy(false),simulate(true),iterations_used_diagnostic(0)
 {
     Print_Diagnostics();
     Print_Residuals(false);
@@ -63,7 +62,7 @@ template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Update_Simulated_Particles()
 {
     rigid_body_collection.Update_Simulated_Particles();
-    deformable_body_collection.Update_Simulated_Particles(*example_forces_and_velocities);
+    deformable_body_collection.Update_Simulated_Particles();
     int particles_number=deformable_body_collection.particles.Size();
     int rigid_particles_number=rigid_body_collection.rigid_body_particles.Size();
 
@@ -85,14 +84,6 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         if(rigid_body_collection.rigids_forces(k)->use_position_based_state) rigid_body_collection.rigids_forces(k)->Update_Position_Based_State(time);
     for(int k=0;k<deformable_body_collection.deformables_forces.m;k++)
         if(deformable_body_collection.deformables_forces(k)->use_position_based_state) deformable_body_collection.deformables_forces(k)->Update_Position_Based_State(time,is_position_update);
-}
-//#####################################################################
-// Function Update_Time_Varying_Material_Properties
-//#####################################################################
-template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Update_Time_Varying_Material_Properties(const T time)
-{
-    example_forces_and_velocities->Update_Time_Varying_Material_Properties(time);
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces

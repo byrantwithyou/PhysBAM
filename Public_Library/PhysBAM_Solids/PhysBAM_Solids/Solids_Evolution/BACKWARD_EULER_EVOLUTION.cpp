@@ -34,12 +34,13 @@ public:
     typedef KRYLOV_VECTOR_WRAPPER<T,VECTOR_T> KRYLOV_VECTOR_T;
 
     const SOLID_BODY_COLLECTION<TV>& solid_body_collection;
+    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities;
     T dt,time;
     INDIRECT_ARRAY<const ARRAY_VIEW<const T> > mass,one_over_mass;
     mutable ARRAY<TWIST<TV> > rigid_dV,rigid_dF; // TODO: support rigid body particles and get rid of these
 
-    BACKWARD_EULER_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,const T dt_input,const T time_input)
-        :KRYLOV_SYSTEM_BASE<typename TV::SCALAR>(false,true),solid_body_collection(solid_body_collection_input),dt(dt_input),
+    BACKWARD_EULER_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities,const T dt_input,const T time_input)
+        :KRYLOV_SYSTEM_BASE<typename TV::SCALAR>(false,true),solid_body_collection(solid_body_collection_input),example_forces_and_velocities(example_forces_and_velocities),dt(dt_input),
         time(time_input),mass(solid_body_collection.deformable_body_collection.particles.mass,solid_body_collection.deformable_body_collection.dynamic_particles),
         one_over_mass(solid_body_collection.deformable_body_collection.particles.one_over_mass,solid_body_collection.deformable_body_collection.dynamic_particles)
     {}
@@ -58,7 +59,7 @@ public:
 
     void Project(KRYLOV_VECTOR_BASE<T>& bdV) const PHYSBAM_OVERRIDE
     {KRYLOV_VECTOR_T& dV=debug_cast<KRYLOV_VECTOR_T&>(bdV);
-    solid_body_collection.example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(dV.v.array,time,time);}
+    example_forces_and_velocities.Zero_Out_Enslaved_Velocity_Nodes(dV.v.array,time,time);}
 
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bdV1,const KRYLOV_VECTOR_BASE<T>& bdV2) const PHYSBAM_OVERRIDE
     {const KRYLOV_VECTOR_T& dV1=debug_cast<const KRYLOV_VECTOR_T&>(bdV1),&dV2=debug_cast<const KRYLOV_VECTOR_T&>(bdV2);
@@ -74,8 +75,8 @@ public:
 // Constructor
 //#####################################################################
 template<class TV> BACKWARD_EULER_EVOLUTION<TV>::
-BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input)
-    :SOLIDS_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input)
+BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input)
+    :SOLIDS_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input,example_forces_and_velocities_input)
 {}
 //#####################################################################
 // Function One_Newton_Step_Backward_Euler
@@ -84,7 +85,6 @@ template<class TV> void BACKWARD_EULER_EVOLUTION<TV>::
 One_Newton_Step_Backward_Euler(const T dt,const T time,ARRAY_VIEW<const TV> V_save,ARRAY<TV>& dV_full)
 {
     typedef KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY_VIEW<TV> > > KRYLOV_VECTOR_T;
-    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*solid_body_collection.example_forces_and_velocities;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
 
     dV_full.Resize(particles.Size()); // an initial guess might be passed in for dV, otherwise it's zero
@@ -103,7 +103,7 @@ One_Newton_Step_Backward_Euler(const T dt,const T time,ARRAY_VIEW<const TV> V_sa
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(F.v.array);
     for(int p=0;p<B.v.Size();p++) B.v.array(p)=V_save(p)-V.array(p)+dt*one_over_mass(p)*F.v.array(p);
 
-    BACKWARD_EULER_SYSTEM<TV> system(solid_body_collection,dt,time);
+    BACKWARD_EULER_SYSTEM<TV> system(solid_body_collection,example_forces_and_velocities,dt,time);
     CONJUGATE_GRADIENT<T> cg;
     cg.restart_iterations=solids_parameters.implicit_solve_parameters.cg_restart_iterations;
     cg.print_diagnostics=solid_body_collection.print_diagnostics;
@@ -120,11 +120,11 @@ template<class TV> void BACKWARD_EULER_EVOLUTION<TV>::
 Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) // TODO: Split this into position/velocity parts
 {
     typedef KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY_VIEW<TV> > > KRYLOV_VECTOR_T;
-    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*solid_body_collection.example_forces_and_velocities;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
 
-    solid_body_collection.Enforce_Definiteness(true);example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
+    solid_body_collection.Enforce_Definiteness(true);
+    example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
     example_forces_and_velocities.Set_External_Velocities(particles.V,time+dt,time+dt);
     Euler_Step_Position(dt,time); // initial guess
     solid_body_collection.Update_Position_Based_State(time+dt,false);

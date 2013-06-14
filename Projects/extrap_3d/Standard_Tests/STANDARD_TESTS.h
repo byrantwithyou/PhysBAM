@@ -181,7 +181,7 @@ public:
     bool use_dump_sv;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),semi_implicit(false),test_forces(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),semi_implicit(false),test_forces(false),
         use_extended_neohookean(false),use_extended_neohookean2(false),use_extended_neohookean3(false),use_int_j_neo(false),
         use_rc_ext(false),use_rc2_ext(false),use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),
         use_extended_neohookean_smooth(false),use_extended_svk(false),use_svk(false),use_corotated(false),use_corotated_fixed(false),
@@ -309,6 +309,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     frame_rate=24;
@@ -606,7 +607,7 @@ void Get_Initial_Data()
         case 2:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
-            tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
+            tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             tests.Add_Ground();
             break;}
 

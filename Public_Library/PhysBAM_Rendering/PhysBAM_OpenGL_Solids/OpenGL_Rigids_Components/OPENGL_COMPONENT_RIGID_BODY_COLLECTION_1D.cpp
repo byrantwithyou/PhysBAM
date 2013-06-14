@@ -21,7 +21,7 @@ template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T,RW>::
 OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const std::string& basedir_input)
     :OPENGL_COMPONENT("Rigid Geometry Collection 1D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_node_velocity_vectors(false),draw_point_simplices(true),
-    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0,0)),current_selection(0),need_destroy_rigid_body_collection(true)
+    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),current_selection(0),need_destroy_rigid_body_collection(true)
 {
     is_animation=true;
     has_init_destroy_information=true;

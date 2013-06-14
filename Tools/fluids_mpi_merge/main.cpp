@@ -87,7 +87,7 @@ public:
 
     void Merge_All_Frames(const int first_frame,const int last_frame)
     {
-        if(merge_solid_fluid) solid_body_collection=new SOLID_BODY_COLLECTION<TV>(0);
+        if(merge_solid_fluid) solid_body_collection=new SOLID_BODY_COLLECTION<TV>;
         for(int frame=first_frame;frame<=last_frame;frame++){
             //if(!Source_Files_Exist(frame)){LOG::cout<<"missing source files for frame "<<frame<<std::endl;break;}
         Merge(frame);}

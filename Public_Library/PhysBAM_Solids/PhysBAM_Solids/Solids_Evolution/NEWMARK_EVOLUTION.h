@@ -31,7 +31,7 @@ protected:
 public:
     using BASE::solid_body_collection;using BASE::Euler_Step_Position;using BASE::Set_External_Velocities;
     using BASE::Clamp_Velocities;using BASE::solids_evolution_callbacks;using BASE::rigid_body_collisions;using BASE::Initialize_World_Space_Masses;
-    using BASE::solids_parameters;using BASE::kinematic_evolution;using BASE::Zero_Out_Enslaved_Velocity_Nodes;
+    using BASE::solids_parameters;using BASE::kinematic_evolution;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::example_forces_and_velocities;
 
     RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>& rigids_evolution_callbacks;
     TRIANGLE_REPULSIONS<TV>* repulsions;
@@ -54,7 +54,7 @@ private:
     ARRAY<FRAME<TV> > rigid_frame_save_for_constraints;
 public:
 
-    NEWMARK_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input);
+    NEWMARK_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input);
     virtual ~NEWMARK_EVOLUTION();
 
 //#####################################################################

@@ -115,6 +115,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     timesplit=timesplit && !exact;
 
     //grid

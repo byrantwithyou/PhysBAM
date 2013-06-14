@@ -16,7 +16,7 @@ INCOMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
     restart(0),write_debug_data(false),analytic_test(false),order(1),output_directory("output"),
     number_of_ghost_cells(3),cfl((T).9),use_viscosity(false),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),//incompressible_fluid_collection(mac_grid),
-    projection(mac_grid),incompressible(mac_grid,projection),boundary(0),rigid_body_collection(this,0)
+    projection(mac_grid),incompressible(mac_grid,projection),boundary(0),rigid_body_collection(0)
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
     PROCESS_UTILITIES::Set_Backtrace(true);

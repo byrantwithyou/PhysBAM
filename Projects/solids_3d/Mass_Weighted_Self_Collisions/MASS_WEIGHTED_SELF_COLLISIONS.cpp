@@ -21,7 +21,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_input> MASS_WEIGHTED_SELF_COLLISIONS<T_input>::
 MASS_WEIGHTED_SELF_COLLISIONS(const STREAM_TYPE stream_type)
-    :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection)
+    :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection)
 {
 }
 //#####################################################################
@@ -39,6 +39,7 @@ template<class T_input> void MASS_WEIGHTED_SELF_COLLISIONS<T_input>::
 Parse_Options()
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
 }
 //#####################################################################
 // Function Initialize_Bodies

@@ -93,14 +93,12 @@ public:
     void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Read_Output_Files_Fluids(const int frame) PHYSBAM_OVERRIDE {}
     void Self_Collisions_Begin_Callback(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Set_Deformable_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE {}
     void Set_PD_Targets(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Set_Rigid_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
     void Setup_Initial_Refinement() PHYSBAM_OVERRIDE {}
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
@@ -124,6 +122,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    solids_tests.data_directory=data_directory;
     if(shed) fluids_parameters.grid->Initialize(TV_INT((int)(2.5*resolution)+1,resolution+1),RANGE<TV>(TV(-(T)2.5,-(T)3.5),TV(15,(T)3.5)));
     else fluids_parameters.grid->Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0,0),TV(4,4)));
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;

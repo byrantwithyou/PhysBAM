@@ -50,7 +50,7 @@ public:
     int njoints;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),njoints(6)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),njoints(6)
     {
         fluids_parameters.simulate=false;
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
@@ -105,6 +105,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
 }

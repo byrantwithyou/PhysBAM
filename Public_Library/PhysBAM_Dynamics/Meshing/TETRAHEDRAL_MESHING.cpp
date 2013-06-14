@@ -35,8 +35,8 @@
 using namespace PhysBAM;
 template<class T> TETRAHEDRAL_MESHING<T>::
 TETRAHEDRAL_MESHING(const STREAM_TYPE stream_type)
-    :solids_parameters(*new SOLIDS_PARAMETERS<TV>),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(new EXAMPLE_FORCES_AND_VELOCITIES<TV>())),
-    solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection)),
+    :solids_parameters(*new SOLIDS_PARAMETERS<TV>),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>),
+    solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection,*new EXAMPLE_FORCES_AND_VELOCITIES<TV>)),
     implicit_surface(0),level_set_forces_and_velocities(0),
     stream_type(stream_type),output_directory("meshing_data"),frame(0),extra_refinement_criteria(0),dependent_nodes(0),boundary_mesh(0)
 {
@@ -67,8 +67,6 @@ Initialize(IMPLICIT_OBJECT<TV>* implicit_surface_input)
     TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=TETRAHEDRALIZED_VOLUME<T>::Create(deformable_body_collection.particles);
     deformable_body_collection.Add_Structure(tetrahedralized_volume);
     level_set_forces_and_velocities=new LEVEL_SET_FORCES_AND_VELOCITIES<TV>(*tetrahedralized_volume,*implicit_surface);
-    solid_body_collection.example_forces_and_velocities=level_set_forces_and_velocities;
-    solid_body_collection.rigid_body_collection.rigids_example_forces_and_velocities=level_set_forces_and_velocities;
     solid_body_collection.Set_CFL_Number(solids_parameters.cfl);
 }
 //#####################################################################

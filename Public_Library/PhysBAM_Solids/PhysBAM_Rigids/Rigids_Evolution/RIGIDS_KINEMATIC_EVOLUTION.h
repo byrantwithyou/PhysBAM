@@ -27,7 +27,7 @@ public:
     using BASE::Set_External_Velocities;using BASE::Set_Kinematic_Velocities;using BASE::Set_External_Positions;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
 
-    RIGIDS_KINEMATIC_EVOLUTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,bool use_kinematic_keyframes_input);
+    RIGIDS_KINEMATIC_EVOLUTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>& rigid_body_example_velocities,bool use_kinematic_keyframes_input);
     ~RIGIDS_KINEMATIC_EVOLUTION();
 
 //#####################################################################

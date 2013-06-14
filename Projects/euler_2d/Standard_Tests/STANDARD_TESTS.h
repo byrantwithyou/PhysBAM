@@ -77,7 +77,7 @@ public:
     ***************/
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(stream_type,output_directory,data_directory,solid_body_collection),boundary(0),spring_factor(1),rigid_body_collection(solid_body_collection.rigid_body_collection),
+        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(stream_type,data_directory,solid_body_collection),boundary(0),spring_factor(1),rigid_body_collection(solid_body_collection.rigid_body_collection),
         eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).6),timesplit(false),exact(false),use_slip(false)
     {}
     
@@ -98,7 +98,6 @@ public:
     void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
-    void Set_Rigid_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
     void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE {}
@@ -136,6 +135,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     timesplit=timesplit && !exact;
     if(resolution==1) resolution=50; // Stupid hack for a bad default parameter.
 
@@ -361,13 +361,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             gnuplot_surface_stream<<boundary->particles.X(segmented_curve(i))(0)<<"\t"<<boundary->particles.X(segmented_curve(i))(1)<<std::endl;}
         gnuplot_surface_stream.flush();
         gnuplot_surface_stream.close();}
-}
-//#####################################################################
-// Function Set_External_Velocities
-//#####################################################################
-void Set_Deformable_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE
-{
-    particle_is_simulated.Subset(bound_particles).Fill(false);
 }
 //#####################################################################
 // Function Set_External_Velocities

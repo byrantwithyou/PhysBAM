@@ -139,7 +139,7 @@ public:
     using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;using BASE::parse_args;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),parameter(1),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),parameter(1),
         rigid_body_collection(solid_body_collection.rigid_body_collection),number_of_joints(2),subsamples(8),refinement_distance((T).2),dynamic_subsampling(false),
         temporarily_disable_dynamic_subsampling(false),old_number_particles(0),ring_mass(10000),num_objects_multiplier((T)1),fish_mattress(false),fully_implicit(false),
         use_forces_for_drift(false),project_nullspace(false)
@@ -172,8 +172,6 @@ public:
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Set_Deformable_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
-    void Set_Rigid_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
 
 ROTATION<TV> Upright_Orientation(const TV& x,const TV& y)
 {
@@ -211,6 +209,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
 }
@@ -474,11 +473,11 @@ void Push_Out_Test()
 
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
         RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)1.5,(T)0))),true,true,1000);
-    tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
+    tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
 
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
         RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)-1.7,(T)2,(T)0))),true,true,1000);
-    tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume2,solids_parameters.triangle_collision_parameters);
+    tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume2,solids_parameters.triangle_collision_parameters);
 
 //    int n=10;
 //    for(int i=0;i<n;i++) for(int j=0;j<n;j++) for(int k=0;k<n;k++) tests.Add_Rigid_Body("subdivided_box",1,(T)0).Frame().t=TV(1.8*(i+1),1.*j,1.75*k);
@@ -1647,7 +1646,7 @@ void Two_Way_Tori()
     embedding.Update_Binding_List_From_Embedding(solid_body_collection.deformable_body_collection,false);
     tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
     embedding.Update_Number_Nodes();
-    tests.Initialize_Tetrahedron_Collisions(1,embedding.embedded_object.simplicial_object,solids_parameters.triangle_collision_parameters,&embedding.material_surface);
+    tests.Initialize_Tetrahedron_Collisions(1,output_directory,embedding.embedded_object.simplicial_object,solids_parameters.triangle_collision_parameters,&embedding.material_surface);
     RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("torus",1,(T).5);
     rigid_body->Set_Mass(1000);
     rigid_body->Frame().t=TV(0,(T)2,0);

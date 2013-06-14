@@ -29,7 +29,7 @@ public:
     using BASE::Initialize_Implicit_Surface;using RIGIDS_STANDARD_TESTS<TV>::Add_Rigid_Body;
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
 
-    SOLIDS_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& output_directory,const std::string& data_directory,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input);
+    SOLIDS_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& data_directory,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input);
     virtual ~SOLIDS_STANDARD_TESTS(){}
 
     TRIANGULATED_AREA<T>& Create_Mattress(const GRID<TV>& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>& initial_state)

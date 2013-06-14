@@ -147,7 +147,7 @@ public:
     bool project_nullspace,opt_residuals;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
         use_extended_neohookean2(false),use_extended_neohookean3(false),use_int_j_neo(false),use_rc_ext(false),use_rc2_ext(false),use_extended_neohookean_refined(false),
         use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),use_corotated_fixed(false),use_corot_blend(false),
         use_corot_quartic(false),dump_sv(false),kinematic_id(0),kinematic_id2(0),print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),
@@ -262,6 +262,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     last_frame=1000;

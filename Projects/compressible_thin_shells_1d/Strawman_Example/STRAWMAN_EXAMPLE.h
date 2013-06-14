@@ -51,7 +51,7 @@ class STRAWMAN_EXAMPLE
     STRAWMAN_EXAMPLE(const int resolution=100)
         : stream_type(T()),resolution(resolution),frame(0),grid(TV_INT(resolution),RANGE<TV>(TV((T)-1),TV(0)),true),
         velocity(grid.Domain_Indices(3)),rho_with_extrapolation(grid.Domain_Indices(3)),rho_fixed(grid.Domain_Indices(3)),
-         rho_tmp(grid.Domain_Indices(3)),initial_distance((T)-.5),solid_velocity((T)-1),rigid_body_collection(0,0)
+         rho_tmp(grid.Domain_Indices(3)),initial_distance((T)-.5),solid_velocity((T)-1),rigid_body_collection(0)
     {output_directory=STRING_UTILITIES::string_sprintf("Strawman_Example/Solution_Resolution_%d",resolution);}
 
 //#####################################################################

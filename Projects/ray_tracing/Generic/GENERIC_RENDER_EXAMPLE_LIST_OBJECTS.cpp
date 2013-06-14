@@ -75,7 +75,7 @@ Get_Rigid_Objects(PARAMETER_LIST& parameters,int frame,std::string& rigid_body_c
     std::string name=parameters.Get_Parameter("Name",unknown);
     PHYSBAM_ASSERT(name!=unknown);
     if(!rigid_body_collection_cached.Get(prefix,rigid_body_collection)){
-        rigid_body_collection=new RIGID_BODY_COLLECTION<TV>(0,0);
+        rigid_body_collection=new RIGID_BODY_COLLECTION<TV>(0);
         // bool load_implicit_surfaces;load_implicit_surfaces=parameters.Get_Parameter("Load_Implicit_Surfaces",false); // TODO: this is currently ignored
         rigid_body_collection->Read(STREAM_TYPE(RW()),prefix,frame); // TODO: only load implicit surfaces if load_implicit_surfaces
         rigid_body_collection_cached.Set(prefix,rigid_body_collection);
@@ -175,7 +175,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 object->Update_Transform(current_transform*rigid_body_collection.Rigid_Body(id).Frame().Matrix());}
             LOG::cout<<"Processed Rigid Body "<<id<<std::endl;}}
     else if(type=="Deformable_Object"){
-        DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=*new DEFORMABLE_BODY_COLLECTION<TV>(0,*new COLLISION_GEOMETRY_COLLECTION<TV>);
+        DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=*new DEFORMABLE_BODY_COLLECTION<TV>(*new COLLISION_GEOMETRY_COLLECTION<TV>);
         int local_frame=parameters.Get_Parameter("Frame",frame);
         bool split_object=parameters.Get_Parameter("Split_Object",false);
         std::string sample_locations_filename=parameters.Get_Parameter("Sample_Locations_File",std::string("unknown"));

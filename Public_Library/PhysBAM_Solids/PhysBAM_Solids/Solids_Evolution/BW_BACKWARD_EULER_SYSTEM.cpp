@@ -28,8 +28,10 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> BW_BACKWARD_EULER_SYSTEM<TV>::
-BW_BACKWARD_EULER_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BW_COLLISIONS<TV>& bw_collisions_input,const T dt_input,const T time_input)
-    :KRYLOV_SYSTEM_BASE<typename TV::SCALAR>(false,true),solid_body_collection(solid_body_collection),bw_collisions(bw_collisions_input),dt(dt_input),time(time_input)
+BW_BACKWARD_EULER_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BW_COLLISIONS<TV>& bw_collisions_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities,
+    const T dt_input,const T time_input)
+    :KRYLOV_SYSTEM_BASE<typename TV::SCALAR>(false,true),solid_body_collection(solid_body_collection),bw_collisions(bw_collisions_input),
+    example_forces_and_velocities(example_forces_and_velocities),dt(dt_input),time(time_input)
 {
 }
 //#####################################################################
@@ -79,7 +81,7 @@ Project_Helper(KRYLOV_VECTOR_BASE<T>& BV,const bool negate) const
 
     // User constrained nodes
     VECTOR_T& V=debug_cast<VECTOR_T&>(BV);
-    solid_body_collection.example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(V.V.array,time,time);
+    example_forces_and_velocities.Zero_Out_Enslaved_Velocity_Nodes(V.V.array,time,time);
 
     // Cloth/body contacts
     for(int i=0;i<bw_collisions.cloth_body_constraints.m;i++){

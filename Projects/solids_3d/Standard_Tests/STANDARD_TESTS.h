@@ -206,7 +206,7 @@ public:
     bool opt_residuals;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),parameter(0),use_forces_for_drift(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),parameter(0),use_forces_for_drift(false),
         number_side_panels(40),aspect_ratio((T)1.7),side_length((T)1.0),cloth_triangles(INT_MAX),constrained_particle(0),
         suspended_particle(0),drifting_particle(0),test_24_poissons_ratio((T).5),no_altitude_springs(false),stiffness_multiplier(1),
         damping_multiplier(1),bending_stiffness_multiplier(1),bending_damping_multiplier(1),planar_damping_multiplier(1),
@@ -332,6 +332,7 @@ void Register_Options()
 void Parse_Options()
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     frame_rate=24;
@@ -417,7 +418,7 @@ void Parse_Options()
         case 9:
             if(test_number==6) last_frame=(int)frame_rate; else if(test_number==9) last_frame=(int)(10*frame_rate); else last_frame=(int)(5*frame_rate);
             delete solids_evolution;
-            solids_evolution=new QUASISTATIC_EVOLUTION<TV>(solids_parameters,solid_body_collection);
+            solids_evolution=new QUASISTATIC_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             if(test_number==6) solids_parameters.newton_iterations=1; else solids_parameters.newton_iterations=10;
@@ -459,7 +460,7 @@ void Parse_Options()
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            solids_evolution=new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection);
+            solids_evolution=new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
             break;
         case 15:
             break;
@@ -622,7 +623,7 @@ void Parse_Options()
         solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
         solids_parameters.cfl*=10;
         delete solids_evolution;
-        solids_evolution=new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection);
+        solids_evolution=new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
         output_directory+="_backward";}
     
     if(opt_noself){
@@ -695,7 +696,7 @@ void Get_Initial_Data()
         case 2:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
-            tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
+            tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             tests.Add_Ground();
             break;}
         case 3:{
@@ -711,7 +712,7 @@ void Get_Initial_Data()
             embedding.Update_Binding_List_From_Embedding(solid_body_collection.deformable_body_collection,false);
 //            tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
             embedding.Update_Number_Nodes();
-            tests.Initialize_Tetrahedron_Collisions(1,embedding.embedded_object.simplicial_object,solids_parameters.triangle_collision_parameters,&embedding.material_surface);
+            tests.Initialize_Tetrahedron_Collisions(1,output_directory,embedding.embedded_object.simplicial_object,solids_parameters.triangle_collision_parameters,&embedding.material_surface);
             tests.Add_Ground();
             break;}
         case 5:
@@ -774,7 +775,7 @@ void Get_Initial_Data()
             FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/bindings",binding_list);
             tetrahedralized_volume.mesh.boundary_mesh=new TRIANGLE_MESH();
             FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/boundary_mesh",*tetrahedralized_volume.mesh.boundary_mesh);
-            tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
+            tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             tests.Add_Ground();
             break;}
         case 16:
@@ -896,7 +897,7 @@ void Get_Initial_Data()
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,false,1000);
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
-            if(0) tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
+            if(0) tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             tests.Add_Ground();
             break;}
         case 25:{

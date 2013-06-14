@@ -28,7 +28,7 @@ using namespace PhysBAM;
 template<class TV> SOLIDS_FLUIDS_EXAMPLE<TV>::
 SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type)
     :BASE(stream_type),use_melting(false),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
-    solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this)),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection)),
+    solid_body_collection(*new SOLID_BODY_COLLECTION<TV>),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
     opt_solidssymmqmr(false),opt_solidscr(false),opt_solidscg(false)
 {
     Set_Minimum_Collision_Thickness();

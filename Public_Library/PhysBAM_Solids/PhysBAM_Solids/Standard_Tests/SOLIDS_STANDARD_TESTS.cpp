@@ -26,8 +26,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> SOLIDS_STANDARD_TESTS<TV>::
-SOLIDS_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& output_directory,const std::string& data_directory,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input)
-    :BASE(stream_type,output_directory,solid_body_collection_input.deformable_body_collection),RIGIDS_STANDARD_TESTS<TV>(stream_type,data_directory,solid_body_collection_input.rigid_body_collection),
+SOLIDS_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& data_directory,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input)
+    :BASE(stream_type,solid_body_collection_input.deformable_body_collection),RIGIDS_STANDARD_TESTS<TV>(stream_type,data_directory,solid_body_collection_input.rigid_body_collection),
     solid_body_collection(solid_body_collection_input)
 {
 }
@@ -264,12 +264,12 @@ template RIGID_BODY<VECTOR<double,3> >* SOLIDS_STANDARD_TESTS<VECTOR<double,3> >
     RIGID_BODY_COLLECTION<VECTOR<double,3> >&,double);
 template RIGID_BODY<VECTOR<double,3> >* SOLIDS_STANDARD_TESTS<VECTOR<double,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<double>&,
     RIGID_BODY_COLLECTION<VECTOR<double,3> >&,double,int);
-template SOLIDS_STANDARD_TESTS<VECTOR<double,1> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<double,1> >&);
-template SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<double,2> >&);
-template SOLIDS_STANDARD_TESTS<VECTOR<double,3> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<double,3> >&);
-template SOLIDS_STANDARD_TESTS<VECTOR<float,1> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<float,1> >&);
-template SOLIDS_STANDARD_TESTS<VECTOR<float,2> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<float,2> >&);
-template SOLIDS_STANDARD_TESTS<VECTOR<float,3> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<float,3> >&);
+template SOLIDS_STANDARD_TESTS<VECTOR<double,1> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<double,1> >&);
+template SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<double,2> >&);
+template SOLIDS_STANDARD_TESTS<VECTOR<double,3> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<double,3> >&);
+template SOLIDS_STANDARD_TESTS<VECTOR<float,1> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<float,1> >&);
+template SOLIDS_STANDARD_TESTS<VECTOR<float,2> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<float,2> >&);
+template SOLIDS_STANDARD_TESTS<VECTOR<float,3> >::SOLIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,SOLID_BODY_COLLECTION<VECTOR<float,3> >&);
 
 
 

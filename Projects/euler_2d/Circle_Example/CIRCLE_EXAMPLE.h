@@ -115,7 +115,7 @@ public:
 
     CIRCLE_EXAMPLE(const STREAM_TYPE stream_type,const bool incompressible_input)
         :BASE(stream_type,0,incompressible_input?fluids_parameters.SMOKE:fluids_parameters.COMPRESSIBLE),
-        tests(stream_type,output_directory,data_directory,solid_body_collection),solid_mass((T).0625),rigid_body_collection(solid_body_collection.rigid_body_collection),
+        tests(stream_type,data_directory,solid_body_collection),solid_mass((T).0625),rigid_body_collection(solid_body_collection.rigid_body_collection),
         use_solids_gravity(false),transition_to_incompressible(false),
         incompressible(incompressible_input),use_soot(true),use_fixed_farfield_boundary(false),
         run_self_tests(false),print_poisson_matrix(false),print_index_map(false),print_matrix(false),
@@ -175,6 +175,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
 
     timesplit=timesplit && !exact;
     //grid

@@ -33,11 +33,12 @@ public:
     typedef KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY<TV> > > KRYLOV_VECTOR_T;
 
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
+    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities;
     T time;
     MPI_SOLIDS<TV>* mpi_solids;
 
-    QUASISTATIC_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,const T time_input,MPI_SOLIDS<TV>* mpi_solids_input)
-        :KRYLOV_SYSTEM_BASE<T>(false,true),solid_body_collection(solid_body_collection_input),time(time_input),mpi_solids(mpi_solids_input)
+    QUASISTATIC_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities,const T time_input,MPI_SOLIDS<TV>* mpi_solids_input)
+        :KRYLOV_SYSTEM_BASE<T>(false,true),solid_body_collection(solid_body_collection_input),example_forces_and_velocities(example_forces_and_velocities),time(time_input),mpi_solids(mpi_solids_input)
     {}
 
     void Multiply(const KRYLOV_VECTOR_BASE<T>& bdX,KRYLOV_VECTOR_BASE<T>& bdF) const PHYSBAM_OVERRIDE
@@ -53,7 +54,7 @@ public:
     {Project(dX);}
 
     void Project(KRYLOV_VECTOR_BASE<T>& bdX) const PHYSBAM_OVERRIDE
-    {KRYLOV_VECTOR_T& dX=debug_cast<KRYLOV_VECTOR_T&>(bdX);solid_body_collection.example_forces_and_velocities->Zero_Out_Enslaved_Position_Nodes(dX.v.array,time);}
+    {KRYLOV_VECTOR_T& dX=debug_cast<KRYLOV_VECTOR_T&>(bdX);example_forces_and_velocities.Zero_Out_Enslaved_Position_Nodes(dX.v.array,time);}
 
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bdX1,const KRYLOV_VECTOR_BASE<T>& bdX2) const PHYSBAM_OVERRIDE
     {const KRYLOV_VECTOR_T& dX1=debug_cast<const KRYLOV_VECTOR_T&>(bdX1),&dX2=debug_cast<const KRYLOV_VECTOR_T&>(bdX2);
@@ -74,8 +75,8 @@ public:
 // Constructor
 //#####################################################################
 template<class TV> QUASISTATIC_EVOLUTION<TV>::
-QUASISTATIC_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input)
-    :SOLIDS_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input),balance_external_forces_only(false)
+QUASISTATIC_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input)
+    :SOLIDS_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input,example_forces_and_velocities_input),balance_external_forces_only(false)
 {}
 //#####################################################################
 // Function One_Newton_Step_Toward_Steady_State
@@ -91,11 +92,11 @@ One_Newton_Step_Toward_Steady_State(const T time,ARRAY<TV>& dX_full)
 
     B_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Fill(TV());
     if(!balance_external_forces_only) solid_body_collection.Add_Velocity_Independent_Forces(B_full,rigid_B_full,time);
-    solid_body_collection.example_forces_and_velocities->Add_External_Forces(B_full,time);
+    example_forces_and_velocities.Add_External_Forces(B_full,time);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B_full);
     B.v=-B.v;
 
-    QUASISTATIC_SYSTEM<TV> system(solid_body_collection,time,solid_body_collection.deformable_body_collection.mpi_solids);
+    QUASISTATIC_SYSTEM<TV> system(solid_body_collection,example_forces_and_velocities,time,solid_body_collection.deformable_body_collection.mpi_solids);
     CONJUGATE_GRADIENT<T> cg;cg.restart_iterations=solids_parameters.implicit_solve_parameters.cg_restart_iterations;
     cg.print_diagnostics=solid_body_collection.print_diagnostics;cg.print_residuals=solid_body_collection.print_residuals;
     cg.iterations_used=&solid_body_collection.iterations_used_diagnostic;
@@ -110,7 +111,6 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
-    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*solid_body_collection.example_forces_and_velocities;
     const ARRAY<int>& dynamic_particles=solid_body_collection.deformable_body_collection.dynamic_particles;
     const ARRAY<int>& simulated_particles=solid_body_collection.deformable_body_collection.simulated_particles;
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
@@ -118,7 +118,8 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
     // for parallelism, assume ghost data is synchronized
 
     // prepare for force computation
-    solid_body_collection.Enforce_Definiteness(true);example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
+    solid_body_collection.Enforce_Definiteness(true);
+    example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
     Set_External_Positions(particles.X,time+dt);binding_list.Clamp_Particles_To_Embedded_Positions();
     solid_body_collection.Update_Position_Based_State(time+dt,true);solid_body_collection.deformable_body_collection.Update_Collision_Penalty_Forces_And_Derivatives();
 

@@ -114,7 +114,7 @@ public:
     bool project_nullspace,print_residuals;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_corotated(false),use_corot_blend(false),dump_sv(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_corotated(false),use_corot_blend(false),dump_sv(false),
         print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1),project_nullspace(false),print_residuals(false)
     {
     }
@@ -190,6 +190,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     last_frame=1000;
@@ -216,7 +217,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 2:
         case 3:
             delete solids_evolution;
-            solids_evolution=new QUASISTATIC_EVOLUTION<TV>(solids_parameters,solid_body_collection);
+            solids_evolution=new QUASISTATIC_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
             solids_parameters.newton_iterations=10;
             solids_parameters.newton_tolerance=(T)1e-2;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;

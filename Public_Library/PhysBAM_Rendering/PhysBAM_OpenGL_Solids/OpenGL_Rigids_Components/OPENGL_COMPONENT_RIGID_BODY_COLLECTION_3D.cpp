@@ -39,7 +39,7 @@ using namespace PhysBAM;
 template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir_input,bool use_display_lists)
     :OPENGL_COMPONENT("Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
-    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0,0)),articulated_rigid_body(0),
+    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),articulated_rigid_body(0),
     velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
     angular_velocity_field(angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(true),one_sided(false),
     front_color_map(0),back_color_map(0),

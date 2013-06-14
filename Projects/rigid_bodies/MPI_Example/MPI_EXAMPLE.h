@@ -49,7 +49,7 @@ public:
     INTERPOLATION_CURVE<T,FRAME<TV> > curve;
 
     MPI_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,this->fluids_parameters.NONE),width(2),height(4),num_bodies(6),tests(stream_type,output_directory,data_directory,solid_body_collection)
+        :BASE(stream_type,0,this->fluids_parameters.NONE),width(2),height(4),num_bodies(6),tests(stream_type,data_directory,solid_body_collection)
     {
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
@@ -139,6 +139,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    tests.data_directory=data_directory;
     output_directory=STRING_UTILITIES::string_sprintf("MPI_Example/Test_%d",test_number);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}

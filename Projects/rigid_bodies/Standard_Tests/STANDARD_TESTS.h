@@ -98,7 +98,7 @@ public:
     using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;using BASE::parse_args;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,output_directory,data_directory,solid_body_collection),small_block_mass(1),parameter(0),collision_manager(0)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),small_block_mass(1),parameter(0),collision_manager(0)
     {
     }
 
@@ -142,6 +142,7 @@ public:
     void Parse_Options() PHYSBAM_OVERRIDE
     {
         BASE::Parse_Options();
+        tests.data_directory=data_directory;
         output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
 
         if(small_block_mass!=1) output_directory+=STRING_UTILITIES::string_sprintf("_m%g",small_block_mass);
@@ -208,13 +209,6 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         if(parameter==3 && time>=(T).4999 && time<=(T).5001){
             solid_body_collection.rigid_body_collection.rigid_body_particles.Remove_Body(0);
             solid_body_collection.rigid_body_collection.Update_Simulated_Particles();}}
-}
-//#####################################################################
-// Function Set_Rigid_Particle_Is_Simulated
-//#####################################################################
-void Set_Rigid_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE
-{
-    if(test_number==31 && parameter==6) particle_is_simulated(1)=false;
 }
 //#####################################################################
 // Function Initialize_Bodies
@@ -1190,6 +1184,7 @@ void Sphere_Sanity_Tests()
     for(int i=0;i<n;i++) tests.Add_Rigid_Body("sphere",1,1).Frame().t.x=(T)3*i;
     if(parameter==3) solid_body_collection.rigid_body_collection.rigid_body_particles.Remove_Body(2);
     if(parameter==4) solid_body_collection.rigid_body_collection.Deactivate_Body(1);
+    if(parameter==4) solid_body_collection.rigid_body_collection.Rigid_Body(1).is_static=true;
 }
 //#####################################################################
 // Function Collision_Contact_Pairs_Test
