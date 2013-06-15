@@ -149,23 +149,20 @@ Rasterize_Pressure_And_One_Over_Lambda_J()
     pressure_rasterized.Fill((T)0);
     one_over_lambda_J.Fill((T)0);
     
-//    for(int p=0;p<sim.particles.number;p++){
-//        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-//            pressure_rasterized(influence_corner_cell_center_grid(p)+it.index)+=sim.particles.pressure(p)*weight_cell_center_grid(p)(it.index);
-//            one_over_lambda_J(influence_corner_cell_center_grid(p)+it.index)+=sim.particles.one_over_lambda_J(p)*weight_cell_center_grid(p)(it.index);}}
-    
-    ARRAY<int,TV_INT> number_particles_in_cell;
-    number_particles_in_cell.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
-    number_particles_in_cell.Fill(0);
+    // weighted average
+    ARRAY<T,TV_INT> total_weight;
+    T weight_eps=(T)1e-9;
+    total_weight.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
+    total_weight.Fill((T)0);    
     for(int p=0;p<sim.particles.number;p++){
-        TV_INT cell=mac_grid.Cell(sim.particles.X(p),0);
-        pressure_rasterized(cell)+=sim.particles.pressure(p);
-        one_over_lambda_J(cell)+=sim.particles.one_over_lambda_J(p);
-        number_particles_in_cell(cell)++;}
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+            pressure_rasterized(influence_corner_cell_center_grid(p)+it.index)+=sim.particles.pressure(p)*weight_cell_center_grid(p)(it.index);
+            one_over_lambda_J(influence_corner_cell_center_grid(p)+it.index)+=sim.particles.one_over_lambda_J(p)*weight_cell_center_grid(p)(it.index);
+            total_weight(influence_corner_cell_center_grid(p)+it.index)+=weight_cell_center_grid(p)(it.index);}}
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
-        if(number_particles_in_cell(it.index)>1){
-            pressure_rasterized(it.index)/=number_particles_in_cell(it.index);
-            one_over_lambda_J(it.index)/=number_particles_in_cell(it.index);}}
+        if(total_weight(it.index)>weight_eps){
+            pressure_rasterized(it.index)/=total_weight(it.index);
+            one_over_lambda_J(it.index)/=total_weight(it.index);}}
 }
 
 //#####################################################################
@@ -292,21 +289,16 @@ Velocities_Faces_To_Corners_MPM_Style(T FLIP_alpha)
 template<class TV> void MPM_PROJECTION<TV>::
 Pressure_Back_To_Particles(T FLIP_alpha)
 {
-//#pragma omp parallel for
-//    for(int p=0;p<sim.particles.number;p++){
-//        T pressure_PIC=(T)0;
-//        T pressure_FLIP=sim.particles.pressure(p);
-//        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-//            TV_INT ind=influence_corner_cell_center_grid(p)+it.index;
-//            T w=weight_cell_center_grid(p)(it.index);
-//            pressure_PIC+=pressure_unknown(ind)*w;
-//            pressure_FLIP+=(pressure_unknown(ind)-pressure_rasterized(ind))*w;}
-//        sim.particles.pressure(p)=((T)1-FLIP_alpha)*pressure_PIC+FLIP_alpha*pressure_FLIP;}
-    
-    
+#pragma omp parallel for
     for(int p=0;p<sim.particles.number;p++){
-        TV_INT cell=mac_grid.Cell(sim.particles.X(p),0);
-        sim.particles.pressure(p)=pressure_unknown(cell);}
+        T pressure_PIC=(T)0;
+        T pressure_FLIP=sim.particles.pressure(p);
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+            TV_INT ind=influence_corner_cell_center_grid(p)+it.index;
+            T w=weight_cell_center_grid(p)(it.index);
+            pressure_PIC+=pressure_unknown(ind)*w;
+            pressure_FLIP+=(pressure_unknown(ind)-pressure_rasterized(ind))*w;}
+        sim.particles.pressure(p)=((T)1-FLIP_alpha)*pressure_PIC+FLIP_alpha*pressure_FLIP;}
 }
 
 //#####################################################################

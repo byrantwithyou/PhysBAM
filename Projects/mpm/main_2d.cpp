@@ -93,8 +93,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.2,-0.2),TV(0.2,0.2)),particle_exclude_radius);
             
-            sim.particles.Resize(1);
-            sim.particles.X(0)=sim.particles.Xm(0)=TV(0.027,0.031);
+            // sim.particles.Resize(1);
+            // sim.particles.X(0)=sim.particles.Xm(0)=TV(0.027,0.031);
             
             int c1=sim.particles.number;
             sim.particles.Set_Material_Properties(0,c1,
@@ -102,6 +102,13 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 80.0*ym/(2.0*(1.0+pr)), // mu
                 80.0*ym*pr/((1.0+pr)*(1.0-2.0*pr)), // lambda
                 true,0); // compress, pressure
+            
+//            sim.particles.Set_Material_Properties(0,c1,
+//                                                  (T)8*density_scale/1000, // mass per particle
+//                                                  0, // mu
+//                                                  0, // lambda
+//                                                  false,0); // compress, pressure
+            
             sim.particles.Set_Plasticity(0,c1,
                 false,-1000,1.2, // plasticity_yield
                 false,-1,1); // plasticity_clamp
