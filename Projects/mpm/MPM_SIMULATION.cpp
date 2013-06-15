@@ -158,7 +158,8 @@ Build_Helper_Structures_For_Constitutive_Model()
         constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),particles.Fp(p),Je(p),Re(p),Se(p));
         T lame_scale=exp(xi*(1-particles.Fp(p).Determinant()));
         particles.mu(p)=particles.mu0(p)*lame_scale;
-        particles.lambda(p)=particles.lambda0(p)*lame_scale;}
+        particles.lambda(p)=particles.lambda0(p)*lame_scale;
+        particles.one_over_lambda_J(p)=(particles.compress(p))?((T)1.0/(particles.lambda(p)*Je(p))):(T)0;}
 }
 //#####################################################################
 // Function Rasterize_Particle_Data_To_The_Grid

@@ -39,6 +39,7 @@ MPM_PARTICLES()
     Add_Array(ATTRIBUTE_ID_VISCO_TAU,&visco_tau);
     Add_Array(ATTRIBUTE_ID_VISCO_KAPPA,&visco_kappa);
     Add_Array(ATTRIBUTE_ID_COMPRESS,&compress);
+    Add_Array(ATTRIBUTE_ID_ONE_OVER_LAMBDA_J,&one_over_lambda_J);
     rand_generator.Set_Seed(0);
 }
 //#####################################################################
@@ -152,6 +153,7 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_VISCO_TAU,"visco_tau");
     Register_Attribute_Name(ATTRIBUTE_ID_VISCO_KAPPA,"visco_kappa");
     Register_Attribute_Name(ATTRIBUTE_ID_COMPRESS,"compress");
+    Register_Attribute_Name(ATTRIBUTE_ID_ONE_OVER_LAMBDA_J,"one_over_lambda_J");
     return 0;
 }
 int initialize_mpm_particles=Initialize_MPM_Particles();

@@ -42,6 +42,7 @@ public:
     ARRAY_VIEW<MATRIX<T,TV::m> > Fp;
     ARRAY_VIEW<T> mu,lambda,mu0,lambda0;
     ARRAY_VIEW<T> pressure;
+    ARRAY_VIEW<T> one_over_lambda_J;
     ARRAY_VIEW<bool> compress;
     ARRAY_VIEW<bool> use_plasticity_yield,use_plasticity_clamp;
     ARRAY_VIEW<T> yield_min,yield_max,clamp_min,clamp_max;

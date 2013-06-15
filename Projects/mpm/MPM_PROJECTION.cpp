@@ -146,8 +146,12 @@ Build_Weights_And_Grad_Weights_For_Cell_Centers()
 template<class TV> void MPM_PROJECTION<TV>::
 Rasterize_Pressure_And_One_Over_Lambda_J()
 {
-
-
+    pressure_rasterized.Fill((T)0);
+    one_over_lambda_J.Fill((T)0);
+    for(int p=0;p<sim.particles.number;p++){
+        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+            pressure_rasterized(influence_corner_cell_center_grid(p)+it.index)+=sim.particles.pressure(p)*weight_cell_center_grid(p)(it.index);
+            one_over_lambda_J(influence_corner_cell_center_grid(p)+it.index)+=sim.particles.one_over_lambda_J(p)*weight_cell_center_grid(p)(it.index);}}
 }
 
 //#####################################################################
