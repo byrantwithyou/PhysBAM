@@ -67,7 +67,8 @@ public:
     void Build_Velocity_Divergence();
     void Solve_For_Pressure();                            
     void Do_Projection();                                  
-    void Velocities_Faces_To_Corners_MPM_Style(T FLIP_alpha=T(0));         
+    void Velocities_Faces_To_Corners_MPM_Style(T FLIP_alpha=T(0));
+    void Pressure_Back_To_Particles(T FLIP_alpha=T(0));
 
     void Fix_RHS_Neumann_Cells(ARRAY<T,TV_INT>& rhs);      // called by Solve_For_Pressure
     

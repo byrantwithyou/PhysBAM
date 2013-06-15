@@ -258,7 +258,7 @@ Grid_Based_Body_Collisions()
         if(node_mass(it.index)>min_mass){
             const TV& x=grid.Node(it.index);
             for(int d=0;d<TV::m;d++){
-                T left_wall=grid.domain.min_corner(d)+4.01*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.01*grid.dX.Min();
+                T left_wall=grid.domain.min_corner(d)+4.2*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.2*grid.dX.Min();
                 if(x(d)<left_wall && node_V_star(it.index)(d)<(T)0){
                     TV vt(node_V_star(it.index));vt(d)=(T)0;
                     T vn=node_V_star(it.index)(d); // <0
@@ -326,7 +326,7 @@ Solve_The_Linear_System()
     if(test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
-    KRYLOV_SOLVER<T>* solver=&cg;
+    KRYLOV_SOLVER<T>* solver=&cr;
     solver->print_residuals=false;
     if(dump_matrix){ // load M-1.txt;load m-1.txt;mm=reshape([m m]',rows(M),1);R=diag(mm)*M;max(max(abs(R-R')))
         LOG::cout<<"solve id "<<solve_id<<std::endl;
@@ -428,18 +428,16 @@ Particle_Based_Body_Collisions()
     static T eps=1e-8;
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++){
-        TV x=particles.X(p)+dt*particles.V(p); // candidate position
+        TV x=particles.X(p);
         for(int d=0;d<TV::m;d++){
             T left_wall=grid.domain.min_corner(d)+4.2*grid.dX.Min(),right_wall=grid.domain.max_corner(d)-4.2*grid.dX.Min();
-            if(x(d)<=left_wall){
-                // TV vt(particles.V(p));vt(d)=(T)0;
-                // particles.V(p)=vt;
-                particles.V(p)*=-0.5;
+            if(x(d)<=left_wall && particles.V(p)(d)>0){
+                TV vt(particles.V(p));vt(d)=(T)0;
+                particles.V(p)=vt;
             }
-            if(x(d)>=right_wall){
-                // TV vt(particles.V(p));vt(d)=(T)0;
-                // particles.V(p)=vt;
-                particles.V(p)*=-0.5;
+            if(x(d)>=right_wall && particles.V(p)(d)<0){
+                TV vt(particles.V(p));vt(d)=(T)0;
+                particles.V(p)=vt;
             }
         }
         for(int b=0;b<rigid_ball.m;b++){
@@ -465,9 +463,9 @@ Update_Particle_Positions()
     TIMING_START;
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++){
-        if(dt*particles.V(p).Max_Mag()>grid.dX.Min()){
-            LOG::cout<<"breaking CFL"<<std::endl;
-            PHYSBAM_FATAL_ERROR();}
+        // if(dt*particles.V(p).Max_Mag()>grid.dX.Min()){
+        //     LOG::cout<<"breaking CFL"<<std::endl;
+        //     PHYSBAM_FATAL_ERROR();}
         particles.X(p)+=dt*particles.V(p);}
 }
 //#####################################################################

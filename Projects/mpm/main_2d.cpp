@@ -89,15 +89,19 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // geometry setting
     switch(test_number){
         case 1:{ // all materials together
-            sim.grid.Initialize(TV_INT(3.2*grid_res+1,5.2*grid_res+1),RANGE<TV>(TV(-1.6,-1.6),TV(1.6,3.6)));
+            sim.grid.Initialize(TV_INT(2*grid_res+1,2*grid_res+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
             
-            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-1.45,-1.45),TV(-0.8,0.8)),particle_exclude_radius);
+            sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.2,-0.2),TV(0.2,0.2)),particle_exclude_radius);
+            
+            sim.particles.Resize(1);
+            sim.particles.X(0)=sim.particles.Xm(0)=TV(0.027,0.031);
+            
             int c1=sim.particles.number;
             sim.particles.Set_Material_Properties(0,c1,
-                (T)8/1000, // mass per particle
-                0, // mu
-                0, // lambda
-                false,0); // compress, pressure
+                (T)8*density_scale/1000, // mass per particle
+                80.0*ym/(2.0*(1.0+pr)), // mu
+                80.0*ym*pr/((1.0+pr)*(1.0-2.0*pr)), // lambda
+                true,0); // compress, pressure
             sim.particles.Set_Plasticity(0,c1,
                 false,-1000,1.2, // plasticity_yield
                 false,-1,1); // plasticity_clamp
@@ -251,13 +255,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
         if(sim.frame==0) sim.Compute_Particle_Volumes_And_Densities(0,sim.particles.number);
 
-        // FOR WATER ONLY
-        // sim.Compute_Grid_Forces();
-        sim.node_force.Fill(TV());       
+        sim.Compute_Grid_Forces();  
         
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
         sim.Update_Velocities_On_Grid();
-        // sim.Grid_Based_Body_Collisions();
+        if(!use_projection) sim.Grid_Based_Body_Collisions();
         sim.Solve_The_Linear_System(); // so far sim.node_V is achieved via MPM
         LOG::cout<<"Momentum - grid (after linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
         if(use_projection){
@@ -288,19 +290,20 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             
             projection.Identify_Nodes_Of_Non_Dirichlet_Cells();
             projection.Velocities_Corners_To_Faces_MPM_Style();
-            LOG::cout<<"Momentum - face (before projection):"<<projection.Get_Total_Momentum_On_Faces()<<std::endl;
+            projection.Build_Weights_And_Grad_Weights_For_Cell_Centers();
+            projection.Rasterize_Pressure_And_One_Over_Lambda_J();
             projection.Build_Velocity_Divergence();
             projection.Solve_For_Pressure();
             projection.Do_Projection();
-            LOG::cout<<"Momentum - face (after projection):"<<projection.Get_Total_Momentum_On_Faces()<<std::endl;
             projection.Velocities_Faces_To_Corners_MPM_Style((T)0.95); // this step modifies sim.node_V
-            LOG::cout<<"Momentum - grid (after projection):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
+            projection.Pressure_Back_To_Particles((T)0);
+            LOG::cout<<sim.particles.pressure(0)<<std::endl;
         }
 
         sim.Update_Deformation_Gradient();
 
         sim.Update_Particle_Velocities();
-        // sim.Particle_Based_Body_Collisions();
+        if(!use_projection) sim.Particle_Based_Body_Collisions();
         sim.Update_Particle_Positions();
         sim.Update_Dirichlet_Box_Positions();
         sim.Update_Colliding_Object_Positions();
