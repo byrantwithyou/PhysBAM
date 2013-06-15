@@ -19,6 +19,7 @@ MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     :sim(sim_in)
 {
     mac_grid.Initialize(sim.grid.numbers_of_cells,RANGE<TV>(sim.grid.domain.min_corner,sim.grid.domain.max_corner),true);
+    cell_center_grid=sim.grid.Get_Center_Grid();
     face_velocities.Resize(mac_grid);
     face_velocities_old.Resize(mac_grid);
     face_masses.Resize(mac_grid);
@@ -29,6 +30,13 @@ MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     div_u.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     pressure_unknown.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     pressure_rasterized.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
+    one_over_lambda_J.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
+    influence_corner_cell_center_grid.Resize(sim.particles.number);
+    weight_cell_center_grid.Resize(sim.particles.number);
+    grad_weight_cell_center_grid.Resize(sim.particles.number);
+    for(int p=0;p<sim.particles.number;p++){
+        weight_cell_center_grid(p).Resize(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));
+        grad_weight_cell_center_grid(p).Resize(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));}
 }
 
 //#####################################################################
@@ -55,6 +63,7 @@ Reinitialize()
     max_div=(T)0;
     pressure_unknown.Fill((T)0);
     pressure_rasterized.Fill((T)0);
+    one_over_lambda_J.Fill((T)0);
 }
 
 //#####################################################################
@@ -118,6 +127,27 @@ Velocities_Corners_To_Faces_MPM_Style()
         if(face_masses(face_index)>sim.min_mass)
             face_velocities(face_index)=face_momenta(face_index)/face_masses(face_index);}
     face_velocities_old=face_velocities; // for FLIPing back
+}
+
+//#####################################################################
+// Function Rasterize_Pressure_And_One_Over_Lambda_J
+//#####################################################################
+template<class TV> void MPM_PROJECTION<TV>::
+Build_Weights_And_Grad_Weights_For_Cell_Centers()
+{
+#pragma omp parallel for
+    for(int p=0;p<sim.particles.number;p++)
+        grid_basis_function.Build_Weights_And_Grad_Weights_Exact(sim.particles.X(p),cell_center_grid,influence_corner_cell_center_grid(p),weight_cell_center_grid(p),grad_weight_cell_center_grid(p));
+}
+    
+//#####################################################################
+// Function Rasterize_Pressure_And_One_Over_Lambda_J
+//#####################################################################
+template<class TV> void MPM_PROJECTION<TV>::
+Rasterize_Pressure_And_One_Over_Lambda_J()
+{
+
+
 }
 
 //#####################################################################
