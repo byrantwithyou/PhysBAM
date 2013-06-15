@@ -218,8 +218,9 @@ Solve_For_Pressure()
     KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
     rhs.v.Copy(-(T)1.0,div_u);
     T one_over_dt=(T)1.0/sim.dt;
-    for(int i=0;i<rhs.v.array.m;i++)
-        rhs.v.array(i)-=one_over_dt*one_over_lambda_J.array(i)*pressure_rasterized.array(i);
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+mac_grid.counts));it.Valid();it.Next()){
+        if(!cell_dirichlet(it.index) && !cell_neumann(it.index)){ // cell is fluid
+            rhs.v(it.index)-=one_over_dt*one_over_lambda_J(it.index)*pressure_rasterized(it.index);}}
     Fix_RHS_Neumann_Cells(rhs.v);
     x.v=rhs.v;
     system.Test_System(*vectors(0),*vectors(1),*vectors(2));

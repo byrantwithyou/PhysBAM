@@ -333,7 +333,7 @@ Solve_The_Linear_System()
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("m-%i.txt",solve_id).c_str()).Write("m",node_mass.array);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs);} 
-    solver->Solve(system,x,rhs,vectors,(T)1e-7,0,1000);
+    solver->Solve(system,x,rhs,vectors,(T)1e-12,0,1000);
     if(dump_matrix){
         LOG::cout<<"solve id "<<solve_id<<std::endl;
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",x);}
