@@ -51,6 +51,9 @@ public:
     ARRAY<T,TV_INT> pressure_unknown;
     ARRAY<T,TV_INT> pressure_rasterized;
     ARRAY<T,TV_INT> one_over_lambda_J;
+    ARRAY<T,TV_INT> lambda;
+    ARRAY<T,TV_INT> J;
+
 
     MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in);
     ~MPM_PROJECTION();

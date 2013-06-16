@@ -31,6 +31,8 @@ MPM_PROJECTION(MPM_SIMULATION<TV>& sim_in)
     pressure_unknown.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     pressure_rasterized.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     one_over_lambda_J.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
+    lambda.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
+    J.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     influence_corner_cell_center_grid.Resize(sim.particles.number);
     weight_cell_center_grid.Resize(sim.particles.number);
     grad_weight_cell_center_grid.Resize(sim.particles.number);
@@ -64,6 +66,8 @@ Reinitialize()
     pressure_unknown.Fill((T)0);
     pressure_rasterized.Fill((T)0);
     one_over_lambda_J.Fill((T)0);
+    lambda.Fill((T)0);
+    J.Fill((T)0);
 }
 
 //#####################################################################
@@ -76,6 +80,11 @@ Identify_Dirichlet_Cells()
     for(int p=0;p<sim.particles.number;p++){
         TV_INT cell=mac_grid.Cell(sim.particles.X(p),0);
         cell_dirichlet(cell)=false;
+
+        // TV_INT cell=cell_center_grid.Cell(sim.particles.X(p),0);
+        // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
+        //     cell_dirichlet(cell+it.index)=false;}
+
     }
 }
 
@@ -124,8 +133,10 @@ Velocities_Corners_To_Faces_MPM_Style()
                 face_momenta(face_index)+=weight*sim.node_mass(node)*sim.node_V(node)(axis);}}}
     for(int i=0;i<faces_got_rasterized.m;i++){
         FACE_INDEX<TV::m> face_index=faces_got_rasterized(i);
-        if(face_masses(face_index)>sim.min_mass)
+        if(face_masses(face_index)>sim.min_mass){
             face_velocities(face_index)=face_momenta(face_index)/face_masses(face_index);}
+    }
+
     face_velocities_old=face_velocities; // for FLIPing back
 }
 
@@ -148,10 +159,11 @@ Rasterize_Pressure_And_One_Over_Lambda_J()
 {
     pressure_rasterized.Fill((T)0);
     one_over_lambda_J.Fill((T)0);
+    lambda.Fill((T)0);
+    J.Fill((T)0);
     
-    // weighted average
     ARRAY<T,TV_INT> total_weight;
-    T weight_eps=(T)1e-9;
+    T weight_eps=(T)0;
     total_weight.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     total_weight.Fill((T)0);    
     for(int p=0;p<sim.particles.number;p++){
@@ -163,6 +175,9 @@ Rasterize_Pressure_And_One_Over_Lambda_J()
         if(total_weight(it.index)>weight_eps){
             pressure_rasterized(it.index)/=total_weight(it.index);
             one_over_lambda_J(it.index)/=total_weight(it.index);}}
+
+    LOG::cout<<"DEBUG: rasterized pressure: "<<pressure_rasterized<<std::endl;
+    LOG::cout<<"DEBUG: rasterizedc one_over_lambda_J: "<<one_over_lambda_J<<std::endl;
 }
 
 //#####################################################################
@@ -171,6 +186,7 @@ Rasterize_Pressure_And_One_Over_Lambda_J()
 template<class TV> void MPM_PROJECTION<TV>::
 Build_Velocity_Divergence()
 {
+    T div_u_eps=(T)1e-7;
     max_div=(T)0;
     div_u.Fill((T)0);
     T one_over_h=(T)1/mac_grid.dX.Min();
@@ -179,7 +195,11 @@ Build_Velocity_Divergence()
             for(int axis=0;axis<TV::m;axis++)
                 div_u(it.index)+=face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))
                     -face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)));
-            div_u(it.index)*=one_over_h;}
+            div_u(it.index)*=one_over_h;
+            
+            // get rid of super small div_u
+            if(abs(div_u(it.index))<div_u_eps) div_u(it.index)=(T)0;}
+
         else div_u(it.index)=(T)0; // dirichlet p cells
         if(!cell_neumann(it.index) && abs(div_u(it.index))>max_div) // record maximum divergence on non neumann cells
             max_div=abs(div_u(it.index));}
@@ -220,17 +240,23 @@ Solve_For_Pressure()
     T one_over_dt=(T)1.0/sim.dt;
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+mac_grid.counts));it.Valid();it.Next()){
         if(!cell_dirichlet(it.index) && !cell_neumann(it.index)){ // cell is fluid
-            rhs.v(it.index)-=one_over_dt*one_over_lambda_J(it.index)*pressure_rasterized(it.index);}}
+            rhs.v(it.index)-=(one_over_dt*one_over_lambda_J(it.index)*pressure_rasterized(it.index));}}
     Fix_RHS_Neumann_Cells(rhs.v);
     x.v=rhs.v;
     system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
-    KRYLOV_SOLVER<T>* solver=&cr;
+    KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=false;
     solver->Solve(system,x,rhs,vectors,(T)1e-11,0,1000);
     pressure_unknown=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
+
+    // get rid of super small pressure
+    T pressure_eps=(T)1e-8;
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+mac_grid.counts));it.Valid();it.Next()){
+        if(abs(pressure_unknown(it.index))<pressure_eps){
+            pressure_unknown(it.index)=(T)0;}}
 }
 
 //#####################################################################

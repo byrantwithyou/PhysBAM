@@ -50,12 +50,14 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
                 if(proj.face_masses(left_face_index)>proj.sim.min_mass){
                     if(proj.cell_dirichlet(left_cell_index)) rr(it.index)+=xx(it.index)/proj.face_masses(left_face_index);
                     else if(proj.cell_neumann(left_cell_index)) rr(it.index)+=T(0);
-                    else rr(it.index)+=(xx(it.index)-xx(left_cell_index))/proj.face_masses(left_face_index);}
+                    else rr(it.index)+=(xx(it.index)-xx(left_cell_index))/proj.face_masses(left_face_index);
+                }
                 FACE_INDEX<TV::m> right_face_index(d,proj.mac_grid.Second_Face_Index_In_Cell(d,it.index));
                 if(proj.face_masses(right_face_index)>proj.sim.min_mass){
                     if(proj.cell_dirichlet(right_cell_index)) rr(it.index)+=xx(it.index)/proj.face_masses(right_face_index);
                     else if(proj.cell_neumann(right_cell_index)) rr(it.index)+=T(0);
-                    else rr(it.index)+=(xx(it.index)-xx(right_cell_index))/proj.face_masses(right_face_index);}}
+                    else rr(it.index)+=(xx(it.index)-xx(right_cell_index))/proj.face_masses(right_face_index);
+                }}
             rr(it.index)*=proj.sim.dt*one_over_h_square;
             rr(it.index)-=one_over_dt*proj.one_over_lambda_J(it.index)*xx(it.index);}}
 }

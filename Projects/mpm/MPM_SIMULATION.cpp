@@ -82,60 +82,6 @@ Resize_For_New_Particle_Data()
     min_volume=(T)1e-7;
 }
 //#####################################################################
-// Function Advance_One_Time_Step_Forward_Euler
-//#####################################################################
-template<class TV> void MPM_SIMULATION<TV>::
-Advance_One_Time_Step_Forward_Euler()
-{
-    Build_Weights_And_Grad_Weights();
-    Build_Helper_Structures_For_Constitutive_Model();
-    Rasterize_Particle_Data_To_The_Grid();
-    if(frame==0) Compute_Particle_Volumes_And_Densities(0,particles.number);
-    Compute_Grid_Forces();
-    if(use_gravity) Apply_Gravity_To_Grid_Forces();
-    Update_Velocities_On_Grid();
-    Grid_Based_Body_Collisions();
-    Solve_The_Linear_System_Explicit();
-    T max_node_v=Get_Maximum_Node_Velocity();
-    LOG::cout<<"Maximum node velocity: "<<max_node_v<<" = "<<max_node_v/(grid.dX(0)/dt)<<" h/dt"<<std::endl;
-    Update_Deformation_Gradient();
-    Update_Particle_Velocities();
-    T max_particle_v=Get_Maximum_Particle_Velocity();
-    LOG::cout<<"Maximum particle velocity: "<<max_particle_v<<" = "<<max_particle_v/(grid.dX.Min()/dt)<<" h/dt"<<std::endl;
-    Particle_Based_Body_Collisions();
-    Update_Particle_Positions();
-    Update_Dirichlet_Box_Positions();
-    Update_Colliding_Object_Positions();
-    frame++;
-}
-//#####################################################################
-// Function Advance_One_Time_Step_Backward_Euler
-//#####################################################################
-template<class TV> void MPM_SIMULATION<TV>::
-Advance_One_Time_Step_Backward_Euler()
-{
-    Build_Weights_And_Grad_Weights();
-    Build_Helper_Structures_For_Constitutive_Model();
-    Rasterize_Particle_Data_To_The_Grid();
-    if(frame==0) Compute_Particle_Volumes_And_Densities(0,particles.number);
-    Compute_Grid_Forces();
-    if(use_gravity) Apply_Gravity_To_Grid_Forces();
-    Update_Velocities_On_Grid();
-    Grid_Based_Body_Collisions();
-    Solve_The_Linear_System();
-    T max_node_v=Get_Maximum_Node_Velocity();
-    LOG::cout<<"Maximum node velocity: "<<max_node_v<<" = "<<max_node_v/(grid.dX(0)/dt)<<" h/dt"<<std::endl;
-    Update_Deformation_Gradient();
-    Update_Particle_Velocities();
-    T max_particle_v=Get_Maximum_Particle_Velocity();
-    LOG::cout<<"Maximum particle velocity: "<<max_particle_v<<" = "<<max_particle_v/(grid.dX.Min()/dt)<<" h/dt"<<std::endl;
-    Particle_Based_Body_Collisions();
-    Update_Particle_Positions();
-    Update_Dirichlet_Box_Positions();
-    Update_Colliding_Object_Positions();
-    frame++;
-}
-//#####################################################################
 // Function Build_Weights_And_Grad_Weights
 //#####################################################################
 template<class TV> void MPM_SIMULATION<TV>::
@@ -180,7 +126,8 @@ Rasterize_Particle_Data_To_The_Grid()
     for(int p=0;p<particles.number;p++){
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
-            if(node_mass(ind)>min_mass) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p)(it.index)/node_mass(ind);}}
+            // if(node_mass(ind)>min_mass) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p)(it.index)/node_mass(ind);}}
+            if(node_mass(ind)!=0) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p)(it.index)/node_mass(ind);}}
 }
 //#####################################################################
 // Function Compute_Particle_Volumes_And_Densities
