@@ -113,9 +113,9 @@ Identify_Nodes_Of_Non_Dirichlet_Cells()
 template<class TV> void MPM_PROJECTION<TV>::
 Velocities_Corners_To_Faces_MPM_Style()
 {
-    face_velocities.Fill((T)0);
-    face_masses.Fill((T)0);
-    face_momenta.Fill((T)0);
+    face_velocities.Fill((T)0.0);
+    face_masses.Fill((T)0.0);
+    face_momenta.Fill((T)0.0);
     ARRAY<FACE_INDEX<TV::m> > faces_got_rasterized;
     T weight=(TV::m==2)?0.5:0.25;
     for(typename HASHTABLE<TV_INT,bool>::ITERATOR it(nodes_non_dirichlet_cells);it.Valid();it.Next()){
@@ -128,7 +128,7 @@ Velocities_Corners_To_Faces_MPM_Style()
                 face_momenta(face_index)+=weight*sim.node_mass(node)*sim.node_V(node)(axis);}}}
     for(int i=0;i<faces_got_rasterized.m;i++){
         FACE_INDEX<TV::m> face_index=faces_got_rasterized(i);
-        if(face_masses(face_index)>sim.min_mass){
+        if(face_masses(face_index)!=(T)0){
             face_velocities(face_index)=face_momenta(face_index)/face_masses(face_index);}
     }
 
@@ -158,7 +158,6 @@ Rasterize_Pressure_And_One_Over_Lambda_J()
     J.Fill((T)0);
     
     ARRAY<T,TV_INT> total_weight;
-    T weight_eps=(T)0;
     total_weight.Resize(RANGE<TV_INT>(TV_INT(),mac_grid.counts));
     total_weight.Fill((T)0);    
     for(int p=0;p<sim.particles.number;p++){
@@ -167,15 +166,15 @@ Rasterize_Pressure_And_One_Over_Lambda_J()
             one_over_lambda_J(influence_corner_cell_center_grid(p)+it.index)+=sim.particles.one_over_lambda_J(p)*weight_cell_center_grid(p)(it.index);
             total_weight(influence_corner_cell_center_grid(p)+it.index)+=weight_cell_center_grid(p)(it.index);}}
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
-        if(total_weight(it.index)>weight_eps){
+        if(total_weight(it.index)>(T)0){
             pressure_rasterized(it.index)/=total_weight(it.index);
             one_over_lambda_J(it.index)/=total_weight(it.index);}
         else{
             pressure_rasterized(it.index)=(T)0;
             one_over_lambda_J(it.index)=(T)0;}}
 
-    LOG::cout<<"DEBUG: rasterized pressure: "<<pressure_rasterized<<std::endl;
-    LOG::cout<<"DEBUG: rasterizedc one_over_lambda_J: "<<one_over_lambda_J<<std::endl;
+    // LOG::cout<<"DEBUG: rasterized pressure: "<<pressure_rasterized<<std::endl;
+    // LOG::cout<<"DEBUG: rasterizedc one_over_lambda_J: "<<one_over_lambda_J<<std::endl;
 }
 
 //#####################################################################
@@ -184,20 +183,14 @@ Rasterize_Pressure_And_One_Over_Lambda_J()
 template<class TV> void MPM_PROJECTION<TV>::
 Build_Velocity_Divergence()
 {
-    T div_u_eps=(T)1e-7;
     max_div=(T)0;
-    div_u.Fill((T)0);
+    div_u.Fill((T)0.0);
     T one_over_h=(T)1/mac_grid.dX.Min();
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
         if(!cell_dirichlet(it.index)){
-            for(int axis=0;axis<TV::m;axis++)
-                div_u(it.index)+=face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))
-                    -face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)));
-            div_u(it.index)*=one_over_h;
-            
-            // get rid of super small div_u
-            if(abs(div_u(it.index))<div_u_eps) div_u(it.index)=(T)0;}
-
+            for(int axis=0;axis<TV::m;axis++){
+                if(face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))-face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))!=(T)0){
+                    div_u(it.index)+=face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index)))*one_over_h-face_velocities(FACE_INDEX<TV::m>(axis,mac_grid.First_Face_Index_In_Cell(axis,it.index)))*one_over_h;}}}
         else div_u(it.index)=(T)0; // dirichlet p cells
         if(!cell_neumann(it.index) && abs(div_u(it.index))>max_div) // record maximum divergence on non neumann cells
             max_div=abs(div_u(it.index));}
@@ -240,21 +233,21 @@ Solve_For_Pressure()
         if(!cell_dirichlet(it.index) && !cell_neumann(it.index)){ // cell is fluid
             rhs.v(it.index)-=(one_over_dt*one_over_lambda_J(it.index)*pressure_rasterized(it.index));}}
     Fix_RHS_Neumann_Cells(rhs.v);
-    x.v=rhs.v;
+    x.v.Fill((T)0);
     system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
-    KRYLOV_SOLVER<T>* solver=&cr;
+    KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=false;
-    solver->Solve(system,x,rhs,vectors,(T)1e-11,0,1000);
+    solver->Solve(system,x,rhs,vectors,(T)1e-6,0,1000);
     pressure_unknown=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
 
     // get rid of super small pressure
-    T pressure_eps=(T)1e-8;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+mac_grid.counts));it.Valid();it.Next()){
-        if(abs(pressure_unknown(it.index))<pressure_eps){
-            pressure_unknown(it.index)=(T)0;}}
+//    T pressure_eps=(T)1e-8;
+//    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+mac_grid.counts));it.Valid();it.Next()){
+//        if(abs(pressure_unknown(it.index))<pressure_eps){
+//            pressure_unknown(it.index)=(T)0;}}
 }
 
 //#####################################################################
@@ -264,7 +257,6 @@ Solve_For_Pressure()
 template<class TV> void MPM_PROJECTION<TV>::
 Do_Projection()
 {
-    LOG::cout<<"Maximum velocity divergence before projection: "<<max_div<<std::endl;        
     T one_over_h=(T)1/mac_grid.dX.Min();
     for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_index=iterator.Full_Index();
@@ -284,9 +276,10 @@ Do_Projection()
             FACE_INDEX<TV::m> second_face(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index));
             face_velocities(first_face)=T(0);
             face_velocities(second_face)=T(0);}}
+
     // check whether divergence free
-    Build_Velocity_Divergence();
-    LOG::cout<<"Maximum velocity divergence after projection: "<<max_div<<std::endl;
+    // Build_Velocity_Divergence();
+    // LOG::cout<<"Maximum velocity divergence after projection: "<<max_div<<std::endl;
 }
 
 //#####################################################################

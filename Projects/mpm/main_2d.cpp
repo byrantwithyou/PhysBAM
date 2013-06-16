@@ -93,16 +93,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.2,-0.2),TV(0.2,0.2)),particle_exclude_radius);
             
-            // sim.particles.Resize(5);
-            // sim.particles.X(0)=sim.particles.Xm(0)=TV(0.027,0.036);
-            // sim.particles.X(1)=sim.particles.Xm(1)=TV(0.032,0.041);
-            // sim.particles.X(2)=sim.particles.Xm(2)=TV(0.022,0.051);
-            // sim.particles.X(3)=sim.particles.Xm(3)=TV(0.032,0.051);
-            // sim.particles.X(4)=sim.particles.Xm(4)=TV(0.02,0.05);
-            
             int c1=sim.particles.number;
             sim.particles.Set_Material_Properties(0,c1,
-                (T)8*density_scale/1000, // mass per particle
+                (T)8*density_scale/c1, // mass per particle
                 80.0*ym/(2.0*(1.0+pr)), // mu
                 80.0*ym*pr/((1.0+pr)*(1.0-2.0*pr)), // lambda
                 true,0); // compress, pressure
@@ -121,9 +114,10 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 5000, // visco_tau
                 0); // visco_kappa
             sim.particles.Set_Initial_State(0,c1,
-                MATRIX<T,TV::m>::Identity_Matrix(), // Fe
+                MATRIX<T,TV::m>(2,0,0,1), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
-                TV(1,2)); // initial velocity
+                TV(0,0)); // initial velocity
+            for(int p=0;p<c1;p++) sim.particles.X(p)=MATRIX<T,TV::m>(2,0,0,1)*sim.particles.Xm(p);
             
             sim.use_gravity=false;
 
@@ -132,7 +126,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         default: PHYSBAM_FATAL_ERROR("Missing test");};
 
     sim.Initialize();
-    if(abs(sim.grid.dX(0)-sim.grid.dX(1))>(T)1e-10){
+    if(abs(sim.grid.dX(0)-sim.grid.dX(1))>(T)1e-15){
         LOG::cout<<"grid not uniform! dx: "<<sim.grid.dX<<std::endl;
         exit(0);}
 
@@ -284,8 +278,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
         if(sim.frame==0) sim.Compute_Particle_Volumes_And_Densities(0,sim.particles.number);
 
-        // sim.Compute_Grid_Forces();  
-        sim.node_force.Fill(TV());
+        sim.Compute_Grid_Forces();
+        // sim.node_force.Fill(TV());
         
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
         sim.Update_Velocities_On_Grid();
@@ -294,9 +288,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         std::string title=STRING_UTILITIES::string_sprintf("TIME STEP %d Before MPM Solve",f);
         Flush_Frame<TV>(title.c_str());
 
-        sim.Solve_The_Linear_System_Explicit(); // so far sim.node_V is achieved via MPM
+        sim.Solve_The_Linear_System(); // so far sim.node_V is achieved via MPM
         // LOG::cout<<"Momentum - grid (after linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
-
 
         // draw particles
         for(int i=0;i<sim.particles.X.m;i++){
@@ -378,12 +371,13 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             projection.Build_Weights_And_Grad_Weights_For_Cell_Centers();
             projection.Rasterize_Pressure_And_One_Over_Lambda_J();
             projection.Build_Velocity_Divergence();
-
+            LOG::cout<<"Maximum velocity divergence before projection: "<<projection.max_div<<std::endl;
             // LOG::cout<<"div_u"<<projection.div_u<<std::endl;
 
             projection.Solve_For_Pressure();
             projection.Do_Projection();
-
+            projection.Build_Velocity_Divergence();
+            LOG::cout<<"Maximum velocity divergence after projection: "<<projection.max_div<<std::endl;
 
             // draw particles
             for(int i=0;i<sim.particles.X.m;i++){
@@ -447,7 +441,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             title=STRING_UTILITIES::string_sprintf("TIME STEP %d After Velocity Face To Corner",f);
             Flush_Frame<TV>(title.c_str());
 
-            // projection.Pressure_Back_To_Particles((T)0);
+            projection.Pressure_Back_To_Particles((T)0);
             
             // LOG::cout<<"particle pressure:"<<sim.particles.pressure<<std::endl;
             // LOG::cout<<"particle one_over_lambda_J:"<<sim.particles.one_over_lambda_J<<std::endl;
@@ -455,7 +449,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         }
 
         sim.Update_Deformation_Gradient();
-        LOG::cout<<sim.particles.Fe<<std::endl;
+        // LOG::cout<<sim.particles.Fe<<std::endl;
 
         sim.Update_Particle_Velocities();
         if(!use_projection) sim.Particle_Based_Body_Collisions();

@@ -115,12 +115,11 @@ Build_Pressure_And_One_Over_Lambda_J()
 #pragma omp parallel for schedule(static)
     for(int p=0;p<particles.number;p++){
         if(particles.compress(p)){
-            T J_lazy=(abs(Je(p)-1)<1e-8)?1:Je(p);
-                          
-            particles.pressure(p)=particles.lambda(p)*(J_lazy-1);
+            T J_lazy=Je(p);
+            // particles.pressure(p)=particles.lambda(p)*(J_lazy-1);
             particles.one_over_lambda_J(p)=(T)1.0/(particles.lambda(p)*J_lazy);}
         else{
-            particles.pressure(p)=(T)0;
+            // particles.pressure(p)=(T)0;
             particles.one_over_lambda_J(p)=(T)0;}}
  }
     
@@ -143,8 +142,8 @@ Rasterize_Particle_Data_To_The_Grid()
     for(int p=0;p<particles.number;p++){
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
             TV_INT ind=influence_corner(p)+it.index;
-            // if(node_mass(ind)>min_mass) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p)(it.index)/node_mass(ind);}}
-            if(node_mass(ind)!=0) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p)(it.index)/node_mass(ind);}}
+            if(node_mass(ind)>min_mass) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p)(it.index)/node_mass(ind);}}
+            // if(node_mass(ind)!=0) node_V(ind)+=particles.V(p)*particles.mass(p)*weight(p)(it.index)/node_mass(ind);}}
 }
 //#####################################################################
 // Function Compute_Particle_Volumes_And_Densities
@@ -290,7 +289,7 @@ Solve_The_Linear_System()
     if(test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
-    KRYLOV_SOLVER<T>* solver=&cr;
+    KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=false;
     if(dump_matrix){ // load M-1.txt;load m-1.txt;mm=reshape([m m]',rows(M),1);R=diag(mm)*M;max(max(abs(R-R')))
         LOG::cout<<"solve id "<<solve_id<<std::endl;
@@ -365,10 +364,10 @@ Update_Deformation_Gradient()
              MATRIX<T,TV::m> dFe=dt*grad_vp*particles.Fe(p);
              
              // get rid of numerically small dFe
-             for(int d1=0;d1<TV::m;d1++)
-                 for(int d2=0;d2<TV::m;d2++)
-                     if(abs(dFe(d1,d2))<(T)1e-4)
-                         dFe(d1,d2)=(T)0;
+//             for(int d1=0;d1<TV::m;d1++)
+//                 for(int d2=0;d2<TV::m;d2++)
+//                     if(abs(dFe(d1,d2))<(T)1e-4)
+//                         dFe(d1,d2)=(T)0;
              
              particles.Fe(p)=particles.Fe(p)+dFe;}
 

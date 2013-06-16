@@ -113,11 +113,6 @@ Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> void MPM_POISSON_SYSTEM<TV>::
 Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
 {
-    PHYSBAM_FATAL_ERROR();
-    const ARRAY<T,TV_INT>& rr=debug_cast<const MPM_POISSON_VECTOR<TV>&>(r).v;
-    ARRAY<T,TV_INT>& zz=debug_cast<MPM_POISSON_VECTOR<TV>&>(z).v;
-    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+proj.mac_grid.counts));it.Valid();it.Next())
-        zz(it.index)=jacobi_scales(it.index)*rr(it.index);
 }
 //#####################################################################
 template class MPM_POISSON_SYSTEM<VECTOR<float,2> >;
