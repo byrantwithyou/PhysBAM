@@ -114,12 +114,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 5000, // visco_tau
                 0); // visco_kappa
             sim.particles.Set_Initial_State(0,c1,
-                MATRIX<T,TV::m>(2,0,0,1), // Fe
+                MATRIX<T,TV::m>(1,0,0,1), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
-                TV(0,0)); // initial velocity
-            for(int p=0;p<c1;p++) sim.particles.X(p)=MATRIX<T,TV::m>(2,0,0,1)*sim.particles.Xm(p);
+                TV(-1,1.8)); // initial velocity
+            // for(int p=0;p<c1;p++) sim.particles.X(p)=MATRIX<T,TV::m>(2,0,0,1)*sim.particles.Xm(p);
             
-            sim.use_gravity=false;
+            sim.use_gravity=true;
 
             break;}
      
@@ -278,8 +278,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
         if(sim.frame==0) sim.Compute_Particle_Volumes_And_Densities(0,sim.particles.number);
 
-        sim.Compute_Grid_Forces();
-        // sim.node_force.Fill(TV());
+        // sim.Compute_Grid_Forces();
+        sim.node_force.Fill(TV());
         
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
         sim.Update_Velocities_On_Grid();
@@ -288,7 +288,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         std::string title=STRING_UTILITIES::string_sprintf("TIME STEP %d Before MPM Solve",f);
         Flush_Frame<TV>(title.c_str());
 
-        sim.Solve_The_Linear_System(); // so far sim.node_V is achieved via MPM
+        sim.Solve_The_Linear_System_Explicit(); // so far sim.node_V is achieved via MPM
         // LOG::cout<<"Momentum - grid (after linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
 
         // draw particles
@@ -441,7 +441,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             title=STRING_UTILITIES::string_sprintf("TIME STEP %d After Velocity Face To Corner",f);
             Flush_Frame<TV>(title.c_str());
 
-            projection.Pressure_Back_To_Particles((T)0);
+            projection.Pressure_Back_To_Particles((T)0.95);
             
             // LOG::cout<<"particle pressure:"<<sim.particles.pressure<<std::endl;
             // LOG::cout<<"particle one_over_lambda_J:"<<sim.particles.one_over_lambda_J<<std::endl;

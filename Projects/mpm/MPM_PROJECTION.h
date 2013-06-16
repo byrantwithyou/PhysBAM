@@ -22,10 +22,10 @@ class MPM_PROJECTION
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     // Used for rasterizing pressure and one_over_lambda_J to cell centers
-    enum WORKAROUND{basis_function_order=1,IN=basis_function_order+1};
-    MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function;
-    // enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
-    // MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function;
+//    enum WORKAROUND{basis_function_order=1,IN=basis_function_order+1};
+//    MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function;
+    enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
+    MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function;
 
     MPM_SIMULATION<TV>& sim;
 

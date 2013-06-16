@@ -128,6 +128,7 @@ Velocities_Corners_To_Faces_MPM_Style()
                 face_momenta(face_index)+=weight*sim.node_mass(node)*sim.node_V(node)(axis);}}}
     for(int i=0;i<faces_got_rasterized.m;i++){
         FACE_INDEX<TV::m> face_index=faces_got_rasterized(i);
+        // face_masses(face_index)=(T)1; // DEBUG
         if(face_masses(face_index)!=(T)0){
             face_velocities(face_index)=face_momenta(face_index)/face_masses(face_index);}
     }
@@ -237,9 +238,9 @@ Solve_For_Pressure()
     system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
-    KRYLOV_SOLVER<T>* solver=&cg;
+    KRYLOV_SOLVER<T>* solver=&cr;
     solver->print_residuals=false;
-    solver->Solve(system,x,rhs,vectors,(T)1e-6,0,1000);
+    solver->Solve(system,x,rhs,vectors,(T)1e-20,0,1000);
     pressure_unknown=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
 
