@@ -26,8 +26,8 @@ class MPM_SIMULATION
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
-    enum WORKAROUND{basis_function_order=1,IN=basis_function_order+1};
-    // enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
+    // enum WORKAROUND{basis_function_order=1,IN=basis_function_order+1};
+    enum WORKAROUND{basis_function_order=3,IN=basis_function_order+1};
 
     //#################################################################
     // need external input
@@ -54,8 +54,8 @@ public:
     ARRAY<TV_INT> influence_corner;
     ARRAY<ARRAY<T,TV_INT> > weight;
     ARRAY<ARRAY<TV,TV_INT> > grad_weight;
-    MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function;
-    // MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function;
+    // MPM_LINEAR_BASIS<TV,basis_function_order> grid_basis_function;
+    MPM_CUBIC_B_SPLINE<TV,basis_function_order> grid_basis_function;
     MPM_CONSTITUTIVE_MODEL<TV> constitutive_model;
     ARRAY<T,TV_INT> node_mass;
     ARRAY<T,TV_INT> node_volume;
@@ -74,6 +74,7 @@ public:
 
     void Build_Weights_And_Grad_Weights();
     void Build_Helper_Structures_For_Constitutive_Model();
+    void Build_Pressure_And_One_Over_Lambda_J();
     void Rasterize_Particle_Data_To_The_Grid();
     void Compute_Particle_Volumes_And_Densities(int starting_index,int count);
     void Compute_Grid_Forces();

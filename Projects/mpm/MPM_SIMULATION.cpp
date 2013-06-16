@@ -104,9 +104,26 @@ Build_Helper_Structures_For_Constitutive_Model()
         constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),particles.Fp(p),Je(p),Re(p),Se(p));
         T lame_scale=exp(xi*(1-particles.Fp(p).Determinant()));
         particles.mu(p)=particles.mu0(p)*lame_scale;
-        particles.lambda(p)=particles.lambda0(p)*lame_scale;
-        particles.one_over_lambda_J(p)=(particles.compress(p))?((T)1.0/(particles.lambda(p)*Je(p))):(T)0;}
+        particles.lambda(p)=particles.lambda0(p)*lame_scale;}
 }
+//#####################################################################
+// Function Build_Pressure_And_One_Over_Lambda_J
+//#####################################################################
+template<class TV> void MPM_SIMULATION<TV>::
+Build_Pressure_And_One_Over_Lambda_J()
+{
+#pragma omp parallel for schedule(static)
+    for(int p=0;p<particles.number;p++){
+        if(particles.compress(p)){
+            T J_lazy=(abs(Je(p)-1)<1e-8)?1:Je(p);
+                          
+            particles.pressure(p)=particles.lambda(p)*(J_lazy-1);
+            particles.one_over_lambda_J(p)=(T)1.0/(particles.lambda(p)*J_lazy);}
+        else{
+            particles.pressure(p)=(T)0;
+            particles.one_over_lambda_J(p)=(T)0;}}
+ }
+    
 //#####################################################################
 // Function Rasterize_Particle_Data_To_The_Grid
 //#####################################################################
@@ -345,7 +362,17 @@ Update_Deformation_Gradient()
              for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
                  TV_INT ind=influence_corner(p)+it.index;
                  grad_vp+=MATRIX<T,TV::m>::Outer_Product(node_V(ind),grad_weight(p)(it.index));}
-             particles.Fe(p)=particles.Fe(p)+dt*grad_vp*particles.Fe(p);}}
+             MATRIX<T,TV::m> dFe=dt*grad_vp*particles.Fe(p);
+             
+             // get rid of numerically small dFe
+             for(int d1=0;d1<TV::m;d1++)
+                 for(int d2=0;d2<TV::m;d2++)
+                     if(abs(dFe(d1,d2))<(T)1e-4)
+                         dFe(d1,d2)=(T)0;
+             
+             particles.Fe(p)=particles.Fe(p)+dFe;}
+
+     }
 }
 //#####################################################################
 // Function Update_Particle_Velocities

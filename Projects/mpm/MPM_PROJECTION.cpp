@@ -80,11 +80,6 @@ Identify_Dirichlet_Cells()
     for(int p=0;p<sim.particles.number;p++){
         TV_INT cell=mac_grid.Cell(sim.particles.X(p),0);
         cell_dirichlet(cell)=false;
-
-        // TV_INT cell=cell_center_grid.Cell(sim.particles.X(p),0);
-        // for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+IN));it.Valid();it.Next()){
-        //     cell_dirichlet(cell+it.index)=false;}
-
     }
 }
 
@@ -174,7 +169,10 @@ Rasterize_Pressure_And_One_Over_Lambda_J()
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
         if(total_weight(it.index)>weight_eps){
             pressure_rasterized(it.index)/=total_weight(it.index);
-            one_over_lambda_J(it.index)/=total_weight(it.index);}}
+            one_over_lambda_J(it.index)/=total_weight(it.index);}
+        else{
+            pressure_rasterized(it.index)=(T)0;
+            one_over_lambda_J(it.index)=(T)0;}}
 
     LOG::cout<<"DEBUG: rasterized pressure: "<<pressure_rasterized<<std::endl;
     LOG::cout<<"DEBUG: rasterizedc one_over_lambda_J: "<<one_over_lambda_J<<std::endl;
@@ -246,7 +244,7 @@ Solve_For_Pressure()
     system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
-    KRYLOV_SOLVER<T>* solver=&cg;
+    KRYLOV_SOLVER<T>* solver=&cr;
     solver->print_residuals=false;
     solver->Solve(system,x,rhs,vectors,(T)1e-11,0,1000);
     pressure_unknown=x.v;

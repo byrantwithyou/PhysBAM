@@ -107,11 +107,11 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 80.0*ym*pr/((1.0+pr)*(1.0-2.0*pr)), // lambda
                 true,0); // compress, pressure
             
-           // sim.particles.Set_Material_Properties(0,c1,
-           //                                       (T)8*density_scale/1000, // mass per particle
-           //                                       0, // mu
-           //                                       0, // lambda
-           //                                       false,0); // compress, pressure
+//           sim.particles.Set_Material_Properties(0,c1,
+//                                                 (T)8*density_scale/1000, // mass per particle
+//                                                 0, // mu
+//                                                 0, // lambda
+//                                                 false,0); // compress, pressure
             
             sim.particles.Set_Plasticity(0,c1,
                 false,-1000,1.2, // plasticity_yield
@@ -260,9 +260,10 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         LOG::cout<<"MPM TIMESTEP "<<f<<std::endl;
         sim.Build_Weights_And_Grad_Weights();
         sim.Build_Helper_Structures_For_Constitutive_Model();
+        sim.Build_Pressure_And_One_Over_Lambda_J();
         LOG::cout<<"Momentum - particles:"<<sim.Get_Total_Momentum_On_Particles()<<std::endl;
 
-        LOG::cout<<"particle_velocity" <<sim.particles.V<<std::endl;
+        // LOG::cout<<"particle_velocity" <<sim.particles.V<<std::endl;
 
         // draw particles
         for(int i=0;i<sim.particles.X.m;i++){
@@ -278,8 +279,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));
         }
 
-        LOG::cout<<"Momentum - grid (before linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
-        LOG::cout<<"node velocity"<<sim.node_V<<std::endl;
+        // LOG::cout<<"Momentum - grid (before linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
+        // LOG::cout<<"node velocity"<<sim.node_V<<std::endl;
 
         if(sim.frame==0) sim.Compute_Particle_Volumes_And_Densities(0,sim.particles.number);
 
@@ -294,7 +295,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         Flush_Frame<TV>(title.c_str());
 
         sim.Solve_The_Linear_System_Explicit(); // so far sim.node_V is achieved via MPM
-        LOG::cout<<"Momentum - grid (after linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
+        // LOG::cout<<"Momentum - grid (after linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
 
 
         // draw particles
@@ -341,7 +342,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             projection.Velocities_Corners_To_Faces_MPM_Style();
 
 
-            LOG::cout<<"face velocity from node"<<projection.face_velocities<<std::endl;
+            // LOG::cout<<"face velocity from node"<<projection.face_velocities<<std::endl;
 
             // draw particles
             for(int i=0;i<sim.particles.X.m;i++){
@@ -378,7 +379,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             projection.Rasterize_Pressure_And_One_Over_Lambda_J();
             projection.Build_Velocity_Divergence();
 
-            LOG::cout<<"div_u"<<projection.div_u<<std::endl;
+            // LOG::cout<<"div_u"<<projection.div_u<<std::endl;
 
             projection.Solve_For_Pressure();
             projection.Do_Projection();
@@ -446,13 +447,15 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             title=STRING_UTILITIES::string_sprintf("TIME STEP %d After Velocity Face To Corner",f);
             Flush_Frame<TV>(title.c_str());
 
-            projection.Pressure_Back_To_Particles((T)0);
-            LOG::cout<<"particle pressure:"<<sim.particles.pressure<<std::endl;
-            LOG::cout<<"particle one_over_lambda_J:"<<sim.particles.one_over_lambda_J<<std::endl;
+            // projection.Pressure_Back_To_Particles((T)0);
+            
+            // LOG::cout<<"particle pressure:"<<sim.particles.pressure<<std::endl;
+            // LOG::cout<<"particle one_over_lambda_J:"<<sim.particles.one_over_lambda_J<<std::endl;
 
         }
 
         sim.Update_Deformation_Gradient();
+        LOG::cout<<sim.particles.Fe<<std::endl;
 
         sim.Update_Particle_Velocities();
         if(!use_projection) sim.Particle_Based_Body_Collisions();
