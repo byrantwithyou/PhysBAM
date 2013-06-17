@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
@@ -125,18 +126,19 @@ public:
 
     void Advance_One_Time_Step_Position(const T dt)
     {
-        NEWTONS_METHOD<T> nm;
-        nm.max_iterations=1000;
-
         MINIMIZATION_OBJECTIVE<TV> obj(solid_body_collection,dt,time);
         KRYLOV_VECTOR_BASE<T>* x0 = obj.x0.Clone_Default();
         *x0=obj.x0;
         obj.Test(*x0,obj);
-        
-        bool converged=nm.Newtons_Method(obj,obj,*x0);
-        delete x0;
 
+        NEWTONS_METHOD<T> nm;
+        nm.max_iterations=100000;
+        nm.max_krylov_iterations=2000;
+        nm.krylov_tolerance=1e-3;
+        nm.fail_on_krylov_not_converged=false;
+        bool converged=nm.Newtons_Method(obj,obj,*x0);
         PHYSBAM_ASSERT(converged);
+        delete x0;
     }
 };
 
