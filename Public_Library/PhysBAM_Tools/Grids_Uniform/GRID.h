@@ -295,7 +295,7 @@ public:
     return GRID<TV>(numbers_of_cells,RANGE<TV>(domain.min_corner+offset,domain.max_corner-offset));}
 
     GRID<TV> Get_Regular_Grid_At_MAC_Positions() const
-    {assert(Is_MAC_Grid());TV expansion=(T).5*dX;return GRID<TV>(counts,RANGE<TV>(domain.min_corner+expansion,domain.max_corner-expansion));}
+    {assert(Is_MAC_Grid());return Get_Center_Grid();}
 
     GRID<TV> Get_MAC_Grid_At_Regular_Positions() const
     {assert(!Is_MAC_Grid());TV expansion=(T).5*dX;return GRID<TV>(counts,RANGE<TV>(domain.min_corner-expansion,domain.max_corner+expansion),true);}
