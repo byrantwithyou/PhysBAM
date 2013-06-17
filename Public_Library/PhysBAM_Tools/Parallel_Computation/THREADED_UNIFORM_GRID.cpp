@@ -95,7 +95,7 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
     // fill in ghost process_ranks for periodic domains
     if(periodic!=TV_BOOL()) for(NODE_ITERATOR<TV> iterator(process_grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
         TV_INT node=iterator.Node_Index(),wrapped_node=node;
-        for(int axis=0;axis<T_GRID::dimension;axis++) if(periodic[axis]) wrapped_node[axis]=(node[axis]+process_grid.Counts()[axis])%process_grid.Counts()[axis];
+        for(int axis=0;axis<T_GRID::dimension;axis++) if(periodic[axis]) wrapped_node[axis]=(node[axis]+process_grid.counts[axis])%process_grid.counts[axis];
         process_ranks(node)=process_ranks(wrapped_node);}
     all_coordinates.Resize(number_of_processes);
     for(NODE_ITERATOR<TV> iterator(process_grid);iterator.Valid();iterator.Next())

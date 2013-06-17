@@ -80,7 +80,7 @@ Average_Velocities_From_Fine_To_Coarse(ARRAY<T,FACE_INDEX<TV::dimension> >& coar
     for(FACE_ITERATOR<TV> iterator(coarse_grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
         T factor=0;
         if(iterator.First_Cell_Index()(axis)>0){factor++;}
-        if(iterator.Second_Cell_Index()(axis)<=coarse_grid.Counts()(axis)){factor++;}
+        if(iterator.Second_Cell_Index()(axis)<=coarse_grid.counts(axis)){factor++;}
         coarse_face_velocities.Component(axis)(iterator.Face_Index())*=(T)(factor==1?scale_face_inverse:0.5*scale_face_inverse);}
 }
 //#####################################################################
@@ -102,7 +102,7 @@ Set_Beta_Face_For_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velociti
         else{
             int factor=0;
             if(iterator.First_Cell_Index()(iterator.Axis())>0){factor++;}
-            if(iterator.Second_Cell_Index()(iterator.Axis())<=coarse_grid.Counts()(iterator.Axis())){factor++;}
+            if(iterator.Second_Cell_Index()(iterator.Axis())<=coarse_grid.counts(iterator.Axis())){factor++;}
             beta_face.Component(iterator.Axis())(iterator.Face_Index())*=(T)((factor==1)?scale_face_inverse:0.5*scale_face_inverse);}}
 }
 //#####################################################################

@@ -256,9 +256,6 @@ public:
     RANGE<TV> Ghost_Domain(const int number_of_ghost_cells) const
     {TV expand(dX*(T)number_of_ghost_cells);return RANGE<TV>(domain.min_corner-expand,domain.max_corner+expand);}
 
-    const TV_INT& Counts() const
-    {return counts;}
-
     RANGE<TV_INT> Domain_Indices(const int ghost_cells=0) const
     {return RANGE<TV_INT>(TV_INT()-ghost_cells,counts+ghost_cells);}
 
@@ -303,9 +300,6 @@ public:
     GRID<VECTOR<T,TV::dimension-1> > Remove_Dimension(int dimension) const
     {return GRID<VECTOR<T,TV::dimension-1> >(counts.Remove_Index(dimension),domain.Remove_Dimension(dimension),Is_MAC_Grid());}
 
-    GRID<VECTOR<T,TV::dimension-1> > Get_Horizontal_Grid() const
-    {return Remove_Dimension(1);}
-
     GRID<VECTOR<T,1> > Get_1D_Grid(const int axis) const
     {return GRID<VECTOR<T,1> >(VECTOR<int,1>(counts[axis]),RANGE<VECTOR<T,1> >(VECTOR<T,1>(domain.Minimum_Corner()[axis]),VECTOR<T,1>(domain.Maximum_Corner()[axis])),Is_MAC_Grid());}
 
@@ -317,11 +311,11 @@ public:
     {static const VECTOR<int,2> neighbor_offset[4]={VECTOR<int,2>(-1,0),VECTOR<int,2>(1,0),VECTOR<int,2>(0,-1),VECTOR<int,2>(0,1)};
     assert((unsigned)i<4);return index+neighbor_offset[i];}
 
-    static VECTOR<int,1> Node_Neighbor(const VECTOR<int,1>& index,const int i) // i=1 to 2
+    static VECTOR<int,1> Node_Neighbor(const VECTOR<int,1>& index,const int i) // i=0 to 1
     {static const VECTOR<int,1> neighbor_offset[2]={VECTOR<int,1>(-1),VECTOR<int,1>(1)};
     assert((unsigned)i<2);return index+neighbor_offset[i];}
 
-    static VECTOR<int,0> Node_Neighbor(const VECTOR<int,0>& index,const int i) // i=1
+    static VECTOR<int,0> Node_Neighbor(const VECTOR<int,0>& index,const int i) // i=0
     {assert(0==i);return index;}
 
     void Cells_Neighboring_Node(const VECTOR<int,3>& node,VECTOR<int,3> cells[8]) const

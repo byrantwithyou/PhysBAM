@@ -192,7 +192,7 @@ Set_Levelset_Boundary_Conditions(const GRID<TV>& levelset_grid,ARRAY<T,FACE_INDE
         if(!Contains_Outside(iterator.Cell_Index(),levelset_phi,buffer)) for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
             TV_INT offset=(axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT::Axis_Vector(axis));
             TV_INT face=iterator.Cell_Index()+(axis_side==0?TV_INT():TV_INT::Axis_Vector(axis));
-            if(domain_boundary(axis)(axis_side) && ((iterator.Cell_Index()(axis)+offset(axis))<1 || (iterator.Cell_Index()(axis)+offset(axis))>coarse_grid.Counts()(axis))) continue;
+            if(domain_boundary(axis)(axis_side) && ((iterator.Cell_Index()(axis)+offset(axis))<1 || (iterator.Cell_Index()(axis)+offset(axis))>coarse_grid.counts(axis))) continue;
             TV_INT adjacent_cell=iterator.Cell_Index()+offset;
             bool adjacent_outside=false;
             if(Contains_Outside(adjacent_cell,levelset_phi,buffer)) adjacent_outside=true;

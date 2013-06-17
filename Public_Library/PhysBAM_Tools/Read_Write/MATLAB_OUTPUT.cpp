@@ -70,7 +70,7 @@ Write_Header_File(const std::string& file_name,const ARRAY<T,VECTOR<int,1> >& x,
 template<class T> void MATLAB_OUTPUT::
 Write_Header_File(const std::string& file_name,const GRID<VECTOR<T,2> >& grid,const int stepnumber)
 {
-    int m=grid.Counts().x,n=grid.Counts().y;
+    int m=grid.counts.x,n=grid.counts.y;
     ARRAY<T,VECTOR<int,2> > x(0,m,0,n),y(0,m,0,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++){x(i,j)=grid.X(VECTOR<int,2>(i,j)).x;y(i,j)=grid.X(VECTOR<int,2>(i,j)).y;}
     Write_Header_File(file_name,x,y,stepnumber);
 }
@@ -95,7 +95,7 @@ Write_Header_File(const std::string& file_name,const ARRAY<T,VECTOR<int,2> >& x,
 template<class T> void MATLAB_OUTPUT::
 Write_Header_File(const std::string& file_name,const GRID<VECTOR<T,3> >& grid,const int stepnumber)
 {
-    int m=grid.Counts().x,n=grid.Counts().y,mn=grid.Counts().z;
+    int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;
     ARRAY<T,VECTOR<int,3> > x(0,m,0,n,0,mn),y(0,m,0,n,0,mn),z(0,m,0,n,0,mn);
     for(RANGE_ITERATOR<3> it(grid.Domain_Indices());it.Valid();it.Next()){x(it.index)=grid.X(it.index).x;y(it.index)=grid.X(it.index).y;z(it.index)=grid.X(it.index).z;}
     for(RANGE_ITERATOR<3> it(grid.Domain_Indices());it.Valid();it.Next()){x(it.index)=grid.X(it.index).x;y(it.index)=grid.X(it.index).y;z(it.index)=grid.X(it.index).z;}

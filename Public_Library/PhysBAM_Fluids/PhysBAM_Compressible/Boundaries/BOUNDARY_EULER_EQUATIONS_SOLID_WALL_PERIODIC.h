@@ -118,14 +118,13 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_
 {
     //TODO: get rid of the helper functions
     //Fill_Ghost_Cells_Helper(grid,u,u_ghost,dt,time,number_of_ghost_cells);
-    TV_INT counts=grid.Counts();
     T_ARRAYS_DIMENSION_BASE::Put(u,u_ghost); // interior
     VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
 
     for(int axis=0;axis<GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(!periodic[axis]) Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));
         else for(CELL_ITERATOR<TV> iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-                int period=repeats_at_last_node[axis]?counts[axis]-1:counts[axis];
+                int period=repeats_at_last_node[axis]?grid.counts[axis]-1:grid.counts[axis];
                 int axis_periodic_node=wrap(cell[axis],period);
                 TV_INT periodic_node=cell;periodic_node[axis]=axis_periodic_node;
                 u_ghost(cell)=u_ghost(periodic_node);}}

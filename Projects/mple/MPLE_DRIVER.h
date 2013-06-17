@@ -266,8 +266,8 @@ public:
     {
         TV result;
         for(int i=0;i<TV::m;i++){
-            if(input(i)<grid.Counts()(i)/2+1) result(i)=input(i);
-            else result(i)=input(i)-grid.Counts()(i);}
+            if(input(i)<grid.counts(i)/2+1) result(i)=input(i);
+            else result(i)=input(i)-grid.counts(i);}
         return result;
     }
 

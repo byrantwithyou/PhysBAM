@@ -35,7 +35,7 @@ Write_Output(PARSE_ARGS& parse_args)
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     GRID<TV> coarse_grid;FILE_UTILITIES::Read_From_File<T>(input_directory1+"/common/grid",coarse_grid);
     GRID<TV> grid;FILE_UTILITIES::Read_From_File<T>(input_directory2+"/common/grid",grid);
-    int scale=grid.Counts().x/coarse_grid.Counts().x;
+    int scale=grid.counts.x/coarse_grid.counts.x;
     ARRAY<T,TV_INT> density_coarse;FILE_UTILITIES::Read_From_File<T>(input_directory1+"/"+f+"/density",density_coarse);
     ARRAY<T,TV_INT> density;FILE_UTILITIES::Read_From_File<T>(input_directory2+"/"+f+"/density",density);
     RANGE<TV> range(TV()+start,TV()+end);
