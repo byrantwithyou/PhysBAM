@@ -98,7 +98,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 (T)8*density_scale/c1, // mass per particle
                 80.0*ym/(2.0*(1.0+pr)), // mu
                 80.0*ym*pr/((1.0+pr)*(1.0-2.0*pr)), // lambda
-                true,0); // compress, pressure
+                false,0); // compress, pressure
             
 //           sim.particles.Set_Material_Properties(0,c1,
 //                                                 (T)8*density_scale/1000, // mass per particle
@@ -248,7 +248,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     Flush_Frame<TV>("mpm");
 
-    for(int f=1;f<=2003;f++){
+    for(int f=0;f<=2003;f++){
 
         TIMING_START;
         LOG::cout<<"MPM TIMESTEP "<<f<<std::endl;
@@ -259,50 +259,48 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
         // LOG::cout<<"particle_velocity" <<sim.particles.V<<std::endl;
 
-        // draw particles
-        for(int i=0;i<sim.particles.X.m;i++){
-            Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.particles.V(i));
-        }
-
         sim.Rasterize_Particle_Data_To_The_Grid();
         
-        // draw node velocity
-        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
-            Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));
-        }
+        // draw particles
+//        for(int i=0;i<sim.particles.X.m;i++){
+//            Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
+//            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.particles.V(i));
+//        }
+//        // draw node velocity
+//        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
+//            Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
+//            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));
+//        }
+//        std::string title=STRING_UTILITIES::string_sprintf("TIME STEP %d Before MPM Solve",f);
+//        Flush_Frame<TV>(title.c_str());
 
         // LOG::cout<<"Momentum - grid (before linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
         // LOG::cout<<"node velocity"<<sim.node_V<<std::endl;
 
         if(sim.frame==0) sim.Compute_Particle_Volumes_And_Densities(0,sim.particles.number);
 
-        // sim.Compute_Grid_Forces();
+        sim.Compute_Grid_Forces();
         sim.node_force.Fill(TV());
         
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
         sim.Update_Velocities_On_Grid();
         if(!use_projection) sim.Grid_Based_Body_Collisions();
 
-        std::string title=STRING_UTILITIES::string_sprintf("TIME STEP %d Before MPM Solve",f);
-        Flush_Frame<TV>(title.c_str());
-
-        sim.Solve_The_Linear_System_Explicit(); // so far sim.node_V is achieved via MPM
+        sim.Solve_The_Linear_System(); // so far sim.node_V is achieved via MPM
         // LOG::cout<<"Momentum - grid (after linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
 
-        // draw particles
-        for(int i=0;i<sim.particles.X.m;i++){
-            Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.particles.V(i));
-        }
-        // draw node velocity
-        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
-            Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));
-        }
-        title=STRING_UTILITIES::string_sprintf("TIME STEP %d After MPM Solve",f);
-        Flush_Frame<TV>(title.c_str());
+//        // draw particles
+//        for(int i=0;i<sim.particles.X.m;i++){
+//            Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
+//            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.particles.V(i));
+//        }
+//        // draw node velocity
+//        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
+//            Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
+//            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));
+//        }
+//        title=STRING_UTILITIES::string_sprintf("TIME STEP %d After MPM Solve",f);
+//        Flush_Frame<TV>(title.c_str());
 
 
         if(use_projection){
@@ -337,35 +335,35 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
             // LOG::cout<<"face velocity from node"<<projection.face_velocities<<std::endl;
 
-            // draw particles
-            for(int i=0;i<sim.particles.X.m;i++){
-                Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.particles.V(i));
-            }
-            // draw node velocity
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
-                Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));
-            }
-            // draw mac velocity
-            for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
-                TV location=iterator.Location();
-                int axis=iterator.Axis();
-                if(axis==0){
-                    Add_Debug_Particle((location),VECTOR<T,3>(1,1,1)); // face centers with x component velocity: 
-                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(projection.face_velocities(iterator.Full_Index()),0));}
-                else if(axis==1){
-                    Add_Debug_Particle((location),VECTOR<T,3>(1,1,1)); // face centers with y component velocity: 
-                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(0,projection.face_velocities(iterator.Full_Index())));}}
-            // visualize Neumann cells and Dirichlet cells
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
-                if(projection.cell_dirichlet(it.index))
-                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0.3,0.3,0.3));
-                if(projection.cell_neumann(it.index)){
-                    PHYSBAM_ASSERT(!projection.cell_dirichlet(it.index));
-                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0,1,0));}}
-            title=STRING_UTILITIES::string_sprintf("TIME STEP %d After Velocity Corner->Face",f);
-            Flush_Frame<TV>(title.c_str());
+//            // draw particles
+//            for(int i=0;i<sim.particles.X.m;i++){
+//                Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
+//                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.particles.V(i));
+//            }
+//            // draw node velocity
+//            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
+//                Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
+//                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));
+//            }
+//            // draw mac velocity
+//            for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
+//                TV location=iterator.Location();
+//                int axis=iterator.Axis();
+//                if(axis==0){
+//                    Add_Debug_Particle((location),VECTOR<T,3>(1,1,1)); // face centers with x component velocity: 
+//                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(projection.face_velocities(iterator.Full_Index()),0));}
+//                else if(axis==1){
+//                    Add_Debug_Particle((location),VECTOR<T,3>(1,1,1)); // face centers with y component velocity: 
+//                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(0,projection.face_velocities(iterator.Full_Index())));}}
+//            // visualize Neumann cells and Dirichlet cells
+//            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
+//                if(projection.cell_dirichlet(it.index))
+//                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0.3,0.3,0.3));
+//                if(projection.cell_neumann(it.index)){
+//                    PHYSBAM_ASSERT(!projection.cell_dirichlet(it.index));
+//                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0,1,0));}}
+//            title=STRING_UTILITIES::string_sprintf("TIME STEP %d After Velocity Corner->Face",f);
+//            Flush_Frame<TV>(title.c_str());
 
 
             projection.Build_Weights_And_Grad_Weights_For_Cell_Centers();
@@ -379,67 +377,67 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             projection.Build_Velocity_Divergence();
             LOG::cout<<"Maximum velocity divergence after projection: "<<projection.max_div<<std::endl;
 
-            // draw particles
-            for(int i=0;i<sim.particles.X.m;i++){
-                Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.particles.V(i));
-            }
-            // draw node velocity
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
-                Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));
-            }
-            // draw mac velocity
-            for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
-                TV location=iterator.Location();
-                int axis=iterator.Axis();
-                if(axis==0){
-                    Add_Debug_Particle((location),VECTOR<T,3>(1,1,1)); // face centers with x component velocity: 
-                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(projection.face_velocities(iterator.Full_Index()),0));}
-                else if(axis==1){
-                    Add_Debug_Particle((location),VECTOR<T,3>(1,1,1)); // face centers with y component velocity: 
-                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(0,projection.face_velocities(iterator.Full_Index())));}}
-            // visualize Neumann cells and Dirichlet cells
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
-                if(projection.cell_dirichlet(it.index))
-                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0.3,0.3,0.3));
-                if(projection.cell_neumann(it.index)){
-                    PHYSBAM_ASSERT(!projection.cell_dirichlet(it.index));
-                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0,1,0));}}
-            title=STRING_UTILITIES::string_sprintf("TIME STEP %d After Projection",f);
-            Flush_Frame<TV>(title.c_str());
+//            // draw particles
+//            for(int i=0;i<sim.particles.X.m;i++){
+//                Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
+//                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.particles.V(i));
+//            }
+//            // draw node velocity
+//            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
+//                Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
+//                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));
+//            }
+//            // draw mac velocity
+//            for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
+//                TV location=iterator.Location();
+//                int axis=iterator.Axis();
+//                if(axis==0){
+//                    Add_Debug_Particle((location),VECTOR<T,3>(1,1,1)); // face centers with x component velocity: 
+//                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(projection.face_velocities(iterator.Full_Index()),0));}
+//                else if(axis==1){
+//                    Add_Debug_Particle((location),VECTOR<T,3>(1,1,1)); // face centers with y component velocity: 
+//                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(0,projection.face_velocities(iterator.Full_Index())));}}
+//            // visualize Neumann cells and Dirichlet cells
+//            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
+//                if(projection.cell_dirichlet(it.index))
+//                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0.3,0.3,0.3));
+//                if(projection.cell_neumann(it.index)){
+//                    PHYSBAM_ASSERT(!projection.cell_dirichlet(it.index));
+//                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0,1,0));}}
+//            title=STRING_UTILITIES::string_sprintf("TIME STEP %d After Projection",f);
+//            Flush_Frame<TV>(title.c_str());
 
             projection.Velocities_Faces_To_Corners_MPM_Style((T)0.95); // this step modifies sim.node_V
 
-            // draw particles
-            for(int i=0;i<sim.particles.X.m;i++){
-                Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.particles.V(i));
-            }
-            // draw node velocity
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
-                Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));
-            }
-            // draw mac velocity
-            for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
-                TV location=iterator.Location();
-                int axis=iterator.Axis();
-                if(axis==0){
-                    Add_Debug_Particle((location),VECTOR<T,3>(1,1,1)); // face centers with x component velocity: 
-                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(projection.face_velocities(iterator.Full_Index()),0));}
-                else if(axis==1){
-                    Add_Debug_Particle((location),VECTOR<T,3>(1,1,1)); // face centers with y component velocity: 
-                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(0,projection.face_velocities(iterator.Full_Index())));}}
-            // visualize Neumann cells and Dirichlet cells
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
-                if(projection.cell_dirichlet(it.index))
-                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0.3,0.3,0.3));
-                if(projection.cell_neumann(it.index)){
-                    PHYSBAM_ASSERT(!projection.cell_dirichlet(it.index));
-                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0,1,0));}}
-            title=STRING_UTILITIES::string_sprintf("TIME STEP %d After Velocity Face To Corner",f);
-            Flush_Frame<TV>(title.c_str());
+//            // draw particles
+//            for(int i=0;i<sim.particles.X.m;i++){
+//                Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
+//                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.particles.V(i));
+//            }
+//            // draw node velocity
+//            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),sim.grid.counts));it.Valid();it.Next()){
+//                Add_Debug_Particle(sim.grid.Node(it.index),VECTOR<T,3>(1,1,1));
+//                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,sim.node_V(it.index));
+//            }
+//            // draw mac velocity
+//            for(FACE_ITERATOR<TV> iterator(projection.mac_grid);iterator.Valid();iterator.Next()){
+//                TV location=iterator.Location();
+//                int axis=iterator.Axis();
+//                if(axis==0){
+//                    Add_Debug_Particle((location),VECTOR<T,3>(1,1,1)); // face centers with x component velocity: 
+//                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(projection.face_velocities(iterator.Full_Index()),0));}
+//                else if(axis==1){
+//                    Add_Debug_Particle((location),VECTOR<T,3>(1,1,1)); // face centers with y component velocity: 
+//                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV(0,projection.face_velocities(iterator.Full_Index())));}}
+//            // visualize Neumann cells and Dirichlet cells
+//            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
+//                if(projection.cell_dirichlet(it.index))
+//                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0.3,0.3,0.3));
+//                if(projection.cell_neumann(it.index)){
+//                    PHYSBAM_ASSERT(!projection.cell_dirichlet(it.index));
+//                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0,1,0));}}
+//            title=STRING_UTILITIES::string_sprintf("TIME STEP %d After Velocity Face To Corner",f);
+//            Flush_Frame<TV>(title.c_str());
 
             projection.Pressure_Back_To_Particles((T)0.95);
             
@@ -461,20 +459,19 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
         TIMING_END("Current MPM time step totally");
 
-        // if(f%frame_jump==0){
+        if(f%frame_jump==0){
 
-        //     // draw MPM particles
-        //     for(int i=0;i<sim.particles.X.m;i++){
-        //         Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
-        //     }
+            // draw MPM particles
+            for(int i=0;i<sim.particles.X.m;i++){
+                Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));}
 
-        //     // visualize Neumann cells and Dirichlet cells
-        //     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
+            // visualize Neumann cells and Dirichlet cells
+            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),projection.mac_grid.counts));it.Valid();it.Next()){
         //         if(projection.cell_dirichlet(it.index))
         //             Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0.3,0.3,0.3));
-        //         if(projection.cell_neumann(it.index)){
-        //             PHYSBAM_ASSERT(!projection.cell_dirichlet(it.index));
-        //             Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0,1,0));}}
+                if(projection.cell_neumann(it.index)){
+                    PHYSBAM_ASSERT(!projection.cell_dirichlet(it.index));
+                    Add_Debug_Particle(projection.mac_grid.Center(it.index),VECTOR<T,3>(0,1,0));}}
 
         //     // Zhu and Bridson
         //     if(use_bridson){
@@ -511,7 +508,8 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         //             TV disp;disp(0)=sim.rigid_ball(b).radius*cos(theta);disp(1)=sim.rigid_ball(b).radius*sin(theta);
         //             Add_Debug_Particle(sim.rigid_ball(b).center+disp,VECTOR<T,3>(0,0,1));}}
 
-        //     Flush_Frame<TV>("mpm");}
+        std::string title=STRING_UTILITIES::string_sprintf("TIME STEP %d After Moving Particles",f);
+        Flush_Frame<TV>(title.c_str());}
 
         LOG::cout<<std::endl;}
 }

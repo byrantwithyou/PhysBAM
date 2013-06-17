@@ -59,7 +59,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
                     else rr(it.index)+=(xx(it.index)-xx(right_cell_index))/proj.face_masses(right_face_index);
                 }}
             rr(it.index)*=proj.sim.dt*one_over_h_square;
-            rr(it.index)-=one_over_dt*proj.one_over_lambda_J(it.index)*xx(it.index);}}
+            rr(it.index)+=one_over_dt*proj.one_over_lambda_J(it.index)*xx(it.index);}}
 }
 //#####################################################################
 // Function Project

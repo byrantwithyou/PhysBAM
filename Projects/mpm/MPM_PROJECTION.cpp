@@ -232,15 +232,15 @@ Solve_For_Pressure()
     T one_over_dt=(T)1.0/sim.dt;
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+mac_grid.counts));it.Valid();it.Next()){
         if(!cell_dirichlet(it.index) && !cell_neumann(it.index)){ // cell is fluid
-            rhs.v(it.index)-=(one_over_dt*one_over_lambda_J(it.index)*pressure_rasterized(it.index));}}
+            rhs.v(it.index)+=(one_over_dt*one_over_lambda_J(it.index)*pressure_rasterized(it.index));}}
     Fix_RHS_Neumann_Cells(rhs.v);
     x.v.Fill((T)0);
     system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
-    KRYLOV_SOLVER<T>* solver=&cr;
+    KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=false;
-    solver->Solve(system,x,rhs,vectors,(T)1e-20,0,1000);
+    solver->Solve(system,x,rhs,vectors,(T)1e-6,0,1000);
     pressure_unknown=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
 
