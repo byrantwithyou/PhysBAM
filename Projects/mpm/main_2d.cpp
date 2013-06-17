@@ -98,7 +98,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 (T)8*density_scale/c1, // mass per particle
                 80.0*ym/(2.0*(1.0+pr)), // mu
                 80.0*ym*pr/((1.0+pr)*(1.0-2.0*pr)), // lambda
-                false,0); // compress, pressure
+                true,0); // compress, pressure
             
 //           sim.particles.Set_Material_Properties(0,c1,
 //                                                 (T)8*density_scale/1000, // mass per particle
@@ -114,12 +114,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 5000, // visco_tau
                 0); // visco_kappa
             sim.particles.Set_Initial_State(0,c1,
-                MATRIX<T,TV::m>(1,0,0,1), // Fe
+                MATRIX<T,TV::m>(1.5,0,0,0.8), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
-                TV(-1,1.8)); // initial velocity
-            // for(int p=0;p<c1;p++) sim.particles.X(p)=MATRIX<T,TV::m>(2,0,0,1)*sim.particles.Xm(p);
+                TV(0,0)); // initial velocity
+            for(int p=0;p<c1;p++) sim.particles.X(p)=MATRIX<T,TV::m>(1.5,0,0,0.8)*sim.particles.Xm(p);
             
-            sim.use_gravity=true;
+            sim.use_gravity=false;
 
             break;}
      
@@ -248,7 +248,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     Flush_Frame<TV>("mpm");
 
-    for(int f=0;f<=2003;f++){
+    for(int f=0;f<=20032323;f++){
 
         TIMING_START;
         LOG::cout<<"MPM TIMESTEP "<<f<<std::endl;
@@ -280,7 +280,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         if(sim.frame==0) sim.Compute_Particle_Volumes_And_Densities(0,sim.particles.number);
 
         sim.Compute_Grid_Forces();
-        sim.node_force.Fill(TV());
+        // sim.node_force.Fill(TV());
         
         if(sim.use_gravity) sim.Apply_Gravity_To_Grid_Forces();
         sim.Update_Velocities_On_Grid();
