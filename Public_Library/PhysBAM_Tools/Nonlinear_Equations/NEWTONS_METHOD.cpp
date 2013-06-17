@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
+#include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/LINE_SEARCH.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 using namespace PhysBAM;
@@ -27,7 +28,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         T norm_grad=sqrt(sys.Inner_Product(grad,grad));
         if(abs(E-last_E)<progress_tolerance || norm_grad<tolerance){result=true;break;}
 
-        if(!krylov.Solve(sys,neg_dx,grad,av,krylov_tolerance,0,max_krylov_iterations))
+        if(!krylov.Solve(sys,neg_dx,grad,av,krylov_tolerance,0,max_krylov_iterations) && fail_on_krylov_not_converged)
             break;
 
         if(use_gradient_descent_failsafe){
