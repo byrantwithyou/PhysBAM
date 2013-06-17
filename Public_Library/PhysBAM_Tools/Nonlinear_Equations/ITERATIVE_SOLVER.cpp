@@ -4,6 +4,7 @@
 //#####################################################################
 // Class ITERATIVE_SOLVER
 //#####################################################################
+#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
@@ -229,7 +230,7 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max)
 // Function Conjugate_Gradient
 //#####################################################################
 template<class T> void ITERATIVE_SOLVER<T>::
-Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>&)>& F,PARAMETER_SPACE<T>& x,const T alpha_max,const int restart_iterations)
+Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>&)>& F,PARAMETER_SPACE<T>& x,const int restart_iterations)
 {
     typedef PARAMETER_SPACE<T> TV;
     iterations=0;
@@ -260,6 +261,49 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>&)>& F,PARAMETER_SPACE
             x.Op(1,x,alpha,s);
             grad_old.Copy(grad);
             F.Gradient(x,grad);
+            grad_dot_grad=grad.Dot(grad);}}
+    if(iterations==max_iterations) LOG::cout<<"Conjugate_Gradient failed with max iterations"<<std::endl;
+    delete &grad;
+    delete &grad_old;
+    delete &s;
+    delete &tmp;
+}
+//#####################################################################
+// Function Conjugate_Gradient
+//#####################################################################
+template<class T> void ITERATIVE_SOLVER<T>::
+Conjugate_Gradient(NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_VECTOR_BASE<T>& x,const int restart_iterations)
+{
+    typedef KRYLOV_VECTOR_BASE<T> TV;
+    iterations=0;
+    TV& grad=*x.Clone_Default();
+    TV& grad_old=*x.Clone_Default();
+    TV& s=*x.Clone_Default();
+    TV& tmp=*x.Clone_Default();
+    F.Compute(x,0,&grad,0);
+    T grad_dot_grad=grad.Dot(grad);
+    while(grad_dot_grad>tolerance*tolerance && iterations<max_iterations){ // do conjugate gradiant n=2 times, then restart with a steepest decent step
+        int cg_step=0;
+        s*=0;
+        while(grad_dot_grad>tolerance*tolerance && cg_step++<restart_iterations && iterations++<max_iterations){
+            T beta=0;
+
+            if(cg_step>1){
+                tmp.Copy(-1,grad,grad_old);
+                T d_dot_y=tmp.Dot(s);
+                T y_dot_y=tmp.Dot(tmp);
+                if(d_dot_y && y_dot_y){
+                    tmp.Copy(-2*y_dot_y/d_dot_y,s,tmp);
+                    beta=tmp.Dot(grad)/d_dot_y;}}
+
+            s.Copy(-beta,s,grad);
+            s*=-1;
+            PARAMETRIC_LINE<T,T(TV&)> line(F,x,s,tmp);
+            T alpha;
+            LINE_SEARCH<T>::Line_Search_Quadratic_Golden_Section(line,0,10/sqrt(grad_dot_grad),alpha,100,(T)1e-6,(T)1e-10*0);
+            x.Copy(alpha,s,x);
+            grad_old.Copy(1,grad);
+            F.Compute(x,0,&grad,0);
             grad_dot_grad=grad.Dot(grad);}}
     if(iterations==max_iterations) LOG::cout<<"Conjugate_Gradient failed with max iterations"<<std::endl;
     delete &grad;

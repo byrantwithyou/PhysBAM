@@ -11,6 +11,7 @@ namespace PhysBAM{
 
 template<class F> class NONLINEAR_FUNCTION;
 template<class T> struct PARAMETER_SPACE;
+template<class T> struct KRYLOV_VECTOR_BASE;
 
 template<class T>
 class ITERATIVE_SOLVER 
@@ -35,7 +36,8 @@ public:
     T Golden_Parabolic_Minimum(NONLINEAR_FUNCTION<T(T)>& F,T a,T b);
     void Steepest_Decent(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max);
     void Conjugate_Gradient(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max);
-    void Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>&)>& F,PARAMETER_SPACE<T>& x,const T alpha_max,const int restart_iterations);
+    void Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>&)>& F,PARAMETER_SPACE<T>& x,const int restart_iterations);
+    void Conjugate_Gradient(NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_VECTOR_BASE<T>& x,const int restart_iterations);
 //#####################################################################
 };   
 }
