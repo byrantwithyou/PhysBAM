@@ -286,7 +286,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
         sim.Update_Velocities_On_Grid();
         if(!use_projection) sim.Grid_Based_Body_Collisions();
 
-        sim.Solve_The_Linear_System(); // so far sim.node_V is achieved via MPM
+        sim.Solve_The_Linear_System_Explicit(); // so far sim.node_V is achieved via MPM
         // LOG::cout<<"Momentum - grid (after linear solve):"<<sim.Get_Total_Momentum_On_Nodes()<<std::endl;
 
 //        // draw particles

@@ -4,6 +4,8 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/clamp.h>
+#include <PhysBAM_Tools/Math_Tools/cbrt.h>
+#include <PhysBAM_Tools/Math_Tools/clamp.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include "MPM_CONSTITUTIVE_MODEL.h"
 namespace PhysBAM{
@@ -11,7 +13,7 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> MPM_CONSTITUTIVE_MODEL<TV>::
-MPM_CONSTITUTIVE_MODEL()
+MPM_CONSTITUTIVE_MODEL(bool dev_part_only_input):dev_part_only(dev_part_only_input)
 {}
 //#####################################################################
 // Destructor
@@ -23,14 +25,29 @@ template<class TV> MPM_CONSTITUTIVE_MODEL<TV>::
 // Function Compute_Helper_Quantities_Using_F
 //#####################################################################
 template<class TV> void MPM_CONSTITUTIVE_MODEL<TV>::
-Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Fp,T& Je,MATRIX<T,TV::m>& Re,MATRIX<T,TV::m>& Se) const
+Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,T& Je,MATRIX<T,TV::m>& Re,MATRIX<T,TV::m>& Se) const
 {
     MATRIX<T,TV::m> Ue,Ve;
     DIAGONAL_MATRIX<T,TV::m> SIGMAe;
     Je=Fe.Determinant();
-    Fe.Fast_Singular_Value_Decomposition(Ue,SIGMAe,Ve);
-    Re=Ue.Times_Transpose(Ve);
-    Se=Re.Transpose_Times(Fe);
+    if(!dev_part_only){
+        Fe.Fast_Singular_Value_Decomposition(Ue,SIGMAe,Ve);
+        Re=Ue.Times_Transpose(Ve);
+        Se=Re.Transpose_Times(Fe);}
+    else{
+//        Fe.Fast_Singular_Value_Decomposition(Ue,SIGMAe,Ve);
+//        Re=Ue.Times_Transpose(Ve);
+//        Se=Re.Transpose_Times(Fe);}
+    
+        MATRIX<T,TV::m> Fe_hat=Fe;
+        // TODO: needs some treatments for zero and negative J
+        if(TV::m==3)
+            Fe_hat=Fe/cbrt(Je);
+        else if(TV::m==2)
+            Fe_hat=Fe/sqrt(Je);
+        Fe_hat.Fast_Singular_Value_Decomposition(Ue,SIGMAe,Ve);
+        Re=Ue.Times_Transpose(Ve);
+        Se=Re.Transpose_Times(Fe_hat);}
 }
 //#####################################################################
 // Function Compute_Energy_Density_Psi
@@ -38,7 +55,19 @@ Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m
 template<class TV> typename TV::SCALAR MPM_CONSTITUTIVE_MODEL<TV>::
 Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const
 {
-    return (Fe-Re).Frobenius_Norm_Squared()*mu+0.5*lambda*sqr(Je-(T)1);
+    if(!dev_part_only)
+        return (Fe-Re).Frobenius_Norm_Squared()*mu+0.5*lambda*sqr(Je-(T)1);
+    else{
+//        return (Fe-Re).Frobenius_Norm_Squared()*mu;}
+        
+        MATRIX<T,TV::m> Fe_hat=Fe;
+        // TODO: needs some treatments for zero and negative J
+        if(TV::m==3)
+            Fe_hat=Fe/cbrt(Je);
+        else if(TV::m==2){
+            if(Je<=0) LOG::cout<<"BAD Je"<<Je<<std::endl;
+            Fe_hat=Fe/sqrt(Je);}
+        return (Fe_hat-Re).Frobenius_Norm_Squared()*mu;}
 }
 //#####################################################################
 // Function Compute_dPsi_dFe
@@ -46,7 +75,20 @@ Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV
 template<class TV> MATRIX<typename TV::SCALAR,TV::m> MPM_CONSTITUTIVE_MODEL<TV>::
 Compute_dPsi_dFe(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const
 {
-    return (Fe-Re)*2.0*mu+Fe.Inverse_Transposed()*Je*lambda*(Je-(T)1);
+    if(!dev_part_only)
+        return (Fe-Re)*2.0*mu+Fe.Inverse_Transposed()*Je*lambda*(Je-(T)1);
+    else{
+        
+//        return (Fe-Re)*2.0*mu;}
+        
+        MATRIX<T,TV::m> Fe_hat=Fe;
+        // TODO: needs some treatments for zero and negative J
+        if(TV::m==3){
+            Fe_hat=Fe/cbrt(Je);
+            return (Fe_hat-Re)*2.0*mu;}
+        else if(TV::m==2){
+            Fe_hat=Fe/sqrt(Je);
+            return (Fe_hat-Re)*2.0*mu;}}
 }
 //#####################################################################
 // Helper Function Compute_dJFinvT // 2d
@@ -126,13 +168,13 @@ Derivative_Test() const
         rand_generator.Fill_Uniform(F1,-1,1);
         rand_generator.Fill_Uniform(dF,-eps,eps);
         Fe=F1;
-        Compute_Helper_Quantities_Using_F(Fe,Fp,Je,Re,Se);
+        Compute_Helper_Quantities_Using_F(Fe,Je,Re,Se);
         Psi1=Compute_Elastic_Energy_Density_Psi(mu,lambda,Fe,Re,Je);
         P1=Compute_dPsi_dFe(mu,lambda,Fe,Re,Je);
         dP1=Compute_d2Psi_dFe_dFe_Action_dF(mu,lambda,Fe,Je,Re,Se,dF);
         F2=F1+dF;
         Fe=F2;
-        Compute_Helper_Quantities_Using_F(Fe,Fp,Je,Re,Se);
+        Compute_Helper_Quantities_Using_F(Fe,Je,Re,Se);
         Psi2=Compute_Elastic_Energy_Density_Psi(mu,lambda,Fe,Re,Je);
         P2=Compute_dPsi_dFe(mu,lambda,Fe,Re,Je);
         dP2=Compute_d2Psi_dFe_dFe_Action_dF(mu,lambda,Fe,Je,Re,Se,dF);

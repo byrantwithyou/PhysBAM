@@ -27,7 +27,9 @@ using ::std::exp;
 template<class TV> MPM_SIMULATION<TV>::
 MPM_SIMULATION()
     :dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0.8)
-{}
+{
+    constitutive_model.dev_part_only=true;
+}
 //#####################################################################
 // Destructor
 //#####################################################################
@@ -101,7 +103,7 @@ Build_Helper_Structures_For_Constitutive_Model()
     TIMING_START;
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++){
-        constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),particles.Fp(p),Je(p),Re(p),Se(p));
+        constitutive_model.Compute_Helper_Quantities_Using_F(particles.Fe(p),Je(p),Re(p),Se(p));
         T lame_scale=exp(xi*(1-particles.Fp(p).Determinant()));
         particles.mu(p)=particles.mu0(p)*lame_scale;
         particles.lambda(p)=particles.lambda0(p)*lame_scale;}

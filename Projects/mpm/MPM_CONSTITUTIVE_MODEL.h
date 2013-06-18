@@ -20,10 +20,11 @@ class MPM_CONSTITUTIVE_MODEL
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
-    MPM_CONSTITUTIVE_MODEL();
+    bool dev_part_only;
+    MPM_CONSTITUTIVE_MODEL(bool dev_part_only_input=false);
     ~MPM_CONSTITUTIVE_MODEL();
 
-    void Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Fp,T& Je,MATRIX<T,TV::m>& Re,MATRIX<T,TV::m>& Se) const;
+    void Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,T& Je,MATRIX<T,TV::m>& Re,MATRIX<T,TV::m>& Se) const;
     T Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const;
     MATRIX<T,TV::m> Compute_dPsi_dFe(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const;
     MATRIX<T,TV::m> Compute_d2Psi_dFe_dFe_Action_dF(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const T& Je,const MATRIX<T,TV::m>& Re,const MATRIX<T,TV::m>& Se,const MATRIX<T,TV::m>& dF) const;
