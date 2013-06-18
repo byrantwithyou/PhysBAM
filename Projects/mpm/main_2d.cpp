@@ -89,7 +89,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // geometry setting
     switch(test_number){
         case 1:{ // all materials together
-            sim.grid.Initialize(TV_INT(2*grid_res+1,2*grid_res+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
+            sim.grid.Initialize(TV_INT(2*grid_res+1,1.6*grid_res+1),RANGE<TV>(TV(-1,-0.6),TV(1,1)));
             
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.2,-0.2),TV(0.2,0.2)),particle_exclude_radius);
             
@@ -114,12 +114,12 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 5000, // visco_tau
                 0); // visco_kappa
             sim.particles.Set_Initial_State(0,c1,
-                MATRIX<T,TV::m>(1.5,0,0,0.8), // Fe
+                MATRIX<T,TV::m>(1,0,0,1), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
                 TV(0,0)); // initial velocity
-            for(int p=0;p<c1;p++) sim.particles.X(p)=MATRIX<T,TV::m>(1.5,0,0,0.8)*sim.particles.Xm(p);
+            // for(int p=0;p<c1;p++) sim.particles.X(p)=MATRIX<T,TV::m>(2,0,0,0.5)*sim.particles.Xm(p);
             
-            sim.use_gravity=false;
+            sim.use_gravity=true;
 
             break;}
      
