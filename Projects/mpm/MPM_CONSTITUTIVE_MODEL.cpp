@@ -88,7 +88,7 @@ Compute_dPsi_dFe(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MAT
             return (Fe_hat-Re)*2.0*mu;}
         else if(TV::m==2){
             Fe_hat=Fe/sqrt(Je);
-            return (Fe_hat-Re)*2.0*mu;}}
+            return (Fe_hat-Re)*2.0*mu-mu*(Fe_hat.Trace()-Re.Trace())*MATRIX<T,TV::m>::Identity_Matrix();}}
 }
 //#####################################################################
 // Helper Function Compute_dJFinvT // 2d
