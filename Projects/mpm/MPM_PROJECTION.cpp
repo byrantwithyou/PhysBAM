@@ -239,16 +239,12 @@ Solve_For_Pressure()
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cg;
-    solver->print_residuals=false;
+    solver->print_residuals=true;
     solver->Solve(system,x,rhs,vectors,(T)1e-6,0,1000);
     pressure_unknown=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
 
-    // get rid of super small pressure
-//    T pressure_eps=(T)1e-8;
-//    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+mac_grid.counts));it.Valid();it.Next()){
-//        if(abs(pressure_unknown(it.index))<pressure_eps){
-//            pressure_unknown(it.index)=(T)0;}}
+    
 }
 
 //#####################################################################

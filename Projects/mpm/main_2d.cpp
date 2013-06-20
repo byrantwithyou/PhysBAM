@@ -89,7 +89,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     // geometry setting
     switch(test_number){
         case 1:{ // all materials together
-            sim.grid.Initialize(TV_INT(2*grid_res+1,1.6*grid_res+1),RANGE<TV>(TV(-1,-0.6),TV(1,1)));
+            sim.grid.Initialize(TV_INT(2*grid_res+1,2*grid_res+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
             
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.2,-0.2),TV(0.2,0.2)),particle_exclude_radius);
             
@@ -117,9 +117,17 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 MATRIX<T,TV::m>(1,0,0,1), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
                 TV(0,0)); // initial velocity
+            for(int p=0;p<sim.particles.number;p++){
+                if(sim.particles.Xm(p).x>0) sim.particles.V(p)=TV(-2,0);
+                else sim.particles.V(p)=TV(2,0);
+                
+            
+            }
+            
+            
             // for(int p=0;p<c1;p++) sim.particles.X(p)=MATRIX<T,TV::m>(2,0,0,0.5)*sim.particles.Xm(p);
             
-            sim.use_gravity=true;
+            sim.use_gravity=false;
 
             break;}
      
@@ -375,8 +383,19 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             projection.Solve_For_Pressure();
             projection.Do_Projection();
             projection.Build_Velocity_Divergence();
-            LOG::cout<<"Maximum velocity divergence after projection: "<<projection.max_div<<std::endl;
+            
+            // LOG::cout<<"Maximum velocity divergence after projection: "<<projection.max_div<<std::endl;
 
+            T max_abs=0;
+            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+projection.mac_grid.counts));it.Valid();it.Next()){
+                T value=projection.div_u(it.index)+(projection.pressure_unknown(it.index)-projection.pressure_rasterized(it.index))*projection.one_over_lambda_J(it.index)*(1.0/sim.dt);
+                if(value>max_abs) max_abs=value;}
+            LOG::cout<<"Check with residual: "<<max_abs<<std::endl;
+            
+
+            
+            
+            
 //            // draw particles
 //            for(int i=0;i<sim.particles.X.m;i++){
 //                Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,1));
@@ -439,7 +458,7 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 //            title=STRING_UTILITIES::string_sprintf("TIME STEP %d After Velocity Face To Corner",f);
 //            Flush_Frame<TV>(title.c_str());
 
-            projection.Pressure_Back_To_Particles((T)0.95);
+            projection.Pressure_Back_To_Particles((T)0);
             
             // LOG::cout<<"particle pressure:"<<sim.particles.pressure<<std::endl;
             // LOG::cout<<"particle one_over_lambda_J:"<<sim.particles.one_over_lambda_J<<std::endl;

@@ -120,6 +120,8 @@ Build_Pressure_And_One_Over_Lambda_J()
             T J_lazy=Je(p);
             // particles.pressure(p)=particles.lambda(p)*(J_lazy-1);
             particles.one_over_lambda_J(p)=(T)1.0/(particles.lambda(p)*J_lazy);}
+            // LOG::cout<<particles.one_over_lambda_J(p)<<std::endl;}
+        
         else{
             // particles.pressure(p)=(T)0;
             particles.one_over_lambda_J(p)=(T)0;}}
