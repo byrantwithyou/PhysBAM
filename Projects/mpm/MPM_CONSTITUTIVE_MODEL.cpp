@@ -49,7 +49,7 @@ Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV
 template<class TV> MATRIX<typename TV::SCALAR,TV::m> MPM_CONSTITUTIVE_MODEL<TV>::
 Compute_dPsi_dFe(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const
 {
-    if(!dev_part_only) eturn (Fe-Re)*(2.0*mu)+Fe.Inverse_Transposed()*(Je*lambda*(Je-(T)1));
+    if(!dev_part_only) return (Fe-Re)*(2.0*mu)+Fe.Inverse_Transposed()*(Je*lambda*(Je-(T)1));
     else return (Fe-Re)*(2.0*mu);
 }
 //#####################################################################
