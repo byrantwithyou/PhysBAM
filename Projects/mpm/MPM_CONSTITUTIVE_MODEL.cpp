@@ -30,24 +30,9 @@ Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,T& Je,MATRIX<T,TV::m
     MATRIX<T,TV::m> Ue,Ve;
     DIAGONAL_MATRIX<T,TV::m> SIGMAe;
     Je=Fe.Determinant();
-    if(!dev_part_only){
-        Fe.Fast_Singular_Value_Decomposition(Ue,SIGMAe,Ve);
-        Re=Ue.Times_Transpose(Ve);
-        Se=Re.Transpose_Times(Fe);}
-    else{
-        Fe.Fast_Singular_Value_Decomposition(Ue,SIGMAe,Ve);
-        Re=Ue.Times_Transpose(Ve);
-        Se=Re.Transpose_Times(Fe);}
-    
-//        MATRIX<T,TV::m> Fe_hat=Fe;
-//        // TODO: needs some treatments for zero and negative J
-//        if(TV::m==3)
-//            Fe_hat=Fe/cbrt(Je);
-//        else if(TV::m==2)
-//            Fe_hat=Fe/sqrt(Je);
-//        Fe_hat.Fast_Singular_Value_Decomposition(Ue,SIGMAe,Ve);
-//        Re=Ue.Times_Transpose(Ve);
-//        Se=Re.Transpose_Times(Fe_hat);}
+    Fe.Fast_Singular_Value_Decomposition(Ue,SIGMAe,Ve);
+    Re=Ue.Times_Transpose(Ve);
+    Se=Re.Transpose_Times(Fe);
 }
 //#####################################################################
 // Function Compute_Energy_Density_Psi
@@ -55,19 +40,8 @@ Compute_Helper_Quantities_Using_F(const MATRIX<T,TV::m>& Fe,T& Je,MATRIX<T,TV::m
 template<class TV> typename TV::SCALAR MPM_CONSTITUTIVE_MODEL<TV>::
 Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const
 {
-    if(!dev_part_only)
-        return (Fe-Re).Frobenius_Norm_Squared()*mu+0.5*lambda*sqr(Je-(T)1);
-    else{
-        return (Fe-Re).Frobenius_Norm_Squared()*mu;}
-        
-//        MATRIX<T,TV::m> Fe_hat=Fe;
-//        // TODO: needs some treatments for zero and negative J
-//        if(TV::m==3)
-//            Fe_hat=Fe/cbrt(Je);
-//        else if(TV::m==2){
-//            if(Je<=0) LOG::cout<<"BAD Je"<<Je<<std::endl;
-//            Fe_hat=Fe/sqrt(Je);}
-//        return (Fe_hat-Re).Frobenius_Norm_Squared()*mu;}
+    if(!dev_part_only) return (Fe-Re).Frobenius_Norm_Squared()*mu+0.5*lambda*sqr(Je-(T)1);
+    else return (Fe-Re).Frobenius_Norm_Squared()*mu;
 }
 //#####################################################################
 // Function Compute_dPsi_dFe
@@ -75,20 +49,8 @@ Compute_Elastic_Energy_Density_Psi(const T& mu,const T& lambda,const MATRIX<T,TV
 template<class TV> MATRIX<typename TV::SCALAR,TV::m> MPM_CONSTITUTIVE_MODEL<TV>::
 Compute_dPsi_dFe(const T& mu,const T& lambda,const MATRIX<T,TV::m>& Fe,const MATRIX<T,TV::m>& Re,const T& Je) const
 {
-    if(!dev_part_only)
-        return (Fe-Re)*2.0*mu+Fe.Inverse_Transposed()*Je*lambda*(Je-(T)1);
-    else{
-        
-        return (Fe-Re)*2.0*mu;}
-    
-//        MATRIX<T,TV::m> Fe_hat=Fe;
-//        // TODO: needs some treatments for zero and negative J
-//        if(TV::m==3){
-//            Fe_hat=Fe/cbrt(Je);
-//            return (Fe_hat-Re)*2.0*mu;}
-//        else if(TV::m==2){
-//            Fe_hat=Fe/sqrt(Je);
-//            return (Fe_hat-Re)*2.0*mu-mu*(Fe_hat.Trace()-Re.Trace())*MATRIX<T,TV::m>::Identity_Matrix();}}
+    if(!dev_part_only) eturn (Fe-Re)*(2.0*mu)+Fe.Inverse_Transposed()*(Je*lambda*(Je-(T)1));
+    else return (Fe-Re)*(2.0*mu);
 }
 //#####################################################################
 // Helper Function Compute_dJFinvT // 2d
