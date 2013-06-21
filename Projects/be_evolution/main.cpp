@@ -6,6 +6,7 @@
 #include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
+#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
@@ -117,25 +118,27 @@ class SIMULATION
 public:
     SOLID_BODY_COLLECTION<TV> solid_body_collection;
     T time;
+    NEWTONS_METHOD<T> nm;
 
     SIMULATION()
     {
+        nm.max_iterations=100000;
+        nm.max_krylov_iterations=2000;
+        nm.krylov_tolerance=1e-3;
+        nm.fail_on_krylov_not_converged=false;
+        nm.use_cg=false;
     }
 
     ~SIMULATION() {}
 
     void Advance_One_Time_Step_Position(const T dt)
     {
+        LOG::SCOPE scope("Advance_One_Time_Step_Position");
         MINIMIZATION_OBJECTIVE<TV> obj(solid_body_collection,dt,time);
         KRYLOV_VECTOR_BASE<T>* x0 = obj.x0.Clone_Default();
         *x0=obj.x0;
         obj.Test(*x0,obj);
 
-        NEWTONS_METHOD<T> nm;
-        nm.max_iterations=100000;
-        nm.max_krylov_iterations=2000;
-        nm.krylov_tolerance=1e-3;
-        nm.fail_on_krylov_not_converged=false;
         bool converged=nm.Newtons_Method(obj,obj,*x0);
         PHYSBAM_ASSERT(converged);
         delete x0;
@@ -150,20 +153,37 @@ int main(int argc,char* argv[])
     typedef VECTOR<int,TV::m> TV_INT;
     RW rw=RW();STREAM_TYPE stream_type(rw); // gcc 3.3.2 workaround
     std::string output_directory="output";
+    SIMULATION<TV> simulation;
+    int res=6,seed=-1;
+    bool enforce_definiteness=false;
+
+    PARSE_ARGS parse_args(argc,argv);
+    LOG::Initialize_Logging(false,false,1<<30,true);
+    LOG::cout<<parse_args.Print_Arguments()<<std::endl;
+    parse_args.Add("-cg",&simulation.nm.use_cg,"use CG instead of minres");
+    parse_args.Add("-o",&output_directory,"dir","output directory");
+    parse_args.Add("-resolution",&res,"res","resolution");
+    parse_args.Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
+    parse_args.Add("-kry_it",&simulation.nm.max_krylov_iterations,"iter","maximum iterations for Krylov solver");
+    parse_args.Add("-newton_it",&simulation.nm.max_iterations,"iter","maximum iterations for Newton");
+    parse_args.Add("-kry_fail",&simulation.nm.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
+    parse_args.Add("-seed",&seed,"fixed seed","set random seed");
+    parse_args.Parse();
+
     LOG::cout<<std::setprecision(16);
 
     GRID<TV> grid(TV_INT(),RANGE<TV>::Unit_Box());
     VIEWER_OUTPUT<TV> vo(stream_type,grid,output_directory);
-    SIMULATION<TV> simulation;
     SOLIDS_STANDARD_TESTS<TV> tests(stream_type,getenv("PHYSBAM_DATA_DIRECTORY"),simulation.solid_body_collection);
-    GRID<TV> cube_grid(TV_INT()+6,RANGE<TV>::Centered_Box());
+    GRID<TV> cube_grid(TV_INT()+res,RANGE<TV>::Centered_Box());
     TETRAHEDRALIZED_VOLUME<T>& tv=tests.Create_Mattress(cube_grid);
     simulation.solid_body_collection.Add_Force(Create_Finite_Volume(tv,new COROTATED_FIXED<T,3>(1e6,0.3,0)));
     for(int i=0;i<simulation.solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
         simulation.solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
-
+    if(enforce_definiteness) simulation.solid_body_collection.Enforce_Definiteness(true);
 
     RANDOM_NUMBERS<T> random;
+    if(seed!=-1) random.Set_Seed(seed);
     random.Fill_Uniform(simulation.solid_body_collection.deformable_body_collection.particles.X,-1,1);
 
 
@@ -179,6 +199,7 @@ int main(int argc,char* argv[])
         simulation.solid_body_collection.Write(stream_type,output_directory,frame,-1,true,true,true,true,false);
     }
 
+    LOG::Finish_Logging();
     return 0;
 }
 //#####################################################################
