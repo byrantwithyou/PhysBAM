@@ -243,8 +243,6 @@ Solve_For_Pressure()
     solver->Solve(system,x,rhs,vectors,(T)1e-6,0,1000);
     pressure_unknown=x.v;
     vectors.Delete_Pointers_And_Clean_Memory();
-
-    
 }
 
 //#####################################################################
