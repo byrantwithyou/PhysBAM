@@ -311,26 +311,26 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             projection.Identify_Dirichlet_Cells();
             
             projection.Identify_Neumann_Cells();
-            for(int x=3;x<projection.mac_grid.counts.x-3;x++){
-                for(int y=2;y<=4;y++){
-                    projection.cell_neumann(TV_INT(x,y))=true;
-                    projection.cell_dirichlet(TV_INT(x,y))=false;
-                    projection.neumann_cell_normal_axis(TV_INT(x,y))=2;}}
-            for(int x=3;x<projection.mac_grid.counts.x-3;x++){
-                for(int y=projection.mac_grid.counts.y-5;y<=projection.mac_grid.counts.y-3;y++){
-                    projection.cell_neumann(TV_INT(x,y))=true;
-                    projection.cell_dirichlet(TV_INT(x,y))=false;
-                    projection.neumann_cell_normal_axis(TV_INT(x,y))=-2;}}
-            for(int x=2;x<=4;x++){
-                for(int y=3;y<projection.mac_grid.counts.y-3;y++){
-                    projection.cell_neumann(TV_INT(x,y))=true;
-                    projection.cell_dirichlet(TV_INT(x,y))=false;
-                    projection.neumann_cell_normal_axis(TV_INT(x,y))=1;}}
-            for(int x=projection.mac_grid.counts.x-5;x<=projection.mac_grid.counts.x-3;x++){
-                for(int y=3;y<projection.mac_grid.counts.y-3;y++){
-                    projection.cell_neumann(TV_INT(x,y))=true;
-                    projection.cell_dirichlet(TV_INT(x,y))=false;
-                    projection.neumann_cell_normal_axis(TV_INT(x,y))=-1;}}
+//            for(int x=3;x<projection.mac_grid.counts.x-3;x++){
+//                for(int y=2;y<=4;y++){
+//                    projection.cell_neumann(TV_INT(x,y))=true;
+//                    projection.cell_dirichlet(TV_INT(x,y))=false;
+//                    projection.neumann_cell_normal_axis(TV_INT(x,y))=2;}}
+//            for(int x=3;x<projection.mac_grid.counts.x-3;x++){
+//                for(int y=projection.mac_grid.counts.y-5;y<=projection.mac_grid.counts.y-3;y++){
+//                    projection.cell_neumann(TV_INT(x,y))=true;
+//                    projection.cell_dirichlet(TV_INT(x,y))=false;
+//                    projection.neumann_cell_normal_axis(TV_INT(x,y))=-2;}}
+//            for(int x=2;x<=4;x++){
+//                for(int y=3;y<projection.mac_grid.counts.y-3;y++){
+//                    projection.cell_neumann(TV_INT(x,y))=true;
+//                    projection.cell_dirichlet(TV_INT(x,y))=false;
+//                    projection.neumann_cell_normal_axis(TV_INT(x,y))=1;}}
+//            for(int x=projection.mac_grid.counts.x-5;x<=projection.mac_grid.counts.x-3;x++){
+//                for(int y=3;y<projection.mac_grid.counts.y-3;y++){
+//                    projection.cell_neumann(TV_INT(x,y))=true;
+//                    projection.cell_dirichlet(TV_INT(x,y))=false;
+//                    projection.neumann_cell_normal_axis(TV_INT(x,y))=-1;}}
             
             projection.Identify_Nodes_Of_Non_Dirichlet_Cells();
             projection.Velocities_Corners_To_Faces_MPM_Style();

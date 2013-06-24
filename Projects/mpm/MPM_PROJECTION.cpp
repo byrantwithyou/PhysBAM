@@ -173,6 +173,12 @@ Rasterize_Pressure_And_One_Over_Lambda_J()
         else{
             pressure_rasterized(it.index)=(T)0;
             one_over_lambda_J(it.index)=(T)0;}}
+    
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
+        if(cell_dirichlet(it.index)){
+            pressure_rasterized(it.index)=(T)0;
+            one_over_lambda_J(it.index)=(T)0;}}
+    
 
     // LOG::cout<<"DEBUG: rasterized pressure: "<<pressure_rasterized<<std::endl;
     // LOG::cout<<"DEBUG: rasterizedc one_over_lambda_J: "<<one_over_lambda_J<<std::endl;
@@ -261,7 +267,8 @@ Do_Projection()
         if(first_cell(axis)>=0&&second_cell(axis)<mac_grid.counts(axis)){ // only deal with non-boundary faces
             if(!cell_neumann(first_cell) && !cell_neumann(second_cell)){
                 T grad_p=(pressure_unknown(second_cell)-pressure_unknown(first_cell))*one_over_h;
-                if(face_masses(face_index)>sim.min_mass) face_velocities(face_index)-=sim.dt/face_masses(face_index)*grad_p;}}}
+                if(face_masses(face_index)!=(T)0)
+                    face_velocities(face_index)-=sim.dt/face_masses(face_index)*grad_p;}}}
     // Enforce face velocities for neumann cells
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),mac_grid.counts));it.Valid();it.Next()){
         if(cell_neumann(it.index)){
