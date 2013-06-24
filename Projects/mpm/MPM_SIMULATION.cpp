@@ -27,9 +27,7 @@ using ::std::exp;
 template<class TV> MPM_SIMULATION<TV>::
 MPM_SIMULATION()
     :dump_matrix(false),test_system(false),min_mass(1e-8),min_rho((T)0),use_gravity(true),FLIP_alpha((T)0.95),friction_coefficient((T)0.8)
-{
-    constitutive_model.dev_part_only=true;
-}
+{}
 //#####################################################################
 // Destructor
 //#####################################################################

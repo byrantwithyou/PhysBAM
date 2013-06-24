@@ -37,15 +37,16 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,2> TV_INT;
     typedef float RW;
+    
     MPM_SIMULATION<TV> sim;
-    VORONOI_2D<T> voronoi;
+//    VORONOI_2D<T> voronoi;
     int test_number=-1;
     std::string output_directory="";
     bool use_output_directory=false;
     sim.dt=(T)1e-3;
     int frame_jump=20;
-    int grid_res=16,particle_res=32,particle_count=100;
-    T particle_exclude_radius=0;
+    int gres_scale=1;
+    int particle_per_cell=4;
     T density_scale=(T)1;
     T ym=1;
     T pr=(T).3;
@@ -55,8 +56,9 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     bool use_bridson=false;
     bool use_delaunay=false;
     bool use_projection=false;
-    T delaunay_maximum_edge_length=(T)99999;
-    T delaunay_minimum_angle=(T)0;
+    sim.constitutive_model.dev_part_only=false;
+//    T delaunay_maximum_edge_length=(T)99999;
+//    T delaunay_minimum_angle=(T)0;
     sim.xi=(T)0;
     parse_args.Add("-test",&test_number,"test","test number");
     parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
@@ -69,18 +71,17 @@ void Run_Simulation(PARSE_ARGS& parse_args)
     parse_args.Add("-turk",&use_turk,"use turk mesh reconstruction on the fly");
     parse_args.Add("-bridson",&use_bridson,"use bridson mesh reconstruction on the fly");
     parse_args.Add("-delaunay",&use_delaunay,"use delaunay to generate voronoi");
-    parse_args.Add("-delaunay_maxl",&delaunay_maximum_edge_length,"value","triangles with edge longer than this will get deleted");
-    parse_args.Add("-delaunay_mina",&delaunay_minimum_angle,"value","triangles with angle smaller than this will get deleted");
+//    parse_args.Add("-delaunay_maxl",&delaunay_maximum_edge_length,"value","triangles with edge longer than this will get deleted");
+//    parse_args.Add("-delaunay_mina",&delaunay_minimum_angle,"value","triangles with angle smaller than this will get deleted");
     parse_args.Add("-stiffness",&ym,"value","scale stiffness");
     parse_args.Add("-poisson_ratio",&pr,"value","poisson's ratio");
     parse_args.Add("-hardening",&sim.xi,"value","harderning coefficient for normal plasticity");
     parse_args.Add("-flip",&sim.FLIP_alpha,"value","flip fraction");
-    parse_args.Add("-gres",&grid_res,"value","grid resolution");
-    parse_args.Add("-pres",&particle_res,"value","particle resolution");
-    parse_args.Add("-pn",&particle_count,"value","particle number");
-    parse_args.Add("-exclude",&particle_exclude_radius,"value","particle exclude radius when using pn");
+    parse_args.Add("-gres_scale",&gres_scale,"value","grid resolution scale");
+    parse_args.Add("-ppc",&particle_per_cell,"value","approximate particles per cell");
     parse_args.Add("-rho",&density_scale,"value","scale object density");
     parse_args.Add("-projection",&use_projection,"use poisson projection to enforce incompressibility");
+    parse_args.Add("-deviatoric",&sim.constitutive_model.dev_part_only,"only use the mu term of the constitituve model");
     parse_args.Parse(true);
     parse_args.Parse();
 
@@ -88,9 +89,10 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     // geometry setting
     switch(test_number){
-        case 1:{ // all materials together
-            sim.grid.Initialize(TV_INT(2*grid_res+1,2*grid_res+1),RANGE<TV>(TV(-1,-1),TV(1,1)));
-            
+        case 1:{ // iniitially stretched
+            TV_INT grid_count(81,81);
+            sim.grid.Initialize(grid_count*gres_scale,RANGE<TV>(TV(-1,-1),TV(1,1)));
+            T particle_exclude_radius=sim.grid.dX.Min()/particle_per_cell;
             sim.particles.Add_Randomly_Sampled_Object(RANGE<TV>(TV(-0.2,-0.2),TV(0.2,0.2)),particle_exclude_radius);
             
             int c1=sim.particles.number;
@@ -99,12 +101,6 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 80.0*ym/(2.0*(1.0+pr)), // mu
                 80.0*ym*pr/((1.0+pr)*(1.0-2.0*pr)), // lambda
                 true,0); // compress, pressure
-            
-//           sim.particles.Set_Material_Properties(0,c1,
-//                                                 (T)8*density_scale/1000, // mass per particle
-//                                                 0, // mu
-//                                                 0, // lambda
-//                                                 false,0); // compress, pressure
             
             sim.particles.Set_Plasticity(0,c1,
                 false,-1000,1.2, // plasticity_yield
@@ -117,16 +113,16 @@ void Run_Simulation(PARSE_ARGS& parse_args)
                 MATRIX<T,TV::m>(1,0,0,1), // Fe
                 MATRIX<T,TV::m>::Identity_Matrix(), // Fp
                 TV(0,0)); // initial velocity
+            int right_count=0;
             for(int p=0;p<sim.particles.number;p++){
-                if(sim.particles.Xm(p).x>0) sim.particles.V(p)=TV(-2,0);
-                else sim.particles.V(p)=TV(2,0);
-                
-            
-            }
-            
-            
-            // for(int p=0;p<c1;p++) sim.particles.X(p)=MATRIX<T,TV::m>(2,0,0,0.5)*sim.particles.Xm(p);
-            
+                if(sim.particles.Xm(p).x>0){
+                    right_count++;
+                    sim.particles.V(p)=TV(-2,0);}}
+            T the_other_velocity=right_count*(T)2/(c1-right_count);
+            for(int p=0;p<sim.particles.number;p++){
+                if(sim.particles.Xm(p).x<=0){
+                    right_count++;
+                    sim.particles.V(p)=TV(the_other_velocity,0);}}
             sim.use_gravity=false;
 
             break;}
@@ -140,101 +136,100 @@ void Run_Simulation(PARSE_ARGS& parse_args)
 
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),sim.grid,output_directory);
 
-    // Delaunay Triangulation
-    TRIANGULATED_AREA<T> ta;
-    if(use_delaunay){
-        DELAUNAY_TRIANGULATION_2D<T>::Triangulate(sim.particles.X,ta,delaunay_maximum_edge_length,delaunay_minimum_angle);
-        for(int s=0;s<ta.mesh.elements.m;s++){
-            Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(ta.mesh.elements(s)(0)),sim.particles.X(ta.mesh.elements(s)(1))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));
-            Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(ta.mesh.elements(s)(1)),sim.particles.X(ta.mesh.elements(s)(2))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));
-            Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(ta.mesh.elements(s)(2)),sim.particles.X(ta.mesh.elements(s)(0))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}
-        for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-        Flush_Frame<TV>("delaunay triangulation");
-        SEGMENTED_CURVE_2D<T>& boundary_curve=ta.Get_Boundary_Object();
-        for(int s=0;s<boundary_curve.mesh.elements.m;s++) Add_Debug_Object(VECTOR<TV,TV::m>(ta.particles.X.Subset(boundary_curve.mesh.elements(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));
-        for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-        Flush_Frame<TV>("delaunay triangulation boundary");}
+//    // Delaunay Triangulation
+//    TRIANGULATED_AREA<T> ta;
+//    if(use_delaunay){
+//        DELAUNAY_TRIANGULATION_2D<T>::Triangulate(sim.particles.X,ta,delaunay_maximum_edge_length,delaunay_minimum_angle);
+//        for(int s=0;s<ta.mesh.elements.m;s++){
+//            Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(ta.mesh.elements(s)(0)),sim.particles.X(ta.mesh.elements(s)(1))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));
+//            Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(ta.mesh.elements(s)(1)),sim.particles.X(ta.mesh.elements(s)(2))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));
+//            Add_Debug_Object(VECTOR<TV,TV::m>(sim.particles.X(ta.mesh.elements(s)(2)),sim.particles.X(ta.mesh.elements(s)(0))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}
+//        for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+//        Flush_Frame<TV>("delaunay triangulation");
+//        SEGMENTED_CURVE_2D<T>& boundary_curve=ta.Get_Boundary_Object();
+//        for(int s=0;s<boundary_curve.mesh.elements.m;s++) Add_Debug_Object(VECTOR<TV,TV::m>(ta.particles.X.Subset(boundary_curve.mesh.elements(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));
+//        for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+//        Flush_Frame<TV>("delaunay triangulation boundary");}
     
-    // voronoi reconstruction
-    if(use_voronoi){
-        voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
-
-        int c1=sim.particles.number;
-        sim.particles.Set_Plasticity(0,c1,
-            true,-1000,1.2, // plasticity_yield
-            false,-1,1); // plasticity_clamp
-        sim.particles.Set_Visco_Plasticity(0,c1,
-            false,100, // visco_nu
-            5000, // visco_tau
-            0); // visco_kappa
-        sim.particles.Set_Initial_State(0,c1,
-            MATRIX<T,TV::m>::Identity_Matrix(), // Fe
-            MATRIX<T,TV::m>::Identity_Matrix(), // Fp
-            TV()); // initial velocity
-        for(int p=0;p<sim.particles.number;p++){
-            T fullE=3000*ym;
-            T alpha=1;
-            T thisE=(1.0-alpha)*fullE/(0.25*0.25)*sqr(sim.particles.Xm(p).y)+alpha*fullE;
-            sim.particles.Set_Material_Properties(p,1,
-                 (T)200*density_scale/1000, // mass per particle
-                thisE/((T)2*((T)1+pr)), // mu
-                thisE*pr/(((T)1+pr)*((T)1-2*pr)), // lambda
-                false,0); // compress,pressure
-        }
-        sim.dirichlet_box.Append(RANGE<TV>(TV(-0.3,-0.3),TV(0.3,-0.22)));
-        sim.dirichlet_velocity.Append(TV(0,-0.1));
-        sim.dirichlet_box.Append(RANGE<TV>(TV(-0.3,0.22),TV(0.3,0.3)));
-        sim.dirichlet_velocity.Append(TV(0,0.1));
-
-        sim.Initialize();
-
-
-        voronoi.Build_Segments();
-        for(int i=0;i<voronoi.X.m;i++) {
-            if(voronoi.type(i)==1) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,0,0));
-            else if(voronoi.type(i)==10) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,1,0));
-            else if(voronoi.type(i)==100) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(0,0,1));}
-        for(int s=0;s<voronoi.segments.m;s++){
-            Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}
-        for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-        Flush_Frame<TV>("voronoi cells");}
-    if(use_voronoi_boundary){
-        voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
-        voronoi.Build_Boundary_Segments();
-        for(int i=0;i<voronoi.X.m;i++) {
-            if(voronoi.type(i)==1) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,0,0));
-            else if(voronoi.type(i)==10) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,1,0));
-            else if(voronoi.type(i)==100) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(0,0,1));}
-        for(int s=0;s<voronoi.boundary_segments.m;s++){
-            Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.boundary_segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}
-        for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
-        Flush_Frame<TV>("voronoi cell boundary");}
+//    // voronoi reconstruction
+//    if(use_voronoi){
+//        voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
+//
+//        int c1=sim.particles.number;
+//        sim.particles.Set_Plasticity(0,c1,
+//            true,-1000,1.2, // plasticity_yield
+//            false,-1,1); // plasticity_clamp
+//        sim.particles.Set_Visco_Plasticity(0,c1,
+//            false,100, // visco_nu
+//            5000, // visco_tau
+//            0); // visco_kappa
+//        sim.particles.Set_Initial_State(0,c1,
+//            MATRIX<T,TV::m>::Identity_Matrix(), // Fe
+//            MATRIX<T,TV::m>::Identity_Matrix(), // Fp
+//            TV()); // initial velocity
+//        for(int p=0;p<sim.particles.number;p++){
+//            T fullE=3000*ym;
+//            T alpha=1;
+//            T thisE=(1.0-alpha)*fullE/(0.25*0.25)*sqr(sim.particles.Xm(p).y)+alpha*fullE;
+//            sim.particles.Set_Material_Properties(p,1,
+//                 (T)200*density_scale/1000, // mass per particle
+//                thisE/((T)2*((T)1+pr)), // mu
+//                thisE*pr/(((T)1+pr)*((T)1-2*pr)), // lambda
+//                false,0); // compress,pressure
+//        }
+//        sim.dirichlet_box.Append(RANGE<TV>(TV(-0.3,-0.3),TV(0.3,-0.22)));
+//        sim.dirichlet_velocity.Append(TV(0,-0.1));
+//        sim.dirichlet_box.Append(RANGE<TV>(TV(-0.3,0.22),TV(0.3,0.3)));
+//        sim.dirichlet_velocity.Append(TV(0,0.1));
+//
+//        sim.Initialize();
+//
+//        voronoi.Build_Segments();
+//        for(int i=0;i<voronoi.X.m;i++) {
+//            if(voronoi.type(i)==1) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,0,0));
+//            else if(voronoi.type(i)==10) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,1,0));
+//            else if(voronoi.type(i)==100) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(0,0,1));}
+//        for(int s=0;s<voronoi.segments.m;s++){
+//            Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}
+//        for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+//        Flush_Frame<TV>("voronoi cells");}
+//    if(use_voronoi_boundary){
+//        voronoi.Initialize_With_And_As_A_Triangulated_Area_And_Relocate_Particles_To_Tri_Centers(ta,sim.particles);
+//        voronoi.Build_Boundary_Segments();
+//        for(int i=0;i<voronoi.X.m;i++) {
+//            if(voronoi.type(i)==1) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,0,0));
+//            else if(voronoi.type(i)==10) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(1,1,0));
+//            else if(voronoi.type(i)==100) Add_Debug_Particle(voronoi.X(i),VECTOR<T,3>(0,0,1));}
+//        for(int s=0;s<voronoi.boundary_segments.m;s++){
+//            Add_Debug_Object(VECTOR<TV,TV::m>(voronoi.X.Subset(voronoi.boundary_segments(s))),VECTOR<T,3>(1,0.57,0.25),VECTOR<T,3>(0,0,0));}
+//        for(int i=0;i<sim.particles.X.m;i++) Add_Debug_Particle(sim.particles.X(i),VECTOR<T,3>(0,1,0));
+//        Flush_Frame<TV>("voronoi cell boundary");}
 
     // projection init
     MPM_PROJECTION<TV> projection(sim);
 
-    // Greg Turk
-    if(use_turk){
-        SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV> recons;
-        ARRAY<TV> xbar;
-        ARRAY<MATRIX<T,TV::m> > G;
-        ARRAY<T> density;
-        GRID<TV> recons_grid(TV_INT(0.6*300+1,2*300+1),RANGE<TV>(TV(-0.3,-1),TV(0.3,1)));
-        ARRAY<T,TV_INT> phi;
-        recons.Compute_Kernal_Centers_And_Transformation_And_Density(sim.particles.X,sim.particles.mass,0.02,0.04,0.9,10,4,1400,0.5,xbar,G,density);
-        recons.Build_Scalar_Field(xbar,sim.particles.mass,density,G,recons_grid,phi);
-        T k;std::cin>>k;
-        for(int i=0;i<phi.array.m;i++) phi.array(i)-=k;
-    }
-
-    // Zhu and Bridson
-    SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON<TV> recons_bridson;
-    GRID<TV> recons_bridson_grid(TV_INT()+(grid_res*8+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
-    ARRAY<T,TV_INT> phi_bridson;
-    if(use_bridson){
-        recons_bridson.Initialize(particle_exclude_radius*4);
-        recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,0);
-        phi_bridson.array+=1;}
+//    // Greg Turk
+//    if(use_turk){
+//        SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL<TV> recons;
+//        ARRAY<TV> xbar;
+//        ARRAY<MATRIX<T,TV::m> > G;
+//        ARRAY<T> density;
+//        GRID<TV> recons_grid(TV_INT(0.6*300+1,2*300+1),RANGE<TV>(TV(-0.3,-1),TV(0.3,1)));
+//        ARRAY<T,TV_INT> phi;
+//        recons.Compute_Kernal_Centers_And_Transformation_And_Density(sim.particles.X,sim.particles.mass,0.02,0.04,0.9,10,4,1400,0.5,xbar,G,density);
+//        recons.Build_Scalar_Field(xbar,sim.particles.mass,density,G,recons_grid,phi);
+//        T k;std::cin>>k;
+//        for(int i=0;i<phi.array.m;i++) phi.array(i)-=k;
+//    }
+//
+//    // Zhu and Bridson
+//    SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON<TV> recons_bridson;
+//    GRID<TV> recons_bridson_grid(TV_INT()+(grid_res*8+1),RANGE<TV>(TV(-0.6,-0.6),TV(0.6,0.6)));
+//    ARRAY<T,TV_INT> phi_bridson;
+//    if(use_bridson){
+//        recons_bridson.Initialize(particle_exclude_radius*4);
+//        recons_bridson.Build_Scalar_Field(sim.particles.X,recons_bridson_grid,phi_bridson,0);
+//        phi_bridson.array+=1;}
 
     // draw wall
     for(T x=sim.grid.domain.min_corner(0)+3.5*sim.grid.dX.Min();x<sim.grid.domain.max_corner(0)-3.5*sim.grid.dX.Min();x+=sim.grid.dX.Min()*0.2){
