@@ -9,7 +9,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/OBJECTS_IN_CELL.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/CUT_CELL.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_BODY_COLLECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 namespace PhysBAM{
 namespace CUT_CELL_COMPUTATIONS{
@@ -18,17 +18,17 @@ namespace CUT_CELL_COMPUTATIONS{
 //#####################################################################
 namespace {
 template<class T,int d>
-bool Is_Occluded_Cell(VECTOR<T,d> centroid,VECTOR<T,d> cell_center,OBJECTS_IN_CELL<GRID<VECTOR<T,d> >,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_COLLECTION<VECTOR<T,d> >& collision_geometry_collection,VECTOR<int,d>& cell_index,VECTOR<int,d>& neighbor_index)
+bool Is_Occluded_Cell(VECTOR<T,d> centroid,VECTOR<T,d> cell_center,OBJECTS_IN_CELL<GRID<VECTOR<T,d> >,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_BODY_COLLECTION<VECTOR<T,d> >& collision_geometry_collection,VECTOR<int,d>& cell_index,VECTOR<int,d>& neighbor_index)
 {ARRAY<COLLISION_GEOMETRY_ID> collision_objects;objects_in_cell.Get_Objects_For_Cells(cell_index,neighbor_index,collision_geometry_collection.bodies.m,collision_objects);return collision_geometry_collection.Intersection_Between_Points(centroid,cell_center,&collision_objects);}
 template<class T,int d>
-bool Is_Occluded_Cell_Center(VECTOR<T,d> centroid,VECTOR<T,d> cell_center,OBJECTS_IN_CELL<GRID<VECTOR<T,d> >,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_COLLECTION<VECTOR<T,d> >& collision_geometry_collection,VECTOR<int,d>& cell_index)
+bool Is_Occluded_Cell_Center(VECTOR<T,d> centroid,VECTOR<T,d> cell_center,OBJECTS_IN_CELL<GRID<VECTOR<T,d> >,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_BODY_COLLECTION<VECTOR<T,d> >& collision_geometry_collection,VECTOR<int,d>& cell_index)
 {ARRAY<COLLISION_GEOMETRY_ID> collision_objects;objects_in_cell.Get_Objects_For_Cell(cell_index,collision_objects);return collision_geometry_collection.Intersection_Between_Points(centroid,cell_center,&collision_objects);}
 }
 //#####################################################################
 // Function Compute_Cut_Geometries 1-D
 //#####################################################################
 template<class T>
-void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_cells,typename COLLISION_GEOMETRY_COLLECTION_POLICY<GRID<VECTOR<T,1> > >::GRID_BASED_COLLISION_GEOMETRY& collision_bodies_affecting_fluid,ARRAY<CUT_CELLS<T,1>*,VECTOR<int,1> >& cut_cells){
+void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_cells,typename COLLISION_BODY_COLLECTION_POLICY<GRID<VECTOR<T,1> > >::GRID_BASED_COLLISION_GEOMETRY& collision_bodies_affecting_fluid,ARRAY<CUT_CELLS<T,1>*,VECTOR<int,1> >& cut_cells){
     typedef VECTOR<T,1> TV;
     typedef VECTOR<int,1> TV_INT;
     for(CELL_ITERATOR<TV> iterator(grid,num_ghost_cells);iterator.Valid();iterator.Next()){
@@ -80,7 +80,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_c
 // Function Compute_Cut_Geometries 2-D
 //#####################################################################
 template<class T>
-void Compute_Cut_Geometries(const GRID<VECTOR<T,2> >& grid,const int num_ghost_cells,typename COLLISION_GEOMETRY_COLLECTION_POLICY<GRID<VECTOR<T,2> > >::GRID_BASED_COLLISION_GEOMETRY& collision_bodies_affecting_fluid,ARRAY<CUT_CELLS<T,2>*,VECTOR<int,2> >& cut_cells)
+void Compute_Cut_Geometries(const GRID<VECTOR<T,2> >& grid,const int num_ghost_cells,typename COLLISION_BODY_COLLECTION_POLICY<GRID<VECTOR<T,2> > >::GRID_BASED_COLLISION_GEOMETRY& collision_bodies_affecting_fluid,ARRAY<CUT_CELLS<T,2>*,VECTOR<int,2> >& cut_cells)
 {
     PHYSBAM_NOT_IMPLEMENTED();
     // ARRAY<TV_INT> neighbor_offsets(8);
@@ -105,7 +105,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,2> >& grid,const int num_ghost_c
 // Function Compute_Cut_Geometries 3-D
 //#####################################################################
 template<class T>
-void Compute_Cut_Geometries(const GRID<VECTOR<T,3> >& grid,const int num_ghost_cells,typename COLLISION_GEOMETRY_COLLECTION_POLICY<GRID<VECTOR<T,3> > >::GRID_BASED_COLLISION_GEOMETRY& collision_bodies_affecting_fluid,ARRAY<CUT_CELLS<T,3>*,VECTOR<int,3> >& cut_cells)
+void Compute_Cut_Geometries(const GRID<VECTOR<T,3> >& grid,const int num_ghost_cells,typename COLLISION_BODY_COLLECTION_POLICY<GRID<VECTOR<T,3> > >::GRID_BASED_COLLISION_GEOMETRY& collision_bodies_affecting_fluid,ARRAY<CUT_CELLS<T,3>*,VECTOR<int,3> >& cut_cells)
 {PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
 template void Compute_Cut_Geometries(const GRID<VECTOR<float,1> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<float,1> > >&,ARRAY<CUT_CELLS<float,1>*,VECTOR<int,1> >&);

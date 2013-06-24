@@ -17,14 +17,14 @@
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_BODY_COLLECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <cassert>
 #include <cfloat>
 namespace PhysBAM{
 
-template<class T_GRID> struct COLLISION_GEOMETRY_COLLECTION_POLICY;
+template<class T_GRID> struct COLLISION_BODY_COLLECTION_POLICY;
 template<class T_GRID> struct INTERPOLATION_POLICY;
 template<class T_GRID> class LEVELSET_CALLBACKS; // TODO: invalid dependency
 template<class T_GRID> struct BOUNDARY_POLICY;

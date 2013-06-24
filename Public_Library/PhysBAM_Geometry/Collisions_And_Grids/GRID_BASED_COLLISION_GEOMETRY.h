@@ -8,7 +8,7 @@
 #define __GRID_BASED_COLLISION_GEOMETRY__
 
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/OBJECTS_IN_CELL.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
@@ -26,7 +26,7 @@ class GRID_BASED_COLLISION_GEOMETRY:public NONCOPYABLE
     typedef typename T_FACE_ARRAYS_BOOL::template REBIND<VECTOR<bool,T_GRID::dimension> >::TYPE T_FACE_ARRAYS_BOOL_DIMENSION;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
 public:
-    COLLISION_GEOMETRY_COLLECTION<TV> collision_geometry_collection;
+    COLLISION_BODY_COLLECTION<TV> collision_geometry_collection;
     // TODO: Add flag to disable collision bodies for fluid.
 
     T_GRID& grid;
@@ -57,7 +57,7 @@ public:
     bool Intersection_With_Any_Simplicial_Object(RAY<TV>& ray,COLLISION_GEOMETRY_ID& body_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const
     {return collision_geometry_collection.Intersection_With_Any_Simplicial_Object(ray,body_id,objects);}
     
-    void Add_Bodies(COLLISION_GEOMETRY_COLLECTION<TV>& collision_geometry_list)
+    void Add_Bodies(COLLISION_BODY_COLLECTION<TV>& collision_geometry_list)
     {collision_geometry_collection.Add_Bodies(collision_geometry_list);}
 
     void Remove_Body(COLLISION_GEOMETRY_ID id)

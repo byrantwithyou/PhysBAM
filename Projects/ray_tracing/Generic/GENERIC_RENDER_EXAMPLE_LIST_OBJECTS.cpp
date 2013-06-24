@@ -6,7 +6,7 @@
 #include <PhysBAM_Tools/Arrays/IDENTITY_ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
@@ -175,7 +175,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 object->Update_Transform(current_transform*rigid_body_collection.Rigid_Body(id).Frame().Matrix());}
             LOG::cout<<"Processed Rigid Body "<<id<<std::endl;}}
     else if(type=="Deformable_Object"){
-        DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=*new DEFORMABLE_BODY_COLLECTION<TV>(*new COLLISION_GEOMETRY_COLLECTION<TV>);
+        DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=*new DEFORMABLE_BODY_COLLECTION<TV>(*new COLLISION_BODY_COLLECTION<TV>);
         int local_frame=parameters.Get_Parameter("Frame",frame);
         bool split_object=parameters.Get_Parameter("Split_Object",false);
         std::string sample_locations_filename=parameters.Get_Parameter("Sample_Locations_File",std::string("unknown"));

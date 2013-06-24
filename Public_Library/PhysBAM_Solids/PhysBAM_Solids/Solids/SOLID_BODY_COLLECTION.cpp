@@ -26,7 +26,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SOLID_BODY_COLLECTION<TV>::
 SOLID_BODY_COLLECTION()
-    :collision_body_list(*new COLLISION_GEOMETRY_COLLECTION<TV>),
+    :collision_body_list(*new COLLISION_BODY_COLLECTION<TV>),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),
     rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(&collision_body_list)),
     print_energy(false),simulate(true),iterations_used_diagnostic(0)

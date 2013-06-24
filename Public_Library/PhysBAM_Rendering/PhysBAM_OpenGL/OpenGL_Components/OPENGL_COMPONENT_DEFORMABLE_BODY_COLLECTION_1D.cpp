@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
@@ -22,7 +22,7 @@ template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>:
 OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(const std::string& prefix,const int start_frame)
     :OPENGL_COMPONENT("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),display_mode(0),
     incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
-    collision_body_list(*new COLLISION_GEOMETRY_COLLECTION<TV>),
+    collision_body_list(*new COLLISION_BODY_COLLECTION<TV>),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),real_selection(0),
     color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map())
 {

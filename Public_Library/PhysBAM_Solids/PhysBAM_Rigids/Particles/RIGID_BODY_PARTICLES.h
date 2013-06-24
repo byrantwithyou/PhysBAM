@@ -18,7 +18,7 @@ namespace PhysBAM{
 
 template<class TV> class RIGID_BODY;
 template<class TV> class STRUCTURE;
-template<class TV> class COLLISION_GEOMETRY_COLLECTION;
+template<class TV> class COLLISION_BODY_COLLECTION;
 template<class TV,class ID> class STRUCTURE_LIST;
 
 template<class TV>

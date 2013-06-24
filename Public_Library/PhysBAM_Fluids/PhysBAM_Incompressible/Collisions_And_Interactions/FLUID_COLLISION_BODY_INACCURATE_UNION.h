@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/GRID_BASED_COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
@@ -58,7 +58,7 @@ public:
     // TODO: check whether this is still valid
     //      in the low accuracy case, the points inside the object are set to invalid in the driver, so this does not need to invalidate anything
     //      (i.e., it ignored crossovers)
-    // If it isn't the case, we need to generalize COLLISION_GEOMETRY_COLLECTION::Latest_Crossover to work for this.
+    // If it isn't the case, we need to generalize COLLISION_BODY_COLLECTION::Latest_Crossover to work for this.
     bool Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,int& simplex_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const PHYSBAM_OVERRIDE
     {return false;}
 

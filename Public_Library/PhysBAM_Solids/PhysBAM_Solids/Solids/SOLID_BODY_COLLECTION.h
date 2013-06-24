@@ -28,7 +28,7 @@ class SOLID_BODY_COLLECTION:public NONCOPYABLE
     typedef typename RIGIDS_FORCES<TV>::FREQUENCY_DATA T_FREQUENCY_RIGID;
     typedef typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA T_FREQUENCY_DEFORMABLE;
 public:
-    COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list;
+    COLLISION_BODY_COLLECTION<TV>& collision_body_list;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     ARRAY<SOLIDS_FORCES<TV>*> solids_forces;

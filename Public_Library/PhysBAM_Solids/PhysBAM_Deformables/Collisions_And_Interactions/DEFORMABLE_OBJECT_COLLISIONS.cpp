@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Arrays/PROJECTED_ARRAY.h>
 #include <PhysBAM_Tools/Utilities/Find_Type.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_PARTICLE_STATE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
@@ -29,7 +29,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> DEFORMABLE_OBJECT_COLLISIONS<TV>::
 DEFORMABLE_OBJECT_COLLISIONS(DEFORMABLE_PARTICLES<TV>& particles,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,ARRAY<STRUCTURE<TV>*>& deformable_object_structures,
-    COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list)
+    COLLISION_BODY_COLLECTION<TV>& collision_body_list)
     :particles(particles),deformable_body_collection(deformable_body_collection),deformable_object_structures(deformable_object_structures),collision_body_list(collision_body_list),
     collision_tolerance((T)1e-6),use_spatial_partition(true),disable_multiple_levelset_collisions(true),use_protectors(false),maximum_levelset_collision_projection_velocity(FLT_MAX),
     protection_thickness((T)1e-3),ignore_priorities(false),collisions_on(false),collision_tolerances(0),thickness_table(0),friction_table(0),use_structure_collide_collision_body(false)

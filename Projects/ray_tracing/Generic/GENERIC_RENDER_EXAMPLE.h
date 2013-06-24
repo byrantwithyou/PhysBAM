@@ -12,7 +12,7 @@
 #include <PhysBAM_Tools/Data_Structures/STACK.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Parsing/GENERIC_PARSER.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
@@ -45,7 +45,7 @@ public:
     bool use_spatial_partition;
 
     ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>* body_list;
-    COLLISION_GEOMETRY_COLLECTION<TV> collision_body_list_dummy;
+    COLLISION_BODY_COLLECTION<TV> collision_body_list_dummy;
     GENERIC_PARSER<T>* parser;
 
     GENERIC_RENDER_EXAMPLE(const std::string& filename_input,const int frame_input)

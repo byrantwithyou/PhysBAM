@@ -16,7 +16,7 @@ namespace PhysBAM{
 
 template<class TV> class BINDING_LIST;
 template<class TV> class DEFORMABLE_GEOMETRY_COLLECTION;
-template<class TV> class COLLISION_GEOMETRY_COLLECTION;
+template<class TV> class COLLISION_BODY_COLLECTION;
 template<class TV> class DEFORMABLE_OBJECT_COLLISIONS;
 template<class TV> class DEFORMABLE_PARTICLES;
 template<class TV> class SOFT_BINDINGS;
@@ -80,7 +80,7 @@ public:
     bool use_nonembedded_self_collision; // TODO: have one of these per fragment
     bool check_stale;
 
-    DEFORMABLE_BODY_COLLECTION(COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list);
+    DEFORMABLE_BODY_COLLECTION(COLLISION_BODY_COLLECTION<TV>& collision_body_list);
     virtual ~DEFORMABLE_BODY_COLLECTION();
 
     template<class T_FORCE> T_FORCE

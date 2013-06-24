@@ -20,7 +20,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> IMPLICIT_BOUNDARY_CONDITION_COLLISIONS<TV>::
-IMPLICIT_BOUNDARY_CONDITION_COLLISIONS(COLLISION_GEOMETRY_COLLECTION<TV>& collision_geometry_collection_input,
+IMPLICIT_BOUNDARY_CONDITION_COLLISIONS(COLLISION_BODY_COLLECTION<TV>& collision_geometry_collection_input,
     const bool use_implicit_geometry_input)
     :collision_geometry_collection(collision_geometry_collection_input),use_implicit_geometry(use_implicit_geometry_input)
 {}

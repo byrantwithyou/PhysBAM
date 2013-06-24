@@ -7,7 +7,7 @@
 #ifndef __OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D__
 #define __OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D__
 
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLES_COLLISIONS_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -44,7 +44,7 @@ protected:
     bool own_deformable_body;
     int display_soft_bound_surface_mode,display_hard_bound_surface_mode,display_forces_mode,interaction_pair_display_mode;
 public:
-    COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list;
+    COLLISION_BODY_COLLECTION<TV>& collision_body_list;
     DEFORMABLE_BODY_COLLECTION<TV> &deformable_body_collection;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection;
     ARRAY<OPENGL_SEGMENTED_CURVE_3D<T>*> segmented_curve_objects;

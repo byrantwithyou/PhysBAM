@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED_EULERIAN.h>
@@ -261,7 +261,7 @@ Initialize_Bodies()
     //fake deformable object for guide hairs
     offset=particles.Size();
     if(!guide_sim_folder.empty()) {
-        COLLISION_GEOMETRY_COLLECTION<TV> guide_list;
+        COLLISION_BODY_COLLECTION<TV> guide_list;
         guide_object1=new DEFORMABLE_BODY_COLLECTION<TV>(guide_list);
         guide_object2=new DEFORMABLE_BODY_COLLECTION<TV>(guide_list);
         guide_object1->Read(stream_type,guide_sim_folder+"/",guide_sim_folder+"/",0,-1,1,solids_parameters.write_from_every_process);

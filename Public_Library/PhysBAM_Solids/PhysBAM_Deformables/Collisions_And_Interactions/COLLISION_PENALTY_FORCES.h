@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
@@ -27,7 +27,7 @@ class COLLISION_PENALTY_FORCES:public DEFORMABLES_FORCES<TV_input>
 public:
     using BASE::particles;
 
-    COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list;
+    COLLISION_BODY_COLLECTION<TV>* collision_body_list;
     ARRAY<bool,COLLISION_GEOMETRY_ID> skip_collision_body;
     ARRAY<int> check_collision; // TODO: If Append is being called on this, why isn't this a ARRAY?
     ARRAY<TV> collision_force;
@@ -56,7 +56,7 @@ public:
     void Set_Separation_Parameter(const T separation_parameter_input=(T)1e-4)
     {separation_parameter=separation_parameter_input;}
 
-    void Set_Collision_Body_List(COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list_input)
+    void Set_Collision_Body_List(COLLISION_BODY_COLLECTION<TV>& collision_body_list_input)
     {collision_body_list=&collision_body_list_input;skip_collision_body.Resize(collision_body_list->collision_bodies.m);skip_collision_body.Fill(false);}
 
     template<class T_MESH>

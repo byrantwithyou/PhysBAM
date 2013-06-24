@@ -38,7 +38,7 @@ protected:
     int selected_vertex;
     bool invalidate_deformable_objects_selection_each_frame;
 public:
-    COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list;
+    COLLISION_BODY_COLLECTION<TV>& collision_body_list;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>* real_selection;
     ARRAY<OPENGL_POINT_SIMPLICES_1D<T>*> point_simplices_1d_objects;

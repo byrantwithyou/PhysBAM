@@ -25,7 +25,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> DEFORMABLE_BODY_COLLECTION<TV>::
-DEFORMABLE_BODY_COLLECTION(COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list)
+DEFORMABLE_BODY_COLLECTION(COLLISION_BODY_COLLECTION<TV>& collision_body_list)
     :particles(*new DEFORMABLE_PARTICLES<TV>),simulate(true),
     binding_list(*new BINDING_LIST<TV>(*this)),soft_bindings(*new SOFT_BINDINGS<TV>(binding_list)),mpi_solids(0),implicit_damping(true),
     print_diagnostics(false),print_residuals(false),print_energy(false),iterations_used_diagnostic(0),

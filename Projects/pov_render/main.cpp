@@ -7,7 +7,7 @@
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -38,7 +38,7 @@ DEFORMABLE_BODY_COLLECTION<TV>& Load_Deformable_Geometry_Collection(const std::s
 {
     DEFORMABLE_BODY_COLLECTION<TV>*& deformable_geometry_collection=deformable_geometry_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
     if(deformable_geometry_collection) return *deformable_geometry_collection;
-    deformable_geometry_collection=new DEFORMABLE_BODY_COLLECTION<TV>(*new COLLISION_GEOMETRY_COLLECTION<TV>);
+    deformable_geometry_collection=new DEFORMABLE_BODY_COLLECTION<TV>(*new COLLISION_BODY_COLLECTION<TV>);
     deformable_geometry_collection->Read(STREAM_TYPE(RW()),location,location,frame,-1,true,true);
     return *deformable_geometry_collection;
 }

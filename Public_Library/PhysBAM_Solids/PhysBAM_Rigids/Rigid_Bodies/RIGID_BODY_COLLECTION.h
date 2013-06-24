@@ -31,7 +31,7 @@ class RIGID_BODY_COLLECTION:public NONCOPYABLE
 public:
     typedef int HAS_TYPED_READ_WRITE;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles;
-    COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list;
+    COLLISION_BODY_COLLECTION<TV>* collision_body_list;
     STRUCTURE_LIST<TV,int>& structure_list;
     bool always_create_structure;
     HASHTABLE<std::string,int>& structure_hash; // maps to id
@@ -58,7 +58,7 @@ public:
 
     RIGID_BODY<TV>* New_Body(int index);
 
-    RIGID_BODY_COLLECTION(COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input);
+    RIGID_BODY_COLLECTION(COLLISION_BODY_COLLECTION<TV>* collision_body_list_input);
     virtual ~RIGID_BODY_COLLECTION();
 
     RIGID_BODY_STATE<TV> State(const int particle) const

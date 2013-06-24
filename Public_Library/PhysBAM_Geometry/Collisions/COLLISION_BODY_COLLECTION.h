@@ -2,10 +2,10 @@
 // Copyright 2004-2008, Ron Fedkiw, Geoffrey Irving, Nipun Kwatra, Frank Losasso, Andrew Selle, Tamar Shinar, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class COLLISION_GEOMETRY_COLLECTION
+// Class COLLISION_BODY_COLLECTION
 //#####################################################################
-#ifndef __COLLISION_GEOMETRY_COLLECTION__
-#define __COLLISION_GEOMETRY_COLLECTION__
+#ifndef __COLLISION_BODY_COLLECTION__
+#define __COLLISION_BODY_COLLECTION__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
@@ -18,7 +18,7 @@ namespace PhysBAM{
 template<class TV> class RAY;
 
 template<class TV>
-class COLLISION_GEOMETRY_COLLECTION:public NONCOPYABLE
+class COLLISION_BODY_COLLECTION:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
 public:
@@ -32,8 +32,8 @@ public:
     HASHTABLE<COLLISION_GEOMETRY_ID,int> collision_geometry_id_to_geometry_id;
     T collision_body_thickness;
 
-    COLLISION_GEOMETRY_COLLECTION();
-    virtual ~COLLISION_GEOMETRY_COLLECTION();
+    COLLISION_BODY_COLLECTION();
+    virtual ~COLLISION_BODY_COLLECTION();
 
     COLLISION_GEOMETRY<TV>& operator()(const COLLISION_GEOMETRY_ID id)
     {return *bodies(id);}
@@ -61,7 +61,7 @@ public:
 
 //#####################################################################
     COLLISION_GEOMETRY_ID Add_Body(COLLISION_GEOMETRY<TV>* collision_body,const int geometry_id,bool owns_collision_geometry_input);
-    void Add_Bodies(COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list);
+    void Add_Bodies(COLLISION_BODY_COLLECTION<TV>& collision_body_list);
     void Remove_Body(COLLISION_GEOMETRY_ID id);
     bool Intersection_Between_Points(const TV& x1,const TV& x2,COLLISION_GEOMETRY_ID& body_id,int& triangle_id,TV& intersection_point,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;
     bool Intersection_Between_Points(const TV& x1,const TV& x2,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;

@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE.h>
@@ -35,7 +35,7 @@ struct ALLOCATE_BODY_HELPER:public ALLOCATE_HELPER<TV>
 // Constructor
 //#####################################################################
 template<class TV> RIGID_BODY_COLLECTION<TV>::
-RIGID_BODY_COLLECTION(COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input)
+RIGID_BODY_COLLECTION(COLLISION_BODY_COLLECTION<TV>* collision_body_list_input)
     :rigid_body_particles(*new RIGID_BODY_PARTICLES<TV>()),collision_body_list(collision_body_list_input),structure_list(*new STRUCTURE_LIST<TV,int>),always_create_structure(false),
     structure_hash(*new HASHTABLE<std::string,int>),frame_list_key(0),frame_list_active(0),check_stale(false),last_read_key(-1),last_read_active(-1),
     allocate_helper(new ALLOCATE_BODY_HELPER<TV>(*this)),owns_collision_body_list(false),
@@ -45,7 +45,7 @@ RIGID_BODY_COLLECTION(COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_inp
 {
     if(!allocate_helper) allocate_helper=new ALLOCATE_BODY_HELPER<TV>(*this);
     if(!collision_body_list){
-        collision_body_list=new COLLISION_GEOMETRY_COLLECTION<TV>;
+        collision_body_list=new COLLISION_BODY_COLLECTION<TV>;
         owns_collision_body_list=true;}
 }
 //#####################################################################

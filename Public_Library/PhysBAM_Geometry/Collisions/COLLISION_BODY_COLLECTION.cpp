@@ -9,20 +9,20 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class TV> COLLISION_GEOMETRY_COLLECTION<TV>::
-COLLISION_GEOMETRY_COLLECTION()
+template<class TV> COLLISION_BODY_COLLECTION<TV>::
+COLLISION_BODY_COLLECTION()
     :spatial_partition(0),collision_body_thickness(0)
 {}
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class TV> COLLISION_GEOMETRY_COLLECTION<TV>::
-~COLLISION_GEOMETRY_COLLECTION()
+template<class TV> COLLISION_BODY_COLLECTION<TV>::
+~COLLISION_BODY_COLLECTION()
 {
     delete spatial_partition;
     for(COLLISION_GEOMETRY_ID id(0);id<bodies.m;id++) if(owns_collision_geometry(id)) delete bodies(id);
@@ -30,7 +30,7 @@ template<class TV> COLLISION_GEOMETRY_COLLECTION<TV>::
 //##################################################################### 
 // Function Add_Body
 //##################################################################### 
-template<class TV> COLLISION_GEOMETRY_ID COLLISION_GEOMETRY_COLLECTION<TV>::
+template<class TV> COLLISION_GEOMETRY_ID COLLISION_BODY_COLLECTION<TV>::
 Add_Body(COLLISION_GEOMETRY<TV>* body,const int geometry_id,bool owns_collision_geometry_input)
 {
     COLLISION_GEOMETRY_ID id;
@@ -49,8 +49,8 @@ Add_Body(COLLISION_GEOMETRY<TV>* body,const int geometry_id,bool owns_collision_
 //##################################################################### 
 // Function Add_Bodies
 //##################################################################### 
-template<class TV> void COLLISION_GEOMETRY_COLLECTION<TV>::
-Add_Bodies(COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list)
+template<class TV> void COLLISION_BODY_COLLECTION<TV>::
+Add_Bodies(COLLISION_BODY_COLLECTION<TV>& collision_body_list)
 {
     for(COLLISION_GEOMETRY_ID i(0);i<collision_body_list.bodies.m;i++)
         if(collision_body_list.Is_Active(i))
@@ -59,7 +59,7 @@ Add_Bodies(COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list)
 //#####################################################################
 // Function Remove_Body
 //#####################################################################
-template<class TV> void COLLISION_GEOMETRY_COLLECTION<TV>::
+template<class TV> void COLLISION_BODY_COLLECTION<TV>::
 Remove_Body(COLLISION_GEOMETRY_ID id)
 {
     PHYSBAM_ASSERT(Is_Active(id));
@@ -73,7 +73,7 @@ Remove_Body(COLLISION_GEOMETRY_ID id)
 //##################################################################### 
 // Function Intersection_Between_Points
 //##################################################################### 
-template<class TV> bool COLLISION_GEOMETRY_COLLECTION<TV>::
+template<class TV> bool COLLISION_BODY_COLLECTION<TV>::
 Intersection_Between_Points(const TV& x1,const TV& x2,COLLISION_GEOMETRY_ID& body_id,int& triangle_id,TV& intersection_point,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     TV ray_vector=x2-x1;T ray_vector_length_squared=ray_vector.Magnitude_Squared();
@@ -88,7 +88,7 @@ Intersection_Between_Points(const TV& x1,const TV& x2,COLLISION_GEOMETRY_ID& bod
 //##################################################################### 
 // Function Intersection_Between_Points
 //##################################################################### 
-template<class TV> bool COLLISION_GEOMETRY_COLLECTION<TV>::
+template<class TV> bool COLLISION_BODY_COLLECTION<TV>::
 Intersection_Between_Points(const TV& x1,const TV& x2,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     TV ray_vector=x2-x1;T ray_vector_length_squared=ray_vector.Magnitude_Squared();COLLISION_GEOMETRY_ID body_id;int triangle_id;
@@ -100,7 +100,7 @@ Intersection_Between_Points(const TV& x1,const TV& x2,const ARRAY<COLLISION_GEOM
 //##################################################################### 
 // Function Intersection_With_Any_Simplicial_Object
 //##################################################################### 
-template<class TV> bool COLLISION_GEOMETRY_COLLECTION<TV>::
+template<class TV> bool COLLISION_BODY_COLLECTION<TV>::
 Intersection_With_Any_Simplicial_Object(RAY<TV>& ray,COLLISION_GEOMETRY_ID& body_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const 
 {
     bool hit=false;
@@ -111,7 +111,7 @@ Intersection_With_Any_Simplicial_Object(RAY<TV>& ray,COLLISION_GEOMETRY_ID& body
 //##################################################################### 
 // Function Closest_Non_Intersecting_Point_Of_Any_Simplicial_Object
 //##################################################################### 
-template<class TV> bool COLLISION_GEOMETRY_COLLECTION<TV>::
+template<class TV> bool COLLISION_BODY_COLLECTION<TV>::
 Closest_Non_Intersecting_Point_Of_Any_Simplicial_Object(RAY<TV>& ray,COLLISION_GEOMETRY_ID& body_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const 
 {
     bool hit=false;
@@ -122,7 +122,7 @@ Closest_Non_Intersecting_Point_Of_Any_Simplicial_Object(RAY<TV>& ray,COLLISION_G
 //##################################################################### 
 // Function Inside_Any_Simplex_Of_Any_Body
 //##################################################################### 
-template<class TV> bool COLLISION_GEOMETRY_COLLECTION<TV>::
+template<class TV> bool COLLISION_BODY_COLLECTION<TV>::
 Inside_Any_Simplex_Of_Any_Body(const TV& location,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     if(!objects){for(COLLISION_GEOMETRY_ID i(0);i<bodies.m;i++) if(Is_Active(i) && bodies(i)->active && bodies(i)->Inside_Any_Simplex(location,simplex_id)){body_id=i;return true;}}
@@ -132,7 +132,7 @@ Inside_Any_Simplex_Of_Any_Body(const TV& location,COLLISION_GEOMETRY_ID& body_id
 //##################################################################### 
 // Function Inside_Any_Body
 //##################################################################### 
-template<class TV> bool COLLISION_GEOMETRY_COLLECTION<TV>::
+template<class TV> bool COLLISION_BODY_COLLECTION<TV>::
 Inside_Any_Body(const TV& location,const T thickness_over_two,COLLISION_GEOMETRY_ID& body_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     if(!objects){for(COLLISION_GEOMETRY_ID i(0);i<bodies.m;i++) if(Is_Active(i) && bodies(i)->active && bodies(i)->Inside(location,thickness_over_two)){body_id=i;return true;}}
@@ -142,7 +142,7 @@ Inside_Any_Body(const TV& location,const T thickness_over_two,COLLISION_GEOMETRY
 //##################################################################### 
 // Function Implicit_Geometry_Lazy_Inside_Any_Body
 //##################################################################### 
-template<class TV> bool COLLISION_GEOMETRY_COLLECTION<TV>::
+template<class TV> bool COLLISION_BODY_COLLECTION<TV>::
 Implicit_Geometry_Lazy_Inside_Any_Body(const TV& location,COLLISION_GEOMETRY_ID& body_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     if(!objects){
@@ -156,7 +156,7 @@ Implicit_Geometry_Lazy_Inside_Any_Body(const TV& location,COLLISION_GEOMETRY_ID&
 //##################################################################### 
 // Function Closest_Boundary_Point
 //##################################################################### 
-template<class TV> TV COLLISION_GEOMETRY_COLLECTION<TV>::
+template<class TV> TV COLLISION_BODY_COLLECTION<TV>::
 Closest_Boundary_Point(const TV& location,const T max_distance,T& distance,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     distance=FLT_MAX;TV point,current_point;T current_distance;int current_simplex_id;
@@ -174,7 +174,7 @@ Closest_Boundary_Point(const TV& location,const T max_distance,T& distance,COLLI
 //#####################################################################
 // Function Update_Spatial_Partition
 //#####################################################################
-template<class TV> void COLLISION_GEOMETRY_COLLECTION<TV>::
+template<class TV> void COLLISION_BODY_COLLECTION<TV>::
 Update_Spatial_Partition(const SPATIAL_PARTITION_VOXEL_SIZE_HEURISTIC heuristic,const int number_of_boxes,const T voxel_size_scale_factor)
 {
     if(!spatial_partition){
@@ -185,17 +185,17 @@ Update_Spatial_Partition(const SPATIAL_PARTITION_VOXEL_SIZE_HEURISTIC heuristic,
 //##################################################################### 
 // Function Update_Bounding_Boxes
 //##################################################################### 
-template<class TV> void COLLISION_GEOMETRY_COLLECTION<TV>::
+template<class TV> void COLLISION_BODY_COLLECTION<TV>::
 Update_Bounding_Boxes()
 {
     for(COLLISION_GEOMETRY_ID i(0);i<bodies.m;i++) if(Is_Active(i)) bodies(i)->Update_Bounding_Box();
 }
 //#####################################################################
 namespace PhysBAM{
-template class COLLISION_GEOMETRY_COLLECTION<VECTOR<float,3> >;
-template class COLLISION_GEOMETRY_COLLECTION<VECTOR<float,2> >;
-template class COLLISION_GEOMETRY_COLLECTION<VECTOR<float,1> >;
-template class COLLISION_GEOMETRY_COLLECTION<VECTOR<double,3> >;
-template class COLLISION_GEOMETRY_COLLECTION<VECTOR<double,2> >;
-template class COLLISION_GEOMETRY_COLLECTION<VECTOR<double,1> >;
+template class COLLISION_BODY_COLLECTION<VECTOR<float,3> >;
+template class COLLISION_BODY_COLLECTION<VECTOR<float,2> >;
+template class COLLISION_BODY_COLLECTION<VECTOR<float,1> >;
+template class COLLISION_BODY_COLLECTION<VECTOR<double,3> >;
+template class COLLISION_BODY_COLLECTION<VECTOR<double,2> >;
+template class COLLISION_BODY_COLLECTION<VECTOR<double,1> >;
 }

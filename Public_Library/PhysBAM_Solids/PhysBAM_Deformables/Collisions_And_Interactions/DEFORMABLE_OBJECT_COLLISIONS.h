@@ -35,7 +35,7 @@ public:
     DEFORMABLE_PARTICLES<TV>& particles;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     ARRAY<STRUCTURE<TV>*>& deformable_object_structures;
-    COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list;
+    COLLISION_BODY_COLLECTION<TV>& collision_body_list;
     ARRAY<bool> check_collision;
     ARRAY<COLLISION_PARTICLE_STATE<TV> > particle_states; // TODO: remove this in exchange for sparser enforced_particles
     ARRAY<COLLISION_GEOMETRY_ID> particle_to_collision_body_id;
@@ -61,7 +61,7 @@ private:
 public:
 
     DEFORMABLE_OBJECT_COLLISIONS(DEFORMABLE_PARTICLES<TV>& particles,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,ARRAY<STRUCTURE<TV>*>& deformable_object_structures,
-        COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list);
+        COLLISION_BODY_COLLECTION<TV>& collision_body_list);
 
     virtual ~DEFORMABLE_OBJECT_COLLISIONS();
 
