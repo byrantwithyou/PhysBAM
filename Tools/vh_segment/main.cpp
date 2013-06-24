@@ -2,10 +2,10 @@
 // Copyright 2005, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Images/IMAGE.h>
-#include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Images/IMAGE.h>
+#include <Tools/Parsing/PARAMETER_LIST.h>
+#include <Tools/Parsing/STRING_UTILITIES.h>
 #include "VH_LEVELSET_BUILDER.h"
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
 

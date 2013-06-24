@@ -6,15 +6,15 @@
 //#####################################################################
 #ifndef __VORONOI_2D__
 #define __VORONOI_2D__
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Data_Structures/TRIPLE.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Matrices/MATRIX.h>
+#include <Tools/Vectors/VECTOR.h>
+#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
+#include <Geometry/Topology/SEGMENT_MESH.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include "MPM_PARTICLES.h"
 namespace PhysBAM{
 template<class T>

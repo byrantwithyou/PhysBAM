@@ -2,8 +2,8 @@
 // Copyright 2009, Michael Lentine, Bridget Vuong.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Data_Structures/DIRECTED_GRAPH.h>
-#include <PhysBAM_Tools/Log/LOG.h>
+#include <Tools/Data_Structures/DIRECTED_GRAPH.h>
+#include <Tools/Log/LOG.h>
 #include <algorithm>
 #include <fstream>
 #include <iostream>

@@ -2,17 +2,17 @@
 // Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
-#include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
-#include <PhysBAM_Geometry/Topology/TETRAHEDRON_MESH.h>
-#include <PhysBAM_Geometry/Topology/TOPOLOGY_POLICY.h>
-#include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
+#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Data_Structures/PAIR.h>
+#include <Tools/Data_Structures/UNION_FIND.h>
+#include <Tools/Log/LOG.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
+#include <Geometry/Topology/SEGMENT_MESH.h>
+#include <Geometry/Topology/TETRAHEDRON_MESH.h>
+#include <Geometry/Topology/TOPOLOGY_POLICY.h>
+#include <Geometry/Topology/TRIANGLE_MESH.h>
 #include "MARCHING_TETRAHEDRA_CUTTING.h"
 using namespace PhysBAM;
 const int edge_table[2][6][2]=

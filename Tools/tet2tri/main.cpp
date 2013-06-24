@@ -2,10 +2,10 @@
 // Copyright 2003-2005, Neil Molino, Andrew Selle, Michael Turitzin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <cstring>
 #include <fstream>
 using namespace PhysBAM;

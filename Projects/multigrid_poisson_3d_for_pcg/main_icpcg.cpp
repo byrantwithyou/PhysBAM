@@ -3,15 +3,15 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.
 //#####################################################################
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
-#include <PhysBAM_Tools/Krylov_Solvers/PCG_SPARSE.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
+#include <Tools/Krylov_Solvers/PCG_SPARSE.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Tools/Vectors/VECTOR.h>
 
 #include "../multigrid_poisson_3d_optimized_kernels/Thread_Queueing/PTHREAD_QUEUE.h"
 #include "MG_PRECONDITIONED_CONJUGATE_GRADIENT.h"

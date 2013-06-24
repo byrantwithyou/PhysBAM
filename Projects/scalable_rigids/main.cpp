@@ -2,11 +2,11 @@
 // Copyright 2010, Elliot English, Jon Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include "Standard_Tests/STANDARD_TESTS.h"
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 
 using namespace PhysBAM;
 

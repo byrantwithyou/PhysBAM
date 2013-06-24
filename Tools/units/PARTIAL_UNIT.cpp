@@ -4,9 +4,9 @@
 //#####################################################################
 // Class PARTIAL_UNIT
 //#####################################################################
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Utilities/NONCOPYABLE.h>
 #include "PARTIAL_UNIT.h"
 #include <boost/format.hpp>
 namespace PhysBAM{

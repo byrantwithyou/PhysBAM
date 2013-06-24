@@ -2,8 +2,8 @@
 // Copyright 2009, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
-#include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
+#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
+#include <Tools/Parsing/STRING_UTILITIES.h>
 #include "FINITE_DIFFERENCE_DISCRETIZATION.h"
 #include "STENCIL_ITERATOR.h"
 using namespace PhysBAM;

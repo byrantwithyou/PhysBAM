@@ -6,15 +6,15 @@
 //#####################################################################
 #ifndef __MPM_SIMULATION__
 #define __MPM_SIMULATION__
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Math_Tools/pow.h>
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Math_Tools/pow.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Tools/Matrices/MATRIX.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Tools/Vectors/VECTOR.h>
+#include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
 #include "MPM_CONSTITUTIVE_MODEL.h"
 #include "MPM_CUBIC_B_SPLINE.h"
 #include "MPM_LINEAR_BASIS.h"

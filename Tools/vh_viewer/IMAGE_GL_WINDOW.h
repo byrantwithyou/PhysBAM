@@ -16,11 +16,11 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #endif
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Images/IMAGE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TEXTURED_RECT.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Images/IMAGE.h>
+#include <Tools/Vectors/VECTOR_2D.h>
+#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
+#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TEXTURED_RECT.h>
 #include "../vh_segment/VH_LEVELSET_BUILDER.h"
 #include "VIEWER_WINDOW.h"
 

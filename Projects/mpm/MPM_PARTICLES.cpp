@@ -2,11 +2,11 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Math_Tools/RANGE_ITERATOR.h>
 #include "MPM_PARTICLES.h"
 #include "MPM_PARTICLES_FORWARD.h"
 namespace PhysBAM{

@@ -2,8 +2,8 @@
 // Copyright 2002-2007, Ronald Fedkiw, Eran Guendelman, Tamar Shinar, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Parallel_Computation/MPI_WORLD.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
+#include <Tools/Parallel_Computation/MPI_WORLD.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include "MPI_Example/MPI_EXAMPLE.h"
 #include "Standard_Tests/STANDARD_TESTS.h"
 using namespace PhysBAM;

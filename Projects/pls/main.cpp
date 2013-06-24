@@ -1,7 +1,7 @@
-#include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
-#include <PhysBAM_Tools/Parallel_Computation/MPI_WORLD.h>
-#include <PhysBAM_Dynamics/Drivers/PLS_DRIVER.h>
-#include <PhysBAM_Dynamics/Drivers/PLS_EXAMPLE.h>
+#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Tools/Parallel_Computation/MPI_WORLD.h>
+#include <Dynamics/Drivers/PLS_DRIVER.h>
+#include <Dynamics/Drivers/PLS_EXAMPLE.h>
 #include "Water_Tests/WATER_TESTS.h"
 
 using namespace PhysBAM;

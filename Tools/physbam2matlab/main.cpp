@@ -2,11 +2,11 @@
 // Copyright 2008, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/MATLAB_OUTPUT.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Read_Write/MATLAB_OUTPUT.h>
 using namespace PhysBAM;
 //#####################################################################
 // Class PHYSBAM_TO_MATLAB_CONVERTER 

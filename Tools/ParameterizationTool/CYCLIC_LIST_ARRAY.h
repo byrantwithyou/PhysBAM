@@ -1,4 +1,4 @@
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <Tools/Arrays/ARRAY.h>
 using namespace PhysBAM;
 
 //ARRAY, the array can be used as a cycle.

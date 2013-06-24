@@ -5,10 +5,10 @@
 #ifndef __VIDEO_VIEW__
 #define __VIDEO_VIEW__
 // Function 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Math_Tools/integer_log.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Math_Tools/integer_log.h>
+#include <Tools/Matrices/MATRIX_4X4.h>
 #include <cstring>
 #include "VIDEO.h"
 #ifdef WIN32

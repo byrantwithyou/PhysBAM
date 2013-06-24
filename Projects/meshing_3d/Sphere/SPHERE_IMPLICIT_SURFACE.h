@@ -7,8 +7,8 @@
 #ifndef __SPHERE_IMPLICIT_SURFACE__
 #define __SPHERE_IMPLICIT_SURFACE__
 
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 namespace PhysBAM{
 
 template<class T_input>

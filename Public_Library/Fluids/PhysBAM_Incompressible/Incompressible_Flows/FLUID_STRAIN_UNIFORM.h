@@ -1,0 +1,103 @@
+//#####################################################################
+// Copyright 2002-2006, Doug Enright, Geoffrey Irving, Nipun Kwatra, Frank Losasso, Andy Lutomirksi, Jonathan Su, Paul-James White.
+// This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
+//#####################################################################
+// Class FLUID_STRAIN_UNIFORM  
+//#####################################################################
+#ifndef __FLUID_STRAIN_UNIFORM__
+#define __FLUID_STRAIN_UNIFORM__
+
+#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
+#include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_FORWARD.h>
+#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/FLUID_STRAIN.h>
+#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_POLICY.h>
+namespace PhysBAM{
+
+template<class T> class EXTERNAL_STRAIN_ADJUSTMENT;
+template<class T_GRID> class LEVELSET_MULTIPLE;
+template<class TV,class T2> class BOUNDARY;
+
+template<class T_GRID>
+class FLUID_STRAIN_UNIFORM:public FLUID_STRAIN<typename T_GRID::SCALAR>
+{
+    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;
+    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename T_ARRAYS_SCALAR::template REBIND<SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ARRAYS_SYMMETRIC_MATRIX;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
+    typedef typename REBIND<T_ADVECTION_SEMI_LAGRANGIAN_SCALAR,SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX;
+    typedef typename INCOMPRESSIBLE_POLICY<T_GRID>::PROJECTION T_PROJECTION;
+public:
+    using FLUID_STRAIN<T>::viscosity_index;using FLUID_STRAIN<T>::strainrate_time;using FLUID_STRAIN<T>::elastic_modulus;
+    using FLUID_STRAIN<T>::plasticity_alpha;using FLUID_STRAIN<T>::plasticity_gamma;
+
+    T_GRID grid;
+    T_ARRAYS_SYMMETRIC_MATRIX e; // strain tensor
+    BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >* e_boundary;
+    ADVECTION<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >* e_advection;
+    EXTERNAL_STRAIN_ADJUSTMENT<T>* external_strain_adjustment;
+private:               
+    BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >& e_boundary_default;
+    T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX& e_advection_default;
+    mutable bool cfl_called;
+public:
+
+    FLUID_STRAIN_UNIFORM(const T_GRID& grid_input);
+    ~FLUID_STRAIN_UNIFORM();
+
+    void Initialize_Grid(const T_GRID& grid_input)
+    {assert(grid_input.Is_MAC_Grid());grid=grid_input;e.Resize(grid.Domain_Indices());}
+
+    void Set_Custom_Boundary(BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >& e_boundary_input)
+    {e_boundary=&e_boundary_input;}
+
+    void Set_Custom_Advection(ADVECTION<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >& e_advection_input)
+    {e_advection=&e_advection_input;}
+
+    void Set_External_Strain_Adjustment(EXTERNAL_STRAIN_ADJUSTMENT<T>& external_strain_adjustment_input)
+    {external_strain_adjustment=&external_strain_adjustment_input;}
+
+//#####################################################################
+    void Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
+        const T_ARRAYS_SCALAR& phi_ghost,const int number_of_ghost_cells);
+    void Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
+        const LEVELSET_MULTIPLE<T_GRID>& levelset,const int region,const int number_of_ghost_cells);
+private:
+    void Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T density,const T heaviside_bandwidth,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
+        ARRAY<TV,TV_INT>& V,const T_ARRAYS_SCALAR& phi_ghost,const int number_of_ghost_cells);
+public:
+    void Extrapolate_Strain_Across_Interface(T_ARRAYS_SCALAR& phi_ghost,const T band_width=3);
+    T CFL(const T density) const;
+//#####################################################################
+};
+
+// not implemented in one dimension
+template<class T>
+class FLUID_STRAIN_UNIFORM<GRID<VECTOR<T,1> > >:public FLUID_STRAIN<T>
+{
+    typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
+public:
+//#####################################################################
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ARRAYS_SYMMETRIC_MATRIX;
+
+    T_ARRAYS_SYMMETRIC_MATRIX e; // strain tensor
+    BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >* e_boundary;
+
+    FLUID_STRAIN_UNIFORM(const GRID<TV>& grid_input){PHYSBAM_NOT_IMPLEMENTED();}
+    void Initialize_Grid(const GRID<TV>& grid_input){PHYSBAM_NOT_IMPLEMENTED();}
+    void Set_Custom_Boundary(BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >& e_boundary_input){e_boundary=&e_boundary_input;}
+    void Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
+        const ARRAY<T,VECTOR<int,1> >& phi_ghost,const int number_of_ghost_cells){PHYSBAM_NOT_IMPLEMENTED();}
+    void Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
+        const LEVELSET_MULTIPLE<GRID<TV> >& levelset,const int region,const int number_of_ghost_cells){PHYSBAM_NOT_IMPLEMENTED();}
+    void Extrapolate_Strain_Across_Interface(ARRAY<T,VECTOR<int,1> >& phi_ghost,const T band_width=3){PHYSBAM_NOT_IMPLEMENTED();}
+    T CFL(const T density) const{PHYSBAM_NOT_IMPLEMENTED();}
+//#####################################################################
+};
+
+}
+#endif

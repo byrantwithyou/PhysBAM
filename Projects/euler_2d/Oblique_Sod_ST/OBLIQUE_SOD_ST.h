@@ -16,13 +16,13 @@
 #include <iostream>
 #include "math.h"
 
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-//#include <PhysBAM_Fluids/PhysBAM_Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC.h>
-#include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
-#include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_RF.h>
-#include <PhysBAM_Fluids/PhysBAM_Compressible/Equations_Of_State/EOS_GAMMA.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Tools/Grids_Uniform/GRID.h>
+//#include <Fluids/PhysBAM_Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC.h>
+#include <Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
+#include <Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_RF.h>
+#include <Fluids/PhysBAM_Compressible/Equations_Of_State/EOS_GAMMA.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include "BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D.h"
 
 namespace PhysBAM{

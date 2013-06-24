@@ -2,7 +2,7 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Log/LOG.h>
+#include <Tools/Log/LOG.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>

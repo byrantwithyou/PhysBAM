@@ -5,13 +5,13 @@
 #ifndef __SMOKE_TESTS__
 #define __SMOKE_TESTS__
 
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
-#include <PhysBAM_Dynamics/Drivers/PLS_EXAMPLE.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Basic_Geometry/CYLINDER.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
+#include <Dynamics/Drivers/PLS_EXAMPLE.h>
 
 namespace PhysBAM{
 

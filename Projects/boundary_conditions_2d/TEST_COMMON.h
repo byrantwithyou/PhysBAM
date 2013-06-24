@@ -1,8 +1,8 @@
 #ifndef __TEST_COMMON__
 #define __TEST_COMMON__
 
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
 #include "SIM_COMMON.h"
 
 using namespace PhysBAM;

@@ -1,8 +1,8 @@
 #ifndef __BOUNDARY_CONDITIONS__
 #define __BOUNDARY_CONDITIONS__
 
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Geometry/Level_Sets/LEVELSET.h>
 
 using namespace PhysBAM;
 

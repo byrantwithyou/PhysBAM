@@ -2,23 +2,23 @@
 // Copyright 2013.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Grids_Uniform_Interpolation/CUBIC_MN_INTERPOLATION_UNIFORM.h>
-#include <PhysBAM_Tools/Images/PNG_FILE.h>
-#include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
-#include <PhysBAM_Geometry/Images/EPS_FILE.h>
-#include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
-#include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_MULTIPLE_UNIFORM.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Tools/Grids_Uniform_Interpolation/CUBIC_MN_INTERPOLATION_UNIFORM.h>
+#include <Tools/Images/PNG_FILE.h>
+#include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
+#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
+#include <Geometry/Images/EPS_FILE.h>
+#include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
+#include <Geometry/Level_Sets/LEVELSET.h>
+#include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <Dynamics/Level_Sets/PARTICLE_LEVELSET_MULTIPLE_UNIFORM.h>
 
 using namespace PhysBAM;
 

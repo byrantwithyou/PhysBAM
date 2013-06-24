@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license 
 // contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include "ARB_Example/ARB_EXAMPLE.h"
 //#include "Little_Man/LITTLE_MAN_EXAMPLE.h"
 //#include "Simple_Muscle/SIMPLE_MUSCLE_EXAMPLE.h"

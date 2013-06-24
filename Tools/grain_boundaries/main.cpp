@@ -1,17 +1,17 @@
-#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Data_Structures/QUEUE.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
-#include <PhysBAM_Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Dynamics/Meshing/RED_GREEN_TETRAHEDRA.h>
+#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Data_Structures/QUEUE.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
+#include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
+#include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Dynamics/Meshing/RED_GREEN_TETRAHEDRA.h>
 
 using namespace PhysBAM;
 

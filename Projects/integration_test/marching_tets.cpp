@@ -2,19 +2,19 @@
 // Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
-#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_TETRAHEDRA.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Geometry/Basic_Geometry/SEGMENT_2D.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
+#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
+#include <Geometry/Grids_Uniform_Computations/MARCHING_TETRAHEDRA.h>
 #include <iostream>
 
 using namespace PhysBAM;

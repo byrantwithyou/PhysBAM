@@ -1,11 +1,11 @@
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/MASS_PROPERTIES.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Rigids/Rigid_Bodies/MASS_PROPERTIES.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <fstream>
 #include <iostream>
 

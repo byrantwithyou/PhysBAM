@@ -1,6 +1,6 @@
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Geometry/Basic_Geometry/RAY.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <fstream>
 #include <iostream>
 #include <string>

@@ -5,8 +5,8 @@
 #ifndef __VIEWER_WINDOW__
 #define __VIEWER_WINDOW__
 
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
 #include "IMAGE_GL_WINDOW.h"
 #include <Fl/Fl_Button.h>
 #include <FL/Fl_Counter.h>

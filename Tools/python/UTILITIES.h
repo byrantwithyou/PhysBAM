@@ -5,8 +5,8 @@
 #ifndef __PYTHON_UTILITIES__
 #define __PYTHON_UTILITIES__
 
-#include <PhysBAM_Tools/Matrices/MATRIX_FORWARD.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
+#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Tools/Vectors/VECTOR_FORWARD.h>
 #include <boost/format.hpp>
 #include <boost/python.hpp>
 #include <PhysBAM_Geometry/Geometry/GEOMETRY_FORWARD.h>

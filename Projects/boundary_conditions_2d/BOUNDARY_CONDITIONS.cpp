@@ -1,6 +1,6 @@
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Geometry/Level_Sets/LEVELSET.h>
 #include "BOUNDARY_CONDITIONS.h"
 
 template<class TV> BOUNDARY_CONDITIONS<TV>::

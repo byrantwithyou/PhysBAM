@@ -7,7 +7,7 @@
 #ifndef __SIMPLE_UNIT__
 #define __SIMPLE_UNIT__
 
-#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Log/DEBUG_UTILITIES.h>
 #include <boost/rational.hpp>
 namespace PhysBAM{
 namespace UNITS{

@@ -7,9 +7,9 @@
 #ifndef __MPM_VECTOR__
 #define __MPM_VECTOR__
 
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
+#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class TV>

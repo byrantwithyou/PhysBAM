@@ -2,11 +2,11 @@
 // Copyright 2007-2008, Geoffrey Irving, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Math_Tools/max.h>
-#include <PhysBAM_Tools/Particles/PARTICLES_FORWARD.h>
-#include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Math_Tools/max.h>
+#include <Tools/Particles/PARTICLES_FORWARD.h>
+#include <Tools/Utilities/TYPE_UTILITIES.h>
+#include <Tools/Vectors/VECTOR_FORWARD.h>
 #include <boost/python/suite/indexing/indexing_suite.hpp>
 #include <PhysBAM_Tools/Particles/PARTICLE_ATTRIBUTE.h>
 

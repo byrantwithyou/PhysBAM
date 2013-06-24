@@ -6,12 +6,12 @@
 //#####################################################################
 #ifndef __HAIR_TESTS__
 #define __HAIR_TESTS__
-#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_TET_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/TRIANGLE_BENDING_SPRINGS.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_3D.h>
+#include <Deformables/Forces/LINEAR_TET_SPRINGS.h>
+#include <Deformables/Forces/TRIANGLE_BENDING_SPRINGS.h>
 #include <fstream>
 namespace PhysBAM{
 

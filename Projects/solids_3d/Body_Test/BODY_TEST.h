@@ -4,18 +4,18 @@
 //#####################################################################
 #ifndef __BODY_TEST__
 #define __BODY_TEST__
-#include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/BINDING_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_S3D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
+#include <Tools/Log/DEBUG_PRINT.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Deformables/Forces/BINDING_SPRINGS.h>
+#include <Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_3D.h>
+#include <Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_S3D.h>
+#include <Deformables/Forces/LINEAR_SPRINGS.h>
+#include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 namespace PhysBAM{
 
 template<class T_input>

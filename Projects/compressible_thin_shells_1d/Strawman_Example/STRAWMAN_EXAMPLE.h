@@ -1,21 +1,21 @@
 #ifndef __STRAWMAN_EXAMPLE__
 #define __STRAWMAN_EXAMPLE__
 
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_CONSERVATIVE_ENO.h>
-#include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
-#include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
-#include <PhysBAM_Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
-#include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Tools/Grids_Uniform_Advection/ADVECTION_CONSERVATIVE_ENO.h>
+#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Matrices/MATRIX_1X1.h>
+#include <Tools/Parsing/STRING_UTILITIES.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Read_Write/TYPED_STREAM.h>
+#include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
+#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
 
 namespace PhysBAM{
 

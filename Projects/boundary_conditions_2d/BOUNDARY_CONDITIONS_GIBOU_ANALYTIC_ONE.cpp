@@ -1,6 +1,6 @@
-#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Tools/Matrices/MATRIX.h>
 #include "BOUNDARY_CONDITIONS_GIBOU_ANALYTIC_ONE.h"
 
 template<class TV> BOUNDARY_CONDITIONS_GIBOU_ANALYTIC_ONE<TV>::

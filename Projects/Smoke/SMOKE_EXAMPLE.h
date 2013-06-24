@@ -4,14 +4,14 @@
 //#####################################################################
 #ifndef __SMOKE_EXAMPLE__
 #define __SMOKE_EXAMPLE__
-#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Boundaries/BOUNDARY.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class TV>

@@ -3,16 +3,16 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
-#include <PhysBAM_Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
-#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Data_Structures/PAIR.h>
+#include <Tools/Data_Structures/TRIPLE.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Vectors/VECTOR.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
+#include <Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
 using namespace PhysBAM;
 
 typedef double T;

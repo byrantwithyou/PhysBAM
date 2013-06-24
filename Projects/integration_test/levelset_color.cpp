@@ -3,25 +3,25 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
-#include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
-#include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
-#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
+#include <Tools/Data_Structures/PAIR.h>
+#include <Tools/Data_Structures/TRIPLE.h>
+#include <Tools/Grids_Uniform/FACE_INDEX.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Tools/Vectors/VECTOR.h>
+#include <Geometry/Basic_Geometry/SEGMENT_2D.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
+#include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <iomanip>
 
 using namespace PhysBAM;

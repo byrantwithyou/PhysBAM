@@ -2,17 +2,17 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
-#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
-#include <PhysBAM_Tools/Math_Tools/cube.h>
-#include <PhysBAM_Tools/Math_Tools/sqr.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
+#include <Tools/Grids_Uniform/FACE_INDEX.h>
+#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
+#include <Tools/Math_Tools/cube.h>
+#include <Tools/Math_Tools/sqr.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Utilities/DEBUG_CAST.h>
 #include <iomanip>
+#include "MPMAC.h"
 #include "MPMAC_POISSON_SYSTEM.h"
 #include "MPMAC_POISSON_VECTOR.h"
-#include "MPMAC.h"
 namespace PhysBAM{
 //#####################################################################
 // Constructor

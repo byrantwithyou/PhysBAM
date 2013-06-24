@@ -4,15 +4,15 @@
 //#####################################################################
 #ifndef __SOLIDS_FLUIDS_EXAMPLE_UNIFORM_PYTHON__
 #define __SOLIDS_FLUIDS_EXAMPLE_UNIFORM_PYTHON__
-#include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Tools/Data_Structures/UNION_FIND.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Log/LOG.h>
+#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <boost/python.hpp>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fragments/PARTICLE_CONNECTIVITY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS_ND.h>

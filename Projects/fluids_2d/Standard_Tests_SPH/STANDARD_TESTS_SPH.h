@@ -6,14 +6,14 @@
 //#####################################################################
 #ifndef __STANDARD_TESTS_SPH__
 #define __STANDARD_TESTS_SPH__
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Tools/Matrices/FRAME.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <PhysBAM_Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
-#include <PhysBAM_Dynamics/Particles/SPH_PARTICLES.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Tools/Matrices/FRAME.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
+#include <Solids/Forces_And_Torques/GRAVITY.h>
+#include <Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
+#include <Dynamics/Particles/SPH_PARTICLES.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 // 1 breaking dam
 // 2 variable density seed showing divergence control
 // 3 falling drop

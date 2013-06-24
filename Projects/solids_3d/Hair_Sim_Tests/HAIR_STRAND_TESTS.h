@@ -6,15 +6,15 @@
 //#####################################################################
 #ifndef __HAIR_STRAND_TESTS__
 #define __HAIR_STRAND_TESTS__
-#include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/GUIDE_ADHESION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_TET_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SEGMENT_ADHESION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Parallel_Computation/MPI_SOLIDS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
+#include <Tools/Parsing/PARAMETER_LIST.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Deformables/Forces/GUIDE_ADHESION.h>
+#include <Deformables/Forces/LINEAR_TET_SPRINGS.h>
+#include <Deformables/Forces/SEGMENT_ADHESION.h>
+#include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
+#include <Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 
 namespace PhysBAM{
 

@@ -7,21 +7,21 @@
 #ifndef __MPM_PARTICLES__
 #define __MPM_PARTICLES__
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Clone/CLONEABLE.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <PhysBAM_Tools/Particles/PARTICLES.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Clone/CLONEABLE.h>
+#include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Tools/Matrices/MATRIX.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Tools/Particles/PARTICLES.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Vectors/VECTOR.h>
+#include <Geometry/Basic_Geometry/CYLINDER.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 #include "MPM_PARTICLES_FORWARD.h"
 
 namespace PhysBAM{

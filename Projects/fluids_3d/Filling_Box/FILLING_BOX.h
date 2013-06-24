@@ -5,7 +5,7 @@
 #ifndef __FILLING_BOX__
 #define __FILLING_BOX__
 
-#include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
+#include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_3D.h>
 namespace PhysBAM{
 

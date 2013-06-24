@@ -3,13 +3,13 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
-#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
-#include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
+#include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
+#include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
+#include <Tools/Krylov_Solvers/MINRES.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Tools/Vectors/VECTOR.h>
 
 using namespace PhysBAM;
 

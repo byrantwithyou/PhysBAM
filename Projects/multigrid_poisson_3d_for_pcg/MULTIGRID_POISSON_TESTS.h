@@ -19,7 +19,7 @@
 #ifndef __MULTIGRID_POISSON_TESTS__
 #define __MULTIGRID_POISSON_TESTS__
 
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include "MG_PRECONDITIONED_CONJUGATE_GRADIENT.h"
 #include "MULTIGRID_POISSON_SOLVER.h"
 #include <boost/format.hpp>

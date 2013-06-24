@@ -9,7 +9,7 @@
 #ifndef __RISING_SMOKE__
 #define __RISING_SMOKE__
 
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform/GRID.h>
 #include "../SMOKE_3D_EXAMPLE.h"
 namespace PhysBAM{
 

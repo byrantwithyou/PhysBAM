@@ -1,9 +1,9 @@
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <fstream>
 #include <iostream>
 

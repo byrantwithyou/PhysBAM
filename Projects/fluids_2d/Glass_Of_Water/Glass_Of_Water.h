@@ -13,11 +13,11 @@
 #ifndef __GLASS_OF_WATER__
 #define __GLASS_OF_WATER__
 
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Particles/HEAVY_PARTICLES.h>
 
-#include <PhysBAM_Tools/Ordinary_Differential_Equations/EXAMPLE.h>
+#include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 
 namespace PhysBAM{
 

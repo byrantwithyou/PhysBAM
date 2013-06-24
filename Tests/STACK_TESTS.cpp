@@ -5,9 +5,9 @@
 // Class STACK_TESTS
 //#####################################################################
 
-#include <PhysBAM_Tools/Data_Structures/STACK.h>
-#include <PhysBAM_Tools/Utilities/TEST_BASE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Data_Structures/STACK.h>
+#include <Tools/Utilities/TEST_BASE.h>
+#include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 class STACK_TESTS:public TEST_BASE

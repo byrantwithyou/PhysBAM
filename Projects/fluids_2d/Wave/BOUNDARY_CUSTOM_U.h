@@ -12,7 +12,7 @@
 #ifndef __BOUNDARY_CUSTOM_U__
 #define __BOUNDARY_CUSTOM_U__
 
-#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
+#include <Tools/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 class BOUNDARY_CUSTOM_U:public BOUNDARY

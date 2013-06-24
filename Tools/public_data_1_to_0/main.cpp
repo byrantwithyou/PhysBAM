@@ -2,17 +2,17 @@
 // Copyright 2012, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Particles/PARTICLES_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Particles/PARTICLES_FORWARD.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
+#include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <cstring>
 #include <fstream>
 using namespace PhysBAM;

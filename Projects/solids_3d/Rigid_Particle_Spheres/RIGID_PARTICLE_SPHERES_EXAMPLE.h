@@ -8,15 +8,15 @@
 #ifndef __RIGID_PARTICLE_SPHERES_EXAMPLE__
 #define __RIGID_PARTICLE_SPHERES_EXAMPLE__
 
-#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/PARTICLE_BINDING.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/IMPLICIT_ZERO_LENGTH_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Bindings/RIGID_BODY_BINDING.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
+#include <Deformables/Bindings/PARTICLE_BINDING.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Deformables/Forces/IMPLICIT_ZERO_LENGTH_SPRINGS.h>
+#include <Solids/Bindings/RIGID_BODY_BINDING.h>
+#include <Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>

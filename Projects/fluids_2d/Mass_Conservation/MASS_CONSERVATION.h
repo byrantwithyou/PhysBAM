@@ -20,16 +20,16 @@
 #ifndef __MASS_CONSERVATION__
 #define __MASS_CONSERVATION__
 
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
-#include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
-#include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SEGMENT_BENDING_ELEMENTS.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
+#include <Tools/Interpolation/INTERPOLATION_CURVE.h>
+#include <Tools/Log/DEBUG_SUBSTEPS.h>
+#include <Tools/Parsing/PARAMETER_LIST.h>
+#include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
+#include <Geometry/Level_Sets/LEVELSET_POLICY.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Deformables/Forces/LINEAR_SPRINGS.h>
+#include <Deformables/Forces/SEGMENT_BENDING_ELEMENTS.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input,class RW=T_input>

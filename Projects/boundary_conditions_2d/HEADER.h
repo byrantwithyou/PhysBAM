@@ -1,10 +1,10 @@
 #ifndef __HEADER__
 #define __HEADER__
 
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Tools/Vectors/VECTOR.h>
 #include "ACCURACY_INFO.h"
 #include "BOUNDARY_CONDITIONS.h"
 using namespace PhysBAM;

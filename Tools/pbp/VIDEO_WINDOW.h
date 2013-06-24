@@ -15,11 +15,11 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #endif
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Math_Tools/clamp.h>
-#include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
-#include <PhysBAM_Tools/Utilities/TIMER.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Math_Tools/clamp.h>
+#include <Tools/Parsing/STRING_UTILITIES.h>
+#include <Tools/Utilities/TIMER.h>
 #include <string>
 #include "VIDEO.h"
 #include "VIDEO_VIEW.h"

@@ -7,10 +7,10 @@
 #ifndef __MARCHING_TETRAHEDRA_CUTTING__
 #define __MARCHING_TETRAHEDRA_CUTTING__
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Vectors/VECTOR.h>
+#include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
+#include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 namespace PhysBAM{
 
 template<int d>

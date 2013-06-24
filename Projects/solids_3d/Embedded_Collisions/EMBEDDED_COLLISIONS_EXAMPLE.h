@@ -7,19 +7,19 @@
 #ifndef __EMBEDDED_COLLISIONS_EXAMPLE__
 #define __EMBEDDED_COLLISIONS_EXAMPLE__
 
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/PARTICLE_BINDING.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDING.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <PhysBAM_Dynamics/Meshing/RED_GREEN_TRIANGLES.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Geometry/Collisions/COLLISION_GEOMETRY.h>
+#include <Deformables/Bindings/LINEAR_BINDING.h>
+#include <Deformables/Bindings/PARTICLE_BINDING.h>
+#include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
+#include <Deformables/Fracture/EMBEDDING.h>
+#include <Solids/Forces_And_Torques/GRAVITY.h>
+#include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
+#include <Dynamics/Meshing/RED_GREEN_TRIANGLES.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>

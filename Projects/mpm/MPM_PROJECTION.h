@@ -8,9 +8,9 @@
 //#####################################################################
 #ifndef __MPM_PROJECTION__
 #define __MPM_PROJECTION__
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
-#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Grids_Uniform/FACE_INDEX.h>
+#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include "MPM_CUBIC_B_SPLINE.h"
 #include "MPM_LINEAR_BASIS.h"
 #include "MPM_SIMULATION.h"

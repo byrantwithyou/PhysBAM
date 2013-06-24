@@ -6,19 +6,19 @@
 //#####################################################################
 #ifndef __ARMADILLO_TEST__
 #define __ARMADILLO_TEST__
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
-#include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET_MAKER.h>
-#include <PhysBAM_Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/BINDING_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_S3D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
+#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
+#include <Tools/Log/DEBUG_PRINT.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Level_Sets/LEVELSET_MAKER.h>
+#include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Deformables/Forces/BINDING_SPRINGS.h>
+#include <Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_3D.h>
+#include <Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_S3D.h>
+#include <Deformables/Forces/LINEAR_SPRINGS.h>
+#include <Solids/Forces_And_Torques/GRAVITY.h>
+#include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 
 namespace PhysBAM{
 

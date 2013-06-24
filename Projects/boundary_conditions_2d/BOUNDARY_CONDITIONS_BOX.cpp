@@ -1,5 +1,5 @@
-#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Matrices/MATRIX.h>
 #include <climits>
 #include <cstdio>
 #include "BOUNDARY_CONDITIONS_BOX.h"

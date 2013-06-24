@@ -7,11 +7,11 @@
 #ifndef __MESHING_EXAMPLE__
 #define __MESHING_EXAMPLE__
 
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <PhysBAM_Dynamics/Meshing/TETRAHEDRAL_MESHING.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <Dynamics/Meshing/TETRAHEDRAL_MESHING.h>
 #include "MULTIPLE_LEVELSET_IMPLICIT_SURFACE.h"
 namespace PhysBAM{
 

@@ -5,10 +5,10 @@
 #ifndef __ANALYTIC_VELOCITY__
 #define __ANALYTIC_VELOCITY__
 
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Matrices/MATRIX.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 #include <boost/function.hpp>
 
 namespace PhysBAM{

@@ -2,18 +2,18 @@
 // Copyright 2006-2007, Geoffrey Irving, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Data_Structures/QUEUE.h>
-#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Math_Tools/integer_log.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Arrays/SORT.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Data_Structures/QUEUE.h>
+#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Math_Tools/integer_log.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Topology/SEGMENT_MESH.h>
+#include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 using namespace PhysBAM;
 //#####################################################################
 // Class MESH_PARTITIONING

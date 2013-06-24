@@ -2,15 +2,15 @@
 // Copyright 2009, Jon Gretarsson, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Particles/PARTICLES_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Particles/PARTICLES_FORWARD.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <fstream>
 #include <iostream>
 #include <ostream>

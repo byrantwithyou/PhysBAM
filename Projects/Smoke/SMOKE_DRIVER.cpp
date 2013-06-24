@@ -2,10 +2,10 @@
 // Copyright 2009-2010, Michael Lentine, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Parallel_Computation/BOUNDARY_MPI.h>
-#include <PhysBAM_Tools/Parallel_Computation/BOUNDARY_THREADED.h>
+#include <Tools/Log/DEBUG_SUBSTEPS.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
+#include <Tools/Parallel_Computation/BOUNDARY_THREADED.h>
 #include "SMOKE_DRIVER.h"
 #include "SMOKE_EXAMPLE.h"
 

@@ -7,10 +7,10 @@
 #ifndef __RAY_TRACING_EXAMPLE__
 #define __RAY_TRACING_EXAMPLE__
 
-#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class T> class RENDER_WORLD;

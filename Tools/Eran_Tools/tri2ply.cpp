@@ -1,6 +1,6 @@
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <fstream>
 #include <iostream>
 #include "../../Personal_Libraries/Eran_Library/POLYGONAL_SURFACE.h"

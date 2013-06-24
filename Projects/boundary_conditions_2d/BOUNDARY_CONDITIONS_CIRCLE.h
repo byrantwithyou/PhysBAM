@@ -1,6 +1,6 @@
 #ifndef __BOUNDARY_CONDITIONS_CIRCLE__
 #define __BOUNDARY_CONDITIONS_CIRCLE__
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
 #include "BOUNDARY_CONDITIONS.h"
 using namespace PhysBAM;
 

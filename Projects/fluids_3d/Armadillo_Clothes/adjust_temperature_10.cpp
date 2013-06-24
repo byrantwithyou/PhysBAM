@@ -4,9 +4,9 @@
 //#####################################################################
 // MAIN  
 //##################################################################### 
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Level_Sets/LEVELSET.h>
 #include <Heat_Flows/HEAT_3D.h>
 using namespace PhysBAM;
 

@@ -7,10 +7,10 @@
 #ifndef __CASTER__
 #define __CASTER__
 
-#include <PhysBAM_Tools/Math_Tools/clamp.h>
-#include <PhysBAM_Tools/Math_Tools/max.h>
-#include <PhysBAM_Tools/Math_Tools/min.h>
-#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
+#include <Tools/Math_Tools/clamp.h>
+#include <Tools/Math_Tools/max.h>
+#include <Tools/Math_Tools/min.h>
+#include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include "QUANTITY_FORWARD.h"
 namespace PhysBAM{
 namespace UNITS{

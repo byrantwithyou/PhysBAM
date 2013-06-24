@@ -2,8 +2,8 @@
 // Copyright 2006, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Images/IMAGE.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Images/IMAGE.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
 using namespace PhysBAM;
 
 int main(int argc,char* argv[])

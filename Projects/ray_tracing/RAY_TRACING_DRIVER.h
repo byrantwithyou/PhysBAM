@@ -7,12 +7,12 @@
 #ifndef __RAY_TRACING_DRIVER__
 #define __RAY_TRACING_DRIVER__
 
-#include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Log/PROGRESS_INDICATOR.h>
-#include <PhysBAM_Tools/Math_Tools/integer_log.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
+#include <Tools/Log/DEBUG_PRINT.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Log/PROGRESS_INDICATOR.h>
+#include <Tools/Math_Tools/integer_log.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include "RAY_TRACING_EXAMPLE.h"
 namespace PhysBAM{
 

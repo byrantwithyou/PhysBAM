@@ -7,14 +7,14 @@
 #ifndef __DSD_NO_NAVIER_STOKES__
 #define __DSD_NO_NAVIER_STOKES__
 
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Standard_Tests/WATER_STANDARD_TESTS_3D.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Geometry/Basic_Geometry/CYLINDER.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
+#include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Dynamics/Standard_Tests/WATER_STANDARD_TESTS_3D.h>
 namespace PhysBAM{
 
 template<class T_input>

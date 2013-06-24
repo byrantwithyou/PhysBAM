@@ -1,7 +1,7 @@
 #ifndef __PROJECT__
 #define __PROJECT__
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <boost/function.hpp>
 using namespace PhysBAM;
 

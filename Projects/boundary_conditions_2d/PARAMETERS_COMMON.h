@@ -1,7 +1,7 @@
 #ifndef __PARAMETERS_COMMON__
 #define __PARAMETERS_COMMON__
 
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
 #include "HEADER.h"
 
 using namespace PhysBAM;

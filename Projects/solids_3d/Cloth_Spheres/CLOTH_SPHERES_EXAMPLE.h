@@ -7,15 +7,15 @@
 #ifndef __CLOTH_SPHERES_EXAMPLE__
 #define __CLOTH_SPHERES_EXAMPLE__
 
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/BINDING_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_S3D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/TRIANGLE_BENDING_ELEMENTS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDING.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Deformables/Forces/BINDING_SPRINGS.h>
+#include <Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_S3D.h>
+#include <Deformables/Forces/LINEAR_SPRINGS.h>
+#include <Deformables/Forces/TRIANGLE_BENDING_ELEMENTS.h>
+#include <Deformables/Fracture/EMBEDDING.h>
+#include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 namespace PhysBAM{
 
 template<class T_input>

@@ -1,9 +1,9 @@
 #ifndef __POISSON_PROJECTION_SYSTEM__
 #define __POISSON_PROJECTION_SYSTEM__
-#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
-#include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
+#include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 
 // TODO: Detect Neumann pockets.

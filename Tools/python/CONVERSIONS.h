@@ -5,8 +5,8 @@
 #ifndef __CONVERSIONS_H
 #define __CONVERSIONS_H
 
-#include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Utilities/TYPE_UTILITIES.h>
+#include <Tools/Vectors/VECTOR.h>
 #include "NUMPY.h"
 #include <boost/python/detail/api_placeholder.hpp>
 #include <boost/python/tuple.hpp>

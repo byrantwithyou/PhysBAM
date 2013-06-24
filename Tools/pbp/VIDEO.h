@@ -7,9 +7,9 @@
 #ifndef __VIDEO__
 #define __VIDEO__
 
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Math_Tools/exchange.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Math_Tools/exchange.h>
+#include <Tools/Vectors/VECTOR_3D.h>
 
 namespace PhysBAM{
 

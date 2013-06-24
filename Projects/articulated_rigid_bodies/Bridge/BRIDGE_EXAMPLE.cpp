@@ -3,23 +3,23 @@
 // This file is part of PhysBAM whose distribution is governed by the license 
 // contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/ANGLE_JOINT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_MESH.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/POINT_JOINT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/RIGID_JOINT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Vectors/VECTOR_3D.h>
+#include <Rigids/Joints/ANGLE_JOINT.h>
+#include <Rigids/Joints/JOINT_MESH.h>
+#include <Rigids/Joints/POINT_JOINT.h>
+#include <Rigids/Joints/RIGID_JOINT.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Solids/Forces_And_Torques/GRAVITY.h>
+#include <Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <map>
 #include "BRIDGE_EXAMPLE.h"
 using namespace PhysBAM;

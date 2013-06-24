@@ -3,12 +3,12 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Vectors/VECTOR.h>
 
 using namespace PhysBAM;
 

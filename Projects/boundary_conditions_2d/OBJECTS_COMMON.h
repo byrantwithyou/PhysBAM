@@ -1,8 +1,8 @@
 #ifndef __OBJECTS_COMMON__
 #define __OBJECTS_COMMON__
 
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
 #include "HEADER.h"
 
 using namespace PhysBAM;

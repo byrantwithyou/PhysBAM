@@ -8,18 +8,18 @@
 #ifndef __CURL_EXAMPLE__
 #define __CURL_EXAMPLE__
 
-#include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <PhysBAM_Tools/Math_Tools/wrap.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/ANGLE_JOINT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_FUNCTION.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/POINT_JOINT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/RIGID_JOINT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Particles/RIGID_BODY_PARTICLES.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_STATE.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Tools/Interpolation/INTERPOLATION_CURVE.h>
+#include <Tools/Math_Tools/wrap.h>
+#include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
+#include <Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER.h>
+#include <Rigids/Joints/ANGLE_JOINT.h>
+#include <Rigids/Joints/JOINT_FUNCTION.h>
+#include <Rigids/Joints/POINT_JOINT.h>
+#include <Rigids/Joints/RIGID_JOINT.h>
+#include <Rigids/Particles/RIGID_BODY_PARTICLES.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_STATE.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include "../ARB_PARAMETERS.h"
 namespace PhysBAM{
 

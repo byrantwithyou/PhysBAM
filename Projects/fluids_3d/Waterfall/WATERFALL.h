@@ -7,14 +7,14 @@
 #ifndef __WATERFALL__
 #define __WATERFALL__
 
-#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <PhysBAM_Tools/Math_Tools/cube.h>
-#include <PhysBAM_Tools/Random_Numbers/NOISE.h>
-#include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_OPEN_CALLBACKS.h>
-#include <PhysBAM_Dynamics/Boundaries/BOUNDARY_OPEN_WATER.h>
-#include <PhysBAM_Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Tools/Math_Tools/cube.h>
+#include <Tools/Random_Numbers/NOISE.h>
+#include <Geometry/Basic_Geometry/CYLINDER.h>
+#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_OPEN_CALLBACKS.h>
+#include <Dynamics/Boundaries/BOUNDARY_OPEN_WATER.h>
+#include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input,class T_GRID=GRID<VECTOR<T_input,3> > >

@@ -8,18 +8,18 @@
 #ifndef __ARB_EXAMPLE__
 #define __ARB_EXAMPLE__
 
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER_HASH.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_FUNCTION.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_MESH.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/POINT_JOINT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/RIGID_JOINT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
+#include <Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER_HASH.h>
+#include <Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
+#include <Rigids/Joints/JOINT_FUNCTION.h>
+#include <Rigids/Joints/JOINT_MESH.h>
+#include <Rigids/Joints/POINT_JOINT.h>
+#include <Rigids/Joints/RIGID_JOINT.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include "../ARB_PARAMETERS.h"
 namespace PhysBAM{
 

@@ -2,8 +2,8 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Utilities/DEBUG_CAST.h>
 #include <iomanip>
 #include "MPM_SIMULATION.h"
 #include "MPM_SYSTEM.h"

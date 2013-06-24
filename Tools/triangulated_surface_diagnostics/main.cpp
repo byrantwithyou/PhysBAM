@@ -7,7 +7,7 @@
 //#####################################################################
 // Bridson - November 20, 2002
 //#####################################################################
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <fstream>
 #include <iostream>
 #include "float.h"

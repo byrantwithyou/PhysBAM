@@ -1,6 +1,6 @@
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Math_Tools/cube.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Math_Tools/cube.h>
 
 namespace PhysBAM{
 template<class T,class T2>

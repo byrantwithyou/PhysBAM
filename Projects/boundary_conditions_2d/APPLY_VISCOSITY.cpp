@@ -1,9 +1,9 @@
-#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
-#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
-#include <PhysBAM_Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
-#include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
+#include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
+#include <Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include "HEADER.h"
 using namespace PhysBAM;
 

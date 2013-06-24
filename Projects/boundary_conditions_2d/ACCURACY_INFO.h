@@ -1,7 +1,7 @@
 #ifndef __ACCURACY_INFO__
 #define __ACCURACY_INFO__
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 
 template<int d>

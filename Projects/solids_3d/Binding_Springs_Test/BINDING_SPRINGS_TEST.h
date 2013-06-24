@@ -7,18 +7,18 @@
 #ifndef __BINDING_SPRINGS_TEST__
 #define __BINDING_SPRINGS_TEST__
 
-#include <PhysBAM_Tools/Arrays/PROJECTED_ARRAY.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/BINDING_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_MATERIAL_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Tools/Arrays/PROJECTED_ARRAY.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Deformables/Bindings/LINEAR_BINDING.h>
+#include <Deformables/Bindings/SOFT_BINDINGS.h>
+#include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
+#include <Deformables/Forces/BINDING_SPRINGS.h>
+#include <Deformables/Forces/FINITE_VOLUME.h>
+#include <Deformables/Forces/LINEAR_SPRINGS.h>
+#include <Deformables/Fracture/EMBEDDED_MATERIAL_SURFACE.h>
+#include <Solids/Forces_And_Torques/GRAVITY.h>
+#include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>

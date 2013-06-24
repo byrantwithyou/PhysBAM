@@ -13,7 +13,7 @@
 #ifndef __BOUNDARY_CUSTOM__
 #define __BOUNDARY_CUSTOM__
 
-#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
+#include <Tools/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 template <class T,class T2>

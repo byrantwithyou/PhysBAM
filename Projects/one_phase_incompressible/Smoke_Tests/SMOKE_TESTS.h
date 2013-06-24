@@ -5,15 +5,15 @@
 #ifndef __SMOKE_TESTS__
 #define __SMOKE_TESTS__
 
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Vectors/Dot_Product.h>
-#include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_EXAMPLE.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Vectors/Dot_Product.h>
+#include <Geometry/Basic_Geometry/CYLINDER.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
+#include <Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_EXAMPLE.h>
 
 namespace PhysBAM{
 

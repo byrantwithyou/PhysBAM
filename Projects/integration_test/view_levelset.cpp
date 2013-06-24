@@ -3,20 +3,20 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
-#include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
-#include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
+#include <Tools/Data_Structures/PAIR.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Vectors/VECTOR.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
+#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Topology/SEGMENT_MESH.h>
+#include <Geometry/Topology/TRIANGLE_MESH.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 using namespace PhysBAM;
 
 typedef float T;

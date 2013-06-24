@@ -9,7 +9,7 @@
 #define TIMING_START ::PhysBAM::TIMING timing;timing.Start();
 #define TIMING_END(x) timing.Print(x);
 #define TIMING_GET timing.Get_And_Restart(); // milliseconds
-#include <PhysBAM_Tools/Log/LOG.h>
+#include <Tools/Log/LOG.h>
 #include <iomanip>
 #include <iostream>
 #ifdef _WIN32

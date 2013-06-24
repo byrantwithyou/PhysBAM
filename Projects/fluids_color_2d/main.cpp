@@ -1,5 +1,5 @@
-#include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_DRIVER.h>
-#include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
+#include <Dynamics/Fluids_Color_Driver/PLS_FC_DRIVER.h>
+#include <Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
 #include "FLUIDS_COLOR.h"
 
 using namespace PhysBAM;

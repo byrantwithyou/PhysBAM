@@ -2,7 +2,7 @@
 // Copyright 2009-2010, Michael Lentine, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
+#include <Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include "SMOKE_EXAMPLE.h"
 #include <pthread.h>
 using namespace PhysBAM;

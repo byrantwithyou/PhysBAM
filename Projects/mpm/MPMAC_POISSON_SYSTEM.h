@@ -7,9 +7,9 @@
 #ifndef __MPMAC_POISSON_SYSTEM__
 #define __MPMAC_POISSON_SYSTEM__
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
+#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class T> class KRYLOV_VECTOR_BASE;

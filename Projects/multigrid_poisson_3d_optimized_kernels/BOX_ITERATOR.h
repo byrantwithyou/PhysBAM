@@ -7,7 +7,7 @@
 #ifndef __BOX_ITERATOR__
 #define __BOX_ITERATOR__
 
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <Tools/Math_Tools/RANGE.h>
 
 namespace PhysBAM{
 

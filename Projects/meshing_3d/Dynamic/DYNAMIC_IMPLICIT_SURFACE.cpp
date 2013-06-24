@@ -1,5 +1,5 @@
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
-#include <PhysBAM_Tools/Log/LOG.h>
+#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
+#include <Tools/Log/LOG.h>
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>

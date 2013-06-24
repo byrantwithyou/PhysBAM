@@ -1,7 +1,7 @@
-#include <PhysBAM_Tools/Images/RGB_FILE.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
+#include <Tools/Images/RGB_FILE.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <fstream>
 #include <iostream>
 #include "../../Public_Library/Geometry/LEVELSET_IMPLICIT_SURFACE.h"

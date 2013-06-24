@@ -10,7 +10,7 @@
 #ifndef __PRINT__
 #define __PRINT__
 
-#include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
+#include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 namespace PhysBAM{
 
 template <class T>

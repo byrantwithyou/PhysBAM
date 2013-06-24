@@ -1,10 +1,10 @@
-#include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
-#include <PhysBAM_Tools/Parallel_Computation/MPI_WORLD.h>
-#include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
-#include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Tools/Parallel_Computation/MPI_WORLD.h>
+#include <Tools/Parallel_Computation/THREAD_QUEUE.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Basic_Geometry/CYLINDER.h>
+#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include "WATER_DRIVER.h"
 #include "WATER_EXAMPLE.h"
 

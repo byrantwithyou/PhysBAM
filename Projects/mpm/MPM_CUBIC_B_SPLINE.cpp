@@ -2,7 +2,7 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <Tools/Math_Tools/RANGE_ITERATOR.h>
 #include "MPM_CUBIC_B_SPLINE.h"
 namespace PhysBAM{
 //#####################################################################

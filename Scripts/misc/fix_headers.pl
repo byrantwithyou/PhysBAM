@@ -16,6 +16,8 @@ close F;
 
 my @tools = ();
 my @geometry = ();
+my @rigids = ();
+my @deformables = ();
 my @solids = ();
 my @fluids = ();
 my @opengl = ();
@@ -40,10 +42,10 @@ my $filename;
 
 sub dump_headers
 {
-    if(!@tools && !@geometry && !@solids && !@fluids && !@opengl && !@physbam && !@system && !@other){return;}
+    if(!@tools && !@geometry && !@rigids && !@deformables && !@solids && !@fluids && !@opengl && !@physbam && !@system && !@other){return;}
     $filename eq $cf or die "Trying to insert includes from $cf into $filename.\n";
     my $last = "";
-    for $L (\@tools, \@geometry, \@solids, \@fluids, \@opengl, \@physbam, \@system, \@other)
+    for $L (\@tools, \@geometry, \@rigids, \@deformables, \@solids, \@fluids, \@opengl, \@physbam, \@system, \@other)
     {
         for(sort {$x=lc $$a[0];$y=lc $$b[0];$x=~s/_/0/g;$y=~s/_/0/g;$x cmp $y;} @$L)
         {
@@ -55,6 +57,8 @@ sub dump_headers
     }
     @tools = ();
     @geometry = ();
+    @rigids = ();
+    @deformables = ();
     @solids = ();
     @fluids = ();
     @opengl = ();
@@ -89,11 +93,13 @@ for $filenamex (@ARGV)
         if(defined $system{$file}){print STDERR "system file specified with path: '$path$file' in '$filename'\n";push @system, [$full,$pre,$post];next;}
         if(!defined $lookup{$file}){print STDERR "include not recognized: '$file' in '$filename'\n";push @other, [$full,$pre,$post];next;}
         my $header = "<$lookup{$file}>";
-        if($header =~ /PhysBAM_Tools/){push @tools, [$header,$pre,$post];next;}
-        if($header =~ /PhysBAM_Geometry/){push @geometry, [$header,$pre,$post];next;}
-        if($header =~ /PhysBAM_Solids/){push @solids, [$header,$pre,$post];next;}
-        if($header =~ /PhysBAM_Fluids/){push @fluids, [$header,$pre,$post];next;}
-        if($header =~ /PhysBAM_OpenGL/){push @opengl, [$header,$pre,$post];next;}
+        if($header =~ /<Tools/){push @tools, [$header,$pre,$post];next;}
+        if($header =~ /<Geometry/){push @geometry, [$header,$pre,$post];next;}
+        if($header =~ /<Rigids/){push @rigids, [$header,$pre,$post];next;}
+        if($header =~ /<Deformables/){push @deformables, [$header,$pre,$post];next;}
+        if($header =~ /<Solids/){push @solids, [$header,$pre,$post];next;}
+        if($header =~ /<Fluids/){push @fluids, [$header,$pre,$post];next;}
+        if($header =~ /<OpenGL/){push @opengl, [$header,$pre,$post];next;}
         push @physbam, [$header,$pre,$post];
     }
     &dump_headers();

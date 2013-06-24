@@ -7,11 +7,11 @@
 #ifndef __RANDOM_PLACEMENT__
 #define __RANDOM_PLACEMENT__
 
-#include <PhysBAM_Tools/Matrices/MATRIX_POLICY.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_INTERSECTIONS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Standard_Tests/RIGIDS_STANDARD_TESTS.h>
+#include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
+#include <Rigids/Collisions/RIGID_BODY_INTERSECTIONS.h>
+#include <Rigids/Standard_Tests/RIGIDS_STANDARD_TESTS.h>
 namespace PhysBAM{
 template<class T>
 void Generate_Orientation(RANDOM_NUMBERS<T>& random_numbers,T max_orientation_angle,ROTATION<VECTOR<T,3> >& orientation)

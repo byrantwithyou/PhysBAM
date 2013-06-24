@@ -1,10 +1,10 @@
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Vectors/VECTOR_2D.h>
+#include <Tools/Vectors/VECTOR_3D.h>
+#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <fstream>
 #include <iostream>
 

@@ -1,6 +1,6 @@
-#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Log/LOG.h>
+#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Tools/Log/LOG.h>
 #include "ACCURACY_INFO.h"
 using namespace PhysBAM;
 

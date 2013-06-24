@@ -2,30 +2,30 @@
 // Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
-#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
-#include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
-#include <PhysBAM_Geometry/Finite_Elements/BOUNDARY_CONDITIONS_COLOR.h>
-#include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
-#include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
-#include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
-#include <PhysBAM_Geometry/Finite_Elements/VOLUME_FORCE_COLOR.h>
-#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
+#include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
+#include <Tools/Krylov_Solvers/MINRES.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Geometry/Basic_Geometry/SEGMENT_2D.h>
+#include <Geometry/Finite_Elements/BOUNDARY_CONDITIONS_COLOR.h>
+#include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
+#include <Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
+#include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
+#include <Geometry/Finite_Elements/VOLUME_FORCE_COLOR.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
+#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
+#include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 
 using namespace PhysBAM;
 

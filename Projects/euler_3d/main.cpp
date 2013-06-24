@@ -5,11 +5,11 @@
 //#####################################################################
 // MAIN  
 //##################################################################### 
-#include <PhysBAM_Tools/Parallel_Computation/MPI_WORLD.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <PhysBAM_Dynamics/Parallel_Computation/MPI_SOLID_FLUID.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
+#include <Tools/Parallel_Computation/MPI_WORLD.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <Dynamics/Parallel_Computation/MPI_SOLID_FLUID.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include "Incompressible_Drop/INCOMPRESSIBLE_DROP.h"
 #include "Sphere_Example/SPHERE_EXAMPLE.h"
 #include "Standard_Tests/STANDARD_TESTS.h"

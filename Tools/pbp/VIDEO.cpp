@@ -5,10 +5,10 @@
 // Class VIDEO
 //#####################################################################
 #define __STDC_CONSTANT_MACROS
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Images/IMAGE.h>
-#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-#include <PhysBAM_Tools/Log/LOG.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Images/IMAGE.h>
+#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Log/LOG.h>
 #include <cstring>
 #include "VIDEO.h"
 #include <boost/format.hpp>

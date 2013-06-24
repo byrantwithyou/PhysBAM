@@ -2,14 +2,14 @@
 // Copyright 2004-2007, Zhaosheng Bao, Eilene Hao, Geoffrey Irving, Sergey Koltakov, Frank Losasso, Andrew Selle, Tamar Shinar, Michael Turitzin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
-#include <PhysBAM_Tools/Interpolation/BSPLINE.h>
-#include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
-#include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
+#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
+#include <Tools/Interpolation/BSPLINE.h>
+#include <Tools/Interpolation/INTERPOLATION_CURVE.h>
+#include <Tools/Log/DEBUG_PRINT.h>
+#include <Tools/Parsing/PARAMETER_LIST.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
 #include "GENERIC_RENDER_EXAMPLE.h"
 using namespace PhysBAM;
 //#####################################################################

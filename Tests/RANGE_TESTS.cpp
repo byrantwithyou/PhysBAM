@@ -10,18 +10,18 @@
 // 4.  Tests functions in box .cpp file
 //#####################################################################
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Math_Tools/cyclic_shift.h>
-#include <PhysBAM_Tools/Math_Tools/pow.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Utilities/TEST_BASE.h>
-#include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Basic_Geometry_Intersections/BOX_SPHERE_INTERSECTION.h>
-#include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Math_Tools/cyclic_shift.h>
+#include <Tools/Math_Tools/pow.h>
+#include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Utilities/TEST_BASE.h>
+#include <Geometry/Basic_Geometry/RAY.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Basic_Geometry_Intersections/BOX_SPHERE_INTERSECTION.h>
+#include <Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
 #include <limits>
 namespace PhysBAM{
 

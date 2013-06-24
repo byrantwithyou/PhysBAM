@@ -1,7 +1,7 @@
-#include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
-#include <PhysBAM_Tools/Parallel_Computation/MPI_WORLD.h>
-#include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Tools/Parallel_Computation/MPI_WORLD.h>
+#include <Tools/Parallel_Computation/THREAD_QUEUE.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
 #include "SMOKE_DRIVER.h"
 #include "SMOKE_EXAMPLE.h"
 

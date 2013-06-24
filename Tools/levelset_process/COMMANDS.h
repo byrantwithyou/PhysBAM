@@ -1,4 +1,4 @@
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <Tools/Arrays/ARRAY.h>
 #include <sstream>
 namespace PhysBAM{
 

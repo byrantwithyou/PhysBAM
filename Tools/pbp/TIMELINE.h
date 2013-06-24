@@ -15,11 +15,11 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #endif
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Math_Tools/clamp.h>
-#include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
-#include <PhysBAM_Tools/Utilities/TIMER.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Math_Tools/clamp.h>
+#include <Tools/Math_Tools/INTERVAL.h>
+#include <Tools/Utilities/TIMER.h>
 #include <cstdio>
 #include <string>
 #include "VIDEO.h"

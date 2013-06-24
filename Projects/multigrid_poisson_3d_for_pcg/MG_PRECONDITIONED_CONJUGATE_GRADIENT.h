@@ -7,7 +7,7 @@
 #ifndef __MG_PRECONDITIONED_CONJUGATE_GRADIENT__
 #define __MG_PRECONDITIONED_CONJUGATE_GRADIENT__
 
-#include <PhysBAM_Tools/Log/LOG.h>
+#include <Tools/Log/LOG.h>
 #include <cfloat>
 #include <limits>
 #include "MULTIGRID_POISSON.h"

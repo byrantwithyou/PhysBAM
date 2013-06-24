@@ -6,9 +6,9 @@
 #ifndef __LOCKING_TEST__
 #define __LOCKING_TEST__
 
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
 
 #define U_GRID(X,Y) ((X)%n)*n+((Y)%n)
 #define V_GRID(X,Y) ((X)%n)*n+((Y)%n)+N

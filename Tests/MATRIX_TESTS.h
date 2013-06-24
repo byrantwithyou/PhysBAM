@@ -4,17 +4,17 @@
 //#####################################################################
 #ifndef __MATRIX_TESTS__
 #define __MATRIX_TESTS__
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_0X0.h>
-#include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_1X1.h>
-#include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
-#include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Utilities/TEST_BASE.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Tools/Matrices/MATRIX.h>
+#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_0X0.h>
+#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_1X1.h>
+#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
+#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Utilities/TEST_BASE.h>
 #include <limits>
 namespace PhysBAM{
 

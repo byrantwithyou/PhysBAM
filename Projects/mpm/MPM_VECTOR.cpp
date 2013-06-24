@@ -2,7 +2,7 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
+#include <Tools/Utilities/DEBUG_CAST.h>
 #include "MPM_VECTOR.h"
 using namespace PhysBAM;
 //#####################################################################

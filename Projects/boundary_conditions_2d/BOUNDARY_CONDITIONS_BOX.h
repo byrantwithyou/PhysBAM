@@ -1,7 +1,7 @@
 #ifndef __BOUNDARY_CONDITIONS_BOX__
 #define __BOUNDARY_CONDITIONS_BOX__
-#include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
-#include <PhysBAM_Geometry/Basic_Geometry/POLYGON.h>
+#include <Geometry/Basic_Geometry/LINE_2D.h>
+#include <Geometry/Basic_Geometry/POLYGON.h>
 #include "BOUNDARY_CONDITIONS.h"
 using namespace PhysBAM;
 

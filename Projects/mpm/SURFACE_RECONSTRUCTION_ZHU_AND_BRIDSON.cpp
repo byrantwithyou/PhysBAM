@@ -2,18 +2,18 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Math_Tools/cube.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Data_Structures/TRIPLE.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Math_Tools/cube.h>
+#include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Tools/Matrices/MATRIX.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include "SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON.h"
 namespace PhysBAM{
 //#####################################################################

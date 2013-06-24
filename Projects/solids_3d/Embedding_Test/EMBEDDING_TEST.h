@@ -9,9 +9,9 @@
 //#####################################################################
 #ifndef __EMBEDDING_TEST__
 #define __EMBEDDING_TEST__
-#include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Tools/Log/DEBUG_PRINT.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 
 namespace PhysBAM{
 

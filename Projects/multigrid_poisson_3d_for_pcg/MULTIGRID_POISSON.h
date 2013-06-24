@@ -7,12 +7,12 @@
 #ifndef __MULTIGRID_POISSON__
 #define __MULTIGRID_POISSON__
 
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Tools/Vectors/VECTOR_2D.h>
+#include <Tools/Vectors/VECTOR_3D.h>
 
 namespace PhysBAM{
 

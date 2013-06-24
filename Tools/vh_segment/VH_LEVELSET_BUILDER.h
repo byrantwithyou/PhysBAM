@@ -4,10 +4,10 @@
 //#####################################################################
 #ifndef __VH_LEVELSET_BUILDER__
 #define __VH_LEVELSET_BUILDER__
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <string>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
 

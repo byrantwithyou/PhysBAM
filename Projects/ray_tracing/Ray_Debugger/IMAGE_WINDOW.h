@@ -5,10 +5,10 @@
 #ifndef __IMAGE_WINDOW__
 #define __IMAGE_WINDOW__
 
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_PRIMITIVES.h> // To get gl, glu in a portable manner
+#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_PRIMITIVES.h> // To get gl, glu in a portable manner
 
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Vectors/VECTOR.h>
 #include <FL/Fl_Gl_Window.h>
 namespace PhysBAM{
 

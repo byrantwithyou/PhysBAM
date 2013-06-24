@@ -4,14 +4,14 @@
 //#####################################################################
 // MAIN
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
-#include <PhysBAM_Tools/Parallel_Computation/MPI_WORLD.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
+#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Tools/Parallel_Computation/MPI_WORLD.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Level_Sets/LEVELSET.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 //#include "Bouncing_Drop/BOUNCING_DROP.h" // drop bouncing on the ground
 //#include "Breaking_Wave/BREAKING_WAVE.h"
 #include "Density_Targetting/DENSITY_TARGETTING.h"

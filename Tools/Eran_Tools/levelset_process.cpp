@@ -1,6 +1,6 @@
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Level_Sets/LEVELSET.h>
 #include <iostream>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_3D.h>
 

@@ -2,17 +2,17 @@
 // Copyright 2010, Jon Gretarsson.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Parsing/STRING_UTILITIES.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 
 using namespace PhysBAM;
 

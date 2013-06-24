@@ -5,9 +5,9 @@
 // Class HASHTABLE_TESTS
 //#####################################################################
 
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Utilities/TEST_BASE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Utilities/TEST_BASE.h>
+#include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 class HASHTABLE_TESTS:public TEST_BASE

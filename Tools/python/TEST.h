@@ -1,9 +1,9 @@
 #ifndef _TEST_H_
 #define _TEST_H_
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Tools/Log/LOG.h>
+#include <Geometry/Topology/TRIANGLE_MESH.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <PhysBAM_Dynamics/Particles/DEFORMABLE_BODY_PARTICLES.h>
 
 using namespace PhysBAM;

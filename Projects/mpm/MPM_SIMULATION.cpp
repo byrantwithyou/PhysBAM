@@ -2,18 +2,18 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
-#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
-#include <PhysBAM_Tools/Math_Tools/cbrt.h>
-#include <PhysBAM_Tools/Math_Tools/clamp.h>
-#include <PhysBAM_Tools/Math_Tools/Inverse.h>
-#include <PhysBAM_Tools/Math_Tools/pow.h>
-#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
+#include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
+#include <Tools/Math_Tools/cbrt.h>
+#include <Tools/Math_Tools/clamp.h>
+#include <Tools/Math_Tools/Inverse.h>
+#include <Tools/Math_Tools/pow.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Tools/Matrices/MATRIX.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Tools/Utilities/DEBUG_CAST.h>
+#include <Tools/Vectors/VECTOR.h>
 #include "MPM_SIMULATION.h"
 #include "MPM_SYSTEM.h"
 #include "MPM_VECTOR.h"

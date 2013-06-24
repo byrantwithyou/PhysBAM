@@ -4,8 +4,8 @@
 //#####################################################################
 // Class main for 3D meshing w/ opengl visualization
 //##################################################################### 
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include "Generic/GENERIC_EXAMPLE.h"
 #include "MESHING_DRIVER.h"
 //#include "Sphere/SPHERE_EXAMPLE.h"

@@ -3,16 +3,16 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
-#include <PhysBAM_Geometry/Images/EPS_FILE.h>
-#include <PhysBAM_Geometry/Images/TEX_FILE.h>
+#include <Tools/Data_Structures/PAIR.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Vectors/VECTOR.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
+#include <Geometry/Images/EPS_FILE.h>
+#include <Geometry/Images/TEX_FILE.h>
 #include <map>
 using namespace PhysBAM;
 

@@ -4,9 +4,9 @@
 //#####################################################################
 // Class SCENE_WINDOW
 //#####################################################################
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/IRRADIANCE_SAMPLE.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
+#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering/IRRADIANCE_SAMPLE.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
 #include "SCENE_WINDOW.h"
 #include <Fl/Fl.h>
 using namespace PhysBAM;

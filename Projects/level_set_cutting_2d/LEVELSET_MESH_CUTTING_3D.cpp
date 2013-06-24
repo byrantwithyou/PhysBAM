@@ -1,7 +1,7 @@
-#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Math_Tools/cyclic_shift.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Math_Tools/cyclic_shift.h>
+#include <Tools/Matrices/MATRIX.h>
 #include "LEVELSET_MESH_CUTTING_3D.h"
 
 using namespace PhysBAM;

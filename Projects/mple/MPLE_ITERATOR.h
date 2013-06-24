@@ -6,7 +6,7 @@
 #ifndef __MPLE_ITERATOR__
 #define __MPLE_ITERATOR__
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Vectors/VECTOR.h>
 #include "MPLE_POINT.h"
 
 namespace PhysBAM{

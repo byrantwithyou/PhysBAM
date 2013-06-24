@@ -1,6 +1,6 @@
 #ifndef __BOUNDARY_CONDITIONS_GIBOU_ANALYTIC_ONE__
 #define __BOUNDARY_CONDITIONS_GIBOU_ANALYTIC_ONE__
-#include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
+#include <Geometry/Basic_Geometry/LINE_2D.h>
 #include "BOUNDARY_CONDITIONS.h"
 using namespace PhysBAM;
 

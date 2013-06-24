@@ -5,13 +5,13 @@
 #ifndef __SCENE_WINDOW__
 #define __SCENE_WINDOW__
 
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_ARCBALL.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_PRIMITIVES.h> // To get gl, glu in a portable manner
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WORLD.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDERING_RAY_DEBUG.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
+#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_ARCBALL.h>
+#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_PRIMITIVES.h> // To get gl, glu in a portable manner
+#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WORLD.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering/RENDERING_RAY_DEBUG.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 #include "FL/Fl_Gl_Window.h"
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/SUBSURFACE_SCATTERING_SAMPLED_IRRADIANCE.h>
 

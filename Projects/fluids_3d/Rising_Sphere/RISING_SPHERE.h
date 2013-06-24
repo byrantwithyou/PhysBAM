@@ -15,8 +15,8 @@
 #ifndef __RISING_SPHERE__
 #define __RISING_SPHERE__
 
-#include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_SPHERE.h>
+#include <Tools/Vectors/VECTOR_3D.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_SPHERE.h>
 
 #include "../WATER_FREE_SURFACE_3D_EXAMPLE.h"
 

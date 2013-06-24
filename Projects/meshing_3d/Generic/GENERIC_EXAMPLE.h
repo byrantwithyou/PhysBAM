@@ -7,14 +7,14 @@
 #ifndef __GENERIC_EXAMPLE__
 #define __GENERIC_EXAMPLE__
 
-#include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
-#include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Tools/Parsing/PARAMETER_LIST.h>
+#include <Geometry/Basic_Geometry/CYLINDER.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Geometry/Basic_Geometry/TORUS.h>
+#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include "../Dynamic/DYNAMIC_IMPLICIT_SURFACE.h"
 #include "../MESHING_EXAMPLE.h"
 #include "../Sphere/SPHERE_IMPLICIT_SURFACE.h"

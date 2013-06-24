@@ -2,25 +2,25 @@
 // Copyright 2013, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Math_Tools/pow.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
-#include <PhysBAM_Tools/Utilities/TIMER.h>
-#include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
-#include <PhysBAM_Geometry/Basic_Geometry/POLYGON.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Math_Tools/pow.h>
+#include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Read_Write/READ_WRITE_FORWARD.h>
+#include <Tools/Read_Write/TYPED_STREAM.h>
+#include <Tools/Utilities/TIMER.h>
+#include <Tools/Utilities/TYPE_UTILITIES.h>
+#include <Geometry/Basic_Geometry/POLYGON.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
+#include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include "DELAUNAY_TRIANGULATION_2D.h"
 #include "MPM_PROJECTION.h"
 #include "MPM_SIMULATION.h"

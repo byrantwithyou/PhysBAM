@@ -1,0 +1,57 @@
+//#####################################################################
+// Copyright 2002-2004, Zhaosheng Bao.
+// This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
+//#####################################################################
+#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Data_Structures/KD_TREE.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
+#include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY_2D.h>
+using namespace PhysBAM;
+//#####################################################################
+// Function Initialize_Hierarchy_Using_KD_Tree
+//#####################################################################
+template<class T> void TRIANGLE_HIERARCHY_2D<T>::
+Initialize_Hierarchy_Using_KD_Tree()
+{
+    KD_TREE<TV> kd_tree(false);
+    ARRAY<TV> centroids(triangle_mesh.elements.m);
+    for(int t=0;t<triangle_mesh.elements.m;t++){int i,j,k;triangle_mesh.elements(t).Get(i,j,k);centroids(t)=TRIANGLE_2D<T>::Center(particles.X(i),particles.X(j),particles.X(k));}
+    kd_tree.Create_Left_Balanced_KD_Tree(centroids);
+    leaves=triangle_mesh.elements.m;parents.Resize(leaves);children.Remove_All();
+    root=Initialize_Hierarchy_Using_KD_Tree_Helper(kd_tree.root_node);assert(root==2*leaves-2);
+    box_hierarchy.Resize(root+1);box_radius.Resize(root+1);
+}
+//#####################################################################
+// Function Calculate_Bounding_Boxes
+//#####################################################################
+template<class T> void TRIANGLE_HIERARCHY_2D<T>::
+Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,ARRAY_VIEW<const TV> X) 
+{
+    for(int k=0;k<leaves;k++){const VECTOR<int,3>& nodes=triangle_mesh.elements(k);
+        bounding_boxes(k)=RANGE<TV>::Bounding_Box(X.Subset(nodes));}
+}
+//#####################################################################
+// Function Calculate_Bounding_Boxes
+//#####################################################################
+template<class T> void TRIANGLE_HIERARCHY_2D<T>::
+Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,ARRAY_VIEW<const TV> start_X,ARRAY_VIEW<const TV> end_X)
+{
+    for(int k=0;k<leaves;k++){const VECTOR<int,3>& nodes=triangle_mesh.elements(k);
+        bounding_boxes(k)=RANGE<TV>::Combine(RANGE<TV>::Bounding_Box(start_X.Subset(nodes)),RANGE<TV>::Bounding_Box(end_X.Subset(nodes)));}
+}
+//#####################################################################
+// Function Calculate_Bounding_Box_Radii
+//#####################################################################
+// at the boxes center, but may be a tighter bound on the triangle than the box
+template<class T> void TRIANGLE_HIERARCHY_2D<T>::
+Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius) 
+{
+    for(int k=0;k<leaves;k++){
+        TV center=bounding_boxes(k).Center();int node1,node2,node3;triangle_mesh.elements(k).Get(node1,node2,node3);
+        radius(k)=sqrt(max((particles.X(node1)-center).Magnitude_Squared(),(particles.X(node2)-center).Magnitude_Squared(),(particles.X(node3)-center).Magnitude_Squared()));}
+}
+//#####################################################################
+namespace PhysBAM{
+template class TRIANGLE_HIERARCHY_2D<float>;
+template class TRIANGLE_HIERARCHY_2D<double>;
+}

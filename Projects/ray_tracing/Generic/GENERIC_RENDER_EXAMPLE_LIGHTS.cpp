@@ -2,14 +2,14 @@
 // Copyright 2004-2008, Zhaosheng Bao, Eilene Hao, Sergey Koltakov, Frank Losasso, Craig Schroeder, Andrew Selle, Michael Turitzin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-#include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_DIRECTIONAL_LIGHT.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_POINT_LIGHT.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_RECTANGLE_LIGHT.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_SPOTLIGHT.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_VOXEL_FIRE_LIGHT.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_LIGHT_SHADER.h>
+#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Parsing/PARAMETER_LIST.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_DIRECTIONAL_LIGHT.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_POINT_LIGHT.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_RECTANGLE_LIGHT.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_SPOTLIGHT.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_VOXEL_FIRE_LIGHT.h>
+#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_LIGHT_SHADER.h>
 #include "GENERIC_RENDER_EXAMPLE.h"
 using namespace PhysBAM;
 //#####################################################################

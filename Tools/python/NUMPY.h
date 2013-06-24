@@ -12,11 +12,11 @@
 
 #include <boost/python/object.hpp>
 #ifdef USE_NUMPY
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Particles/PARTICLES_FORWARD.h>
-#include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Particles/PARTICLES_FORWARD.h>
+#include <Tools/Utilities/TYPE_UTILITIES.h>
 #include "UTILITIES.h"
 #include <numpy/arrayobject.h>
 namespace PhysBAM{
@@ -295,7 +295,7 @@ void Import_Numpy()
 //#####################################################################
 }
 #else
-#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Log/DEBUG_UTILITIES.h>
 namespace PhysBAM{
 
 template<class T_ARRAY> boost::python::object As_Numpy(const T_ARRAY& array)

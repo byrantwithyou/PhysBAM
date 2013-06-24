@@ -2,7 +2,7 @@
 
 #ifndef USER_INTERFACE_h
 #define USER_INTERFACE_h
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <Tools/Arrays/ARRAY.h>
 #include "TIMELINE.h"
 #include "VIDEO_WINDOW.h"
 #include <FL/Fl.H>

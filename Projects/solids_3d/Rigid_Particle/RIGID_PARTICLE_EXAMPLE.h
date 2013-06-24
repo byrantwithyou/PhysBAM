@@ -7,12 +7,12 @@
 #ifndef __RIGID_PARTICLE_EXAMPLE__
 #define __RIGID_PARTICLE_EXAMPLE__
 
-#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SEGMENT_BENDING_ELEMENTS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Bindings/RIGID_BODY_BINDING.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Deformables/Forces/LINEAR_SPRINGS.h>
+#include <Deformables/Forces/SEGMENT_BENDING_ELEMENTS.h>
+#include <Solids/Bindings/RIGID_BODY_BINDING.h>
+#include <Solids/Forces_And_Torques/GRAVITY.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>

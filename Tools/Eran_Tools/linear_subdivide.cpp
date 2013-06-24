@@ -1,5 +1,5 @@
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGLE_SUBDIVISION.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGLE_SUBDIVISION.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <fstream>
 #include <iostream>
 #include <string.h> // for gcc 2.96 for str* functions

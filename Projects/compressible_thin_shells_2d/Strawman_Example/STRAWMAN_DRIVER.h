@@ -4,7 +4,7 @@
 //#####################################################################
 #ifndef __STRAWMAN_DRIVER__
 #define __STRAWMAN_DRIVER__
-#include <PhysBAM_Tools/Ordinary_Differential_Equations/DRIVER.h>
+#include <Tools/Ordinary_Differential_Equations/DRIVER.h>
 namespace PhysBAM{
 
 template<class TV> class STRAWMAN_EXAMPLE;

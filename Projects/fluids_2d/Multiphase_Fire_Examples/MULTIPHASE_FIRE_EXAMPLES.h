@@ -7,14 +7,14 @@
 #ifndef __MULTIPHASE_FIRE_EXAMPLES__
 #define __MULTIPHASE_FIRE_EXAMPLES__
 
-#include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform_Computations/SMOOTH_UNIFORM.h>
-#include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
-#include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Tools/Boundaries/BOUNDARY.h>
+#include <Tools/Grids_Uniform_Computations/SMOOTH_UNIFORM.h>
+#include <Tools/Interpolation/INTERPOLATION_CURVE.h>
+#include <Tools/Parsing/PARAMETER_LIST.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
+#include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
+#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>

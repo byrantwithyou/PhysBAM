@@ -2,23 +2,23 @@
 // Copyright 2013.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
-#include <PhysBAM_Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
-#include <PhysBAM_Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED_FIXED.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
+#include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
+#include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
+#include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
+#include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
+#include <Deformables/Forces/FINITE_VOLUME.h>
+#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
+#include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
+#include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <climits>
 
 using namespace PhysBAM;
