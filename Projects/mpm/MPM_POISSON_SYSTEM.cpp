@@ -91,6 +91,12 @@ template<class TV> typename TV::SCALAR MPM_POISSON_SYSTEM<TV>::
 Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 {
     const ARRAY<T,TV_INT>& xx=debug_cast<const MPM_POISSON_VECTOR<TV>&>(x).v;
+//    LOG::cout<<"resudual: ";
+//    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),proj.mac_grid.counts));it.Valid();it.Next())
+//        LOG::cout<<xx(it.index)<<" ";
+//    LOG::cout<<std::endl;
+    
+    
     return xx.array.Maximum_Magnitude();
 }
 //#####################################################################

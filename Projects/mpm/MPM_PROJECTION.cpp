@@ -271,10 +271,6 @@ Do_Projection()
             FACE_INDEX<TV::m> second_face(axis,mac_grid.Second_Face_Index_In_Cell(axis,it.index));
             face_velocities(first_face)=T(0);
             face_velocities(second_face)=T(0);}}
-
-    // check whether divergence free
-    // Build_Velocity_Divergence();
-    // LOG::cout<<"Maximum velocity divergence after projection: "<<max_div<<std::endl;
 }
 
 //#####################################################################

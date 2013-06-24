@@ -381,14 +381,15 @@ void Run_Simulation(PARSE_ARGS& parse_args)
             
             // LOG::cout<<"Maximum velocity divergence after projection: "<<projection.max_div<<std::endl;
 
-            T max_abs=0;
+
+            ARRAY<T,TV_INT> check=projection.div_u;
             for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),TV_INT()+projection.mac_grid.counts));it.Valid();it.Next()){
-                T value=projection.div_u(it.index)+(projection.pressure_unknown(it.index)-projection.pressure_rasterized(it.index))*projection.one_over_lambda_J(it.index)*(1.0/sim.dt);
-                if(value>max_abs) max_abs=value;}
-            LOG::cout<<"Check with residual: "<<max_abs<<std::endl;
+                check(it.index)=projection.div_u(it.index)+(projection.pressure_unknown(it.index)-projection.pressure_rasterized(it.index))*projection.one_over_lambda_J(it.index)*(1.0/sim.dt);}
+//            LOG::cout<<"Check with residual: "<<check<<std::endl;
+            LOG::cout<<"checker max mag:"<<check.array.Maximum_Magnitude()<<std::endl;
             
 
-            
+//            exit(0);
             
             
 //            // draw particles
