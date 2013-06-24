@@ -15,7 +15,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 COLLISION_GEOMETRY_SPATIAL_PARTITION(T_ARRAY& collision_bodies_input,T collision_body_thickness_input)
     :collision_bodies(collision_bodies_input),voxel_range(collision_bodies.Size()),hashtable(10*Value(collision_bodies.Size())),reinitialize_counter(-1),
     collision_body_thickness(collision_body_thickness_input)
@@ -24,7 +24,7 @@ COLLISION_GEOMETRY_SPATIAL_PARTITION(T_ARRAY& collision_bodies_input,T collision
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 ~COLLISION_GEOMETRY_SPATIAL_PARTITION()
 {
     hashtable.Delete_Pointers_Stored_In_Table();
@@ -32,7 +32,7 @@ template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> COLLISION_GEOMETRY_S
 //#####################################################################
 // Function Scene_Bounding_Box_Size
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> typename T_COLLISION_GEOMETRY::VECTOR_T::SCALAR COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> typename TV::SCALAR COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Scene_Bounding_Box_Size()
 {
     TV lengths=Scene_Bounding_Box().Edge_Lengths();
@@ -41,7 +41,7 @@ Scene_Bounding_Box_Size()
 //#####################################################################
 // Function Scene_Bounding_Box
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> RANGE<typename T_COLLISION_GEOMETRY::VECTOR_T> COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> RANGE<TV> COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Scene_Bounding_Box()
 {
     RANGE<TV> scene_bounding_box;
@@ -55,7 +55,7 @@ Scene_Bounding_Box()
 //#####################################################################
 // Function Average_Bounding_Box_Size
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> typename T_COLLISION_GEOMETRY::VECTOR_T::SCALAR COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> typename TV::SCALAR COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Average_Bounding_Box_Size()
 {
     T average_size=0;int count=0;
@@ -69,7 +69,7 @@ Average_Bounding_Box_Size()
 //#####################################################################
 // Function Maximum_Bounding_Box_Size
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> typename T_COLLISION_GEOMETRY::VECTOR_T::SCALAR COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> typename TV::SCALAR COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Maximum_Bounding_Box_Size()
 {
     T max_size=0;
@@ -82,7 +82,7 @@ Maximum_Bounding_Box_Size()
 //#####################################################################
 // Function Compute_Voxel_Size
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Compute_Voxel_Size(const SPATIAL_PARTITION_VOXEL_SIZE_HEURISTIC heuristic,const int number_of_boxes,const T voxel_size_scale_factor)
 {
     reinitialize_counter=max(reinitialize_counter,0);
@@ -102,7 +102,7 @@ Compute_Voxel_Size(const SPATIAL_PARTITION_VOXEL_SIZE_HEURISTIC heuristic,const 
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Reinitialize()
 {
     assert(reinitialize_counter>=0);
@@ -123,7 +123,7 @@ Reinitialize()
 //#####################################################################
 // Function Print_Initial_Statistics
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Print_Initial_Statistics() const
 {
     int min_size=INT_MAX,max_size=0,number=0;T average_size=0;
@@ -136,7 +136,7 @@ Print_Initial_Statistics() const
 //#####################################################################
 // Function Update_Body
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Update_Body(const ID index)
 {
     if(collision_bodies(index)->add_to_spatial_partition){
@@ -150,7 +150,7 @@ Update_Body(const ID index)
 //#####################################################################
 // Function Insert_Into_Hashtable
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Insert_Into_Hashtable(const ID index)
 {
     assert(collision_bodies(index)->add_to_spatial_partition);
@@ -160,7 +160,7 @@ Insert_Into_Hashtable(const ID index)
 //#####################################################################
 // Function Remove_From_Cell
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> bool COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> bool COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Remove_From_Cell(const TV_INT& voxel,const ID index)
 {
     ARRAY<ID>* list=0;
@@ -173,7 +173,7 @@ Remove_From_Cell(const TV_INT& voxel,const ID index)
 //#####################################################################
 // Function Add_To_Cell
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Add_To_Cell(const TV_INT& voxel,const ID index)
 {
     ARRAY<ID>* occupancy_list=0;
@@ -183,7 +183,7 @@ Add_To_Cell(const TV_INT& voxel,const ID index)
 //#####################################################################
 // Function Remove_If_Not_Still_Present
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Remove_If_Not_Still_Present(const RANGE<TV_INT>& old_locations,const RANGE<TV_INT>& new_locations,const ID index)
 {
     if(new_locations.Contains(old_locations)) return;GRID<TV> unused;
@@ -193,7 +193,7 @@ Remove_If_Not_Still_Present(const RANGE<TV_INT>& old_locations,const RANGE<TV_IN
 //#####################################################################
 // Function Add_If_Newly_Present
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Add_If_Newly_Present(const RANGE<TV_INT>& old_locations,const RANGE<TV_INT>& new_locations,const ID index)
 {
     if(old_locations.Contains(new_locations)) return;GRID<TV> unused;
@@ -203,7 +203,7 @@ Add_If_Newly_Present(const RANGE<TV_INT>& old_locations,const RANGE<TV_INT>& new
 //#####################################################################
 // Function Get_Potential_Collisions
 //#####################################################################
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Get_Potential_Collisions(const ID index,const RANGE<TV_INT>& range,ARRAY<ID>& object_indices,bool only_higher_index) const
 {
     object_indices.Remove_All();
@@ -220,16 +220,16 @@ Get_Potential_Collisions(const ID index,const RANGE<TV_INT>& range,ARRAY<ID>& ob
 }
 //##################################################################### 
 namespace PhysBAM{
-template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<float,1> >,const ARRAY<COLLISION_GEOMETRY<VECTOR<float,1> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
-template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<float,2> >,const ARRAY<COLLISION_GEOMETRY<VECTOR<float,2> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
-template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<float,3> >,const ARRAY<COLLISION_GEOMETRY<VECTOR<float,3> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
-template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<float,1> >,ARRAY<COLLISION_GEOMETRY<VECTOR<float,1> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
-template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<float,2> >,ARRAY<COLLISION_GEOMETRY<VECTOR<float,2> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
-template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<float,3> >,ARRAY<COLLISION_GEOMETRY<VECTOR<float,3> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
-template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<double,1> >,const ARRAY<COLLISION_GEOMETRY<VECTOR<double,1> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
-template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<double,2> >,const ARRAY<COLLISION_GEOMETRY<VECTOR<double,2> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
-template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<double,3> >,const ARRAY<COLLISION_GEOMETRY<VECTOR<double,3> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
-template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<double,1> >,ARRAY<COLLISION_GEOMETRY<VECTOR<double,1> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
-template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<double,2> >,ARRAY<COLLISION_GEOMETRY<VECTOR<double,2> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
-template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<double,3> >,ARRAY<COLLISION_GEOMETRY<VECTOR<double,3> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
+template class COLLISION_GEOMETRY_SPATIAL_PARTITION<VECTOR<float,1>,const ARRAY<COLLISION_GEOMETRY<VECTOR<float,1> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
+template class COLLISION_GEOMETRY_SPATIAL_PARTITION<VECTOR<float,2>,const ARRAY<COLLISION_GEOMETRY<VECTOR<float,2> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
+template class COLLISION_GEOMETRY_SPATIAL_PARTITION<VECTOR<float,3>,const ARRAY<COLLISION_GEOMETRY<VECTOR<float,3> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
+template class COLLISION_GEOMETRY_SPATIAL_PARTITION<VECTOR<float,1>,ARRAY<COLLISION_GEOMETRY<VECTOR<float,1> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
+template class COLLISION_GEOMETRY_SPATIAL_PARTITION<VECTOR<float,2>,ARRAY<COLLISION_GEOMETRY<VECTOR<float,2> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
+template class COLLISION_GEOMETRY_SPATIAL_PARTITION<VECTOR<float,3>,ARRAY<COLLISION_GEOMETRY<VECTOR<float,3> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
+template class COLLISION_GEOMETRY_SPATIAL_PARTITION<VECTOR<double,1>,const ARRAY<COLLISION_GEOMETRY<VECTOR<double,1> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
+template class COLLISION_GEOMETRY_SPATIAL_PARTITION<VECTOR<double,2>,const ARRAY<COLLISION_GEOMETRY<VECTOR<double,2> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
+template class COLLISION_GEOMETRY_SPATIAL_PARTITION<VECTOR<double,3>,const ARRAY<COLLISION_GEOMETRY<VECTOR<double,3> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
+template class COLLISION_GEOMETRY_SPATIAL_PARTITION<VECTOR<double,1>,ARRAY<COLLISION_GEOMETRY<VECTOR<double,1> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
+template class COLLISION_GEOMETRY_SPATIAL_PARTITION<VECTOR<double,2>,ARRAY<COLLISION_GEOMETRY<VECTOR<double,2> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
+template class COLLISION_GEOMETRY_SPATIAL_PARTITION<VECTOR<double,3>,ARRAY<COLLISION_GEOMETRY<VECTOR<double,3> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
 }

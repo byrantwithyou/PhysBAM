@@ -178,7 +178,7 @@ template<class TV> void COLLISION_GEOMETRY_COLLECTION<TV>::
 Update_Spatial_Partition(const SPATIAL_PARTITION_VOXEL_SIZE_HEURISTIC heuristic,const int number_of_boxes,const T voxel_size_scale_factor)
 {
     if(!spatial_partition){
-        spatial_partition=new COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<TV>,const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>(bodies,collision_body_thickness);
+        spatial_partition=new COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>(bodies,collision_body_thickness);
         spatial_partition->Compute_Voxel_Size(heuristic,number_of_boxes,voxel_size_scale_factor);}
     spatial_partition->Reinitialize();
 }

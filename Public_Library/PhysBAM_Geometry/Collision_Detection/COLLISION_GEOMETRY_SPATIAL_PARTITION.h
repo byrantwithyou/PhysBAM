@@ -13,17 +13,17 @@
 #include <PhysBAM_Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <PhysBAM_Geometry/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <climits> // for INT_MAX (for old gcc)
 
 namespace PhysBAM{
 
-template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID>
+template<class TV,class T_ARRAY,class ID>
 class COLLISION_GEOMETRY_SPATIAL_PARTITION:public NONCOPYABLE
 {
 private:
-    typedef typename T_COLLISION_GEOMETRY::VECTOR_T TV;typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
 
     T_ARRAY& collision_bodies;

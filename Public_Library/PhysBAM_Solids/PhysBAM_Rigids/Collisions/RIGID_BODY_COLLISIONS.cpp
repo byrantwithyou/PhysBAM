@@ -47,7 +47,7 @@ RIGID_BODY_COLLISIONS(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,RIG
     RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks_input,RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>& rigids_example_forces_and_velocities_input)
     :parameters(parameters_input),collision_callbacks(collision_callbacks_input),verbose(false),prune_stacks_from_contact(false),prune_contact_using_velocity(false),collision_manager(0),
     skip_collision_check(*new RIGID_BODY_SKIP_COLLISION_CHECK),rigid_body_collection(rigid_body_collection_input),rigids_example_forces_and_velocities(rigids_example_forces_and_velocities_input),
-    spatial_partition(new COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<TV>,ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>(rigid_body_collection.collision_body_list->bodies)),
+    spatial_partition(new COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>(rigid_body_collection.collision_body_list->bodies)),
     intersections(*new RIGID_BODY_INTERSECTIONS<TV>(rigid_body_collection)),contact_graph(*new RIGID_BODY_CONTACT_GRAPH<TV>(rigid_body_collection.rigid_body_particles)),
     store_collision_intersections_for_projection(false),use_static_body_masses(false),use_parent_normal(false),
     rigid_body_cluster_bindings(rigid_body_collection.rigid_body_cluster_bindings),fracture_pattern(0)
