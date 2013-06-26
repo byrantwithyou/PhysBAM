@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Vectors/VECTOR.h>
 
 using namespace PhysBAM;
 
