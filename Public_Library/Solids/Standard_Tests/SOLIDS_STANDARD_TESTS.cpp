@@ -15,8 +15,8 @@
 #include <Rigids/Joints/POINT_JOINT.h>
 #include <Rigids/Rigid_Bodies/MASS_PROPERTIES.h>
 #include <Deformables/Bindings/BINDING_LIST.h>
+#include <Deformables/Bindings/RIGID_BODY_BINDING.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <Solids/Bindings/RIGID_BODY_BINDING.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>

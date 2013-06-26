@@ -8,9 +8,9 @@
 #define __RIGID_PARTICLE_EXAMPLE__
 
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Deformables/Bindings/RIGID_BODY_BINDING.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SEGMENT_BENDING_ELEMENTS.h>
-#include <Solids/Bindings/RIGID_BODY_BINDING.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{

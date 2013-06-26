@@ -11,9 +11,9 @@
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Deformables/Bindings/PARTICLE_BINDING.h>
+#include <Deformables/Bindings/RIGID_BODY_BINDING.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Forces/IMPLICIT_ZERO_LENGTH_SPRINGS.h>
-#include <Solids/Bindings/RIGID_BODY_BINDING.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>

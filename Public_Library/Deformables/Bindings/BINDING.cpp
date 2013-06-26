@@ -11,7 +11,7 @@
 #include <Deformables/Bindings/LINEAR_BINDING.h>
 #include <Deformables/Bindings/LINEAR_BINDING_DYNAMIC.h>
 #include <Deformables/Bindings/PARTICLE_BINDING.h>
-#include <Solids/Bindings/RIGID_BODY_BINDING.h>
+#include <Deformables/Bindings/RIGID_BODY_BINDING.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Create_Structure

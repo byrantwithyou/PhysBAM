@@ -27,6 +27,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
+#include <Deformables/Bindings/RIGID_BODY_BINDING.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
@@ -36,7 +37,6 @@
 #include <Deformables/Constitutive_Models/SIMPLE_PLASTICITY.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
-#include <Solids/Bindings/RIGID_BODY_BINDING.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Fracture/FRACTURE_OBJECT.h>
 #include <Solids/Fracture/FRACTURE_TETRAHEDRALIZED_VOLUME.h>

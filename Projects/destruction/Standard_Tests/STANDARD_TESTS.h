@@ -45,6 +45,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Rigids/Rigid_Bodies/RIGID_CLUSTER_CONSTITUENT_ID.h>
 #include <Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
+#include <Deformables/Bindings/RIGID_BODY_BINDING.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
@@ -57,7 +58,6 @@
 #include <Deformables/Forces/SEGMENT_BENDING_SPRINGS.h>
 #include <Deformables/Forces/TRIANGLE_BENDING_ELEMENTS.h>
 #include <Deformables/Forces/TRIANGLE_BENDING_SPRINGS.h>
-#include <Solids/Bindings/RIGID_BODY_BINDING.h>
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
