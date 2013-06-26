@@ -16,20 +16,22 @@
 
 namespace PhysBAM{
 
-template<class TV,class TRANSFORM> class IMPLICIT_OBJECT_TRANSFORMED_HELPER
+template<class TV,class TRANSFORM> class IMPLICIT_OBJECT_TRANSFORMED_HELPER;
+
+template<class TV> class IMPLICIT_OBJECT_TRANSFORMED_HELPER<TV,FRAME<TV> >
 {
     typedef typename TV::SCALAR T;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
 public:
 
-    IMPLICIT_OBJECT_TRANSFORMED_HELPER(const TRANSFORM* transform_input)
+    IMPLICIT_OBJECT_TRANSFORMED_HELPER(const FRAME<TV>* transform_input)
         :transform(transform_input),owns_transform(false)
     {}
 
     ~IMPLICIT_OBJECT_TRANSFORMED_HELPER()
     {if(owns_transform) delete transform;}
 
-    const TRANSFORM* transform;
+    const FRAME<TV>* transform;
     bool owns_transform;
 
     bool Scale_Transform(const T scale_input) PHYSBAM_ALWAYS_INLINE
@@ -71,7 +73,7 @@ public:
     {return SYMMETRIC_MATRIX<T,TV::m>::Conjugate(transform->Frame().r.Rotation_Matrix(),object_space_hessian);}
 
     static std::string Name_Helper()
-    {return STRING_UTILITIES::string_sprintf("IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,%d>,%s>",TV::dimension,TRANSFORM::Static_Name().c_str());}
+    {return STRING_UTILITIES::string_sprintf("IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,%d>,%s>",TV::dimension,FRAME<TV>::Static_Name().c_str());}
 
     template<class READ_TRANSFORM> void Read_Transform_Helper(TYPED_ISTREAM& input,const READ_TRANSFORM& transform_input)
     {PHYSBAM_FATAL_ERROR();}

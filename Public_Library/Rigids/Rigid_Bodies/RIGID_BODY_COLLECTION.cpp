@@ -419,6 +419,17 @@ New_Body(int index)
     return allocate_helper->Create(index);
 }
 //#####################################################################
+// Function Update_Level_Set_Transforms
+//#####################################################################
+template<class TV> void RIGID_BODY_COLLECTION<TV>::
+Update_Level_Set_Transforms()
+{
+    for(int i=0;i<rigid_body_particles.Size();i++)
+        if(rigid_body_particles.rigid_body(i))
+            if(rigid_body_particles.rigid_body(i)->implicit_object)
+                rigid_body_particles.rigid_body(i)->implicit_object->transform=&rigid_body_particles.frame(i);
+}
+//#####################################################################
 // Function Read
 //#####################################################################
 template<class TV> void RIGID_BODY_COLLECTION<TV>::

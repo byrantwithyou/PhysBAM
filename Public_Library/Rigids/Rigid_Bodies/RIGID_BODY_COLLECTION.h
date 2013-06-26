@@ -96,6 +96,7 @@ public:
     void Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
     void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const; // TODO: optionally skip certain kinds of structures in output
     void Update_Simulated_Particles();
+    void Update_Level_Set_Transforms();
 
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const;
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const;

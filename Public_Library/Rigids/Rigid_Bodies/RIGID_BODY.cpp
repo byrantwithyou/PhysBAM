@@ -45,7 +45,10 @@ RIGID_BODY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,bool create_co
 {
     if(index>=0) particle_index=index;
     else{
+        FRAME<TV>* old_frames=rigid_body_collection.rigid_body_particles.frame.base_pointer;
         particle_index=rigid_body_collection.rigid_body_particles.Add_Element();
+        if(old_frames!=rigid_body_collection.rigid_body_particles.frame.base_pointer)
+            rigid_body_collection.Update_Level_Set_Transforms();
         rigid_body_collection.rigid_body_particles.structure_ids(particle_index)=VECTOR<int,3>(-1,-1,-1);}
     if(particle_index>=rigid_body_collection.rigid_body_particles.rigid_body.m)
         rigid_body_collection.rigid_body_particles.rigid_body.Resize(particle_index+1);
@@ -163,7 +166,7 @@ Add_Structure_Helper(RIGID_BODY<VECTOR<T,1> >& self,STRUCTURE<VECTOR<T,1> >& str
         if(!self.simplicial_object->bounding_box) self.simplicial_object->Update_Bounding_Box();}
     else if(IMPLICIT_OBJECT<TV>* implicit_object_input=dynamic_cast<IMPLICIT_OBJECT<TV>*>(&structure)){
         if(self.implicit_object) self.Remove_Structure(self.implicit_object->object_space_implicit_object);
-        self.implicit_object=new IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_BODY<TV> >(implicit_object_input,false,&self);
+        self.implicit_object=new IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >(implicit_object_input,false,&self.Frame());
         self.implicit_object->Update_Box();self.implicit_object->Compute_Cell_Minimum_And_Maximum(false);} // don't recompute cell min/max if already computed
     self.structures.Append(&structure);
 }
@@ -177,7 +180,7 @@ Add_Structure_Helper(RIGID_BODY<VECTOR<T,2> >& self,STRUCTURE<VECTOR<T,2> >& str
         if(!self.simplicial_object->bounding_box) self.simplicial_object->Update_Bounding_Box();}
     else if(IMPLICIT_OBJECT<TV>* implicit_object_input=dynamic_cast<IMPLICIT_OBJECT<TV>*>(&structure)){
         if(self.implicit_object) self.Remove_Structure(self.implicit_object->object_space_implicit_object);
-        self.implicit_object=new IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_BODY<TV> >(implicit_object_input,false,&self);
+        self.implicit_object=new IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >(implicit_object_input,false,&self.Frame());
         self.implicit_object->Update_Box();self.implicit_object->Compute_Cell_Minimum_And_Maximum(false);} // don't recompute cell min/max if already computed
     else if(TRIANGULATED_AREA<T>* triangulated_area=dynamic_cast<TRIANGULATED_AREA<T>*>(&structure)){
         if(TRIANGULATED_AREA<T>* old_triangulated_area=self.template Find_Structure<TRIANGULATED_AREA<T>*>()) self.Remove_Structure(old_triangulated_area);
@@ -195,11 +198,11 @@ Add_Structure_Helper(RIGID_BODY<VECTOR<T,3> >& self,STRUCTURE<VECTOR<T,3> >& str
         if(!self.simplicial_object->bounding_box) self.simplicial_object->Update_Bounding_Box();}
     else if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* implicit_object_input=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(&structure)){
         if(self.implicit_object) self.Remove_Structure(self.implicit_object->object_space_implicit_object);
-        self.implicit_object=new IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_BODY<TV> >(implicit_object_input,false,&self);
+        self.implicit_object=new IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >(implicit_object_input,false,&self.Frame());
         self.implicit_object->Update_Box();self.implicit_object->Compute_Cell_Minimum_And_Maximum(false);} // don't recompute cell min/max if already computed
     else if(IMPLICIT_OBJECT<TV>* implicit_object_input=dynamic_cast<IMPLICIT_OBJECT<TV>*>(&structure)){
         if(self.implicit_object) self.Remove_Structure(self.implicit_object->object_space_implicit_object);
-        self.implicit_object=new IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_BODY<TV> >(implicit_object_input,false,&self);
+        self.implicit_object=new IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >(implicit_object_input,false,&self.Frame());
         self.implicit_object->Update_Box();self.implicit_object->Compute_Cell_Minimum_And_Maximum(false);} // don't recompute cell min/max if already computed
     else if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(&structure)){
         if(TETRAHEDRALIZED_VOLUME<T>* old_tetrahedralized_volume=self.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>()) self.Remove_Structure(old_tetrahedralized_volume);

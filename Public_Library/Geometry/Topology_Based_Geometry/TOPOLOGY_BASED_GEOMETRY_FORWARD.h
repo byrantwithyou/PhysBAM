@@ -23,8 +23,6 @@ template<class TV,class TRANSFORM> class IMPLICIT_OBJECT_TRANSFORMED;
 template<class TV> class ANALYTIC_IMPLICIT_OBJECT;
 template<class TV> class IMPLICIT_OBJECT_COMBINED;
 template<class TV> class IMPLICIT_OBJECT_COMBINED_EULERIAN;
-template<class TV,class TRANSFORM> class IMPLICIT_OBJECT_TRANSFORMED;
-template<class TV> class LEVELSET_IMPLICIT_OBJECT;
 template<class TV> class MULTIBODY_LEVELSET_IMPLICIT_OBJECT;
 
 }

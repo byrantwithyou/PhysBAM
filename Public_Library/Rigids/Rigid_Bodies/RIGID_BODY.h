@@ -36,7 +36,7 @@ class RIGID_BODY:public NONCOPYABLE
     typedef typename IF<TV::m==2,SEGMENT_HIERARCHY<TV>,TRIANGLE_HIERARCHY<T> >::TYPE T_SIMPLEX_HIERARCHY;
 
 public:
-    IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_BODY<TV> >* implicit_object; // implicit representation of geometry
+    IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* implicit_object; // implicit representation of geometry
     T_SIMPLICIAL_OBJECT* simplicial_object; // discrete representation of geometry
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     int particle_index;

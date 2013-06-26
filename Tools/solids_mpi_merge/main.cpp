@@ -89,7 +89,10 @@ Merge_Rigid_Data(const int frame)
         local_rigid_collections(p)=new RIGID_BODY_COLLECTION<TV>(0);
         local_rigid_collections(p)->Read(STREAM_TYPE(RW()),STRING_UTILITIES::string_sprintf("%s/%d/",input_directory.c_str(),p),frame,&needs_init);
         local_rigid_collections(p)->structure_list.Fill_Needs_Write();
+        FRAME<TV>* old_frames=rigid_body_collection.rigid_body_particles.frame.base_pointer;
         rigid_body_collection.rigid_body_particles.Add_Elements(local_rigid_collections(p)->rigid_body_particles.Size());
+        if(old_frames!=rigid_body_collection.rigid_body_particles.frame.base_pointer)
+            rigid_body_collection.Update_Level_Set_Transforms();
         colors.Resize(local_rigid_collections(p)->rigid_body_particles.Size());
         for(int i=0;i<local_rigid_collections(p)->rigid_body_particles.Size();i++){
             if(!local_rigid_collections(p)->rigid_body_particles.rigid_body(i)) continue;

@@ -627,12 +627,12 @@ Update_Keyframed_Parameters_For_Time_Update(const T time)
     if(time<start_time) return;
     if(use_eulerian_level_set_interpolation){
         IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>& implicit_combined_eulerian=
-            ((IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>&)*((IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_BODY<TV> >*)implicit_rigid_body->implicit_object)->object_space_implicit_object);
+            ((IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>&)*((IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*)implicit_rigid_body->implicit_object)->object_space_implicit_object);
         implicit_combined_eulerian.dt=levelset_frequency;
         Update_Keyframed_Parameters_For_Time_Update_Helper(time,implicit_combined_eulerian);}
     else
         Update_Keyframed_Parameters_For_Time_Update_Helper(time,
-            ((IMPLICIT_OBJECT_COMBINED<TV>&)*((IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_BODY<TV> >*)implicit_rigid_body->implicit_object)->object_space_implicit_object));
+            ((IMPLICIT_OBJECT_COMBINED<TV>&)*((IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*)implicit_rigid_body->implicit_object)->object_space_implicit_object));
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -911,9 +911,9 @@ Write_Output_Files(const int frame) const
     if(guide_adhesion) guide_adhesion->Write_State(stream_type,output_directory+STRING_UTILITIES::string_sprintf("/adhesion.%d",frame));
     if(use_deforming_levelsets){
         if(use_eulerian_level_set_interpolation) Write_Interpolated_Level_Set(frame,
-            ((IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>&)*((IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_BODY<TV> >*)implicit_rigid_body->implicit_object)->object_space_implicit_object));
+            ((IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>&)*((IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*)implicit_rigid_body->implicit_object)->object_space_implicit_object));
         else if(use_eulerian_level_set_interpolation) Write_Interpolated_Level_Set(frame,
-            ((IMPLICIT_OBJECT_COMBINED<TV>&)*((IMPLICIT_OBJECT_TRANSFORMED<TV,RIGID_BODY<TV> >*)implicit_rigid_body->implicit_object)->object_space_implicit_object));
+            ((IMPLICIT_OBJECT_COMBINED<TV>&)*((IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*)implicit_rigid_body->implicit_object)->object_space_implicit_object));
     }
 }
 //#####################################################################
