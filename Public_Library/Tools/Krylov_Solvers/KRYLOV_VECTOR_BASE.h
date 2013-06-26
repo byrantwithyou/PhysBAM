@@ -9,6 +9,7 @@
 
 #include <Tools/Utilities/DEBUG_CAST.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
+#include <iostream>
 namespace PhysBAM{
 
 template<class T>
@@ -34,5 +35,6 @@ public:
     virtual void Resize(const KRYLOV_VECTOR_BASE& v)=0;
 //#####################################################################
 };
+template<class T> std::ostream& operator<<(std::ostream& output,const KRYLOV_VECTOR_BASE<T>& x);
 }
 #endif
