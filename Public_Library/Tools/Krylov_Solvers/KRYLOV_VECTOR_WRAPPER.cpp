@@ -76,7 +76,7 @@ operator*=(const T a)
 template<class T,class TV> void KRYLOV_VECTOR_WRAPPER<T,TV>::
 Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 {
-    v.Copy(c,dynamic_cast<const KRYLOV_VECTOR_WRAPPER&>(bv).v,v);
+    v.Copy(c,dynamic_cast<const KRYLOV_VECTOR_WRAPPER&>(bv).v);
 }
 //#####################################################################
 // Function Copy
