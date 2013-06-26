@@ -9,7 +9,7 @@ env=env.Copy()
 ignore=["build","install","Documentation"]
 exclude=[]
 #directories=Find_Directories(lambda x: x not in ignore)
-directories=['Rendering', 'Dynamics', 'Fluids', 'Solids', 'Deformables', 'Rigids', 'Geometry', 'Tools']
+directories=['Rendering', 'Dynamics', 'Fluids', 'Compressible', 'Incompressible', 'Solids', 'Deformables', 'Rigids', 'Geometry', 'Tools']
 
 if env['install_headers'] and env['INSTALL_PATH']:
     install_include=os.path.join(env['INSTALL_PATH'],'include','physbam','')
@@ -50,10 +50,11 @@ else:
             exclude_regex=re.compile("OpenGL|Rendering|CVS")
             Automatic_Circular_DLLs(env,filter(lambda x:not exclude_regex.search(x),directories))
         else:
-            common_libraries.append('PhysBAM_Fluids');
             common_libraries.append('PhysBAM_Deformables');
-            common_libraries.append('PhysBAM_Geometry');
             common_libraries.append('PhysBAM_Rigids');
+            common_libraries.append('PhysBAM_Incompressible');
+            common_libraries.append('PhysBAM_Dynamics');
+            common_libraries.append('PhysBAM_Incompressible');
             for d in directories:
                 Sublibrary(env,d,parent=d)
             if env["INSTALL_PATH"]:

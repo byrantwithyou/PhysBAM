@@ -10,7 +10,7 @@
 #include <Tools/Boundaries/BOUNDARY.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
-#include <Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
+#include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include "MULTIPHASE_FIRE_EXAMPLES_UNIFORM.h"
 namespace PhysBAM{
 

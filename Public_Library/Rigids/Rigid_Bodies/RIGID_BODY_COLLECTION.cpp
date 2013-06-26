@@ -7,8 +7,6 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Utilities/DEBUG_CAST.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE.h>
@@ -16,6 +14,8 @@
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_1D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>

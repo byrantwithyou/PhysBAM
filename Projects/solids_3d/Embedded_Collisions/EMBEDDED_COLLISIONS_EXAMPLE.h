@@ -8,8 +8,8 @@
 #define __EMBEDDED_COLLISIONS_EXAMPLE__
 
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
 #include <Deformables/Bindings/PARTICLE_BINDING.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>

@@ -7,8 +7,8 @@
 #ifndef __OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D__
 #define __OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D__
 
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>

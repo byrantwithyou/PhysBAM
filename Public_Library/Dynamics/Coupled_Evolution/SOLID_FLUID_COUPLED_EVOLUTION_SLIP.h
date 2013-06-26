@@ -10,8 +10,8 @@
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
 #include <Dynamics/Coupled_Evolution/COUPLED_SYSTEM_VECTOR.h>
+#include <Dynamics/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T> class FRACTURE_PATTERN;

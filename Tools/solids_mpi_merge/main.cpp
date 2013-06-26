@@ -8,8 +8,8 @@
 #include <Tools/Parallel_Computation/LOCAL_GRID.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>

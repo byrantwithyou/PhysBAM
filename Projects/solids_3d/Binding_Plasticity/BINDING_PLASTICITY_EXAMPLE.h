@@ -11,8 +11,8 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
 #include <Deformables/Bindings/PARTICLE_BINDING.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>

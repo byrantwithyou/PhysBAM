@@ -8,9 +8,7 @@
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Polynomials/QUADRATIC.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
+#include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;
@@ -20,9 +18,8 @@ template<class TV> typename LEVELSET<TV>::T_LINEAR_INTERPOLATION_VECTOR LEVELSET
 // Constructor
 //#####################################################################
 template<class TV> LEVELSET<TV>::
-LEVELSET(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input)
-    :levelset_callbacks(0),collision_body_list(0),face_velocities_valid_mask_current(0),clamp_phi_with_collision_bodies(true),boundary_default(*new BOUNDARY<TV,T>),
-    collision_aware_interpolation_plus(0),collision_aware_interpolation_minus(0),collision_unaware_interpolation(0),collidable_phi_replacement_value((T)1e-5),grid(grid_input),
+LEVELSET(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input)
+    :levelset_callbacks(0),face_velocities_valid_mask_current(0),boundary_default(*new BOUNDARY<TV,T>),grid(grid_input),
     phi(phi_input),normals(0),curvature(0),cell_range(0),thread_queue(0),number_of_ghost_cells(number_of_ghost_cells_input)
 {
     Set_Small_Number();
@@ -41,34 +38,10 @@ LEVELSET(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_gho
 template<class TV> LEVELSET<TV>::
 ~LEVELSET()
 {
-    assert(!collision_unaware_interpolation);
-    delete collision_aware_interpolation_plus;
-    delete collision_aware_interpolation_minus;
     delete &boundary_default;
     delete normals;
     delete curvature;
     delete cell_range;
-}
-//#####################################################################
-// Function Set_Collision_Body_List
-//#####################################################################
-template<class TV> void LEVELSET<TV>::
-Set_Collision_Body_List(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const bool set_secondary_interpolation)
-{
-    collision_body_list=&collision_body_list_input;
-    delete collision_aware_interpolation_plus;delete collision_aware_interpolation_minus;
-    collision_aware_interpolation_plus=new T_LINEAR_INTERPOLATION_SCALAR;
-    collision_aware_interpolation_minus=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV>,T>(*collision_body_list,&valid_mask_current,collidable_phi_replacement_value);
-    if(set_secondary_interpolation) secondary_interpolation=collision_aware_interpolation_minus;
-}
-//#####################################################################
-// Function Collision_Aware_Phi
-//#####################################################################
-template<class TV> typename TV::SCALAR LEVELSET<TV>::
-Collision_Aware_Phi(const TV& location) const
-{
-    assert(collision_body_list);
-    return LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV>,T>(*collision_body_list,&valid_mask_current,collidable_phi_replacement_value).Clamped_To_Array(grid,phi,location);
 }
 //#####################################################################
 // Function CFL
@@ -124,7 +97,7 @@ Compute_Gradient(ARRAY<TV,TV_INT>& gradient,const T time) const
 {
     TV one_over_two_dx=(T).5*grid.one_over_dX;
     int ghost_cells=3;
-    T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
+    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     gradient.Resize(grid.Domain_Indices(ghost_cells-1));
     for(CELL_ITERATOR<TV> iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         for(int axis=0;axis<TV::dimension;axis++){

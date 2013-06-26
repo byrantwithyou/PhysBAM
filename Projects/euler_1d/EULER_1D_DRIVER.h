@@ -14,8 +14,8 @@
 
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_1D_EIGENSYSTEM_F.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
+#include <Compressible/Euler_Equations/EULER_1D_EIGENSYSTEM_F.h>
+#include <Compressible/Euler_Equations/EULER_UNIFORM.h>
 
 #include "EULER_1D_EXAMPLE.h"
 

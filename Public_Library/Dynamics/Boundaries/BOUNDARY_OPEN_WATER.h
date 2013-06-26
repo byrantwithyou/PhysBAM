@@ -11,7 +11,7 @@
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Boundaries/BOUNDARY.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_FORWARD.h>
+#include <Incompressible/Boundaries/BOUNDARY_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV>

@@ -17,27 +17,23 @@
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Vectors/SCALAR_POLICY.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_BODY_COLLECTION_POLICY_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <cassert>
 #include <cfloat>
 namespace PhysBAM{
 
-template<class T_GRID> struct COLLISION_BODY_COLLECTION_POLICY;
 template<class T_GRID> struct INTERPOLATION_POLICY;
 template<class T_GRID> class LEVELSET_CALLBACKS; // TODO: invalid dependency
 template<class T_GRID> struct BOUNDARY_POLICY;
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template<class TV> class GRID;
 template<class TV,class T2> class BOUNDARY;
-template<class T_GRID> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
 template<class TV> class LEVELSET;
 
 template<class TV>
 class LEVELSET:public NONCOPYABLE
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename INTERPOLATION_POLICY<GRID<TV> >::LINEAR_INTERPOLATION_SCALAR T_LINEAR_INTERPOLATION_SCALAR;
     typedef typename INTERPOLATION_POLICY<GRID<TV> >::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
     typedef typename REBIND<T_INTERPOLATION_SCALAR,TV>::TYPE T_INTERPOLATION_VECTOR;
@@ -59,26 +55,22 @@ public:
 
     BOUNDARY<TV,T>* boundary;
     LEVELSET_CALLBACKS<GRID<TV> >* levelset_callbacks;
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >* collision_body_list;
     const T_FACE_ARRAYS_BOOL* face_velocities_valid_mask_current;
-    bool collision_aware_signed_distance,clamp_phi_with_collision_bodies;
 //protected:
     BOUNDARY<TV,T>& boundary_default;
     static T_LINEAR_INTERPOLATION_SCALAR interpolation_default;
-    T_INTERPOLATION_SCALAR *collision_aware_interpolation_plus,*collision_aware_interpolation_minus,*collision_unaware_interpolation;
     static T_LINEAR_INTERPOLATION_VECTOR normal_interpolation_default;
-    T collidable_phi_replacement_value;
     ARRAY<bool,TV_INT> valid_mask_current;
     ARRAY<bool,TV_INT> valid_mask_next;
     GRID<TV>& grid;
-    T_ARRAYS_SCALAR& phi;
+    ARRAY<T,TV_INT>& phi;
     ARRAY<TV,TV_INT>* normals;
-    T_ARRAYS_SCALAR *curvature;
+    ARRAY<T,TV_INT> *curvature;
     ARRAY<INTERVAL<T>,TV_INT> *cell_range;
     THREAD_QUEUE *thread_queue;
     int number_of_ghost_cells;
 
-    LEVELSET(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input=3);
+    LEVELSET(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input=3);
     ~LEVELSET();
 
     void Set_Small_Number(const T small_number_input=1e-8)
@@ -121,17 +113,8 @@ public:
     void Set_Custom_Curvature_Interpolation(T_INTERPOLATION_SCALAR& curvature_interpolation_input)
     {curvature_interpolation=&curvature_interpolation_input;}
 
-    void Enable_Collision_Aware_Interpolation(const int sign)
-    {PHYSBAM_ASSERT(!collision_unaware_interpolation);collision_unaware_interpolation=interpolation;
-    interpolation=sign==1?collision_aware_interpolation_plus:collision_aware_interpolation_minus;}
-
-    void Disable_Collision_Aware_Interpolation()
-    {interpolation=collision_unaware_interpolation;collision_unaware_interpolation=0;}
-
     void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<GRID<TV> >& levelset_callbacks_input)
     {levelset_callbacks=&levelset_callbacks_input;}
-
-    void Set_Collision_Body_List(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const bool set_secondary_interpolation=false);
 
     void Set_Face_Velocities_Valid_Mask(const T_FACE_ARRAYS_BOOL* face_velocities_valid_mask_current_input)
     {
@@ -224,7 +207,6 @@ public:
     {return Compute_Curvature(phi,index);}
 
 //#####################################################################
-    T Collision_Aware_Phi(const TV& location) const;
     T CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const;
     T CFL(const ARRAY<TV,TV_INT>& velocity) const;
     TV Iterative_Find_Interface(TV left,TV right,const int iterations=3) const;

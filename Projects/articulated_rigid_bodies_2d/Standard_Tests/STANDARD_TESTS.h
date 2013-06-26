@@ -14,8 +14,8 @@
 
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Matrices/MATRIX_MXN.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Joints/ANGLE_JOINT.h>
 #include <Rigids/Joints/JOINT_FUNCTION.h>
 #include <Rigids/Joints/POINT_JOINT.h>

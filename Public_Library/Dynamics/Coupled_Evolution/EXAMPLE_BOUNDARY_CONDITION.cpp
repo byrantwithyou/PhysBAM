@@ -2,7 +2,7 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Fluids/PhysBAM_Incompressible/Solids_And_Fluids/BOUNDARY_CONDITIONS_CALLBACKS.h>
+#include <Incompressible/Solids_And_Fluids/BOUNDARY_CONDITIONS_CALLBACKS.h>
 #include <Dynamics/Coupled_Evolution/EXAMPLE_BOUNDARY_CONDITION.h>
 using namespace PhysBAM;
 //#####################################################################

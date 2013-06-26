@@ -13,7 +13,7 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/constants.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
+#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>

@@ -11,10 +11,8 @@
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Utilities/INTERRUPTS.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
@@ -26,15 +24,17 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_LAPLACE.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
-#include <Fluids/PhysBAM_Fluids/Coupled_Evolution/COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
+#include <Fluids/Coupled_Evolution/COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES.h>
+#include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
+#include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
+#include <Compressible/Euler_Equations/EULER_LAPLACE.h>
+#include <Compressible/Euler_Equations/EULER_UNIFORM.h>
 #include <Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>
 #include <Dynamics/Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION.h>
 #include <Dynamics/Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION_SLIP.h>
+#include <Dynamics/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
 #include <Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
 #include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
@@ -188,13 +188,11 @@ Initialize()
     if(example.fluids_parameters.sph) example.fluids_parameters.sph_evolution->Set_SPH_Callbacks(example);
     // solid fluid coupling
     if(number_of_regions>=2){
-        particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Set_Collision_Body_List(collision_bodies_affecting_fluid);
         for(int i=0;i<number_of_regions;i++)
             particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.levelsets(i)->Set_Face_Velocities_Valid_Mask(&incompressible->valid_mask);
         particle_levelset_evolution_multiple->particle_levelset_multiple.Set_Collision_Distance_Factors(example.fluids_parameters.min_collision_distance_factor,
             example.fluids_parameters.max_collision_distance_factor);}
     else if(number_of_regions==1){
-        particle_levelset_evolution->Particle_Levelset(0).levelset.Set_Collision_Body_List(collision_bodies_affecting_fluid);
         particle_levelset_evolution->Particle_Levelset(0).levelset.Set_Face_Velocities_Valid_Mask(&incompressible->valid_mask);
         particle_levelset_evolution->Particle_Levelset(0).Set_Collision_Distance_Factors(example.fluids_parameters.min_collision_distance_factor,
             example.fluids_parameters.max_collision_distance_factor);}
@@ -356,7 +354,8 @@ Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
 
     if(rigid_bindings.callbacks && ((substep-1)%example.solids_parameters.rigid_cluster_fracture_frequency)==0 && rigid_bindings.Size()){
         T dt=min(dt_cfl*example.solids_parameters.rigid_cluster_fracture_frequency,dt_full_advance);
-        rigid_bindings.Deactivate_And_Return_Clusters(active_clusters,example.fluids_parameters.collision_bodies_affecting_fluid);
+        // TODO update example.fluids_parameters.collision_bodies_affecting_fluid for Deactivate_And_Return_Clusters
+        rigid_bindings.Deactivate_And_Return_Clusters(active_clusters);
         example.solid_body_collection.Update_Simulated_Particles();
         Write_Substep("Before declustered evolution",substep,1);
 
@@ -396,7 +395,7 @@ Initialize_Fluids_Grids()
         fluids_parameters.particle_levelset_evolution->Initialize_Domain(fluids_parameters.p_grid);
         fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).Set_Band_Width((T)2*fluids_parameters.particle_half_bandwidth);}
     else if(number_of_regions>=2){
-        fluids_parameters.particle_levelset_evolution_multiple->Initialize_Domain(fluids_parameters.p_grid,number_of_regions);
+        fluids_parameters.particle_levelset_evolution_multiple->Initialize_Domain(fluids_parameters.p_grid,*fluids_parameters.collision_bodies_affecting_fluid,number_of_regions);
         for(int i=0;i<number_of_regions;i++)
             fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i)->Set_Band_Width(
                 (T)2*fluids_parameters.particle_half_bandwidth);}

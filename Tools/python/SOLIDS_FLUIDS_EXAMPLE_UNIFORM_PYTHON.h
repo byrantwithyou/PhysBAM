@@ -7,8 +7,8 @@
 #include <Tools/Data_Structures/UNION_FIND.h>
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Log/LOG.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>

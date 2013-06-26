@@ -10,10 +10,10 @@
 #include <Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Geometry/Basic_Geometry/RAY.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
 #include <Dynamics/Parallel_Computation/MPI_UNIFORM_PARTICLES.h>
@@ -30,8 +30,8 @@ using namespace __gnu_cxx;
 // Constructor
 //##################################################################### 
 template<class T_GRID> PARTICLE_LEVELSET_UNIFORM<T_GRID>::
-PARTICLE_LEVELSET_UNIFORM(T_GRID& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input)
-    :PARTICLE_LEVELSET<T_GRID>(grid_input,phi_input,number_of_ghost_cells_input),mpi_grid(0),thread_queue(0)
+PARTICLE_LEVELSET_UNIFORM(T_GRID& grid_input,T_ARRAYS_SCALAR& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input)
+    :PARTICLE_LEVELSET<T_GRID>(grid_input,phi_input,collision_body_list_input,number_of_ghost_cells_input),mpi_grid(0),thread_queue(0)
 {
 #ifdef USE_PTHREADS
     pthread_mutex_init(&cell_lock,0);

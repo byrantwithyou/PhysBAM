@@ -24,10 +24,10 @@
 #include <Geometry/Finite_Elements/VOLUME_FORCE_COLOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
+#include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
+#include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
+#include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <Dynamics/Fluids_Color_Driver/PLS_FC_DRIVER.h>
 #include <Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
@@ -95,7 +95,7 @@ Initialize()
         example.pressure_color.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
         example.pressure.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));}
 
-    example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.number_of_colors,false);//false= we use positive and negative particles, not just negative
+    example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.collision_bodies_affecting_fluid,example.number_of_colors,false);//false= we use positive and negative particles, not just negative
     example.particle_levelset_evolution_multiple.particle_levelset_multiple.Set_Band_Width(2*example.number_of_ghost_cells);
     example.collision_bodies_affecting_fluid.Initialize_Grids();
 
@@ -117,7 +117,6 @@ Initialize()
     for(int i=0;i<example.number_of_colors;i++){
         example.particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(i)->levelset.Set_Custom_Boundary(example.boundary);
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Store_Unique_Particle_Id();
-        example.particle_levelset_evolution_multiple.Particle_Levelset(i).levelset.Set_Collision_Body_List(example.collision_bodies_affecting_fluid);
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Set_Collision_Distance_Factors(.1,1);}
     example.particle_levelset_evolution_multiple.Bias_Towards_Negative_Particles(true);
     example.particle_levelset_evolution_multiple.use_particle_levelset=true;

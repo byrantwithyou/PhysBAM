@@ -9,11 +9,11 @@
 #include <Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <Tools/Parallel_Computation/PCG_SPARSE_THREADED.h>
 #include <Tools/Vectors/VECTOR_UTILITIES.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
+#include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
+#include <Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
+#include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
+#include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 #include "WATER_DRIVER.h"
 #include "WATER_EXAMPLE.h"
@@ -124,7 +124,6 @@ Initialize()
     example.particle_levelset_evolution.Particle_Levelset(0).Use_Removed_Negative_Particles();
     example.particle_levelset_evolution.Particle_Levelset(0).Store_Unique_Particle_Id();
     example.particle_levelset_evolution.use_particle_levelset=true;
-    example.particle_levelset_evolution.Particle_Levelset(0).levelset.Set_Collision_Body_List(example.collision_bodies_affecting_fluid);
     example.particle_levelset_evolution.Particle_Levelset(0).levelset.Set_Face_Velocities_Valid_Mask(&example.incompressible.valid_mask);
     example.particle_levelset_evolution.Particle_Levelset(0).Set_Collision_Distance_Factors(.1,1);
 

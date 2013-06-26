@@ -10,7 +10,7 @@
 #include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_FORWARD.h>
+#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_FORWARD.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <Dynamics/Particles/SPH_PARTICLES.h>
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h>

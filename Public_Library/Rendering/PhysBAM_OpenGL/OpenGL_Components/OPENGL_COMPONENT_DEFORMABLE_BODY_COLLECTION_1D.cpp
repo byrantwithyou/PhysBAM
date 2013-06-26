@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_FREE_PARTICLES.h>

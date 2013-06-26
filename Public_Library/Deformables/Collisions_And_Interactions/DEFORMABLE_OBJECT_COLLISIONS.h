@@ -10,9 +10,9 @@
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Data_Structures/PAIR.h>
 #include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
-#include <Geometry/Collisions/COLLISION_PARTICLE_STATE.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
+#include <Rigids/Collisions/COLLISION_PARTICLE_STATE.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>

@@ -7,11 +7,11 @@
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Log/LOG.h>
-#include <Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_1D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <Rigids/Muscles/MUSCLE_LIST.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>

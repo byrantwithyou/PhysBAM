@@ -9,8 +9,8 @@
 
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 #include <Solids/Collisions/SOLIDS_COLLISIONS_FORWARD.h>
-#include <Fluids/PhysBAM_Fluids/Fluids/FLUID_COLLECTION.h>
-#include <Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/INCOMPRESSIBLE_COLLISIONS_FORWARD.h>
+#include <Fluids/Fluids/FLUID_COLLECTION.h>
+#include <Incompressible/Collisions_And_Interactions/INCOMPRESSIBLE_COLLISIONS_FORWARD.h>
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_CALLBACKS.h>
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h>

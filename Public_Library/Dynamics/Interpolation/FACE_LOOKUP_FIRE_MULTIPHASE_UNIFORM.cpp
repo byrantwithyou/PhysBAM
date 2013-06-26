@@ -4,8 +4,8 @@
 //#####################################################################
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_2D_HELPER_DEFINITIONS.h>
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_3D_HELPER_DEFINITIONS.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/FACE_LOOKUP_COLLIDABLE_UNIFORM.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Incompressible/Interpolation_Collidable/FACE_LOOKUP_COLLIDABLE_UNIFORM.h>
 #include <Dynamics/Interpolation/FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM.h>
 using namespace PhysBAM;
 template VECTOR<float,2> LINEAR_INTERPOLATION_MAC_2D_HELPER<GRID<VECTOR<float,2> > >::Extrema_Face_X_Transformed<BLOCK_UNIFORM<GRID<VECTOR<float,2> > >,FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<VECTOR<float,2> >,FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<GRID<VECTOR<float,2> > > >::LOOKUP>(BLOCK_UNIFORM<GRID<VECTOR<float,2> > > const&,FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<VECTOR<float,2> >,FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<GRID<VECTOR<float,2> > > >::LOOKUP const&,FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<VECTOR<float,2> >,FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<GRID<VECTOR<float,2> > > >::LOOKUP const&,VECTOR<float,2> const&);

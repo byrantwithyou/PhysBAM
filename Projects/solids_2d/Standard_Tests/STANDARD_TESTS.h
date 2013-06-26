@@ -43,8 +43,8 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Parallel_Computation/PARTITION_ID.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_STATE.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>

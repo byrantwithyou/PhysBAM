@@ -12,10 +12,13 @@
 #include <Tools/Particles/POINTS_POOL.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
+#include <Incompressible/Level_Sets/LEVELSET_COLLIDABLE.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 #include <climits>
 namespace PhysBAM{
+
+template<class TV> class LEVELSET_COLLIDABLE;
 
 template<class T_GRID>
 class PARTICLE_LEVELSET:public NONCOPYABLE
@@ -46,13 +49,13 @@ public:
     T cfl_number;
     int number_of_ghost_cells;
 
-    LEVELSET<TV> levelset;
+    LEVELSET_COLLIDABLE<TV> levelset;
     ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT> positive_particles,negative_particles;
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> removed_negative_particles,removed_positive_particles;
     ARRAY<ARRAY<bool>,TV_INT> escaped_positive_particles,escaped_negative_particles;
     ARRAY<ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT> deletion_list;
 
-    PARTICLE_LEVELSET(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input);
+    PARTICLE_LEVELSET(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input);
     virtual ~PARTICLE_LEVELSET();
 
     void Set_Band_Width(const T number_of_cells=6)

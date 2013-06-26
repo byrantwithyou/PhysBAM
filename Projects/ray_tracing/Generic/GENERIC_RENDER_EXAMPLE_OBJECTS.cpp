@@ -4,11 +4,11 @@
 //#####################################################################
 #include <Tools/Grids_Uniform_Computations/GRADIENT_UNIFORM.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
-#include <Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
-#include <Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <Geometry/Implicit_Objects_Uniform/SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT.h>
+#include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
+#include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <Dynamics/Geometry/REMOVED_PARTICLES_IMPLICIT_OBJECT.h>
 #include <Dynamics/Level_Sets/REMOVED_PARTICLES_PROCESSING.h>
 #include <Dynamics/Level_Sets/UNIFORM_REMOVED_PARTICLES_PROCESSING.h>
@@ -483,8 +483,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                     COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);}
 
             ARRAY<bool,VECTOR<int,3> >* cell_valid_mask=new ARRAY<bool,VECTOR<int,3> >(grid->Domain_Indices(3),false);cell_valid_mask->Fill(true);
-            LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV> ,T>* linear=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV> ,T>(*fluid_collision_body_list,cell_valid_mask,
-                implicit_surface->levelset.collidable_phi_replacement_value);
+            LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV> ,T>* linear=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV> ,T>(*fluid_collision_body_list,cell_valid_mask,(T)1e-5);
             GRID<TV> occupied_grid=grid->Get_MAC_Grid();
             fluid_collision_body_list->Rasterize_Objects();
             fluid_collision_body_list->Compute_Occupied_Blocks(false,(T)2*grid->dX.Min(),5);

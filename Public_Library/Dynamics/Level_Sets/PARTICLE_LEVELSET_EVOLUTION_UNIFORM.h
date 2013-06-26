@@ -39,7 +39,7 @@ private:
     LEVELSET_ADVECTION<TV>* levelset_advection;
 public:
 
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM(const T_GRID& grid_input,const int number_of_ghost_cells_input,bool multiphase);
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM(const T_GRID& grid_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input,bool multiphase);
     virtual ~PARTICLE_LEVELSET_EVOLUTION_UNIFORM();
 
     virtual PARTICLE_LEVELSET_UNIFORM<T_GRID>& Particle_Levelset(const int i)

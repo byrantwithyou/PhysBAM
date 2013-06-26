@@ -13,10 +13,10 @@
 #include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Vectors/VECTOR.h>
-#include <Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <Rigids/Collisions/RIGID_BODY_PARTICLE_INTERSECTION.h>
 #include <Rigids/Joints/JOINT_ID.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_FORWARD.h>

@@ -16,11 +16,11 @@
 #include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Geometry/Collisions/COLLISION_PARTICLE_STATE.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology/TETRAHEDRON_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Rigids/Collisions/COLLISION_PARTICLE_STATE.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <Deformables/Forces/INCOMPRESSIBLE_FINITE_VOLUME.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>

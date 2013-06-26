@@ -4,8 +4,8 @@
 //#####################################################################
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
-#include <Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
+#include <Incompressible/Forces/FLUID_GRAVITY.h>
+#include <Incompressible/Forces/INCOMPRESSIBILITY.h>
 #include <Dynamics/Drivers/PLS_REFINEMENT_EXAMPLE.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -16,7 +16,7 @@ PLS_REFINEMENT_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(100),frame_rate(24),write_debug_data(true),
     output_directory("output"),restart(0),number_of_ghost_cells(3),cfl(.9),use_collidable_advection(false),gravity(9.8),
     fine_mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),coarse_mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),fine_mpi_grid(0),coarse_mpi_grid(0),
-    projection(coarse_mac_grid),particle_levelset_evolution(fine_mac_grid,number_of_ghost_cells,false),incompressible(fine_mac_grid,projection),boundary(0),boundary_coarse(0),phi_boundary(0),
+    projection(coarse_mac_grid),particle_levelset_evolution(fine_mac_grid,collision_bodies_affecting_fluid,number_of_ghost_cells,false),incompressible(fine_mac_grid,projection),boundary(0),boundary_coarse(0),phi_boundary(0),
     //projection(coarse_mac_grid,false,false,true,true),particle_levelset_evolution(fine_mac_grid),incompressible(fine_mac_grid,projection),boundary(0),
     rigid_body_collection(0),collision_bodies_affecting_fluid(fine_mac_grid)
 {

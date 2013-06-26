@@ -44,11 +44,11 @@
 #include <Tools/Ordinary_Differential_Equations/ODE_SOLVER.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER.h>
 #include <Rigids/Joints/ANGLE_JOINT.h>
 #include <Rigids/Joints/CONSTRAINT_FUNCTION.h>

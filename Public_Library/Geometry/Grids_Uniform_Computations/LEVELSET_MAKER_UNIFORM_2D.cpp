@@ -7,7 +7,7 @@
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM_2D.h>
-#include <Geometry/Grids_Uniform_Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
+#include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 using namespace PhysBAM;

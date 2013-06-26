@@ -8,7 +8,7 @@
 #include <Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Tools/Vectors/VECTOR.h>
-#include <Geometry/Solids_Geometry_Evolution/KINEMATIC_EVOLUTION.h>
+#include <Rigids/Rigids_Evolution/KINEMATIC_EVOLUTION.h>
 namespace PhysBAM{
 
 

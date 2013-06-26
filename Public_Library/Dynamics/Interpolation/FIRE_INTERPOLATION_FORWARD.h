@@ -7,7 +7,7 @@
 #ifndef __FIRE_INTERPOLATION_FORWARD__
 #define __FIRE_INTERPOLATION_FORWARD__
 
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/INTERPOLATION_COLLIDABLE_UNIFORM_FORWARD.h>
+#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_UNIFORM_FORWARD.h>
 namespace PhysBAM{
 
 template<class T_GRID> class FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM;

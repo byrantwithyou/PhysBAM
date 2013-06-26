@@ -16,11 +16,11 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T_GRID> PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
-PARTICLE_LEVELSET_EVOLUTION_UNIFORM(const T_GRID& grid_input,const int number_of_ghost_cells_input,bool multiphase)
+PARTICLE_LEVELSET_EVOLUTION_UNIFORM(const T_GRID& grid_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input,bool multiphase)
     :grid(grid_input),particle_levelset(0),levelset_advection(0)
 {
     if(!multiphase){
-        particle_levelset=new PARTICLE_LEVELSET_UNIFORM<GRID<TV> >(grid,phi,number_of_ghost_cells_input);
+        particle_levelset=new PARTICLE_LEVELSET_UNIFORM<GRID<TV> >(grid,phi,collision_body_list_input,number_of_ghost_cells_input);
         levelset_advection=new LEVELSET_ADVECTION<TV>(&particle_levelset->levelset);
         Use_Semi_Lagrangian_Advection();
         Track_Mass(false);}

@@ -17,14 +17,14 @@
 #include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MULTIPLE_UNIFORM.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Fluids/PhysBAM_Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.h>
-#include <Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_RF.h>
-#include <Fluids/PhysBAM_Compressible/Equations_Of_State/EOS_GAMMA.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_LAPLACE.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.h>
+#include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_RF.h>
+#include <Compressible/Equations_Of_State/EOS_GAMMA.h>
+#include <Compressible/Euler_Equations/EULER_LAPLACE.h>
 #include <Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 

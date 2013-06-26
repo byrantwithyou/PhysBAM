@@ -10,14 +10,14 @@
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
-#include <Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
+#include <Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
 #include <Dynamics/Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h>
 #include <Dynamics/Coupled_Evolution/GENERALIZED_FLUID_MASS.h>
 #include <Dynamics/Coupled_Evolution/MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED.h>

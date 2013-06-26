@@ -9,7 +9,7 @@
 
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Geometry/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
+#include <Rigids/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV>

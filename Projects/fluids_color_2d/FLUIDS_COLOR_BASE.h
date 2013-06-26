@@ -30,7 +30,7 @@
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
-#include <Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
+#include <Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 #include "ANALYTIC_VELOCITY.h"

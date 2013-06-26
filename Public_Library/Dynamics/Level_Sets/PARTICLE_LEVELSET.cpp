@@ -7,18 +7,18 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Math_Tools/pow.h>
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Geometry/Level_Sets/LEVELSET.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Incompressible/Level_Sets/LEVELSET_COLLIDABLE.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //##################################################################### 
 template<class T_GRID> PARTICLE_LEVELSET<T_GRID>::
-PARTICLE_LEVELSET(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input)
+PARTICLE_LEVELSET(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input)
     :only_use_negative_particles(false),use_removed_negative_particles(false),use_removed_positive_particles(false),last_unique_particle_id(0),
     particle_pool(template_particles),reincorporate_removed_particles_everywhere(false),save_removed_particle_times(false),
-    delete_positive_particles_crossing_bodies(true),number_of_ghost_cells(number_of_ghost_cells_input),levelset(grid_input,phi_input,number_of_ghost_cells_input),
+    delete_positive_particles_crossing_bodies(true),number_of_ghost_cells(number_of_ghost_cells_input),levelset(grid_input,phi_input,collision_body_list_input,number_of_ghost_cells_input),
     deletion_list(levelset.grid.Domain_Indices())
 {   
     Set_Outside_Particle_Distance();

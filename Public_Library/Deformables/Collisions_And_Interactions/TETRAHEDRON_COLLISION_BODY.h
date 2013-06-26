@@ -8,7 +8,7 @@
 #define __TETRAHEDRON_COLLISION_BODY__
 
 #include <Tools/Arrays/ARRAY.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
 

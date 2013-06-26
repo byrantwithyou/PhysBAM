@@ -11,7 +11,7 @@
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Random_Numbers/NOISE.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_OPEN_CALLBACKS.h>
+#include <Incompressible/Boundaries/BOUNDARY_OPEN_CALLBACKS.h>
 #include <Dynamics/Boundaries/BOUNDARY_OPEN_WATER.h>
 #include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>

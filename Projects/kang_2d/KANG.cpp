@@ -1,9 +1,9 @@
 #include <Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
 #include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM_2D.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLECTION.h>
 #include <Dynamics/Coupled_Evolution/MATRIX_FLUID_GRADIENT_CUT.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
@@ -188,7 +188,6 @@ Initialize_Advection()
     fluids_parameters.particle_levelset_evolution->Levelset_Advection(1).
         Use_Semi_Lagrangian_Collidable_Advection(*fluids_parameters.collision_bodies_affecting_fluid,fluids_parameters.collidable_phi_replacement_value,
             fluids_parameters.incompressible->valid_mask);
-    fluids_parameters.particle_levelset_evolution->Levelset(1).Set_Collision_Body_List(*fluids_parameters.collision_bodies_affecting_fluid);
     fluids_parameters.incompressible->Use_Semi_Lagrangian_Collidable_Advection(*fluids_parameters.collision_bodies_affecting_fluid);
     fluids_parameters.incompressible->collision_body_list=fluids_parameters.collision_bodies_affecting_fluid;
 

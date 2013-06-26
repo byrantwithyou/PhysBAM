@@ -14,8 +14,8 @@
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Finite_Elements/LEVELSET_COLOR.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
+#include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
+#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 namespace PhysBAM{
 
@@ -62,6 +62,7 @@ public:
     bool save_pressure;
 
     GRID<TV> grid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid;
     PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >& particle_levelset_evolution_multiple;
     VECTOR<ARRAY<T,TV_INT>,num_bc> bc_phis; // 0=Neumann, 1=Dirichlet, 2=Slip
     ARRAY<int,FACE_INDEX<TV::dimension> > face_color,prev_face_color;
@@ -72,7 +73,6 @@ public:
     BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
     BOUNDARY_MAC_GRID_PERIODIC<TV,int> boundary_int;
     LEVELSET_COLOR<TV> levelset_color;
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid;
     DEBUG_PARTICLES<TV>& debug_particles;
 
     PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input);

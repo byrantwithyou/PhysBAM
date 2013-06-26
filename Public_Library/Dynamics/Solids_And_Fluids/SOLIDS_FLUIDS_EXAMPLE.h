@@ -14,7 +14,7 @@
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION_CALLBACKS.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/EXTERNAL_STRAIN_ADJUSTMENT.h>
+#include <Incompressible/Incompressible_Flows/EXTERNAL_STRAIN_ADJUSTMENT.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_CALLBACKS.h>
 namespace PhysBAM{
 

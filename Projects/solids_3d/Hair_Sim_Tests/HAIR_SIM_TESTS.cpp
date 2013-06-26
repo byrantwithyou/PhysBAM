@@ -11,13 +11,13 @@
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED.h>
 #include <Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED_EULERIAN.h>
 #include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>

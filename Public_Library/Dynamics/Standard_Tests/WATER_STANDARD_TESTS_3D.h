@@ -31,7 +31,7 @@
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
-#include <Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>
+#include <Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>
 namespace PhysBAM{
 
 template<class T_GRID> class FLUIDS_PARAMETERS;

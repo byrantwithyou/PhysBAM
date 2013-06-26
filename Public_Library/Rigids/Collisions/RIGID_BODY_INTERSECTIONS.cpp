@@ -15,9 +15,9 @@
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/PARTICLE_LEVELSET_VISITOR.h>
+#include <Rigids/Collisions/PARTICLES_IN_IMPLICIT_OBJECT.h>
 #include <Rigids/Collisions/RIGID_BODY_INTERSECTIONS.h>
 #include <Rigids/Collisions/RIGID_BODY_PARTICLE_INTERSECTION.h>
-#include <Rigids/Collisions_Computations/PARTICLES_IN_IMPLICIT_OBJECT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 
 using namespace PhysBAM;

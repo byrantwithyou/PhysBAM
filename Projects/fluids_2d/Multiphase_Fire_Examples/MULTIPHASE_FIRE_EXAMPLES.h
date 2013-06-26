@@ -12,7 +12,7 @@
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
-#include <Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
+#include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{

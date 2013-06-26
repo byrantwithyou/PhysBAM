@@ -8,7 +8,7 @@
 #define __IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM__
 
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/IMPLICIT_VISCOSITY_UNIFORM.h>
+#include <Incompressible/Incompressible_Flows/IMPLICIT_VISCOSITY_UNIFORM.h>
 #include <string>
 namespace PhysBAM{
 

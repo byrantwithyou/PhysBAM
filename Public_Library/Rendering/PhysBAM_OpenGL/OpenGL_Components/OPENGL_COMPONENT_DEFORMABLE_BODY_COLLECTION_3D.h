@@ -7,8 +7,8 @@
 #ifndef __OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D__
 #define __OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D__
 
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLES_COLLISIONS_FORWARD.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>

@@ -6,8 +6,8 @@
 #define __FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM__
 
 #include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_POLICY.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
+#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_POLICY.h>
+#include <Dynamics/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
 #include <cassert>
 namespace PhysBAM{
 

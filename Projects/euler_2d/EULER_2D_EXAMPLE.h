@@ -19,8 +19,8 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Read_Write/MATLAB_OUTPUT.h>
-#include <Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION.h>
-#include <Fluids/PhysBAM_Compressible/Equations_Of_State/EOS.h>
+#include <Compressible/Conservation_Law_Solvers/CONSERVATION.h>
+#include <Compressible/Equations_Of_State/EOS.h>
 
 namespace PhysBAM{
 

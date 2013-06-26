@@ -11,7 +11,7 @@
 #include <Tools/Vectors/VECTOR_1D.h>
 #include <Tools/Vectors/VECTOR_2D.h>
 #include <Tools/Vectors/VECTOR_3D.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 namespace PhysBAM{
 
 template<class TV> class RIGID_BODY;

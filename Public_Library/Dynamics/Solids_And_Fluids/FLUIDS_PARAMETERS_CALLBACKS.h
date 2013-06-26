@@ -11,7 +11,7 @@
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
-#include <Fluids/PhysBAM_Incompressible/Solids_And_Fluids/BOUNDARY_CONDITIONS_CALLBACKS.h>
+#include <Incompressible/Solids_And_Fluids/BOUNDARY_CONDITIONS_CALLBACKS.h>
 namespace PhysBAM{
 
 template<class T,int d> class VECTOR;

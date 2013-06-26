@@ -5,7 +5,7 @@
 // Class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED
 //##################################################################### 
 #include <Tools/Data_Structures/PAIR.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Dynamics/Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h>
 #include <Dynamics/Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED.h>
 #include <climits>

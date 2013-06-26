@@ -1,7 +1,7 @@
 #include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
-#include <Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_DRIVER.h>
-#include <Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_EXAMPLE.h>
+#include <Incompressible/INCOMPRESSIBLE_DRIVER.h>
+#include <Incompressible/INCOMPRESSIBLE_EXAMPLE.h>
 #include "Smoke_Tests/SMOKE_TESTS.h"
 
 using namespace PhysBAM;

@@ -8,9 +8,9 @@
 #define __SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES__
 #include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 #include <Geometry/Basic_Geometry/POLYGON.h>
-#include <Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
-#include <Geometry/Grids_Uniform_Collisions/CUT_CELL.h>
-#include <Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
+#include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
+#include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
+#include <Incompressible/Collisions_And_Interactions/CUT_CELL.h>
 namespace PhysBAM{
 template<class TV> class GRID;
 template<class T,int d> class VECTOR;

@@ -11,8 +11,6 @@
 #include <Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Tessellation/BOWL_TESSELLATION.h>
@@ -26,6 +24,8 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Joints/JOINT_MESH.h>
 #include <Rigids/Joints/POINT_JOINT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>

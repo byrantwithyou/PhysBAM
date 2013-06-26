@@ -6,11 +6,11 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Geometry/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_LAPLACE.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
+#include <Compressible/Euler_Equations/EULER_LAPLACE.h>
+#include <Compressible/Euler_Equations/EULER_UNIFORM.h>
 #include <Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>
 #include <Dynamics/Drivers/COMPRESSIBLE_DRIVER.h>
 #include <Dynamics/Drivers/COMPRESSIBLE_EXAMPLE.h>

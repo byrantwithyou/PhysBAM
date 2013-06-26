@@ -9,7 +9,7 @@
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
-#include <Fluids/PhysBAM_Incompressible/Particles/VORTICITY_PARTICLES.h>
+#include <Incompressible/Particles/VORTICITY_PARTICLES.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>

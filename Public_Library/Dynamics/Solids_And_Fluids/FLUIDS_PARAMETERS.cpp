@@ -12,9 +12,9 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Vectors/VECTOR_UTILITIES.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
+#include <Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
+#include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS.h>
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_CALLBACKS.h>
 using namespace PhysBAM;

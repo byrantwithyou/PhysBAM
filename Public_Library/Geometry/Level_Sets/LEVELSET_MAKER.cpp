@@ -10,7 +10,7 @@
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
-#include <Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
+#include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_MAKER.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>

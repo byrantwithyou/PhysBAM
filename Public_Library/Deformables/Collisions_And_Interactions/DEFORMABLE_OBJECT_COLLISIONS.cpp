@@ -7,11 +7,11 @@
 #include <Tools/Arrays/CONSTANT_ARRAY.h>
 #include <Tools/Arrays/PROJECTED_ARRAY.h>
 #include <Tools/Utilities/Find_Type.h>
-#include <Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
-#include <Geometry/Collisions/COLLISION_PARTICLE_STATE.h>
 #include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
+#include <Rigids/Collisions/COLLISION_PARTICLE_STATE.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>

@@ -12,8 +12,8 @@
 #ifndef __SHU_OSHER_ST__
 #define __SHU_OSHER_ST__
 
-#include <Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_RF.h>
-#include <Fluids/PhysBAM_Compressible/Equations_Of_State/EOS_GAMMA.h>
+#include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_RF.h>
+#include <Compressible/Equations_Of_State/EOS_GAMMA.h>
 #include <fstream>
 #include <iostream>
 #include "../EULER_1D_EXAMPLE.h"

@@ -14,12 +14,10 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Utilities/INTERRUPTS.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
+#include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -33,14 +31,16 @@
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
+#include <Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
+#include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
+#include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <Dynamics/Coupled_Driver/PLS_FSI_DRIVER.h>
 #include <Dynamics/Coupled_Driver/PLS_FSI_EXAMPLE.h>
 #include <Dynamics/Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION_SLIP.h>
+#include <Dynamics/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
+#include <Dynamics/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
 #include <Dynamics/Kang/KANG_POISSON_VISCOSITY.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
@@ -147,7 +147,8 @@ Initialize()
         example.Set_Boundary_Conditions(example.kang_poisson_viscosity->psi_D,example.kang_poisson_viscosity->psi_N,
             example.kang_poisson_viscosity->psi_D_value,example.kang_poisson_viscosity->psi_N_value);
 
-    example.fluids_parameters.particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,example.fluids_parameters.number_of_ghost_cells,false);
+    example.fluids_parameters.particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,
+        collision_bodies_affecting_fluid,example.fluids_parameters.number_of_ghost_cells,false);
     example.fluids_parameters.projection=new PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,example.fluids_parameters.particle_levelset_evolution->Levelset(0));
     example.fluids_parameters.incompressible=new INCOMPRESSIBLE_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,*example.fluids_parameters.projection);
     example.fluids_parameters.phi_boundary=&example.fluids_parameters.phi_boundary_water; // override default
@@ -200,7 +201,6 @@ Initialize()
     particle_levelset_evolution->use_particle_levelset=example.fluids_parameters.use_particle_levelset;
 
     // solid fluid coupling
-    particle_levelset_evolution->Particle_Levelset(0).levelset.Set_Collision_Body_List(collision_bodies_affecting_fluid);
     particle_levelset_evolution->Particle_Levelset(0).levelset.Set_Face_Velocities_Valid_Mask(&incompressible->valid_mask);
     particle_levelset_evolution->Particle_Levelset(0).Set_Collision_Distance_Factors(example.fluids_parameters.min_collision_distance_factor,
         example.fluids_parameters.max_collision_distance_factor);

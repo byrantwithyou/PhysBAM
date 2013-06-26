@@ -7,10 +7,10 @@
 #ifndef __INCOMPRESSIBLE_MULTIPHASE_UNIFORM__
 #define __INCOMPRESSIBLE_MULTIPHASE_UNIFORM__
 
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/FLUID_STRAIN_UNIFORM.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
+#include <Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
+#include <Incompressible/Incompressible_Flows/FLUID_STRAIN_UNIFORM.h>
+#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
+#include <Dynamics/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_GRID>

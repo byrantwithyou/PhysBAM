@@ -10,7 +10,7 @@
 #include <Tools/Data_Structures/TRIPLE.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Dynamics/Coupled_Evolution/COUPLING_CONSTRAINT_ID.h>
 
 namespace PhysBAM{

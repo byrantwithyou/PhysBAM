@@ -10,7 +10,7 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
-#include <Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
+#include <Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <Dynamics/Drivers/PLS_EXAMPLE.h>
 
 namespace PhysBAM{

@@ -7,9 +7,9 @@
 
 #include <Tools/Advection/ADVECTION_FORWARD.h>
 #include <Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
-#include <Geometry/Advection_Collidable/ADVECTION_COLLIDABLE_FORWARD.h>
-#include <Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
-#include <Geometry/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
+#include <Incompressible/Advection_Collidable/ADVECTION_COLLIDABLE_FORWARD.h>
+#include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
+#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
 #include <Dynamics/Advection_Equations/FIRE_ADVECTION_FORWARD.h>
 #include <Dynamics/Interpolation/FIRE_INTERPOLATION_POLICY.h>
 

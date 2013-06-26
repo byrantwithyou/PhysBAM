@@ -17,7 +17,7 @@
 #ifndef __HEAT_UNIFORM__
 #define __HEAT_UNIFORM__
 
-#include <Geometry/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE_UNIFORM.h>
+#include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE_UNIFORM.h>
 #include <Dynamics/Heat_Flows/HEAT.h>
 #include <Dynamics/Heat_Flows/HEAT_LAPLACE.h>
 namespace PhysBAM{

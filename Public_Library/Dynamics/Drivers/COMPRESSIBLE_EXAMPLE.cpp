@@ -5,10 +5,10 @@
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Computations/GRADIENT_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Geometry/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_LAPLACE.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
+#include <Compressible/Euler_Equations/EULER_LAPLACE.h>
+#include <Compressible/Euler_Equations/EULER_UNIFORM.h>
 #include <Dynamics/Drivers/COMPRESSIBLE_EXAMPLE.h>
 using namespace PhysBAM;
 //#####################################################################

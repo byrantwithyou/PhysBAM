@@ -9,7 +9,7 @@
 
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Geometry/Solids_Geometry_Evolution/KINEMATIC_EVOLUTION.h>
+#include <Rigids/Rigids_Evolution/KINEMATIC_EVOLUTION.h>
 namespace PhysBAM{
 
 template<class TV> class RIGID_BODY_COLLECTION;

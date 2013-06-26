@@ -7,7 +7,7 @@
 #ifndef __DEFORMABLES_COLLISIONS_FORWARD__
 #define __DEFORMABLES_COLLISIONS_FORWARD__
 
-#include <Geometry/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
+#include <Rigids/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV> struct REPULSION_PAIR;

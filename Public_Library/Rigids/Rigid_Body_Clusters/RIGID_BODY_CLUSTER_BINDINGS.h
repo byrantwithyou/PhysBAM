@@ -20,7 +20,6 @@ namespace PhysBAM{
 
 template<class TV> class JOINT;
 template<class TV> class ARTICULATED_RIGID_BODY;
-template<class TV> class GRID_BASED_COLLISION_GEOMETRY;
 template<class TV> class GRID;
 
 template<class TV>
@@ -93,9 +92,9 @@ public:
     int Add_Binding(const ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID>& child_particles);
     void Delete_Binding(const int parent_particle);
     void Make_Active_Parent(const int parent_particle,ARRAY<PAIR<int,RIGID_CLUSTER_CONSTITUENT_ID> >& child_list);
-    void Set_Binding_Active(const int parent_rigid_body_index,const bool active,GRID_BASED_COLLISION_GEOMETRY<GRID<TV> >* fluid_collision_body_list=0);
-    void Deactivate_And_Return_Clusters(ARRAY<int>& active_bindings,GRID_BASED_COLLISION_GEOMETRY<GRID<TV> >* fluid_collision_body_list=0);
-    void Reactivate_Bindings(const ARRAY<int>& active_bindings,GRID_BASED_COLLISION_GEOMETRY<GRID<TV> >* fluid_collision_body_list=0);
+    void Set_Binding_Active(const int parent_rigid_body_index,const bool active=0);
+    void Deactivate_And_Return_Clusters(ARRAY<int>& active_bindings=0);
+    void Reactivate_Bindings(const ARRAY<int>& active_bindings=0);
     void Save_Bindings_State();
     void Restore_Bindings_State();
     int Size() const{return reverse_bindings.Size();}

@@ -7,9 +7,9 @@
 #ifndef __IMPLICIT_BOUNDARY_CONDITION_COLLISIONS__
 #define __IMPLICIT_BOUNDARY_CONDITION_COLLISIONS__
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
-#include <Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
+#include <Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
 #include <Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION.h>
 namespace PhysBAM{
 template<class TV>

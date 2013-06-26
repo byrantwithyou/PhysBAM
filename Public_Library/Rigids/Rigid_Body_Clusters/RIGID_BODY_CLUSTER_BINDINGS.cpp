@@ -9,7 +9,6 @@
 #include <Tools/Data_Structures/TRIPLE.h>
 #include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Matrices/MATRIX.h>
-#include <Geometry/Collisions_And_Grids/GRID_BASED_COLLISION_GEOMETRY.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
@@ -22,6 +21,7 @@
 #include <Rigids/Joints/JOINT_MESH.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function RIGID_BODY_CLUSTER_BINDINGS
@@ -145,7 +145,7 @@ Make_Active_Parent(const int parent_particle,ARRAY<PAIR<int,RIGID_CLUSTER_CONSTI
 // Function Set_Binding_Active
 //#####################################################################
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
-Set_Binding_Active(const int parent_particle,const bool active,GRID_BASED_COLLISION_GEOMETRY<GRID<TV> >* fluid_collision_body_list)
+Set_Binding_Active(const int parent_particle,const bool active)
 {
     CLUSTER& cluster=*reverse_bindings.Get(parent_particle);
     if(cluster.active==active) return;
@@ -159,12 +159,7 @@ Set_Binding_Active(const int parent_particle,const bool active,GRID_BASED_COLLIS
             articulated_rigid_body.joint_mesh.Deactivate_Articulation(cluster.internal_joints(i).joint->id_number);
         for(int i=0;i<cluster.boundary_joints.m;i++){
             if(cluster.boundary_joints(i).is_parent){articulated_rigid_body.Substitute_Joint_Parent_Body(cluster.boundary_joints(i).joint_id,parent_particle);}
-            else{articulated_rigid_body.Substitute_Joint_Child_Body(cluster.boundary_joints(i).joint_id,parent_particle);}}
-        if(fluid_collision_body_list && fluid_collision_body_list->collision_geometry_collection.bodies.m){
-            fluid_collision_body_list->collision_geometry_collection.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body_collection.Rigid_Body(parent_particle)),parent_particle,true);
-            for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
-                COLLISION_GEOMETRY<TV>& child_collision_geometry=*fluid_collision_body_list->collision_geometry_collection.Get_Collision_Geometry(cluster.children(i));
-                fluid_collision_body_list->collision_geometry_collection.Remove_Body(child_collision_geometry.collision_geometry_id);}}}
+            else{articulated_rigid_body.Substitute_Joint_Child_Body(cluster.boundary_joints(i).joint_id,parent_particle);}}}
     else{
         Clamp_Particles_To_Embedded_Positions(parent_particle);
         Clamp_Particles_To_Embedded_Velocities(parent_particle);
@@ -173,12 +168,7 @@ Set_Binding_Active(const int parent_particle,const bool active,GRID_BASED_COLLIS
         for(int i=0;i<cluster.boundary_joints.m;i++){
             if(cluster.boundary_joints(i).is_parent) articulated_rigid_body.Substitute_Joint_Parent_Body(cluster.boundary_joints(i).joint_id,cluster.boundary_joints(i).boundary_body,cluster.boundary_joints(i).original_frame);
             else articulated_rigid_body.Substitute_Joint_Child_Body(cluster.boundary_joints(i).joint_id,cluster.boundary_joints(i).boundary_body,cluster.boundary_joints(i).original_frame);}
-        rigid_body_collection.Deactivate_Body(cluster.parent);
-        if(fluid_collision_body_list && fluid_collision_body_list->collision_geometry_collection.bodies.m){
-            COLLISION_GEOMETRY<TV>& parent_geometry=*rigid_body_collection.collision_body_list->Get_Collision_Geometry(parent_particle);
-            fluid_collision_body_list->collision_geometry_collection.Remove_Body(parent_geometry.collision_geometry_id);
-            for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
-                fluid_collision_body_list->collision_geometry_collection.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body_collection.Rigid_Body(cluster.children(i))),cluster.children(i),true);}}}
+        rigid_body_collection.Deactivate_Body(cluster.parent);}
 
     cluster.active=active;
     if(!active){
@@ -191,18 +181,18 @@ Set_Binding_Active(const int parent_particle,const bool active,GRID_BASED_COLLIS
 // Function Deactivate_And_Return_Clusters
 //#####################################################################
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
-Deactivate_And_Return_Clusters(ARRAY<int>& active_bindings,GRID_BASED_COLLISION_GEOMETRY<GRID<TV> >* fluid_collision_body_list)
+Deactivate_And_Return_Clusters(ARRAY<int>& active_bindings)
 {
     for(typename HASHTABLE<int,CLUSTER*>::ITERATOR i(reverse_bindings);i.Valid();i.Next()){
-        if(i.Data()->active){active_bindings.Append(i.Key());Set_Binding_Active(i.Key(),false,fluid_collision_body_list);}}
+        if(i.Data()->active){active_bindings.Append(i.Key());Set_Binding_Active(i.Key(),false);}}
 }
 //#####################################################################
 // Function Reactivate_Bindings
 //#####################################################################
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
-Reactivate_Bindings(const ARRAY<int>& active_bindings,GRID_BASED_COLLISION_GEOMETRY<GRID<TV> >* fluid_collision_body_list)
+Reactivate_Bindings(const ARRAY<int>& active_bindings)
 {
-    for(int i=0;i<active_bindings.m;i++) Set_Binding_Active(active_bindings(i),true,fluid_collision_body_list);
+    for(int i=0;i<active_bindings.m;i++) Set_Binding_Active(active_bindings(i),true);
 }
 //#####################################################################
 // Function Save_Bindings_State

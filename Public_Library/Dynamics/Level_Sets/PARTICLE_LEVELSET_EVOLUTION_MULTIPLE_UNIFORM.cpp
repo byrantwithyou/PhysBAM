@@ -6,8 +6,8 @@
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
-#include <Geometry/Grids_Uniform_Level_Sets/LEVELSET_MULTIPLE.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
+#include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION_MULTIPLE.h>
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
@@ -17,8 +17,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T_GRID> PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
-PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM(const T_GRID& grid_input,const int number_of_ghost_cells_input)
-    :PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>(grid_input,number_of_ghost_cells_input,true),
+PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM(const T_GRID& grid_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input)
+    :PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>(grid_input,collision_body_list_input,number_of_ghost_cells_input,true),
     particle_levelset_multiple(*new PARTICLE_LEVELSET_MULTIPLE_UNIFORM<T_GRID>(grid,phis,number_of_ghost_cells_input)),
     levelset_advection_multiple(*new LEVELSET_ADVECTION_MULTIPLE<T_GRID>(particle_levelset_multiple.levelset_multiple))
 {
@@ -199,14 +199,14 @@ Track_Mass(const bool track_mass_input)
         LOG::cout<<"negative material("<<i<<") = "<<initial_mass(i)<<std::endl;}
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
-Initialize_Domain(const T_GRID& grid_input,const int number_of_regions,const bool use_only_negative_particles)  // don't call up to the base class here because we don't need those variables initialized OVERRIDE PROBLEM
+Initialize_Domain(const T_GRID& grid_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_regions,const bool use_only_negative_particles)  // don't call up to the base class here because we don't need those variables initialized OVERRIDE PROBLEM
 {
     assert(grid_input.Is_MAC_Grid());
     grid=grid_input;
     phis.Resize(number_of_regions);
     for(int i=0;i<phis.m;i++) phis(i).Resize(grid.Domain_Indices(particle_levelset_multiple.number_of_ghost_cells));
     V.Resize(grid);
-    particle_levelset_multiple.Initialize_Particle_Levelsets_And_Grid_Values(grid,phis,number_of_regions,use_only_negative_particles);
+    particle_levelset_multiple.Initialize_Particle_Levelsets_And_Grid_Values(grid,phis,collision_body_list_input,number_of_regions,use_only_negative_particles);
     levelset_advection_multiple.Initialize();
     for(int i=0;i<phis.m;i++)
         if(levelset_advection_multiple.levelset_advections(i).semi_lagrangian_collidable)
@@ -217,7 +217,6 @@ template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>
 Initialize_Domain(const T_GRID& grid_input)
 {
     PHYSBAM_FATAL_ERROR();
-    Initialize_Domain(grid_input,2);
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Make_Signed_Distance()

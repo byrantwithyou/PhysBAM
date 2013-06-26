@@ -4,8 +4,8 @@
 //#####################################################################
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/FAST_PROJECTION_DYNAMICS_UNIFORM.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_REFINEMENT_UNIFORM.h>
+#include <Incompressible/Incompressible_Flows/PROJECTION_REFINEMENT_UNIFORM.h>
+#include <Dynamics/Incompressible_Flows/FAST_PROJECTION_DYNAMICS_UNIFORM.h>
 #include <Dynamics/Parallel_Computation/REFINEMENT_THREADS.h>
 
 using namespace PhysBAM;

@@ -5,11 +5,11 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
-#include <Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
-#include <Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Incompressible/Forces/FLUID_GRAVITY.h>
+#include <Incompressible/Forces/INCOMPRESSIBILITY.h>
+#include <Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
 #include <Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 using namespace PhysBAM;
@@ -22,9 +22,10 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     output_directory("output"),restart(0),number_of_ghost_cells(5),dt(1),time(0),time_steps_per_frame(1),use_preconditioner(true),
     max_iter(100000),dump_matrix(false),wrap(true),use_advection(true),use_reduced_advection(true),omit_solve(false),
     number_of_colors(1),use_discontinuous_velocity(false),use_p_null_mode(false),use_level_set_method(false),use_pls(false),dump_largest_eigenvector(false),save_pressure(false),
-    grid(TV_INT(),RANGE<TV>::Unit_Box(),true),particle_levelset_evolution_multiple(*new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >(grid,number_of_ghost_cells)),
+    grid(TV_INT(),RANGE<TV>::Unit_Box(),true),collision_bodies_affecting_fluid(*new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >(grid)),
+    particle_levelset_evolution_multiple(*new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >(grid,collision_bodies_affecting_fluid,number_of_ghost_cells)),
     advection_scalar(*new ADVECTION_HAMILTON_JACOBI_ENO<GRID<TV>,T>),levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),
-    collision_bodies_affecting_fluid(*new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >(grid)),debug_particles(*new DEBUG_PARTICLES<TV>)
+    debug_particles(*new DEBUG_PARTICLES<TV>)
 {
     debug_particles.debug_particles.template Add_Array<TV>(ATTRIBUTE_ID_V);
     debug_particles.debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);

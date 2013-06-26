@@ -10,8 +10,8 @@
 #include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
-#include <Fluids/PhysBAM_Compressible/Compressible_Fluids/COMPRESSIBLE_FLUID_COLLECTION.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
+#include <Compressible/Compressible_Fluids/COMPRESSIBLE_FLUID_COLLECTION.h>
+#include <Compressible/Euler_Equations/EULER_UNIFORM.h>
 #include <Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>
 namespace PhysBAM{
 

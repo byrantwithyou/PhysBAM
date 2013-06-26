@@ -60,7 +60,7 @@ public:
     pthread_barrier_t cell_barr;
 #endif
 
-    PARTICLE_LEVELSET_UNIFORM(T_GRID& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input);
+    PARTICLE_LEVELSET_UNIFORM(T_GRID& grid_input,T_ARRAYS_SCALAR& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input);
     ~PARTICLE_LEVELSET_UNIFORM();
 
     void Set_Thread_Queue(THREAD_QUEUE* thread_queue_input)

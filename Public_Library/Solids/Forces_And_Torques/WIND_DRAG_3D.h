@@ -10,9 +10,9 @@
 #include <Tools/Data_Structures/FORCE_ELEMENTS.h>
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/INTERPOLATION_COLLIDABLE_UNIFORM_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Solids/Forces_And_Torques/SOLIDS_FORCES.h>
+#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_UNIFORM_FORWARD.h>
 namespace PhysBAM{
 template<class TV> class RIGID_BODY;
 

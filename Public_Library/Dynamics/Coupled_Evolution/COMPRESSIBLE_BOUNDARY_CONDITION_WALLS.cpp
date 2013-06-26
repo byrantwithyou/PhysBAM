@@ -4,8 +4,8 @@
 //#####################################################################
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_PROJECTION_UNIFORM.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
+#include <Compressible/Euler_Equations/EULER_PROJECTION_UNIFORM.h>
+#include <Compressible/Euler_Equations/EULER_UNIFORM.h>
 #include <Dynamics/Coupled_Evolution/COMPRESSIBLE_BOUNDARY_CONDITION_WALLS.h>
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h>
 using namespace PhysBAM;

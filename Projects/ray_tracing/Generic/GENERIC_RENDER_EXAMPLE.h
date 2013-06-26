@@ -12,7 +12,7 @@
 #include <Tools/Data_Structures/STACK.h>
 #include <Tools/Matrices/MATRIX_4X4.h>
 #include <Tools/Parsing/GENERIC_PARSER.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>

@@ -13,17 +13,17 @@
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Read_Write/TYPED_STREAM.h>
 #include <Geometry/Basic_Geometry/LINE_2D.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_BODY_COLLECTION_POLICY_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
+#include <Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
+#include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_BODY_COLLECTION_POLICY_UNIFORM.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
+#include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
@@ -153,7 +153,7 @@ virtual void Parse_Options() PHYSBAM_OVERRIDE
     face_velocities.Resize(grid.Domain_Indices(3));
     face_valid_mask.Resize(grid.Domain_Indices(3));
 
-    pls_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>(grid,3,false);
+    pls_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>(grid,collision_bodies_affecting_fluid,3,false);
 }
 //#####################################################################
 // Function Initialize

@@ -6,7 +6,7 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
-#include <Fluids/PhysBAM_Incompressible/Particles/VORTICITY_PARTICLES.h>
+#include <Incompressible/Particles/VORTICITY_PARTICLES.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET.h>
 #include <Dynamics/Parallel_Computation/MPI_UNIFORM_PARTICLES.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>

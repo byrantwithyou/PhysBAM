@@ -11,8 +11,8 @@
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <Rigids/Joints/JOINT_ID.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_FORWARD.h>

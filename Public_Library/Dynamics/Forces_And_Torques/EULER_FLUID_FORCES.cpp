@@ -6,9 +6,9 @@
 //#####################################################################
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Dynamics/Forces_And_Torques/EULER_FLUID_FORCES.h>
 using ::std::sqrt;
 using namespace PhysBAM;

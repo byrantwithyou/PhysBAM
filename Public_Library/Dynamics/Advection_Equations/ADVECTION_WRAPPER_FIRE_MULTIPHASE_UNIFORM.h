@@ -8,7 +8,7 @@
 #define __ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM__
 
 #include <Tools/Advection/ADVECTION.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_POLICY.h>
+#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_POLICY.h>
 #include <Dynamics/Interpolation/FIRE_INTERPOLATION_FORWARD.h>
 namespace PhysBAM{
 

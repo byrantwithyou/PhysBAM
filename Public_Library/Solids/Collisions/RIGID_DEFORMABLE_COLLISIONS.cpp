@@ -11,14 +11,14 @@
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Vectors/Dot_Product.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
-#include <Geometry/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <Rigids/Collisions/RIGID_BODY_CONTACT_GRAPH.h>
@@ -29,7 +29,7 @@
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <Rigids/Collisions/RIGIDS_COLLISION_CALLBACKS.h>
-#include <Rigids/Collisions_Computations/SOLVE_CONTACT.h>
+#include <Rigids/Collisions/SOLVE_CONTACT.h>
 #include <Rigids/Joints/JOINT_MESH.h>
 #include <Rigids/Joints/NORMAL_JOINT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>

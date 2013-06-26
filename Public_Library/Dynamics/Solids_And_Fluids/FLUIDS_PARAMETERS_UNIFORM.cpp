@@ -20,21 +20,21 @@
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Utilities/Find_Type.h>
 #include <Tools/Utilities/TYPE_UTILITIES.h>
-#include <Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
-#include <Geometry/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
-#include <Fluids/PhysBAM_Compressible/Compressible_Fluids/COMPRESSIBLE_AUXILIARY_DATA.h>
-#include <Fluids/PhysBAM_Compressible/Equations_Of_State/EOS_GAMMA.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_LAPLACE.h>
-#include <Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
-#include <Fluids/PhysBAM_Fluids/Coupled_Evolution/COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
+#include <Fluids/Coupled_Evolution/COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES.h>
+#include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
+#include <Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
+#include <Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
+#include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
+#include <Compressible/Compressible_Fluids/COMPRESSIBLE_AUXILIARY_DATA.h>
+#include <Compressible/Equations_Of_State/EOS_GAMMA.h>
+#include <Compressible/Euler_Equations/EULER_LAPLACE.h>
+#include <Compressible/Euler_Equations/EULER_UNIFORM.h>
 #include <Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>
+#include <Dynamics/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
 #include <Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
 #include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
@@ -91,7 +91,7 @@ Initialize_Fluid_Evolution(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities)
         else if(thread_queue->Number_Of_Threads()!=number_of_threads){delete thread_queue;thread_queue=new THREAD_QUEUE(number_of_threads);}
         semi_lagrangian.thread_queue=thread_queue;maccormack_semi_lagrangian.thread_queue=thread_queue;}
     if(number_of_regions>=2){ // multiphase
-        particle_levelset_evolution_multiple=new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>(grid->Get_MAC_Grid(),number_of_ghost_cells);
+        particle_levelset_evolution_multiple=new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>(grid->Get_MAC_Grid(),*collision_bodies_affecting_fluid,number_of_ghost_cells);
         if(!projection) projection=new PROJECTION_DYNAMICS_UNIFORM<T_GRID>(*grid,fire,true,false);
         incompressible_multiphase=new INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>(grid->Get_MAC_Grid(),*projection);
         phi_boundary_multiphase.Resize(number_of_regions);for(int i=0;i<number_of_regions;i++) phi_boundary_multiphase(i)=&phi_boundary_reflection;
@@ -99,7 +99,7 @@ Initialize_Fluid_Evolution(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities)
         particle_levelset_evolution=0;
         incompressible=incompressible_multiphase;}
     else if(number_of_regions==1){ // free surface_flow
-        particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> >(*grid,number_of_ghost_cells,false);
+        particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> >(*grid,*collision_bodies_affecting_fluid,number_of_ghost_cells,false);
         particle_levelset_evolution->Particle_Levelset(0).thread_queue=thread_queue;
         particle_levelset_evolution->Particle_Levelset(0).levelset.thread_queue=thread_queue;
         if(!projection){
@@ -153,8 +153,7 @@ Use_Fluid_Coupling_Defaults()
     density_container.Use_Semi_Lagrangian_Collidable_Advection(*collision_bodies_affecting_fluid,incompressible->valid_mask);
     temperature_container.Use_Semi_Lagrangian_Collidable_Advection(*collision_bodies_affecting_fluid,incompressible->valid_mask);
     for(int i=0;i<number_of_regions;i++){
-        particle_levelset_evolution->Levelset_Advection(i).Use_Semi_Lagrangian_Collidable_Advection(*collision_bodies_affecting_fluid,collidable_phi_replacement_value,incompressible->valid_mask);
-        particle_levelset_evolution->Levelset(i).Set_Collision_Body_List(*collision_bodies_affecting_fluid);}
+        particle_levelset_evolution->Levelset_Advection(i).Use_Semi_Lagrangian_Collidable_Advection(*collision_bodies_affecting_fluid,collidable_phi_replacement_value,incompressible->valid_mask);}
     /*if(use_slip) incompressible->Use_Semi_Lagrangian_Collidable_Slip_Advection(*collision_bodies_affecting_fluid);
       else */if(!use_reacting_flow) incompressible->Use_Semi_Lagrangian_Collidable_Advection(*collision_bodies_affecting_fluid);
     else incompressible->Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection(*collision_bodies_affecting_fluid,incompressible->projection,

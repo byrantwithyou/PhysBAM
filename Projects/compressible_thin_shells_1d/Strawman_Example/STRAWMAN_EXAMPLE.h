@@ -15,7 +15,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
+#include <Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
 
 namespace PhysBAM{
 

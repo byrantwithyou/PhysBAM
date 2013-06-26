@@ -6,7 +6,7 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
-#include <Fluids/PhysBAM_Incompressible/Particles/VORTICITY_PARTICLES.h>
+#include <Incompressible/Particles/VORTICITY_PARTICLES.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>

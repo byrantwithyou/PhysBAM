@@ -2,9 +2,9 @@
 // Copyright 2009, Michael Lentine, Avi Robinson-Mosher, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
-#include <Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
-#include <Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
+#include <Incompressible/Forces/FLUID_GRAVITY.h>
+#include <Incompressible/Forces/INCOMPRESSIBILITY.h>
+#include <Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
 #include <Dynamics/Drivers/PLS_EXAMPLE.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -15,7 +15,7 @@ PLS_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
     write_substeps_level(-1),write_output_files(true),output_directory("output"),restart(0),
     number_of_ghost_cells(3),cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),//incompressible_fluid_collection(mac_grid),
-    mpi_grid(0),projection(mac_grid),particle_levelset_evolution(mac_grid,number_of_ghost_cells,false),incompressible(mac_grid,projection),boundary(0),
+    mpi_grid(0),projection(mac_grid),particle_levelset_evolution(mac_grid,collision_bodies_affecting_fluid,number_of_ghost_cells,false),incompressible(mac_grid,projection),boundary(0),
     phi_boundary(0),collision_bodies_affecting_fluid(mac_grid)
 {
     incompressible.Set_Custom_Advection(advection_scalar);
