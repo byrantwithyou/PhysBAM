@@ -50,8 +50,6 @@ else:
             exclude_regex=re.compile("OpenGL|Rendering|CVS")
             Automatic_Circular_DLLs(env,filter(lambda x:not exclude_regex.search(x),directories))
         else:
-            common_libraries.append('PhysBAM_Deformables');
-            common_libraries.append('PhysBAM_Rigids');
             common_libraries.append('PhysBAM_Incompressible');
             common_libraries.append('PhysBAM_Dynamics');
             common_libraries.append('PhysBAM_Incompressible');

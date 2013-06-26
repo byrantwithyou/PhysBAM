@@ -11,6 +11,7 @@
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
+#include <Rigids/Collisions/COLLISION_HELPER.h>
 #include <Rigids/Collisions/COLLISION_PARTICLE_STATE.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
@@ -18,7 +19,6 @@
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
-#include <Deformables/Collisions_And_Interactions/COLLISION_HELPER.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>

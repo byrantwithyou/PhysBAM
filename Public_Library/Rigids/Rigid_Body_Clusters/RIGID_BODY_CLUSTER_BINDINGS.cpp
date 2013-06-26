@@ -21,7 +21,6 @@
 #include <Rigids/Joints/JOINT_MESH.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
-#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function RIGID_BODY_CLUSTER_BINDINGS

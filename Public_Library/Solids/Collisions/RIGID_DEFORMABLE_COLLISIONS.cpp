@@ -19,6 +19,7 @@
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
+#include <Rigids/Collisions/COLLISION_HELPER.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <Rigids/Collisions/RIGID_BODY_CONTACT_GRAPH.h>
@@ -38,7 +39,6 @@
 #include <Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
-#include <Deformables/Collisions_And_Interactions/COLLISION_HELPER.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h>
