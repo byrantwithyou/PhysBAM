@@ -155,7 +155,8 @@ int main(int argc,char* argv[])
     std::string output_directory="output";
     SIMULATION<TV> simulation;
     int res=6,seed=-1;
-    bool enforce_definiteness=false;
+    bool enforce_definiteness=false,do_pt=false;
+    T dt=.1;
 
     PARSE_ARGS parse_args(argc,argv);
     LOG::Initialize_Logging(false,false,1<<30,true);
@@ -168,6 +169,8 @@ int main(int argc,char* argv[])
     parse_args.Add("-newton_it",&simulation.nm.max_iterations,"iter","maximum iterations for Newton");
     parse_args.Add("-kry_fail",&simulation.nm.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
     parse_args.Add("-seed",&seed,"fixed seed","set random seed");
+    parse_args.Add("-dt",&dt,"step","time step size");
+    parse_args.Add("-pt",&do_pt,"point test");
     parse_args.Parse();
 
     LOG::cout<<std::setprecision(16);
@@ -184,12 +187,11 @@ int main(int argc,char* argv[])
 
     RANDOM_NUMBERS<T> random;
     if(seed!=-1) random.Set_Seed(seed);
-    random.Fill_Uniform(simulation.solid_body_collection.deformable_body_collection.particles.X,-1,1);
-
+    if(do_pt) simulation.solid_body_collection.deformable_body_collection.particles.X.Fill(TV());
+    else random.Fill_Uniform(simulation.solid_body_collection.deformable_body_collection.particles.X,-1,1);
 
     simulation.solid_body_collection.Update_Simulated_Particles();
 
-    T dt=.1;
     vo.Flush_Frame(STRING_UTILITIES::string_sprintf("frame %d",0).c_str());
     simulation.solid_body_collection.Write(stream_type,output_directory,0,-1,true,true,true,true,false);
     for(int frame=1;frame<10;frame++)
