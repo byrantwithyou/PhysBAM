@@ -154,7 +154,7 @@ int main(int argc,char* argv[])
     RW rw=RW();STREAM_TYPE stream_type(rw); // gcc 3.3.2 workaround
     std::string output_directory="output";
     SIMULATION<TV> simulation;
-    int res=6,seed=-1;
+    int res=6,seed=-1,steps=10;
     bool enforce_definiteness=false,do_pt=false;
     T dt=.1;
 
@@ -171,6 +171,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-seed",&seed,"fixed seed","set random seed");
     parse_args.Add("-dt",&dt,"step","time step size");
     parse_args.Add("-pt",&do_pt,"point test");
+    parse_args.Add("-steps",&steps,"steps","number of time steps");
     parse_args.Parse();
 
     LOG::cout<<std::setprecision(16);
@@ -194,7 +195,7 @@ int main(int argc,char* argv[])
 
     vo.Flush_Frame(STRING_UTILITIES::string_sprintf("frame %d",0).c_str());
     simulation.solid_body_collection.Write(stream_type,output_directory,0,-1,true,true,true,true,false);
-    for(int frame=1;frame<10;frame++)
+    for(int frame=1;frame<=steps;frame++)
     {
         simulation.Advance_One_Time_Step_Position(dt);
         vo.Flush_Frame(STRING_UTILITIES::string_sprintf("frame %d",frame).c_str());
