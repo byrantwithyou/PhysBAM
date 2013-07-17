@@ -140,10 +140,10 @@ Read(const STREAM_TYPE stream_type,const std::string& prefix,const std::string& 
     const bool read_from_every_process)
 {
     particles.Store_Mass();
+    if(include_static_variables) Read_Static_Variables(stream_type,static_prefix,static_frame);
     Read_Dynamic_Variables(stream_type,prefix,frame);
     if(mpi_solids && read_from_every_process) // make sure every process has all the correct data
         mpi_solids->Broadcast_Data(particles.X,particles.V);
-    if(include_static_variables) Read_Static_Variables(stream_type,static_prefix,static_frame);
 }
 //#####################################################################
 // Function Write
