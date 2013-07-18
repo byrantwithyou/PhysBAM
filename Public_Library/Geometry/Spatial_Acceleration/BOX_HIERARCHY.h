@@ -115,17 +115,17 @@ public:
     virtual void Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius);
     void Update_Nonleaf_Box_Radii();
     // for internal use - but octrees use them as well so they're not private
-    template<class T_THICKNESS> void Intersection_List(const int box,const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T_THICKNESS thickness_over_two) const;
+    void Intersection_List(const int box,const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T thickness_over_two) const;
 protected:
-    template<class T_THICKNESS> void Intersection_List(const int box,const TV& point,ARRAY<int>& intersection_list,const T_THICKNESS thickness_over_two) const;
+    void Intersection_List(const int box,const TV& point,ARRAY<int>& intersection_list,const T thickness_over_two) const;
     void Intersection_List(const int box,const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const;
     void Intersection_List(const int box,const T_HYPERPLANE& test_plane,ARRAY<int>& intersection_list,const T thickness_over_two) const;
     void Intersection_List(const int box,const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::dimension>& rotation,const TV& translation,ARRAY<int>& intersection_list,
         const T contour_value) const;
-    template<class T_VISITOR,class T_THICKNESS> void Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,const int self_box,const int other_box,
-        const T_THICKNESS extra_thickness=ZERO()) const;
+    template<class T_VISITOR> void Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,const int self_box,const int other_box,
+        const T extra_thickness=0) const;
 public:
-    template<class T_VISITOR,class T_THICKNESS> void Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,const T_THICKNESS extra_thickness=ZERO()) const;
+    template<class T_VISITOR> void Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,const T extra_thickness=0) const;
     template<class T_VISITOR> void Intersection_List(T_VISITOR& visitor) const;
 //#####################################################################
 };   

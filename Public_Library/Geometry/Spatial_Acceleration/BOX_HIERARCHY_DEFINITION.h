@@ -7,10 +7,10 @@ namespace PhysBAM{
 //#####################################################################
 // Function Intersection_List
 //#####################################################################
-template<class TV> template<class T_VISITOR,class T_THICKNESS> void BOX_HIERARCHY<TV>::
-Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,const int self_box,const int other_box,const T_THICKNESS extra_thickness) const
+template<class TV> template<class T_VISITOR> void BOX_HIERARCHY<TV>::
+Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,const int self_box,const int other_box,const T extra_thickness) const
 {
-    assert((IS_SAME<T_THICKNESS,ZERO>::value || !!extra_thickness));
+    assert((IS_SAME<T,ZERO>::value || !!extra_thickness));
 
     // borrow stack ownership to improve aliasing semantics
     STACK<VECTOR<int,2> > stack;stack.Exchange(dual_traversal_stack); // borrow stack ownership to improve aliasing semantics
@@ -39,10 +39,9 @@ Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,co
 //#####################################################################
 // Function Intersection_List
 //#####################################################################
-template<class TV> template<class T_VISITOR,class T_THICKNESS> void BOX_HIERARCHY<TV>::
-Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,const T_THICKNESS extra_thickness) const
+template<class TV> template<class T_VISITOR> void BOX_HIERARCHY<TV>::
+Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,const T extra_thickness) const
 {
-    if(!IS_SAME<T_THICKNESS,ZERO>::value && !extra_thickness){Intersection_List(other_hierarchy,visitor,ZERO());return;}
     if(&other_hierarchy != this) return Intersection_List(other_hierarchy,visitor,root,other_hierarchy.root,extra_thickness);
 
     // borrow stack ownership to improve aliasing semantics

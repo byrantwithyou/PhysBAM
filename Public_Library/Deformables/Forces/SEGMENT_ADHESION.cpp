@@ -170,10 +170,10 @@ Update_Springs(const bool search_hierarchy)
         LOG::cout<<"segments "<<internal_curve.mesh.elements.m<<std::endl;
         for(int i=0;i<internal_segment_indices.m;i++){int segment=internal_segment_indices(i);segments_with_springs(segment).y=false;} // we no longer have heaps
         EDGE_EDGE_ADHESION_VISITOR<TV> internal_visitor(*this,internal_segment_indices,internal_segment_indices,true);
-        internal_curve.hierarchy->Intersection_List(*internal_curve.hierarchy,internal_visitor,ZERO());
+        internal_curve.hierarchy->Intersection_List(*internal_curve.hierarchy,internal_visitor,0);
         if(mpi_solids){
             EDGE_EDGE_ADHESION_VISITOR<TV> external_visitor(*this,internal_segment_indices,external_segment_indices,false);
-            internal_curve.hierarchy->Intersection_List(*external_curve.hierarchy,external_visitor,ZERO());}
+            internal_curve.hierarchy->Intersection_List(*external_curve.hierarchy,external_visitor,0);}
 
         if(mpi_solids){
             LOG::Time("Send and Receive Pairs");
@@ -300,8 +300,8 @@ Update_Partitions(bool restart,MPI_SOLIDS<TV>* mpi_solids,const std::string outp
         Update_Hierarchy();
         EDGE_EDGE_INITIAL_CULL_VISITOR<TV> internal_visitor(*this,internal_segment_indices,internal_segment_indices);
         EDGE_EDGE_INITIAL_CULL_VISITOR<TV> external_visitor(*this,internal_segment_indices,external_segment_indices);
-        internal_curve.hierarchy->Intersection_List(*internal_curve.hierarchy,internal_visitor,ZERO());
-        if(mpi_solids) internal_curve.hierarchy->Intersection_List(*external_curve.hierarchy,external_visitor,ZERO());
+        internal_curve.hierarchy->Intersection_List(*internal_curve.hierarchy,internal_visitor,0);
+        if(mpi_solids) internal_curve.hierarchy->Intersection_List(*external_curve.hierarchy,external_visitor,0);
         FILE_UTILITIES::Write_To_File<float>(output_directory+"/adhesion_existing",existing_pairs);} // TODO: use real output_directory
 }
 //#####################################################################

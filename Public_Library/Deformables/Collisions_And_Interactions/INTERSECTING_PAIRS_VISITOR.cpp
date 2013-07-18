@@ -62,12 +62,7 @@ Store_Helper(const int segment,const int triangle,const VECTOR<T,3>* dimension)
     count++;
 }
 //####################################################################
-#define INSTANTIATION_HELPER(T,d) \
-    template void BOX_HIERARCHY<VECTOR<T,d> >::Intersection_List<INTERSECTING_PAIRS_VISITOR<VECTOR<T,d> >,T>(BOX_HIERARCHY<VECTOR<T,d> > const&, \
-        INTERSECTING_PAIRS_VISITOR<VECTOR<T,d> >&,T) const; \
-    template void BOX_HIERARCHY<VECTOR<T,d> >::Intersection_List<BOX_VISITOR_MPI<INTERSECTING_PAIRS_VISITOR<VECTOR<T,d> > >,T>(BOX_HIERARCHY<VECTOR<T,d> > const&, \
-        BOX_VISITOR_MPI<INTERSECTING_PAIRS_VISITOR<VECTOR<T,d> > >&,T) const;
-
+namespace PhysBAM{
 template INTERSECTING_PAIRS_VISITOR<VECTOR<float,2> >::INTERSECTING_PAIRS_VISITOR(HASHTABLE<VECTOR<int,3>,void>&,HASHTABLE<VECTOR<int,2>,void>&,
     STRUCTURE_INTERACTION_GEOMETRY<VECTOR<float,2> > const&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<float,2> >&,ARRAY<VECTOR<float,2>,int> const&,float,int&);
 template void INTERSECTING_PAIRS_VISITOR<VECTOR<float,2> >::Store_Helper(int,int,const VECTOR<float,2>* dimension);
@@ -76,9 +71,6 @@ template INTERSECTING_PAIRS_VISITOR<VECTOR<float,3> >::INTERSECTING_PAIRS_VISITO
     STRUCTURE_INTERACTION_GEOMETRY<VECTOR<float,3> > const&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<float,3> >&,ARRAY<VECTOR<float,3>,int> const&,float,int&);
 template void INTERSECTING_PAIRS_VISITOR<VECTOR<float,3> >::Store_Helper(int,int,const VECTOR<float,3>* dimension);
 template INTERSECTING_PAIRS_VISITOR<VECTOR<float,3> >::~INTERSECTING_PAIRS_VISITOR();
-
-INSTANTIATION_HELPER(float,2);
-INSTANTIATION_HELPER(float,3);
 template INTERSECTING_PAIRS_VISITOR<VECTOR<double,2> >::INTERSECTING_PAIRS_VISITOR(HASHTABLE<VECTOR<int,3>,void>&,HASHTABLE<VECTOR<int,2>,void>&,
     STRUCTURE_INTERACTION_GEOMETRY<VECTOR<double,2> > const&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<double,2> >&,ARRAY<VECTOR<double,2>,int> const&,double,int&);
 template void INTERSECTING_PAIRS_VISITOR<VECTOR<double,2> >::Store_Helper(int,int,const VECTOR<double,2>* dimension);
@@ -87,6 +79,20 @@ template INTERSECTING_PAIRS_VISITOR<VECTOR<double,3> >::INTERSECTING_PAIRS_VISIT
     STRUCTURE_INTERACTION_GEOMETRY<VECTOR<double,3> > const&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<double,3> >&,ARRAY<VECTOR<double,3>,int> const&,double,int&);
 template void INTERSECTING_PAIRS_VISITOR<VECTOR<double,3> >::Store_Helper(int,int,const VECTOR<double,3>* dimension);
 template INTERSECTING_PAIRS_VISITOR<VECTOR<double,3> >::~INTERSECTING_PAIRS_VISITOR();
-
-INSTANTIATION_HELPER(double,2);
-INSTANTIATION_HELPER(double,3);
+template void BOX_HIERARCHY<VECTOR<double,2> >::Intersection_List<BOX_VISITOR_MPI<INTERSECTING_PAIRS_VISITOR<VECTOR<double,2> > > >(
+    BOX_HIERARCHY<VECTOR<double,2> > const&,BOX_VISITOR_MPI<INTERSECTING_PAIRS_VISITOR<VECTOR<double,2> > >&,double) const;
+template void BOX_HIERARCHY<VECTOR<double,2> >::Intersection_List<INTERSECTING_PAIRS_VISITOR<VECTOR<double,2> > >(
+    BOX_HIERARCHY<VECTOR<double,2> > const&,INTERSECTING_PAIRS_VISITOR<VECTOR<double,2> >&,double) const;
+template void BOX_HIERARCHY<VECTOR<double,3> >::Intersection_List<BOX_VISITOR_MPI<INTERSECTING_PAIRS_VISITOR<VECTOR<double,3> > > >(
+    BOX_HIERARCHY<VECTOR<double,3> > const&,BOX_VISITOR_MPI<INTERSECTING_PAIRS_VISITOR<VECTOR<double,3> > >&,double) const;
+template void BOX_HIERARCHY<VECTOR<double,3> >::Intersection_List<INTERSECTING_PAIRS_VISITOR<VECTOR<double,3> > >(
+    BOX_HIERARCHY<VECTOR<double,3> > const&,INTERSECTING_PAIRS_VISITOR<VECTOR<double,3> >&,double) const;
+template void BOX_HIERARCHY<VECTOR<float,2> >::Intersection_List<BOX_VISITOR_MPI<INTERSECTING_PAIRS_VISITOR<VECTOR<float,2> > > >(
+    BOX_HIERARCHY<VECTOR<float,2> > const&,BOX_VISITOR_MPI<INTERSECTING_PAIRS_VISITOR<VECTOR<float,2> > >&,float) const;
+template void BOX_HIERARCHY<VECTOR<float,2> >::Intersection_List<INTERSECTING_PAIRS_VISITOR<VECTOR<float,2> > >(
+    BOX_HIERARCHY<VECTOR<float,2> > const&,INTERSECTING_PAIRS_VISITOR<VECTOR<float,2> >&,float) const;
+template void BOX_HIERARCHY<VECTOR<float,3> >::Intersection_List<BOX_VISITOR_MPI<INTERSECTING_PAIRS_VISITOR<VECTOR<float,3> > > >(
+    BOX_HIERARCHY<VECTOR<float,3> > const&,BOX_VISITOR_MPI<INTERSECTING_PAIRS_VISITOR<VECTOR<float,3> > >&,float) const;
+template void BOX_HIERARCHY<VECTOR<float,3> >::Intersection_List<INTERSECTING_PAIRS_VISITOR<VECTOR<float,3> > >(
+    BOX_HIERARCHY<VECTOR<float,3> > const&,INTERSECTING_PAIRS_VISITOR<VECTOR<float,3> >&,float) const;
+}

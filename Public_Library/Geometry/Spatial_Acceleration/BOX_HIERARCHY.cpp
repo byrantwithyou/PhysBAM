@@ -127,10 +127,9 @@ Update_Nonleaf_Box_Radii()
 //#####################################################################
 // Function Intersection_List
 //#####################################################################
-template<class TV> template<class T_THICKNESS> void BOX_HIERARCHY<TV>::
-Intersection_List(const int box,const TV& point,ARRAY<int>& intersection_list,const T_THICKNESS thickness_over_two) const
+template<class TV> void BOX_HIERARCHY<TV>::
+Intersection_List(const int box,const TV& point,ARRAY<int>& intersection_list,const T thickness_over_two) const
 {
-    if(!IS_SAME<T_THICKNESS,ZERO>::value && !thickness_over_two){Intersection_List(box,point,intersection_list,ZERO());return;}
     if(box<0) return;
     traversal_stack.Remove_All();traversal_stack.Push(box);
     while(!traversal_stack.Empty()){int current=traversal_stack.Pop();
@@ -140,10 +139,9 @@ Intersection_List(const int box,const TV& point,ARRAY<int>& intersection_list,co
 //#####################################################################
 // Function Intersection_List
 //#####################################################################
-template<class TV> template<class T_THICKNESS> void BOX_HIERARCHY<TV>::
-Intersection_List(const int box,const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T_THICKNESS thickness_over_two) const
+template<class TV> void BOX_HIERARCHY<TV>::
+Intersection_List(const int box,const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T thickness_over_two) const
 {
-    if(!IS_SAME<T_THICKNESS,ZERO>::value && !thickness_over_two){Intersection_List(box,test_box,intersection_list,ZERO());return;}
     if(box<0) return;
     traversal_stack.Remove_All();traversal_stack.Push(box);
     

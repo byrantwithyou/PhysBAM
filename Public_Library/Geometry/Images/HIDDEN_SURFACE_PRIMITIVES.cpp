@@ -145,7 +145,7 @@ Initialize(DIRECTED_GRAPH<>& dg)
     bh.Set_Leaf_Boxes(bh.box_hierarchy,true);
     ARRAY<ARRAY<int> > intersection_list(primitives.m),adjacency_list(primitives.m);
     BOX_VISITOR_TRIVIAL visitor(intersection_list);
-    bh.Intersection_List(bh,visitor,ZERO());
+    bh.Intersection_List(bh,visitor,0);
 
     HASHTABLE<VECTOR<int,2> > edges;
     ARRAY<VECTOR<int,2> > pairs;

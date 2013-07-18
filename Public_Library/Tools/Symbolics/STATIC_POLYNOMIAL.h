@@ -210,7 +210,7 @@ struct STATIC_POLYNOMIAL
 
     void Shift_Variable(int v,T shift)
     {
-        T table[d+1][d+1];
+        T table[d+2][d+2]; // only need d+1, but use d+2 to work around 4.8 compiler warning
         table[0][0]=1;
         for(int i=1;i<=size(v) && i<d+1;i++){
             table[i][0]=1;

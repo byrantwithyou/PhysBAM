@@ -86,7 +86,7 @@ template<class TV> void VOLUME_COLLISIONS<TV>::
 Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
 {
     VOLUME_COLLISIONS_VISITOR<TV> visitor(obj1,obj2);
-    obj1.hierarchy->Intersection_List(*obj2.hierarchy,visitor,ZERO());
+    obj1.hierarchy->Intersection_List(*obj2.hierarchy,visitor,0);
     if(visitor.pairs.m==0) return;
 
     HASHTABLE<int> visited_particles1;

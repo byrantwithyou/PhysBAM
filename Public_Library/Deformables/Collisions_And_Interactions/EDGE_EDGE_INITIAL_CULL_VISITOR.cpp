@@ -28,12 +28,7 @@ Store(const int segment1_local_index,const int segment2_local_index)
     if(segment1_hair_index==segment2_hair_index) adhesion.existing_pairs.Set(segment_indices);
 }
 //####################################################################
-#define INSTANTIATION_HELPER(T) \
-    template void EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<T,3> >::Store(int,int); \
-    template void BOX_HIERARCHY<VECTOR<T,3> >::Intersection_List<EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<T,3> >,ZERO>(BOX_HIERARCHY<VECTOR<T,3> > const&, \
-        EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<T,3> >&,ZERO) const;
-
-//template void EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<float,2> >::Store(int,int);
-INSTANTIATION_HELPER(float);
-//template void EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<double,2> >::Store(int,int);
-INSTANTIATION_HELPER(double);
+namespace PhysBAM{
+template void BOX_HIERARCHY<VECTOR<double,3> >::Intersection_List<EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<double,3> > >(BOX_HIERARCHY<VECTOR<double,3> > const&,EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<double,3> >&,double) const;
+template void BOX_HIERARCHY<VECTOR<float,3> >::Intersection_List<EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<float,3> > >(BOX_HIERARCHY<VECTOR<float,3> > const&,EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<float,3> >&,float) const;
+}

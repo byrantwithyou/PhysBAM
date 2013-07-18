@@ -85,10 +85,7 @@ Store(const int segment1_local_index,const int segment2_local_index)
     }
 }
 //####################################################################
-#define INSTANTIATION_HELPER(T) \
-    template void EDGE_EDGE_ADHESION_VISITOR<VECTOR<T,3> >::Store(int,int); \
-    template void BOX_HIERARCHY<VECTOR<T,3> >::Intersection_List<EDGE_EDGE_ADHESION_VISITOR<VECTOR<T,3> >,ZERO>(BOX_HIERARCHY<VECTOR<T,3> > const&, \
-        EDGE_EDGE_ADHESION_VISITOR<VECTOR<T,3> >&,ZERO) const;
-
-INSTANTIATION_HELPER(float);
-INSTANTIATION_HELPER(double);
+namespace PhysBAM{
+template void BOX_HIERARCHY<VECTOR<float,3> >::Intersection_List<EDGE_EDGE_ADHESION_VISITOR<VECTOR<float,3> > >(BOX_HIERARCHY<VECTOR<float,3> > const&,EDGE_EDGE_ADHESION_VISITOR<VECTOR<float,3> >&,float) const;
+template void BOX_HIERARCHY<VECTOR<double,3> >::Intersection_List<EDGE_EDGE_ADHESION_VISITOR<VECTOR<double,3> > >(BOX_HIERARCHY<VECTOR<double,3> > const&,EDGE_EDGE_ADHESION_VISITOR<VECTOR<double,3> >&,double) const;
+}
