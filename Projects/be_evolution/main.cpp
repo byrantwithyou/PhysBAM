@@ -147,15 +147,33 @@ public:
     }
 };
 
+typedef double T;
+typedef float RW;
+typedef VECTOR<T,3> TV;
+typedef VECTOR<int,TV::m> TV_INT;
+RW rw=RW();
+STREAM_TYPE stream_type(rw); // gcc 3.3.2 workaround
+std::string output_directory="output";
+
+VIEWER_OUTPUT<TV>* pvo=0;
+SIMULATION<TV>* psim=0;
+
+void Flush_State(const char* str)
+{
+    static int frame=0;
+    printf("Flush %i, '%s'\n",frame,str);
+    pvo->Flush_Frame(STRING_UTILITIES::string_sprintf(str,frame).c_str());
+    psim->solid_body_collection.Write(stream_type,output_directory,frame,-1,frame==0,true,true,true,false);
+    FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/last_frame",frame,"\n");
+    frame++;
+}
+extern void (*NM_Flush_State)(const char*);
+
 int main(int argc,char* argv[])
 {
-    typedef double T;
-    typedef float RW;
-    typedef VECTOR<T,3> TV;
-    typedef VECTOR<int,TV::m> TV_INT;
-    RW rw=RW();STREAM_TYPE stream_type(rw); // gcc 3.3.2 workaround
-    std::string output_directory="output";
+    NM_Flush_State=&Flush_State;
     SIMULATION<TV> simulation;
+    psim=&simulation;
     int res=6,seed=-1,steps=10;
     bool enforce_definiteness=false,do_pt=false;
     T dt=.1;
@@ -180,6 +198,7 @@ int main(int argc,char* argv[])
 
     GRID<TV> grid(TV_INT(),RANGE<TV>::Unit_Box());
     VIEWER_OUTPUT<TV> vo(stream_type,grid,output_directory);
+    pvo=&vo;
     SOLIDS_STANDARD_TESTS<TV> tests(stream_type,getenv("PHYSBAM_DATA_DIRECTORY"),simulation.solid_body_collection);
     GRID<TV> cube_grid(TV_INT()+res,RANGE<TV>::Centered_Box());
     TETRAHEDRALIZED_VOLUME<T>& tv=tests.Create_Mattress(cube_grid);
@@ -195,13 +214,11 @@ int main(int argc,char* argv[])
 
     simulation.solid_body_collection.Update_Simulated_Particles();
 
-    vo.Flush_Frame(STRING_UTILITIES::string_sprintf("frame %d",0).c_str());
-    simulation.solid_body_collection.Write(stream_type,output_directory,0,-1,true,true,true,true,false);
+    Flush_State("frame %d");
     for(int frame=1;frame<=steps;frame++)
     {
         simulation.Advance_One_Time_Step_Position(dt);
-        vo.Flush_Frame(STRING_UTILITIES::string_sprintf("frame %d",frame).c_str());
-        simulation.solid_body_collection.Write(stream_type,output_directory,frame,-1,true,true,true,true,false);
+        Flush_State("frame %d");
     }
 
     LOG::Finish_Logging();
