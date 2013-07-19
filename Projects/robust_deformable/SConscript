@@ -1,0 +1,4 @@
+# SConscript
+
+Import('env Automatic_Program')
+Automatic_Program(env,"robust_deformable",["main.cpp","LOCAL_NEWTONS_METHOD.cpp"])
