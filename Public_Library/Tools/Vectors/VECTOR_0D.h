@@ -33,7 +33,11 @@ public:
     typedef ARRAY_BASE<T,VECTOR<T,0> > BASE;
     using BASE::Assert_Same_Size;
 
-    explicit VECTOR(INITIAL_SIZE n=INITIAL_SIZE())
+    VECTOR()
+    {
+    }
+
+    explicit VECTOR(INITIAL_SIZE n)
     {
         assert(n==INITIAL_SIZE());
     }

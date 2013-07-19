@@ -35,7 +35,8 @@ SEGMENT_MESH(const SEGMENT_MESH& segment_mesh)
 SEGMENT_MESH::
 ~SEGMENT_MESH()
 {
-    delete connected_segments;delete ordered_loop_nodes;
+    delete connected_segments;
+    delete ordered_loop_nodes;
 }
 //#####################################################################
 // Function Delete_Auxiliary_Structures
@@ -44,7 +45,10 @@ void SEGMENT_MESH::
 Delete_Auxiliary_Structures()
 {
     SIMPLEX_MESH<1>::Delete_Auxiliary_Structures();
-    delete connected_segments;connected_segments=0;delete ordered_loop_nodes;ordered_loop_nodes=0;
+    delete connected_segments;
+    connected_segments=0;
+    delete ordered_loop_nodes;
+    ordered_loop_nodes=0;
 }
 //#####################################################################
 // Function Refresh_Auxiliary_Structures
@@ -53,7 +57,8 @@ void SEGMENT_MESH::
 Refresh_Auxiliary_Structures()
 {
     SIMPLEX_MESH<1>::Refresh_Auxiliary_Structures();
-    if(connected_segments) Initialize_Connected_Segments();if(ordered_loop_nodes) Initialize_Ordered_Loop_Nodes();
+    if(connected_segments) Initialize_Connected_Segments();
+    if(ordered_loop_nodes) Initialize_Ordered_Loop_Nodes();
 }
 //#####################################################################
 // Function Initialize_Connected_Segments
@@ -61,16 +66,16 @@ Refresh_Auxiliary_Structures()
 void SEGMENT_MESH::
 Initialize_Connected_Segments()
 {
-    delete connected_segments;connected_segments=new ARRAY<ARRAY<VECTOR<int,2> > >;
-    UNION_FIND<> union_find(number_nodes);Add_Connectivity(union_find);
-    ARRAY<int> buckets;
+    delete connected_segments;
+    connected_segments=new ARRAY<ARRAY<VECTOR<int,2> > >;
+    UNION_FIND<> union_find(number_nodes);
+    Add_Connectivity(union_find);
+    ARRAY<int> buckets(number_nodes);
+    buckets.Fill(-1);
     for(int s=0;s<elements.m;s++){
         int bucket=union_find.Find(elements(s)(0));
-        int index=buckets.Find(bucket);
-        if(index<0){
-            connected_segments->Append(ARRAY<VECTOR<int,2> >(-1,-1));
-            buckets.Append(bucket);
-            index=connected_segments->m;}
+        int& index=buckets(bucket);
+        if(index<0) index=connected_segments->Append(ARRAY<VECTOR<int,2> >());
         (*connected_segments)(index).Append(elements(s));}
 }
 //#####################################################################
@@ -79,11 +84,14 @@ Initialize_Connected_Segments()
 void SEGMENT_MESH::
 Initialize_Ordered_Loop_Nodes()
 {
-    delete ordered_loop_nodes;ordered_loop_nodes=new ARRAY<ARRAY<int> >;
+    delete ordered_loop_nodes;
+    ordered_loop_nodes=new ARRAY<ARRAY<int> >;
 
     bool created_neighbor_nodes=false,created_connected_segments=false;
-    if(!neighbor_nodes){Initialize_Neighbor_Nodes();created_neighbor_nodes=true;} 
-    if(!connected_segments){Initialize_Connected_Segments();created_connected_segments=true;}
+    if(!neighbor_nodes){Initialize_Neighbor_Nodes();
+        created_neighbor_nodes=true;} 
+    if(!connected_segments){Initialize_Connected_Segments();
+        created_connected_segments=true;}
 
     for(int i=0;i<connected_segments->m;i++){
         for(int j=0;j<(*connected_segments)(i).m;j++)for(int k=0;k<2;k++)if((*neighbor_nodes)((*connected_segments)(i)(j)(k)).m!=2) goto not_closed;

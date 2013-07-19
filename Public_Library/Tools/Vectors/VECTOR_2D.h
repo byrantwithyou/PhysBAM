@@ -54,10 +54,16 @@ public:
 
     T x,y;
 
-    explicit VECTOR(INITIAL_SIZE n=INITIAL_SIZE(2))
+    VECTOR()
         :x(),y()
     {
-        STATIC_ASSERT(sizeof(VECTOR)==2*sizeof(T));assert(n==INITIAL_SIZE(2));
+        STATIC_ASSERT(sizeof(VECTOR)==2*sizeof(T));
+    }
+
+    explicit VECTOR(INITIAL_SIZE n)
+        :x(),y()
+    {
+        assert(n==INITIAL_SIZE(2));
     }
 
     VECTOR(const T& x_input,const T& y_input)

@@ -113,7 +113,7 @@ Initialize(const T_ARRAYS_BASE& phi,ARRAYS_ND_BASE<bool,TV_INT>& done,ARRAYS_ND_
 template<class T_GRID,class T2> void EXTRAPOLATION_UNIFORM<T_GRID,T2>::
 Update_Close_Point(ARRAYS_ND_BASE<T2,TV_INT>& u,const T_ARRAYS_BASE& phi,const ARRAYS_ND_BASE<bool,TV_INT>& done,const TV_INT& index)
 {
-    T2 value[3]={T2()}; // the value to use in the given direction
+    T2 value[3]={}; // the value to use in the given direction
     T phix_dx[3]={0}; // the difference in phi value for the direction
     int number_of_axis=0; // the number of axis that we want to use later
     int missing_axis=2; // used in number_of_axis==2 case only, so it gives you which axis is missing (==2 for 2d)

@@ -50,10 +50,16 @@ public:
 
     T x,y,z;
 
-    explicit VECTOR(INITIAL_SIZE n=INITIAL_SIZE(3))
+    VECTOR()
         :x(),y(),z()
     {
-        STATIC_ASSERT(sizeof(VECTOR)==3*sizeof(T));assert(n==INITIAL_SIZE(3));
+        STATIC_ASSERT(sizeof(VECTOR)==3*sizeof(T));
+    }
+
+    explicit VECTOR(INITIAL_SIZE n)
+        :x(),y(),z()
+    {
+        assert(n==INITIAL_SIZE(3));
     }
 
     VECTOR(const T& x_input,const T& y_input,const T& z_input)

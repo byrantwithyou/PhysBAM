@@ -52,9 +52,15 @@ public:
 
     T array[d];
 
-    explicit VECTOR(INITIAL_SIZE n=INITIAL_SIZE(d))
+    VECTOR()
     {
-        STATIC_ASSERT(sizeof(VECTOR)==d*sizeof(T));assert(n==INITIAL_SIZE(d));
+        STATIC_ASSERT(sizeof(VECTOR)==d*sizeof(T));
+        for(int i=0;i<d;i++) array[i]=T();
+    }
+
+    explicit VECTOR(INITIAL_SIZE n)
+    {
+        assert(n==INITIAL_SIZE(d));
         for(int i=0;i<d;i++) array[i]=T();
     }
 

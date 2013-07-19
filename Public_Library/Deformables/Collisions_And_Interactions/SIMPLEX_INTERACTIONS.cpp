@@ -53,7 +53,7 @@ Two_Segment_Intersection_Barycentric_Coordinates(const VECTOR<VECTOR<T,2>,2>& se
 template<class T> bool SIMPLEX_INTERACTIONS<T>::
 Intersection(const VECTOR<VECTOR<T,2>,3>& triangle,const VECTOR<T,2>& point)
 {
-    T points[4][2],m2p[16],d3p[16];
+    T points[4][2],m2p[16],d3p[16]={};
     int plus,minus;
     unsigned int mask;
 
