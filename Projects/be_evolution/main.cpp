@@ -188,6 +188,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-kry_it",&simulation.nm.max_krylov_iterations,"iter","maximum iterations for Krylov solver");
     parse_args.Add("-newton_it",&simulation.nm.max_iterations,"iter","maximum iterations for Newton");
     parse_args.Add("-kry_fail",&simulation.nm.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
+    parse_args.Add("-angle_tol",&simulation.nm.angle_tolerance,"tol","gradient descent tolerance");
     parse_args.Add("-seed",&seed,"fixed seed","set random seed");
     parse_args.Add("-dt",&dt,"step","time step size");
     parse_args.Add("-pt",&do_pt,"point test");
@@ -202,7 +203,7 @@ int main(int argc,char* argv[])
     SOLIDS_STANDARD_TESTS<TV> tests(stream_type,getenv("PHYSBAM_DATA_DIRECTORY"),simulation.solid_body_collection);
     GRID<TV> cube_grid(TV_INT()+res,RANGE<TV>::Centered_Box());
     TETRAHEDRALIZED_VOLUME<T>& tv=tests.Create_Mattress(cube_grid);
-    simulation.solid_body_collection.Add_Force(Create_Finite_Volume(tv,new COROTATED_FIXED<T,3>(1e6,0.3,0)));
+    simulation.solid_body_collection.Add_Force(Create_Finite_Volume(tv,new COROTATED_FIXED<T,TV::m>(1e6,0.3,0)));
     for(int i=0;i<simulation.solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
         simulation.solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
     if(enforce_definiteness) simulation.solid_body_collection.Enforce_Definiteness(true);
