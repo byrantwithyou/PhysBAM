@@ -119,6 +119,30 @@ Write_Preconditioner(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECT
     End_Sparse_Matrix();
 }
 //#####################################################################
+// Function Write_Preconditioner
+//#####################################################################
+template<class T> void OCTAVE_OUTPUT<T>::
+Write_Inner_Product(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& s)
+{
+    int b=r.Raw_Size();
+    Begin_Sparse_Matrix(name,b,b);
+    r*=0;
+    s*=0;
+    for(int i=0;i<b;i++){
+        current_column++;
+        r.Raw_Get(i)=1;
+        for(int j=0;j<b;j++){
+            s.Raw_Get(j)=1;
+            T x=m.Inner_Product(s,r);
+            if(x){
+                out<<(j+1)<<" "<<current_column<<" "<<x<<std::endl;
+                nnz++;}
+            s.Raw_Get(j)=0;}
+        r.Raw_Get(i)=0;}
+
+    End_Sparse_Matrix();
+}
+//#####################################################################
 // Function Write
 //#####################################################################
 template<class T> void OCTAVE_OUTPUT<T>::
