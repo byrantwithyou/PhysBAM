@@ -70,6 +70,7 @@
 #include <Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <fstream>
@@ -92,27 +93,34 @@ public:
     KINEMATIC_COLLISION_BODY<GRID<TV> >* deforming_sphere;
 
     RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager;
+    bool print_matrix;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
     using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;using BASE::parse_args;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),small_block_mass(1),parameter(0),collision_manager(0)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),small_block_mass(1),
+        parameter(0),collision_manager(0),print_matrix(false)
     {
     }
 
     ~STANDARD_TESTS()
-    {if(test_number==21){
-        T angle=parameter*(T)pi/40;
-        T y=solid_body_collection.rigid_body_collection.rigid_body_particles.frame(0).t.y,yanalytic=-(T)5./14*(T)9.8*sqr((T)last_frame/24)*sqr(sin(angle));
-        T ke=solid_body_collection.rigid_body_collection.Rigid_Body(0).Kinetic_Energy(),pe=y*solid_body_collection.rigid_body_collection.rigid_body_particles.mass(0)*(T)9.8;
-        T omega=solid_body_collection.rigid_body_collection.rigid_body_particles.twist(0).angular.z,speed=solid_body_collection.rigid_body_collection.rigid_body_particles.twist(0).linear.Magnitude();
-        LOG::cout<<"ERROR in y for angle "<<angle<<"  ("<<(angle*180/(T)pi)<<" degrees):  "<<(1-y/yanalytic)<<std::endl;
-        LOG::cout<<"SLIPPAGE  "<<omega/speed<<std::endl;LOG::cout<<"PE = "<<pe<<"    KE = "<<ke<<std::endl;}}
+    {
+        if(test_number==21){
+            T angle=parameter*(T)pi/40;
+            T y=solid_body_collection.rigid_body_collection.rigid_body_particles.frame(0).t.y,yanalytic=-(T)5./14*(T)9.8*sqr((T)last_frame/24)*sqr(sin(angle));
+            T ke=solid_body_collection.rigid_body_collection.Rigid_Body(0).Kinetic_Energy(),pe=y*solid_body_collection.rigid_body_collection.rigid_body_particles.mass(0)*(T)9.8;
+            T omega=solid_body_collection.rigid_body_collection.rigid_body_particles.twist(0).angular.z,speed=solid_body_collection.rigid_body_collection.rigid_body_particles.twist(0).linear.Magnitude();
+            LOG::cout<<"ERROR in y for angle "<<angle<<"  ("<<(angle*180/(T)pi)<<" degrees):  "<<(1-y/yanalytic)<<std::endl;
+            LOG::cout<<"SLIPPAGE  "<<omega/speed<<std::endl;LOG::cout<<"PE = "<<pe<<"    KE = "<<ke<<std::endl;}
+    }
 
     // Unused callbacks
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
+    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+    {
+        dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
+    }
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
 
@@ -138,6 +146,7 @@ public:
         parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
         parse_args->Add_Not("-noanalytic",&solids_parameters.rigid_body_collision_parameters.use_analytic_collisions,"disable analytic collisions");
         parse_args->Add("-print_energy",&solid_body_collection.rigid_body_collection.print_energy,"print energy statistics");
+        parse_args->Add("-print_matrix",&print_matrix,"Print Krylov matrix");
     }
     void Parse_Options() PHYSBAM_OVERRIDE
     {
