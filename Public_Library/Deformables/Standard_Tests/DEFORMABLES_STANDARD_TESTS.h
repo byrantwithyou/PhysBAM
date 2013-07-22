@@ -79,7 +79,7 @@ public:
         const bool use_constant_mass,const T scale=1);
     T_SEGMENTED_CURVE& Create_Segmented_Curve(const std::string& filename,const RIGID_BODY_STATE<TV>& initial_state,const bool relative_to_box_center,
         const bool use_constant_mass);
-    TRIANGULATED_AREA<T>& Create_Mattress(const GRID<VECTOR<T,2> >& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>* initial_state=0,const T density=(T)1000,const bool reverse_triangles=false);
+    TRIANGULATED_AREA<T>& Create_Mattress(const GRID<VECTOR<T,2> >& mattress_grid,const bool use_constant_mass=true,const RIGID_BODY_STATE<TV>* initial_state=0,const T density=(T)1000,const bool reverse_triangles=false);
     TETRAHEDRALIZED_VOLUME<T>& Create_Mattress(const GRID<VECTOR<T,3> >& mattress_grid,const bool use_constant_mass=true,const RIGID_BODY_STATE<TV>* initial_state=0,const T density=(T)1000);
     template<class T_SHAPE>
     EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>& Create_Embedded_Tetrahedralized_Volume(const T_SHAPE& shape,const RIGID_BODY_STATE<TV>& initial_state,const bool relative_to_box_center);
