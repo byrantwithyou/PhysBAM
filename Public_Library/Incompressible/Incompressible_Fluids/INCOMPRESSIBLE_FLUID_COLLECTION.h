@@ -17,7 +17,7 @@ template<class T_GRID>
 class INCOMPRESSIBLE_FLUID_COLLECTION:public NONCOPYABLE
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<T,SIDED_FACE_INDEX<TV::m> >  T_FACE_ARRAYS_SLIP_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
