@@ -8,9 +8,7 @@
 #define __SOLIDS_EVOLUTION_CALLBACKS__
 
 #include <Tools/Arrays/ARRAY.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
-#include <cfloat>
 namespace PhysBAM{
 
 class RIGID_BODY_COLLISION_MANAGER;
@@ -23,23 +21,22 @@ public:
     SOLIDS_EVOLUTION_CALLBACKS()
     {}
 
-    virtual ~SOLIDS_EVOLUTION_CALLBACKS()
-    {}
+    virtual ~SOLIDS_EVOLUTION_CALLBACKS();
 
 //#####################################################################
-    virtual void Update_Solids_Parameters(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Self_Collisions_Begin_Callback(const T time,const int substep){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Preprocess_Solids_Substep(const T time,const int substep){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Postprocess_Solids_Substep(const T time,const int substep){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Align_Deformable_Bodies_With_Rigid_Bodies(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Apply_Constraints(const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual T Constraints_CFL(){return FLT_MAX;}
-    virtual void Limit_Solids_Dt(T& dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Pre_Advance_Cluster_Fracture(const T& dt, const T& time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Post_Advance_Cluster_Fracture(const T& dt, const T& time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Filter_Velocities(const T dt,const T time,const bool velocity_update){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual bool Get_Solid_Source_Velocities(ARRAY<int>& deformable_simplices,ARRAY<T>& deformable_simplex_forces,ARRAY<PAIR<int,int> >& rigid_simplices,ARRAY<T>& rigid_simplex_forces,TV& orientation,const T time)
-    {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return false;}
+    virtual void Update_Solids_Parameters(const T time);
+    virtual void Self_Collisions_Begin_Callback(const T time,const int substep);
+    virtual void Preprocess_Solids_Substep(const T time,const int substep);
+    virtual void Postprocess_Solids_Substep(const T time,const int substep);
+    virtual void Align_Deformable_Bodies_With_Rigid_Bodies();
+    virtual void Apply_Constraints(const T dt,const T time);
+    virtual T Constraints_CFL();
+    virtual void Limit_Solids_Dt(T& dt,const T time);
+    virtual void Pre_Advance_Cluster_Fracture(const T& dt, const T& time);
+    virtual void Post_Advance_Cluster_Fracture(const T& dt, const T& time);
+    virtual void Filter_Velocities(const T dt,const T time,const bool velocity_update);
+    virtual bool Get_Solid_Source_Velocities(ARRAY<int>& deformable_simplices,ARRAY<T>& deformable_simplex_forces,ARRAY<PAIR<int,int> >& rigid_simplices,
+        ARRAY<T>& rigid_simplex_forces,TV& orientation,const T time);
 //#####################################################################
 };
 }
