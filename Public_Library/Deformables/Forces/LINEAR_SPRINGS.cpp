@@ -46,6 +46,63 @@ template<class TV> LINEAR_SPRINGS<TV>::
 {
 }
 //#####################################################################
+// Function Set_Stiffness
+//#####################################################################
+template<class TV> void LINEAR_SPRINGS<TV>::
+Set_Stiffness(const T youngs_modulus_input)
+{
+    constant_youngs_modulus=youngs_modulus_input;
+    youngs_modulus.Clean_Memory();
+    Invalidate_CFL();
+}
+//#####################################################################
+// Function Set_Stiffness
+//#####################################################################
+template<class TV> void LINEAR_SPRINGS<TV>::
+Set_Stiffness(ARRAY_VIEW<const T> youngs_modulus_input)
+{
+    constant_youngs_modulus=0;
+    youngs_modulus=youngs_modulus_input;
+    Invalidate_CFL();
+}
+//#####################################################################
+// Function Set_Restlength
+//#####################################################################
+template<class TV> void LINEAR_SPRINGS<TV>::
+Set_Restlength(ARRAY_VIEW<const T> restlength_input)
+{
+    restlength=restlength_input;
+    visual_restlength=restlength;
+    Invalidate_CFL();
+}
+//#####################################################################
+// Function Set_Damping
+//#####################################################################
+template<class TV> void LINEAR_SPRINGS<TV>::
+Set_Damping(const T damping_input)
+{
+    constant_damping=damping_input;
+    damping.Clean_Memory();
+    Invalidate_CFL();
+}
+//#####################################################################
+// Function Set_Damping
+//#####################################################################
+template<class TV> void LINEAR_SPRINGS<TV>::
+Set_Damping(ARRAY_VIEW<const T> damping_input)
+{
+    constant_damping=0;
+    damping=damping_input;
+    Invalidate_CFL();
+}
+//#####################################################################
+// Function Enforce_Definiteness
+//#####################################################################
+template<class TV> void LINEAR_SPRINGS<TV>::
+Enforce_Definiteness(const bool enforce_definiteness_input)
+{
+}
+//#####################################################################
 // Function Set_Restlength_From_Particles
 //#####################################################################
 template<class TV> void LINEAR_SPRINGS<TV>::

@@ -7,6 +7,13 @@
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 using namespace PhysBAM;
 //#####################################################################
+// Destructor
+//#####################################################################
+template<class TV> ANALYTIC_LEVELSET<TV>::
+~ANALYTIC_LEVELSET()
+{
+}
+//#####################################################################
 // Function Test
 //#####################################################################
 template<class TV> void ANALYTIC_LEVELSET<TV>::

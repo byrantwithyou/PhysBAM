@@ -6,9 +6,24 @@
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_VECTOR_FIELD_2D.h>
 using namespace PhysBAM;
 //#####################################################################
+// Constructor
+//#####################################################################
+template<class T_ARRAY> OPENGL_VECTOR_FIELD_2D<T_ARRAY>::
+OPENGL_VECTOR_FIELD_2D(T_ARRAY& vector_field,T_ARRAY& vector_locations,const OPENGL_COLOR &color,double size,bool draw_arrowhead,bool draw_value)
+    :vector_field(vector_field),vector_locations(vector_locations),vector_color(color),size(size),draw_arrowhead(draw_arrowhead),draw_value(draw_value),draw(true)
+{
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class T_ARRAY> OPENGL_VECTOR_FIELD_2D<T_ARRAY>::
+~OPENGL_VECTOR_FIELD_2D()
+{
+}
+//#####################################################################
 // Function Display
 //#####################################################################
-template<class T> void OPENGL_VECTOR_FIELD_2D<T>::
+template<class T_ARRAY> void OPENGL_VECTOR_FIELD_2D<T_ARRAY>::
 Display(const int in_color) const
 {
     if(!draw)return;
@@ -41,7 +56,7 @@ Display(const int in_color) const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_VECTOR_FIELD_2D<T>::
+template<class T_ARRAY> RANGE<VECTOR<float,3> > OPENGL_VECTOR_FIELD_2D<T_ARRAY>::
 Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box(World_Space_Point(VECTOR<float,2>(vector_locations(0))));
@@ -51,7 +66,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> void OPENGL_VECTOR_FIELD_2D<T>::
+template<class T_ARRAY> void OPENGL_VECTOR_FIELD_2D<T_ARRAY>::
 Scale_Vector_Size(const T scale)
 {
     size*=scale;

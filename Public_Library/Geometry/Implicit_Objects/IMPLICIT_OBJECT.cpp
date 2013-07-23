@@ -36,6 +36,14 @@ template<> inline float Iterative_Solver_Tolerance(){return (float).01;}
 template<> inline double Iterative_Solver_Tolerance(){return .001;}
 }
 //#####################################################################
+// Function Box
+//#####################################################################
+template<class TV> RANGE<TV>& IMPLICIT_OBJECT<TV>::
+Box()
+{
+    return box;
+}
+//#####################################################################
 // Function Intersection
 //#####################################################################
 template<class TV> bool IMPLICIT_OBJECT<TV>::

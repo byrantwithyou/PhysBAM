@@ -245,6 +245,22 @@ Angular_Projection_Matrix(const FRAME<TV>& parent_frame) const
     return MATRIX<T,T_SPIN::m>(M.Times_Transpose(M));
 }
 //#####################################################################
+// Function Read
+//#####################################################################
+template<class TV> void JOINT<TV>::
+Read(TYPED_ISTREAM& input)
+{
+    Read_Binary(input,id_number,frame_pj,frame_jp,frame_cj,frame_jc,J,J_inverse,name);
+}
+//#####################################################################
+// Function Write
+//#####################################################################
+template<class TV> void JOINT<TV>::
+Write(TYPED_OSTREAM& output) const
+{
+    Write_Binary(output,id_number,frame_pj,frame_jp,frame_cj,frame_jc,J,J_inverse,name);
+}
+//#####################################################################
 namespace PhysBAM{
 template class JOINT<VECTOR<float,1> >;
 template class JOINT<VECTOR<float,2> >;

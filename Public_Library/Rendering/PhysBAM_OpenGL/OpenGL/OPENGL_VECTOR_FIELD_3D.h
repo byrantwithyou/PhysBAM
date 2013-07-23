@@ -30,14 +30,10 @@ public:
 #endif
 
     OPENGL_VECTOR_FIELD_3D(ARRAY<VECTOR<T,3> >& field,ARRAY<VECTOR<T,3> >& locations, 
-                           const OPENGL_COLOR& color = OPENGL_COLOR::White(),double size=0.025, 
-                           bool draw_arrowhead=false,bool draw_value=false,bool draw_basepoint=false,bool draw_fancy_arrow=false)
-        :vector_field(field),vector_locations(locations),vector_color(color),size(size),
-        draw_arrowhead(draw_arrowhead),draw_value(draw_value),draw_basepoint(draw_basepoint),draw_fancy_arrow(draw_fancy_arrow)
-#ifndef USE_OPENGLES
-        ,vector_hat(0)
-#endif
-    {}
+        const OPENGL_COLOR& color=OPENGL_COLOR::White(),double size=0.025, 
+        bool draw_arrowhead=false,bool draw_value=false,bool draw_basepoint=false,bool draw_fancy_arrow=false);
+
+    virtual ~OPENGL_VECTOR_FIELD_3D();
 
 //#####################################################################
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;

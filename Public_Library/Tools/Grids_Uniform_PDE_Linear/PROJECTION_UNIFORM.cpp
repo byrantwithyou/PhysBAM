@@ -206,6 +206,14 @@ Exchange_Pressures_For_Projection()
     T_ARRAYS_SCALAR::Exchange(p,p_save_for_projection);
 }
 //#####################################################################
+// Function Calculate_Kinetic_Energy_Error
+//#####################################################################
+template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
+Calculate_Kinetic_Energy_Error(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<TV,TV_INT>& kinetic_energy_error)
+{
+    PHYSBAM_FATAL_ERROR();
+}
+//#####################################################################
 namespace PhysBAM{
 template class PROJECTION_UNIFORM<GRID<VECTOR<float,1> > >;
 template class PROJECTION_UNIFORM<GRID<VECTOR<float,2> > >;

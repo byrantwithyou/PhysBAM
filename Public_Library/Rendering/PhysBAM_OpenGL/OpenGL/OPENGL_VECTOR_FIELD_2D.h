@@ -29,9 +29,8 @@ public:
     bool draw;
 
     OPENGL_VECTOR_FIELD_2D(T_ARRAY& vector_field,T_ARRAY& vector_locations,const OPENGL_COLOR &color=OPENGL_COLOR::White(),
-        double size=0.025,bool draw_arrowhead=true,bool draw_value=false)
-        :vector_field(vector_field),vector_locations(vector_locations),vector_color(color),size(size),draw_arrowhead(draw_arrowhead),draw_value(draw_value),draw(true)
-    {}
+        double size=0.025,bool draw_arrowhead=true,bool draw_value=false);
+    virtual ~OPENGL_VECTOR_FIELD_2D();
 
 //##################################################################### 
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;

@@ -7,6 +7,26 @@
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_VECTOR_FIELD_3D.h>
 using namespace PhysBAM;
 //#####################################################################
+// Constructor
+//#####################################################################
+template<class T> OPENGL_VECTOR_FIELD_3D<T>::
+OPENGL_VECTOR_FIELD_3D(ARRAY<VECTOR<T,3> >& field,ARRAY<VECTOR<T,3> >& locations,const OPENGL_COLOR& color,double size, 
+    bool draw_arrowhead,bool draw_value,bool draw_basepoint,bool draw_fancy_arrow)
+    :vector_field(field),vector_locations(locations),vector_color(color),size(size),
+    draw_arrowhead(draw_arrowhead),draw_value(draw_value),draw_basepoint(draw_basepoint),draw_fancy_arrow(draw_fancy_arrow)
+#ifndef USE_OPENGLES
+    ,vector_hat(0)
+#endif
+{
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class T> OPENGL_VECTOR_FIELD_3D<T>::
+~OPENGL_VECTOR_FIELD_3D()
+{
+}
+//#####################################################################
 // Function Bounding_Box
 //#####################################################################
 template<class T> RANGE<VECTOR<float,3> > OPENGL_VECTOR_FIELD_3D<T>::

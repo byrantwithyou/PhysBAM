@@ -60,12 +60,6 @@ public:
     void Set_Joint_Function(JOINT_FUNCTION<TV>* joint_function_input)
     {joint_function=joint_function_input;}
 
-    virtual void Read(TYPED_ISTREAM& input)
-    {Read_Binary(input,id_number,frame_pj,frame_jp,frame_cj,frame_jc,J,J_inverse,name);}
-
-    virtual void Write(TYPED_OSTREAM& output) const
-    {Write_Binary(output,id_number,frame_pj,frame_jp,frame_cj,frame_jc,J,J_inverse,name);}
-
 //#####################################################################
     //FRAME<TV> Joint_Error() const;
     virtual VECTOR<bool,TV::SPIN::dimension> Angular_Constraints() const;
@@ -93,6 +87,8 @@ public:
     virtual void Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_constraint_matrix,MATRIX_MXN<T>* angular_unconstrained_matrix=0) const;
     MATRIX<typename TV::SCALAR,TV::m> Prismatic_Projection_Matrix(const FRAME<TV>& parent_frame) const;
     MATRIX<typename TV::SCALAR,TV::SPIN::m> Angular_Projection_Matrix(const FRAME<TV>& parent_frame) const;
+    virtual void Read(TYPED_ISTREAM& input);
+    virtual void Write(TYPED_OSTREAM& output) const;
 protected:
     template<int d>
     void Constraint_Matrix_Helper(const ROTATION<TV>& orientation,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix,const VECTOR<bool,d>& constrain) const;

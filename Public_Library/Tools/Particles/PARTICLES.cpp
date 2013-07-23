@@ -326,6 +326,15 @@ Print(std::ostream& output,const int p) const
     if(p<0 || p>=number) throw INDEX_ERROR("Index out of range");
     for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++) arrays(i)->Print(output,p);
 }
+//#####################################################################
+// Function Remove_Array_Using_Index
+//#####################################################################
+template<class TV> void PARTICLES<TV>::
+Remove_Array_Using_Index(const ATTRIBUTE_INDEX attribute_index)
+{
+    delete arrays(attribute_index);
+    arrays.Remove_Index(attribute_index);
+}
 struct ELEMENT_SAMPLES_HELPER
 {
     ARRAY<ARRAY_COLLECTION_ELEMENT_BASE*> samples;

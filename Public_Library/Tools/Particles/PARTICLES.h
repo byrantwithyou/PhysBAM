@@ -103,9 +103,6 @@ public:
     if(index!=ATTRIBUTE_INDEX(-1)) return index;
     return Add_Array(attribute_id,new ARRAY_COLLECTION_ELEMENT<E>);}
 
-    virtual void Remove_Array_Using_Index(const ATTRIBUTE_INDEX attribute_index)
-    {delete arrays(attribute_index);arrays.Remove_Index(attribute_index);}
-
     void Remove_Array(const ATTRIBUTE_ID attribute_id)
     {ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id);if(index!=ATTRIBUTE_INDEX(-1)) Remove_Array_Using_Index(index);}
 
@@ -156,6 +153,7 @@ public:
     int Pack_Size() const;
     void Pack(ARRAY_VIEW<char> buffer,int& position,const int p) const;
     void Unpack(ARRAY_VIEW<const char> buffer,int& position,const int p);
+    virtual void Remove_Array_Using_Index(const ATTRIBUTE_INDEX attribute_index);
 protected:
     void Copy_Element_Helper(const int from,const int to);
     virtual void Reallocate_Buffer(int new_size);

@@ -63,25 +63,13 @@ public:
 
     virtual ~LINEAR_SPRINGS();
 
-    virtual void Set_Stiffness(const T youngs_modulus_input)
-    {constant_youngs_modulus=youngs_modulus_input;youngs_modulus.Clean_Memory();Invalidate_CFL();}
-
-    virtual void Set_Stiffness(ARRAY_VIEW<const T> youngs_modulus_input)
-    {constant_youngs_modulus=0;youngs_modulus=youngs_modulus_input;Invalidate_CFL();}
-
-    virtual void Set_Restlength(ARRAY_VIEW<const T> restlength_input)
-    {restlength=restlength_input;visual_restlength=restlength;Invalidate_CFL();}
-
-    virtual void Set_Damping(const T damping_input)
-    {constant_damping=damping_input;damping.Clean_Memory();Invalidate_CFL();}
-
-    virtual void Set_Damping(ARRAY_VIEW<const T> damping_input)
-    {constant_damping=0;damping=damping_input;Invalidate_CFL();}
-
-    void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE
-    {} // Add_Force_Differential always enforces definiteness
-
 //#####################################################################
+    void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE;
+    virtual void Set_Stiffness(const T youngs_modulus_input);
+    virtual void Set_Stiffness(ARRAY_VIEW<const T> youngs_modulus_input);
+    virtual void Set_Restlength(ARRAY_VIEW<const T> restlength_input);
+    virtual void Set_Damping(const T damping_input);
+    virtual void Set_Damping(ARRAY_VIEW<const T> damping_input);
     template<class T_FIELD> void Enable_Plasticity(const T_FIELD& plastic_yield_strain_input,const T_FIELD& plastic_hardening_input,const T plasticity_clamp_ratio_input=4);
     virtual void Set_Restlength_From_Particles();
     virtual void Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<TV> material_coordinates);

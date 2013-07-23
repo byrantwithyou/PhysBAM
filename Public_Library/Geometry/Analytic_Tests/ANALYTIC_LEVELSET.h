@@ -14,7 +14,7 @@ struct ANALYTIC_LEVELSET
 {
     typedef typename TV::SCALAR T;
 
-    virtual ~ANALYTIC_LEVELSET(){}
+    virtual ~ANALYTIC_LEVELSET();
 
     static T Large_Phi() {return 1000;}
     virtual T phi(const TV& X,T t,int& c) const=0;

@@ -33,10 +33,8 @@ public:
     void Use_Secondary_Interpolation(const bool use_secondary_interpolation_input=true)
     {use_secondary_interpolation=use_secondary_interpolation_input;}
 
-    virtual RANGE<TV>& Box()
-    {return box;}
-
 //#####################################################################
+    virtual RANGE<TV>& Box();
     virtual void Update_Box();
     virtual void Update_Minimum_Cell_Size(const int maximum_depth=0);
     virtual T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box) const;

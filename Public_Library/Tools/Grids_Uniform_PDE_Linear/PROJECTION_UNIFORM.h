@@ -54,7 +54,7 @@ public:
 //#####################################################################
     virtual void Initialize_Grid(const T_GRID& mac_grid);
     virtual void Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    virtual void Calculate_Kinetic_Energy_Error(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<TV,TV_INT>& kinetic_energy_error) {PHYSBAM_FATAL_ERROR();}
+    virtual void Calculate_Kinetic_Energy_Error(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<TV,TV_INT>& kinetic_energy_error);
     void Zero_Out_Neumann_Pocket_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities);
     virtual void Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt=false);
     void Enforce_Velocity_Compatibility(T_FACE_ARRAYS_SCALAR& face_velocities);
