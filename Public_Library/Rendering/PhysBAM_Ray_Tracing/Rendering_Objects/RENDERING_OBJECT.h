@@ -45,32 +45,8 @@ public:
     bool flip_normal;
     RENDERING_BSSRDF_SHADER<T>* bssrdf_shader;
 
-    RENDERING_OBJECT()
-        :add_to_spatial_partition(false),index_of_refraction(1),priority(0),support_transparent_overlapping_objects(false),material_shader(0),volumetric_shader(0),two_sided(true),
-         flip_normal(false),
-        bssrdf_shader(0)
-    {
-        small_number=Default_Small_Number();
-        transform=MATRIX<T,4>::Identity_Matrix();inverse_transform=MATRIX<T,4>::Identity_Matrix();solid_texture_transform=MATRIX<T,4>::Identity_Matrix();
-    }
-
-    virtual ~RENDERING_OBJECT()
-    {}
-
-    virtual T Index_Of_Refraction(const TV& world_space_location) const
-    {return index_of_refraction;}
-
-    virtual void Get_Texture_Coordinates(const TV& object_space_point,const int aggregate,T& s,T& t) const
-    {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-
-    virtual TV Get_Solid_Texture_Coordinates(const TV& object_space_point,const int aggregate) const
-    {return solid_texture_transform.Homogeneous_Times(object_space_point);}
-
-    virtual void Get_World_Space_Tangent_And_Bitangent(const TV& world_space_point,const TV& world_space_normal,const int aggregate,TV& world_tangent,TV& world_bitangent) const
-    {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-
-    virtual void Get_Object_Space_Tangent_And_Bitangent(const TV& object_space_point,const TV& object_space_normal,const int aggregate,TV& object_tangent,TV& object_bitangent) const
-    {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+    RENDERING_OBJECT();
+    virtual ~RENDERING_OBJECT();
 
     void Update_Transform(const MATRIX<T,4>& A)
     {transform=A*transform;inverse_transform=transform.Inverse();}
@@ -99,40 +75,36 @@ public:
     RANGE<TV> World_Space_Bounding_Box() const
     {return ORIENTED_BOX<TV>(Object_Space_Bounding_Box(),transform).Axis_Aligned_Bounding_Box();}
 
-    virtual bool Closed_Volume() const // indicates whether Inside/Outside are meaningful for this object
-    {return true;}
-
     static T Default_Small_Number()
     {STATIC_ASSERT((T)false);}
 
-    virtual bool Intersection(RAY<TV>& ray,const int lowest_priority,const RENDERING_OBJECT<T>** intersected_object) const
-    {if(priority>=lowest_priority&&Intersection(ray)){*intersected_object=this;return true;}
-    else return false;}
-
-    virtual bool Inside(const TV& location,RENDERING_OBJECT<T>** intersected_object) const
-    {if(support_transparent_overlapping_objects && Inside(location)){
-        *intersected_object=const_cast<RENDERING_OBJECT<T>*>(this);return true;}
-    return false;}
-
 //#####################################################################
-    virtual bool Intersection(RAY<TV>& ray) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual bool Intersection(RAY<TV>& ray,const int aggregate) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual void Preprocess_Efficiency_Structures(RENDER_WORLD<T>& world){}
-    virtual void Get_Aggregate_World_Space_Bounding_Boxes(ARRAY<RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T> >& primitives) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual TV Normal(const TV& location,const int aggregate=0) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual bool Inside(const TV& location) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual bool Lazy_Inside(const TV& location) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual bool Outside(const TV& location) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual bool Lazy_Outside(const TV& location) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual bool Boundary(const TV& location) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual TV Surface(const TV& location) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual T Signed_Distance(const TV& location) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual bool Has_Bounding_Box() const {return false;}
-    virtual RANGE<TV> Object_Space_Bounding_Box() const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual bool Close_To_Open_Surface(const TV& location,const T threshold_distance) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual bool Get_Intersection_Range(const RAY<TV>& ray,T& start_t,T& end_t) const {return false;}
-    virtual void Generate_BSSRDF_Tree(RENDER_WORLD<T>& world){}
-    virtual TRIANGULATED_SURFACE<T>* Generate_Triangles()const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();return 0;};
+    virtual bool Closed_Volume() const; // indicates whether Inside/Outside are meaningful for this object
+    virtual bool Intersection(RAY<TV>& ray,const int lowest_priority,const RENDERING_OBJECT<T>** intersected_object) const;
+    virtual bool Inside(const TV& location,RENDERING_OBJECT<T>** intersected_object) const;
+    virtual T Index_Of_Refraction(const TV& world_space_location) const;
+    virtual void Get_Texture_Coordinates(const TV& object_space_point,const int aggregate,T& s,T& t) const;
+    virtual TV Get_Solid_Texture_Coordinates(const TV& object_space_point,const int aggregate) const;
+    virtual void Get_World_Space_Tangent_And_Bitangent(const TV& world_space_point,const TV& world_space_normal,const int aggregate,TV& world_tangent,TV& world_bitangent) const;
+    virtual void Get_Object_Space_Tangent_And_Bitangent(const TV& object_space_point,const TV& object_space_normal,const int aggregate,TV& object_tangent,TV& object_bitangent) const;
+    virtual bool Intersection(RAY<TV>& ray) const;
+    virtual bool Intersection(RAY<TV>& ray,const int aggregate) const;
+    virtual void Preprocess_Efficiency_Structures(RENDER_WORLD<T>& world);
+    virtual void Get_Aggregate_World_Space_Bounding_Boxes(ARRAY<RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T> >& primitives) const;
+    virtual TV Normal(const TV& location,const int aggregate=0) const;
+    virtual bool Inside(const TV& location) const;
+    virtual bool Lazy_Inside(const TV& location) const;
+    virtual bool Outside(const TV& location) const;
+    virtual bool Lazy_Outside(const TV& location) const;
+    virtual bool Boundary(const TV& location) const;
+    virtual TV Surface(const TV& location) const;
+    virtual T Signed_Distance(const TV& location) const;
+    virtual bool Has_Bounding_Box() const;
+    virtual RANGE<TV> Object_Space_Bounding_Box() const;
+    virtual bool Close_To_Open_Surface(const TV& location,const T threshold_distance) const;
+    virtual bool Get_Intersection_Range(const RAY<TV>& ray,T& start_t,T& end_t) const;
+    virtual void Generate_BSSRDF_Tree(RENDER_WORLD<T>& world);
+    virtual TRIANGULATED_SURFACE<T>* Generate_Triangles()const;
 //#####################################################################
 };
 template<> inline float RENDERING_OBJECT<float>::Default_Small_Number(){return (float)1e-6;}

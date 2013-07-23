@@ -40,29 +40,15 @@ public:
 
     virtual void Read(TYPED_ISTREAM& input)=0;
 
-    void Read_Structure(TYPED_ISTREAM& input)
-    {std::string name;Read_Binary(input,name);
-    if(name!=Name()){LOG::cerr<<"Trying to read in a "<<name<<" as a "<<Name()<<std::endl;PHYSBAM_FATAL_ERROR();}
-    Read(input);}
-
     virtual void Write(TYPED_OSTREAM& output) const=0;
 
-    void Write_Structure(TYPED_OSTREAM& output)
-    {Write_Binary(output,Name());Write(output);}
-
-    static STRUCTURE<TV>* Create_Structure(TYPED_ISTREAM& input,GEOMETRY_PARTICLES<TV>& particles)
-    {std::string name;Read_Binary(input,name);
-    STRUCTURE<TV>* structure=STRUCTURE<TV>::Create_From_Name(name,particles);
-    structure->Read(input);return structure;}
-
-    template<class RW>
-    static STRUCTURE<TV>* Create_From_File(const std::string& filename)
-    {STRUCTURE<TV>* structure=STRUCTURE<TV>::Create_From_Extension(FILE_UTILITIES::Get_File_Extension(filename));
-    FILE_UTILITIES::template Read_From_File<RW>(filename,*structure);return structure;}
-
 //#####################################################################
-    virtual std::string Name() const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return Static_Name();}
-    virtual std::string Extension() const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return Static_Extension();}
+    void Read_Structure(TYPED_ISTREAM& input);
+    void Write_Structure(TYPED_OSTREAM& output);
+    static STRUCTURE<TV>* Create_Structure(TYPED_ISTREAM& input,GEOMETRY_PARTICLES<TV>& particles);
+    template<class RW> static STRUCTURE<TV>* Create_From_File(const std::string& filename);
+    virtual std::string Name() const;
+    virtual std::string Extension() const;
     static std::string Static_Name() {return "";}
     static std::string Static_Extension() {return "";}
     static STRUCTURE* Create_From_Name(const std::string& name);
@@ -70,8 +56,8 @@ public:
     static STRUCTURE* Create_From_Extension(const std::string& extension);
     virtual void Rescale(const T scaling_factor);
     virtual STRUCTURE* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>* particle_indices=0) const;
-    virtual void Update_Number_Nodes(){}
-    virtual void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const {}
+    virtual void Update_Number_Nodes();
+    virtual void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const;
 //#####################################################################
 };
 }

@@ -71,6 +71,82 @@ Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>* p
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
 //#####################################################################
+// Function Update_Number_Nodes
+//#####################################################################
+template<class TV> void STRUCTURE<TV>::
+Update_Number_Nodes()
+{
+}
+//#####################################################################
+// Function Mark_Nodes_Referenced
+//#####################################################################
+template<class TV> void STRUCTURE<TV>::
+Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const
+{
+}
+//#####################################################################
+// Function Name
+//#####################################################################
+template<class TV> std::string STRUCTURE<TV>::
+Name() const
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+    return Static_Name();
+}
+//#####################################################################
+// Function Extension
+//#####################################################################
+template<class TV> std::string STRUCTURE<TV>::
+Extension() const
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+    return Static_Extension();
+}
+//#####################################################################
+// Function Read_Structure
+//#####################################################################
+template<class TV> void STRUCTURE<TV>::
+Read_Structure(TYPED_ISTREAM& input)
+{
+    std::string name;
+    Read_Binary(input,name);
+    if(name!=Name()){
+        LOG::cerr<<"Trying to read in a "<<name<<" as a "<<Name()<<std::endl;
+        PHYSBAM_FATAL_ERROR();}
+    Read(input);
+}
+//#####################################################################
+// Function Write_Structure
+//#####################################################################
+template<class TV> void STRUCTURE<TV>::
+Write_Structure(TYPED_OSTREAM& output)
+{
+    Write_Binary(output,Name());
+    Write(output);
+}
+//#####################################################################
+// Function Create_Structure
+//#####################################################################
+template<class TV> STRUCTURE<TV>*  STRUCTURE<TV>::
+Create_Structure(TYPED_ISTREAM& input,GEOMETRY_PARTICLES<TV>& particles)
+{
+    std::string name;
+    Read_Binary(input,name);
+    STRUCTURE<TV>* structure=STRUCTURE<TV>::Create_From_Name(name,particles);
+    structure->Read(input);
+    return structure;
+}
+//#####################################################################
+// Function Create_From_File
+//#####################################################################
+template<class TV> template<class RW> STRUCTURE<TV>*  STRUCTURE<TV>::
+Create_From_File(const std::string& filename)
+{
+    STRUCTURE<TV>* structure=STRUCTURE<TV>::Create_From_Extension(FILE_UTILITIES::Get_File_Extension(filename));
+    FILE_UTILITIES::template Read_From_File<RW>(filename,*structure);
+    return structure;
+}
+//#####################################################################
 namespace PhysBAM{
 template class STRUCTURE<VECTOR<float,1> >;
 template class STRUCTURE<VECTOR<float,2> >;
@@ -78,4 +154,16 @@ template class STRUCTURE<VECTOR<float,3> >;
 template class STRUCTURE<VECTOR<double,1> >;
 template class STRUCTURE<VECTOR<double,2> >;
 template class STRUCTURE<VECTOR<double,3> >;
+template STRUCTURE<VECTOR<double,1> >* STRUCTURE<VECTOR<double,1> >::Create_From_File<double>(std::string const&);
+template STRUCTURE<VECTOR<double,1> >* STRUCTURE<VECTOR<double,1> >::Create_From_File<float>(std::string const&);
+template STRUCTURE<VECTOR<double,2> >* STRUCTURE<VECTOR<double,2> >::Create_From_File<double>(std::string const&);
+template STRUCTURE<VECTOR<double,2> >* STRUCTURE<VECTOR<double,2> >::Create_From_File<float>(std::string const&);
+template STRUCTURE<VECTOR<double,3> >* STRUCTURE<VECTOR<double,3> >::Create_From_File<double>(std::string const&);
+template STRUCTURE<VECTOR<double,3> >* STRUCTURE<VECTOR<double,3> >::Create_From_File<float>(std::string const&);
+template STRUCTURE<VECTOR<float,1> >* STRUCTURE<VECTOR<float,1> >::Create_From_File<double>(std::string const&);
+template STRUCTURE<VECTOR<float,1> >* STRUCTURE<VECTOR<float,1> >::Create_From_File<float>(std::string const&);
+template STRUCTURE<VECTOR<float,2> >* STRUCTURE<VECTOR<float,2> >::Create_From_File<double>(std::string const&);
+template STRUCTURE<VECTOR<float,2> >* STRUCTURE<VECTOR<float,2> >::Create_From_File<float>(std::string const&);
+template STRUCTURE<VECTOR<float,3> >* STRUCTURE<VECTOR<float,3> >::Create_From_File<double>(std::string const&);
+template STRUCTURE<VECTOR<float,3> >* STRUCTURE<VECTOR<float,3> >::Create_From_File<float>(std::string const&);
 }
