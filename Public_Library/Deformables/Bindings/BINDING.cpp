@@ -14,6 +14,13 @@
 #include <Deformables/Bindings/RIGID_BODY_BINDING.h>
 using namespace PhysBAM;
 //#####################################################################
+// Destructor
+//#####################################################################
+template<class TV> BINDING<TV>::
+~BINDING()
+{
+}
+//#####################################################################
 // Function Create_Structure
 //#####################################################################
 template<class TV> BINDING<TV>* BINDING<TV>::
@@ -74,6 +81,30 @@ Create_From_Name(const int name,DEFORMABLE_PARTICLES<TV>& particles)
     BINDING* binding=BINDING_REGISTRY<TV>::Name_To_Factory(name)->Create(dynamic_cast<GEOMETRY_PARTICLES<TV>&>(particles));
     if(!binding){LOG::cerr<<name<<" has no Create(GEOMETRY_PARTICLES<TV>& particles) function."<<std::endl;PHYSBAM_FATAL_ERROR();}
     return binding;
+}
+//#####################################################################
+// Function Read_Helper
+//#####################################################################
+template<class TV> void BINDING<TV>::
+Read_Helper(TYPED_ISTREAM& input)
+{
+    Read_Binary(input,particle_index);
+}
+//#####################################################################
+// Function Write_Helper
+//#####################################################################
+template<class TV> void BINDING<TV>::
+Write_Helper(TYPED_OSTREAM& output) const
+{
+    Write_Binary(output,particle_index);
+}
+//#####################################################################
+// Function One_Over_Effective_Mass
+//#####################################################################
+template<class TV> typename TV::SCALAR BINDING<TV>::
+One_Over_Effective_Mass(const TV& direction) const // by default return the direction-independent effective mass
+{
+    return One_Over_Effective_Mass();
 }
 //#####################################################################
 namespace PhysBAM{

@@ -37,13 +37,7 @@ public:
         :particles(particles_input),particle_index(particle_index_input)
     {}
 
-    virtual ~BINDING()
-    {}
-
-    virtual T One_Over_Effective_Mass(const TV& direction) const // by default return the direction-independent effective mass
-    {return One_Over_Effective_Mass();}
-
-    virtual SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor() const=0;
+    virtual ~BINDING();
 
     void Clamp_To_Embedded_Position(ARRAY_VIEW<TV> X)
     {X(particle_index)=Embedded_Position(X);}
@@ -54,15 +48,9 @@ public:
     void Clamp_To_Embedded_Velocity()
     {particles.V(particle_index)=Embedded_Velocity();}
 
-protected:    
-    virtual void Read_Helper(TYPED_ISTREAM& input)
-    {Read_Binary(input,particle_index);}
-
-    virtual void Write_Helper(TYPED_OSTREAM& output) const
-    {Write_Binary(output,particle_index);}
-public:
-
 //#####################################################################
+    virtual SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor() const=0;
+    virtual T One_Over_Effective_Mass(const TV& direction) const; // by default return the direction-independent effective mass
     virtual TV Embedded_Position() const=0;
     virtual TV Embedded_Position(ARRAY_VIEW<const TV> X) const=0;
     virtual TV Embedded_Velocity() const=0;
@@ -91,6 +79,9 @@ public:
     void Write(TYPED_OSTREAM& output) const;
 private:
     static BINDING* Create_From_Name(const int name,DEFORMABLE_PARTICLES<TV>& particles);
+protected:    
+    virtual void Read_Helper(TYPED_ISTREAM& input);
+    virtual void Write_Helper(TYPED_OSTREAM& output) const;
 //#####################################################################
 };
 
