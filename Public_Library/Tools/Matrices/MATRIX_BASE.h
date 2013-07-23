@@ -482,12 +482,6 @@ public:
     {return T_MATRIX(Derived()).In_Place_Cholesky_Inverse(*this);}
 
     template<class T_MATRIX2>
-    void In_Place_Cholesky_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse)
-    {assert(Rows()==Columns());inverse.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());LEFT_VECTOR b((INITIAL_SIZE)Rows()); // holds piece of the identity matrix
-    In_Place_Cholesky_Factorization();
-    for(int j=0;j<Columns();j++){b(j)=1;inverse.Set_Column(j,Transpose_Upper_Triangular_Solve(Lower_Triangular_Solve(b)));b(j)=0;}}
-
-    template<class T_MATRIX2>
     void Cholesky_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse) const
     {return T_MATRIX(Derived()).In_Place_Cholesky_Inverse(inverse);}
 
@@ -500,14 +494,14 @@ public:
     {return T_MATRIX(Derived()).In_Place_Gram_Schmidt_QR_Solve(b);}
 
     template<class T_VECTOR,class T_MATRIX2>
-    static ARRAY<T> Householder_Transform(const ARRAY_BASE<T,T_VECTOR>& b,const MATRIX_BASE<T,T_MATRIX2>& V) // TODO: don't assume ARRAY
-    {assert(V.Rows()==b.Size());ARRAY<T> result(b);
-    for(int j=0;j<V.Columns();j++){ARRAY<T> v(V.Rows());for(int i=0;i<V.Rows();i++) v(i)=V(i,j);result=result.Householder_Transform(v);}
+    static typename T_MATRIX2::LEFT_VECTOR Householder_Transform(const ARRAY_BASE<T,T_VECTOR>& b,const MATRIX_BASE<T,T_MATRIX2>& V)
+    {assert(V.Rows()==b.Size());typename T_MATRIX2::LEFT_VECTOR result(b),v(V.Rows());
+    for(int j=0;j<V.Columns();j++){Get_Column(j,v);result=result.Householder_Transform(v);}
     return result;}
 
     template<class T_VECTOR>
-    RIGHT_VECTOR Householder_QR_Solve(const ARRAY_BASE<T,T_VECTOR>& b)
-    {T_MATRIX V,R;Householder_QR_Factorization(V,R);ARRAY<T> c=Householder_Transform(b,V),c_short(Columns());for(int i=0;i<Columns();i++) c_short(i)=c(i); // TODO: don't assume ARRAY
+    LEFT_VECTOR Householder_QR_Solve(const ARRAY_BASE<T,T_VECTOR>& b)
+    {T_MATRIX V,R;Householder_QR_Factorization(V,R);LEFT_VECTOR c=Householder_Transform(b,V),c_short(Columns());for(int i=0;i<Columns();i++) c_short(i)=c(i);
     return R.Upper_Triangular_Solve(c_short);}
 
     T Condition_Number() const
@@ -523,13 +517,6 @@ public:
     {return T_MATRIX(Derived()).In_Place_PLU_Solve(b);}
 
     template<class T_MATRIX2>
-    void In_Place_PLU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse)
-    {assert(Rows()==Columns());inverse.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());COLUMN_PERMUTATION p;T_MATRIX L;
-    In_Place_PLU_Factorization(L,p);
-    RIGHT_VECTOR b((INITIAL_SIZE)Columns()); // used for piece of the identity matrix
-    for(int j=0;j<Columns();j++){b(j)=0;inverse.Set_Column(j,Upper_Triangular_Solve(L.Lower_Triangular_Solve(b.Permute(p))));b(j)=0;}}
-
-    template<class T_MATRIX2>
     void PLU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse) const
     {(T_MATRIX2(Derived())).In_Place_PLU_Inverse(inverse);}
 
@@ -542,12 +529,6 @@ public:
     {return T_MATRIX(Derived()).In_Place_LU_Inverse(b);}
 
     template<class T_MATRIX2>
-    void In_Place_LU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse) // don't assume ARRAY
-    {assert(Rows()==Columns());inverse.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());T_MATRIX L;ARRAY<T> b(Columns()); // used forpiece of the identity matrix
-    In_Place_LU_Factorization(L);
-    for(int j=0;j<Columns();j++){b(j)=1;inverse.Set_Column(j,Upper_Triangular_Solve(L.Lower_Triangular_Solve(b)));b(j)=0;}}
-
-    template<class T_MATRIX2>
     void LU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse) const
     {(T_MATRIX2(Derived())).In_Place_LU_Inverse(inverse);}
 
@@ -556,6 +537,9 @@ public:
     {return PLU_Solve(b);}
 
 //#####################################################################
+    template<class T_MATRIX2> void In_Place_Cholesky_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse);
+    template<class T_MATRIX2> void In_Place_PLU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse);
+    template<class T_MATRIX2> void In_Place_LU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse);
     template<class T_MATRIX2> void In_Place_Gram_Schmidt_QR_Factorization(MATRIX_BASE<T,T_MATRIX2>& R); // this=Q
     template<class T_MATRIX2,class T_MATRIX3> void Householder_QR_Factorization(MATRIX_BASE<T,T_MATRIX2>& V,MATRIX_BASE<T,T_MATRIX3>& R);
     template<class T_VECTOR1,class T_VECTOR2> void In_Place_Robust_Householder_QR_Solve(ARRAY_BASE<T,T_VECTOR1>& b,ARRAY_BASE<int,T_VECTOR2>& p); // this=Q

@@ -11,6 +11,54 @@
 #include <limits>
 using namespace PhysBAM;
 //#####################################################################
+// Function In_Place_Cholesky_Inverse
+//#####################################################################
+template<class T,class T_MATRIX> template<class T_MATRIX2> void MATRIX_BASE<T,T_MATRIX>::
+In_Place_Cholesky_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse)
+{
+    assert(Rows()==Columns());
+    inverse.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
+    LEFT_VECTOR b((INITIAL_SIZE)Rows()); // holds piece of the identity matrix
+    In_Place_Cholesky_Factorization();
+    for(int j=0;j<Columns();j++){
+        b(j)=1;
+        inverse.Set_Column(j,Transpose_Upper_Triangular_Solve(Lower_Triangular_Solve(b)));
+        b(j)=0;}
+}
+//#####################################################################
+// Function In_Place_PLU_Inverse
+//#####################################################################
+template<class T,class T_MATRIX> template<class T_MATRIX2> void MATRIX_BASE<T,T_MATRIX>::
+In_Place_PLU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse)
+{
+    assert(Rows()==Columns());
+    inverse.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
+    COLUMN_PERMUTATION p;
+    T_MATRIX L;
+    In_Place_PLU_Factorization(L,p);
+    RIGHT_VECTOR b((INITIAL_SIZE)Columns()); // used for piece of the identity matrix
+    for(int j=0;j<Columns();j++){
+        b(j)=0;
+        inverse.Set_Column(j,Upper_Triangular_Solve(L.Lower_Triangular_Solve(b.Permute(p))));
+        b(j)=0;}
+}
+//#####################################################################
+// Function In_Place_LU_Inverse
+//#####################################################################
+template<class T,class T_MATRIX> template<class T_MATRIX2> void MATRIX_BASE<T,T_MATRIX>::
+In_Place_LU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse) // don't assume ARRAY
+{
+    assert(Rows()==Columns());
+    inverse.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
+    T_MATRIX L;
+    RIGHT_VECTOR b(Columns()); // used forpiece of the identity matrix
+    In_Place_LU_Factorization(L);
+    for(int j=0;j<Columns();j++){
+        b(j)=1;
+        inverse.Set_Column(j,Upper_Triangular_Solve(L.Lower_Triangular_Solve(b)));
+        b(j)=0;}
+}
+//#####################################################################
 // Function Gram_Schmidt_QR_Factorization
 //#####################################################################
 template<class T,class T_MATRIX> template<class T_MATRIX2> void MATRIX_BASE<T,T_MATRIX>::
@@ -169,6 +217,7 @@ Jacobi_Singular_Value_Decomposition(ARRAY<VECTOR<int,2> >& left_givens_pairs,ARR
             Update_Max_Off_Diagonal_Element_Of_Row_After_Column_Change(*this,max_off_diagonal_element_of_row,j);}}
 }
 //#####################################################################
+namespace PhysBAM{
 template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_Robust_Householder_QR_Solve<ARRAY<float>,ARRAY<int> >(ARRAY_BASE<float,ARRAY<float> >&,ARRAY_BASE<int,ARRAY<int> >&);
 template void MATRIX_BASE<float,MATRIX<float,6,6> >::In_Place_Gram_Schmidt_QR_Factorization<MATRIX<float,6,6> >(MATRIX_BASE<float,MATRIX<float,6,6> >&);
 template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_LU_Factorization<MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> >&);
@@ -213,3 +262,14 @@ template void MATRIX_BASE<double,MATRIX<double,4,4> >::In_Place_PLU_Factorizatio
 template void MATRIX_BASE<double,MATRIX<double,5,5> >::In_Place_PLU_Factorization<MATRIX<double,5,5> >(MATRIX_BASE<double,MATRIX<double,5,5> >&,VECTOR<int,5>&);
 template void MATRIX_BASE<double,MATRIX<double,6,6> >::In_Place_PLU_Factorization<MATRIX<double,6,6> >(MATRIX_BASE<double,MATRIX<double,6,6> >&,VECTOR<int,6>&);
 template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_PLU_Factorization<MATRIX_MXN<double> >(MATRIX_BASE<double,MATRIX_MXN<double> >&,ARRAY<int>&);
+template void MATRIX_BASE<double,MATRIX<double,1,1> >::In_Place_Cholesky_Inverse<MATRIX<double,1,1> >(MATRIX_BASE<double,MATRIX<double,1,1> >&);
+template void MATRIX_BASE<double,MATRIX<double,3,3> >::In_Place_Cholesky_Inverse<MATRIX<double,3,3> >(MATRIX_BASE<double,MATRIX<double,3,3> >&);
+template void MATRIX_BASE<double,MATRIX<double,6,6> >::In_Place_Cholesky_Inverse<MATRIX<double,6,6> >(MATRIX_BASE<double,MATRIX<double,6,6> >&);
+template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_Cholesky_Inverse<MATRIX_MXN<double> >(MATRIX_BASE<double,MATRIX_MXN<double> >&);
+template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_LU_Inverse<MATRIX_MXN<double> >(MATRIX_BASE<double,MATRIX_MXN<double> >&);
+template void MATRIX_BASE<float,MATRIX<float,1,1> >::In_Place_Cholesky_Inverse<MATRIX<float,1,1> >(MATRIX_BASE<float,MATRIX<float,1,1> >&);
+template void MATRIX_BASE<float,MATRIX<float,3,3> >::In_Place_Cholesky_Inverse<MATRIX<float,3,3> >(MATRIX_BASE<float,MATRIX<float,3,3> >&);
+template void MATRIX_BASE<float,MATRIX<float,6,6> >::In_Place_Cholesky_Inverse<MATRIX<float,6,6> >(MATRIX_BASE<float,MATRIX<float,6,6> >&);
+template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_Cholesky_Inverse<MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> >&);
+template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_LU_Inverse<MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> >&);
+}
