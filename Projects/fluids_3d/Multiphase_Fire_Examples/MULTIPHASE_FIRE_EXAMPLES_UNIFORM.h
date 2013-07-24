@@ -309,7 +309,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,cons
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
    if(test_number==2){
        Get_Source_Velocities(outer_cylinder1,MATRIX<T,4>::Identity_Matrix(),VECTOR<T,3>());

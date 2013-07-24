@@ -56,7 +56,7 @@ public:
     void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
     bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE {return false;}
     void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
-    void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE {}
+    void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_BOOL& psi_N,const T time) PHYSBAM_OVERRIDE {}
     void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
 
 //#####################################################################

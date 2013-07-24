@@ -189,8 +189,8 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 }
 //#####################################################################
 // Function Get_Source_Velocities
-//#####################################################################
-void Get_Object_Velocities(PROJECTION_UNIFORM<GRID<TV> >& projection,const T dt,const T time) PHYSBAM_OVERRIDE
+//######################### ############################################
+void Get_Object_Velocities(LAPLACE_UNIFORM<GRID<TV> >* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==1 && time<4)
         for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(iterator.Location().x<(T).7){
@@ -198,14 +198,12 @@ void Get_Object_Velocities(PROJECTION_UNIFORM<GRID<TV> >& projection,const T dt,
             fluid_collection.incompressible_fluid_collection.face_velocities(iterator.Axis(),iterator.Face_Index())=0;}
     if(test_number==5){
         for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(sphere.Lazy_Inside(iterator.Location())){
-            projection.elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;
-            fluid_collection.incompressible_fluid_collection.face_velocities(iterator.Axis(),iterator.Face_Index())=0;}
-    }
+            elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;
+            fluid_collection.incompressible_fluid_collection.face_velocities(iterator.Axis(),iterator.Face_Index())=0;}}
     if(test_number==6){
         for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(rigid->Implicit_Geometry_Lazy_Inside(iterator.Location())){
-            projection.elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;
-            fluid_collection.incompressible_fluid_collection.face_velocities(iterator.Axis(),iterator.Face_Index())=rigid->Pointwise_Object_Velocity(iterator.Location())[iterator.Axis()];}
-    }   
+            elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;
+            fluid_collection.incompressible_fluid_collection.face_velocities(iterator.Axis(),iterator.Face_Index())=rigid->Pointwise_Object_Velocity(iterator.Location())[iterator.Axis()];}}   
 }
 //#####################################################################
 // Function Limit_Dt

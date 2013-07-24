@@ -45,9 +45,6 @@ public:
     void Resize_Controls(const int leading_context_frames=0,const int trailing_context_frames=0)
     {controls.Resize(1-leading_context_frames,frame_length+trailing_context_frames);}
 
-    void Set_Custom_Interpolation(const INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,ARRAY<T> >* interpolation_input)
-    {interpolation=interpolation_input;}
-
     template <class RW>
     void Interpolate_Rigid_Body_State(RIGID_BODY_STATE<VECTOR<T,3> >& rigid_body_state,const std::string rigid_transform_data_directory,const std::string rigid_transform_filename_prefix,const int initial_frame,const T time)
     {T fractional_frame=((T)(frame_length-1))*time/time_length+(T)initial_frame;

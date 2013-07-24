@@ -180,7 +180,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
     Get_Source_Velocities(sources(1),world_to_source(1),source_velocity(1));
 }

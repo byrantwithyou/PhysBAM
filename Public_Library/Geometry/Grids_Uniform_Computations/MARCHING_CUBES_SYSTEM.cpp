@@ -18,7 +18,7 @@ using namespace PhysBAM;
 // Function Multiply
 //#####################################################################
 template<class TV> void MARCHING_CUBES_SYSTEM<TV>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& bv_input,KRYLOV_VECTOR_BASE<T>& bv_result) const PHYSBAM_OVERRIDE
+Multiply(const KRYLOV_VECTOR_BASE<T>& bv_input,KRYLOV_VECTOR_BASE<T>& bv_result) const
 {
     const ARRAY<TV>& x_input=debug_cast<const VECTOR_T&>(bv_input).x;
     ARRAY<TV>& x_result=debug_cast<VECTOR_T&>(bv_result).x;
@@ -35,7 +35,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& bv_input,KRYLOV_VECTOR_BASE<T>& bv_result)
 // Function Inner_Product
 //#####################################################################
 template<class TV> double MARCHING_CUBES_SYSTEM<TV>::
-Inner_Product(const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2) const PHYSBAM_OVERRIDE
+Inner_Product(const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2) const
 {
     const VECTOR_T& v1=debug_cast<const MARCHING_CUBES_VECTOR<TV>&>(bv1);
     const VECTOR_T& v2=debug_cast<const MARCHING_CUBES_VECTOR<TV>&>(bv2);
@@ -46,7 +46,7 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2)
 // Function Convergence_Norm
 //#####################################################################
 template<class TV> typename TV::SCALAR MARCHING_CUBES_SYSTEM<TV>::
-Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE
+Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bv) const
 {
     return sqrt(Inner_Product(bv,bv));
 }

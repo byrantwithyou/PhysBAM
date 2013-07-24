@@ -25,7 +25,7 @@ template<class TV> STRAWMAN_DRIVER<TV>::
 // Initialize
 //#####################################################################
 template<class TV> void STRAWMAN_DRIVER<TV>::
-Initialize() PHYSBAM_OVERRIDE
+Initialize()
 {
     BASE::Initialize();
     example.Parse_Late_Options();
@@ -35,7 +35,7 @@ Initialize() PHYSBAM_OVERRIDE
 // Advance_To_Target_Time
 //#####################################################################
 template<class TV> void STRAWMAN_DRIVER<TV>::
-Advance_To_Target_Time(const T target_time) PHYSBAM_OVERRIDE
+Advance_To_Target_Time(const T target_time)
 {
     if((current_frame-example.first_frame)%20==0){
         example.pls_evolution->Reseed_Particles(time);

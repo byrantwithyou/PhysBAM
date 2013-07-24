@@ -176,9 +176,9 @@ void Adjust_Density_And_Temperature_With_Sources(const T time)
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
-    GRID<TV> u_grid=fluids_parameters.grid->Get_X_Face_Grid(),v_grid=fluids_parameters.grid->Get_Y_Face_Grid(),w_grid=fluids_parameters.grid->Get_Z_Face_Grid();
+    GRID<TV> u_grid=fluids_parameters.grid->Get_Face_Grid(0),v_grid=fluids_parameters.grid->Get_Face_Grid(1),w_grid=fluids_parameters.grid->Get_Face_Grid(2);
     LAPLACE_UNIFORM<GRID<TV> >& elliptic_solver=*fluids_parameters.incompressible->projection.elliptic_solver;
 
     if(test_number==1){

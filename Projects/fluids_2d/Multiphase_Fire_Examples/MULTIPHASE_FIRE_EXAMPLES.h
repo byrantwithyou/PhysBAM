@@ -237,12 +237,11 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==2){
-        Get_Source_Velocities(RANGE<TV>(0,(T).1,(T).1,(T).3),MATRIX<T,3>::Identity_Matrix(),VECTOR<T,2>((T).2,0));
-        Get_Source_Velocities(RANGE<TV>((T).9,1,(T).1,(T).3),MATRIX<T,3>::Identity_Matrix(),VECTOR<T,2>(-(T).2,0));
-    }
+        Get_Source_Velocities(RANGE<TV>(TV(0,(T).1),TV((T).1,(T).3)),MATRIX<T,3>::Identity_Matrix(),VECTOR<T,2>((T).2,0));
+        Get_Source_Velocities(RANGE<TV>(TV((T).9,(T).1),TV(1,(T).3)),MATRIX<T,3>::Identity_Matrix(),VECTOR<T,2>(-(T).2,0));}
 }
 //#####################################################################
 // Function Initialize_Advection

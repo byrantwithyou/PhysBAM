@@ -99,7 +99,6 @@ public:
     void Recreate_Levelsets();
     void Fill_Ghost_Cells(ARRAY<T_ARRAYS_SCALAR >& phi_ghost,const T time,const int number_of_ghost_cells);
     void Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input);
-    void Set_Custom_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input);
     void Set_Custom_Secondary_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input);
     void Set_Custom_Normal_Interpolation(T_INTERPOLATION_VECTOR& normal_interpolation_input);
     void Set_Custom_Curvature_Interpolation(T_INTERPOLATION_SCALAR& curvature_interpolation_input);

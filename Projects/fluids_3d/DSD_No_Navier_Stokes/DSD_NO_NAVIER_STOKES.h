@@ -54,7 +54,7 @@ public:
     void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
     void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE {return false;}
-    void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE {}
+    void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE {}
 
 //#####################################################################
 // Function Register_Options

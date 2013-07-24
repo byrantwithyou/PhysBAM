@@ -43,14 +43,6 @@ Create()
 // Function Update_Minimum_Cell_Size
 //#####################################################################
 template<class TV> void LEVELSET_IMPLICIT_OBJECT<TV>::
-Set_Custom_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,T>& interpolation)
-{
-    levelset.Set_Custom_Interpolation(interpolation);
-}
-//#####################################################################
-// Function Update_Minimum_Cell_Size
-//#####################################################################
-template<class TV> void LEVELSET_IMPLICIT_OBJECT<TV>::
 Set_Custom_Secondary_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,T>& interpolation)
 {
     levelset.Set_Custom_Secondary_Interpolation(interpolation);

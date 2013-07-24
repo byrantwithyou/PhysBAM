@@ -101,9 +101,6 @@ public:
     void Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
     {boundary=&boundary_input;}
 
-    void Set_Custom_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input)
-    {interpolation=&interpolation_input;}
-
     void Set_Custom_Secondary_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input)
     {secondary_interpolation=&interpolation_input;}
 

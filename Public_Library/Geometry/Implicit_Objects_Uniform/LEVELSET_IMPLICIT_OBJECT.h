@@ -46,7 +46,6 @@ public:
 
 //###########################################################################
     static LEVELSET_IMPLICIT_OBJECT<TV>* Create();
-    void Set_Custom_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,T>& interpolation);
     void Set_Custom_Secondary_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,T>& interpolation);
     void Set_Custom_Normal_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,TV>& interpolation);
     void Set_Custom_Velocity_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,TV>& interpolation);

@@ -124,10 +124,10 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Object_Velocities
 //#####################################################################
-void Get_Object_Velocities(PROJECTION_UNIFORM<GRID<TV> >& projection,const T dt,const T time) PHYSBAM_OVERRIDE
+void Get_Object_Velocities(LAPLACE_UNIFORM<GRID<TV> >* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    BASE::Get_Object_Velocities(projection,dt,time);
-    tests.Get_Object_Velocities(projection,dt,time);
+    BASE::Get_Object_Velocities(elliptic_solver,face_velocities,dt,time);
+//    tests.Get_Object_Velocities(elliptic_solver,face_velocities,dt,time); // TODO: signature is not a match
 }
 //#####################################################################
 };

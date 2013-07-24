@@ -105,8 +105,173 @@ Adjust_Output_Directory_For_MPI(const T_MPI mpi)
         output_directory+=STRING_UTILITIES::string_sprintf("/%d",(mpi->rank+1));
         FILE_UTILITIES::Create_Directory(output_directory);
         FILE_UTILITIES::Create_Directory(output_directory+"/common");
-        LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",restart);
+        LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",restart);}
 }
+//#####################################################################
+// Function Post_Initialization
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Post_Initialization()
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Preprocess_Frame
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Preprocess_Frame(const int frame)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Postprocess_Frame
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Postprocess_Frame(const int frame)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Preprocess_Substep
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Preprocess_Substep(const T dt,const T time)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Postprocess_Substep
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Postprocess_Substep(const T dt,const T time)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Read_Output_Files_Fluids
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Read_Output_Files_Fluids(const int frame)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Initialize_Bodies
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Initialize_Bodies() 
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Extrapolate_Phi_Into_Objects
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Extrapolate_Phi_Into_Objects(const T time)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Postprocess_Phi
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Postprocess_Phi(const T time)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Adjust_Phi_With_Sources
+//#####################################################################
+template<class TV> bool SOLIDS_FLUIDS_EXAMPLE<TV>::
+Adjust_Phi_With_Sources(const T time)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+    return false;
+}
+//#####################################################################
+// Function Adjust_Phi_With_Objects
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Adjust_Phi_With_Objects(const T time)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Add_SPH_Particles_For_Sources
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Add_SPH_Particles_For_Sources(const T dt,const T time)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Initialize_SPH_Particles
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Initialize_SPH_Particles()
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Initialize_Velocities
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Initialize_Velocities()
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Initialize_Euler_State
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Initialize_Euler_State()
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Setup_Initial_Refinement
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Setup_Initial_Refinement()
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Initialize_Advection
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Initialize_Advection()
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Clamp_Velocities
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Clamp_Velocities(const T time)
+{
+    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
+}
+//#####################################################################
+// Function Melting_Substep
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Melting_Substep(const T dt,const T time)
+{
+}
+//#####################################################################
+// Function Modify_Fluid_For_Melting
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Modify_Fluid_For_Melting(const T dt,const T time)
+{
+}
+//#####################################################################
+// Function Update_Melting_Substep_Parameters
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Update_Melting_Substep_Parameters(const T dt,const T time)
+{
 }
 //#####################################################################
 namespace PhysBAM{

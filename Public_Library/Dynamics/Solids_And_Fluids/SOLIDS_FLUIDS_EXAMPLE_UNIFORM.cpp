@@ -756,3 +756,5 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Adjust_Ph
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Adjust_Phi_With_Source<SPHERE<VECTOR<double,3> > >(SPHERE<VECTOR<double,3> > const&,int,MATRIX<double,4,4> const&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Get_Source_Reseed_Mask<CYLINDER<double> >(CYLINDER<double> const&,MATRIX<double,4,4> const&,ARRAY<bool,VECTOR<int,3> >*&,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Get_Source_Reseed_Mask<SPHERE<VECTOR<double,3> > >(SPHERE<VECTOR<double,3> > const&,MATRIX<double,4,4> const&,ARRAY<bool,VECTOR<int,3> >*&,bool);
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,3> > >::Get_Source_Velocities<SPHERE<VECTOR<float,3> > >(SPHERE<VECTOR<float,3> > const&,MATRIX<float,4,4> const&,VECTOR<float,3> const&);
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Get_Source_Velocities<SPHERE<VECTOR<double,3> > >(SPHERE<VECTOR<double,3> > const&,MATRIX<double,4,4> const&,VECTOR<double,3> const&);

@@ -35,7 +35,7 @@ public:
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
     bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE {return false;}
-    void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE {}
+    void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE {}
     void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
     void Extrapolate_Phi_Into_Objects(const T time) PHYSBAM_OVERRIDE {}
     void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}

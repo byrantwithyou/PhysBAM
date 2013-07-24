@@ -57,14 +57,6 @@ Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
 //    for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Boundary(boundary_input);
 }
 //#####################################################################
-// Function Set_Custom_Interpolation
-//#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
-Set_Custom_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input)
-{
-    for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Interpolation(interpolation_input);
-}
-//#####################################################################
 // Function Set_Custom_Secondary_Interpolation
 //#####################################################################
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::

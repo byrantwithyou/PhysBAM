@@ -40,7 +40,7 @@ template<class T> MAGNETS_EXAMPLE<T>::
 // Function Register_Options
 //#####################################################################
 template<class T> void MAGNETS_EXAMPLE<T>::
-Register_Options() PHYSBAM_OVERRIDE
+Register_Options()
 {
     BASE::Register_Options();
 }
@@ -48,7 +48,7 @@ Register_Options() PHYSBAM_OVERRIDE
 // Function Parse_Options
 //#####################################################################
 template<class T> void MAGNETS_EXAMPLE<T>::
-Parse_Options() PHYSBAM_OVERRIDE
+Parse_Options()
 {
     BASE::Parse_Options();
     tests.data_directory=data_directory;

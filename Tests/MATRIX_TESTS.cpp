@@ -9,7 +9,7 @@ using namespace PhysBAM;
 // Function Run_Test
 //#####################################################################
 template<class T> typename MATRIX_TESTS<T>::TEST_RESULT MATRIX_TESTS<T>::
-Run_Test(int n) PHYSBAM_OVERRIDE
+Run_Test(int n)
 {
     switch(n){
         case 0:if(Dynamic_Tests(6,20)) return success;return failure;
@@ -20,7 +20,7 @@ Run_Test(int n) PHYSBAM_OVERRIDE
 // Function Number_Of_Tests
 //#####################################################################
 template<class T> int MATRIX_TESTS<T>::
-Number_Of_Tests() const PHYSBAM_OVERRIDE
+Number_Of_Tests() const
 {
     return 2;
 }

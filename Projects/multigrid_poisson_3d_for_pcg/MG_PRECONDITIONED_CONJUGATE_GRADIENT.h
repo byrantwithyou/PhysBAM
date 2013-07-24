@@ -159,7 +159,7 @@ public:
     ~MG_PRECONDITIONED_CONJUGATE_GRADIENT()
     {}
 
-    bool Solve(MULTIGRID_SYSTEM<T,d>& system,ARRAY<T,TV_INT>& x,ARRAY<T,TV_INT>& r,ARRAY<T,TV_INT>& z,ARRAY<T,TV_INT>& p,const T tolerance,const int min_iterations,const int max_iterations) PHYSBAM_OVERRIDE
+    bool Solve(MULTIGRID_SYSTEM<T,d>& system,ARRAY<T,TV_INT>& x,ARRAY<T,TV_INT>& r,ARRAY<T,TV_INT>& z,ARRAY<T,TV_INT>& p,const T tolerance,const int min_iterations,const int max_iterations)
     {
         T rho=0,rho_new=0,p_dot_z=0,nullspace_component=0,rmax=0,rmin=0;
         double sum=0,one_over_interior_count=0;

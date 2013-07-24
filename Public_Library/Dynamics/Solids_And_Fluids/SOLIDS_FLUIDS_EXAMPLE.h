@@ -53,32 +53,32 @@ public:
     {minimum_collision_thickness=minimum_collision_thickness_input;}
 
 //#####################################################################
-    virtual void Post_Initialization(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Preprocess_Frame(const int frame){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Postprocess_Frame(const int frame){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Preprocess_Substep(const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Postprocess_Substep(const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();} // time at start of substep
-    virtual void Read_Output_Files_Fluids(const int frame){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
+    virtual void Post_Initialization();
+    virtual void Preprocess_Frame(const int frame);
+    virtual void Postprocess_Frame(const int frame);
+    virtual void Preprocess_Substep(const T dt,const T time);
+    virtual void Postprocess_Substep(const T dt,const T time);
+    virtual void Read_Output_Files_Fluids(const int frame);
     void Log_Parameters() const;
     // solids
-    virtual void Initialize_Bodies() {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
+    virtual void Initialize_Bodies();
     virtual void Read_Output_Files_Solids(const int frame);
     // fluids
-    virtual void Extrapolate_Phi_Into_Objects(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Postprocess_Phi(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual bool Adjust_Phi_With_Sources(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN(); return false; }
-    virtual void Adjust_Phi_With_Objects(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Add_SPH_Particles_For_Sources(const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Initialize_SPH_Particles(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Initialize_Velocities(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Initialize_Euler_State(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Setup_Initial_Refinement(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Initialize_Advection(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Clamp_Velocities(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
+    virtual void Extrapolate_Phi_Into_Objects(const T time);
+    virtual void Postprocess_Phi(const T time);
+    virtual bool Adjust_Phi_With_Sources(const T time);
+    virtual void Adjust_Phi_With_Objects(const T time);
+    virtual void Add_SPH_Particles_For_Sources(const T dt,const T time);
+    virtual void Initialize_SPH_Particles();
+    virtual void Initialize_Velocities();
+    virtual void Initialize_Euler_State();
+    virtual void Setup_Initial_Refinement();
+    virtual void Initialize_Advection();
+    virtual void Clamp_Velocities(const T time);
     // melting
-    virtual void Melting_Substep(const T dt,const T time){}
-    virtual void Modify_Fluid_For_Melting(const T dt,const T time){}
-    virtual void Update_Melting_Substep_Parameters(const T dt,const T time){}
+    virtual void Melting_Substep(const T dt,const T time);
+    virtual void Modify_Fluid_For_Melting(const T dt,const T time);
+    virtual void Update_Melting_Substep_Parameters(const T dt,const T time);
     void Register_Options() PHYSBAM_OVERRIDE;
     void Parse_Late_Options() PHYSBAM_OVERRIDE;
     template<class T_MPI> void Adjust_Output_Directory_For_MPI(const T_MPI mpi);

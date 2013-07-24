@@ -35,7 +35,7 @@ public:
     {bool hit=false;
     for(int i=0;i<primitives.m;i++){
         if(primitives(i).object->priority>=lowest_priority){
-            bool primitive_i_hit=primitives(i).object->Intersection(ray,primitives(i).aggregate_id) PHYSBAM_OVERRIDE;
+            bool primitive_i_hit=primitives(i).object->Intersection(ray,primitives(i).aggregate_id);
             if(primitive_i_hit){hit=true;*intersected_object=primitives(i).object;}}}
     return hit;}
 
