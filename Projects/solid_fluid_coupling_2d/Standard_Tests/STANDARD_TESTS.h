@@ -1198,7 +1198,7 @@ void Falling_Rigid_Circle_Test()
 
     PHYSBAM_ASSERT(fluids_parameters.viscosity);
     LOG::cout<<"VISCOSITY "<<fluids_parameters.viscosity<<std::endl;
-    // Xiaodong Wang and Wing Kam Liu, Extended immersed boundary method using FEM and RKPM.  Comput. Methods Appl. Mech. Engrg. 193 (2004) 1305–1321
+    // Xiaodong Wang and Wing Kam Liu, Extended immersed boundary method using FEM and RKPM.  Comput. Methods Appl. Mech. Engrg. 193 (2004) 1305-1321
     T aL=.25; // solid diameter divided by channel width
     T analytic_v=(density-fluids_parameters.density)*solid_gravity*scale_length*radius*radius/(4*fluids_parameters.viscosity)*(-log(aL)-(T)0.9157+(T)1.7244*sqr(aL)-1.7302*sqr(sqr(aL)));
 
