@@ -496,7 +496,7 @@ public:
     template<class T_VECTOR,class T_MATRIX2>
     static typename T_MATRIX2::LEFT_VECTOR Householder_Transform(const ARRAY_BASE<T,T_VECTOR>& b,const MATRIX_BASE<T,T_MATRIX2>& V)
     {assert(V.Rows()==b.Size());typename T_MATRIX2::LEFT_VECTOR result(b),v(V.Rows());
-    for(int j=0;j<V.Columns();j++){Get_Column(j,v);result=result.Householder_Transform(v);}
+    for(int j=0;j<V.Columns();j++){V.Get_Column(j,v);result=result.Householder_Transform(v);}
     return result;}
 
     template<class T_VECTOR>
