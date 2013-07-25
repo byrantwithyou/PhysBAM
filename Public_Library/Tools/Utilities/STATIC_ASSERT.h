@@ -9,7 +9,7 @@
 
 namespace PhysBAM{
 
-#define STATIC_ASSERT(...) static_assert((__VA_ARGS__),"")
+#define STATIC_ASSERT(...) static_assert((__VA_ARGS__),#__VA_ARGS__)
 }
 
 #endif
