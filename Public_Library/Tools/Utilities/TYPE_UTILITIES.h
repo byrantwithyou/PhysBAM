@@ -42,7 +42,7 @@ template<class T> struct IS_SAME<T,T> {static const bool value=true;};
 template<class T1,class T2> struct ASSERT_SAME_HELPER{static const bool value=false;};
 template<class T> struct ASSERT_SAME_HELPER<T,T>{static const bool value=true;};
 
-#define STATIC_ASSERT_SAME(T1,T2) static_assert(::PhysBAM::ASSERT_SAME_HELPER<T1,T2>::value,"")
+#define STATIC_ASSERT_SAME(T1,T2) static_assert(::PhysBAM::ASSERT_SAME_HELPER<T1,T2>::value,"ASSERT_SAME_HELPER<"#T1","#T2">")
 
 template<class T> struct IS_CONST {static const bool value=false;};
 template<class T> struct IS_CONST<const T> {static const bool value=true;};
