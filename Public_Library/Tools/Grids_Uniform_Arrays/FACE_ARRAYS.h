@@ -201,5 +201,97 @@ template<class T> inline std::ostream& operator<<(std::ostream& output_stream,co
 
 template<class T,int d> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAY<T,FACE_INDEX<d> >& a)
 {for(int i=0;i<d;i++) output_stream<<a.data(i)<<std::endl;return output_stream;}
+
+extern template ARRAY<bool,FACE_INDEX<1> >::~ARRAY();
+extern template ARRAY<bool,FACE_INDEX<2> >::~ARRAY();
+extern template ARRAY<bool,FACE_INDEX<3> >::~ARRAY();
+extern template ARRAY<int,FACE_INDEX<1> >::~ARRAY();
+extern template ARRAY<int,FACE_INDEX<2> >::~ARRAY();
+extern template ARRAY<int,FACE_INDEX<3> >::~ARRAY();
+extern template ARRAY<float,FACE_INDEX<1> >::~ARRAY();
+extern template ARRAY<float,FACE_INDEX<2> >::~ARRAY();
+extern template ARRAY<float,FACE_INDEX<3> >::~ARRAY();
+extern template ARRAY<double,FACE_INDEX<1> >::~ARRAY();
+extern template ARRAY<double,FACE_INDEX<2> >::~ARRAY();
+extern template ARRAY<double,FACE_INDEX<3> >::~ARRAY();
+
+extern template ARRAY<VECTOR<double,1>, FACE_INDEX<1> >::~ARRAY();
+extern template ARRAY<VECTOR<double,2>, FACE_INDEX<2> >::~ARRAY();
+extern template ARRAY<VECTOR<double,3>, FACE_INDEX<3> >::~ARRAY();
+extern template ARRAY<VECTOR<float,1>, FACE_INDEX<1> >::~ARRAY();
+extern template ARRAY<VECTOR<float,2>, FACE_INDEX<2> >::~ARRAY();
+extern template ARRAY<VECTOR<float,3>, FACE_INDEX<3> >::~ARRAY();
+
+extern template ARRAY<VECTOR<double,3>, FACE_INDEX<1> >::~ARRAY();
+extern template ARRAY<VECTOR<double,4>, FACE_INDEX<2> >::~ARRAY();
+extern template ARRAY<VECTOR<double,5>, FACE_INDEX<3> >::~ARRAY();
+extern template ARRAY<VECTOR<float,3>, FACE_INDEX<1> >::~ARRAY();
+extern template ARRAY<VECTOR<float,4>, FACE_INDEX<2> >::~ARRAY();
+extern template ARRAY<VECTOR<float,5>, FACE_INDEX<3> >::~ARRAY();
+
+extern template void ARRAY<bool, FACE_INDEX<1> >::Resize(const RANGE<VECTOR<int, 1> >&, bool, bool, const bool&);
+extern template void ARRAY<bool, FACE_INDEX<2> >::Resize(const RANGE<VECTOR<int, 2> >&, bool, bool, const bool&);
+extern template void ARRAY<bool, FACE_INDEX<3> >::Resize(const RANGE<VECTOR<int, 3> >&, bool, bool, const bool&);
+extern template void ARRAY<int, FACE_INDEX<1> >::Resize(const RANGE<VECTOR<int, 1> >&, bool, bool, const int&);
+extern template void ARRAY<int, FACE_INDEX<2> >::Resize(const RANGE<VECTOR<int, 2> >&, bool, bool, const int&);
+extern template void ARRAY<int, FACE_INDEX<3> >::Resize(const RANGE<VECTOR<int, 3> >&, bool, bool, const int&);
+extern template void ARRAY<float, FACE_INDEX<1> >::Resize(const RANGE<VECTOR<int, 1> >&, bool, bool, const float&);
+extern template void ARRAY<float, FACE_INDEX<2> >::Resize(const RANGE<VECTOR<int, 2> >&, bool, bool, const float&);
+extern template void ARRAY<float, FACE_INDEX<3> >::Resize(const RANGE<VECTOR<int, 3> >&, bool, bool, const float&);
+extern template void ARRAY<double, FACE_INDEX<1> >::Resize(const RANGE<VECTOR<int, 1> >&, bool, bool, const double&);
+extern template void ARRAY<double, FACE_INDEX<2> >::Resize(const RANGE<VECTOR<int, 2> >&, bool, bool, const double&);
+extern template void ARRAY<double, FACE_INDEX<3> >::Resize(const RANGE<VECTOR<int, 3> >&, bool, bool, const double&);
+
+extern template void ARRAY<VECTOR<double,1>, FACE_INDEX<1> >::Resize(const RANGE<VECTOR<int, 1> >&, bool, bool, const VECTOR<double,1>&);
+extern template void ARRAY<VECTOR<double,2>, FACE_INDEX<2> >::Resize(const RANGE<VECTOR<int, 2> >&, bool, bool, const VECTOR<double,2>&);
+extern template void ARRAY<VECTOR<double,3>, FACE_INDEX<3> >::Resize(const RANGE<VECTOR<int, 3> >&, bool, bool, const VECTOR<double,3>&);
+extern template void ARRAY<VECTOR<float,1>, FACE_INDEX<1> >::Resize(const RANGE<VECTOR<int, 1> >&, bool, bool, const VECTOR<float,1>&);
+extern template void ARRAY<VECTOR<float,2>, FACE_INDEX<2> >::Resize(const RANGE<VECTOR<int, 2> >&, bool, bool, const VECTOR<float,2>&);
+extern template void ARRAY<VECTOR<float,3>, FACE_INDEX<3> >::Resize(const RANGE<VECTOR<int, 3> >&, bool, bool, const VECTOR<float,3>&);
+
+extern template void ARRAY<VECTOR<double,3>, FACE_INDEX<1> >::Resize(const RANGE<VECTOR<int, 1> >&, bool, bool, const VECTOR<double,3>&);
+extern template void ARRAY<VECTOR<double,4>, FACE_INDEX<2> >::Resize(const RANGE<VECTOR<int, 2> >&, bool, bool, const VECTOR<double,4>&);
+extern template void ARRAY<VECTOR<double,5>, FACE_INDEX<3> >::Resize(const RANGE<VECTOR<int, 3> >&, bool, bool, const VECTOR<double,5>&);
+extern template void ARRAY<VECTOR<float,3>, FACE_INDEX<1> >::Resize(const RANGE<VECTOR<int, 1> >&, bool, bool, const VECTOR<float,3>&);
+extern template void ARRAY<VECTOR<float,4>, FACE_INDEX<2> >::Resize(const RANGE<VECTOR<int, 2> >&, bool, bool, const VECTOR<float,4>&);
+extern template void ARRAY<VECTOR<float,5>, FACE_INDEX<3> >::Resize(const RANGE<VECTOR<int, 3> >&, bool, bool, const VECTOR<float,5>&);
+
+extern template void ARRAY<int, FACE_INDEX<1> >::Read<float>(std::istream&);
+extern template void ARRAY<int, FACE_INDEX<2> >::Read<float>(std::istream&);
+extern template void ARRAY<int, FACE_INDEX<3> >::Read<float>(std::istream&);
+extern template void ARRAY<float, FACE_INDEX<1> >::Read<float>(std::istream&);
+extern template void ARRAY<float, FACE_INDEX<2> >::Read<float>(std::istream&);
+extern template void ARRAY<float, FACE_INDEX<3> >::Read<float>(std::istream&);
+extern template void ARRAY<double, FACE_INDEX<1> >::Read<float>(std::istream&);
+extern template void ARRAY<double, FACE_INDEX<2> >::Read<float>(std::istream&);
+extern template void ARRAY<double, FACE_INDEX<3> >::Read<float>(std::istream&);
+extern template void ARRAY<int, FACE_INDEX<1> >::Read<double>(std::istream&);
+extern template void ARRAY<int, FACE_INDEX<2> >::Read<double>(std::istream&);
+extern template void ARRAY<int, FACE_INDEX<3> >::Read<double>(std::istream&);
+extern template void ARRAY<float, FACE_INDEX<1> >::Read<double>(std::istream&);
+extern template void ARRAY<float, FACE_INDEX<2> >::Read<double>(std::istream&);
+extern template void ARRAY<float, FACE_INDEX<3> >::Read<double>(std::istream&);
+extern template void ARRAY<double, FACE_INDEX<1> >::Read<double>(std::istream&);
+extern template void ARRAY<double, FACE_INDEX<2> >::Read<double>(std::istream&);
+extern template void ARRAY<double, FACE_INDEX<3> >::Read<double>(std::istream&);
+
+extern template void ARRAY<int, FACE_INDEX<1> >::Write<float>(std::ostream&) const;
+extern template void ARRAY<int, FACE_INDEX<2> >::Write<float>(std::ostream&) const;
+extern template void ARRAY<int, FACE_INDEX<3> >::Write<float>(std::ostream&) const;
+extern template void ARRAY<float, FACE_INDEX<1> >::Write<float>(std::ostream&) const;
+extern template void ARRAY<float, FACE_INDEX<2> >::Write<float>(std::ostream&) const;
+extern template void ARRAY<float, FACE_INDEX<3> >::Write<float>(std::ostream&) const;
+extern template void ARRAY<double, FACE_INDEX<1> >::Write<float>(std::ostream&) const;
+extern template void ARRAY<double, FACE_INDEX<2> >::Write<float>(std::ostream&) const;
+extern template void ARRAY<double, FACE_INDEX<3> >::Write<float>(std::ostream&) const;
+extern template void ARRAY<int, FACE_INDEX<1> >::Write<double>(std::ostream&) const;
+extern template void ARRAY<int, FACE_INDEX<2> >::Write<double>(std::ostream&) const;
+extern template void ARRAY<int, FACE_INDEX<3> >::Write<double>(std::ostream&) const;
+extern template void ARRAY<float, FACE_INDEX<1> >::Write<double>(std::ostream&) const;
+extern template void ARRAY<float, FACE_INDEX<2> >::Write<double>(std::ostream&) const;
+extern template void ARRAY<float, FACE_INDEX<3> >::Write<double>(std::ostream&) const;
+extern template void ARRAY<double, FACE_INDEX<1> >::Write<double>(std::ostream&) const;
+extern template void ARRAY<double, FACE_INDEX<2> >::Write<double>(std::ostream&) const;
+extern template void ARRAY<double, FACE_INDEX<3> >::Write<double>(std::ostream&) const;
 }
 #endif
