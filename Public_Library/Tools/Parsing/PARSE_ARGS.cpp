@@ -124,3 +124,52 @@ Print_Arguments() const
     return s;
 }
 //#####################################################################
+// Function Add
+//#####################################################################
+void PARSE_ARGS::
+Add(const std::string& arg_str,bool* found,const std::string& desc)
+{
+    Add(arg_str,(int*)0,found,"",desc);
+}
+//#####################################################################
+// Function Add_Not
+//#####################################################################
+void PARSE_ARGS::
+Add_Not(const std::string& arg_str,bool* found,const std::string& desc)
+{
+    OPTION o={arg_str,"",desc,found,false,(int*)0,&store_impl<int>,&print_default_impl<int>};
+    options.Set(arg_str,o);
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+PARSE_ARGS::OPTION::
+~OPTION()
+{
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+PARSE_ARGS::EXTRA::
+~EXTRA()
+{
+}
+//#####################################################################
+namespace PhysBAM{
+template void PARSE_ARGS::print_default_impl<int>(const void*);
+template void PARSE_ARGS::print_default_impl<std::string>(const void*);
+template void PARSE_ARGS::print_default_impl<float>(const void*);
+template void PARSE_ARGS::print_default_impl<double>(const void*);
+template bool PARSE_ARGS::store_impl<int>(void*, const std::string&);
+template bool PARSE_ARGS::store_impl<std::string>(void*, const std::string&);
+template bool PARSE_ARGS::store_impl<float>(void*, const std::string&);
+template bool PARSE_ARGS::store_impl<double>(void*, const std::string&);
+template void PARSE_ARGS::Add<int>(const std::string&, int*, bool*, const std::string&, const std::string&);
+template void PARSE_ARGS::Add<std::string>(const std::string&, std::string*, bool*, const std::string&, const std::string&);
+template void PARSE_ARGS::Add<float>(const std::string&, float*, bool*, const std::string&, const std::string&);
+template void PARSE_ARGS::Add<double>(const std::string&, double*, bool*, const std::string&, const std::string&);
+
+template ARRAY<HASHTABLE_ENTRY_TEMPLATE<std::string, PARSE_ARGS::OPTION>, int>::~ARRAY();
+template bool HASHTABLE<std::string, PARSE_ARGS::OPTION>::Set(const std::string&, const PARSE_ARGS::OPTION&);
+template void HASHTABLE<std::string, PARSE_ARGS::OPTION>::Resize_Table(int);
+}

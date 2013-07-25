@@ -19,6 +19,7 @@ class PARSE_ARGS:public NONCOPYABLE
 public:
     struct OPTION
     {
+        ~OPTION();
         std::string opt;
         std::string name;
         std::string desc;
@@ -31,6 +32,7 @@ public:
 
     struct EXTRA
     {
+        ~EXTRA();
         std::string name;
         std::string desc;
         bool required;
@@ -81,15 +83,6 @@ public:
         options.Set(arg_str,o);
     }
 
-    void Add(const std::string& arg_str,bool* found,const std::string& desc)
-    {Add(arg_str,(int*)0,found,"",desc);}
-
-    void Add_Not(const std::string& arg_str,bool* found,const std::string& desc)
-    {
-        OPTION o={arg_str,"",desc,found,false,(int*)0,&store_impl<int>,&print_default_impl<int>};
-        options.Set(arg_str,o);
-    }
-
     template<class T> void Add(const std::string& arg_str,T* store,const std::string& name,const std::string& desc)
     {Add(arg_str,store,0,name,desc);}
 
@@ -121,11 +114,29 @@ public:
     }
 
 //#####################################################################
+    void Add(const std::string& arg_str,bool* found,const std::string& desc);
+    void Add_Not(const std::string& arg_str,bool* found,const std::string& desc);
     void Parse(bool partial=false);
     const std::string& Get_Program_Name() const;
     void Print_Usage(bool do_exit=false) const;
     std::string Print_Arguments() const;
 //#####################################################################
 };
+extern template void PARSE_ARGS::print_default_impl<int>(const void*);
+extern template void PARSE_ARGS::print_default_impl<std::string>(const void*);
+extern template void PARSE_ARGS::print_default_impl<float>(const void*);
+extern template void PARSE_ARGS::print_default_impl<double>(const void*);
+extern template bool PARSE_ARGS::store_impl<int>(void*, const std::string&);
+extern template bool PARSE_ARGS::store_impl<std::string>(void*, const std::string&);
+extern template bool PARSE_ARGS::store_impl<float>(void*, const std::string&);
+extern template bool PARSE_ARGS::store_impl<double>(void*, const std::string&);
+extern template void PARSE_ARGS::Add<int>(const std::string&, int*, bool*, const std::string&, const std::string&);
+extern template void PARSE_ARGS::Add<std::string>(const std::string&, std::string*, bool*, const std::string&, const std::string&);
+extern template void PARSE_ARGS::Add<float>(const std::string&, float*, bool*, const std::string&, const std::string&);
+extern template void PARSE_ARGS::Add<double>(const std::string&, double*, bool*, const std::string&, const std::string&);
+
+extern template ARRAY<HASHTABLE_ENTRY_TEMPLATE<std::string, PARSE_ARGS::OPTION>, int>::~ARRAY();
+extern template bool HASHTABLE<std::string, PARSE_ARGS::OPTION>::Set(const std::string&, const PARSE_ARGS::OPTION&);
+extern template void HASHTABLE<std::string, PARSE_ARGS::OPTION>::Resize_Table(int);
 }
 #endif
