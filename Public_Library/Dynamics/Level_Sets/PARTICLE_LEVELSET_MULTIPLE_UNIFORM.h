@@ -11,21 +11,21 @@
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID>
+template<class TV>
 class PARTICLE_LEVELSET_MULTIPLE_UNIFORM:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     T min_collision_distance_factor,max_collision_distance_factor,max_minus_min_collision_distance_factor_over_max_short;
 
-    LEVELSET_MULTIPLE<T_GRID> levelset_multiple;
-    ARRAY<PARTICLE_LEVELSET_UNIFORM<T_GRID>*> particle_levelsets;
+    LEVELSET_MULTIPLE<TV> levelset_multiple;
+    ARRAY<PARTICLE_LEVELSET_UNIFORM<TV>*> particle_levelsets;
     int number_of_ghost_cells;
 
-    PARTICLE_LEVELSET_MULTIPLE_UNIFORM(T_GRID& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const int number_of_ghost_cells_input)
+    PARTICLE_LEVELSET_MULTIPLE_UNIFORM(GRID<TV>& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const int number_of_ghost_cells_input)
         :levelset_multiple(grid_input,phis_input,true),number_of_ghost_cells(number_of_ghost_cells_input)
     {
         Set_Collision_Distance_Factors(); // TODO: use this from a normal particle levelset
@@ -36,13 +36,13 @@ public:
         particle_levelsets.Delete_Pointers_And_Clean_Memory();
     }
 
-    void Initialize_Particle_Levelsets_And_Grid_Values(T_GRID& grid,ARRAY<T_ARRAYS_SCALAR>& phis,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,
+    void Initialize_Particle_Levelsets_And_Grid_Values(GRID<TV>& grid,ARRAY<T_ARRAYS_SCALAR>& phis,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,
         const int number_of_regions,const bool only_use_negative_particles=true)
     {if(particle_levelsets.m!=number_of_regions){
         for(int i=0;i<particle_levelsets.m;i++)delete particle_levelsets(i);
         particle_levelsets.Resize(number_of_regions);levelset_multiple.levelsets.Resize(particle_levelsets.m);
         for(int i=0;i<particle_levelsets.m;i++){
-            particle_levelsets(i)=new PARTICLE_LEVELSET_UNIFORM<T_GRID>(grid,phis(i),collision_body_list_input,number_of_ghost_cells);
+            particle_levelsets(i)=new PARTICLE_LEVELSET_UNIFORM<TV>(grid,phis(i),collision_body_list_input,number_of_ghost_cells);
             particle_levelsets(i)->only_use_negative_particles=only_use_negative_particles;
             particle_levelsets(i)->Initialize_Particle_Levelset_Grid_Values();
             levelset_multiple.levelsets(i)=&particle_levelsets(i)->levelset;}}

@@ -22,23 +22,23 @@ using namespace PhysBAM;
 //#####################################################################
 // Class MERGER
 //#####################################################################
-template<class T,class T_GRID,class RW>
+template<class T,class TV,class RW>
 class MERGER
 {
 public:
-    typedef typename T_GRID::VECTOR_T TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef typename T_FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<VECTOR<T,T_GRID::dimension+2> >::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef typename T_ARRAYS_SCALAR::template REBIND<VECTOR<T,TV::m+2> >::TYPE T_ARRAYS_DIMENSION_SCALAR;
     
 
     const int number_of_processes;
     int number_of_fluid_processes;
     int fluid_proc_offset;
     const std::string input_directory,output_directory;
-    T_GRID grid;
-    ARRAY<LOCAL_GRID<T_GRID>*> local_grids;
+    GRID<TV> grid;
+    ARRAY<LOCAL_GRID<TV>*> local_grids;
 
     ARRAY<int> needs_init,needs_destroy;
     SOLID_BODY_COLLECTION<TV>* solid_body_collection;
@@ -107,7 +107,7 @@ public:
 //#####################################################################
 // Function Merge
 //#####################################################################
-template<class T,class T_GRID,class RW> void MERGER<T,T_GRID,RW>::
+template<class T,class TV,class RW> void MERGER<T,TV,RW>::
 Merge(const int frame)
 {
     LOG::SCOPE scope("FRAME","Frame %d",frame);
@@ -115,7 +115,7 @@ Merge(const int frame)
 
     local_grids.Resize(number_of_fluid_processes);
     for(int p=0;p<number_of_fluid_processes;p++){
-        local_grids(p)=new LOCAL_GRID<T_GRID>(grid);
+        local_grids(p)=new LOCAL_GRID<TV>(grid);
         FILE_UTILITIES::Read_From_File<RW>(input_directory+STRING_UTILITIES::string_sprintf("/%d/common/grid",p+fluid_proc_offset),*local_grids(p));}
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid",grid);
     FILE_UTILITIES::Create_Directory(output_directory+"/"+f);
@@ -198,7 +198,7 @@ Merge(const int frame)
 //#####################################################################
 // Function Merge_Cell_Data
 //#####################################################################
-template<class T,class T_GRID,class RW> template<class T_ARRAYS> bool MERGER<T,T_GRID,RW>::
+template<class T,class TV,class RW> template<class T_ARRAYS> bool MERGER<T,TV,RW>::
 Merge_Cell_Data(const std::string& filename,const int verify_bandwidth,const bool scale)
 {
     // read
@@ -221,7 +221,7 @@ Merge_Cell_Data(const std::string& filename,const int verify_bandwidth,const boo
 //#####################################################################
 // Function Scale_Cell_Data
 //#####################################################################
-template<class T,class T_GRID,class RW> void MERGER<T,T_GRID,RW>::
+template<class T,class TV,class RW> void MERGER<T,TV,RW>::
 Scale_Cell_Data(T_ARRAYS_SCALAR& array)
 {
     T max_val=array.Max();
@@ -232,14 +232,14 @@ Scale_Cell_Data(T_ARRAYS_SCALAR& array)
 //#####################################################################
 // Function Merge_Levelset
 //#####################################################################
-template<class T,class T_GRID,class RW> template<class T_ARRAYS> bool MERGER<T,T_GRID,RW>::
+template<class T,class TV,class RW> template<class T_ARRAYS> bool MERGER<T,TV,RW>::
 Merge_Levelset(const std::string& filename,const int verify_bandwidth)
 {
     // read
     ARRAY<T_ARRAYS> local_data(number_of_fluid_processes);
     for(int p=0;p<number_of_fluid_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p+fluid_proc_offset))+filename;
         if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping merge"<<std::endl;return false;}
-        T_GRID skip;FILE_UTILITIES::Read_From_File<RW>(name,skip,local_data(p));}
+        GRID<TV> skip;FILE_UTILITIES::Read_From_File<RW>(name,skip,local_data(p));}
     // merge
     T_ARRAYS global_data(grid.Cell_Indices(3));
     for(int p=0;p<number_of_fluid_processes;p++)local_grids(p)->Put(local_data(p),global_data);
@@ -254,7 +254,7 @@ Merge_Levelset(const std::string& filename,const int verify_bandwidth)
 //#####################################################################
 // Function Merge_Face_Data
 //#####################################################################
-template<class T,class T_GRID,class RW> template<class T_FACE_ARRAYS_2> bool MERGER<T,T_GRID,RW>::
+template<class T,class TV,class RW> template<class T_FACE_ARRAYS_2> bool MERGER<T,TV,RW>::
 Merge_Face_Data(const std::string& filename,const int verify_bandwidth)
 {
     // read
@@ -279,7 +279,7 @@ Merge_Face_Data(const std::string& filename,const int verify_bandwidth)
 //#####################################################################
 // Function Merge_Lists
 //#####################################################################
-template<class T,class T_GRID,class RW> template<class T_LIST_2> bool MERGER<T,T_GRID,RW>::
+template<class T,class TV,class RW> template<class T_LIST_2> bool MERGER<T,TV,RW>::
 Merge_Lists(const std::string& filename)
 {
     // read
@@ -299,7 +299,7 @@ Merge_Lists(const std::string& filename)
 //#####################################################################
 // Function Merge_Particles
 //#####################################################################
-template<class T,class T_GRID,class RW> template<class T_PARTICLES> bool MERGER<T,T_GRID,RW>::
+template<class T,class TV,class RW> template<class T_PARTICLES> bool MERGER<T,TV,RW>::
 Merge_Particles(const std::string& filename)
 {
     // read
@@ -389,7 +389,7 @@ Do_Merge(PARSE_ARGS& parse_args)
         else is_1d=true;}
 
     if(is_1d){
-        MERGER<T,GRID<VECTOR<T,1> >,T> merger(number_of_processes,input_directory,output_directory,print_maxerrors,is_solid_fluid);
+        MERGER<T,VECTOR<T,1>,T> merger(number_of_processes,input_directory,output_directory,print_maxerrors,is_solid_fluid);
         merger.merge_levelset=opt_merge_levelset;
         merger.merge_object_levelset=opt_merge_object_levelset;
         merger.merge_debug_data=opt_merge_debug_data;
@@ -402,7 +402,7 @@ Do_Merge(PARSE_ARGS& parse_args)
             merger.merge_object_levelset=false;merger.merge_debug_data=false;merger.merge_particles=false;merger.merge_removed_particles=false;merger.merge_removed_particle_times=false;merger.merge_velocities=false;}
         merger.Merge_All_Frames(first_frame,last_frame);}
     else if(is_2d){
-        MERGER<T,GRID<VECTOR<T,2> >,T> merger(number_of_processes,input_directory,output_directory,print_maxerrors,is_solid_fluid);
+        MERGER<T,VECTOR<T,2>,T> merger(number_of_processes,input_directory,output_directory,print_maxerrors,is_solid_fluid);
         merger.merge_levelset=opt_merge_levelset;
         merger.merge_object_levelset=opt_merge_object_levelset;
         merger.merge_debug_data=opt_merge_debug_data;
@@ -415,7 +415,7 @@ Do_Merge(PARSE_ARGS& parse_args)
             merger.merge_object_levelset=false;merger.merge_debug_data=false;merger.merge_particles=false;merger.merge_removed_particles=false;merger.merge_removed_particle_times=false;merger.merge_velocities=false;}
         merger.Merge_All_Frames(first_frame,last_frame);}
     else if(is_3d){
-        MERGER<T,GRID<VECTOR<T,3> >,T> merger(number_of_processes,input_directory,output_directory,print_maxerrors,is_solid_fluid);
+        MERGER<T,VECTOR<T,3>,T> merger(number_of_processes,input_directory,output_directory,print_maxerrors,is_solid_fluid);
         merger.merge_levelset=opt_merge_levelset;
         merger.merge_object_levelset=opt_merge_object_levelset;
         merger.merge_debug_data=opt_merge_debug_data;

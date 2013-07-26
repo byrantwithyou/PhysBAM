@@ -20,12 +20,11 @@ class COMPRESSIBLE_EXAMPLE:public EXAMPLE<TV_input>
 {
     typedef TV_input TV;
     typedef typename TV::SCALAR T;
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;typedef VECTOR<T,GRID<TV>::dimension+2> TV_DIMENSION;
+    typedef typename TV::template REBIND<int>::TYPE TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename COLLISION_BODY_COLLECTION_POLICY<GRID<TV> >::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     typedef EXAMPLE<TV> BASE;
     enum workaround1{d=TV::m};
 
@@ -38,16 +37,16 @@ public:
     T cfl;
 
     GRID<TV> mac_grid;
-    EULER_UNIFORM<GRID<TV> > euler;
+    EULER_UNIFORM<TV> euler;
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV> euler_solid_fluid_coupling_utilities;
-    COMPRESSIBLE_FLUID_COLLECTION<GRID<TV> > compressible_fluid_collection;
+    COMPRESSIBLE_FLUID_COLLECTION<TV> compressible_fluid_collection;
     T_FACE_ARRAYS_SCALAR face_velocities;
 
-    CONSERVATION<GRID<TV>,GRID<TV>::dimension+2>* conservation_method;
+    CONSERVATION<TV,TV::m+2>* conservation_method;
     BOUNDARY_REFLECTION_UNIFORM<TV,VECTOR<T,TV::m+2> >* boundary;
     BOUNDARY<TV,T>* pressure_boundary;
 
-    T_GRID_BASED_COLLISION_GEOMETRY* collision_bodies_affecting_fluid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>* collision_bodies_affecting_fluid;
 
     bool left_wall,right_wall,bottom_wall,top_wall,front_wall,back_wall;
     bool timesplit;

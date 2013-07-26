@@ -11,13 +11,13 @@
 #include <Tools/Data_Structures/OPERATION_HASH.h>
 namespace PhysBAM{
 
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class TV> struct GRID_ARRAYS_POLICY;
 
-template <class T_GRID,class ID>
+template <class TV,class ID>
 class OBJECTS_IN_CELL
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename T_GRID::INDEX T_INDEX;typedef typename T_GRID::BLOCK T_BLOCK;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef TV_INT T_INDEX;typedef typename GRID<TV>::BLOCK T_BLOCK;
 public:
     ARRAY<ID,TV_INT> object_in_cell;
     ARRAY<ARRAY<ID>,ID> object_list;
@@ -29,7 +29,7 @@ public:
     OBJECTS_IN_CELL();
     virtual ~OBJECTS_IN_CELL();
 
-    void Reset(const T_GRID& grid,const int number_of_ghost_cells=3);
+    void Reset(const GRID<TV>& grid,const int number_of_ghost_cells=3);
     void Add_Object_To_Cell(const T_INDEX& cell_index,const ID object_id);
 
     void Get_Objects_For_Cell(const T_INDEX& cell_index,ARRAY<ID>& objects) const;

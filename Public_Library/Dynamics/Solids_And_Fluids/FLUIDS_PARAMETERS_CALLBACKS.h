@@ -17,14 +17,14 @@ namespace PhysBAM{
 template<class T,int d> class VECTOR;
 template<class TV> class PARTICLE_LEVELSET_PARTICLES;
 template<class TV> class PARTICLE_LEVELSET;
-template<class T_GRID> class LAPLACE_UNIFORM;
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class TV> class LAPLACE_UNIFORM;
+template<class TV> struct GRID_ARRAYS_POLICY;
 
-template<class T_GRID>
-class FLUIDS_PARAMETERS_CALLBACKS:public BOUNDARY_CONDITIONS_CALLBACKS<typename T_GRID::VECTOR_T>
+template<class TV>
+class FLUIDS_PARAMETERS_CALLBACKS:public BOUNDARY_CONDITIONS_CALLBACKS<TV>
 {    
-    typedef typename T_GRID::SCALAR T;
-    typedef typename T_GRID::VECTOR_T TV;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;
@@ -42,7 +42,7 @@ public:
     virtual void Get_Source_Velocities_Masked(const T time,const T_FACE_ARRAYS_BOOL& invalid_mask);
     virtual void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time);
     virtual void Get_Object_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    virtual void Get_Object_Velocities(LAPLACE_UNIFORM<T_GRID>* elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    virtual void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
     virtual void Get_Analytic_Velocities(const T time) const;
     virtual void Set_Dirichlet_Boundary_Conditions(const T time);
     virtual void Move_Grid_Explicitly(const T time);

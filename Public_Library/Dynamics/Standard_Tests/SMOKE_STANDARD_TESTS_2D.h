@@ -21,23 +21,23 @@ namespace PhysBAM{
 
 template<class TV> class SOLIDS_FLUIDS_EXAMPLE;
 template<class TV> class RIGID_BODY_COLLECTION;
-template<class T_GRID> class FLUIDS_PARAMETERS_UNIFORM;
-template<class T_GRID> class INCOMPRESSIBLE_FLUID_COLLECTION;
-template<class T_GRID> class PROJECTION_DYNAMICS_UNIFORM;
-template<class T_GRID>
+template<class TV> class FLUIDS_PARAMETERS_UNIFORM;
+template<class TV> class INCOMPRESSIBLE_FLUID_COLLECTION;
+template<class TV> class PROJECTION_DYNAMICS_UNIFORM;
+template<class TV>
 class SMOKE_STANDARD_TESTS_2D
 {
-    typedef typename T_GRID::SCALAR T;typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     SOLIDS_FLUIDS_EXAMPLE<TV>& example;
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters;
-    INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>& incompressible_fluid_collection;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters;
+    INCOMPRESSIBLE_FLUID_COLLECTION<TV>& incompressible_fluid_collection;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
 
     int test_number;
-    T_GRID grid;
+    GRID<TV> grid;
     RANGE<TV> source;
     MATRIX<T,3> world_to_source;
     VECTOR<T,2> source_velocity;
@@ -50,7 +50,7 @@ public:
     T_FACE_ARRAYS_SCALAR beta_face;
     T_FACE_ARRAYS_SCALAR divergence_face_weights;
     
-    SMOKE_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters,INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>& incompressible_fluid_collection,
+    SMOKE_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters,INCOMPRESSIBLE_FLUID_COLLECTION<TV>& incompressible_fluid_collection,
         RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
     virtual ~SMOKE_STANDARD_TESTS_2D();
 
@@ -66,7 +66,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time)
     void Initialize_Bodies();
     void Initialize(const int test_number_input,const int resolution,const T angle_fraction=0);
     void Get_Divergence(ARRAY<T,VECTOR<int,2> >& divergence,const T dt,const T time);
-    void Get_Object_Velocities(PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection,const T dt,const T time);
+    void Get_Object_Velocities(PROJECTION_DYNAMICS_UNIFORM<TV>& projection,const T dt,const T time);
 //#####################################################################
 };
 }

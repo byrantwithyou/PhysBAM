@@ -21,10 +21,10 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> FLUIDS_PARAMETERS<T_GRID>::
+template<class TV> FLUIDS_PARAMETERS<TV>::
 FLUIDS_PARAMETERS(const TYPE type)
     :smoke(type==SMOKE),fire(type==FIRE),water(type==WATER),sph(type==SPH),compressible(type==COMPRESSIBLE),quadtree(false),octree(false),
-    number_of_ghost_cells(3),cfl((T).9),gravity((T)9.8),gravity_direction(-TV::Axis_Vector(TV::m==1?0:1)),grid(new T_GRID()),need_destroy_grid(true),maximum_tree_depth(1),
+    number_of_ghost_cells(3),cfl((T).9),gravity((T)9.8),gravity_direction(-TV::Axis_Vector(TV::m==1?0:1)),grid(new GRID<TV>()),need_destroy_grid(true),maximum_tree_depth(1),
     levelset_refinement_bandwidth(6),minimal_air_bandwidth(false),
     phi_boundary_reflection(*new BOUNDARY_REFLECTION_UNIFORM<TV,T>(VECTOR_UTILITIES::Complement(domain_walls))),phi_boundary_water(*new T_BOUNDARY_PHI_WATER),
     particle_half_bandwidth(3),reseeding_frame_rate(20),reinitialize_geometry_frame_rate(1),bias_towards_negative_particles(false),
@@ -71,7 +71,7 @@ FLUIDS_PARAMETERS(const TYPE type)
     thin_shells_refine_near_objects(true),
     use_separation_inside_water(false),separation_velocity_tolerance((T)9.8/24), // dt*gravity where dt=1/24 is based on the length of a frame
     callbacks(0),refine_fmm_initialization_with_iterative_solver(true),modify_wall_tangential_velocities(true),
-    collision_bodies_affecting_fluid(new T_GRID_BASED_COLLISION_GEOMETRY(*grid)),need_destroy_collision_bodies_affecting_fluid(true),
+    collision_bodies_affecting_fluid(new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>(*grid)),need_destroy_collision_bodies_affecting_fluid(true),
     collidable_contour_value(0),collidable_phi_replacement_value((T)1e-5),flood_fill_for_bubbles(false),
     use_maccormack_semi_lagrangian_advection(false),use_maccormack_compute_mask(true),use_maccormack_for_level_set(true),use_maccormack_for_incompressible(true),
     bandwidth_without_maccormack_near_interface(0),analytic_test(false),
@@ -107,7 +107,7 @@ FLUIDS_PARAMETERS(const TYPE type)
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> FLUIDS_PARAMETERS<T_GRID>::
+template<class TV> FLUIDS_PARAMETERS<TV>::
 ~FLUIDS_PARAMETERS()
 {
     if(need_destroy_grid) delete grid;
@@ -118,7 +118,7 @@ template<class T_GRID> FLUIDS_PARAMETERS<T_GRID>::
 //#####################################################################
 // Function Initialize_Turbulence
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS<TV>::
 Initialize_Turbulence(const T time,const T frame_rate)
 {
     turbulence.Set_Lowest_Angular_Frequency(turbulence_lowest_angular_frequency);
@@ -128,7 +128,7 @@ Initialize_Turbulence(const T time,const T frame_rate)
 //#####################################################################
 // Function Initialize_Domain_Boundary_Conditions
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS<TV>::
 Initialize_Domain_Boundary_Conditions()
 {
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(domain_walls);
@@ -160,7 +160,7 @@ Initialize_Domain_Boundary_Conditions()
 //#####################################################################
 // Function Initialize_Soot
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS<TV>::
 Initialize_Soot(const T time)
 {
     assert(use_soot);
@@ -170,7 +170,7 @@ Initialize_Soot(const T time)
 //#####################################################################
 // Function Evolve_Soot
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS<TV>::
 Evolve_Soot(const T dt,const T time)
 {
     assert(use_soot);
@@ -181,7 +181,7 @@ Evolve_Soot(const T dt,const T time)
 //#####################################################################
 // Function Initialize_Density_And_Temperature
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS<TV>::
 Initialize_Density_And_Temperature(const T time)
 {
     if(use_density) density_container.Set_To_Ambient_Density();
@@ -190,7 +190,7 @@ Initialize_Density_And_Temperature(const T time)
 //#####################################################################
 // Function Evolve_Density_And_Temperature
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS<TV>::
 Evolve_Density_And_Temperature(const T dt,const T time)
 {
     if(use_density || use_temperature) callbacks->Adjust_Density_And_Temperature_With_Sources(time);
@@ -200,7 +200,7 @@ Evolve_Density_And_Temperature(const T dt,const T time)
 //#####################################################################
 // Function Log_Parameters 
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS<TV>::
 Log_Parameters() const
 {
     LOG::SCOPE scope("FLUIDS_PARAMETERS parameters");
@@ -223,10 +223,10 @@ Log_Parameters() const
 }
 //#####################################################################
 namespace PhysBAM{
-template class FLUIDS_PARAMETERS<GRID<VECTOR<float,1> > >;
-template class FLUIDS_PARAMETERS<GRID<VECTOR<float,2> > >;
-template class FLUIDS_PARAMETERS<GRID<VECTOR<float,3> > >;
-template class FLUIDS_PARAMETERS<GRID<VECTOR<double,1> > >;
-template class FLUIDS_PARAMETERS<GRID<VECTOR<double,2> > >;
-template class FLUIDS_PARAMETERS<GRID<VECTOR<double,3> > >;
+template class FLUIDS_PARAMETERS<VECTOR<float,1> >;
+template class FLUIDS_PARAMETERS<VECTOR<float,2> >;
+template class FLUIDS_PARAMETERS<VECTOR<float,3> >;
+template class FLUIDS_PARAMETERS<VECTOR<double,1> >;
+template class FLUIDS_PARAMETERS<VECTOR<double,2> >;
+template class FLUIDS_PARAMETERS<VECTOR<double,3> >;
 }

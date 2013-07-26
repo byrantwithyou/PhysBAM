@@ -3,38 +3,38 @@ using namespace PhysBAM;
 //#####################################################################
 // Function Clamped_To_Array_No_Extrema
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array_No_Extrema(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
+template<class TV,class T2,class T_FACE_LOOKUP> T2 LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Clamped_To_Array_No_Extrema(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
-    TV_INT index=INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u,X);
+    TV_INT index=INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u,X);
     TV X_clamped=clamp(X,grid.X(index),grid.X(index+1));
     return From_Base_Node(grid,u,X_clamped,index);
 }
 //#####################################################################
 // Function Clamped_To_Array
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
+template<class TV,class T2,class T_FACE_LOOKUP> T2 LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Clamped_To_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
-    TV_INT index=INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u,X);
+    TV_INT index=INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u,X);
     return From_Base_Node(grid,u,X,index);
 }
 //#####################################################################
 // Function Clamped_To_Array_Weights
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<typename T_GRID::VECTOR_INT,typename T_GRID::VECTOR_T::SCALAR> > LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array_Weights(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
+template<class TV,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<VECTOR<int,TV::m>,typename TV::SCALAR> > LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Clamped_To_Array_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
-    TV_INT index=INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u,X);
+    TV_INT index=INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u,X);
     return From_Base_Node_Weights(grid,u,X,index);
 }
 //#####################################################################
 // Function Extrema_Clamped_To_Array
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> VECTOR<T2,2> LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Extrema_Clamped_To_Array(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X) const
+template<class TV,class T2,class T_FACE_LOOKUP> VECTOR<T2,2> LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Extrema_Clamped_To_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X) const
 {
-    TV_INT index=INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u_min,X);
+    TV_INT index=INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u_min,X);
     return Extrema_From_Base_Node(grid,u_min,u_max,X,index);
 }
 namespace{
@@ -153,40 +153,40 @@ Extrema_From_Base_Node_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BAS
 //#####################################################################
 // Function From_Base_Node
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-From_Base_Node(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const
+template<class TV,class T2,class T_FACE_LOOKUP> T2 LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const
 {
     return From_Base_Node_Helper(grid,u,X,index);
 }
 //#####################################################################
 // Function From_Base_Node_Weights
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<typename T_GRID::VECTOR_INT,typename T_GRID::VECTOR_T::SCALAR> > LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-From_Base_Node_Weights(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const
+template<class TV,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<VECTOR<int,TV::m>,typename TV::SCALAR> > LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+From_Base_Node_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const
 {
     return From_Base_Node_Weights_Helper(grid,u,X,index);
 }
 //#####################################################################
 // Function Extrema_From_Base_Node
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> VECTOR<T2,2> LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Extrema_From_Base_Node(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X,const TV_INT& index) const
+template<class TV,class T2,class T_FACE_LOOKUP> VECTOR<T2,2> LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Extrema_From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X,const TV_INT& index) const
 {
     return Extrema_From_Base_Node_Helper(grid,u_min,u_max,X,index);
 }
 //#####################################################################
 // Function From_Block_Face_Component
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> typename T_GRID::VECTOR_T::SCALAR LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-From_Block_Face_Component(const int axis,const T_GRID& grid,const BLOCK_UNIFORM<T_GRID>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
+template<class TV,class T2,class T_FACE_LOOKUP> typename TV::SCALAR LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+From_Block_Face_Component(const int axis,const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
 {
-    return T_LINEAR_INTERPOLATION_MAC_HELPER::Interpolate_Face_Component(axis,block,u,X);
+    return LINEAR_INTERPOLATION_MAC_HELPER<TV>::Interpolate_Face_Component(axis,block,u,X);
 }
 //#####################################################################
 // Function From_Block_Face_Component_Weights
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<FACE_INDEX<T_GRID::VECTOR_T::dimension>,typename T_GRID::VECTOR_T::SCALAR> > LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-From_Block_Face_Component_Weights(const int axis,const T_GRID& grid,const BLOCK_UNIFORM<T_GRID>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
+template<class TV,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<FACE_INDEX<TV::m>,typename TV::SCALAR> > LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+From_Block_Face_Component_Weights(const int axis,const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
 {
-    return T_LINEAR_INTERPOLATION_MAC_HELPER::Interpolate_Face_Component_Weights(axis,block,u,X);
+    return LINEAR_INTERPOLATION_MAC_HELPER<TV>::Interpolate_Face_Component_Weights(axis,block,u,X);
 }

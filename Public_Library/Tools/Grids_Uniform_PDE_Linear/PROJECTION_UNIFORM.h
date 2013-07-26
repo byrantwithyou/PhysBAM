@@ -13,31 +13,31 @@
 #include <Tools/Grids_Uniform_PDE_Linear/POISSON_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class PROJECTION_UNIFORM:public PROJECTION<typename T_GRID::SCALAR>
+template<class TV>
+class PROJECTION_UNIFORM:public PROJECTION<typename TV::SCALAR>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;
+    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
 public:
     typedef PROJECTION<T> BASE;
     using PROJECTION<T>::use_non_zero_divergence;
     
-    T_GRID p_grid; // p_grid is a cell centered MAC grid
+    GRID<TV> p_grid; // p_grid is a cell centered MAC grid
     T_ARRAYS_SCALAR p;
     T_ARRAYS_SCALAR p_save_for_projection;
     T_FACE_ARRAYS_SCALAR face_velocities_save_for_projection;
-    LAPLACE_UNIFORM<T_GRID>* elliptic_solver;
-    LAPLACE_UNIFORM<T_GRID>* laplace; 
-    POISSON_UNIFORM<T_GRID>* poisson;     
+    LAPLACE_UNIFORM<TV>* elliptic_solver;
+    LAPLACE_UNIFORM<TV>* laplace; 
+    POISSON_UNIFORM<TV>* poisson;     
     T_ARRAYS_SCALAR divergence; // use this to set up a non-zero divergence
     bool use_divergence_multiplier;
     T_ARRAYS_SCALAR divergence_multiplier;
     THREAD_QUEUE* thread_queue;
 
-    PROJECTION_UNIFORM(const T_GRID& mac_grid,const bool use_variable_beta=false,const bool use_poisson=false,THREAD_QUEUE* thread_queue=0);
+    PROJECTION_UNIFORM(const GRID<TV>& mac_grid,const bool use_variable_beta=false,const bool use_poisson=false,THREAD_QUEUE* thread_queue=0);
 protected:
     PROJECTION_UNIFORM(THREAD_QUEUE* thread_queue_input=0);
 public:
@@ -52,7 +52,7 @@ public:
     if(use_divergence_multiplier) divergence_multiplier.Resize(p_grid.Domain_Indices(3));else divergence_multiplier.Clean_Memory();}
 
 //#####################################################################
-    virtual void Initialize_Grid(const T_GRID& mac_grid);
+    virtual void Initialize_Grid(const GRID<TV>& mac_grid);
     virtual void Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
     virtual void Calculate_Kinetic_Energy_Error(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<TV,TV_INT>& kinetic_energy_error);
     void Zero_Out_Neumann_Pocket_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities);
@@ -61,8 +61,8 @@ public:
     void Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities);
     void Restore_After_Projection(T_FACE_ARRAYS_SCALAR& face_velocities);
     void Exchange_Pressures_For_Projection();
-    void Compute_Divergence(const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<T_GRID>* solver);
-    void Compute_Divergence_Threaded(RANGE<TV_INT>& domain,const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<T_GRID>* solver);
+    void Compute_Divergence(const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<TV>* solver);
+    void Compute_Divergence_Threaded(RANGE<TV_INT>& domain,const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<TV>* solver);
 //#####################################################################
 };
 }

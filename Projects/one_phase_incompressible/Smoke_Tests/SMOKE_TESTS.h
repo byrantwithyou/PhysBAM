@@ -35,7 +35,7 @@ class SMOKE_TESTS:public INCOMPRESSIBLE_EXAMPLE<TV>
     T buoyancy_clamp;
 
     GRID<TV> upsampled_mac_grid;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
 
 public:
     using BASE::mac_grid; using BASE::incompressible;using BASE::projection;using BASE::output_directory;using BASE::mpi_grid;using BASE::domain_boundary;

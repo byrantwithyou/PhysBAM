@@ -7,34 +7,31 @@
 #ifndef __LEVELSET_MULTIPLE__
 #define __LEVELSET_MULTIPLE__ 
 
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
-#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_BODY_COLLECTION_POLICY_UNIFORM.h>
 namespace PhysBAM{
 
 template<class TV,class T2> class BOUNDARY;
 
-template<class T_GRID> class LEVELSET_CALLBACKS; // TODO: invalid dependency
-template<class T_GRID>
+template<class TV> class LEVELSET_CALLBACKS; // TODO: invalid dependency
+template<class TV>
 class LEVELSET_MULTIPLE:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR::template REBIND<TV>::TYPE T_INTERPOLATION_VECTOR;
-    typedef typename COLLISION_BODY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
+    typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
+    typedef INTERPOLATION_UNIFORM<TV,TV> T_INTERPOLATION_VECTOR;
 public:
     typedef TV VECTOR_T;
 
-    T_GRID& grid;
+    GRID<TV>& grid;
     ARRAY<T_ARRAYS_SCALAR>& phis;
-    LEVELSET_CALLBACKS<T_GRID>* levelset_callbacks;
+    LEVELSET_CALLBACKS<TV>* levelset_callbacks;
     ARRAY<LEVELSET<TV>*> levelsets;
     bool use_external_levelsets;
 
-    LEVELSET_MULTIPLE(T_GRID& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const bool use_external_levelsets_input=false);
+    LEVELSET_MULTIPLE(GRID<TV>& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const bool use_external_levelsets_input=false);
     ~LEVELSET_MULTIPLE();
 
     T Phi(const int region,const TV_INT& index) const
@@ -102,7 +99,7 @@ public:
     void Set_Custom_Secondary_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input);
     void Set_Custom_Normal_Interpolation(T_INTERPOLATION_VECTOR& normal_interpolation_input);
     void Set_Custom_Curvature_Interpolation(T_INTERPOLATION_SCALAR& curvature_interpolation_input);
-    void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<T_GRID>& levelset_callbacks_input);
+    void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<TV>& levelset_callbacks_input);
     int Inside_Region(const TV_INT& index) const; // assumes exactly one Phi<0 on a node
     int Inside_Region(const TV_INT& index,T& phi) const; // assumes exactly one Phi<0 on a node
     int Inside_Region(const TV& location) const;

@@ -71,7 +71,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-flow_cylinder",&opt_flow_cylinder,"Use flow_cylinder test");
     parse_args.Parse(true);
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
     if(opt_sph) example=new STANDARD_TESTS_SPH<T>(stream_type);
     else if(opt_multiphase) example=new STANDARD_TESTS_MULTIPHASE<T>(stream_type);
     else if(opt_twophase) example=new TWO_PHASE<T>(stream_type);
@@ -107,14 +107,14 @@ int main(int argc,char* argv[])
     example->want_mpi_world=true;
     example->Parse(parse_args);
     
-    FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters=example->fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example->fluids_parameters;
     if(example->mpi_world->initialized)
-        fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(*fluids_parameters.grid,3,false,VECTOR<int,2>(),fluids_parameters.periodic);
+        fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<TV>(*fluids_parameters.grid,3,false,VECTOR<int,2>(),fluids_parameters.periodic);
     else if(fluids_parameters.periodic!=VECTOR<bool,2>()){LOG::cerr<<"Periodic domains require MPI."<<std::endl;exit(1);}
 
     example->Adjust_Output_Directory_For_MPI(fluids_parameters.mpi_grid);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*example);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*example);
     driver.Execute_Main_Program();
 
     delete example;

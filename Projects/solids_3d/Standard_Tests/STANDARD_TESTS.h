@@ -113,12 +113,12 @@ namespace PhysBAM{
 using boost::math::asinh;
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;
 
@@ -1434,7 +1434,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             //edge_springs->Set_Overdamping_Fraction(damping_multiplier*10/(1+sqrt((T)2))); // put it under more tension with cylinder
             solid_body_collection.Add_Force(edge_springs);
             solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,2/(1+sqrt((T)2)),(T)8));
-            ETHER_DRAG<GRID<TV> >* drag=new ETHER_DRAG<GRID<TV> >(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true,0);
+            ETHER_DRAG<TV>* drag=new ETHER_DRAG<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true,0);
             solid_body_collection.Add_Force(drag);}
             break;
         case 6:
@@ -1723,7 +1723,7 @@ void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE
             INTERPOLATION_CURVE<T,T> wind_viscosity;
             wind_viscosity.Add_Control_Point(test_32_wind_drag_on,0);
             wind_viscosity.Add_Control_Point(test_32_wind_drag_ramp_off,20);
-            ETHER_DRAG<GRID<TV> >& drag=solid_body_collection.template Find_Force<ETHER_DRAG<GRID<TV> >&>();
+            ETHER_DRAG<TV>& drag=solid_body_collection.template Find_Force<ETHER_DRAG<TV>&>();
             drag.Use_Constant_Wind(wind_viscosity.Value(time));}}
 }
 //#####################################################################

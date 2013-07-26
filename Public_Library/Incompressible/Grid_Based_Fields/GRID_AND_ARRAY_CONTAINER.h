@@ -14,20 +14,20 @@
 #include <Tools/Vectors/VECTOR_UTILITIES.h>
 namespace PhysBAM{
 
-template<class T_GRID> struct BOUNDARY_POLICY;
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class TV> struct BOUNDARY_POLICY;
+template<class TV> struct GRID_ARRAYS_POLICY;
 
-template<class T_GRID,class T2>
+template<class TV,class T2>
 class GRID_AND_ARRAY_CONTAINER:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,T_GRID::dimension> TV_SIDES;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
+    typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
 public:
-    T_GRID& grid;
+    GRID<TV>& grid;
     ARRAY<T2,TV_INT> array;
-    ADVECTION<T_GRID,T>* advection;
-    ADVECTION<T_GRID,T>* advection_maccormack;
+    ADVECTION<TV,T>* advection;
+    ADVECTION<TV,T>* advection_maccormack;
     BOUNDARY<TV,T>* boundary;
 private:
     T_ADVECTION_SEMI_LAGRANGIAN_SCALAR& advection_default;
@@ -37,7 +37,7 @@ protected:
     const ARRAY<TV,TV_INT>* cell_velocities;
 public:
 
-    GRID_AND_ARRAY_CONTAINER(T_GRID& grid_input);
+    GRID_AND_ARRAY_CONTAINER(GRID<TV>& grid_input);
     virtual ~GRID_AND_ARRAY_CONTAINER();
 
     void Clean_Memory()
@@ -52,7 +52,7 @@ public:
     void Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
     {boundary=&boundary_input;}
 
-    void Set_Custom_Advection(ADVECTION<T_GRID,T>& advection_input)
+    void Set_Custom_Advection(ADVECTION<TV,T>& advection_input)
     {advection=&advection_input;}
 
     void Set_To_Constant_Value(const T2& value)
@@ -66,7 +66,7 @@ public:
 
     template<class T_ARRAYS_BOOL>
     void Use_Maccormack_Advection(const T_ARRAYS_BOOL& cell_mask)
-    {advection_maccormack=new ADVECTION_MACCORMACK_UNIFORM<T_GRID,T,ADVECTION<T_GRID,T> >(*advection,0,&cell_mask,0);
+    {advection_maccormack=new ADVECTION_MACCORMACK_UNIFORM<TV,T,ADVECTION<TV,T> >(*advection,0,&cell_mask,0);
     Set_Custom_Advection(*advection_maccormack);}
 
 //#####################################################################

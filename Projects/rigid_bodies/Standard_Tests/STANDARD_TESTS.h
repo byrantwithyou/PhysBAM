@@ -78,7 +78,7 @@
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T_input,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
@@ -90,12 +90,12 @@ public:
     int curve_left_id,curve_right_id,curve_plank_id,torus_id;
     ARRAY<int> rigid_body_particles_with_ether_drag; // test 16
 
-    KINEMATIC_COLLISION_BODY<GRID<TV> >* deforming_sphere;
+    KINEMATIC_COLLISION_BODY<TV>* deforming_sphere;
 
     RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager;
     bool print_matrix;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
     using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;using BASE::parse_args;
 
@@ -266,7 +266,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     // add forces
     if(test_number==16){
         rigid_body_particles_with_ether_drag.Append(1);
-        solid_body_collection.Add_Force(new RIGID_ETHER_DRAG<GRID<TV> >(solid_body_collection.rigid_body_collection,&rigid_body_particles_with_ether_drag,(T).5,(T).5));}
+        solid_body_collection.Add_Force(new RIGID_ETHER_DRAG<TV>(solid_body_collection.rigid_body_collection,&rigid_body_particles_with_ether_drag,(T).5,(T).5));}
     else if(test_number==17){
         for(int i=2;i<=3;i++){
             PHYSBAM_NOT_IMPLEMENTED("RIGID_BODY_BASIC_FORCES is obsolete");
@@ -1090,7 +1090,7 @@ void Drop_Cubes()
 //#####################################################################
 // Function Build_Deforming_Sphere
 //#####################################################################
-void Build_Deforming_Sphere(KINEMATIC_COLLISION_BODY<GRID<TV> >* sphere,FRAME<TV>& frame,T time,bool update_positions,bool update_velocities)
+void Build_Deforming_Sphere(KINEMATIC_COLLISION_BODY<TV>* sphere,FRAME<TV>& frame,T time,bool update_positions,bool update_velocities)
 {
     typedef VECTOR<int,3> TV_INT;
 
@@ -1126,7 +1126,7 @@ void Build_Deforming_Sphere(KINEMATIC_COLLISION_BODY<GRID<TV> >* sphere,FRAME<TV
 void Deforming_Sphere()
 {
     last_frame=240;
-    deforming_sphere=new KINEMATIC_COLLISION_BODY<GRID<TV> >(solid_body_collection.rigid_body_collection,true,new GRID<TV>,new ARRAY<TV,TV_INT>);
+    deforming_sphere=new KINEMATIC_COLLISION_BODY<TV>(solid_body_collection.rigid_body_collection,true,new GRID<TV>,new ARRAY<TV,TV_INT>);
     Build_Deforming_Sphere(deforming_sphere,deforming_sphere->Frame(),0,true,true);
     solid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(deforming_sphere);
     

@@ -61,7 +61,7 @@ int main(int argc,char* argv[])
             T time;FILE_UTILITIES::Read_From_File<RW>(f+"time",time);
             T transverse_velocity;FILE_UTILITIES::Read_From_File<RW>(input_directory+"/common/transverse_velocity",transverse_velocity);
             T x_position=xstart+time*transverse_velocity;
-            LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
+            LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
             GRID<VECTOR<T,1> > cut_grid(grid.counts.Remove_Index(1),grid.domain.Remove_Dimension(1),grid.Is_MAC_Grid());
             for(CELL_ITERATOR<VECTOR<T,1> > iter(cut_grid,2);iter.Valid();iter.Next())
                 LOG::cout<<iter.Location().x<<"\t"<<interpolation.Clamped_To_Array(grid, data,iter.Location().Insert(x_position,1))<<std::endl;}

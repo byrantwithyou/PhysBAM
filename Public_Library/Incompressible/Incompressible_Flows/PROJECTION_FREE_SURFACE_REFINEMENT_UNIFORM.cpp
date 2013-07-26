@@ -16,23 +16,23 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
-PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM(const T_GRID& mac_grid,LEVELSET<TV>& levelset_input,const int scale,const T alpha_in,const bool use_surface_solve,const bool flame_input,const bool multiphase,const bool use_variable_beta,const bool use_poisson)
-    :PROJECTION_REFINEMENT_UNIFORM<T_GRID>(mac_grid,scale,alpha_in,flame_input,multiphase,use_variable_beta,use_poisson),boundary(0),phi_boundary(0),levelset_projection(fine_grid),levelset(levelset_input),coarse_levelset(coarse_grid,coarse_phi),surface_solve(use_surface_solve),buffer(1)
+template<class TV> PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
+PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM(const GRID<TV>& mac_grid,LEVELSET<TV>& levelset_input,const int scale,const T alpha_in,const bool use_surface_solve,const bool flame_input,const bool multiphase,const bool use_variable_beta,const bool use_poisson)
+    :PROJECTION_REFINEMENT_UNIFORM<TV>(mac_grid,scale,alpha_in,flame_input,multiphase,use_variable_beta,use_poisson),boundary(0),phi_boundary(0),levelset_projection(fine_grid),levelset(levelset_input),coarse_levelset(coarse_grid,coarse_phi),surface_solve(use_surface_solve),buffer(1)
 {
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
+template<class TV> PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
 ~PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM()
 {
 }
 //#####################################################################
 // Function Initialize_Grid
 //#####################################################################
-template<class T_GRID> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
-Initialize_Grid(const T_GRID& mac_grid)
+template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
+Initialize_Grid(const GRID<TV>& mac_grid)
 {
     BASE::Initialize_Grid(mac_grid);
     local_phi.Resize(local_grid.Domain_Indices(1));
@@ -51,18 +51,18 @@ Initialize_Grid(const T_GRID& mac_grid)
 //#####################################################################
 // Function Set_Coarse_Boundary_Conditions
 //#####################################################################
-template<class T_GRID> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
 Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
 {
     int ghost=max(3,coarse_scale);
     phi_boundary->Fill_Ghost_Cells(fine_grid,levelset.phi,phi_ghost,0,0,ghost);
-    for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
+    for(int axis=0;axis<TV::m;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
         TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
         if(solid_wall(axis)(axis_side)){
-            for(FACE_ITERATOR<TV> iterator(coarse_grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR<TV> iterator(coarse_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index()+boundary_face_offset;
                 if(!Contains_Outside(face+interior_cell_offset,phi_ghost,0)){
                     if(coarse_face_velocities.Component(axis).Valid_Index(face)){
@@ -70,10 +70,10 @@ Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
                 else{TV_INT cell=face+exterior_cell_offset;
                     elliptic_solver->psi_D(cell)=true;p(cell)=0;}}}
         else
-            for(FACE_ITERATOR<TV> iterator(coarse_grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
+            for(FACE_ITERATOR<TV> iterator(coarse_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
                 elliptic_solver->psi_D(cell)=true;p(cell)=0;}}
     Set_Beta_Face_For_Boundary_Conditions(coarse_face_velocities);
-    if(false) if(POISSON_COLLIDABLE_UNIFORM<T_GRID>* poisson_collidable=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<T_GRID>*>(poisson)){
+    if(false) if(POISSON_COLLIDABLE_UNIFORM<TV>* poisson_collidable=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<TV>*>(poisson)){
         T_FACE_ARRAYS_SCALAR beta_face_new(coarse_grid);
         T_ARRAYS_SCALAR phi_ghost(coarse_grid.Domain_Indices(3),false);levelset.boundary->Fill_Ghost_Cells(coarse_grid,coarse_phi,phi_ghost,0,0,ghost);
         poisson_collidable->Find_Constant_beta(beta_face_new,phi_ghost);
@@ -87,8 +87,8 @@ Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
 //#####################################################################
 // Function Set_Local_Boundary_Conditions
 //#####################################################################
-template<class T_GRID> bool PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
-Set_Local_Boundary_Conditions(GRID<TV>& local_grid,PROJECTION_UNIFORM<GRID<TV> >& local_projection,TV_INT coarse_index)
+template<class TV> bool PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
+Set_Local_Boundary_Conditions(GRID<TV>& local_grid,PROJECTION_UNIFORM<TV>& local_projection,TV_INT coarse_index)
 {
     local_projection.elliptic_solver->psi_D.Fill(false);bool contains_surface=false;
     for(CELL_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next()){
@@ -99,7 +99,7 @@ Set_Local_Boundary_Conditions(GRID<TV>& local_grid,PROJECTION_UNIFORM<GRID<TV> >
 //#####################################################################
 // Function Set_Local_Phi_From_Fine_Phi
 //#####################################################################
-template<class T_GRID> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
 Set_Local_Phi_From_Fine_Phi(GRID<TV>& local_mac_grid,ARRAY<T,TV_INT>& local_phi,const ARRAY<T,TV_INT>& fine_phi,TV_INT cell_index)
 {
     for(CELL_ITERATOR<TV> iterator(local_mac_grid,1);iterator.Valid();iterator.Next()){
@@ -109,8 +109,8 @@ Set_Local_Phi_From_Fine_Phi(GRID<TV>& local_mac_grid,ARRAY<T,TV_INT>& local_phi,
 //#####################################################################
 // Function Local_Projection_PCG
 //#####################################################################
-template<class T_GRID> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
-Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,T_GRID& local_grid,T_FACE_ARRAYS_SCALAR& local_face_velocities,FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >& local_projection,const T dt,const T time,TV_INT cell_index)
+template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
+Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,GRID<TV>& local_grid,T_FACE_ARRAYS_SCALAR& local_face_velocities,FAST_PROJECTION_DYNAMICS_UNIFORM<TV>& local_projection,const T dt,const T time,TV_INT cell_index)
 {
     if(surface_solve && Contains_Outside(cell_index,phi_ghost,buffer)) return;
     if(!surface_solve && !Contains_Inside(cell_index,phi_ghost,buffer)) return;
@@ -135,7 +135,7 @@ Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,T_GRID& local_gr
 //#####################################################################
 // Function Contains_Outside
 //#####################################################################
-template<class T_GRID> bool PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
+template<class TV> bool PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
 Contains_Outside(TV_INT cell_index,const ARRAY<T,TV_INT>& levelset_phi,int buffer)
 { 
     RANGE<TV_INT> domain=local_grid.Domain_Indices();domain.max_corner+=buffer*TV_INT::All_Ones_Vector();domain.min_corner-=buffer*TV_INT::All_Ones_Vector();
@@ -147,7 +147,7 @@ Contains_Outside(TV_INT cell_index,const ARRAY<T,TV_INT>& levelset_phi,int buffe
 //#####################################################################
 // Function Contains_Inside
 //#####################################################################
-template<class T_GRID> bool PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
+template<class TV> bool PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
 Contains_Inside(TV_INT cell_index,const ARRAY<T,TV_INT>& levelset_phi,int buffer)
 { 
     RANGE<TV_INT> domain=local_grid.Domain_Indices();domain.max_corner+=buffer*TV_INT::All_Ones_Vector();domain.min_corner-=buffer*TV_INT::All_Ones_Vector();
@@ -159,7 +159,7 @@ Contains_Inside(TV_INT cell_index,const ARRAY<T,TV_INT>& levelset_phi,int buffer
 //#####################################################################
 // Function Set_Coarse_Phi_From_Fine_Phi
 //#####################################################################
-template<class T_GRID> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
 Set_Coarse_Phi_From_Fine_Phi(ARRAY<T,TV_INT>& coarse_phi,const ARRAY<T,TV_INT>& fine_phi)
 {
     for(CELL_ITERATOR<TV> iterator(coarse_grid,1);iterator.Valid();iterator.Next())
@@ -168,7 +168,7 @@ Set_Coarse_Phi_From_Fine_Phi(ARRAY<T,TV_INT>& coarse_phi,const ARRAY<T,TV_INT>& 
 //#####################################################################
 // Function Set_Levelset_Boundary_Conditions
 //#####################################################################
-template<class T_GRID> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
 Set_Levelset_Boundary_Conditions(const GRID<TV>& levelset_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& levelset_velocities,const ARRAY<T,TV_INT>& levelset_phi,const T time)
 {
     Map_Fine_To_Levelset_For_Constraints(levelset_velocities);
@@ -204,7 +204,7 @@ Set_Levelset_Boundary_Conditions(const GRID<TV>& levelset_grid,ARRAY<T,FACE_INDE
 //#####################################################################
 // Function Map_Fine_To_Coarse
 //#####################################################################
-template<class T_GRID> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
 Map_Fine_To_Levelset_For_Constraints(T_FACE_ARRAYS_SCALAR& face_velocities)
 {
     for(FACE_ITERATOR<TV> iterator(fine_grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face=iterator.Full_Index();
@@ -213,7 +213,7 @@ Map_Fine_To_Levelset_For_Constraints(T_FACE_ARRAYS_SCALAR& face_velocities)
 //#####################################################################
 // Function Map_Fine_To_Coarse
 //#####################################################################
-template<class T_GRID> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
 Map_Fine_To_Coarse(T_FACE_ARRAYS_SCALAR& coarse_face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities)
 {
     phi_boundary->Fill_Ghost_Cells(fine_grid,levelset.phi,phi_ghost,0,0,3);    
@@ -224,7 +224,7 @@ Map_Fine_To_Coarse(T_FACE_ARRAYS_SCALAR& coarse_face_velocities,const T_FACE_ARR
 //#####################################################################
 // Function Map_Coarse_To_Fine
 //#####################################################################
-template<class T_GRID> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
 Map_Coarse_To_Fine(const T_FACE_ARRAYS_SCALAR& coarse_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     int ghost=max(buffer+coarse_scale,3);
@@ -252,10 +252,10 @@ Map_Coarse_To_Fine(const T_FACE_ARRAYS_SCALAR& coarse_face_velocities,T_FACE_ARR
 }
 //#####################################################################
 namespace PhysBAM{
-template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<VECTOR<float,1> > >;
-template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<VECTOR<float,2> > >;
-template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<VECTOR<float,3> > >;
-template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<VECTOR<double,1> > >;
-template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<VECTOR<double,2> > >;
-template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<VECTOR<double,3> > >;
+template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<VECTOR<float,1> >;
+template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<VECTOR<float,2> >;
+template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<VECTOR<float,3> >;
+template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<VECTOR<double,1> >;
+template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<VECTOR<double,2> >;
+template class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<VECTOR<double,3> >;
 }

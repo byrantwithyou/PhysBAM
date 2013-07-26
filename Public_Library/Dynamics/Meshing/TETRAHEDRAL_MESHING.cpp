@@ -339,7 +339,7 @@ Initialize_Dynamics()
     solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(deformable_body_collection.particles.mass);
     solid_body_collection.deformable_body_collection.particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
     if(dynamic_ether_viscosity!=0)
-        solid_body_collection.Add_Force(new ETHER_DRAG<GRID<TV> >(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(tetrahedralized_volume.particles),
+        solid_body_collection.Add_Force(new ETHER_DRAG<TV>(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(tetrahedralized_volume.particles),
                 solid_body_collection.rigid_body_collection,true,true,dynamic_ether_viscosity));
     if(use_finite_volume) solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,
         new ROTATED_LINEAR<T,3>(youngs_modulus,poissons_ratio,Rayleigh_coefficient)));

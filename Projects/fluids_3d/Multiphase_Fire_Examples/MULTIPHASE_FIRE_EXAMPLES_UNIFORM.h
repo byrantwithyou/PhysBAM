@@ -16,13 +16,13 @@
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class MULTIPHASE_FIRE_EXAMPLES_UNIFORM:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>
+template<class TV>
+class MULTIPHASE_FIRE_EXAMPLES_UNIFORM:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;using BASE::Adjust_Phi_With_Source;
     using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;
     using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
@@ -40,7 +40,7 @@ public:
     bool pseudo_dirichlet;
     
     MULTIPHASE_FIRE_EXAMPLES_UNIFORM(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>(stream_type,0,fluids_parameters.FIRE),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.FIRE),
         rigid_body_collection(solid_body_collection.rigid_body_collection),pseudo_dirichlet(false)
     {
     }
@@ -178,7 +178,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
 
     if(test_number==1){
         for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
-            if((T).45<iterator.Location().x && iterator.Location().x<=(T).55  &&  (T_GRID::dimension==2 || ((T).45<iterator.Location().z && iterator.Location().z<=(T).55)))
+            if((T).45<iterator.Location().x && iterator.Location().x<=(T).55  &&  (TV::m==2 || ((T).45<iterator.Location().z && iterator.Location().z<=(T).55)))
                 flame_speed_multiplier.Component(iterator.Axis())(iterator.Face_Index())=1;}
     else if(test_number==2){
         for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
@@ -220,17 +220,17 @@ void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
 
     T_ARRAYS_SCALAR phi;LEVELSET<TV> levelset(*fluids_parameters.grid,phi);
     T_FACE_ARRAYS_SCALAR& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
-    TEMPERATURE_CONTAINER<T_GRID>& temperature=fluids_parameters.temperature_container;
-    DENSITY_CONTAINER<T_GRID>& density=fluids_parameters.density_container;
+    TEMPERATURE_CONTAINER<TV>& temperature=fluids_parameters.temperature_container;
+    DENSITY_CONTAINER<TV>& density=fluids_parameters.density_container;
 
     fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Get_Single_Levelset(fluids_parameters.fuel_region,levelset,false);
 
     T bandwidth=2*fluids_parameters.grid->dX.Min();
     for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
         T cell_flame_speed_multiplier=0;
-        for(int i=0;i<T_GRID::dimension;i++)
+        for(int i=0;i<TV::m;i++)
             cell_flame_speed_multiplier+=flame_speed_multiplier.Component(i)(iterator.First_Face_Index(i))+flame_speed_multiplier.Component(i)(iterator.Second_Face_Index(i));
-        cell_flame_speed_multiplier/=2*T_GRID::dimension;
+        cell_flame_speed_multiplier/=2*TV::m;
         if(-phi(index)<0){
             if(-bandwidth<-phi(index) && fluids_parameters.particle_levelset_evolution_multiple->Levelset(air_region).phi(index)<bandwidth){
                 temperature.temperature(index)=LINEAR_INTERPOLATION<T,T>::Linear(temperature.ambient_temperature,fluids_parameters.temperature_products,cell_flame_speed_multiplier);

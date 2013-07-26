@@ -11,22 +11,22 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template <class T_GRID,class ID> OBJECTS_IN_CELL<T_GRID,ID>::
+template <class TV,class ID> OBJECTS_IN_CELL<TV,ID>::
 OBJECTS_IN_CELL()
 {
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-template <class T_GRID,class ID> OBJECTS_IN_CELL<T_GRID,ID>::
+template <class TV,class ID> OBJECTS_IN_CELL<TV,ID>::
 ~OBJECTS_IN_CELL() 
 {
 }
 //#####################################################################
 // Function Reset
 //#####################################################################
-template <class T_GRID,class ID> void OBJECTS_IN_CELL<T_GRID,ID>::
-Reset(const T_GRID& grid,const int number_of_ghost_cells)
+template <class TV,class ID> void OBJECTS_IN_CELL<TV,ID>::
+Reset(const GRID<TV>& grid,const int number_of_ghost_cells)
 {
     object_in_cell.Resize(grid.Cell_Indices(number_of_ghost_cells),false,false);
     object_in_cell.Fill(ID(INT_MAX));
@@ -35,7 +35,7 @@ Reset(const T_GRID& grid,const int number_of_ghost_cells)
 //#####################################################################
 // Function Add_Object_To_Cell
 //#####################################################################
-template <class T_GRID,class ID> void OBJECTS_IN_CELL<T_GRID,ID>::
+template <class TV,class ID> void OBJECTS_IN_CELL<TV,ID>::
 Add_Object_To_Cell(const T_INDEX& cell_index,const ID object_id)
 {
     assert(object_id>=ID());
@@ -51,7 +51,7 @@ Add_Object_To_Cell(const T_INDEX& cell_index,const ID object_id)
 //#####################################################################
 // Function Get_Objects_For_Cells_Cell
 //#####################################################################
-template <class T_GRID,class ID> void OBJECTS_IN_CELL<T_GRID,ID>::
+template <class TV,class ID> void OBJECTS_IN_CELL<TV,ID>::
 Get_Objects_For_Cells_Cell(const T_INDEX& cell) const
 {
     if(object_in_cell(cell)<ID()){
@@ -66,7 +66,7 @@ Get_Objects_For_Cells_Cell(const T_INDEX& cell) const
 //#####################################################################
 // Function Get_Objects_For_Cells
 //#####################################################################
-template <class T_GRID,class ID> void OBJECTS_IN_CELL<T_GRID,ID>::
+template <class TV,class ID> void OBJECTS_IN_CELL<TV,ID>::
 Get_Objects_For_Cells(const T_INDEX* cells,const int number_of_cells,const ID number_of_collision_bodies,ARRAY<ID>& objects) const
 {
     Get_Objects_For_Cells_Start(number_of_collision_bodies);
@@ -76,17 +76,17 @@ Get_Objects_For_Cells(const T_INDEX* cells,const int number_of_cells,const ID nu
 //#####################################################################
 // Function Get_Objects_For_Cells
 //#####################################################################
-template <class T_GRID,class ID> void OBJECTS_IN_CELL<T_GRID,ID>::
+template <class TV,class ID> void OBJECTS_IN_CELL<TV,ID>::
 Get_Objects_For_Cells(const T_BLOCK& block,const ID number_of_collision_bodies,ARRAY<ID>& objects) const
 {
     Get_Objects_For_Cells_Start(number_of_collision_bodies);
-    for(int i=0;i<T_GRID::number_of_cells_per_block-1;i++) Get_Objects_For_Cells_Cell(block.Cell(i));
+    for(int i=0;i<GRID<TV>::number_of_cells_per_block-1;i++) Get_Objects_For_Cells_Cell(block.Cell(i));
     Get_Objects_For_Cells_End(objects);
 }
 //#####################################################################
 // Function Get_Objects_For_Cell
 //#####################################################################
-template <class T_GRID,class ID> void OBJECTS_IN_CELL<T_GRID,ID>::
+template <class TV,class ID> void OBJECTS_IN_CELL<TV,ID>::
 Get_Objects_For_Cell(const T_INDEX& cell_index,ARRAY<ID>& objects) const
 {
     assert(!objects.m);
@@ -96,7 +96,7 @@ Get_Objects_For_Cell(const T_INDEX& cell_index,ARRAY<ID>& objects) const
 //#####################################################################
 // Function Get_Objects_For_Cells
 //#####################################################################
-template <class T_GRID,class ID> void OBJECTS_IN_CELL<T_GRID,ID>::
+template <class TV,class ID> void OBJECTS_IN_CELL<TV,ID>::
 Get_Objects_For_Cells(const T_INDEX& cell_index1,const T_INDEX& cell_index2,const ID number_of_collision_bodies,ARRAY<ID>& objects) const
 {
     Get_Objects_For_Cells_Start(number_of_collision_bodies);
@@ -107,7 +107,7 @@ Get_Objects_For_Cells(const T_INDEX& cell_index1,const T_INDEX& cell_index2,cons
 //#####################################################################
 // Function Get_Objects_For_Cells_Start
 //#####################################################################
-template <class T_GRID,class ID> void OBJECTS_IN_CELL<T_GRID,ID>::
+template <class TV,class ID> void OBJECTS_IN_CELL<TV,ID>::
 Get_Objects_For_Cells_Start(const ID number_of_collision_bodies) const
 {
     if(operation_hash.operations.m!=number_of_collision_bodies) operation_hash.Initialize(number_of_collision_bodies);
@@ -115,10 +115,10 @@ Get_Objects_For_Cells_Start(const ID number_of_collision_bodies) const
     operation_hash.Next_Operation();
 }
 namespace PhysBAM{
-template class OBJECTS_IN_CELL<GRID<VECTOR<float,1> >,COLLISION_GEOMETRY_ID>;
-template class OBJECTS_IN_CELL<GRID<VECTOR<float,2> >,COLLISION_GEOMETRY_ID>;
-template class OBJECTS_IN_CELL<GRID<VECTOR<float,3> >,COLLISION_GEOMETRY_ID>;
-template class OBJECTS_IN_CELL<GRID<VECTOR<double,1> >,COLLISION_GEOMETRY_ID>;
-template class OBJECTS_IN_CELL<GRID<VECTOR<double,2> >,COLLISION_GEOMETRY_ID>;
-template class OBJECTS_IN_CELL<GRID<VECTOR<double,3> >,COLLISION_GEOMETRY_ID>;
+template class OBJECTS_IN_CELL<VECTOR<float,1>,COLLISION_GEOMETRY_ID>;
+template class OBJECTS_IN_CELL<VECTOR<float,2>,COLLISION_GEOMETRY_ID>;
+template class OBJECTS_IN_CELL<VECTOR<float,3>,COLLISION_GEOMETRY_ID>;
+template class OBJECTS_IN_CELL<VECTOR<double,1>,COLLISION_GEOMETRY_ID>;
+template class OBJECTS_IN_CELL<VECTOR<double,2>,COLLISION_GEOMETRY_ID>;
+template class OBJECTS_IN_CELL<VECTOR<double,3>,COLLISION_GEOMETRY_ID>;
 }

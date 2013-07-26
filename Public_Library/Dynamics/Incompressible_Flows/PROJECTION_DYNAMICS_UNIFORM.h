@@ -15,18 +15,18 @@
 #include <Dynamics/Interpolation/FIRE_INTERPOLATION_POLICY.h>
 namespace PhysBAM{
 
-template<class T_GRID> class DETONATION_SHOCK_DYNAMICS;
+template<class TV> class DETONATION_SHOCK_DYNAMICS;
 
-template<class T_GRID>
-class PROJECTION_DYNAMICS_UNIFORM:public PROJECTION_COLLIDABLE_UNIFORM<T_GRID>,public PROJECTION_DYNAMICS<typename T_GRID::SCALAR>
+template<class TV>
+class PROJECTION_DYNAMICS_UNIFORM:public PROJECTION_COLLIDABLE_UNIFORM<TV>,public PROJECTION_DYNAMICS<typename TV::SCALAR>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;typedef typename FIRE_INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP_FIRE_MULTIPHASE T_FACE_LOOKUP_FIRE_MULTIPHASE;
+    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef typename FIRE_INTERPOLATION_POLICY<TV>::FACE_LOOKUP_FIRE_MULTIPHASE T_FACE_LOOKUP_FIRE_MULTIPHASE;
 public:
-    typedef PROJECTION_COLLIDABLE_UNIFORM<T_GRID> BASE;
+    typedef PROJECTION_COLLIDABLE_UNIFORM<TV> BASE;
     using BASE::use_non_zero_divergence;using BASE::p_grid;using BASE::poisson;using BASE::elliptic_solver;using BASE::laplace;using BASE::p;using BASE::collidable_solver;using BASE::use_divergence_multiplier;using BASE::divergence;
     using BASE::divergence_multiplier;using BASE::poisson_collidable;using BASE::laplace_collidable;
     using BASE::Use_Divergence_Multiplier;using BASE::Use_Non_Zero_Divergence;using BASE::Compute_Divergence;using BASE::density;
@@ -34,20 +34,20 @@ public:
     
     bool use_flame_speed_multiplier;
     T_FACE_ARRAYS_SCALAR flame_speed_multiplier;
-    DETONATION_SHOCK_DYNAMICS<T_GRID>* dsd;
+    DETONATION_SHOCK_DYNAMICS<TV>* dsd;
 
 protected:
     bool use_divergence_multiplier_save_for_sph,use_non_zero_divergence_save_for_sph;
     T_ARRAYS_SCALAR *p_save_for_sph,*divergence_save_for_sph,*divergence_multiplier_save_for_sph;
     T_FACE_ARRAYS_SCALAR *face_velocities_save_for_sph;
-    LAPLACE_UNIFORM<T_GRID>* elliptic_solver_save_for_sph;
-    LAPLACE_COLLIDABLE_UNIFORM<T_GRID>* laplace_save_for_sph;
-    POISSON_COLLIDABLE_UNIFORM<T_GRID>* poisson_save_for_sph;
-    LAPLACE_COLLIDABLE<T_GRID>* collidable_solver_save_for_sph;
+    LAPLACE_UNIFORM<TV>* elliptic_solver_save_for_sph;
+    LAPLACE_COLLIDABLE_UNIFORM<TV>* laplace_save_for_sph;
+    POISSON_COLLIDABLE_UNIFORM<TV>* poisson_save_for_sph;
+    LAPLACE_COLLIDABLE<TV>* collidable_solver_save_for_sph;
 public:
 
-    PROJECTION_DYNAMICS_UNIFORM(const T_GRID& mac_grid,const bool flame_input=false,const bool multiphase=false,const bool use_variable_beta=false,const bool use_poisson=false,THREAD_QUEUE* thread_queue=0);
-    PROJECTION_DYNAMICS_UNIFORM(const T_GRID& mac_grid,LEVELSET<TV>& levelset_input);
+    PROJECTION_DYNAMICS_UNIFORM(const GRID<TV>& mac_grid,const bool flame_input=false,const bool multiphase=false,const bool use_variable_beta=false,const bool use_poisson=false,THREAD_QUEUE* thread_queue=0);
+    PROJECTION_DYNAMICS_UNIFORM(const GRID<TV>& mac_grid,LEVELSET<TV>& levelset_input);
     virtual ~PROJECTION_DYNAMICS_UNIFORM();
 
     T Face_Velocity_With_Ghost_Value_Multiphase(const T_ARRAYS_BASE& face_velocities_ghost,const int axis,const TV_INT& face_index,const int current_region) const
@@ -66,16 +66,16 @@ public:
     {int face_region=poisson_collidable->levelset_multiple->Inside_Region_Face(axis,face_index);return Face_Jump_Multiphase(axis,face_index,current_region,face_region);}
 
 //#####################################################################
-    virtual void Initialize_Grid(const T_GRID& mac_grid);
-    void Initialize_Dsd(const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple,const ARRAY<bool>& is_fuel_region);
+    virtual void Initialize_Grid(const GRID<TV>& mac_grid);
+    void Initialize_Dsd(const LEVELSET_MULTIPLE<TV>& levelset_multiple,const ARRAY<bool>& is_fuel_region);
     void Initialize_Dsd(const LEVELSET<TV>& levelset,const ARRAY<bool>& fuel_region);
     virtual void Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    void Compute_Divergence(const T_FACE_LOOKUP_FIRE_MULTIPHASE& face_lookup,LAPLACE_UNIFORM<T_GRID>* solver);
+    void Compute_Divergence(const T_FACE_LOOKUP_FIRE_MULTIPHASE& face_lookup,LAPLACE_UNIFORM<TV>* solver);
     void Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt=false);
     void Set_Up_For_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_density_solve=false,const bool use_one_way_coupling=false);
     void Restore_After_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_density_solve=false,const bool use_one_way_coupling=false);
-    void Update_Phi_And_Move_Velocity_Discontinuity(T_FACE_ARRAYS_SCALAR& face_velocities,LEVELSET_MULTIPLE<T_GRID>& levelset_multiple,const T time,const bool update_phi_only=false);
-    template<class FACE_LOOKUP> void Compute_Divergence(const FACE_LOOKUP &face_lookup,LAPLACE_UNIFORM<T_GRID>* solver);
+    void Update_Phi_And_Move_Velocity_Discontinuity(T_FACE_ARRAYS_SCALAR& face_velocities,LEVELSET_MULTIPLE<TV>& levelset_multiple,const T time,const bool update_phi_only=false);
+    template<class FACE_LOOKUP> void Compute_Divergence(const FACE_LOOKUP &face_lookup,LAPLACE_UNIFORM<TV>* solver);
     T Flame_Speed_Face_Multiphase(const int axis,const TV_INT& face_index,const int fuel_region,const int product_region) const;
     void Use_Flame_Speed_Multiplier(const bool use_flame_speed_multiplier_input=true);
     T Face_Jump_Multiphase(const int axis,const TV_INT& face_index,const int current_region,const int face_region) const;

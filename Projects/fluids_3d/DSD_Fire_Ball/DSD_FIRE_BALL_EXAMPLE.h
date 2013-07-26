@@ -16,14 +16,14 @@
 using namespace PhysBAM;
 
 template<class T_input>
-class DSD_FIRE_BALL_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class DSD_FIRE_BALL_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;
 public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef GRID<TV> T_GRID;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
     using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::data_directory;
 
@@ -33,7 +33,7 @@ public:
     T Dn_initial;
 
     DSD_FIRE_BALL_EXAMPLE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>(stream_type,2,fluids_parameters.FIRE),source_sphere(TV(1,(T)0.5,1),(T)0.2),source_end_time((T)3),normal_velocity(4),Dn_initial((T)0.1)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,2,fluids_parameters.FIRE),source_sphere(TV(1,(T)0.5,1),(T)0.2),source_end_time((T)3),normal_velocity(4),Dn_initial((T)0.1)
     {
         frame_rate=96;
         fluids_parameters.grid->Initialize(TV_INT(151,226,151),RANGE<TV>(TV(),TV(2,3,2)));
@@ -111,8 +111,8 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::Update_Fluid_Parameters(dt,time);
-    DETONATION_SHOCK_DYNAMICS<T_GRID>& dsd=*fluids_parameters.incompressible_multiphase->projection.dsd;
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
+    DETONATION_SHOCK_DYNAMICS<TV>& dsd=*fluids_parameters.incompressible_multiphase->projection.dsd;
     dsd.order=3;
     dsd.Dcj=(T)0.2;
     dsd.Dcj_min_clamp=(T)0.0;
@@ -138,14 +138,14 @@ void Initialize_Advection()    PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         const TV location=iterator.Location();
         if(source_sphere.Lazy_Inside(location)){
             const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
             fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis)(face_index)=source_sphere.Normal(location)[axis]*normal_velocity;}}
 
-    DETONATION_SHOCK_DYNAMICS<T_GRID>& dsd=*fluids_parameters.incompressible_multiphase->projection.dsd;
+    DETONATION_SHOCK_DYNAMICS<TV>& dsd=*fluids_parameters.incompressible_multiphase->projection.dsd;
     fluids_parameters.incompressible_multiphase->projection.dsd->Dn.array.Fill(Dn_initial);
     dsd.Dn.boundary->Fill_Ghost_Cells(dsd.Dn.grid,dsd.Dn.array,dsd.Dn.array,0,0,3); // TODO: use real time/dt
     LEVELSET<TV>& levelset=*fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.levelsets(1);
@@ -156,7 +156,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 //#####################################################################
 void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,FACE_INDEX<3> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         const TV location=iterator.Location();
         if(source_sphere.Lazy_Inside(location)){
@@ -169,7 +169,7 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,F
 //#####################################################################
 void Initialize_Phi() PHYSBAM_OVERRIDE
 {
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<T_ARRAYS_SCALAR>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) phis(1)(iterator.Cell_Index())=source_sphere.Signed_Distance(iterator.Location());
     phis(2).Copy(-1,phis(1));
@@ -179,7 +179,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 //#####################################################################
 bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<T_ARRAYS_SCALAR>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
         if(source_sphere.Lazy_Inside(iterator.Location())) phis(1)(iterator.Cell_Index())=-grid.dX.x;

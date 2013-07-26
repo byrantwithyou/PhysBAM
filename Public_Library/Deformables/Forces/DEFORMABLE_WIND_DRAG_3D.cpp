@@ -11,8 +11,8 @@
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
-template<class T> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<VECTOR<T,3> >,T> DEFORMABLE_WIND_DRAG_3D<T>::interpolation;
-template<class T> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<VECTOR<T,3> >,VECTOR<T,3> > DEFORMABLE_WIND_DRAG_3D<T>::vector_interpolation;
+template<class T> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<VECTOR<T,3>,T> DEFORMABLE_WIND_DRAG_3D<T>::interpolation;
+template<class T> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<VECTOR<T,3>,VECTOR<T,3> > DEFORMABLE_WIND_DRAG_3D<T>::vector_interpolation;
 //#####################################################################
 // Constructor
 //#####################################################################

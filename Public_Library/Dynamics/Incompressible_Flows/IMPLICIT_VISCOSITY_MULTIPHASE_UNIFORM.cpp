@@ -14,34 +14,34 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<T_GRID>::
-IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM(PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection_input,const T_ARRAYS_SCALAR& variable_viscosity_input,const ARRAY<T>& densities_input,const ARRAY<T>& viscosities_input,T_MPI_GRID* mpi_grid_input,const int axis_input,bool use_variable_viscosity_input)
-    :IMPLICIT_VISCOSITY_UNIFORM<T_GRID>(*projection_input.elliptic_solver,variable_viscosity_input,(T)0,(T)0,mpi_grid_input,axis_input,use_variable_viscosity_input,false),projection(projection_input),densities(densities_input),viscosities(viscosities_input)
+template<class TV> IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<TV>::
+IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM(PROJECTION_DYNAMICS_UNIFORM<TV>& projection_input,const T_ARRAYS_SCALAR& variable_viscosity_input,const ARRAY<T>& densities_input,const ARRAY<T>& viscosities_input,T_MPI_GRID* mpi_grid_input,const int axis_input,bool use_variable_viscosity_input)
+    :IMPLICIT_VISCOSITY_UNIFORM<TV>(*projection_input.elliptic_solver,variable_viscosity_input,(T)0,(T)0,mpi_grid_input,axis_input,use_variable_viscosity_input,false),projection(projection_input),densities(densities_input),viscosities(viscosities_input)
 {}
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<TV>::
 ~IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM()
 {}
 //#####################################################################
 // Function Allocate_Heat_Solver
 //#####################################################################
-template<class T_GRID> void IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> void IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<TV>::
 Allocate_Heat_Solver()
 {
-    heat_solver=new HEAT_LAPLACE<POISSON_COLLIDABLE_UNIFORM<T_GRID> >(face_grid,u);
+    heat_solver=new HEAT_LAPLACE<POISSON_COLLIDABLE_UNIFORM<TV> >(face_grid,u);
 }
 //#####################################################################
 // Function Setup_Viscosity
 //#####################################################################
-template<class T_GRID> void IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> void IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<TV>::
 Setup_Viscosity(const T dt)
 {
     if(use_variable_viscosity) PHYSBAM_NOT_IMPLEMENTED();
 
-    POISSON_COLLIDABLE_UNIFORM<T_GRID>& heat_poisson=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<T_GRID>&>(*heat_solver);
-    PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection_dynamics=dynamic_cast<PROJECTION_DYNAMICS_UNIFORM<T_GRID>&>(projection);
+    POISSON_COLLIDABLE_UNIFORM<TV>& heat_poisson=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<TV>&>(*heat_solver);
+    PROJECTION_DYNAMICS_UNIFORM<TV>& projection_dynamics=dynamic_cast<PROJECTION_DYNAMICS_UNIFORM<TV>&>(projection);
     heat_poisson.multiphase=true;
     const int number_of_regions=densities.m;
 
@@ -52,7 +52,7 @@ Setup_Viscosity(const T dt)
 
     // set up internal levelset
     heat_poisson.Use_Internal_Level_Set(number_of_regions);
-    T_AVERAGING averaging;const LEVELSET_MULTIPLE<T_GRID>& cell_centered_levelset_multiple=*projection_dynamics.poisson_collidable->levelset_multiple;
+    T_AVERAGING averaging;const LEVELSET_MULTIPLE<TV>& cell_centered_levelset_multiple=*projection_dynamics.poisson_collidable->levelset_multiple;
     for(CELL_ITERATOR<TV> iterator(face_grid,2);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
         for(int i=0;i<number_of_regions;i++) heat_poisson.levelset_multiple->phis(i)(cell_index)=averaging.Cell_To_Face(projection.p_grid,axis,p_face_index,cell_centered_levelset_multiple.phis(i));}
     heat_poisson.levelset_multiple->Project_Levelset(2);
@@ -63,23 +63,23 @@ Setup_Viscosity(const T dt)
 //#####################################################################
 // Function Setup_Boundary_Conditions
 //#####################################################################
-template<class T_GRID> void IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> void IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<TV>::
 Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities)
 {
-    IMPLICIT_VISCOSITY_UNIFORM<T_GRID>::Setup_Boundary_Conditions(face_velocities);
+    IMPLICIT_VISCOSITY_UNIFORM<TV>::Setup_Boundary_Conditions(face_velocities);
     // set neumann b.c. at zero viscosity faces
-    POISSON_COLLIDABLE_UNIFORM<T_GRID>& heat_poisson=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<T_GRID>&>(*heat_solver);
+    POISSON_COLLIDABLE_UNIFORM<TV>& heat_poisson=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<TV>&>(*heat_solver);
     for(FACE_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){int face_axis=iterator.Axis();TV_INT face=iterator.Face_Index();
         if(!heat_poisson.beta_face(face_axis,face)) heat_poisson.psi_N(face_axis,face)=true;}
 }
 //#####################################################################
 // Function Calculate_Velocity_Jump
 //#####################################################################
-template<class T_GRID> void IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> void IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<TV>::
 Calculate_Velocity_Jump()
 {
-    POISSON_COLLIDABLE_UNIFORM<T_GRID>& heat_poisson=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<T_GRID>&>(*heat_solver);
-    PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection_dynamics=dynamic_cast<PROJECTION_DYNAMICS_UNIFORM<T_GRID>&>(projection);
+    POISSON_COLLIDABLE_UNIFORM<TV>& heat_poisson=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<TV>&>(*heat_solver);
+    PROJECTION_DYNAMICS_UNIFORM<TV>& projection_dynamics=dynamic_cast<PROJECTION_DYNAMICS_UNIFORM<TV>&>(projection);
     heat_poisson.Set_Jump_Multiphase();
     const ARRAY<TRIPLE<T,T,T> ,VECTOR<int,2> >& flame_speed_constants=projection_dynamics.flame_speed_constants;
     TV_INT axis_offset=TV_INT::Axis_Vector(axis);
@@ -100,15 +100,15 @@ Calculate_Velocity_Jump()
         if(iterator.Axis()==axis)face_normal=(*levelset.normals)(p_face_index-axis_offset)[axis];
         else{face_normal=((*levelset.normals)(p_face_index-axis_offset-face_axis_offset)+(*levelset.normals)(p_face_index-face_axis_offset)+
             (*levelset.normals)(p_face_index)+(*levelset.normals)(p_face_index-axis_offset)).Normalized()[axis];}
-        heat_poisson.u_jump_face.Component(iterator.Axis())(face_index)=LEVELSET_MULTIPLE<T_GRID>::Sign(product_region,fuel_region)*constants.z*flame_speed*face_normal;}
+        heat_poisson.u_jump_face.Component(iterator.Axis())(face_index)=LEVELSET_MULTIPLE<TV>::Sign(product_region,fuel_region)*constants.z*flame_speed*face_normal;}
 }
 //#####################################################################
 // Debug_Write
 //#####################################################################
-template<class T_GRID> void IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> void IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<TV>::
 Debug_Write(const std::string& output_directory_input)
 {
-    POISSON_COLLIDABLE_UNIFORM<T_GRID>& heat_poisson=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<T_GRID>&>(*heat_solver);
+    POISSON_COLLIDABLE_UNIFORM<TV>& heat_poisson=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<TV>&>(*heat_solver);
     static int frame[3]={0,0,0};
     std::string output_directory=output_directory_input;if(mpi_grid) output_directory+=STRING_UTILITIES::string_sprintf("/processor%d",mpi_grid->rank);
     FILE_UTILITIES::Create_Directory(output_directory);
@@ -126,10 +126,10 @@ Debug_Write(const std::string& output_directory_input)
 }
 //#####################################################################
 namespace PhysBAM{
-template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<GRID<VECTOR<float,1> > >;
-template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<GRID<VECTOR<float,2> > >;
-template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<GRID<VECTOR<float,3> > >;
-template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<GRID<VECTOR<double,1> > >;
-template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<GRID<VECTOR<double,2> > >;
-template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<GRID<VECTOR<double,3> > >;
+template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<VECTOR<float,1> >;
+template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<VECTOR<float,2> >;
+template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<VECTOR<float,3> >;
+template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<VECTOR<double,1> >;
+template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<VECTOR<double,2> >;
+template class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<VECTOR<double,3> >;
 }

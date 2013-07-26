@@ -20,8 +20,8 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> FLOOD_FILL_MPI<T_GRID>::
-FLOOD_FILL_MPI(const T_MPI_GRID& mpi_grid_input,const T_GRID& local_grid_input,const T_FACE_ARRAYS_BOOL& psi_N_input,int& number_of_regions_input,T_ARRAYS_INT& colors_input,
+template<class TV> FLOOD_FILL_MPI<TV>::
+FLOOD_FILL_MPI(const T_MPI_GRID& mpi_grid_input,const GRID<TV>& local_grid_input,const T_FACE_ARRAYS_BOOL& psi_N_input,int& number_of_regions_input,T_ARRAYS_INT& colors_input,
     ARRAY<ARRAY<int> >& color_ranks_input,ARRAY<bool>* color_touches_uncolorable_input)
     :mpi_grid(mpi_grid_input),local_grid(local_grid_input),psi_N(psi_N_input),number_of_regions(number_of_regions_input),colors(colors_input),color_ranks(color_ranks_input),
     color_touches_uncolorable(color_touches_uncolorable_input)
@@ -29,7 +29,7 @@ FLOOD_FILL_MPI(const T_MPI_GRID& mpi_grid_input,const T_GRID& local_grid_input,c
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> FLOOD_FILL_MPI<T_GRID>::
+template<class TV> FLOOD_FILL_MPI<TV>::
 ~FLOOD_FILL_MPI()
 {}
 //#####################################################################
@@ -55,15 +55,15 @@ static void Union_Find_Merge_Op(const void* in,void* inout,int len,const MPI::Da
 //#####################################################################
 // Function Synchronize_Colors
 //#####################################################################
-template<class T_ARRAYS,class T_GRID,class T_BOX> static inline void Resize_Helper(T_ARRAYS& array,const T_GRID& grid,const T_BOX& box)
+template<class T_ARRAYS,class TV,class T_BOX> static inline void Resize_Helper(T_ARRAYS& array,const GRID<TV>& grid,const T_BOX& box)
 {
     array.Resize(box); // for uniform grids we can allocate exactly the requested region
 }
-template<class T_GRID,class T_BOX> static inline void Resize_Helper(ARRAY<int>& array,const T_GRID& grid,const T_BOX& box)
+template<class TV,class T_BOX> static inline void Resize_Helper(ARRAY<int>& array,const GRID<TV>& grid,const T_BOX& box)
 {
     array.Resize(grid.Cell_Indices()); // for rle grids we have to allocate space for the entire grid due to the unstructuredness
 }
-template<class T_GRID> int FLOOD_FILL_MPI<T_GRID>::
+template<class TV> int FLOOD_FILL_MPI<TV>::
 Synchronize_Colors()
 {
     if(mpi_grid.threaded_grid) return Synchronize_Colors_Threaded();
@@ -158,7 +158,7 @@ Synchronize_Colors()
 
     return color_ranks.m;
 }
-template<class T_GRID> int FLOOD_FILL_MPI<T_GRID>::
+template<class TV> int FLOOD_FILL_MPI<TV>::
 Synchronize_Colors_Threaded()
 {
 #ifdef USE_PTHREADS
@@ -269,39 +269,39 @@ Synchronize_Colors_Threaded()
 //#####################################################################
 // Function Find_Global_Colors
 //#####################################################################
-template<class T_GRID> void FLOOD_FILL_MPI<T_GRID>::
+template<class TV> void FLOOD_FILL_MPI<TV>::
 Find_Global_Colors(ARRAY<bool,VECTOR<int,1> >& color_is_global,const RANGE<TV_INT>&) const
 {
     int proc_null=mpi_grid.threaded_grid?-1:MPI::PROC_NULL;
     const ARRAY<int>& side_neighbor_ranks=mpi_grid.threaded_grid?mpi_grid.threaded_grid->side_neighbor_ranks:mpi_grid.side_neighbor_ranks;
-    for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
+    for(int axis=0;axis<TV::m;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
         if(side_neighbor_ranks(side)!=proc_null){
-            for(FACE_ITERATOR<TV> iterator(local_grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Face_Index())){
+            for(FACE_ITERATOR<TV> iterator(local_grid,0,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Face_Index())){
                 color_is_global(colors(iterator.First_Cell_Index()))=true;
                 color_is_global(colors(iterator.Second_Cell_Index()))=true;}}}
 }
 //#####################################################################
 // Function Find_Global_Colors
 //#####################################################################
-template<class T_GRID> template<class T_BOX_HORIZONTAL_INT> void FLOOD_FILL_MPI<T_GRID>::
+template<class TV> template<class T_BOX_HORIZONTAL_INT> void FLOOD_FILL_MPI<TV>::
 Find_Global_Colors(ARRAY<bool,VECTOR<int,1> >& color_is_global,const T_BOX_HORIZONTAL_INT&) const
 {
-    T_GRID::template Horizontal_Face_Loop<Find_Global_Colors_Helper>(mpi_grid,mpi_grid.local_grid,psi_N,colors,color_is_global);
+    GRID<TV>::template Horizontal_Face_Loop<Find_Global_Colors_Helper>(mpi_grid,mpi_grid.local_grid,psi_N,colors,color_is_global);
 }
 //#####################################################################
 // Function Find_Global_Colors_Helper
 //#####################################################################
-template<class T_GRID> template<class T_FACE> void FLOOD_FILL_MPI<T_GRID>::
-Find_Global_Colors_Helper::Apply(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,const ARRAY<bool>& psi_N,const ARRAY<int>& colors,ARRAY<bool,VECTOR<int,1> >& color_is_global)
+template<class TV> template<class T_FACE> void FLOOD_FILL_MPI<TV>::
+Find_Global_Colors_Helper::Apply(const T_MPI_GRID& mpi_grid,const GRID<TV>& local_grid,const ARRAY<bool>& psi_N,const ARRAY<int>& colors,ARRAY<bool,VECTOR<int,1> >& color_is_global)
 {
     int horizontal_axis=T_FACE::Horizontal_Axis();
-    ARRAY<typename T_GRID::BOX_HORIZONTAL_INT> boundary_regions;
+    ARRAY<typename GRID<TV>::BOX_HORIZONTAL_INT> boundary_regions;
     mpi_grid.Find_Boundary_Regions(boundary_regions,CELL_ITERATOR::Sentinels(),false,RANGE<VECTOR<int,1> >(0,0),false,true,local_grid);
     for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*horizontal_axis+axis_side;
         if(mpi_grid.side_neighbor_ranks(side)!=MPI::PROC_NULL){
-            typename T_GRID::BOX_HORIZONTAL_INT face_region=boundary_regions(side);if(axis_side) face_region+=T_GRID::VECTOR_HORIZONTAL_INT::Axis_Vector(horizontal_axis);
+            typename GRID<TV>::BOX_HORIZONTAL_INT face_region=boundary_regions(side);if(axis_side) face_region+=GRID<TV>::VECTOR_HORIZONTAL_INT::Axis_Vector(horizontal_axis);
             for(T_FACE face(local_grid,face_region);face;face++)if(!psi_N(face.Face())){int c1=face.cell1.Cell(),c2=face.cell2.Cell();
                 for(int i=0;i<face.cell1.Long();i++)color_is_global(colors(c1+i))=true;
                 for(int i=0;i<face.cell2.Long();i++)color_is_global(colors(c2+i))=true;}}}
@@ -309,7 +309,7 @@ Find_Global_Colors_Helper::Apply(const T_MPI_GRID& mpi_grid,const T_GRID& local_
 //#####################################################################
 // Function Translate_Local_Colors_To_Global_Colors
 //#####################################################################
-template<class T_GRID> void FLOOD_FILL_MPI<T_GRID>::
+template<class TV> void FLOOD_FILL_MPI<TV>::
 Translate_Local_Colors_To_Global_Colors(const ARRAY<int,VECTOR<int,1> >& color_map,T_ARRAYS_INT& colors_copy,const RANGE<TV_INT>& region,const int global_color_offset) const
 {
     for(CELL_ITERATOR<TV> iterator(local_grid,region);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
@@ -318,7 +318,7 @@ Translate_Local_Colors_To_Global_Colors(const ARRAY<int,VECTOR<int,1> >& color_m
 //#####################################################################
 // Function Find_Color_Matches
 //#####################################################################
-template<class T_GRID> void FLOOD_FILL_MPI<T_GRID>::
+template<class TV> void FLOOD_FILL_MPI<TV>::
 Find_Color_Matches(const ARRAY<int,VECTOR<int,1> >& color_map,UNION_FIND<>& union_find,T_ARRAYS_INT& colors_copy,const RANGE<TV_INT>& region,const int global_color_offset) const
 {
     for(CELL_ITERATOR<TV> iterator(local_grid,region);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();if(colors_copy(cell_index)>0){
@@ -328,7 +328,7 @@ Find_Color_Matches(const ARRAY<int,VECTOR<int,1> >& color_map,UNION_FIND<>& unio
 //#####################################################################
 // Function Remap_Colors
 //#####################################################################
-template<class T_GRID> void FLOOD_FILL_MPI<T_GRID>::
+template<class TV> void FLOOD_FILL_MPI<TV>::
 Remap_Colors(ARRAY<int,VECTOR<int,1> >& color_map,const RANGE<TV_INT>&)
 {
     for(CELL_ITERATOR<TV> iterator(local_grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
@@ -339,7 +339,7 @@ Remap_Colors(ARRAY<int,VECTOR<int,1> >& color_map,const RANGE<TV_INT>&)
 //#####################################################################
 // Function Remap_Colors
 //#####################################################################
-template<class T_GRID> template<class T_BOX_HORIZONTAL_INT> void FLOOD_FILL_MPI<T_GRID>::
+template<class TV> template<class T_BOX_HORIZONTAL_INT> void FLOOD_FILL_MPI<TV>::
 Remap_Colors(ARRAY<int,VECTOR<int,1> >& color_map,const T_BOX_HORIZONTAL_INT&)
 {
     for(int c=0;c<colors.m;c++){
@@ -352,20 +352,20 @@ Remap_Colors(ARRAY<int,VECTOR<int,1> >& color_map,const T_BOX_HORIZONTAL_INT&)
 #else
 
 //#####################################################################
-template<class T_GRID> int FLOOD_FILL_MPI<T_GRID>::Synchronize_Colors(){PHYSBAM_FUNCTION_IS_NOT_DEFINED();return 0;}
+template<class TV> int FLOOD_FILL_MPI<TV>::Synchronize_Colors(){PHYSBAM_FUNCTION_IS_NOT_DEFINED();return 0;}
 //#####################################################################
 
 #endif
 
 //#####################################################################
-#define INSTANTIATION_HELPER(T,T_GRID) \
-    template FLOOD_FILL_MPI<T_GRID >::FLOOD_FILL_MPI(const T_MPI_GRID&,const T_GRID&,const T_FACE_ARRAYS_BOOL&,int&,T_ARRAYS_INT&,ARRAY<ARRAY<int> >&,ARRAY<bool>*); \
-    template FLOOD_FILL_MPI<T_GRID >::~FLOOD_FILL_MPI(); \
-    template int FLOOD_FILL_MPI<T_GRID >::Synchronize_Colors();
+#define INSTANTIATION_HELPER(T,TV) \
+    template FLOOD_FILL_MPI<TV>::FLOOD_FILL_MPI(const T_MPI_GRID&,const GRID<TV>&,const T_FACE_ARRAYS_BOOL&,int&,T_ARRAYS_INT&,ARRAY<ARRAY<int> >&,ARRAY<bool>*); \
+    template FLOOD_FILL_MPI<TV>::~FLOOD_FILL_MPI(); \
+    template int FLOOD_FILL_MPI<TV>::Synchronize_Colors();
 #define P(...) __VA_ARGS__
-INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,1> >));
-INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,2> >));
-INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,3> >));
-INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,1> >));
-INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,2> >));
-INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,3> >));
+INSTANTIATION_HELPER(float,P(VECTOR<float,1>));
+INSTANTIATION_HELPER(float,P(VECTOR<float,2>));
+INSTANTIATION_HELPER(float,P(VECTOR<float,3>));
+INSTANTIATION_HELPER(double,P(VECTOR<double,1>));
+INSTANTIATION_HELPER(double,P(VECTOR<double,2>));
+INSTANTIATION_HELPER(double,P(VECTOR<double,3>));

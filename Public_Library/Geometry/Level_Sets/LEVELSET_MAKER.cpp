@@ -231,7 +231,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         else{
             if(verbose) LOG::Time(STRING_UTILITIES::string_sprintf("Extrapolating velocity (one sided band width=%f)",velocity_extrapolation_one_sided_band_width));
             GRID<TV> grid_copy=grid;
-            EXTRAPOLATION_UNIFORM<GRID<TV>,TV> extrapolation(grid_copy,phi,*velocity,3);
+            EXTRAPOLATION_UNIFORM<TV,TV> extrapolation(grid_copy,phi,*velocity,3);
             extrapolation.Set_Custom_Seed_Indices(&initialized_indices);
             extrapolation.Set_Band_Width(velocity_extrapolation_one_sided_band_width);
             extrapolation.Extrapolate(0);

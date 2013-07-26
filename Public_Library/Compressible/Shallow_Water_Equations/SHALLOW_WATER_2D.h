@@ -23,7 +23,7 @@ class SHALLOW_WATER_2D:public SHALLOW_WATER<GRID<VECTOR<T_input,2> > >
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
     T_FACE_ARRAYS_SCALAR face_velocities;
 public:
-    using SHALLOW_WATER<GRID<TV> >::boundary;using SHALLOW_WATER<GRID<TV> >::conservation;
+    using SHALLOW_WATER<TV>::boundary;using SHALLOW_WATER<TV>::conservation;
 
     T gravity;
     T min_height;

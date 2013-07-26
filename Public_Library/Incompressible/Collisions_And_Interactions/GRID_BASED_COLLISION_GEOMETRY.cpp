@@ -15,20 +15,20 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
-GRID_BASED_COLLISION_GEOMETRY(T_GRID& grid_input)
+template<class TV> GRID_BASED_COLLISION_GEOMETRY<TV>::
+GRID_BASED_COLLISION_GEOMETRY(GRID<TV>& grid_input)
     :grid(grid_input),number_of_ghost_cells(3)
 {}
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> GRID_BASED_COLLISION_GEOMETRY<TV>::
 ~GRID_BASED_COLLISION_GEOMETRY()
 {}
 //##################################################################### 
 // Function Add_Bodies
 //##################################################################### 
-template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
 Add_Bodies(RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
 {
     for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++) if(rigid_body_collection.Is_Active(i))
@@ -37,7 +37,7 @@ Add_Bodies(RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
 //##################################################################### 
 // Function Add_Bodies
 //##################################################################### 
-template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
 Add_Body(RIGID_BODY<TV>& rigid_body)
 {
     collision_geometry_collection.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body),rigid_body.particle_index,true);
@@ -45,7 +45,7 @@ Add_Body(RIGID_BODY<TV>& rigid_body)
 //##################################################################### 
 // Function Rasterize_Objects
 //##################################################################### 
-template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
 Rasterize_Objects()
 {
     objects_in_cell.Reset(grid,number_of_ghost_cells);
@@ -56,7 +56,7 @@ Rasterize_Objects()
 //##################################################################### 
 // Function Earliest_Simplex_Crossover
 //##################################################################### 
-template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY<TV>::
 Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     T min_time=FLT_MAX;bool collision=false;T current_hit_time;TV current_weights;int current_simplex_id;
@@ -71,7 +71,7 @@ Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_t
 //##################################################################### 
 // Function Latest_Crossover
 //##################################################################### 
-template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY<TV>::
 Latest_Crossover(const TV& start_X,const TV& end_X,const T dt,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,TV& initial_hit_point,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     T hit_time;TV weights;POINT_SIMPLEX_COLLISION_TYPE returned_collision_type;
@@ -84,7 +84,7 @@ Latest_Crossover(const TV& start_X,const TV& end_X,const T dt,COLLISION_GEOMETRY
 //##################################################################### 
 // Function Latest_Simplex_Crossover
 //##################################################################### 
-template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY<TV>::
 Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type,
     const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
@@ -103,7 +103,7 @@ Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_tim
 //##################################################################### 
 // Function Any_Simplex_Crossover
 //##################################################################### 
-template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY<TV>::
 Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     if(!objects){for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && collision_geometry_collection.bodies(i)->Any_Simplex_Crossover(start_X,end_X,dt)) return true;}
@@ -113,7 +113,7 @@ Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,const ARRAY<C
 //##################################################################### 
 // Function Update_Intersection_Acceleration_Structures
 //##################################################################### 
-template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
 Update_Intersection_Acceleration_Structures(const bool use_swept_simplex_hierarchy,const int state1,const int state2)
 {
     for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Update_Intersection_Acceleration_Structures(use_swept_simplex_hierarchy,state1,state2);
@@ -122,7 +122,7 @@ Update_Intersection_Acceleration_Structures(const bool use_swept_simplex_hierarc
 // Function Get_Body_Penetration
 //##################################################################### 
 // normal is flipped to ensure that start_phi is positive
-template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY<TV>::
 Get_Body_Penetration(const TV& start_X,const TV& end_X,const T contour_value,const T dt,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,T& start_phi,T& end_phi,TV& end_body_normal,TV& body_velocity,
     const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
@@ -142,7 +142,7 @@ Get_Body_Penetration(const TV& start_X,const TV& end_X,const T contour_value,con
 //##################################################################### 
 // Function Push_Out_Point
 //##################################################################### 
-template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY<TV>::
 Push_Out_Point(TV& X,const T collision_distance,const bool check_particle_crossover,bool& particle_crossover,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     T distance=FLT_MAX,current_distance;TV X_old=X;
@@ -158,7 +158,7 @@ Push_Out_Point(TV& X,const T collision_distance,const bool check_particle_crosso
 //##################################################################### 
 // Function Occupied_Block
 //##################################################################### 
-template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY<TV>::
 Occupied_Block(const T_BLOCK& block) const
 {
     return occupied_blocks(block.Block());
@@ -166,7 +166,7 @@ Occupied_Block(const T_BLOCK& block) const
 //##################################################################### 
 // Function Swept_Occupied_Block
 //##################################################################### 
-template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY<TV>::
 Swept_Occupied_Block(const T_BLOCK& block) const
 {
     return swept_occupied_blocks(block.Block());
@@ -174,7 +174,7 @@ Swept_Occupied_Block(const T_BLOCK& block) const
 //##################################################################### 
 // Function Read_State
 //##################################################################### 
-template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
 Read_State(TYPED_ISTREAM& input,const int state_index)
 {
     for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Read_State(input,state_index);
@@ -182,17 +182,17 @@ Read_State(TYPED_ISTREAM& input,const int state_index)
 //##################################################################### 
 // Function Write_State
 //##################################################################### 
-template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
 Write_State(TYPED_OSTREAM& output,const int state_index) const
 {
     for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Write_State(output,state_index);
 }
 //#####################################################################
 namespace PhysBAM{
-template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,1> > >;
-template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,2> > >;
-template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,3> > >;
-template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,1> > >;
-template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,2> > >;
-template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,3> > >;
+template class GRID_BASED_COLLISION_GEOMETRY<VECTOR<float,1> >;
+template class GRID_BASED_COLLISION_GEOMETRY<VECTOR<float,2> >;
+template class GRID_BASED_COLLISION_GEOMETRY<VECTOR<float,3> >;
+template class GRID_BASED_COLLISION_GEOMETRY<VECTOR<double,1> >;
+template class GRID_BASED_COLLISION_GEOMETRY<VECTOR<double,2> >;
+template class GRID_BASED_COLLISION_GEOMETRY<VECTOR<double,3> >;
 }

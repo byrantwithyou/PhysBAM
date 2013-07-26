@@ -13,8 +13,8 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> DETONATION_SHOCK_DYNAMICS<T_GRID>::
-DETONATION_SHOCK_DYNAMICS(T_GRID& grid_input,const LEVELSET<TV>& levelset_input,const int order_input)
+template<class TV> DETONATION_SHOCK_DYNAMICS<TV>::
+DETONATION_SHOCK_DYNAMICS(GRID<TV>& grid_input,const LEVELSET<TV>& levelset_input,const int order_input)
     :grid(grid_input),levelset(levelset_input),Dn(grid),Dn_dot(grid),curvature(grid),curvature_old(grid),order(order_input),boundary(&boundary_default),
     boundary_vector(&boundary_vector_default)
 {
@@ -22,14 +22,14 @@ DETONATION_SHOCK_DYNAMICS(T_GRID& grid_input,const LEVELSET<TV>& levelset_input,
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> DETONATION_SHOCK_DYNAMICS<T_GRID>::
+template<class TV> DETONATION_SHOCK_DYNAMICS<TV>::
 ~DETONATION_SHOCK_DYNAMICS()
 {
 }
 //#####################################################################
 // Function Initialize_Grid
 //#####################################################################
-template<class T_GRID> void DETONATION_SHOCK_DYNAMICS<T_GRID>::
+template<class TV> void DETONATION_SHOCK_DYNAMICS<TV>::
 Initialize_Grid()
 {
     assert(order>=1&&order<=3);
@@ -40,7 +40,7 @@ Initialize_Grid()
 //#####################################################################
 // Function Advance_One_Time_Step
 //#####################################################################
-template<class T_GRID> void DETONATION_SHOCK_DYNAMICS<T_GRID>::
+template<class TV> void DETONATION_SHOCK_DYNAMICS<TV>::
 Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,const int number_of_ghost_cells)
 {
     LOG::SCOPE scope("DSD Advance","DSD Advance (order=%d, dt=%f)",3,dt);
@@ -97,7 +97,7 @@ Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,cons
     T_ARRAYS_SCALAR Dn_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary->Fill_Ghost_Cells(grid,Dn.array,Dn_ghost,dt,time,number_of_ghost_cells);
     T_ARRAYS_SCALAR Dn_dot_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary->Fill_Ghost_Cells(grid,Dn_dot.array,Dn_dot_ghost,dt,time,number_of_ghost_cells);
     T_ARRAYS_SCALAR curvature_old_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary->Fill_Ghost_Cells(grid,curvature_old.array,curvature_old_ghost,dt,time,number_of_ghost_cells);
-    LINEAR_INTERPOLATION_UNIFORM<T_GRID,T> interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
         if(abs(phi(index))>(T)nb_width*grid.dX.x){Dn.array(index)=Dcj;continue;}//to make 'reaction_speed' files compact
         if(interfacial(index))continue;
@@ -130,8 +130,8 @@ Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,cons
 //#####################################################################
 // Function Make_NB_Indices
 //#####################################################################
-template<class T_GRID> void DETONATION_SHOCK_DYNAMICS<T_GRID>::
-Make_NB_Indices(T_GRID &grid,T_ARRAYS_SCALAR &phi,ARRAY<TV_INT>& indices_interface,const T dt,const T time,int number_of_ghost_cells)
+template<class TV> void DETONATION_SHOCK_DYNAMICS<TV>::
+Make_NB_Indices(GRID<TV> &grid,T_ARRAYS_SCALAR &phi,ARRAY<TV_INT>& indices_interface,const T dt,const T time,int number_of_ghost_cells)
 {
     T_ARRAYS_SCALAR phi_ghost;
     if(number_of_ghost_cells>0){   
@@ -141,7 +141,7 @@ Make_NB_Indices(T_GRID &grid,T_ARRAYS_SCALAR &phi,ARRAY<TV_INT>& indices_interfa
     indices_interface.Clean_Memory();// Clean memory of lists
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         T phi_1=phi_ghost(iterator.Cell_Index());
-        for(int i=0;i<T_GRID::number_of_faces_per_cell;i++){// painful symmetric debugging, T_GRID::dimension was a big mistake
+        for(int i=0;i<GRID<TV>::number_of_faces_per_cell;i++){// painful symmetric debugging, TV::m was a big mistake
             TV_INT neighbor_index=iterator.Cell_Neighbor(i);
             if(!phi_ghost.Valid_Index(neighbor_index))continue;
             T phi_2=phi_ghost(neighbor_index);
@@ -150,12 +150,12 @@ Make_NB_Indices(T_GRID &grid,T_ARRAYS_SCALAR &phi,ARRAY<TV_INT>& indices_interfa
 //#####################################################################
 // Function Closest_Point_On_Boundary
 //#####################################################################
-template<class T_GRID> bool DETONATION_SHOCK_DYNAMICS<T_GRID>::
+template<class TV> bool DETONATION_SHOCK_DYNAMICS<TV>::
 Closest_Point_On_Boundary(T_ARRAYS_SCALAR &phi_ghost,ARRAY<TV,TV_INT> &normals_ghost,const TV& location,TV& new_location,const T tolerance,const int max_iterations) const
 {
     RANGE<TV> box=grid.Ghost_Domain(3);
-    LINEAR_INTERPOLATION_UNIFORM<T_GRID,T> interpolation;
-    LINEAR_INTERPOLATION_UNIFORM<T_GRID,TV> interpolation_vector;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,TV> interpolation_vector;
     if(!tolerance){
         T phi=interpolation.Clamped_To_Array_Cell(grid,phi_ghost,location);
         TV normal=interpolation_vector.Clamped_To_Array_Cell(grid,normals_ghost,location);
@@ -177,7 +177,7 @@ Closest_Point_On_Boundary(T_ARRAYS_SCALAR &phi_ghost,ARRAY<TV,TV_INT> &normals_g
 //#####################################################################
 // Function Normal_Flame_Speed
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR DETONATION_SHOCK_DYNAMICS<T_GRID>::
+template<class TV> typename TV::SCALAR DETONATION_SHOCK_DYNAMICS<TV>::
 Normal_Flame_Speed(const int axis,const TV_INT& face_index) const
 {
     TV_INT cell1,cell2;grid.Cells_Touching_Face(axis,face_index,cell1,cell2);
@@ -186,11 +186,11 @@ Normal_Flame_Speed(const int axis,const TV_INT& face_index) const
 }
 //#####################################################################
 namespace PhysBAM{
-template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<float,1> > >;
-template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<float,2> > >;
-template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<float,3> > >;
-template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<double,1> > >;
-template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<double,2> > >;
-template class DETONATION_SHOCK_DYNAMICS<GRID<VECTOR<double,3> > >;
+template class DETONATION_SHOCK_DYNAMICS<VECTOR<float,1> >;
+template class DETONATION_SHOCK_DYNAMICS<VECTOR<float,2> >;
+template class DETONATION_SHOCK_DYNAMICS<VECTOR<float,3> >;
+template class DETONATION_SHOCK_DYNAMICS<VECTOR<double,1> >;
+template class DETONATION_SHOCK_DYNAMICS<VECTOR<double,2> >;
+template class DETONATION_SHOCK_DYNAMICS<VECTOR<double,3> >;
 }
 

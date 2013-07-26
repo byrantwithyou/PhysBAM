@@ -8,31 +8,31 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> FAST_PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
+template<class TV> FAST_PROJECTION_DYNAMICS_UNIFORM<TV>::
 FAST_PROJECTION_DYNAMICS_UNIFORM(const int scale,const bool flame_input,const bool multiphase,const bool use_variable_beta,const bool use_poisson)
-    :PROJECTION_DYNAMICS_UNIFORM<T_GRID>(GRID<TV>(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true),flame_input,multiphase,use_variable_beta,use_poisson)
+    :PROJECTION_DYNAMICS_UNIFORM<TV>(GRID<TV>(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true),flame_input,multiphase,use_variable_beta,use_poisson)
 {
 }
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> FAST_PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
+template<class TV> FAST_PROJECTION_DYNAMICS_UNIFORM<TV>::
 FAST_PROJECTION_DYNAMICS_UNIFORM(const int scale,LEVELSET<TV>& levelset_input)
-    :PROJECTION_DYNAMICS_UNIFORM<T_GRID>(GRID<TV>(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true),levelset_input)
+    :PROJECTION_DYNAMICS_UNIFORM<TV>(GRID<TV>(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true),levelset_input)
 {
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> FAST_PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
+template<class TV> FAST_PROJECTION_DYNAMICS_UNIFORM<TV>::
 ~FAST_PROJECTION_DYNAMICS_UNIFORM()
 {
 }
 //#####################################################################
 // Function Initialize_Grid
 //#####################################################################
-template<class T_GRID> void FAST_PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-Initialize_Grid(const T_GRID& mac_grid)
+template<class TV> void FAST_PROJECTION_DYNAMICS_UNIFORM<TV>::
+Initialize_Grid(const GRID<TV>& mac_grid)
 {
     BASE::Initialize_Grid(mac_grid);
     int scale=mac_grid.counts.x;
@@ -60,7 +60,7 @@ Initialize_Grid(const T_GRID& mac_grid)
     for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T row_sum=default_row_sum;
         int matrix_index=cell_index_to_matrix_index(cell_index);
-        for(int axis=0;axis<GRID<TV>::dimension;axis++){TV_INT offset;offset[axis]=1;
+        for(int axis=0;axis<TV::m;axis++){TV_INT offset;offset[axis]=1;
             if(elliptic_solver->psi_N.Component(axis)(cell_index)) row_sum+=one_over_dx2[axis];
             else A.Set_Element(matrix_index,cell_index_to_matrix_index(cell_index-offset),one_over_dx2[axis]);
             if(elliptic_solver->psi_N.Component(axis)(cell_index+offset)) row_sum+=one_over_dx2[axis];
@@ -70,10 +70,10 @@ Initialize_Grid(const T_GRID& mac_grid)
 //#####################################################################
 // Function Make_Divergence_Free
 //#####################################################################
-template<class T_GRID> void FAST_PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
+template<class TV> void FAST_PROJECTION_DYNAMICS_UNIFORM<TV>::
 Make_Divergence_Free_Fast(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
-    Compute_Divergence(typename INTERPOLATION_POLICY<GRID<TV> >::FACE_LOOKUP(face_velocities),elliptic_solver);
+    Compute_Divergence(FACE_LOOKUP_UNIFORM<TV>(face_velocities),elliptic_solver);
     for(CELL_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         int matrix_index=cell_index_to_matrix_index(cell_index);
@@ -84,10 +84,10 @@ Make_Divergence_Free_Fast(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const
 }
 //#####################################################################
 namespace PhysBAM{
-template class FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<VECTOR<float,1> > >;
-template class FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<VECTOR<float,2> > >;
-template class FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<VECTOR<float,3> > >;
-template class FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<VECTOR<double,1> > >;
-template class FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<VECTOR<double,2> > >;
-template class FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<VECTOR<double,3> > >;
+template class FAST_PROJECTION_DYNAMICS_UNIFORM<VECTOR<float,1> >;
+template class FAST_PROJECTION_DYNAMICS_UNIFORM<VECTOR<float,2> >;
+template class FAST_PROJECTION_DYNAMICS_UNIFORM<VECTOR<float,3> >;
+template class FAST_PROJECTION_DYNAMICS_UNIFORM<VECTOR<double,1> >;
+template class FAST_PROJECTION_DYNAMICS_UNIFORM<VECTOR<double,2> >;
+template class FAST_PROJECTION_DYNAMICS_UNIFORM<VECTOR<double,3> >;
 }

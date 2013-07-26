@@ -24,7 +24,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Function Find_Matrix_Indices
 //#####################################################################
-template<class T_GRID> void LAPLACE_UNIFORM_MPI<T_GRID>::
+template<class TV> void LAPLACE_UNIFORM_MPI<TV>::
 Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,const VECTOR<T,1>&)
 {
     assert(local_grid.Is_MAC_Grid());
@@ -38,7 +38,7 @@ Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS
 //#####################################################################
 // Function Find_Matrix_Indices
 //#####################################################################
-template<class T_GRID> void LAPLACE_UNIFORM_MPI<T_GRID>::
+template<class TV> void LAPLACE_UNIFORM_MPI<TV>::
 Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,const VECTOR<T,2>&)
 {
     assert(local_grid.Is_MAC_Grid());
@@ -56,7 +56,7 @@ Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS
 //#####################################################################
 // Function Find_Matrix_Indices
 //#####################################################################
-template<class T_GRID> void LAPLACE_UNIFORM_MPI<T_GRID>::
+template<class TV> void LAPLACE_UNIFORM_MPI<TV>::
 Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,const VECTOR<T,3>&)
 {
     assert(local_grid.Is_MAC_Grid());
@@ -78,8 +78,8 @@ Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS
 //#####################################################################
 // Function Find_Matrix_Indices
 //#####################################################################
-template<class T_GRID> void LAPLACE_UNIFORM_MPI<T_GRID>::
-Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL<int> > >& interior_indices,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >& ghost_indices,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,LAPLACE_UNIFORM<T_GRID>* laplace)
+template<class TV> void LAPLACE_UNIFORM_MPI<TV>::
+Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL<int> > >& interior_indices,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >& ghost_indices,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,LAPLACE_UNIFORM<TV>* laplace)
 {
     assert(local_grid.Is_MAC_Grid());
     //interior mpi cells, interior thread cells
@@ -111,7 +111,7 @@ Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL
 //#####################################################################
 // Function Find_Matrix_Indices_In_Region
 //#####################################################################
-template<class T_GRID> void LAPLACE_UNIFORM_MPI<T_GRID>::
+template<class TV> void LAPLACE_UNIFORM_MPI<TV>::
 Find_Matrix_Indices_In_Region(const int region_index,const RANGE<TV_INT>& region,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,
     ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array)
 {
@@ -127,7 +127,7 @@ Find_Matrix_Indices_In_Region(const int region_index,const RANGE<TV_INT>& region
 //#####################################################################
 // Function Find_Boundary_Indices_In_Region
 //#####################################################################
-template<class T_GRID> void LAPLACE_UNIFORM_MPI<T_GRID>::
+template<class TV> void LAPLACE_UNIFORM_MPI<TV>::
 Find_Boundary_Indices_In_Region(const int side,const RANGE<TV_INT>& region,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     int axis=side/2,cell_side=side&1;
@@ -150,28 +150,28 @@ Find_Boundary_Indices_In_Region(const int side,const RANGE<TV_INT>& region,T_ARR
 #else
 
 //#####################################################################
-template<class T_GRID> void LAPLACE_UNIFORM_MPI<T_GRID>::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const VECTOR<T,1>&){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class T_GRID> void LAPLACE_UNIFORM_MPI<T_GRID>::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const VECTOR<T,2>&){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class T_GRID> void LAPLACE_UNIFORM_MPI<T_GRID>::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const VECTOR<T,3>&){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class T_GRID> void LAPLACE_UNIFORM_MPI<T_GRID>::Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >&,ARRAY<ARRAY<INTERVAL<int> > >&,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >&,ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,LAPLACE_UNIFORM<T_GRID>*){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const VECTOR<T,1>&){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const VECTOR<T,2>&){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const VECTOR<T,3>&){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >&,ARRAY<ARRAY<INTERVAL<int> > >&,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >&,ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,LAPLACE_UNIFORM<TV>*){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 //#####################################################################
 
 #endif
 
 //#####################################################################
 #define P(...) __VA_ARGS__
-#define INSTANTIATION_HELPER(T_GRID) \
-    template void LAPLACE_UNIFORM_MPI<T_GRID >::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const TV&); \
-    template void LAPLACE_UNIFORM_MPI<T_GRID >::Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >&,ARRAY<ARRAY<INTERVAL<int> > >&,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >&,ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,LAPLACE_UNIFORM<T_GRID>*);
-template LAPLACE_UNIFORM_MPI<GRID<VECTOR<float,1> > >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(GRID<VECTOR<float,1> >) >&);
-template LAPLACE_UNIFORM_MPI<GRID<VECTOR<float,2> > >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(GRID<VECTOR<float,2> >) >&);
-template LAPLACE_UNIFORM_MPI<GRID<VECTOR<float,3> > >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(GRID<VECTOR<float,3> >) >&);
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,1> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,2> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,3> >));
-template LAPLACE_UNIFORM_MPI<GRID<VECTOR<double,1> > >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(GRID<VECTOR<double,1> >) >&);
-template LAPLACE_UNIFORM_MPI<GRID<VECTOR<double,2> > >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(GRID<VECTOR<double,2> >) >&);
-template LAPLACE_UNIFORM_MPI<GRID<VECTOR<double,3> > >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(GRID<VECTOR<double,3> >) >&);
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,1> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,2> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,3> >));
+#define INSTANTIATION_HELPER(TV) \
+    template void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const TV&); \
+    template void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >&,ARRAY<ARRAY<INTERVAL<int> > >&,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >&,ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,LAPLACE_UNIFORM<TV>*);
+template LAPLACE_UNIFORM_MPI<VECTOR<float,1> >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(VECTOR<float,1>) >&);
+template LAPLACE_UNIFORM_MPI<VECTOR<float,2> >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(VECTOR<float,2>) >&);
+template LAPLACE_UNIFORM_MPI<VECTOR<float,3> >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(VECTOR<float,3>) >&);
+INSTANTIATION_HELPER(P(VECTOR<float,1>));
+INSTANTIATION_HELPER(P(VECTOR<float,2>));
+INSTANTIATION_HELPER(P(VECTOR<float,3>));
+template LAPLACE_UNIFORM_MPI<VECTOR<double,1> >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(VECTOR<double,1>) >&);
+template LAPLACE_UNIFORM_MPI<VECTOR<double,2> >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(VECTOR<double,2>) >&);
+template LAPLACE_UNIFORM_MPI<VECTOR<double,3> >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(VECTOR<double,3>) >&);
+INSTANTIATION_HELPER(P(VECTOR<double,1>));
+INSTANTIATION_HELPER(P(VECTOR<double,2>));
+INSTANTIATION_HELPER(P(VECTOR<double,3>));

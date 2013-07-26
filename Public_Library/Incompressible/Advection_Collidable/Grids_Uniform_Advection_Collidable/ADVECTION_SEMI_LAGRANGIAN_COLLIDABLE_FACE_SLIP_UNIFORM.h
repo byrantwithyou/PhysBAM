@@ -13,29 +13,27 @@
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<T_GRID>
-class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM:public ADVECTION<T_GRID,typename T_GRID::SCALAR,T_FACE_LOOKUP>
+template<class TV,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<TV>
+class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM:public ADVECTION<TV,typename TV::SCALAR,T_FACE_LOOKUP>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename COLLISION_BODY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
-    T_GRID_BASED_COLLISION_GEOMETRY& body_list;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list;
 private:
-    LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM<T_GRID,T,T_FACE_LOOKUP> linear_interpolation_collidable;
-    LINEAR_INTERPOLATION_UNIFORM<T_GRID,T,typename T_FACE_LOOKUP::NESTED_LOOKUP> linear_interpolation;
-    AVERAGING_UNIFORM<T_GRID,typename T_FACE_LOOKUP::NESTED_LOOKUP> averaging;
+    LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM<TV,T,T_FACE_LOOKUP> linear_interpolation_collidable;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T,typename T_FACE_LOOKUP::NESTED_LOOKUP> linear_interpolation;
+    AVERAGING_UNIFORM<TV,typename T_FACE_LOOKUP::NESTED_LOOKUP> averaging;
 public:
 
-    ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM(T_GRID_BASED_COLLISION_GEOMETRY& body_list_input);
+    ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list_input);
     virtual ~ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM();
 
 //#####################################################################
-    void Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
+    void Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
         const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max);
-    void Average_To_Invalidated_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_values,T_FACE_ARRAYS_BOOL* faces_not_to_revalidate=0);
+    void Average_To_Invalidated_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_values,T_FACE_ARRAYS_BOOL* faces_not_to_revalidate=0);
 //#####################################################################
 };
 }

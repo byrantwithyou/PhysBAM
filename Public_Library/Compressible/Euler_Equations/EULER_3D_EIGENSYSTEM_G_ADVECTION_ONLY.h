@@ -14,7 +14,7 @@
 namespace PhysBAM{
 
 template<class T_input>
-class EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY:public EULER_EIGENSYSTEM<GRID<VECTOR<T_input,3> > >
+class EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY:public EULER_EIGENSYSTEM<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,5> TV_DIMENSION;
     enum WORKAROUND1 {d=TV_DIMENSION::m};

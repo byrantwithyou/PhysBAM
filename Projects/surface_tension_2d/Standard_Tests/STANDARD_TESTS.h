@@ -62,13 +62,13 @@
 namespace PhysBAM{
 template <class TV> class FLUID_TO_SOLID_INTERPOLATION_CUT;
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
     typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<bool,FACE_INDEX<2> > T_FACE_ARRAYS_BOOL;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;

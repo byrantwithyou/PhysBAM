@@ -15,23 +15,23 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID,class T_FACE_LOOKUP> ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<T_GRID,T_FACE_LOOKUP>::
-ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM(T_GRID_BASED_COLLISION_GEOMETRY& body_list_input)
+template<class TV,class T_FACE_LOOKUP> ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<TV,T_FACE_LOOKUP>::
+ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list_input)
     :body_list(body_list_input)
 {
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID,class T_FACE_LOOKUP> ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<T_GRID,T_FACE_LOOKUP>::
+template<class TV,class T_FACE_LOOKUP> ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<TV,T_FACE_LOOKUP>::
 ~ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM()
 {
 }
 //#####################################################################
 // Function Update_Advection_Equation_Face_Lookup
 //#####################################################################
-template<class T_GRID,class T_FACE_LOOKUP> void ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<T_GRID,T_FACE_LOOKUP>::
-Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
+template<class TV,class T_FACE_LOOKUP> void ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<TV,T_FACE_LOOKUP>::
+Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
     const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
 {
     PHYSBAM_ASSERT(!Z_min_ghost && !Z_max_ghost && !Z_min && !Z_max);
@@ -44,7 +44,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
         else{
             FACE_ITERATOR<TV> lookup_iterator(grid,axis,face);
             const typename T_FACE_LOOKUP::LOOKUP& lookup=Z_ghost.Starting_Point_Face(axis,face);
-            TV velocity=AVERAGING_UNIFORM<T_GRID,T_FACE_LOOKUP>::Average_Face_To_Face_Vector_Helper(grid,iterator,lookup);
+            TV velocity=AVERAGING_UNIFORM<TV,T_FACE_LOOKUP>::Average_Face_To_Face_Vector_Helper(grid,iterator,lookup);
             TV length_and_direction=-dt*velocity;
             TV_INT adjacent_cell_center=iterator.First_Cell_Index();
             if((*body_list.outside_fluid)(iterator.First_Cell_Index()))
@@ -69,22 +69,22 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
                     PHYSBAM_FATAL_ERROR("Inconsistent inside checks");}
             else{
                 const typename T_FACE_LOOKUP::LOOKUP lookup(Z_ghost,Z_ghost.nested_face_lookup);
-                Z(axis,face)=linear_interpolation_collidable.From_Block_Face_Component(axis,grid,BLOCK_UNIFORM<T_GRID>(grid,interpolation_point,lookup.Number_Of_Ghost_Cells()),lookup,interpolation_point);}}}
+                Z(axis,face)=linear_interpolation_collidable.From_Block_Face_Component(axis,grid,BLOCK_UNIFORM<TV>(grid,interpolation_point,lookup.Number_Of_Ghost_Cells()),lookup,interpolation_point);}}}
 }
 //#####################################################################
 // Function Average_To_Invalidated_Face
 //#####################################################################
-template<class T_GRID,class T_FACE_LOOKUP> void ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<T_GRID,T_FACE_LOOKUP>::
-Average_To_Invalidated_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_values,T_FACE_ARRAYS_BOOL* faces_not_to_revalidate)
+template<class TV,class T_FACE_LOOKUP> void ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<TV,T_FACE_LOOKUP>::
+Average_To_Invalidated_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_values,T_FACE_ARRAYS_BOOL* faces_not_to_revalidate)
 {
     return;
     PHYSBAM_FATAL_ERROR("Not doing this");
 }
 namespace PhysBAM{
-template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<GRID<VECTOR<float,1> >,FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<GRID<VECTOR<float,1> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,1> > > > >;
-template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<GRID<VECTOR<float,2> >,FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<GRID<VECTOR<float,2> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,2> > > > >;
-template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<GRID<VECTOR<float,3> >,FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<GRID<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > > >;
-template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<GRID<VECTOR<double,1> >,FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<GRID<VECTOR<double,1> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,1> > > > >;
-template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<GRID<VECTOR<double,2> >,FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<GRID<VECTOR<double,2> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,2> > > > >;
-template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<GRID<VECTOR<double,3> >,FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<GRID<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > > >;
+template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<VECTOR<float,1>,FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<VECTOR<float,1>,FACE_LOOKUP_UNIFORM<VECTOR<float,1> > > >;
+template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<VECTOR<float,2>,FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<VECTOR<float,2>,FACE_LOOKUP_UNIFORM<VECTOR<float,2> > > >;
+template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<VECTOR<float,3>,FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<VECTOR<float,3>,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > > >;
+template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<VECTOR<double,1>,FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<VECTOR<double,1>,FACE_LOOKUP_UNIFORM<VECTOR<double,1> > > >;
+template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<VECTOR<double,2>,FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<VECTOR<double,2>,FACE_LOOKUP_UNIFORM<VECTOR<double,2> > > >;
+template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM<VECTOR<double,3>,FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<VECTOR<double,3>,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > > >;
 }

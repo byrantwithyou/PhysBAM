@@ -195,7 +195,7 @@ Initialize_Advection()
     fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles=3;
     fluids_parameters.particle_levelset_evolution->runge_kutta_order_levelset=3;
     fluids_parameters.particle_levelset_evolution->Use_Hamilton_Jacobi_Weno_Advection();
-    fluids_parameters.incompressible->advection=new ADVECTION_HAMILTON_JACOBI_ENO<GRID<TV>,T>;
+    fluids_parameters.incompressible->advection=new ADVECTION_HAMILTON_JACOBI_ENO<TV,T>;
     convection_order=3;
     fluids_parameters.particle_levelset_evolution->Use_Reinitialization();
 }

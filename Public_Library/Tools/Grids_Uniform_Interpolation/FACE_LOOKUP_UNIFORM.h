@@ -10,11 +10,11 @@
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 namespace PhysBAM{
 
-template<class T_GRID>
+template<class TV>
 class FACE_LOOKUP_UNIFORM
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;
-    typedef typename T_GRID::INDEX T_INDEX;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
 public:
     typedef T ELEMENT;
         
@@ -32,16 +32,16 @@ public:
     
     typedef FACE_LOOKUP_UNIFORM LOOKUP;
 
-    const LOOKUP& Starting_Point_Face(const int axis,const T_INDEX& face) const
+    const LOOKUP& Starting_Point_Face(const int axis,const TV_INT& face) const
     {return *this;}
     
-    const LOOKUP& Starting_Point_Cell(const T_INDEX& cell) const
+    const LOOKUP& Starting_Point_Cell(const TV_INT& cell) const
     {return *this;}
 
     void Set_Reference_Point(const TV& reference_point) const
     {}
 
-    T operator()(const int axis,const T_INDEX& face) const
+    T operator()(const int axis,const TV_INT& face) const
     {return V_face.Component(axis)(face);}
 
     T operator()(const FACE_INDEX<TV::dimension>& face) const

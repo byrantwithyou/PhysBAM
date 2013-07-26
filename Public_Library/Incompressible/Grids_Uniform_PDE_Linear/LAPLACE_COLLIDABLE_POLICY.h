@@ -6,12 +6,12 @@
 #define __LAPLACE_COLLIDABLE_POLICY__
 
 namespace PhysBAM{
-template<class T_GRID> class LAPLACE_COLLIDABLE_UNIFORM;
+template<class TV> class LAPLACE_COLLIDABLE_UNIFORM;
 
-template<class T_GRID>
+template<class TV>
 struct LAPLACE_COLLIDABLE_POLICY
 {
-    typedef LAPLACE_COLLIDABLE_UNIFORM<T_GRID> LAPLACE;
+    typedef LAPLACE_COLLIDABLE_UNIFORM<TV> LAPLACE;
 };
 }
 #endif

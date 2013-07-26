@@ -17,20 +17,20 @@
 namespace PhysBAM{
 
 template<class T_input>
-class SHEETING:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class SHEETING:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;
 public:
     typedef VECTOR<int,3> TV_INT;
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::solid_body_collection;using BASE::stream_type;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
-    FLUID_COLLISION_BODY_INACCURATE_UNION<GRID<TV> > inaccurate_union;
+    FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
     bool use_variable_density_for_sph,use_two_way_coupling_for_sph,convert_sph_particles_to_fluid,use_analytic_divergence;
     T ballistic_particles_as_percentage_of_target;
     RANDOM_NUMBERS<T> random;
@@ -43,7 +43,7 @@ public:
     ARRAY<VECTOR<T,3> > source_velocity;
 
     SHEETING(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,1,fluids_parameters.WATER),rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,1,fluids_parameters.WATER),rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid),
         use_variable_density_for_sph(false),use_two_way_coupling_for_sph(false),convert_sph_particles_to_fluid(false),ballistic_particles_as_percentage_of_target((T).03),bowl(0)
     {
     }
@@ -169,7 +169,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
 {
-    SPH_EVOLUTION_UNIFORM<GRID<TV> >& sph_evolution=*fluids_parameters.sph_evolution;
+    SPH_EVOLUTION_UNIFORM<TV>& sph_evolution=*fluids_parameters.sph_evolution;
     sph_evolution.use_two_way_coupling=use_two_way_coupling_for_sph;
     sph_evolution.use_variable_density_solve=use_variable_density_for_sph;
     sph_evolution.convert_particles_to_fluid=convert_sph_particles_to_fluid;
@@ -203,7 +203,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBA
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Update_Fluid_Parameters(dt,time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
     Update_Sources(time);
 }
 //#####################################################################

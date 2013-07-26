@@ -18,7 +18,7 @@ class REFINEMENT_TASK:public THREAD_QUEUE::TASK
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
     
 public:
-    PROJECTION_REFINEMENT_UNIFORM<GRID<TV> >* projection;
+    PROJECTION_REFINEMENT_UNIFORM<TV>* projection;
     ARRAY<T,FACE_INDEX<TV::dimension> > *fine_face_velocities;
     TV_INT cell_index;
     T time,dt;

@@ -14,8 +14,8 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //##################################################################### 
-template<class T_GRID> PARTICLE_LEVELSET<T_GRID>::
-PARTICLE_LEVELSET(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input)
+template<class TV> PARTICLE_LEVELSET<TV>::
+PARTICLE_LEVELSET(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,const int number_of_ghost_cells_input)
     :only_use_negative_particles(false),use_removed_negative_particles(false),use_removed_positive_particles(false),last_unique_particle_id(0),
     particle_pool(template_particles),reincorporate_removed_particles_everywhere(false),save_removed_particle_times(false),
     delete_positive_particles_crossing_bodies(true),number_of_ghost_cells(number_of_ghost_cells_input),levelset(grid_input,phi_input,collision_body_list_input,number_of_ghost_cells_input),
@@ -32,12 +32,12 @@ PARTICLE_LEVELSET(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input,GRID_BASED_COLLI
     Set_Band_Width();
     Use_Removed_Positive_Particles(false);
     Use_Removed_Negative_Particles(false);
-    Set_Number_Particles_Per_Cell(pow<T_GRID::dimension>(4));
+    Set_Number_Particles_Per_Cell(pow<TV::m>(4));
 }   
 //#####################################################################
 // Destructor
 //##################################################################### 
-template<class T_GRID> PARTICLE_LEVELSET<T_GRID>::
+template<class TV> PARTICLE_LEVELSET<TV>::
 ~PARTICLE_LEVELSET()
 {
     removed_negative_particles.Delete_Pointers_And_Clean_Memory();
@@ -48,7 +48,7 @@ template<class T_GRID> PARTICLE_LEVELSET<T_GRID>::
 //#####################################################################
 // Function Initialize_Particle_Levelset_Grid_Values
 //#####################################################################
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Initialize_Particle_Levelset_Grid_Values()
 {
     positive_particles.Resize(levelset.grid.Block_Indices(number_of_ghost_cells));
@@ -65,7 +65,7 @@ Initialize_Particle_Levelset_Grid_Values()
 //#####################################################################
 // Function Store_Unique_Particle_Id
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Store_Unique_Particle_Id(const bool store_unique_particle_id_input)
 {
     store_unique_particle_id=store_unique_particle_id_input;
@@ -79,7 +79,7 @@ Store_Unique_Particle_Id(const bool store_unique_particle_id_input)
 //#####################################################################
 // Function Add_Particle
 //##################################################################### 
-template<class T_GRID> PARTICLE_LEVELSET_PARTICLES<typename T_GRID::VECTOR_T>* PARTICLE_LEVELSET<T_GRID>::
+template<class TV> PARTICLE_LEVELSET_PARTICLES<TV>* PARTICLE_LEVELSET<TV>::
 Allocate_Particles(const PARTICLE_LEVELSET_PARTICLES<TV>& clone_particles)
 {
     assert(!dynamic_cast<const PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&clone_particles));
@@ -88,7 +88,7 @@ Allocate_Particles(const PARTICLE_LEVELSET_PARTICLES<TV>& clone_particles)
 //#####################################################################
 // Function Add_Particle
 //##################################################################### 
-template<class T_GRID> PARTICLE_LEVELSET_REMOVED_PARTICLES<typename T_GRID::VECTOR_T>* PARTICLE_LEVELSET<T_GRID>::
+template<class TV> PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* PARTICLE_LEVELSET<TV>::
 Allocate_Particles(const PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& clone_particles)
 {
     return clone_particles.Clone();
@@ -96,7 +96,7 @@ Allocate_Particles(const PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& clone_particle
 //#####################################################################
 // Function Add_Particle
 //##################################################################### 
-template<class T_GRID> int PARTICLE_LEVELSET<T_GRID>::
+template<class TV> int PARTICLE_LEVELSET<TV>::
 Add_Particle(PARTICLE_LEVELSET_PARTICLES<TV>*& particles)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(particles));
@@ -106,7 +106,7 @@ Add_Particle(PARTICLE_LEVELSET_PARTICLES<TV>*& particles)
 //#####################################################################
 // Function Add_Particle
 //##################################################################### 
-template<class T_GRID> int PARTICLE_LEVELSET<T_GRID>::
+template<class TV> int PARTICLE_LEVELSET<TV>::
 Add_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*& particles)
 {
     return particles->Add_Element();
@@ -114,7 +114,7 @@ Add_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*& particles)
 //#####################################################################
 // Function Add_Particle_To_Deletion_List
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Add_Particle_To_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >& deletion_list,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&particles));
@@ -124,7 +124,7 @@ Add_Particle_To_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >
 //#####################################################################
 // Function Add_Particle_To_Deletion_List
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Add_Particle_To_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >& deletion_list,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles,const int index)
 {
     particles.Add_To_Deletion_List(index);
@@ -132,7 +132,7 @@ Add_Particle_To_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >
 //#####################################################################
 // Function Delete_Particle
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Delete_Particle_And_Clean_Memory(PARTICLE_LEVELSET_PARTICLES<TV>* head_particles,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&particles));
@@ -146,7 +146,7 @@ Delete_Particle_And_Clean_Memory(PARTICLE_LEVELSET_PARTICLES<TV>* head_particles
 //#####################################################################
 // Function Delete_Particle
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Delete_Particle_And_Clean_Memory(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* head_particles,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles,const int index)
 {
     Delete_Particle(particles,index);
@@ -154,7 +154,7 @@ Delete_Particle_And_Clean_Memory(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* head_p
 //#####################################################################
 // Function Delete_Particle
 //##################################################################### 
-template<class T_GRID> bool PARTICLE_LEVELSET<T_GRID>::
+template<class TV> bool PARTICLE_LEVELSET<TV>::
 Delete_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&particles));
@@ -167,7 +167,7 @@ Delete_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index)
 //#####################################################################
 // Function Delete_Particle
 //##################################################################### 
-template<class T_GRID> bool PARTICLE_LEVELSET<T_GRID>::
+template<class TV> bool PARTICLE_LEVELSET<TV>::
 Delete_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles,const int index)
 {
     particles.Delete_Element(index);
@@ -176,7 +176,7 @@ Delete_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles,const int ind
 //#####################################################################
 // Function Delete_Particle
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Delete_Particles_From_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >& deletion_list,PARTICLE_LEVELSET_PARTICLES<TV>& particles,bool verbose)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&particles));
@@ -201,7 +201,7 @@ Delete_Particles_From_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,
 //#####################################################################
 // Function Delete_Particle
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Delete_Particles_From_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >& deletion_list,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles)
 {
     particles.Delete_Elements_On_Deletion_List();
@@ -209,7 +209,7 @@ Delete_Particles_From_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,
 //#####################################################################
 // Function Get_Particle_Link
 //##################################################################### 
-template<class T_GRID> PARTICLE_LEVELSET_PARTICLES<typename T_GRID::VECTOR_T>& PARTICLE_LEVELSET<T_GRID>::
+template<class TV> PARTICLE_LEVELSET_PARTICLES<TV>& PARTICLE_LEVELSET<TV>::
 Get_Particle_Link(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int absolute_index,int& index_in_link)
 {
     PARTICLE_LEVELSET_PARTICLES<TV>* particles_link=&particles;index_in_link=absolute_index;
@@ -222,7 +222,7 @@ Get_Particle_Link(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int absolute_
 //#####################################################################
 // Function Copy_Particle
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Copy_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_PARTICLES<TV>& to_particles,const int from_absolute_index)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&from_particles));
@@ -234,7 +234,7 @@ Copy_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_
 //#####################################################################
 // Function Copy_Particle
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Copy_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& to_particles,const int from_absolute_index)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&from_particles));
@@ -244,7 +244,7 @@ Copy_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_
 //#####################################################################
 // Function Copy_Particle
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Copy_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_PARTICLES<TV>& to_particles,const int from_index)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&to_particles));
@@ -254,7 +254,7 @@ Copy_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_L
 //#####################################################################
 // Function Copy_Particle
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Copy_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& to_particles,const int from_index)
 {
     to_particles.Append(from_particles,from_index);
@@ -262,7 +262,7 @@ Copy_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_L
 //#####################################################################
 // Function Move_Particle
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Move_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_PARTICLES<TV>& to_particles,const int from_absolute_index)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&from_particles));
@@ -274,7 +274,7 @@ Move_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_
 //#####################################################################
 // Function Move_Particle
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Move_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& to_particles,const int from_absolute_index)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&from_particles));
@@ -285,7 +285,7 @@ Move_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_
 //#####################################################################
 // Function Move_Particle
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Move_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_PARTICLES<TV>& to_particles,const int from_index)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&to_particles));
@@ -295,7 +295,7 @@ Move_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_L
 //#####################################################################
 // Function Move_Particle
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Move_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& to_particles,const int from_index)
 {
     to_particles.Take(from_particles,from_index);
@@ -303,7 +303,7 @@ Move_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_L
 //#####################################################################
 // Function Compact_Particles
 //##################################################################### 
-template<class T_GRID> template<class T_PARTICLES> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> template<class T_PARTICLES> void PARTICLE_LEVELSET<TV>::
 Compact_Particles(T_PARTICLES& particles)
 {
     particles.Compact();
@@ -311,17 +311,17 @@ Compact_Particles(T_PARTICLES& particles)
 //#####################################################################
 // Function Allocate_Particle
 //##################################################################### 
-template<class TV,class T_GRID> static inline PARTICLE_LEVELSET_PARTICLES<TV>*
-Allocate_Particle_Helper(PARTICLE_LEVELSET<T_GRID>& particle_levelset,const PARTICLE_LEVELSET_PARTICLES<TV>*)
+template<class TV> static inline PARTICLE_LEVELSET_PARTICLES<TV>*
+Allocate_Particle_Helper(PARTICLE_LEVELSET<TV>& particle_levelset,const PARTICLE_LEVELSET_PARTICLES<TV>*)
 {
     return particle_levelset.particle_pool.Allocate_Particle();
 }
-template<class TV,class T_GRID> static inline PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*
-Allocate_Particle_Helper(PARTICLE_LEVELSET<T_GRID>& particle_levelset,const PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*)
+template<class TV> static inline PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*
+Allocate_Particle_Helper(PARTICLE_LEVELSET<TV>& particle_levelset,const PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*)
 {
     return particle_levelset.template_removed_particles.Clone();
 }
-template<class T_GRID> template<class T_PARTICLES> T_PARTICLES* PARTICLE_LEVELSET<T_GRID>::
+template<class TV> template<class T_PARTICLES> T_PARTICLES* PARTICLE_LEVELSET<TV>::
 Allocate_Particle()
 {
     return Allocate_Particle_Helper(*this,(T_PARTICLES*)0);
@@ -329,7 +329,7 @@ Allocate_Particle()
 //#####################################################################
 // Function Free_Particle_And_Clear_Pointer
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Free_Particle_And_Clear_Pointer(PARTICLE_LEVELSET_PARTICLES<TV>*& particles)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(particles));
@@ -338,7 +338,7 @@ Free_Particle_And_Clear_Pointer(PARTICLE_LEVELSET_PARTICLES<TV>*& particles)
 //#####################################################################
 // Function Free_Particle_And_Clear_Pointer
 //##################################################################### 
-template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET<TV>::
 Free_Particle_And_Clear_Pointer(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*& particles)
 {
     delete particles;particles=0;
@@ -346,7 +346,7 @@ Free_Particle_And_Clear_Pointer(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*& partic
 //#####################################################################
 // Function Adjust_Particle_For_Object
 //##################################################################### 
-template<class T_GRID> bool PARTICLE_LEVELSET<T_GRID>::
+template<class TV> bool PARTICLE_LEVELSET<TV>::
 Adjust_Particle_For_Objects(TV& X,TV& V,const T r, const T collision_distance,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) const
 {
     TV X_old=X,X_new=X_old+dt*V;
@@ -367,17 +367,17 @@ Adjust_Particle_For_Objects(TV& X,TV& V,const T r, const T collision_distance,co
 }
 //#####################################################################
 namespace PhysBAM{
-#define INSTANTIATION_HELPER(T_GRID) \
-    template class PARTICLE_LEVELSET<T_GRID >; \
-    template PARTICLE_LEVELSET_PARTICLES<T_GRID::VECTOR_T>* PARTICLE_LEVELSET<T_GRID >::Allocate_Particle<PARTICLE_LEVELSET_PARTICLES<T_GRID::VECTOR_T> >(); \
-    template PARTICLE_LEVELSET_REMOVED_PARTICLES<T_GRID::VECTOR_T>* PARTICLE_LEVELSET<T_GRID >::Allocate_Particle<PARTICLE_LEVELSET_REMOVED_PARTICLES<T_GRID::VECTOR_T> >(); \
-    template void PARTICLE_LEVELSET<T_GRID >::Compact_Particles<PARTICLE_LEVELSET_PARTICLES<T_GRID::VECTOR_T> >(PARTICLE_LEVELSET_PARTICLES<T_GRID::VECTOR_T>&); \
-    template void PARTICLE_LEVELSET<T_GRID >::Compact_Particles<PARTICLE_LEVELSET_REMOVED_PARTICLES<T_GRID::VECTOR_T> >(PARTICLE_LEVELSET_REMOVED_PARTICLES<T_GRID::VECTOR_T>&);
+#define INSTANTIATION_HELPER(TV) \
+    template class PARTICLE_LEVELSET<TV>; \
+    template PARTICLE_LEVELSET_PARTICLES<TV>* PARTICLE_LEVELSET<TV>::Allocate_Particle<PARTICLE_LEVELSET_PARTICLES<TV> >(); \
+    template PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* PARTICLE_LEVELSET<TV>::Allocate_Particle<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >(); \
+    template void PARTICLE_LEVELSET<TV>::Compact_Particles<PARTICLE_LEVELSET_PARTICLES<TV> >(PARTICLE_LEVELSET_PARTICLES<TV>&); \
+    template void PARTICLE_LEVELSET<TV>::Compact_Particles<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>&);
 #define P(...) __VA_ARGS__
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,1> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,2> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,3> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,1> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,2> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,3> >));
+INSTANTIATION_HELPER(P(VECTOR<float,1>));
+INSTANTIATION_HELPER(P(VECTOR<float,2>));
+INSTANTIATION_HELPER(P(VECTOR<float,3>));
+INSTANTIATION_HELPER(P(VECTOR<double,1>));
+INSTANTIATION_HELPER(P(VECTOR<double,2>));
+INSTANTIATION_HELPER(P(VECTOR<double,3>));
 }

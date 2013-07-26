@@ -20,7 +20,7 @@ class RENDERING_BUMP_MAP_NORMAL_IMAGE_SHADER:public RENDERING_BUMP_MAP_SHADER<T>
 public:
     ARRAY<VECTOR<T,3> ,VECTOR<int,2> > normals;
     GRID<VECTOR<T,2> > grid;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<T,2> >,VECTOR<T,3> > interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,2>,VECTOR<T,3> > interpolation;
     
     RENDERING_BUMP_MAP_NORMAL_IMAGE_SHADER(const MATERIAL_SHADER<T>* shader,RENDER_WORLD<T>& world,const T s0_input=0,const T s1_input=1,const T t0_input=0,const T t1_input=1) 
         :RENDERING_BUMP_MAP_SHADER<T>(shader,world)

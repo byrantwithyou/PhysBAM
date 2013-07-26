@@ -17,7 +17,7 @@ namespace PhysBAM{
 template<class TV>
 class BOUNDARY_OPEN_WATER:public BOUNDARY<TV,typename TV::SCALAR>
 {
-    typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
 public:
@@ -57,7 +57,7 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAY
 {
     assert(grid.Is_MAC_Grid());
     T_FACE_ARRAYS_SCALAR::Put(u,u_ghost); // interior
-    for(int face_axis=0;face_axis<GRID<TV>::dimension;face_axis++){
+    for(int face_axis=0;face_axis<TV::m;face_axis++){
         GRID<TV> face_grid=grid.Get_Face_Grid(face_axis);
         T_ARRAYS_BASE& u_ghost_component=u_ghost.Component(face_axis);
         ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);

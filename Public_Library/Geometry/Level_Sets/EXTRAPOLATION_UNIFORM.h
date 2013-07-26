@@ -17,15 +17,15 @@
 #include <Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
-template<class T_GRID,class T2>
-class EXTRAPOLATION_UNIFORM:public EXTRAPOLATION<T_GRID,T2>
+template<class TV,class T2>
+class EXTRAPOLATION_UNIFORM:public EXTRAPOLATION<TV,T2>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
-    template<class T3> struct REBIND{typedef EXTRAPOLATION_UNIFORM<T_GRID,T3> TYPE;};
-    typedef  EXTRAPOLATION<T_GRID,T2> BASE;
+    template<class T3> struct REBIND{typedef EXTRAPOLATION_UNIFORM<TV,T3> TYPE;};
+    typedef  EXTRAPOLATION<TV,T2> BASE;
     using BASE::band_width;using BASE::boundary;using BASE::isobaric_fix_width;using BASE::Add_To_Heap;using BASE::Remove_Root_From_Heap;
    
     ARRAYS_ND_BASE<T2,TV_INT>& u; // variable to be extrapolated
@@ -35,14 +35,14 @@ public:
     bool collision_aware_extrapolation;
     const ARRAYS_ND_BASE<VECTOR<bool,TV::m>,TV_INT>* neighbors_visible; // used for collision aware extrapolation
 protected:
-    T_GRID node_grid;
+    GRID<TV> node_grid;
     T optimization_scale[3]; // dz^2/dy^2, dz^2/dx^2, dy^2/dx^2, optimizations, indexed by missing axis
     TV_INT dimension_start,dimension_end;
     int ghost_cells;
     T small_number;
 public:
 
-    EXTRAPOLATION_UNIFORM(const T_GRID& grid,const T_ARRAYS_BASE& phi_input,ARRAYS_ND_BASE<T2,TV_INT>& u_input,const int ghost_cells_input);
+    EXTRAPOLATION_UNIFORM(const GRID<TV>& grid,const T_ARRAYS_BASE& phi_input,ARRAYS_ND_BASE<T2,TV_INT>& u_input,const int ghost_cells_input);
     ~EXTRAPOLATION_UNIFORM();
 
     void Set_Band_Width(const T number_of_cells=(T)5)

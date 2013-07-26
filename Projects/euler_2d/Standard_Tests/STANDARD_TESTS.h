@@ -37,14 +37,13 @@
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
 public:
-    typedef T_input T;typedef VECTOR<T,2> TV;;typedef GRID<TV> T_GRID;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
+    typedef T_input T;typedef VECTOR<T,2> TV;;typedef GRID<TV> T_GRID;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
-    typedef typename COLLISION_BODY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_FLUID_COLLISION_GEOMETRY_LIST;
-    typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
 
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
     using BASE::solids_fluids_parameters;using BASE::Add_To_Fluid_Simulation;
@@ -159,9 +158,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     //custom stuff . . . 
     fluids_parameters.compressible_eos=new EOS_GAMMA<T>;
 
-    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,false,false);
-    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,true,false);
-    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,true,true);
+    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
+    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
+    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
     fluids_parameters.compressible_spatial_order=eno_order;
     //fluids_parameters.compressible_conservation_method->Save_Fluxes();
     //fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,1e-6);
@@ -214,8 +213,8 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {
 void Initialize_Advection() PHYSBAM_OVERRIDE
 {
     //set custom boundary
-    VECTOR<VECTOR<bool,2>,T_GRID::dimension> valid_wall;
-    for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
+    VECTOR<VECTOR<bool,2>,TV::m> valid_wall;
+    for(int axis=0;axis<TV::m;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
 
     if(test_number==1 || test_number==3 || test_number==4){
@@ -234,7 +233,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_Euler_State() PHYSBAM_OVERRIDE
 {
-    T_GRID& grid=fluids_parameters.euler->grid;
+    GRID<TV>& grid=fluids_parameters.euler->grid;
     ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& U=fluids_parameters.euler->U;
     fluids_parameters.euler->e_min=1e-6;
 

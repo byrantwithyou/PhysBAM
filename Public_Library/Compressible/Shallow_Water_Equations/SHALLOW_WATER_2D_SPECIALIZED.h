@@ -25,11 +25,11 @@ class SHALLOW_WATER_2D_SPECIALIZED
     enum {d=3};
 public:
     BOUNDARY<TV,TV_DIMENSION>* boundary;
-    CONSERVATION<GRID<TV>,2>* conservation;
+    CONSERVATION<TV,2>* conservation;
 private:
     BOUNDARY<TV,TV_DIMENSION> boundary_default;
-    CONSERVATION_ENO_LLF<GRID<TV>,2> conservation_default;
-    CONSERVATION_ENO_LLF<GRID<TV>,3> internal_conservation;
+    CONSERVATION_ENO_LLF<TV,2> conservation_default;
+    CONSERVATION_ENO_LLF<TV,3> internal_conservation;
 public:
     T gravity;
     T min_height;
@@ -54,7 +54,7 @@ public:
     void Set_Custom_Boundary(BOUNDARY<TV,TV_DIMENSION>& boundary_input)
     {boundary=&boundary_input;}
 
-    void Set_Custom_Conservation(CONSERVATION<GRID<TV>,2>& conservation_input)
+    void Set_Custom_Conservation(CONSERVATION<TV,2>& conservation_input)
     {conservation=&conservation_input;}
     
     void Set_Ground_Ghost(ARRAY<T,VECTOR<int,2> >& ground_ghost_input)

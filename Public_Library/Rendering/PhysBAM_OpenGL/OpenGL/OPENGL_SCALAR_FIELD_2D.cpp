@@ -225,7 +225,7 @@ Update()
 
 template<class T2,class T> static void Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>* selection,const GRID<VECTOR<T,2> >& grid,ARRAY<T2,VECTOR<int,2> >& values)
 {
-    output_stream<<" @ particle = "<<LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<T,2> >,T2>().Clamped_To_Array(grid,values,selection->location);
+    output_stream<<" @ particle = "<<LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,2>,T2>().Clamped_To_Array(grid,values,selection->location);
 }
 // no interpolation for bool's and int's
 template<class T> static void Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>* selection,const GRID<VECTOR<T,2> >&,ARRAY<bool,VECTOR<int,2> >& values){}

@@ -18,14 +18,14 @@ namespace PhysBAM{
 
 class SPARSE_MATRIX_PARTITION;
 
-template<class T_GRID>
+template<class TV>
 class PCG_SPARSE_MPI:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR T;
 public:
     PCG_SPARSE<T>& pcg;
     MPI::Intracomm& comm;
-    THREADED_UNIFORM_GRID<T_GRID>* thread_grid;
+    THREADED_UNIFORM_GRID<TV>* thread_grid;
     SPARSE_MATRIX_PARTITION& partition;
     ARRAY<MPI::Datatype> boundary_datatypes,ghost_datatypes;
     ARRAY<ARRAY<int> > columns_to_send;

@@ -10,19 +10,18 @@
 #include <Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION.h>
 namespace PhysBAM{
 
-template<class T_GRID> class FLUIDS_PARAMETERS_UNIFORM;
+template<class TV> class FLUIDS_PARAMETERS_UNIFORM;
 
 template<class TV>
 class COMPRESSIBLE_BOUNDARY_CONDITION_WALLS:public IMPLICIT_BOUNDARY_CONDITION<TV>
 {
     typedef VECTOR<int,TV::dimension> TV_INT;typedef typename TV::SCALAR T;
-    typedef GRID<TV> T_GRID;
 public:
     const VECTOR<VECTOR<bool,2>,TV::dimension>& walls;
     const VECTOR<VECTOR<bool,2>,TV::dimension> mpi_boundary;
-    const FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters;
+    const FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters;
 
-    COMPRESSIBLE_BOUNDARY_CONDITION_WALLS(const VECTOR<VECTOR<bool,2>,TV::dimension>& walls_input,const VECTOR<VECTOR<bool,2>,TV::dimension>& mpi_boundary_input,const FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input);
+    COMPRESSIBLE_BOUNDARY_CONDITION_WALLS(const VECTOR<VECTOR<bool,2>,TV::dimension>& walls_input,const VECTOR<VECTOR<bool,2>,TV::dimension>& mpi_boundary_input,const FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input);
     virtual ~COMPRESSIBLE_BOUNDARY_CONDITION_WALLS();
 
     void Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& p,

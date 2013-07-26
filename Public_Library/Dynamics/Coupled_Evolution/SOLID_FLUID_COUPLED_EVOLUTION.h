@@ -24,13 +24,13 @@ namespace PhysBAM{
 
 template<class TV> class FLUIDS_PARAMETERS_UNIFORM;
 template<class TV> class FLUID_COLLECTION;
-template<class T_GRID> class POISSON_COLLIDABLE_UNIFORM;
+template<class TV> class POISSON_COLLIDABLE_UNIFORM;
 template<class TV> class GENERALIZED_VELOCITY;
 
 template<class TV_input>
 class SOLID_FLUID_COUPLED_EVOLUTION:public NEWMARK_EVOLUTION<TV_input>
 {
-    typedef TV_input TV;typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
+    typedef TV_input TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<PAIR<int,T> > FACE_WEIGHT_ELEMENTS;typedef ARRAY<FACE_WEIGHT_ELEMENTS*,FACE_INDEX<TV::m> > T_FACE_ARRAYS_FACE_WEIGHT_ELEMENTS;
     typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> > >::TYPE T_ARRAYS_STRUCTURE_SIMPLEX_LIST;
@@ -38,7 +38,7 @@ class SOLID_FLUID_COUPLED_EVOLUTION:public NEWMARK_EVOLUTION<TV_input>
     typedef typename MESH_POLICY<TV::dimension>::MESH T_MESH;typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension>::OBJECT T_OBJECT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_BOUNDARY_SIMPLEX;typedef VECTOR<int,TV::dimension> T_BOUNDARY_ELEMENT;typedef VECTOR<int,TV::dimension+1> T_ELEMENT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension>::SIMPLEX T_SIMPLEX;
-    typedef typename INTERPOLATION_POLICY<GRID<TV> >::FACE_LOOKUP T_FACE_LOOKUP;
+    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename TV::SPIN T_SPIN;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT T_THIN_SHELL;typedef typename T_THIN_SHELL::MESH T_THIN_SHELL_MESH;
@@ -59,12 +59,12 @@ public:
     bool print_matrix_rhs_and_solution;
 protected:
     ARRAY<int> kinematic_rigid_bodies;
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies;
     T_FACE_ARRAYS_FACE_WEIGHT_ELEMENTS dual_cell_weights;
     T_FACE_ARRAYS_FACE_WEIGHT_ELEMENTS rigid_body_dual_cell_weights;
     T_FACE_ARRAYS_SCALAR dual_cell_fluid_volume;
     T_FACE_ARRAYS_BOOL dual_cell_contains_solid;
-    FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection;
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters;
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > nodal_fluid_mass;
@@ -75,7 +75,7 @@ protected:
     T_FACE_ARRAYS_SCALAR solid_projected_face_velocities_star;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> coupled_vectors;
 
-    POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* Get_Poisson()
+    POISSON_COLLIDABLE_UNIFORM<TV>* Get_Poisson()
     {return (fluids_parameters.compressible ? fluids_parameters.euler->euler_projection.elliptic_solver : fluids_parameters.incompressible->projection.poisson_collidable);}
 
     T_FACE_ARRAYS_SCALAR& Get_Face_Velocities()
@@ -109,7 +109,7 @@ public:
     {return ((solids_fluids_parameters.mpi_solid_fluid || solid_body_collection.deformable_body_collection.simulate) && solid_body_collection.deformable_body_collection.particles.Size()) || ((solids_fluids_parameters.mpi_solid_fluid || solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies) && solid_body_collection.rigid_body_collection.rigid_body_particles.Size());}
 
     SOLID_FLUID_COUPLED_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,
-        EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input,FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_input,
+        EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input,
         FLUID_COLLECTION<TV>& fluid_collection_input,SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters);
     virtual ~SOLID_FLUID_COUPLED_EVOLUTION();
 

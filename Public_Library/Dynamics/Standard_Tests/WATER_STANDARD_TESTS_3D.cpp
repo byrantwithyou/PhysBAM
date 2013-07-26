@@ -23,8 +23,8 @@ using namespace PhysBAM;
 //#####################################################################
 // Function WATER_STANDARD_TESTS_3D
 //#####################################################################
-template<class T_GRID> WATER_STANDARD_TESTS_3D<T_GRID>::
-WATER_STANDARD_TESTS_3D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS<T_GRID>& fluids_parameters,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
+template<class TV> WATER_STANDARD_TESTS_3D<TV>::
+WATER_STANDARD_TESTS_3D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS<TV>& fluids_parameters,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
     :example(example),fluids_parameters(fluids_parameters),rigid_body_collection(rigid_body_collection_input),inaccurate_union(*fluids_parameters.grid),
     use_inaccurate_body_collisions(false),use_variable_density_for_sph(false),use_two_way_coupling_for_sph(false),convert_sph_particles_to_fluid(false),use_analytic_divergence(false),
     use_analytic_divergence_for_expansion_only(false),adjust_cell_weights_on_neumann_boundaries(false),enforce_density_near_interface(true),flip_ratio(1),target_particles_per_unit_volume(1),
@@ -34,7 +34,7 @@ WATER_STANDARD_TESTS_3D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS<T_G
 //#####################################################################
 // Function Initialize
 //#####################################################################
-template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> void WATER_STANDARD_TESTS_3D<TV>::
 Initialize(const int test_number_input,const int resolution)
 {
     test_number=test_number_input;
@@ -210,7 +210,7 @@ Initialize(const int test_number_input,const int resolution)
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
-template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> void WATER_STANDARD_TESTS_3D<TV>::
 Initialize_Advection(const bool always_use_objects)
 {
     PHYSBAM_ASSERT(!always_use_objects,"fluids_parameters.solid_affects_fluids overrides this functionality");  // Deprecated parameter
@@ -220,7 +220,7 @@ Initialize_Advection(const bool always_use_objects)
 //#####################################################################
 // Function Initial_Velocity
 //#####################################################################
-template<class T_GRID> VECTOR<typename T_GRID::SCALAR,3> WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> TV WATER_STANDARD_TESTS_3D<TV>::
 Initial_Velocity(const TV& X) const
 {
     if(test_number==7 || test_number==11) return TV(0,1,0);
@@ -241,7 +241,7 @@ void Get_Variable_Viscosity_Helper(GRID<VECTOR<T,3> >& grid,const int test_numbe
         for(CELL_ITERATOR<VECTOR<T,3> > iterator(grid,1);iterator.Valid();iterator.Next())
             variable_viscosity(iterator.Cell_Index())=(iterator.Location().x<.5)?(T)0:(T)1000;}
 }
-template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> void WATER_STANDARD_TESTS_3D<TV>::
 Get_Variable_Viscosity(ARRAY<T,VECTOR<int,3> >& variable_viscosity,const T time) const
 {
     Get_Variable_Viscosity_Helper(*fluids_parameters.grid,test_number,variable_viscosity,time);
@@ -249,7 +249,7 @@ Get_Variable_Viscosity(ARRAY<T,VECTOR<int,3> >& variable_viscosity,const T time)
 //#####################################################################
 // Function Initial_Phi
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> typename TV::SCALAR WATER_STANDARD_TESTS_3D<TV>::
 Initial_Phi(const TV& X) const
 {
     T phi=1;
@@ -305,7 +305,7 @@ Initial_Phi(const TV& X) const
 //#####################################################################
 // Function Initial_Phi_Object
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> typename TV::SCALAR WATER_STANDARD_TESTS_3D<TV>::
 Initial_Phi_Object(const TV& X) const
 {
     if(test_number==4 || test_number==20) return rigid_body_collection.Rigid_Body(sphere).Implicit_Geometry_Extended_Value(X);
@@ -320,7 +320,7 @@ Initial_Phi_Object(const TV& X) const
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> void WATER_STANDARD_TESTS_3D<TV>::
 Initialize_Bodies()
 {
     if(test_number==4){
@@ -339,7 +339,7 @@ Initialize_Bodies()
 //#####################################################################
 // Function Update_Sources
 //#####################################################################
-template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> void WATER_STANDARD_TESTS_3D<TV>::
 Update_Sources(const T time)
 {
     if(test_number==3)
@@ -349,8 +349,8 @@ Update_Sources(const T time)
     if(test_number==8)
         if(time>2) sources.Clean_Memory();
     if(test_number==10) {//TODO : move this to a better callback function
-        FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >&>(fluids_parameters);
-        SPH_EVOLUTION_UNIFORM<GRID<TV> >& sph_evolution=*fluids_parameters_uniform.sph_evolution;
+        FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters);
+        SPH_EVOLUTION_UNIFORM<TV>& sph_evolution=*fluids_parameters_uniform.sph_evolution;
         if(time>7){
             sph_evolution.target_particles_per_unit_volume=target_particles_per_unit_volume/2;
             sph_evolution.ballistic_particles_per_unit_volume=ballistic_particles_as_percentage_of_target*sph_evolution.target_particles_per_unit_volume;}
@@ -364,7 +364,7 @@ Update_Sources(const T time)
 //#####################################################################
 // Function Set_Kinematic_Positions
 //#####################################################################
-template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> void WATER_STANDARD_TESTS_3D<TV>::
 Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 {
     if((test_number==4 || test_number==20) && id==sphere) frame.t=motion_curve.Value(time);
@@ -372,7 +372,7 @@ Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 //#####################################################################
 // Function Set_Kinematic_Velocities
 //#####################################################################
-template<class T_GRID> bool WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> bool WATER_STANDARD_TESTS_3D<TV>::
 Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 {
     if((test_number==4 || test_number==20) && id==sphere){twist.linear=motion_curve.Derivative(time);return true;}
@@ -381,7 +381,7 @@ Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 //#####################################################################
 // Function Limit_Dt
 //#####################################################################
-template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> void WATER_STANDARD_TESTS_3D<TV>::
 Limit_Dt(T& dt,const T time)
 {
     if(test_number==4 || test_number==20){
@@ -393,13 +393,13 @@ Limit_Dt(T& dt,const T time)
 // Function Initialize_SPH_Particles
 //#####################################################################
 template<class T> void
-Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<GRID<VECTOR<T,3> > >& tests,FLUIDS_PARAMETERS<GRID<VECTOR<T,3> > >& fluids_parameters)
+Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<VECTOR<T,3> >& tests,FLUIDS_PARAMETERS<VECTOR<T,3> >& fluids_parameters)
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 
-    FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >&>(fluids_parameters);
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=fluids_parameters_uniform.particle_levelset_evolution->Particle_Levelset(0);
-    SPH_EVOLUTION_UNIFORM<GRID<TV> >& sph_evolution=*fluids_parameters_uniform.sph_evolution;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters);
+    PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=fluids_parameters_uniform.particle_levelset_evolution->Particle_Levelset(0);
+    SPH_EVOLUTION_UNIFORM<TV>& sph_evolution=*fluids_parameters_uniform.sph_evolution;
     GRID<TV>& grid=fluids_parameters_uniform.particle_levelset_evolution->grid;
 
     sph_evolution.use_two_way_coupling=tests.use_two_way_coupling_for_sph;
@@ -471,7 +471,7 @@ Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<GRID<VEC
             (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
             removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.dX.Min();}}
 }
-template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> void WATER_STANDARD_TESTS_3D<TV>::
 Initialize_SPH_Particles()
 {
     Initialize_SPH_Particles_Helper(test_number,*this,fluids_parameters);
@@ -479,7 +479,7 @@ Initialize_SPH_Particles()
 //#####################################################################
 // Function Analytic_Velocity
 //#####################################################################
-template<class T_GRID> VECTOR<typename T_GRID::SCALAR,3>  WATER_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> TV  WATER_STANDARD_TESTS_3D<TV>::
 Analytic_Velocity(const T time,const TV& location) const
 {
     if(test_number==15) return TV(0,(T)-1,0);
@@ -488,6 +488,6 @@ Analytic_Velocity(const T time,const TV& location) const
 }
 //#####################################################################
 namespace PhysBAM{
-template class WATER_STANDARD_TESTS_3D<GRID<VECTOR<float,3> > >;
-template class WATER_STANDARD_TESTS_3D<GRID<VECTOR<double,3> > >;
+template class WATER_STANDARD_TESTS_3D<VECTOR<float,3> >;
+template class WATER_STANDARD_TESTS_3D<VECTOR<double,3> >;
 }

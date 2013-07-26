@@ -25,21 +25,20 @@
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_CALLBACKS.h>
 namespace PhysBAM{
 
-template<class T_GRID> class EULER_EIGENSYSTEM;
+template<class TV> class EULER_EIGENSYSTEM;
 template<class T,class TV_DIMENSION> class EIGENSYSTEM;
-template<class T_GRID,class TV_DIMENSION> class BOUNDARY_OBJECT;
-template<class T_GRID,class TV_DIMENSION> class BOUNDARY_OBJECT_REFLECTION;
+template<class TV,class TV_DIMENSION> class BOUNDARY_OBJECT;
+template<class TV,class TV_DIMENSION> class BOUNDARY_OBJECT_REFLECTION;
 template<class TV> class GRID;
 
-template<class T_GRID,int d>
+template<class TV,int d>
 class CONSERVATION
 {
-    STATIC_ASSERT(T_GRID::dimension+2==d);
-    typedef typename T_GRID::SCALAR T;
-    typedef typename T_GRID::VECTOR_T TV;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    STATIC_ASSERT(TV::m+2==d);
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<T,d> TV_DIMENSION;
-    typedef VECTOR<bool,2*T_GRID::dimension> TV_BOOL;
+    typedef VECTOR<bool,2*TV::m> TV_BOOL;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
@@ -54,7 +53,7 @@ public:
     ARRAY<TV_DIMENSION,VECTOR<int,1> > flux_temp; // temporary array used for saving 1d fluxes 
     CONSERVATION_CALLBACKS<T> *callbacks;
     BOUNDARY_OBJECT<TV,TV_DIMENSION> *object_boundary;
-    BOUNDARY_OBJECT_REFLECTION<T_GRID,TV_DIMENSION>& object_boundary_default;
+    BOUNDARY_OBJECT_REFLECTION<TV,TV_DIMENSION>& object_boundary_default;
     T_FACE_ARRAYS_DIMENSION_SCALAR fluxes;
     bool use_exact_neumann_face_location,scale_outgoing_fluxes_to_clamp_variable;
     int clamped_variable_index;
@@ -98,25 +97,25 @@ public:
 
 //#####################################################################
     virtual ~CONSERVATION();
-    void Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
-        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
+    void Compute_Flux_Without_Clamping(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
+        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
         const T_FACE_ARRAYS_SCALAR& face_velocities,const TV_BOOL& outflow_boundaries,T_ARRAYS_DIMENSION_SCALAR& rhs,const bool thinshell,const T_ARRAYS_DIMENSION_SCALAR* U_ghost_clamped=0);
-    void Compute_Flux_With_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
-        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
+    void Compute_Flux_With_Clamping(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
+        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
         const T_FACE_ARRAYS_SCALAR& face_velocities,const TV_BOOL& outflow_boundaries,T_ARRAYS_DIMENSION_SCALAR& rhs,const bool thinshell,
-        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>* eigensystems_auxiliary,T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary);
-    void Compute_Flux(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
-        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
+        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>* eigensystems_auxiliary,T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary);
+    void Compute_Flux(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
+        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
         const T_FACE_ARRAYS_SCALAR& face_velocities,const TV_BOOL& outflow_boundaries,T_ARRAYS_DIMENSION_SCALAR& rhs,const bool thinshell,
-        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>* eigensystems_auxiliary,T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary);
-    virtual void Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
-        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
-        const T_FACE_ARRAYS_SCALAR& face_velocities,const bool thinshell=false,const TV_BOOL& outflow_boundaries=TV_BOOL(),VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>* eigensystems_auxiliary=0,
+        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>* eigensystems_auxiliary,T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary);
+    virtual void Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
+        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
+        const T_FACE_ARRAYS_SCALAR& face_velocities,const bool thinshell=false,const TV_BOOL& outflow_boundaries=TV_BOOL(),VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>* eigensystems_auxiliary=0,
         T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary=0);
     template<class T_ARRAYS> void Update_Conservation_Law_For_Specialized_Shallow_Water_Equations(GRID<TV>& grid,T_ARRAYS& U,const T_ARRAYS& U_ghost,const ARRAY<bool,VECTOR<int,2> >& psi,const T dt,
-        EIGENSYSTEM<T,VECTOR<T,2> >& eigensystem_F,EIGENSYSTEM<T,VECTOR<T,2> >& eigensystem_G,CONSERVATION<GRID<TV>,2>& solver,const TV_BOOL& outflow_boundaries=TV_BOOL());
+        EIGENSYSTEM<T,VECTOR<T,2> >& eigensystem_F,EIGENSYSTEM<T,VECTOR<T,2> >& eigensystem_G,CONSERVATION<TV,2>& solver,const TV_BOOL& outflow_boundaries=TV_BOOL());
     T Alpha(const ARRAY<T,VECTOR<int,1> >& lambda_left,const ARRAY<T,VECTOR<int,1> >& lambda_right,const int k,const int length);
-    void Compute_Delta_Flux_For_Clamping_Variable(const T_GRID& grid,const int number_of_ghost_cells,T dt,const int clamped_variable_index,const T clamped_value,const T_FACE_ARRAYS_BOOL& psi_N,
+    void Compute_Delta_Flux_For_Clamping_Variable(const GRID<TV>& grid,const int number_of_ghost_cells,T dt,const int clamped_variable_index,const T clamped_value,const T_FACE_ARRAYS_BOOL& psi_N,
         const T_ARRAYS_DIMENSION_SCALAR& U,const T_FACE_ARRAYS_DIMENSION_SCALAR& flux,T_FACE_ARRAYS_DIMENSION_SCALAR& delta_flux,T_ARRAYS_DIMENSION_SCALAR& rhs,T_ARRAYS_SCALAR& overshoot_percentages);
     virtual void Log_Parameters() const;
     virtual void Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,

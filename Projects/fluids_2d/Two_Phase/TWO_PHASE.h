@@ -21,26 +21,26 @@
 namespace PhysBAM{
 
 template<class T_input>
-class TWO_PHASE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class TWO_PHASE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;
 public:
     typedef VECTOR<T,2> TV;typedef GRID<TV> T_GRID;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::fluid_collection;
     using BASE::solid_body_collection;using BASE::stream_type;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
-    FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID > inaccurate_union;
+    FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
     bool use_inaccurate_body_collisions;
     int sphere;
 
     TWO_PHASE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID >(stream_type,2,fluids_parameters.WATER),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >(stream_type,2,fluids_parameters.WATER),
         rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid),use_inaccurate_body_collisions(true),sphere(0)
     {
     }
@@ -104,7 +104,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.solve_neumann_regions=true;
 
     // set up the domain
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     grid.Initialize(TV_INT(10*cells+1,20*cells+1),RANGE<TV>(TV((T)-.01,(T)-.01),TV((T).01,(T).02)));
 
     output_directory=STRING_UTILITIES::string_sprintf("Two_Phase/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
@@ -167,14 +167,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::Set_Dirichlet_Boundary_Conditions(time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Set_Dirichlet_Boundary_Conditions(time);
     if(test_number!=3) return;
     //TODO: Is there a good place to set Neuman conditions?
     T_FACE_ARRAYS_BOOL& psi_N=fluids_parameters.incompressible_multiphase->projection.elliptic_solver->psi_N;
     T_FACE_ARRAYS_SCALAR& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
 
     RANGE<TV_INT> right_grid_cells=RANGE<TV_INT>(TV_INT(fluids_parameters.grid->counts.x-2,1),fluids_parameters.grid->Numbers_Of_Cells());
-    for(int axis=0;axis<T_GRID::dimension;axis++){
+    for(int axis=0;axis<TV::m;axis++){
         RANGE<TV_INT> right_grid_faces=right_grid_cells+RANGE<TV_INT>(TV_INT(),TV_INT::Axis_Vector(axis));
         for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,right_grid_faces,axis);iterator.Valid();iterator.Next()){TV_INT face=iterator.Face_Index();
             psi_N.Component(axis)(face)=true;face_velocities.Component(axis)(face)=axis==1?(T)-1:(T)0;}}
@@ -184,14 +184,14 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Construct_Levelsets_For_Objects(const T time)
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID >::Construct_Levelsets_For_Objects(time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >::Construct_Levelsets_For_Objects(time);
 }
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID >::Update_Fluid_Parameters(dt,time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >::Update_Fluid_Parameters(dt,time);
 }
 //#####################################################################
 };

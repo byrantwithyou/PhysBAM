@@ -169,7 +169,7 @@ Update_Vorticity()
 {
     GRID<TV>& grid=opengl_mac_velocity_field.grid;
     RANGE<VECTOR<int,3> > domain_indices(grid.Domain_Indices());domain_indices.Change_Size(-VECTOR<int,3>::All_Ones_Vector());
-    FACE_LOOKUP_UNIFORM<GRID<TV> > lookup(opengl_mac_velocity_field.face_velocities);
+    FACE_LOOKUP_UNIFORM<TV> lookup(opengl_mac_velocity_field.face_velocities);
     opengl_vorticity_magnitude.values.Resize(grid.Domain_Indices());
     for(CELL_ITERATOR<TV> iterator(grid,domain_indices);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
         T vorticity_magnitude=VORTICITY_UNIFORM<TV>::Vorticity(grid,lookup,index).Magnitude();

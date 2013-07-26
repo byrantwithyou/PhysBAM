@@ -212,7 +212,7 @@ Initialize_Bodies()
         drag->Use_Linear_Normal_Viscosity(1);drag->Use_Constant_Wind(0,TV());}
 #endif
     //if(test_number==8){
-        ETHER_DRAG<GRID<TV> >* ether_drag=new ETHER_DRAG<GRID<TV> >(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true);
+        ETHER_DRAG<TV>* ether_drag=new ETHER_DRAG<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true);
         solid_body_collection.Add_Force(ether_drag);
         ether_drag->Use_Constant_Wind(ether_drag_wind);//}
 

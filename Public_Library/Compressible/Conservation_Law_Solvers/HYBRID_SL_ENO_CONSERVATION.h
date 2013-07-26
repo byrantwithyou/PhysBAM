@@ -15,27 +15,27 @@
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_CALLBACKS.h>
 namespace PhysBAM{
 
-template<class T_GRID> class EULER_EIGENSYSTEM;
+template<class TV> class EULER_EIGENSYSTEM;
 template<class T,class TV_DIMENSION> class EIGENSYSTEM;
 template<class TV> class GRID;
 
-template<class T_GRID,int d>
-class HYBRID_SL_ENO_CONSERVATION:public CONSERVATION<T_GRID,d>
+template<class TV,int d>
+class HYBRID_SL_ENO_CONSERVATION:public CONSERVATION<TV,d>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<T,d> TV_DIMENSION;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::INDEX INDEX;
-    typedef VECTOR<bool,2*T_GRID::dimension> TV_BOOL;
+    typedef typename TV::SCALAR T;typedef VECTOR<T,d> TV_DIMENSION;
+    typedef VECTOR<int,TV::m> TV_INT;typedef TV_INT INDEX;
+    typedef VECTOR<bool,2*TV::m> TV_BOOL;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename REBIND<ARRAY<T,FACE_INDEX<TV::m> >,bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
-    typedef CONSERVATION<T_GRID,d> BASE;
+    typedef CONSERVATION<TV,d> BASE;
 
     const T_FACE_ARRAYS_BOOL& flux_face;
-    CONSERVATION<T_GRID,d> *conservation;
+    CONSERVATION<TV,d> *conservation;
 
 public:
-    HYBRID_SL_ENO_CONSERVATION(const T_FACE_ARRAYS_BOOL& flux_face_in, CONSERVATION<T_GRID,d> *conservation_law_solver)
+    HYBRID_SL_ENO_CONSERVATION(const T_FACE_ARRAYS_BOOL& flux_face_in, CONSERVATION<TV,d> *conservation_law_solver)
         : flux_face(flux_face_in),conservation(conservation_law_solver)
     {conservation->Save_Fluxes();}
 
@@ -69,9 +69,9 @@ public:
     virtual void Log_Parameters() const
     {BASE::Log_Parameters();conservation->Log_Parameters();}
 
-    virtual void Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
-        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
-        const T_FACE_ARRAYS_SCALAR& face_velocities,const bool thinshell=false,const TV_BOOL& outflow_boundaries=TV_BOOL(),VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>* eigensystems_auxiliary=0,
+    virtual void Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
+        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
+        const T_FACE_ARRAYS_SCALAR& face_velocities,const bool thinshell=false,const TV_BOOL& outflow_boundaries=TV_BOOL(),VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>* eigensystems_auxiliary=0,
         T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary=0);
 };
 }

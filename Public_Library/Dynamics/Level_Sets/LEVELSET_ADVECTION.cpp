@@ -10,7 +10,6 @@
 #include <Tools/Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Polynomials/CUBIC.h>
@@ -47,11 +46,11 @@ template<class TV> LEVELSET_ADVECTION<TV>::
 // Function Use_Semi_Lagrangian_Collidable_Advection
 //#####################################################################
 template<class TV> void LEVELSET_ADVECTION<TV>::
-Use_Semi_Lagrangian_Collidable_Advection(const T_GRID_BASED_COLLISION_GEOMETRY& body_list,const T phi_replacement_value,const T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input)
+Use_Semi_Lagrangian_Collidable_Advection(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list,const T phi_replacement_value,const T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input)
 {
     assert(!nested_semi_lagrangian_collidable&&!semi_lagrangian_collidable);
     nested_semi_lagrangian_collidable=new T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL(body_list,levelset->valid_mask_current,levelset->valid_mask_next,phi_replacement_value,true);
-    semi_lagrangian_collidable=new ADVECTION_WRAPPER_COLLIDABLE_CELL<GRID<TV>,T,T_FACE_LOOKUP,T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL,T_FACE_LOOKUP_COLLIDABLE>(*nested_semi_lagrangian_collidable,body_list,
+    semi_lagrangian_collidable=new ADVECTION_WRAPPER_COLLIDABLE_CELL<TV,T,T_FACE_LOOKUP,T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL,T_FACE_LOOKUP_COLLIDABLE>(*nested_semi_lagrangian_collidable,body_list,
         face_velocities_valid_mask_input);
     Set_Custom_Advection(*semi_lagrangian_collidable);
 }
@@ -66,8 +65,8 @@ HJ_WENO(const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,ARRAY<T,VECTOR
     T one_over_dx=1/dx;
     ARRAY<T,VECTOR<int,1> > D1(-2,m+2);for(int i=-3;i<m+2;i++) D1(i)=(phi(i+1)-phi(i))*one_over_dx; // 1st divided difference
     for(int i=0;i<m;i++){
-        phix_minus(i)=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::WENO(D1(i-3),D1(i-2),D1(i-1),D1(i),D1(i+1),epsilon);
-        phix_plus(i)=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::WENO(D1(i+2),D1(i+1),D1(i),D1(i-1),D1(i-2),epsilon);}
+        phix_minus(i)=ADVECTION_SEPARABLE_UNIFORM<TV,T>::WENO(D1(i-3),D1(i-2),D1(i-1),D1(i),D1(i+1),epsilon);
+        phix_plus(i)=ADVECTION_SEPARABLE_UNIFORM<TV,T>::WENO(D1(i+2),D1(i+1),D1(i),D1(i-1),D1(i-2),epsilon);}
 }
 //#####################################################################
 // Function HJ_ENO
@@ -84,11 +83,11 @@ HJ_ENO(const int order,const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi
 
     if(order == 1) for(int i=0;i<m;i++){phix_minus(i)=D1(i-1);phix_plus(i)=D1(i);}
     else if(order == 2) for(int i=0;i<m;i++){
-        phix_minus(i)=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,D1(i-1),D2(i-2),D2(i-1));
-        phix_plus(i)=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,D1(i),-D2(i),-D2(i-1));}
+        phix_minus(i)=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,D1(i-1),D2(i-2),D2(i-1));
+        phix_plus(i)=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,D1(i),-D2(i),-D2(i-1));}
     else if(order == 3) for(int i=0;i<m;i++){
-        phix_minus(i)=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,D1(i-1),D2(i-2),D2(i-1),D3(i-3),D3(i-2),D3(i-1));
-        phix_plus(i)=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,D1(i),-D2(i),-D2(i-1),D3(i),D3(i-1),D3(i-2));}
+        phix_minus(i)=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,D1(i-1),D2(i-2),D2(i-1),D3(i-3),D3(i-2),D3(i-1));
+        phix_plus(i)=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,D1(i),-D2(i),-D2(i-1),D3(i),D3(i-1),D3(i-2));}
 }
 //#####################################################################
 // Function Use_Maccormack_Advection
@@ -97,7 +96,7 @@ HJ_ENO(const int order,const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi
 template<class TV> void LEVELSET_ADVECTION<TV>::
 Use_Maccormack_Advection(const ARRAY<bool,TV_INT>& cell_mask)
 {
-    advection_maccormack=new ADVECTION_MACCORMACK_UNIFORM<GRID<TV>,T,ADVECTION<GRID<TV>,T> >(*advection,0,&cell_mask,0);
+    advection_maccormack=new ADVECTION_MACCORMACK_UNIFORM<TV,T,ADVECTION<TV,T> >(*advection,0,&cell_mask,0);
     Set_Custom_Advection(*advection_maccormack);
 }
 //#####################################################################
@@ -153,8 +152,8 @@ Local_WENO_Advect(const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,cons
     T epsilon=(T)1e-6*sqr(dx); // 1e-6 works since phi is a distance function - sqr(dx) since undivided differences are used
     T one_over_dx=1/dx;
     for(int i=0;i<m;i++) if(abs(distance(i)) <= half_band_width){ // one_over_dx since undivided differences are used
-        if(u(i) > 0) u_phix(i)=u(i)*ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<T,1> >,T>::WENO(phi(i-2)-phi(i-3),phi(i-1)-phi(i-2),phi(i)-phi(i-1),phi(i+1)-phi(i),phi(i+2)-phi(i+1),epsilon)*one_over_dx;
-        else u_phix(i)=u(i)*ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<T,1> >,T>::WENO(phi(i+3)-phi(i+2),phi(i+2)-phi(i+1),phi(i+1)-phi(i),phi(i)-phi(i-1),phi(i-1)-phi(i-2),epsilon)*one_over_dx;}
+        if(u(i) > 0) u_phix(i)=u(i)*ADVECTION_SEPARABLE_UNIFORM<VECTOR<T,1>,T>::WENO(phi(i-2)-phi(i-3),phi(i-1)-phi(i-2),phi(i)-phi(i-1),phi(i+1)-phi(i),phi(i+2)-phi(i+1),epsilon)*one_over_dx;
+        else u_phix(i)=u(i)*ADVECTION_SEPARABLE_UNIFORM<VECTOR<T,1>,T>::WENO(phi(i+3)-phi(i+2),phi(i+2)-phi(i+1),phi(i+1)-phi(i),phi(i)-phi(i-1),phi(i-1)-phi(i-2),epsilon)*one_over_dx;}
 }
 //#####################################################################
 // Function Local_ENO_Advect
@@ -206,7 +205,7 @@ Euler_Step(const ARRAY<TV,TV_INT>& V,const T dt,const T time,const int number_of
     T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(number_of_ghost_cells));levelset->boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);
 
     if(local_semi_lagrangian_advection){
-        LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
+        LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi_ghost(cell)) <= levelset->half_band_width)
             phi(cell)=interpolation.Clamped_To_Array(grid,phi_ghost,iterator.Location()-dt*V(cell));}}
     else if(local_advection_spatial_order){

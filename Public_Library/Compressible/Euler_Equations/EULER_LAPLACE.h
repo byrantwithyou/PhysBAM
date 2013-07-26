@@ -14,14 +14,14 @@
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 namespace PhysBAM{
 
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class TV> struct GRID_ARRAYS_POLICY;
 
 template<class T_LAPLACE>
 class EULER_LAPLACE:public T_LAPLACE
 {
-    typedef typename T_LAPLACE::GRID_T T_GRID;typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename T_LAPLACE::GRID_T::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename REBIND<T_ARRAYS_SCALAR,int>::TYPE T_ARRAYS_INT;
-    typedef typename T_GRID::INDEX INDEX;
+    typedef TV_INT INDEX;
 public:
     typedef T_LAPLACE BASE;
     using BASE::filled_region_touches_dirichlet;using BASE::Solve;using BASE::Find_Solution_Regions;using BASE::f;
@@ -29,11 +29,11 @@ public:
 
     const T_ARRAYS_SCALAR& one_over_rho_c_squared;
 
-    EULER_LAPLACE(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,const T_ARRAYS_SCALAR& one_over_rho_c_squared_input)
+    EULER_LAPLACE(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const T_ARRAYS_SCALAR& one_over_rho_c_squared_input)
         :T_LAPLACE(grid_input,u_input,true,false,false),one_over_rho_c_squared(one_over_rho_c_squared_input)
     {}
 
-    EULER_LAPLACE(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,const T_ARRAYS_SCALAR& one_over_rho_c_squared_input,const bool flag)
+    EULER_LAPLACE(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const T_ARRAYS_SCALAR& one_over_rho_c_squared_input,const bool flag)
         :T_LAPLACE(grid_input,u_input,flag,flag,false),one_over_rho_c_squared(one_over_rho_c_squared_input)
     {}
 

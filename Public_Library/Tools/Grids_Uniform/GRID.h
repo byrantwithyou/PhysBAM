@@ -22,7 +22,7 @@ template<class T> class GRID_ITERATOR_BASE;
 template<class T> class NODE_ITERATOR;
 template<class T> class CELL_ITERATOR;
 template<class T> class FACE_ITERATOR;
-template<class T_GRID> class BLOCK_UNIFORM;
+template<class TV> class BLOCK_UNIFORM;
 
 template<class TV>
 class GRID
@@ -47,7 +47,7 @@ public:
     typedef TV_INT VECTOR_INT;
     typedef TV_INT INDEX;
     typedef UNIFORM_TAG<TV> GRID_TAG;
-    typedef BLOCK_UNIFORM<GRID<TV> > BLOCK;
+    typedef BLOCK_UNIFORM<TV> BLOCK;
     typedef int HAS_UNTYPED_READ_WRITE;
 
     TV_INT counts;

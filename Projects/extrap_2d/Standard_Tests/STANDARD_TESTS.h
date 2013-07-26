@@ -83,12 +83,12 @@ template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV
 template<class TV,class ATTR> void Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr);
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solids_evolution;
     using BASE::parse_args;using BASE::test_number;using BASE::data_directory;
@@ -614,7 +614,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
-    if(ether_drag) solid_body_collection.Add_Force(new ETHER_DRAG<GRID<TV> >(particles,rigid_body_collection,true,true,ether_drag,0));
+    if(ether_drag) solid_body_collection.Add_Force(new ETHER_DRAG<TV>(particles,rigid_body_collection,true,true,ether_drag,0));
 
     if(solid_body_collection.deformable_body_collection.mpi_solids)
         solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection,particles.X,VECTOR<int,2>(2,1));
@@ -627,7 +627,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     if(scatter_plot) Init_Scatter_Plot();
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Initialize_Bodies();
 }
 //#####################################################################
 // Function Place_Triangle

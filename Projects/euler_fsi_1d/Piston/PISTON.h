@@ -34,16 +34,15 @@
 namespace PhysBAM{
 
 template<class T_input>
-class PISTON:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,1> > >,CONSERVATION_CALLBACKS<T_input>
+class PISTON:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,1> >,CONSERVATION_CALLBACKS<T_input>
 {
 public:
     typedef T_input T;typedef VECTOR<T,1> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,1> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename COLLISION_BODY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
-    typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
+    typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
 
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
     using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
 
@@ -51,7 +50,7 @@ public:
     T piston_initial_position,piston_speed,piston_final_position;
     T boundary_set_time;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
-    FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID>* inaccurate_union;
+    FLUID_COLLISION_BODY_INACCURATE_UNION<TV>* inaccurate_union;
     int piston;
     int piston_width;
     INTERPOLATION_CURVE<T,TV> motion_curve;
@@ -114,10 +113,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.cfl=cfl_number;;
     //custom stuff . . .
     fluids_parameters.compressible_eos=new EOS_GAMMA<T>;
-    if(eno_scheme==1) fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,false,false);
-    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,true,false);
-    else fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,true,true);
-    //fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_RF<T_GRID,T_GRID::dimension+2>;
+    if(eno_scheme==1) fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
+    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
+    else fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
+    //fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_RF<T_GRID,TV::m+2>;
     fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
     fluids_parameters.compressible_rungekutta_order=rk_order;
     fluids_parameters.compressible_conservation_method->Save_Fluxes();
@@ -162,14 +161,14 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
         TV velocity_initial=TV::All_Ones_Vector()*u_initial;
         fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,T_FACE_VECTOR(rho_initial,rho_initial),
             T_FACE_VECTOR(p_initial,p_initial),TV_FACE_VECTOR(test_number==4?-velocity_initial:velocity_initial,velocity_initial),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));}
-    inaccurate_union=new FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID>(fluids_parameters.euler->grid);
+    inaccurate_union=new FLUID_COLLISION_BODY_INACCURATE_UNION<TV>(fluids_parameters.euler->grid);
 }
 //#####################################################################
 // Function Intialize_Euler_State
 //#####################################################################
 void Initialize_Euler_State() PHYSBAM_OVERRIDE
 {
-    T_GRID& grid=fluids_parameters.euler->grid;
+    GRID<TV>& grid=fluids_parameters.euler->grid;
     ARRAY<VECTOR<T,3> ,VECTOR<int,1> >& U=fluids_parameters.euler->U;
     EOS_GAMMA<T> *tmp_eos=dynamic_cast<EOS_GAMMA<T>*>(fluids_parameters.euler->eos);
 
@@ -195,8 +194,8 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::Set_Dirichlet_Boundary_Conditions(time);
-    EULER_UNIFORM<T_GRID>& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<T_GRID>&>(fluids_parameters)).euler);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Set_Dirichlet_Boundary_Conditions(time);
+    EULER_UNIFORM<TV>& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters)).euler);
     T_FACE_ARRAYS_BOOL& psi_N=euler.euler_projection.elliptic_solver->psi_N;
     T_FACE_ARRAYS_SCALAR& face_velocities=euler.euler_projection.face_velocities;
 
@@ -211,7 +210,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
        for(int i=-piston_width;i<=piston_width;i++){
            TV_INT cell_index(piston_index.x+i);
            euler.psi(cell_index)=false;
-           for(int axis=0;axis<T_GRID::dimension;axis++){
+           for(int axis=0;axis<TV::m;axis++){
                psi_N.Component(axis)(euler.grid.First_Face_Index_In_Cell(axis,cell_index))=true;face_velocities.Component(axis)(euler.grid.First_Face_Index_In_Cell(axis,cell_index))=0;
                psi_N.Component(axis)(euler.grid.Second_Face_Index_In_Cell(axis,cell_index))=true;face_velocities.Component(axis)(euler.grid.Second_Face_Index_In_Cell(axis,cell_index))=0;}}}
    if(test_number==3){TV_INT face_index=euler.grid.Cell(TV(piston_initial_position),0);
@@ -251,7 +250,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     inaccurate_union->collision_bodies.Add_Bodies(rigid_body_collection);
     fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 
-    VECTOR<T,T_GRID::dimension+2>& solid_state=fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state;
+    VECTOR<T,TV::m+2>& solid_state=fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state;
     EOS_GAMMA<T> *tmp_eos=dynamic_cast<EOS_GAMMA<T>*>(fluids_parameters.euler->eos);
     T rho=rho_initial,p=p_initial,u_vel=u_initial;
     solid_state(0)=rho;solid_state(1)=rho*u_vel;solid_state(2)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u_vel)/(T)2.);
@@ -277,7 +276,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBA
 void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==1 || test_number==4) return;
-    T_GRID& grid=fluids_parameters.euler->grid;
+    GRID<TV>& grid=fluids_parameters.euler->grid;
     TV velocity=TV(piston_speed);
     T piston_dt_denominator=abs(velocity.x)/grid.dX.x;
     if(piston_dt_denominator>1e-8) dt=min(dt,1/piston_dt_denominator);

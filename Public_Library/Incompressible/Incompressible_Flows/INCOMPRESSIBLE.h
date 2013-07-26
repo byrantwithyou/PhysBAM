@@ -17,30 +17,30 @@
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_POLICY_UNIFORM.h>
-#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_BODY_COLLECTION_POLICY_UNIFORM.h>
-#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_POLICY.h>
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>
 #include <Dynamics/Advection_Equations/FIRE_ADVECTION_POLICY.h>
 namespace PhysBAM{
 
-template<class T_GRID>
+template<class TV> class PROJECTION_DYNAMICS_UNIFORM;
+template<class TV> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
+
+template<class TV>
 class INCOMPRESSIBLE:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename ADVECTION_COLLIDABLE_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<T_GRID> T_FACE_LOOKUP_COLLIDABLE;typedef typename INCOMPRESSIBLE_POLICY<T_GRID>::PROJECTION T_PROJECTION;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename ADVECTION_COLLIDABLE_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE;
+    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename FIRE_ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE;
-    typedef typename FIRE_ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE;
-    typedef typename COLLISION_BODY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
-    typedef typename FIRE_ADVECTION_POLICY<T_GRID>::ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE T_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE;
-    typedef typename FIRE_INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP_FIRE_MULTIPHASE_COLLIDABLE T_FACE_LOOKUP_FIRE_MULTIPHASE_COLLIDABLE;
-    typedef typename FIRE_ADVECTION_POLICY<T_GRID>::NESTED_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE T_NESTED_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE;
-    typedef typename FIRE_ADVECTION_POLICY<T_GRID>::ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE T_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE;
-    typedef typename ADVECTION_COLLIDABLE_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_SLIP_FACE T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_SLIP_FACE;
-    typedef FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<T_GRID> T_FACE_LOOKUP_COLLIDABLE_SLIP;
+    typedef typename FIRE_ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE;
+    typedef typename FIRE_ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE;
+    typedef typename FIRE_ADVECTION_POLICY<TV>::ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE T_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE;
+    typedef typename FIRE_INTERPOLATION_POLICY<TV>::FACE_LOOKUP_FIRE_MULTIPHASE_COLLIDABLE T_FACE_LOOKUP_FIRE_MULTIPHASE_COLLIDABLE;
+    typedef typename FIRE_ADVECTION_POLICY<TV>::NESTED_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE T_NESTED_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE;
+    typedef typename FIRE_ADVECTION_POLICY<TV>::ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE T_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE;
+    typedef typename ADVECTION_COLLIDABLE_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_SLIP_FACE T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_SLIP_FACE;
+    typedef FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE_SLIP;
 public:
-    ADVECTION<T_GRID,T>* advection;
+    ADVECTION<TV,T>* advection;
 protected:               
     T max_time_step;
     T gravity;
@@ -71,9 +71,9 @@ public:
     T_FACE_ARRAYS_BOOL valid_mask;
 
     T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE* nested_semi_lagrangian_collidable;
-    ADVECTION_WRAPPER_COLLIDABLE_FACE<T_GRID,T,T_FACE_LOOKUP,T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE,T_FACE_LOOKUP_COLLIDABLE>* semi_lagrangian_collidable;
+    ADVECTION_WRAPPER_COLLIDABLE_FACE<TV,T,T_FACE_LOOKUP,T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE,T_FACE_LOOKUP_COLLIDABLE>* semi_lagrangian_collidable;
     T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_SLIP_FACE* nested_semi_lagrangian_collidable_slip;
-    ADVECTION_WRAPPER_COLLIDABLE_FACE<T_GRID,T,T_FACE_LOOKUP,T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_SLIP_FACE,T_FACE_LOOKUP_COLLIDABLE_SLIP>* semi_lagrangian_collidable_slip;
+    ADVECTION_WRAPPER_COLLIDABLE_FACE<TV,T,T_FACE_LOOKUP,T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_SLIP_FACE,T_FACE_LOOKUP_COLLIDABLE_SLIP>* semi_lagrangian_collidable_slip;
     T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE* nested_semi_lagrangian_fire_multiphase;
     T_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE* semi_lagrangian_fire_multiphase;
     T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE* nested_nested_semi_lagrangian_fire_multiphase_collidable;
@@ -84,17 +84,17 @@ public:
     INCOMPRESSIBLE();
     virtual ~INCOMPRESSIBLE();
 
-    virtual void Initialize_Grids(const T_GRID& grid)
+    virtual void Initialize_Grids(const GRID<TV>& grid)
     {valid_mask.Resize(grid.Domain_Indices(3),true,true,true);}
 
-    void Set_Custom_Advection(ADVECTION<T_GRID,T>& advection_input)
+    void Set_Custom_Advection(ADVECTION<TV,T>& advection_input)
     {advection=&advection_input;}
         
     void Set_Max_Time_Step(const T max_time_step_input=1e8)
     {max_time_step=max_time_step_input;}
 
     void Set_Gravity(const T gravity_input=9.8)
-    {gravity=gravity_input;downward_direction=T_GRID::dimension>1?-TV::Axis_Vector(1):TV();}
+    {gravity=gravity_input;downward_direction=TV::m>1?-TV::Axis_Vector(1):TV();}
 
     void Set_Gravity(const T gravity_input,const TV& downward_direction_input)
     {gravity=gravity_input;downward_direction=downward_direction_input;}
@@ -133,10 +133,10 @@ public:
     {vorticity_confinements=vorticity_confinements_input;}
 
 //#####################################################################
-    void Use_Semi_Lagrangian_Collidable_Advection(T_GRID_BASED_COLLISION_GEOMETRY& body_list);
-    void Use_Semi_Lagrangian_Collidable_Slip_Advection(T_GRID_BASED_COLLISION_GEOMETRY& body_list);
-    void Use_Semi_Lagrangian_Fire_Multiphase_Advection(const T_PROJECTION& projection,const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_n_plus_one);
-    void Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection(T_GRID_BASED_COLLISION_GEOMETRY& body_list,const T_PROJECTION& projection,const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_n_plus_one);
+    void Use_Semi_Lagrangian_Collidable_Advection(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list);
+    void Use_Semi_Lagrangian_Collidable_Slip_Advection(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list);
+    void Use_Semi_Lagrangian_Fire_Multiphase_Advection(const PROJECTION_DYNAMICS_UNIFORM<TV>& projection,const LEVELSET_MULTIPLE<TV>& levelset_multiple_n_plus_one);
+    void Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list,const PROJECTION_DYNAMICS_UNIFORM<TV>& projection,const LEVELSET_MULTIPLE<TV>& levelset_multiple_n_plus_one);
 //#####################################################################
 };
 }

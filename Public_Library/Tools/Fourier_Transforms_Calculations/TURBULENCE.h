@@ -35,7 +35,7 @@ public:
     T time_start,time_end;
     GRID<TV> grid;
     VECTOR<ARRAY<T,TV_INT>,TV::m> u_old,u_new;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
 
     TURBULENCE()
     {

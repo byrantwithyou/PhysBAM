@@ -15,21 +15,21 @@
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;
 public:
     typedef VECTOR<T,2> TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::test_number;using BASE::parse_args;using BASE::fluid_collection;using BASE::solid_body_collection;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
 
-    WATER_STANDARD_TESTS_2D<GRID<TV> > tests;
+    WATER_STANDARD_TESTS_2D<TV> tests;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,1,fluids_parameters.WATER),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,1,fluids_parameters.WATER),
         tests(*this,fluids_parameters,solid_body_collection.rigid_body_collection)
     {
     }
@@ -102,14 +102,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Construct_Levelsets_For_Objects(const T time)
 {
     tests.Update_Rigid_Bodies(time);
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Construct_Levelsets_For_Objects(time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Construct_Levelsets_For_Objects(time);
 }
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Update_Fluid_Parameters(dt,time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
     tests.Update_Sources(time);
 }
 //#####################################################################

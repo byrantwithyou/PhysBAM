@@ -43,20 +43,20 @@
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS_WATER:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class STANDARD_TESTS_WATER:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
     typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<bool,FACE_INDEX<2> > T_FACE_ARRAYS_BOOL;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::mpi_world; // silence -Woverloaded-virtual
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
     using BASE::Add_To_Fluid_Simulation;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::Add_Thin_Shell_To_Fluid_Simulation;using BASE::Adjust_Phi_With_Source;
     using BASE::data_directory;
 
-    WATER_STANDARD_TESTS_2D<GRID<TV> > water_tests;
+    WATER_STANDARD_TESTS_2D<TV> water_tests;
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
     GRID<TV> mattress_grid;
     int deformable_object_id;

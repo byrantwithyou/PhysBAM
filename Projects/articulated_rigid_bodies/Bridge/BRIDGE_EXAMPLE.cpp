@@ -80,7 +80,7 @@ Initialize_Bodies()
 
     solid_body_collection.Update_Simulated_Particles();
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Initialize_Bodies();
 }
 //#####################################################################
 // Function Update_Solids_Parameters

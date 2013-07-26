@@ -101,7 +101,7 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
                 eps_writer.Draw_Object(sc.particles.X(sc.mesh.elements(t)(0)),sc.particles.X(sc.mesh.elements(t)(1)));}
     }
 
-    CUBIC_MN_INTERPOLATION_UNIFORM<GRID<TV>,T> interp;
+    CUBIC_MN_INTERPOLATION_UNIFORM<TV,T> interp;
     ARRAY<ARRAY<T,TV_INT> > color_pressure(levelsets.m);
     for(int i=0;i<levelsets.m;i++){
         color_pressure(i)=pressure;

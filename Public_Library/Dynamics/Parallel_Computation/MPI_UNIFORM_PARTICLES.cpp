@@ -23,9 +23,9 @@ namespace PhysBAM{
 //#####################################################################
 // Function ISend_Particles
 //#####################################################################
-template<class T_GRID,class T_PARTICLES> MPI::Request
-ISend_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const ARRAY<PAIR<T_PARTICLES*,int> >& particles,const int destination_rank,
-    const typename T_GRID::VECTOR_INT& destination_direction,const int tag,ARRAY<char>& buffer)
+template<class TV,class T_PARTICLES> MPI::Request
+ISend_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const ARRAY<PAIR<T_PARTICLES*,int> >& particles,const int destination_rank,
+    const VECTOR<int,TV::m>& destination_direction,const int tag,ARRAY<char>& buffer)
 {
     int position=0;
     MPI::Comm& comm=*mpi_grid.comm;
@@ -39,12 +39,12 @@ ISend_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const ARRAY<PAIR<T_PART
 //#####################################################################
 // Function Recv_Particles
 //#####################################################################
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
-Recv_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int tag,
-    const MPI::Status& probe_status,PARTICLE_LEVELSET<T_GRID>& particle_levelset)
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
+Recv_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int tag,
+    const MPI::Status& probe_status,PARTICLE_LEVELSET<TV>& particle_levelset)
 {
-    typedef typename T_GRID::VECTOR_T TV;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    
+    typedef VECTOR<int,TV::m> TV_INT;
     MPI::Comm& comm=*mpi_grid.comm;
     T_PARTICLES* recv_particles(template_particles.Clone()); // message will unpack into this particle object
     recv_particles->Add_Element();
@@ -67,12 +67,12 @@ Recv_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& templ
 //#####################################################################
 // Function Recv_Block_Particles
 //#####################################################################
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
-Recv_Block_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int tag,
-    const MPI::Status& probe_status,PARTICLE_LEVELSET<T_GRID>& particle_levelset)
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
+Recv_Block_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int tag,
+    const MPI::Status& probe_status,PARTICLE_LEVELSET<TV>& particle_levelset)
 {
-    typedef typename T_GRID::VECTOR_T TV;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    
+    typedef VECTOR<int,TV::m> TV_INT;
     MPI::Comm& comm=*mpi_grid.comm;
     T_PARTICLES* recv_particles(template_particles.Clone()); // message will unpack into this particle object
     recv_particles->Add_Element();
@@ -95,12 +95,12 @@ Recv_Block_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES&
 //#####################################################################
 // Function Recv_Ghost_Particles
 //#####################################################################
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
-Recv_Ghost_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int tag,
-    const MPI::Status& probe_status,const int bandwidth,PARTICLE_LEVELSET<T_GRID>& particle_levelset)
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
+Recv_Ghost_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int tag,
+    const MPI::Status& probe_status,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
 {
-    typedef typename T_GRID::VECTOR_T TV;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    
+    typedef VECTOR<int,TV::m> TV_INT;
     MPI::Comm& comm=*mpi_grid.comm;
     T_PARTICLES* recv_particles(template_particles.Clone()); // message will unpack into this particle object
     recv_particles->Add_Element();
@@ -123,23 +123,23 @@ Recv_Ghost_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES&
 //#####################################################################
 // Function ISend_Particles
 //#####################################################################
-template<class T_GRID,class T_PARTICLES,class T> void
-ISend_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,T_PARTICLES& particles,const T ghost_distance,const int tag,ARRAY<ARRAY<char> >& buffers,ARRAY<MPI::Request>& requests)
+template<class TV,class T_PARTICLES,class T> void
+ISend_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,T_PARTICLES& particles,const T ghost_distance,const int tag,ARRAY<ARRAY<char> >& buffers,ARRAY<MPI::Request>& requests)
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     RANGE<TV> domain=mpi_grid.local_grid.Domain();
-    ARRAY<RANGE<TV> > neighbor_domains(T_GRID::number_of_one_ring_neighbors_per_cell);
+    ARRAY<RANGE<TV> > neighbor_domains(GRID<TV>::number_of_one_ring_neighbors_per_cell);
     for(int n=0;n<neighbor_domains.m;n++){
-        TV neighbor_direction=TV(T_GRID::One_Ring_Neighbor(TV_INT(),n));
+        TV neighbor_direction=TV(GRID<TV>::One_Ring_Neighbor(TV_INT(),n));
         neighbor_domains(n)=(domain+neighbor_direction*domain.Edge_Lengths()).Thickened((T).01*mpi_grid.local_grid.dX.Min());}
     if(ghost_distance){
         domain.Change_Size(-ghost_distance);
         for(int n=0;n<neighbor_domains.m;n++)neighbor_domains(n).Change_Size(ghost_distance);}
     // send particles that have exited the domain
-    buffers.Resize(T_GRID::number_of_one_ring_neighbors_per_cell);
-    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(T_GRID::number_of_one_ring_neighbors_per_cell);
+    buffers.Resize(GRID<TV>::number_of_one_ring_neighbors_per_cell);
+    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(GRID<TV>::number_of_one_ring_neighbors_per_cell);
     // TODO: this is inefficient because it does an entire box check even if only some sides are needed, and doesn't locally delete sent particles
-    for(int n=0;n<T_GRID::number_of_one_ring_neighbors_per_cell;n++)if(mpi_grid.all_neighbor_ranks(n)!=MPI::PROC_NULL){
+    for(int n=0;n<GRID<TV>::number_of_one_ring_neighbors_per_cell;n++)if(mpi_grid.all_neighbor_ranks(n)!=MPI::PROC_NULL){
         exchange_particles(n).Preallocate(100);
         for(int i=0;i<particles.Size();i++){
             if(!domain.Lazy_Inside(particles.X(i)) && neighbor_domains(n).Lazy_Inside(particles.X(i)))
@@ -149,10 +149,10 @@ ISend_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,T_PARTICLES& particles,
 //#####################################################################
 // Function Recv_Particles
 //#####################################################################
-template<class T_GRID,class T_PARTICLES> void
-Recv_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,T_PARTICLES& particles,const int tag)
+template<class TV,class T_PARTICLES> void
+Recv_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,T_PARTICLES& particles,const int tag)
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     MPI::Comm& comm=*mpi_grid.comm;
     MPI::Status probe_status;
     comm.Probe(MPI::ANY_SOURCE,tag,probe_status);
@@ -170,18 +170,18 @@ Recv_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,T_PARTICLES& particles,c
 //#####################################################################
 // Function Exchange_Boundary_Particles
 //#####################################################################
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
-Exchange_Boundary_Particles_Threaded(const THREADED_UNIFORM_GRID<T_GRID>& threaded_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<T_GRID>& particle_levelset)
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
+Exchange_Boundary_Particles_Threaded(const THREADED_UNIFORM_GRID<TV>& threaded_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
 {
 #ifdef USE_PTHREADS
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
     ARRAY<RANGE<TV_INT> > send_regions;
     // this way Find_Boundary_Regions will return block indices which for uniform grids are the node index not minimum corner cell
     RANGE<TV_INT> sentinels=RANGE<TV_INT>(TV_INT(),TV_INT::All_Ones_Vector());
     threaded_grid.Find_Boundary_Regions(send_regions,sentinels,false,RANGE<VECTOR<int,1> >(0,bandwidth-1),true,false);
     // send particles that have exited the domain
-    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(T_GRID::number_of_one_ring_neighbors_per_cell);
+    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(GRID<TV>::number_of_one_ring_neighbors_per_cell);
     // TODO: this is inefficient because it does an entire box check even if only some sides are needed, and send a lot more corner particles than it should
     RANGE<TV> domain=threaded_grid.local_grid.Domain();
     for(int n=0;n<send_regions.m;n++) if(threaded_grid.all_neighbor_ranks(n)!=-1){
@@ -216,11 +216,11 @@ Exchange_Boundary_Particles_Threaded(const THREADED_UNIFORM_GRID<T_GRID>& thread
     pthread_barrier_wait(threaded_grid.barr);
 #endif
 }
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
-Exchange_Boundary_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<T_GRID>& particle_levelset)
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
+Exchange_Boundary_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
 {
     if(mpi_grid.threaded_grid){Exchange_Boundary_Particles_Threaded(*mpi_grid.threaded_grid,template_particles,particles,bandwidth,particle_levelset);return;}
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
     int tag=mpi_grid.Get_Unique_Tag();
     ARRAY<RANGE<TV_INT> > send_regions;
@@ -229,8 +229,8 @@ Exchange_Boundary_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PAR
     mpi_grid.Find_Boundary_Regions(send_regions,sentinels,false,RANGE<VECTOR<int,1> >(0,bandwidth-1),true,false);
     // send particles that have exited the domain
     ARRAY<MPI::Request> requests;
-    ARRAY<ARRAY<char> > buffers(T_GRID::number_of_one_ring_neighbors_per_cell);
-    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(T_GRID::number_of_one_ring_neighbors_per_cell);
+    ARRAY<ARRAY<char> > buffers(GRID<TV>::number_of_one_ring_neighbors_per_cell);
+    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(GRID<TV>::number_of_one_ring_neighbors_per_cell);
     // TODO: this is inefficient because it does an entire box check even if only some sides are needed, and send a lot more corner particles than it should
     RANGE<TV> domain=mpi_grid.local_grid.Domain();
     for(int n=0;n<send_regions.m;n++) if(mpi_grid.all_neighbor_ranks(n)!=MPI::PROC_NULL){
@@ -251,18 +251,18 @@ Exchange_Boundary_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PAR
 //#####################################################################
 // Function Exchange_Overlapping_Block_Particles
 //#####################################################################
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
-Exchange_Overlapping_Block_Particles_Threaded(const THREADED_UNIFORM_GRID<T_GRID>& threaded_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<T_GRID>& particle_levelset)
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
+Exchange_Overlapping_Block_Particles_Threaded(const THREADED_UNIFORM_GRID<TV>& threaded_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
 {
 #ifdef USE_PTHREADS
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
     ARRAY<RANGE<TV_INT> > send_regions;
     // this way Find_Boundary_Regions will return block indices which for uniform grids are the node index not minimum corner cell
     RANGE<TV_INT> sentinels=RANGE<TV_INT>(TV_INT(),TV_INT::All_Ones_Vector());
     threaded_grid.Find_Boundary_Regions(send_regions,sentinels,false,RANGE<VECTOR<int,1> >(0,bandwidth-1),true,false);
     // send particles that have exited the domain
-    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(T_GRID::number_of_one_ring_neighbors_per_cell);
+    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(GRID<TV>::number_of_one_ring_neighbors_per_cell);
     // TODO: this is inefficient because it does an entire box check even if only some sides are needed, and send a lot more corner particles than it should
     RANGE<TV> block_domain=threaded_grid.local_grid.Domain();block_domain.Change_Size(-(T).5*threaded_grid.local_grid.DX());
     for(int n=0;n<send_regions.m;n++) if(threaded_grid.all_neighbor_ranks(n)!=-1){
@@ -297,11 +297,11 @@ Exchange_Overlapping_Block_Particles_Threaded(const THREADED_UNIFORM_GRID<T_GRID
     pthread_barrier_wait(threaded_grid.barr);
 #endif
 }
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
-Exchange_Overlapping_Block_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<T_GRID>& particle_levelset)
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
+Exchange_Overlapping_Block_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
 {
     if(mpi_grid.threaded_grid){Exchange_Overlapping_Block_Particles_Threaded(*mpi_grid.threaded_grid,template_particles,particles,bandwidth,particle_levelset);return;}
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
     int tag=mpi_grid.Get_Unique_Tag();
     ARRAY<RANGE<TV_INT> > send_regions;
@@ -310,8 +310,8 @@ Exchange_Overlapping_Block_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,co
     mpi_grid.Find_Boundary_Regions(send_regions,sentinels,false,RANGE<VECTOR<int,1> >(0,bandwidth-1),true,false);
     // send particles that have exited the domain
     ARRAY<MPI::Request> requests;
-    ARRAY<ARRAY<char> > buffers(T_GRID::number_of_one_ring_neighbors_per_cell);
-    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(T_GRID::number_of_one_ring_neighbors_per_cell);
+    ARRAY<ARRAY<char> > buffers(GRID<TV>::number_of_one_ring_neighbors_per_cell);
+    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(GRID<TV>::number_of_one_ring_neighbors_per_cell);
     // TODO: this is inefficient because it does an entire box check even if only some sides are needed, and send a lot more corner particles than it should
     RANGE<TV> block_domain=mpi_grid.local_grid.Domain();block_domain.Change_Size(-(T).5*mpi_grid.local_grid.DX());
     for(int n=0;n<send_regions.m;n++) if(mpi_grid.all_neighbor_ranks(n)!=MPI::PROC_NULL){
@@ -332,10 +332,10 @@ Exchange_Overlapping_Block_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,co
 //#####################################################################
 // Function Exchange_Ghost_Particles
 //#####################################################################
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
-Exchange_Ghost_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<T_GRID>& particle_levelset)
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
+Exchange_Ghost_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
     int tag=mpi_grid.Get_Unique_Tag();
     ARRAY<RANGE<TV_INT> > send_regions;
@@ -344,8 +344,8 @@ Exchange_Ghost_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTIC
     mpi_grid.Find_Boundary_Regions(send_regions,sentinels,false,RANGE<VECTOR<int,1> >(0,bandwidth-1),true,false);
     // send particles that are in the ghost cells of an adjacent processor
     ARRAY<MPI::Request> requests;
-    ARRAY<ARRAY<char> > buffers(T_GRID::number_of_one_ring_neighbors_per_cell);
-    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(T_GRID::number_of_one_ring_neighbors_per_cell);
+    ARRAY<ARRAY<char> > buffers(GRID<TV>::number_of_one_ring_neighbors_per_cell);
+    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(GRID<TV>::number_of_one_ring_neighbors_per_cell);
     // TODO: this is inefficient because it does an entire box check even if only some sides are needed, and send a lot more corner particles than it should
     RANGE<TV> domain=mpi_grid.local_grid.Domain();
     for(int n=0;n<send_regions.m;n++) if(mpi_grid.all_neighbor_ranks(n)!=MPI::PROC_NULL){
@@ -366,8 +366,8 @@ Exchange_Ghost_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTIC
 //#####################################################################
 // Function Exchange_Boundary_Particles
 //#####################################################################
-template<class T_GRID,class T_PARTICLES> void
-Exchange_Boundary_Particles_Flat(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,T_PARTICLES& particles,const typename T_GRID::SCALAR ghost_distance)
+template<class TV,class T_PARTICLES> void
+Exchange_Boundary_Particles_Flat(const MPI_UNIFORM_GRID<TV>& mpi_grid,T_PARTICLES& particles,const typename TV::SCALAR ghost_distance)
 {
     int tag=mpi_grid.Get_Unique_Tag();
     ARRAY<MPI::Request> requests;
@@ -381,16 +381,16 @@ Exchange_Boundary_Particles_Flat(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,T_PART
 #else
 
 //#####################################################################
-template<class T_GRID,class T_PARTICLES> void Exchange_Boundary_Particles_Flat(const MPI_UNIFORM_GRID<T_GRID>&,T_PARTICLES&,const typename T_GRID::SCALAR)
+template<class TV,class T_PARTICLES> void Exchange_Boundary_Particles_Flat(const MPI_UNIFORM_GRID<TV>&,T_PARTICLES&,const typename TV::SCALAR)
 {PHYSBAM_NOT_IMPLEMENTED();}
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES> void Exchange_Boundary_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,
-    const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<T_GRID>& particle_levelset)
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void Exchange_Boundary_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,
+    const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
 {PHYSBAM_NOT_IMPLEMENTED();}
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES> void Exchange_Overlapping_Block_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,
-    const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<T_GRID>& particle_levelset)
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void Exchange_Overlapping_Block_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,
+    const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
 {PHYSBAM_NOT_IMPLEMENTED();}
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES> void Exchange_Ghost_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& template_particles,
-    T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<T_GRID>& particle_levelset)
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void Exchange_Ghost_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,
+    T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
 {PHYSBAM_NOT_IMPLEMENTED();}
 
 //#####################################################################
@@ -398,80 +398,80 @@ template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES> void Exchange_
 #endif
 
 //#####################################################################
-template void Exchange_Boundary_Particles<GRID<VECTOR<float,1> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<float,1> > >&);
-template void Exchange_Boundary_Particles<GRID<VECTOR<float,1> >,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<float,1> > >&);
-template void Exchange_Boundary_Particles<GRID<VECTOR<float,2> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<float,2> > >&);
-template void Exchange_Boundary_Particles<GRID<VECTOR<float,2> >,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<float,2> > >&);
-template void Exchange_Boundary_Particles<GRID<VECTOR<float,3> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<float,3> > >&);
-template void Exchange_Boundary_Particles<GRID<VECTOR<float,3> >,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<float,3> > >&);
-template void Exchange_Boundary_Particles_Flat<GRID<VECTOR<double,3> >,VORTICITY_PARTICLES<VECTOR<double,3> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,VORTICITY_PARTICLES<VECTOR<double,3> >&,GRID<VECTOR<double,3> >::SCALAR);
-template void Exchange_Boundary_Particles_Flat<GRID<VECTOR<float,3> >,VORTICITY_PARTICLES<VECTOR<float,3> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,VORTICITY_PARTICLES<VECTOR<float,3> >&,GRID<VECTOR<float,3> >::SCALAR);
-template void Exchange_Ghost_Particles<GRID<VECTOR<double,1> >,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<double,1> > >&);
-template void Exchange_Ghost_Particles<GRID<VECTOR<double,2> >,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<double,2> > >&);
-template void Exchange_Ghost_Particles<GRID<VECTOR<double,3> >,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<double,3> > >&);
-template void Exchange_Overlapping_Block_Particles<GRID<VECTOR<double,1> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<double,1> > >&);
-template void Exchange_Overlapping_Block_Particles<GRID<VECTOR<double,2> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<double,2> > >&);
-template void Exchange_Overlapping_Block_Particles<GRID<VECTOR<double,3> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<double,3> > >&);
-template void Exchange_Boundary_Particles<GRID<VECTOR<double,1> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<double,1> > >&);
-template void Exchange_Boundary_Particles<GRID<VECTOR<double,1> >,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<double,1> > >&);
-template void Exchange_Boundary_Particles<GRID<VECTOR<double,2> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<double,2> > >&);
-template void Exchange_Boundary_Particles<GRID<VECTOR<double,2> >,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<double,2> > >&);
-template void Exchange_Boundary_Particles<GRID<VECTOR<double,3> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<double,3> > >&);
-template void Exchange_Boundary_Particles<GRID<VECTOR<double,3> >,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<double,3> > >&);
-template void Exchange_Ghost_Particles<GRID<VECTOR<float,1> >,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<float,1> > >&);
-template void Exchange_Ghost_Particles<GRID<VECTOR<float,2> >,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<float,2> > >&);
-template void Exchange_Ghost_Particles<GRID<VECTOR<float,3> >,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<float,3> > >&);
-template void Exchange_Overlapping_Block_Particles<GRID<VECTOR<float,1> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<float,1> > >&);
-template void Exchange_Overlapping_Block_Particles<GRID<VECTOR<float,2> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<float,2> > >&);
-template void Exchange_Overlapping_Block_Particles<GRID<VECTOR<float,3> >,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
-    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,int,
-    PARTICLE_LEVELSET<GRID<VECTOR<float,3> > >&);
+template void Exchange_Boundary_Particles<VECTOR<float,1>,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,1> > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,int,
+    PARTICLE_LEVELSET<VECTOR<float,1> >&);
+template void Exchange_Boundary_Particles<VECTOR<float,1>,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,1> > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,int,
+    PARTICLE_LEVELSET<VECTOR<float,1> >&);
+template void Exchange_Boundary_Particles<VECTOR<float,2>,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,2> > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,int,
+    PARTICLE_LEVELSET<VECTOR<float,2> >&);
+template void Exchange_Boundary_Particles<VECTOR<float,2>,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,2> > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,int,
+    PARTICLE_LEVELSET<VECTOR<float,2> >&);
+template void Exchange_Boundary_Particles<VECTOR<float,3>,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,3> > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,int,
+    PARTICLE_LEVELSET<VECTOR<float,3> >&);
+template void Exchange_Boundary_Particles<VECTOR<float,3>,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,3> > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,int,
+    PARTICLE_LEVELSET<VECTOR<float,3> >&);
+template void Exchange_Boundary_Particles_Flat<VECTOR<double,3>,VORTICITY_PARTICLES<VECTOR<double,3> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,3> > const&,VORTICITY_PARTICLES<VECTOR<double,3> >&,GRID<VECTOR<double,3> >::SCALAR);
+template void Exchange_Boundary_Particles_Flat<VECTOR<float,3>,VORTICITY_PARTICLES<VECTOR<float,3> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,3> > const&,VORTICITY_PARTICLES<VECTOR<float,3> >&,GRID<VECTOR<float,3> >::SCALAR);
+template void Exchange_Ghost_Particles<VECTOR<double,1>,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,1> > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,int,
+    PARTICLE_LEVELSET<VECTOR<double,1> >&);
+template void Exchange_Ghost_Particles<VECTOR<double,2>,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,2> > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,int,
+    PARTICLE_LEVELSET<VECTOR<double,2> >&);
+template void Exchange_Ghost_Particles<VECTOR<double,3>,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,3> > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,int,
+    PARTICLE_LEVELSET<VECTOR<double,3> >&);
+template void Exchange_Overlapping_Block_Particles<VECTOR<double,1>,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,1> > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,int,
+    PARTICLE_LEVELSET<VECTOR<double,1> >&);
+template void Exchange_Overlapping_Block_Particles<VECTOR<double,2>,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,2> > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,int,
+    PARTICLE_LEVELSET<VECTOR<double,2> >&);
+template void Exchange_Overlapping_Block_Particles<VECTOR<double,3>,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,3> > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,int,
+    PARTICLE_LEVELSET<VECTOR<double,3> >&);
+template void Exchange_Boundary_Particles<VECTOR<double,1>,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,1> > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,int,
+    PARTICLE_LEVELSET<VECTOR<double,1> >&);
+template void Exchange_Boundary_Particles<VECTOR<double,1>,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,1> > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,int,
+    PARTICLE_LEVELSET<VECTOR<double,1> >&);
+template void Exchange_Boundary_Particles<VECTOR<double,2>,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,2> > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,int,
+    PARTICLE_LEVELSET<VECTOR<double,2> >&);
+template void Exchange_Boundary_Particles<VECTOR<double,2>,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,2> > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,int,
+    PARTICLE_LEVELSET<VECTOR<double,2> >&);
+template void Exchange_Boundary_Particles<VECTOR<double,3>,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,3> > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,int,
+    PARTICLE_LEVELSET<VECTOR<double,3> >&);
+template void Exchange_Boundary_Particles<VECTOR<double,3>,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+    MPI_UNIFORM_GRID<VECTOR<double,3> > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,int,
+    PARTICLE_LEVELSET<VECTOR<double,3> >&);
+template void Exchange_Ghost_Particles<VECTOR<float,1>,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,1> > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,int,
+    PARTICLE_LEVELSET<VECTOR<float,1> >&);
+template void Exchange_Ghost_Particles<VECTOR<float,2>,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,2> > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,int,
+    PARTICLE_LEVELSET<VECTOR<float,2> >&);
+template void Exchange_Ghost_Particles<VECTOR<float,3>,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,3> > const&,PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,int,
+    PARTICLE_LEVELSET<VECTOR<float,3> >&);
+template void Exchange_Overlapping_Block_Particles<VECTOR<float,1>,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,1> > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,int,
+    PARTICLE_LEVELSET<VECTOR<float,1> >&);
+template void Exchange_Overlapping_Block_Particles<VECTOR<float,2>,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,2> > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,int,
+    PARTICLE_LEVELSET<VECTOR<float,2> >&);
+template void Exchange_Overlapping_Block_Particles<VECTOR<float,3>,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+    MPI_UNIFORM_GRID<VECTOR<float,3> > const&,PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,int,
+    PARTICLE_LEVELSET<VECTOR<float,3> >&);
 }

@@ -30,7 +30,7 @@ public:
     RANGE<TV> spatially_varying_wind_domain;
     GRID<TV> V_grid;
     ARRAY<TV,TV_INT>* spatially_varying_wind;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> vector_interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,TV> vector_interpolation;
 
     DEFORMABLE_ETHER_DRAG(DEFORMABLE_PARTICLES<TV>& particles_input,ARRAY<int>* influenced_particles_input,T dynamic_ether_viscosity=0,T angular_viscosity=0)
         :POINTWISE_DEFORMABLE_FORCE<TV>(particles_input,influenced_particles_input),use_constant_wind(dynamic_ether_viscosity!=0),

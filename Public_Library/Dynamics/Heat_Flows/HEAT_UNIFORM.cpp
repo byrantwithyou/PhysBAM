@@ -15,26 +15,26 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> HEAT_UNIFORM<T_GRID>::
-HEAT_UNIFORM(T_GRID& grid_input,T_ARRAYS_SCALAR& Q_input)
+template<class TV> HEAT_UNIFORM<TV>::
+HEAT_UNIFORM(GRID<TV>& grid_input,T_ARRAYS_SCALAR& Q_input)
     :grid(grid_input),Q(Q_input),laplace(grid,Q)
 {}
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> HEAT_UNIFORM<T_GRID>::
+template<class TV> HEAT_UNIFORM<TV>::
 ~HEAT_UNIFORM()
 {}
 //#####################################################################
 // Function Euler_Step
 //#####################################################################
-template<class T_GRID> void HEAT_UNIFORM<T_GRID>::
+template<class TV> void HEAT_UNIFORM<TV>::
 Euler_Step(const T dt,const T time)
 {
     TV kappa_over_DX2=kappa*sqr(grid.one_over_dX);
     laplace.f.Fill(0);
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(!laplace.psi_D(cell))
-        for(int axis=0;axis<T_GRID::dimension;axis++){
+        for(int axis=0;axis<TV::m;axis++){
             TV_INT face1=iterator.First_Face_Index(axis),face2=iterator.Second_Face_Index(axis),offset=TV_INT::Axis_Vector(axis);
             if(!laplace.psi_N.Component(axis)(face1)) laplace.f(cell)-=(Q(cell)-Q(cell-offset))*kappa_over_DX2[axis];
             if(!laplace.psi_N.Component(axis)(face2)) laplace.f(cell)+=(Q(cell+offset)-Q(cell))*kappa_over_DX2[axis];}}
@@ -43,7 +43,7 @@ Euler_Step(const T dt,const T time)
 //#####################################################################
 // Function CFL
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR HEAT_UNIFORM<T_GRID>::
+template<class TV> typename TV::SCALAR HEAT_UNIFORM<TV>::
 CFL()
 {
     T dt_overall=kappa*2*grid.one_over_dX.Magnitude_Squared();
@@ -53,7 +53,7 @@ CFL()
 // Function Backward_Euler_Calculate_Right_Hand_Side
 //#####################################################################
 // boundary conditions at time n
-template<class T_GRID> void HEAT_UNIFORM<T_GRID>::
+template<class TV> void HEAT_UNIFORM<TV>::
 Backward_Euler_Calculate_Right_Hand_Side(const T dt,const T time)
 {
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();laplace.f(cell)=Q(cell);}
@@ -62,7 +62,7 @@ Backward_Euler_Calculate_Right_Hand_Side(const T dt,const T time)
 // Function Backward_Euler_Step
 //#####################################################################
 // boundary conditions at time n+1
-template<class T_GRID> void HEAT_UNIFORM<T_GRID>::
+template<class TV> void HEAT_UNIFORM<TV>::
 Backward_Euler_Step(const T dt,const T time)
 {
     Implicit_Solve(dt*kappa,dt,time);
@@ -71,14 +71,14 @@ Backward_Euler_Step(const T dt,const T time)
 // Function Crank_Nicolson_Calculate_Right_Hand_Side
 //#####################################################################
 // boundary conditions at time n
-template<class T_GRID> void HEAT_UNIFORM<T_GRID>::
+template<class TV> void HEAT_UNIFORM<TV>::
 Crank_Nicolson_Calculate_Right_Hand_Side(const T dt,const T time)
 {
     TV half_dt_kappa_over_DX2=(T).5*dt*kappa*sqr(grid.one_over_dX);
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         laplace.f(cell)=Q(cell);
         if(!laplace.psi_D(cell)){
-            for(int axis=0;axis<T_GRID::dimension;axis++){
+            for(int axis=0;axis<TV::m;axis++){
                 TV_INT face1=iterator.First_Face_Index(axis),face2=iterator.Second_Face_Index(axis),offset=TV_INT::Axis_Vector(axis);
                 if(!laplace.psi_N.Component(axis)(face1)) laplace.f(cell)-=(Q(cell)-Q(cell-offset))*half_dt_kappa_over_DX2[axis];
                 if(!laplace.psi_N.Component(axis)(face2)) laplace.f(cell)+=(Q(cell+offset)-Q(cell))*half_dt_kappa_over_DX2[axis];}}}
@@ -96,7 +96,7 @@ Crank_Nicolson_Calculate_Right_Hand_Side(const T dt,const T time)
 // Function Crank_Nicolson_Step
 //#####################################################################
 // boundary conditions at time n+1
-template<class T_GRID> void HEAT_UNIFORM<T_GRID>::
+template<class TV> void HEAT_UNIFORM<TV>::
 Crank_Nicolson_Step(const T dt,const T time)
 {
     Implicit_Solve((T).5*dt*kappa,dt,time);
@@ -105,7 +105,7 @@ Crank_Nicolson_Step(const T dt,const T time)
 // Function Implicit_Solve
 //#####################################################################
 // duplicate of laplace.Solve() with some changes
-template<class T_GRID> void HEAT_UNIFORM<T_GRID>::
+template<class TV> void HEAT_UNIFORM<TV>::
 Implicit_Solve(const T coefficient,const T dt,const T time)
 {
     laplace.coefficient=coefficient;
@@ -113,10 +113,10 @@ Implicit_Solve(const T coefficient,const T dt,const T time)
 }
 //#####################################################################
 namespace PhysBAM{
-template class HEAT_UNIFORM<GRID<VECTOR<float,1> > >;
-template class HEAT_UNIFORM<GRID<VECTOR<float,2> > >;
-template class HEAT_UNIFORM<GRID<VECTOR<float,3> > >;
-template class HEAT_UNIFORM<GRID<VECTOR<double,1> > >;
-template class HEAT_UNIFORM<GRID<VECTOR<double,2> > >;
-template class HEAT_UNIFORM<GRID<VECTOR<double,3> > >;
+template class HEAT_UNIFORM<VECTOR<float,1> >;
+template class HEAT_UNIFORM<VECTOR<float,2> >;
+template class HEAT_UNIFORM<VECTOR<float,3> >;
+template class HEAT_UNIFORM<VECTOR<double,1> >;
+template class HEAT_UNIFORM<VECTOR<double,2> >;
+template class HEAT_UNIFORM<VECTOR<double,3> >;
 }

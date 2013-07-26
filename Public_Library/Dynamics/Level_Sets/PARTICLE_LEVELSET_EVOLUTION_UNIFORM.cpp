@@ -15,12 +15,12 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
-PARTICLE_LEVELSET_EVOLUTION_UNIFORM(const T_GRID& grid_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input,bool multiphase)
+template<class TV> PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
+PARTICLE_LEVELSET_EVOLUTION_UNIFORM(const GRID<TV>& grid_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,const int number_of_ghost_cells_input,bool multiphase)
     :grid(grid_input),particle_levelset(0),levelset_advection(0)
 {
     if(!multiphase){
-        particle_levelset=new PARTICLE_LEVELSET_UNIFORM<GRID<TV> >(grid,phi,collision_body_list_input,number_of_ghost_cells_input);
+        particle_levelset=new PARTICLE_LEVELSET_UNIFORM<TV>(grid,phi,collision_body_list_input,number_of_ghost_cells_input);
         levelset_advection=new LEVELSET_ADVECTION<TV>(&particle_levelset->levelset);
         Use_Semi_Lagrangian_Advection();
         Track_Mass(false);}
@@ -28,7 +28,7 @@ PARTICLE_LEVELSET_EVOLUTION_UNIFORM(const T_GRID& grid_input,GRID_BASED_COLLISIO
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
 ~PARTICLE_LEVELSET_EVOLUTION_UNIFORM()
 {
     delete levelset_advection;
@@ -37,7 +37,7 @@ template<class T_GRID> PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
 //#####################################################################
 // Function Time_Step
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> typename TV::SCALAR PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
 Time_Step(const T stopping_time,bool& limited_by_stopping_time)
 {
     T dt=CFL();limited_by_stopping_time=false;
@@ -47,7 +47,7 @@ Time_Step(const T stopping_time,bool& limited_by_stopping_time)
 //#####################################################################
 // Function CFL
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> typename TV::SCALAR PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
 CFL(const bool need_to_get_velocity,const bool analytic_test)
 {
     if(need_to_get_velocity) particle_levelset->levelset.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset->levelset,V,time);
@@ -57,7 +57,7 @@ CFL(const bool need_to_get_velocity,const bool analytic_test)
 //#####################################################################
 // Function Advance_To_Time
 //#####################################################################
-template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
 Advance_To_Time(T_FACE_ARRAYS_SCALAR* face_velocities,const T stopping_time,const bool verbose)
 {
     int substep=0;bool done=false;
@@ -72,7 +72,7 @@ Advance_To_Time(T_FACE_ARRAYS_SCALAR* face_velocities,const T stopping_time,cons
 //#####################################################################
 // Function Advance_One_Time_Step
 //#####################################################################
-template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
 Advance_One_Time_Step(T_FACE_ARRAYS_SCALAR* face_velocities,const T dt)
 {
     LOG::Time("advancing levelset");
@@ -85,7 +85,7 @@ Advance_One_Time_Step(T_FACE_ARRAYS_SCALAR* face_velocities,const T dt)
 // Function Advance_Levelset
 //#####################################################################
 // only does an Euler step for the level set
-template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
 Advance_Levelset(const T dt)
 {
     for(RUNGEKUTTA<T_ARRAYS_SCALAR> rk(phi,runge_kutta_order_levelset,dt,time);rk.Valid();){
@@ -97,7 +97,7 @@ Advance_Levelset(const T dt)
 //#####################################################################
 // Function Advance_Particles
 //#####################################################################
-template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
 Advance_Particles(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const bool analytic_test)
 {
     if(use_particle_levelset){
@@ -118,10 +118,10 @@ Advance_Particles(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const b
 //#####################################################################
 // Function Advance_Particles
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> typename TV::SCALAR PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
 Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time)
 {
-    T_GRID mac_grid=grid.Get_MAC_Grid();
+    GRID<TV> mac_grid=grid.Get_MAC_Grid();
     T current_time=input_time;
     T_ARRAYS_RUNGEKUTTA rungekutta_particles(mac_grid.Domain_Indices(1));
     for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index()))
@@ -146,10 +146,10 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const PARTICLE
 //#####################################################################
 // Function Advance_Particles
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> typename TV::SCALAR PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
 Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time)
 {
-    T_GRID mac_grid=grid.Get_MAC_Grid();
+    GRID<TV> mac_grid=grid.Get_MAC_Grid();
     T current_time=input_time;
     T_ARRAYS_RUNGEKUTTA rungekutta_particles;rungekutta_particles.Resize(mac_grid.Domain_Indices(1));
     for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index()))
@@ -174,7 +174,7 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const 
 //#####################################################################
 // Function Modify_Levelset_And_Particles
 //#####################################################################
-template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
 Modify_Levelset_And_Particles(T_FACE_ARRAYS_SCALAR* face_velocities)
 {
     // TODO: a call for creating particles from the geometry if necessary
@@ -193,7 +193,7 @@ Modify_Levelset_And_Particles(T_FACE_ARRAYS_SCALAR* face_velocities)
 //#####################################################################
 // Function Reseed_Particles
 //#####################################################################
-template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
 Reseed_Particles(const T time,const int time_step,ARRAY<bool,TV_INT>* cell_centered_mask,const bool verbose)
 {
     if((use_particle_levelset && cell_centered_mask) || (!time_step || (reseeding_frequency && time_step%reseeding_frequency == 0))){
@@ -202,10 +202,10 @@ Reseed_Particles(const T time,const int time_step,ARRAY<bool,TV_INT>* cell_cente
 }
 //#####################################################################
 namespace PhysBAM{
-template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >;
-template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >;
-template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >;
-template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >;
-template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >;
-template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >;
+template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<VECTOR<float,1> >;
+template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<VECTOR<float,2> >;
+template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<VECTOR<float,3> >;
+template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<VECTOR<double,1> >;
+template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<VECTOR<double,2> >;
+template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<VECTOR<double,3> >;
 }

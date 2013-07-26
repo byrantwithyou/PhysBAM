@@ -31,7 +31,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>::
-SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES(EULER_UNIFORM<T_GRID>& euler_input,MPI_UNIFORM_GRID<T_GRID>* mpi_grid_input)
+SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES(EULER_UNIFORM<TV>& euler_input,MPI_UNIFORM_GRID<TV>* mpi_grid_input)
     :euler(euler_input),mpi_grid(mpi_grid_input),collision_bodies_affecting_fluid(0),thinshell(true),use_fast_marching(false),use_higher_order_solid_extrapolation(true),
     fluid_affects_solid(false),number_of_cells_to_extrapolate(7),solid_state(TV_DIMENSION()),euler_fluid_forces(0)
 {}
@@ -47,12 +47,12 @@ template<class TV> SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>::
 // Initialize_Solid_Fluid_Coupling
 //#####################################################################
 template<class TV> void SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>::
-Initialize_Solid_Fluid_Coupling(GRID_BASED_COLLISION_GEOMETRY<T_GRID>* collision_bodies_affecting_fluid_input)
+Initialize_Solid_Fluid_Coupling(GRID_BASED_COLLISION_GEOMETRY<TV>* collision_bodies_affecting_fluid_input)
 {
     phi_all_solids_negated.Resize(euler.grid.Domain_Indices(number_of_cells_to_extrapolate));
     outside_fluid.Resize(euler.grid.Domain_Indices(number_of_cells_to_extrapolate));
     uncovered_cells.Resize(euler.grid.Domain_Indices(1));
-    collision_bodies_affecting_fluid=dynamic_cast<GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>*>(collision_bodies_affecting_fluid_input);
+    collision_bodies_affecting_fluid=dynamic_cast<GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>*>(collision_bodies_affecting_fluid_input);
     collision_bodies_affecting_fluid->Initialize_Grids();
     collision_bodies_affecting_fluid->Rasterize_Objects();
     if(fluid_affects_solid){
@@ -154,7 +154,7 @@ Extrapolate_State_Into_Solids(T_ARRAYS_SCALAR& phi_all_solids_negated,const int 
         mpi_boundary.Fill_Ghost_Cells(euler.grid,euler.U,U_extrapolated,(T)0,(T)0,number_of_ghost_cells);}
     else U_extrapolated=euler.U;
 
-    EXTRAPOLATION_UNIFORM<GRID<TV>,TV_DIMENSION> extrapolate(euler.grid,phi_all_solids_negated,U_extrapolated,number_of_ghost_cells);extrapolate.Set_Band_Width((T)number_of_cells_to_extrapolate);
+    EXTRAPOLATION_UNIFORM<TV,TV_DIMENSION> extrapolate(euler.grid,phi_all_solids_negated,U_extrapolated,number_of_ghost_cells);extrapolate.Set_Band_Width((T)number_of_cells_to_extrapolate);
     extrapolate.Extrapolate((T)0,false);
     T_ARRAYS_DIMENSION_SCALAR::Get(euler.U,U_extrapolated);
 
@@ -204,7 +204,7 @@ Compute_Phi_Solids(const int number_of_ghost_cells)
             seed_indices.Append(iterator.First_Cell_Index());seed_indices.Append(iterator.Second_Cell_Index());}
 
         LEVELSET<TV> levelset(euler.grid,phi_all_solids_negated); // TODO(jontg): Make this a permanent member variable?
-        FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(levelset,number_of_cells_to_extrapolate);
+        FAST_MARCHING_METHOD_UNIFORM<TV> fmm(levelset,number_of_cells_to_extrapolate);
         fmm.Fast_Marching_Method(phi_all_solids_negated,euler.grid.dX.Max()*(T)number_of_cells_to_extrapolate,&seed_indices,true);}
 }
 //#####################################################################
@@ -260,7 +260,7 @@ Apply_Isobaric_Fix(const T dt,const T time)
     for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(euler.psi(cell_index) && phi_all_solids_negated(cell_index)<0){
             bool encountered_neumann_face=false;TV_INT reference_point;
-            for(int axis=0;axis<T_GRID::dimension;axis++){
+            for(int axis=0;axis<TV::m;axis++){
                 TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
                 if(euler.euler_projection.elliptic_solver->psi_N.Component(axis)(first_face_index) &&
                         euler.euler_projection.elliptic_solver->psi_N.Component(axis)(second_face_index)) continue; // cant get a reference point
@@ -271,19 +271,19 @@ Apply_Isobaric_Fix(const T dt,const T time)
             if(encountered_neumann_face){
                 LOG::cout<<"ISOBARIC FIX: fixing cell "<<cell_index<<" with reference cell "<<reference_point<<std::endl;
                 T rho=euler.U(cell_index)(0);
-                TV velocity=EULER<T_GRID>::Get_Velocity(euler.U,cell_index);
-                T e=EULER<T_GRID>::e(euler.U,cell_index);
+                TV velocity=EULER<TV>::Get_Velocity(euler.U,cell_index);
+                T e=EULER<TV>::e(euler.U,cell_index);
                 T p_cell=euler.eos->p(rho,e);
 
                 T rho_reference=euler.U_ghost(reference_point)(0);
-                T e_reference=EULER<T_GRID>::e(euler.U_ghost,reference_point);
+                T e_reference=EULER<TV>::e(euler.U_ghost,reference_point);
                 T p_reference=euler.eos->p(rho_reference,e_reference);
 
                 if(p_cell>p_reference) rho=rho_reference*sqrt(p_cell/p_reference); //isobaric fix
                 else rho=rho_reference;
                 //rho=rho_reference*pow(p_cell/p_reference,(T)(1/1.4)); //isobaric fix (constant entropy)
                 e=euler.eos->e_From_p_And_rho(p_cell,rho);
-                EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(euler.U,cell_index,rho,velocity,e);}}}
+                EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(euler.U,cell_index,rho,velocity,e);}}}
     euler.Invalidate_Ghost_Cells();
 }
 //#####################################################################
@@ -311,7 +311,7 @@ Snapshot_State(const T_ARRAYS_DIMENSION_SCALAR& U_ghost)
     T_ARRAYS_DIMENSION_SCALAR::Put(U_ghost,U_n);
     for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next())
         if(!euler.psi(iterator.Cell_Index())) U_n(iterator.Cell_Index())=TV_DIMENSION();
-        else advection_velocities_n(iterator.Cell_Index())=EULER<T_GRID>::Get_Velocity(U_n(iterator.Cell_Index()));
+        else advection_velocities_n(iterator.Cell_Index())=EULER<TV>::Get_Velocity(U_n(iterator.Cell_Index()));
 
     accumulated_flux.Fill(TV_DIMENSION());
     TV_DIMENSION accumulated_material;
@@ -485,9 +485,9 @@ void Add_Weight_To_Advection(const T weight, const VECTOR<int,d>& donor_cell, co
 template<class TV> void Fill_Fluid_Velocity(const GRID<TV>& grid, const ARRAY<bool,VECTOR<int,TV::dimension> >& psi, const ARRAY<bool,VECTOR<int,TV::dimension> >& psi_new, const ARRAY<bool,VECTOR<int,TV::dimension> >& swept_cells,
                                             const ARRAY<TV,VECTOR<int,TV::dimension> >& V_n, const ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,VECTOR<int,TV::dimension> >& U_new,ARRAY<TV,VECTOR<int,TV::dimension> >& velocity_field)
 {
-    typedef GRID<TV> T_GRID; typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        if(psi(cell_index)) velocity_field(cell_index)=EULER<T_GRID>::Get_Velocity(U_new(cell_index));
+        if(psi(cell_index)) velocity_field(cell_index)=EULER<TV>::Get_Velocity(U_new(cell_index));
         else if(swept_cells(cell_index)) velocity_field(cell_index)=V_n(cell_index);}
 }
 
@@ -496,15 +496,15 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                                                    const ARRAY<CUT_CELLS<typename TV::SCALAR,TV::dimension>*,VECTOR<int,TV::dimension> >& cut_cells_n,  const ARRAY<typename TV::SCALAR,VECTOR<int,TV::dimension> >& cell_volumes_n,  const ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,VECTOR<int,TV::dimension> >& U_n,
                                                    const ARRAY<CUT_CELLS<typename TV::SCALAR,TV::dimension>*,VECTOR<int,TV::dimension> >& cut_cells_np1,const ARRAY<typename TV::SCALAR,VECTOR<int,TV::dimension> >& cell_volumes_np1,      ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,VECTOR<int,TV::dimension> >& U_np1)
 {   // TODO(jontg): Sparse data representation.
-    typedef typename TV::SCALAR T; typedef VECTOR<T,TV::dimension+2> TV_DIMENSION; typedef GRID<TV> T_GRID;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T; typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
+    typedef VECTOR<int,TV::m> TV_INT;
 
     ARRAY<bool,VECTOR<int,TV::dimension> > near_interface(near_interface_mask);
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(!psi_np1(iterator.Cell_Index())) near_interface(iterator.Cell_Index())=false;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(near_interface(iterator.Cell_Index())) U_np1(iterator.Cell_Index())=TV_DIMENSION();
 
     ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,TV_INT,TV_INT> > hybrid_boundary_flux;
-    for(FACE_ITERATOR<TV> iterator(grid,0,T_GRID::INTERIOR_REGION);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
         TV_INT first_cell_index=iterator.First_Cell_Index(), second_cell_index=iterator.Second_Cell_Index();
         if((near_interface(first_cell_index) ^ near_interface(second_cell_index)) && psi_np1(first_cell_index) && psi_np1(second_cell_index))
             hybrid_boundary_flux.Append(TRIPLE<FACE_INDEX<TV::dimension>,TV_INT,TV_INT>(iterator.Full_Index(),first_cell_index,second_cell_index));}

@@ -34,7 +34,7 @@ public:
     T emission_amplification;
     bool use_lms_scaling;
     const IMPLICIT_OBJECT<TV>* empty_implicit_surface;
-    const RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<GRID<TV> > >* levelset_multiple_object;
+    const RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<TV> >* levelset_multiple_object;
     int non_empty_region;
     bool use_empty_implicit_surface_for_light_attenuation;
     
@@ -44,11 +44,11 @@ public:
     TV constant_emission_color;
     ARRAY<T,VECTOR<int,1> > temperature_remap;
     GRID<VECTOR<T,1> > temperature_remap_grid;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,T> temperature_remap_interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,1>,T> temperature_remap_interpolation;
 
     GRID<VECTOR<T,1> > blackbody_ramp_grid;
     ARRAY<TV,VECTOR<int,1> > blackbody_ramp;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,TV> blackbody_interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,1>,TV> blackbody_interpolation;
 
     RENDERING_VOXEL_SHADER(const TV& absorption_input,const TV& scattering_input,const T inscattering_amplification_input,
         const T emission_amplification_input,const T white_point_temperature,const bool use_lms_scaling_input,
@@ -67,7 +67,7 @@ public:
     void Use_Empty_Implicit_Surface(const IMPLICIT_OBJECT<TV>& empty_implicit_surface_input,const bool use_empty_implicit_surface_for_light_attenuation_input=true)
     {empty_implicit_surface=&empty_implicit_surface_input;supports_photon_mapping=false;use_empty_implicit_surface_for_light_attenuation=use_empty_implicit_surface_for_light_attenuation_input;}
 
-    void Use_Levelset_Multiple_Region(const RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<GRID<TV> > >* levelset_multiple_object_input,int region_in){
+    void Use_Levelset_Multiple_Region(const RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<TV> >* levelset_multiple_object_input,int region_in){
       levelset_multiple_object=levelset_multiple_object_input;
       non_empty_region=region_in;}
 

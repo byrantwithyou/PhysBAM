@@ -10,12 +10,12 @@
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION.h>
 namespace PhysBAM{
 
-template<class T_GRID,int d>
-class CONSERVATION_ENO_LLF:public CONSERVATION<T_GRID,d>
+template<class TV,int d>
+class CONSERVATION_ENO_LLF:public CONSERVATION<TV,d>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<T,d> TV_DIMENSION;
+    typedef typename TV::SCALAR T;typedef VECTOR<T,d> TV_DIMENSION;
 public:
-    typedef CONSERVATION<T_GRID,d> BASE;
+    typedef CONSERVATION<TV,d> BASE;
     using BASE::order;using BASE::save_fluxes;using BASE::flux_temp;using BASE::Alpha;
 
     const bool use_global_llf,use_face_velocity_for_fluxes,use_standard_average,use_explicit_eigensystem_for_alphas;

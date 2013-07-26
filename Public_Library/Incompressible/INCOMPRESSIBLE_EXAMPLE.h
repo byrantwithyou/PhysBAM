@@ -42,11 +42,11 @@ public:
     bool use_viscosity;
 
     GRID<TV> mac_grid;
-    MPI_UNIFORM_GRID<GRID<TV> > *mpi_grid;
-    PROJECTION_DYNAMICS_UNIFORM<GRID<TV> > projection;
-    INCOMPRESSIBLE_UNIFORM<GRID<TV> > incompressible;
+    MPI_UNIFORM_GRID<TV> *mpi_grid;
+    PROJECTION_DYNAMICS_UNIFORM<TV> projection;
+    INCOMPRESSIBLE_UNIFORM<TV> incompressible;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities,face_velocities_save;
-    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T> advection_scalar;
     BOUNDARY<TV,T> boundary_scalar;
     BOUNDARY<TV,T> *boundary;
     ARRAY<T,TV_INT> density,temperature;

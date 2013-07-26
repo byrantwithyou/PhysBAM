@@ -20,10 +20,10 @@ public:
     int number_nodes;
     typedef typename TV::SCALAR T;
     typedef GRID<TV> T_GRID;
-    ARRAY<ENVIRONMENTAL_STATE<T_GRID>*> states;
+    ARRAY<ENVIRONMENTAL_STATE<TV>*> states;
     DIRECTED_GRAPH<int> states_graph;
     
-    ARRAY<ENVIRONMENTAL_STATE<T_GRID>*> graph_index_to_state;
+    ARRAY<ENVIRONMENTAL_STATE<TV>*> graph_index_to_state;
     int next_hash_number;
     
  

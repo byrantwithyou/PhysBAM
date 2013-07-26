@@ -29,7 +29,7 @@ int main(int argc,char *argv[])
     if(example.mpi_world->initialized) example.solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<TV>);
     example.Adjust_Output_Directory_For_MPI(example.solid_body_collection.deformable_body_collection.mpi_solids);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(example);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(example);
     driver.Execute_Main_Program();
 
     return 0;

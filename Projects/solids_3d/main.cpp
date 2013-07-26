@@ -60,7 +60,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-body_test",&opt_body_test,"Use body_test test");
     parse_args.Parse(true);
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example;
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example;
     if(opt_incomp) example=new INCOMPRESSIBLE_TESTS<T>(stream_type);
     else if(opt_hair_sim_tests) example=new HAIR_SIM_TESTS<T>(stream_type);
     else if(opt_hair_strand_tests) example=new HAIR_STRAND_TESTS<T>(stream_type);
@@ -85,7 +85,7 @@ int main(int argc,char* argv[])
     if(example->mpi_world->initialized) example->solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<TV>);
     example->Adjust_Output_Directory_For_MPI(example->solid_body_collection.deformable_body_collection.mpi_solids);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*example);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*example);
     driver.Execute_Main_Program();
 
     delete example;

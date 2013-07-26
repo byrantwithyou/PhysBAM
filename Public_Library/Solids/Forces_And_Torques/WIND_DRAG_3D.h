@@ -42,8 +42,8 @@ public:
     ARRAY<T,VECTOR<int,3> > *spatially_varying_wind_density,*spatially_varying_wind_pressure;
     T linear_normal_viscosity; // uses vertex normals
 private:
-    static const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
-    static const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<TV>,TV> vector_interpolation;
+    static const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<TV,T> interpolation;
+    static const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<TV,TV> vector_interpolation;
     struct OPTIMIZATION{
         OPTIMIZATION()
             :one_third_area((T)0)

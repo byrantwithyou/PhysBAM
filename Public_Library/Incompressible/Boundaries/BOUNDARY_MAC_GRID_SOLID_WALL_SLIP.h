@@ -16,8 +16,8 @@ namespace PhysBAM{
 template<class TV>
 class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP:public BOUNDARY<TV,typename TV::SCALAR>
 {
-    typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
-    typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,GRID<TV>::dimension> TV_SIDES;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
 public:
     typedef BOUNDARY<TV,T> BASE;

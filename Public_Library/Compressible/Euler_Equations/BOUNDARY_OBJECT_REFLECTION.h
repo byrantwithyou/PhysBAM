@@ -11,11 +11,11 @@
 
 namespace PhysBAM{
 
-template<class T_GRID,class TV_DIMENSION>
-class BOUNDARY_OBJECT_REFLECTION:public BOUNDARY_OBJECT<typename T_GRID::VECTOR_T,TV_DIMENSION>
+template<class TV,class TV_DIMENSION>
+class BOUNDARY_OBJECT_REFLECTION:public BOUNDARY_OBJECT<TV,TV_DIMENSION>
 {
-    typedef typename T_GRID::SCALAR T;
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef typename T_ARRAYS_DIMENSION_SCALAR::ELEMENT T_ARRAYS_ELEMENT;
@@ -39,12 +39,12 @@ public:
 //#####################################################################
 // Function Apply_Neumann_Boundary_Condition
 //#####################################################################
-template<class T_GRID,class TV_DIMENSION> void BOUNDARY_OBJECT_REFLECTION<T_GRID,TV_DIMENSION>::
+template<class TV,class TV_DIMENSION> void BOUNDARY_OBJECT_REFLECTION<TV,TV_DIMENSION>::
 Apply_Neumann_Boundary_Condition(TV_DIMENSION& u_1d,const T neumann_face_velocity,const int axis)
 {
     if(flip) u_1d=u_1d*(T)-1;
 }
-template<class T_GRID,class TV_DIMENSION> void BOUNDARY_OBJECT_REFLECTION<T_GRID,TV_DIMENSION>::
+template<class TV,class TV_DIMENSION> void BOUNDARY_OBJECT_REFLECTION<TV,TV_DIMENSION>::
 Apply_Neumann_Boundary_Condition(T_ARRAYS_ELEMENT& u_1d,const TV& normal,const T object_velocity_normal_component)
 {
     if(flip) u_1d=u_1d*(T)-1;

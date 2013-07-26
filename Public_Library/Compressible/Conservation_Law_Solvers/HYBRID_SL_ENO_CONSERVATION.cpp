@@ -21,10 +21,10 @@ using namespace PhysBAM;
 //#####################################################################
 // Function Update_Conservation_Law
 //#####################################################################
-template<class T_GRID,int d> void HYBRID_SL_ENO_CONSERVATION<T_GRID,d>::
-Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
-    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
-    const T_FACE_ARRAYS_SCALAR& face_velocities,const bool thinshell,const TV_BOOL& outflow_boundaries,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>* eigensystems_auxiliary,
+template<class TV,int d> void HYBRID_SL_ENO_CONSERVATION<TV,d>::
+Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
+    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
+    const T_FACE_ARRAYS_SCALAR& face_velocities,const bool thinshell,const TV_BOOL& outflow_boundaries,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>* eigensystems_auxiliary,
     T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary)
 {
     const T cell_volume=grid.Cell_Size();
@@ -94,7 +94,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
                     sigma(cell_index) = U_ghost(cell_index)(dim)*cell_volume;}}
 
             // Compute backward-cast weights
-            LINEAR_INTERPOLATION_UNIFORM<T_GRID,T> linear;
+            LINEAR_INTERPOLATION_UNIFORM<TV,T> linear;
             for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
                 INDEX cell_index=iterator.Cell_Index();
                 if(!regular_cell(cell_index)){
@@ -137,10 +137,10 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
         else if(psi(cell_index)) U(cell_index) = U_ghost(cell_index) - dt*rhs(cell_index);}
 }
 namespace PhysBAM{
-template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<float,1> >,3>;
-template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<float,2> >,4>;
-template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<float,3> >,5>;
-template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<double,1> >,3>;
-template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<double,2> >,4>;
-template class HYBRID_SL_ENO_CONSERVATION<GRID<VECTOR<double,3> >,5>;
+template class HYBRID_SL_ENO_CONSERVATION<VECTOR<float,1>,3>;
+template class HYBRID_SL_ENO_CONSERVATION<VECTOR<float,2>,4>;
+template class HYBRID_SL_ENO_CONSERVATION<VECTOR<float,3>,5>;
+template class HYBRID_SL_ENO_CONSERVATION<VECTOR<double,1>,3>;
+template class HYBRID_SL_ENO_CONSERVATION<VECTOR<double,2>,4>;
+template class HYBRID_SL_ENO_CONSERVATION<VECTOR<double,3>,5>;
 }

@@ -13,7 +13,7 @@ namespace PhysBAM{
 template<class TV> class LEVELSET_IMPLICIT_OBJECT;
 template<class T_IMPLICIT_OBJECT> class IMPLICIT_OBJECT_ON_A_RAY;
 
-template<class T_GRID> struct IMPLICIT_OBJECT_ON_A_RAY_POLICY:public IMPLICIT_OBJECT_ON_A_RAY_POLICY<typename T_GRID::GRID_TAG>{};
+template<class TV> struct IMPLICIT_OBJECT_ON_A_RAY_POLICY:public IMPLICIT_OBJECT_ON_A_RAY_POLICY<typename GRID<TV>::GRID_TAG>{};
 
 //#####################################################################
 // Uniform

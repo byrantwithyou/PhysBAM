@@ -30,7 +30,7 @@ void Smooth(T_ARRAYS_T2& d,const int steps,const ARRAY<T,VECTOR<int,dim> >* phi)
     T_ARRAYS_T2 d_ghost(grid.Domain_Indices(number_of_ghost_cells+1),false);    
     for(int step=0;step<steps;step++){
         T_ARRAYS_T2::Put(d,d_ghost);
-        for(int axis=0;axis<GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
+        for(int axis=0;axis<TV::m;axis++)for(int axis_side=0;axis_side<2;axis_side++){
             int side=2*axis+axis_side;TV_INT ghost_offset=(axis_side==0?-1:1)*TV_INT::Axis_Vector(axis);
             for(NODE_ITERATOR<TV> iterator(grid,number_of_ghost_cells,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
                 d_ghost(node+ghost_offset)=d_ghost(node);}}

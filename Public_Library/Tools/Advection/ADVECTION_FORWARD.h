@@ -7,10 +7,11 @@
 #ifndef __ADVECTION_FORWARD__
 #define __ADVECTION_FORWARD__
 
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID,class T2,class T_FACE_LOOKUP=typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP> class ADVECTION;
+template<class TV> class FACE_LOOKUP_UNIFORM;
+
+template<class TV,class T2,class T_FACE_LOOKUP=FACE_LOOKUP_UNIFORM<TV> > class ADVECTION;
 
 }
 #endif

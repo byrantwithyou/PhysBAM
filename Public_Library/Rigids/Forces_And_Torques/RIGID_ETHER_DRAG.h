@@ -11,11 +11,11 @@
 #include <Rigids/Forces_And_Torques/RIGID_POINTWISE_FORCE.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class RIGID_ETHER_DRAG:public RIGID_POINTWISE_FORCE<typename T_GRID::VECTOR_T>
+template<class TV>
+class RIGID_ETHER_DRAG:public RIGID_POINTWISE_FORCE<TV>
 {
 private:
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef RIGID_POINTWISE_FORCE<TV> BASE;
     using BASE::rigid_body_collection;using BASE::force_rigid_body_particles;
@@ -27,9 +27,9 @@ public:
     bool use_spatially_varying_wind;
     T spatially_varying_wind_viscosity;
     RANGE<TV> spatially_varying_wind_domain;
-    T_GRID V_grid;
+    GRID<TV> V_grid;
     ARRAY<TV,TV_INT>* spatially_varying_wind;
-    LINEAR_INTERPOLATION_UNIFORM<T_GRID,TV> vector_interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,TV> vector_interpolation;
 
     RIGID_ETHER_DRAG(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_rigid_body_particles_input,T dynamic_ether_viscosity=0,T angular_viscosity=0);
     RIGID_ETHER_DRAG(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_rigid_body_particles_input,T dynamic_ether_viscosity=0,T angular_viscosity=0);
@@ -42,7 +42,7 @@ public:
     {if(!viscosity_input && wind_input==TV()) Use_No_Drag();
     else{use_constant_wind=true;constant_wind_viscosity=viscosity_input;constant_wind=wind_input;}}
 
-    void Use_Spatially_Varying_Wind(const T viscosity_input,const RANGE<TV>& domain_input,const T_GRID& grid_input,ARRAY<TV,TV_INT>& V_input)
+    void Use_Spatially_Varying_Wind(const T viscosity_input,const RANGE<TV>& domain_input,const GRID<TV>& grid_input,ARRAY<TV,TV_INT>& V_input)
     {use_spatially_varying_wind=true;spatially_varying_wind_viscosity=viscosity_input;
     spatially_varying_wind_domain=domain_input;V_grid=grid_input;spatially_varying_wind=&V_input;}
 

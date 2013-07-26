@@ -10,16 +10,16 @@
 #include <Tools/Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID,class T2>
-class ADVECTION_HAMILTON_JACOBI_WENO:public ADVECTION_SEPARABLE_UNIFORM<T_GRID,T2>
+template<class TV,class T2>
+class ADVECTION_HAMILTON_JACOBI_WENO:public ADVECTION_SEPARABLE_UNIFORM<TV,T2>
 {
 private:
-    typedef typename T_GRID::SCALAR T;
+    typedef typename TV::SCALAR T;
 
     bool compute_epsilon; 
     T epsilon;
 public:
-    using ADVECTION_SEPARABLE_UNIFORM<T_GRID,T2>::WENO;
+    using ADVECTION_SEPARABLE_UNIFORM<TV,T2>::WENO;
 
     ADVECTION_HAMILTON_JACOBI_WENO()
     {

@@ -23,10 +23,10 @@
 namespace PhysBAM{
 
 template<class T_input>
-class TANK_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class TANK_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;
-    typedef VECTOR<T,3> TV;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef VECTOR<T,3> TV;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
 public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::solids_parameters;using BASE::data_directory;using BASE::stream_type;
     using BASE::test_number;using BASE::parse_args;using BASE::fluids_parameters;using BASE::solid_body_collection;using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
@@ -129,7 +129,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     tests.Add_Gravity();
     solid_body_collection.Update_Simulated_Particles();
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Initialize_Bodies();
 }
 //#####################################################################
 // Function Make_Gun

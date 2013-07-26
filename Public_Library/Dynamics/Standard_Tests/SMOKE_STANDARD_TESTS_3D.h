@@ -24,17 +24,17 @@ template<class TV> class GRID;
 template<class TV> class SOLIDS_FLUIDS_EXAMPLE;
 template<class TV> class RIGID_BODY_COLLECTION;
 template<class T> class VORTEX_PARTICLE_EVOLUTION_3D;
-template<class T_GRID> class FLUIDS_PARAMETERS_UNIFORM;
-template<class T_GRID> class INCOMPRESSIBLE_FLUID_COLLECTION;
+template<class TV> class FLUIDS_PARAMETERS_UNIFORM;
+template<class TV> class INCOMPRESSIBLE_FLUID_COLLECTION;
 
-template<class T_GRID>
+template<class TV>
 class SMOKE_STANDARD_TESTS_3D
 {
-    typedef typename T_GRID::SCALAR T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,3> TV_INT;
 public:
     SOLIDS_FLUIDS_EXAMPLE<TV>& example;
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters;
-    INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>& incompressible_fluid_collection;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters;
+    INCOMPRESSIBLE_FLUID_COLLECTION<TV>& incompressible_fluid_collection;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     VORTEX_PARTICLE_EVOLUTION_3D<T>* vortex_particle_evolution;
 
@@ -48,7 +48,7 @@ public:
     T source_vorticity_magnitude,particle_vorticity_minimum_density,particle_radius;
     RANDOM_NUMBERS<T> random;
 
-    SMOKE_STANDARD_TESTS_3D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters,INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>& incompressible_fluid_collection,
+    SMOKE_STANDARD_TESTS_3D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters,INCOMPRESSIBLE_FLUID_COLLECTION<TV>& incompressible_fluid_collection,
         RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
     virtual ~SMOKE_STANDARD_TESTS_3D();
 

@@ -24,12 +24,12 @@ class BURGERS_1D
     typedef VECTOR<T,1> TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
     BOUNDARY<TV,TV>* boundary;
-    CONSERVATION<GRID<TV>,1>* conservation;
+    CONSERVATION<TV,1>* conservation;
 protected:
     GRID<TV>& grid;
     ARRAY<TV,VECTOR<int,1> >& U;
     BOUNDARY<TV,TV> boundary_default;
-    CONSERVATION_ENO_LLF<GRID<TV>,1> conservation_default;
+    CONSERVATION_ENO_LLF<TV,1> conservation_default;
     BURGERS_1D_EIGENSYSTEM_F<T> eigensystem_F;
 private:
      T max_time_step;
@@ -46,7 +46,7 @@ public:
     void Set_Custom_Boundary(BOUNDARY<TV,TV>& boundary_input)
     {boundary=&boundary_input;}
     
-    void Set_Custom_Conservation(CONSERVATION<GRID<TV>,1>& conservation_input)
+    void Set_Custom_Conservation(CONSERVATION<TV,1>& conservation_input)
     {conservation=&conservation_input;}
     
     void Set_Max_Time_Step(const T max_time_step_input=FLT_MAX)

@@ -66,7 +66,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 SOLID_FLUID_COUPLED_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,
-    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input,FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_input,
+    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input,
     FLUID_COLLECTION<TV>& fluid_collection_input,SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters_input)
     :NEWMARK_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input,example_forces_and_velocities_input),rigid_body_count(0),print_matrix_rhs_and_solution(false),
     collision_bodies(*fluids_parameters_input.collision_bodies_affecting_fluid),dual_cell_weights(*fluids_parameters_input.grid),
@@ -122,7 +122,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
     if(!fluids_parameters.fluid_affects_solid){
         if(fluids){
-            POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson=*Get_Poisson();
+            POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
             Compute_W(current_position_time);
 
             if(fluids_parameters.compressible){
@@ -207,7 +207,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         if(solids_fluids_parameters.mpi_solid_fluid) solids_fluids_parameters.mpi_solid_fluid->Exchange_Solid_Positions_And_Velocities(solid_body_collection); // TODO: only need to exchange velocities
         }
     if(fluids){
-        POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson=*Get_Poisson();
+        POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
         T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
         const GRID<TV>& grid=Get_Grid();
 
@@ -346,7 +346,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             RANGE<TV> grid_domain=fluids_parameters.grid->domain;
             grid_domain.Change_Size(fluids_parameters.grid->dX*(T).5);
             ARRAY<int> boundary_particles(particles.Size());boundary_particles.Fill(0);
-            GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
+            GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
             for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies_affecting_fluid.collision_geometry_collection.bodies.m;i++)
                 if(collision_bodies_affecting_fluid.collision_geometry_collection.Is_Active(i)){
                     COLLISION_GEOMETRY<TV>& body=*collision_bodies_affecting_fluid.collision_geometry_collection.bodies(i);
@@ -391,7 +391,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     if(solids_fluids_parameters.mpi_solid_fluid){
         LOG::Time("conjugate residual parallel");
         if(fluids){
-            POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson=*Get_Poisson();
+            POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
             solids_fluids_parameters.mpi_solid_fluid->Parallel_Solve_Fluid_Part(*fluid_system_mpi,x_array,kb_array,p_array,ap_array,ar_array,r_array,z_array,zaq_array,
                 1,solids_parameters.implicit_solve_parameters.cg_iterations,solids_parameters.implicit_solve_parameters.cg_tolerance,true,poisson.laplace_mpi->communicators,&poisson.laplace_mpi->partitions);}
         else{
@@ -447,7 +447,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
 
             // compute the preconditioner
-            POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson=*Get_Poisson();
+            POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
             for(int i=0;i<A_array.m;i++)
                 A_array(i).Construct_Incomplete_Cholesky_Factorization(poisson.pcg.modified_incomplete_cholesky,poisson.pcg.modified_incomplete_cholesky_coefficient,
                     poisson.pcg.preconditioner_zero_tolerance,poisson.pcg.preconditioner_zero_replacement); // check to see if the blocks can be preconditioned even though the whole
@@ -534,7 +534,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<TV>* B)
 {
     T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
-    POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson=*Get_Poisson();
+    POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
     const GRID<TV>& grid=Get_Grid();
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
@@ -614,7 +614,7 @@ Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Set_Neumann_and_Dirichlet_Boundary_Conditions(const T time)
 {
-    POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson=*Get_Poisson();
+    POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
     T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
     poisson.psi_N.Copy(dual_cell_contains_solid);poisson.psi_D.Fill(false);
     fluids_parameters.Set_Domain_Boundary_Conditions(poisson,face_velocities,time);
@@ -641,7 +641,7 @@ Set_Neumann_and_Dirichlet_Boundary_Conditions(const T time)
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Set_Dirichlet_Boundary_Conditions(const T time)
 {
-    POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson=*Get_Poisson();
+    POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
     T_ARRAYS_SCALAR& p=Get_Pressure();
     const GRID<TV>& grid=Get_Grid();
 
@@ -675,7 +675,7 @@ Compute_W(const T current_position_time)
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     const GRID<TV>& grid=Get_Grid();
     rigid_body_count=0;kinematic_rigid_bodies.Remove_All();
 
@@ -722,7 +722,7 @@ Compute_W(const T current_position_time)
 
     dual_cell_contains_solid.Fill(false);
     collision_bodies.Compute_Psi_N_Zero_Velocity(dual_cell_contains_solid,0);
-    POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson=Get_Poisson();
+    POISSON_COLLIDABLE_UNIFORM<TV>* poisson=Get_Poisson();
     fluids_parameters.Set_Domain_Boundary_Conditions(*poisson,face_velocities,current_position_time);
     const T one_over_number_nodes_thin_shell=(T)1/TV::dimension;
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
@@ -834,7 +834,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
 
     nodal_fluid_mass.Resize(solid_body_collection.deformable_body_collection.dynamic_particles.m);nodal_fluid_mass.Fill(DIAGONAL_MATRIX<T,TV::m>());
     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
-        POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson=Get_Poisson();
+        POISSON_COLLIDABLE_UNIFORM<TV>* poisson=Get_Poisson();
         const GRID<TV>& grid=Get_Grid();
         RANGE<TV_INT> domain_indices=grid.Domain_Indices();
         // estimate the number of non-zero entries per row - DEFORMABLE PART
@@ -871,7 +871,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
 
     // populate the entries of J
     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
-        POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson=Get_Poisson();
+        POISSON_COLLIDABLE_UNIFORM<TV>* poisson=Get_Poisson();
         const GRID<TV>& grid=Get_Grid();
         RANGE<TV_INT> domain_indices=grid.Domain_Indices();
         TV one_over_dx=grid.one_over_dX;
@@ -914,7 +914,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
         J_rigid.Resize(colors);}
 
     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
-        POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson=Get_Poisson();
+        POISSON_COLLIDABLE_UNIFORM<TV>* poisson=Get_Poisson();
         const GRID<TV>& grid=Get_Grid();
         // estimate the number of non-zero entries per row - RIGID PART
         // think of this as a separate block of the matrix - call it J_rigid
@@ -991,7 +991,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
 
     // populate the entries of J_rigid
     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
-        POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson=Get_Poisson();
+        POISSON_COLLIDABLE_UNIFORM<TV>* poisson=Get_Poisson();
         const GRID<TV>& grid=Get_Grid();
         TV one_over_dx=grid.one_over_dX;
         RANGE<TV_INT> domain_indices=grid.Domain_Indices();
@@ -1066,7 +1066,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Apply_Pressure(const T dt,const T time)
 {
-    EULER_PROJECTION_UNIFORM<GRID<TV> >& euler_projection=fluids_parameters.euler->euler_projection;
+    EULER_PROJECTION_UNIFORM<TV>& euler_projection=fluids_parameters.euler->euler_projection;
     T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
     //TODO(kwatra): move this logic to driver
     if(fluids_parameters.compressible && !fluids_parameters.euler->timesplit) return;
@@ -1087,7 +1087,7 @@ Apply_Pressure(const T dt,const T time)
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<ARRAY<T> >& right_hand_side,const ARRAY<INTERVAL<int> >& interior_regions,const int colors)
 {
-    POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson=Get_Poisson();
+    POISSON_COLLIDABLE_UNIFORM<TV>* poisson=Get_Poisson();
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection);
@@ -1113,7 +1113,7 @@ Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
-    POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson=*Get_Poisson();
+    POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
 
     // TODO: it is possible that we will end up with strange face weight behavior in cells on domain boundaries, depending on how we're setting up our Ws.
     // if that happens, look here.

@@ -9,7 +9,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> IMPLICIT_BOUNDARY_CONDITION_SOURCES<TV>::
-IMPLICIT_BOUNDARY_CONDITION_SOURCES(FLUIDS_PARAMETERS_CALLBACKS<T_GRID>& callbacks_input)
+IMPLICIT_BOUNDARY_CONDITION_SOURCES(FLUIDS_PARAMETERS_CALLBACKS<TV>& callbacks_input)
     :callbacks(callbacks_input)
 {
 }

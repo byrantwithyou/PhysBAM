@@ -17,18 +17,18 @@
 #include <Dynamics/Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class WATER_STANDARD_TESTS_MULTIPHASE_3D:public WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,WATER_STANDARD_TESTS_3D<T_GRID> >
+template<class TV>
+class WATER_STANDARD_TESTS_MULTIPHASE_3D:public WATER_STANDARD_TESTS_MULTIPHASE<TV,WATER_STANDARD_TESTS_3D<TV> >
 {
-    typedef typename T_GRID::SCALAR T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,3> TV_INT;
 public:
-    typedef WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,WATER_STANDARD_TESTS_3D<T_GRID> > BASE;
+    typedef WATER_STANDARD_TESTS_MULTIPHASE<TV,WATER_STANDARD_TESTS_3D<TV> > BASE;
     using BASE::rigid_body_collection;using BASE::fluids_parameters;using BASE::grid;using BASE::example;using BASE::sphere;using BASE::test_number;using BASE::world_to_source;
     using BASE::source_velocity;using BASE::source_region;using BASE::sources;
 
-    WATER_STANDARD_TESTS_MULTIPHASE_3D(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>& example_input,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection,
+    WATER_STANDARD_TESTS_MULTIPHASE_3D(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>& example_input,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection,
         RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
-        :WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,WATER_STANDARD_TESTS_3D<T_GRID> >(example_input,fluids_parameters_input,fluid_collection,rigid_body_collection_input)
+        :WATER_STANDARD_TESTS_MULTIPHASE<TV,WATER_STANDARD_TESTS_3D<TV> >(example_input,fluids_parameters_input,fluid_collection,rigid_body_collection_input)
     {
     }
 
@@ -79,7 +79,7 @@ void Initialize(const int test_number_input,const int resolution,const int resta
 //#####################################################################
 void Initialize_Bodies()
 {
-    WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,WATER_STANDARD_TESTS_3D<T_GRID> >::Initialize_Bodies();
+    WATER_STANDARD_TESTS_MULTIPHASE<TV,WATER_STANDARD_TESTS_3D<TV> >::Initialize_Bodies();
     if(test_number==15){
         int ground=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",(T).01,true,true,false);
         rigid_body_collection.rigid_body_particles.frame(ground).t=TV((T).1,0,0);

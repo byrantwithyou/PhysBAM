@@ -24,11 +24,11 @@
 namespace PhysBAM{
 
 template<class T_input>
-class CURL_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class CURL_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::stream_type;using BASE::fluids_parameters;
     using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solid_body_collection;
     using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::parse_args;

@@ -23,13 +23,13 @@
 namespace PhysBAM{
 
 template<class T_input>
-class EULER_1D:public EULER<GRID<VECTOR<T_input,1> > >
+class EULER_1D:public EULER<VECTOR<T_input,1> >
 {
     typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<T,3> TV_DIMENSION;
 protected:
-    using EULER<GRID<TV> >::cut_out_grid;using EULER<GRID<TV> >::max_time_step;
+    using EULER<TV>::cut_out_grid;using EULER<TV>::max_time_step;
 public:
-    using EULER<GRID<TV> >::boundary;using EULER<GRID<TV> >::conservation;using EULER<GRID<TV> >::eos;
+    using EULER<TV>::boundary;using EULER<TV>::conservation;using EULER<TV>::eos;
     
     GRID<TV> grid;
     ARRAY<TV_DIMENSION,VECTOR<int,1> >& U;         // mass, momentum, and energy
@@ -44,7 +44,7 @@ public:
     {psi_pointer=&psi_input;cut_out_grid=true;}
 
     void Set_Custom_Equation_Of_State(EOS<T>& eos_input)
-    {eigensystem_F.Set_Custom_Equation_Of_State(eos_input);EULER<GRID<TV> >::Set_Custom_Equation_Of_State(eos_input);}
+    {eigensystem_F.Set_Custom_Equation_Of_State(eos_input);EULER<TV>::Set_Custom_Equation_Of_State(eos_input);}
     
     void Initialize_Domain(const int m, const T xmin, const T xmax)
     {grid.Initialize(m,xmin,xmax);}

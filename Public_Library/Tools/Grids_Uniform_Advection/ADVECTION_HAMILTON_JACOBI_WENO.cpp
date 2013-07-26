@@ -10,7 +10,7 @@ using namespace PhysBAM;
 //##################################################################### 
 // Function Advection_Solver
 //#####################################################################
-template<class T_GRID,class T2> void ADVECTION_HAMILTON_JACOBI_WENO<T_GRID,T2>::
+template<class TV,class T2> void ADVECTION_HAMILTON_JACOBI_WENO<TV,T2>::
 Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const ARRAY<T,VECTOR<int,1> >& u,ARRAY<T2,VECTOR<int,1> >& u_Zx)
 {      
     int i;T one_over_dx=1/dx;
@@ -26,10 +26,10 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
 }
 //#####################################################################
 namespace PhysBAM{
-template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<float,1> >,float>;
-template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<float,2> >,float>;
-template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<float,3> >,float>;
-template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<double,1> >,double>;
-template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<double,2> >,double>;
-template class ADVECTION_HAMILTON_JACOBI_WENO<GRID<VECTOR<double,3> >,double>;
+template class ADVECTION_HAMILTON_JACOBI_WENO<VECTOR<float,1>,float>;
+template class ADVECTION_HAMILTON_JACOBI_WENO<VECTOR<float,2>,float>;
+template class ADVECTION_HAMILTON_JACOBI_WENO<VECTOR<float,3>,float>;
+template class ADVECTION_HAMILTON_JACOBI_WENO<VECTOR<double,1>,double>;
+template class ADVECTION_HAMILTON_JACOBI_WENO<VECTOR<double,2>,double>;
+template class ADVECTION_HAMILTON_JACOBI_WENO<VECTOR<double,3>,double>;
 }

@@ -12,11 +12,11 @@ using namespace PhysBAM;
 //#####################################################################
 // Class PHYSBAM_TO_GNUPLOT_CONVERTER 
 //#####################################################################
-template<class T_GRID,class RW>
+template<class TV,class RW>
 class PHYSBAM_TO_GNUPLOT_CONVERTER
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename T_GRID::SCALAR T;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     const std::string input_directory,output_directory;
     GNUPLOT_OUTPUT gnuplot_output;
@@ -28,7 +28,7 @@ public:
     {}
 
     void Convert(const int frame,const std::string variable_name="")
-    {T_GRID grid;FILE_UTILITIES::Read_From_File<RW>(input_directory+"/common/grid",grid);
+    {GRID<TV> grid;FILE_UTILITIES::Read_From_File<RW>(input_directory+"/common/grid",grid);
     if(variable_name.size()) Convert_Data<T_ARRAYS_SCALAR>(variable_name,grid,frame);
     if(convert_density) Convert_Data<T_ARRAYS_SCALAR>("density",grid,frame);
     if(convert_momentum) Convert_Data<T_ARRAYS_SCALAR>("momentum",grid,frame);
@@ -44,7 +44,7 @@ public:
     {for(int frame=first_frame;frame<=last_frame;frame++){Convert(frame,variable_name);}}
 
 private:
-    template <class T_TYPE> void Convert_Data(const std::string& file_name_prefix,const T_GRID& grid,const int frame)
+    template <class T_TYPE> void Convert_Data(const std::string& file_name_prefix,const GRID<TV>& grid,const int frame)
     {std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
     std::string input_file=input_directory+"/"+f+"/"+file_name_prefix;
     std::string output_file=output_directory+"/"+file_name_prefix;
@@ -54,7 +54,7 @@ private:
             data(iterator.Cell_Index()) = log(tmp)/log((T)10);}}
     gnuplot_output.Write_Output_File(output_file,grid,data,frame);}
 };
-template<class T_GRID,class RW> void PhysBAM_To_Gnuplot(PARSE_ARGS& parse_args,const int verbosity)
+template<class TV,class RW> void PhysBAM_To_Gnuplot(PARSE_ARGS& parse_args,const int verbosity)
 {
     bool convert_density=false,convert_momentum=false,convert_energy=false,convert_velocity=false;
     bool convert_pressure=false,convert_internal_energy=false,convert_entropy=false,convert_machnumber=false,convert_log=false;
@@ -88,7 +88,7 @@ template<class T_GRID,class RW> void PhysBAM_To_Gnuplot(PARSE_ARGS& parse_args,c
         if(variable_name.size()) std::cout<<"variable_name="<<variable_name<<std::endl;
         else std::cout<<"no variable_name specified"<<std::endl;}
 
-    PHYSBAM_TO_GNUPLOT_CONVERTER<T_GRID,typename T_GRID::SCALAR> physbam_to_matlab_converter(input_directory,output_directory);
+    PHYSBAM_TO_GNUPLOT_CONVERTER<TV,typename TV::SCALAR> physbam_to_matlab_converter(input_directory,output_directory);
 
     physbam_to_matlab_converter.convert_density=convert_density;
     physbam_to_matlab_converter.convert_momentum=convert_momentum;
@@ -122,25 +122,25 @@ int main(int argc,char* argv[])
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
         switch(dimension){
             case 1:
-                PhysBAM_To_Gnuplot<GRID<VECTOR<double,1> >,double>(parse_args,verbosity);
+                PhysBAM_To_Gnuplot<VECTOR<double,1>,double>(parse_args,verbosity);
                 break;
             case 2:
-                PhysBAM_To_Gnuplot<GRID<VECTOR<double,2> >,double>(parse_args,verbosity);
+                PhysBAM_To_Gnuplot<VECTOR<double,2>,double>(parse_args,verbosity);
                 break;
             case 3:
-                PhysBAM_To_Gnuplot<GRID<VECTOR<double,3> >,double>(parse_args,verbosity);
+                PhysBAM_To_Gnuplot<VECTOR<double,3>,double>(parse_args,verbosity);
                 break;}
 #endif
     }
     else{
         switch(dimension){
             case 1:
-                PhysBAM_To_Gnuplot<GRID<VECTOR<float,1> >,float>(parse_args,verbosity);
+                PhysBAM_To_Gnuplot<VECTOR<float,1>,float>(parse_args,verbosity);
                 break;
             case 2:
-                PhysBAM_To_Gnuplot<GRID<VECTOR<float,2> >,float>(parse_args,verbosity);
+                PhysBAM_To_Gnuplot<VECTOR<float,2>,float>(parse_args,verbosity);
                 break;
             case 3:
-                PhysBAM_To_Gnuplot<GRID<VECTOR<float,3> >,float>(parse_args,verbosity);
+                PhysBAM_To_Gnuplot<VECTOR<float,3>,float>(parse_args,verbosity);
                 break;}}
 }

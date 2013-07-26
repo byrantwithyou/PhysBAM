@@ -12,12 +12,12 @@ using namespace PhysBAM;
 // Function Advection_Solver
 //#####################################################################
 // Z is (-2,m+3), u and u_Zx are (1,m)
-template<class T_GRID,class T2> void ADVECTION_HAMILTON_JACOBI_ENO<T_GRID,T2>::
+template<class TV,class T2> void ADVECTION_HAMILTON_JACOBI_ENO<TV,T2>::
 Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const ARRAY<T,VECTOR<int,1> >& u,ARRAY<T2,VECTOR<int,1> >& u_Zx)
 {
     return Advection_Solver(0,m,dx,Z,u,u_Zx);
 }
-template<class T_GRID,class T2> void ADVECTION_HAMILTON_JACOBI_ENO<T_GRID,T2>::
+template<class TV,class T2> void ADVECTION_HAMILTON_JACOBI_ENO<TV,T2>::
 Advection_Solver(const int m_start,const int m_end,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const ARRAY<T,VECTOR<int,1> >& u,ARRAY<T2,VECTOR<int,1> >& u_Zx)
 {
     int i;T one_over_dx=1/dx,one_over_two_dx=(T).5*one_over_dx,one_over_three_dx=(T)one_third*one_over_dx;
@@ -33,10 +33,10 @@ Advection_Solver(const int m_start,const int m_end,const T dx,const ARRAY<T2,VEC
 }
 //#####################################################################
 namespace PhysBAM{
-template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<float,1> >,float>;
-template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<float,2> >,float>;
-template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<float,3> >,float>;
-template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<double,1> >,double>;
-template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<double,2> >,double>;
-template class ADVECTION_HAMILTON_JACOBI_ENO<GRID<VECTOR<double,3> >,double>;
+template class ADVECTION_HAMILTON_JACOBI_ENO<VECTOR<float,1>,float>;
+template class ADVECTION_HAMILTON_JACOBI_ENO<VECTOR<float,2>,float>;
+template class ADVECTION_HAMILTON_JACOBI_ENO<VECTOR<float,3>,float>;
+template class ADVECTION_HAMILTON_JACOBI_ENO<VECTOR<double,1>,double>;
+template class ADVECTION_HAMILTON_JACOBI_ENO<VECTOR<double,2>,double>;
+template class ADVECTION_HAMILTON_JACOBI_ENO<VECTOR<double,3>,double>;
 }

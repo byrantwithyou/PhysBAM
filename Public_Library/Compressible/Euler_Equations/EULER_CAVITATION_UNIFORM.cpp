@@ -19,10 +19,10 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> EULER_CAVITATION_UNIFORM<TV>::
-EULER_CAVITATION_UNIFORM(EULER_UNIFORM<T_GRID>& euler_input, const bool clamp_density_input, const T epsilon_input)
+EULER_CAVITATION_UNIFORM(EULER_UNIFORM<TV>& euler_input, const bool clamp_density_input, const T epsilon_input)
 :euler(euler_input),epsilon(epsilon_input),clamp_density(clamp_density_input)
 {
-    elliptic_solver=new LAPLACE_COLLIDABLE_UNIFORM<T_GRID>(euler.grid,p_cavitation,false,false,true);
+    elliptic_solver=new LAPLACE_COLLIDABLE_UNIFORM<TV>(euler.grid,p_cavitation,false,false,true);
     Initialize_Grid();
 }
 //#####################################################################
@@ -120,13 +120,13 @@ Compute_Clamped_Internal_Energy_Divergence(const T dt)
         clamped_internal_energy_divergence(cell_index)=0;
         if(elliptic_solver->psi_D(cell_index)) continue;
         sufficient_internal_energy_cells(cell_index)=false;
-        if(euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index)>5*epsilon){
+        if(euler.U(cell_index)(0)*EULER<TV>::e(euler.U,cell_index)>5*epsilon){
             sufficient_internal_energy_cells(cell_index)=true;
-            total_donor_energy+=(euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index)-5*epsilon);}
-        else if(euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index)<epsilon){
-            clamped_internal_energy_divergence(cell_index)=min((T)0,(euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index)-epsilon)*one_over_dt);
-            LOG::cout<<"clamping energy at cell_index="<<cell_index<<", internal energy="<<euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index)<<", epsilon="<<epsilon<<std::endl;
-            total_deficient_energy+=(epsilon-euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index));}}
+            total_donor_energy+=(euler.U(cell_index)(0)*EULER<TV>::e(euler.U,cell_index)-5*epsilon);}
+        else if(euler.U(cell_index)(0)*EULER<TV>::e(euler.U,cell_index)<epsilon){
+            clamped_internal_energy_divergence(cell_index)=min((T)0,(euler.U(cell_index)(0)*EULER<TV>::e(euler.U,cell_index)-epsilon)*one_over_dt);
+            LOG::cout<<"clamping energy at cell_index="<<cell_index<<", internal energy="<<euler.U(cell_index)(0)*EULER<TV>::e(euler.U,cell_index)<<", epsilon="<<epsilon<<std::endl;
+            total_deficient_energy+=(epsilon-euler.U(cell_index)(0)*EULER<TV>::e(euler.U,cell_index));}}
 
     T fractional_contribution_from_each_cell=total_deficient_energy/total_donor_energy;
     LOG::cout<<"Fractional contribution from each cell:"<<fractional_contribution_from_each_cell<<std::endl;
@@ -136,7 +136,7 @@ Compute_Clamped_Internal_Energy_Divergence(const T dt)
     for(CELL_ITERATOR<TV> iterator(euler.grid,0);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(sufficient_internal_energy_cells(cell_index))
-            clamped_internal_energy_divergence(cell_index)=fractional_contribution_from_each_cell*(euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index)-5*epsilon)*one_over_dt;}
+            clamped_internal_energy_divergence(cell_index)=fractional_contribution_from_each_cell*(euler.U(cell_index)(0)*EULER<TV>::e(euler.U,cell_index)-5*epsilon)*one_over_dt;}
 }
 //#####################################################################
 // Compute_Right_Hand_Side
@@ -175,10 +175,10 @@ template<class TV> void EULER_CAVITATION_UNIFORM<TV>::
 Apply_Pressure_To_Density(const T dt)
 {
     T_FACE_ARRAYS_SCALAR grad_p_cavitation_face(euler.grid);
-    ARRAYS_UTILITIES<T_GRID,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler.grid,grad_p_cavitation_face,p_cavitation);
+    ARRAYS_UTILITIES<TV,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler.grid,grad_p_cavitation_face,p_cavitation);
 
     T_ARRAYS_SCALAR laplacian_p_cavitation_cell(euler.grid.Domain_Indices(0));
-    ARRAYS_UTILITIES<T_GRID,T>::Compute_Divergence_At_Cells_From_Face_Data(euler.grid,laplacian_p_cavitation_cell,grad_p_cavitation_face);
+    ARRAYS_UTILITIES<TV,T>::Compute_Divergence_At_Cells_From_Face_Data(euler.grid,laplacian_p_cavitation_cell,grad_p_cavitation_face);
 
     for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
@@ -201,19 +201,19 @@ template<class TV> void EULER_CAVITATION_UNIFORM<TV>::
 Apply_Pressure_To_Internal_Energy(const T dt)
 {
     T_FACE_ARRAYS_SCALAR grad_p_cavitation_face(euler.grid);
-    ARRAYS_UTILITIES<T_GRID,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler.grid,grad_p_cavitation_face,p_cavitation);
+    ARRAYS_UTILITIES<TV,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler.grid,grad_p_cavitation_face,p_cavitation);
 
     T_ARRAYS_SCALAR laplacian_p_cavitation_cell(euler.grid.Domain_Indices(0));
-    ARRAYS_UTILITIES<T_GRID,T>::Compute_Divergence_At_Cells_From_Face_Data(euler.grid,laplacian_p_cavitation_cell,grad_p_cavitation_face);
+    ARRAYS_UTILITIES<TV,T>::Compute_Divergence_At_Cells_From_Face_Data(euler.grid,laplacian_p_cavitation_cell,grad_p_cavitation_face);
 
     for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
-        euler.U(cell_index)(T_GRID::dimension+1) += laplacian_p_cavitation_cell(cell_index)*dt;}
+        euler.U(cell_index)(TV::m+1) += laplacian_p_cavitation_cell(cell_index)*dt;}
 
     euler.Invalidate_Ghost_Cells();
 }
 template<class TV> void EULER_CAVITATION_UNIFORM<TV>::
-Compute_Face_Pressure_From_Cell_Pressures(const T_GRID& face_grid,T_FACE_ARRAYS_SCALAR& p_face,const T_ARRAYS_SCALAR& p_cell)
+Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,T_FACE_ARRAYS_SCALAR& p_face,const T_ARRAYS_SCALAR& p_cell)
 {
     TV_INT first_cell_index,second_cell_index;int axis;
     for(FACE_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){
@@ -242,7 +242,7 @@ Apply_Pressure(const T dt,const T time, T_FACE_ARRAYS_SCALAR& face_velocities)
         Compute_Face_Pressure_From_Cell_Pressures(euler.grid,p_face,p_cavitation);
 
         T_FACE_ARRAYS_SCALAR grad_p_cavitation_face(euler.grid);
-        ARRAYS_UTILITIES<T_GRID,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler.grid,grad_p_cavitation_face,p_cavitation);
+        ARRAYS_UTILITIES<TV,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler.grid,grad_p_cavitation_face,p_cavitation);
         for(FACE_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face_index=iterator.Full_Index();
             TV_INT first_cell_index=iterator.First_Cell_Index(), second_cell_index=iterator.Second_Cell_Index();
             T rho_star_face=(T).5*(rho_star(first_cell_index)+rho_star(second_cell_index));
@@ -252,9 +252,9 @@ Apply_Pressure(const T dt,const T time, T_FACE_ARRAYS_SCALAR& face_velocities)
 
         //T_FACE_ARRAYS_SCALAR face_velocities;
         //face_velocities.Resize(euler.grid);
-        //EULER_PROJECTION_UNIFORM<T_GRID>::Compute_Density_Weighted_Face_Velocities(euler.grid,face_velocities,euler.U_ghost,elliptic_solver->psi_N);
+        //EULER_PROJECTION_UNIFORM<TV>::Compute_Density_Weighted_Face_Velocities(euler.grid,face_velocities,euler.U_ghost,elliptic_solver->psi_N);
 
-        EULER_PROJECTION_UNIFORM<T_GRID>::Apply_Pressure(p_cavitation,p_face,face_velocities,elliptic_solver->psi_D,elliptic_solver->psi_N,dt,time,0,&euler);
+        EULER_PROJECTION_UNIFORM<TV>::Apply_Pressure(p_cavitation,p_face,face_velocities,elliptic_solver->psi_D,elliptic_solver->psi_N,dt,time,0,&euler);
     }
     else
         Apply_Pressure_To_Internal_Energy(dt);

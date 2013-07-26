@@ -18,37 +18,36 @@
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class FLUID_COLLISION_BODY_INACCURATE_UNION:public COLLISION_GEOMETRY<typename T_GRID::VECTOR_T>
+template<class TV>
+class FLUID_COLLISION_BODY_INACCURATE_UNION:public COLLISION_GEOMETRY<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T;
     typedef typename T_FACE_ARRAYS_T::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_FACE_ARRAYS_T::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
     typedef typename T_FACE_ARRAYS_T::template REBIND<COLLISION_GEOMETRY_ID>::TYPE T_FACE_ARRAYS_COLLISION_GEOMETRY_ID;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
-    typedef typename IMPLICIT_OBJECT_ON_A_RAY_POLICY<T_GRID>::TYPE T_IMPLICIT_OBJECT_ON_A_RAY;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_SCALAR T_LINEAR_INTERPOLATION_SCALAR;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_MAC_HELPER T_LINEAR_INTERPOLATION_MAC_HELPER;
-    typedef typename T_GRID::BLOCK T_BLOCK;
+    typedef typename IMPLICIT_OBJECT_ON_A_RAY_POLICY<TV>::TYPE T_IMPLICIT_OBJECT_ON_A_RAY;
+    typedef LINEAR_INTERPOLATION_MAC_HELPER<TV> T_LINEAR_INTERPOLATION_MAC_HELPER;
+    typedef typename GRID<TV>::BLOCK T_BLOCK;
     typedef COLLISION_GEOMETRY<TV> BASE;
 
 public:
-    GRID_BASED_COLLISION_GEOMETRY<T_GRID> collision_bodies;
+    GRID_BASED_COLLISION_GEOMETRY<TV> collision_bodies;
     using BASE::collision_geometries_for_rasterization;
     T contour_value;
-    T_GRID& grid;
+    GRID<TV>& grid;
     T_ARRAYS_T phi;
     LEVELSET_IMPLICIT_OBJECT<TV> levelset;
 private:
     T_FACE_ARRAYS_T face_velocities;
     T_FACE_ARRAYS_BOOL face_velocities_set;
-    T_LINEAR_INTERPOLATION_SCALAR interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
 public:
 
-    FLUID_COLLISION_BODY_INACCURATE_UNION(T_GRID& grid_input);
-    FLUID_COLLISION_BODY_INACCURATE_UNION(T_GRID& grid_input,T contour_value_input);
+    FLUID_COLLISION_BODY_INACCURATE_UNION(GRID<TV>& grid_input);
+    FLUID_COLLISION_BODY_INACCURATE_UNION(GRID<TV>& grid_input,T contour_value_input);
     
     ~FLUID_COLLISION_BODY_INACCURATE_UNION();
 
@@ -112,7 +111,7 @@ private:
 public:
 
     TV Pointwise_Object_Velocity(const int aggregate_id,const TV& X) const PHYSBAM_OVERRIDE
-    {T_BLOCK block(grid,X);if(!Block_Valid(block,typename T_GRID::GRID_TAG())) return TV();
+    {T_BLOCK block(grid,X);if(!Block_Valid(block,typename GRID<TV>::GRID_TAG())) return TV();
     return T_LINEAR_INTERPOLATION_MAC_HELPER::Interpolate_Face_Normalized(block,face_velocities,face_velocities_set,X);}
 
     TV Pointwise_Object_Velocity(const TV& X) const PHYSBAM_OVERRIDE
@@ -124,11 +123,11 @@ public:
     void Restore_State(const int state_index) PHYSBAM_OVERRIDE;
     void Read_State(TYPED_ISTREAM& input,const int state_index) PHYSBAM_OVERRIDE;
     void Write_State(TYPED_OSTREAM& output,const int state_index) const PHYSBAM_OVERRIDE;
-    typename T_GRID::SCALAR Implicit_Geometry_Extended_Value(const TV& location) const PHYSBAM_OVERRIDE;
-    void Initialize_Grid_Structures(const T_GRID& grid,OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_ID id) const;
+    typename TV::SCALAR Implicit_Geometry_Extended_Value(const TV& location) const PHYSBAM_OVERRIDE;
+    void Initialize_Grid_Structures(const GRID<TV>& grid,OBJECTS_IN_CELL<TV,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_ID id) const;
 private:
-    typename T_GRID::SCALAR Implicit_Geometry_Extended_Value_Helper(const TV& location,UNIFORM_TAG<TV>) const;
-    void Initialize_Grid_Structures_Helper(OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_ID id,UNIFORM_TAG<TV>);
+    typename TV::SCALAR Implicit_Geometry_Extended_Value_Helper(const TV& location,UNIFORM_TAG<TV>) const;
+    void Initialize_Grid_Structures_Helper(OBJECTS_IN_CELL<TV,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_ID id,UNIFORM_TAG<TV>);
     void Initialize_Grid_Structures_Subobject(T_FACE_ARRAYS_INT& face_velocities_count,T_FACE_ARRAYS_COLLISION_GEOMETRY_ID& face_operations,const COLLISION_GEOMETRY_ID subobject,UNIFORM_TAG<TV>);
 //#####################################################################
 };

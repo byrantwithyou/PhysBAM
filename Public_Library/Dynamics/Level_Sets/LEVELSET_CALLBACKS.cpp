@@ -11,30 +11,30 @@ using namespace PhysBAM;
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> LEVELSET_CALLBACKS<T_GRID>::
+template<class TV> LEVELSET_CALLBACKS<TV>::
 ~LEVELSET_CALLBACKS()
 {
 }
 //#####################################################################
 // Function Get_Levelset_Velocity
 //#####################################################################
-template<class T_GRID> void LEVELSET_CALLBACKS<T_GRID>::
-Get_Levelset_Velocity(const T_GRID& grid,LEVELSET<TV>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time) const
+template<class TV> void LEVELSET_CALLBACKS<TV>::
+Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
 //#####################################################################
 // Function Get_Levelset_Velocity
 //#####################################################################
-template<class T_GRID> void LEVELSET_CALLBACKS<T_GRID>::
-Get_Levelset_Velocity(const T_GRID& grid,LEVELSET_MULTIPLE<T_GRID>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time) const
+template<class TV> void LEVELSET_CALLBACKS<TV>::
+Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
 //#####################################################################
 // Function Adjust_Particle_For_Domain_Boundaries
 //#####################################################################
-template<class T_GRID> void LEVELSET_CALLBACKS<T_GRID>::
+template<class TV> void LEVELSET_CALLBACKS<TV>::
 Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,
     const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time)
 {
@@ -43,7 +43,7 @@ Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles
 //#####################################################################
 // Function Adjust_Particle_For_Objects
 //#####################################################################
-template<class T_GRID> bool LEVELSET_CALLBACKS<T_GRID>::
+template<class TV> bool LEVELSET_CALLBACKS<TV>::
 Adjust_Particle_For_Objects(TV& X,TV& V,const T r, const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
@@ -51,10 +51,10 @@ Adjust_Particle_For_Objects(TV& X,TV& V,const T r, const PARTICLE_LEVELSET_PARTI
 }
 //#####################################################################
 namespace PhysBAM{
-template class LEVELSET_CALLBACKS<GRID<VECTOR<double,1> > >;
-template class LEVELSET_CALLBACKS<GRID<VECTOR<double,2> > >;
-template class LEVELSET_CALLBACKS<GRID<VECTOR<double,3> > >;
-template class LEVELSET_CALLBACKS<GRID<VECTOR<float,1> > >;
-template class LEVELSET_CALLBACKS<GRID<VECTOR<float,2> > >;
-template class LEVELSET_CALLBACKS<GRID<VECTOR<float,3> > >;
+template class LEVELSET_CALLBACKS<VECTOR<double,1> >;
+template class LEVELSET_CALLBACKS<VECTOR<double,2> >;
+template class LEVELSET_CALLBACKS<VECTOR<double,3> >;
+template class LEVELSET_CALLBACKS<VECTOR<float,1> >;
+template class LEVELSET_CALLBACKS<VECTOR<float,2> >;
+template class LEVELSET_CALLBACKS<VECTOR<float,3> >;
 }

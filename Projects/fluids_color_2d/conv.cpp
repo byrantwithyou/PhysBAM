@@ -104,7 +104,7 @@ void Analyze(PARSE_ARGS& parse_args)
     ARRAY<int> samples(sim_data.m);
     ARRAY<T> u_linf(sim_data.m);
     ARRAY<T> u_2(sim_data.m);
-    CUBIC_MN_INTERPOLATION_UNIFORM<GRID<TV>,T> interp;
+    CUBIC_MN_INTERPOLATION_UNIFORM<TV,T> interp;
     const GRID<TV>& base_grid(sim_data(0)->grid);
     const ARRAY<T,TV_INT>& base_phi=sim_data(0)->phi;
     for(CELL_ITERATOR<TV> it(base_grid,-1);it.Valid();it.Next()){

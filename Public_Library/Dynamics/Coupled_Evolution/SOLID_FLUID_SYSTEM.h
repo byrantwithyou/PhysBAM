@@ -21,7 +21,7 @@ template<class TV> class GRID;
 template<class TV,class T_MATRIX>
 class SOLID_FLUID_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 {
-    typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<PAIR<int,T> > FACE_WEIGHT_ELEMENTS;typedef ARRAY<FACE_WEIGHT_ELEMENTS*,FACE_INDEX<TV::m> > T_FACE_ARRAYS_FACE_WEIGHT_ELEMENTS;
     typedef typename TV::SPIN T_SPIN;
     typedef KRYLOV_SYSTEM_BASE<typename TV::SCALAR> BASE;

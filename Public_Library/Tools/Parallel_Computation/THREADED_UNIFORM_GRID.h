@@ -19,19 +19,19 @@
 //TODO: Merge this with MPI_UNIFORM_GRID
 namespace PhysBAM{
 
-template<class T_GRID>
-class THREADED_UNIFORM_GRID:public MPI_GRID<T_GRID>
+template<class TV>
+class THREADED_UNIFORM_GRID:public MPI_GRID<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
     typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
     typedef typename T_ARRAYS_SCALAR::template REBIND<RANGE<TV_INT> >::TYPE T_ARRAYS_BOX_INT;
 public:
-    typedef T_GRID GRID_T;
+    typedef GRID<TV> GRID_T;
 
-    typedef MPI_GRID<T_GRID> BASE;
+    typedef MPI_GRID<TV > BASE;
     using BASE::number_of_processes;using BASE::global_grid;using BASE::local_grid;using BASE::coordinates;using BASE::boundaries;using BASE::periodic;
     using BASE::side_neighbor_ranks;using BASE::side_neighbor_directions;using BASE::all_neighbor_ranks;using BASE::all_neighbor_directions;using BASE::rank;
     using BASE::local_to_global_offset;using BASE::all_coordinates;using BASE::local_cell_index_to_global_column_index_map;using BASE::process_ranks;using BASE::process_grid;
@@ -45,7 +45,7 @@ public:
     mutable pthread_barrier_t* barr;
 #endif
 
-    THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,const int number_of_threads,T_GRID& local_grid_input,const int number_of_ghost_cells_input,
+    THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,const int number_of_threads,GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,
         const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),const TV_BOOL& periodic_input=TV_BOOL());
 
     RANGE<TV_INT> Face_Sentinels(const int axis) const
@@ -69,7 +69,7 @@ public:
         for(NODE_ITERATOR<TV> iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();global_data(node+local_to_global_offset)=local_data(node);}
     }
 
-    void Initialize(VECTOR<VECTOR<bool,2>,T_GRID::dimension>& domain_walls);
+    void Initialize(VECTOR<VECTOR<bool,2>,TV::m>& domain_walls);
     void Synchronize_Dt(T& dt) const;
     void All_Reduce(bool& flag) const;
     void Allgather(ARRAY<int>& data) const;

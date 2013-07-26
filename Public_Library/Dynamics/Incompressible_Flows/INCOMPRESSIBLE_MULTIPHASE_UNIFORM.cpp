@@ -26,22 +26,22 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
-INCOMPRESSIBLE_MULTIPHASE_UNIFORM(const T_GRID& grid_input,PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection_input)
-    :INCOMPRESSIBLE_UNIFORM<T_GRID>(grid_input,projection_input),levelset_for_dirichlet_regions(0)
+template<class TV> INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
+INCOMPRESSIBLE_MULTIPHASE_UNIFORM(const GRID<TV>& grid_input,PROJECTION_DYNAMICS_UNIFORM<TV>& projection_input)
+    :INCOMPRESSIBLE_UNIFORM<TV>(grid_input,projection_input),levelset_for_dirichlet_regions(0)
 {
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 ~INCOMPRESSIBLE_MULTIPHASE_UNIFORM()
 {
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Explicit_Part
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& advecting_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells)
 {
     // TODO: make efficient if advection velocities are same as advected velocities
@@ -54,7 +54,7 @@ Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& a
     if(pseudo_dirichlet_regions->Number_True()>0){
         T_FACE_ARRAYS_SCALAR face_velocities_liquid=face_velocities_to_advect;T_FACE_ARRAYS_SCALAR advection_face_velocities_ghost_extrapolated=advection_face_velocities_ghost;
         T_FACE_ARRAYS_SCALAR face_velocities_to_advect_ghost_extrapolated=face_velocities_to_advect_ghost;
-        T_ARRAYS_SCALAR phi_for_pseudo_dirichlet_regions;T_GRID grid_temp(grid);
+        T_ARRAYS_SCALAR phi_for_pseudo_dirichlet_regions;GRID<TV> grid_temp(grid);
         LEVELSET<TV> levelset_for_pseudo_dirichlet_regions(grid_temp,phi_for_pseudo_dirichlet_regions);
         projection.poisson_collidable->levelset_multiple->Get_Single_Levelset(*pseudo_dirichlet_regions,levelset_for_pseudo_dirichlet_regions,false);
         Extrapolate_Velocity_Across_Interface(advection_face_velocities_ghost_extrapolated,phi_for_pseudo_dirichlet_regions);
@@ -71,7 +71,7 @@ Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& a
 //#####################################################################
 // Function Advance_One_Time_Step_Explicit_Part
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<T_ARRAYS_SCALAR>* phi_ghost,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells)
 {
     T_FACE_ARRAYS_SCALAR face_velocities_ghost(grid.Domain_Indices(number_of_ghost_cells),false);
@@ -82,17 +82,17 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
         // extrapolate the velocity across the interface to get better strain boundaries
         T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(number_of_ghost_cells));projection.poisson_collidable->levelset_multiple->levelsets(i)->boundary->Fill_Ghost_Cells(grid,projection.poisson_collidable->levelset_multiple->phis(i),phi_ghost,dt,time,number_of_ghost_cells);
         T_FACE_ARRAYS_SCALAR face_velocities_temp=face_velocities_ghost;
-        for(int axis=0;axis<T_GRID::dimension;axis++){
-            T_GRID face_grid=grid.Get_Face_Grid(axis);T_ARRAYS_SCALAR phi_face(face_grid.Domain_Indices(),false);T_ARRAYS_BASE& face_velocity=face_velocities_temp.Component(axis);
-            for(FACE_ITERATOR<TV> iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next())
+        for(int axis=0;axis<TV::m;axis++){
+            GRID<TV> face_grid=grid.Get_Face_Grid(axis);T_ARRAYS_SCALAR phi_face(face_grid.Domain_Indices(),false);T_ARRAYS_BASE& face_velocity=face_velocities_temp.Component(axis);
+            for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next())
                 phi_face(iterator.Face_Index())=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
             int extrapolation_bandwidth=3;
-            EXTRAPOLATION_UNIFORM<GRID<TV>,T>  extrapolate(face_grid,phi_face,face_velocity,number_of_ghost_cells);extrapolate.Set_Band_Width((T)extrapolation_bandwidth);
+            EXTRAPOLATION_UNIFORM<TV,T>  extrapolate(face_grid,phi_face,face_velocity,number_of_ghost_cells);extrapolate.Set_Band_Width((T)extrapolation_bandwidth);
             extrapolate.Extrapolate();}
         strains(i)->Update_Strain_Equation_Multiphase(dt,time,projection.densities(i),face_velocities,face_velocities_temp,*projection.poisson_collidable->levelset_multiple,i,number_of_ghost_cells);}
 
     // update gravity
-    if(gravity) for(int axis=0;axis<T_GRID::dimension;axis++) if(downward_direction[axis]) face_velocities.Component(axis)+=dt*gravity*downward_direction[axis];
+    if(gravity) for(int axis=0;axis<TV::m;axis++) if(downward_direction[axis]) face_velocities.Component(axis)+=dt*gravity*downward_direction[axis];
     
     // update body force
     if(use_force) for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) 
@@ -103,7 +103,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
 
     if(!GFM && nonzero_surface_tension){
         T half_width=(T).5*number_of_interface_cells*grid.dX.Min();T dt_over_four=(T).25*dt;
-        LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
+        LEVELSET_MULTIPLE<TV>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
         levelset_multiple.Compute_Normals();levelset_multiple.Compute_Curvature();
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT index=iterator.Face_Index();
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
@@ -143,7 +143,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
 //#####################################################################
 // Function Advance_One_Time_Step_Implicit_Part
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity)
 {
     // boundary conditions
@@ -157,12 +157,12 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
     if((GFM&&nonzero_surface_tension)||projection.flame) projection.poisson_collidable->Set_Jump_Multiphase();
     
     if(GFM && nonzero_surface_tension){
-        LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;levelset_multiple.Compute_Curvature();
+        LEVELSET_MULTIPLE<TV>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;levelset_multiple.Compute_Curvature();
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
             int region_1,region_2;T phi_1,phi_2;levelset_multiple.Minimum_Regions(cell_1,cell_2,region_1,region_2,phi_1,phi_2);
             if(region_1!=region_2){
-                T sign=LEVELSET_MULTIPLE<T_GRID>::Sign(region_1,region_2);
+                T sign=LEVELSET_MULTIPLE<TV>::Sign(region_1,region_2);
                 T curvature=LEVELSET_UTILITIES<T>::Average(phi_1,-sign*(*levelset_multiple.levelsets(region_1)->curvature)(cell_1),
                                                        -phi_2,sign*(*levelset_multiple.levelsets(region_2)->curvature)(cell_2));
                 projection.poisson_collidable->u_jump_face.Component(iterator.Axis())(iterator.Face_Index())+=dt*surface_tensions(region_1,region_2)*curvature;}}}
@@ -180,11 +180,11 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
 // Function Calculate_Pressure_Jump
 //#####################################################################
 // flame_speed must be up to date
-template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 Calculate_Pressure_Jump(const T dt,const T time)
 {
     assert(projection.poisson_collidable->levelset_multiple);
-    LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
+    LEVELSET_MULTIPLE<TV>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
         int region1=levelset_multiple.Inside_Region(cell1),region2=levelset_multiple.Inside_Region(cell2);
@@ -193,13 +193,13 @@ Calculate_Pressure_Jump(const T dt,const T time)
         if(projection.densities(region1)<projection.densities(region2))exchange(region1,region2); //region1 is now the fuel region
         // [p]=dt*[1/density]*sqr(M) with M=-density_fuel*flame_speed, [1/density]=(1/density_fuel-1/density_products)
         // flame_speed_constant.z is (-density_fuel*[1/density])
-        projection.poisson_collidable->u_jump_face.Component(iterator.Axis())(iterator.Face_Index())+=LEVELSET_MULTIPLE<T_GRID>::Sign(region1,region2)*
+        projection.poisson_collidable->u_jump_face.Component(iterator.Axis())(iterator.Face_Index())+=LEVELSET_MULTIPLE<TV>::Sign(region1,region2)*
             dt*constants.z*projection.densities(region1)*sqr(projection.Flame_Speed_Face_Multiphase(iterator.Axis(),iterator.Face_Index(),region1,region2));}
 }
 //#####################################################################
 // Function CFL
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> typename TV::SCALAR INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous_only) const
 {
     TV DX=grid.dX,sqr_DX=DX*DX,max_abs_V;
@@ -207,14 +207,14 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
     T dt_convection=0;
     if(!viscous_only){
         if(projection.flame){
-            FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<T_GRID> face_velocities_fire(face_velocities,projection,projection.poisson_collidable->levelset_multiple);
-            typename FIRE_INTERPOLATION_POLICY<T_GRID>::AVERAGING_FIRE_MULTIPHASE averaging;
+            FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> face_velocities_fire(face_velocities,projection,projection.poisson_collidable->levelset_multiple);
+            typename FIRE_INTERPOLATION_POLICY<TV>::AVERAGING_FIRE_MULTIPHASE averaging;
             for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
                 TV V=averaging.Face_To_Face_Vector(grid,iterator.Axis(),iterator.Face_Index(),face_velocities_fire);
                 dt_convection=max(dt_convection,TV::Dot_Product(grid.one_over_dX,abs(V)));}}
         else{
             for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-                T local_V_norm=0;for(int axis=0;axis<T_GRID::dimension;axis++){
+                T local_V_norm=0;for(int axis=0;axis<TV::m;axis++){
                     TV_INT first_face_index=grid.First_Face_Index_In_Cell(axis,cell),second_face_index=grid.Second_Face_Index_In_Cell(axis,cell);
                     local_V_norm+=grid.one_over_dX[axis]*maxabs(face_velocities(axis,first_face_index),face_velocities(axis,second_face_index));}
                 dt_convection=max(dt_convection,local_V_norm);}}}
@@ -228,15 +228,15 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
     // surface tension
     T dt_surface_tension=0;
     if(nonzero_surface_tension){
-        LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;levelset_multiple.Compute_Curvature();
+        LEVELSET_MULTIPLE<TV>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;levelset_multiple.Compute_Curvature();
         int ghost_cells=1;
         levelset_multiple.Fill_Ghost_Cells(levelset_multiple.phis,0,ghost_cells);T kappa_cfl=0;
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
             int region_1,region_2;T phi_1,phi_2;levelset_multiple.Minimum_Regions(cell_1,cell_2,region_1,region_2,phi_1,phi_2);
             if(region_1!=region_2 && surface_tensions(region_1,region_2)){
-                T curvature=LEVELSET_UTILITIES<T>::Average(phi_1,LEVELSET_MULTIPLE<T_GRID>::Sign(region_2,region_1)*(*levelset_multiple.levelsets(region_1)->curvature)(cell_1),
-                    -phi_2,LEVELSET_MULTIPLE<T_GRID>::Sign(region_1,region_2)*(*levelset_multiple.levelsets(region_2)->curvature)(cell_2));
+                T curvature=LEVELSET_UTILITIES<T>::Average(phi_1,LEVELSET_MULTIPLE<TV>::Sign(region_2,region_1)*(*levelset_multiple.levelsets(region_1)->curvature)(cell_1),
+                    -phi_2,LEVELSET_MULTIPLE<TV>::Sign(region_1,region_2)*(*levelset_multiple.levelsets(region_2)->curvature)(cell_2));
                 kappa_cfl=max(kappa_cfl,abs(curvature*surface_tensions(region_1,region_2)/
                           LEVELSET_UTILITIES<T>::Heaviside((T).5*(phi_1-phi_2),projection.densities(region_1),projection.densities(region_2))));}}
         dt_surface_tension=sqrt(kappa_cfl)/grid.dX.Min();}
@@ -256,10 +256,10 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 Set_Dirichlet_Boundary_Conditions(ARRAY<T_ARRAYS_SCALAR>& phis,const ARRAY<bool>& dirichlet_regions,const ARRAY<T>* pressures)
 {
-    LEVELSET_MULTIPLE<T_GRID> levelset_multiple(grid,phis);
+    LEVELSET_MULTIPLE<TV> levelset_multiple(grid,phis);
     if(dirichlet_regions.Number_True()>0){
         if(!pressures){for(CELL_ITERATOR<TV> iterator(projection.p_grid);iterator.Valid();iterator.Next()) if(dirichlet_regions(levelset_multiple.Inside_Region(iterator.Cell_Index()))){
             projection.elliptic_solver->psi_D(iterator.Cell_Index())=true;projection.p(iterator.Cell_Index())=0;}}
@@ -274,12 +274,12 @@ Set_Dirichlet_Boundary_Conditions(ARRAY<T_ARRAYS_SCALAR>& phis,const ARRAY<bool>
 //#####################################################################
 // Function Add_Surface_Tension
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 Add_Surface_Tension(LEVELSET<TV>& levelset,const T time)
 {
-    LAPLACE_UNIFORM<T_GRID>& elliptic_solver=*projection.elliptic_solver;T_GRID& p_grid=elliptic_solver.grid;
-    LAPLACE_COLLIDABLE<T_GRID>& collidable_solver=*projection.collidable_solver;
-    LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
+    LAPLACE_UNIFORM<TV>& elliptic_solver=*projection.elliptic_solver;GRID<TV>& p_grid=elliptic_solver.grid;
+    LAPLACE_COLLIDABLE<TV>& collidable_solver=*projection.collidable_solver;
+    LEVELSET_MULTIPLE<TV>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
     T_ARRAYS_SCALAR& phi=levelset.phi; 
 
    if(collidable_solver.second_order_cut_cell_method) for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
@@ -300,33 +300,33 @@ Add_Surface_Tension(LEVELSET<TV>& levelset,const T time)
 //#####################################################################
 // Function Implicit_Viscous_Update
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 Implicit_Viscous_Update(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
-    for(int axis=0;axis<T_GRID::dimension;axis++){
-        IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<T_GRID> implicit_viscosity(projection,variable_viscosity,projection.densities,viscosities,mpi_grid,axis,use_variable_viscosity);
+    for(int axis=0;axis<TV::m;axis++){
+        IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<TV> implicit_viscosity(projection,variable_viscosity,projection.densities,viscosities,mpi_grid,axis,use_variable_viscosity);
         implicit_viscosity.Viscous_Update(grid,face_velocities,face_velocities,dt,time,maximum_implicit_viscosity_iterations);}
 }
 //#####################################################################
 // Function Compute_Vorticity_Confinement_Force
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
-Compute_Vorticity_Confinement_Force(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& F)
+template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
+Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& F)
 {
     T_ARRAYS_SPIN vorticity(grid.Cell_Indices(2),false);T_ARRAYS_SCALAR vorticity_magnitude(grid.Cell_Indices(2));
-    if(projection.flame){FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<T_GRID> face_velocities_lookup(face_velocities_ghost,projection,projection.poisson_collidable->levelset_multiple);
+    if(projection.flame){FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> face_velocities_lookup(face_velocities_ghost,projection,projection.poisson_collidable->levelset_multiple);
         VORTICITY_UNIFORM<TV>::Vorticity(grid,face_velocities_lookup,vorticity,vorticity_magnitude);}
-    else VORTICITY_UNIFORM<TV>::Vorticity(grid,FACE_LOOKUP_UNIFORM<T_GRID>(face_velocities_ghost),vorticity,vorticity_magnitude);
+    else VORTICITY_UNIFORM<TV>::Vorticity(grid,FACE_LOOKUP_UNIFORM<TV>(face_velocities_ghost),vorticity,vorticity_magnitude);
     for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
         TV vortex_normal_vector=LEVELSET<TV>::Normal_At_Node(grid,vorticity_magnitude,iterator.Cell_Index());
         F(iterator.Cell_Index())=TV::Cross_Product(vortex_normal_vector,vorticity(iterator.Cell_Index()));}
 }
 //#####################################################################
 namespace PhysBAM{
-template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<GRID<VECTOR<float,1> > >;
-template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<GRID<VECTOR<float,2> > >;
-template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<GRID<VECTOR<float,3> > >;
-template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<GRID<VECTOR<double,1> > >;
-template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<GRID<VECTOR<double,2> > >;
-template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<GRID<VECTOR<double,3> > >;
+template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<VECTOR<float,1> >;
+template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<VECTOR<float,2> >;
+template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<VECTOR<float,3> >;
+template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<VECTOR<double,1> >;
+template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<VECTOR<double,2> >;
+template class INCOMPRESSIBLE_MULTIPHASE_UNIFORM<VECTOR<double,3> >;
 }

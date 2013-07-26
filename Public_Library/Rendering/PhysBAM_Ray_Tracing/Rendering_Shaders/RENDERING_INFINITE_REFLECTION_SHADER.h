@@ -22,7 +22,7 @@ class RENDERING_INFINITE_REFLECTION_SHADER:public MATERIAL_SHADER<T>
 public:
     GRID<TV2> grid;
     ARRAY<VECTOR<T,3> ,VECTOR<int,2> > pixels;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<T,2> >,VECTOR<T,3> > interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,2>,VECTOR<T,3> > interpolation;
     T rotation; // stored as a value between -pi and pi
     
     RENDERING_INFINITE_REFLECTION_SHADER(RENDER_WORLD<T>& world_input,const T rotation_input) 

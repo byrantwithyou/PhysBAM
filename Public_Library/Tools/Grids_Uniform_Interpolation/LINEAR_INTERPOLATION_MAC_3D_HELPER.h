@@ -9,17 +9,18 @@
 
 #include <Tools/Grids_Uniform/BLOCK_UNIFORM.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
 #include <Tools/Vectors/VECTOR_2D.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class LINEAR_INTERPOLATION_MAC_3D_HELPER
+template<class TV> class LINEAR_INTERPOLATION_MAC_HELPER;
+
+template<class T>
+class LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename T_GRID::BLOCK T_BLOCK;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef typename T_FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef ARRAY<T,TV_INT> T_ARRAYS;typedef typename T_GRID::INDEX T_INDEX;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename GRID<TV>::BLOCK T_BLOCK;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef typename T_FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef ARRAY<T,TV_INT> T_ARRAYS;typedef TV_INT T_INDEX;
 private:
     TV base,center,one_over_DX;
     T u2,u5,u8,u11,slope_u12,slope_u23,slope_u45,slope_u56,slope_u78,slope_u89,slope_u10_11,slope_u11_12; // standard z-y-x major ordering
@@ -27,8 +28,8 @@ private:
     T w2,w5,w8,w11,slope_w12,slope_w23,slope_w45,slope_w56,slope_w78,slope_w89,slope_w10_11,slope_w11_12; // y-x-z major ordering for symmetry with u
 public:
 
-    LINEAR_INTERPOLATION_MAC_3D_HELPER(const T_BLOCK& block,const T_FACE_ARRAYS& face_velocities);
-    ~LINEAR_INTERPOLATION_MAC_3D_HELPER();
+    LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const T_FACE_ARRAYS& face_velocities);
+    ~LINEAR_INTERPOLATION_MAC_HELPER();
 
     template<class T_FACE_LOOKUP>
     static TV Interpolate_Face(const T_BLOCK& block,const T_FACE_LOOKUP& face_velocities,const TV& X)
@@ -81,7 +82,7 @@ public:
         cell_value(block.Cell(4)),cell_value(block.Cell(5)),cell_value(block.Cell(6)),cell_value(block.Cell(7)),Transformed(block,X));}
 
 //#####################################################################
-    static void Block_Transfer(const T_BLOCK& source_block,const T_FACE_ARRAYS_BOOL& source_values,const BLOCK_UNIFORM<GRID<TV> >& destination_block,ARRAY<T,FACE_INDEX<3> >& destination_values);
+    static void Block_Transfer(const T_BLOCK& source_block,const T_FACE_ARRAYS_BOOL& source_values,const BLOCK_UNIFORM<TV>& destination_block,ARRAY<T,FACE_INDEX<3> >& destination_values);
     TV Interpolate_Face(const TV& X) const;
     // assumes face_velocities are 0 where not valid
     static TV Interpolate_Face_Normalized(const T_BLOCK& block,const T_FACE_ARRAYS& face_velocities,const T_FACE_ARRAYS_BOOL& face_velocities_valid,const TV& X,const TV& default_value=TV());

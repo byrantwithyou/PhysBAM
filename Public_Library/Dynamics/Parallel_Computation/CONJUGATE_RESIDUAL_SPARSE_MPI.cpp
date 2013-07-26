@@ -12,7 +12,6 @@
 #include <Dynamics/Parallel_Computation/FLUID_SYSTEM_MPI.h>
 #include <Dynamics/Parallel_Computation/SOLID_SYSTEM_MPI.h>
 #include <limits>
-#include <PhysBAM_Tools/Vectors/SPARSE_ARRAY.h>
 using namespace PhysBAM;
 
 //#####################################################################

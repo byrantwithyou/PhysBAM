@@ -208,11 +208,11 @@ Update_Streamlines()
 
     RANDOM_NUMBERS<T> random;
     if(use_seed_for_streamlines) random.Set_Seed(streamline_seed);
-    T_LINEAR_INTERPOLATION_VECTOR linear_interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> linear_interpolation;
     T_FACE_ARRAYS_SCALAR mac_velocity_field(grid);
     mac_velocity_field.Component(0)=opengl_mac_velocity_field->u;
     mac_velocity_field.Component(1)=opengl_mac_velocity_field->v;
-    FACE_LOOKUP_UNIFORM<GRID<TV> > V_lookup(mac_velocity_field);
+    FACE_LOOKUP_UNIFORM<TV> V_lookup(mac_velocity_field);
 
     for(int i=0;i<number_of_streamlines;i++){
         int p=streamlines.particles.Add_Element();
@@ -346,7 +346,7 @@ Update_Vorticity()
 {
     GRID<TV>& grid=opengl_mac_velocity_field->grid;
     RANGE<VECTOR<int,2> > domain_indices(grid.Domain_Indices());domain_indices.Change_Size(-VECTOR<int,2>::All_Ones_Vector());
-    FACE_LOOKUP_UNIFORM<GRID<TV> > lookup(opengl_mac_velocity_field->face_velocities);
+    FACE_LOOKUP_UNIFORM<TV> lookup(opengl_mac_velocity_field->face_velocities);
     opengl_vorticity_magnitude->values.Resize(grid.Domain_Indices());
     for(CELL_ITERATOR<TV> iterator(grid,domain_indices);iterator.Valid();iterator.Next()){VECTOR<int,2> index=iterator.Cell_Index();
         T vorticity_magnitude=VORTICITY_UNIFORM<TV>::Vorticity(grid,lookup,index).Magnitude();

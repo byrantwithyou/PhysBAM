@@ -42,12 +42,12 @@ template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
 Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& force,const T dt,const T time)
 {
     ARRAY<T,TV_INT> grid_vorticity_magnitude(grid.Domain_Indices(2),false);
-    VORTICITY_UNIFORM<TV>::Vorticity(grid,FACE_LOOKUP_UNIFORM<GRID<TV> >(face_velocities_ghost),grid_vorticity,grid_vorticity_magnitude);
+    VORTICITY_UNIFORM<TV>::Vorticity(grid,FACE_LOOKUP_UNIFORM<TV>(face_velocities_ghost),grid_vorticity,grid_vorticity_magnitude);
 
     if(apply_individual_particle_forces){
         // compute missing vorticity per particle
         VORTICITY_PARTICLES<TV> missing_vorticity_particles;missing_vorticity_particles.Add_Elements(vorticity_particles.Size());
-        LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> vorticity_interpolation;
+        LINEAR_INTERPOLATION_UNIFORM<TV,TV> vorticity_interpolation;
 
         for(int p=0;p<vorticity_particles.Size();p++){
             // find missing vorticity
@@ -134,7 +134,7 @@ Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T 
             two_times_V_ghost(it.index)(d)=face_velocities_ghost.Component(d)(it.index)+face_velocities_ghost.Component(d)(next);}
 
     // vortex stretching/tilting term  - omega dot grad V
-    ARRAY<MATRIX<T,3> ,TV_INT> VX(grid.Domain_Indices(1),false);LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,MATRIX<T,3> > VX_interpolation;
+    ARRAY<MATRIX<T,3> ,TV_INT> VX(grid.Domain_Indices(1),false);LINEAR_INTERPOLATION_UNIFORM<TV,MATRIX<T,3> > VX_interpolation;
     T one_over_four_dx=1/(4*grid.dX.x),one_over_four_dy=1/(4*grid.dX.y),one_over_four_dz=1/(4*grid.dX.z);
     for(int i=0;i<grid.counts.x+1;i++) for(int j=0;j<grid.counts.y+1;j++) for(int ij=0;ij<grid.counts.z+1;ij++)
         VX(TV_INT(i,j,ij))=MATRIX<T,3>(one_over_four_dx*(two_times_V_ghost(i+1,j,ij)-two_times_V_ghost(i-1,j,ij)),
@@ -148,7 +148,7 @@ Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T 
     else for(int p=0;p<vorticity_particles.Size();p++){
         vorticity_particles.vorticity(p)+=dt*VX_interpolation.Clamped_To_Array(grid,VX,vorticity_particles.X(p))*vorticity_particles.vorticity(p);}
     // advance vortex particle position
-    EULER_STEP_PARTICLES<GRID<TV> >::Euler_Step_Face(vorticity_particles.X,grid,face_velocities_ghost,dt);
+    EULER_STEP_PARTICLES<TV>::Euler_Step_Face(vorticity_particles.X,grid,face_velocities_ghost,dt);
     if(mpi_grid) Exchange_Boundary_Particles_Flat(*mpi_grid,vorticity_particles);
 }
 //#####################################################################

@@ -27,9 +27,9 @@ public:
 
     LEVELSET<TV> levelset;
     ARRAY<TV,TV_INT>* V;
-    INTERPOLATION_UNIFORM<GRID<TV>,TV>* velocity_interpolation;
+    INTERPOLATION_UNIFORM<TV,TV>* velocity_interpolation;
 private:
-    static LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> default_velocity_interpolation;
+    static LINEAR_INTERPOLATION_UNIFORM<TV,TV> default_velocity_interpolation;
 protected:
     T minimum_cell_size;
     bool need_destroy_data;
@@ -46,9 +46,9 @@ public:
 
 //###########################################################################
     static LEVELSET_IMPLICIT_OBJECT<TV>* Create();
-    void Set_Custom_Secondary_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,T>& interpolation);
-    void Set_Custom_Normal_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,TV>& interpolation);
-    void Set_Custom_Velocity_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,TV>& interpolation);
+    void Set_Custom_Secondary_Interpolation(INTERPOLATION_UNIFORM<TV,T>& interpolation);
+    void Set_Custom_Normal_Interpolation(INTERPOLATION_UNIFORM<TV,TV>& interpolation);
+    void Set_Custom_Velocity_Interpolation(INTERPOLATION_UNIFORM<TV,TV>& interpolation);
     void Update_Box() PHYSBAM_OVERRIDE;
     void Update_Minimum_Cell_Size(const int maximum_depth=0) PHYSBAM_OVERRIDE;
     T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box) const PHYSBAM_OVERRIDE;

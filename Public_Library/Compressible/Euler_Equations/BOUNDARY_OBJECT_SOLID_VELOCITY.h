@@ -11,16 +11,16 @@
 
 namespace PhysBAM{
 
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class TV> struct GRID_ARRAYS_POLICY;
 
-template<class T_GRID>
-class BOUNDARY_OBJECT_SOLID_VELOCITY:public BOUNDARY_OBJECT<typename T_GRID::VECTOR_T,VECTOR<typename T_GRID::SCALAR,T_GRID::dimension+2> >
+template<class TV>
+class BOUNDARY_OBJECT_SOLID_VELOCITY:public BOUNDARY_OBJECT<TV,VECTOR<typename TV::SCALAR,TV::m+2> >
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+2> TV_DIMENSION;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef typename T_ARRAYS_DIMENSION_SCALAR::ELEMENT T_ARRAYS_ELEMENT;
-    enum{d=T_GRID::dimension+2};
+    enum{d=TV::m+2};
 public:
 
     BOUNDARY_OBJECT_SOLID_VELOCITY()

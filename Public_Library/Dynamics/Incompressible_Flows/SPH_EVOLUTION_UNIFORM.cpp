@@ -25,9 +25,9 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> SPH_EVOLUTION_UNIFORM<T_GRID>::
-SPH_EVOLUTION_UNIFORM(T_GRID& grid_input,INCOMPRESSIBLE_UNIFORM<T_GRID>& incompressible_input,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input,
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution_input)
+template<class TV> SPH_EVOLUTION_UNIFORM<TV>::
+SPH_EVOLUTION_UNIFORM(GRID<TV>& grid_input,INCOMPRESSIBLE_UNIFORM<TV>& incompressible_input,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input,
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution_input)
     :grid(grid_input.Get_MAC_Grid()),callbacks(0),incompressible(incompressible_input),fluids_parameters(fluids_parameters_input),particle_levelset_evolution(particle_levelset_evolution_input),
     particle_radius(1.5),target_particles_per_unit_volume((T)1000),ballistic_particles_per_unit_volume(0),use_analytic_divergence(false),use_analytic_divergence_for_expansion_only(false),
     adjust_cell_weights_on_neumann_boundaries(false),enforce_density_near_interface(true),particle_targeting_time(1),divergence_expansion_multiplier(0),grid_to_particle_slip_multiplier(1),
@@ -39,13 +39,13 @@ SPH_EVOLUTION_UNIFORM(T_GRID& grid_input,INCOMPRESSIBLE_UNIFORM<T_GRID>& incompr
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> SPH_EVOLUTION_UNIFORM<TV>::
 ~SPH_EVOLUTION_UNIFORM()
 {}
 //#####################################################################
 // Function Euler_Step
 //#####################################################################
-template<class T_GRID> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
 Euler_Step(const T dt,const T time)
 {
     LOG::cout<<"Number of SPH particles: "<<sph_particles.Size()<<std::endl;
@@ -57,7 +57,7 @@ Euler_Step(const T dt,const T time)
 //#####################################################################
 // Function CFL
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> typename TV::SCALAR SPH_EVOLUTION_UNIFORM<TV>::
 CFL() const
 {
     T max_particle_velocity=0;
@@ -73,7 +73,7 @@ CFL() const
 //#####################################################################
 // Function Copy_Particle_Attributes_From_Array
 //#####################################################################
-template<class T_GRID> template<class T_ARRAYS_PARTICLES> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> template<class T_ARRAYS_PARTICLES> void SPH_EVOLUTION_UNIFORM<TV>::
 Copy_Particle_Attributes_From_Array(T_ARRAYS_PARTICLES& particles)
 {
     int particle_index=0;sph_particles.Delete_All_Elements();
@@ -84,7 +84,7 @@ Copy_Particle_Attributes_From_Array(T_ARRAYS_PARTICLES& particles)
 //#####################################################################
 // Function Copy_Particle_Attributes_To_Array
 //#####################################################################
-template<class T_GRID> template<class T_ARRAYS_PARTICLES> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> template<class T_ARRAYS_PARTICLES> void SPH_EVOLUTION_UNIFORM<TV>::
 Copy_Particle_Attributes_To_Array(T_ARRAYS_PARTICLES& particles) const
 {
     int particle_index=0;
@@ -95,7 +95,7 @@ Copy_Particle_Attributes_To_Array(T_ARRAYS_PARTICLES& particles) const
 //#####################################################################
 // Function Make_Incompressible
 //#####################################################################
-template<class T_GRID> template<class T_ARRAYS_PARTICLES> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> template<class T_ARRAYS_PARTICLES> void SPH_EVOLUTION_UNIFORM<TV>::
 Make_Incompressible(T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     Copy_Particle_Attributes_From_Array(particles);
@@ -104,7 +104,7 @@ Make_Incompressible(T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR& face_vel
 //#####################################################################
 // Function Make_Incompressible
 //#####################################################################
-template<class T_GRID> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
 Make_Incompressible(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     LOG::SCOPE scope("SPH_INCOMPRESSIBLE","sph incompressible (time=%f,dt=%f)",time,dt);
@@ -116,7 +116,7 @@ Make_Incompressible(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T tim
 //#####################################################################
 // Function Calculate_SPH_Constants
 //#####################################################################
-template<class T_GRID> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
 Calculate_SPH_Constants()
 {
     radius=particle_radius*grid.dX.Min();
@@ -132,7 +132,7 @@ Calculate_SPH_Constants()
 //#####################################################################
 // Function Set_Up_For_Projection
 //#####################################################################
-template<class T_GRID> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
 Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
 {
     Calculate_SPH_Constants();
@@ -150,7 +150,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
             if(distance_squared<radius_plus_half_dx_squared && particles_in_cell.Valid_Index(cell)){
                 if(!particles_in_cell(cell).m)particles_in_cell(cell).Preallocate(15);
                 particles_in_cell(cell).Append(p);}}
-        for(int axis=0;axis<T_GRID::dimension;axis++)
+        for(int axis=0;axis<TV::m;axis++)
             for(FACE_ITERATOR<TV> iterator(grid,particle_cells+RANGE<TV_INT>(TV_INT(),TV_INT::Axis_Vector(axis)),axis);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index();
                 TV X_minus_Xp=grid.Face(iterator.Full_Index())-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
@@ -161,7 +161,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
         if(one_over_total_particle_face_weight(p))one_over_total_particle_face_weight(p)=1/one_over_total_particle_face_weight(p);}
 
     LOG::Time("initializing");
-    PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection=incompressible.projection;
+    PROJECTION_DYNAMICS_UNIFORM<TV>& projection=incompressible.projection;
     T_FACE_ARRAYS_SCALAR preset_velocities=face_velocities;
     particle_velocities.Resize(grid.Domain_Indices(3),false,false);particle_velocities.Fill(0);
     valid_particle_face_velocities.Resize(grid.Domain_Indices(3),false,false);valid_particle_face_velocities.Fill(false);
@@ -197,7 +197,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     projection.divergence_multiplier.Fill(0);projection.divergence.Fill(0);
     ARRAY<bool,TV_INT> cells_valid(grid.Domain_Indices(1));cells_valid.Fill(true); 
     for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-        if(projection.elliptic_solver->psi_D(cell)) for(int axis=0;axis<T_GRID::dimension;axis++) for(int k=0;k<2;k++){
+        if(projection.elliptic_solver->psi_D(cell)) for(int axis=0;axis<TV::m;axis++) for(int k=0;k<2;k++){
             TV_INT face(cell);face[axis]+=k;if(!face_weight(axis,face)) cells_valid(cell)=false;}}
     for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         if(cells_valid(cell) && cell_weight(cell)>ballistic_particles_per_cell) projection.elliptic_solver->psi_D(cell)=false;
@@ -211,21 +211,21 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
         if(projection.elliptic_solver->psi_N(axis,face)) face_velocities(axis,face)=preset_velocities(axis,face);}
-    for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
+    for(int axis=0;axis<TV::m;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(!fluids_parameters.mpi_grid || !fluids_parameters.mpi_grid->Neighbor(axis,axis_side)){
             TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
-            for(FACE_ITERATOR<TV> iterator(grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
+            for(FACE_ITERATOR<TV> iterator(grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
                 projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}
 }
 //#####################################################################
 // Function Set_Divergence_And_Multiplier
 //#####################################################################
-template<class T_GRID> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
 Set_Divergence_And_Multiplier(const TV_INT cell,const ARRAY<bool,TV_INT>& cells_valid,const T time)
 {
     Calculate_SPH_Constants();
 
-    PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection=incompressible.projection;
+    PROJECTION_DYNAMICS_UNIFORM<TV>& projection=incompressible.projection;
     if(projection.elliptic_solver->psi_D(cell)){projection.divergence_multiplier(cell)=1;projection.divergence(cell)=0;return;}
     
     if(!use_analytic_divergence){
@@ -248,7 +248,7 @@ Set_Divergence_And_Multiplier(const TV_INT cell,const ARRAY<bool,TV_INT>& cells_
 //#####################################################################
 // Function Postprocess_Particles
 //#####################################################################
-template<class T_GRID> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
 Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     Calculate_SPH_Constants();
@@ -265,16 +265,16 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             if(incompressible.projection.elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())){
                 cell_faces_blocked(iterator.First_Cell_Index())++;cell_faces_blocked(iterator.Second_Cell_Index())++;}}
-        T multiplier_over_number_of_faces_per_cell=neumann_boundary_slip_multiplier/(T)T_GRID::number_of_faces_per_cell;
+        T multiplier_over_number_of_faces_per_cell=neumann_boundary_slip_multiplier/(T)GRID<TV>::number_of_faces_per_cell;
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             cell_weight(iterator.Cell_Index())*=1+cell_faces_blocked(iterator.Cell_Index())*multiplier_over_number_of_faces_per_cell;}}
 
     LOG::Time("applying deltas");
-    LINEAR_INTERPOLATION_UNIFORM<T_GRID,T> interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
     for(int p=0;p<sph_particles.Size();p++){
         T delta_slip=grid_to_particle_slip_multiplier*max((T)0,interpolation.Clamped_To_Array_Cell(grid,cell_weight,sph_particles.X(p))-ballistic_particles_per_cell);
         delta_slip=min((T)1,delta_slip/target_minus_ballistic_particles_per_cell);
-        for(int axis=0;axis<T_GRID::dimension;axis++) if(delta_weight(p)[axis]){
+        for(int axis=0;axis<TV::m;axis++) if(delta_weight(p)[axis]){
         sph_particles.V(p)[axis]+=delta_slip*delta_velocity(p)[axis]/delta_weight(p)[axis];}}
 
     if(flip_ratio!=1){
@@ -284,8 +284,8 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
         incompressible.boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,ghost_cells);
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
             if(incompressible.projection.elliptic_solver->psi_N(axis,face)){int valid_neighbors=0;T face_velocity=0;
-                for(int i=0;i<T_GRID::number_of_one_ring_neighbors_per_cell;i++){
-                    TV_INT face_neighbor=T_GRID::One_Ring_Neighbor(face,i); // TODO: Check that this is correct for one-way coupling
+                for(int i=0;i<GRID<TV>::number_of_one_ring_neighbors_per_cell;i++){
+                    TV_INT face_neighbor=GRID<TV>::One_Ring_Neighbor(face,i); // TODO: Check that this is correct for one-way coupling
                     if(face_weight(axis,face_neighbor)&&!incompressible.projection.elliptic_solver->psi_N(axis,face_neighbor)){
                         valid_neighbors++;face_velocity+=face_velocities_ghost(axis,face_neighbor);}}
                 if(valid_neighbors) face_velocities_ghost(axis,face)=face_velocity/(T)valid_neighbors;}}
@@ -338,7 +338,7 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
 //#####################################################################
 // Function Rasterize_Velocities_To_Grid
 //#####################################################################
-template<class T_GRID> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
 Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,T_ARRAYS_SCALAR& cell_weight,T_FACE_ARRAYS_SCALAR& face_weight)
 {
     Calculate_SPH_Constants();
@@ -349,7 +349,7 @@ Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,T_ARRAYS_SCALAR& c
             int p=particles_in_cell(cell)(k);
             TV X_minus_Xp=X-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
             T weight=(1-distance_squared*one_over_radius_squared)*one_over_total_particle_cell_weight(p); 
-            int weight_multiplier=1;if(adjust_cell_weights_on_neumann_boundaries) for(int axis=0;axis<T_GRID::dimension;axis++){ // TODO: Make this more accurate
+            int weight_multiplier=1;if(adjust_cell_weights_on_neumann_boundaries) for(int axis=0;axis<TV::m;axis++){ // TODO: Make this more accurate
                 TV_INT face1=grid.First_Face_Index_In_Cell(axis,cell),face2=grid.Second_Face_Index_In_Cell(axis,cell);
                 if(incompressible.projection.elliptic_solver->psi_N(axis,face1)) if(sph_particles.X(p)(axis)>X(axis)+.5*grid.dX(axis)) weight_multiplier++;
                 if(incompressible.projection.elliptic_solver->psi_N(axis,face2)) if(sph_particles.X(p)(axis)<X(axis)-.5*grid.dX(axis)) weight_multiplier++;}
@@ -368,7 +368,7 @@ Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,T_ARRAYS_SCALAR& c
 //#####################################################################
 // Function Calculate_Particle_Deltas
 //#####################################################################
-template<class T_GRID> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
 Calculate_Particle_Deltas(const T_FACE_ARRAYS_SCALAR& minus_face_delta,ARRAY<TV>& delta_velocity,ARRAY<TV>& delta_weight)
 {
     Calculate_SPH_Constants();
@@ -386,13 +386,13 @@ Calculate_Particle_Deltas(const T_FACE_ARRAYS_SCALAR& minus_face_delta,ARRAY<TV>
 //#####################################################################
 // Function Create_Fluid_From_Particles
 //#####################################################################
-template<class T_GRID> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
 Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR* face_velocities)
 {
     Calculate_SPH_Constants();
 
     LOG::Time("modifying levelset");
-    PARTICLE_LEVELSET_UNIFORM<T_GRID>& particle_levelset=particle_levelset_evolution->Particle_Levelset(0);
+    PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution->Particle_Levelset(0);
     particle_levelset.Modify_Levelset_Using_Escaped_Particles(face_velocities);
 
     LOG::Time("creating fluid from particles");
@@ -440,7 +440,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
         if(removed_negative_particle_cell_weight(cell)>=target_particles_per_cell){created_fluid_from_particles=true;converting_cells(cell)=true;}}
 
     if(created_fluid_from_particles){
-        ARRAYS_UTILITIES<T_GRID,T>::Make_Ghost_Mask_From_Active_Mask(grid.Get_Regular_Grid_At_MAC_Positions(),converting_cells,converting_cells_neighborhood,2,1);
+        ARRAYS_UTILITIES<TV,T>::Make_Ghost_Mask_From_Active_Mask(grid.Get_Regular_Grid_At_MAC_Positions(),converting_cells,converting_cells_neighborhood,2,1);
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();converting_cells(cell)=converting_cells(cell)||converting_cells_neighborhood(cell);}
         
         T blending_particle_radius=(T).5*grid.dX.Min();
@@ -478,7 +478,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
                 removed_negative_particles(block)->Delete_Elements_On_Deletion_List();}}}
 
     LOG::Time("reseeding around new fluid");
-    ARRAYS_UTILITIES<T_GRID,T>::Make_Ghost_Mask_From_Active_Mask(grid.Get_Regular_Grid_At_MAC_Positions(),converting_cells,converting_cells_neighborhood,2,1);
+    ARRAYS_UTILITIES<TV,T>::Make_Ghost_Mask_From_Active_Mask(grid.Get_Regular_Grid_At_MAC_Positions(),converting_cells,converting_cells_neighborhood,2,1);
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();converting_cells(cell)=converting_cells(cell)||converting_cells_neighborhood(cell);}
     particle_levelset_evolution->Particle_Levelset(0).Reseed_Particles(time,&converting_cells);
         
@@ -491,13 +491,13 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
 //#####################################################################
 // Function Move_Particles_Off_Grid_Boundaries
 //#####################################################################
-template<class T_GRID> template<class T_ARRAYS_PARTICLES> void SPH_EVOLUTION_UNIFORM<T_GRID>::
+template<class TV> template<class T_ARRAYS_PARTICLES> void SPH_EVOLUTION_UNIFORM<TV>::
 Move_Particles_Off_Grid_Boundaries(T_ARRAYS_PARTICLES& particles,const T tolerance) const
 {
     assert(fluids_parameters.mpi_grid);
-    for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
+    for(int axis=0;axis<TV::m;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(fluids_parameters.mpi_grid->Neighbor(axis,axis_side)){
-            for(NODE_ITERATOR<TV> iterator(grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+            for(NODE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT block=iterator.Node_Index();
                 if(particles(block)) for(int p=0;p<particles(block)->Size();p++){
                     if(axis_side==0) particles(block)->X(p)[axis]=max(grid.domain.Minimum_Corner()[axis]+tolerance,particles(block)->X(p)[axis]);
@@ -505,58 +505,58 @@ Move_Particles_Off_Grid_Boundaries(T_ARRAYS_PARTICLES& particles,const T toleran
 }
 //#####################################################################
 namespace PhysBAM{
-template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >;
-template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >;
-template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >;
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+template class SPH_EVOLUTION_UNIFORM<VECTOR<float,1> >;
+template class SPH_EVOLUTION_UNIFORM<VECTOR<float,2> >;
+template class SPH_EVOLUTION_UNIFORM<VECTOR<float,3> >;
+template void SPH_EVOLUTION_UNIFORM<VECTOR<float,1> >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&);
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<float,1> >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&) const;
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<float,1> >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,ARRAY<float,FACE_INDEX<1> >&,float,float);
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<float,1> >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,float) const;
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<float,2> >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&);
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<float,2> >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&) const;
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<float,2> >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,ARRAY<float,FACE_INDEX<2> >&,float,float);
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<float,2> >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,float) const;
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<float,3> >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&);
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<float,3> >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&) const;
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<float,3> >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,ARRAY<float,FACE_INDEX<3> >&,float,float);
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<float,3> >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,float) const;
-template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >;
-template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >;
-template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >;
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+template class SPH_EVOLUTION_UNIFORM<VECTOR<double,1> >;
+template class SPH_EVOLUTION_UNIFORM<VECTOR<double,2> >;
+template class SPH_EVOLUTION_UNIFORM<VECTOR<double,3> >;
+template void SPH_EVOLUTION_UNIFORM<VECTOR<double,1> >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&);
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<double,1> >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&) const;
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<double,1> >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,ARRAY<double,FACE_INDEX<1> >&,double,double);
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<double,1> >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,double) const;
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<double,2> >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&);
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<double,2> >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&) const;
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<double,2> >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,ARRAY<double,FACE_INDEX<2> >&,double,double);
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<double,2> >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,double) const;
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<double,3> >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&);
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<double,3> >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&) const;
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<double,3> >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,ARRAY<double,FACE_INDEX<3> >&,double,double);
-template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+template void SPH_EVOLUTION_UNIFORM<VECTOR<double,3> >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,double) const;
 }

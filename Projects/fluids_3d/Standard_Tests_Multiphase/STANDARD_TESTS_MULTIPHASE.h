@@ -13,21 +13,21 @@
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS_MULTIPHASE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class STANDARD_TESTS_MULTIPHASE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;
 public:
     typedef VECTOR<T,3> TV;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::solid_body_collection;using BASE::Time_At_Frame;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
 
-    WATER_STANDARD_TESTS_MULTIPHASE_3D<GRID<TV> > tests;
+    WATER_STANDARD_TESTS_MULTIPHASE_3D<TV> tests;
 
     STANDARD_TESTS_MULTIPHASE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,0,fluids_parameters.WATER),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.WATER),
         tests(*this,fluids_parameters,fluid_collection,solid_body_collection.rigid_body_collection)
     {
     }
@@ -62,7 +62,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     tests.Initialize(test_number,resolution,restart_frame);
-    fluids_parameters.Initialize_Number_Of_Regions(WATER_STANDARD_TESTS_MULTIPHASE_3D<GRID<TV> >::Number_Of_Regions(test_number));
+    fluids_parameters.Initialize_Number_Of_Regions(WATER_STANDARD_TESTS_MULTIPHASE_3D<TV>::Number_Of_Regions(test_number));
     *fluids_parameters.grid=tests.grid;
 /*
   fluids_parameters.viscosities(0)=(T)100;
@@ -104,14 +104,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Construct_Levelsets_For_Objects(const T time)
 {
     tests.Update_Rigid_Bodies(time);
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Construct_Levelsets_For_Objects(time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Construct_Levelsets_For_Objects(time);
 }
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Update_Fluid_Parameters(dt,time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
     tests.Update_Sources(time);
 }
 //#####################################################################

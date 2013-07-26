@@ -12,7 +12,7 @@
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>
 using namespace PhysBAM;
 //#####################################################################
-template<class TV> LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> LEVELSET_IMPLICIT_OBJECT<TV>::default_velocity_interpolation;
+template<class TV> LINEAR_INTERPOLATION_UNIFORM<TV,TV> LEVELSET_IMPLICIT_OBJECT<TV>::default_velocity_interpolation;
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -43,7 +43,7 @@ Create()
 // Function Update_Minimum_Cell_Size
 //#####################################################################
 template<class TV> void LEVELSET_IMPLICIT_OBJECT<TV>::
-Set_Custom_Secondary_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,T>& interpolation)
+Set_Custom_Secondary_Interpolation(INTERPOLATION_UNIFORM<TV,T>& interpolation)
 {
     levelset.Set_Custom_Secondary_Interpolation(interpolation);
 }
@@ -51,7 +51,7 @@ Set_Custom_Secondary_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,T>& interpolat
 // Function Update_Minimum_Cell_Size
 //#####################################################################
 template<class TV> void LEVELSET_IMPLICIT_OBJECT<TV>::
-Set_Custom_Normal_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,TV>& interpolation)
+Set_Custom_Normal_Interpolation(INTERPOLATION_UNIFORM<TV,TV>& interpolation)
 {
     levelset.Set_Custom_Normal_Interpolation(interpolation);
 }
@@ -59,7 +59,7 @@ Set_Custom_Normal_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,TV>& interpolatio
 // Function Update_Minimum_Cell_Size
 //#####################################################################
 template<class TV> void LEVELSET_IMPLICIT_OBJECT<TV>::
-Set_Custom_Velocity_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,TV>& interpolation)
+Set_Custom_Velocity_Interpolation(INTERPOLATION_UNIFORM<TV,TV>& interpolation)
 {
     velocity_interpolation=&interpolation;
 }

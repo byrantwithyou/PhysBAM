@@ -16,8 +16,8 @@ namespace PhysBAM{
 template<class TV>
 class BOUNDARY_PHI_WATER:public BOUNDARY<TV,typename TV::SCALAR>
 {
-    typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
-    typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,GRID<TV>::dimension> TV_SIDES;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     typedef BOUNDARY<TV,T> BASE;
@@ -29,7 +29,7 @@ public:
 
     bool use_open_boundary_mode;
     ARRAY<bool> open_boundary;
-    const BOUNDARY_OPEN_CALLBACKS<GRID<TV> > *callbacks;
+    const BOUNDARY_OPEN_CALLBACKS<TV> *callbacks;
 private:
     const T_FACE_ARRAYS_SCALAR* V;
 public:
@@ -59,7 +59,7 @@ public:
     void Use_Open_Boundary_Mode(const bool use=true)
     {use_open_boundary_mode=use;}
 
-    void Set_Boundary_Open_Callbacks(const BOUNDARY_OPEN_CALLBACKS<GRID<TV> >& callbacks_input)
+    void Set_Boundary_Open_Callbacks(const BOUNDARY_OPEN_CALLBACKS<TV>& callbacks_input)
     {callbacks=&callbacks_input;}
 
 //#####################################################################

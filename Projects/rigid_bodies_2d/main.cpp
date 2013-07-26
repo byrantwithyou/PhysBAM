@@ -25,7 +25,7 @@ int main(int argc,char *argv[])
     PARSE_ARGS parse_args(argc,argv);
     example.Parse(parse_args);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(example);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(example);
     driver.Execute_Main_Program();
 
     return 0;

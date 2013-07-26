@@ -18,7 +18,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
+template<class TV,class T2,class T_NESTED_ADVECTION> ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::
 ADVECTION_MACCORMACK_UNIFORM(T_NESTED_ADVECTION& nested_advection_input,const ARRAY<bool,TV_INT>* node_mask_input,const ARRAY<bool,TV_INT>* cell_mask_input,const T_FACE_ARRAYS_BOOL* face_mask_input,THREAD_QUEUE* thread_queue_input)
     :node_mask(node_mask_input),cell_mask(cell_mask_input),face_mask(face_mask_input),nested_advection(nested_advection_input),clamp_extrema(true),ensure_second_order(false),thread_queue(thread_queue_input)
 {
@@ -26,8 +26,8 @@ ADVECTION_MACCORMACK_UNIFORM(T_NESTED_ADVECTION& nested_advection_input,const AR
 //#####################################################################
 // Function Update_Advection_Equation_Node
 //#####################################################################
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
-Update_Advection_Equation_Node(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const ARRAY<TV,TV_INT>& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
+template<class TV,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::
+Update_Advection_Equation_Node(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const ARRAY<TV,TV_INT>& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
     const ARRAY<T2,TV_INT>* Z_min_ghost_input,const ARRAY<T2,TV_INT>* Z_max_ghost_input,ARRAY<T2,TV_INT>* Z_min_input,ARRAY<T2,TV_INT>* Z_max_input)
 {
     assert(node_mask && !Z_min_input && !Z_max_input);
@@ -39,17 +39,17 @@ Update_Advection_Equation_Node(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRA
     boundary.Fill_Ghost_Cells(grid,Z_min,Z_min_ghost,dt,time+dt,number_of_ghost_cells);boundary.Fill_Ghost_Cells(grid,Z_max,Z_max_ghost,dt,time+dt,number_of_ghost_cells);
     nested_advection.Update_Advection_Equation_Node(grid,Z_temp,Z_forward_ghost,negative_V,boundary,dt,time+dt,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp has time n data
     RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner+=TV_INT::All_Ones_Vector();
-    DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>,typename T_GRID::VECTOR_T> thread_iterator(domain,thread_queue);
+    DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>,TV> thread_iterator(domain,thread_queue);
     if(clamp_extrema)
-        thread_iterator.template Run<const T_GRID&,ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&>(*this,&ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::Apply_Clamped_Extrema_Limiter_Node_Threaded,grid,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);
+        thread_iterator.template Run<const GRID<TV>&,ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&>(*this,&ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::Apply_Clamped_Extrema_Limiter_Node_Threaded,grid,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);
     else
-        thread_iterator.template Run<const T_GRID&,ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&>(*this,&ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::Apply_Reversion_Limiter_Node_Threaded,grid,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);
+        thread_iterator.template Run<const GRID<TV>&,ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&>(*this,&ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::Apply_Reversion_Limiter_Node_Threaded,grid,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);
 }
 //#####################################################################
 // Function Update_Advection_Equation_Cell_Lookup
 //#####################################################################
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
-Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const FACE_LOOKUP_UNIFORM<T_GRID>& face_velocities,BOUNDARY<TV,T2>& boundary,
+template<class TV,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::
+Update_Advection_Equation_Cell_Lookup(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const FACE_LOOKUP_UNIFORM<TV>& face_velocities,BOUNDARY<TV,T2>& boundary,
     const T dt,const T time,const ARRAY<T2,TV_INT>* Z_min_ghost_input,const ARRAY<T2,TV_INT>* Z_max_ghost_input,ARRAY<T2,TV_INT>* Z_min_input,ARRAY<T2,TV_INT>* Z_max_input)
 {
     assert(cell_mask && !Z_min_input && !Z_max_input);
@@ -60,18 +60,18 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,con
     ARRAY<T2,TV_INT> Z_forward_ghost(grid.Domain_Indices(number_of_ghost_cells),false);boundary.Fill_Ghost_Cells(grid,Z_temp,Z_forward_ghost,dt,time+dt,number_of_ghost_cells);
     boundary.Fill_Ghost_Cells(grid,Z_min,Z_min_ghost,dt,time+dt,number_of_ghost_cells);boundary.Fill_Ghost_Cells(grid,Z_max,Z_max_ghost,dt,time+dt,number_of_ghost_cells);
     nested_advection.Update_Advection_Equation_Cell(grid,Z_temp,Z_forward_ghost,negative_V,boundary,dt,time+dt,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp has time n data
-    DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>,typename T_GRID::VECTOR_T> thread_iterator(grid.Domain_Indices(),thread_queue);
+    DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>,TV> thread_iterator(grid.Domain_Indices(),thread_queue);
     if(clamp_extrema)
-        thread_iterator.template Run<const T_GRID&,ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&>(*this,&ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::Apply_Clamped_Extrema_Limiter_Cell_Threaded,grid,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);
+        thread_iterator.template Run<const GRID<TV>&,ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&>(*this,&ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::Apply_Clamped_Extrema_Limiter_Cell_Threaded,grid,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);
     else
-        thread_iterator.template Run<const T_GRID&,ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&>(*this,&ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::Apply_Reversion_Limiter_Cell_Threaded,grid,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);
+        thread_iterator.template Run<const GRID<TV>&,ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&>(*this,&ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::Apply_Reversion_Limiter_Cell_Threaded,grid,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);
 }
 //#####################################################################
 // Function Update_Advection_Equation_Face_Lookup
 //#####################################################################
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
-Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const FACE_LOOKUP_UNIFORM<T_GRID>& Z_ghost,const FACE_LOOKUP_UNIFORM<T_GRID>& face_velocities,
-    BOUNDARY<TV,T>& boundary,const T dt,const T time,const FACE_LOOKUP_UNIFORM<T_GRID>* Z_min_ghost_input,const FACE_LOOKUP_UNIFORM<T_GRID>* Z_max_ghost_input,
+template<class TV,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::
+Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const FACE_LOOKUP_UNIFORM<TV>& Z_ghost,const FACE_LOOKUP_UNIFORM<TV>& face_velocities,
+    BOUNDARY<TV,T>& boundary,const T dt,const T time,const FACE_LOOKUP_UNIFORM<TV>* Z_min_ghost_input,const FACE_LOOKUP_UNIFORM<TV>* Z_max_ghost_input,
     T_FACE_ARRAYS_SCALAR* Z_min_input,T_FACE_ARRAYS_SCALAR* Z_max_input)
 {
     assert(!ensure_second_order || !clamp_extrema);
@@ -85,26 +85,26 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
         boundary.Fill_Ghost_Faces(grid,Z_min,Z_min_ghost,time+dt,number_of_ghost_cells);boundary.Fill_Ghost_Faces(grid,Z_max,Z_max_ghost,time+dt,number_of_ghost_cells);
         nested_advection.Update_Advection_Equation_Face(grid,Z_temp,Z_forward_ghost,face_velocities.V_face,boundary,-dt,time+dt,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp has time n data
         if(clamp_extrema)
-            for(int axis=0;axis<T_GRID::dimension;axis++){
+            for(int axis=0;axis<TV::m;axis++){
                 RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(axis)++;
-                DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>,typename T_GRID::VECTOR_T> thread_iterator(domain,thread_queue);
-                thread_iterator.template Run<const T_GRID&,int,T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&>(*this,&ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::Apply_Clamped_Extrema_Limiter_Face_Threaded,grid,axis,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);}
+                DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>,TV> thread_iterator(domain,thread_queue);
+                thread_iterator.template Run<const GRID<TV>&,int,T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&>(*this,&ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::Apply_Clamped_Extrema_Limiter_Face_Threaded,grid,axis,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);}
         else
-            for(int axis=0;axis<T_GRID::dimension;axis++){
+            for(int axis=0;axis<TV::m;axis++){
                 RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(axis)++;
-                DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>,typename T_GRID::VECTOR_T> thread_iterator(domain,thread_queue);
-                thread_iterator.template Run<const T_GRID&,int,T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&>(*this,&ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::Apply_Reversion_Limiter_Face_Threaded,grid,axis,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);}}
+                DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>,TV> thread_iterator(domain,thread_queue);
+                thread_iterator.template Run<const GRID<TV>&,int,T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&>(*this,&ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::Apply_Reversion_Limiter_Face_Threaded,grid,axis,Z,Z_forward_ghost,Z_temp,Z_min,Z_max);}}
     else{
         nested_advection.Update_Advection_Equation_Face(grid,Z_temp,Z_ghost.V_face,face_velocities.V_face,boundary,dt,time,0,0,0,0); // Z_temp now has time n+1 data
         T_FACE_ARRAYS_SCALAR Z_forward_ghost(grid,number_of_ghost_cells,false);boundary.Fill_Ghost_Faces(grid,Z_temp,Z_forward_ghost,time+dt,number_of_ghost_cells);
         nested_advection.Update_Advection_Equation_Face(grid,Z_temp,Z_forward_ghost,face_velocities.V_face,boundary,-dt,time+dt,0,0,0,0); // Z_temp has time n data
-        for(int axis=0;axis<T_GRID::dimension;axis++){
+        for(int axis=0;axis<TV::m;axis++){
             RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(axis)++;
-            DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>,typename T_GRID::VECTOR_T> thread_iterator(domain,thread_queue);
-            thread_iterator.template Run<const T_GRID&,int,T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&>(*this,&ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::Apply_Second_Order_Update_Face_Threaded,grid,axis,Z,Z_forward_ghost,Z_temp);}}
+            DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>,TV> thread_iterator(domain,thread_queue);
+            thread_iterator.template Run<const GRID<TV>&,int,T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&,const T_FACE_ARRAYS_SCALAR&>(*this,&ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::Apply_Second_Order_Update_Face_Threaded,grid,axis,Z,Z_forward_ghost,Z_temp);}}
 }
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
-Apply_Clamped_Extrema_Limiter_Node_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_forward_ghost,const ARRAY<T2,TV_INT>& Z_backward_ghost,const ARRAY<T2,TV_INT>& Z_min,const ARRAY<T2,TV_INT>& Z_max)
+template<class TV,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::
+Apply_Clamped_Extrema_Limiter_Node_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_forward_ghost,const ARRAY<T2,TV_INT>& Z_backward_ghost,const ARRAY<T2,TV_INT>& Z_min,const ARRAY<T2,TV_INT>& Z_max)
 {
     for(NODE_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Node_Index();
@@ -112,8 +112,8 @@ Apply_Clamped_Extrema_Limiter_Node_Threaded(RANGE<TV_INT>& domain,const T_GRID& 
         else Z(index)=Z_forward_ghost(index);}
 }
 
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
-Apply_Clamped_Extrema_Limiter_Cell_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,ARRAY<T2,TV_INT>& Z, const ARRAY<T2,TV_INT>& Z_forward_ghost, const ARRAY<T2,TV_INT>& Z_backward_ghost, const ARRAY<T2,TV_INT>& Z_min, const ARRAY<T2,TV_INT>& Z_max)
+template<class TV,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::
+Apply_Clamped_Extrema_Limiter_Cell_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z, const ARRAY<T2,TV_INT>& Z_forward_ghost, const ARRAY<T2,TV_INT>& Z_backward_ghost, const ARRAY<T2,TV_INT>& Z_min, const ARRAY<T2,TV_INT>& Z_max)
 {
     for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Cell_Index();
@@ -121,8 +121,8 @@ Apply_Clamped_Extrema_Limiter_Cell_Threaded(RANGE<TV_INT>& domain,const T_GRID& 
         else Z(index)=Z_forward_ghost(index);}
 }
 
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
-Apply_Clamped_Extrema_Limiter_Face_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,int axis,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_ARRAYS_SCALAR& Z_forward_ghost,const T_FACE_ARRAYS_SCALAR& Z_backward_ghost,const T_FACE_ARRAYS_SCALAR& Z_min,const T_FACE_ARRAYS_SCALAR& Z_max)
+template<class TV,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::
+Apply_Clamped_Extrema_Limiter_Face_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& grid,int axis,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_ARRAYS_SCALAR& Z_forward_ghost,const T_FACE_ARRAYS_SCALAR& Z_backward_ghost,const T_FACE_ARRAYS_SCALAR& Z_min,const T_FACE_ARRAYS_SCALAR& Z_max)
 {
     for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Face_Index();int axis=iterator.Axis();
@@ -130,8 +130,8 @@ Apply_Clamped_Extrema_Limiter_Face_Threaded(RANGE<TV_INT>& domain,const T_GRID& 
         else Z(axis,index)=Z_forward_ghost(axis,index);}
 }
 
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
-Apply_Reversion_Limiter_Node_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_forward_ghost,const ARRAY<T2,TV_INT>& Z_backward_ghost,const ARRAY<T2,TV_INT>& Z_min,const ARRAY<T2,TV_INT>& Z_max)
+template<class TV,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::
+Apply_Reversion_Limiter_Node_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_forward_ghost,const ARRAY<T2,TV_INT>& Z_backward_ghost,const ARRAY<T2,TV_INT>& Z_min,const ARRAY<T2,TV_INT>& Z_max)
 {
     for(NODE_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Node_Index();
@@ -141,8 +141,8 @@ Apply_Reversion_Limiter_Node_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,A
         else Z(index)=Z_forward_ghost(index);}
 }
 
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
-Apply_Reversion_Limiter_Cell_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_forward_ghost,const ARRAY<T2,TV_INT>& Z_backward_ghost,const ARRAY<T2,TV_INT>& Z_min,const ARRAY<T2,TV_INT>& Z_max)
+template<class TV,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::
+Apply_Reversion_Limiter_Cell_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_forward_ghost,const ARRAY<T2,TV_INT>& Z_backward_ghost,const ARRAY<T2,TV_INT>& Z_min,const ARRAY<T2,TV_INT>& Z_max)
 {
     for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Cell_Index();
@@ -152,8 +152,8 @@ Apply_Reversion_Limiter_Cell_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,A
         else Z(index)=Z_forward_ghost(index);}
 }
 
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
-Apply_Reversion_Limiter_Face_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,int axis,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_ARRAYS_SCALAR& Z_forward_ghost,const T_FACE_ARRAYS_SCALAR& Z_backward_ghost,const T_FACE_ARRAYS_SCALAR& Z_min,const T_FACE_ARRAYS_SCALAR& Z_max)
+template<class TV,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::
+Apply_Reversion_Limiter_Face_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& grid,int axis,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_ARRAYS_SCALAR& Z_forward_ghost,const T_FACE_ARRAYS_SCALAR& Z_backward_ghost,const T_FACE_ARRAYS_SCALAR& Z_min,const T_FACE_ARRAYS_SCALAR& Z_max)
 {
     for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Face_Index();int axis=iterator.Axis();
@@ -163,8 +163,8 @@ Apply_Reversion_Limiter_Face_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,i
         else Z(axis,index)=Z_forward_ghost(axis,index);}
 }
 
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<T_GRID,T2,T_NESTED_ADVECTION>::
-Apply_Second_Order_Update_Face_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,int axis,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_ARRAYS_SCALAR& Z_forward_ghost,const T_FACE_ARRAYS_SCALAR& Z_backward_ghost)
+template<class TV,class T2,class T_NESTED_ADVECTION> void ADVECTION_MACCORMACK_UNIFORM<TV,T2,T_NESTED_ADVECTION>::
+Apply_Second_Order_Update_Face_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& grid,int axis,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_ARRAYS_SCALAR& Z_forward_ghost,const T_FACE_ARRAYS_SCALAR& Z_backward_ghost)
 {
     for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> index=iterator.Full_Index();
@@ -174,22 +174,22 @@ Apply_Second_Order_Update_Face_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid
 
 //#####################################################################
 namespace PhysBAM{
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<float,1> >,float,ADVECTION<GRID<VECTOR<float,1> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,1> > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<float,1> >,float,ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<VECTOR<float,1> >,float,AVERAGING_UNIFORM<GRID<VECTOR<float,1> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,1> > > >,LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<float,1> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,1> > > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<float,1> >,float,ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<GRID<VECTOR<float,1> >,float,AVERAGING_UNIFORM<GRID<VECTOR<float,1> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,1> > > >,LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<float,1> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,1> > > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<float,2> >,float,ADVECTION<GRID<VECTOR<float,2> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,2> > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<float,2> >,float,ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<VECTOR<float,2> >,float,AVERAGING_UNIFORM<GRID<VECTOR<float,2> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,2> > > >,LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<float,2> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,2> > > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<float,2> >,float,ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<GRID<VECTOR<float,2> >,float,AVERAGING_UNIFORM<GRID<VECTOR<float,2> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,2> > > >,LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<float,2> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,2> > > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<float,3> >,float,ADVECTION<GRID<VECTOR<float,3> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<float,3> >,float,ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<VECTOR<float,3> >,float,AVERAGING_UNIFORM<GRID<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >,LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<float,3> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<float,3> >,float,ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<GRID<VECTOR<float,3> >,float,AVERAGING_UNIFORM<GRID<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >,LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<float,3> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<double,1> >,double,ADVECTION<GRID<VECTOR<double,1> >,double,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,1> > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<double,1> >,double,ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<VECTOR<double,1> >,double,AVERAGING_UNIFORM<GRID<VECTOR<double,1> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,1> > > >,LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<double,1> >,double,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,1> > > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<double,1> >,double,ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<GRID<VECTOR<double,1> >,double,AVERAGING_UNIFORM<GRID<VECTOR<double,1> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,1> > > >,LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<double,1> >,double,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,1> > > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<double,2> >,double,ADVECTION<GRID<VECTOR<double,2> >,double,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,2> > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<double,2> >,double,ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<VECTOR<double,2> >,double,AVERAGING_UNIFORM<GRID<VECTOR<double,2> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,2> > > >,LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<double,2> >,double,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,2> > > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<double,2> >,double,ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<GRID<VECTOR<double,2> >,double,AVERAGING_UNIFORM<GRID<VECTOR<double,2> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,2> > > >,LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<double,2> >,double,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,2> > > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<double,3> >,double,ADVECTION<GRID<VECTOR<double,3> >,double,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<double,3> >,double,ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<VECTOR<double,3> >,double,AVERAGING_UNIFORM<GRID<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >,LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<double,3> >,double,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > > > >;
-template class ADVECTION_MACCORMACK_UNIFORM<GRID<VECTOR<double,3> >,double,ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<GRID<VECTOR<double,3> >,double,AVERAGING_UNIFORM<GRID<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >,LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<double,3> >,double,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<float,1>,float,ADVECTION<VECTOR<float,1>,float,FACE_LOOKUP_UNIFORM<VECTOR<float,1> > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<float,1>,float,ADVECTION_SEMI_LAGRANGIAN_UNIFORM<VECTOR<float,1>,float,AVERAGING_UNIFORM<VECTOR<float,1>,FACE_LOOKUP_UNIFORM<VECTOR<float,1> > >,LINEAR_INTERPOLATION_UNIFORM<VECTOR<float,1>,float,FACE_LOOKUP_UNIFORM<VECTOR<float,1> > > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<float,1>,float,ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<VECTOR<float,1>,float,AVERAGING_UNIFORM<VECTOR<float,1>,FACE_LOOKUP_UNIFORM<VECTOR<float,1> > >,LINEAR_INTERPOLATION_UNIFORM<VECTOR<float,1>,float,FACE_LOOKUP_UNIFORM<VECTOR<float,1> > > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<float,2>,float,ADVECTION<VECTOR<float,2>,float,FACE_LOOKUP_UNIFORM<VECTOR<float,2> > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<float,2>,float,ADVECTION_SEMI_LAGRANGIAN_UNIFORM<VECTOR<float,2>,float,AVERAGING_UNIFORM<VECTOR<float,2>,FACE_LOOKUP_UNIFORM<VECTOR<float,2> > >,LINEAR_INTERPOLATION_UNIFORM<VECTOR<float,2>,float,FACE_LOOKUP_UNIFORM<VECTOR<float,2> > > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<float,2>,float,ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<VECTOR<float,2>,float,AVERAGING_UNIFORM<VECTOR<float,2>,FACE_LOOKUP_UNIFORM<VECTOR<float,2> > >,LINEAR_INTERPOLATION_UNIFORM<VECTOR<float,2>,float,FACE_LOOKUP_UNIFORM<VECTOR<float,2> > > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<float,3>,float,ADVECTION<VECTOR<float,3>,float,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<float,3>,float,ADVECTION_SEMI_LAGRANGIAN_UNIFORM<VECTOR<float,3>,float,AVERAGING_UNIFORM<VECTOR<float,3>,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > >,LINEAR_INTERPOLATION_UNIFORM<VECTOR<float,3>,float,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<float,3>,float,ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<VECTOR<float,3>,float,AVERAGING_UNIFORM<VECTOR<float,3>,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > >,LINEAR_INTERPOLATION_UNIFORM<VECTOR<float,3>,float,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<double,1>,double,ADVECTION<VECTOR<double,1>,double,FACE_LOOKUP_UNIFORM<VECTOR<double,1> > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<double,1>,double,ADVECTION_SEMI_LAGRANGIAN_UNIFORM<VECTOR<double,1>,double,AVERAGING_UNIFORM<VECTOR<double,1>,FACE_LOOKUP_UNIFORM<VECTOR<double,1> > >,LINEAR_INTERPOLATION_UNIFORM<VECTOR<double,1>,double,FACE_LOOKUP_UNIFORM<VECTOR<double,1> > > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<double,1>,double,ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<VECTOR<double,1>,double,AVERAGING_UNIFORM<VECTOR<double,1>,FACE_LOOKUP_UNIFORM<VECTOR<double,1> > >,LINEAR_INTERPOLATION_UNIFORM<VECTOR<double,1>,double,FACE_LOOKUP_UNIFORM<VECTOR<double,1> > > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<double,2>,double,ADVECTION<VECTOR<double,2>,double,FACE_LOOKUP_UNIFORM<VECTOR<double,2> > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<double,2>,double,ADVECTION_SEMI_LAGRANGIAN_UNIFORM<VECTOR<double,2>,double,AVERAGING_UNIFORM<VECTOR<double,2>,FACE_LOOKUP_UNIFORM<VECTOR<double,2> > >,LINEAR_INTERPOLATION_UNIFORM<VECTOR<double,2>,double,FACE_LOOKUP_UNIFORM<VECTOR<double,2> > > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<double,2>,double,ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<VECTOR<double,2>,double,AVERAGING_UNIFORM<VECTOR<double,2>,FACE_LOOKUP_UNIFORM<VECTOR<double,2> > >,LINEAR_INTERPOLATION_UNIFORM<VECTOR<double,2>,double,FACE_LOOKUP_UNIFORM<VECTOR<double,2> > > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<double,3>,double,ADVECTION<VECTOR<double,3>,double,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<double,3>,double,ADVECTION_SEMI_LAGRANGIAN_UNIFORM<VECTOR<double,3>,double,AVERAGING_UNIFORM<VECTOR<double,3>,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > >,LINEAR_INTERPOLATION_UNIFORM<VECTOR<double,3>,double,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > > > >;
+template class ADVECTION_MACCORMACK_UNIFORM<VECTOR<double,3>,double,ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<VECTOR<double,3>,double,AVERAGING_UNIFORM<VECTOR<double,3>,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > >,LINEAR_INTERPOLATION_UNIFORM<VECTOR<double,3>,double,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > > > >;
 }

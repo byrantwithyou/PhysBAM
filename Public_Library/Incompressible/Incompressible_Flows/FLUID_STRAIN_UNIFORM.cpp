@@ -23,8 +23,8 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> FLUID_STRAIN_UNIFORM<T_GRID>::
-FLUID_STRAIN_UNIFORM(const T_GRID& grid_input)
+template<class TV> FLUID_STRAIN_UNIFORM<TV>::
+FLUID_STRAIN_UNIFORM(const GRID<TV>& grid_input)
     :external_strain_adjustment(0),e_boundary_default(*new BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >),e_advection_default(*new T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX),cfl_called(false)
 {
     e_advection=&e_advection_default;
@@ -34,7 +34,7 @@ FLUID_STRAIN_UNIFORM(const T_GRID& grid_input)
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> FLUID_STRAIN_UNIFORM<T_GRID>::
+template<class TV> FLUID_STRAIN_UNIFORM<TV>::
 ~FLUID_STRAIN_UNIFORM()
 {
     delete &e_boundary_default;delete &e_advection_default;
@@ -42,7 +42,7 @@ template<class T_GRID> FLUID_STRAIN_UNIFORM<T_GRID>::
 //#####################################################################
 // Function Update_Strain_Equation_Helper_Cell_Centered
 //#####################################################################
-template<class T_GRID> void FLUID_STRAIN_UNIFORM<T_GRID>::
+template<class TV> void FLUID_STRAIN_UNIFORM<TV>::
 Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T density,const T heaviside_bandwidth,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& V,
     const T_ARRAYS_SCALAR& phi_ghost,const int number_of_ghost_cells)
 {
@@ -51,10 +51,10 @@ Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T dens
     // update the strain to time n+1
     e_advection->Update_Advection_Equation_Cell(grid,e,e_ghost,face_velocities_ghost,*e_boundary,dt,time);
 
-    TV one_over_two_DX=(T).5*Inverse(grid.dX);T one_over_dimension=1/T_GRID::dimension;
+    TV one_over_two_DX=(T).5*Inverse(grid.dX);T one_over_dimension=1/TV::m;
     for(CELL_ITERATOR<TV> iterator(grid,0);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();MATRIX<T,TV::dimension> VX;
-        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
+        for(int axis=0;axis<TV::m;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
             VX.Column(axis)=one_over_two_DX[axis]*(V(cell+offset)-V(cell-offset));} // TODO: maybe change this to do a better difference for the derivative in the same axis as the face
         e(cell)=SYMMETRIC_MATRIX<T,TV::m>::Conjugate(MATRIX<T,TV::dimension>::Rotation_Matrix(dt*VX.Antisymmetric_Part_Cross_Product_Vector()),e(cell));
         e(cell)+=dt*VX.Symmetric_Part();
@@ -74,18 +74,18 @@ Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T dens
     TV dt_elastic_modulus_over_density_over_two_DX=dt*elastic_modulus/density*one_over_two_DX;
     V.Fill(TV());
     for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
+        for(int axis=0;axis<TV::m;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
             V(cell)+=dt_elastic_modulus_over_density_over_two_DX[axis]*(e_ghost(cell+offset).Column(axis)-e_ghost(cell-offset).Column(axis));}}
 }
 //#####################################################################
 // Function Update_Strain_Equation
 //#####################################################################
-template<class T_GRID> void FLUID_STRAIN_UNIFORM<T_GRID>::
+template<class TV> void FLUID_STRAIN_UNIFORM<TV>::
 Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T_ARRAYS_SCALAR& phi_ghost,const int number_of_ghost_cells)
 {
     if(!cfl_called) PHYSBAM_WARNING("Using strain without calling strain CFL");
     ARRAY<TV,TV_INT> V(grid.Domain_Indices(1));
-    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=0;axis<T_GRID::dimension;axis++)
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=0;axis<TV::m;axis++)
         V(iterator.Cell_Index())[axis]=(T).5*(face_velocities_ghost.Component(axis)(iterator.First_Face_Index(axis))+face_velocities_ghost.Component(axis)(iterator.Second_Face_Index(axis)));
     Update_Strain_Equation_Helper_Cell_Centered(dt,time,density,(T)1.5,face_velocities_ghost,V,phi_ghost,number_of_ghost_cells);
     // apply the velocity update to the face velocities
@@ -95,13 +95,13 @@ Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCA
 //#####################################################################
 // Function Update_Strain_Equation
 //#####################################################################
-template<class T_GRID> void FLUID_STRAIN_UNIFORM<T_GRID>::
+template<class TV> void FLUID_STRAIN_UNIFORM<TV>::
 Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
-    const LEVELSET_MULTIPLE<T_GRID>& levelset,const int region,const int number_of_ghost_cells)
+    const LEVELSET_MULTIPLE<TV>& levelset,const int region,const int number_of_ghost_cells)
 {
     if(!cfl_called) PHYSBAM_WARNING("Using strain without calling strain CFL");
     ARRAY<TV,TV_INT> V(grid.Domain_Indices(1));
-    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=0;axis<T_GRID::dimension;axis++)
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=0;axis<TV::m;axis++)
         V(iterator.Cell_Index())[axis]=(T).5*(face_velocities_ghost.Component(axis)(iterator.First_Face_Index(axis))+face_velocities_ghost.Component(axis)(iterator.Second_Face_Index(axis)));
     Update_Strain_Equation_Helper_Cell_Centered(dt,time,density,0,face_velocities_ghost,V,levelset.phis(region),number_of_ghost_cells);
     // apply the velocity update to the face velocities
@@ -112,17 +112,17 @@ Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE
 //#####################################################################
 // Function Extrapolate_Strain_Across_Interface
 //#####################################################################
-template<class T_GRID> void FLUID_STRAIN_UNIFORM<T_GRID>::
+template<class TV> void FLUID_STRAIN_UNIFORM<TV>::
 Extrapolate_Strain_Across_Interface(T_ARRAYS_SCALAR& phi_ghost,const T band_width)
 {
     T delta=band_width*grid.dX.Max();
     for(CELL_ITERATOR<TV> iterator(grid,0);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(phi_ghost(cell)>=delta) e(cell)=SYMMETRIC_MATRIX<T,TV::m>();}
-    EXTRAPOLATION_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> > extrapolate(grid,phi_ghost,e,3);extrapolate.Set_Band_Width(band_width);extrapolate.Extrapolate();
+    EXTRAPOLATION_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m> > extrapolate(grid,phi_ghost,e,3);extrapolate.Set_Band_Width(band_width);extrapolate.Extrapolate();
 }
 //#####################################################################
 // Function CFL
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR FLUID_STRAIN_UNIFORM<T_GRID>::
+template<class TV> typename TV::SCALAR FLUID_STRAIN_UNIFORM<TV>::
 CFL(const T density) const
 {
     cfl_called=true;
@@ -130,10 +130,10 @@ CFL(const T density) const
 }
 //#####################################################################
 namespace PhysBAM{
-template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<float,1> > >;
-template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<float,2> > >;
-template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<float,3> > >;
-template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<double,1> > >;
-template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<double,2> > >;
-template class FLUID_STRAIN_UNIFORM<GRID<VECTOR<double,3> > >;
+template class FLUID_STRAIN_UNIFORM<VECTOR<float,1> >;
+template class FLUID_STRAIN_UNIFORM<VECTOR<float,2> >;
+template class FLUID_STRAIN_UNIFORM<VECTOR<float,3> >;
+template class FLUID_STRAIN_UNIFORM<VECTOR<double,1> >;
+template class FLUID_STRAIN_UNIFORM<VECTOR<double,2> >;
+template class FLUID_STRAIN_UNIFORM<VECTOR<double,3> >;
 }

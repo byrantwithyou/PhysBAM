@@ -18,19 +18,19 @@
 namespace PhysBAM{
 
 template<class T_input>
-class DENSITY_TARGETTING:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class DENSITY_TARGETTING:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;
 public:
     typedef VECTOR<T,2> TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef VECTOR<int,2> TV_INT;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::fluid_collection;
     using BASE::solid_body_collection;using BASE::stream_type;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
-    FLUID_COLLISION_BODY_INACCURATE_UNION<GRID<TV> > inaccurate_union;
+    FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
     int sphere;
     ARRAY<VECTOR<T,3> ,VECTOR<int,2> > target_image,target_image2;
     GRID<TV> grid_image,grid_image2;
@@ -65,7 +65,7 @@ public:
     ***************/
 
     DENSITY_TARGETTING(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,1,fluids_parameters.WATER),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,1,fluids_parameters.WATER),
         rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid)
     {
     }
@@ -315,14 +315,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Construct_Levelsets_For_Objects(const T time)
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Construct_Levelsets_For_Objects(time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Construct_Levelsets_For_Objects(time);
 }
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Update_Fluid_Parameters(dt,time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
 }
 //#####################################################################
 // Function Adjust_Phi_With_Sources
@@ -368,8 +368,8 @@ void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
 {
-    FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >&>(fluids_parameters);
-    SPH_EVOLUTION_UNIFORM<GRID<TV> >& sph_evolution=*fluids_parameters_uniform.sph_evolution;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters);
+    SPH_EVOLUTION_UNIFORM<TV>& sph_evolution=*fluids_parameters_uniform.sph_evolution;
     GRID<TV> & grid=fluids_parameters_uniform.particle_levelset_evolution->grid;
     sph_evolution.target_particles_per_unit_volume=fluids_parameters.number_particles_per_cell/fluids_parameters.grid->Cell_Size();
     sph_evolution.flip_ratio=1;
@@ -430,7 +430,7 @@ void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sources,const
             TV location=node_iterator.Location();TV_INT block=grid.Block_Index(location,1);
             T target_density_factor=1;
             if(use_initial_targetting) target_density_factor=Target_Density_Factor(location,targetting_time_start+targetting_falloff_time);
-            BLOCK_UNIFORM<GRID<TV> > block_uniform(grid,block);
+            BLOCK_UNIFORM<TV> block_uniform(grid,block);
             RANGE<TV> block_bounding_box=block_uniform.Bounding_Box();
             if(sources(s).Lazy_Inside(location)){
                 if(!removed_negative_particles(block)) removed_negative_particles(block)=new PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>();
@@ -468,10 +468,10 @@ T Target_Density_Factor(const TV& location,const T time) const PHYSBAM_OVERRIDE
 
     if(time<targetting_time_start || time>targetting_time_end) return 1;
     if(!grid_image.Domain().Lazy_Inside(location_transformed)) return target_density_factor_outside_image;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,VECTOR<T,3> > interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,VECTOR<T,3> > interpolation;
     VECTOR<T,3> color=interpolation.Clamped_To_Array(grid_image,target_image,location_transformed);
     if(time>targetting_switch_time){
-        LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,VECTOR<T,3> > interpolation2;
+        LINEAR_INTERPOLATION_UNIFORM<TV,VECTOR<T,3> > interpolation2;
         VECTOR<T,3> color2=interpolation2.Clamped_To_Array(grid_image2,target_image2,location_transformed);
         if(time<targetting_switch_time+targetting_falloff_time) color=(1-(time-targetting_switch_time)/targetting_falloff_time)*color+((time-targetting_switch_time)/targetting_falloff_time)*color2;
         else color=color2;}

@@ -18,7 +18,7 @@
 namespace PhysBAM{
 
 template<class T_input>
-class MULTIPHASE_FIRE_EXAMPLES:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class MULTIPHASE_FIRE_EXAMPLES:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
@@ -26,7 +26,7 @@ public:
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;
     using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;using BASE::Get_Source_Velocities;using BASE::resolution;
     using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
@@ -38,7 +38,7 @@ public:
     T reaction_bandwidth;
     
     MULTIPHASE_FIRE_EXAMPLES(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,0,fluids_parameters.FIRE),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.FIRE),
          rigid_body_collection(solid_body_collection.rigid_body_collection)
     {
     }

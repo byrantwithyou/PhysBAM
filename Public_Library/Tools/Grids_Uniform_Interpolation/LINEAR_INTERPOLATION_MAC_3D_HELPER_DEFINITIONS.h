@@ -7,7 +7,7 @@
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_3D_HELPER.h>
 #include <Tools/Math_Tools/Componentwise_Min_Max.h>
 using namespace PhysBAM;
-template<class T_GRID> template<class T_BLOCK_2,class T_FACE_LOOKUP> typename T_GRID::VECTOR_T::SCALAR LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
+template<class T> template<class T_BLOCK_2,class T_FACE_LOOKUP> T LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
 Interpolate_Face_X_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& face_velocities,const TV& DX) // between 0 and 1 in the dual cell
 {
     if(DX.x<.5) return LINEAR_INTERPOLATION<T,T>::Trilinear(
@@ -21,7 +21,7 @@ Interpolate_Face_X_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& face_
         block.Face_X_Value(face_velocities,7),block.Face_X_Value(face_velocities,8),
         block.Face_X_Value(face_velocities,10),block.Face_X_Value(face_velocities,11),TV(DX.x-(T).5,DX.y,DX.z));
 }
-template<class T_GRID> template<class T_BLOCK_2,class T_FACE_LOOKUP> typename T_GRID::VECTOR_T::SCALAR LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
+template<class T> template<class T_BLOCK_2,class T_FACE_LOOKUP> T LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
 Interpolate_Face_Y_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& face_velocities,const TV& DX) // between 0 and 1 in the dual cell
 {
     if(DX.y<.5) return LINEAR_INTERPOLATION<T,T>::Trilinear(
@@ -35,7 +35,7 @@ Interpolate_Face_Y_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& face_
         block.Face_Y_Value(face_velocities,8),block.Face_Y_Value(face_velocities,9),
         block.Face_Y_Value(face_velocities,10),block.Face_Y_Value(face_velocities,11),TV(DX.x,DX.y-(T).5,DX.z));
 }
-template<class T_GRID> template<class T_BLOCK_2,class T_FACE_LOOKUP> typename T_GRID::VECTOR_T::SCALAR LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
+template<class T> template<class T_BLOCK_2,class T_FACE_LOOKUP> T LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
 Interpolate_Face_Z_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& face_velocities,const TV& DX) // between 0 and 1 in the dual cell
 {
     if(DX.z<.5) return LINEAR_INTERPOLATION<T,T>::Trilinear(
@@ -49,7 +49,7 @@ Interpolate_Face_Z_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& face_
         block.Face_Z_Value(face_velocities,8),block.Face_Z_Value(face_velocities,9),
         block.Face_Z_Value(face_velocities,10),block.Face_Z_Value(face_velocities,11),TV(DX.x,DX.y,DX.z-(T).5));
 }
-template<class T_GRID> template<class T_BLOCK_2,class T_FACE_LOOKUP> ARRAY<PAIR<FACE_INDEX<3>,typename T_GRID::VECTOR_T::SCALAR> > LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
+template<class T> template<class T_BLOCK_2,class T_FACE_LOOKUP> ARRAY<PAIR<FACE_INDEX<3>,T> > LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
 Interpolate_Face_X_Transformed_Weights(const T_BLOCK_2& block,const T_FACE_LOOKUP& face_velocities,const TV& DX) // between 0 and 1 in the dual cell
 {
     ARRAY<PAIR<FACE_INDEX<3>,T> > weights;
@@ -64,7 +64,7 @@ Interpolate_Face_X_Transformed_Weights(const T_BLOCK_2& block,const T_FACE_LOOKU
         weights.Append(PAIR<FACE_INDEX<3>,T>(block.Face_X_Index(7),(1-w.x)*(1-w.y)*w.z));weights.Append(PAIR<FACE_INDEX<3>,T>(block.Face_X_Index(8),w.x*(1-w.y)*w.z));
         weights.Append(PAIR<FACE_INDEX<3>,T>(block.Face_X_Index(10),(1-w.x)*w.y*w.z));weights.Append(PAIR<FACE_INDEX<3>,T>(block.Face_X_Index(11),w.x*w.y*w.z));return weights;}
 }
-template<class T_GRID> template<class T_BLOCK_2,class T_FACE_LOOKUP> ARRAY<PAIR<FACE_INDEX<3>,typename T_GRID::VECTOR_T::SCALAR> > LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
+template<class T> template<class T_BLOCK_2,class T_FACE_LOOKUP> ARRAY<PAIR<FACE_INDEX<3>,T> > LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
 Interpolate_Face_Y_Transformed_Weights(const T_BLOCK_2& block,const T_FACE_LOOKUP& face_velocities,const TV& DX) // between 0 and 1 in the dual cell
 {
     ARRAY<PAIR<FACE_INDEX<3>,T> > weights;
@@ -79,7 +79,7 @@ Interpolate_Face_Y_Transformed_Weights(const T_BLOCK_2& block,const T_FACE_LOOKU
         weights.Append(PAIR<FACE_INDEX<3>,T>(block.Face_Y_Index(8),(1-w.x)*(1-w.y)*w.z));weights.Append(PAIR<FACE_INDEX<3>,T>(block.Face_Y_Index(9),w.x*(1-w.y)*w.z));
         weights.Append(PAIR<FACE_INDEX<3>,T>(block.Face_Y_Index(10),(1-w.x)*w.y*w.z));weights.Append(PAIR<FACE_INDEX<3>,T>(block.Face_Y_Index(11),w.x*w.y*w.z));return weights;}
 }
-template<class T_GRID> template<class T_BLOCK_2,class T_FACE_LOOKUP> ARRAY<PAIR<FACE_INDEX<3>,typename T_GRID::VECTOR_T::SCALAR> > LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
+template<class T> template<class T_BLOCK_2,class T_FACE_LOOKUP> ARRAY<PAIR<FACE_INDEX<3>,T> > LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
 Interpolate_Face_Z_Transformed_Weights(const T_BLOCK_2& block,const T_FACE_LOOKUP& face_velocities,const TV& DX) // between 0 and 1 in the dual cell
 { 
     ARRAY<PAIR<FACE_INDEX<3>,T> > weights;
@@ -94,7 +94,7 @@ Interpolate_Face_Z_Transformed_Weights(const T_BLOCK_2& block,const T_FACE_LOOKU
         weights.Append(PAIR<FACE_INDEX<3>,T>(block.Face_Z_Index(8),(1-w.x)*(1-w.y)*w.z));weights.Append(PAIR<FACE_INDEX<3>,T>(block.Face_Z_Index(9),w.x*(1-w.y)*w.z));
         weights.Append(PAIR<FACE_INDEX<3>,T>(block.Face_Z_Index(10),(1-w.x)*w.y*w.z));weights.Append(PAIR<FACE_INDEX<3>,T>(block.Face_Z_Index(11),w.x*w.y*w.z));return weights;}
 }
-template<class T_GRID> template<class T_BLOCK_2,class T_FACE_LOOKUP> VECTOR<typename T_GRID::VECTOR_T::SCALAR,2> LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
+template<class T> template<class T_BLOCK_2,class T_FACE_LOOKUP> VECTOR<T,2> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
 Extrema_Face_X_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& u_min,const T_FACE_LOOKUP& u_max,const TV& DX) // between 0 and 1 in the dual cell
 {
     if(DX.x<.5) return VECTOR<T,2>(
@@ -108,7 +108,7 @@ Extrema_Face_X_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& u_min,con
          Componentwise_Max(block.Face_X_Value(u_max,1),block.Face_X_Value(u_max,2),block.Face_X_Value(u_max,4),block.Face_X_Value(u_max,5),
              block.Face_X_Value(u_max,7),block.Face_X_Value(u_max,8),block.Face_X_Value(u_max,10),block.Face_X_Value(u_max,11)));
 }
-template<class T_GRID> template<class T_BLOCK_2,class T_FACE_LOOKUP> VECTOR<typename T_GRID::VECTOR_T::SCALAR,2> LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
+template<class T> template<class T_BLOCK_2,class T_FACE_LOOKUP> VECTOR<T,2> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
 Extrema_Face_Y_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& u_min,const T_FACE_LOOKUP& u_max,const TV& DX) // between 0 and 1 in the dual cell
 {
     if(DX.y<.5) return VECTOR<T,2>(
@@ -122,7 +122,7 @@ Extrema_Face_Y_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& u_min,con
         Componentwise_Max(block.Face_Y_Value(u_max,2),block.Face_Y_Value(u_max,3),block.Face_Y_Value(u_max,4),block.Face_Y_Value(u_max,5),
             block.Face_Y_Value(u_max,8),block.Face_Y_Value(u_max,9),block.Face_Y_Value(u_max,10),block.Face_Y_Value(u_max,11)));
 }
-template<class T_GRID> template<class T_BLOCK_2,class T_FACE_LOOKUP> VECTOR<typename T_GRID::VECTOR_T::SCALAR,2> LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
+template<class T> template<class T_BLOCK_2,class T_FACE_LOOKUP> VECTOR<T,2> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
 Extrema_Face_Z_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& u_min,const T_FACE_LOOKUP& u_max,const TV& DX) // between 0 and 1 in the dual cell
 {
     if(DX.z<.5) return VECTOR<T,2>(

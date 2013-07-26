@@ -10,7 +10,7 @@
 #include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_UNIFORM_FORWARD.h>
 namespace PhysBAM{
 
-template<class T_GRID> class FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM;
+template<class TV> class FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM;
 
 }
 #endif

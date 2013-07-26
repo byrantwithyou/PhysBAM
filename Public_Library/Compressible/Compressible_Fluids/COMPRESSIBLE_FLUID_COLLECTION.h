@@ -12,21 +12,21 @@
 #include <Compressible/Equations_Of_State/EOS.h>
 namespace PhysBAM{
 
-template<class T_GRID>
+template<class TV>
 class COMPRESSIBLE_FLUID_COLLECTION:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
 public:
-    const T_GRID& grid;
+    const GRID<TV>& grid;
 
     EOS<T>* eos;
     ARRAY<bool,TV_INT> psi;
     T_ARRAYS_DIMENSION_SCALAR U;
         
-    COMPRESSIBLE_FLUID_COLLECTION(const T_GRID& grid_input);
+    COMPRESSIBLE_FLUID_COLLECTION(const GRID<TV>& grid_input);
     ~COMPRESSIBLE_FLUID_COLLECTION();
 
     void Set_Equation_Of_State(EOS<T>* eos_input)

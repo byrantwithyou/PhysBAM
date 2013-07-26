@@ -14,7 +14,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
+template<class TV> FAST_MARCHING_METHOD_UNIFORM<TV>::
 FAST_MARCHING_METHOD_UNIFORM(const LEVELSET<TV>& levelset,const int ghost_cells_input,THREAD_QUEUE* thread_queue_input)
     :levelset(levelset),ghost_cells(ghost_cells_input),thread_queue(thread_queue_input),Neighbor_Visible(0)
 {
@@ -24,21 +24,21 @@ FAST_MARCHING_METHOD_UNIFORM(const LEVELSET<TV>& levelset,const int ghost_cells_
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
+template<class TV> FAST_MARCHING_METHOD_UNIFORM<TV>::
 ~FAST_MARCHING_METHOD_UNIFORM()
 {}
 //#####################################################################
 // Function Fast_Marching_Method
 //#####################################################################
-template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
+template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
 Fast_Marching_Method(ARRAY<T,TV_INT>& phi_ghost,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
-    DOMAIN_ITERATOR_THREADED_ALPHA<FAST_MARCHING_METHOD_UNIFORM<T_GRID>,TV>(cell_grid.Domain_Indices(ghost_cells),thread_queue,1,ghost_cells,2,1).template Run<ARRAY<T,TV_INT>&,T,const ARRAY<TV_INT>*,bool,int>(*this,&FAST_MARCHING_METHOD_UNIFORM<T_GRID>::Fast_Marching_Method_Threaded,phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
+    DOMAIN_ITERATOR_THREADED_ALPHA<FAST_MARCHING_METHOD_UNIFORM<TV>,TV>(cell_grid.Domain_Indices(ghost_cells),thread_queue,1,ghost_cells,2,1).template Run<ARRAY<T,TV_INT>&,T,const ARRAY<TV_INT>*,bool,int>(*this,&FAST_MARCHING_METHOD_UNIFORM<TV>::Fast_Marching_Method_Threaded,phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
 }
 //#####################################################################
 // Function Fast_Marching_Method
 //#####################################################################
-template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
+template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
 Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     int heap_length=0;
@@ -62,13 +62,13 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,c
         if((process_sign==1 && phi_new(index)<0) || (process_sign==-1 && phi_new(index)>0)) continue;
 
         if(Neighbor_Visible)
-            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<TV::m;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != domain.min_corner[axis] && !done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector))
                     Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index-axis_vector);
                 if(index[axis] != domain.max_corner[axis]-1 && !done(index+axis_vector) && Neighbor_Visible(axis,index))
                     Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index+axis_vector);}
         else
-            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<TV::m;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != domain.min_corner[axis] && !done(index-axis_vector))
                     Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index-axis_vector);
                 if(index[axis] != domain.max_corner[axis]-1 && !done(index+axis_vector))
@@ -80,7 +80,7 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,c
 //#####################################################################
 // Function Update_Or_Add_Neighbor
 //#####################################################################
-template<class T_GRID> inline void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
+template<class TV> inline void FAST_MARCHING_METHOD_UNIFORM<TV>::
 Update_Or_Add_Neighbor(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const TV_INT& neighbor)
 {
     if(close_k(neighbor)>=0){
@@ -96,7 +96,7 @@ Update_Or_Add_Neighbor(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY
 // Function Initialize_Interface
 //#####################################################################
 // pass heap_length by reference
-template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
+template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
 Initialize_Interface(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells)
 { 
     RANGE<TV_INT> interior_domain=domain.Thickened(-ghost_cells);
@@ -106,7 +106,7 @@ Initialize_Interface(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool
             for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
                 RANGE<TV_INT> ghost_domain=domain;if(side==0) ghost_domain.max_corner(axis)=interior_domain.min_corner(axis)-1;else ghost_domain.min_corner(axis)=interior_domain.max_corner(axis)+1;
                 for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
-                    for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
+                    for(int i=0;i<GRID<TV>::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
                         if(domain.Lazy_Inside_Half_Open(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
                             if(!done(index))Add_To_Initial(done,close_k,index);
                             if(!done(neighbor_index))Add_To_Initial(done,close_k,neighbor_index);}}}}}}
@@ -145,14 +145,14 @@ Initialize_Interface(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool
 // Function Initialize_Interface
 //#####################################################################
 // pass heap_length by reference
-template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
+template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
 Initialize_Interface(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells)
 { 
     if(seed_indices){
         for(int i=0;i<seed_indices->m;i++)Add_To_Initial(done,close_k,(*seed_indices)(i));
         if(add_seed_indices_for_ghost_cells){RANGE<TV_INT> ghost_domain=cell_grid.Domain_Indices().Thickened(ghost_cells);
-            for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
-                for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
+            for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
+                for(int i=0;i<GRID<TV>::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
                     if(ghost_domain.Lazy_Inside_Half_Open(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
                         if(!done(index))Add_To_Initial(done,close_k,index);
                         if(!done(neighbor_index))Add_To_Initial(done,close_k,neighbor_index);}}}}}
@@ -160,18 +160,18 @@ Initialize_Interface(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<i
         ARRAY<T,TV_INT> phi_new(cell_grid.Domain_Indices(ghost_cells+1),false); // same size as done and close_k for array accelerations
         phi_new.Fill(2*cell_grid.dX.Max()); // ok positive, since minmag is used below
         if(Neighbor_Visible){
-            for(FACE_ITERATOR<TV> iterator(cell_grid,ghost_cells,T_GRID::INTERIOR_REGION);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
+            for(FACE_ITERATOR<TV> iterator(cell_grid,ghost_cells,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
                 if(!Neighbor_Visible(iterator.Axis(),index1)){
                     if(phi_ghost(index1)<=0) Add_To_Initial(done,close_k,index1);
                     if(phi_ghost(index2)<=0) Add_To_Initial(done,close_k,index2);}
                 else if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(index1),phi_ghost(index2))){
                     Add_To_Initial(done,close_k,index1);Add_To_Initial(done,close_k,index2);}}}
         else{
-            for(FACE_ITERATOR<TV> iterator(cell_grid,ghost_cells,T_GRID::INTERIOR_REGION);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
+            for(FACE_ITERATOR<TV> iterator(cell_grid,ghost_cells,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
                 if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(index1),phi_ghost(index2))){
                     Add_To_Initial(done,close_k,index1);Add_To_Initial(done,close_k,index2);}}}
 
-        DOMAIN_ITERATOR_THREADED_ALPHA<FAST_MARCHING_METHOD_UNIFORM<T_GRID>,TV>(cell_grid.Domain_Indices(ghost_cells),thread_queue).template Run<ARRAY<T,TV_INT>&,ARRAY<T,TV_INT>&,ARRAY<bool,TV_INT>&>(*this,&FAST_MARCHING_METHOD_UNIFORM<T_GRID>::Initialize_Interface_Threaded,phi_ghost,phi_new,done);
+        DOMAIN_ITERATOR_THREADED_ALPHA<FAST_MARCHING_METHOD_UNIFORM<TV>,TV>(cell_grid.Domain_Indices(ghost_cells),thread_queue).template Run<ARRAY<T,TV_INT>&,ARRAY<T,TV_INT>&,ARRAY<bool,TV_INT>&>(*this,&FAST_MARCHING_METHOD_UNIFORM<TV>::Initialize_Interface_Threaded,phi_ghost,phi_new,done);
 
         for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) phi_ghost(iterator.Cell_Index())=phi_new(iterator.Cell_Index());} // initialize done points
 
@@ -185,7 +185,7 @@ Initialize_Interface(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<i
 // Function Initialize_Interface
 //#####################################################################
 // pass heap_length by reference
-template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
+template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
 Initialize_Interface_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,ARRAY<T,TV_INT>& phi_new,ARRAY<bool,TV_INT>& done)
 { 
     LEVELSET<TV> levelset_ghost(cell_grid,phi_ghost);
@@ -198,7 +198,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,A
         T value[3]={0}; // the phi value to use in the given direction
         int number_of_axis=0; // the number of axis that we want to use later
         TV location=iterator.Location();
-        for(int axis=0;axis<T_GRID::dimension;axis++){
+        for(int axis=0;axis<TV::m;axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
             T dx=cell_grid.dX[axis];
             bool use_low=(done(low) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(low))),use_high=(done(high) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(high)));
@@ -212,7 +212,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,A
         else if(number_of_axis==2){
             if(T d2=sqr(value[0])+sqr(value[1])) phi_new(index)=value[0]*value[1]/sqrt(d2);
             else phi_new(index)=0;}
-        else{PHYSBAM_ASSERT(T_GRID::dimension==3); // 2d should never get to this point
+        else{PHYSBAM_ASSERT(TV::m==3); // 2d should never get to this point
             T value_xy=value[0]*value[1],value_xz=value[0]*value[2],value_yz=value[1]*value[2],d2=sqr(value_xy)+sqr(value_xz)+sqr(value_yz);
             if(d2) phi_new(index)=value_xy*value[2]/sqrt(d2);
             else phi_new(index)=min(value[0],value[1],value[2]);}
@@ -232,15 +232,15 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,A
 // Function Initialize_Interface
 //#####################################################################
 // pass heap_length by reference
-template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
+template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
 Initialize_Interface(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const bool add_seed_indices_for_ghost_cells)
 {
     LEVELSET<TV> levelset_ghost(cell_grid,phi_ghost);
 
     for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) Add_To_Initial(done,close_k,iterator.Cell_Index());
     if(add_seed_indices_for_ghost_cells){RANGE<TV_INT> ghost_domain=cell_grid.Domain_Indices().Thickened(ghost_cells);
-        for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
-            for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
+        for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
+            for(int i=0;i<GRID<TV>::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
                 if(ghost_domain.Lazy_Inside_Half_Open(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
                     if(!done(index))Add_To_Initial(done,close_k,index);
                     if(!done(neighbor_index))Add_To_Initial(done,close_k,neighbor_index);}}}}
@@ -255,7 +255,7 @@ Initialize_Interface(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<i
 // Function Update_Close_Point
 //##################################################################### 
 // needs done=0 around the outside of the domain
-template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
+template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
 Update_Close_Point(ARRAY<T,TV_INT>& phi_ghost,const ARRAY<bool,TV_INT>& done,const TV_INT& index)
 {
     T value[3]={}; // the phi value to use in the given direction
@@ -263,7 +263,7 @@ Update_Close_Point(ARRAY<T,TV_INT>& phi_ghost,const ARRAY<bool,TV_INT>& done,con
     int number_of_axis=0; // the number of axis that we want to use later
 
     // check each principal axis
-    for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
+    for(int axis=0;axis<TV::m;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
         bool check_low=done(low),check_high=done(high);
         if(Neighbor_Visible){
             if(check_low && !Neighbor_Visible(axis,low)) check_low=false;
@@ -276,31 +276,31 @@ Update_Close_Point(ARRAY<T,TV_INT>& phi_ghost,const ARRAY<bool,TV_INT>& done,con
         else value[number_of_axis]=minmag(phi_ghost(low),phi_ghost(high));
         number_of_axis++;}
 
-    phi_ghost(index)=FAST_MARCHING<T>::template Solve_Close_Point<T_GRID::dimension>(phi_ghost(index),number_of_axis,value,dx);
+    phi_ghost(index)=FAST_MARCHING<T>::template Solve_Close_Point<TV::m>(phi_ghost(index),number_of_axis,value,dx);
 }
 //#####################################################################
 // Function Add_To_Initial
 //##################################################################### 
-template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
+template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
 Add_To_Initial(ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,const TV_INT& index)
 {
     done(index)=true;close_k(index)=-1; // add to done, remove from close 
     // add neighbors to close if not done 
     if(Neighbor_Visible){
-        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+        for(int axis=0;axis<TV::m;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             if(!done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector)) close_k(index-axis_vector)=0;
             if(!done(index+axis_vector) && Neighbor_Visible(axis,index)) close_k(index+axis_vector)=0;}}
     else{
-        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+        for(int axis=0;axis<TV::m;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             if(!done(index-axis_vector)) close_k(index-axis_vector)=0;
             if(!done(index+axis_vector)) close_k(index+axis_vector)=0;}}
 }
 //#####################################################################
 namespace PhysBAM{
-template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<float,1> > >;
-template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<float,2> > >;
-template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<float,3> > >;
-template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<double,1> > >;
-template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<double,2> > >;
-template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<double,3> > >;
+template class FAST_MARCHING_METHOD_UNIFORM<VECTOR<float,1> >;
+template class FAST_MARCHING_METHOD_UNIFORM<VECTOR<float,2> >;
+template class FAST_MARCHING_METHOD_UNIFORM<VECTOR<float,3> >;
+template class FAST_MARCHING_METHOD_UNIFORM<VECTOR<double,1> >;
+template class FAST_MARCHING_METHOD_UNIFORM<VECTOR<double,2> >;
+template class FAST_MARCHING_METHOD_UNIFORM<VECTOR<double,3> >;
 }

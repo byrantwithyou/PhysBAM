@@ -61,7 +61,7 @@ template<class TV_input> PLS_FSI_EXAMPLE<TV_input>::
 PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions)
     :BASE(stream_type),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
     solid_body_collection(*new SOLID_BODY_COLLECTION<TV>),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
-    fluids_parameters(number_of_regions,FLUIDS_PARAMETERS<GRID<TV> >::WATER),fluid_collection(*fluids_parameters.grid),resolution(8),convection_order(1),
+    fluids_parameters(number_of_regions,FLUIDS_PARAMETERS<TV>::WATER),fluid_collection(*fluids_parameters.grid),resolution(8),convection_order(1),
     use_pls_evolution_for_structure(false),two_phase(false),use_kang(false),print_matrix(false),test_system(false),kang_poisson_viscosity(0),m(1),s(1),kg(1),
     opt_skip_debug_data(false),opt_solidscg(false),opt_solidscr(false),opt_solidssymmqmr(false)
 {
@@ -236,7 +236,7 @@ Revalidate_Fluid_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 // Function Get_Object_Velocities
 //#####################################################################
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
-Get_Object_Velocities(LAPLACE_UNIFORM<GRID<TV> >* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
+Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     if(fluids_parameters.solid_affects_fluid && (fluids_parameters.fluid_affects_solid || fluids_parameters.use_slip)){
         if(!fluids_parameters.use_slip){
@@ -251,7 +251,7 @@ Get_Object_Velocities(LAPLACE_UNIFORM<GRID<TV> >* elliptic_solver,ARRAY<T,FACE_I
 // Function Get_Levelset_Velocity
 //#####################################################################
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
-Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const
+Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const
 {
     ARRAY<T,FACE_INDEX<TV::m> >::Put(fluid_collection.incompressible_fluid_collection.face_velocities,V_levelset);
 }
@@ -263,7 +263,7 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,const ARR
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     T maximum_fluid_speed=face_velocities.Max_Abs().Max(),maximum_particle_speed=0;
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0);
+    PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0);
     if(particle_levelset.use_removed_negative_particles) for(CELL_ITERATOR<TV> iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=particle_levelset.removed_negative_particles(iterator.Cell_Index());
             if(particles) maximum_particle_speed=max(maximum_particle_speed,particles->V.Maximum_Magnitude());}

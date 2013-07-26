@@ -16,14 +16,14 @@
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID> class PARTICLE_LEVELSET_EVOLUTION_UNIFORM;
+template<class TV> class PARTICLE_LEVELSET_EVOLUTION_UNIFORM;
 
-template<class T_GRID>
+template<class TV>
 class SPH_EVOLUTION_UNIFORM:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;
-    STATIC_ASSERT((IS_SAME<typename T_GRID::GRID_TAG,UNIFORM_TAG<TV> >::value));
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;
+    STATIC_ASSERT((IS_SAME<typename GRID<TV>::GRID_TAG,UNIFORM_TAG<TV> >::value));
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
@@ -35,11 +35,11 @@ class SPH_EVOLUTION_UNIFORM:public NONCOPYABLE
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
 public:
 
-    T_GRID grid;
-    const SPH_CALLBACKS<T_GRID>* callbacks;
-    INCOMPRESSIBLE_UNIFORM<T_GRID>& incompressible;
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters;
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution;
+    GRID<TV> grid;
+    const SPH_CALLBACKS<TV>* callbacks;
+    INCOMPRESSIBLE_UNIFORM<TV>& incompressible;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution;
     SPH_PARTICLES<TV> sph_particles;
     T_FACE_ARRAYS_BOOL valid_particle_face_velocities;
 
@@ -70,14 +70,14 @@ private:
     RANDOM_NUMBERS<T> random;
 public:
 
-    SPH_EVOLUTION_UNIFORM(T_GRID& grid_input,INCOMPRESSIBLE_UNIFORM<T_GRID>& incompressible_input,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input,
-        PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=0);
+    SPH_EVOLUTION_UNIFORM(GRID<TV>& grid_input,INCOMPRESSIBLE_UNIFORM<TV>& incompressible_input,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input,
+        PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=0);
     ~SPH_EVOLUTION_UNIFORM();
 
-    void Initialize_Grids(const T_GRID& grid_input)
+    void Initialize_Grids(const GRID<TV>& grid_input)
     {grid=grid_input.Get_MAC_Grid();}
 
-    void Set_SPH_Callbacks(const SPH_CALLBACKS<T_GRID>& callbacks_input)
+    void Set_SPH_Callbacks(const SPH_CALLBACKS<TV>& callbacks_input)
     {callbacks=&callbacks_input;}
 
 //#####################################################################

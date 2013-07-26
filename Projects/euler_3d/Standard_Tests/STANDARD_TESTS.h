@@ -60,17 +60,16 @@
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
 public:
-    typedef T_input T;typedef VECTOR<T,3> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,3> TV_INT;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef T_input T;typedef VECTOR<T,3> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,3> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
-    typedef VECTOR<bool,2*T_GRID::dimension> T_FACE_VECTOR_BOOL;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_SCALAR T_LINEAR_INTERPOLATION_SCALAR;
+    typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
+    typedef VECTOR<bool,2*TV::m> T_FACE_VECTOR_BOOL;
 
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::restart;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solids_fluids_parameters;
@@ -117,7 +116,7 @@ public:
     TV source_velocity_value;
 
     bool read_soot_from_file;
-    T_LINEAR_INTERPOLATION_SCALAR soot_interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> soot_interpolation;
     std::string soot_data_dir;
 
     bool simulate_rigids,simulate_deformable;
@@ -331,9 +330,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
         eos_smooth_transition=new EOS_SMOOTH_TRANSITION_INCOMPRESSIBLE<EOS_GAMMA<T> >(time_start_transition,time_end_transition,one_over_c_incompressible,true,3);
         fluids_parameters.compressible_eos=eos_smooth_transition;}
     else fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
-    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,false,false);
-    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,true,false);
-    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,true,true);
+    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
+    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
+    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
     fluids_parameters.compressible_spatial_order=eno_order;
     fluids_parameters.compressible_conservation_method->Save_Fluxes();
     //fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
@@ -422,7 +421,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     else if(test_number==5||test_number==6||test_number==7||test_number==8||test_number==9||test_number==10||test_number==19||test_number==21) shock_type=VERTICAL;
 
     // spherical shock positioning
-    T_GRID& grid=(fluids_parameters.mpi_grid)?fluids_parameters.mpi_grid->global_grid:*fluids_parameters.grid;
+    GRID<TV>& grid=(fluids_parameters.mpi_grid)?fluids_parameters.mpi_grid->global_grid:*fluids_parameters.grid;
     shock_radius=(T).6;
     shock_center=TV();
     if(test_number==3){
@@ -547,8 +546,8 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
         return;}
 
     //set custom boundary
-    VECTOR<VECTOR<bool,2>,T_GRID::dimension> valid_wall;
-    for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
+    VECTOR<VECTOR<bool,2>,TV::m> valid_wall;
+    for(int axis=0;axis<TV::m;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
 
     TV far_field_velocity=TV(state_outside(1),state_outside(2),state_outside(3));
@@ -581,7 +580,7 @@ void Initialize_Euler_State()
 {
     if(incompressible) return;
 
-    T_GRID& grid=fluids_parameters.euler->grid;
+    GRID<TV>& grid=fluids_parameters.euler->grid;
     ARRAY<VECTOR<T,5> ,VECTOR<int,3> >& U=fluids_parameters.euler->U;
     EOS<T> *eos = fluids_parameters.euler->eos;
 
@@ -604,7 +603,7 @@ void Initialize_Euler_State()
 //#####################################################################
 void Read_Soot_Velocities()
 {
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<VECTOR<T,5> ,VECTOR<int,3> >& U=fluids_parameters.euler->U;
     std::string soot_grid_file=soot_data_dir+"/grid";
     std::string soot_velocity_file=soot_data_dir+"/mac_velocities";
@@ -619,8 +618,8 @@ void Read_Soot_Velocities()
         TV location=iterator.Location();
         if(soot_domain.Inside(location,soot_dx_over_2)){
             T velocity;
-            for(int axis=0;axis<T_GRID::dimension;axis++){
-                velocity=soot_interpolation.Clamped_To_Array_Face_Component(axis,soot_grid,FACE_LOOKUP_UNIFORM<T_GRID>(soot_mac_velocities),location);
+            for(int axis=0;axis<TV::m;axis++){
+                velocity=soot_interpolation.Clamped_To_Array_Face_Component(axis,soot_grid,FACE_LOOKUP_UNIFORM<TV>(soot_mac_velocities),location);
                 U(cell_index)(axis+1)=U(cell_index)(0)*velocity;}}}
 }
 //#####################################################################
@@ -628,7 +627,7 @@ void Read_Soot_Velocities()
 //#####################################################################
 void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     if(!incompressible) PHYSBAM_FATAL_ERROR("this shouldn't be called in compressible case");
     if(!use_smoke_sourcing && time>0) return;
 
@@ -661,8 +660,8 @@ void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Clear_Inside_Solid_Soot()
 {
-    T_GRID& grid=*fluids_parameters.grid;
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
+    GRID<TV>& grid=*fluids_parameters.grid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
 
     for(COLLISION_GEOMETRY_ID id(0);id<collision_bodies_affecting_fluid.collision_geometry_collection.bodies.m;id++)
         if(collision_bodies_affecting_fluid.collision_geometry_collection.Is_Active(id)){
@@ -681,7 +680,7 @@ void Clear_Inside_Solid_Soot()
 //#####################################################################
 void Adjust_Soot_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     if(!use_soot) PHYSBAM_FATAL_ERROR("this shouldn't be called in non use_soot case");
 
     if(time>0) Clear_Inside_Solid_Soot();
@@ -763,7 +762,7 @@ void Add_Sphere()
 //#####################################################################
 void Add_Ground(bool is_static)
 {
-    T_GRID& grid=(fluids_parameters.mpi_grid)?fluids_parameters.mpi_grid->global_grid:*fluids_parameters.grid;
+    GRID<TV>& grid=(fluids_parameters.mpi_grid)?fluids_parameters.mpi_grid->global_grid:*fluids_parameters.grid;
     T scale=(T)grid.Domain().max_corner.x*10;
     RIGID_BODY<TV>& ground=solid_tests.Add_Analytic_Box(TV::All_Ones_Vector()*scale);
     if(test_number==12) Set_Rigid_Body_Parameters(ground.particle_index,"ground",TV(0,-scale*(T).5,0),(T)1e10,.5);
@@ -981,7 +980,7 @@ void Bunny()
 //#####################################################################
 void Add_Wall_High_Resolution(const T x_delta,const T unit_mass)
 {
-    T_GRID& grid=(fluids_parameters.mpi_grid)?fluids_parameters.mpi_grid->global_grid:*fluids_parameters.grid;
+    GRID<TV>& grid=(fluids_parameters.mpi_grid)?fluids_parameters.mpi_grid->global_grid:*fluids_parameters.grid;
     const char* wallfile="short_plank_subdivided";
     T scale=((T)1/(T)1.5)*grid.Domain().max_corner.z;
     T mass=unit_mass*scale*scale*scale;
@@ -1033,7 +1032,7 @@ void Add_Stack_Of_Squares()
 //#####################################################################
 void Add_Stack_Of_Bodies()
 {
-    T_GRID& grid=(fluids_parameters.mpi_grid)?fluids_parameters.mpi_grid->global_grid:*fluids_parameters.grid;
+    GRID<TV>& grid=(fluids_parameters.mpi_grid)?fluids_parameters.mpi_grid->global_grid:*fluids_parameters.grid;
     int parameter=0;
     const char* boxfile=parameter?"box":"subdivided_box";
     const char* plankfile=parameter?"unsubdivided_plank":"plank_refined";
@@ -1090,7 +1089,7 @@ void Add_Stack_Of_Bodies()
 //#####################################################################
 void Add_Deformable_Ball()
 {
-    T_GRID& grid=(fluids_parameters.mpi_grid)?fluids_parameters.mpi_grid->global_grid:*fluids_parameters.grid;
+    GRID<TV>& grid=(fluids_parameters.mpi_grid)?fluids_parameters.mpi_grid->global_grid:*fluids_parameters.grid;
     T solid_density=10;
     T scale=.75;
     T y_top=grid.Domain().min_corner.y;

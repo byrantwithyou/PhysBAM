@@ -11,22 +11,22 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>::
-INCOMPRESSIBLE_FLUID_COLLECTION(const T_GRID& grid_input)
+template<class TV> INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
+INCOMPRESSIBLE_FLUID_COLLECTION(const GRID<TV>& grid_input)
     :grid(grid_input)
     //density_container(grid),temperature_container(grid)
 {}
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>::
+template<class TV> INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
 ~INCOMPRESSIBLE_FLUID_COLLECTION()
 {
 }
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
 Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
 {
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
@@ -35,7 +35,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
 Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame)
 {
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
@@ -58,7 +58,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
 //#####################################################################
 // Function Initialize_Grids
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
 Initialize_Grids()
 {
     face_velocities.Resize(grid);
@@ -66,8 +66,8 @@ Initialize_Grids()
 //#####################################################################
 // Function Sync_Data
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>::
-Sync_Data(INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>& fluid_collection,THREADED_UNIFORM_GRID<T_GRID>& threaded_grid)
+template<class TV> void INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
+Sync_Data(INCOMPRESSIBLE_FLUID_COLLECTION<TV>& fluid_collection,THREADED_UNIFORM_GRID<TV>& threaded_grid)
 {
     threaded_grid.Sync_Face_Scalar(face_velocities,fluid_collection.face_velocities);    
     threaded_grid.Sync_Scalar(viscosity,fluid_collection.viscosity);    
@@ -75,18 +75,18 @@ Sync_Data(INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>& fluid_collection,THREADED_UNI
 //#####################################################################
 // Function Distribute_Data
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>::
-Distribute_Data(INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>& fluid_collection,THREADED_UNIFORM_GRID<T_GRID>& threaded_grid)
+template<class TV> void INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
+Distribute_Data(INCOMPRESSIBLE_FLUID_COLLECTION<TV>& fluid_collection,THREADED_UNIFORM_GRID<TV>& threaded_grid)
 {
     threaded_grid.Distribute_Face_Scalar(face_velocities,fluid_collection.face_velocities);    
     threaded_grid.Distribute_Scalar(viscosity,fluid_collection.viscosity);    
 }
 //#####################################################################
 namespace PhysBAM{
-template class INCOMPRESSIBLE_FLUID_COLLECTION<GRID<VECTOR<float,1> > >;
-template class INCOMPRESSIBLE_FLUID_COLLECTION<GRID<VECTOR<float,2> > >;
-template class INCOMPRESSIBLE_FLUID_COLLECTION<GRID<VECTOR<float,3> > >;
-template class INCOMPRESSIBLE_FLUID_COLLECTION<GRID<VECTOR<double,1> > >;
-template class INCOMPRESSIBLE_FLUID_COLLECTION<GRID<VECTOR<double,2> > >;
-template class INCOMPRESSIBLE_FLUID_COLLECTION<GRID<VECTOR<double,3> > >;
+template class INCOMPRESSIBLE_FLUID_COLLECTION<VECTOR<float,1> >;
+template class INCOMPRESSIBLE_FLUID_COLLECTION<VECTOR<float,2> >;
+template class INCOMPRESSIBLE_FLUID_COLLECTION<VECTOR<float,3> >;
+template class INCOMPRESSIBLE_FLUID_COLLECTION<VECTOR<double,1> >;
+template class INCOMPRESSIBLE_FLUID_COLLECTION<VECTOR<double,2> >;
+template class INCOMPRESSIBLE_FLUID_COLLECTION<VECTOR<double,3> >;
 }

@@ -17,24 +17,24 @@
 #ifndef __EULER_UNIFORM__
 #define __EULER_UNIFORM__
 
-#include <Tools/Parallel_Computation/MPI_GRID_POLICY.h>
 #include <Compressible/Euler_Equations/EULER.h>
 #include <Compressible/Euler_Equations/EULER_CAVITATION_UNIFORM.h>
 #include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 #include <Compressible/Euler_Equations/EULER_PROJECTION_UNIFORM.h>
 namespace PhysBAM{
+template<class T> class MPI_UNIFORM_GRID;
 
-template<class T_GRID>
-class EULER_UNIFORM:public EULER<T_GRID>
+template<class TV>
+class EULER_UNIFORM:public EULER<TV>
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
-    typedef typename MPI_GRID_POLICY<T_GRID>::MPI_GRID T_MPI_GRID;
-    typedef EULER<T_GRID> BASE;
-    typedef VECTOR<bool,T_GRID::dimension> TV_BOOL;
+    typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
+    typedef EULER<TV> BASE;
+    typedef VECTOR<bool,TV::m> TV_BOOL;
     typedef typename T_ARRAYS_DIMENSION_SCALAR::ELEMENT T_ARRAYS_ELEMENT;
     typedef BOUNDARY<TV,TV_DIMENSION> T_BOUNDARY;
 protected:
@@ -44,17 +44,17 @@ public:
     using BASE::Set_Max_Time_Step;using BASE::Set_Custom_Conservation;using BASE::Set_CFL_Number;using BASE::open_boundaries;
     using BASE::use_force;using BASE::Get_Density;
 
-    T_GRID grid;
+    GRID<TV> grid;
     T_MPI_GRID* mpi_grid;
     T_ARRAYS_DIMENSION_SCALAR U,U_save; // mass, momentum, and energy
     const T_ARRAYS_DIMENSION_SCALAR& U_ghost;
     ARRAY<bool,TV_INT>* psi_pointer; // defines cut out grid
     ARRAY<bool,TV_INT> psi;
-    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension> eigensystems,eigensystems_default,eigensystems_pressureonly;
+    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m> eigensystems,eigensystems_default,eigensystems_pressureonly;
     bool timesplit,use_sound_speed_for_cfl,perform_rungekutta_for_implicit_part,compute_pressure_fluxes,thinshell;
     bool use_sound_speed_based_dt_multiple_for_cfl; // if set, dt will be set to multiplication_factor_for_sound_speed_based_dt*dt_based_on_c whenever this number is less than dt_based_on_u
     T multiplication_factor_for_sound_speed_based_dt;
-    EULER_PROJECTION_UNIFORM<T_GRID> euler_projection;
+    EULER_PROJECTION_UNIFORM<TV> euler_projection;
     bool apply_cavitation_correction;
     EULER_CAVITATION_UNIFORM<TV> euler_cavitation_density;
     EULER_CAVITATION_UNIFORM<TV> euler_cavitation_internal_energy;
@@ -71,7 +71,7 @@ private:
 public:
     bool need_to_remove_added_internal_energy,need_to_remove_added_internal_energy_save;
 
-    EULER_UNIFORM(const T_GRID& grid_input);
+    EULER_UNIFORM(const GRID<TV>& grid_input);
     virtual ~EULER_UNIFORM();
 
     T Get_Temperature(const TV_INT& cell)
@@ -86,7 +86,7 @@ public:
     void Set_Custom_Equation_Of_State(EOS<T>& eos_input);
     void Set_Custom_Boundary(T_BOUNDARY& boundary_input);
     void Set_Body_Force(const bool use_force_input=true);
-    void Initialize_Domain(const T_GRID& grid_input);
+    void Initialize_Domain(const GRID<TV>& grid_input);
     void Save_State(T_ARRAYS_DIMENSION_SCALAR& U_save,T_FACE_ARRAYS_SCALAR& face_velocities_save,bool& need_to_remove_added_internal_energy_save);
     void Restore_State(T_ARRAYS_DIMENSION_SCALAR& U_save,T_FACE_ARRAYS_SCALAR& face_velocities_save,bool& need_to_remove_added_internal_energy_save);
     void Get_Cell_Velocities(const T dt,const T time,const int ghost_cells,ARRAY<TV,TV_INT>& centered_velocities);

@@ -13,8 +13,8 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 using namespace PhysBAM;
 //#####################################################################
-template<class TV> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<TV>,typename TV::SCALAR> RIGID_WIND_DRAG<TV>::interpolation;
-template<class TV> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<TV>,TV> RIGID_WIND_DRAG<TV>::vector_interpolation;
+template<class TV> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<TV,typename TV::SCALAR> RIGID_WIND_DRAG<TV>::interpolation;
+template<class TV> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<TV,TV> RIGID_WIND_DRAG<TV>::vector_interpolation;
 //#####################################################################
 // Constructor
 //#####################################################################

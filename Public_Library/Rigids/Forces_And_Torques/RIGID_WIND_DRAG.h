@@ -41,8 +41,8 @@ public:
     T linear_normal_viscosity; // uses vertex normals
     mutable T surface_area;
 private:
-    static const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
-    static const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<TV>,TV> vector_interpolation;
+    static const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<TV,T> interpolation;
+    static const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<TV,TV> vector_interpolation;
     struct OPTIMIZATION{
         OPTIMIZATION()
             :area_over_m((T)0)

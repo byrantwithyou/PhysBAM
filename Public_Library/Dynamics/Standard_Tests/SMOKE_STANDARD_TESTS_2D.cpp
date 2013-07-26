@@ -16,8 +16,8 @@
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <Dynamics/Standard_Tests/SMOKE_STANDARD_TESTS_2D.h>
 using namespace PhysBAM;
-template<class T_GRID> SMOKE_STANDARD_TESTS_2D<T_GRID>::
-SMOKE_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters,INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>& incompressible_fluid_collection,
+template<class TV> SMOKE_STANDARD_TESTS_2D<TV>::
+SMOKE_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters,INCOMPRESSIBLE_FLUID_COLLECTION<TV>& incompressible_fluid_collection,
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
     :example(example),fluids_parameters(fluids_parameters),incompressible_fluid_collection(incompressible_fluid_collection),rigid_body_collection(rigid_body_collection)
 {
@@ -26,7 +26,7 @@ SMOKE_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNI
     // TODO: *REALLY* need to pick sensible constants and settings
     example.frame_rate=24;
     fluids_parameters.cfl=(T).9;
-    fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,T_GRID::dimension>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(false));
+    fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,TV::m>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(false));
     fluids_parameters.domain_walls(1)(0)=true;
     fluids_parameters.use_vorticity_confinement=true;fluids_parameters.confinement_parameter=(T).04;        
     fluids_parameters.kolmogorov=(T)0;fluids_parameters.gravity=0;
@@ -39,7 +39,7 @@ SMOKE_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNI
 //#####################################################################
 // Function Initialize
 //#####################################################################
-template<class T_GRID> void SMOKE_STANDARD_TESTS_2D<T_GRID>::
+template<class TV> void SMOKE_STANDARD_TESTS_2D<TV>::
 Initialize(const int test_number_input,const int resolution,const T angle_fraction)
 {
     test_number=test_number_input;
@@ -51,7 +51,7 @@ Initialize(const int test_number_input,const int resolution,const T angle_fracti
         example.first_frame=0;example.last_frame=3840;
         grid.Initialize(TV_INT(10,15)*cells+1,RANGE<TV>(TV(),TV(1,1.5)));}
     else if(test_number==4){
-        fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,T_GRID::dimension>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(true));
+        fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,TV::m>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(true));
         fluids_parameters.use_vorticity_confinement=false;
         fluids_parameters.gravity=(T)0;
         fluids_parameters.use_poisson=true;  // TODO This is a hack to tell Projection to use poisson rather than laplace
@@ -75,14 +75,14 @@ Initialize(const int test_number_input,const int resolution,const T angle_fracti
     rotation_angle=angle_fraction?(T)pi/angle_fraction:(T)0;
     rotation_frame=FRAME<TV>(ROTATION<TV>::From_Angle(rotation_angle));
 }
-template<class T_GRID> SMOKE_STANDARD_TESTS_2D<T_GRID>::
+template<class TV> SMOKE_STANDARD_TESTS_2D<TV>::
 ~SMOKE_STANDARD_TESTS_2D()
 {
 }
 //#####################################################################
 // Function Initial_Velocity
 //#####################################################################
-template<class T_GRID> VECTOR<typename T_GRID::SCALAR,2> SMOKE_STANDARD_TESTS_2D<T_GRID>::
+template<class TV> VECTOR<typename TV::SCALAR,2> SMOKE_STANDARD_TESTS_2D<TV>::
 Initial_Velocity(const VECTOR<T,2>& X) const
 {
     if(test_number==4) return TV(-10*cos(X.x)*sin(X.y),10*sin(X.x)*cos(X.y));
@@ -91,7 +91,7 @@ Initial_Velocity(const VECTOR<T,2>& X) const
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-template<class T_GRID> void SMOKE_STANDARD_TESTS_2D<T_GRID>::
+template<class TV> void SMOKE_STANDARD_TESTS_2D<TV>::
 Initialize_Bodies()
 {
     if(test_number==2){
@@ -106,7 +106,7 @@ Initialize_Bodies()
 
         // Calculate the volume fraction for our new divergence face weights (see Normal stuff)
         IMPLICIT_OBJECT_INTERSECTOR<TV> implicit_object(*rigid_body_collection.Rigid_Body(oriented_box).implicit_object);
-        T_GRID& grid=*fluids_parameters.grid;
+        GRID<TV>& grid=*fluids_parameters.grid;
         divergence_face_weights.Resize(grid,1);beta_face.Resize(grid,1);
         T one_over_cell_size=(T)1/grid.Cell_Size();
 
@@ -132,7 +132,7 @@ Initialize_Bodies()
 //#####################################################################
 // Function Get_Divergence
 //#####################################################################
-template<class T_GRID> void SMOKE_STANDARD_TESTS_2D<T_GRID>::
+template<class TV> void SMOKE_STANDARD_TESTS_2D<TV>::
 Get_Divergence(ARRAY<T,VECTOR<int,2> >& divergence,const T dt,const T time)
 {
     if(test_number==3){
@@ -143,11 +143,11 @@ Get_Divergence(ARRAY<T,VECTOR<int,2> >& divergence,const T dt,const T time)
 //#####################################################################
 // Function Get_Object_Velocities
 //#####################################################################
-template<class T_GRID> void SMOKE_STANDARD_TESTS_2D<T_GRID>::
-Get_Object_Velocities(PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection,const T dt,const T time)
+template<class TV> void SMOKE_STANDARD_TESTS_2D<TV>::
+Get_Object_Velocities(PROJECTION_DYNAMICS_UNIFORM<TV>& projection,const T dt,const T time)
 {
     if(test_number==4){
-         T_GRID& grid=*fluids_parameters.grid;
+         GRID<TV>& grid=*fluids_parameters.grid;
          projection.poisson->Set_Variable_beta(true);
          projection.poisson->beta_face.Copy(beta_face);
          projection.poisson->Use_Weighted_Divergence();
@@ -160,6 +160,6 @@ Get_Object_Velocities(PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection,const T dt
                  projection.elliptic_solver->psi_N(axis,face_index)=true;incompressible_fluid_collection.face_velocities(axis,face_index)=0;}}}
 }
 namespace PhysBAM{
-template class SMOKE_STANDARD_TESTS_2D<GRID<VECTOR<float,2> > >;
-template class SMOKE_STANDARD_TESTS_2D<GRID<VECTOR<double,2> > >;
+template class SMOKE_STANDARD_TESTS_2D<VECTOR<float,2> >;
+template class SMOKE_STANDARD_TESTS_2D<VECTOR<double,2> >;
 }

@@ -22,7 +22,8 @@
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 namespace PhysBAM{
 
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class TV> struct GRID_ARRAYS_POLICY;
+template<class TV> struct GRID;
 
 template<class T_LAPLACE>
 class HEAT_LAPLACE:public T_LAPLACE
@@ -35,11 +36,11 @@ public:
 
     T coefficient;
 
-    HEAT_LAPLACE(T_GRID& grid_input,T_ARRAYS_SCALAR& u_input)
+    HEAT_LAPLACE(GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input)
         :T_LAPLACE(grid_input,u_input,true,false,false),coefficient(1)
     {}
 
-    HEAT_LAPLACE(T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid_input,const bool multiphase_input)
+    HEAT_LAPLACE(GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid_input,const bool multiphase_input)
         :T_LAPLACE(grid_input,u_input,initialize_grid_input,multiphase_input,false),coefficient(1)
     {}
 

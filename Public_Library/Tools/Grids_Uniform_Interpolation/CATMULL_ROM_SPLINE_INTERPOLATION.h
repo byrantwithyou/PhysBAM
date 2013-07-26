@@ -12,13 +12,13 @@
 #include <Tools/Math_Tools/cube.h>
 namespace PhysBAM{
 
-template<class T_GRID,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_UNIFORM<T_GRID>
-class CATMULL_ROM_SPLINE_INTERPOLATION:public INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>
+template<class TV,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_UNIFORM<TV>
+class CATMULL_ROM_SPLINE_INTERPOLATION:public INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::VECTOR_T::template REBIND<bool>::TYPE TV_BOOL;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
 public:
-    typedef INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP> BASE;
+    typedef INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP> BASE;
     using BASE::Clamped_Index_End_Minus_One;
 
     T tension;
@@ -27,27 +27,27 @@ public:
         :tension((T).5)
     {}
 
-    T2 Clamped_To_Array(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE
+    T2 Clamped_To_Array(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE
     {return From_Base_Node(grid,u,X,Clamped_Index_End_Minus_One(grid,u,X));}
 
-    T2 Clamped_To_Array_Derivative(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const TV_BOOL& derivatives) const
+    T2 Clamped_To_Array_Derivative(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const VECTOR<bool,TV::m>& derivatives) const
     {return From_Base_Node_Derivative(grid,u,X,Clamped_Index_End_Minus_One(grid,u,X),derivatives);}
 
-    T2 From_Base_Node(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE
-    {T basis[T_GRID::dimension][4];T2 sum=T2();TV X_normalized=(X-grid.X(index))*grid.one_over_dX;
-    for(int axis=0;axis<T_GRID::dimension;axis++) Catmull_Rom_Basis(X_normalized[axis],basis[axis]);
+    T2 From_Base_Node(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE
+    {T basis[TV::m][4];T2 sum=T2();TV X_normalized=(X-grid.X(index))*grid.one_over_dX;
+    for(int axis=0;axis<TV::m;axis++) Catmull_Rom_Basis(X_normalized[axis],basis[axis]);
     for(CELL_ITERATOR<TV> iterator(grid,RANGE<TV_INT>(index-TV_INT::All_Ones_Vector(),index+2*TV_INT::All_Ones_Vector()));iterator.Valid();iterator.Next()){
-        T product=1;for(int axis=0;axis<T_GRID::dimension;axis++) product*=basis[axis][iterator.Cell_Index()[axis]-index[axis]+1];
+        T product=1;for(int axis=0;axis<TV::m;axis++) product*=basis[axis][iterator.Cell_Index()[axis]-index[axis]+1];
         sum+=u(iterator.Cell_Index())*product;}
     return sum;}
 
-    T2 From_Base_Node_Derivative(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const TV_INT& index,const TV_BOOL& derivative) const
-    {T basis[T_GRID::dimension][4];T2 sum=T2();TV X_normalized=(X-grid.X(index))*grid.one_over_dX;
-    for(int axis=0;axis<T_GRID::dimension;axis++)
+    T2 From_Base_Node_Derivative(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const TV_INT& index,const VECTOR<bool,TV::m>& derivative) const
+    {T basis[TV::m][4];T2 sum=T2();TV X_normalized=(X-grid.X(index))*grid.one_over_dX;
+    for(int axis=0;axis<TV::m;axis++)
         if(derivative[axis]) Catmull_Rom_Basis_Derivative(X_normalized[axis],basis[axis]);
         else Catmull_Rom_Basis(X_normalized[axis],basis[axis]);
     for(CELL_ITERATOR<TV> iterator(grid,RANGE<TV_INT>(index-TV_INT::All_Ones_Vector(),index+2*TV_INT::All_Ones_Vector()));iterator.Valid();iterator.Next()){
-        T product=1;for(int axis=0;axis<T_GRID::dimension;axis++) product*=basis[axis][iterator.Cell_Index()[axis]-index[axis]+1];
+        T product=1;for(int axis=0;axis<TV::m;axis++) product*=basis[axis][iterator.Cell_Index()[axis]-index[axis]+1];
         sum+=u(iterator.Cell_Index())*product;}
     return sum;}
 

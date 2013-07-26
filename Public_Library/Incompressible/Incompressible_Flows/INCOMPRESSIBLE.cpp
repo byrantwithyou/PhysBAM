@@ -13,7 +13,6 @@
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE.h>
-#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_POLICY.h>
 #include <Incompressible/Interpolation_Collidable/FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM.h>
 #include <Dynamics/Advection_Equations/ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM.h>
 #include <Dynamics/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
@@ -22,7 +21,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> INCOMPRESSIBLE<T_GRID>::
+template<class TV> INCOMPRESSIBLE<TV>::
 INCOMPRESSIBLE()
     :use_force_x(false),use_force_y(false),use_force_z(false),use_force(false),use_variable_surface_tension(false),use_variable_viscosity(false),
     use_variable_vorticity_confinement(false),nonzero_viscosity(false),nonzero_surface_tension(false),
@@ -45,7 +44,7 @@ INCOMPRESSIBLE()
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> INCOMPRESSIBLE<T_GRID>::
+template<class TV> INCOMPRESSIBLE<TV>::
 ~INCOMPRESSIBLE()
 {
     delete nested_semi_lagrangian_collidable;delete semi_lagrangian_collidable;
@@ -57,28 +56,28 @@ template<class T_GRID> INCOMPRESSIBLE<T_GRID>::
 //#####################################################################
 // Function Use_Semi_Lagrangian_Collidable_Advection
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE<T_GRID>::
-Use_Semi_Lagrangian_Collidable_Advection(T_GRID_BASED_COLLISION_GEOMETRY& body_list)
+template<class TV> void INCOMPRESSIBLE<TV>::
+Use_Semi_Lagrangian_Collidable_Advection(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list)
 {
     nested_semi_lagrangian_collidable=new T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE(body_list,valid_mask);
-    semi_lagrangian_collidable=new ADVECTION_WRAPPER_COLLIDABLE_FACE<T_GRID,T,T_FACE_LOOKUP,T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE,T_FACE_LOOKUP_COLLIDABLE>(*nested_semi_lagrangian_collidable,body_list,valid_mask);
+    semi_lagrangian_collidable=new ADVECTION_WRAPPER_COLLIDABLE_FACE<TV,T,T_FACE_LOOKUP,T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE,T_FACE_LOOKUP_COLLIDABLE>(*nested_semi_lagrangian_collidable,body_list,valid_mask);
     Set_Custom_Advection(*semi_lagrangian_collidable);
 }
 //#####################################################################
 // Function Use_Semi_Lagrangian_Collidable_Slip_Advection
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE<T_GRID>::
-Use_Semi_Lagrangian_Collidable_Slip_Advection(T_GRID_BASED_COLLISION_GEOMETRY& body_list)
+template<class TV> void INCOMPRESSIBLE<TV>::
+Use_Semi_Lagrangian_Collidable_Slip_Advection(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list)
 {
     nested_semi_lagrangian_collidable_slip=new T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_SLIP_FACE(body_list);
-    semi_lagrangian_collidable_slip=new ADVECTION_WRAPPER_COLLIDABLE_FACE<T_GRID,T,T_FACE_LOOKUP,T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_SLIP_FACE,T_FACE_LOOKUP_COLLIDABLE_SLIP>(*nested_semi_lagrangian_collidable_slip,body_list,valid_mask);
+    semi_lagrangian_collidable_slip=new ADVECTION_WRAPPER_COLLIDABLE_FACE<TV,T,T_FACE_LOOKUP,T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_SLIP_FACE,T_FACE_LOOKUP_COLLIDABLE_SLIP>(*nested_semi_lagrangian_collidable_slip,body_list,valid_mask);
     Set_Custom_Advection(*semi_lagrangian_collidable_slip);
 }
 //#####################################################################
 // Function Use_Semi_Lagrangian_Fire_Multiphase_Advection
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE<T_GRID>::
-Use_Semi_Lagrangian_Fire_Multiphase_Advection(const T_PROJECTION& projection,const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_n_plus_one)
+template<class TV> void INCOMPRESSIBLE<TV>::
+Use_Semi_Lagrangian_Fire_Multiphase_Advection(const PROJECTION_DYNAMICS_UNIFORM<TV>& projection,const LEVELSET_MULTIPLE<TV>& levelset_multiple_n_plus_one)
 {
     nested_semi_lagrangian_fire_multiphase=new T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE();
     semi_lagrangian_fire_multiphase=new T_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE(*nested_semi_lagrangian_fire_multiphase,projection,levelset_multiple_n_plus_one);
@@ -87,8 +86,8 @@ Use_Semi_Lagrangian_Fire_Multiphase_Advection(const T_PROJECTION& projection,con
 //#####################################################################
 // Function Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE<T_GRID>::
-Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection(T_GRID_BASED_COLLISION_GEOMETRY& body_list,const T_PROJECTION& projection,const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_n_plus_one)
+template<class TV> void INCOMPRESSIBLE<TV>::
+Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list,const PROJECTION_DYNAMICS_UNIFORM<TV>& projection,const LEVELSET_MULTIPLE<TV>& levelset_multiple_n_plus_one)
 {
     nested_nested_semi_lagrangian_fire_multiphase_collidable=new T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE(body_list,valid_mask);
     nested_semi_lagrangian_fire_multiphase_collidable=new T_NESTED_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE(*nested_nested_semi_lagrangian_fire_multiphase_collidable,
@@ -99,19 +98,19 @@ Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection(T_GRID_BASED_COLLISION_
 }
 //#####################################################################
 namespace PhysBAM{
-#define INSTANTIATION_HELPER(T,T_GRID,d) \
-    template class ADVECTION_SEMI_LAGRANGIAN_UNIFORM<T_GRID,T,AVERAGING_UNIFORM<T_GRID,FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<T_GRID > >,LINEAR_INTERPOLATION_UNIFORM<T_GRID,T,FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<T_GRID > > >;
+#define INSTANTIATION_HELPER(T,TV,d) \
+    template class ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T,AVERAGING_UNIFORM<TV,FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> >,LINEAR_INTERPOLATION_UNIFORM<TV,T,FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> > >;
 #define P(...) __VA_ARGS__
-INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,1> >),2)
-INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,2> >),2);
-INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,3> >),3);
-template class INCOMPRESSIBLE<GRID<VECTOR<float,1> > >;
-template class INCOMPRESSIBLE<GRID<VECTOR<float,2> > >;
-template class INCOMPRESSIBLE<GRID<VECTOR<float,3> > >;
-INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,1> >),2);
-INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,2> >),2);
-INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,3> >),3);
-template class INCOMPRESSIBLE<GRID<VECTOR<double,1> > >;
-template class INCOMPRESSIBLE<GRID<VECTOR<double,2> > >;
-template class INCOMPRESSIBLE<GRID<VECTOR<double,3> > >;
+INSTANTIATION_HELPER(float,P(VECTOR<float,1>),2)
+INSTANTIATION_HELPER(float,P(VECTOR<float,2>),2);
+INSTANTIATION_HELPER(float,P(VECTOR<float,3>),3);
+template class INCOMPRESSIBLE<VECTOR<float,1> >;
+template class INCOMPRESSIBLE<VECTOR<float,2> >;
+template class INCOMPRESSIBLE<VECTOR<float,3> >;
+INSTANTIATION_HELPER(double,P(VECTOR<double,1>),2);
+INSTANTIATION_HELPER(double,P(VECTOR<double,2>),2);
+INSTANTIATION_HELPER(double,P(VECTOR<double,3>),3);
+template class INCOMPRESSIBLE<VECTOR<double,1> >;
+template class INCOMPRESSIBLE<VECTOR<double,2> >;
+template class INCOMPRESSIBLE<VECTOR<double,3> >;
 }

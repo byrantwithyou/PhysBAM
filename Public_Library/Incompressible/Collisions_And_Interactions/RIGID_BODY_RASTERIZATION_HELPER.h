@@ -16,8 +16,8 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Incompressible/Collisions_And_Interactions/RIGID_BODY_RASTERIZATION_UNIFORM.h>
 namespace PhysBAM{
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
-template<class T_GRID,class COLLISION_GEOMETRY_ID> class OBJECTS_IN_CELL;
+template<class TV> struct GRID_ARRAYS_POLICY;
+template<class TV,class COLLISION_GEOMETRY_ID> class OBJECTS_IN_CELL;
 
 namespace RASTERIZATION{
 //#####################################################################
@@ -42,7 +42,7 @@ template<class T> void Prepare_For_World_Space_Simplex_Bounding_Box(const RIGID_
 //#####################################################################
 // Function Rasterize_Object_Generic
 //#####################################################################
-template<class TV,class T_GRID> void Rasterize_Object_Generic(const COLLISION_GEOMETRY<TV>& collision_geometry,const T_GRID& grid,OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>& objects,
+template<class TV> void Rasterize_Object_Generic(const COLLISION_GEOMETRY<TV>& collision_geometry,const GRID<TV>& grid,OBJECTS_IN_CELL<TV,COLLISION_GEOMETRY_ID>& objects,
     const COLLISION_GEOMETRY_ID id)
 {
     const RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry;
@@ -64,15 +64,15 @@ template<class TV,class T_GRID> void Rasterize_Object_Generic(const COLLISION_GE
 //#####################################################################
 // Macro SPECIALIZE_RASTERIZE_OBJECT
 //#####################################################################
-#define SPECIALIZE_RASTERIZE_OBJECT(T_GRID) \
-    void Rasterize_Object_Generic(const COLLISION_GEOMETRY<T_GRID::VECTOR_T>&,const T_GRID&,OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>&,const COLLISION_GEOMETRY_ID&) \
+#define SPECIALIZE_RASTERIZE_OBJECT(TV) \
+    void Rasterize_Object_Generic(const COLLISION_GEOMETRY<TV>&,const GRID<TV>&,OBJECTS_IN_CELL<TV,COLLISION_GEOMETRY_ID>&,const COLLISION_GEOMETRY_ID&) \
     {PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
 // Function Compute_Occupied_Blocks_Generic
 //#####################################################################
 // NOTE: Since Compute_Occupied_Blocks is a virtual function we can't directly make it a template member
-template<class T,class TV,class T_GRID> void
-Compute_Occupied_Blocks_Generic(const COLLISION_GEOMETRY<TV>& collision_geometry,const T_GRID& grid,ARRAY<bool,VECTOR<int,TV::m> >& occupied,
+template<class T,class TV> void
+Compute_Occupied_Blocks_Generic(const COLLISION_GEOMETRY<TV>& collision_geometry,const GRID<TV>& grid,ARRAY<bool,VECTOR<int,TV::m> >& occupied,
     const bool with_body_motion,const T extra_thickness,const T body_thickness_factor)
 {
     const RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry;
@@ -95,8 +95,8 @@ Compute_Occupied_Blocks_Generic(const COLLISION_GEOMETRY<TV>& collision_geometry
 //#####################################################################
 // Macro SPECIALIZE_COMPUTE_OCCUPIED
 //#####################################################################
-#define SPECIALIZE_COMPUTE_OCCUPIED(T_GRID) \
-    void Compute_Occupied_Blocks_Generic(const COLLISION_GEOMETRY<T_GRID::VECTOR_T>&,const T_GRID&,ARRAY<bool>&,const bool,const T_GRID::SCALAR,const T_GRID::SCALAR) \
+#define SPECIALIZE_COMPUTE_OCCUPIED(TV) \
+    void Compute_Occupied_Blocks_Generic(const COLLISION_GEOMETRY<TV>&,const GRID<TV>&,ARRAY<bool>&,const bool,const TV::SCALAR,const TV::SCALAR) \
     {PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
 };

@@ -87,13 +87,13 @@
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
     typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<bool,FACE_INDEX<2> > T_FACE_ARRAYS_BOOL;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::output_directory;using BASE::last_frame;
     using BASE::frame_rate;using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::Add_To_Fluid_Simulation;
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;
@@ -439,7 +439,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         LOG::cout<<"solid-velocity "<<solid_body_collection.rigid_body_collection.rigid_body_particles.twist.Last().linear.y<<std::endl;}
     if(test_number==41){
         ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
-        LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interp;
+        LINEAR_INTERPOLATION_UNIFORM<TV,T> interp;
         for(int i=0;i<sample_points.m;i++){
             TV X=sample_points(i),V;
             for(int d=0;d<V.m;d++)
@@ -671,7 +671,7 @@ void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_B
 //#####################################################################
 void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
 {
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     for(FACE_ITERATOR<TV> it(*fluids_parameters.grid); it.Valid(); it.Next()){
         COLLISION_GEOMETRY_ID body_id;
         if(collision_bodies_affecting_fluid.Inside_Any_Body(it.Location(),body_id)) outside(it.Full_Index())=true;}
@@ -681,7 +681,7 @@ void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
 //#####################################################################
 void Mark_Outside(ARRAY<bool,TV_INT>& outside) PHYSBAM_OVERRIDE
 {
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     for(CELL_ITERATOR<TV> it(*fluids_parameters.grid); it.Valid(); it.Next()){
         COLLISION_GEOMETRY_ID body_id;
         if(collision_bodies_affecting_fluid.Inside_Any_Body(it.Location(),body_id)) outside(it.index)=true;}
@@ -691,7 +691,7 @@ void Mark_Outside(ARRAY<bool,TV_INT>& outside) PHYSBAM_OVERRIDE
 //#####################################################################
 typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(const FACE_INDEX<TV::m>& f1,const FACE_INDEX<TV::m>& f2,T& theta,T& value) PHYSBAM_OVERRIDE
 {
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::unused;
     COLLISION_GEOMETRY_ID body_id;
     TV X1=fluids_parameters.grid->Face(f1);

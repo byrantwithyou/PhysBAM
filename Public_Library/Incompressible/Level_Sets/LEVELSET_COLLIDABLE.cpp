@@ -18,13 +18,13 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> LEVELSET_COLLIDABLE<TV>::
-LEVELSET_COLLIDABLE(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input,
+LEVELSET_COLLIDABLE(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,const int number_of_ghost_cells_input,
     const bool set_secondary_interpolation)
     :LEVELSET<TV>(grid_input,phi_input,number_of_ghost_cells_input),collision_body_list(&collision_body_list_input),clamp_phi_with_collision_bodies(true),
     collision_aware_interpolation_plus(0),collision_aware_interpolation_minus(0),collision_unaware_interpolation(0),collidable_phi_replacement_value((T)1e-5)
 {
-    collision_aware_interpolation_plus=new T_LINEAR_INTERPOLATION_SCALAR;
-    collision_aware_interpolation_minus=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV>,T>(*collision_body_list,&valid_mask_current,collidable_phi_replacement_value);
+    collision_aware_interpolation_plus=new LINEAR_INTERPOLATION_UNIFORM<TV,T>;
+    collision_aware_interpolation_minus=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,T>(*collision_body_list,&valid_mask_current,collidable_phi_replacement_value);
     if(set_secondary_interpolation) secondary_interpolation=collision_aware_interpolation_minus;
 }
 //#####################################################################
@@ -44,7 +44,7 @@ template<class TV> typename TV::SCALAR LEVELSET_COLLIDABLE<TV>::
 Collision_Aware_Phi(const TV& location) const
 {
     assert(collision_body_list);
-    return LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV>,T>(*collision_body_list,&valid_mask_current,collidable_phi_replacement_value).Clamped_To_Array(grid,phi,location);
+    return LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,T>(*collision_body_list,&valid_mask_current,collidable_phi_replacement_value).Clamped_To_Array(grid,phi,location);
 }
 namespace PhysBAM{
 template class LEVELSET_COLLIDABLE<VECTOR<float,1> >;

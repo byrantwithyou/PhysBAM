@@ -15,8 +15,8 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID,class T2> GRID_AND_ARRAY_CONTAINER<T_GRID,T2>::
-GRID_AND_ARRAY_CONTAINER(T_GRID& grid_input)
+template<class TV,class T2> GRID_AND_ARRAY_CONTAINER<TV,T2>::
+GRID_AND_ARRAY_CONTAINER(GRID<TV>& grid_input)
     :grid(grid_input),advection_maccormack(0),advection_default(*new T_ADVECTION_SEMI_LAGRANGIAN_SCALAR),boundary_default(*new BOUNDARY_REFLECTION_UNIFORM<TV,T>),face_velocities(0)
 {
     advection=&advection_default;
@@ -27,7 +27,7 @@ GRID_AND_ARRAY_CONTAINER(T_GRID& grid_input)
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID,class T2> GRID_AND_ARRAY_CONTAINER<T_GRID,T2>::
+template<class TV,class T2> GRID_AND_ARRAY_CONTAINER<TV,T2>::
 ~GRID_AND_ARRAY_CONTAINER()
 {
     delete advection_maccormack;
@@ -36,7 +36,7 @@ template<class T_GRID,class T2> GRID_AND_ARRAY_CONTAINER<T_GRID,T2>::
 //#####################################################################
 // Function Euler_Step
 //#####################################################################
-template<class T_GRID,class T2> void GRID_AND_ARRAY_CONTAINER<T_GRID,T2>::
+template<class TV,class T2> void GRID_AND_ARRAY_CONTAINER<TV,T2>::
 Euler_Step(const T dt,const T time,const int number_of_ghost_cells)
 {
     ARRAY<T2,TV_INT> array_ghost(grid.Cell_Indices(number_of_ghost_cells),false);boundary->Fill_Ghost_Cells(grid,array,array_ghost,dt,time,number_of_ghost_cells);
@@ -45,10 +45,10 @@ Euler_Step(const T dt,const T time,const int number_of_ghost_cells)
 }
 //#####################################################################
 namespace PhysBAM{
-template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<float,1> >,float>;
-template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<float,2> >,float>;
-template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<float,3> >,float>;
-template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<double,1> >,double>;
-template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<double,2> >,double>;
-template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<double,3> >,double>;
+template class GRID_AND_ARRAY_CONTAINER<VECTOR<float,1>,float>;
+template class GRID_AND_ARRAY_CONTAINER<VECTOR<float,2>,float>;
+template class GRID_AND_ARRAY_CONTAINER<VECTOR<float,3>,float>;
+template class GRID_AND_ARRAY_CONTAINER<VECTOR<double,1>,double>;
+template class GRID_AND_ARRAY_CONTAINER<VECTOR<double,2>,double>;
+template class GRID_AND_ARRAY_CONTAINER<VECTOR<double,3>,double>;
 }

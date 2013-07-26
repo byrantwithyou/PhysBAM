@@ -46,7 +46,7 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const ARRAY<T2,FACE_INDEX<TV::m> >& u,ARRA
 {
     assert(grid.Is_MAC_Grid() && !clamp_below && !clamp_above);BOUNDARY<TV,T2> temp_boundary;
     if(use_fixed_boundary) temp_boundary.Set_Fixed_Boundary(true,fixed_boundary_value);
-    for(int axis=0;axis<GRID<TV>::dimension;axis++)temp_boundary.Fill_Ghost_Cells(grid.Get_Face_Grid(axis),u.Component(axis),u_ghost.Component(axis),0,time,number_of_ghost_cells);
+    for(int axis=0;axis<TV::m;axis++)temp_boundary.Fill_Ghost_Cells(grid.Get_Face_Grid(axis),u.Component(axis),u_ghost.Component(axis),0,time,number_of_ghost_cells);
 }
 //#####################################################################
 // Function Find_Ghost_Regions

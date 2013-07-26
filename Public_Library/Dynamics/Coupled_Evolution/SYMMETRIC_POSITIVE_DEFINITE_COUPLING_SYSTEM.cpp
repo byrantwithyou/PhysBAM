@@ -932,7 +932,7 @@ Exchange_Velocities(ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure
 // Function Set_MPI
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Set_MPI(MPI_SOLID_FLUID<TV>& mpi_solid_fluid_input,MPI_UNIFORM_GRID<GRID<TV> >& mpi_grid_input)
+Set_MPI(MPI_SOLID_FLUID<TV>& mpi_solid_fluid_input,MPI_UNIFORM_GRID<TV>& mpi_grid_input)
 {
     mpi_grid=&mpi_grid_input;
     mpi_solid_fluid=&mpi_solid_fluid_input;

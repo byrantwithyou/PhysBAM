@@ -343,12 +343,12 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         if(collision_aware){
             if(!body_list){LOG::cout<<"Error: Voxel_Data Use_Collision_Aware_Interpolation set to true, but collision list is null"<<std::endl;exit(1);}
             LOG::cout<<"Using collidable thin shell interpolation..."<<std::endl;
-            GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >* fluid_collision_body_list=new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >(*grid);
+            GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>* fluid_collision_body_list=new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>(*grid);
             for(COLLISION_GEOMETRY_ID i(0);i<body_list->m;i++) if((*body_list)(i)) fluid_collision_body_list->collision_geometry_collection.Add_Body((*body_list)(i),0,false);
             ARRAY<bool,VECTOR<int,3> >* cell_valid_mask=new ARRAY<bool,VECTOR<int,3> >(grid->Domain_Indices(3),false);cell_valid_mask->Fill(true);
-            LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV>,T>* linear=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV>,T>(*fluid_collision_body_list,cell_valid_mask,0);
-            LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV>,TV>* linear_vector=
-                new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV>,TV>(*fluid_collision_body_list,cell_valid_mask,TV());
+            LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,T>* linear=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,T>(*fluid_collision_body_list,cell_valid_mask,0);
+            LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,TV>* linear_vector=
+                new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,TV>(*fluid_collision_body_list,cell_valid_mask,TV());
             GRID<TV> occupied_grid=grid->Get_MAC_Grid();
             fluid_collision_body_list->Rasterize_Objects();
             fluid_collision_body_list->Compute_Occupied_Blocks(false,(T)2*grid->dX.Min(),5);
@@ -442,7 +442,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 LOG::cout<<"Removing phi ghost values"<<std::endl;
                 phi->Resize(1,grid->counts.x,1,grid->counts.y,1,grid->counts.z);}
             LOG::cout<<"Using collidable thin shell interpolation..."<<std::endl;
-            GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >* fluid_collision_body_list=new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >(*grid);
+            GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>* fluid_collision_body_list=new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>(*grid);
             for(COLLISION_GEOMETRY_ID i(0);i<body_list->m;i++) if((*body_list)(i)) fluid_collision_body_list->collision_geometry_collection.Add_Body((*body_list)(i),0,false);
 
             if(revalidate_for_subdivision){ // TODO: clean this up
@@ -451,7 +451,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 fluid_collision_body_list->Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,(T)0);
                 for(COLLISION_GEOMETRY_ID i(0);i<body_list->m;i++) if((*body_list)(i)) (*body_list)(i)->Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE);
                 fluid_collision_body_list->Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,(T)1);
-                ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<GRID<TV>,T> advection(*fluid_collision_body_list,current_arrays_valid,next_arrays_valid,(T)1e-5,true);
+                ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<TV,T> advection(*fluid_collision_body_list,current_arrays_valid,next_arrays_valid,(T)1e-5,true);
 
                 fluid_collision_body_list->Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
 
@@ -483,7 +483,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                     COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);}
 
             ARRAY<bool,VECTOR<int,3> >* cell_valid_mask=new ARRAY<bool,VECTOR<int,3> >(grid->Domain_Indices(3),false);cell_valid_mask->Fill(true);
-            LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV> ,T>* linear=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV> ,T>(*fluid_collision_body_list,cell_valid_mask,(T)1e-5);
+            LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,T>* linear=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,T>(*fluid_collision_body_list,cell_valid_mask,(T)1e-5);
             GRID<TV> occupied_grid=grid->Get_MAC_Grid();
             fluid_collision_body_list->Rasterize_Objects();
             fluid_collision_body_list->Compute_Occupied_Blocks(false,(T)2*grid->dX.Min(),5);
@@ -500,7 +500,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         LOG::cout<<"Multiple Levelset"<<std::endl;
         int number_of_regions=parameters.Get_Parameter("Number_Regions", 0);
         GRID<TV>* grid=new GRID<TV>;ARRAY<ARRAY<T,VECTOR<int,3> > >* phis=new ARRAY<ARRAY<T,VECTOR<int,3> > >(number_of_regions);
-        RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<GRID<TV> > >* rendering_levelset_multiple_object=new RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<GRID<TV> > >(*grid,*phis);
+        RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<TV> >* rendering_levelset_multiple_object=new RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<TV> >(*grid,*phis);
         // read in the data
         for(int i=0;i<number_of_regions;i++){
             LOG::cout<<"Reading Region("<<i<<")"<<std::endl;

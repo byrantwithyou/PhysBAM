@@ -13,7 +13,7 @@ namespace PhysBAM{
 template<class TV,class T2>
 class BOUNDARY_MAC_GRID_PERIODIC:public BOUNDARY<TV,T2>
 {
-    typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<T2,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T2;
 public:

@@ -18,7 +18,7 @@ template<class TV> class GRID;
 template<class T,class RW=T>
 class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D : public OPENGL_COMPONENT
 {
-    typedef VECTOR<T,3> TV;typedef typename GRID<TV>::VECTOR_INT TV_INT;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:
     OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(const GRID<TV> &grid,const std::string &velocity_filename_input);
     virtual ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D();

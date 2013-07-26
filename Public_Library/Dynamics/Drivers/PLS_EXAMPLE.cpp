@@ -43,7 +43,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
     if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);
-    if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >* refinement=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >*>(&projection)){
+    if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>* refinement=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>*>(&projection)){
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure",refinement->levelset_projection.p);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",refinement->levelset_projection.elliptic_solver->psi_N);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",refinement->levelset_projection.elliptic_solver->psi_D);
@@ -56,7 +56,7 @@ Write_Output_Files(const int frame)
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure",incompressible.projection.p);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);}
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
+    PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);
@@ -68,7 +68,7 @@ template<class TV_input> void PLS_EXAMPLE<TV_input>::
 Read_Output_Files(const int frame)
 {
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
+    PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);

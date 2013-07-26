@@ -15,7 +15,7 @@
 
 namespace PhysBAM{
 
-template<class T_GRID> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
+template<class TV> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
 template<class TV> class GRID;
 template<class TV> class COLLISION_GEOMETRY;
 template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;
@@ -43,7 +43,7 @@ class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO:public NONCOPYABLE
     enum WORKAROUND {d=TV::dimension};
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::dimension> TV_INT;
 
-    const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid;
+    const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid;
 
 public:
     ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID> coupling_bodies;
@@ -53,7 +53,7 @@ public:
     const bool& use_collision_face_neighbors;
     T iterator_rasterization_thickness;
 
-    explicit UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collection);
+    explicit UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collection);
 
 //#####################################################################
     void Initialize_Collision_Aware_Face_Iterator(const ARRAY<bool,TV_INT>& outside_fluid_input,const ARRAY<bool,FACE_INDEX<d> >& kinematic_faces,int ghost_cells,const bool disable_thinshell);

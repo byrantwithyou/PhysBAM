@@ -47,14 +47,14 @@
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T_input,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     SOLIDS_STANDARD_TESTS<TV> tests;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
 
@@ -250,7 +250,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     std::string f=STRING_UTILITIES::string_sprintf(".%d",frame);
 
     // viewer and restart output
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Write_Output_Files(frame);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Write_Output_Files(frame);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/fracture_object"+f,*fracture_object);
     if(plasticity_model) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/fp_inverse"+f,plasticity_model->Fp_inverse);
 
@@ -281,7 +281,7 @@ void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
 {
     std::string f=STRING_UTILITIES::string_sprintf(".%d",frame);
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Read_Output_Files_Solids(frame);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Read_Output_Files_Solids(frame);
     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/fracture_object"+f,*fracture_object);
     if(plasticity_model) FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/fp_inverse"+f,plasticity_model->Fp_inverse);
 

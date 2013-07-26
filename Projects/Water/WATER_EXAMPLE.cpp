@@ -20,7 +20,7 @@ WATER_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads,int refi
     write_substeps_level(-1),write_output_files(true),output_directory("output"),restart(0),number_of_ghost_cells(3),
     cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),//incompressible_fluid_collection(mac_grid),
     thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),
-    projection(refine>1?*new PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >(mac_grid,particle_levelset_evolution.Particle_Levelset(0).levelset,refine):*new PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >(mac_grid,false,false,false,false,thread_queue)),
+    projection(refine>1?*new PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>(mac_grid,particle_levelset_evolution.Particle_Levelset(0).levelset,refine):*new PROJECTION_DYNAMICS_UNIFORM<TV>(mac_grid,false,false,false,false,thread_queue)),
     particle_levelset_evolution(mac_grid,collision_bodies_affecting_fluid,number_of_ghost_cells,false),
     incompressible(mac_grid,projection),boundary(0),rigid_body_collection(0),collision_bodies_affecting_fluid(mac_grid)
 {
@@ -128,7 +128,7 @@ Extrapolate_Phi_Into_Objects(const T time)
         ARRAY<T,TV_INT> phi_object(mac_grid.Domain_Indices(3));
         for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
             phi_object(iterator.Cell_Index())=-rigid_body_collection.Rigid_Body(id).Implicit_Geometry_Extended_Value(iterator.Location());
-        EXTRAPOLATION_UNIFORM<GRID<TV>,T> extrapolate(mac_grid,phi_object,particle_levelset_evolution.Particle_Levelset(0).levelset.phi,3);extrapolate.Set_Band_Width(3);extrapolate.Extrapolate();}
+        EXTRAPOLATION_UNIFORM<TV,T> extrapolate(mac_grid,phi_object,particle_levelset_evolution.Particle_Levelset(0).levelset.phi,3);extrapolate.Set_Band_Width(3);extrapolate.Extrapolate();}
 }
 //#####################################################################
 // Adjust_Particle_For_Domain_Boundaries
@@ -170,7 +170,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure",incompressible.projection.p);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
+    PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);
@@ -186,7 +186,7 @@ template<class TV> void WATER_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
+    PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);

@@ -17,7 +17,7 @@
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION_CALLBACKS.h>
 namespace PhysBAM{
 
-template<class T_GRID> class RIGID_BODY_COLLISIONS;
+template<class TV> class RIGID_BODY_COLLISIONS;
 template<class TV,bool world_space> class RIGID_BODY_MASS;
 template<class TV> class RIGID_BODY_STATE;
 template<class TV> class SOLID_BODY_COLLECTION;

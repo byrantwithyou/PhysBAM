@@ -47,7 +47,7 @@ public:
     T xmin, xmax;
     
     //allow for custom boundary conditions & eos's
-    BOUNDARY<TV,T,T_GRID::dimension+2>* u_boundary;
+    BOUNDARY<TV,T,TV::m+2>* u_boundary;
     EOS<T>* eos;
     CONSERVATION<T,3>* conservation_method;
     
@@ -63,15 +63,15 @@ public:
     virtual ~EULER_1D_EXAMPLE() {}
 
 //#####################################################################
-    virtual void Initialize_U(const T_GRID& grid, ARRAY<T,3,VECTOR<int,1> >& u);
-    virtual void Write_Matlab_Data_File(const int stepnumber, const T_GRID& grid, const ARRAY<T,3,VECTOR<int,1> >& u);
+    virtual void Initialize_U(const GRID<TV>& grid, ARRAY<T,3,VECTOR<int,1> >& u);
+    virtual void Write_Matlab_Data_File(const int stepnumber, const GRID<TV>& grid, const ARRAY<T,3,VECTOR<int,1> >& u);
 //#####################################################################    
 };
 //#####################################################################
 // Function Intialize_U
 //#####################################################################
 template<class T> void EULER_1D_EXAMPLE<T>::
-Initialize_U(const T_GRID& grid, ARRAY<T,3,VECTOR<int,1> >& u)
+Initialize_U(const GRID<TV>& grid, ARRAY<T,3,VECTOR<int,1> >& u)
 {
     // could be problematic to reinitialize if phi is always postive or negative, so maybe have this function call sources
     std::cout << "Careful - Need Initial Data For Euler" << std::endl;
@@ -81,7 +81,7 @@ Initialize_U(const T_GRID& grid, ARRAY<T,3,VECTOR<int,1> >& u)
 // Function Write_Matlab_Data_File
 //#####################################################################
 template<class T> void EULER_1D_EXAMPLE<T>::
-Write_Matlab_Data_File(const int stepnumber, const T_GRID& grid, const ARRAY<T,3,VECTOR<int,1> >& u)
+Write_Matlab_Data_File(const int stepnumber, const GRID<TV>& grid, const ARRAY<T,3,VECTOR<int,1> >& u)
 {
     int i,m=grid.m;
     ARRAY<T,VECTOR<int,1> > output(1,m);

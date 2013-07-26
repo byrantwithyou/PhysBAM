@@ -89,7 +89,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-waterfall",&opt_waterfall,"Use waterfall test");
     parse_args.Parse(true);
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
     if(opt_sph) example=new STANDARD_TESTS_SPH<T>(stream_type);
     else if(opt_multiphase) example=new STANDARD_TESTS_MULTIPHASE<T>(stream_type);
     else if(opt_fire) example=new MULTIPHASE_FIRE_EXAMPLES<T>(stream_type);
@@ -140,10 +140,10 @@ int main(int argc,char* argv[])
     example->want_mpi_world=true;
     example->Parse(parse_args);
 
-    if(example->mpi_world->initialized) example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(*example->fluids_parameters.grid,3);
+    if(example->mpi_world->initialized) example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<TV>(*example->fluids_parameters.grid,3);
     example->Adjust_Output_Directory_For_MPI(example->fluids_parameters.mpi_grid);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*example);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*example);
     driver.Execute_Main_Program();
 
     delete example;

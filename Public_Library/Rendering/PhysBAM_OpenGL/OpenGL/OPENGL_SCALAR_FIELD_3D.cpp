@@ -344,7 +344,7 @@ Update()
 
 template<class T2,class T> static void Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* selection,const GRID<VECTOR<T,3> >& grid,ARRAY<T2,VECTOR<int,3> >& values)
 {
-    output_stream<<" @ particle = "<<LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<T,3> >,T2>().Clamped_To_Array(grid,values,selection->location);
+    output_stream<<" @ particle = "<<LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,3>,T2>().Clamped_To_Array(grid,values,selection->location);
 }
 // no interpolation for bool's and int's
 template<class T> static void Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* selection,const GRID<VECTOR<T,3> >&,ARRAY<bool,VECTOR<int,3> >& values){}
@@ -437,7 +437,7 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,T2>* self,int tex_width,int te
     OPENGL_COLOR* bitmap=new OPENGL_COLOR[tex_width*tex_height];
     OPENGL_COLOR_MAP<T2>* color_map=self->color_maps(self->current_color_map);
 
-    LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T2> interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T2> interpolation;
     for(int i=0;i<tex_width;i++)
         for(int j=0;j<tex_height;j++){
             T2 value=T2();

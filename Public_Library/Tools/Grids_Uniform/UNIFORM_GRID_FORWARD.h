@@ -15,7 +15,7 @@ template<class T> class CELL_ITERATOR;
 template<class T> class FACE_ITERATOR;
 template<class TV> struct UNIFORM_TAG{};
 
-template<class T_GRID> class BLOCK_UNIFORM;
+template<class TV> class BLOCK_UNIFORM;
 
 }
 #endif

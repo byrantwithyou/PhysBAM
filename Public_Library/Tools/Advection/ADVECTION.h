@@ -20,15 +20,16 @@
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
-template<class T_GRID> struct BOUNDARY_POLICY;
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class TV> struct BOUNDARY_POLICY;
+template<class TV> struct GRID_ARRAYS_POLICY;
 template<class TV,class T2> class BOUNDARY;
 template<class T,class ID> class ARRAY;
+template<class TV> class GRID;
 
-template<class T_GRID,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=typename T_GRID::FACE_LOOKUP
+template<class TV,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=typename GRID<TV>::FACE_LOOKUP
 class ADVECTION:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
 
@@ -38,12 +39,12 @@ public:
     virtual ~ADVECTION()
     {}
 
-    void Update_Advection_Equation_Cell(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
+    void Update_Advection_Equation_Cell(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
         const T_FACE_ARRAYS_SCALAR& face_velocities,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost=0,const ARRAY<T2,TV_INT>* Z_max_ghost=0,ARRAY<T2,TV_INT>* Z_min=0,ARRAY<T2,TV_INT>* Z_max=0)
     {Update_Advection_Equation_Cell_Lookup(grid,Z,Z_ghost,T_FACE_LOOKUP(face_velocities),boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);}
 
-    void Update_Advection_Equation_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_ARRAYS_SCALAR& Z_ghost,
+    void Update_Advection_Equation_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_ARRAYS_SCALAR& Z_ghost,
         const T_FACE_ARRAYS_SCALAR& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
         const T_FACE_ARRAYS_SCALAR* Z_min_ghost=0,const T_FACE_ARRAYS_SCALAR* Z_max_ghost=0,T_FACE_ARRAYS_SCALAR* Z_min=0,T_FACE_ARRAYS_SCALAR* Z_max=0)
     {if(Z_min_ghost && Z_max_ghost){
@@ -51,21 +52,21 @@ public:
         Update_Advection_Equation_Face_Lookup(grid,Z,T_FACE_LOOKUP(Z_ghost),T_FACE_LOOKUP(face_velocities),boundary,dt,time,&Z_min_lookup,&Z_max_lookup,Z_min,Z_max);}
     else Update_Advection_Equation_Face_Lookup(grid,Z,T_FACE_LOOKUP(Z_ghost),T_FACE_LOOKUP(face_velocities),boundary,dt,time,0,0,0,0);}
 
-    void Update_Advection_Equation_Cell(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
+    void Update_Advection_Equation_Cell(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
         const ARRAY<TV,TV_INT>& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost=0,const ARRAY<T2,TV_INT>* Z_max_ghost=0,ARRAY<T2,TV_INT>* Z_min=0,ARRAY<T2,TV_INT>* Z_max=0)
     {Update_Advection_Equation_Node(grid.Get_Regular_Grid_At_MAC_Positions(),Z,Z_ghost,V,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);}
 
 //#####################################################################
-    virtual void Update_Advection_Equation_Node(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
+    virtual void Update_Advection_Equation_Node(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
         const ARRAY<TV,TV_INT>& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost=0,const ARRAY<T2,TV_INT>* Z_max_ghost=0,ARRAY<T2,TV_INT>* Z_min=0,ARRAY<T2,TV_INT>* Z_max=0)
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual void Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
+    virtual void Update_Advection_Equation_Cell_Lookup(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost=0,const ARRAY<T2,TV_INT>* Z_max_ghost=0,ARRAY<T2,TV_INT>* Z_min=0,ARRAY<T2,TV_INT>* Z_max=0)
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual void Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
+    virtual void Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
         const T_FACE_LOOKUP* Z_min_ghost=0,const T_FACE_LOOKUP* Z_max_ghost=0,T_FACE_ARRAYS_SCALAR* Z_min=0,T_FACE_ARRAYS_SCALAR* Z_max=0)
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}

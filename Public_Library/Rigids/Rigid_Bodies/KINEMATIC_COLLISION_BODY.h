@@ -8,29 +8,27 @@
 #define __KINEMATIC_COLLISION_BODY__
 
 #include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 #include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class KINEMATIC_COLLISION_BODY:public RIGID_BODY<typename T_GRID::VECTOR_T>
+template<class TV>
+class KINEMATIC_COLLISION_BODY:public RIGID_BODY<TV>
 {
 public:
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_SCALAR::template REBIND<TV>::TYPE T_LINEAR_INTERPOLATION_TV;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 
     typedef RIGID_BODY<TV> BASE;
 
     using BASE::implicit_object;using BASE::particle_index;using BASE::Object_Space_Point;using BASE::Add_Structure;
 
-    T_GRID* velocity_grid;
+    GRID<TV>* velocity_grid;
     ARRAY<TV,TV_INT>* velocity_field; // a field defined on velocity_grid, in object space
 
-    T_LINEAR_INTERPOLATION_TV interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,TV> interpolation;
 
-    KINEMATIC_COLLISION_BODY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,bool create_collision_geometry,T_GRID *initial_velocity_grid=0,ARRAY<TV,TV_INT> *initial_velocity_field=0)
+    KINEMATIC_COLLISION_BODY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,bool create_collision_geometry,GRID<TV> *initial_velocity_grid=0,ARRAY<TV,TV_INT> *initial_velocity_field=0)
         :BASE(rigid_body_collection,create_collision_geometry),velocity_grid(initial_velocity_grid),velocity_field(initial_velocity_field)
     {
         rigid_body_collection.rigid_body_particles.kinematic(particle_index)=true;

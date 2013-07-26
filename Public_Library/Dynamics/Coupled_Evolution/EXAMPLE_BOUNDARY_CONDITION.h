@@ -13,7 +13,7 @@ template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;
 template<class TV>
 class EXAMPLE_BOUNDARY_CONDITION:public IMPLICIT_BOUNDARY_CONDITION<TV>
 {
-    typedef VECTOR<int,TV::dimension> TV_INT;typedef typename TV::SCALAR T;typedef GRID<TV> T_GRID;
+    typedef VECTOR<int,TV::dimension> TV_INT;typedef typename TV::SCALAR T;
 public:
     BOUNDARY_CONDITIONS_CALLBACKS<TV>* callback;
 

@@ -13,11 +13,11 @@ namespace PhysBAM{
 template<class TV,class T2>
 class BOUNDARY_MULTIPLE_UNIFORM:public BOUNDARY<TV,T2>
 {
-    typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename T_ARRAYS_BASE::template REBIND<T2>::TYPE T_ARRAYS_DIMENSION_T2;
-    typedef VECTOR<BOUNDARY<TV,T2>*,2*GRID<TV>::dimension> T_BOUNDARY_FACE_VECTOR;
+    typedef VECTOR<BOUNDARY<TV,T2>*,2*TV::m> T_BOUNDARY_FACE_VECTOR;
     typedef BOUNDARY<TV,T2> BASE;
 
     T_BOUNDARY_FACE_VECTOR boundaries;
@@ -28,7 +28,7 @@ public:
         :boundaries(boundaries_input) {}
 
     ~BOUNDARY_MULTIPLE_UNIFORM()
-    {for(int side=0;side<2*GRID<TV>::dimension;side++) delete boundaries[side];}
+    {for(int side=0;side<2*TV::m;side++) delete boundaries[side];}
 
 //#####################################################################
     void Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_T2& u,T_ARRAYS_DIMENSION_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const PHYSBAM_OVERRIDE;
@@ -43,7 +43,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_T2& u,T_ARRAYS_DI
 {
     T_ARRAYS_DIMENSION_T2::Put(u,u_ghost);
     VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
-    for(int side=0;side<2*GRID<TV>::dimension;side++) boundaries[side]->Fill_Single_Ghost_Region(grid,u_ghost,regions(side),side,dt,time,number_of_ghost_cells); 
+    for(int side=0;side<2*TV::m;side++) boundaries[side]->Fill_Single_Ghost_Region(grid,u_ghost,regions(side),side,dt,time,number_of_ghost_cells); 
 }
 //#####################################################################
 // Function Apply_Boundary_Condition
@@ -51,7 +51,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_T2& u,T_ARRAYS_DI
 template<class TV,class T2> void BOUNDARY_MULTIPLE_UNIFORM<TV,T2>::
 Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_DIMENSION_T2& u,const T time) const
 {
-    for(int side=0;side<2*GRID<TV>::dimension;side++) boundaries[side]->Apply_Boundary_Condition(grid,u,time);
+    for(int side=0;side<2*TV::m;side++) boundaries[side]->Apply_Boundary_Condition(grid,u,time);
 }
 }
 #endif

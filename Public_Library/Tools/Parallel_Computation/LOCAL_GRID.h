@@ -11,22 +11,22 @@
 #include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 namespace PhysBAM{
 
-template<class T_GRID>
+template<class TV>
 class LOCAL_GRID
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
 
-    T_GRID grid;
-    MPI_UNIFORM_GRID<T_GRID> mpi_grid;
-    const T_GRID& global_grid;
+    GRID<TV> grid;
+    MPI_UNIFORM_GRID<TV> mpi_grid;
+    const GRID<TV>& global_grid;
     TV_INT offset;
     ARRAY<bool> neighbor_overlaps;
 
-    LOCAL_GRID(const T_GRID& global_grid_input);
-    LOCAL_GRID(const T_GRID& global_grid_input,const T_GRID& local_grid_input);
+    LOCAL_GRID(const GRID<TV>& global_grid_input);
+    LOCAL_GRID(const GRID<TV>& global_grid_input,const GRID<TV>& local_grid_input);
     ~LOCAL_GRID();
 
     RANGE<TV_INT> Interior_Region(const RANGE<TV_INT>& sentinels) const

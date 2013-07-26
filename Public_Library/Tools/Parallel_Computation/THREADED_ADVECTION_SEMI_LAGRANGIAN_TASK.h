@@ -17,15 +17,15 @@
 namespace PhysBAM{
 template<class TV,class T2> class BOUNDARY;
 
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION>
+template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION>
 class ADVECTION_SEMI_LAGRANGIAN_TASK_NODE:public THREAD_QUEUE::TASK
 {    
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
 
 public:
 
-    const T_GRID& grid;
+    const GRID<TV>& grid;
     ARRAY<T2,TV_INT>& Z;
     const ARRAY<T2,TV_INT>& Z_ghost;
     const ARRAY<TV,TV_INT>& V;
@@ -38,7 +38,7 @@ public:
     ARRAY<T2,TV_INT>* Z_max;
     RANGE<TV_INT> domain;
 
-    ADVECTION_SEMI_LAGRANGIAN_TASK_NODE(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const ARRAY<TV,TV_INT>& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
+    ADVECTION_SEMI_LAGRANGIAN_TASK_NODE(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const ARRAY<TV,TV_INT>& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max,RANGE<TV_INT> domain)
         :grid(grid),Z(Z),Z_ghost(Z_ghost),V(V),boundary(boundary),dt(dt),time(time),Z_min_ghost(Z_min_ghost),Z_max_ghost(Z_max_ghost),Z_min(Z_min),Z_max(Z_max),domain(domain)
     {}
@@ -56,15 +56,15 @@ public:
     }
 };
 
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION>
+template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION>
 class ADVECTION_SEMI_LAGRANGIAN_TASK_CELL:public THREAD_QUEUE::TASK
 {    
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
 
 public:
 
-    const T_GRID& grid;
+    const GRID<TV>& grid;
     ARRAY<T2,TV_INT>& Z;
     const ARRAY<T2,TV_INT>& Z_ghost;
     const T_FACE_LOOKUP& face_velocities;
@@ -77,7 +77,7 @@ public:
     ARRAY<T2,TV_INT>* Z_max;
     RANGE<TV_INT> domain;
 
-    ADVECTION_SEMI_LAGRANGIAN_TASK_CELL(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
+    ADVECTION_SEMI_LAGRANGIAN_TASK_CELL(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max,RANGE<TV_INT> domain)
         :grid(grid),Z(Z),Z_ghost(Z_ghost),face_velocities(face_velocities),boundary(boundary),dt(dt),time(time),Z_min_ghost(Z_min_ghost),Z_max_ghost(Z_max_ghost),Z_min(Z_min),Z_max(Z_max),domain(domain)
     {}
@@ -99,15 +99,15 @@ public:
     }
 };
 
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION>
+template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION>
 class ADVECTION_SEMI_LAGRANGIAN_TASK_FACE:public THREAD_QUEUE::TASK
 {    
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
 
 public:
 
-    const T_GRID& grid;
+    const GRID<TV>& grid;
     T_FACE_ARRAYS_SCALAR& Z;
     const T_FACE_LOOKUP& Z_ghost;
     const T_FACE_LOOKUP& face_velocities;
@@ -121,7 +121,7 @@ public:
     RANGE<TV_INT> domain;
     int axis;
 
-    ADVECTION_SEMI_LAGRANGIAN_TASK_FACE(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
+    ADVECTION_SEMI_LAGRANGIAN_TASK_FACE(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
         const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max,RANGE<TV_INT> domain,int axis)
         :grid(grid),Z(Z),Z_ghost(Z_ghost),face_velocities(face_velocities),boundary(boundary),dt(dt),time(time),Z_min_ghost(Z_min_ghost),Z_max_ghost(Z_max_ghost),Z_min(Z_min),Z_max(Z_max),domain(domain),axis(axis)
     {}

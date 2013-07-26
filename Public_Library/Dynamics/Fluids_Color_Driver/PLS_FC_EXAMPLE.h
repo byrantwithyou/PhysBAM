@@ -19,13 +19,13 @@
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 namespace PhysBAM{
 
-template<class T_GRID> class LEVELSET_MULTIPLE;
-template<class T_GRID> class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM;
-template<class T_GRID> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
+template<class TV> class LEVELSET_MULTIPLE;
+template<class TV> class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM;
+template<class TV> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
 template<class TV> class DEBUG_PARTICLES;
 
 template<class TV_input>
-class PLS_FC_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV_input> >
+class PLS_FC_EXAMPLE:public LEVELSET_CALLBACKS<TV_input>
 {
     typedef TV_input TV;
     typedef typename TV::SCALAR T;
@@ -62,14 +62,14 @@ public:
     bool save_pressure;
 
     GRID<TV> grid;
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid;
-    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >& particle_levelset_evolution_multiple;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid;
+    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>& particle_levelset_evolution_multiple;
     VECTOR<ARRAY<T,TV_INT>,num_bc> bc_phis; // 0=Neumann, 1=Dirichlet, 2=Slip
     ARRAY<int,FACE_INDEX<TV::dimension> > face_color,prev_face_color;
     ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > face_velocities,prev_face_velocities;
     ARRAY<int,TV_INT> pressure_color;
     ARRAY<T,TV_INT> pressure;
-    ADVECTION<GRID<TV>,T>& advection_scalar;
+    ADVECTION<TV,T>& advection_scalar;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
     BOUNDARY_MAC_GRID_PERIODIC<TV,int> boundary_int;
     LEVELSET_COLOR<TV> levelset_color;
@@ -79,7 +79,7 @@ public:
     virtual ~PLS_FC_EXAMPLE();
     
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE;
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE;
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE;
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) PHYSBAM_OVERRIDE;
     void Merge_Velocities(ARRAY<T,FACE_INDEX<TV::dimension> >& V,const ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color) const;
     virtual void Write_Output_Files(const int frame);

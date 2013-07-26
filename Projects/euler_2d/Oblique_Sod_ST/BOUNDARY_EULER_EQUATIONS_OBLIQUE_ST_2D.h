@@ -16,11 +16,10 @@
 
 namespace PhysBAM{
 
-template<class T_GRID>
-class BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D:public BOUNDARY<typename T_GRID::VECTOR_T,VECTOR<typename T_GRID::SCALAR,T_GRID::dimension+2> >
+template<class TV>
+class BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D:public BOUNDARY<TV,VECTOR<typename TV::SCALAR,TV::m+2> >
 {
-    typedef typename T_GRID::SCALAR T;
-    typedef VECTOR<T,2> TV;
+    typedef typename TV::SCALAR T;
     typedef VECTOR<int,2> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
@@ -49,7 +48,7 @@ public:
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
-template<class T_GRID> void BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D<T_GRID>::
+template<class TV> void BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D<TV>::
 Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const
 {
     //if(u.length == 1){Default();return;}
@@ -95,7 +94,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& 
 //#####################################################################
 // Function Apply_Boundary_Condition
 //#####################################################################
-template<class T_GRID> void BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D<T_GRID>::
+template<class TV> void BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D<TV>::
 Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,const T time) const
 {
     //if(u.length == 1){Default();return;}

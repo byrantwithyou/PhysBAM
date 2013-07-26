@@ -15,8 +15,8 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID,class T2> EXTRAPOLATION_UNIFORM<T_GRID,T2>::
-EXTRAPOLATION_UNIFORM(const T_GRID& grid,const T_ARRAYS_BASE& phi_input,ARRAYS_ND_BASE<T2,TV_INT>& u_input,const int ghost_cells_input)
+template<class TV,class T2> EXTRAPOLATION_UNIFORM<TV,T2>::
+EXTRAPOLATION_UNIFORM(const GRID<TV>& grid,const T_ARRAYS_BASE& phi_input,ARRAYS_ND_BASE<T2,TV_INT>& u_input,const int ghost_cells_input)
     :u(u_input),phi(phi_input),seed_indices(0),seed_done(0),collision_aware_extrapolation(false),neighbors_visible(0),ghost_cells(ghost_cells_input)
 {
     Set_Band_Width();
@@ -24,20 +24,20 @@ EXTRAPOLATION_UNIFORM(const T_GRID& grid,const T_ARRAYS_BASE& phi_input,ARRAYS_N
     Set_Small_Number();
     node_grid=grid.Is_MAC_Grid()?grid.Get_Regular_Grid_At_MAC_Positions():grid;
     TV DX2=node_grid.dX*node_grid.dX;
-    if(T_GRID::dimension>=2){optimization_scale[2]=DX2[1]/DX2[0]; // dy^2/dx^2
-        if(T_GRID::dimension==3){optimization_scale[0]=DX2[2]/DX2[1];optimization_scale[1]=DX2[2]/DX2[0];}} // dz^2/dy^2 and dz^2/dx^2 
+    if(TV::m>=2){optimization_scale[2]=DX2[1]/DX2[0]; // dy^2/dx^2
+        if(TV::m==3){optimization_scale[0]=DX2[2]/DX2[1];optimization_scale[1]=DX2[2]/DX2[0];}} // dz^2/dy^2 and dz^2/dx^2 
     RANGE<TV_INT> domain_indices=node_grid.Domain_Indices().Thickened(ghost_cells);dimension_start=domain_indices.Minimum_Corner();dimension_end=domain_indices.Maximum_Corner();
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID,class T2> EXTRAPOLATION_UNIFORM<T_GRID,T2>::
+template<class TV,class T2> EXTRAPOLATION_UNIFORM<TV,T2>::
 ~EXTRAPOLATION_UNIFORM()
 {} 
 //#####################################################################
 // Function Extrapolate
 //#####################################################################
-template<class T_GRID,class T2> void EXTRAPOLATION_UNIFORM<T_GRID,T2>::
+template<class TV,class T2> void EXTRAPOLATION_UNIFORM<TV,T2>::
 Extrapolate(const T time,const bool fill_ghost_cells)
 {
     T_ARRAYS_SCALAR phi_ghost(node_grid.Domain_Indices(ghost_cells),false);ARRAY<T2,TV_INT> u_ghost(node_grid.Domain_Indices(ghost_cells),false); 
@@ -62,13 +62,13 @@ Extrapolate(const T time,const bool fill_ghost_cells)
         Update_Close_Point(u_ghost,phi_ghost,done,index);
     
         if(collision_aware_extrapolation){
-            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<TV::m;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector))
                     Add_To_Heap(phi_ghost,heap,heap_length,close,index-axis_vector);
                 if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && !close(index+axis_vector) && Neighbor_Visible(axis,index))
                     Add_To_Heap(phi_ghost,heap,heap_length,close,index+axis_vector);}}
         else{
-            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<TV::m;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector))
                     Add_To_Heap(phi_ghost,heap,heap_length,close,index-axis_vector);
                 if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && !close(index+axis_vector))
@@ -81,7 +81,7 @@ Extrapolate(const T time,const bool fill_ghost_cells)
 // Function Initialize
 //#####################################################################
 // pass heap_length by reference
-template<class T_GRID,class T2> void EXTRAPOLATION_UNIFORM<T_GRID,T2>::
+template<class TV,class T2> void EXTRAPOLATION_UNIFORM<TV,T2>::
 Initialize(const T_ARRAYS_BASE& phi,ARRAYS_ND_BASE<bool,TV_INT>& done,ARRAYS_ND_BASE<bool,TV_INT>& close,ARRAY<TV_INT>& heap,int& heap_length)
 {  
     assert(!seed_indices||!seed_done);
@@ -92,14 +92,14 @@ Initialize(const T_ARRAYS_BASE& phi,ARRAYS_ND_BASE<bool,TV_INT>& done,ARRAYS_ND_
     // find neighbors of done nodes which have positive phi
     if(collision_aware_extrapolation){
         for(NODE_ITERATOR<TV> iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Node_Index())){TV_INT index=iterator.Node_Index();
-            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<TV::m;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector) && phi(index-axis_vector) > 0 && Neighbor_Visible(axis,index-axis_vector))
                     Add_To_Heap(phi,heap,heap_length,close,index-axis_vector);
                 if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && !close(index+axis_vector) && phi(index+axis_vector) > 0 && Neighbor_Visible(axis,index))
                     Add_To_Heap(phi,heap,heap_length,close,index+axis_vector);}}}
     else{
         for(NODE_ITERATOR<TV> iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Node_Index())){TV_INT index=iterator.Node_Index();
-            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<TV::m;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector) && phi(index-axis_vector) > 0)
                     Add_To_Heap(phi,heap,heap_length,close,index-axis_vector);
                 if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && !close(index+axis_vector) && phi(index+axis_vector) > 0)
@@ -110,7 +110,7 @@ Initialize(const T_ARRAYS_BASE& phi,ARRAYS_ND_BASE<bool,TV_INT>& done,ARRAYS_ND_
 //##################################################################### 
 // needs done=0 around the outside of the domain
 // note that sqrt(phix^2+phiy^2+phiz^2)=1 if it's a distance function
-template<class T_GRID,class T2> void EXTRAPOLATION_UNIFORM<T_GRID,T2>::
+template<class TV,class T2> void EXTRAPOLATION_UNIFORM<TV,T2>::
 Update_Close_Point(ARRAYS_ND_BASE<T2,TV_INT>& u,const T_ARRAYS_BASE& phi,const ARRAYS_ND_BASE<bool,TV_INT>& done,const TV_INT& index)
 {
     T2 value[3]={}; // the value to use in the given direction
@@ -119,7 +119,7 @@ Update_Close_Point(ARRAYS_ND_BASE<T2,TV_INT>& u,const T_ARRAYS_BASE& phi,const A
     int missing_axis=2; // used in number_of_axis==2 case only, so it gives you which axis is missing (==2 for 2d)
 
     // check each principal axis
-    for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
+    for(int axis=0;axis<TV::m;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
         bool check_low=done(low),check_high=done(high);
         if(collision_aware_extrapolation){
             if(check_low && !Neighbor_Visible(axis,low)) check_low=false;
@@ -135,11 +135,11 @@ Update_Close_Point(ARRAYS_ND_BASE<T2,TV_INT>& u,const T_ARRAYS_BASE& phi,const A
 
     assert(number_of_axis);
     if(number_of_axis==1) u(index)=value[0];
-    else if(T_GRID::dimension==2 || number_of_axis==2){
+    else if(TV::m==2 || number_of_axis==2){
         T a=phix_dx[0]*optimization_scale[missing_axis],b=phix_dx[1],denominator=a+b,fraction=(T).5;
         if(denominator > small_number) fraction=clamp(a/denominator,(T)0,(T)1);
         u(index)=fraction*value[0]+(1-fraction)*value[1];}
-    else{PHYSBAM_ASSERT(T_GRID::dimension==3); // should only get here in 3D
+    else{PHYSBAM_ASSERT(TV::m==3); // should only get here in 3D
         T a=phix_dx[0]*optimization_scale[1],b=phix_dx[1]*optimization_scale[0],c=phix_dx[2],denominator=a+b+c;
         T fraction_1=(T)one_third,fraction_2=(T)one_third;
         if(denominator > small_number){fraction_1=clamp(a/denominator,(T)0,(T)1);fraction_2=clamp(b/denominator,(T)0,1-fraction_1);}
@@ -147,26 +147,26 @@ Update_Close_Point(ARRAYS_ND_BASE<T2,TV_INT>& u,const T_ARRAYS_BASE& phi,const A
 }
 //#####################################################################
 namespace PhysBAM{
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,1> >,float>;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,2> >,float>;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,3> >,float>;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,1> >,VECTOR<float,1> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,1> >,VECTOR<float,3> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,2> >,VECTOR<float,2> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,2> >,VECTOR<float,4> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,3> >,VECTOR<float,3> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,3> >,VECTOR<float,5> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,2> >,SYMMETRIC_MATRIX<float,2> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<float,3> >,SYMMETRIC_MATRIX<float,3> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,1> >,double>;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,2> >,double>;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,3> >,double>;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,1> >,VECTOR<double,1> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,1> >,VECTOR<double,3> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,2> >,VECTOR<double,2> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,2> >,VECTOR<double,4> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,3> >,VECTOR<double,3> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,3> >,VECTOR<double,5> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,2> >,SYMMETRIC_MATRIX<double,2> >;
-template class EXTRAPOLATION_UNIFORM<GRID<VECTOR<double,3> >,SYMMETRIC_MATRIX<double,3> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<float,1>,float>;
+template class EXTRAPOLATION_UNIFORM<VECTOR<float,2>,float>;
+template class EXTRAPOLATION_UNIFORM<VECTOR<float,3>,float>;
+template class EXTRAPOLATION_UNIFORM<VECTOR<float,1>,VECTOR<float,1> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<float,1>,VECTOR<float,3> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<float,2>,VECTOR<float,2> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<float,2>,VECTOR<float,4> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<float,3>,VECTOR<float,3> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<float,3>,VECTOR<float,5> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<float,2>,SYMMETRIC_MATRIX<float,2> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<float,3>,SYMMETRIC_MATRIX<float,3> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<double,1>,double>;
+template class EXTRAPOLATION_UNIFORM<VECTOR<double,2>,double>;
+template class EXTRAPOLATION_UNIFORM<VECTOR<double,3>,double>;
+template class EXTRAPOLATION_UNIFORM<VECTOR<double,1>,VECTOR<double,1> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<double,1>,VECTOR<double,3> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<double,2>,VECTOR<double,2> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<double,2>,VECTOR<double,4> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<double,3>,VECTOR<double,3> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<double,3>,VECTOR<double,5> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<double,2>,SYMMETRIC_MATRIX<double,2> >;
+template class EXTRAPOLATION_UNIFORM<VECTOR<double,3>,SYMMETRIC_MATRIX<double,3> >;
 }

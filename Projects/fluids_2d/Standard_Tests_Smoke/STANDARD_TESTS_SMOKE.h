@@ -13,18 +13,18 @@
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS_SMOKE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class STANDARD_TESTS_SMOKE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::test_number;using BASE::parse_args;
     using BASE::Get_Object_Velocities;using BASE::resolution; // silence -Woverloaded-virtual
 
-    SMOKE_STANDARD_TESTS_2D<GRID<TV> > tests;
+    SMOKE_STANDARD_TESTS_2D<TV> tests;
 
     STANDARD_TESTS_SMOKE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,0,fluids_parameters.SMOKE),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.SMOKE),
         tests(*this,fluids_parameters,fluid_collection.incompressible_fluid_collection,solid_body_collection.rigid_body_collection)
     {
     }
@@ -124,7 +124,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Object_Velocities
 //#####################################################################
-void Get_Object_Velocities(LAPLACE_UNIFORM<GRID<TV> >* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE
+void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE
 {
     BASE::Get_Object_Velocities(elliptic_solver,face_velocities,dt,time);
 //    tests.Get_Object_Velocities(elliptic_solver,face_velocities,dt,time); // TODO: signature is not a match

@@ -8,11 +8,11 @@
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_3D_HELPER_DEFINITIONS.h>
 #include <Tools/Vectors/VECTOR_3D.h>
 using namespace PhysBAM;
-template<class T_GRID> LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
-LINEAR_INTERPOLATION_MAC_3D_HELPER(const T_BLOCK& block,const T_FACE_ARRAYS& face_velocities)
+template<class T> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
+LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const T_FACE_ARRAYS& face_velocities)
     :base(block.Minimum_Corner()),center(block.Center()),one_over_DX(block.One_Over_DX())
 {
-    typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP face_velocities_lookup(face_velocities);
+    FACE_LOOKUP_UNIFORM<TV> face_velocities_lookup(face_velocities);
     static const int rotated_face_x[12]={0,1,2,3,4,5,6,7,8,9,10,11};
     u2=block.Face_X_Value(face_velocities_lookup,rotated_face_x[1]);u5=block.Face_X_Value(face_velocities_lookup,rotated_face_x[4]);
     u8=block.Face_X_Value(face_velocities_lookup,rotated_face_x[7]);u11=block.Face_X_Value(face_velocities_lookup,rotated_face_x[10]);
@@ -47,11 +47,11 @@ LINEAR_INTERPOLATION_MAC_3D_HELPER(const T_BLOCK& block,const T_FACE_ARRAYS& fac
     slope_w10_11=one_over_DX.z*(w11-block.Face_Z_Value(face_velocities_lookup,rotated_face_z[9]));
     slope_w11_12=one_over_DX.z*(block.Face_Z_Value(face_velocities_lookup,rotated_face_z[11])-w11);
 }
-template<class T_GRID> LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
-~LINEAR_INTERPOLATION_MAC_3D_HELPER()
+template<class T> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
+~LINEAR_INTERPOLATION_MAC_HELPER()
 {
 }
-template<class T_GRID> typename T_GRID::VECTOR_T LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
+template<class T> VECTOR<T,3> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
 Interpolate_Face(const TV& X) const
 {
     TV yxz(X.y,X.x,X.z),zxy(X.z,X.x,X.y);
@@ -62,42 +62,42 @@ Interpolate_Face(const TV& X) const
         X.z<center.z?LINEAR_INTERPOLATION<T,T>::Trilinear(w2,w5,w8,w11,one_over_DX.x,one_over_DX.y,center.z,base.x,base.y,slope_w12,slope_w45,slope_w78,slope_w10_11,zxy)
         :LINEAR_INTERPOLATION<T,T>::Trilinear(w2,w5,w8,w11,one_over_DX.x,one_over_DX.y,center.z,base.x,base.y,slope_w23,slope_w56,slope_w89,slope_w11_12,zxy));
 }
-template<class T_GRID> void LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
-Block_Transfer(const T_BLOCK& source_block,const T_FACE_ARRAYS_BOOL& source_values,const BLOCK_UNIFORM<GRID<TV> >& destination_block,ARRAY<T,FACE_INDEX<3> >& destination_values)
+template<class T> void LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
+Block_Transfer(const T_BLOCK& source_block,const T_FACE_ARRAYS_BOOL& source_values,const BLOCK_UNIFORM<TV>& destination_block,ARRAY<T,FACE_INDEX<3> >& destination_values)
 {
-    for(int i=0;i<T_GRID::number_of_faces_per_block/T_GRID::dimension;i++){
+    for(int i=0;i<GRID<TV>::number_of_faces_per_block/TV::m;i++){
         destination_block.Face_X_Reference(destination_values,i)=(T)source_block.Face_X_Value(source_values,i);
         destination_block.Face_Y_Reference(destination_values,i)=(T)source_block.Face_Y_Value(source_values,i);
         destination_block.Face_Z_Reference(destination_values,i)=(T)source_block.Face_Z_Value(source_values,i);}
 }
-template<class T_GRID> typename T_GRID::VECTOR_T LINEAR_INTERPOLATION_MAC_3D_HELPER<T_GRID>::
+template<class T> VECTOR<T,3> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
 Interpolate_Face_Normalized(const T_BLOCK& block,const T_FACE_ARRAYS& face_velocities,const T_FACE_ARRAYS_BOOL& face_velocities_valid,const TV& X,const TV& default_value)
 {
     static const GRID<TV> valid_values_grid=GRID<TV>(TV_INT()+2,RANGE<TV>::Unit_Box()).Get_MAC_Grid_At_Regular_Positions();
-    static const BLOCK_UNIFORM<GRID<TV> > valid_values_block(valid_values_grid,VECTOR<int,3>(2,2,2));
+    static const BLOCK_UNIFORM<TV> valid_values_block(valid_values_grid,VECTOR<int,3>(2,2,2));
     ARRAY<T,FACE_INDEX<3> > valid_values(valid_values_grid);Block_Transfer(block,face_velocities_valid,valid_values_block,valid_values);
     TV DX=Transformed(block,X),velocity=Interpolate_Face_Transformed(block,face_velocities,DX),weight=Interpolate_Face_Transformed(valid_values_block,valid_values,DX);
     return TV(weight.x==0?default_value.x:velocity.x/weight.x,weight.y==0?default_value.y:velocity.y/weight.y,weight.z==0?default_value.z:velocity.z/weight.z);
 }
 namespace PhysBAM{
-template class LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >;
-template VECTOR<float,2> LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >::Extrema_Face_X_Transformed<BLOCK_UNIFORM<GRID<VECTOR<float,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,VECTOR<float,3> const&);
-template VECTOR<float,2> LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >::Extrema_Face_Y_Transformed<BLOCK_UNIFORM<GRID<VECTOR<float,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,VECTOR<float,3> const&);
-template VECTOR<float,2> LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >::Extrema_Face_Z_Transformed<BLOCK_UNIFORM<GRID<VECTOR<float,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,VECTOR<float,3> const&);
-template float LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >::Interpolate_Face_X_Transformed<BLOCK_UNIFORM<GRID<VECTOR<float,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,VECTOR<float,3> const&);
-template float LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >::Interpolate_Face_Y_Transformed<BLOCK_UNIFORM<GRID<VECTOR<float,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,VECTOR<float,3> const&);
-template float LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >::Interpolate_Face_Z_Transformed<BLOCK_UNIFORM<GRID<VECTOR<float,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,VECTOR<float,3> const&);
-template ARRAY<PAIR<FACE_INDEX<3>,float> > LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >::Interpolate_Face_X_Transformed_Weights<BLOCK_UNIFORM<GRID<VECTOR<float,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,VECTOR<float,3> const&);
-template ARRAY<PAIR<FACE_INDEX<3>,float> > LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >::Interpolate_Face_Y_Transformed_Weights<BLOCK_UNIFORM<GRID<VECTOR<float,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,VECTOR<float,3> const&);
-template ARRAY<PAIR<FACE_INDEX<3>,float> > LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<float,3> > >::Interpolate_Face_Z_Transformed_Weights<BLOCK_UNIFORM<GRID<VECTOR<float,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<float,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > const&,VECTOR<float,3> const&);
-template class LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >;
-template VECTOR<double,2> LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::Extrema_Face_X_Transformed<BLOCK_UNIFORM<GRID<VECTOR<double,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,VECTOR<double,3> const&);
-template VECTOR<double,2> LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::Extrema_Face_Y_Transformed<BLOCK_UNIFORM<GRID<VECTOR<double,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,VECTOR<double,3> const&);
-template VECTOR<double,2> LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::Extrema_Face_Z_Transformed<BLOCK_UNIFORM<GRID<VECTOR<double,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,VECTOR<double,3> const&);
-template double LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::Interpolate_Face_X_Transformed<BLOCK_UNIFORM<GRID<VECTOR<double,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,VECTOR<double,3> const&);
-template double LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::Interpolate_Face_Y_Transformed<BLOCK_UNIFORM<GRID<VECTOR<double,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,VECTOR<double,3> const&);
-template double LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::Interpolate_Face_Z_Transformed<BLOCK_UNIFORM<GRID<VECTOR<double,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,VECTOR<double,3> const&);
-template ARRAY<PAIR<FACE_INDEX<3>,double> > LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::Interpolate_Face_X_Transformed_Weights<BLOCK_UNIFORM<GRID<VECTOR<double,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,VECTOR<double,3> const&);
-template ARRAY<PAIR<FACE_INDEX<3>,double> > LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::Interpolate_Face_Y_Transformed_Weights<BLOCK_UNIFORM<GRID<VECTOR<double,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,VECTOR<double,3> const&);
-template ARRAY<PAIR<FACE_INDEX<3>,double> > LINEAR_INTERPOLATION_MAC_3D_HELPER<GRID<VECTOR<double,3> > >::Interpolate_Face_Z_Transformed_Weights<BLOCK_UNIFORM<GRID<VECTOR<double,3> > >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > >(BLOCK_UNIFORM<GRID<VECTOR<double,3> > > const&,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > const&,VECTOR<double,3> const&);
+template class LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<float,3> >;
+template VECTOR<float,2> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<float,3> >::Extrema_Face_X_Transformed<BLOCK_UNIFORM<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > >(BLOCK_UNIFORM<VECTOR<float,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > const&,VECTOR<float,3> const&);
+template VECTOR<float,2> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<float,3> >::Extrema_Face_Y_Transformed<BLOCK_UNIFORM<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > >(BLOCK_UNIFORM<VECTOR<float,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > const&,VECTOR<float,3> const&);
+template VECTOR<float,2> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<float,3> >::Extrema_Face_Z_Transformed<BLOCK_UNIFORM<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > >(BLOCK_UNIFORM<VECTOR<float,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > const&,VECTOR<float,3> const&);
+template float LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<float,3> >::Interpolate_Face_X_Transformed<BLOCK_UNIFORM<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > >(BLOCK_UNIFORM<VECTOR<float,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > const&,VECTOR<float,3> const&);
+template float LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<float,3> >::Interpolate_Face_Y_Transformed<BLOCK_UNIFORM<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > >(BLOCK_UNIFORM<VECTOR<float,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > const&,VECTOR<float,3> const&);
+template float LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<float,3> >::Interpolate_Face_Z_Transformed<BLOCK_UNIFORM<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > >(BLOCK_UNIFORM<VECTOR<float,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > const&,VECTOR<float,3> const&);
+template ARRAY<PAIR<FACE_INDEX<3>,float> > LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<float,3> >::Interpolate_Face_X_Transformed_Weights<BLOCK_UNIFORM<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > >(BLOCK_UNIFORM<VECTOR<float,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > const&,VECTOR<float,3> const&);
+template ARRAY<PAIR<FACE_INDEX<3>,float> > LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<float,3> >::Interpolate_Face_Y_Transformed_Weights<BLOCK_UNIFORM<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > >(BLOCK_UNIFORM<VECTOR<float,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > const&,VECTOR<float,3> const&);
+template ARRAY<PAIR<FACE_INDEX<3>,float> > LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<float,3> >::Interpolate_Face_Z_Transformed_Weights<BLOCK_UNIFORM<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > >(BLOCK_UNIFORM<VECTOR<float,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > const&,VECTOR<float,3> const&);
+template class LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<double,3> >;
+template VECTOR<double,2> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<double,3> >::Extrema_Face_X_Transformed<BLOCK_UNIFORM<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > >(BLOCK_UNIFORM<VECTOR<double,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > const&,VECTOR<double,3> const&);
+template VECTOR<double,2> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<double,3> >::Extrema_Face_Y_Transformed<BLOCK_UNIFORM<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > >(BLOCK_UNIFORM<VECTOR<double,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > const&,VECTOR<double,3> const&);
+template VECTOR<double,2> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<double,3> >::Extrema_Face_Z_Transformed<BLOCK_UNIFORM<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > >(BLOCK_UNIFORM<VECTOR<double,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > const&,VECTOR<double,3> const&);
+template double LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<double,3> >::Interpolate_Face_X_Transformed<BLOCK_UNIFORM<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > >(BLOCK_UNIFORM<VECTOR<double,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > const&,VECTOR<double,3> const&);
+template double LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<double,3> >::Interpolate_Face_Y_Transformed<BLOCK_UNIFORM<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > >(BLOCK_UNIFORM<VECTOR<double,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > const&,VECTOR<double,3> const&);
+template double LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<double,3> >::Interpolate_Face_Z_Transformed<BLOCK_UNIFORM<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > >(BLOCK_UNIFORM<VECTOR<double,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > const&,VECTOR<double,3> const&);
+template ARRAY<PAIR<FACE_INDEX<3>,double> > LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<double,3> >::Interpolate_Face_X_Transformed_Weights<BLOCK_UNIFORM<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > >(BLOCK_UNIFORM<VECTOR<double,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > const&,VECTOR<double,3> const&);
+template ARRAY<PAIR<FACE_INDEX<3>,double> > LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<double,3> >::Interpolate_Face_Y_Transformed_Weights<BLOCK_UNIFORM<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > >(BLOCK_UNIFORM<VECTOR<double,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > const&,VECTOR<double,3> const&);
+template ARRAY<PAIR<FACE_INDEX<3>,double> > LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<double,3> >::Interpolate_Face_Z_Transformed_Weights<BLOCK_UNIFORM<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > >(BLOCK_UNIFORM<VECTOR<double,3> > const&,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > const&,VECTOR<double,3> const&);
 }

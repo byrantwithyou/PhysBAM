@@ -21,8 +21,8 @@ INCOMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input)
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
     PROCESS_UTILITIES::Set_Backtrace(true);
     incompressible.Set_Custom_Advection(advection_scalar);
-    //incompressible.Add_Force(new INCOMPRESSIBILITY<GRID<TV> >(projection));
-    //incompressible.Add_Force(new FLUID_GRAVITY<GRID<TV> >());
+    //incompressible.Add_Force(new INCOMPRESSIBILITY<TV>(projection));
+    //incompressible.Add_Force(new FLUID_GRAVITY<TV>());
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
 }
 //#####################################################################

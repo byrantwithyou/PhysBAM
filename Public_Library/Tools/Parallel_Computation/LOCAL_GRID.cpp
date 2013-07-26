@@ -11,16 +11,16 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> LOCAL_GRID<T_GRID>::
-LOCAL_GRID(const T_GRID& global_grid_input)
+template<class TV> LOCAL_GRID<TV>::
+LOCAL_GRID(const GRID<TV>& global_grid_input)
     :mpi_grid(grid,3,true),global_grid(global_grid_input)
 {
 }
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> LOCAL_GRID<T_GRID>::
-LOCAL_GRID(const T_GRID& global_grid_input,const T_GRID& local_grid_input)
+template<class TV> LOCAL_GRID<TV>::
+LOCAL_GRID(const GRID<TV>& global_grid_input,const GRID<TV>& local_grid_input)
     :grid(local_grid_input),mpi_grid(grid,3,true),global_grid(global_grid_input)
 {
     Initialize();
@@ -28,14 +28,14 @@ LOCAL_GRID(const T_GRID& global_grid_input,const T_GRID& local_grid_input)
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> LOCAL_GRID<T_GRID>::
+template<class TV> LOCAL_GRID<TV>::
 ~LOCAL_GRID()
 {
 }
 //#####################################################################
 // Function Initialize
 //#####################################################################
-template<class T_GRID> void LOCAL_GRID<T_GRID>::
+template<class TV> void LOCAL_GRID<TV>::
 Initialize()
 {// find offset
     TV X=grid.Domain().Minimum_Corner();
@@ -43,9 +43,9 @@ Initialize()
     offset=global_offset-local_offset;
     PHYSBAM_ASSERT((grid.Node(local_offset)-global_grid.Node(global_offset)).Magnitude()<(T).01*grid.dX.Min(),"mismatch between global and local grids");
     // pretend there are neighbors on all sides for use in Find_Boundary_Regions
-    mpi_grid.side_neighbor_ranks.Resize(T_GRID::number_of_neighbors_per_cell);
+    mpi_grid.side_neighbor_ranks.Resize(GRID<TV>::number_of_neighbors_per_cell);
     mpi_grid.side_neighbor_ranks.Fill(1);
-    mpi_grid.all_neighbor_ranks.Resize(T_GRID::number_of_one_ring_neighbors_per_cell);
+    mpi_grid.all_neighbor_ranks.Resize(GRID<TV>::number_of_one_ring_neighbors_per_cell);
     mpi_grid.all_neighbor_ranks.Fill(1);
     ARRAY<RANGE<TV_INT> > regions;
     mpi_grid.Find_Boundary_Regions(regions,RANGE<TV_INT>::Zero_Box(),true,RANGE<VECTOR<int,1> >(VECTOR<int,1>(-5),VECTOR<int,1>(-5)),true);
@@ -56,7 +56,7 @@ Initialize()
 //#####################################################################
 // Function Put
 //#####################################################################
-template<class T_GRID> template<class T_ARRAYS> void LOCAL_GRID<T_GRID>::
+template<class TV> template<class T_ARRAYS> void LOCAL_GRID<TV>::
 Put(const T_ARRAYS& local_data,const RANGE<TV_INT>& region,T_ARRAYS& global_data) const
 {
     CELL_ITERATOR<TV> local(grid,region),global(grid,region+offset);
@@ -66,7 +66,7 @@ Put(const T_ARRAYS& local_data,const RANGE<TV_INT>& region,T_ARRAYS& global_data
 //#####################################################################
 // Function Put
 //#####################################################################
-template<class T_GRID> template<class T_ARRAYS> void LOCAL_GRID<T_GRID>::
+template<class TV> template<class T_ARRAYS> void LOCAL_GRID<TV>::
 Put(const T_ARRAYS& local_data,T_ARRAYS& global_data,const RANGE<TV_INT>& sentinels) const
 {
     Put(local_data,Interior_Region(sentinels),global_data);
@@ -77,7 +77,7 @@ Put(const T_ARRAYS& local_data,T_ARRAYS& global_data,const RANGE<TV_INT>& sentin
 //#####################################################################
 // Function Get
 //#####################################################################
-template<class T_GRID> template<class T_ARRAYS> void LOCAL_GRID<T_GRID>::
+template<class TV> template<class T_ARRAYS> void LOCAL_GRID<TV>::
 Get(const T_ARRAYS& global_data,T_ARRAYS& local_data) const
 {
     RANGE<TV_INT> region=local_data.Domain_Indices();
@@ -87,15 +87,15 @@ Get(const T_ARRAYS& global_data,T_ARRAYS& local_data) const
 //#####################################################################
 // Function Put_Faces
 //#####################################################################
-template<class T_GRID> template<class T_FACE_ARRAYS> void LOCAL_GRID<T_GRID>::
+template<class TV> template<class T_FACE_ARRAYS> void LOCAL_GRID<TV>::
 Put_Faces(const T_FACE_ARRAYS& local_data,T_FACE_ARRAYS& global_data) const
 {
-    for(int axis=0;axis<T_GRID::dimension;axis++) Put(local_data.Component(axis),global_data.Component(axis),mpi_grid.Face_Sentinels(axis));
+    for(int axis=0;axis<TV::m;axis++) Put(local_data.Component(axis),global_data.Component(axis),mpi_grid.Face_Sentinels(axis));
 }
 //#####################################################################
 // Function Maximum_Error
 //#####################################################################
-template<class T_GRID> template<class T_ARRAYS> typename T_GRID::VECTOR_T::SCALAR LOCAL_GRID<T_GRID>::
+template<class TV> template<class T_ARRAYS> typename TV::SCALAR LOCAL_GRID<TV>::
 Maximum_Error(const T_ARRAYS& local_data,const T_ARRAYS& global_data,const int bandwidth,TV_INT& index,const RANGE<TV_INT>& sentinels) const
 {
     RANGE<TV_INT> region=Interior_Region(sentinels).Thickened(bandwidth);
@@ -108,12 +108,12 @@ Maximum_Error(const T_ARRAYS& local_data,const T_ARRAYS& global_data,const int b
 //#####################################################################
 // Function Maximum_Error
 //#####################################################################
-template<class T_GRID> template<class T_FACE_ARRAYS> typename T_GRID::VECTOR_T::SCALAR LOCAL_GRID<T_GRID>::
+template<class TV> template<class T_FACE_ARRAYS> typename TV::SCALAR LOCAL_GRID<TV>::
 Maximum_Error(const std::string& prefix,const T_FACE_ARRAYS& local_data,const T_FACE_ARRAYS& global_data,const int bandwidth,const T threshold)
 {
     T max_error=(T)0;
     const char *axis_names[3]={"x","y","z"};
-    for(int axis=0;axis<T_GRID::dimension;axis++){
+    for(int axis=0;axis<TV::m;axis++){
         TV_INT index;
         max_error=Maximum_Error(local_data.Component(axis),global_data.Component(axis),bandwidth,index,mpi_grid.Face_Sentinels(axis));
         if(max_error>threshold){LOG::cout<<prefix<<", face "<<axis_names[axis]<<" = "<<max_error<<" ("<<index<<")"<<std::endl;}
@@ -123,21 +123,21 @@ Maximum_Error(const std::string& prefix,const T_FACE_ARRAYS& local_data,const T_
 //#####################################################################
 namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d) \
-    template class LOCAL_GRID<GRID<VECTOR<T,d> > >; \
-    template T LOCAL_GRID<GRID<VECTOR<T,d> > >::Maximum_Error<ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > >(ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > const&,ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > const&,int,VECTOR<int,d>&,RANGE<VECTOR<int,d> > const&) const; \
-    template T LOCAL_GRID<GRID<VECTOR<T,d> > >::Maximum_Error<ARRAY<VECTOR<T,d>,VECTOR<int,d> > >(ARRAY<VECTOR<T,d>,VECTOR<int,d> > const&,ARRAY<VECTOR<T,d>,VECTOR<int,d> > const&,int,VECTOR<int,d>&,RANGE<VECTOR<int,d> > const&) const; \
-    template T LOCAL_GRID<GRID<VECTOR<T,d> > >::Maximum_Error<ARRAY<T,VECTOR<int,d> > >(ARRAY<T,VECTOR<int,d> > const&,ARRAY<T,VECTOR<int,d> > const&,int,VECTOR<int,d>&,RANGE<VECTOR<int,d> > const&) const; \
-    template T LOCAL_GRID<GRID<VECTOR<T,d> > >::Maximum_Error<ARRAY<bool,VECTOR<int,d> > >(ARRAY<bool,VECTOR<int,d> > const&,ARRAY<bool,VECTOR<int,d> > const&,int,VECTOR<int,d>&,RANGE<VECTOR<int,d> > const&) const; \
-    template T LOCAL_GRID<GRID<VECTOR<T,d> > >::Maximum_Error<ARRAY<int,VECTOR<int,d> > >(ARRAY<int,VECTOR<int,d> > const&,ARRAY<int,VECTOR<int,d> > const&,int,VECTOR<int,d>&,RANGE<VECTOR<int,d> > const&) const; \
-    template T LOCAL_GRID<GRID<VECTOR<T,d> > >::Maximum_Error<ARRAY<bool,FACE_INDEX<d> > >(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,ARRAY<bool,FACE_INDEX<d> > const&,ARRAY<bool,FACE_INDEX<d> > const&,int,T); \
-    template T LOCAL_GRID<GRID<VECTOR<T,d> > >::Maximum_Error<ARRAY<T,FACE_INDEX<d> > >(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,ARRAY<T,FACE_INDEX<d> > const&,ARRAY<T,FACE_INDEX<d> > const&,int,T); \
-    template void LOCAL_GRID<GRID<VECTOR<T,d> > >::Put<ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > >(ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > const&,ARRAY<VECTOR<T,d+2>,VECTOR<int,d> >&,RANGE<VECTOR<int,d> > const&) const; \
-    template void LOCAL_GRID<GRID<VECTOR<T,d> > >::Put<ARRAY<VECTOR<T,d>,VECTOR<int,d> > >(ARRAY<VECTOR<T,d>,VECTOR<int,d> > const&,ARRAY<VECTOR<T,d>,VECTOR<int,d> >&,RANGE<VECTOR<int,d> > const&) const; \
-    template void LOCAL_GRID<GRID<VECTOR<T,d> > >::Put<ARRAY<T,VECTOR<int,d> > >(ARRAY<T,VECTOR<int,d> > const&,ARRAY<T,VECTOR<int,d> >&,RANGE<VECTOR<int,d> > const&) const; \
-    template void LOCAL_GRID<GRID<VECTOR<T,d> > >::Put<ARRAY<bool,VECTOR<int,d> > >(ARRAY<bool,VECTOR<int,d> > const&,ARRAY<bool,VECTOR<int,d> >&,RANGE<VECTOR<int,d> > const&) const; \
-    template void LOCAL_GRID<GRID<VECTOR<T,d> > >::Put<ARRAY<int,VECTOR<int,d> > >(ARRAY<int,VECTOR<int,d> > const&,ARRAY<int,VECTOR<int,d> >&,RANGE<VECTOR<int,d> > const&) const; \
-    template void LOCAL_GRID<GRID<VECTOR<T,d> > >::Put_Faces<ARRAY<bool,FACE_INDEX<d> > >(ARRAY<bool,FACE_INDEX<d> > const&,ARRAY<bool,FACE_INDEX<d> >&) const; \
-    template void LOCAL_GRID<GRID<VECTOR<T,d> > >::Put_Faces<ARRAY<T,FACE_INDEX<d> > >(ARRAY<T,FACE_INDEX<d> > const&,ARRAY<T,FACE_INDEX<d> >&) const;
+    template class LOCAL_GRID<VECTOR<T,d> >; \
+    template T LOCAL_GRID<VECTOR<T,d> >::Maximum_Error<ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > >(ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > const&,ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > const&,int,VECTOR<int,d>&,RANGE<VECTOR<int,d> > const&) const; \
+    template T LOCAL_GRID<VECTOR<T,d> >::Maximum_Error<ARRAY<VECTOR<T,d>,VECTOR<int,d> > >(ARRAY<VECTOR<T,d>,VECTOR<int,d> > const&,ARRAY<VECTOR<T,d>,VECTOR<int,d> > const&,int,VECTOR<int,d>&,RANGE<VECTOR<int,d> > const&) const; \
+    template T LOCAL_GRID<VECTOR<T,d> >::Maximum_Error<ARRAY<T,VECTOR<int,d> > >(ARRAY<T,VECTOR<int,d> > const&,ARRAY<T,VECTOR<int,d> > const&,int,VECTOR<int,d>&,RANGE<VECTOR<int,d> > const&) const; \
+    template T LOCAL_GRID<VECTOR<T,d> >::Maximum_Error<ARRAY<bool,VECTOR<int,d> > >(ARRAY<bool,VECTOR<int,d> > const&,ARRAY<bool,VECTOR<int,d> > const&,int,VECTOR<int,d>&,RANGE<VECTOR<int,d> > const&) const; \
+    template T LOCAL_GRID<VECTOR<T,d> >::Maximum_Error<ARRAY<int,VECTOR<int,d> > >(ARRAY<int,VECTOR<int,d> > const&,ARRAY<int,VECTOR<int,d> > const&,int,VECTOR<int,d>&,RANGE<VECTOR<int,d> > const&) const; \
+    template T LOCAL_GRID<VECTOR<T,d> >::Maximum_Error<ARRAY<bool,FACE_INDEX<d> > >(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,ARRAY<bool,FACE_INDEX<d> > const&,ARRAY<bool,FACE_INDEX<d> > const&,int,T); \
+    template T LOCAL_GRID<VECTOR<T,d> >::Maximum_Error<ARRAY<T,FACE_INDEX<d> > >(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,ARRAY<T,FACE_INDEX<d> > const&,ARRAY<T,FACE_INDEX<d> > const&,int,T); \
+    template void LOCAL_GRID<VECTOR<T,d> >::Put<ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > >(ARRAY<VECTOR<T,d+2>,VECTOR<int,d> > const&,ARRAY<VECTOR<T,d+2>,VECTOR<int,d> >&,RANGE<VECTOR<int,d> > const&) const; \
+    template void LOCAL_GRID<VECTOR<T,d> >::Put<ARRAY<VECTOR<T,d>,VECTOR<int,d> > >(ARRAY<VECTOR<T,d>,VECTOR<int,d> > const&,ARRAY<VECTOR<T,d>,VECTOR<int,d> >&,RANGE<VECTOR<int,d> > const&) const; \
+    template void LOCAL_GRID<VECTOR<T,d> >::Put<ARRAY<T,VECTOR<int,d> > >(ARRAY<T,VECTOR<int,d> > const&,ARRAY<T,VECTOR<int,d> >&,RANGE<VECTOR<int,d> > const&) const; \
+    template void LOCAL_GRID<VECTOR<T,d> >::Put<ARRAY<bool,VECTOR<int,d> > >(ARRAY<bool,VECTOR<int,d> > const&,ARRAY<bool,VECTOR<int,d> >&,RANGE<VECTOR<int,d> > const&) const; \
+    template void LOCAL_GRID<VECTOR<T,d> >::Put<ARRAY<int,VECTOR<int,d> > >(ARRAY<int,VECTOR<int,d> > const&,ARRAY<int,VECTOR<int,d> >&,RANGE<VECTOR<int,d> > const&) const; \
+    template void LOCAL_GRID<VECTOR<T,d> >::Put_Faces<ARRAY<bool,FACE_INDEX<d> > >(ARRAY<bool,FACE_INDEX<d> > const&,ARRAY<bool,FACE_INDEX<d> >&) const; \
+    template void LOCAL_GRID<VECTOR<T,d> >::Put_Faces<ARRAY<T,FACE_INDEX<d> > >(ARRAY<T,FACE_INDEX<d> > const&,ARRAY<T,FACE_INDEX<d> >&) const;
 
 INSTANTIATION_HELPER(float,1);
 INSTANTIATION_HELPER(float,2);

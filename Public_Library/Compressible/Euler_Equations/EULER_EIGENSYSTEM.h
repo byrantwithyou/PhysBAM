@@ -12,13 +12,13 @@
 #include <Compressible/Euler_Equations/EULER.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class EULER_EIGENSYSTEM:public EIGENSYSTEM<typename T_GRID::SCALAR,VECTOR<typename T_GRID::SCALAR,T_GRID::dimension+2> >,public EULER<T_GRID>
+template<class TV>
+class EULER_EIGENSYSTEM:public EIGENSYSTEM<typename TV::SCALAR,VECTOR<typename TV::SCALAR,TV::m+2> >,public EULER<TV>
 {
-    typedef typename T_GRID::SCALAR T;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+2> TV_DIMENSION;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef EULER<T_GRID> EULER_BASE;
+    typedef EULER<TV> EULER_BASE;
     typedef EIGENSYSTEM<T,TV_DIMENSION> EIGENSYSTEM_BASE;
 public:
     using EULER_BASE::eos;using EIGENSYSTEM_BASE::Flux;using EIGENSYSTEM_BASE::Eigenvalues;using EIGENSYSTEM_BASE::Eigenvectors;using EIGENSYSTEM_BASE::slice_index;

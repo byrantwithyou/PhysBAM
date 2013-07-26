@@ -22,7 +22,7 @@ int main(int argc,char** argv)
     STREAM_TYPE stream_type((RW()));
     typedef VECTOR<T,2> TV;
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
 
     bool opt_arb=false;
     PARSE_ARGS parse_args(argc,argv);
@@ -33,7 +33,7 @@ int main(int argc,char** argv)
     else example=new STANDARD_TESTS<T>(stream_type);
     example->Parse(parse_args);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*example);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*example);
     driver.Execute_Main_Program();
     delete example;
 

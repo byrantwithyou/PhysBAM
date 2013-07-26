@@ -403,7 +403,7 @@ Initialize_Bodies()
         if(restart) segment_adhesion->Read_State(stream_type,output_directory+STRING_UTILITIES::string_sprintf("/adhesion.%d",restart_frame));
         else segment_adhesion->Write_State(stream_type,output_directory+"/adhesion.0");}
     // drag forces
-    ETHER_DRAG<GRID<TV> >* ether_drag=new ETHER_DRAG<GRID<TV> >(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,&active_particles,NULL);
+    ETHER_DRAG<TV>* ether_drag=new ETHER_DRAG<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,&active_particles,NULL);
     solid_body_collection.Add_Force(ether_drag);
     ether_drag->Use_Constant_Wind(20);
     PHYSBAM_ASSERT(!use_wind);
@@ -718,10 +718,10 @@ Update_Time_Varying_Material_Properties(const T time)
         INTERPOLATION_CURVE<T,T> wind_viscosity;
         wind_viscosity.Add_Control_Point(ether_drag_off,20);
         wind_viscosity.Add_Control_Point(ether_drag_ramp_off,0);
-        ETHER_DRAG<GRID<TV> >& drag=solid_body_collection.template Find_Force<ETHER_DRAG<GRID<TV> >&>();
+        ETHER_DRAG<TV>& drag=solid_body_collection.template Find_Force<ETHER_DRAG<TV>&>();
         drag.Use_Constant_Wind(wind_viscosity.Value(time));}
     if(use_drag&&time>start_time){
-        ETHER_DRAG<GRID<TV> >& drag=solid_body_collection.template Find_Force<ETHER_DRAG<GRID<TV> >&>();
+        ETHER_DRAG<TV>& drag=solid_body_collection.template Find_Force<ETHER_DRAG<TV>&>();
         drag.Use_Constant_Wind(drag_viscosity);}
     //start wind
     if(test_number%3!=1){

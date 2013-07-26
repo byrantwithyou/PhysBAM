@@ -10,18 +10,18 @@
 #include <Dynamics/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID> class DETONATION_SHOCK_DYNAMICS;
+template<class TV> class DETONATION_SHOCK_DYNAMICS;
 
-template<class T_GRID>
-class FAST_PROJECTION_DYNAMICS_UNIFORM:public PROJECTION_DYNAMICS_UNIFORM<T_GRID>
+template<class TV>
+class FAST_PROJECTION_DYNAMICS_UNIFORM:public PROJECTION_DYNAMICS_UNIFORM<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;typedef typename FIRE_INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP_FIRE_MULTIPHASE T_FACE_LOOKUP_FIRE_MULTIPHASE;
+    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef typename FIRE_INTERPOLATION_POLICY<TV>::FACE_LOOKUP_FIRE_MULTIPHASE T_FACE_LOOKUP_FIRE_MULTIPHASE;
 public:
-    typedef PROJECTION_DYNAMICS_UNIFORM<T_GRID> BASE;using BASE::p_grid;using BASE::elliptic_solver;using BASE::Compute_Divergence;using BASE::Apply_Pressure;
+    typedef PROJECTION_DYNAMICS_UNIFORM<TV> BASE;using BASE::p_grid;using BASE::elliptic_solver;using BASE::Compute_Divergence;using BASE::Apply_Pressure;
     
     SPARSE_MATRIX_FLAT_NXN<T> A;
     ARRAY<T> b;
@@ -33,7 +33,7 @@ public:
     virtual ~FAST_PROJECTION_DYNAMICS_UNIFORM();
 
 //#####################################################################
-    virtual void Initialize_Grid(const T_GRID& mac_grid);
+    virtual void Initialize_Grid(const GRID<TV>& mac_grid);
     void Make_Divergence_Free_Fast(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
 //#####################################################################
 };

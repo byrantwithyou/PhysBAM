@@ -6,24 +6,24 @@
 #define __VORTEX_PARTICLE_EVOLUTION_3D__
 
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Parallel_Computation/MPI_GRID_POLICY.h>
 #include <Tools/Particles_Interpolation/SCATTERED_INTERPOLATION.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Incompressible/Particles/VORTICITY_PARTICLES.h>
 namespace PhysBAM{
+template<class T> class MPI_UNIFORM_GRID;
 
 template<class T>
 class VORTEX_PARTICLE_EVOLUTION_3D:public NONCOPYABLE
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename MPI_GRID_POLICY<GRID<TV> >::MPI_GRID T_MPI_GRID;
+    typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
 public:
     VORTICITY_PARTICLES<VECTOR<T,3> > vorticity_particles;
     GRID<TV> grid;
     T_MPI_GRID* mpi_grid;
     RANDOM_NUMBERS<T> random;
-    SCATTERED_INTERPOLATION<GRID<TV> > scattered_interpolation;
+    SCATTERED_INTERPOLATION<TV> scattered_interpolation;
     ARRAY<VECTOR<T,3> ,VECTOR<int,3> > grid_vorticity,grid_vorticity_particles;
     T grid_confinement_parameter,particle_confinement_parameter,force_scaling;
     bool renormalize_vorticity_after_stretching_tilting;

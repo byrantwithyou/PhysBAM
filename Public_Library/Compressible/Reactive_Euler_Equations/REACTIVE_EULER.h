@@ -17,19 +17,19 @@
 #include <Compressible/Equations_Of_State/REACTIVE_EOS.h>
 namespace PhysBAM{
 
-template<class T_GRID>
+template<class TV>
 class REACTIVE_EULER
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef VECTOR<T,T_GRID::dimension+3> TV_DIMENSION;
+    typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+3> TV_DIMENSION;
 public:
     REACTIVE_EOS<T>& eos; // needed for equation of state functions
     BOUNDARY<TV,TV_DIMENSION>* boundary;
-    CONSERVATION<T_GRID,T_GRID::dimension+3>* conservation;
+    CONSERVATION<TV,TV::m+3>* conservation;
 protected:
     int cut_out_grid; // (1) cut out grid, (0) no cut out grid 
 private:
     BOUNDARY<TV,TV_DIMENSION> boundary_default;
-    CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+3> conservation_default;
+    CONSERVATION_ENO_LLF<TV,TV::m+3> conservation_default;
 
 protected:
     REACTIVE_EULER(REACTIVE_EOS<T>& eos_input)
@@ -44,7 +44,7 @@ public:
     void Set_Custom_Boundary(BOUNDARY<TV,TV_DIMENSION>& boundary_input)
     {boundary=&boundary_input;}
     
-    void Set_Custom_Conservation(CONSERVATION<T_GRID,T_GRID::dimension+3>& conservation_input)
+    void Set_Custom_Conservation(CONSERVATION<TV,TV::m+3>& conservation_input)
     {conservation=&conservation_input;}
 
 //#####################################################################

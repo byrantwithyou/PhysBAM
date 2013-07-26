@@ -15,10 +15,10 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> EULER_FLUID_FORCES<T_GRID>::
-EULER_FLUID_FORCES(const T_GRID& grid_input,const T_FACE_ARRAYS_SCALAR& pressure_at_faces_input,
+template<class TV> EULER_FLUID_FORCES<TV>::
+EULER_FLUID_FORCES(const GRID<TV>& grid_input,const T_FACE_ARRAYS_SCALAR& pressure_at_faces_input,
     const T_FACE_ARRAYS_BOOL& solid_fluid_face_input,const ARRAY<bool,TV_INT>& cells_inside_fluid_input,
-    const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>* collision_bodies_affecting_fluid_input,DEFORMABLE_PARTICLES<TV>& particles_input,
+    const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>* collision_bodies_affecting_fluid_input,DEFORMABLE_PARTICLES<TV>& particles_input,
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input):SOLIDS_FORCES<TV>(particles_input,rigid_body_collection_input),
     grid(grid_input),pressure_at_faces(pressure_at_faces_input),solid_fluid_face(solid_fluid_face_input),
     cells_inside_fluid(cells_inside_fluid_input),collision_bodies_affecting_fluid(collision_bodies_affecting_fluid_input)
@@ -26,13 +26,13 @@ EULER_FLUID_FORCES(const T_GRID& grid_input,const T_FACE_ARRAYS_SCALAR& pressure
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> EULER_FLUID_FORCES<T_GRID>::
+template<class TV> EULER_FLUID_FORCES<TV>::
 ~EULER_FLUID_FORCES()
 {}
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
 //#####################################################################
-template<class T_GRID> void EULER_FLUID_FORCES<T_GRID>::
+template<class TV> void EULER_FLUID_FORCES<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {
     COLLISION_GEOMETRY_ID body_id;int simplex_id;
@@ -64,10 +64,10 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
 }
 //#####################################################################
 namespace PhysBAM{
-template class EULER_FLUID_FORCES<GRID<VECTOR<float,1> > >;
-template class EULER_FLUID_FORCES<GRID<VECTOR<float,2> > >;
-template class EULER_FLUID_FORCES<GRID<VECTOR<float,3> > >;
-template class EULER_FLUID_FORCES<GRID<VECTOR<double,1> > >;
-template class EULER_FLUID_FORCES<GRID<VECTOR<double,2> > >;
-template class EULER_FLUID_FORCES<GRID<VECTOR<double,3> > >;
+template class EULER_FLUID_FORCES<VECTOR<float,1> >;
+template class EULER_FLUID_FORCES<VECTOR<float,2> >;
+template class EULER_FLUID_FORCES<VECTOR<float,3> >;
+template class EULER_FLUID_FORCES<VECTOR<double,1> >;
+template class EULER_FLUID_FORCES<VECTOR<double,2> >;
+template class EULER_FLUID_FORCES<VECTOR<double,3> >;
 }

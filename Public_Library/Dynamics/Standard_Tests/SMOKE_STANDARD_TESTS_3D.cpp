@@ -15,16 +15,16 @@
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <Dynamics/Standard_Tests/SMOKE_STANDARD_TESTS_3D.h>
 using namespace PhysBAM;
-template<class T_GRID> SMOKE_STANDARD_TESTS_3D<T_GRID>::
-SMOKE_STANDARD_TESTS_3D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters,INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID>& incompressible_fluid_collection,RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
+template<class TV> SMOKE_STANDARD_TESTS_3D<TV>::
+SMOKE_STANDARD_TESTS_3D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters,INCOMPRESSIBLE_FLUID_COLLECTION<TV>& incompressible_fluid_collection,RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
     :example(example),fluids_parameters(fluids_parameters),incompressible_fluid_collection(incompressible_fluid_collection),rigid_body_collection(rigid_body_collection),test_number(0)
 {
 }
-template<class T_GRID> SMOKE_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> SMOKE_STANDARD_TESTS_3D<TV>::
 ~SMOKE_STANDARD_TESTS_3D()
 {
 }
-template<class T_GRID> void SMOKE_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> void SMOKE_STANDARD_TESTS_3D<TV>::
 Initialize(const int test_number_input,const int resolution)
 {
     test_number=test_number_input;
@@ -34,7 +34,7 @@ Initialize(const int test_number_input,const int resolution)
     // TODO: *REALLY* need to pick sensible constants and settings
     example.frame_rate=24;
     fluids_parameters.cfl=3;
-    fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,T_GRID::dimension>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(false));
+    fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,TV::m>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(false));
     fluids_parameters.domain_walls(1)(0)=true;
     fluids_parameters.use_vorticity_confinement=true;fluids_parameters.confinement_parameter=(T).15;
     fluids_parameters.kolmogorov=(T)0;fluids_parameters.gravity=(T)0;
@@ -77,7 +77,7 @@ Initialize(const int test_number_input,const int resolution)
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-template<class T_GRID> void SMOKE_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> void SMOKE_STANDARD_TESTS_3D<TV>::
 Initialize_Bodies()
 {
     if(test_number==2){
@@ -89,7 +89,7 @@ Initialize_Bodies()
 //#####################################################################
 // Function Get_Divergence
 //#####################################################################
-template<class T_GRID> void SMOKE_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> void SMOKE_STANDARD_TESTS_3D<TV>::
 Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time)
 {
     LOG::Time("Getting divergence");
@@ -101,7 +101,7 @@ Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time)
 //#####################################################################
 // Function Get_Body_Force
 //#####################################################################
-template<class T_GRID> void SMOKE_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> void SMOKE_STANDARD_TESTS_3D<TV>::
 Get_Body_Force(ARRAY<T,FACE_INDEX<3> >& force,const T dt,const T time)
 {
     if(test_number==4){
@@ -109,7 +109,7 @@ Get_Body_Force(ARRAY<T,FACE_INDEX<3> >& force,const T dt,const T time)
         fluids_parameters.incompressible->boundary->Fill_Ghost_Faces(*fluids_parameters.grid,incompressible_fluid_collection.face_velocities,face_velocities_ghost,time,fluids_parameters.number_of_ghost_cells);
         vortex_particle_evolution->Compute_Body_Force(face_velocities_ghost,force,dt,time);
         if(time<=explosion_end_time){
-            int add_count=0;VORTICITY_PARTICLES<TV >& vorticity_particles=vortex_particle_evolution->vorticity_particles;
+            int add_count=0;VORTICITY_PARTICLES<TV>& vorticity_particles=vortex_particle_evolution->vorticity_particles;
             TV cell_upper=(T).5*fluids_parameters.grid->dX,cell_lower=-cell_upper;
             for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
                 if(source.Lazy_Inside(iterator.Location()) && time>(T)1/24 && random.Get_Uniform_Number((T)0,(T)1)<(T).005){
@@ -123,12 +123,12 @@ Get_Body_Force(ARRAY<T,FACE_INDEX<3> >& force,const T dt,const T time)
 //#####################################################################
 // Function Initial_Velocity
 //#####################################################################
-template<class T_GRID> VECTOR<typename T_GRID::SCALAR,3> SMOKE_STANDARD_TESTS_3D<T_GRID>::
+template<class TV> TV SMOKE_STANDARD_TESTS_3D<TV>::
 Initial_Velocity(const TV& X) const
 {
     return TV();
 }
 namespace PhysBAM{
-template class SMOKE_STANDARD_TESTS_3D<GRID<VECTOR<float,3> > >;
-template class SMOKE_STANDARD_TESTS_3D<GRID<VECTOR<double,3> > >;
+template class SMOKE_STANDARD_TESTS_3D<VECTOR<float,3> >;
+template class SMOKE_STANDARD_TESTS_3D<VECTOR<double,3> >;
 }

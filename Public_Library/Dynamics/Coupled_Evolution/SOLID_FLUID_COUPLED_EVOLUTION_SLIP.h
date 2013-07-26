@@ -17,22 +17,22 @@ namespace PhysBAM{
 template<class T> class FRACTURE_PATTERN;
 template<class TV> class COLLISION_AWARE_INDEX_MAP;
 template<class TV> class FLUIDS_PARAMETERS_UNIFORM;
-template<class T_GRID> class POISSON_COLLIDABLE_UNIFORM;
+template<class TV> class POISSON_COLLIDABLE_UNIFORM;
 template<class TV> class GENERALIZED_VELOCITY;
 template<class TV> class GENERALIZED_MASS;
 template<class TV> class MATRIX_SOLID_INTERPOLATION;
 template<class TV> class SOLIDS_FLUIDS_PARAMETERS;
 template<class TV> class BACKWARD_EULER_SYSTEM;
 template<class TV> class FLUID_COLLECTION;
-template<class T_GRID> class EULER_PROJECTION_UNIFORM;
+template<class TV> class EULER_PROJECTION_UNIFORM;
 template<class TV> class IMPLICIT_BOUNDARY_CONDITION_COLLECTION;
 template<class TV> class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO;
 
 template<class TV_input>
-class SOLID_FLUID_COUPLED_EVOLUTION_SLIP:public NEWMARK_EVOLUTION<TV_input>,public PROJECTION_DYNAMICS_UNIFORM<GRID<TV_input> >
+class SOLID_FLUID_COUPLED_EVOLUTION_SLIP:public NEWMARK_EVOLUTION<TV_input>,public PROJECTION_DYNAMICS_UNIFORM<TV_input>
 {
-    typedef TV_input TV;typedef typename TV::SCALAR T;typedef GRID<TV> T_GRID;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef TV_input TV;typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
@@ -41,15 +41,15 @@ class SOLID_FLUID_COUPLED_EVOLUTION_SLIP:public NEWMARK_EVOLUTION<TV_input>,publ
 
 protected:
     typedef NEWMARK_EVOLUTION<TV> BASE;
-    typedef PROJECTION_DYNAMICS_UNIFORM<T_GRID> FLUID_BASE;
+    typedef PROJECTION_DYNAMICS_UNIFORM<TV> FLUID_BASE;
     using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::B_full;using BASE::rigid_B_full;
     using BASE::repulsions;using BASE::rigids_evolution_callbacks;using BASE::rigid_body_collisions;
     using FLUID_BASE::p;using FLUID_BASE::poisson;using BASE::Prepare_Backward_Euler_System;using BASE::krylov_vectors;
 
     COUPLED_SYSTEM_VECTOR<TV> coupled_x,coupled_b;
 
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies;
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters;
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection;
     ARRAY<TV> leakproof_empty_V,temp_solid_full,second_temp_solid_full;
@@ -64,7 +64,7 @@ public:
     IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>& boundary_condition_collection;
 protected:
 
-    T_GRID& grid;
+    GRID<TV>& grid;
     T_FACE_ARRAYS_SCALAR fluids_face_velocities; // Stores combined compressible-incompressible face velocities.
 public:
     T_ARRAYS_SCALAR pressure;
@@ -101,7 +101,7 @@ public:
     bool use_full_ic;
 
     SOLID_FLUID_COUPLED_EVOLUTION_SLIP(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,
-        EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input,
+        EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input,
         SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection_input);
     virtual ~SOLID_FLUID_COUPLED_EVOLUTION_SLIP();
 

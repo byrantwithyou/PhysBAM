@@ -48,20 +48,20 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
-SOLIDS_FLUIDS_DRIVER_UNIFORM(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>& example)
+template<class TV> SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
+SOLIDS_FLUIDS_DRIVER_UNIFORM(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>& example)
     :SOLIDS_FLUIDS_DRIVER<TV>(example),example(example),last_dt(0),restart_dt(0),reset_with_restart(false)
 {}
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 ~SOLIDS_FLUIDS_DRIVER_UNIFORM()
 {}
 //#####################################################################
 // Function Initialize
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Initialize()
 {
     SOLIDS_FLUIDS_DRIVER<TV>::Initialize();
@@ -82,22 +82,22 @@ Initialize()
     example.Parse_Late_Options();
 
     int number_of_regions=example.fluids_parameters.number_of_regions;
-    T_GRID& grid=*example.fluids_parameters.grid;
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=example.fluids_parameters.particle_levelset_evolution;
-    INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible=example.fluids_parameters.incompressible;
-    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>* particle_levelset_evolution_multiple=example.fluids_parameters.particle_levelset_evolution_multiple;
-    INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>* incompressible_multiphase=example.fluids_parameters.incompressible_multiphase;
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>& collision_bodies_affecting_fluid=*example.fluids_parameters.collision_bodies_affecting_fluid;
-    EULER_UNIFORM<T_GRID>* euler=example.fluids_parameters.euler;
+    GRID<TV>& grid=*example.fluids_parameters.grid;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=example.fluids_parameters.particle_levelset_evolution;
+    INCOMPRESSIBLE_UNIFORM<TV>* incompressible=example.fluids_parameters.incompressible;
+    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>* particle_levelset_evolution_multiple=example.fluids_parameters.particle_levelset_evolution_multiple;
+    INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>* incompressible_multiphase=example.fluids_parameters.incompressible_multiphase;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*example.fluids_parameters.collision_bodies_affecting_fluid;
+    EULER_UNIFORM<TV>* euler=example.fluids_parameters.euler;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
 
     // this needs to be before Initialize_Fluids_Grids
     if(example.fluids_parameters.use_sph_for_removed_negative_particles){
         for(int i=0;i<number_of_regions;i++){
-            PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(i);
+            PARTICLE_LEVELSET_UNIFORM<TV>& pls=example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(i);
             pls.template_particles.template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
             pls.template_removed_particles.template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);}
-        example.fluids_parameters.sph_evolution=new SPH_EVOLUTION_UNIFORM<T_GRID>(grid,*incompressible,example.fluids_parameters,particle_levelset_evolution);
+        example.fluids_parameters.sph_evolution=new SPH_EVOLUTION_UNIFORM<TV>(grid,*incompressible,example.fluids_parameters,particle_levelset_evolution);
         example.fluids_parameters.sph_evolution->Set_SPH_Callbacks(example);
         example.fluids_parameters.fluid_boundary=&example.fluids_parameters.fluid_boundary_water;}
 
@@ -332,8 +332,8 @@ Initialize()
         example.solid_body_collection.Compute_Linear_Momentum(solid_momentum);
         example.solid_body_collection.Compute_Energy(time,solid_kinetic_energy,solid_potential_energy);
 
-        for(int i=0;i<T_GRID::dimension;i++) euler->initial_total_conserved_quantity[i+1]+=solid_momentum[i];
-        euler->initial_total_conserved_quantity[T_GRID::dimension+1]+=(solid_kinetic_energy+solid_potential_energy);}
+        for(int i=0;i<TV::m;i++) euler->initial_total_conserved_quantity[i+1]+=solid_momentum[i];
+        euler->initial_total_conserved_quantity[TV::m+1]+=(solid_kinetic_energy+solid_potential_energy);}
 
     if(Simulate_Fluids()){
         if(example.fluids_parameters.compressible){
@@ -344,7 +344,7 @@ Initialize()
 //#####################################################################
 // Function Rigid_Cluster_Fracture
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
 {
     Check_For_Interrupts(); // see if keyboard or other interrupts are waiting
@@ -382,12 +382,12 @@ Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
 //#####################################################################
 // Function Initialize_Fluids_Grids
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Initialize_Fluids_Grids()
 {
-    T_GRID& grid=*example.fluids_parameters.grid;
+    GRID<TV>& grid=*example.fluids_parameters.grid;
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     int number_of_regions=fluids_parameters.number_of_regions;
     fluids_parameters.Initialize_Grids();
     example.fluid_collection.Initialize_Grids();
@@ -415,13 +415,13 @@ Initialize_Fluids_Grids()
 //#####################################################################
 // Function Advance_To_Target_Time
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Advance_To_Target_Time(const T target_time)
 {
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters=example.solids_fluids_parameters;
-    INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible=fluids_parameters.incompressible;
-    EULER_UNIFORM<T_GRID>* euler=fluids_parameters.euler;
+    INCOMPRESSIBLE_UNIFORM<TV>* incompressible=fluids_parameters.incompressible;
+    EULER_UNIFORM<TV>* euler=fluids_parameters.euler;
     int number_of_regions=fluids_parameters.number_of_regions;
     const bool fluids=Simulate_Fluids() && (!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node());
 
@@ -488,16 +488,16 @@ Advance_To_Target_Time(const T target_time)
 //#####################################################################
 // Function Integrate_Fluid_Non_Advection_Forces
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Integrate_Fluid_Non_Advection_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const int substep)
 {
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     int number_of_regions=fluids_parameters.number_of_regions;
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
-    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>* particle_levelset_evolution_multiple=fluids_parameters.particle_levelset_evolution_multiple;
-    INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>* incompressible_multiphase=fluids_parameters.incompressible_multiphase;
-    INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible=fluids_parameters.incompressible;
-    EULER_UNIFORM<T_GRID>* euler=fluids_parameters.euler;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
+    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>* particle_levelset_evolution_multiple=fluids_parameters.particle_levelset_evolution_multiple;
+    INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>* incompressible_multiphase=fluids_parameters.incompressible_multiphase;
+    INCOMPRESSIBLE_UNIFORM<TV>* incompressible=fluids_parameters.incompressible;
+    EULER_UNIFORM<TV>* euler=fluids_parameters.euler;
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>* euler_solid_fluid_coupling_utilities=fluids_parameters.euler_solid_fluid_coupling_utilities;
 
     LOG::SCOPE integration_scope("INTEGRATE NON ADVECTION FORCES","integrate non advection forces");
@@ -533,7 +533,7 @@ Integrate_Fluid_Non_Advection_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const
 //#####################################################################
 // Function Setup_Solids
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Setup_Solids(const T time,const int substep)
 {
     SOLIDS_PARAMETERS<TV>& solids_parameters=example.solids_parameters;
@@ -558,14 +558,14 @@ Setup_Solids(const T time,const int substep)
 //#####################################################################
 // Function Setup_Fluids
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Setup_Fluids(const T time)
 {  
     const T fictitious_dt=(T)1./example.frame_rate;
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
-    EULER_UNIFORM<T_GRID>* euler=fluids_parameters.euler;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
+    EULER_UNIFORM<TV>* euler=fluids_parameters.euler;
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>* euler_solid_fluid_coupling_utilities=fluids_parameters.euler_solid_fluid_coupling_utilities;
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
 
     fluids_parameters.collision_bodies_affecting_fluid->Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,time);
     if(fluids_parameters.number_of_regions) particle_levelset_evolution->Set_Number_Particles_Per_Cell(fluids_parameters.number_particles_per_cell);
@@ -579,21 +579,21 @@ Setup_Fluids(const T time)
 //#####################################################################
 // Function Solid_Position_Update
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Solid_Position_Update(const T dt,const int substep)
 {
     Check_For_Interrupts(); // see if keyboard or other interrupts are waiting
     LOG::SCOPE scope("solids position update");
 
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     SOLIDS_PARAMETERS<TV>& solids_parameters=example.solids_parameters;
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters=example.solids_fluids_parameters;
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=example.solid_body_collection.deformable_body_collection;
     SOLIDS_EVOLUTION_CALLBACKS<TV>* solids_evolution_callbacks=solids_evolution.solids_evolution_callbacks;
-    T_GRID& grid=*fluids_parameters.grid;
-    EULER_UNIFORM<T_GRID>* euler=fluids_parameters.euler;
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
+    GRID<TV>& grid=*fluids_parameters.grid;
+    EULER_UNIFORM<TV>* euler=fluids_parameters.euler;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     const bool solids=Simulate_Solids() && (!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Solid_Node());
     const bool fluids=Simulate_Fluids() && (!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node());
 
@@ -653,19 +653,19 @@ Solid_Position_Update(const T dt,const int substep)
 //#####################################################################
 // Function Project_Fluid
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Project_Fluid(const T dt_projection,const T time_projection,const int substep)
 {
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
     int number_of_regions=fluids_parameters.number_of_regions;
-    T_GRID& grid=*fluids_parameters.grid;
-    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>* particle_levelset_evolution_multiple=fluids_parameters.particle_levelset_evolution_multiple;
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
-    INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>* incompressible_multiphase=fluids_parameters.incompressible_multiphase;
-    INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible=fluids_parameters.incompressible;
-    EULER_UNIFORM<T_GRID>* euler=fluids_parameters.euler;
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
+    GRID<TV>& grid=*fluids_parameters.grid;
+    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>* particle_levelset_evolution_multiple=fluids_parameters.particle_levelset_evolution_multiple;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
+    INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>* incompressible_multiphase=fluids_parameters.incompressible_multiphase;
+    INCOMPRESSIBLE_UNIFORM<TV>* incompressible=fluids_parameters.incompressible;
+    EULER_UNIFORM<TV>* euler=fluids_parameters.euler;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 
     // TODO: time+dt in this function may want to be time when this is used for initial object compatible velocity
@@ -840,14 +840,14 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
 //#####################################################################
 // Function Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(const T dt_projection,const T time_projection,const int substep)
 {
     // if(example.fluids_parameters.compressible) PHYSBAM_FATAL_ERROR("This currently doesn't work, as Fill_Solid_Cells is not aware of pseudo-velocities");
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters=example.solids_fluids_parameters;
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
-    INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible=fluids_parameters.incompressible;
-    EULER_UNIFORM<T_GRID>* euler=fluids_parameters.euler;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
+    INCOMPRESSIBLE_UNIFORM<TV>* incompressible=fluids_parameters.incompressible;
+    EULER_UNIFORM<TV>* euler=fluids_parameters.euler;
 
     if(fluids_parameters.simulate && fluids_parameters.compressible && (!euler->timesplit || !euler->thinshell))
         fluids_parameters.euler_solid_fluid_coupling_utilities->Fill_Solid_Cells();
@@ -861,23 +861,23 @@ Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(const T dt_pr
 //#####################################################################
 // Function Calculate_Maximum_Allowable_dt
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Calculate_Maximum_Allowable_dt(const T dt,T& min_dt,const int substep,RUNGEKUTTA<T_ARRAYS_DIMENSION_SCALAR>& rungekutta_u)
 {
     int val=2;
     if((substep==2)&&(rungekutta_u.order==3)) val=3;
     else if((substep==3)&&(rungekutta_u.order==3)) val=4;
 
-    EULER_UNIFORM<T_GRID>* euler=example.fluids_parameters.euler;
+    EULER_UNIFORM<TV>* euler=example.fluids_parameters.euler;
     ARRAY_VIEW<TV_DIMENSION,TV_INT> U_n(rungekutta_u.u_copy);
     for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T clamp_rho_cell=euler->conservation->clamp_rho*U_n(cell_index)(0);
-        T clamp_e_cell=euler->conservation->clamp_e*EULER<T_GRID>::e(U_n,cell_index);
+        T clamp_e_cell=euler->conservation->clamp_e*EULER<TV>::e(U_n,cell_index);
         if((euler->U(cell_index)(0)<U_n(cell_index)(0))&&(abs(euler->U(cell_index)(0)-U_n(cell_index)(0))>1e-5))
             min_dt=min(min_dt,((T)val*dt*(clamp_rho_cell-U_n(cell_index)(0)))/(euler->U(cell_index)(0)-U_n(cell_index)(0)));
         assert(min_dt>0);
-        if((EULER<T_GRID>::e(euler->U,cell_index)<EULER<T_GRID>::e(U_n,cell_index))&&(abs(EULER<T_GRID>::e(euler->U,cell_index)-EULER<T_GRID>::e(U_n,cell_index))>1e-5))
-            min_dt=min(min_dt,((T)val*dt*(clamp_e_cell-EULER<T_GRID>::e(U_n,cell_index)))/(EULER<T_GRID>::e(euler->U,cell_index)-EULER<T_GRID>::e(U_n,cell_index)));
+        if((EULER<TV>::e(euler->U,cell_index)<EULER<TV>::e(U_n,cell_index))&&(abs(EULER<TV>::e(euler->U,cell_index)-EULER<TV>::e(U_n,cell_index))>1e-5))
+            min_dt=min(min_dt,((T)val*dt*(clamp_e_cell-EULER<TV>::e(U_n,cell_index)))/(EULER<TV>::e(euler->U,cell_index)-EULER<TV>::e(U_n,cell_index)));
         assert(min_dt>0);}
     if(min_dt!=dt){
         T alpha=min_dt/(val*dt);
@@ -886,21 +886,21 @@ Calculate_Maximum_Allowable_dt(const T dt,T& min_dt,const int substep,RUNGEKUTTA
 //#####################################################################
 // Function Advect_Fluid
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Advect_Fluid(const T dt,const int substep)
 {
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters=example.solids_fluids_parameters;
     int number_of_regions=fluids_parameters.number_of_regions;
-    T_GRID& grid=*fluids_parameters.grid;
-    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>* particle_levelset_evolution_multiple=fluids_parameters.particle_levelset_evolution_multiple;
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
-    INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>* incompressible_multiphase=fluids_parameters.incompressible_multiphase;
-    INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible=fluids_parameters.incompressible;
-    EULER_UNIFORM<T_GRID>* euler=fluids_parameters.euler;
+    GRID<TV>& grid=*fluids_parameters.grid;
+    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>* particle_levelset_evolution_multiple=fluids_parameters.particle_levelset_evolution_multiple;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
+    INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>* incompressible_multiphase=fluids_parameters.incompressible_multiphase;
+    INCOMPRESSIBLE_UNIFORM<TV>* incompressible=fluids_parameters.incompressible;
+    EULER_UNIFORM<TV>* euler=fluids_parameters.euler;
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>* euler_solid_fluid_coupling_utilities=fluids_parameters.euler_solid_fluid_coupling_utilities;
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 
     LOG::SCOPE scalar_scope("SCALAR SCOPE");
@@ -965,8 +965,8 @@ Advect_Fluid(const T dt,const int substep)
     if(number_of_regions==1) fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(true);
     if(number_of_regions) particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time);
     if(!fluids_parameters.analytic_test) for(int k=0;k<number_of_regions;k++){
-        PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=particle_levelset_evolution->Particle_Levelset(k);
-        LINEAR_INTERPOLATION_UNIFORM<T_GRID,TV> interpolation;
+        PARTICLE_LEVELSET_UNIFORM<TV>& pls=particle_levelset_evolution->Particle_Levelset(k);
+        LINEAR_INTERPOLATION_UNIFORM<TV,TV> interpolation;
         if(pls.use_removed_positive_particles) for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());
             for(int p=0;p<particles.Size();p++){
@@ -987,7 +987,7 @@ Advect_Fluid(const T dt,const int substep)
 
     if(fluids_parameters.use_reacting_flow && incompressible_multiphase->projection.dsd){
         LOG::Time("advancing detonation shock dynamics");
-        LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple;
+        LEVELSET_MULTIPLE<TV>& levelset_multiple=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple;
         levelset_multiple.Compute_Normals();levelset_multiple.Compute_Curvature();
         incompressible_multiphase->projection.dsd->Advance_One_Time_Step(particle_levelset_evolution_multiple->V,dt,time,fluids_parameters.number_of_ghost_cells);}
     else if(incompressible && incompressible->projection.dsd){
@@ -1044,7 +1044,7 @@ Advect_Fluid(const T dt,const int substep)
                 else if((rk.substep==1)&&(rk.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);*const_cast<T*>(&dt)=min_dt;rk.time-=dt/2;continue;}
                 else if((rk.substep==2)&&(rk.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);restart_dt=min_dt;break;}}
             for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-                assert(euler->U(cell_index)(0)>0);assert(EULER<T_GRID>::e(euler->U,cell_index)>0);}
+                assert(euler->U(cell_index)(0)>0);assert(EULER<TV>::e(euler->U,cell_index)>0);}
             if(euler->timesplit && euler->perform_rungekutta_for_implicit_part){assert(!euler->thinshell);
                 euler->Get_Dirichlet_Boundary_Conditions(dt,rk.time);
                 fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_projection.elliptic_solver,euler->euler_projection.face_velocities,dt,rk.time+dt);
@@ -1162,7 +1162,7 @@ Advect_Fluid(const T dt,const int substep)
 //#####################################################################
 // Function Solid_Velocity_Update
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Solid_Velocity_Update(const T dt,const int substep,const bool done)
 {
     Check_For_Interrupts(); // see if keyboard or other interrupts are waiting
@@ -1184,19 +1184,19 @@ Solid_Velocity_Update(const T dt,const int substep,const bool done)
 //#####################################################################
 // Function Advance_Fluid_One_Time_Step_Implicit_Part
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int substep)
 {
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     int number_of_regions=fluids_parameters.number_of_regions;
-    EULER_UNIFORM<T_GRID>* euler=fluids_parameters.euler;
-    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>* particle_levelset_evolution_multiple=fluids_parameters.particle_levelset_evolution_multiple;
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
-    INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>* incompressible_multiphase=fluids_parameters.incompressible_multiphase;
-    INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible=fluids_parameters.incompressible;
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
+    EULER_UNIFORM<TV>* euler=fluids_parameters.euler;
+    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>* particle_levelset_evolution_multiple=fluids_parameters.particle_levelset_evolution_multiple;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
+    INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>* incompressible_multiphase=fluids_parameters.incompressible_multiphase;
+    INCOMPRESSIBLE_UNIFORM<TV>* incompressible=fluids_parameters.incompressible;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
 
     if(fluids_parameters.solid_affects_fluid && !fluids_parameters.fluid_affects_solid && !done && !project_at_frame_boundaries) return;
@@ -1254,19 +1254,19 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
 
     if(fluids_parameters.compressible){
         if(fluids_parameters.compressible_monitor_conservation_error){
-            VECTOR<T,T_GRID::dimension+2> new_total_conserved_quantity;
+            VECTOR<T,TV::m+2> new_total_conserved_quantity;
             TV solid_momentum;T solid_kinetic_energy,solid_potential_energy;
             euler->Compute_Total_Conserved_Quantity(true,dt,new_total_conserved_quantity);
             example.solid_body_collection.Compute_Linear_Momentum(solid_momentum);
             example.solid_body_collection.Compute_Energy(time,solid_kinetic_energy,solid_potential_energy);
 
-            for(int i=0;i<T_GRID::dimension;i++) new_total_conserved_quantity[i+1]+=solid_momentum[i];
-            new_total_conserved_quantity[T_GRID::dimension+1]+=(solid_kinetic_energy+solid_potential_energy);
+            for(int i=0;i<TV::m;i++) new_total_conserved_quantity[i+1]+=solid_momentum[i];
+            new_total_conserved_quantity[TV::m+1]+=(solid_kinetic_energy+solid_potential_energy);
             LOG::cout<<"solid_momentum="<<solid_momentum<<", solid_energy="<<solid_kinetic_energy+solid_potential_energy<<std::endl;
 
-            VECTOR<T,T_GRID::dimension+2>& initial_total_conserved_quantity=euler->initial_total_conserved_quantity;
+            VECTOR<T,TV::m+2>& initial_total_conserved_quantity=euler->initial_total_conserved_quantity;
             LOG::cout<<"Conserved variable error at time="<<time<<std::endl;
-            for(int d=0;d<T_GRID::dimension+2;d++){
+            for(int d=0;d<TV::m+2;d++){
                 T total_error=new_total_conserved_quantity(d)-initial_total_conserved_quantity(d);
                 T relative_error=(initial_total_conserved_quantity(d)!=0)?total_error/initial_total_conserved_quantity(d):0;
                 LOG::cout<<"Conserved variable dimension="<<d<<", initial value="<<initial_total_conserved_quantity(d)<<", new value="<<new_total_conserved_quantity(d)<<
@@ -1279,7 +1279,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
             for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
                 if(euler->psi(cell_index)){
                     T current_density=euler->U(cell_index)[0];
-                    TV current_velocity=EULER<T_GRID>::Get_Velocity(euler->U,cell_index);
+                    TV current_velocity=EULER<TV>::Get_Velocity(euler->U,cell_index);
                     if(current_density<min_density){min_density=current_density;min_cell_index=cell_index;}
                     if(current_density>max_density){max_density=current_density;max_cell_index=cell_index;}
                     if(current_velocity.Magnitude()>max_velocity.Magnitude()){max_velocity=current_velocity;max_velocity_index=cell_index;}}}
@@ -1291,11 +1291,11 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
 //#####################################################################
 // Function Postprocess_Frame
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Postprocess_Frame(const int frame)
 {
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=example.fluids_parameters.particle_levelset_evolution;
-    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>* particle_levelset_evolution_multiple=example.fluids_parameters.particle_levelset_evolution_multiple;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=example.fluids_parameters.particle_levelset_evolution;
+    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>* particle_levelset_evolution_multiple=example.fluids_parameters.particle_levelset_evolution_multiple;
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
     int number_of_regions=example.fluids_parameters.number_of_regions;
 
@@ -1329,13 +1329,13 @@ Postprocess_Frame(const int frame)
 //#####################################################################
 // Function Compute_Dt
 //#####################################################################
-template<class T_GRID> typename T_GRID::VECTOR_T::SCALAR SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> typename TV::SCALAR SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Compute_Dt(const T time,const T target_time,bool& done)
 {
     SOLIDS_PARAMETERS<TV>& solids_parameters=example.solids_parameters;
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters=example.solids_fluids_parameters;
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
     SOLIDS_EVOLUTION_CALLBACKS<TV>* solids_evolution_callbacks=solids_evolution.solids_evolution_callbacks;
     int number_of_regions=fluids_parameters.number_of_regions;
@@ -1384,7 +1384,7 @@ Compute_Dt(const T time,const T target_time,bool& done)
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
-template<class T_GRID> void SOLIDS_FLUIDS_DRIVER_UNIFORM<T_GRID>::
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Write_Output_Files(const int frame)
 {
     LOG::SCOPE scope("writing output files");
@@ -1400,10 +1400,10 @@ Write_Output_Files(const int frame)
     if(number_of_regions==1) example.fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(true);
 
     if(number_of_regions>=1){
-        T_GRID& grid=*example.fluids_parameters.grid;
+        GRID<TV>& grid=*example.fluids_parameters.grid;
         for(int i=0;i<number_of_regions;i++){
             int number_of_positive_particles=0,number_of_negative_particles=0,number_of_removed_positive_particles=0,number_of_removed_negative_particles=0;
-            PARTICLE_LEVELSET_UNIFORM<T_GRID>* pls=0;
+            PARTICLE_LEVELSET_UNIFORM<TV>* pls=0;
             if(number_of_regions==1) pls=&example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(0);
             else pls=example.fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
             for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls->positive_particles(iterator.Cell_Index()))
@@ -1424,10 +1424,10 @@ Write_Output_Files(const int frame)
 }
 //#####################################################################
 namespace PhysBAM{
-template class SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<VECTOR<float,1> > >;
-template class SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<VECTOR<float,2> > >;
-template class SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<VECTOR<float,3> > >;
-template class SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<VECTOR<double,1> > >;
-template class SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<VECTOR<double,2> > >;
-template class SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<VECTOR<double,3> > >;
+template class SOLIDS_FLUIDS_DRIVER_UNIFORM<VECTOR<float,1> >;
+template class SOLIDS_FLUIDS_DRIVER_UNIFORM<VECTOR<float,2> >;
+template class SOLIDS_FLUIDS_DRIVER_UNIFORM<VECTOR<float,3> >;
+template class SOLIDS_FLUIDS_DRIVER_UNIFORM<VECTOR<double,1> >;
+template class SOLIDS_FLUIDS_DRIVER_UNIFORM<VECTOR<double,2> >;
+template class SOLIDS_FLUIDS_DRIVER_UNIFORM<VECTOR<double,3> >;
 }

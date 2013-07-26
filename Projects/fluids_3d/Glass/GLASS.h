@@ -18,20 +18,20 @@
 namespace PhysBAM{
 
 template<class T_input>
-class GLASS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class GLASS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;
 public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::solid_body_collection;
     using BASE::stream_type;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
-    FLUID_COLLISION_BODY_INACCURATE_UNION<GRID<TV> > inaccurate_union;
+    FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
     int glass;
 
     int particle_id;
@@ -58,7 +58,7 @@ public:
     ***************/
 
     GLASS(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,1,fluids_parameters.WATER),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,1,fluids_parameters.WATER),
         rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid),particle_id(0)
     {
     }
@@ -209,7 +209,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
 {
     GRID<TV>& grid=*fluids_parameters.grid;
-    SPH_EVOLUTION_UNIFORM<GRID<TV> >& sph_evolution=*fluids_parameters.sph_evolution;
+    SPH_EVOLUTION_UNIFORM<TV>& sph_evolution=*fluids_parameters.sph_evolution;
     sph_evolution.use_two_way_coupling=use_two_way_coupling_for_sph;
     sph_evolution.use_variable_density_solve=use_variable_density_for_sph;
     sph_evolution.convert_particles_to_fluid=convert_sph_particles_to_fluid;
@@ -251,7 +251,7 @@ void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Update_Fluid_Parameters(dt,time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
     if(time>1.85) sources.Clean_Memory();
 }
 //#####################################################################
@@ -302,7 +302,7 @@ void Add_SPH_Particles_For_Sources(const T dt,const T time) PHYSBAM_OVERRIDE
              grid.Block_Index(TV(source_bounding_box.max_corner.x,source_bounding_box.max_corner.y,source_bounding_box.max_corner.z),1));
         for(NODE_ITERATOR<TV> node_iterator(grid,source_bounding_box_int);node_iterator.Valid();node_iterator.Next()){
             TV location=node_iterator.Location();TV_INT block=grid.Block_Index(location,1);
-            BLOCK_UNIFORM<GRID<TV> > block_uniform(grid,block);
+            BLOCK_UNIFORM<TV> block_uniform(grid,block);
             RANGE<TV> block_bounding_box=block_uniform.Bounding_Box();
             if(sph_sources(s).Lazy_Inside(location)){
                 if(!removed_negative_particles(block)) removed_negative_particles(block)=new PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>();

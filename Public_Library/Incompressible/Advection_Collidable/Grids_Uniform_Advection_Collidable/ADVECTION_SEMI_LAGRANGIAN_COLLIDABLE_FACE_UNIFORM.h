@@ -15,23 +15,22 @@
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_COLLIDABLE_UNIFORM<T_GRID>
-class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM:public ADVECTION<T_GRID,typename T_GRID::SCALAR,T_FACE_LOOKUP>
+template<class TV,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_COLLIDABLE_UNIFORM<TV>
+class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM:public ADVECTION<TV,typename TV::SCALAR,T_FACE_LOOKUP>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename COLLISION_BODY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
-    T_GRID_BASED_COLLISION_GEOMETRY& body_list;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list;
 private:
-    LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM<T_GRID,T,T_FACE_LOOKUP> linear_interpolation_collidable;
-    LINEAR_INTERPOLATION_UNIFORM<T_GRID,T,typename T_FACE_LOOKUP::NESTED_LOOKUP> linear_interpolation;
-    AVERAGING_UNIFORM<T_GRID,typename T_FACE_LOOKUP::NESTED_LOOKUP> averaging;
-    AVERAGING_COLLIDABLE_UNIFORM<T_GRID,T_FACE_LOOKUP> averaging_collidable;
+    LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM<TV,T,T_FACE_LOOKUP> linear_interpolation_collidable;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T,typename T_FACE_LOOKUP::NESTED_LOOKUP> linear_interpolation;
+    AVERAGING_UNIFORM<TV,typename T_FACE_LOOKUP::NESTED_LOOKUP> averaging;
+    AVERAGING_COLLIDABLE_UNIFORM<TV,T_FACE_LOOKUP> averaging_collidable;
     T_FACE_ARRAYS_BOOL& face_velocities_valid_mask;
 public:
 
-    ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM(T_GRID_BASED_COLLISION_GEOMETRY& body_list_input,T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input)
+    ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list_input,T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input)
         :body_list(body_list_input),averaging_collidable(body_list,0),
          face_velocities_valid_mask(face_velocities_valid_mask_input)
     {}
@@ -39,7 +38,7 @@ public:
     virtual ~ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM()
     {}
 
-    void Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
+    void Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
         const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
     {T_FACE_ARRAYS_BOOL face_velocities_valid_mask_next(grid,3,false);
@@ -81,13 +80,13 @@ public:
     if(body_list.collision_geometry_collection.Intersection_Between_Points(from,to,body_id,aggregate_id,point)) return body_list.Object_Velocity(body_id,aggregate_id,point)[axis];
     else return default_value;}
 
-    void Average_To_Invalidated_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_values)
+    void Average_To_Invalidated_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_values)
     {// average values collision aware in Gauss-Jacobi fashion
     typename TV::template REBIND<ARRAY<PAIR<TV_INT,bool> > >::TYPE face_invalid_indices; // index and bool true if entry has been validated on iteration
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(!face_velocities_valid_mask.Component(iterator.Axis())(iterator.Face_Index())) 
         face_invalid_indices[iterator.Axis()].Append(PAIR<TV_INT,bool>(iterator.Face_Index(),false));
     
-    for(int arrays_axis=0;arrays_axis<T_GRID::dimension;arrays_axis++){
+    for(int arrays_axis=0;arrays_axis<TV::m;arrays_axis++){
         ARRAY<PAIR<TV_INT,bool> >& invalid_indices=face_invalid_indices[arrays_axis];
         ARRAYS_ND_BASE<VECTOR<bool,TV::m>,TV_INT>& neighbors_visible=body_list.face_neighbors_visible.Component(arrays_axis);
         ARRAYS_ND_BASE<bool,TV_INT>& valid_points=face_velocities_valid_mask.Component(arrays_axis);T_ARRAYS_BASE& values=face_values.Component(arrays_axis);
@@ -100,7 +99,7 @@ public:
             done=true;
             for(int k=0;k<invalid_indices.m;k++){ 
                 T sum=0;int count=0;
-                for(int axis=0;axis<T_GRID::dimension;axis++){
+                for(int axis=0;axis<TV::m;axis++){
                     TV_INT min_face=invalid_indices(k).x-TV_INT::Axis_Vector(axis),max_face=invalid_indices(k).x+TV_INT::Axis_Vector(axis);
                     if(neighbors_visible(min_face)(axis) && valid_points(min_face)){sum+=values(min_face);count++;}
                     if(neighbors_visible(invalid_indices(k).x)(axis) && valid_points(max_face)){sum+=values(max_face);count++;}}
@@ -113,7 +112,7 @@ public:
             done=true;
             for(int k=0;k<invalid_indices.m;k++){ 
                 T sum=0;int count=0;
-                for(int axis=0;axis<T_GRID::dimension;axis++){
+                for(int axis=0;axis<TV::m;axis++){
                     TV_INT min_face=invalid_indices(k).x-TV_INT::Axis_Vector(axis),max_face=invalid_indices(k).x+TV_INT::Axis_Vector(axis);
                     if(neighbors_visible(min_face)(axis)){if(valid_points(min_face)){sum+=values(min_face);count++;}}
                     else{sum+=Compute_Revalidation_Value(arrays_axis,grid.X(invalid_indices(k).x),grid.X(min_face),values(invalid_indices(k).x),T());count++;}

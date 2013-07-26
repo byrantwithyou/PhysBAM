@@ -14,40 +14,40 @@
 
 using namespace PhysBAM;
 
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
+template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::
 ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA(THREAD_QUEUE* thread_queue_input)
     :thread_queue(thread_queue_input)
 {}
 
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Node(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
+template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::
+Update_Advection_Equation_Node(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
     const ARRAY<TV,TV_INT>& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
     const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
     RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner+=TV_INT::All_Ones_Vector();
-    DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>,TV>(domain,thread_queue).template Run<const T_GRID&,ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<TV,TV_INT>&,BOUNDARY<TV,T2>&,T,T,const ARRAY<T2,TV_INT>*,const ARRAY<T2,TV_INT>*,ARRAY<T2,TV_INT>*,ARRAY<T2,TV_INT>*>(*this,&ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::Update_Advection_Equation_Node_Threaded,grid,Z,Z_ghost,V,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);
+    DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>,TV>(domain,thread_queue).template Run<const GRID<TV>&,ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const ARRAY<TV,TV_INT>&,BOUNDARY<TV,T2>&,T,T,const ARRAY<T2,TV_INT>*,const ARRAY<T2,TV_INT>*,ARRAY<T2,TV_INT>*,ARRAY<T2,TV_INT>*>(*this,&ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::Update_Advection_Equation_Node_Threaded,grid,Z,Z_ghost,V,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);
 }
 
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
+template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::
+Update_Advection_Equation_Cell_Lookup(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
-    DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>,TV>(grid.Domain_Indices(),thread_queue).template Run<const T_GRID&,ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const T_FACE_LOOKUP&,BOUNDARY<TV,T2>&,T,T,const ARRAY<T2,TV_INT>*,const ARRAY<T2,TV_INT>*,ARRAY<T2,TV_INT>*,ARRAY<T2,TV_INT>*>(*this,&ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::Update_Advection_Equation_Cell_Lookup_Threaded,grid,Z,Z_ghost,face_velocities,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);
+    DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>,TV>(grid.Domain_Indices(),thread_queue).template Run<const GRID<TV>&,ARRAY<T2,TV_INT>&,const ARRAY<T2,TV_INT>&,const T_FACE_LOOKUP&,BOUNDARY<TV,T2>&,T,T,const ARRAY<T2,TV_INT>*,const ARRAY<T2,TV_INT>*,ARRAY<T2,TV_INT>*,ARRAY<T2,TV_INT>*>(*this,&ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::Update_Advection_Equation_Cell_Lookup_Threaded,grid,Z,Z_ghost,face_velocities,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);
 }
 
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
+template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::
+Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
     const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
     const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
 {
     for(int axis=0;axis<TV::dimension;axis++){
         RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner+=TV_INT::Axis_Vector(axis);
-        DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>,TV>(domain,thread_queue).template Run<int,const T_GRID&,T_FACE_ARRAYS_SCALAR&,const T_FACE_LOOKUP&,const T_FACE_LOOKUP&,BOUNDARY<TV,T>&,T,T,const T_FACE_LOOKUP*,const T_FACE_LOOKUP*,T_FACE_ARRAYS_SCALAR*,T_FACE_ARRAYS_SCALAR*>(*this,&ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::Update_Advection_Equation_Face_Lookup_Threaded,axis,grid,Z,Z_ghost,face_velocities,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);}
+        DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>,TV>(domain,thread_queue).template Run<int,const GRID<TV>&,T_FACE_ARRAYS_SCALAR&,const T_FACE_LOOKUP&,const T_FACE_LOOKUP&,BOUNDARY<TV,T>&,T,T,const T_FACE_LOOKUP*,const T_FACE_LOOKUP*,T_FACE_ARRAYS_SCALAR*,T_FACE_ARRAYS_SCALAR*>(*this,&ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::Update_Advection_Equation_Face_Lookup_Threaded,axis,grid,Z,Z_ghost,face_velocities,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);}
 }
 
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Node_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
+template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::
+Update_Advection_Equation_Node_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
     const ARRAY<TV,TV_INT>& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
     const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
@@ -61,8 +61,8 @@ Update_Advection_Equation_Node_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid
         Z(node)=interpolation.Clamped_To_Array(iterator.grid,Z_ghost,iterator.Location()-dt*V(node));}
 }
 
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Cell_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
+template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::
+Update_Advection_Equation_Cell_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
     const ARRAY<TV,TV_INT>& V,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
     const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
@@ -76,8 +76,8 @@ Update_Advection_Equation_Cell_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid
         Z(cell)=interpolation.Clamped_To_Array(iterator.grid,Z_ghost,iterator.Location()-dt*V(cell));}
 }
 
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Cell_Lookup_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
+template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::
+Update_Advection_Equation_Cell_Lookup_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
@@ -96,8 +96,8 @@ Update_Advection_Equation_Cell_Lookup_Threaded(RANGE<TV_INT>& domain,const T_GRI
     }
 }
 
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Face_Lookup_Threaded(RANGE<TV_INT>& domain,int axis,const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
+template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::
+Update_Advection_Equation_Face_Lookup_Threaded(RANGE<TV_INT>& domain,int axis,const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
     const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
     const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
 {

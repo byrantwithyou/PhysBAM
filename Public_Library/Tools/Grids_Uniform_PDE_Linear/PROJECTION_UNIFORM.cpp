@@ -14,20 +14,20 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> PROJECTION_UNIFORM<T_GRID>::
-PROJECTION_UNIFORM(const T_GRID& mac_grid,const bool use_variable_beta,const bool use_poisson,THREAD_QUEUE* thread_queue_input)
+template<class TV> PROJECTION_UNIFORM<TV>::
+PROJECTION_UNIFORM(const GRID<TV>& mac_grid,const bool use_variable_beta,const bool use_poisson,THREAD_QUEUE* thread_queue_input)
     :use_divergence_multiplier(false),thread_queue(thread_queue_input)
 {
     if(use_variable_beta || use_poisson){
-        poisson=new POISSON_UNIFORM<T_GRID>(p_grid,p,true,false,true);
+        poisson=new POISSON_UNIFORM<TV>(p_grid,p,true,false,true);
         if(use_variable_beta) poisson->Set_Variable_beta();elliptic_solver=poisson;laplace=0;}
-    else{laplace=new LAPLACE_UNIFORM<T_GRID>(p_grid,p,true,true,thread_queue);elliptic_solver=laplace;poisson=0;}
+    else{laplace=new LAPLACE_UNIFORM<TV>(p_grid,p,true,true,thread_queue);elliptic_solver=laplace;poisson=0;}
     Initialize_Grid(mac_grid);
 }
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> PROJECTION_UNIFORM<T_GRID>::
+template<class TV> PROJECTION_UNIFORM<TV>::
 PROJECTION_UNIFORM(THREAD_QUEUE* thread_queue_input)
     :elliptic_solver(0),laplace(0),poisson(0),use_divergence_multiplier(false),thread_queue(thread_queue_input)
 {
@@ -35,7 +35,7 @@ PROJECTION_UNIFORM(THREAD_QUEUE* thread_queue_input)
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> PROJECTION_UNIFORM<T_GRID>::
+template<class TV> PROJECTION_UNIFORM<TV>::
 ~PROJECTION_UNIFORM()
 {
     delete elliptic_solver;
@@ -43,8 +43,8 @@ template<class T_GRID> PROJECTION_UNIFORM<T_GRID>::
 //#####################################################################
 // Function Initialize_Grid
 //#####################################################################
-template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
-Initialize_Grid(const T_GRID& mac_grid)
+template<class TV> void PROJECTION_UNIFORM<TV>::
+Initialize_Grid(const GRID<TV>& mac_grid)
 {
     assert(mac_grid.Is_MAC_Grid());p_grid=mac_grid;
     if(poisson) poisson->Initialize_Grid(p_grid);else laplace->Initialize_Grid(p_grid);
@@ -54,7 +54,7 @@ Initialize_Grid(const T_GRID& mac_grid)
 //#####################################################################
 // Function Make_Divergence_Free
 //#####################################################################
-template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_UNIFORM<TV>::
 Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     // find f - divergence of the velocity
@@ -71,7 +71,7 @@ Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T ti
 //#####################################################################
 // Function Zero_Out_Neumann_Pocket_Velocities
 //#####################################################################
-template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_UNIFORM<TV>::
 Zero_Out_Neumann_Pocket_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities)
 {
     // zero out the velocities in neumann pockets to prevent gravity from accumulating
@@ -87,7 +87,7 @@ Zero_Out_Neumann_Pocket_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities)
 //#####################################################################
 // Function Apply_Pressure
 //#####################################################################
-template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_UNIFORM<TV>::
 Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt)
 {
     Zero_Out_Neumann_Pocket_Velocities(face_velocities);
@@ -111,18 +111,18 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
 //#####################################################################
 // Function Compute_Divergence
 //#####################################################################
-template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
-Compute_Divergence(const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<T_GRID>* solver)
+template<class TV> void PROJECTION_UNIFORM<TV>::
+Compute_Divergence(const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<TV>* solver)
 {
-    DOMAIN_ITERATOR_THREADED_ALPHA<PROJECTION_UNIFORM<T_GRID>,TV>(p_grid.Domain_Indices(),thread_queue).template Run<const T_FACE_LOOKUP&,LAPLACE_UNIFORM<T_GRID>*>(*this,&PROJECTION_UNIFORM<T_GRID>::Compute_Divergence_Threaded,face_lookup,solver);
+    DOMAIN_ITERATOR_THREADED_ALPHA<PROJECTION_UNIFORM<TV>,TV>(p_grid.Domain_Indices(),thread_queue).template Run<const T_FACE_LOOKUP&,LAPLACE_UNIFORM<TV>*>(*this,&PROJECTION_UNIFORM<TV>::Compute_Divergence_Threaded,face_lookup,solver);
 }
-template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
-Compute_Divergence_Threaded(RANGE<TV_INT>& domain,const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<T_GRID>* solver)
+template<class TV> void PROJECTION_UNIFORM<TV>::
+Compute_Divergence_Threaded(RANGE<TV_INT>& domain,const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<TV>* solver)
 {
     TV one_over_dx=p_grid.one_over_dX;
     for(CELL_ITERATOR<TV> iterator(p_grid,domain);iterator.Valid();iterator.Next()){
         const typename T_FACE_LOOKUP::LOOKUP& lookup=face_lookup.Starting_Point_Cell(iterator.Cell_Index());T divergence=0;
-        for(int axis=0;axis<T_GRID::dimension;axis++)divergence+=(lookup(axis,iterator.Second_Face_Index(axis))-lookup(axis,iterator.First_Face_Index(axis)))*one_over_dx[axis];
+        for(int axis=0;axis<TV::m;axis++)divergence+=(lookup(axis,iterator.Second_Face_Index(axis))-lookup(axis,iterator.First_Face_Index(axis)))*one_over_dx[axis];
         solver->f(iterator.Cell_Index())=divergence;}
 
     if(use_non_zero_divergence) for(CELL_ITERATOR<TV> iterator(p_grid,domain);iterator.Valid();iterator.Next())
@@ -135,7 +135,7 @@ Compute_Divergence_Threaded(RANGE<TV_INT>& domain,const T_FACE_LOOKUP& face_look
 //#####################################################################
 // For each Neumann region, modifies divergence in cells touching its boundary so that the sum of f in the region is zero. Also modifies each bounding face velocity to the desired velocity
 // (or the average of the desired velocity if the face joins two different Neumann regions).
-template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_UNIFORM<TV>::
 Enforce_Velocity_Compatibility(T_FACE_ARRAYS_SCALAR& face_velocities)
 {
     bool found_neumann_region=false;
@@ -184,7 +184,7 @@ Enforce_Velocity_Compatibility(T_FACE_ARRAYS_SCALAR& face_velocities)
 //#####################################################################
 // Function Set_Up_For_Projection
 //#####################################################################
-template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_UNIFORM<TV>::
 Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities)
 {
     face_velocities_save_for_projection.Copy(face_velocities);
@@ -192,7 +192,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities)
 //#####################################################################
 // Function Restore_After_Projection
 //#####################################################################
-template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_UNIFORM<TV>::
 Restore_After_Projection(T_FACE_ARRAYS_SCALAR& face_velocities)
 {
     T_FACE_ARRAYS_SCALAR::Exchange(face_velocities,face_velocities_save_for_projection);
@@ -200,7 +200,7 @@ Restore_After_Projection(T_FACE_ARRAYS_SCALAR& face_velocities)
 //#####################################################################
 // Function Exchange_Pressures_For_Projection
 //#####################################################################
-template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_UNIFORM<TV>::
 Exchange_Pressures_For_Projection()
 {
     T_ARRAYS_SCALAR::Exchange(p,p_save_for_projection);
@@ -208,17 +208,17 @@ Exchange_Pressures_For_Projection()
 //#####################################################################
 // Function Calculate_Kinetic_Energy_Error
 //#####################################################################
-template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_UNIFORM<TV>::
 Calculate_Kinetic_Energy_Error(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<TV,TV_INT>& kinetic_energy_error)
 {
     PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
 namespace PhysBAM{
-template class PROJECTION_UNIFORM<GRID<VECTOR<float,1> > >;
-template class PROJECTION_UNIFORM<GRID<VECTOR<float,2> > >;
-template class PROJECTION_UNIFORM<GRID<VECTOR<float,3> > >;
-template class PROJECTION_UNIFORM<GRID<VECTOR<double,1> > >;
-template class PROJECTION_UNIFORM<GRID<VECTOR<double,2> > >;
-template class PROJECTION_UNIFORM<GRID<VECTOR<double,3> > >;
+template class PROJECTION_UNIFORM<VECTOR<float,1> >;
+template class PROJECTION_UNIFORM<VECTOR<float,2> >;
+template class PROJECTION_UNIFORM<VECTOR<float,3> >;
+template class PROJECTION_UNIFORM<VECTOR<double,1> >;
+template class PROJECTION_UNIFORM<VECTOR<double,2> >;
+template class PROJECTION_UNIFORM<VECTOR<double,3> >;
 }

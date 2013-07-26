@@ -259,7 +259,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,con
 // Function Add_Rigid_Body_Walls
 //#####################################################################
 template<class T> void THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::
-Add_Rigid_Body_Walls(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T,2> > >& example,const T coefficient_of_restitution,const T coefficient_of_friction,ARRAY<int>* walls_added)
+Add_Rigid_Body_Walls(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T,2> >& example,const T coefficient_of_restitution,const T coefficient_of_friction,ARRAY<int>* walls_added)
 {
     ::Add_Rigid_Body_Walls(example,(example.fluids_parameters.mpi_grid?example.fluids_parameters.mpi_grid->global_grid:*example.fluids_parameters.grid),coefficient_of_restitution,coefficient_of_friction,walls_added);
 }
@@ -267,7 +267,7 @@ Add_Rigid_Body_Walls(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T,2> > >& example
 // Function Add_Rigid_Body_Walls
 //#####################################################################
 template<class T> void THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::
-Add_Rigid_Body_Walls(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T,3> > >& example,const T coefficient_of_restitution,const T coefficient_of_friction,ARRAY<int>* walls_added)
+Add_Rigid_Body_Walls(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T,3> >& example,const T coefficient_of_restitution,const T coefficient_of_friction,ARRAY<int>* walls_added)
 {
     ::Add_Rigid_Body_Walls(example,(example.fluids_parameters.mpi_grid?example.fluids_parameters.mpi_grid->global_grid:*example.fluids_parameters.grid),coefficient_of_restitution,coefficient_of_friction,walls_added);
 }

@@ -136,14 +136,14 @@ Compute_Adaptive_Pixel_Color(const TV& center,const T dx,const T dy,const int re
     RENDERING_RAY<T> dummy_root;
     if(debug_mode&&debug_data){dummy_root.debug_ray=new RENDERING_RAY_DEBUG<T>(dummy_root);debug_data->Set_Ray_Tree(dummy_root.debug_ray);}
     
-    ARRAY<TV > positions(5);T dx_2=(T)0.5*dx,dy_2=(T)0.5*dy;
+    ARRAY<TV> positions(5);T dx_2=(T)0.5*dx,dy_2=(T)0.5*dy;
     positions(0)=center-dx_2*camera.horizontal_vector-dy_2*camera.vertical_vector;
     positions(1)=center-dx_2*camera.horizontal_vector+dy_2*camera.vertical_vector;
     positions(2)=center+dx_2*camera.horizontal_vector-dy_2*camera.vertical_vector;
     positions(3)=center+dx_2*camera.horizontal_vector+dy_2*camera.vertical_vector;
     positions(4)=center;
 
-    ARRAY<TV > colors(5);
+    ARRAY<TV> colors(5);
     for(int i=0;i<5;i++){
         if(i==precomputed_index){colors(i)=precomputed_color_one;continue;}
         if(i==5-precomputed_index){colors(i)=precomputed_color_two;continue;}

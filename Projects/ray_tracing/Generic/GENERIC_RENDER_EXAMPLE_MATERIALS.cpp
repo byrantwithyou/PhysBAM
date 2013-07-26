@@ -432,8 +432,8 @@ Volume_Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameter
         if(!objects.Get(multiple_levelset_object_name,multiple_levelset_object)){
             if(multiple_levelset_object_name!="none"){LOG::cout<<"Invalid multiple levelset object \""<<empty_levelset_object<<"\"."<<std::endl;exit(1);}}
         else{
-            RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<GRID<TV> > >& multiple_levelset=
-                dynamic_cast<RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<GRID<TV> > >&>(*multiple_levelset_object);
+            RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<TV> >& multiple_levelset=
+                dynamic_cast<RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<TV> >&>(*multiple_levelset_object);
             voxel_shader->Use_Levelset_Multiple_Region(&multiple_levelset,non_empty_region);}
 
         T absorption_shadow=parameters.Get_Parameter("Absorption_Shadow",absorption);

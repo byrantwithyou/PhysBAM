@@ -16,13 +16,13 @@
 namespace PhysBAM{
 
 template<class T_input>
-class FLOW_PAST_EFTYCHIS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class FLOW_PAST_EFTYCHIS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;
 public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::solid_body_collection;using BASE::stream_type;using BASE::parse_args;using BASE::test_number;
@@ -34,7 +34,7 @@ public:
 
 
     FLOW_PAST_EFTYCHIS(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,0,fluids_parameters.SMOKE)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.SMOKE)
     {
     }
 
@@ -142,7 +142,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Update_Fluid_Parameters(dt,time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
 }
 //#####################################################################
 // Function Adjust_Phi_With_Sources
@@ -179,7 +179,7 @@ void Adjust_Density_And_Temperature_With_Sources(const T time)
 void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
     GRID<TV> u_grid=fluids_parameters.grid->Get_Face_Grid(0),v_grid=fluids_parameters.grid->Get_Face_Grid(1),w_grid=fluids_parameters.grid->Get_Face_Grid(2);
-    LAPLACE_UNIFORM<GRID<TV> >& elliptic_solver=*fluids_parameters.incompressible->projection.elliptic_solver;
+    LAPLACE_UNIFORM<TV>& elliptic_solver=*fluids_parameters.incompressible->projection.elliptic_solver;
 
     if(test_number==1){
         if(!fluids_parameters.mpi_grid || !fluids_parameters.mpi_grid->Neighbor(3,1))

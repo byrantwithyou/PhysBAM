@@ -24,20 +24,20 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
-GRID_BASED_COLLISION_GEOMETRY_UNIFORM(T_GRID& grid_input)
-    :GRID_BASED_COLLISION_GEOMETRY<T_GRID>(grid_input),use_collision_face_neighbors(false)
+template<class TV> GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+GRID_BASED_COLLISION_GEOMETRY_UNIFORM(GRID<TV>& grid_input)
+    :GRID_BASED_COLLISION_GEOMETRY<TV>(grid_input),use_collision_face_neighbors(false)
 {}
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
+template<class TV> GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
 ~GRID_BASED_COLLISION_GEOMETRY_UNIFORM()
 {}
 //##################################################################### 
 // Function Initialize_Grids
 //##################################################################### 
-template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
 Initialize_Grids()
 {
     collision_thickness=(T)1e-3*grid.dX.Min();
@@ -51,7 +51,7 @@ Initialize_Grids()
 //##################################################################### 
 // Function Compute_Occupied_Blocks
 //##################################################################### 
-template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
 Compute_Occupied_Blocks(const bool with_body_motion,const T extra_thickness,const T body_thickness_factor)
 {
     ARRAY<bool,TV_INT>& occupied=with_body_motion?swept_occupied_blocks:occupied_blocks;
@@ -63,7 +63,7 @@ Compute_Occupied_Blocks(const bool with_body_motion,const T extra_thickness,cons
 //#####################################################################
 // Function Compute_Grid_Visibility
 //#####################################################################
-template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
 Compute_Grid_Visibility()
 {
     TV_BOOL all_true;all_true.Fill(true);
@@ -71,14 +71,14 @@ Compute_Grid_Visibility()
     if(!collision_geometry_collection.bodies.m) return;
 
     // cell neighbors
-    for(FACE_ITERATOR<TV> iterator(grid,3,T_GRID::INTERIOR_REGION);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(grid,3,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
         TV_INT cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
         ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cells(cell1,cell2,collision_geometry_collection.bodies.m,objects);if(!objects.m) continue;
         if(collision_geometry_collection.Intersection_Between_Points(grid.Center(cell1),grid.Center(cell2),&objects)) cell_neighbors_visible(cell1)(iterator.Axis())=false;}
 
     // face neighbors
     for(FACE_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT index=iterator.Face_Index();
-        for(int direction=0;direction<T_GRID::dimension;direction++){TV_INT direction_offset=TV_INT::Axis_Vector(direction);
+        for(int direction=0;direction<TV::m;direction++){TV_INT direction_offset=TV_INT::Axis_Vector(direction);
             ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cells(iterator.Second_Cell_Index(),iterator.Second_Cell_Index()+direction_offset,collision_geometry_collection.bodies.m,objects);
             if(!objects.m) continue;
             if(collision_geometry_collection.Intersection_Between_Points(iterator.Location(),grid.Face(FACE_INDEX<TV::m>(axis,iterator.Face_Index()+direction_offset)),&objects))
@@ -87,7 +87,7 @@ Compute_Grid_Visibility()
 //#####################################################################
 // Function Compute_Psi_N
 //#####################################################################
-template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
 Compute_Psi_N(T_FACE_ARRAYS_BOOL& psi_N,T_FACE_ARRAYS_SCALAR* face_velocities) const
 {
     if(!collision_geometry_collection.bodies.m) return;
@@ -108,7 +108,7 @@ Compute_Psi_N(T_FACE_ARRAYS_BOOL& psi_N,T_FACE_ARRAYS_SCALAR* face_velocities) c
 //#####################################################################
 // Function Compute_Psi_N
 //#####################################################################
-template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
 Compute_Psi_N_Zero_Velocity(T_FACE_ARRAYS_BOOL& psi_N,T_FACE_ARRAYS_SCALAR* face_velocities) const
 {
     if(!collision_geometry_collection.bodies.m) return;
@@ -125,7 +125,7 @@ Compute_Psi_N_Zero_Velocity(T_FACE_ARRAYS_BOOL& psi_N,T_FACE_ARRAYS_SCALAR* face
 //#####################################################################
 // Function Compute_Simplices_In_Cell
 //#####################################################################
-template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
 Compute_Simplices_In_Cell(ARRAY<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV_INT>& simplices_in_cell,const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>& bodies,
     int ghost_cells,T thickness,bool assume_active) const
 {
@@ -140,10 +140,10 @@ Compute_Simplices_In_Cell(ARRAY<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV_INT>&
 }
 //#####################################################################
 namespace PhysBAM{
-template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<float,1> > >;
-template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<float,2> > >;
-template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<float,3> > >;
-template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<double,1> > >;
-template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<double,2> > >;
-template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<VECTOR<double,3> > >;
+template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<float,1> >;
+template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<float,2> >;
+template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<float,3> >;
+template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<double,1> >;
+template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<double,2> >;
+template class GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<double,3> >;
 }

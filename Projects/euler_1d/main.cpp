@@ -39,7 +39,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-drop",&opt_drop,"Use drop test");
     parse_args.Parse(true);
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
     if(opt_sod) example=new SOD_ST<T>(stream_type);
     else if(opt_bangbang) example=new BANG_BANG_ST<T>(stream_type);
     else if(opt_smoothflow) example=new SMOOTH_FLOW<T>(stream_type);
@@ -48,11 +48,11 @@ int main(int argc,char* argv[])
     example->want_mpi_world=true;
     example->Parse(parse_args);
 
-    if(example->mpi_world->initialized) example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(*example->fluids_parameters.grid,3);
+    if(example->mpi_world->initialized) example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<TV>(*example->fluids_parameters.grid,3);
     example->Adjust_Output_Directory_For_MPI(example->fluids_parameters.mpi_grid);
     
     LOG::cout<<std::setprecision(16)<<std::endl;
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*example);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*example);
     driver.Execute_Main_Program();
     
     delete example;

@@ -17,25 +17,22 @@
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <Incompressible/Grid_Based_Fields/DENSITY_CONTAINER.h>
 #include <Incompressible/Grid_Based_Fields/TEMPERATURE_CONTAINER.h>
-#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_POLICY.h>
 namespace PhysBAM{
 
 template<class T> class FLUIDS_PARAMETERS_CALLBACKS;
 template<class T> class EOS;
-template<class T_GRID,int d> class CONSERVATION;
+template<class TV,int d> class CONSERVATION;
 template<class TV> class GRID;
 template<class TV> class TURBULENCE;
 template<class TV,class T2> class BOUNDARY_REFLECTION_UNIFORM;
 
-template <class T_GRID>
+template <class TV>
 class FLUIDS_PARAMETERS:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;typedef VECTOR<int,TV::dimension> TV_INT;
-    typedef typename COLLISION_BODY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
-    typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::dimension> TV_INT;
+    typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
     typedef typename REBIND<T_ADVECTION_SEMI_LAGRANGIAN_SCALAR,TV>::TYPE T_ADVECTION_SEMI_LAGRANGIAN_VECTOR;
-    typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_HAMILTON_JACOBI_WENO_SCALAR T_ADVECTION_HAMILTON_JACOBI_WENO_SCALAR;
-    typedef typename INCOMPRESSIBLE_POLICY<T_GRID>::INCOMPRESSIBLE T_INCOMPRESSIBLE;
+    typedef typename ADVECTION_POLICY<TV>::ADVECTION_HAMILTON_JACOBI_WENO_SCALAR T_ADVECTION_HAMILTON_JACOBI_WENO_SCALAR;
     typedef BOUNDARY_PHI_WATER<TV> T_BOUNDARY_PHI_WATER;
     typedef BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV> T_BOUNDARY_MAC_GRID_SOLID_WALL_SLIP;
     typedef BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> > T_BOUNDARY_SYMMETRIC_MATRIX;
@@ -46,7 +43,7 @@ public:
     T cfl;
     T gravity;
     TV gravity_direction;
-    T_GRID* grid;
+    GRID<TV>* grid;
 protected:
     bool need_destroy_grid;
 public:
@@ -103,10 +100,10 @@ public:
     bool use_fixed_soot_boundary,use_fixed_density_boundary,use_fixed_temperature_boundary;
     int soot_advection_order;
     T ambient_soot,ambient_density,ambient_temperature;
-    DENSITY_CONTAINER<T_GRID> soot_container;
-    DENSITY_CONTAINER<T_GRID> soot_fuel_container;
-    DENSITY_CONTAINER<T_GRID> density_container;
-    TEMPERATURE_CONTAINER<T_GRID> temperature_container;
+    DENSITY_CONTAINER<TV> soot_container;
+    DENSITY_CONTAINER<TV> soot_fuel_container;
+    DENSITY_CONTAINER<TV> density_container;
+    TEMPERATURE_CONTAINER<TV> temperature_container;
     bool use_soot_fuel_combustion;
     T burn_temperature_threshold,burn_rate,soot_fuel_calorific_value;
     BOUNDARY<TV,T> *soot_boundary,*density_boundary,*temperature_boundary;
@@ -136,14 +133,14 @@ public:
     T min_collision_distance_factor,max_collision_distance_factor;
     bool solid_affects_fluid,fluid_affects_solid;
     bool thin_shells_refine_near_objects;
-    TV_BOOL periodic;
+    VECTOR<bool,TV::m> periodic;
     bool use_separation_inside_water;
     T separation_velocity_tolerance;
-    FLUIDS_PARAMETERS_CALLBACKS<T_GRID>* callbacks;
+    FLUIDS_PARAMETERS_CALLBACKS<TV>* callbacks;
     enum TYPE {NONE,SMOKE,FIRE,WATER,SPH,COMPRESSIBLE};
     bool refine_fmm_initialization_with_iterative_solver;
     bool modify_wall_tangential_velocities;
-    T_GRID_BASED_COLLISION_GEOMETRY* collision_bodies_affecting_fluid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>* collision_bodies_affecting_fluid;
 protected:
     bool need_destroy_collision_bodies_affecting_fluid;
 public:
@@ -156,10 +153,10 @@ public:
     bool use_maccormack_for_incompressible;
     T bandwidth_without_maccormack_near_interface;
     bool analytic_test;
-    BOUNDARY<TV,VECTOR<T,T_GRID::dimension+2> >* compressible_boundary;
+    BOUNDARY<TV,VECTOR<T,TV::m+2> >* compressible_boundary;
     BOUNDARY<TV,T>* compressible_pressure_boundary;
     EOS<T>* compressible_eos;
-    CONSERVATION<T_GRID,T_GRID::dimension+2>* compressible_conservation_method;
+    CONSERVATION<TV,TV::m+2>* compressible_conservation_method;
     bool compressible_set_max_time_step;
     T compressible_max_time_step;
     int compressible_spatial_order;
@@ -188,7 +185,7 @@ public:
     FLUIDS_PARAMETERS(const TYPE type);
     virtual ~FLUIDS_PARAMETERS();
 
-    void Set_Fluids_Parameters_Callbacks(FLUIDS_PARAMETERS_CALLBACKS<T_GRID>& callbacks_input)
+    void Set_Fluids_Parameters_Callbacks(FLUIDS_PARAMETERS_CALLBACKS<TV>& callbacks_input)
     {callbacks=&callbacks_input;}
 
     void Set_Default_Number_Particles_Per_Cell(const VECTOR<T,1>&)

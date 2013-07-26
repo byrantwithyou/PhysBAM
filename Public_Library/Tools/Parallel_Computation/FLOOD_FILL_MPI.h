@@ -12,25 +12,26 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Parallel_Computation/MPI_GRID.h>
 namespace PhysBAM{
+template<class T> class MPI_UNIFORM_GRID;
 
-template<class T_GRID>
+template<class TV>
 class FLOOD_FILL_MPI:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename MPI_GRID_POLICY<T_GRID>::MPI_GRID T_MPI_GRID;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename T_GRID::INDEX T_INDEX;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;
+    typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;typedef VECTOR<int,TV::m> TV_INT;
+    typedef TV_INT T_INDEX;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<int,TV_INT> T_ARRAYS_INT;typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;
-    typedef typename MPI_GRID_POLICY<T_GRID>::PARALLEL_GRID T_PARALLEL_GRID;
+    typedef GRID<TV> T_PARALLEL_GRID;
 public:
     const T_MPI_GRID& mpi_grid;
-    const T_GRID& local_grid;
+    const GRID<TV>& local_grid;
     const T_FACE_ARRAYS_BOOL& psi_N;
     int& number_of_regions;
     T_ARRAYS_INT& colors;
     ARRAY<ARRAY<int> >& color_ranks;
     ARRAY<bool>* color_touches_uncolorable;
 
-    FLOOD_FILL_MPI(const T_MPI_GRID& mpi_grid_input,const T_GRID& local_grid_input,const T_FACE_ARRAYS_BOOL& psi_N_input,int& number_of_regions_input,T_ARRAYS_INT& colors_input,
+    FLOOD_FILL_MPI(const T_MPI_GRID& mpi_grid_input,const GRID<TV>& local_grid_input,const T_FACE_ARRAYS_BOOL& psi_N_input,int& number_of_regions_input,T_ARRAYS_INT& colors_input,
         ARRAY<ARRAY<int> >& color_ranks_input,ARRAY<bool>* color_touches_uncolorable);
     virtual ~FLOOD_FILL_MPI();
 
@@ -40,7 +41,7 @@ public:
 protected:
     void Find_Global_Colors(ARRAY<bool,VECTOR<int,1> >& color_is_global,const RANGE<TV_INT>&) const;
     template<class T_BOX_HORIZONTAL_INT> void Find_Global_Colors(ARRAY<bool,VECTOR<int,1> >& color_is_global,const T_BOX_HORIZONTAL_INT&) const;
-    struct Find_Global_Colors_Helper{template<class T_FACE> static void Apply(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,const ARRAY<bool>& psi_N,const ARRAY<int>& colors,
+    struct Find_Global_Colors_Helper{template<class T_FACE> static void Apply(const T_MPI_GRID& mpi_grid,const GRID<TV>& local_grid,const ARRAY<bool>& psi_N,const ARRAY<int>& colors,
         ARRAY<bool,VECTOR<int,1> >& color_is_global);};
     void Translate_Local_Colors_To_Global_Colors(const ARRAY<int,VECTOR<int,1> >& color_map,T_ARRAYS_INT& colors_copy,const RANGE<TV_INT>& region,const int global_color_offset) const;
     template<class T_BOX_HORIZONTAL_INT> void Translate_Local_Colors_To_Global_Colors(const ARRAY<int,VECTOR<int,1> >& color_map,ARRAY<int>& colors_copy,const T_BOX_HORIZONTAL_INT& region,

@@ -25,7 +25,7 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAY
 {
     assert(grid.Is_MAC_Grid());
     T_FACE_ARRAYS_SCALAR::Put(u,u_ghost); // interior
-    for(int face_axis=0;face_axis<GRID<TV>::dimension;face_axis++){
+    for(int face_axis=0;face_axis<TV::m;face_axis++){
         GRID<TV> face_grid=grid.Get_Face_Grid(face_axis);
         T_ARRAYS_BASE& u_ghost_component=u_ghost.Component(face_axis);
         VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);

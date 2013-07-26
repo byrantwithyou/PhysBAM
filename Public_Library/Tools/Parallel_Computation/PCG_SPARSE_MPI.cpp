@@ -8,12 +8,11 @@
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Parallel_Computation/PCG_SPARSE_MPI.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
-#include <Tools/Vectors/SPARSE_ARRAY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Serial_Solve
 //#####################################################################
-template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
+template<class TV> void PCG_SPARSE_MPI<TV>::
 Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,ARRAY<T>& s,ARRAY<T>& r,ARRAY<T>& k,ARRAY<T>& z,const int tag,const T tolerance)
 {
     // TODO: this routine is useful only for testing purposes
@@ -83,7 +82,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,AR
 //#####################################################################
 // Function Parallel_Solve
 //#####################################################################
-template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
+template<class TV> void PCG_SPARSE_MPI<TV>::
 Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,const bool recompute_preconditioner)
 {
     if(thread_grid){Parallel_Solve(A,x,b,thread_grid->global_column_index_boundaries,tolerance,recompute_preconditioner);return;}
@@ -156,7 +155,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tole
 //#####################################################################
 // Function Parallel_Solve
 //#####################################################################
-template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
+template<class TV> void PCG_SPARSE_MPI<TV>::
 Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x_local,ARRAY<T>& b_local,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries,
     const T tolerance,const bool recompute_preconditioner)
 {
@@ -229,7 +228,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x_local,ARRAY<T>& b_local,
 //#####################################################################
 // Function Initialize_Datatypes
 //#####################################################################
-template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
+template<class TV> void PCG_SPARSE_MPI<TV>::
 Initialize_Datatypes()
 {
     MPI_UTILITIES::Free_Elements_And_Clean_Memory(boundary_datatypes);MPI_UTILITIES::Free_Elements_And_Clean_Memory(ghost_datatypes);
@@ -248,7 +247,7 @@ Initialize_Datatypes()
 //#####################################################################
 // Function Find_Ghost_Regions
 //#####################################################################
-template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
+template<class TV> void PCG_SPARSE_MPI<TV>::
 Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries)
 {
     // Find which columns we need from each of the other procs
@@ -291,7 +290,7 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
 //#####################################################################
 // Function Find_Ghost_Regions
 //#####################################################################
-template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
+template<class TV> void PCG_SPARSE_MPI<TV>::
 Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries)
 {
     // Find which columns we need from each of the other procs
@@ -334,7 +333,7 @@ Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,
 //#####################################################################
 // Function Fill_Ghost_Cells_Far
 //#####################################################################
-template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
+template<class TV> void PCG_SPARSE_MPI<TV>::
 Fill_Ghost_Cells_Far(ARRAY<T>& x)
 {
     ARRAY<MPI_PACKAGE> packages;ARRAY<MPI::Request> requests;requests.Preallocate(2*columns_to_send.m);
@@ -367,7 +366,7 @@ Fill_Ghost_Cells_Far(ARRAY<T>& x)
 //#####################################################################
 // Function Fill_Ghost_Cells_Far
 //#####################################################################
-template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
+template<class TV> void PCG_SPARSE_MPI<TV>::
 Fill_Ghost_Cells_Threaded(ARRAY<T>& x)
 {
     int my_rank=thread_grid->rank;
@@ -398,10 +397,10 @@ Fill_Ghost_Cells_Threaded(ARRAY<T>& x)
                 x(columns_to_receive(node_rank)(i))=columns_to_receive_values(node_rank)(i);}
 }
 //#####################################################################
-template class PCG_SPARSE_MPI<GRID<VECTOR<float,1> > >;
-template class PCG_SPARSE_MPI<GRID<VECTOR<float,2> > >;
-template class PCG_SPARSE_MPI<GRID<VECTOR<float,3> > >;
-template class PCG_SPARSE_MPI<GRID<VECTOR<double,1> > >;
-template class PCG_SPARSE_MPI<GRID<VECTOR<double,2> > >;
-template class PCG_SPARSE_MPI<GRID<VECTOR<double,3> > >;
+template class PCG_SPARSE_MPI<VECTOR<float,1> >;
+template class PCG_SPARSE_MPI<VECTOR<float,2> >;
+template class PCG_SPARSE_MPI<VECTOR<float,3> >;
+template class PCG_SPARSE_MPI<VECTOR<double,1> >;
+template class PCG_SPARSE_MPI<VECTOR<double,2> >;
+template class PCG_SPARSE_MPI<VECTOR<double,3> >;
 #endif

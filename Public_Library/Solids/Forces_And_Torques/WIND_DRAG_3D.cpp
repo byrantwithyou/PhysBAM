@@ -12,8 +12,8 @@
 #include <Solids/Forces_And_Torques/WIND_DRAG_3D.h>
 using namespace PhysBAM;
 //#####################################################################
-template<class T> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<VECTOR<T,3> >,T> WIND_DRAG_3D<T>::interpolation;
-template<class T> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<VECTOR<T,3> >,VECTOR<T,3> > WIND_DRAG_3D<T>::vector_interpolation;
+template<class T> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<VECTOR<T,3>,T> WIND_DRAG_3D<T>::interpolation;
+template<class T> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<VECTOR<T,3>,VECTOR<T,3> > WIND_DRAG_3D<T>::vector_interpolation;
 //#####################################################################
 // Constructor
 //#####################################################################

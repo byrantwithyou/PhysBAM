@@ -16,7 +16,7 @@
 #include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_VOXELS.h>
 namespace PhysBAM{
 
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class TV> struct GRID_ARRAYS_POLICY;
 
 template<class T>
 class RENDERING_SHOCKS:public RENDERING_VOXELS<T>
@@ -36,7 +36,7 @@ public:
     T skip_next_intersection_factor;
     T dale_constant;
     bool use_pressure_for_intersection,use_pressure_for_rarefaction;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
     mutable TV last_intersection_point;
     mutable T last_intersection_t;
 

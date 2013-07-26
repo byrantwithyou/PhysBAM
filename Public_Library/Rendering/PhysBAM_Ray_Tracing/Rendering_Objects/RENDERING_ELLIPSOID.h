@@ -23,7 +23,7 @@ public:
     RENDERING_ELLIPSOID()
     {}
 
-    RENDERING_ELLIPSOID(const TV& center_input,const TV& radius_input,const ROTATION<TV >& orientation_input)
+    RENDERING_ELLIPSOID(const TV& center_input,const TV& radius_input,const ROTATION<TV>& orientation_input)
         :ellipsoid(center_input,radius_input,orientation_input)
     {}
 

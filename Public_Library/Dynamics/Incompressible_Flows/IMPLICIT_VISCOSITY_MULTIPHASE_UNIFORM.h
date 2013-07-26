@@ -11,30 +11,31 @@
 #include <Incompressible/Incompressible_Flows/IMPLICIT_VISCOSITY_UNIFORM.h>
 #include <string>
 namespace PhysBAM{
+template<class T> class MPI_UNIFORM_GRID;
 
-template<class T_GRID> class POISSON_COLLIDABLE_UNIFORM;
+template<class TV> class POISSON_COLLIDABLE_UNIFORM;
 template<class T_LAPLACE> class HEAT_LAPLACE;
-template<class T_GRID> class PROJECTION_DYNAMICS_UNIFORM;
+template<class TV> class PROJECTION_DYNAMICS_UNIFORM;
 
-template<class T_GRID>
-class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM:public IMPLICIT_VISCOSITY_UNIFORM<T_GRID>
+template<class TV>
+class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM:public IMPLICIT_VISCOSITY_UNIFORM<TV>
 {
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef AVERAGING_UNIFORM<T_GRID> T_AVERAGING;
-    typedef typename MPI_GRID_POLICY<T_GRID>::MPI_GRID T_MPI_GRID;
+    typedef AVERAGING_UNIFORM<TV> T_AVERAGING;
+    typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
 public:
-    typedef IMPLICIT_VISCOSITY_UNIFORM<T_GRID> BASE;
+    typedef IMPLICIT_VISCOSITY_UNIFORM<TV> BASE;
     using BASE::face_grid;using BASE::heat_solver;using BASE::u;using BASE::axis;
     using BASE::mpi_grid;using BASE::use_variable_viscosity;
 
-    PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection;
+    PROJECTION_DYNAMICS_UNIFORM<TV>& projection;
     ARRAY<T> densities;
     ARRAY<T> viscosities;
 
-    IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM(PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection_input,const T_ARRAYS_SCALAR& variable_viscosity_input,const ARRAY<T>& densities_input,const ARRAY<T>& viscosities_input,T_MPI_GRID* mpi_grid_input,const int axis_input,bool use_variable_viscosity_input);
+    IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM(PROJECTION_DYNAMICS_UNIFORM<TV>& projection_input,const T_ARRAYS_SCALAR& variable_viscosity_input,const ARRAY<T>& densities_input,const ARRAY<T>& viscosities_input,T_MPI_GRID* mpi_grid_input,const int axis_input,bool use_variable_viscosity_input);
     virtual ~IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM();
 
 //#####################################################################

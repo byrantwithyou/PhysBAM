@@ -15,10 +15,10 @@
 namespace PhysBAM{
 
 template<class T>
-class ARB_EXAMPLE_3D:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >
+class ARB_EXAMPLE_3D:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>
 {
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;typedef VECTOR<T,3> TV;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;typedef VECTOR<T,3> TV;
     using BASE::fluids_parameters;using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::last_frame;
     using BASE::stream_type;using BASE::frame_rate;
     RIGID_BODY<TV>* square1,*square2;

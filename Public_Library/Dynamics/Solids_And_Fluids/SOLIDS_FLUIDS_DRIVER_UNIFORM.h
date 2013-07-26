@@ -14,10 +14,10 @@
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class SOLIDS_FLUIDS_DRIVER_UNIFORM:public SOLIDS_FLUIDS_DRIVER<typename T_GRID::VECTOR_T>
+template<class TV>
+class SOLIDS_FLUIDS_DRIVER_UNIFORM:public SOLIDS_FLUIDS_DRIVER<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename TV::SCALAR T;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
 
@@ -25,16 +25,16 @@ class SOLIDS_FLUIDS_DRIVER_UNIFORM:public SOLIDS_FLUIDS_DRIVER<typename T_GRID::
 public:
     using BASE::project_at_frame_boundaries;using BASE::current_frame;using BASE::next_dt;using BASE::next_done;using BASE::Write_Time;using BASE::Write_First_Frame;
     using BASE::Write_Last_Frame;using BASE::Write_Substep;using BASE::time;
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>& example;
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>& example;
     T last_dt;
     T restart_dt;
     bool reset_with_restart;
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>& example_input);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>& example_input);
     virtual ~SOLIDS_FLUIDS_DRIVER_UNIFORM();
 
     bool Simulate_Fluids() const
-    {const FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters=example.solids_fluids_parameters;
+    {const FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters=example.solids_fluids_parameters;
     return (solids_fluids_parameters.mpi_solid_fluid || fluids_parameters.simulate) && (fluids_parameters.smoke || fluids_parameters.fire || fluids_parameters.water || fluids_parameters.sph || fluids_parameters.compressible);}
 
     bool Simulate_Solids() const
@@ -43,7 +43,7 @@ public:
     return (deformable_body_collection.simulate && deformable_body_collection.particles.Size()) || (solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies && example.solid_body_collection.rigid_body_collection.rigid_body_particles.Size());}
 
     bool Simulate_Incompressible_Fluids() const
-    {const FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    {const FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     return fluids_parameters.simulate && (fluids_parameters.smoke || fluids_parameters.fire || fluids_parameters.water || fluids_parameters.sph);}
 
     bool Two_Way_Coupled() const

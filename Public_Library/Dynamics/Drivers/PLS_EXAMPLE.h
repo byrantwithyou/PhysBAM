@@ -11,23 +11,21 @@
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_BODY_COLLECTION_POLICY_UNIFORM.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID> class LEVELSET_MULTIPLE;
+template<class TV> class LEVELSET_MULTIPLE;
 
 template<class TV_input>
-class PLS_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV_input> >
+class PLS_EXAMPLE:public LEVELSET_CALLBACKS<TV_input>
 {
     typedef TV_input TV;
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
     typedef BOUNDARY_PHI_WATER<TV> T_BOUNDARY_PHI_WATER;
-    typedef typename COLLISION_BODY_COLLECTION_POLICY<GRID<TV> >::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     enum workaround1{d=TV::m};
 
 public:
@@ -45,18 +43,18 @@ public:
     T cfl;
 
     GRID<TV> mac_grid;
-    MPI_UNIFORM_GRID<GRID<TV> > *mpi_grid;
-    PROJECTION_DYNAMICS_UNIFORM<GRID<TV> > projection;
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> > particle_levelset_evolution;
-    INCOMPRESSIBLE_UNIFORM<GRID<TV> > incompressible;
+    MPI_UNIFORM_GRID<TV> *mpi_grid;
+    PROJECTION_DYNAMICS_UNIFORM<TV> projection;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV> particle_levelset_evolution;
+    INCOMPRESSIBLE_UNIFORM<TV> incompressible;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
-    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T> advection_scalar;
     BOUNDARY<TV,T> boundary_scalar;
     BOUNDARY<TV,T> *boundary,*phi_boundary;
     T_BOUNDARY_PHI_WATER phi_boundary_water;
     //ARRAY<T,TV_INT> density,temperature;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
-    T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;    
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV> collision_bodies_affecting_fluid;    
 
     PLS_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~PLS_EXAMPLE();
@@ -75,7 +73,7 @@ public:
         T max_collision_distance=particle_levelset_evolution.Particle_Levelset(0).Particle_Collision_Distance(particles.quantized_collision_distance(index));
         T min_collision_distance=particle_levelset_evolution.Particle_Levelset(0).min_collision_distance_factor*max_collision_distance;
         TV min_corner=mac_grid.domain.Minimum_Corner(),max_corner=mac_grid.domain.Maximum_Corner();
-        for(int axis=0;axis<GRID<TV>::dimension;axis++){
+        for(int axis=0;axis<TV::m;axis++){
             if(domain_boundary[axis][0] && X_new[axis]<min_corner[axis]+max_collision_distance){
                 T collision_distance=X[axis]-min_corner[axis];
                 if(collision_distance>max_collision_distance)collision_distance=X_new[axis]-min_corner[axis];
@@ -90,7 +88,7 @@ public:
                 V[axis]=min((T)0,V[axis]);X=X_new-dt*V;}}
     }
     
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {}
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {}
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);
     virtual void Set_Boundary_Conditions(const T time)=0;

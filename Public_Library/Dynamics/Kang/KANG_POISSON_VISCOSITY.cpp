@@ -30,7 +30,7 @@ namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const 
 // Constructor
 //#####################################################################
 template<class TV> KANG_POISSON_VISCOSITY<TV>::
-KANG_POISSON_VISCOSITY(FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_input,const ARRAY<T,TV_INT>& old_phi_input)
+KANG_POISSON_VISCOSITY(FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input,const ARRAY<T,TV_INT>& old_phi_input)
     :fluids_parameters(fluids_parameters_input),old_phi(old_phi_input),print_matrix(false),test_system(false)
 {
 }

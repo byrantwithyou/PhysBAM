@@ -12,13 +12,13 @@
 #include <Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 namespace PhysBAM{
 
-template<class T_GRID> struct BOUNDARY_POLICY;
+template<class TV> struct BOUNDARY_POLICY;
 
 template<class TV,class T2=typename TV::SCALAR>
 class BOUNDARY_THREADED:public BOUNDARY<TV,T2>
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,GRID<TV>::dimension> TV_SIDES;
-    typedef VECTOR<int,GRID<TV>::dimension> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T2,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T2;
 public:
@@ -49,7 +49,7 @@ public:
     }
 
     void Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells_input) const PHYSBAM_OVERRIDE
-    {for(int axis=0;axis<GRID<TV>::dimension;axis++)Fill_Ghost_Cells(grid.Get_Face_Grid(axis),u.Component(axis),u_ghost.Component(axis),0,time,number_of_ghost_cells_input);}
+    {for(int axis=0;axis<TV::m;axis++)Fill_Ghost_Cells(grid.Get_Face_Grid(axis),u.Component(axis),u_ghost.Component(axis),0,time,number_of_ghost_cells_input);}
 
     void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) const PHYSBAM_OVERRIDE
     {boundary.Apply_Boundary_Condition(grid,u,time);}

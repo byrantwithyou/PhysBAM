@@ -66,10 +66,10 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
 }
 //#####################################################################
 namespace PhysBAM{
-template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<float,1> >,float>;
-template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<float,2> >,float>;
-template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<float,3> >,float>;
-template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<double,1> >,double>;
-template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<double,2> >,double>;
-template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<double,3> >,double>;
+template class ADVECTION_CONSERVATIVE_ENO<VECTOR<float,1>,float>;
+template class ADVECTION_CONSERVATIVE_ENO<VECTOR<float,2>,float>;
+template class ADVECTION_CONSERVATIVE_ENO<VECTOR<float,3>,float>;
+template class ADVECTION_CONSERVATIVE_ENO<VECTOR<double,1>,double>;
+template class ADVECTION_CONSERVATIVE_ENO<VECTOR<double,2>,double>;
+template class ADVECTION_CONSERVATIVE_ENO<VECTOR<double,3>,double>;
 }

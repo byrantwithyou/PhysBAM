@@ -74,10 +74,10 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
 SOLID_FLUID_COUPLED_EVOLUTION_SLIP(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,
-    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input,
+    EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input,
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection_input)
     :NEWMARK_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input,example_forces_and_velocities_input),
-    PROJECTION_DYNAMICS_UNIFORM<T_GRID>(*fluids_parameters_input.grid,fluids_parameters_input.fire,false,false,fluids_parameters_input.use_poisson),
+    PROJECTION_DYNAMICS_UNIFORM<TV>(*fluids_parameters_input.grid,fluids_parameters_input.fire,false,false,fluids_parameters_input.use_poisson),
     collision_bodies(*fluids_parameters_input.collision_bodies_affecting_fluid),
     fluids_parameters(fluids_parameters_input),solids_fluids_parameters(solids_fluids_parameters_input),fluid_collection(fluid_collection_input),
     iterator_info(*new UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>(collision_bodies)),
@@ -257,7 +257,7 @@ Setup_Fluids(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T curren
     if(solids_fluids_parameters.mpi_solid_fluid && solids_fluids_parameters.mpi_solid_fluid->Solid_Node()) return;
     boundary_condition_collection.periodic_boundary=fluids_parameters.periodic_boundary;
     boundary_condition_collection.Compute(grid,pressure,fluids_face_velocities,current_position_time);
-    EULER_PROJECTION_UNIFORM<T_GRID>& euler_projection=fluids_parameters.euler->euler_projection;
+    EULER_PROJECTION_UNIFORM<TV>& euler_projection=fluids_parameters.euler->euler_projection;
     // TODO: in case of both compressible and incompressible fluids, use a levelset to decide which faces to fill with what.
     one_over_rho_c_squared.Fill(0);p_advected_over_rho_c_squared_dt.Fill(0);p_advected=pressure;
     if(Simulate_Incompressible_Fluids()){
@@ -286,7 +286,7 @@ Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T cu
     static int solve_id=-1;solve_id++;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
-    EULER_PROJECTION_UNIFORM<T_GRID>& euler_projection=fluids_parameters.euler->euler_projection;
+    EULER_PROJECTION_UNIFORM<TV>& euler_projection=fluids_parameters.euler->euler_projection;
     bool solids=Simulate_Solids();
     bool fluids=Simulate_Fluids();
 
@@ -459,7 +459,7 @@ Apply_Second_Order_Cut_Cell_Method(const T_ARRAYS_INT& cell_index_to_divergence_
 /*
     // modify div_active to work for second order cut cell
     // assume only one color for the moment
-    POISSON_COLLIDABLE_UNIFORM<T_GRID>& poisson=*poisson;
+    POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*poisson;
     T_FACE_ARRAYS_BOOL& psi_N=poisson->psi_N;
     ARRAY<bool,TV_INT>& psi_D=poisson->psi_D;
     // TODO: this will not work for multiphase, obviously
@@ -562,7 +562,7 @@ Apply_Viscosity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
             poisson->psi_R=boundary_condition_collection.psi_R;}
 
         T_ARRAYS_SCALAR variable_viscosity;
-        VISCOSITY<T_GRID> viscosity_helper(*poisson,variable_viscosity,fluids_parameters.density,fluids_parameters.viscosity,fluids_parameters.implicit_viscosity,false,false,1000,fluids_parameters.use_psi_R);
+        VISCOSITY<TV> viscosity_helper(*poisson,variable_viscosity,fluids_parameters.density,fluids_parameters.viscosity,fluids_parameters.implicit_viscosity,false,false,1000,fluids_parameters.use_psi_R);
 
         LOG::cout<<"KE before viscosity: "<<std::endl;
         TV KE=TV();

@@ -4,21 +4,22 @@
 //#####################################################################
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 using namespace PhysBAM;
-template<class T_GRID,class T2,class T_FACE_LOOKUP> ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM(const T_GRID_BASED_COLLISION_GEOMETRY& body_list_input,ARRAY<bool,TV_INT>& cell_valid_points_current_input,
+template<class TV,class T2,class T_FACE_LOOKUP> ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list_input,ARRAY<bool,TV_INT>& cell_valid_points_current_input,
     ARRAY<bool,TV_INT>& cell_valid_points_next_input,const T2& default_cell_replacement_value_input,const bool extrapolate_to_revalidate_interpolation_input)
     :body_list(body_list_input),cell_valid_points_current(cell_valid_points_current_input),cell_valid_points_next(cell_valid_points_next_input),
     cell_crossover_replacement_value(default_cell_replacement_value_input),extrapolate_to_revalidate_interpolation(extrapolate_to_revalidate_interpolation_input),
     linear_interpolation_collidable(body_list,&cell_valid_points_current,cell_crossover_replacement_value,extrapolate_to_revalidate_interpolation),velocity_averaging_collidable(body_list,0)
 {
 }
-template<class T_GRID,class T2,class T_FACE_LOOKUP> ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
+template<class TV,class T2,class T_FACE_LOOKUP> ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<TV,T2,T_FACE_LOOKUP>::
 ~ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM()
 {
 }
-template<class T_GRID,class T2,class T_FACE_LOOKUP> void ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
+template<class TV,class T2,class T_FACE_LOOKUP> void ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Update_Advection_Equation_Cell_Lookup(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
@@ -47,8 +48,8 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,con
                     (*Z_min)(cell)=extrema.x;(*Z_max)(cell)=extrema.y;}}}}
     ARRAY<bool,TV_INT>::Exchange(cell_valid_points_current,cell_valid_points_next);
 }
-template<class T_GRID,class T2,class T_FACE_LOOKUP> void ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Average_To_Invalidated_Cells(const T_GRID& grid,const T2 default_value,ARRAY<T2,TV_INT>& values)
+template<class TV,class T2,class T_FACE_LOOKUP> void ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Average_To_Invalidated_Cells(const GRID<TV>& grid,const T2 default_value,ARRAY<T2,TV_INT>& values)
 {// average values collision aware in Gauss-Jacobi fashion
     const ARRAY<VECTOR<bool,TV::m>,TV_INT>& cell_neighbors_visible=body_list.cell_neighbors_visible;
     bool done=false;ARRAY<PAIR<TV_INT,bool> > invalid_indices; // index and bool true if entry has been validated on iteration
@@ -61,7 +62,7 @@ Average_To_Invalidated_Cells(const T_GRID& grid,const T2 default_value,ARRAY<T2,
     while(!done){done=true;
         for(int k=0;k<invalid_indices.m;k++){
             T2 sum=T2();int count=0;
-            for(int axis=0;axis<T_GRID::dimension;axis++){
+            for(int axis=0;axis<TV::m;axis++){
                 TV_INT min_cell=invalid_indices(k).x-TV_INT::Axis_Vector(axis),max_cell=invalid_indices(k).x+TV_INT::Axis_Vector(axis);
                 if(cell_neighbors_visible(min_cell)(axis) && cell_valid_points_current(min_cell)){sum+=values(min_cell);count++;}
                 if(cell_neighbors_visible(invalid_indices(k).x)(axis) && cell_valid_points_current(max_cell)){sum+=values(max_cell);count++;}}
@@ -80,7 +81,7 @@ Average_To_Invalidated_Cells(const T_GRID& grid,const T2 default_value,ARRAY<T2,
         done=true;
         for(int k=0;k<invalid_indices.m;k++){
             T2 sum=T2();int count=0;
-            for(int axis=0;axis<T_GRID::dimension;axis++){
+            for(int axis=0;axis<TV::m;axis++){
                 TV_INT min_cell=invalid_indices(k).x-TV_INT::Axis_Vector(axis),max_cell=invalid_indices(k).x+TV_INT::Axis_Vector(axis);
                 if(cell_neighbors_visible(min_cell)(axis)){if(cell_valid_points_current(min_cell)){sum+=values(min_cell);count++;}}
                 else{sum+=Compute_Revalidation_Value(grid.X(invalid_indices(k).x),grid.X(min_cell),values(invalid_indices(k).x),default_value);count++;}
@@ -93,10 +94,10 @@ Average_To_Invalidated_Cells(const T_GRID& grid,const T2 default_value,ARRAY<T2,
         cell_valid_points_current(iterator.index)=true;
 }
 namespace PhysBAM{
-template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<float,1> >,float,FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<VECTOR<float,1> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,1> > > > >;
-template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<float,2> >,float,FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<VECTOR<float,2> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,2> > > > >;
-template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<float,3> >,float,FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<VECTOR<float,3> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,3> > > > >;
-template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<double,1> >,double,FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<VECTOR<double,1> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,1> > > > >;
-template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<double,2> >,double,FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<VECTOR<double,2> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,2> > > > >;
-template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<GRID<VECTOR<double,3> >,double,FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<VECTOR<double,3> >,FACE_LOOKUP_UNIFORM<GRID<VECTOR<double,3> > > > >;
+template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<VECTOR<float,1>,float,FACE_LOOKUP_COLLIDABLE_UNIFORM<VECTOR<float,1>,FACE_LOOKUP_UNIFORM<VECTOR<float,1> > > >;
+template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<VECTOR<float,2>,float,FACE_LOOKUP_COLLIDABLE_UNIFORM<VECTOR<float,2>,FACE_LOOKUP_UNIFORM<VECTOR<float,2> > > >;
+template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<VECTOR<float,3>,float,FACE_LOOKUP_COLLIDABLE_UNIFORM<VECTOR<float,3>,FACE_LOOKUP_UNIFORM<VECTOR<float,3> > > >;
+template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<VECTOR<double,1>,double,FACE_LOOKUP_COLLIDABLE_UNIFORM<VECTOR<double,1>,FACE_LOOKUP_UNIFORM<VECTOR<double,1> > > >;
+template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<VECTOR<double,2>,double,FACE_LOOKUP_COLLIDABLE_UNIFORM<VECTOR<double,2>,FACE_LOOKUP_UNIFORM<VECTOR<double,2> > > >;
+template class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<VECTOR<double,3>,double,FACE_LOOKUP_COLLIDABLE_UNIFORM<VECTOR<double,3>,FACE_LOOKUP_UNIFORM<VECTOR<double,3> > > >;
 }

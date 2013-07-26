@@ -6,28 +6,27 @@
 #define __FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM__
 
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
-#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_BODY_COLLECTION_POLICY_UNIFORM.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID,class T_NESTED_LOOKUP> // T_NESTED_LOOKUP=FACE_LOOKUP_UNIFORM<T_GRID>
+template<class TV,class T_NESTED_LOOKUP> // T_NESTED_LOOKUP=FACE_LOOKUP_UNIFORM<TV>
 class FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
-    typedef ARRAY<bool,FACE_INDEX<TV::m> > FACE_ARRAYS_BOOL;typedef typename COLLISION_BODY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
+    typedef ARRAY<bool,FACE_INDEX<TV::m> > FACE_ARRAYS_BOOL;
 public:
-    template<class T_NESTED_LOOKUP_2> struct REBIND_NESTED_LOOKUP{typedef FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<T_GRID,T_NESTED_LOOKUP_2> TYPE;};
+    template<class T_NESTED_LOOKUP_2> struct REBIND_NESTED_LOOKUP{typedef FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<TV,T_NESTED_LOOKUP_2> TYPE;};
     typedef T ELEMENT;
     typedef T_NESTED_LOOKUP NESTED_LOOKUP;
 
     class LOOKUP;
 
     const T_NESTED_LOOKUP& nested_face_lookup;
-    const T_GRID_BASED_COLLISION_GEOMETRY& body_list;
+    const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list;
     const FACE_ARRAYS_BOOL* valid_value_mask;
 
-    FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM(const T_NESTED_LOOKUP& nested_face_lookup_input,const T_GRID_BASED_COLLISION_GEOMETRY& body_list_input,
+    FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM(const T_NESTED_LOOKUP& nested_face_lookup_input,const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list_input,
         const FACE_ARRAYS_BOOL* valid_value_mask_input);
 
     const T_FACE_ARRAYS& Raw_Data() const
@@ -49,7 +48,7 @@ public:
     class LOOKUP
     {
     private:
-        const FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<T_GRID,T_NESTED_LOOKUP>& face_lookup;
+        const FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<TV,T_NESTED_LOOKUP>& face_lookup;
         typename T_NESTED_LOOKUP::LOOKUP nested_lookup;
     public:
         typedef T ELEMENT;
@@ -58,13 +57,13 @@ public:
         mutable bool found_valid_point;
         mutable TV reference_point;
         mutable TV object_velocity;
-        mutable TV_INT cells_in_block[T_GRID::number_of_cells_per_block];
+        mutable TV_INT cells_in_block[GRID<TV>::number_of_cells_per_block];
         mutable TV_INT cell;
         bool both_cells_visible;
         bool using_reference_point;
 
-        LOOKUP(const FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<T_GRID,T_NESTED_LOOKUP>& face_lookup_input,const typename T_NESTED_LOOKUP::LOOKUP& nested_lookup_input);
-        LOOKUP(const FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<T_GRID,T_NESTED_LOOKUP>& face_lookup_input,const typename T_NESTED_LOOKUP::LOOKUP& nested_lookup_input,const TV_INT& cell_input,
+        LOOKUP(const FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<TV,T_NESTED_LOOKUP>& face_lookup_input,const typename T_NESTED_LOOKUP::LOOKUP& nested_lookup_input);
+        LOOKUP(const FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<TV,T_NESTED_LOOKUP>& face_lookup_input,const typename T_NESTED_LOOKUP::LOOKUP& nested_lookup_input,const TV_INT& cell_input,
             const bool both_cells_visible_input=true);
 
         int Number_Of_Ghost_Cells() const

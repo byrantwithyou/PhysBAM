@@ -10,7 +10,6 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Grids_PDE_Linear/LAPLACE.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 #include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <Tools/Log/LOG.h>
@@ -23,24 +22,24 @@ namespace PhysBAM{
 
 template<class T> class PCG_SPARSE;
 template<class T> class SPARSE_MATRIX_FLAT_NXN;
-template<class T_GRID> class LAPLACE_UNIFORM_MPI;
+template<class TV> class LAPLACE_UNIFORM_MPI;
 
-template<class T_GRID>
-class LAPLACE_UNIFORM:public LAPLACE<typename T_GRID::SCALAR>
+template<class TV>
+class LAPLACE_UNIFORM:public LAPLACE<typename TV::SCALAR>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
+    typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
 public:
     typedef TV VECTOR_T;
-    typedef T_GRID GRID_T;
+    typedef GRID<TV> GRID_T;
 
     using LAPLACE<T>::tolerance;using LAPLACE<T>::number_of_regions;using LAPLACE<T>::solve_neumann_regions;using LAPLACE<T>::Find_Tolerance;
 
-    T_GRID grid;
+    GRID<TV> grid;
     T_ARRAYS_SCALAR& u;
     T_ARRAYS_SCALAR f; // f will be modified and reused as b in Ax=b for PCG
     PCG_SPARSE<T> pcg;
@@ -51,8 +50,8 @@ public:
     T_FACE_ARRAYS_SCALAR psi_R;
     ARRAY<bool,TV_INT> psi_D;
     TV_BOOL periodic_boundary;
-    LAPLACE_UNIFORM_MPI<T_GRID>* laplace_mpi;
-    MPI_UNIFORM_GRID<T_GRID>* mpi_grid;
+    LAPLACE_UNIFORM_MPI<TV>* laplace_mpi;
+    MPI_UNIFORM_GRID<TV>* mpi_grid;
     ARRAY<bool,TV_INT>* psi_D_save_for_sph;
     T_FACE_ARRAYS_BOOL* psi_N_save_for_sph;
     bool enforce_compatibility;
@@ -65,26 +64,26 @@ public:
 #endif
 public:
 
-    LAPLACE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue_input=0);
+    LAPLACE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue_input=0);
     virtual ~LAPLACE_UNIFORM();
 
     bool All_Cell_Faces_Neumann(const TV_INT& cell_index) const
-    {for(int axis=0;axis<T_GRID::dimension;axis++)if(!psi_N.Component(axis)(cell_index) || !psi_N.Component(axis)(cell_index+TV_INT::Axis_Vector(axis))) return false;
+    {for(int axis=0;axis<TV::m;axis++)if(!psi_N.Component(axis)(cell_index) || !psi_N.Component(axis)(cell_index+TV_INT::Axis_Vector(axis))) return false;
     return true;}
 
     bool Any_Cell_Faces_Neumann(const TV_INT& cell_index) const
-    {for(int axis=0;axis<T_GRID::dimension;axis++)if(psi_N.Component(axis)(cell_index) || psi_N.Component(axis)(cell_index+TV_INT::Axis_Vector(axis))) return true;
+    {for(int axis=0;axis<TV::m;axis++)if(psi_N.Component(axis)(cell_index) || psi_N.Component(axis)(cell_index+TV_INT::Axis_Vector(axis))) return true;
     return false;}
 
     bool Any_Neighbor_Dirichlet(const TV_INT& cell_index) const
-    {for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
+    {for(int axis=0;axis<TV::m;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
         if((!psi_N.Component(axis)(cell_index) && psi_D(cell_index-offset)) || (!psi_N.Component(axis)(cell_index+offset) && psi_D(cell_index+offset))) return true;}
     return false;}
 
 //#####################################################################
     void Set_Neumann_Outer_Boundaries();
     void Set_Dirichlet_Outer_Boundaries();
-    virtual void Initialize_Grid(const T_GRID& mac_grid_input);
+    virtual void Initialize_Grid(const GRID<TV>& mac_grid_input);
     virtual void Solve(const T time=0,const bool solution_regions_already_computed=false);
     // Undefined in cpp.
     //void Set_Threaded_Boundary(RANGE<TV_INT>& domain,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N);

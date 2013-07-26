@@ -27,7 +27,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-water",&opt_water,"Use water test");
     parse_args.Parse(true);
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
     if(opt_water) example=new STANDARD_TESTS_WATER<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type);
     example->want_mpi_world=true;
@@ -36,7 +36,7 @@ int main(int argc,char* argv[])
     if(example->mpi_world->initialized){
         example->solids_fluids_parameters.mpi_solid_fluid=new MPI_SOLID_FLUID<TV>();
         if(example->solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
-            example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<T_GRID>(*example->fluids_parameters.grid,3,false,VECTOR<int,2>(),VECTOR<bool,2>(),
+            example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<TV>(*example->fluids_parameters.grid,3,false,VECTOR<int,2>(),VECTOR<bool,2>(),
                 example->solids_fluids_parameters.mpi_solid_fluid->fluid_group);
             example->solid_body_collection.deformable_body_collection.simulate=false;
             example->solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=false;}
@@ -45,7 +45,7 @@ int main(int argc,char* argv[])
             example->solids_fluids_parameters.mpi_solid_fluid->Create_Fluid_Comm_For_Solid_Nodes();}}
     example->Adjust_Output_Directory_For_MPI(example->solids_fluids_parameters.mpi_solid_fluid);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*example);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*example);
     driver.Execute_Main_Program();
 
     delete example;

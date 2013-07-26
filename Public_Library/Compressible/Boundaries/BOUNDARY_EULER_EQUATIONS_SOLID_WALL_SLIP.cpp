@@ -13,7 +13,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>::
-BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP(EULER_UNIFORM<GRID<TV> >* euler_input,const T_FACE_VECTOR rho_far_field,
+BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP(EULER_UNIFORM<TV>* euler_input,const T_FACE_VECTOR rho_far_field,
     const T_FACE_VECTOR p_far_field,const TV_FACE_VECTOR velocity_far_field,const T inflow_attenuation_input,
     const TV_SIDES& constant_extrapolation,const bool always_attenuate_input,const T_FACE_VECTOR linear_attenuations_input,
     const T_FACE_VECTOR_BOOL linear_attenuation_faces_input)
@@ -26,13 +26,13 @@ BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP(EULER_UNIFORM<GRID<TV> >* euler_input,c
     linear_attenuation_faces=linear_attenuation_faces_input;
 
     T gamma=dynamic_cast<EOS_GAMMA<T>*>(euler->eos)->gamma;
-    for(int side=0;side<2*GRID<TV>::dimension;side++){
+    for(int side=0;side<2*TV::m;side++){
         T e_far_field=euler->eos->e_From_p_And_rho(p_far_field(side),rho_far_field(side));
         T c_far_field=euler->eos->c(rho_far_field(side),e_far_field);
         S_far_field(side)=euler->eos->S(rho_far_field(side),e_far_field);
         iL_far_field(side)=-velocity_far_field(side)[0]+2*c_far_field/(gamma-1);
         iR_far_field(side)=velocity_far_field(side)[0]+2*c_far_field/(gamma-1);    
-        U_far_field(side)=EULER<GRID<TV> >::Get_Euler_State_From_rho_velocity_And_internal_energy(rho_far_field(side),velocity_far_field(side),e_far_field);}
+        U_far_field(side)=EULER<TV>::Get_Euler_State_From_rho_velocity_And_internal_energy(rho_far_field(side),velocity_far_field(side),e_far_field);}
 }
 //#####################################################################
 // Function Attenuate_To_Far_Field_Values_Using_Riemann_Invariants
@@ -45,8 +45,8 @@ Attenuate_To_Far_Field_Values_Using_Riemann_Invariants(const T_ARRAYS_DIMENSION_
     T net_inflow_attenuation=exp((inflow_attenuation-1)*dt);
 
     T rho=u_ghost(node_index)(0);
-    T u_velocity=EULER<GRID<TV> >::Get_Velocity_Component(u_ghost,node_index,1);
-    T e=EULER<GRID<TV> >::e(u_ghost,node_index);
+    T u_velocity=EULER<TV>::Get_Velocity_Component(u_ghost,node_index,1);
+    T e=EULER<TV>::e(u_ghost,node_index);
 
     T c=euler->eos->c(rho,e);
     T S=euler->eos->S(rho,e);
@@ -150,9 +150,9 @@ Fill_Single_Ghost_Region(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u_ghost,c
         for(CELL_ITERATOR<TV> iterator(grid,region);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             TV_INT reflected_node=cell;reflected_node[axis]=reflection_times_two-cell[axis];
             T rho=u_ghost(reflected_node)(0);
-            TV velocity=EULER<GRID<TV> >::Get_Velocity(u_ghost,reflected_node);velocity(axis)*=-1;
-            T e=EULER<GRID<TV> >::e(u_ghost,reflected_node);
-            EULER<GRID<TV> >::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell,rho,velocity,e);}}
+            TV velocity=EULER<TV>::Get_Velocity(u_ghost,reflected_node);velocity(axis)*=-1;
+            T e=EULER<TV>::e(u_ghost,reflected_node);
+            EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell,rho,velocity,e);}}
 }
 //#####################################################################
 // Function Fill_Ghost_Cells
@@ -162,7 +162,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_
 {
     T_ARRAYS_DIMENSION_BASE::Put(u,u_ghost); // interior
     VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
-    for(int side=0;side<2*GRID<TV>::dimension;side++){
+    for(int side=0;side<2*TV::m;side++){
         Fill_Single_Ghost_Region(grid,u_ghost,regions(side),side,dt,time,number_of_ghost_cells);}
 }
 //#####################################################################
@@ -178,10 +178,10 @@ Apply_Boundary_Condition_Single_Side(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BAS
         if(!Constant_Extrapolation(side)) for(CELL_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_INTERIOR_REGION,side);iterator.Valid();iterator.Next()){
             TV_INT boundary_node=iterator.Cell_Index();
             T rho=u(boundary_node)(0);
-            TV velocity=EULER<GRID<TV> >::Get_Velocity(u,boundary_node);
-            T e=EULER<GRID<TV> >::e(u,boundary_node);
+            TV velocity=EULER<TV>::Get_Velocity(u,boundary_node);
+            T e=EULER<TV>::e(u,boundary_node);
             velocity[axis]=0; // Boundary condition
-            EULER<GRID<TV> >::Set_Euler_State_From_rho_velocity_And_internal_energy(u,boundary_node,rho,velocity,e);}}
+            EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(u,boundary_node,rho,velocity,e);}}
 }
 //#####################################################################
 // Function Apply_Boundary_Condition
@@ -190,7 +190,7 @@ template<class TV> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>::
 Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u,const T time) const
 {
     if(grid.Is_MAC_Grid()) return;
-    for(int side=0;side<2*GRID<TV>::dimension;side++) Apply_Boundary_Condition_Single_Side(grid,u,side,time);
+    for(int side=0;side<2*TV::m;side++) Apply_Boundary_Condition_Single_Side(grid,u,side,time);
 }
 //#####################################################################
 namespace PhysBAM{

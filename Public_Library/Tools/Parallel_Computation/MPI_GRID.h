@@ -11,7 +11,6 @@
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Boundaries/BOUNDARY.h>
 #include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Parallel_Computation/MPI_GRID_POLICY.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Vectors/VECTOR_2D.h>
 namespace MPI{class Group;class Intracomm;class Request;class Status;class Op;}
@@ -21,21 +20,21 @@ class MPI_PACKAGE;
 template<class TV> class RANGE;
 template<class TV> class GRID;
 
-template<class T_GRID>
+template<class TV>
 class MPI_GRID:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
 public:
-    T_GRID& local_grid;
+    GRID<TV>& local_grid;
     int number_of_ghost_cells;
-    T_GRID global_grid;
+    GRID<TV> global_grid;
     int rank;
     int number_of_processes;
     MPI::Intracomm* comm;
     MPI::Group* group;
-    T_GRID process_grid;
+    GRID<TV> process_grid;
     T_ARRAYS_INT process_ranks;
     TV_INT coordinates;
     ARRAY<TV_INT> all_coordinates;
@@ -50,7 +49,7 @@ public:
     TV_BOOL periodic;
     bool ignore_boundary_faces;
 
-    MPI_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),
+    MPI_GRID(GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),
         const TV_BOOL& periodic_input=TV_BOOL(),MPI::Group* group_input=0);
     ~MPI_GRID();
 
@@ -77,10 +76,10 @@ protected:
 public:
 
 //#####################################################################
-    void Initialize(VECTOR<VECTOR<bool,2>,T_GRID::dimension>& domain_walls);
+    void Initialize(VECTOR<VECTOR<bool,2>,TV::m>& domain_walls);
     bool Neighbor(const int axis,const int axis_side) const;
     void Split_Grid(const TV_INT& processes_per_dimension);
-    T_GRID Restrict_Grid(const TV_INT& coordinates) const;
+    GRID<TV> Restrict_Grid(const TV_INT& coordinates) const;
     void Synchronize_Dt(T& dt) const;
     void Synchronize_J_Bounds(int& jmin,int& jmax) const;
     void Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE_INDEX<TV::dimension> >& weights_to,ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,int> >,FACE_INDEX<TV::dimension> >& weights_from,const int ghost_cells);
@@ -88,10 +87,10 @@ public:
     void Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARRAY<ARRAY<PAIR<TV_INT,int> >,TV_INT>& weights_from,const int ghost_cells);
     void Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARRAY<ARRAY<PAIR<TV_INT,int> >,TV_INT>& weights_from,const int ghost_cells);
     template<class T_MPI_GRID,class T2> void Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,const bool include_corners=true) const;
-    template<class T_MPI_GRID,class T2> void Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,
+    template<class T_MPI_GRID,class T2> void Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const GRID<TV>& local_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,
         const bool include_corners=true) const;
     template<class T_MPI_GRID,class T2,class T_ARRAYS,class INDEX> void Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAY_BASE<T2,T_ARRAYS,INDEX>& data,const int bandwidth,const bool include_corners=true) const;
-    template<class T_MPI_GRID,class T2,class T_ARRAYS,class INDEX> void Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,ARRAY_BASE<T2,T_ARRAYS,INDEX>& data,const int bandwidth,
+    template<class T_MPI_GRID,class T2,class T_ARRAYS,class INDEX> void Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const GRID<TV>& local_grid,ARRAY_BASE<T2,T_ARRAYS,INDEX>& data,const int bandwidth,
         const bool include_corners=true) const;
     template<class T_MPI_GRID,class T_FACE_ARRAYS> void Exchange_Boundary_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data,const int bandwidth) const;
     template<class T_MPI_GRID,class T_FACE_ARRAYS> void Average_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const;

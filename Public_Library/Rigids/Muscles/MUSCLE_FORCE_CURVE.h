@@ -29,23 +29,23 @@ public:
     GRID<VECTOR<T,1> > velocity_grid;
     ARRAY<T,VECTOR<int,1> > velocity_curve;
 private:
-    INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,T>* passive_interpolation; 
-    INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,T>* active_interpolation;
-    INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,T>* tendon_force_interpolation;
-    INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,T>* velocity_interpolation;
-    LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,T> default_interpolation;
+    INTERPOLATION_UNIFORM<VECTOR<T,1>,T>* passive_interpolation; 
+    INTERPOLATION_UNIFORM<VECTOR<T,1>,T>* active_interpolation;
+    INTERPOLATION_UNIFORM<VECTOR<T,1>,T>* tendon_force_interpolation;
+    INTERPOLATION_UNIFORM<VECTOR<T,1>,T>* velocity_interpolation;
+    LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<VECTOR<T,1>,T> default_interpolation;
 
 public:
     MUSCLE_FORCE_CURVE();
     virtual ~MUSCLE_FORCE_CURVE();
 
-    void Set_Custom_Passive_Interpolation(INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,T>* passive_interpolation_input)
+    void Set_Custom_Passive_Interpolation(INTERPOLATION_UNIFORM<VECTOR<T,1>,T>* passive_interpolation_input)
     {passive_interpolation=passive_interpolation_input;}
 
-    void Set_Custom_Active_Interpolation(INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,T>* active_interpolation_input)
+    void Set_Custom_Active_Interpolation(INTERPOLATION_UNIFORM<VECTOR<T,1>,T>* active_interpolation_input)
     {active_interpolation=active_interpolation_input;}
 
-    void Set_Custom_Tendon_Force_Interpolation(INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,T>* tendon_force_interpolation_input)
+    void Set_Custom_Tendon_Force_Interpolation(INTERPOLATION_UNIFORM<VECTOR<T,1>,T>* tendon_force_interpolation_input)
     {tendon_force_interpolation=tendon_force_interpolation_input;}
 
     T Passive_Force(const T length) const // assumes normalized length

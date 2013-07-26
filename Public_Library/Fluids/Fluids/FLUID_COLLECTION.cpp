@@ -10,7 +10,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> FLUID_COLLECTION<TV>::
-FLUID_COLLECTION(const T_GRID& grid_input)
+FLUID_COLLECTION(const GRID<TV>& grid_input)
     :grid(grid_input),incompressible_fluid_collection(grid)
 {}
 //#####################################################################

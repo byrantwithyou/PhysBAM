@@ -94,7 +94,7 @@ Initialize()
         example.boundary=&example.boundary_scalar;
         example.phi_boundary=&example.phi_boundary_water;}
 
-    if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> > *refine=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >*>(&example.projection)){
+    if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV> *refine=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>*>(&example.projection)){
         refine->boundary=example.boundary;
         refine->phi_boundary=example.phi_boundary;}
     example.rigid_body_collection.Update_Kinematic_Particles();
@@ -103,12 +103,12 @@ Initialize()
     example.phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     example.boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     if(thread_queue){
-        ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<GRID<TV>,T>* threaded_advection_scalar=new ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<GRID<TV>,T>(thread_queue);
+        ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T>* threaded_advection_scalar=new ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T>(thread_queue);
         example.particle_levelset_evolution.Levelset_Advection(1).Set_Custom_Advection(*threaded_advection_scalar);
         example.incompressible.Set_Custom_Advection(*threaded_advection_scalar);
         example.particle_levelset_evolution.Particle_Levelset(0).Set_Thread_Queue(thread_queue);
         example.particle_levelset_evolution.Particle_Levelset(0).levelset.thread_queue=thread_queue;
-        if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >* refinement=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >*>(&example.projection))
+        if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>* refinement=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>*>(&example.projection))
             refinement->thread_queue=thread_queue;}
     else{
         example.particle_levelset_evolution.Levelset_Advection(1).Set_Custom_Advection(example.advection_scalar);
@@ -183,8 +183,8 @@ Run(RANGE<TV_INT>& domain,const T dt,const T time)
 {
     T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(example.incompressible.grid,3,false);
     example.incompressible.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
-    LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> interpolation;
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& pls=example.particle_levelset_evolution.Particle_Levelset(0);
+    LINEAR_INTERPOLATION_UNIFORM<TV,TV> interpolation;
+    PARTICLE_LEVELSET_UNIFORM<TV>& pls=example.particle_levelset_evolution.Particle_Levelset(0);
     if(pls.use_removed_positive_particles) for(NODE_ITERATOR<TV> iterator(example.mac_grid,domain);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
         PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());
         for(int p=0;p<particles.Size();p++){

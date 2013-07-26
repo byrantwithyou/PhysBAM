@@ -19,7 +19,7 @@ template<class TV>
 class IMPLICIT_OBJECT_INTERSECTOR
 {
 private:
-    typedef typename TV::SCALAR T;typedef typename GRID<TV>::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::HYPERPLANE T_HYPERPLANE;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef VECTOR<int,TV::dimension+1> T_ELEMENT;typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension>::SIMPLEX T_SIMPLEX;
     typedef IMPLICIT_OBJECT<TV> BASE;
@@ -49,9 +49,9 @@ public:
 
     static bool Refinement_Condition(const ARRAY<TV>& X,const ARRAY<T>& phis,const T_ELEMENT& indices)
     {T maximum_edge_length_magnitude_squared=0; 
-    for(int i=0;i<GRID<TV>::dimension;i++)for(int j=i;j<GRID<TV>::dimension+1;j++)
+    for(int i=0;i<TV::m;i++)for(int j=i;j<TV::m+1;j++)
         maximum_edge_length_magnitude_squared=max(maximum_edge_length_magnitude_squared,(X(indices[i])-X(indices[j])).Magnitude_Squared());
-    T result=sqr(phis(indices[0]));for(int i=1;i<GRID<TV>::dimension+1;i++) result=min(result,sqr(phis(indices[i])));
+    T result=sqr(phis(indices[0]));for(int i=1;i<TV::m+1;i++) result=min(result,sqr(phis(indices[i])));
     return result<=maximum_edge_length_magnitude_squared;}
 
     static void Refined_Object_Initialization_Helper(ARRAY<VECTOR<int,4> >& tets)

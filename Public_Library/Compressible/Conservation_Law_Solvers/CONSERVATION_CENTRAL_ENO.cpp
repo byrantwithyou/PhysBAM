@@ -13,7 +13,7 @@ using namespace PhysBAM;
 // Function Conservation_Solver
 //#####################################################################
 // psi is size (0,m) - U is size 3 by (-3,m+3) with 3 ghost cells - Fx is size 3 by (0,m)
-template<class T_GRID,int d> void CONSERVATION_CENTRAL_ENO<T_GRID,d>::
+template<class TV,int d> void CONSERVATION_CENTRAL_ENO<TV,d>::
 Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
         const VECTOR<bool,2>& outflow_boundaries,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux)
 {
@@ -25,7 +25,7 @@ Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi
 //#####################################################################
 // Function Conservation_Solver_Helper
 //#####################################################################
-template<class T_GRID,int d> template<int eno_order> void CONSERVATION_CENTRAL_ENO<T_GRID,d>::
+template<class TV,int d> template<int eno_order> void CONSERVATION_CENTRAL_ENO<TV,d>::
 Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
         const VECTOR<bool,2>& outflow_boundaries)
 {
@@ -60,15 +60,15 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
     for(i=0;i<m;i++) if(psi_ghost(i)) Fx(i)=(flux(i)-flux(i-1))*one_over_dx;
 }
 //#####################################################################
-#define INSTANTIATION_HELPER(T_GRID) \
-    template class CONSERVATION_CENTRAL_ENO<T_GRID,1>; \
-    template class CONSERVATION_CENTRAL_ENO<T_GRID,2>;
+#define INSTANTIATION_HELPER(TV) \
+    template class CONSERVATION_CENTRAL_ENO<TV,1>; \
+    template class CONSERVATION_CENTRAL_ENO<TV,2>;
 #define P(...) __VA_ARGS__
 #if 0 // broken
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,1> >))
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,2> >))
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,3> >))
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,1> >))
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,2> >))
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,3> >))
+INSTANTIATION_HELPER(P(VECTOR<float,1>))
+INSTANTIATION_HELPER(P(VECTOR<float,2>))
+INSTANTIATION_HELPER(P(VECTOR<float,3>))
+INSTANTIATION_HELPER(P(VECTOR<double,1>))
+INSTANTIATION_HELPER(P(VECTOR<double,2>))
+INSTANTIATION_HELPER(P(VECTOR<double,3>))
 #endif

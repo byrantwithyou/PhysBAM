@@ -7,7 +7,7 @@
 
 namespace PhysBAM{
 
-template<class T_GRID>
+template<class TV>
 struct INTERPOLATION_COLLIDABLE_POLICY;
 
 //#####################################################################

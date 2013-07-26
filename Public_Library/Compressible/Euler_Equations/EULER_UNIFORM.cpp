@@ -28,8 +28,8 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> EULER_UNIFORM<T_GRID>::
-EULER_UNIFORM(const T_GRID& grid_input) :grid(grid_input),mpi_grid(0),U_ghost(U_ghost_private),psi_pointer(0),timesplit(false),
+template<class TV> EULER_UNIFORM<TV>::
+EULER_UNIFORM(const GRID<TV>& grid_input) :grid(grid_input),mpi_grid(0),U_ghost(U_ghost_private),psi_pointer(0),timesplit(false),
     use_sound_speed_for_cfl(false),perform_rungekutta_for_implicit_part(false),compute_pressure_fluxes(false),
     thinshell(true), use_sound_speed_based_dt_multiple_for_cfl(false),multiplication_factor_for_sound_speed_based_dt(1.),
     euler_projection(this),apply_cavitation_correction(false),euler_cavitation_density(*this,true,(T).0001),
@@ -37,15 +37,15 @@ EULER_UNIFORM(const T_GRID& grid_input) :grid(grid_input),mpi_grid(0),U_ghost(U_
     accumulated_boundary_flux(),ghost_cells_valid(false),ghost_cells_valid_ring(0),need_to_remove_added_internal_energy(false)
 {
     assert(!(use_sound_speed_for_cfl && use_sound_speed_based_dt_multiple_for_cfl));
-    for(int i=0;i<T_GRID::dimension;i++){pressure_flux_dimension_indices(i)=1+i;eigensystems[i]=0;eigensystems_default[i]=0;eigensystems_pressureonly[i]=0;}
+    for(int i=0;i<TV::m;i++){pressure_flux_dimension_indices(i)=1+i;eigensystems[i]=0;eigensystems_default[i]=0;eigensystems_pressureonly[i]=0;}
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> EULER_UNIFORM<T_GRID>::
+template<class TV> EULER_UNIFORM<TV>::
 ~EULER_UNIFORM()
 {
-    for(int i=0;i<T_GRID::dimension;i++){
+    for(int i=0;i<TV::m;i++){
         delete eigensystems[i];
         delete eigensystems_default[i];
         delete eigensystems_pressureonly[i];}
@@ -54,7 +54,7 @@ template<class T_GRID> EULER_UNIFORM<T_GRID>::
 //#####################################################################
 // Function Set_Up_Cut_Out_Grid
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Set_Up_Cut_Out_Grid(ARRAY<bool,TV_INT>& psi_input)
 {
     psi_pointer=&psi_input;cut_out_grid=true;
@@ -63,19 +63,19 @@ Set_Up_Cut_Out_Grid(ARRAY<bool,TV_INT>& psi_input)
 //#####################################################################
 // Function Set_Custom_Equation_Of_State
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Set_Custom_Equation_Of_State(EOS<T>& eos_input)
 {
-    for(int i=0;i<T_GRID::dimension;i++){
-        (dynamic_cast<EULER_EIGENSYSTEM<T_GRID>*>(eigensystems[i]))->Set_Custom_Equation_Of_State(eos_input);
-        (dynamic_cast<EULER_EIGENSYSTEM<T_GRID>*>(eigensystems_default[i]))->Set_Custom_Equation_Of_State(eos_input);
-        (dynamic_cast<EULER_EIGENSYSTEM<T_GRID>*>(eigensystems_pressureonly[i]))->Set_Custom_Equation_Of_State(eos_input);}
+    for(int i=0;i<TV::m;i++){
+        (dynamic_cast<EULER_EIGENSYSTEM<TV>*>(eigensystems[i]))->Set_Custom_Equation_Of_State(eos_input);
+        (dynamic_cast<EULER_EIGENSYSTEM<TV>*>(eigensystems_default[i]))->Set_Custom_Equation_Of_State(eos_input);
+        (dynamic_cast<EULER_EIGENSYSTEM<TV>*>(eigensystems_pressureonly[i]))->Set_Custom_Equation_Of_State(eos_input);}
     BASE::Set_Custom_Equation_Of_State(eos_input);
 }
 //#####################################################################
 // Function Set_Custom_Boundary
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Set_Custom_Boundary(T_BOUNDARY& boundary_input)
 {
     BASE::Set_Custom_Boundary(boundary_input);
@@ -84,7 +84,7 @@ Set_Custom_Boundary(T_BOUNDARY& boundary_input)
 //#####################################################################
 // Function Set_Body_Force
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Set_Body_Force(const bool use_force_input)
 {
     use_force=use_force_input;
@@ -94,8 +94,8 @@ Set_Body_Force(const bool use_force_input)
 //#####################################################################
 // Function Initialize_Domain
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
-Initialize_Domain(const T_GRID& grid_input)
+template<class TV> void EULER_UNIFORM<TV>::
+Initialize_Domain(const GRID<TV>& grid_input)
 {
     if(grid_input.Is_MAC_Grid()) grid=grid_input;
     else grid=grid_input.Get_MAC_Grid_At_Regular_Positions();
@@ -110,7 +110,7 @@ Initialize_Domain(const T_GRID& grid_input)
 //#####################################################################
 // Function Save_State 
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Save_State(T_ARRAYS_DIMENSION_SCALAR& U_s,T_FACE_ARRAYS_SCALAR& face_velocities_s,bool& need_to_remove_added_internal_energy_s)
 {
     U_s.Copy(U);
@@ -120,7 +120,7 @@ Save_State(T_ARRAYS_DIMENSION_SCALAR& U_s,T_FACE_ARRAYS_SCALAR& face_velocities_
 //#####################################################################
 // Function Restore_State 
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Restore_State(T_ARRAYS_DIMENSION_SCALAR& U_s,T_FACE_ARRAYS_SCALAR& face_velocities_s,bool& need_to_remove_added_internal_energy_s)
 {
     U.Copy(U_s);
@@ -131,17 +131,17 @@ Restore_State(T_ARRAYS_DIMENSION_SCALAR& U_s,T_FACE_ARRAYS_SCALAR& face_velociti
 //#####################################################################
 // Function Get_Cell_Velocities
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Get_Cell_Velocities(const T dt,const T time,const int ghost_cells,ARRAY<TV,TV_INT>& centered_velocities)
 {
     Fill_Ghost_Cells(dt,time,ghost_cells);
     for(CELL_ITERATOR<TV> iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        centered_velocities(cell_index)=EULER<T_GRID>::Get_Velocity(U_ghost(cell_index));}
+        centered_velocities(cell_index)=EULER<TV>::Get_Velocity(U_ghost(cell_index));}
 }
 //#####################################################################
 // Compute_Total_Conserved_Quantity
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Compute_Total_Conserved_Quantity(const bool update_boundary_flux,const T dt,TV_DIMENSION& total_conserved_quantity)
 {
     assert(conservation->save_fluxes);
@@ -149,7 +149,7 @@ Compute_Total_Conserved_Quantity(const bool update_boundary_flux,const T dt,TV_D
     total_conserved_quantity=TV_DIMENSION();
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(psi(cell_index)) total_conserved_quantity+=U(cell_index)*cell_size;}
-    if(update_boundary_flux) for(FACE_ITERATOR<TV> iterator(grid,0,T_GRID::BOUNDARY_REGION);iterator.Valid();iterator.Next()){
+    if(update_boundary_flux) for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION);iterator.Valid();iterator.Next()){
         const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
         const T direction=iterator.First_Boundary()?(T)1:(T)-1;
         const TV_INT inside_cell_index=iterator.First_Boundary()?iterator.Second_Cell_Index():iterator.First_Cell_Index();
@@ -161,19 +161,19 @@ Compute_Total_Conserved_Quantity(const bool update_boundary_flux,const T dt,TV_D
 //#####################################################################
 // Function Warn_For_Low_Internal_Energy
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Warn_For_Low_Internal_Energy() const
 {
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_DIMENSION U_cell=U(iterator.Cell_Index());
-        T e=EULER<T_GRID>::e(U_cell);
+        T e=EULER<TV>::e(U_cell);
         if(e<e_min){
             LOG::cout<<"WARNING: low internal energy at cell "<<iterator.Cell_Index()<<" with e="<<e<<", state="<<U_cell<<std::endl;}}
 }
 //#####################################################################
 // Function Invalidate_Ghost_Cells
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Invalidate_Ghost_Cells()
 {
     ghost_cells_valid=false;
@@ -181,7 +181,7 @@ Invalidate_Ghost_Cells()
 //#####################################################################
 // Function Equal_Real_Data
 //#####################################################################
-template<class T_GRID> bool EULER_UNIFORM<T_GRID>::
+template<class TV> bool EULER_UNIFORM<TV>::
 Equal_Real_Data(const T_ARRAYS_DIMENSION_SCALAR& U1,const T_ARRAYS_DIMENSION_SCALAR& U2) const
 {
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
@@ -191,7 +191,7 @@ Equal_Real_Data(const T_ARRAYS_DIMENSION_SCALAR& U1,const T_ARRAYS_DIMENSION_SCA
 //#####################################################################
 // Function Apply_Boundary_Conditions
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Fill_Ghost_Cells(const T dt,const T time,const int ghost_cells) const
 {
     if(ghost_cells_valid_ring >= ghost_cells && ghost_cells_valid){
@@ -206,7 +206,7 @@ Fill_Ghost_Cells(const T dt,const T time,const int ghost_cells) const
 //#####################################################################
 // Function Get_Dirichlet_Boundary_Conditions
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Get_Dirichlet_Boundary_Conditions(const T dt,const T time)
 {
     if(timesplit){
@@ -216,17 +216,17 @@ Get_Dirichlet_Boundary_Conditions(const T dt,const T time)
 //#####################################################################
 // Function Advance_One_Time_Step_Forces
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Advance_One_Time_Step_Forces(const T dt,const T time)
 {
     // update gravity
     if(gravity) for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        for(int axis=0;axis<T_GRID::dimension;axis++){
+        for(int axis=0;axis<TV::m;axis++){
             if(downward_direction[axis]) U(cell_index)(axis+1)+=dt*U(cell_index)(0)*gravity*downward_direction[axis];}}
 
     // update body force
     if(use_force) for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        for(int axis=0;axis<T_GRID::dimension;axis++) U(cell_index)(axis+1)+=dt*U(cell_index)(0)*force.Component(axis)(cell_index);}
+        for(int axis=0;axis<TV::m;axis++) U(cell_index)(axis+1)+=dt*U(cell_index)(0)*force.Component(axis)(cell_index);}
 
     //TODO: Is this necessary?
     boundary->Apply_Boundary_Condition(grid,U,time+dt);
@@ -235,7 +235,7 @@ Advance_One_Time_Step_Forces(const T dt,const T time)
 //#####################################################################
 // Function Compute_Cavitation_Velocity
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Compute_Cavitation_Velocity(T_ARRAYS_SCALAR& rho_n, T_FACE_ARRAYS_SCALAR& face_velocities_n, T_ARRAYS_DIMENSION_SCALAR& momentum_n)
 {
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
@@ -250,7 +250,7 @@ Compute_Cavitation_Velocity(T_ARRAYS_SCALAR& rho_n, T_FACE_ARRAYS_SCALAR& face_v
 //#####################################################################
 // Function Advance_One_Time_Step_Explicit_Part
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep,const int rk_order)
 {
     last_dt=dt;
@@ -267,7 +267,7 @@ Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep
 
         // Store time n momentum
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-            for(int axis=0;axis<T_GRID::dimension;axis++) momentum_n(cell_index)(axis)=U_ghost(cell_index)(axis+1);}}
+            for(int axis=0;axis<TV::m;axis++) momentum_n(cell_index)(axis)=U_ghost(cell_index)(axis+1);}}
 
     if(compute_pressure_fluxes && !timesplit){
         conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_default,euler_projection.elliptic_solver->psi_N,euler_projection.face_velocities,thinshell,
@@ -296,7 +296,7 @@ Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep
 //#####################################################################
 // Function Advance_One_Time_Step_Implicit_Part
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Advance_One_Time_Step_Implicit_Part(const T dt,const T time)
 {
     euler_projection.Compute_Density_Weighted_Face_Velocities(dt,time,euler_projection.elliptic_solver->psi_N);
@@ -306,7 +306,7 @@ Advance_One_Time_Step_Implicit_Part(const T dt,const T time)
 //#####################################################################
 // Function Clamp_Internal_Energy
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Clamp_Internal_Energy(const T dt,const T time)
 {
     if(apply_cavitation_correction) return;
@@ -317,34 +317,34 @@ Clamp_Internal_Energy(const T dt,const T time)
         TV_INT cell_index=iterator.Cell_Index();
         if(!psi(cell_index)) continue;
         TV_DIMENSION U_cell=U(cell_index);
-        T e=EULER<T_GRID>::e(U_cell);
+        T e=EULER<TV>::e(U_cell);
         if(e<e_min){
             PHYSBAM_FATAL_ERROR("Do not clamp internal energy");
             LOG::cout<<"Warning: Clamping internal energy at cell "<<cell_index<<" with e="<<e<<", state="<<U_cell<<std::endl;
-            EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(U,cell_index,U_cell(0),EULER<T_GRID>::Get_Velocity(U_cell),e_min);
+            EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(U,cell_index,U_cell(0),EULER<TV>::Get_Velocity(U_cell),e_min);
             added_internal_energy(cell_index)=e_min-e;}}
     Invalidate_Ghost_Cells();
 }
 //#####################################################################
 // Function Clamp_Internal_Energy_Ghost
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Clamp_Internal_Energy_Ghost(T_ARRAYS_DIMENSION_SCALAR& U_ghost,const int number_of_ghost_cells) const
 {
     if(apply_cavitation_correction) return;
     for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++) if(!mpi_grid || !mpi_grid->Neighbor(axis,axis_side)){
-        for(CELL_ITERATOR<TV> iterator(grid,number_of_ghost_cells,T_GRID::GHOST_REGION,2*axis-(1-axis_side));iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR<TV> iterator(grid,number_of_ghost_cells,GRID<TV>::GHOST_REGION,2*axis-(1-axis_side));iterator.Valid();iterator.Next()){
             TV_DIMENSION U_cell=U_ghost(iterator.Cell_Index());
-            T e=EULER<T_GRID>::e(U_cell);
+            T e=EULER<TV>::e(U_cell);
             if(e<e_min){
                 PHYSBAM_FATAL_ERROR("Do not clamp internal energy e2");
                 LOG::cout<<"Warning: Clamping internal energy at ghost cell "<<iterator.Cell_Index()<<" with e="<<e<<", state="<<U_cell<<std::endl;
-                EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(U_ghost,iterator.Cell_Index(),U_cell(0),EULER<T_GRID>::Get_Velocity(U_cell),e_min);}}}
+                EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(U_ghost,iterator.Cell_Index(),U_cell(0),EULER<TV>::Get_Velocity(U_cell),e_min);}}}
 }
 //#####################################################################
 // Function Remove_Added_Internal_Energy
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Remove_Added_Internal_Energy(const T dt,const T time)
 {
     if(apply_cavitation_correction) return;
@@ -357,15 +357,15 @@ Remove_Added_Internal_Energy(const T dt,const T time)
         if(added_e){
             PHYSBAM_FATAL_ERROR("Did not clamp internal energy");
             TV_DIMENSION U_cell=U(cell_index);
-            T e=EULER<T_GRID>::e(U_cell);
-            EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(U,cell_index,U_cell(0),EULER<T_GRID>::Get_Velocity(U_cell),e-added_e);}}
+            T e=EULER<TV>::e(U_cell);
+            EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(U,cell_index,U_cell(0),EULER<TV>::Get_Velocity(U_cell),e-added_e);}}
     Invalidate_Ghost_Cells();
 }
 //#####################################################################
 // Function Euler_Step
 //#####################################################################
 // providing time is optional
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Euler_Step(const T dt,const T time,const bool is_time_n)
 {
     Advance_One_Time_Step_Forces(dt,time);
@@ -375,7 +375,7 @@ Euler_Step(const T dt,const T time,const bool is_time_n)
 //#####################################################################
 // Function CFL_Using_Sound_Speed
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR EULER_UNIFORM<T_GRID>::
+template<class TV> typename TV::SCALAR EULER_UNIFORM<TV>::
 CFL_Using_Sound_Speed() const
 {
     ARRAY<TV,TV_INT> velocity(grid.Domain_Indices()),velocity_minus_c(grid.Domain_Indices()),velocity_plus_c(grid.Domain_Indices());
@@ -390,7 +390,7 @@ CFL_Using_Sound_Speed() const
             velocity_minus_c(cell_index)=velocity_cell-sound_speed*TV::All_Ones_Vector();velocity_plus_c(cell_index)=velocity_cell+sound_speed*TV::All_Ones_Vector();}}
 
     TV max_velocity_minus_c=velocity_minus_c.Componentwise_Max_Abs();TV max_velocity_plus_c=velocity_plus_c.Componentwise_Max_Abs();
-    T dt_convect=0;for(int axis=0;axis<T_GRID::dimension;axis++) dt_convect+=max(max_velocity_minus_c(axis),max_velocity_plus_c(axis))/grid.dX[axis];
+    T dt_convect=0;for(int axis=0;axis<TV::m;axis++) dt_convect+=max(max_velocity_minus_c(axis),max_velocity_plus_c(axis))/grid.dX[axis];
     dt_convect=max(dt_convect,1/max_time_step);
     LOG::cout<<"max sound speed="<<max_sound_speed<<std::endl;
     LOG::cout<<"max velocity="<<velocity.Componentwise_Max_Abs()<<std::endl;
@@ -399,7 +399,7 @@ CFL_Using_Sound_Speed() const
 //#####################################################################
 // Function CFL
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR EULER_UNIFORM<T_GRID>::
+template<class TV> typename TV::SCALAR EULER_UNIFORM<TV>::
 CFL(const T time) const
 {
     // TODO: add gravity and body force contribution
@@ -415,15 +415,15 @@ CFL(const T time) const
             p_approx(iterator.Cell_Index())=eos->p(U_ghost(iterator.Cell_Index())(0),e(U_ghost,iterator.Cell_Index()));
         T_FACE_ARRAYS_SCALAR p_approx_face(grid);
         euler_projection.Compute_Face_Pressure_From_Cell_Pressures(grid,U_ghost,psi,p_approx_face,p_approx);
-        ARRAY<TV,TV_INT> grad_p_approx(grid.Domain_Indices());ARRAYS_UTILITIES<T_GRID,T>::Compute_Gradient_At_Cells_From_Face_Data(grid,grad_p_approx,p_approx_face);
+        ARRAY<TV,TV_INT> grad_p_approx(grid.Domain_Indices());ARRAYS_UTILITIES<TV,T>::Compute_Gradient_At_Cells_From_Face_Data(grid,grad_p_approx,p_approx_face);
 
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){const TV_INT cell_index=iterator.Cell_Index();
-            if(psi(cell_index)) for(int axis=0;axis<T_GRID::dimension;axis++){
+            if(psi(cell_index)) for(int axis=0;axis<TV::m;axis++){
                 max_lambdas[axis]=max(max_lambdas[axis],eigensystems[axis]->Maximum_Magnitude_Eigenvalue(U(cell_index)));
                 max_grad_p[axis]=maxabs(max_grad_p[axis],grad_p_approx(cell_index)[axis]);
                 max_grad_p_over_rho[axis]=maxabs(max_grad_p_over_rho[axis],grad_p_approx(cell_index)[axis]/U(cell_index)(0));}}
 
-        T dt_convect=0;for(int axis=0;axis<T_GRID::dimension;axis++){
+        T dt_convect=0;for(int axis=0;axis<TV::m;axis++){
             T max_u_over_dx=max_lambdas[axis]*one_over_dx[axis];
             dt_convect+=max_u_over_dx+sqrt(max_u_over_dx*max_u_over_dx+((T)4*max_grad_p_over_rho[axis])*one_over_dx[axis]);}
         dt_convect=(T).5*dt_convect;
@@ -434,9 +434,9 @@ CFL(const T time) const
         sum_ratios+=ratio_new_dt_to_old_dt;count_ratios++;
         LOG::cout<<"dt after CFL="<<1/one_over_dt<<std::endl;
         LOG::cout<<"Ratio of new dt to old dt="<<ratio_new_dt_to_old_dt<<", average ratio till now="<<(sum_ratios/(T)count_ratios)<<std::endl;
-        LOG::cout<<"max_lambdas= ";for(int axis=0;axis<T_GRID::dimension;axis++) LOG::cout<<max_lambdas[axis]<<", ";LOG::cout<<std::endl;
-        LOG::cout<<"max_grad_p_over_rho= ";for(int axis=0;axis<T_GRID::dimension;axis++) LOG::cout<<max_grad_p_over_rho[axis]<<", ";LOG::cout<<std::endl;
-        LOG::cout<<"max_grad_p= ";for(int axis=0;axis<T_GRID::dimension;axis++) LOG::cout<<max_grad_p[axis]<<", ";LOG::cout<<std::endl;
+        LOG::cout<<"max_lambdas= ";for(int axis=0;axis<TV::m;axis++) LOG::cout<<max_lambdas[axis]<<", ";LOG::cout<<std::endl;
+        LOG::cout<<"max_grad_p_over_rho= ";for(int axis=0;axis<TV::m;axis++) LOG::cout<<max_grad_p_over_rho[axis]<<", ";LOG::cout<<std::endl;
+        LOG::cout<<"max_grad_p= ";for(int axis=0;axis<TV::m;axis++) LOG::cout<<max_grad_p[axis]<<", ";LOG::cout<<std::endl;
 
         // Try going to a higher cfl number on time step computed using sound speed
         if(use_sound_speed_based_dt_multiple_for_cfl && (ratio_new_dt_to_old_dt>multiplication_factor_for_sound_speed_based_dt)){
@@ -449,8 +449,8 @@ CFL(const T time) const
 //#####################################################################
 // Function Set_Eigensystems
 //#####################################################################
-template<class T_GRID,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems_pressureonly,
-    const EULER_PROJECTION_UNIFORM<T_GRID>& euler_projection,const bool advection_only)
+template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems_pressureonly,
+    const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only)
 {
     if(eigensystems_default[0]) delete eigensystems_default[0];eigensystems_default[0]=new EULER_1D_EIGENSYSTEM_F<T>();
     if(eigensystems_pressureonly[0]) delete eigensystems_pressureonly[0];eigensystems_pressureonly[0]=new EULER_1D_EIGENSYSTEM_F<T>(true);
@@ -458,8 +458,8 @@ template<class T_GRID,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T
     if(advection_only) eigensystems[0]=new EULER_1D_EIGENSYSTEM_F_ADVECTION_ONLY<T>();
     else eigensystems[0]=new EULER_1D_EIGENSYSTEM_F<T>();
 }
-template<class T_GRID,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems_pressureonly,
-    const EULER_PROJECTION_UNIFORM<T_GRID>& euler_projection,const bool advection_only)
+template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems_pressureonly,
+    const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only)
 {
     if(eigensystems_default[0]) delete eigensystems_default[0];eigensystems_default[0]=new EULER_2D_EIGENSYSTEM_F<T>();
     if(eigensystems_default[1]) delete eigensystems_default[1];eigensystems_default[1]=new EULER_2D_EIGENSYSTEM_G<T>();
@@ -474,8 +474,8 @@ template<class T_GRID,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T
         eigensystems[0]=new EULER_2D_EIGENSYSTEM_F<T>();
         eigensystems[1]=new EULER_2D_EIGENSYSTEM_G<T>();}
 }
-template<class T_GRID,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems_pressureonly,
-    const EULER_PROJECTION_UNIFORM<T_GRID>& euler_projection,const bool advection_only)
+template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems_pressureonly,
+    const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only)
 {
     if(eigensystems_default[0]) delete eigensystems_default[0];eigensystems_default[0]=new EULER_3D_EIGENSYSTEM_F<T>();
     if(eigensystems_default[1]) delete eigensystems_default[1];eigensystems_default[1]=new EULER_3D_EIGENSYSTEM_G<T>();
@@ -496,7 +496,7 @@ template<class T_GRID,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T
         eigensystems[2]=new EULER_3D_EIGENSYSTEM_H<T>();}
 }
 
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Set_Eigensystems(const bool advection_only)
 {
     Set_Eigensystems_Helper(eigensystems_default,eigensystems,eigensystems_pressureonly,euler_projection,advection_only);
@@ -505,7 +505,7 @@ Set_Eigensystems(const bool advection_only)
 //#####################################################################
 // Function Log_Parameters
 //#####################################################################
-template<class T_GRID> void EULER_UNIFORM<T_GRID>::
+template<class TV> void EULER_UNIFORM<TV>::
 Log_Parameters() const
 {
     LOG::SCOPE scope("EULER_UNIFORM parameters");
@@ -521,10 +521,10 @@ Log_Parameters() const
 }
 //#####################################################################
 namespace PhysBAM{
-template class EULER_UNIFORM<GRID<VECTOR<float,1> > >;
-template class EULER_UNIFORM<GRID<VECTOR<float,2> > >;
-template class EULER_UNIFORM<GRID<VECTOR<float,3> > >;
-template class EULER_UNIFORM<GRID<VECTOR<double,1> > >;
-template class EULER_UNIFORM<GRID<VECTOR<double,2> > >;
-template class EULER_UNIFORM<GRID<VECTOR<double,3> > >;
+template class EULER_UNIFORM<VECTOR<float,1> >;
+template class EULER_UNIFORM<VECTOR<float,2> >;
+template class EULER_UNIFORM<VECTOR<float,3> >;
+template class EULER_UNIFORM<VECTOR<double,1> >;
+template class EULER_UNIFORM<VECTOR<double,2> >;
+template class EULER_UNIFORM<VECTOR<double,3> >;
 }

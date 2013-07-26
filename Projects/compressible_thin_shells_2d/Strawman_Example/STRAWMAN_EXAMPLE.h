@@ -20,7 +20,6 @@
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_BODY_COLLECTION_POLICY_UNIFORM.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
@@ -31,14 +30,13 @@
 namespace PhysBAM{
 
 template<class TV>
-class STRAWMAN_EXAMPLE : public EXAMPLE<TV>,LEVELSET_CALLBACKS<GRID<TV> >
+class STRAWMAN_EXAMPLE : public EXAMPLE<TV>,LEVELSET_CALLBACKS<TV>
 {
     typedef EXAMPLE<TV> BASE;
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,2> TV_INT;
     typedef GRID<TV> T_GRID;
     typedef ARRAY<T,TV_INT> T_ARRAY_SCALAR;
-    typedef typename COLLISION_BODY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     typedef BOUNDARY_PHI_WATER<TV> T_BOUNDARY_PHI_WATER;
 
 public:
@@ -49,7 +47,7 @@ private:
     using BASE::output_directory;
 
     int resolution,order,frame;
-    T_GRID grid;
+    GRID<TV> grid;
     T_ARRAY_SCALAR rho,rho_tmp;
     T_ARRAY_SCALAR phi,phi_tmp;
 public:
@@ -61,8 +59,8 @@ public:
     UNCOVERED_CELL_METHOD method;
     bool fill_ghost_region;
 
-    ADVECTION_CONSERVATIVE_ENO<T_GRID,T> advection_scheme;
-    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<T_GRID,T> passive_advection_scheme;
+    ADVECTION_CONSERVATIVE_ENO<TV,T> advection_scheme;
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T> passive_advection_scheme;
     BOUNDARY_LINEAR_EXTRAPOLATION<TV,T> boundary;
 
     // Initial Conditions
@@ -71,8 +69,8 @@ public:
     T fluid_tangential_velocity; // u
 
     RIGID_BODY_COLLECTION<TV> rigid_body_collection;
-    T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID> *pls_evolution;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV> collision_bodies_affecting_fluid;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV> *pls_evolution;
     T_BOUNDARY_PHI_WATER pls_boundary;
     bool opt_analytic,opt_extrapolation,opt_gfm,opt_new_gfm;
 
@@ -95,7 +93,7 @@ public:
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             V_levelset(iterator.Full_Index())=fluid_velocity_field(iterator.Location(),time)(iterator.Axis());
     }
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             V_levelset(iterator.Full_Index())=fluid_velocity_field(iterator.Location(),time)(iterator.Axis());
     }
@@ -153,7 +151,7 @@ virtual void Parse_Options() PHYSBAM_OVERRIDE
     face_velocities.Resize(grid.Domain_Indices(3));
     face_valid_mask.Resize(grid.Domain_Indices(3));
 
-    pls_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>(grid,collision_bodies_affecting_fluid,3,false);
+    pls_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>(grid,collision_bodies_affecting_fluid,3,false);
 }
 //#####################################################################
 // Function Initialize
@@ -263,8 +261,8 @@ void Fill_Solid_Cells(const T time,const T solid_boundary,T_ARRAY_SCALAR& rho,T_
         velocity(TV_INT(i,solid_clamped_tn.y+offset))=velocity(TV_INT(i,solid_clamped_tn.y+1));}
 
     // Perform higher-order interpolation
-    LINEAR_INTERPOLATION_UNIFORM<T_GRID,T> rho_interpolation;
-    LINEAR_INTERPOLATION_UNIFORM<T_GRID,TV> velocity_interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> rho_interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,TV> velocity_interpolation;
     for(int offset=0;offset>=(1-num_ghost_cells);--offset) for(int i=1;i <= resolution; ++i){
         TV location=grid.X(TV_INT(i,solid_clamped_tn.y+offset)),
            reflected_location=TV(location.x,(T)2*solid_boundary-location.y);
@@ -291,7 +289,7 @@ void Fill_Uncovered_Cells(const T& dt,const T& time,T_ARRAY_SCALAR& scalar_field
                 scalar_field(cell_index)=scalar_field(TV_INT(i,solid_clamped_tn.y+1));}
             break;
         case NEW_GFM:{
-            LINEAR_INTERPOLATION_UNIFORM<T_GRID,T> interpolation;
+            LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
             //for(int verticle_offset=0;verticle_offset>-3;--verticle_offset)
                 for(int i=1-num_ghost_cells;i<=resolution+num_ghost_cells;++i){TV_INT cell_index(i,solid_clamped_tn.y);
                     TV stencil_center=grid.Center(cell_index)-(T)2*(solid_boundary-grid.Center(cell_index).y)*TV(fluid_tangential_velocity,solid_velocity);
@@ -395,7 +393,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/phi",phi);
 
     { // PLS
-        const PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=pls_evolution->Particle_Levelset(0);
+        const PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=pls_evolution->Particle_Levelset(0);
         FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"levelset",particle_levelset.levelset);
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s",frame_folder.c_str(),"positive_particles"),particle_levelset.positive_particles);
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s",frame_folder.c_str(),"negative_particles"),particle_levelset.negative_particles);

@@ -14,7 +14,7 @@ template<class TV,class T2>
 class BOUNDARY_REFLECTION_WATER:public BOUNDARY<TV,T2>
 {
     typedef typename TV::SCALAR T;
-    typedef typename GRID<TV>::VECTOR_INT TV_INT;typedef typename GRID<TV>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename GRID<TV>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
     typedef typename GRID<TV>::FACE_ARRAYS_SCALAR T_FACE_ARRAYS_SCALAR;
 public:
     typedef BOUNDARY<TV,T2> BASE;
@@ -59,7 +59,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>
     assert(grid.Is_MAC_Grid() && phi && V);ARRAY<T2,TV_INT>::Put(u,u_ghost);
     RANGE<TV_INT> domain_indices=grid.Domain_Indices();
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
-    for(int axis=0;axis<GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
+    for(int axis=0;axis<TV::m;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
         if(use_extrapolation_mode && Constant_Extrapolation(side)) BOUNDARY<TV,T>::Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));
         else{ // either phi=phi_object for a wall, or no wall

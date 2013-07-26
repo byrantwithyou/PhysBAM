@@ -15,16 +15,16 @@
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 namespace PhysBAM{
 
-template<class T_GRID>
+template<class TV>
 class SHALLOW_WATER
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef VECTOR<T,T_GRID::dimension+1> TV_DIMENSION;
+    typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+1> TV_DIMENSION;
 public:
     BOUNDARY<TV,TV_DIMENSION>* boundary;
-    CONSERVATION<T_GRID,T_GRID::dimension+1>* conservation;
+    CONSERVATION<TV,TV::m+1>* conservation;
 private:
     BOUNDARY<TV,TV_DIMENSION> boundary_default;
-    CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+1> conservation_default;
+    CONSERVATION_ENO_LLF<TV,TV::m+1> conservation_default;
 
 protected:
     SHALLOW_WATER()
@@ -37,7 +37,7 @@ public:
     void Set_Custom_Boundary(BOUNDARY<TV,TV_DIMENSION>& boundary_input)
     {boundary=&boundary_input;}
     
-    void Set_Custom_Conservation(CONSERVATION<T,T_GRID::dimension+1>& conservation_input)
+    void Set_Custom_Conservation(CONSERVATION<T,TV::m+1>& conservation_input)
     {conservation=&conservation_input;}
 
 //#####################################################################

@@ -12,20 +12,20 @@
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS_SMOKE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class STANDARD_TESTS_SMOKE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;
 public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
     using BASE::restart_frame;using BASE::resolution;
 
-    SMOKE_STANDARD_TESTS_3D<GRID<TV> > tests;
+    SMOKE_STANDARD_TESTS_3D<TV> tests;
 
     STANDARD_TESTS_SMOKE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,0,fluids_parameters.SMOKE),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.SMOKE),
         tests(*this,fluids_parameters,fluid_collection.incompressible_fluid_collection,solid_body_collection.rigid_body_collection)
     {
         *fluids_parameters.grid=tests.grid;

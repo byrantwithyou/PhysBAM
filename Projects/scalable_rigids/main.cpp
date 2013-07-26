@@ -316,9 +316,9 @@ int main(int argc,char* argv[])
     PARSE_ARGS parse_args(argc,argv);
     example->Parse(parse_args);
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* solid_fluid_example=dynamic_cast<SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >*>(example);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* solid_fluid_example=dynamic_cast<SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>*>(example);
     LOG::Instance()->Copy_Log_To_File(example->output_directory+"/common/log.txt",solid_fluid_example->restart);
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*solid_fluid_example);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*solid_fluid_example);
     driver.Execute_Main_Program();
     delete example;
 #endif

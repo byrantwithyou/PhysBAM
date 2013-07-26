@@ -14,13 +14,13 @@ namespace PhysBAM{
 template<class TV>
 class FLUID_COLLECTION:public NONCOPYABLE
 {
-    typedef GRID<TV> T_GRID;typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR T;
 public:
-    const T_GRID& grid;
-    //COMPRESSIBLE_FLUID_COLLECTION<T_GRID>& compressible_fluid_collection;
-    INCOMPRESSIBLE_FLUID_COLLECTION<T_GRID> incompressible_fluid_collection;
+    const GRID<TV>& grid;
+    //COMPRESSIBLE_FLUID_COLLECTION<TV>& compressible_fluid_collection;
+    INCOMPRESSIBLE_FLUID_COLLECTION<TV> incompressible_fluid_collection;
     
-    FLUID_COLLECTION(const T_GRID& grid_input);
+    FLUID_COLLECTION(const GRID<TV>& grid_input);
     virtual ~FLUID_COLLECTION();
 
 //#####################################################################

@@ -20,9 +20,9 @@ class RENDERING_TEXTURE_IMAGE_SHADER:public MATERIAL_SHADER<T>
 public:
     GRID<VECTOR<T,2> > grid;
     ARRAY<VECTOR<T,3> ,VECTOR<int,2> > pixels;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<T,2> >,VECTOR<T,3> > linear_interpolation;
-    CUBIC_MN_INTERPOLATION_UNIFORM<GRID<VECTOR<T,2> >,VECTOR<T,3> > cubic_interpolation;
-    INTERPOLATION_UNIFORM<GRID<VECTOR<T,2> >,VECTOR<T,3> >* interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,2>,VECTOR<T,3> > linear_interpolation;
+    CUBIC_MN_INTERPOLATION_UNIFORM<VECTOR<T,2>,VECTOR<T,3> > cubic_interpolation;
+    INTERPOLATION_UNIFORM<VECTOR<T,2>,VECTOR<T,3> >* interpolation;
     bool wrap_s,wrap_t;
     
     RENDERING_TEXTURE_IMAGE_SHADER(RENDER_WORLD<T>& world_input,const bool wrap_s_input=true,const bool wrap_t_input=true,const bool cubic_interpolation_input=false)

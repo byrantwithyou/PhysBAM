@@ -13,26 +13,26 @@ namespace PhysBAM{
 
 template<class T> class SPARSE_MATRIX_FLAT_NXN;
 
-template<class T_GRID>
-class POISSON_UNIFORM:public POISSON<typename T_GRID::SCALAR>,public LAPLACE_UNIFORM<T_GRID>
+template<class TV>
+class POISSON_UNIFORM:public POISSON<typename TV::SCALAR>,public LAPLACE_UNIFORM<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
-    using LAPLACE_UNIFORM<T_GRID>::grid;using POISSON<T>::use_variable_beta;using POISSON<T>::beta_given_on_faces;
+    using LAPLACE_UNIFORM<TV>::grid;using POISSON<T>::use_variable_beta;using POISSON<T>::beta_given_on_faces;
     using POISSON<T>::use_weighted_divergence;using POISSON<T>::multiphase;
-    using LAPLACE_UNIFORM<T_GRID>::psi_N;using LAPLACE_UNIFORM<T_GRID>::periodic_boundary;
-    using LAPLACE_UNIFORM<T_GRID>::filled_region_colors;using LAPLACE_UNIFORM<T_GRID>::f;using LAPLACE_UNIFORM<T_GRID>::u;using LAPLACE_UNIFORM<T_GRID>::psi_D;
-    using LAPLACE_UNIFORM<T_GRID>::filled_region_touches_dirichlet;using LAPLACE_UNIFORM<T_GRID>::solve_neumann_regions;
+    using LAPLACE_UNIFORM<TV>::psi_N;using LAPLACE_UNIFORM<TV>::periodic_boundary;
+    using LAPLACE_UNIFORM<TV>::filled_region_colors;using LAPLACE_UNIFORM<TV>::f;using LAPLACE_UNIFORM<TV>::u;using LAPLACE_UNIFORM<TV>::psi_D;
+    using LAPLACE_UNIFORM<TV>::filled_region_touches_dirichlet;using LAPLACE_UNIFORM<TV>::solve_neumann_regions;
 
     T_FACE_ARRAYS_SCALAR beta_face;
     T_ARRAYS_SCALAR variable_beta;
     T_FACE_ARRAYS_SCALAR divergence_face_weights;
 public:
 
-    POISSON_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input);
+    POISSON_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input);
     virtual ~POISSON_UNIFORM();
 
     void Set_Variable_beta(const bool beta_given_on_faces_input=false)
@@ -44,7 +44,7 @@ public:
     if(use_weighted_divergence) divergence_face_weights.Resize(grid,1);}
 
 //#####################################################################
-    void Initialize_Grid(const T_GRID& grid_input);
+    void Initialize_Grid(const GRID<TV>& grid_input);
     void Find_Variable_beta();
     void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index) PHYSBAM_OVERRIDE;
 //#####################################################################

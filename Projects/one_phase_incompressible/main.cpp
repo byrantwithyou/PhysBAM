@@ -25,7 +25,7 @@ int main(int argc,char *argv[])
         SMOKE_TESTS<TV>* example=new SMOKE_TESTS<TV>(stream_type,parse_args);
         
         if(mpi_world.initialized){
-            example->mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(example->mac_grid,3);
+            example->mpi_grid=new MPI_UNIFORM_GRID<TV>(example->mac_grid,3);
             if(example->mpi_grid->Number_Of_Processors()>1) example->output_directory+=STRING_UTILITIES::string_sprintf("_NP%d/%d",example->mpi_grid->Number_Of_Processors(),(mpi_world.rank+1));}
         FILE_UTILITIES::Create_Directory(example->output_directory+"/common");
         LOG::Instance()->Copy_Log_To_File(example->output_directory+"/common/log.txt",false);
@@ -37,7 +37,7 @@ int main(int argc,char *argv[])
         SMOKE_TESTS<TV>* example=new SMOKE_TESTS<TV>(stream_type,parse_args);
         
         if(mpi_world.initialized){
-            example->mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(example->mac_grid,3);
+            example->mpi_grid=new MPI_UNIFORM_GRID<TV>(example->mac_grid,3);
             if(example->mpi_grid->Number_Of_Processors()>1) example->output_directory+=STRING_UTILITIES::string_sprintf("_NP%d/%d",example->mpi_grid->Number_Of_Processors(),(mpi_world.rank+1));}
         FILE_UTILITIES::Create_Directory(example->output_directory+"/common");
         LOG::Instance()->Copy_Log_To_File(example->output_directory+"/common/log.txt",false);

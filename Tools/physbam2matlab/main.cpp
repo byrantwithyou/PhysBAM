@@ -11,12 +11,11 @@ using namespace PhysBAM;
 //#####################################################################
 // Class PHYSBAM_TO_MATLAB_CONVERTER 
 //#####################################################################
-template<class T_GRID,class RW>
+template<class TV,class RW>
 class PHYSBAM_TO_MATLAB_CONVERTER
 {
-    typedef typename T_GRID::SCALAR T;
-    typedef typename T_GRID::VECTOR_T TV;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     const std::string input_directory,output_directory;
@@ -30,7 +29,7 @@ public:
     {}
 
     void Convert(const int frame)
-    {T_GRID grid;FILE_UTILITIES::Read_From_File<RW>(input_directory+"/common/grid",grid);
+    {GRID<TV> grid;FILE_UTILITIES::Read_From_File<RW>(input_directory+"/common/grid",grid);
     matlab_output.Write_Header_File(output_directory+"/header",grid,frame);
     if(convert_density) Convert_Data<T_ARRAYS_SCALAR>("density",frame);
     if(convert_momentum) Convert_Data<T_ARRAYS_SCALAR>("momentum",frame);
@@ -91,7 +90,7 @@ int main(int argc,char* argv[])
 
     std::cout<<"input_directory="<<input_directory<<"output_directory="<<output_directory<<std::endl;
     std::cout<<"first_frame="<<first_frame<<std::endl<<"last_frame="<<last_frame<<std::endl;
-    PHYSBAM_TO_MATLAB_CONVERTER<GRID<VECTOR<T,1> >,RW> physbam_to_matlab_converter(input_directory,output_directory);
+    PHYSBAM_TO_MATLAB_CONVERTER<VECTOR<T,1>,RW> physbam_to_matlab_converter(input_directory,output_directory);
     physbam_to_matlab_converter.convert_density=convert_density;
     physbam_to_matlab_converter.convert_momentum=convert_momentum;
     physbam_to_matlab_converter.convert_energy=convert_energy;

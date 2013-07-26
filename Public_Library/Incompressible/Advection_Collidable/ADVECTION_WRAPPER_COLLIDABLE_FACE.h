@@ -8,28 +8,29 @@
 #define __ADVECTION_WRAPPER_COLLIDABLE_FACE__
 
 #include <Tools/Advection/ADVECTION.h>
-#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_BODY_COLLECTION_POLICY_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
 
 namespace PhysBAM{
 
+template<class TV> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
+
 // Assumes NESTED_ADVECTION is of type ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE
-template<class T_GRID,class T2,class T_NESTED_LOOKUP,class T_NESTED_ADVECTION,class T_FACE_LOOKUP_COLLIDABLE>
-class ADVECTION_WRAPPER_COLLIDABLE_FACE:public ADVECTION<T_GRID,T2,T_NESTED_LOOKUP>
+template<class TV,class T2,class T_NESTED_LOOKUP,class T_NESTED_ADVECTION,class T_FACE_LOOKUP_COLLIDABLE>
+class ADVECTION_WRAPPER_COLLIDABLE_FACE:public ADVECTION<TV,T2,T_NESTED_LOOKUP>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;typedef typename COLLISION_BODY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;
     typedef typename T_FACE_LOOKUP_COLLIDABLE::template REBIND_NESTED_LOOKUP<T_NESTED_LOOKUP>::TYPE T_FACE_LOOKUP_COLLIDABLE_NESTED_LOOKUP;
 public:
     T_NESTED_ADVECTION& nested_advection;
-    const T_GRID_BASED_COLLISION_GEOMETRY& body_list;
+    const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list;
     const T_FACE_ARRAYS_BOOL& face_velocities_valid_mask;
 
-    ADVECTION_WRAPPER_COLLIDABLE_FACE(T_NESTED_ADVECTION& nested_advection_input,T_GRID_BASED_COLLISION_GEOMETRY& body_list_input,const T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input)
+    ADVECTION_WRAPPER_COLLIDABLE_FACE(T_NESTED_ADVECTION& nested_advection_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list_input,const T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input)
         :nested_advection(nested_advection_input),body_list(body_list_input),face_velocities_valid_mask(face_velocities_valid_mask_input)
     {}
 
-    void Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_NESTED_LOOKUP& Z_ghost,
+    void Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_NESTED_LOOKUP& Z_ghost,
         const T_NESTED_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
         const T_NESTED_LOOKUP* Z_min_ghost,const T_NESTED_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
     {T_FACE_LOOKUP_COLLIDABLE_NESTED_LOOKUP Z_ghost_lookup(Z_ghost,body_list,&face_velocities_valid_mask);

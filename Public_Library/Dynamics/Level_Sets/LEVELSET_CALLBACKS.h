@@ -12,15 +12,15 @@
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 namespace PhysBAM{
 
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
-template<class T_GRID> class LEVELSET_MULTIPLE;
+template<class TV> struct GRID_ARRAYS_POLICY;
+template<class TV> class LEVELSET_MULTIPLE;
 template<class TV> class LEVELSET;
 template<class TV> class PARTICLE_LEVELSET_PARTICLES;
 
-template<class T_GRID>
+template<class TV>
 class LEVELSET_CALLBACKS
 {    
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
 
@@ -30,8 +30,8 @@ public:
     virtual ~LEVELSET_CALLBACKS();
 
 //#####################################################################
-    virtual void Get_Levelset_Velocity(const T_GRID& grid,LEVELSET<TV>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time=0) const;
-    virtual void Get_Levelset_Velocity(const T_GRID& grid,LEVELSET_MULTIPLE<T_GRID>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time=0) const;
+    virtual void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time=0) const;
+    virtual void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time=0) const;
     virtual void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time);
     virtual bool Adjust_Particle_For_Objects(TV& X,TV& V,const T r, const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time);

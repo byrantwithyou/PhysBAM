@@ -123,7 +123,7 @@ Phi_Secondary(const TV& location) const
 template<class TV> TV MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>::
 Normal(const TV& location,const int aggregate) const
 {
-    assert((aggregate >= 1 && aggregate <= 2*GRID<TV>::dimension) || aggregate == -1);
+    assert((aggregate >= 1 && aggregate <= 2*TV::m) || aggregate == -1);
     if(aggregate != -1) return box.Normal(aggregate);
     else{
         int index=-1;
@@ -136,7 +136,7 @@ Normal(const TV& location,const int aggregate) const
 template<class TV> TV MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>::
 Extended_Normal(const TV& location,const int aggregate) const
 {
-    assert((aggregate >= 1 && aggregate <= 2*GRID<TV>::dimension) || aggregate == -1);
+    assert((aggregate >= 1 && aggregate <= 2*TV::m) || aggregate == -1);
     if(aggregate != -1) return box.Normal(aggregate);
     else{
         int index=-1;

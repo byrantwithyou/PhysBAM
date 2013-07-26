@@ -23,17 +23,16 @@
 
 namespace PhysBAM{
 
-template<class T_GRID>
-class SOLIDS_FLUIDS_EXAMPLE_UNIFORM_PYTHON:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>,public boost::python::wrapper<SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> >
+template<class TV>
+class SOLIDS_FLUIDS_EXAMPLE_UNIFORM_PYTHON:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>,public boost::python::wrapper<SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> >
 {
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;
-    typedef typename T_GRID::VECTOR_T TV;
-    typedef typename T_GRID::SCALAR T;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef typename TV::SCALAR T;
 public:
     using BASE::solids_parameters;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM_PYTHON(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<T_GRID>::TYPE type)
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM_PYTHON(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<TV>::TYPE type)
         :BASE(stream_type,number_of_regions,type)
     {}
 

@@ -33,10 +33,10 @@
 namespace PhysBAM{
 
 template<class T_input,class RW=T_input>
-class MASS_CONSERVATION:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class MASS_CONSERVATION:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;
-    typedef VECTOR<T,2> TV;typedef GRID<TV> T_GRID;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;typedef VECTOR<int,2> TV_INT;
+    typedef VECTOR<T,2> TV;typedef GRID<TV> T_GRID;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;typedef VECTOR<int,2> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::fluids_parameters;
@@ -59,7 +59,7 @@ public:
     T period;
 
     MASS_CONSERVATION(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID >(stream_type,1,fluids_parameters.WATER),pi_over_314((T)pi/314),root_two_over_two((T).5*(T)root_two)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >(stream_type,1,fluids_parameters.WATER),pi_over_314((T)pi/314),root_two_over_two((T).5*(T)root_two)
     {
     }
 
@@ -223,7 +223,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     if((test_number==11 || test_number==12) && frame && frame%40==0){
-        T_GRID& grid=*fluids_parameters.grid;
+        GRID<TV>& grid=*fluids_parameters.grid;
         T_ARRAYS_SCALAR copy_phis=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi;
         T_ARRAYS_SCALAR copy_volumes;
         fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi.Fill((T)1);
@@ -267,7 +267,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID >::Update_Fluid_Parameters(dt,time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >::Update_Fluid_Parameters(dt,time);
 }
 //#####################################################################
 // Function Initialize_Phi
@@ -275,7 +275,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 void Initialize_Phi() PHYSBAM_OVERRIDE
 {
     // Not so good to set up a heaviside function here because then the interface will be exactly between the two nodes which can lead to roundoff issues when setting dirichlet cells, etc.
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
 
     if(test_number==1 || test_number==2){
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -362,7 +362,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==10){
         // should write something to rasterize source mass using our negative material calc in cell
-        const T_GRID& grid=*fluids_parameters.grid;
+        const GRID<TV>& grid=*fluids_parameters.grid;
         RANGE<TV> source_one_box((T).2,(T).3,(T).14,(T).16);ORIENTED_BOX<TV> oriented_one_box(source_one_box,ROTATION<TV>::From_Angle((T)pi/4),source_one_box.Minimum_Corner());
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV source_X=world_to_source.Homogeneous_Times(iterator.Location());T source_phi=oriented_one_box.Signed_Distance(source_X);
@@ -406,7 +406,7 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
     // just overwrite fluids_parameters.face_velocities
     PHYSBAM_FATAL_ERROR("broken");
 #if 0
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     if(test_number == 1 || test_number==11)
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -466,7 +466,7 @@ bool Adjust_Particle_For_Objects(TV& X,TV& V,const T r,const PARTICLE_LEVELSET_P
 void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==6){
-        T_GRID& grid=*fluids_parameters.grid;
+        GRID<TV>& grid=*fluids_parameters.grid;
         TV DX=grid.Domain().Edge_Lengths(),X=particles.X(index),X_new=X+dt*V,X_new_original=X_new;
         if(particle_type==PARTICLE_LEVELSET_REMOVED_NEGATIVE || particle_type==PARTICLE_LEVELSET_REMOVED_POSITIVE){
             if(X_new.x>grid.domain.max_corner.x) X.x-=DX.x;else if(X_new.x<grid.domain.min_corner.x) X.x+=DX.x;
@@ -476,7 +476,7 @@ void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& part
             if(X_new.x>grid.domain.max_corner.x) X_new.x-=DX.x;else if(X_new.x<grid.domain.min_corner.x) X_new.x+=DX.x;
             if(X_new.y>grid.domain.max_corner.y) X_new.y-=DX.y;else if(X_new.y<grid.domain.min_corner.y) X_new.y+=DX.y;
             if(X_new!=X_new_original){particles.X(index)=X_new;V=TV();}}}
-    else SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Adjust_Particle_For_Domain_Boundaries(particles,index,V,particle_type,dt,time);
+    else SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Adjust_Particle_For_Domain_Boundaries(particles,index,V,particle_type,dt,time);
 }
 //#####################################################################
 // Function Get_Analytic_Velocity

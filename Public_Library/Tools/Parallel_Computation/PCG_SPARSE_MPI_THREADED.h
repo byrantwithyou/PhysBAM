@@ -17,7 +17,7 @@ class PCG_SPARSE_MPI_THREADED:public PCG_SPARSE_MPI<GRID<VECTOR<typename TV::SCA
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::dimension> TV_INT;
-    typedef PCG_SPARSE_MPI<GRID<TV> > BASE;
+    typedef PCG_SPARSE_MPI<TV> BASE;
 public:
     using BASE::pcg;using BASE::partition;using BASE::Fill_Ghost_Cells;
 

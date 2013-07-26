@@ -22,22 +22,22 @@
 #include <Dynamics/Heat_Flows/HEAT_LAPLACE.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class HEAT_UNIFORM:public HEAT<typename T_GRID::SCALAR>
+template<class TV>
+class HEAT_UNIFORM:public HEAT<typename TV::SCALAR>
 {
 private:
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
 
     using HEAT<T>::max_time_step;using HEAT<T>::density;using HEAT<T>::specific_heat;using HEAT<T>::thermal_conductivity;using HEAT<T>::kappa;
 public:
 
-    T_GRID& grid;
+    GRID<TV>& grid;
     T_ARRAYS_SCALAR& Q;
-    HEAT_LAPLACE<LAPLACE_COLLIDABLE_UNIFORM<T_GRID> > laplace;
+    HEAT_LAPLACE<LAPLACE_COLLIDABLE_UNIFORM<TV> > laplace;
 
-    HEAT_UNIFORM(T_GRID& grid_input,T_ARRAYS_SCALAR& Q_input);
+    HEAT_UNIFORM(GRID<TV>& grid_input,T_ARRAYS_SCALAR& Q_input);
     ~HEAT_UNIFORM();
 
 //#####################################################################

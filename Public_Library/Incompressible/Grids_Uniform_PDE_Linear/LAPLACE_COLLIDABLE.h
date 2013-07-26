@@ -11,10 +11,10 @@
 #include <Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
-template<class T_GRID>
+template<class TV>
 class LAPLACE_COLLIDABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 
 public:

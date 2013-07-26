@@ -61,7 +61,7 @@ Compute_Averaged_Orientation_Helper(const VECTOR<CELL_ELEMENTS,8>& cell_elements
     typedef VECTOR<T,3> TV;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
 
-    ARRAY<TV > normal(base_orientation.m);
+    ARRAY<TV> normal(base_orientation.m);
     TV tangent;
     for(int s=0;s<8;s++){
         const ARRAY<INTERFACE_ELEMENT>& subcell_interface=cell_elements(s).interface;

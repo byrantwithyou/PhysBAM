@@ -10,37 +10,37 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> INCOMPRESSIBILITY<T_GRID>::
-INCOMPRESSIBILITY(PROJECTION_UNIFORM<T_GRID>& projection_input)
+template<class TV> INCOMPRESSIBILITY<TV>::
+INCOMPRESSIBILITY(PROJECTION_UNIFORM<TV>& projection_input)
     :projection(projection_input)
 {}
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> INCOMPRESSIBILITY<T_GRID>::
+template<class TV> INCOMPRESSIBILITY<TV>::
 ~INCOMPRESSIBILITY()
 {
 }
 //#####################################################################
 // Function Add_Implicit_Forces
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBILITY<T_GRID>::
-Add_Implicit_Forces_Projection(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+template<class TV> void INCOMPRESSIBILITY<TV>::
+Add_Implicit_Forces_Projection(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     projection.Make_Divergence_Free(face_velocities,dt,time);
 }
 //#####################################################################
 // Function Initialize_Grids
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBILITY<T_GRID>::
-Initialize_Grids(const T_GRID& grid)
+template<class TV> void INCOMPRESSIBILITY<TV>::
+Initialize_Grids(const GRID<TV>& grid)
 {
     projection.Initialize_Grid(grid);
 }
 //#####################################################################
 namespace PhysBAM{
-template class INCOMPRESSIBILITY<GRID<VECTOR<float,2> > >;
-template class INCOMPRESSIBILITY<GRID<VECTOR<float,3> > >;
-template class INCOMPRESSIBILITY<GRID<VECTOR<double,2> > >;
-template class INCOMPRESSIBILITY<GRID<VECTOR<double,3> > >;
+template class INCOMPRESSIBILITY<VECTOR<float,2> >;
+template class INCOMPRESSIBILITY<VECTOR<float,3> >;
+template class INCOMPRESSIBILITY<VECTOR<double,2> >;
+template class INCOMPRESSIBILITY<VECTOR<double,3> >;
 }

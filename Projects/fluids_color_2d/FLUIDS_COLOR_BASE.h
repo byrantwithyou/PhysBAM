@@ -645,8 +645,8 @@ public:
                 ls.Compute_Curvature(time);
                 ls.Compute_Normals(time);}
 
-            T k=CUBIC_MN_INTERPOLATION_UNIFORM<GRID<TV>,T>().Clamped_To_Array(grid,*ls.curvature,X);
-            TV n=CUBIC_MN_INTERPOLATION_UNIFORM<GRID<TV>,TV>().Clamped_To_Array(grid,*ls.normals,X).Normalized();
+            T k=CUBIC_MN_INTERPOLATION_UNIFORM<TV,T>().Clamped_To_Array(grid,*ls.curvature,X);
+            TV n=CUBIC_MN_INTERPOLATION_UNIFORM<TV,TV>().Clamped_To_Array(grid,*ls.normals,X).Normalized();
             Add_Debug_Particle(X,VECTOR<T,3>(0,0,1));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*surface_tension*n);
             return k*surface_tension*n;}

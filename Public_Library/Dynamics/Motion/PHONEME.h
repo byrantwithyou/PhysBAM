@@ -24,7 +24,7 @@ public:
     int frame_length;
     T time_length;
     ARRAY<ARRAY<T> ,VECTOR<int,1> > controls;
-    const INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,ARRAY<T> >* interpolation;
+    const INTERPOLATION_UNIFORM<VECTOR<T,1>,ARRAY<T> >* interpolation;
 
     PHONEME()
         :interpolation(0)

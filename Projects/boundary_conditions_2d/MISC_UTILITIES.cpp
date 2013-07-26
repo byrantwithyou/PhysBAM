@@ -71,7 +71,7 @@ template<class TV>
 void Add_Advection(const OBJECTS_COMMON<TV>& obj,const PARAMETERS_COMMON<typename TV::SCALAR>& param,ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >& u,bool use_extrapolation)
 {
     typedef typename TV::SCALAR T;
-    ADVECTION_HAMILTON_JACOBI_ENO<GRID<TV>,T> advection;
+    ADVECTION_HAMILTON_JACOBI_ENO<TV,T> advection;
     BOUNDARY<TV,T> boundary;
 
     if(use_extrapolation){

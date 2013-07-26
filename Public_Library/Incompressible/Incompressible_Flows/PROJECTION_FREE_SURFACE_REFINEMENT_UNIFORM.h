@@ -13,16 +13,16 @@
 #include <Dynamics/Interpolation/FIRE_INTERPOLATION_POLICY.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM:public PROJECTION_REFINEMENT_UNIFORM<T_GRID>
+template<class TV>
+class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM:public PROJECTION_REFINEMENT_UNIFORM<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;typedef typename FIRE_INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP_FIRE_MULTIPHASE T_FACE_LOOKUP_FIRE_MULTIPHASE;
+    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef typename FIRE_INTERPOLATION_POLICY<TV>::FACE_LOOKUP_FIRE_MULTIPHASE T_FACE_LOOKUP_FIRE_MULTIPHASE;
 public:
-    typedef PROJECTION_REFINEMENT_UNIFORM<T_GRID> BASE;
+    typedef PROJECTION_REFINEMENT_UNIFORM<TV> BASE;
     using BASE::fine_mpi_grid;using BASE::collidable_solver;using BASE::elliptic_solver;using BASE::p;using BASE::coarse_mpi_grid;using BASE::solid_wall;using BASE::fine_psi_N;using BASE::poisson;
     using BASE::coarse_grid;using BASE::local_grid;using BASE::fast_local_projection;using BASE::fine_grid;using BASE::coarse_scale;using BASE::domain_boundary;using BASE::face_velocities_save;
     using BASE::Set_Beta_Face_For_Boundary_Conditions;using BASE::Map_Fine_To_Local_Boundary_For_Cell;using BASE::Map_Fine_To_Local_Interior_For_Cell;
@@ -30,23 +30,23 @@ public:
     
     BOUNDARY<TV,T> *boundary,*phi_boundary;
 public:
-    LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> phi_interpolation;
-    PROJECTION_DYNAMICS_UNIFORM<T_GRID> levelset_projection;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> phi_interpolation;
+    PROJECTION_DYNAMICS_UNIFORM<TV> levelset_projection;
     LEVELSET<TV> &levelset,coarse_levelset;
     T_ARRAYS_SCALAR phi_ghost,coarse_phi,local_phi;
     bool surface_solve;
     int buffer;
 public:
 
-    PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM(const T_GRID& mac_grid,LEVELSET<TV>& levelset_input,const int scale,const T alpha=1,const bool use_surface_solve=true,const bool flame_input=false,const bool multiphase=false,const bool use_variable_beta=false,const bool use_poisson=false);
+    PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM(const GRID<TV>& mac_grid,LEVELSET<TV>& levelset_input,const int scale,const T alpha=1,const bool use_surface_solve=true,const bool flame_input=false,const bool multiphase=false,const bool use_variable_beta=false,const bool use_poisson=false);
     virtual ~PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM();
 
 //#####################################################################
-    virtual void Initialize_Grid(const T_GRID& mac_grid);
+    virtual void Initialize_Grid(const GRID<TV>& mac_grid);
     virtual void Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities);
-    bool Set_Local_Boundary_Conditions(GRID<TV>& local_grid,PROJECTION_UNIFORM<GRID<TV> >& local_projection,TV_INT coarse_index);
+    bool Set_Local_Boundary_Conditions(GRID<TV>& local_grid,PROJECTION_UNIFORM<TV>& local_projection,TV_INT coarse_index);
     void Set_Local_Phi_From_Fine_Phi(GRID<TV>& local_mac_grid,ARRAY<T,TV_INT>& local_phi,const ARRAY<T,TV_INT>& fine_phi,TV_INT cell_index);
-    virtual void Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,T_GRID& local_grid,T_FACE_ARRAYS_SCALAR& local_face_velocities,FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >& local_projection,const T dt,const T time,TV_INT cell_index);
+    virtual void Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,GRID<TV>& local_grid,T_FACE_ARRAYS_SCALAR& local_face_velocities,FAST_PROJECTION_DYNAMICS_UNIFORM<TV>& local_projection,const T dt,const T time,TV_INT cell_index);
     bool Contains_Inside(TV_INT cell_index,const ARRAY<T,TV_INT>& levelset_phi,int buffer);
     bool Contains_Outside(TV_INT cell_index,const ARRAY<T,TV_INT>& levelset_phi,int buffer);
     void Set_Coarse_Phi_From_Fine_Phi(ARRAY<T,TV_INT>& coarse_phi,const ARRAY<T,TV_INT>& fine_phi);

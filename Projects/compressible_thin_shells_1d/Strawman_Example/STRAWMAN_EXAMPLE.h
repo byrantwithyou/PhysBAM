@@ -118,8 +118,8 @@ void Fill_Solid_Cells(const T time,const T solid_boundary,ARRAY<T,TV_INT>& rho,A
         velocity(TV_INT(solid_clamped_tn.x+offset))=velocity(TV_INT(solid_clamped_tn.x+1));}
 
     // Perform higher-order interpolation
-    LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> rho_interpolation;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> velocity_interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> rho_interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,TV> velocity_interpolation;
     for(int offset=0;offset>=-2;--offset){
         TV location=grid.X(TV_INT(solid_clamped_tn.x+offset)),
            reflected_location=TV((T)2*solid_boundary-location.x);
@@ -130,7 +130,7 @@ void Fill_Solid_Cells(const T time,const T solid_boundary,ARRAY<T,TV_INT>& rho,A
 // Function Euler_Step
 //#####################################################################
 void Euler_Step(const T dt, const T time){
-    ADVECTION_CONSERVATIVE_ENO<GRID<TV>,T> advection_scheme;advection_scheme.Set_Order(1);
+    ADVECTION_CONSERVATIVE_ENO<TV,T> advection_scheme;advection_scheme.Set_Order(1);
     BOUNDARY_LINEAR_EXTRAPOLATION<TV,T> boundary;
 
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
@@ -149,7 +149,7 @@ void Euler_Step(const T dt, const T time){
     if(solid_clamped_tn != grid.Index(TV(solid_position(time+dt))) && solid_clamped_tn.x > 0){
         //Write_Output_Files(time+dt,"Before filling uncovered cells");
         LOG::cout<<"Crossover detected... "<<solid_clamped_tn<<", "<<grid.Index(TV(solid_position(time+dt)))<<std::endl;
-        LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> rho_interpolation;
+        LINEAR_INTERPOLATION_UNIFORM<TV,T> rho_interpolation;
         rho_with_extrapolation(solid_clamped_tn)=rho_with_extrapolation(TV_INT(solid_clamped_tn.x+1));
         {
             TV stencil_center=grid.Center(solid_clamped_tn)-(T)2*(solid_boundary-grid.Center(solid_clamped_tn).x)*TV(-1);

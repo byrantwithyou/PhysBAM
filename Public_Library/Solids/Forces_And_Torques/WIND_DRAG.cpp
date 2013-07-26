@@ -14,8 +14,8 @@
 #include <Solids/Forces_And_Torques/WIND_DRAG.h>
 using namespace PhysBAM;
 //#####################################################################
-template<class TV> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<TV>,typename TV::SCALAR> WIND_DRAG<TV>::interpolation;
-template<class TV> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<TV>,TV> WIND_DRAG<TV>::vector_interpolation;
+template<class TV> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<TV,typename TV::SCALAR> WIND_DRAG<TV>::interpolation;
+template<class TV> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<TV,TV> WIND_DRAG<TV>::vector_interpolation;
 //#####################################################################
 // Constructor
 //#####################################################################

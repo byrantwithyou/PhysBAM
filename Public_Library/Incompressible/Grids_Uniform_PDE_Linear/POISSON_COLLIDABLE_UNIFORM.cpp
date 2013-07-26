@@ -15,8 +15,8 @@ namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> POISSON_COLLIDABLE_UNIFORM<T_GRID>::
-POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input)
+template<class TV> POISSON_COLLIDABLE_UNIFORM<TV>::
+POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input)
     :BASE(grid_input,u_input,initialize_grid,multiphase_input,enforce_compatibility_input),levelset_multiple(0),
     levelset_multiple_default(grid,phis_default,false),dt(0),dt_is_set(false)
 {
@@ -25,8 +25,8 @@ POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,con
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> POISSON_COLLIDABLE_UNIFORM<T_GRID>::
-POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
+template<class TV> POISSON_COLLIDABLE_UNIFORM<TV>::
+POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
     const bool enforce_compatibility_input)
     :BASE(grid_input,u_input,initialize_grid,multiphase_input,enforce_compatibility_input),levelset_multiple(0),
     levelset_multiple_default(grid,phis_default,false),dt(0),dt_is_set(false)
@@ -37,14 +37,14 @@ POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,LEV
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> POISSON_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> POISSON_COLLIDABLE_UNIFORM<TV>::
 ~POISSON_COLLIDABLE_UNIFORM()
 {
 }
 //#####################################################################
 // Function Compute_beta_And_Add_Jumps_To_b
 //#####################################################################
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
 Compute_beta_And_Add_Jumps_To_b(const T dt,const T time)
 {
     int ghost_cells=3;
@@ -68,7 +68,7 @@ Compute_beta_And_Add_Jumps_To_b(const T dt,const T time)
 //#####################################################################
 // Function Find_Constant_beta
 //#####################################################################
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
 Find_Constant_beta(const T_ARRAYS_SCALAR& phi_ghost)
 {
     Find_Constant_beta(beta_face,phi_ghost);
@@ -77,7 +77,7 @@ Find_Constant_beta(const T_ARRAYS_SCALAR& phi_ghost)
 // Function Find_Constant_beta
 //#####################################################################
 // only set up for jump conditons - doesn't work for Dirichlet boundary conditions yet 
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
 Find_Constant_beta(T_FACE_ARRAYS_SCALAR& beta_face,const T_ARRAYS_SCALAR& phi_ghost)
 {
     assert(!multiphase);
@@ -104,10 +104,10 @@ Find_Constant_beta(T_FACE_ARRAYS_SCALAR& beta_face,const T_ARRAYS_SCALAR& phi_gh
 // Function Find_Constant_beta_Multiphase
 //#####################################################################
 // only set up for jump conditons - doesn't work for Dirichlet boundary conditions yet 
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
 Find_Constant_beta_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost)
 {
-    LEVELSET_MULTIPLE<T_GRID> levelset(grid,phis_ghost);levelset.Recreate_Levelsets();
+    LEVELSET_MULTIPLE<TV> levelset(grid,phis_ghost);levelset.Recreate_Levelsets();
 
     T half_width=(T).5*number_of_interface_cells*grid.dX.Max();
     if(GFM || smear_beta){
@@ -134,7 +134,7 @@ Find_Constant_beta_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost)
 //#####################################################################
 // Function Find_A
 //#####################################################################
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
 Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     BASE::Find_A_Part_Two(domain,A_array,b_array,cell_index_to_matrix_index);
@@ -144,7 +144,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
 // Function Add_Jump_To_b
 //#####################################################################
 // b is negative
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
 Add_Jump_To_b(const T_ARRAYS_SCALAR& phi_ghost)
 {
     assert(!multiphase);
@@ -161,23 +161,23 @@ Add_Jump_To_b(const T_ARRAYS_SCALAR& phi_ghost)
 // Function Add_Jump_To_b_Multiphase
 //#####################################################################
 // b is negative
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
 Add_Jump_To_b_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost)
 {
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
-    LEVELSET_MULTIPLE<T_GRID> levelset(grid,phis_ghost);levelset.Recreate_Levelsets();
+    LEVELSET_MULTIPLE<TV> levelset(grid,phis_ghost);levelset.Recreate_Levelsets();
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index(),face_index=iterator.Face_Index();int axis=iterator.Axis();
         if(levelset.Interface(first_cell_index,second_cell_index) && !psi_N.Component(axis)(face_index) && !(psi_D(first_cell_index) && psi_D(second_cell_index))){
             int region_1,region_2;T phi_1,phi_2;levelset.Minimum_Regions(first_cell_index,second_cell_index,region_1,region_2,phi_1,phi_2);
             T jump=beta_face.Component(axis)(face_index)*one_over_dx2[axis]*u_jump_face.Component(axis)(face_index);
-            f(first_cell_index)-=LEVELSET_MULTIPLE<T_GRID>::Sign(region_1,region_2)*jump;f(second_cell_index)-=LEVELSET_MULTIPLE<T_GRID>::Sign(region_2,region_1)*jump;}}
+            f(first_cell_index)-=LEVELSET_MULTIPLE<TV>::Sign(region_1,region_2)*jump;f(second_cell_index)-=LEVELSET_MULTIPLE<TV>::Sign(region_2,region_1)*jump;}}
 }
 //#####################################################################
 // Function Add_Derivative_Jump_To_b
 //#####################################################################
 // b is negative
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
 Add_Derivative_Jump_To_b(const T_ARRAYS_SCALAR& phi_ghost)
 {
     assert(!multiphase);
@@ -199,7 +199,7 @@ Add_Derivative_Jump_To_b(const T_ARRAYS_SCALAR& phi_ghost)
 //#####################################################################
 // Function Apply_Second_Order_Cut_Cell_Method
 //#####################################################################
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
 Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     assert(levelset);
@@ -256,7 +256,7 @@ Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLA
                     A_right_i/=max(theta,second_order_cut_cell_threshold);
                     A_array(color).Add_Element(matrix_index,matrix_index,A_right_i);b_array(color)(matrix_index)+=A_right_i*u_interface.Component(axis)(face_index);}}}}
 }
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
 Use_Internal_Level_Set(const int number_of_regions)
 {
     assert(multiphase);
@@ -266,30 +266,30 @@ Use_Internal_Level_Set(const int number_of_regions)
     levelset_multiple=&levelset_multiple_default;
     levelset_multiple->Recreate_Levelsets();
 }
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
-Update_Internal_Level_Set(LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_input)
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
+Update_Internal_Level_Set(LEVELSET_MULTIPLE<TV>& levelset_multiple_input)
 {
     for(int k=0;k<levelset_multiple_input.phis.m;k++) levelset_multiple->phis(k)=levelset_multiple_input.phis(k);
 }
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
 Set_Up_Second_Order_Cut_Cell_Method(const bool use_second_order_cut_cell_method_input)
 {
     second_order_cut_cell_method=use_second_order_cut_cell_method_input;
     if(second_order_cut_cell_method){u_interface.Resize(grid);beta_interface_face.Resize(grid);}
     else{u_interface.Clean_Memory();beta_interface_face.Clean_Memory();}
 }
-template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
-Initialize_Grid(const T_GRID& grid_input)
+template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
+Initialize_Grid(const GRID<TV>& grid_input)
 {
     BASE::Initialize_Grid(grid_input);
     if(u_jumps)u_jump.Resize(grid.Domain_Indices(1));
     if(beta_un_jumps)beta_un_jump.Resize(grid.Domain_Indices(1));
 }
 //#####################################################################
-template class POISSON_COLLIDABLE_UNIFORM<GRID<VECTOR<float,1> > >;
-template class POISSON_COLLIDABLE_UNIFORM<GRID<VECTOR<float,2> > >;
-template class POISSON_COLLIDABLE_UNIFORM<GRID<VECTOR<float,3> > >;
-template class POISSON_COLLIDABLE_UNIFORM<GRID<VECTOR<double,1> > >;
-template class POISSON_COLLIDABLE_UNIFORM<GRID<VECTOR<double,2> > >;
-template class POISSON_COLLIDABLE_UNIFORM<GRID<VECTOR<double,3> > >;
+template class POISSON_COLLIDABLE_UNIFORM<VECTOR<float,1> >;
+template class POISSON_COLLIDABLE_UNIFORM<VECTOR<float,2> >;
+template class POISSON_COLLIDABLE_UNIFORM<VECTOR<float,3> >;
+template class POISSON_COLLIDABLE_UNIFORM<VECTOR<double,1> >;
+template class POISSON_COLLIDABLE_UNIFORM<VECTOR<double,2> >;
+template class POISSON_COLLIDABLE_UNIFORM<VECTOR<double,3> >;
 }

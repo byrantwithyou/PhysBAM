@@ -11,10 +11,10 @@
 #include <Tools/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
-template<class T_GRID>
+template<class TV>
 class FLUID_CONTROL_CALLBACKS
 {
-    typedef typename T_GRID::VECTOR_T TV;
+    
     typedef typename TV::SCALAR T;
 public:
 

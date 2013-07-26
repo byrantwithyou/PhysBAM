@@ -10,10 +10,10 @@
 #include <Tools/Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID,class T2>
-class ADVECTION_CENTRAL:public ADVECTION_SEPARABLE_UNIFORM<T_GRID,T2>
+template<class TV,class T2>
+class ADVECTION_CENTRAL:public ADVECTION_SEPARABLE_UNIFORM<TV,T2>
 {
-    typedef typename T_GRID::SCALAR T;
+    typedef typename TV::SCALAR T;
 public:
     ADVECTION_CENTRAL()
     {}
@@ -25,7 +25,7 @@ public:
 //#####################################################################
 // Function Advection_Solver
 //#####################################################################
-template<class T_GRID,class T2> void ADVECTION_CENTRAL<T_GRID,T2>::
+template<class TV,class T2> void ADVECTION_CENTRAL<TV,T2>::
 Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const ARRAY<T,VECTOR<int,1> >& u,ARRAY<T2,VECTOR<int,1> >& u_Zx)
 {
     T one_over_two_dx=1/(2*dx);

@@ -14,13 +14,13 @@ int main(int argc,char* argv[])
     typedef VECTOR<T,3> TV;
     STREAM_TYPE stream_type((RW()));
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example;
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example;
 
     example=new STANDARD_TESTS<T>(stream_type);
     PARSE_ARGS parse_args(argc,argv);
     example->Parse(parse_args);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*example);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*example);
     driver.Execute_Main_Program();
 
     delete example;

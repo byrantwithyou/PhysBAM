@@ -8,16 +8,16 @@
 #define __IMPLICIT_BOUNDARY_CONDITION_SOURCES__
 #include <Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION.h>
 namespace PhysBAM{
-template<class T_GRID> class FLUIDS_PARAMETERS_CALLBACKS;
+template<class TV> class FLUIDS_PARAMETERS_CALLBACKS;
 
 template<class TV>
 class IMPLICIT_BOUNDARY_CONDITION_SOURCES:public IMPLICIT_BOUNDARY_CONDITION<TV>
 {
-    typedef VECTOR<int,TV::dimension> TV_INT;typedef typename TV::SCALAR T;typedef GRID<TV> T_GRID;
+    typedef VECTOR<int,TV::dimension> TV_INT;typedef typename TV::SCALAR T;
 public:
-    FLUIDS_PARAMETERS_CALLBACKS<T_GRID>& callbacks;
+    FLUIDS_PARAMETERS_CALLBACKS<TV>& callbacks;
 
-    IMPLICIT_BOUNDARY_CONDITION_SOURCES(FLUIDS_PARAMETERS_CALLBACKS<T_GRID>& callbacks_input);
+    IMPLICIT_BOUNDARY_CONDITION_SOURCES(FLUIDS_PARAMETERS_CALLBACKS<TV>& callbacks_input);
     virtual ~IMPLICIT_BOUNDARY_CONDITION_SOURCES();
 
     void Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& p,

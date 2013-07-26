@@ -7,33 +7,32 @@
 #ifndef __LEVELSET_ADVECTION_MULTIPLE__
 #define __LEVELSET_ADVECTION_MULTIPLE__
 
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 
 namespace PhysBAM {
     
-template<class T_GRID> class LEVELSET_MULTIPLE;
+template<class TV> class LEVELSET_MULTIPLE;
 
-template<class T_GRID>
+template<class TV>
 class LEVELSET_ADVECTION_MULTIPLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
-    LEVELSET_MULTIPLE<T_GRID>& levelsets;
+    LEVELSET_MULTIPLE<TV>& levelsets;
     ARRAY<LEVELSET_ADVECTION<TV> > levelset_advections;
 
-    LEVELSET_ADVECTION_MULTIPLE(LEVELSET_MULTIPLE<T_GRID>& _levelsets)
+    LEVELSET_ADVECTION_MULTIPLE(LEVELSET_MULTIPLE<TV>& _levelsets)
         :levelsets(_levelsets)
     {}
 
     void Initialize()
     {levelset_advections.Remove_All();for(int i=0;i<levelsets.levelsets.m;i++) levelset_advections.Append(LEVELSET_ADVECTION<TV>(levelsets.levelsets(i)));}
 
-    void Set_Custom_Advection(ADVECTION<GRID<TV>,T>& advection_input)
+    void Set_Custom_Advection(ADVECTION<TV,T>& advection_input)
     {for(int i=0;i<levelset_advections.m;i++)levelset_advections(i).Set_Custom_Advection(advection_input);}
     
     void Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const int number_of_ghost_cells)

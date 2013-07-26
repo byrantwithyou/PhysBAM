@@ -41,15 +41,14 @@
 namespace PhysBAM{
 
 template<class T_input>
-class CIRCLE_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class CIRCLE_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
 public:
-    typedef T_input T;typedef VECTOR<T,2> TV;;typedef GRID<TV> T_GRID;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
+    typedef T_input T;typedef VECTOR<T,2> TV;;typedef GRID<TV> T_GRID;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
-    typedef typename COLLISION_BODY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_FLUID_COLLISION_GEOMETRY_LIST;
-    typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
-    typedef VECTOR<bool,2*T_GRID::dimension> T_FACE_VECTOR_BOOL;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
+    typedef VECTOR<bool,2*TV::m> T_FACE_VECTOR_BOOL;
 
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solids_fluids_parameters;
@@ -218,9 +217,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
         eos_smooth_transition=new EOS_SMOOTH_TRANSITION_INCOMPRESSIBLE<EOS_GAMMA<T> >(time_start_transition,time_end_transition,one_over_c_incompressible,false);
         fluids_parameters.compressible_eos=eos_smooth_transition;}
     else fluids_parameters.compressible_eos=new EOS_GAMMA<T>;
-    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,false,false);
-    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,true,false);
-    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,true,true);
+    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
+    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
+    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
     fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
     fluids_parameters.compressible_conservation_method->Save_Fluxes();
     fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,e_min_for_clamping);
@@ -374,7 +373,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
 {
     if(incompressible) return;
 
-    T_GRID& grid=fluids_parameters.euler->grid;
+    GRID<TV>& grid=fluids_parameters.euler->grid;
     ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& U=fluids_parameters.euler->U;
 
     fluids_parameters.euler->e_min=e_min_for_clamping;
@@ -390,7 +389,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
         U(cell_index)(0)=rho;U(cell_index)(1)=rho*u_vel;U(cell_index)(2)=rho*v_vel;U(cell_index)(3)=rho*(fluids_parameters.euler->eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))*((T).5));}
 
     // initialize solid_state
-    VECTOR<T,T_GRID::dimension+2>& solid_state=fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state;
+    VECTOR<T,TV::m+2>& solid_state=fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state;
     T rho=state_outside(0),p=state_outside(3),u_vel=(T)0.,v_vel=(T)0.;
     solid_state(0)=rho;solid_state(1)=rho*u_vel;solid_state(2)=rho*v_vel;solid_state(3)=rho*(fluids_parameters.euler->eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))*((T).5));
 }
@@ -403,7 +402,7 @@ void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
     if(time>0) return;
     LOG::cout<<"INITIALIZING DENSITY"<<std::endl;
     
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         T rho;
@@ -420,7 +419,7 @@ void Adjust_Soot_With_Sources(const T time) PHYSBAM_OVERRIDE
     if(time>0) return;
     LOG::cout<<"INITIALIZING SOOT"<<std::endl;
     
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         T soot;
@@ -549,7 +548,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBA
 void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==3){
-        T_GRID& grid=fluids_parameters.euler->grid;
+        GRID<TV>& grid=fluids_parameters.euler->grid;
         TV velocity=rigid_body_collection.rigid_body_particles.twist(sphere).linear;
         T rigid_dt_denominator=abs(velocity.x)/grid.dX.x+abs(velocity.y)/grid.dX.y;
         if(rigid_dt_denominator>(T)1e-8) dt=min(dt,1/rigid_dt_denominator);}
@@ -590,7 +589,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 }
 /*void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 {
-    LAPLACE_UNIFORM<T_GRID>* elliptic_solver=fluids_parameters.euler->euler_projection.elliptic_solver;
+    LAPLACE_UNIFORM<TV>* elliptic_solver=fluids_parameters.euler->euler_projection.elliptic_solver;
     BASE::Set_Dirichlet_Boundary_Conditions(time);
     elliptic_solver->psi_N.Component(0)(TV_INT(1,1))=false;
     elliptic_solver->psi_D(TV_INT(0,1))=true;

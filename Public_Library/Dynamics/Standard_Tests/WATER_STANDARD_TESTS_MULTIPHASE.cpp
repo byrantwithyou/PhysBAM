@@ -15,18 +15,18 @@
 #include <Dynamics/Standard_Tests/WATER_STANDARD_TESTS_3D.h>
 #include <Dynamics/Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE.h>
 using namespace PhysBAM;
-template<class T_GRID,class T_WATER_STANDARD_TESTS> WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,T_WATER_STANDARD_TESTS>::
-WATER_STANDARD_TESTS_MULTIPHASE(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>& example,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection_input,
+template<class TV,class T_WATER_STANDARD_TESTS> WATER_STANDARD_TESTS_MULTIPHASE<TV,T_WATER_STANDARD_TESTS>::
+WATER_STANDARD_TESTS_MULTIPHASE(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>& example,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection_input,
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
     :T_WATER_STANDARD_TESTS(example,fluids_parameters_input,rigid_body_collection_input),fluids_parameters_uniform(fluids_parameters_input),
     fluid_collection(fluid_collection_input)
 {
 }
-template<class T_GRID,class T_WATER_STANDARD_TESTS> WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,T_WATER_STANDARD_TESTS>::
+template<class TV,class T_WATER_STANDARD_TESTS> WATER_STANDARD_TESTS_MULTIPHASE<TV,T_WATER_STANDARD_TESTS>::
 ~WATER_STANDARD_TESTS_MULTIPHASE()
 {
 }
-template<class T_GRID,class T_WATER_STANDARD_TESTS> void WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,T_WATER_STANDARD_TESTS>::
+template<class TV,class T_WATER_STANDARD_TESTS> void WATER_STANDARD_TESTS_MULTIPHASE<TV,T_WATER_STANDARD_TESTS>::
 Initialize(const int test_number_input,const int resolution,const int restart_frame)
 {
     BASE::Initialize(Non_Multiphase_Test_Number(test_number_input),resolution);
@@ -37,7 +37,7 @@ Initialize(const int test_number_input,const int resolution,const int restart_fr
     fluids_parameters.incompressible_iterations=100;
 
     use_open_wall=false;air_region=-1;
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input=static_cast<FLUIDS_PARAMETERS_UNIFORM<T_GRID>&>(fluids_parameters);
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input=static_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters);
 
     if(test_number<10){
         fluids_parameters_input.densities(0)=1000;fluids_parameters_input.densities(0)=1;
@@ -144,7 +144,7 @@ Initialize(const int test_number_input,const int resolution,const int restart_fr
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
-template<class T_GRID,class T_WATER_STANDARD_TESTS> void WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,T_WATER_STANDARD_TESTS>::
+template<class TV,class T_WATER_STANDARD_TESTS> void WATER_STANDARD_TESTS_MULTIPHASE<TV,T_WATER_STANDARD_TESTS>::
 Initialize_Advection(const bool always_use_objects)   
 {
     if(always_use_objects||test_number==4||test_number==5||test_number==6||test_number==15) fluids_parameters.Use_Fluid_Coupling_Defaults();
@@ -160,7 +160,7 @@ Initialize_Advection(const bool always_use_objects)
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-template<class T_GRID,class T_WATER_STANDARD_TESTS> void WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,T_WATER_STANDARD_TESTS>::
+template<class TV,class T_WATER_STANDARD_TESTS> void WATER_STANDARD_TESTS_MULTIPHASE<TV,T_WATER_STANDARD_TESTS>::
 Initialize_Bodies()
 {
     T_WATER_STANDARD_TESTS::Initialize_Bodies();
@@ -169,10 +169,10 @@ Initialize_Bodies()
         ARRAY<T,VECTOR<int,3> > armadillo_temp_phi;
         LEVELSET<VECTOR<T,3> > armadillo_temp(armadillo_temp_grid,armadillo_temp_phi);
         FILE_UTILITIES::Read_From_File<float>(example.data_directory+"/Rigid_Bodies/armadillo_high_res.phi",armadillo_temp);
-        armadillo=new LEVELSET<TV>(*(new T_GRID(*fluids_parameters.grid)),*(new T_ARRAYS_SCALAR(fluids_parameters.grid->Domain_Indices(0))));
+        armadillo=new LEVELSET<TV>(*(new GRID<TV>(*fluids_parameters.grid)),*(new T_ARRAYS_SCALAR(fluids_parameters.grid->Domain_Indices(0))));
         for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             VECTOR<T,3> vec(iterator.Location());exchange(vec.x,vec.z);
-            if(T_GRID::dimension==3){armadillo->phi(cell)=armadillo_temp.Extended_Phi((vec-VECTOR<T,3>((T).5,(T).35,(T).5+(T).07*vec.y))*(T)145)/(T)145;}
+            if(TV::m==3){armadillo->phi(cell)=armadillo_temp.Extended_Phi((vec-VECTOR<T,3>((T).5,(T).35,(T).5+(T).07*vec.y))*(T)145)/(T)145;}
             else{
                 armadillo->phi(cell)=1;
                 for(T i=0;i<=1;i+=(T).01)armadillo->phi(cell)=min(armadillo->phi(cell),armadillo_temp.Extended_Phi((VECTOR<T,3>(i,vec.y,vec.z)-VECTOR<T,3>((T).5,(T).35,(T).5+(T).07*vec.y))*(T)145)/(T)145);}}
@@ -181,7 +181,7 @@ Initialize_Bodies()
 //#####################################################################
 // Function Number_Of_Regions
 //#####################################################################
-template<class T_GRID,class T_WATER_STANDARD_TESTS> int WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,T_WATER_STANDARD_TESTS>::
+template<class TV,class T_WATER_STANDARD_TESTS> int WATER_STANDARD_TESTS_MULTIPHASE<TV,T_WATER_STANDARD_TESTS>::
 Number_Of_Regions(int test_number)
 {
     if(test_number<=5) return 2;
@@ -198,7 +198,7 @@ Number_Of_Regions(int test_number)
 //#####################################################################
 // Function Non_Multiphase_Test_Number
 //#####################################################################
-template<class T_GRID,class T_WATER_STANDARD_TESTS> int WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,T_WATER_STANDARD_TESTS>::
+template<class TV,class T_WATER_STANDARD_TESTS> int WATER_STANDARD_TESTS_MULTIPHASE<TV,T_WATER_STANDARD_TESTS>::
 Non_Multiphase_Test_Number(int test_number)
 {
     if(test_number<10) return test_number;
@@ -215,7 +215,7 @@ Non_Multiphase_Test_Number(int test_number)
 //#####################################################################
 // Function Initial_Phi
 //#####################################################################
-template<class T_GRID,class T_WATER_STANDARD_TESTS> typename T_GRID::VECTOR_T::SCALAR WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,T_WATER_STANDARD_TESTS>::
+template<class TV,class T_WATER_STANDARD_TESTS> typename TV::SCALAR WATER_STANDARD_TESTS_MULTIPHASE<TV,T_WATER_STANDARD_TESTS>::
 Initial_Phi(const int region,const TV& X) const
 {
     if(test_number<10){
@@ -226,7 +226,7 @@ Initial_Phi(const int region,const TV& X) const
     // two drops test
     if(test_number==11){
         TV center1=TV(VECTOR<T,2>((T).055,(T).03)),center2=TV(VECTOR<T,2>((T).05,(T).07));
-        if(T_GRID::dimension==3){center1[2]=(T).055;center2[2]=(T).05;}
+        if(TV::m==3){center1[2]=(T).055;center2[2]=(T).05;}
         T radius=(T).015;
         phis(1)=(X-center1).Magnitude()-radius;
         phis(2)=(X-center2).Magnitude()-radius;
@@ -240,7 +240,7 @@ Initial_Phi(const int region,const TV& X) const
     // RT
     if(test_number==13){
         VECTOR<double,3> vec=VECTOR<double,3>(VECTOR<T,3>(X*(T)10));
-        if(T_GRID::dimension==3) vec[2]=X[2]*10;
+        if(TV::m==3) vec[2]=X[2]*10;
         T y_pos=X.y-(T)NOISE<double>::Noise1(vec,5,(T).5)*(T)0.002;
         phis(0)=abs(y_pos-(T).25)-(T).25;
         phis(1)=abs(y_pos-(T).75)-(T).25;
@@ -253,8 +253,8 @@ Initial_Phi(const int region,const TV& X) const
         phis(0)=-phis(1);}
     // incline plane
     if(test_number==15){
-        SPHERE<VECTOR<T,3> > sphere1((VECTOR<T,3>((T).4,(T).35,(T).35)),(T).1);if(T_GRID::dimension==2)sphere1.center.z=0;
-        SPHERE<VECTOR<T,3> > sphere2((VECTOR<T,3>((T).4,(T).35,(T).65)),(T).1);if(T_GRID::dimension==2){sphere2.center.z=0;sphere2.center.x=(T).15;}
+        SPHERE<VECTOR<T,3> > sphere1((VECTOR<T,3>((T).4,(T).35,(T).35)),(T).1);if(TV::m==2)sphere1.center.z=0;
+        SPHERE<VECTOR<T,3> > sphere2((VECTOR<T,3>((T).4,(T).35,(T).65)),(T).1);if(TV::m==2){sphere2.center.z=0;sphere2.center.x=(T).15;}
         phis(0)=sphere1.Signed_Distance(VECTOR<T,3>(X));
         phis(1)=sphere2.Signed_Distance(VECTOR<T,3>(X));
         phis(2)=1;
@@ -268,7 +268,7 @@ Initial_Phi(const int region,const TV& X) const
         phis(3)=1;}
     // milk crown
     if(test_number==17){
-        TV center1=TV(VECTOR<T,2>((T).05,(T).03));if(T_GRID::dimension==3)center1[2]=(T).05;
+        TV center1=TV(VECTOR<T,2>((T).05,(T).03));if(TV::m==3)center1[2]=(T).05;
         T radius=(T).01;
         phis(0)=min((X-center1).Magnitude()-radius,X.y-(T).01);
         phis(1)=-phis(0);}
@@ -277,12 +277,12 @@ Initial_Phi(const int region,const TV& X) const
 //#####################################################################
 // Function Initial_Velocity
 //#####################################################################
-template<class T_GRID,class T_WATER_STANDARD_TESTS> typename T_GRID::VECTOR_T WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,T_WATER_STANDARD_TESTS>::
+template<class TV,class T_WATER_STANDARD_TESTS> TV WATER_STANDARD_TESTS_MULTIPHASE<TV,T_WATER_STANDARD_TESTS>::
 Initial_Velocity(const TV& X) const
 {
     // milk crown
     if(test_number==17){
-        TV center1=TV(VECTOR<T,2>((T).05,(T).03));if(T_GRID::dimension==3)center1[2]=(T).05;
+        TV center1=TV(VECTOR<T,2>((T).05,(T).03));if(TV::m==3)center1[2]=(T).05;
         T radius=(T).011;
         if((X-center1).Magnitude()-radius<=0) return -TV::Axis_Vector(1);}
     return TV();
@@ -290,7 +290,7 @@ Initial_Velocity(const TV& X) const
 //#####################################################################
 // Function Update_Sources
 //#####################################################################
-template<class T_GRID,class T_WATER_STANDARD_TESTS> void WATER_STANDARD_TESTS_MULTIPHASE<T_GRID,T_WATER_STANDARD_TESTS>::
+template<class TV,class T_WATER_STANDARD_TESTS> void WATER_STANDARD_TESTS_MULTIPHASE<TV,T_WATER_STANDARD_TESTS>::
 Update_Sources(const T time)
 {
     if(test_number==15){
@@ -300,8 +300,8 @@ Update_Sources(const T time)
     }
 }
 namespace PhysBAM{
-template class WATER_STANDARD_TESTS_MULTIPHASE<GRID<VECTOR<float,2> >,WATER_STANDARD_TESTS_2D<GRID<VECTOR<float,2> > > >;
-template class WATER_STANDARD_TESTS_MULTIPHASE<GRID<VECTOR<float,3> >,WATER_STANDARD_TESTS_3D<GRID<VECTOR<float,3> > > >;
-template class WATER_STANDARD_TESTS_MULTIPHASE<GRID<VECTOR<double,2> >,WATER_STANDARD_TESTS_2D<GRID<VECTOR<double,2> > > >;
-template class WATER_STANDARD_TESTS_MULTIPHASE<GRID<VECTOR<double,3> >,WATER_STANDARD_TESTS_3D<GRID<VECTOR<double,3> > > >;
+template class WATER_STANDARD_TESTS_MULTIPHASE<VECTOR<float,2>,WATER_STANDARD_TESTS_2D<VECTOR<float,2> > >;
+template class WATER_STANDARD_TESTS_MULTIPHASE<VECTOR<float,3>,WATER_STANDARD_TESTS_3D<VECTOR<float,3> > >;
+template class WATER_STANDARD_TESTS_MULTIPHASE<VECTOR<double,2>,WATER_STANDARD_TESTS_2D<VECTOR<double,2> > >;
+template class WATER_STANDARD_TESTS_MULTIPHASE<VECTOR<double,3>,WATER_STANDARD_TESTS_3D<VECTOR<double,3> > >;
 }

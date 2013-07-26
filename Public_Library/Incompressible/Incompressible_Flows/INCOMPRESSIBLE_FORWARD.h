@@ -10,11 +10,11 @@
 #include <Tools/Particles/PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
-template<class T_GRID> class INCOMPRESSIBLE_UNIFORM;
-template<class T_GRID> class INCOMPRESSIBLE_MULTIPHASE_UNIFORM;
-template<class T_GRID> class SPH_EVOLUTION_UNIFORM;
-template<class T_GRID> class SPH_CALLBACKS;
-template<class T_GRID> class PROJECTION_DYNAMICS_UNIFORM;
+template<class TV> class INCOMPRESSIBLE_UNIFORM;
+template<class TV> class INCOMPRESSIBLE_MULTIPHASE_UNIFORM;
+template<class TV> class SPH_EVOLUTION_UNIFORM;
+template<class TV> class SPH_CALLBACKS;
+template<class TV> class PROJECTION_DYNAMICS_UNIFORM;
 
 }
 #endif

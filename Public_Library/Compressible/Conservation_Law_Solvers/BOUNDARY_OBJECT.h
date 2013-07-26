@@ -12,7 +12,7 @@
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_CALLBACKS.h>
 namespace PhysBAM{
 
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class TV> struct GRID_ARRAYS_POLICY;
 
 template<class TV,class TV_DIMENSION>
 class BOUNDARY_OBJECT

@@ -10,7 +10,7 @@
 #include <Tools/Grids_Uniform/FACE_INDEX.h>
 namespace PhysBAM{
 
-template<class T_GRID> class FLUIDS_PARAMETERS_UNIFORM;
+template<class TV> class FLUIDS_PARAMETERS_UNIFORM;
 
 template<class TV>
 class KANG_POISSON_VISCOSITY
@@ -18,7 +18,7 @@ class KANG_POISSON_VISCOSITY
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
 
-    FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters;
     const ARRAY<T,TV_INT>& old_phi;
 
     bool print_matrix;
@@ -29,7 +29,7 @@ public:
     ARRAY<T,TV_INT> psi_D_value;
     ARRAY<T,FACE_INDEX<TV::dimension> > psi_N_value;
 
-    KANG_POISSON_VISCOSITY(FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_input,const ARRAY<T,TV_INT>& old_phi_input);
+    KANG_POISSON_VISCOSITY(FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input,const ARRAY<T,TV_INT>& old_phi_input);
     ~KANG_POISSON_VISCOSITY();
 
 //#####################################################################

@@ -138,7 +138,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
         output_stream<<"    divergence = "<<ux+vy+wz<<" (ux="<<ux<<", vy="<<vy<<", wz="<<wz<<")"<<std::endl;}
     if(selection && selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_3D){
         OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *particle_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)selection;
-        LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
+        LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
         TV interp(interpolation.Clamped_To_Array(grid.Get_Face_Grid(0),u,particle_selection->location),
             interpolation.Clamped_To_Array(grid.Get_Face_Grid(1),v,particle_selection->location),
             interpolation.Clamped_To_Array(grid.Get_Face_Grid(2),w,particle_selection->location));

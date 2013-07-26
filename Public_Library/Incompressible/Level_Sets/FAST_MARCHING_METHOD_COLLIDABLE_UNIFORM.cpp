@@ -15,9 +15,9 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<TV>::
 FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM(const LEVELSET_COLLIDABLE<TV>& levelset_collidable,const int ghost_cells,THREAD_QUEUE* thread_queue_input)
-    :FAST_MARCHING_METHOD_UNIFORM<T_GRID>(levelset_collidable,ghost_cells,thread_queue_input),levelset_collidable(levelset_collidable)
+    :FAST_MARCHING_METHOD_UNIFORM<TV>(levelset_collidable,ghost_cells,thread_queue_input),levelset_collidable(levelset_collidable)
 {
     Neighbor_Visible=[&](const int neighbor_number,const TV_INT& current_index) -> bool
         {return !levelset_collidable.collision_body_list->cell_neighbors_visible.Valid_Index(current_index) || levelset_collidable.collision_body_list->cell_neighbors_visible(current_index)(neighbor_number);};
@@ -25,7 +25,7 @@ FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM(const LEVELSET_COLLIDABLE<TV>& levelset_
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<TV>::
 ~FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM()
 {
 }
@@ -33,7 +33,7 @@ template<class T_GRID> FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<T_GRID>::
 // Function Initialize_Interface
 //#####################################################################
 // pass heap_length by reference
-template<class T_GRID> void FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<TV>::
 Initialize_Interface_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,ARRAY<T,TV_INT>& phi_new,ARRAY<bool,TV_INT>& done)
 { 
     LEVELSET<TV> levelset_ghost(cell_grid,phi_ghost);
@@ -49,7 +49,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,A
         bool really_clamp_phi_with_collision_bodies=levelset_collidable.clamp_phi_with_collision_bodies&&phi_ghost(index)<=0;
         T abs_phi=abs(phi_ghost(index));
         TV location=iterator.Location();
-        for(int axis=0;axis<T_GRID::dimension;axis++){
+        for(int axis=0;axis<TV::m;axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
             T dx=cell_grid.dX[axis];
             bool use_low=false,use_high=false;T value_low=0,value_high=0;
@@ -77,7 +77,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,A
         else if(number_of_axis==2){
             if(T d2=sqr(value[0])+sqr(value[1])) phi_new(index)=value[0]*value[1]/sqrt(d2);
             else phi_new(index)=0;}
-        else{PHYSBAM_ASSERT(T_GRID::dimension==3); // 2d should never get to this point
+        else{PHYSBAM_ASSERT(TV::m==3); // 2d should never get to this point
             T value_xy=value[0]*value[1],value_xz=value[0]*value[2],value_yz=value[1]*value[2],d2=sqr(value_xy)+sqr(value_xz)+sqr(value_yz);
             if(d2) phi_new(index)=value_xy*value[2]/sqrt(d2);
             else phi_new(index)=min(value[0],value[1],value[2]);}
@@ -95,10 +95,10 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,A
 }
 //#####################################################################
 namespace PhysBAM{
-template class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<GRID<VECTOR<float,1> > >;
-template class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<GRID<VECTOR<float,2> > >;
-template class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<GRID<VECTOR<float,3> > >;
-template class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<GRID<VECTOR<double,1> > >;
-template class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<GRID<VECTOR<double,2> > >;
-template class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<GRID<VECTOR<double,3> > >;
+template class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<VECTOR<float,1> >;
+template class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<VECTOR<float,2> >;
+template class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<VECTOR<float,3> >;
+template class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<VECTOR<double,1> >;
+template class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<VECTOR<double,2> >;
+template class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM<VECTOR<double,3> >;
 }

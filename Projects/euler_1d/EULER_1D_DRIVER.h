@@ -31,7 +31,7 @@ public:
     int total_steps;
 
     ARRAY<T,3,VECTOR<int,1> > U;
-    EULER_UNIFORM<T_GRID> euler;
+    EULER_UNIFORM<TV> euler;
 
 public:
     EULER_1D_DRIVER(EULER_1D_EXAMPLE<T>& example_input):example(example_input),euler(U)

@@ -15,7 +15,7 @@ template<class TV> void REFINEMENT_TASK<TV>::Run()
     //TODO: Prevent repeated allocation
     GRID<TV> local_mac_grid(TV_INT::All_Ones_Vector()*projection->coarse_scale,RANGE<TV>::Centered_Box(),true);
     ARRAY<T,FACE_INDEX<TV::dimension> > local_face_velocities(local_mac_grid);
-    FAST_PROJECTION_DYNAMICS_UNIFORM<GRID<TV> > local_projection(projection->coarse_scale);
+    FAST_PROJECTION_DYNAMICS_UNIFORM<TV> local_projection(projection->coarse_scale);
     projection->Local_Projection_PCG(*fine_face_velocities,local_mac_grid,local_face_velocities,local_projection,dt,time,cell_index);
 }
 namespace PhysBAM{

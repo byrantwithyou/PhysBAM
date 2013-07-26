@@ -8,26 +8,28 @@
 #define __LINEAR_INTERPOLATION_MAC_1D_HELPER__
 
 #include <Tools/Grids_Uniform/BLOCK_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
+#include <Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Math_Tools/Componentwise_Min_Max.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class LINEAR_INTERPOLATION_MAC_1D_HELPER
+template<class TV> class LINEAR_INTERPOLATION_MAC_HELPER;
+
+template<class T>
+class LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,1> >
 {   
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename T_GRID::BLOCK T_BLOCK;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_GRID::INDEX T_INDEX;
+    typedef VECTOR<T,1> TV;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename GRID<TV>::BLOCK T_BLOCK;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef TV_INT T_INDEX;
 public:
     VECTOR<T,1> center;
     T u2,slope_u12,slope_u23; // standard y-x major ordering
     
-    LINEAR_INTERPOLATION_MAC_1D_HELPER(const T_BLOCK& block,const T_FACE_ARRAYS_SCALAR& face_velocities)
+    LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const T_FACE_ARRAYS_SCALAR& face_velocities)
         :center(block.Center())
     {
-        typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP face_velocities_lookup(face_velocities);
+        FACE_LOOKUP_UNIFORM<TV> face_velocities_lookup(face_velocities);
         T one_over_dx=block.One_Over_DX().x;
         static const int rotated_face_x[3]={0,1,2};
         u2=block.Face_X_Value(face_velocities_lookup,rotated_face_x[1]);
@@ -59,7 +61,7 @@ public:
     static VECTOR<T,1> Interpolate_Face_Normalized(const T_BLOCK& block,const T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_BOOL& face_velocities_valid,const VECTOR<T,1>& X,
          const VECTOR<T,1>& default_value=TV())
     {static const GRID<TV> valid_values_grid=GRID<TV>(TV_INT(2),RANGE<TV>::Unit_Box()).Get_MAC_Grid_At_Regular_Positions();
-    static const BLOCK_UNIFORM<GRID<TV> > valid_values_block(valid_values_grid,VECTOR<int,1>(2));
+    static const BLOCK_UNIFORM<TV> valid_values_block(valid_values_grid,VECTOR<int,1>(2));
     ARRAY<T,FACE_INDEX<1> > valid_values(valid_values_grid);Block_Transfer(block,face_velocities_valid,valid_values_block,valid_values);
     VECTOR<T,1> DX=Transformed(block,X),velocity=Interpolate_Face_Transformed(block,face_velocities,DX),weight=Interpolate_Face_Transformed(valid_values_block,valid_values,DX);
     return VECTOR<T,1>(weight.x==0?default_value.x:velocity.x/weight.x);}
@@ -77,8 +79,8 @@ public:
     {VECTOR<T,2> x_extrema=Extrema_Face_X_Transformed(block,u_min,u_max,DX);return VECTOR<VECTOR<T,1>,2>(VECTOR<T,1>(x_extrema.x),VECTOR<T,1>(x_extrema.y));}
 
 private:
-    static void Block_Transfer(const T_BLOCK& source_block,const T_FACE_ARRAYS_BOOL& source_values,const BLOCK_UNIFORM<GRID<TV> >& destination_block,ARRAY<T,FACE_INDEX<1> >& destination_values)
-    {for(int i=0;i<T_GRID::number_of_faces_per_block/T_GRID::dimension;i++)
+    static void Block_Transfer(const T_BLOCK& source_block,const T_FACE_ARRAYS_BOOL& source_values,const BLOCK_UNIFORM<TV>& destination_block,ARRAY<T,FACE_INDEX<1> >& destination_values)
+    {for(int i=0;i<GRID<TV>::number_of_faces_per_block/TV::m;i++)
         destination_block.Face_X_Reference(destination_values,i)=(T)source_block.Face_X_Value(source_values,i);}
         
     static VECTOR<T,1> Transformed(const T_BLOCK& block,const VECTOR<T,1>& X)

@@ -19,9 +19,9 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID,int d> CONSERVATION<T_GRID,d>::
+template<class TV,int d> CONSERVATION<TV,d>::
 CONSERVATION()
-    :save_fluxes(1),object_boundary_default(*new BOUNDARY_OBJECT_REFLECTION<T_GRID,TV_DIMENSION>),use_exact_neumann_face_location(false),
+    :save_fluxes(1),object_boundary_default(*new BOUNDARY_OBJECT_REFLECTION<TV,TV_DIMENSION>),use_exact_neumann_face_location(false),
     scale_outgoing_fluxes_to_clamp_variable(false),clamped_variable_index(0),clamped_value(0),clamp_rho(.5),clamp_e(.5),min_dt(0),adaptive_time_step(false)
 {
     Set_Order();
@@ -33,7 +33,7 @@ CONSERVATION()
 //#####################################################################
 // Destructor
 //##################################################################### 
-template<class T_GRID,int d> CONSERVATION<T_GRID,d>::
+template<class TV,int d> CONSERVATION<TV,d>::
 ~CONSERVATION()
 {
     delete &object_boundary_default;
@@ -41,7 +41,7 @@ template<class T_GRID,int d> CONSERVATION<T_GRID,d>::
 //#####################################################################
 // Function Alpha
 //#####################################################################
-template<class T_GRID,int d> typename T_GRID::SCALAR CONSERVATION<T_GRID,d>::
+template<class TV,int d> typename TV::SCALAR CONSERVATION<TV,d>::
 Alpha(const ARRAY<T,VECTOR<int,1> >& lambda_left,const ARRAY<T,VECTOR<int,1> >& lambda_right,const int k,const int length)
 {
     if(field_by_field_alpha) return amplification_factor*maxabs(lambda_left(k),lambda_right(k));
@@ -52,16 +52,16 @@ Alpha(const ARRAY<T,VECTOR<int,1> >& lambda_left,const ARRAY<T,VECTOR<int,1> >& 
 //#####################################################################
 // Function Compute_Delta_Flux_For_Clamping_Variable
 //#####################################################################
-template<class T_GRID,int d> void CONSERVATION<T_GRID,d>::
-Compute_Delta_Flux_For_Clamping_Variable(const T_GRID& grid,const int number_of_ghost_cells,T dt,const int clamped_variable_index,const T clamped_value,const T_FACE_ARRAYS_BOOL& psi_N,
+template<class TV,int d> void CONSERVATION<TV,d>::
+Compute_Delta_Flux_For_Clamping_Variable(const GRID<TV>& grid,const int number_of_ghost_cells,T dt,const int clamped_variable_index,const T clamped_value,const T_FACE_ARRAYS_BOOL& psi_N,
     const T_ARRAYS_DIMENSION_SCALAR& U,const T_FACE_ARRAYS_DIMENSION_SCALAR& flux,T_FACE_ARRAYS_DIMENSION_SCALAR& delta_flux,T_ARRAYS_DIMENSION_SCALAR& rhs,T_ARRAYS_SCALAR& overshoot_percentages)
 {
     TV one_over_dx=grid.one_over_dX;
-    VECTOR<bool,T_GRID::dimension*2> clamp_flux;
+    VECTOR<bool,TV::m*2> clamp_flux;
     for(CELL_ITERATOR<TV> iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T outgoing_flux=0;overshoot_percentages(cell_index)=0;
-        for(int i=0;i<T_GRID::dimension*2;i++) clamp_flux(i)=false;
-        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
+        for(int i=0;i<TV::m*2;i++) clamp_flux(i)=false;
+        for(int axis=0;axis<TV::m;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
             if(flux.Component(axis)(first_face_index)(clamped_variable_index)<0){clamp_flux(2*axis)=true;
                 outgoing_flux-=dt*flux.Component(axis)(first_face_index)(clamped_variable_index)*one_over_dx[axis];}
             if(flux.Component(axis)(second_face_index)(clamped_variable_index)>0){clamp_flux(2*axis+1)=true;
@@ -76,7 +76,7 @@ Compute_Delta_Flux_For_Clamping_Variable(const T_GRID& grid,const int number_of_
                 T overshoot=clamped_value-clamped_variable_value;
                 overshoot_percentages(cell_index)=overshoot/outgoing_flux;}}
         if(overshoot_percentages(cell_index))
-            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
+            for(int axis=0;axis<TV::m;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
                 if(clamp_flux(2*axis)){
                     if(!psi_N.Component(axis)(first_face_index))
                         delta_flux.Component(axis)(first_face_index)(clamped_variable_index)=(-overshoot_percentages(cell_index))*flux.Component(axis)(first_face_index)(clamped_variable_index);
@@ -90,9 +90,9 @@ Compute_Delta_Flux_For_Clamping_Variable(const T_GRID& grid,const int number_of_
 //#####################################################################
 // Function Compute_Flux_Without_Clamping
 //#####################################################################
-template<class T_GRID,int d> void CONSERVATION<T_GRID,d>::
-Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
-    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
+template<class TV,int d> void CONSERVATION<TV,d>::
+Compute_Flux_Without_Clamping(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
+    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
     const T_FACE_ARRAYS_SCALAR& face_velocities,const TV_BOOL& outflow_boundaries,T_ARRAYS_DIMENSION_SCALAR& rhs,const bool thinshell,const T_ARRAYS_DIMENSION_SCALAR* U_ghost_clamped)
 {
     RANGE<TV_INT> U_domain_indices=U.Domain_Indices();
@@ -101,7 +101,7 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
     TV dx=grid.dX;
     FLOOD_FILL<1> find_connected_components;
 
-    for(int axis=0;axis<T_GRID::dimension;axis++){
+    for(int axis=0;axis<TV::m;axis++){
         U_start=U_domain_indices.min_corner(axis);U_end=U_domain_indices.max_corner(axis);
         U_ghost_start=U_ghost_domain_indices.min_corner(axis);U_ghost_end=U_ghost_domain_indices.max_corner(axis);
         ARRAY<TV_DIMENSION,VECTOR<int,1> > U_1d_axis(U_ghost_start,U_ghost_end),flux_axis_1d(U_start,U_end);
@@ -114,7 +114,7 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
         GRID<TV_LOWER_DIM> lower_dimension_grid=grid.Remove_Dimension(axis);
         for(CELL_ITERATOR<TV_LOWER_DIM> iterator(lower_dimension_grid);iterator.Valid();iterator.Next()){VECTOR<int,TV::m-1> cell_index=iterator.Cell_Index();
             VECTOR<int,3> slice_index;TV_INT cell_index_full_dimension=cell_index.Insert(0,axis);
-            for(int axis_slice=0;axis_slice<T_GRID::dimension;axis_slice++){
+            for(int axis_slice=0;axis_slice<TV::m;axis_slice++){
                 slice_index[axis_slice]=cell_index_full_dimension[axis_slice];}
 
             for(int i=U_start;i<U_end;i++){
@@ -147,11 +147,11 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
                 if(!scale_outgoing_fluxes_to_clamp_variable||(!U_ghost_clamped&&k==clamped_variable_index)||(U_ghost_clamped&&k!=clamped_variable_index))
                     fluxes.Component(axis)(cell_index.Insert(i+1,axis))(k)=flux_temp(i)(k);}}
 }
-template<class T_GRID,int d> void CONSERVATION<T_GRID,d>::
-Compute_Flux_With_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
-    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
+template<class TV,int d> void CONSERVATION<TV,d>::
+Compute_Flux_With_Clamping(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
+    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
     const T_FACE_ARRAYS_SCALAR& face_velocities,const TV_BOOL& outflow_boundaries,T_ARRAYS_DIMENSION_SCALAR& rhs,const bool thinshell,
-    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>* eigensystems_auxiliary,T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary)
+    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>* eigensystems_auxiliary,T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary)
 {
     RANGE<TV_INT> U_domain_indices=U.Domain_Indices();
     Compute_Flux_Without_Clamping(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs,thinshell); // After this call, we should have rhs for clamped variable
@@ -162,7 +162,7 @@ Compute_Flux_With_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR& U
 
     Compute_Delta_Flux_For_Clamping_Variable(grid,U_domain_indices.max_corner.x-grid.Domain_Indices().max_corner.x,dt,clamped_variable_index,clamped_value,psi_N,U,fluxes,delta_flux,rhs,
         overshoot_percentages);
-    ARRAYS_UTILITIES<T_GRID,TV_DIMENSION>::Compute_Divergence_At_Cells_From_Face_Data(grid,delta_rhs,delta_flux,0);
+    ARRAYS_UTILITIES<TV,TV_DIMENSION>::Compute_Divergence_At_Cells_From_Face_Data(grid,delta_rhs,delta_flux,0);
     rhs+=delta_rhs;
     T_ARRAYS_DIMENSION_SCALAR U_ghost_clamped(U_ghost,true);
     for(CELL_ITERATOR<TV> iterator(grid,U_domain_indices.max_corner.x-grid.Domain_Indices().max_corner.x);iterator.Valid();iterator.Next())
@@ -174,11 +174,11 @@ Compute_Flux_With_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR& U
         *fluxes_auxiliary=fluxes;}
     Compute_Flux_Without_Clamping(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs,thinshell,&U_ghost_clamped);
 }
-template<class T_GRID,int d> void CONSERVATION<T_GRID,d>::
-Compute_Flux(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
-    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
+template<class TV,int d> void CONSERVATION<TV,d>::
+Compute_Flux(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
+    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
     const T_FACE_ARRAYS_SCALAR& face_velocities,const TV_BOOL& outflow_boundaries,T_ARRAYS_DIMENSION_SCALAR& rhs,const bool thinshell,
-    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>* eigensystems_auxiliary,T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary)
+    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>* eigensystems_auxiliary,T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary)
 {
     if(scale_outgoing_fluxes_to_clamp_variable) Compute_Flux_With_Clamping(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs,thinshell,
         eigensystems_auxiliary,fluxes_auxiliary);
@@ -192,10 +192,10 @@ Compute_Flux(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAY
 //#####################################################################
 // Function Update_Conservation_Law
 //#####################################################################
-template<class T_GRID,int d> void CONSERVATION<T_GRID,d>::
-Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
-    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
-    const T_FACE_ARRAYS_SCALAR& face_velocities,const bool thinshell,const TV_BOOL& outflow_boundaries,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>* eigensystems_auxiliary,
+template<class TV,int d> void CONSERVATION<TV,d>::
+Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
+    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
+    const T_FACE_ARRAYS_SCALAR& face_velocities,const bool thinshell,const TV_BOOL& outflow_boundaries,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>* eigensystems_auxiliary,
     T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary)
 {
     RANGE<TV_INT> U_domain_indices=U.Domain_Indices();
@@ -213,7 +213,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
         else rho_dt(cell_index)=dt;
 
         T momentum_dt=dt;
-        T clamp_e_cell=clamp_e*EULER<T_GRID>::e(U,cell_index);
+        T clamp_e_cell=clamp_e*EULER<TV>::e(U,cell_index);
         for(int axis=0;axis<TV::dimension;axis++){
             T tmp_dt=dt;
             T momentum_flux_sqr=rhs(cell_index)(axis+1)*rhs(cell_index)(axis+1);
@@ -244,9 +244,9 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
 // Function Update_Conservation_Law_For_Specialized_Shallow_Water_Equations
 //#####################################################################
 // A specialized function only used in SHALLOW_WATER_2D_SPECIALIZED
-template<class T_GRID,int d> template<class T_ARRAYS> void CONSERVATION<T_GRID,d>::
+template<class TV,int d> template<class T_ARRAYS> void CONSERVATION<TV,d>::
 Update_Conservation_Law_For_Specialized_Shallow_Water_Equations(GRID<TV>& grid,T_ARRAYS& U,const T_ARRAYS& U_ghost,const ARRAY<bool,VECTOR<int,2> >& psi,const T dt,
-    EIGENSYSTEM<T,VECTOR<T,2> >& eigensystem_F,EIGENSYSTEM<T,VECTOR<T,2> >& eigensystem_G,CONSERVATION<GRID<TV>,2>& solver,const TV_BOOL& outflow_boundaries)
+    EIGENSYSTEM<T,VECTOR<T,2> >& eigensystem_F,EIGENSYSTEM<T,VECTOR<T,2> >& eigensystem_G,CONSERVATION<TV,2>& solver,const TV_BOOL& outflow_boundaries)
 {
     STATIC_ASSERT((IS_SAME<T_ARRAYS,ARRAY<VECTOR<T,3> ,VECTOR<int,2> > >::value));
     if(save_fluxes!=solver.save_fluxes) PHYSBAM_FATAL_ERROR();
@@ -285,7 +285,7 @@ Update_Conservation_Law_For_Specialized_Shallow_Water_Equations(GRID<TV>& grid,T
 //#####################################################################
 // Function Log_Parameters
 //#####################################################################
-template<class T_GRID,int d> void CONSERVATION<T_GRID,d>::
+template<class TV,int d> void CONSERVATION<TV,d>::
 Log_Parameters() const
 {
     LOG::SCOPE scope("CONSERVATION parameters");
@@ -300,10 +300,10 @@ Log_Parameters() const
 }
 //#####################################################################
 namespace PhysBAM{
-template class CONSERVATION<GRID<VECTOR<double,1> >,3>;
-template class CONSERVATION<GRID<VECTOR<double,2> >,4>;
-template class CONSERVATION<GRID<VECTOR<double,3> >,5>;
-template class CONSERVATION<GRID<VECTOR<float,1> >,3>;
-template class CONSERVATION<GRID<VECTOR<float,2> >,4>;
-template class CONSERVATION<GRID<VECTOR<float,3> >,5>;
+template class CONSERVATION<VECTOR<double,1>,3>;
+template class CONSERVATION<VECTOR<double,2>,4>;
+template class CONSERVATION<VECTOR<double,3>,5>;
+template class CONSERVATION<VECTOR<float,1>,3>;
+template class CONSERVATION<VECTOR<float,2>,4>;
+template class CONSERVATION<VECTOR<float,3>,5>;
 }

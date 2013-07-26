@@ -15,10 +15,12 @@
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
-template<class T_GRID>
+template<class TV> class GRID;
+
+template<class TV>
 class INCOMPRESSIBLE_FLUIDS_FORCES:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;
+    
     typedef typename TV::SCALAR T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
@@ -30,19 +32,19 @@ public:
     {}
 
 //#####################################################################
-    virtual void Add_Explicit_Forces(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+    virtual void Add_Explicit_Forces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
     {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
 
-    virtual void Add_Implicit_Forces_Before_Projection(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+    virtual void Add_Implicit_Forces_Before_Projection(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
     {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
 
-    virtual void Add_Implicit_Forces_Projection(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+    virtual void Add_Implicit_Forces_Projection(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
     {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
 
-    virtual void Initialize_Grids(const T_GRID& grid)
+    virtual void Initialize_Grids(const GRID<TV>& grid)
     {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     
-    virtual T CFL(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities)
+    virtual T CFL(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& face_velocities)
     {return 0;}
 //#####################################################################
 };

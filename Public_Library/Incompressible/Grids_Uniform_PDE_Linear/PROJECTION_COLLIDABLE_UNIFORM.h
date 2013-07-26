@@ -13,27 +13,27 @@
 #include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class PROJECTION_COLLIDABLE_UNIFORM:public PROJECTION_UNIFORM<T_GRID>
+template<class TV>
+class PROJECTION_COLLIDABLE_UNIFORM:public PROJECTION_UNIFORM<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
-    typedef PROJECTION_UNIFORM<T_GRID> BASE;
+    typedef PROJECTION_UNIFORM<TV> BASE;
     using BASE::p_grid;using BASE::p;using BASE::elliptic_solver;using BASE::poisson;using BASE::laplace;using BASE::Zero_Out_Neumann_Pocket_Velocities;
     
-    LAPLACE_COLLIDABLE<T_GRID>* collidable_solver;
-    LAPLACE_COLLIDABLE_UNIFORM<T_GRID>* laplace_collidable; 
-    POISSON_COLLIDABLE_UNIFORM<T_GRID>* poisson_collidable;
+    LAPLACE_COLLIDABLE<TV>* collidable_solver;
+    LAPLACE_COLLIDABLE_UNIFORM<TV>* laplace_collidable; 
+    POISSON_COLLIDABLE_UNIFORM<TV>* poisson_collidable;
 
-    PROJECTION_COLLIDABLE_UNIFORM(const T_GRID& mac_grid,const bool multiphase,const bool use_poisson,const bool use_variable_beta,THREAD_QUEUE* thread_queue=0);
-    PROJECTION_COLLIDABLE_UNIFORM(const T_GRID& mac_grid,LEVELSET<TV>& levelset_input);
+    PROJECTION_COLLIDABLE_UNIFORM(const GRID<TV>& mac_grid,const bool multiphase,const bool use_poisson,const bool use_variable_beta,THREAD_QUEUE* thread_queue=0);
+    PROJECTION_COLLIDABLE_UNIFORM(const GRID<TV>& mac_grid,LEVELSET<TV>& levelset_input);
     virtual ~PROJECTION_COLLIDABLE_UNIFORM();
 
 //#####################################################################
-    virtual void Initialize_Grid(const T_GRID& mac_grid) PHYSBAM_OVERRIDE;
+    virtual void Initialize_Grid(const GRID<TV>& mac_grid) PHYSBAM_OVERRIDE;
     virtual void Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt=false) PHYSBAM_OVERRIDE;
 //#####################################################################
 };

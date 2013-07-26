@@ -11,21 +11,21 @@
 #include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 
-template<class T_GRID> class PARTICLE_LEVELSET;
+template<class TV> class PARTICLE_LEVELSET;
 
 namespace PhysBAM{
 
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES>
-void Exchange_Boundary_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<T_GRID>& particle_levelset);
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES>
+void Exchange_Boundary_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset);
 
-template<class T_GRID,class T_PARTICLES>
-void Exchange_Boundary_Particles_Flat(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,T_PARTICLES& particles,const typename T_GRID::SCALAR ghost_distance=0);
+template<class TV,class T_PARTICLES>
+void Exchange_Boundary_Particles_Flat(const MPI_UNIFORM_GRID<TV>& mpi_grid,T_PARTICLES& particles,const typename TV::SCALAR ghost_distance=0);
 
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES>
-void Exchange_Overlapping_Block_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<T_GRID>& particle_levelset);
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES>
+void Exchange_Overlapping_Block_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset);
 
-template<class T_GRID,class T_PARTICLES,class T_ARRAYS_PARTICLES>
-void Exchange_Ghost_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<T_GRID>& particle_levelset);
+template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES>
+void Exchange_Ghost_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset);
 
 }
 #endif

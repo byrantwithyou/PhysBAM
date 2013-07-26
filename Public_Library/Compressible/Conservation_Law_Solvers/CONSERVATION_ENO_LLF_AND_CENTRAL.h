@@ -16,12 +16,12 @@
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION.h>
 namespace PhysBAM{
 
-template<class T_GRID,int d>
-class CONSERVATION_ENO_LLF_AND_CENTRAL:public CONSERVATION<T_GRID,d>
+template<class TV,int d>
+class CONSERVATION_ENO_LLF_AND_CENTRAL:public CONSERVATION<TV,d>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<T,d> TV_DIMENSION;
+    typedef typename TV::SCALAR T;typedef VECTOR<T,d> TV_DIMENSION;
 private:
-    typedef CONSERVATION<T_GRID,d> BASE;
+    typedef CONSERVATION<TV,d> BASE;
     using BASE::order;using BASE::field_by_field_alpha;using BASE::amplification_factor;
 
     int central_order; // 1 or 2, although order=1,2,or 3 for ENO-LLF

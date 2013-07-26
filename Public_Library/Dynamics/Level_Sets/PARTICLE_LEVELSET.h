@@ -20,11 +20,11 @@ namespace PhysBAM{
 
 template<class TV> class LEVELSET_COLLIDABLE;
 
-template<class T_GRID>
+template<class TV>
 class PARTICLE_LEVELSET:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::dimension> TV_INT;typedef typename T_GRID::BLOCK T_BLOCK;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::dimension> TV_INT;typedef typename GRID<TV>::BLOCK T_BLOCK;
 public:
     int number_particles_per_cell;
     bool only_use_negative_particles;
@@ -55,7 +55,7 @@ public:
     ARRAY<ARRAY<bool>,TV_INT> escaped_positive_particles,escaped_negative_particles;
     ARRAY<ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT> deletion_list;
 
-    PARTICLE_LEVELSET(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input);
+    PARTICLE_LEVELSET(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,const int number_of_ghost_cells_input);
     virtual ~PARTICLE_LEVELSET();
 
     void Set_Band_Width(const T number_of_cells=6)

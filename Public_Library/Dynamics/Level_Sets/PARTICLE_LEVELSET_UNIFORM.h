@@ -8,7 +8,6 @@
 #define __PARTICLE_LEVELSET_UNIFORM__
 
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Parallel_Computation/MPI_GRID_POLICY.h>
 #ifdef USE_PTHREADS
 #include <Tools/Parallel_Computation/PTHREAD.h>
 #endif
@@ -17,27 +16,27 @@
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET.h>
 namespace PhysBAM{
 
-template<class T_GRID> class FLUID_MASS_CONSERVATION_MODIFY_PHI;
+template<class TV> class FLUID_MASS_CONSERVATION_MODIFY_PHI;
+template<class T> class MPI_UNIFORM_GRID;
 
-template<class T_GRID>
-class PARTICLE_LEVELSET_UNIFORM:public PARTICLE_LEVELSET<T_GRID>
+template<class TV>
+class PARTICLE_LEVELSET_UNIFORM:public PARTICLE_LEVELSET<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_GRID::BLOCK T_BLOCK;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename GRID<TV>::BLOCK T_BLOCK;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef typename T_ARRAYS_SCALAR::template REBIND<char>::TYPE T_ARRAYS_CHAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<bool> >::TYPE T_ARRAYS_ARRAY_BOOL;
     typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
     typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<TV>*>::TYPE T_ARRAYS_ARRAY_TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_MAC_HELPER T_LINEAR_INTERPOLATION_MAC_HELPER;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_SCALAR T_LINEAR_INTERPOLATION_SCALAR;
-    typedef typename T_LINEAR_INTERPOLATION_SCALAR::template REBIND<TV>::TYPE T_LINEAR_INTERPOLATION_VECTOR;
-    typedef typename INTERPOLATION_COLLIDABLE_POLICY<T_GRID>::LINEAR_INTERPOLATION_COLLIDABLE_FACE_SCALAR T_LINEAR_INTERPOLATION_COLLIDABLE_FACE_SCALAR;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<T_GRID> T_FACE_LOOKUP_COLLIDABLE;
+    typedef LINEAR_INTERPOLATION_MAC_HELPER<TV> T_LINEAR_INTERPOLATION_MAC_HELPER;
+    typedef typename LINEAR_INTERPOLATION_UNIFORM<TV,T>::template REBIND<TV>::TYPE T_LINEAR_INTERPOLATION_VECTOR;
+    typedef typename INTERPOLATION_COLLIDABLE_POLICY<TV>::LINEAR_INTERPOLATION_COLLIDABLE_FACE_SCALAR T_LINEAR_INTERPOLATION_COLLIDABLE_FACE_SCALAR;
+    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
-    typedef PARTICLE_LEVELSET<T_GRID> BASE;
+    typedef PARTICLE_LEVELSET<TV> BASE;
     using BASE::half_band_width;using BASE::use_removed_negative_particles;using BASE::use_removed_positive_particles;using BASE::store_unique_particle_id;using BASE::last_unique_particle_id;
     using BASE::number_particles_per_cell;using BASE::maximum_particle_radius;using BASE::minimum_particle_radius;using BASE::random;using BASE::outside_particle_distance_multiplier;
     using BASE::maximum_iterations_for_attraction;using BASE::bias_towards_negative_particles;using BASE::Set_Number_Particles_Per_Cell;
@@ -50,7 +49,7 @@ public:
     using BASE::Free_Particle_And_Clear_Pointer;using BASE::Add_Particle;using BASE::Delete_Particles_From_Deletion_List;using BASE::Move_Particle;using BASE::Copy_Particle;
     using BASE::Get_Particle_Link;using BASE::Add_Particle_To_Deletion_List;using BASE::deletion_list;
 
-    MPI_UNIFORM_GRID<T_GRID>* mpi_grid;
+    MPI_UNIFORM_GRID<TV>* mpi_grid;
 
     T_ARRAYS_ARRAY_TV positive_particle_positions,negative_particle_positions;
 
@@ -60,7 +59,7 @@ public:
     pthread_barrier_t cell_barr;
 #endif
 
-    PARTICLE_LEVELSET_UNIFORM(T_GRID& grid_input,T_ARRAYS_SCALAR& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input);
+    PARTICLE_LEVELSET_UNIFORM(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,const int number_of_ghost_cells_input);
     ~PARTICLE_LEVELSET_UNIFORM();
 
     void Set_Thread_Queue(THREAD_QUEUE* thread_queue_input)
@@ -129,14 +128,14 @@ public:
 protected:
 #ifdef USE_PTHREADS
     bool Attract_Individual_Particle_To_Interface_And_Adjust_Radius(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles,
-        const T phi_min,const T phi_max,const BLOCK_UNIFORM<T_GRID>& block,const int index,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const bool delete_particles_that_leave_original_cell,
+        const T phi_min,const T phi_max,const BLOCK_UNIFORM<TV>& block,const int index,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const bool delete_particles_that_leave_original_cell,
         RANDOM_NUMBERS<T>& local_random,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process,ARRAY<pthread_mutex_t>* mutexes,const ARRAY<int,TV_INT>* domain_index);
 #else
     bool Attract_Individual_Particle_To_Interface_And_Adjust_Radius(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles,
-        const T phi_min,const T phi_max,const BLOCK_UNIFORM<T_GRID>& block,const int index,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const bool delete_particles_that_leave_original_cell,
+        const T phi_min,const T phi_max,const BLOCK_UNIFORM<TV>& block,const int index,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const bool delete_particles_that_leave_original_cell,
         RANDOM_NUMBERS<T>& local_random,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index);
 #endif
-    void Adjust_Particle_Radii(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int sign);
+    void Adjust_Particle_Radii(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int sign);
     template<class T_ARRAYS_PARTICLES> void Modify_Levelset_Using_Escaped_Particles(T_ARRAYS_SCALAR& phi,T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR* V,const int sign);
     int Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& other_particles,const int sign,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,ARRAY<bool,TV_INT>* cell_centered_mask);
@@ -147,15 +146,15 @@ protected:
     void Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const int sign,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const ARRAY<int,TV_INT>& number_of_particles_to_add,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index);
 #endif
     //void Copy_From_Move_List_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,ARRAY<ARRAY<TRIPLE<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT,int> >,TV_INT>& move_particles,ARRAY<pthread_mutex_t>* mutexes,const ARRAY<int,TV_INT>* domain_index);
-    void Identify_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,ARRAY<bool>& escaped,const int sign);
-    int Delete_Deep_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,ARRAY<bool>& escaped,const int sign,const T radius_fraction,
+    void Identify_Escaped_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,ARRAY<bool>& escaped,const int sign);
+    int Delete_Deep_Escaped_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,ARRAY<bool>& escaped,const int sign,const T radius_fraction,
         const bool need_to_identify_escaped_particles);
     void Delete_Particles_Outside_Grid(const T domain_boundary,const int axis,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int side);
     void Delete_Particles_Outside_Grid(const T domain_boundary,const int axis,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles,const int side);
-    template<class T_FACE_LOOKUP_LOOKUP> int Remove_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const ARRAY<bool>& escaped,const int sign,
+    template<class T_FACE_LOOKUP_LOOKUP> int Remove_Escaped_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const ARRAY<bool>& escaped,const int sign,
         PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*& removed_particles,const T_FACE_LOOKUP_LOOKUP& V,const T radius_fraction,const T time);
-    int Remove_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const ARRAY<bool>& escaped,const int sign,const T radius_fraction);
-    void Reincorporate_Removed_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PARTICLES<TV>*& particles,const int sign,
+    int Remove_Escaped_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const ARRAY<bool>& escaped,const int sign,const T radius_fraction);
+    void Reincorporate_Removed_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES<TV>*& particles,const int sign,
         PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& removed_particles,const T radius_fraction,const T mass_scaling,T_FACE_ARRAYS_SCALAR* V);
 //#####################################################################
 };

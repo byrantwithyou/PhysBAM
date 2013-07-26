@@ -14,7 +14,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> COMPRESSIBLE_BOUNDARY_CONDITION_WALLS<TV>::
 COMPRESSIBLE_BOUNDARY_CONDITION_WALLS(const VECTOR<VECTOR<bool,2>,TV::dimension>& walls_input,const VECTOR<VECTOR<bool,2>,TV::dimension>& mpi_boundary_input,
-    const FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input)
+    const FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input)
     :walls(walls_input),mpi_boundary(mpi_boundary_input),fluids_parameters(fluids_parameters_input)
 {}
 //#####################################################################

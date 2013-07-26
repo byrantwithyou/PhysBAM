@@ -15,7 +15,7 @@ namespace PhysBAM
 {
 template<class TV> class RANGE;
 template<class TV> class GRID;
-template<class T_GRID> class LEVELSET_3D;
+template<class TV> class LEVELSET_3D;
 template<class TV> class LEVELSET_IMPLICIT_OBJECT;
 template<class T> class TRIANGULATED_SURFACE;
 template<class T> class OPENGL_TRIANGULATED_SURFACE;

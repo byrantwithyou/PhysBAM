@@ -12,7 +12,6 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Parallel_Computation/MPI_GRID_POLICY.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
@@ -26,18 +25,19 @@ template<class TV> class FLUID_SYSTEM_MPI_SLIP;
 template<class TV> class SOLID_SYSTEM_MPI_SLIP;
 template<class TV> class GENERALIZED_VELOCITY;
 template<class TV> class SOLID_BODY_COLLECTION;
-template<class T_GRID> class POISSON_COLLIDABLE_UNIFORM;
+template<class TV> class POISSON_COLLIDABLE_UNIFORM;
 template<class TV> class GRID;
+template<class T> class MPI_UNIFORM_GRID;
 
 template<class TV>
 class MPI_SOLID_FLUID_SLIP:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
-    typedef typename GRID<TV>::VECTOR_INT TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<T,SIDED_FACE_INDEX<TV::dimension> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
-    typedef typename MPI_GRID_POLICY<GRID<TV> >::MPI_GRID T_MPI_GRID;
-    typedef typename MPI_GRID_POLICY<GRID<TV> >::PARALLEL_GRID T_PARALLEL_GRID;
+    typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
+    typedef GRID<TV> T_PARALLEL_GRID;
 public:
     int rank; // global rank
     int number_of_processes;
@@ -49,7 +49,7 @@ public:
     ARRAY<int> solid_ranks,fluid_ranks;
     SPARSE_MATRIX_PARTITION partition;
     T_MPI_GRID* mpi_grid;
-    POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson;
+    POISSON_COLLIDABLE_UNIFORM<TV>* poisson;
 private:
     mutable int current_tag;
 public:
@@ -63,7 +63,7 @@ public:
     int Get_Unique_Tag() const
     {current_tag=max(32,(current_tag+1)&((1<<15)-1));return current_tag;}
 
-    void Set_Poisson(POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson_input)
+    void Set_Poisson(POISSON_COLLIDABLE_UNIFORM<TV>& poisson_input)
     {poisson=&poisson_input;}
 
     void Set_MPI_Grid(T_MPI_GRID& mpi_grid_input);

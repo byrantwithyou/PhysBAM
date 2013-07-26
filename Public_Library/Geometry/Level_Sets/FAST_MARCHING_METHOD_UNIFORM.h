@@ -13,14 +13,14 @@
 #include <boost/function.hpp>
 namespace PhysBAM{
 
-template<class T_GRID>
+template<class TV>
 class FAST_MARCHING_METHOD_UNIFORM:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
     const LEVELSET<TV>& levelset;
 protected:
-    T_GRID cell_grid;
+    GRID<TV> cell_grid;
     TV_INT dimension_start,dimension_end;
     int ghost_cells;
 public:

@@ -36,7 +36,7 @@ Initialize()
 {
     BASE::Initialize();
 
-    EULER_UNIFORM<GRID<TV> >& euler=example.euler;
+    EULER_UNIFORM<TV>& euler=example.euler;
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>& euler_solid_fluid_coupling_utilities=example.euler_solid_fluid_coupling_utilities;
 
     // setup grids
@@ -124,7 +124,7 @@ Setup_Fluids(const T time)
 template<class TV> void COMPRESSIBLE_DRIVER<TV>::
 Restore_Solids_To_Time_N(const T time_n_plus_one)
 {
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*example.collision_bodies_affecting_fluid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*example.collision_bodies_affecting_fluid;
 
     collision_bodies_affecting_fluid.Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,time_n_plus_one);
     collision_bodies_affecting_fluid.Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
@@ -138,7 +138,7 @@ Restore_Solids_To_Time_N(const T time_n_plus_one)
 template<class TV> void COMPRESSIBLE_DRIVER<TV>::
 Restore_Solids_To_Time_N_Plus_One()
 {
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*example.collision_bodies_affecting_fluid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*example.collision_bodies_affecting_fluid;
 
     collision_bodies_affecting_fluid.Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE);
     collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false); // NON-swept acceleration structures
@@ -150,9 +150,9 @@ Restore_Solids_To_Time_N_Plus_One()
 template<class TV> void COMPRESSIBLE_DRIVER<TV>::
 Advect_Fluid(const T dt,const int substep)
 {
-    EULER_UNIFORM<GRID<TV> >& euler=example.euler;
+    EULER_UNIFORM<TV>& euler=example.euler;
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>& euler_solid_fluid_coupling_utilities=example.euler_solid_fluid_coupling_utilities;
-    COMPRESSIBLE_FLUID_COLLECTION<GRID<TV> >& compressible_fluid_collection=example.compressible_fluid_collection;
+    COMPRESSIBLE_FLUID_COLLECTION<TV>& compressible_fluid_collection=example.compressible_fluid_collection;
 
     Write_Substep("before compressible explicit solve",substep,1);
     if(euler_solid_fluid_coupling_utilities.thinshell){
@@ -167,7 +167,7 @@ Advect_Fluid(const T dt,const int substep)
     // initialize p_advected to current eos pressure
     if(euler.timesplit && !euler.perform_rungekutta_for_implicit_part){
         for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-            euler.euler_projection.p_advected(cell_index)=euler.eos->p(compressible_fluid_collection.U(cell_index)(1),EULER<GRID<TV> >::e(compressible_fluid_collection.U,cell_index));}}
+            euler.euler_projection.p_advected(cell_index)=euler.eos->p(compressible_fluid_collection.U(cell_index)(1),EULER<TV>::e(compressible_fluid_collection.U,cell_index));}}
 
     RUNGEKUTTA<T_ARRAYS_DIMENSION_SCALAR> rungekutta_u(compressible_fluid_collection.U,example.rungekutta_order,dt,time);
     RUNGEKUTTA<T_ARRAYS_SCALAR> rungekutta_p_advected(euler.euler_projection.p_advected,example.rungekutta_order,dt,time);
@@ -193,7 +193,7 @@ Advect_Fluid(const T dt,const int substep)
 template<class TV> void COMPRESSIBLE_DRIVER<TV>::
 Advance_Fluid_One_Time_Step_Implicit_Part(const T dt_projection,const T time_projection,const int substep)
 {
-    EULER_UNIFORM<GRID<TV> >& euler=example.euler;
+    EULER_UNIFORM<TV>& euler=example.euler;
 
     if(euler.timesplit && !euler.perform_rungekutta_for_implicit_part){
         LOG::Time("compressible implicit update");

@@ -14,11 +14,11 @@
 #include <Incompressible/Level_Sets/LEVELSET_COLLIDABLE.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM:public FAST_MARCHING_METHOD_UNIFORM<T_GRID>
+template<class TV>
+class FAST_MARCHING_METHOD_COLLIDABLE_UNIFORM:public FAST_MARCHING_METHOD_UNIFORM<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef FAST_MARCHING_METHOD_UNIFORM<T_GRID> BASE;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef FAST_MARCHING_METHOD_UNIFORM<TV> BASE;
 public:
     using BASE::Neighbor_Visible;using BASE::cell_grid;using BASE::dimension_start;using BASE::dimension_end;
     const LEVELSET_COLLIDABLE<TV>& levelset_collidable;

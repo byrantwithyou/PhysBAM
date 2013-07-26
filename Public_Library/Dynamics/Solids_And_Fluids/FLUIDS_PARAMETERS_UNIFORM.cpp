@@ -48,11 +48,11 @@ namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
-FLUIDS_PARAMETERS_UNIFORM(const int number_of_regions_input,const typename FLUIDS_PARAMETERS<T_GRID>::TYPE type)
-    :FLUIDS_PARAMETERS<T_GRID>(type),mpi_grid(0),particle_levelset_evolution(0),incompressible(0),particle_levelset_evolution_multiple(0),incompressible_multiphase(0),sph_evolution(0),
+template<class TV> FLUIDS_PARAMETERS_UNIFORM<TV>::
+FLUIDS_PARAMETERS_UNIFORM(const int number_of_regions_input,const typename FLUIDS_PARAMETERS<TV>::TYPE type)
+    :FLUIDS_PARAMETERS<TV>(type),mpi_grid(0),particle_levelset_evolution(0),incompressible(0),particle_levelset_evolution_multiple(0),incompressible_multiphase(0),sph_evolution(0),
     maccormack_node_mask(*new ARRAY<bool,TV_INT>),maccormack_cell_mask(*new ARRAY<bool,TV_INT>),maccormack_face_mask(*new T_FACE_ARRAYS_BOOL),
-    maccormack_semi_lagrangian(*new ADVECTION_MACCORMACK_UNIFORM<T_GRID,T,T_ADVECTION_SEMI_LAGRANGIAN_SCALAR>(semi_lagrangian,&maccormack_node_mask,&maccormack_cell_mask,
+    maccormack_semi_lagrangian(*new ADVECTION_MACCORMACK_UNIFORM<TV,T,T_ADVECTION_SEMI_LAGRANGIAN_SCALAR>(semi_lagrangian,&maccormack_node_mask,&maccormack_cell_mask,
         &maccormack_face_mask)),euler(0),euler_solid_fluid_coupling_utilities(0),compressible_incompressible_coupling_utilities(0),projection(0),use_reacting_flow(false),
     use_flame_speed_multiplier(false),use_dsd(false),use_psi_R(false),use_levelset_viscosity(false),print_viscosity_matrix(false),use_second_order_pressure(false),
     use_modified_projection(false),use_surface_solve(true),projection_scale(1)
@@ -62,7 +62,7 @@ FLUIDS_PARAMETERS_UNIFORM(const int number_of_regions_input,const typename FLUID
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> FLUIDS_PARAMETERS_UNIFORM<TV>::
 ~FLUIDS_PARAMETERS_UNIFORM()
 {
     delete mpi_grid;delete &maccormack_semi_lagrangian;
@@ -71,7 +71,7 @@ template<class T_GRID> FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
     delete sph_evolution;delete projection;
     delete euler;delete euler_solid_fluid_coupling_utilities;delete compressible_incompressible_coupling_utilities;
 }
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Initialize_Number_Of_Regions(const int number_of_regions_input)
 {
     number_of_regions=number_of_regions_input;masses.Resize(number_of_regions);densities.Resize(number_of_regions);viscosities.Resize(number_of_regions);
@@ -83,7 +83,7 @@ Initialize_Number_Of_Regions(const int number_of_regions_input)
 //#####################################################################
 // Function Initialize_Fluid_Evolution
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Initialize_Fluid_Evolution(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities)
 {
     if(number_of_threads>1){
@@ -91,20 +91,20 @@ Initialize_Fluid_Evolution(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities)
         else if(thread_queue->Number_Of_Threads()!=number_of_threads){delete thread_queue;thread_queue=new THREAD_QUEUE(number_of_threads);}
         semi_lagrangian.thread_queue=thread_queue;maccormack_semi_lagrangian.thread_queue=thread_queue;}
     if(number_of_regions>=2){ // multiphase
-        particle_levelset_evolution_multiple=new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>(grid->Get_MAC_Grid(),*collision_bodies_affecting_fluid,number_of_ghost_cells);
-        if(!projection) projection=new PROJECTION_DYNAMICS_UNIFORM<T_GRID>(*grid,fire,true,false);
-        incompressible_multiphase=new INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>(grid->Get_MAC_Grid(),*projection);
+        particle_levelset_evolution_multiple=new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>(grid->Get_MAC_Grid(),*collision_bodies_affecting_fluid,number_of_ghost_cells);
+        if(!projection) projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*grid,fire,true,false);
+        incompressible_multiphase=new INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>(grid->Get_MAC_Grid(),*projection);
         phi_boundary_multiphase.Resize(number_of_regions);for(int i=0;i<number_of_regions;i++) phi_boundary_multiphase(i)=&phi_boundary_reflection;
         phi_boundary=0;
         particle_levelset_evolution=0;
         incompressible=incompressible_multiphase;}
     else if(number_of_regions==1){ // free surface_flow
-        particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> >(*grid,*collision_bodies_affecting_fluid,number_of_ghost_cells,false);
+        particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>(*grid,*collision_bodies_affecting_fluid,number_of_ghost_cells,false);
         particle_levelset_evolution->Particle_Levelset(0).thread_queue=thread_queue;
         particle_levelset_evolution->Particle_Levelset(0).levelset.thread_queue=thread_queue;
         if(!projection){
-            if(use_modified_projection) projection=new PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>(*grid,particle_levelset_evolution->Particle_Levelset(0).levelset,projection_scale,1,use_surface_solve,fire,false,use_poisson,use_poisson);
-            else projection=new PROJECTION_DYNAMICS_UNIFORM<T_GRID>(*grid,fire,false,false,use_poisson,thread_queue);}
+            if(use_modified_projection) projection=new PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>(*grid,particle_levelset_evolution->Particle_Levelset(0).levelset,projection_scale,1,use_surface_solve,fire,false,use_poisson,use_poisson);
+            else projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*grid,fire,false,false,use_poisson,thread_queue);}
         projection->elliptic_solver->thread_queue=thread_queue;        
         incompressible=new T_INCOMPRESSIBLE(*grid,*projection);
         phi_boundary=&phi_boundary_water; // override default
@@ -112,15 +112,15 @@ Initialize_Fluid_Evolution(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities)
         boundary_mac_slip.Set_Phi(particle_levelset_evolution->phi);}
     else if(!compressible){ // smoke or sph
         if(!projection){
-            if(use_modified_projection) projection=new PROJECTION_REFINEMENT_UNIFORM<T_GRID>(*grid,projection_scale,1,fire,false,use_poisson,use_poisson);
-            else projection=new PROJECTION_DYNAMICS_UNIFORM<T_GRID>(*grid,fire,false,false,use_poisson);}
+            if(use_modified_projection) projection=new PROJECTION_REFINEMENT_UNIFORM<TV>(*grid,projection_scale,1,fire,false,use_poisson,use_poisson);
+            else projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*grid,fire,false,false,use_poisson);}
         incompressible=new T_INCOMPRESSIBLE(*grid,*projection);}
 
     if(sph){
-        sph_evolution=new SPH_EVOLUTION_UNIFORM<T_GRID>(*grid,*incompressible,*this);
+        sph_evolution=new SPH_EVOLUTION_UNIFORM<TV>(*grid,*incompressible,*this);
         fluid_boundary=&fluid_boundary_water;}
     if(compressible){
-        euler=new EULER_UNIFORM<T_GRID>(*grid);
+        euler=new EULER_UNIFORM<TV>(*grid);
         euler_solid_fluid_coupling_utilities=new SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>(*euler,mpi_grid);
         if(number_of_regions){
             compressible_incompressible_coupling_utilities=new COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>(*grid,&incompressible_face_velocities,
@@ -144,7 +144,7 @@ Initialize_Fluid_Evolution(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities)
 //#####################################################################
 // Function Use_Fluid_Coupling_Defaults
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Use_Fluid_Coupling_Defaults()
 {
     PHYSBAM_ASSERT(solid_affects_fluid,"solid_affects_fluid should be true when using coupling"); // This might break out-of-date examples
@@ -170,7 +170,7 @@ Use_Fluid_Coupling_Defaults()
 //#####################################################################
 // Function Use_No_Fluid_Coupling_Defaults
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Use_No_Fluid_Coupling_Defaults()
 {
     if(!compressible) soot_container.Set_Custom_Advection(semi_lagrangian);
@@ -194,7 +194,7 @@ Use_No_Fluid_Coupling_Defaults()
 //#####################################################################
 // Function Initialize_Grids
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Initialize_Grids()
 {
     if(!compressible)
@@ -204,7 +204,7 @@ Initialize_Grids()
 //#####################################################################
 // Function Adjust_Particle_For_Domain_Boundaries
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time)
 {
     // remove this for speed - don't call the function for the other particles
@@ -216,7 +216,7 @@ Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles
     else particle_levelset_evolution_multiple->particle_levelset_multiple.Particle_Collision_Distance(particles.quantized_collision_distance(index));
     T min_collision_distance=particle_levelset_evolution->Particle_Levelset(0).min_collision_distance_factor*max_collision_distance;
     TV min_corner=grid->domain.Minimum_Corner(),max_corner=grid->domain.Maximum_Corner();
-    for(int axis=0;axis<T_GRID::dimension;axis++){
+    for(int axis=0;axis<TV::m;axis++){
         if(domain_walls[axis][0] && X_new[axis]<min_corner[axis]+max_collision_distance){
             T collision_distance=X[axis]-min_corner[axis];
             if(collision_distance>max_collision_distance)collision_distance=X_new[axis]-min_corner[axis];
@@ -233,11 +233,11 @@ Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles
 //#####################################################################
 // Function Delete_Particles_Inside_Objects
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Delete_Particles_Inside_Objects(const T time)
 {
     for(int i=0;i<number_of_regions;i++){
-        PARTICLE_LEVELSET_UNIFORM<T_GRID>* particle_levelset;
+        PARTICLE_LEVELSET_UNIFORM<TV>* particle_levelset;
         if(number_of_regions==1) particle_levelset=&particle_levelset_evolution->Particle_Levelset(0);
         else particle_levelset=particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
         Delete_Particles_Inside_Objects<PARTICLE_LEVELSET_PARTICLES<TV> >(particle_levelset->positive_particles,PARTICLE_LEVELSET_POSITIVE,time);
@@ -250,11 +250,11 @@ Delete_Particles_Inside_Objects(const T time)
 //#####################################################################
 // Function Delete_Particles_Inside_Objects
 //#####################################################################
-template<class T_GRID> template<class T_PARTICLES> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> template<class T_PARTICLES> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Delete_Particles_Inside_Objects(typename T_ARRAYS_SCALAR::template REBIND<T_PARTICLES*>::TYPE& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time)
 {
     for(NODE_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
-        BLOCK_UNIFORM<T_GRID> block(*grid,block_index);
+        BLOCK_UNIFORM<TV> block(*grid,block_index);
         COLLISION_GEOMETRY_ID body_id;int aggregate_id;
         T_PARTICLES& block_particles=*particles(block_index);
         if(collision_bodies_affecting_fluid->Occupied_Block(block)){
@@ -268,8 +268,8 @@ Delete_Particles_Inside_Objects(typename T_ARRAYS_SCALAR::template REBIND<T_PART
 //#####################################################################
 // Function Set_Projection
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
-Set_Projection(PROJECTION_DYNAMICS_UNIFORM<T_GRID>* projection_input)
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
+Set_Projection(PROJECTION_DYNAMICS_UNIFORM<TV>* projection_input)
 {
     if(incompressible) PHYSBAM_FATAL_ERROR("projection cannot be set after initialization");
     projection=projection_input;
@@ -277,7 +277,7 @@ Set_Projection(PROJECTION_DYNAMICS_UNIFORM<T_GRID>* projection_input)
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Update_Fluid_Parameters(const T dt,const T time)
 {
     if(!incompressible) return;
@@ -317,13 +317,13 @@ Update_Fluid_Parameters(const T dt,const T time)
 //#####################################################################
 // Function Get_Neumann_And_Dirichlet_Boundary_Conditions
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
-Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>* elliptic_solver,
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
+Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<TV>* elliptic_solver,
         T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     elliptic_solver->psi_N.Fill(false);elliptic_solver->psi_D.Fill(false);
     if(incompressible){
-        POISSON_COLLIDABLE_UNIFORM<T_GRID>* poisson=incompressible->projection.poisson_collidable;
+        POISSON_COLLIDABLE_UNIFORM<TV>* poisson=incompressible->projection.poisson_collidable;
         if(poisson) poisson->beta_face.Fill(1/density);}
     Set_Domain_Boundary_Conditions(*elliptic_solver,face_velocities,time);
     callbacks->Set_Dirichlet_Boundary_Conditions(time);
@@ -338,12 +338,12 @@ Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>* elliptic_
 //#####################################################################
 // Function Set_Domain_Boundary_Conditions
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
-Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>& elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
+Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<TV>& elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
 {
     ARRAY<bool,TV_INT>& psi_D=elliptic_solver.psi_D;T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver.psi_N;
 
-    for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
+    for(int axis=0;axis<TV::m;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
         TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
@@ -351,7 +351,7 @@ Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>& elliptic_solver,T_FACE_A
         if(domain_walls(axis)(axis_side)){
             if(number_of_regions>=2){
                 // TODO: clean this up. currently iterating over faces 1 grid cell out from boundary in order to get the corners as well. change iterators to give corners instead.
-                for(FACE_ITERATOR<TV> iterator(elliptic_solver.grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+                for(FACE_ITERATOR<TV> iterator(elliptic_solver.grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT boundary_face=iterator.Face_Index()+boundary_face_offset;
                     int region=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Inside_Region_Face(iterator.Axis(),boundary_face);
                     if(!dirichlet_regions(region) || (flood_fill_for_bubbles && incompressible_multiphase->levelset_for_dirichlet_regions->phi(boundary_face+interior_cell_offset)<=0)){
@@ -361,7 +361,7 @@ Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>& elliptic_solver,T_FACE_A
                         psi_D(cell)=true;elliptic_solver.u(cell)=0;}}}
             else{
                 // TODO: clean this up. currently iterating over faces 1 grid cell out from boundary in order to get the corners as well. change iterators to give corners instead.
-                for(FACE_ITERATOR<TV> iterator(elliptic_solver.grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+                for(FACE_ITERATOR<TV> iterator(elliptic_solver.grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT face=iterator.Face_Index()+boundary_face_offset;
                     if(!water || particle_levelset_evolution->phi(face+interior_cell_offset)<=0 || use_sph_for_removed_negative_particles){
                         if(face_velocities.Component(axis).Valid_Index(face)){
@@ -370,21 +370,21 @@ Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>& elliptic_solver,T_FACE_A
                         psi_D(cell)=true;elliptic_solver.u(cell)=0;}}}}
         else
             // TODO: clean this up. currently iterating over faces 1 grid cell out from boundary in order to get the corners as well. change iterators to give corners instead.
-            for(FACE_ITERATOR<TV> iterator(elliptic_solver.grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
+            for(FACE_ITERATOR<TV> iterator(elliptic_solver.grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
                 psi_D(cell)=true;elliptic_solver.u(cell)=0;}}
 }
 //#####################################################################
 // Function Get_Body_Force
 //#####################################################################
 // flames and smoke have a buoyancy force
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
 {
     if(smoke){
         T_ARRAYS_SCALAR density_ghost(grid->Domain_Indices(number_of_ghost_cells),false),temperature_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
         density_container.boundary->Fill_Ghost_Cells_Cell(*grid,density_container.density,density_ghost,time,number_of_ghost_cells);
         temperature_container.boundary->Fill_Ghost_Cells_Cell(*grid,temperature_container.temperature,temperature_ghost,time,number_of_ghost_cells);
-        for(FACE_ITERATOR<TV> iterator(*grid,0,T_GRID::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
+        for(FACE_ITERATOR<TV> iterator(*grid,0,GRID<TV>::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
             T rho_atm=rho_bottom+(rho_top-rho_bottom)*(iterator.Location().y-grid->domain.min_corner.y)/(grid->domain.max_corner.y-grid->domain.min_corner.y);
             T face_density=(density_ghost(iterator.First_Cell_Index())+density_ghost(iterator.Second_Cell_Index()))/(T)2;
             T face_temperature=(temperature_ghost(iterator.First_Cell_Index())+temperature_ghost(iterator.Second_Cell_Index()))/(T)2;
@@ -395,21 +395,21 @@ Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
     else if(use_reacting_flow){
         T_ARRAYS_SCALAR temperature_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
         temperature_container.boundary->Fill_Ghost_Cells_Cell(*grid,temperature_container.temperature,temperature_ghost,time,number_of_ghost_cells);
-        LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple;
+        LEVELSET_MULTIPLE<TV>& levelset_multiple=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple;
         ARRAY<T> one_over_densities(number_of_regions);for(int i=0;i<number_of_regions;i++) one_over_densities(i)=(T)1/densities(i);
-        for(FACE_ITERATOR<TV> iterator(*grid,0,T_GRID::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
+        for(FACE_ITERATOR<TV> iterator(*grid,0,GRID<TV>::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
             T temperature;
             int region=levelset_multiple.Inside_Region_Face(iterator.Axis(),iterator.Face_Index());
             if(fuel_region(region)) temperature=temperature_fuel;
             else temperature=(T).5*(temperature_ghost(iterator.First_Cell_Index())+temperature_ghost(iterator.Second_Cell_Index()));
             force.Component(1)(iterator.Face_Index())=one_over_densities(region)*temperature_buoyancy_constant*(temperature-temperature_container.ambient_temperature);}}
 }
-template<> void FLUIDS_PARAMETERS_UNIFORM<GRID<VECTOR<double,1> > >::
+template<> void FLUIDS_PARAMETERS_UNIFORM<VECTOR<double,1> >::
 Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }
-template<> void FLUIDS_PARAMETERS_UNIFORM<GRID<VECTOR<float,1> > >::
+template<> void FLUIDS_PARAMETERS_UNIFORM<VECTOR<float,1> >::
 Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
 {
     PHYSBAM_NOT_IMPLEMENTED();
@@ -417,7 +417,7 @@ Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
 //#####################################################################
 // Function Apply_Isobaric_Fix
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Apply_Isobaric_Fix(const T dt,const T time)
 {
     if(compressible_apply_isobaric_fix) euler_solid_fluid_coupling_utilities->Apply_Isobaric_Fix(dt,time);
@@ -425,7 +425,7 @@ Apply_Isobaric_Fix(const T dt,const T time)
 //#####################################################################
 // Function Blend_In_External_Velocity
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Blend_In_External_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     if(use_external_velocity){
@@ -442,7 +442,7 @@ Blend_In_External_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,cons
 //#####################################################################
 // Function Move_Grid
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const T time)
 {
     TV_INT max_shift=2*TV_INT::All_Ones_Vector();
@@ -454,12 +454,12 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const
         RANGE<TV> new_domain(grid->domain.Minimum_Corner()+temp_shift_t*grid->dX,grid->domain.Maximum_Corner()+temp_shift_t*grid->dX);
         grid->Initialize(grid->counts,new_domain,grid->Is_MAC_Grid());
 
-        {T_GRID& pls_grid(particle_levelset_evolution->grid);
+        {GRID<TV>& pls_grid(particle_levelset_evolution->grid);
         RANGE<TV> new_domain(pls_grid.domain.Minimum_Corner()+temp_shift_t*pls_grid.dX,pls_grid.domain.Maximum_Corner()+temp_shift_t*pls_grid.dX);
         pls_grid.Initialize(pls_grid.counts,new_domain,pls_grid.Is_MAC_Grid());}
 
         if(mpi_grid){
-            T_GRID& global_grid(mpi_grid->global_grid);
+            GRID<TV>& global_grid(mpi_grid->global_grid);
             RANGE<TV> new_domain(global_grid.domain.Minimum_Corner()+temp_shift_t*global_grid.dX,global_grid.domain.Maximum_Corner()+temp_shift_t*global_grid.dX);
             global_grid.Initialize(global_grid.counts,new_domain,global_grid.Is_MAC_Grid());}
 
@@ -467,13 +467,13 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const
         {T_ARRAYS_SCALAR phi_ghost(grid->Domain_Indices(number_of_ghost_cells),false);phi_boundary->Fill_Ghost_Cells(*grid,particle_levelset_evolution->phi,phi_ghost,0,time,number_of_ghost_cells);
         T_ARRAYS_SCALAR::Limited_Shifted_Get(particle_levelset_evolution->phi,phi_ghost,temp_shift);}
         {T_FACE_ARRAYS_SCALAR face_velocities_ghost(*grid,number_of_ghost_cells,false);fluid_boundary->Fill_Ghost_Faces(*grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
-        for(int axis=0;axis<T_GRID::dimension;axis++)
+        for(int axis=0;axis<TV::m;axis++)
             T_ARRAYS_SCALAR::Limited_Shifted_Get(face_velocities.Component(axis),face_velocities_ghost.Component(axis),temp_shift);}
         {T_ARRAYS_SCALAR p_ghost(p_grid.Domain_Indices(number_of_ghost_cells),false);BOUNDARY<TV,T>().Fill_Ghost_Cells(p_grid,incompressible->projection.p,p_ghost,0,time,number_of_ghost_cells);
         T_ARRAYS_SCALAR::Limited_Shifted_Get(incompressible->projection.p,p_ghost,temp_shift);}
 
         for(int i=0;i<number_of_regions;i++){
-            PARTICLE_LEVELSET_UNIFORM<T_GRID>& particle_levelset=particle_levelset_evolution->Particle_Levelset(i);
+            PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution->Particle_Levelset(i);
             particle_levelset.Update_Particle_Cells(particle_levelset.positive_particles);
             particle_levelset.Update_Particle_Cells(particle_levelset.negative_particles);
             if(particle_levelset.use_removed_positive_particles) particle_levelset.Update_Particle_Cells(particle_levelset.removed_positive_particles);
@@ -483,7 +483,7 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const
 //#####################################################################
 // Function Move_Grid
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
 {
     assert(!smoke && !fire);
@@ -491,19 +491,19 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     if(move_grid_explicitly){callbacks->Move_Grid_Explicitly(time);return;} // otherwise move automatically
 
     TV_INT shift;
-    for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
+    for(int axis=0;axis<TV::m;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;TV_INT offset=(axis_side==0?-1:1)*moving_grid_number_of_cells*TV_INT::Axis_Vector(axis);
         // loop over boundary region by looping over ghost region and shifting inwards
-        for(CELL_ITERATOR<TV> iterator(*grid,moving_grid_number_of_cells,T_GRID::GHOST_REGION,side);iterator.Valid();iterator.Next())
+        for(CELL_ITERATOR<TV> iterator(*grid,moving_grid_number_of_cells,GRID<TV>::GHOST_REGION,side);iterator.Valid();iterator.Next())
             if(particle_levelset_evolution->phi(iterator.Cell_Index()-offset)<=0){shift+=offset;break;}}
 
     Move_Grid(face_velocities,shift,time);
-    *grid=T_GRID(grid->Domain_Indices().Maximum_Corner(),grid->domain+(TV)shift*grid->dX);
+    *grid=GRID<TV>(grid->Domain_Indices().Maximum_Corner(),grid->domain+(TV)shift*grid->dX);
 }
 //#####################################################################
 // Function Adjust_Strain_For_Object
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX& e_ghost,const T time)
 {
     assert(!smoke && !fire);
@@ -517,7 +517,7 @@ Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX
 //#####################################################################
 // Function Combustion
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Combustion(const T dt,const T time)
 {
     PHYSBAM_DEBUG_WRITE_SUBSTEP("Before Combustion",0,1);
@@ -536,14 +536,14 @@ Combustion(const T dt,const T time)
 
             soot_fuel_container.density(cell_index)-=fuel_fraction_burnt;
             soot_container.density(cell_index)+=fuel_fraction_burnt;
-            euler->U(cell_index)(T_GRID::dimension+1)+=energy_generated;}}
+            euler->U(cell_index)(TV::m+1)+=energy_generated;}}
     euler->Invalidate_Ghost_Cells();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("After Combustion",0,1);
 }
 //#####################################################################
 // Function Evolve_Soot
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Evolve_Soot(const T dt,const T time)
 {
     if(compressible){
@@ -554,8 +554,8 @@ Evolve_Soot(const T dt,const T time)
 //#####################################################################
 // Function Sync_Parameters 
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
-Sync_Parameters(FLUIDS_PARAMETERS_UNIFORM<T_GRID>& global_parameters,THREADED_UNIFORM_GRID<T_GRID>& threaded_grid)
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
+Sync_Parameters(FLUIDS_PARAMETERS_UNIFORM<TV>& global_parameters,THREADED_UNIFORM_GRID<TV>& threaded_grid)
 {
     threaded_grid.Sync_Scalar(particle_levelset_evolution->phi,global_parameters.particle_levelset_evolution->phi);
     threaded_grid.Sync_Scalar(incompressible->projection.p,global_parameters.incompressible->projection.p);
@@ -570,8 +570,8 @@ Sync_Parameters(FLUIDS_PARAMETERS_UNIFORM<T_GRID>& global_parameters,THREADED_UN
 //#####################################################################
 // Function Distribute_Parameters 
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
-Distribute_Parameters(FLUIDS_PARAMETERS_UNIFORM<T_GRID>& global_parameters,THREADED_UNIFORM_GRID<T_GRID>& threaded_grid)
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
+Distribute_Parameters(FLUIDS_PARAMETERS_UNIFORM<TV>& global_parameters,THREADED_UNIFORM_GRID<TV>& threaded_grid)
 {
     threaded_grid.Distribute_Scalar(particle_levelset_evolution->phi,global_parameters.particle_levelset_evolution->phi);
     threaded_grid.Distribute_Scalar(incompressible->projection.p,global_parameters.incompressible->projection.p);
@@ -595,7 +595,7 @@ Distribute_Parameters(FLUIDS_PARAMETERS_UNIFORM<T_GRID>& global_parameters,THREA
 //#####################################################################
 // Function Total_Number_Of_Particles
 //#####################################################################
-template<class T_GRID> template<class T_ARRAYS_PARTICLES> int FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> template<class T_ARRAYS_PARTICLES> int FLUIDS_PARAMETERS_UNIFORM<TV>::
 Total_Number_Of_Particles(const T_ARRAYS_PARTICLES& particles) const
 {
     int total=0;
@@ -605,7 +605,7 @@ Total_Number_Of_Particles(const T_ARRAYS_PARTICLES& particles) const
 //#####################################################################
 // Function Write_Particles
 //#####################################################################
-template<class T_GRID> template<class T_ARRAYS_PARTICLES> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> template<class T_ARRAYS_PARTICLES> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_particles,const T_ARRAYS_PARTICLES& particles,const std::string& output_directory,const std::string& prefix,
     const int frame) const
 {
@@ -622,7 +622,7 @@ Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_part
 //#####################################################################
 // Function Read_Particles
 //#####################################################################
-template<class T_GRID> template<class T_PARTICLES,class T_ARRAYS_PARTICLES> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> template<class T_PARTICLES,class T_ARRAYS_PARTICLES> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Read_Particles(const STREAM_TYPE stream_type,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const std::string& output_directory,const std::string& prefix,
     const int frame)
 {
@@ -639,7 +639,7 @@ Read_Particles(const STREAM_TYPE stream_type,const T_PARTICLES& template_particl
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame)
 {
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
@@ -656,7 +656,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
         // particle levelset
         if(write_levelset){
             if(number_of_regions==1){
-                PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution->Particle_Levelset(0);
+                PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution->Particle_Levelset(0);
                 FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
                 if(write_particles && frame%restart_data_write_rate==0){
                     Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles",frame);
@@ -673,7 +673,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
             else if(number_of_regions>=2){
                 for(int i=0;i<number_of_regions;i++){
                     std::string ii=STRING_UTILITIES::string_sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg): This still does .%d.gz
-                    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
+                    PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
                     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
                     if(write_particles && frame%restart_data_write_rate==0){
                         Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles_"+ii,frame);
@@ -703,7 +703,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int first_frame,const int frame) const
 {
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
@@ -721,8 +721,8 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/grid",*grid);
         if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/global_grid",mpi_grid->global_grid);
         // object levelset
-        if(FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID>* innacurate_union=
-            Find_Type<FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID>*>(collision_bodies_affecting_fluid->collision_geometry_collection.bodies))
+        if(FLUID_COLLISION_BODY_INACCURATE_UNION<TV>* innacurate_union=
+            Find_Type<FLUID_COLLISION_BODY_INACCURATE_UNION<TV>*>(collision_bodies_affecting_fluid->collision_geometry_collection.bodies))
             FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/object_levelset",innacurate_union->levelset);
         // scalar fields
         if(smoke || fire){
@@ -742,7 +742,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
         // particle levelset
         if(write_levelset){
             if(number_of_regions==1){
-                PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution->Particle_Levelset(0);
+                PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution->Particle_Levelset(0);
                 FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
                 if(write_particles && frame%restart_data_write_rate==0){
                     Write_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles",frame);
@@ -758,7 +758,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
             else if(number_of_regions>=2){
                 for(int i=0;i<number_of_regions;i++){
                     std::string ii=STRING_UTILITIES::string_sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg) ...
-                    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
+                    PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
                     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
                     if(write_particles && frame%restart_data_write_rate==0){
                         Write_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles_"+ii,frame);
@@ -829,7 +829,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
 //#####################################################################
 // Function Log_Parameters 
 //#####################################################################
-template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Log_Parameters() const
 {
     LOG::SCOPE scope("FLUIDS_PARAMETERS_UNIFORM parameters");
@@ -837,13 +837,10 @@ Log_Parameters() const
     if(euler) euler->Log_Parameters();
 }
 //#####################################################################
-#define INSTANTIATION_HELPER(T_GRID,T) \
-    template class FLUIDS_PARAMETERS_UNIFORM<T_GRID>;
-#define P(...) __VA_ARGS__
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,1> >),float);
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,2> >),float);
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,3> >),float);
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,1> >),double);
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,2> >),double);
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,3> >),double);
+template class FLUIDS_PARAMETERS_UNIFORM<VECTOR<float,1> >;
+template class FLUIDS_PARAMETERS_UNIFORM<VECTOR<float,2> >;
+template class FLUIDS_PARAMETERS_UNIFORM<VECTOR<float,3> >;
+template class FLUIDS_PARAMETERS_UNIFORM<VECTOR<double,1> >;
+template class FLUIDS_PARAMETERS_UNIFORM<VECTOR<double,2> >;
+template class FLUIDS_PARAMETERS_UNIFORM<VECTOR<double,3> >;
 }

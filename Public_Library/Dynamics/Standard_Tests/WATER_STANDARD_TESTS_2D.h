@@ -41,15 +41,15 @@ namespace PhysBAM{
 
 template<class TV> class RIGID_BODY_COLLECTION;
 
-template<class T_GRID>
+template<class TV>
 class WATER_STANDARD_TESTS_2D
 {
-    typedef typename T_GRID::SCALAR T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,2> TV_INT;
 public:
     SOLIDS_FLUIDS_EXAMPLE<TV>& example;
-    FLUIDS_PARAMETERS<T_GRID>& fluids_parameters;
+    FLUIDS_PARAMETERS<TV>& fluids_parameters;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
-    FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID> inaccurate_union;
+    FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
     bool use_inaccurate_body_collisions;
     bool use_variable_density_for_sph,use_two_way_coupling_for_sph,convert_sph_particles_to_fluid,use_analytic_divergence,use_analytic_divergence_for_expansion_only,
          adjust_cell_weights_on_neumann_boundaries,enforce_density_near_interface;
@@ -63,7 +63,7 @@ public:
     int sphere;
     INTERPOLATION_CURVE<T,TV> motion_curve;
 
-    WATER_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS<T_GRID>& fluids_parameters,RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
+    WATER_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS<TV>& fluids_parameters,RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
 
     virtual ~WATER_STANDARD_TESTS_2D();
 

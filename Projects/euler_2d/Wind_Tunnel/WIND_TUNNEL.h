@@ -31,20 +31,19 @@
 namespace PhysBAM{
 
 template<class T_input>
-class WIND_TUNNEL:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >,public BOUNDARY<VECTOR<T_input,2>,VECTOR<T_input,4> >
+class WIND_TUNNEL:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >,public BOUNDARY<VECTOR<T_input,2>,VECTOR<T_input,4> >
 {
 public:
-    typedef T_input T;typedef VECTOR<T,2> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
+    typedef T_input T;typedef VECTOR<T,2> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename T_ARRAYS_BASE::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef typename COLLISION_BODY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
-    typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
-    typedef VECTOR<bool,2*T_GRID::dimension> T_FACE_VECTOR_BOOL;
-    typedef VECTOR<BOUNDARY<TV,TV_DIMENSION>*,2*T_GRID::dimension> T_BOUNDARY_FACE_VECTOR;
+    typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
+    typedef VECTOR<bool,2*TV::m> T_FACE_VECTOR_BOOL;
+    typedef VECTOR<BOUNDARY<TV,TV_DIMENSION>*,2*TV::m> T_BOUNDARY_FACE_VECTOR;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef BOUNDARY<TV,TV_DIMENSION> BASE_BOUNDARY;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;
     using BASE::data_directory;using BASE::solid_body_collection;using BASE_BOUNDARY::Boundary;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
@@ -127,9 +126,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.cfl=cfl_number;
     //custom stuff . . . 
     fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
-    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,false,false);
-    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,true,false);
-    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,true,true);
+    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
+    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
+    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
     fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
     fluids_parameters.compressible_conservation_method->Save_Fluxes();
     fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
@@ -157,8 +156,8 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 {
     //set custom boundary
     TV velocity_initial(u_vel_initial,v_vel_initial);
-    VECTOR<VECTOR<bool,2>,T_GRID::dimension> valid_wall;
-    for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
+    VECTOR<VECTOR<bool,2>,TV::m> valid_wall;
+    for(int axis=0;axis<TV::m;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
     valid_wall[2]=VECTOR<bool,2>::Constant_Vector(false);
 
@@ -202,7 +201,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
                 rho=rho_initial;u_vel=u_vel_initial;v_vel=v_vel_initial;p=p_initial;}
             else{
                 rho=rho_left;u_vel=u_left;v_vel=v_left;p=p_left;}}
-        EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(U,cell_index,rho,TV(u_vel,v_vel),fluids_parameters.euler->eos->e_From_p_And_rho(p,rho));}
+        EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(U,cell_index,rho,TV(u_vel,v_vel),fluids_parameters.euler->eos->e_From_p_And_rho(p,rho));}
 }
 //#####################################################################
 // Function Intialize_Bodies
@@ -225,7 +224,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 
-    fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state=EULER<T_GRID>::Get_Euler_State_From_rho_velocity_And_internal_energy(rho_initial,TV(u_vel_initial,v_vel_initial),
+    fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state=EULER<TV>::Get_Euler_State_From_rho_velocity_And_internal_energy(rho_initial,TV(u_vel_initial,v_vel_initial),
         fluids_parameters.euler->eos->e_From_p_And_rho(p_initial,rho_initial));
 }
 //#####################################################################
@@ -233,8 +232,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::Set_Dirichlet_Boundary_Conditions(time);
-    EULER_UNIFORM<T_GRID >& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<T_GRID >&>(fluids_parameters)).euler);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Set_Dirichlet_Boundary_Conditions(time);
+    EULER_UNIFORM<TV >& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV >&>(fluids_parameters)).euler);
     T_FACE_ARRAYS_BOOL& psi_N=euler.euler_projection.elliptic_solver->psi_N;
     T_FACE_ARRAYS_SCALAR& face_velocities=euler.euler_projection.face_velocities;
     RANGE<TV> domain=fluids_parameters.euler->grid.Domain();
@@ -254,19 +253,19 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
             inside=inside || (location.y<=domain_center.y && location.x>=domain.max_corner.x-wall_thickness);} // bottom right 
         if(inside){
             euler.psi(iterator.Cell_Index())=false;
-            for(int axis=0;axis<T_GRID::dimension;axis++){
+            for(int axis=0;axis<TV::m;axis++){
                 psi_N.Component(axis)(iterator.First_Face_Index(axis))=true;face_velocities.Component(axis)(iterator.First_Face_Index(axis))=0;
                 psi_N.Component(axis)(iterator.Second_Face_Index(axis))=true;face_velocities.Component(axis)(iterator.Second_Face_Index(axis))=0;}}}
 }
 //#####################################################################
 // Function Fill_Single_Ghost_Region
 //#####################################################################
-void Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& u_ghost,const RANGE<TV_INT>& region,const int side,const T dt,const T time_input,const int number_of_ghost_cells) const
+void Fill_Single_Ghost_Region(const GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& u_ghost,const RANGE<TV_INT>& region,const int side,const T dt,const T time_input,const int number_of_ghost_cells) const
 {
     T time=time_input;
     static T last_time_used=0;  // Hack to get around the fact that fluid_parameters.Write_Output_Files doesn't know what time it is...
     if(time) last_time_used=time; else time=last_time_used;
-    const EULER_UNIFORM<T_GRID >& euler=*((const_cast<FLUIDS_PARAMETERS_UNIFORM<T_GRID >&>(fluids_parameters)).euler);
+    const EULER_UNIFORM<TV >& euler=*((const_cast<FLUIDS_PARAMETERS_UNIFORM<TV >&>(fluids_parameters)).euler);
     assert(test_number==7);
     if(side==3){
         int axis=(side+1)/2;
@@ -280,17 +279,17 @@ void Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& u_gh
             if(location.x>=(T).1667){
                 TV_INT reflected_node=cell_index;reflected_node[axis]=reflection_times_two-cell_index[axis];
                 T rho=u_ghost(reflected_node)(1);
-                TV velocity=EULER<T_GRID>::Get_Velocity(u_ghost,reflected_node);velocity(axis)*=-1;
-                T e=EULER<T_GRID>::e(u_ghost,reflected_node);
-                EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell_index,rho,velocity,e);}
-            else{EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell_index,rho_left,TV(u_left,v_left),euler.eos->e_From_p_And_rho(p_left,rho_left));}}}
+                TV velocity=EULER<TV>::Get_Velocity(u_ghost,reflected_node);velocity(axis)*=-1;
+                T e=EULER<TV>::e(u_ghost,reflected_node);
+                EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell_index,rho,velocity,e);}
+            else{EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell_index,rho_left,TV(u_left,v_left),euler.eos->e_From_p_And_rho(p_left,rho_left));}}}
     else if(side==4){
         T rho=rho_initial,p=p_initial,u_vel=u_vel_initial,v_vel=v_vel_initial;
         for(CELL_ITERATOR<TV> iterator(grid,region);iterator.Valid();iterator.Next()){
             const TV_INT& cell_index=iterator.Cell_Index();const TV location=iterator.Location();
             if(location.y-sqrt((T)3)*(location.x-(T)1./(T)6) + (T)2*(T)10*time <= 0){rho=rho_initial;u_vel=u_vel_initial;v_vel=v_vel_initial;p=p_initial;}
             else{rho=rho_left;u_vel=u_left;v_vel=v_left;p=p_left;}
-            EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell_index,rho,TV(u_vel,v_vel),euler.eos->e_From_p_And_rho(p,rho));}}
+            EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell_index,rho,TV(u_vel,v_vel),euler.eos->e_From_p_And_rho(p,rho));}}
     else assert(false); // Just to verify that nothing funky is going on with the new boundary class
 }
 //#####################################################################
@@ -298,7 +297,7 @@ void Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& u_gh
 //#####################################################################
 void Woodward_Collela_Fix(bool fix_entropy,bool fix_enthalpy)
 {
-    EULER_UNIFORM<T_GRID >& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<T_GRID >&>(fluids_parameters)).euler);
+    EULER_UNIFORM<TV >& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV >&>(fluids_parameters)).euler);
     EOS_GAMMA<T>* gamma_law=dynamic_cast<EOS_GAMMA<T>*>(euler.eos);  // This isobaric fix depends on the EOS being a gamma law
     static TV_INT reference_cell=fluids_parameters.grid->Closest_Node(TV((T).6-fluids_parameters.grid->dX.x,(T).2-fluids_parameters.grid->dX.y));
     const T rho_a=euler.U(reference_cell)(1);
@@ -340,7 +339,7 @@ void Woodward_Collela_Fix(bool fix_entropy,bool fix_enthalpy)
 }
 void Fedkiw_Isobaric_Fix(bool fix_only_6_cells)
 {
-    EULER_UNIFORM<T_GRID >& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<T_GRID >&>(fluids_parameters)).euler);
+    EULER_UNIFORM<TV >& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV >&>(fluids_parameters)).euler);
     T_FACE_ARRAYS_BOOL& psi_N=euler.euler_projection.elliptic_solver->psi_N;
     EOS_GAMMA<T>* gamma_law=dynamic_cast<EOS_GAMMA<T>*>(euler.eos);  // This isobaric fix depends on the EOS being a gamma law
     const T gamma=gamma_law->gamma;

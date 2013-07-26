@@ -36,7 +36,7 @@ public:
     mutable ARRAY<TRIANGLE_3D<T> > world_space_triangles;
     bool closed_volume;
     ARRAY<TV,VECTOR<int,2> > bump_map_pixels;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<T,2> >,TV> interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,2>,TV> interpolation;
     GRID<VECTOR<T,2> > grid;
     ARRAY<VECTOR<T,2> >* texture_coordinates;
     ARRAY<VECTOR<int,3> >* triangle_texture_coordinates;

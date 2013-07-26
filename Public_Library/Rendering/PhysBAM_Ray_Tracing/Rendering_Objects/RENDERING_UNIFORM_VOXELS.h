@@ -33,10 +33,10 @@ public:
     ARRAY<ARRAY<bool,VECTOR<int,3> >*> precomputed_light_valid;
     ARRAY<VECTOR<int,3> > map_from_accessor_index_to_my_index;
     T volumetric_step;
-    INTERPOLATION_UNIFORM<GRID<TV>,T>* voxel_source_interpolation;
-    INTERPOLATION_UNIFORM<GRID<TV>,VECTOR<T,3> >* voxel_light_interpolation;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> default_voxel_source_interpolation;
-    LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,VECTOR<T,3> > default_voxel_light_interpolation;
+    INTERPOLATION_UNIFORM<TV,T>* voxel_source_interpolation;
+    INTERPOLATION_UNIFORM<TV,VECTOR<T,3> >* voxel_light_interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> default_voxel_source_interpolation;
+    LINEAR_INTERPOLATION_UNIFORM<TV,VECTOR<T,3> > default_voxel_light_interpolation;
     int number_of_smoothing_steps;
 
     RENDERING_UNIFORM_VOXELS(GRID<TV>& grid_input,ARRAY<T,VECTOR<int,3> >& data_input,const T volumetric_step)
@@ -80,7 +80,7 @@ public:
 
     bool Use_Precomputed_Light_Data(const VECTOR<T,3>& location,const int light_index) const PHYSBAM_OVERRIDE
     {if(!precompute_single_scattering)return false;
-    VECTOR<int,3> index=INTERPOLATION_UNIFORM<GRID<TV>,VECTOR<T,3> >::Clamped_Index_End_Minus_One(coarse_grid,*precomputed_light(light_index),location);
+    VECTOR<int,3> index=INTERPOLATION_UNIFORM<TV,VECTOR<T,3> >::Clamped_Index_End_Minus_One(coarse_grid,*precomputed_light(light_index),location);
     int i=index.x,j=index.y,ij=index.z;
     if(coarse_grid.Outside(location))return false;
     bool i_j_ij=(*precomputed_light_valid(light_index))(i,j,ij),i_j_ij1=(*precomputed_light_valid(light_index))(i,j,ij+1),i_j1_ij=(*precomputed_light_valid(light_index))(i,j+1,ij),
@@ -98,10 +98,10 @@ public:
     VECTOR<T,3> Precomputed_Light_Data(const VECTOR<T,3>& location,const int light) const PHYSBAM_OVERRIDE
     {return voxel_light_interpolation->Clamped_To_Array(coarse_grid,*precomputed_light(light),location);}
 
-    void Set_Custom_Source_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,T>* interpolation)
+    void Set_Custom_Source_Interpolation(INTERPOLATION_UNIFORM<TV,T>* interpolation)
     {voxel_source_interpolation=interpolation;}
 
-    void Set_Custom_Light_Interpolation(INTERPOLATION_UNIFORM<GRID<TV>,VECTOR<T,3> >* interpolation)
+    void Set_Custom_Light_Interpolation(INTERPOLATION_UNIFORM<TV,VECTOR<T,3> >* interpolation)
     {voxel_light_interpolation=interpolation;}
 
 protected:

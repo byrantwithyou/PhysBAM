@@ -10,8 +10,8 @@ using namespace PhysBAM;
 //#####################################################################
 // Function Clamped_To_Array
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> typename T_GRID::VECTOR_INT QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Base_Index(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
+template<class TV,class T2,class T_FACE_LOOKUP> VECTOR<int,TV::m> QUADRATIC_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Base_Index(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
     TV_INT index(rint((X-grid.domain.min_corner)*grid.one_over_dX-grid.MAC_offset));
     RANGE<TV_INT> range=grid.Domain_Indices(ghost_cells);
@@ -20,16 +20,16 @@ Base_Index(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) co
 //#####################################################################
 // function Clamped_To_Array
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
+template<class TV,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Clamped_To_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
     return From_Base_Node(grid,u,X,Base_Index(grid,u,X));
 }
 //#####################################################################
 // Function Clamped_To_Array_Weights
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<typename T_GRID::VECTOR_INT,typename T_GRID::VECTOR_T::SCALAR> > QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array_Weights(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
+template<class TV,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<VECTOR<int,TV::m>,typename TV::SCALAR> > QUADRATIC_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Clamped_To_Array_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
     return From_Base_Node_Weights(grid,u,X,Base_Index(grid,u,X));
 }
@@ -123,8 +123,8 @@ From_Block_Face_Component_Helper(const int axis,const GRID<TV>& grid,const LOOKU
 //#####################################################################
 // Function Clamped_To_Array
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> typename T_GRID::VECTOR_INT QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Base_Index_Face(const T_GRID& grid,const typename T_FACE_LOOKUP::LOOKUP& u,int axis,const TV& X) const
+template<class TV,class T2,class T_FACE_LOOKUP> VECTOR<int,TV::m> QUADRATIC_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Base_Index_Face(const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,int axis,const TV& X) const
 {
     TV offset;
     offset(axis)=(T).5;
@@ -136,16 +136,16 @@ Base_Index_Face(const T_GRID& grid,const typename T_FACE_LOOKUP::LOOKUP& u,int a
 //#####################################################################
 // Function From_Block_Face_Component
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> typename T_GRID::VECTOR_T::SCALAR QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-From_Block_Face_Component(const int axis,const T_GRID& grid,const BLOCK_UNIFORM<T_GRID>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
+template<class TV,class T2,class T_FACE_LOOKUP> typename TV::SCALAR QUADRATIC_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+From_Block_Face_Component(const int axis,const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
 {
     return From_Block_Face_Component_Helper(axis,grid,u,X,Base_Index_Face(grid,u,axis,X));
 }
 //#####################################################################
 // Function From_Base_Node_Weights
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<typename T_GRID::VECTOR_INT,typename T_GRID::VECTOR_T::SCALAR> > QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-From_Base_Node_Weights(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const
+template<class TV,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<VECTOR<int,TV::m>,typename TV::SCALAR> > QUADRATIC_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+From_Base_Node_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const
 {
     PHYSBAM_NOT_IMPLEMENTED();
     return ARRAY<PAIR<TV_INT,T> >();
@@ -153,20 +153,20 @@ From_Base_Node_Weights(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,con
 //#####################################################################
 // Function From_Base_Node
 //#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-From_Base_Node(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const
+template<class TV,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const
 {
     return From_Base_Node_Helper(grid,u,X,index);
 }
-template class QUADRATIC_INTERPOLATION_UNIFORM<GRID<VECTOR<double,1> >,VECTOR<double,1> >;
-template class QUADRATIC_INTERPOLATION_UNIFORM<GRID<VECTOR<double,1> >,double>;
-template class QUADRATIC_INTERPOLATION_UNIFORM<GRID<VECTOR<double,2> >,VECTOR<double,2> >;
-template class QUADRATIC_INTERPOLATION_UNIFORM<GRID<VECTOR<double,2> >,double>;
-template class QUADRATIC_INTERPOLATION_UNIFORM<GRID<VECTOR<double,3> >,VECTOR<double,3> >;
-template class QUADRATIC_INTERPOLATION_UNIFORM<GRID<VECTOR<double,3> >,double>;
-template class QUADRATIC_INTERPOLATION_UNIFORM<GRID<VECTOR<float,1> >,VECTOR<float,1> >;
-template class QUADRATIC_INTERPOLATION_UNIFORM<GRID<VECTOR<float,1> >,float>;
-template class QUADRATIC_INTERPOLATION_UNIFORM<GRID<VECTOR<float,2> >,VECTOR<float,2> >;
-template class QUADRATIC_INTERPOLATION_UNIFORM<GRID<VECTOR<float,2> >,float>;
-template class QUADRATIC_INTERPOLATION_UNIFORM<GRID<VECTOR<float,3> >,VECTOR<float,3> >;
-template class QUADRATIC_INTERPOLATION_UNIFORM<GRID<VECTOR<float,3> >,float>;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,1>,VECTOR<double,1> >;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,1>,double>;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,2>,VECTOR<double,2> >;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,2>,double>;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,3>,VECTOR<double,3> >;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,3>,double>;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,1>,VECTOR<float,1> >;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,1>,float>;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,2>,VECTOR<float,2> >;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,2>,float>;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,3>,VECTOR<float,3> >;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,3>,float>;

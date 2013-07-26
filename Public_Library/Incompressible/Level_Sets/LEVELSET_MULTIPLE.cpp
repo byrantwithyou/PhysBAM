@@ -14,8 +14,8 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> LEVELSET_MULTIPLE<T_GRID>::
-LEVELSET_MULTIPLE(T_GRID& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const bool use_external_levelsets_input)
+template<class TV> LEVELSET_MULTIPLE<TV>::
+LEVELSET_MULTIPLE(GRID<TV>& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const bool use_external_levelsets_input)
     :grid(grid_input),phis(phis_input),levelset_callbacks(0),use_external_levelsets(use_external_levelsets_input)
 {
     if(!use_external_levelsets) Recreate_Levelsets();
@@ -23,7 +23,7 @@ LEVELSET_MULTIPLE(T_GRID& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const bo
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> LEVELSET_MULTIPLE<TV>::
 ~LEVELSET_MULTIPLE()
 {
     if(!use_external_levelsets) for(int i=0;i<levelsets.m;i++) delete levelsets(i);
@@ -31,7 +31,7 @@ template<class T_GRID> LEVELSET_MULTIPLE<T_GRID>::
 //#####################################################################
 // Function Recreate_Levelsets
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Recreate_Levelsets() 
 {
     assert(!use_external_levelsets);
@@ -42,7 +42,7 @@ Recreate_Levelsets()
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Fill_Ghost_Cells(ARRAY<T_ARRAYS_SCALAR >& phi_ghost,const T time,const int number_of_ghost_cells) 
 {
     for(int i=0;i<levelsets.m;i++) levelsets(i)->boundary->Fill_Ghost_Cells(grid,levelsets(i)->phi,phi_ghost(i),0,time,number_of_ghost_cells);
@@ -50,7 +50,7 @@ Fill_Ghost_Cells(ARRAY<T_ARRAYS_SCALAR >& phi_ghost,const T time,const int numbe
 //#####################################################################
 // Function Set_Custom_Boundary
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
 {
     PHYSBAM_FATAL_ERROR(); // TODO: The next line does not compile.
@@ -59,7 +59,7 @@ Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
 //#####################################################################
 // Function Set_Custom_Secondary_Interpolation
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Set_Custom_Secondary_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input)
 {
     for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Secondary_Interpolation(interpolation_input);
@@ -67,7 +67,7 @@ Set_Custom_Secondary_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input)
 //#####################################################################
 // Function Set_Custom_Normal_Interpolation
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Set_Custom_Normal_Interpolation(T_INTERPOLATION_VECTOR& normal_interpolation_input)
 {
     for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Normal_Interpolation(normal_interpolation_input);
@@ -75,7 +75,7 @@ Set_Custom_Normal_Interpolation(T_INTERPOLATION_VECTOR& normal_interpolation_inp
 //#####################################################################
 // Function Set_Custom_Curvature_Interpolation
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Set_Custom_Curvature_Interpolation(T_INTERPOLATION_SCALAR& curvature_interpolation_input)
 {
     for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Curvature_Interpolation(curvature_interpolation_input);
@@ -83,8 +83,8 @@ Set_Custom_Curvature_Interpolation(T_INTERPOLATION_SCALAR& curvature_interpolati
 //#####################################################################
 // Function Set_Levelset_Callbacks
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
-Set_Levelset_Callbacks(LEVELSET_CALLBACKS<T_GRID>& levelset_callbacks_input)
+template<class TV> void LEVELSET_MULTIPLE<TV>::
+Set_Levelset_Callbacks(LEVELSET_CALLBACKS<TV>& levelset_callbacks_input)
 {
     levelset_callbacks=&levelset_callbacks_input;
     for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Levelset_Callbacks(levelset_callbacks_input);
@@ -92,7 +92,7 @@ Set_Levelset_Callbacks(LEVELSET_CALLBACKS<T_GRID>& levelset_callbacks_input)
 //#####################################################################
 // Function Inside_Region
 //#####################################################################
-template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> int LEVELSET_MULTIPLE<TV>::
 Inside_Region(const TV_INT& index) const // assumes exactly one Phi<0 on a node
 {
     for(int k=0;k<phis.m-1;k++) if(Phi(k,index)<=0) return k;
@@ -102,7 +102,7 @@ Inside_Region(const TV_INT& index) const // assumes exactly one Phi<0 on a node
 //#####################################################################
 // Function Inside_Region
 //#####################################################################
-template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> int LEVELSET_MULTIPLE<TV>::
 Inside_Region(const TV_INT& index,T& phi) const // assumes exactly one Phi<0 on a node
 {
     for(int k=0;k<phis.m-1;k++){phi=Phi(k,index);if(phi<=0) return k;}
@@ -113,7 +113,7 @@ Inside_Region(const TV_INT& index,T& phi) const // assumes exactly one Phi<0 on 
 //#####################################################################
 // Function Inside_Region
 //#####################################################################
-template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> int LEVELSET_MULTIPLE<TV>::
 Inside_Region(const TV& location) const
 {
     T minimum_phi=Phi(0,location);
@@ -124,7 +124,7 @@ Inside_Region(const TV& location) const
 //#####################################################################
 // Function Inside_Region
 //#####################################################################
-template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> int LEVELSET_MULTIPLE<TV>::
 Inside_Region(const TV& location,T& phi) const
 {
     T minimum_phi=Phi(0,location);
@@ -136,7 +136,7 @@ Inside_Region(const TV& location,T& phi) const
 //#####################################################################
 // Function Inside_Region_Face
 //#####################################################################
-template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> int LEVELSET_MULTIPLE<TV>::
 Inside_Region_Face(const int axis,const TV_INT& face_index) const // does not assume exactly one Phi<0
 {
     TV_INT cell_1,cell_2;
@@ -150,7 +150,7 @@ Inside_Region_Face(const int axis,const TV_INT& face_index) const // does not as
 //#####################################################################
 // Function Two_Minimum_Regions
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Two_Minimum_Regions(const TV_INT& index,int& minimum_region,int& second_minimum_region,T& minimum_phi,T& second_minimum_phi) const
 {
     T phi1=phis(0)(index),phi2=phis(1)(index);
@@ -178,7 +178,7 @@ Two_Minimum_Regions(const TV_INT& index,int& minimum_region,int& second_minimum_
 //#####################################################################
 // Function Two_Minimum_Regions
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Two_Minimum_Regions(const TV& location,int& minimum_region,int& second_minimum_region,T& minimum_phi,T& second_minimum_phi) const
 {
     T phi1=Phi(0,location),phi2=Phi(1,location);
@@ -206,7 +206,7 @@ Two_Minimum_Regions(const TV& location,int& minimum_region,int& second_minimum_r
 //#####################################################################
 // Function CFL
 //#####################################################################
-template<class T_GRID> typename T_GRID::VECTOR_T::SCALAR LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> typename TV::SCALAR LEVELSET_MULTIPLE<TV>::
 CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
 {
     T minimum_cfl=FLT_MAX;
@@ -216,7 +216,7 @@ CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
 //#####################################################################
 // Function CFL
 //#####################################################################
-template<class T_GRID> typename T_GRID::VECTOR_T::SCALAR LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> typename TV::SCALAR LEVELSET_MULTIPLE<TV>::
 CFL(const ARRAY<TV,TV_INT>& velocity) const
 {
     T minimum_cfl=FLT_MAX;
@@ -226,7 +226,7 @@ CFL(const ARRAY<TV,TV_INT>& velocity) const
 //#####################################################################
 // Function Is_Projected_At_Nodes
 //#####################################################################
-template<class T_GRID> bool LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> bool LEVELSET_MULTIPLE<TV>::
 Is_Projected_At_Nodes()
 {
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -238,7 +238,7 @@ Is_Projected_At_Nodes()
 //#####################################################################
 // Function Compute_Normals
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Compute_Normals(const T time)
 {
     for(int i=0;i<levelsets.m;i++) levelsets(i)->Compute_Normals(time);
@@ -246,7 +246,7 @@ Compute_Normals(const T time)
 //#####################################################################
 // Function Compute_Curvature
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Compute_Curvature(const T time)
 {
     for(int i=0;i<levelsets.m;i++) levelsets(i)->Compute_Curvature(time);
@@ -254,7 +254,7 @@ Compute_Curvature(const T time)
 //#####################################################################
 // Function Fast_Marching_Method
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Fast_Marching_Method(const ARRAY<int>& local_advection_spatial_orders,int process_sign)
 {
     for(int i=0;i<levelsets.m;i++) levelsets(i)->Fast_Marching_Method(local_advection_spatial_orders(i),process_sign);
@@ -262,7 +262,7 @@ Fast_Marching_Method(const ARRAY<int>& local_advection_spatial_orders,int proces
 //#####################################################################
 // Function Project_Levelset
 //##################################################################### 
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Project_Levelset(const int number_of_ghost_cells)
 {
     for(CELL_ITERATOR<TV> iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){
@@ -274,7 +274,7 @@ Project_Levelset(const int number_of_ghost_cells)
 //#####################################################################
 // Function Get_Single_Levelset
 //#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
+template<class TV> void LEVELSET_MULTIPLE<TV>::
 Get_Single_Levelset(const ARRAY<bool>& positive_regions,LEVELSET<TV>& levelset,const bool flood_fill_for_bubbles)
 {
     ARRAY<T,TV_INT>& phi_ghost=levelset.phi;phi_ghost.Resize(grid.Domain_Indices(3));
@@ -286,7 +286,7 @@ Get_Single_Levelset(const ARRAY<bool>& positive_regions,LEVELSET<TV>& levelset,c
         FLOOD_FILL<TV::m> flood_fill;
         int number_of_colors=flood_fill.Flood_Fill(colors,edge_is_blocked);
         ARRAY<bool> color_touches_top_of_domain(number_of_colors);
-        for(FACE_ITERATOR<TV> iterator(grid,0,T_GRID::BOUNDARY_REGION,4);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION,4);iterator.Valid();iterator.Next()){
             if(colors(iterator.First_Cell_Index())>0)color_touches_top_of_domain(colors(iterator.First_Cell_Index()))=true;}
         for(CELL_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
             T minimum_phi;Inside_Region(iterator.Cell_Index(),minimum_phi);
@@ -302,10 +302,10 @@ Get_Single_Levelset(const ARRAY<bool>& positive_regions,LEVELSET<TV>& levelset,c
     if(number_of_positive_regions>1)levelset.Fast_Marching_Method();
 }
 namespace PhysBAM{
-template class LEVELSET_MULTIPLE<GRID<VECTOR<float,1> > >;
-template class LEVELSET_MULTIPLE<GRID<VECTOR<float,2> > >;
-template class LEVELSET_MULTIPLE<GRID<VECTOR<float,3> > >;
-template class LEVELSET_MULTIPLE<GRID<VECTOR<double,1> > >;
-template class LEVELSET_MULTIPLE<GRID<VECTOR<double,2> > >;
-template class LEVELSET_MULTIPLE<GRID<VECTOR<double,3> > >;
+template class LEVELSET_MULTIPLE<VECTOR<float,1> >;
+template class LEVELSET_MULTIPLE<VECTOR<float,2> >;
+template class LEVELSET_MULTIPLE<VECTOR<float,3> >;
+template class LEVELSET_MULTIPLE<VECTOR<double,1> >;
+template class LEVELSET_MULTIPLE<VECTOR<double,2> >;
+template class LEVELSET_MULTIPLE<VECTOR<double,3> >;
 }

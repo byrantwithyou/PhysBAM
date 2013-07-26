@@ -14,7 +14,7 @@ template<class TV>
 class BOUNDARY_SOLID_WALL_SLIP_OUTFLOW:public BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>
 {
     typedef typename TV::SCALAR T;
-    typedef typename GRID<TV>::VECTOR_INT TV_INT;typedef typename GRID<TV>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename GRID<TV>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename GRID<TV>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename GRID<TV>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
 public:
     typedef BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV> BASE;
     using BASE::Constant_Extrapolation;using BASE::lower_threshold;using BASE::upper_threshold;using BASE::clamp_below;using BASE::clamp_above;
@@ -39,7 +39,7 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAY
     assert(grid.Is_MAC_Grid());
     T_FACE_ARRAYS_SCALAR::Put(u,u_ghost); // interior
     lower_threshold=upper_threshold=0;
-    for(int face_axis=0;face_axis<GRID<TV>::dimension;face_axis++){
+    for(int face_axis=0;face_axis<TV::m;face_axis++){
         GRID<TV> face_grid=grid.Get_Face_Grid(face_axis);
         T_ARRAYS_SCALAR& u_ghost_component=u_ghost.Component(face_axis);
         ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);

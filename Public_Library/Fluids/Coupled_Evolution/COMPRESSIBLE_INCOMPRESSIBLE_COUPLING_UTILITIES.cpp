@@ -17,7 +17,7 @@ namespace PhysBAM{
 // Function Constructor
 //#####################################################################
 template<class TV> COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
-COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR* incompressible_face_velocities,const T* incompressible_density,
+COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR* incompressible_face_velocities,const T* incompressible_density,
     const T_ARRAYS_SCALAR* incompressible_phi):incompressible_face_velocities_(*incompressible_face_velocities),
     incompressible_density_(*incompressible_density),incompressible_phi_(*incompressible_phi)
 {
@@ -28,21 +28,21 @@ COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES(const T_GRID& grid,const T_FACE_A
 //#####################################################################
 template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
 Extrapolate_Compressible_State_Into_Incompressible_Region(const T dt,const T time,const T bandwidth,const int ghost_cells,const EOS<T>& eos,
-    const T_GRID& grid,const T_ARRAYS_SCALAR& phi_ghost,const T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,T_ARRAYS_DIMENSION_SCALAR& U)
+    const GRID<TV>& grid,const T_ARRAYS_SCALAR& phi_ghost,const T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,T_ARRAYS_DIMENSION_SCALAR& U)
 {
     T_ARRAYS_SCALAR phi_ghost_negated(phi_ghost),entropy(phi_ghost,false),pressure(phi_ghost,false);ARRAY<TV,TV_INT> velocity(phi_ghost.Domain_Indices());
 
     for(CELL_ITERATOR<TV> iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){
-        TV_INT cell_index=iterator.Cell_Index();T density=U_ghost(cell_index)(0);TV vel=EULER<T_GRID>::Get_Velocity(U_ghost,cell_index);
-        T e=EULER<T_GRID>::e(U_ghost(cell_index));
+        TV_INT cell_index=iterator.Cell_Index();T density=U_ghost(cell_index)(0);TV vel=EULER<TV>::Get_Velocity(U_ghost,cell_index);
+        T e=EULER<TV>::e(U_ghost(cell_index));
         phi_ghost_negated(cell_index)*=-1;
         pressure(cell_index)=eos.p(density,e);
         entropy(cell_index)=eos.S(density,e);
         velocity(iterator.Cell_Index())=vel;}
 
-    EXTRAPOLATION_UNIFORM<GRID<TV>,T>  extrapolate_entropy(grid,phi_ghost_negated,entropy,ghost_cells);extrapolate_entropy.Set_Band_Width(bandwidth);extrapolate_entropy.Extrapolate(time,false);
-    EXTRAPOLATION_UNIFORM<GRID<TV>,T>  extrapolate_pressure(grid,phi_ghost_negated,pressure,ghost_cells);extrapolate_pressure.Set_Band_Width(bandwidth);extrapolate_pressure.Extrapolate(time,false);
-    EXTRAPOLATION_UNIFORM<GRID<TV>,TV> extrapolate_velocity(grid,phi_ghost_negated,velocity,ghost_cells);extrapolate_velocity.Set_Band_Width(bandwidth);extrapolate_velocity.Extrapolate(time,false);
+    EXTRAPOLATION_UNIFORM<TV,T>  extrapolate_entropy(grid,phi_ghost_negated,entropy,ghost_cells);extrapolate_entropy.Set_Band_Width(bandwidth);extrapolate_entropy.Extrapolate(time,false);
+    EXTRAPOLATION_UNIFORM<TV,T>  extrapolate_pressure(grid,phi_ghost_negated,pressure,ghost_cells);extrapolate_pressure.Set_Band_Width(bandwidth);extrapolate_pressure.Extrapolate(time,false);
+    EXTRAPOLATION_UNIFORM<TV,TV> extrapolate_velocity(grid,phi_ghost_negated,velocity,ghost_cells);extrapolate_velocity.Set_Band_Width(bandwidth);extrapolate_velocity.Extrapolate(time,false);
     // Find the tangential component and combine it with the normal component from the incompressible region
     TV one_over_two_dx=(T).5*grid.one_over_dX;
     for(CELL_ITERATOR<TV> iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){
@@ -50,7 +50,7 @@ Extrapolate_Compressible_State_Into_Incompressible_Region(const T dt,const T tim
         if(phi_ghost_negated(cell_index)>0 && phi_ghost_negated(cell_index)<=bandwidth){
             TV v_ext,v_i,grad_phi,N,v_total;
             v_ext=velocity(cell_index);
-            for(int axis=0;axis<T_GRID::dimension;axis++){
+            for(int axis=0;axis<TV::m;axis++){
                 TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 v_i(axis)=(incompressible_face_velocities.Component(axis)(iterator.First_Face_Index(axis))+
                     incompressible_face_velocities.Component(axis)(iterator.Second_Face_Index(axis)))*(T).5;
@@ -59,13 +59,13 @@ Extrapolate_Compressible_State_Into_Incompressible_Region(const T dt,const T tim
             v_total=(TV::Dot_Product(v_i,N)*N)+(v_ext-(TV::Dot_Product(v_ext,N))*N);
             // Get the conserved variables from entropy, velocity, and pressure
             T rho=eos.rho_From_p_And_S(pressure(cell_index),entropy(cell_index));
-            EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(U,cell_index,rho,v_total,eos.e_From_S_And_rho(entropy(cell_index),rho));}}
+            EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(U,cell_index,rho,v_total,eos.e_From_S_And_rho(entropy(cell_index),rho));}}
 }
 //#####################################################################
 // Function Get_Dirichlet_Boundary_Conditions_For_Incompressible_Region
 //#####################################################################
 template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
-Get_Dirichlet_Boundary_Conditions_For_Incompressible_Region(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR& U_dirichlet,const EOS<T>& euler_eos,const T incompressible_density,const T dt)
+Get_Dirichlet_Boundary_Conditions_For_Incompressible_Region(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCALAR& U_dirichlet,const EOS<T>& euler_eos,const T incompressible_density,const T dt)
 {
     TV_INT cell_index;
     for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
@@ -73,13 +73,13 @@ Get_Dirichlet_Boundary_Conditions_For_Incompressible_Region(const T_GRID& grid,c
         const EOS_GAMMA<T> *eos_gamma=dynamic_cast<const EOS_GAMMA<T>*>(&euler_eos);
         // TODO(kwatra): This does not look right. It seems to be calculating p=(gamma-1)e
         p_dirichlet_incompressible(cell_index)=dt*(1/incompressible_density)*(eos_gamma->gamma-1)*
-            (U_dirichlet(cell_index)(TV::dimension+1)-((T).5*U_dirichlet(cell_index)(0)*EULER<T_GRID>::Get_Velocity(U_dirichlet,cell_index).Magnitude_Squared()));}
+            (U_dirichlet(cell_index)(TV::dimension+1)-((T).5*U_dirichlet(cell_index)(0)*EULER<TV>::Get_Velocity(U_dirichlet,cell_index).Magnitude_Squared()));}
 }
 //#####################################################################
 // Function Compute_Compressible_Incompressible_Face_Velocities
 //#####################################################################
 template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
-Compute_Compressible_Incompressible_Face_Velocities(const T_GRID& face_grid,const T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T incompressible_density,
+Compute_Compressible_Incompressible_Face_Velocities(const GRID<TV>& face_grid,const T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T incompressible_density,
     const T_ARRAYS_SCALAR& incompressible_phi,const T_ARRAYS_DIMENSION_SCALAR& U,const ARRAY<bool,TV_INT>& euler_psi,T_FACE_ARRAYS_SCALAR& compressible_face_velocities)
 {
     TV_INT first_cell_index,second_cell_index,compressible_cell_index;
@@ -96,7 +96,7 @@ Compute_Compressible_Incompressible_Face_Velocities(const T_GRID& face_grid,cons
 
             T rho_compressible=U(compressible_cell_index)(0),rho_incompressible=incompressible_density;
             compressible_face_velocities.Component(axis)(face_index)=(rho_incompressible*incompressible_face_velocities.Component(axis)(face_index)+
-                rho_compressible*EULER<T_GRID>::Get_Velocity_Component(U,compressible_cell_index,axis))/(rho_compressible+rho_incompressible);}
+                rho_compressible*EULER<TV>::Get_Velocity_Component(U,compressible_cell_index,axis))/(rho_compressible+rho_incompressible);}
         else if(first_cell_incompressible && second_cell_incompressible) // TODO(jontg): Move this out.
             compressible_face_velocities.Component(axis)(face_index)=incompressible_face_velocities.Component(axis)(face_index);
     }
@@ -105,7 +105,7 @@ Compute_Compressible_Incompressible_Face_Velocities(const T_GRID& face_grid,cons
 // Function Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures
 //#####################################################################
 template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
-Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const T_GRID& face_grid,
+Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const GRID<TV>& face_grid,
     const T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T incompressible_density,const T_ARRAYS_SCALAR& incompressible_phi,
     const T_ARRAYS_DIMENSION_SCALAR& U,const ARRAY<bool,TV_INT>& euler_psi,const T_ARRAYS_SCALAR& p_cell,T_FACE_ARRAYS_SCALAR& p_face)
 {
@@ -123,14 +123,14 @@ Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const T_G
             T u_star_first_cell,u_star_second_cell;
             if(first_cell_euler){
                 rho_first_cell=U(first_cell_index)(0);
-                u_star_first_cell=EULER<T_GRID>::Get_Velocity_Component(U,first_cell_index,axis);
+                u_star_first_cell=EULER<TV>::Get_Velocity_Component(U,first_cell_index,axis);
                 rho_second_cell=incompressible_density;
                 u_star_second_cell=incompressible_face_velocities.Component(axis)(face_index);}
             else{
                 rho_first_cell=incompressible_density;
                 u_star_first_cell=incompressible_face_velocities.Component(axis)(face_index);
                 rho_second_cell=U(second_cell_index)(0);
-                u_star_second_cell=EULER<T_GRID>::Get_Velocity_Component(U,second_cell_index,axis);}
+                u_star_second_cell=EULER<TV>::Get_Velocity_Component(U,second_cell_index,axis);}
 
             T correction_term=(T).5*rho_first_cell*rho_second_cell*face_grid.dX[axis]*(u_star_second_cell-u_star_first_cell)/(rho_first_cell+rho_second_cell);
             p_face.Component(axis)(iterator.Face_Index())=(rho_second_cell*p_cell(first_cell_index)+rho_first_cell*p_cell(second_cell_index))/(rho_first_cell+rho_second_cell)-correction_term;}}
@@ -139,7 +139,7 @@ Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const T_G
 // Function Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures
 //#####################################################################
 template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
-Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const T_GRID& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U,
+Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const GRID<TV>& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U,
     const ARRAY<bool,TV_INT>& euler_psi,const T_ARRAYS_SCALAR& p_cell,T_FACE_ARRAYS_SCALAR& p_face) const
 {
     Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(face_grid,incompressible_face_velocities_,incompressible_density_,
@@ -149,7 +149,7 @@ Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const T_G
 // Function Fill_Incompressible_Beta_Face
 //#####################################################################
 template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
-Fill_Incompressible_Beta_Face(const T_GRID& grid,const T incompressible_density,const T_ARRAYS_SCALAR& incompressible_phi,
+Fill_Incompressible_Beta_Face(const GRID<TV>& grid,const T incompressible_density,const T_ARRAYS_SCALAR& incompressible_phi,
     T_FACE_ARRAYS_SCALAR& beta_face)
 {
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
@@ -161,7 +161,7 @@ Fill_Incompressible_Beta_Face(const T_GRID& grid,const T incompressible_density,
 // Function Fill_Incompressible_Beta_Face
 //#####################################################################
 template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
-Fill_Incompressible_Beta_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& beta_face) const
+Fill_Incompressible_Beta_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& beta_face) const
 {
     Fill_Incompressible_Beta_Face(grid,incompressible_density_,incompressible_phi_,beta_face);
 }
@@ -169,7 +169,7 @@ Fill_Incompressible_Beta_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& beta_face
 // Function Apply_Pressure_At_Incompressible_Faces
 //#####################################################################
 template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
-Apply_Pressure_At_Incompressible_Faces(const T_GRID& face_grid,const T incompressible_density,const T_ARRAYS_SCALAR& incompressible_phi,
+Apply_Pressure_At_Incompressible_Faces(const GRID<TV>& face_grid,const T incompressible_density,const T_ARRAYS_SCALAR& incompressible_phi,
     const T_FACE_ARRAYS_BOOL& psi_N,const T_ARRAYS_SCALAR& p_hat,T_FACE_ARRAYS_SCALAR& incompressible_face_velocities)
 {
     TV one_over_dx=face_grid.one_over_dX;

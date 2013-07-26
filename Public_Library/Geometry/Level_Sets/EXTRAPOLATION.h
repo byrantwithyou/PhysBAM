@@ -13,15 +13,15 @@
 #include <Tools/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class TV> struct GRID_ARRAYS_POLICY;
 template<class TV,class T2> class BOUNDARY;
 
-template<class T_GRID,class T2>
+template<class TV,class T2>
 class EXTRAPOLATION:public NONCOPYABLE
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef typename T_GRID::INDEX T_INDEX;
+    typedef TV_INT T_INDEX;
 public:
     T band_width; // band for extrapolation near the interface
     T isobaric_fix_width;  // band for the isobaric fix

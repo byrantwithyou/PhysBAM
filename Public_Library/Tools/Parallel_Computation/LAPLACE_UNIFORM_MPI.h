@@ -20,17 +20,17 @@ namespace PhysBAM{
 
 class GRAPH;
 template<class TV> class GRID;
-template<class T_GRID> class LAPLACE_UNIFORM;
+template<class TV> class LAPLACE_UNIFORM;
 
-template<class T_GRID>
-class LAPLACE_UNIFORM_MPI:public LAPLACE_MPI<T_GRID>
+template<class TV>
+class LAPLACE_UNIFORM_MPI:public LAPLACE_MPI<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename MPI_GRID_POLICY<T_GRID>::MPI_GRID T_MPI_GRID;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;
+    typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
+    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
-    typedef LAPLACE_MPI<T_GRID> BASE;
+    typedef LAPLACE_MPI<TV> BASE;
     using BASE::mpi_grid;using BASE::local_grid;using BASE::filled_region_ranks;using BASE::partitions;using BASE::number_of_regions;using BASE::solve_neumann_regions;using BASE::psi_N;
     using BASE::filled_region_touches_dirichlet;
 
@@ -41,8 +41,8 @@ public:
     pthread_barrier_t barr;
 #endif
 
-    LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<T_GRID>& laplace)
-        :LAPLACE_MPI<T_GRID>(laplace),sum_int_needs_init(false),sum_int(0)
+    LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<TV>& laplace)
+        :LAPLACE_MPI<TV>(laplace),sum_int_needs_init(false),sum_int(0)
     {
 #ifdef USE_PTHREADS
         pthread_mutex_init(&sum_int_lock,0);pthread_mutex_init(&lock,0);
@@ -69,7 +69,7 @@ public:
     }
 
 //#####################################################################
-    void Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL<int> > >& interior_indices,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >& ghost_indices,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,LAPLACE_UNIFORM<T_GRID>* laplace);
+    void Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL<int> > >& interior_indices,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >& ghost_indices,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,LAPLACE_UNIFORM<TV>* laplace);
 private:
     void Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,const VECTOR<T,1>&);
     void Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,const VECTOR<T,2>&);

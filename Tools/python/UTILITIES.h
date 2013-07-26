@@ -53,9 +53,9 @@ int d=sizeof(x)/sizeof(T);const T* data=(const T*)&x;
 for(int i=0;i<d-1;i++) stream<<Repr(data[i])<<',';stream<<Repr(data[d-1])<<')';
 return stream.str();}
 
-template<class T_GRID> std::string Repr_Grid(const T_GRID& grid)
+template<class TV> std::string Repr_Grid(const GRID<TV>& grid)
 {std::ostringstream stream;stream<<Class(grid)<<'(';
-for(int i=0;i<T_GRID::dimension;i++) stream<<Repr(grid.Counts()[i])<<',';
+for(int i=0;i<TV::m;i++) stream<<Repr(grid.Counts()[i])<<',';
 stream<<Repr(grid.Domain())<<(grid.Is_MAC_Grid()?",True)":",False)");
 return stream.str();}
 

@@ -14,7 +14,7 @@ using namespace PhysBAM;
 // Function Conservation_Solver
 //#####################################################################
 // psi is size (0,m) - U is size 3 by (-2,m+3) with 3 ghost cells - Fx is size 3 by (0,m)
-template<class T_GRID,int d> void CONSERVATION_ENO_LLF<T_GRID,d>::
+template<class TV,int d> void CONSERVATION_ENO_LLF<TV,d>::
 Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,
     ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
     const VECTOR<bool,2>& outflow_boundaries,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux)
@@ -30,7 +30,7 @@ Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi
 //#####################################################################
 // Does not implement MENO for fully explicit case. Also does not implement the outflow_boundaries fix. Use Experimental version instead for them.
 // TODO(kwatra): can try implementing Flux_Divided_By_Velocity for fully explicit eigensystems and see if multiplying by face_velocity later works.
-template<class T_GRID,int d> template<int eno_order> void CONSERVATION_ENO_LLF<T_GRID,d>::
+template<class TV,int d> template<int eno_order> void CONSERVATION_ENO_LLF<TV,d>::
 Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,
     ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
     const VECTOR<bool,2>& outflow_boundaries,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux)
@@ -89,16 +89,16 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
             Lflux(k)=(T).5*(flux_left+flux_right);}
         else if(eno_order == 2) for(int k=0;k<d;k++){
             T alpha=max_alpha[k];
-            T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(i,0)(k)+alpha*LDU(i,0)(k),LDF(i-1,1)(k)+alpha*LDU(i-1,1)(k),
+            T flux_left=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,LDF(i,0)(k)+alpha*LDU(i,0)(k),LDF(i-1,1)(k)+alpha*LDU(i-1,1)(k),
                 LDF(i,1)(k)+alpha*LDU(i,1)(k));
-            T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(i+1,0)(k)-alpha*LDU(i+1,0)(k),-(LDF(i+1,1)(k)-alpha*LDU(i+1,1)(k)),
+            T flux_right=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,LDF(i+1,0)(k)-alpha*LDU(i+1,0)(k),-(LDF(i+1,1)(k)-alpha*LDU(i+1,1)(k)),
                 -(LDF(i,1)(k)-alpha*LDU(i,1)(k)));
             Lflux(k)=(T).5*(flux_left+flux_right);}
         else if(eno_order == 3) for(int k=0;k<d;k++){
             T alpha=max_alpha[k];
-            T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(i,0)(k)+alpha*LDU(i,0)(k),LDF(i-1,1)(k)+alpha*LDU(i-1,1)(k),
+            T flux_left=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,LDF(i,0)(k)+alpha*LDU(i,0)(k),LDF(i-1,1)(k)+alpha*LDU(i-1,1)(k),
                 LDF(i,1)(k)+alpha*LDU(i,1)(k),LDF(i-2,2)(k)+alpha*LDU(i-2,2)(k),LDF(i-1,2)(k)+alpha*LDU(i-1,2)(k),LDF(i,2)(k)+alpha*LDU(i,2)(k));
-            T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(i+1,0)(k)-alpha*LDU(i+1,0)(k),-(LDF(i+1,1)(k)-alpha*LDU(i+1,1)(k)),
+            T flux_right=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,LDF(i+1,0)(k)-alpha*LDU(i+1,0)(k),-(LDF(i+1,1)(k)-alpha*LDU(i+1,1)(k)),
                 -(LDF(i,1)(k)-alpha*LDU(i,1)(k)),LDF(i+1,2)(k)-alpha*LDU(i+1,2)(k),LDF(i,2)(k)-alpha*LDU(i,2)(k),LDF(i-1,2)(k)-alpha*LDU(i-1,2)(k));
             Lflux(k)=(T).5*(flux_left+flux_right);}
 
@@ -113,7 +113,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
 //#####################################################################
 // Function Conservation_Solver_Helper
 //#####################################################################
-template<class T_GRID,int d> template<int eno_order> void CONSERVATION_ENO_LLF<T_GRID,d>::
+template<class TV,int d> template<int eno_order> void CONSERVATION_ENO_LLF<TV,d>::
 Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
     const VECTOR<bool,2>& outflow_boundaries,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux)
 {
@@ -185,17 +185,17 @@ Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,
             T alpha;
             if(use_global_llf) alpha=max_alpha[k];
             else alpha=Alpha(lambda_left,lambda_right,k,d);
-            T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i)(0)+alpha*Dstate(k,i)(0),Dflux(k,i-1)(1)+alpha*Dstate(k,i-1)(1),Dflux(k,i)(1)+alpha*Dstate(k,i)(1));
-            T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i+1)(0)-alpha*Dstate(k,i+1)(0),-(Dflux(k,i+1)(1)-alpha*Dstate(k,i+1)(1)),-(Dflux(k,i)(1)-alpha*Dstate(k,i)(1)));
+            T flux_left=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,Dflux(k,i)(0)+alpha*Dstate(k,i)(0),Dflux(k,i-1)(1)+alpha*Dstate(k,i-1)(1),Dflux(k,i)(1)+alpha*Dstate(k,i)(1));
+            T flux_right=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,Dflux(k,i+1)(0)-alpha*Dstate(k,i+1)(0),-(Dflux(k,i+1)(1)-alpha*Dstate(k,i+1)(1)),-(Dflux(k,i)(1)-alpha*Dstate(k,i)(1)));
             if(!eigensystem.All_Eigenvalues_Same()) for(int kk=0;kk<d;kk++) flux(i)(kk)+=(T).5*(flux_left+flux_right)*R(k,kk);
             else flux(i)(k)=(T).5*(flux_left+flux_right);}
         else if(eno_order == 3) for(int k=0;k<d;k++){
             T alpha;
             if(use_global_llf) alpha=max_alpha[k];
             else alpha=Alpha(lambda_left,lambda_right,k,d);
-            T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i)(0)+alpha*Dstate(k,i)(0),Dflux(k,i-1)(1)+alpha*Dstate(k,i-1)(1),Dflux(k,i)(1)+alpha*Dstate(k,i)(1),
+            T flux_left=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,Dflux(k,i)(0)+alpha*Dstate(k,i)(0),Dflux(k,i-1)(1)+alpha*Dstate(k,i-1)(1),Dflux(k,i)(1)+alpha*Dstate(k,i)(1),
                     Dflux(k,i-2)(2)+alpha*Dstate(k,i-2)(2),Dflux(k,i-1)(2)+alpha*Dstate(k,i-1)(2),Dflux(k,i)(2)+alpha*Dstate(k,i)(2));
-            T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i+1)(0)-alpha*Dstate(k,i+1)(0),-(Dflux(k,i+1)(1)-alpha*Dstate(k,i+1)(1)),-(Dflux(k,i)(1)-alpha*Dstate(k,i)(1)),
+            T flux_right=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,Dflux(k,i+1)(0)-alpha*Dstate(k,i+1)(0),-(Dflux(k,i+1)(1)-alpha*Dstate(k,i+1)(1)),-(Dflux(k,i)(1)-alpha*Dstate(k,i)(1)),
                     Dflux(k,i+1)(2)-alpha*Dstate(k,i+1)(2),Dflux(k,i)(2)-alpha*Dstate(k,i)(2),Dflux(k,i-1)(2)-alpha*Dstate(k,i-1)(2));
             if(!eigensystem.All_Eigenvalues_Same()) for(int kk=0;kk<d;kk++) flux(i)(kk)+=(T).5*(flux_left+flux_right)*R(k,kk);
             else flux(i)(k)=(T).5*(flux_left+flux_right);}}
@@ -207,10 +207,10 @@ Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,
 }
 //#####################################################################
 namespace PhysBAM{
-template class CONSERVATION_ENO_LLF<GRID<VECTOR<float,1> >,3>;
-template class CONSERVATION_ENO_LLF<GRID<VECTOR<float,2> >,4>;
-template class CONSERVATION_ENO_LLF<GRID<VECTOR<float,3> >,5>;
-template class CONSERVATION_ENO_LLF<GRID<VECTOR<double,1> >,3>;
-template class CONSERVATION_ENO_LLF<GRID<VECTOR<double,2> >,4>;
-template class CONSERVATION_ENO_LLF<GRID<VECTOR<double,3> >,5>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,1>,3>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,2>,4>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,3>,5>;
+template class CONSERVATION_ENO_LLF<VECTOR<double,1>,3>;
+template class CONSERVATION_ENO_LLF<VECTOR<double,2>,4>;
+template class CONSERVATION_ENO_LLF<VECTOR<double,3>,5>;
 }

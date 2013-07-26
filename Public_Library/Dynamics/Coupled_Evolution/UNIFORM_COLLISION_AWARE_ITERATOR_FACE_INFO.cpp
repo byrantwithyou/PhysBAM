@@ -13,7 +13,7 @@
 #include <Dynamics/Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h>
 using namespace PhysBAM;
 template<class TV> UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>::
-UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collection)
+UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collection)
     :collision_bodies_affecting_fluid(collection),grid(collision_bodies_affecting_fluid.grid),outside_fluid(0),
     use_collision_face_neighbors(collision_bodies_affecting_fluid.use_collision_face_neighbors)
 {}

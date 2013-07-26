@@ -9,24 +9,24 @@
 
 #include <Incompressible/Forces/INCOMPRESSIBLE_FLUIDS_FORCES.h>
 namespace PhysBAM{
-template<class T_GRID> class PROJECTION_UNIFORM;
+template<class TV> class PROJECTION_UNIFORM;
 
-template<class T_GRID>
-class INCOMPRESSIBILITY:public INCOMPRESSIBLE_FLUIDS_FORCES<T_GRID>
+template<class TV>
+class INCOMPRESSIBILITY:public INCOMPRESSIBLE_FLUIDS_FORCES<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;
+    
     typedef typename TV::SCALAR T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    PROJECTION_UNIFORM<T_GRID>& projection;
+    PROJECTION_UNIFORM<TV>& projection;
 public:
 
-    INCOMPRESSIBILITY(PROJECTION_UNIFORM<T_GRID>& projection_input);
+    INCOMPRESSIBILITY(PROJECTION_UNIFORM<TV>& projection_input);
     virtual ~INCOMPRESSIBILITY();
 
 //#####################################################################
-    void Add_Explicit_Forces(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Add_Implicit_Forces_Projection(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Initialize_Grids(const T_GRID& grid) PHYSBAM_OVERRIDE;
+    void Add_Explicit_Forces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE {}
+    void Add_Implicit_Forces_Projection(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE;
+    void Initialize_Grids(const GRID<TV>& grid) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

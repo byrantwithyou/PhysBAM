@@ -31,10 +31,10 @@
 namespace PhysBAM{
 
 template<class T_input,class RW=T_input>
-class MASS_CONSERVATION:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
+class MASS_CONSERVATION:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;
-    typedef GRID<TV> T_GRID;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;typedef VECTOR<int,3> TV_INT;
+    typedef GRID<TV> T_GRID;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;typedef VECTOR<int,3> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::fluids_parameters;
@@ -57,7 +57,7 @@ public:
     T period;
 
     MASS_CONSERVATION(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID >(stream_type,1,fluids_parameters.WATER)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >(stream_type,1,fluids_parameters.WATER)
     {
     }
 
@@ -218,7 +218,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID >::Update_Fluid_Parameters(dt,time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >::Update_Fluid_Parameters(dt,time);
 }
 //#####################################################################
 // Function Initialize_Phi
@@ -226,7 +226,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 void Initialize_Phi() PHYSBAM_OVERRIDE
 {
     // Not so good to set up a heaviside function here because then the interface will be exactly between the two nodes which can lead to roundoff issues when setting dirichlet cells, etc.
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
 
     if(test_number==1 || test_number==2){
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -294,7 +294,7 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
 #if 0
     // call this here to allow use of velocity divergence in our conservation
     // just overwrite fluids_parameters.face_velocities
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     if(test_number==1)
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){

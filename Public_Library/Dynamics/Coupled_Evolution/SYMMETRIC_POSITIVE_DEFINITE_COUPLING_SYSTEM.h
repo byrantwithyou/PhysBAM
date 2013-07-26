@@ -102,7 +102,7 @@ public:
     bool use_full_ic;
     SPARSE_MATRIX_FLAT_NXN<T> full_matrix;
     MPI_SOLID_FLUID<TV>* mpi_solid_fluid;
-    MPI_UNIFORM_GRID<GRID<TV> >* mpi_grid;
+    MPI_UNIFORM_GRID<TV>* mpi_grid;
     mutable ARRAY<T,TV_INT> pressure_on_grid;
     ARRAY<T,FACE_INDEX<TV::m> >* debug_velocity;
     GENERALIZED_VELOCITY<TV>* debug_generalized_velocity;
@@ -155,7 +155,7 @@ public:
     void Exchange_Pressure(ARRAY<T>& pressure) const;
     void Exchange_Coupled_Vector(VECTOR_T& V) const;
     void Exchange_Velocities(ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const;
-    void Set_MPI(MPI_SOLID_FLUID<TV>& mpi_solid_fluid_input,MPI_UNIFORM_GRID<GRID<TV> >& mpi_grid_input);
+    void Set_MPI(MPI_SOLID_FLUID<TV>& mpi_solid_fluid_input,MPI_UNIFORM_GRID<TV>& mpi_grid_input);
     void Apply_Massless_Structure_Force_To_Fluid(ARRAY<T>& fluid_velocity,T time) const;
     void Dump_Substep(const ARRAY<T>& fluid_velocity,const char* name,int substep=0,int level=1) const;
     void Dump_Substep(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity,const char* name,int substep=0,int level=1) const;

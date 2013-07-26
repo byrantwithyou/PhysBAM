@@ -27,7 +27,7 @@ class REACTIVE_EULER_1D:public REACTIVE_EULER<GRID<VECTOR<T_input,1> > >
     typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<T,4> TV_DIMENSION;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 protected:
-    typedef REACTIVE_EULER<GRID<TV> > BASE;
+    typedef REACTIVE_EULER<TV> BASE;
     using BASE::cut_out_grid;using BASE::boundary;using BASE::eos;using BASE::conservation;
 
     GRID<TV>& grid;
@@ -37,7 +37,7 @@ protected:
 
 public:
     REACTIVE_EULER_1D(REACTIVE_EOS<T>& eos_input,GRID<VECTOR<T,1> >& grid_input,ARRAY<TV_DIMENSION,VECTOR<int,1> >& U_input)  
-        :REACTIVE_EULER<GRID<TV> >(eos_input),grid(grid_input),U(U_input),eigensystem_F(eos_input)
+        :REACTIVE_EULER<TV>(eos_input),grid(grid_input),U(U_input),eigensystem_F(eos_input)
     {}
     
     void Set_Up_Cut_Out_Grid(ARRAY<bool,VECTOR<int,1> >& psi_input)

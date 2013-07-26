@@ -108,7 +108,7 @@ Simulate_To_Frame(const int frame_input)
 template<class TV> void PLS_FSI_DRIVER<TV>::
 Initialize()
 {
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>& collision_bodies_affecting_fluid=*example.fluids_parameters.collision_bodies_affecting_fluid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*example.fluids_parameters.collision_bodies_affecting_fluid;
 
     if(example.auto_restart){
         std::string last_frame_file=example.output_directory+"/common/last_frame";
@@ -147,16 +147,16 @@ Initialize()
         example.Set_Boundary_Conditions(example.kang_poisson_viscosity->psi_D,example.kang_poisson_viscosity->psi_N,
             example.kang_poisson_viscosity->psi_D_value,example.kang_poisson_viscosity->psi_N_value);
 
-    example.fluids_parameters.particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,
+    example.fluids_parameters.particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>(*example.fluids_parameters.grid,
         collision_bodies_affecting_fluid,example.fluids_parameters.number_of_ghost_cells,false);
-    example.fluids_parameters.projection=new PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,example.fluids_parameters.particle_levelset_evolution->Levelset(0));
-    example.fluids_parameters.incompressible=new INCOMPRESSIBLE_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,*example.fluids_parameters.projection);
+    example.fluids_parameters.projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*example.fluids_parameters.grid,example.fluids_parameters.particle_levelset_evolution->Levelset(0));
+    example.fluids_parameters.incompressible=new INCOMPRESSIBLE_UNIFORM<TV>(*example.fluids_parameters.grid,*example.fluids_parameters.projection);
     example.fluids_parameters.phi_boundary=&example.fluids_parameters.phi_boundary_water; // override default
     example.fluids_parameters.phi_boundary_water.Set_Velocity_Pointer(example.fluid_collection.incompressible_fluid_collection.face_velocities);
     example.fluids_parameters.boundary_mac_slip.Set_Phi(example.fluids_parameters.particle_levelset_evolution->phi);
 
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> >* particle_levelset_evolution=example.fluids_parameters.particle_levelset_evolution;
-    INCOMPRESSIBLE_UNIFORM<GRID<TV> >* incompressible=example.fluids_parameters.incompressible;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=example.fluids_parameters.particle_levelset_evolution;
+    INCOMPRESSIBLE_UNIFORM<TV>* incompressible=example.fluids_parameters.incompressible;
 
     example.Parse_Late_Options();
 
@@ -256,9 +256,9 @@ Initialize()
 template<class TV> void PLS_FSI_DRIVER<TV>::
 Initialize_Fluids_Grids()
 {
-    T_GRID& grid=*example.fluids_parameters.grid;
+    GRID<TV>& grid=*example.fluids_parameters.grid;
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     *example.fluids_parameters.grid=example.fluids_parameters.grid->Get_MAC_Grid();
     example.fluids_parameters.p_grid=*example.fluids_parameters.grid;
     example.Initialize_Fluids_Grids();
@@ -277,12 +277,12 @@ Initialize_Fluids_Grids()
 template<class TV> void PLS_FSI_DRIVER<TV>::
 First_Order_Time_Step(int substep,T dt)
 {
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* slip=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(example.solids_evolution);
-    T_GRID& grid=*fluids_parameters.grid;
+    GRID<TV>& grid=*fluids_parameters.grid;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
-    INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible=fluids_parameters.incompressible;
+    INCOMPRESSIBLE_UNIFORM<TV>* incompressible=fluids_parameters.incompressible;
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
 
     if(example.use_kang) old_phi=fluids_parameters.particle_levelset_evolution->Levelset(0).phi;
@@ -349,8 +349,8 @@ First_Order_Time_Step(int substep,T dt)
 template<class TV> void PLS_FSI_DRIVER<TV>::
 Extrapolate_Velocity_Across_Interface(T time,T dt)
 {
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=example.fluids_parameters.particle_levelset_evolution;
-    T_GRID& grid=*example.fluids_parameters.grid;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=example.fluids_parameters.particle_levelset_evolution;
+    GRID<TV>& grid=*example.fluids_parameters.grid;
     SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>& slip=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*example.solids_evolution);
     ARRAY<bool,FACE_INDEX<TV::m> >& valid_faces=slip.solved_faces;
     int extrapolation_ghost_cells=2*example.fluids_parameters.number_of_ghost_cells+2;
@@ -363,13 +363,13 @@ Extrapolate_Velocity_Across_Interface(T time,T dt)
         ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),false);
         ARRAYS_ND_BASE<T,TV_INT>& face_velocity=example.fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis);
         ARRAYS_ND_BASE<bool,TV_INT>& fixed_face=valid_faces.Component(axis);
-        for(FACE_ITERATOR<TV> iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
             TV_INT index=iterator.Face_Index();
             T phi1=phi_ghost(iterator.First_Cell_Index()),phi2=phi_ghost(iterator.Second_Cell_Index());
             phi_face(index)=(T).5*(phi1+phi2);
             if(phi_face(index) >= delta && !fixed_face(index)) face_velocity(index)=(T)0;}
 
-        EXTRAPOLATION_UNIFORM<GRID<TV>,T> extrapolate(face_grid,phi_face,face_velocity,extrapolation_ghost_cells);
+        EXTRAPOLATION_UNIFORM<TV,T> extrapolate(face_grid,phi_face,face_velocity,extrapolation_ghost_cells);
         extrapolate.Set_Band_Width((T)band_width);
         extrapolate.Set_Custom_Seed_Done(&fixed_face);
         extrapolate.Extrapolate();}
@@ -393,9 +393,9 @@ Advance_Particles_With_PLS(T dt)
 template<class TV> void PLS_FSI_DRIVER<TV>::
 Advance_To_Target_Time(const T target_time)
 {
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     SOLIDS_EVOLUTION_CALLBACKS<TV>* solids_evolution_callbacks=example.solids_evolution->solids_evolution_callbacks;
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
 
     bool done=false;for(int substep=1;!done;substep++){
         LOG::SCOPE scope("SUBSTEP","substep %d",substep);
@@ -418,12 +418,12 @@ Advance_To_Target_Time(const T target_time)
 template<class TV> void PLS_FSI_DRIVER<TV>::
 Advect_Fluid(const T dt,const int substep)
 {
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
-    T_GRID& grid=*fluids_parameters.grid;
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
-    INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible=fluids_parameters.incompressible;
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
+    GRID<TV>& grid=*fluids_parameters.grid;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=fluids_parameters.particle_levelset_evolution;
+    INCOMPRESSIBLE_UNIFORM<TV>* incompressible=fluids_parameters.incompressible;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
 
     LOG::SCOPE scalar_scope("SCALAR SCOPE");
 
@@ -453,8 +453,8 @@ Advect_Fluid(const T dt,const int substep)
     LOG::Time("updating removed particle velocities");
     example.Modify_Removed_Particles_Before_Advection(dt,time);
     particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time);
-    PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=particle_levelset_evolution->Particle_Levelset(0);
-    LINEAR_INTERPOLATION_UNIFORM<T_GRID,TV> interpolation;
+    PARTICLE_LEVELSET_UNIFORM<TV>& pls=particle_levelset_evolution->Particle_Levelset(0);
+    LINEAR_INTERPOLATION_UNIFORM<TV,TV> interpolation;
     if(pls.use_removed_positive_particles) for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
         PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());
         for(int p=0;p<particles.Size();p++){
@@ -552,7 +552,7 @@ Advect_Fluid(const T dt,const int substep)
 template<class TV> void PLS_FSI_DRIVER<TV>::
 Postprocess_Frame(const int frame)
 {
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>* particle_levelset_evolution=example.fluids_parameters.particle_levelset_evolution;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=example.fluids_parameters.particle_levelset_evolution;
 
     example.Postprocess_Phi(time);
 
@@ -574,7 +574,7 @@ Compute_Dt(const T time,const T target_time,bool& done)
 {
     SOLIDS_PARAMETERS<TV>& solids_parameters=example.solids_parameters;
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
-    FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     SOLIDS_EVOLUTION_CALLBACKS<TV>* solids_evolution_callbacks=solids_evolution.solids_evolution_callbacks;
 
     T fluids_dt=FLT_MAX;
@@ -612,9 +612,9 @@ Write_Output_Files(const int frame)
     example.Write_Output_Files(frame);
     example.fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(true);
 
-    T_GRID& grid=*example.fluids_parameters.grid;
+    GRID<TV>& grid=*example.fluids_parameters.grid;
     int number_of_positive_particles=0,number_of_negative_particles=0,number_of_removed_positive_particles=0,number_of_removed_negative_particles=0;
-    PARTICLE_LEVELSET_UNIFORM<T_GRID>* pls=0;
+    PARTICLE_LEVELSET_UNIFORM<TV>* pls=0;
     pls=&example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(0);
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls->positive_particles(iterator.Cell_Index()))
         number_of_positive_particles+=pls->positive_particles(iterator.Cell_Index())->Size();
@@ -638,7 +638,7 @@ Write_Output_Files(const int frame)
 template<class TV> void PLS_FSI_DRIVER<TV>::
 Delete_Particles_Inside_Objects(const T time)
 {
-    PARTICLE_LEVELSET_UNIFORM<T_GRID>* particle_levelset=&example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(0);
+    PARTICLE_LEVELSET_UNIFORM<TV>* particle_levelset=&example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(0);
     Delete_Particles_Inside_Objects<PARTICLE_LEVELSET_PARTICLES<TV> >(particle_levelset->positive_particles,PARTICLE_LEVELSET_POSITIVE,time);
     Delete_Particles_Inside_Objects<PARTICLE_LEVELSET_PARTICLES<TV> >(particle_levelset->negative_particles,PARTICLE_LEVELSET_NEGATIVE,time);
     if(particle_levelset->use_removed_positive_particles)
@@ -653,7 +653,7 @@ template<class TV> template<class T_PARTICLES> void PLS_FSI_DRIVER<TV>::
 Delete_Particles_Inside_Objects(ARRAY<T_PARTICLES*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time)
 {
     for(NODE_ITERATOR<TV> iterator(*example.fluids_parameters.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
-        BLOCK_UNIFORM<T_GRID> block(*example.fluids_parameters.grid,block_index);
+        BLOCK_UNIFORM<TV> block(*example.fluids_parameters.grid,block_index);
         COLLISION_GEOMETRY_ID body_id;int aggregate_id;
         T_PARTICLES& block_particles=*particles(block_index);
         if(example.fluids_parameters.collision_bodies_affecting_fluid->Occupied_Block(block)){
@@ -668,7 +668,7 @@ Delete_Particles_Inside_Objects(ARRAY<T_PARTICLES*,TV_INT>& particles,const PART
 template<class TV> void PLS_FSI_DRIVER<TV>::
 Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const LEVELSET<TV>& phi,const T band_width)
 {
-    T_GRID& grid=*example.fluids_parameters.grid;
+    GRID<TV>& grid=*example.fluids_parameters.grid;
     EXTRAPOLATION_HIGHER_ORDER<TV,T> eho(grid,phi,20,example.fluids_parameters.number_of_ghost_cells,(int)ceil(band_width));
     eho.Extrapolate_Face([&](const FACE_INDEX<TV::m>& index){return phi.Phi(grid.Face(index))<=0;},face_velocities);
 }

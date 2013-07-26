@@ -11,46 +11,46 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> PROJECTION_COLLIDABLE_UNIFORM<T_GRID>::
-PROJECTION_COLLIDABLE_UNIFORM(const T_GRID& mac_grid,const bool multiphase,const bool use_poisson,const bool use_variable_beta,THREAD_QUEUE* thread_queue)
+template<class TV> PROJECTION_COLLIDABLE_UNIFORM<TV>::
+PROJECTION_COLLIDABLE_UNIFORM(const GRID<TV>& mac_grid,const bool multiphase,const bool use_poisson,const bool use_variable_beta,THREAD_QUEUE* thread_queue)
     :laplace_collidable(0),poisson_collidable(0)
 {
     if(use_poisson){
-        poisson=poisson_collidable=new POISSON_COLLIDABLE_UNIFORM<T_GRID>(p_grid,p,true,multiphase,true);
+        poisson=poisson_collidable=new POISSON_COLLIDABLE_UNIFORM<TV>(p_grid,p,true,multiphase,true);
         if(use_variable_beta) poisson->Set_Variable_beta();elliptic_solver=poisson;collidable_solver=poisson_collidable;}
     else{
-        laplace=laplace_collidable=new LAPLACE_COLLIDABLE_UNIFORM<T_GRID>(p_grid,p,true,false,true,thread_queue);elliptic_solver=laplace;collidable_solver=laplace_collidable;}
+        laplace=laplace_collidable=new LAPLACE_COLLIDABLE_UNIFORM<TV>(p_grid,p,true,false,true,thread_queue);elliptic_solver=laplace;collidable_solver=laplace_collidable;}
     Initialize_Grid(mac_grid);
 }
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> PROJECTION_COLLIDABLE_UNIFORM<T_GRID>::
-PROJECTION_COLLIDABLE_UNIFORM(const T_GRID& mac_grid,LEVELSET<TV>& levelset_input)
+template<class TV> PROJECTION_COLLIDABLE_UNIFORM<TV>::
+PROJECTION_COLLIDABLE_UNIFORM(const GRID<TV>& mac_grid,LEVELSET<TV>& levelset_input)
     :laplace_collidable(0),poisson_collidable(0)
 {
-    poisson=poisson_collidable=new POISSON_COLLIDABLE_UNIFORM<T_GRID>(p_grid,p,levelset_input,true,false,true);elliptic_solver=poisson;collidable_solver=poisson_collidable;
+    poisson=poisson_collidable=new POISSON_COLLIDABLE_UNIFORM<TV>(p_grid,p,levelset_input,true,false,true);elliptic_solver=poisson;collidable_solver=poisson_collidable;
     Initialize_Grid(mac_grid);
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> PROJECTION_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> PROJECTION_COLLIDABLE_UNIFORM<TV>::
 ~PROJECTION_COLLIDABLE_UNIFORM()
 {
 }
 //#####################################################################
 // Function Initialize_Grid
 //#####################################################################
-template<class T_GRID> void PROJECTION_COLLIDABLE_UNIFORM<T_GRID>::
-Initialize_Grid(const T_GRID& mac_grid)
+template<class TV> void PROJECTION_COLLIDABLE_UNIFORM<TV>::
+Initialize_Grid(const GRID<TV>& mac_grid)
 {
     BASE::Initialize_Grid(mac_grid);
 }
 //#####################################################################
 // Function Apply_Pressure
 //#####################################################################
-template<class T_GRID> void PROJECTION_COLLIDABLE_UNIFORM<T_GRID>::
+template<class TV> void PROJECTION_COLLIDABLE_UNIFORM<TV>::
 Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt)
 {
     // find divergence free u, v and w 
@@ -90,10 +90,10 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
 }
 //#####################################################################
 namespace PhysBAM{
-template class PROJECTION_COLLIDABLE_UNIFORM<GRID<VECTOR<float,1> > >;
-template class PROJECTION_COLLIDABLE_UNIFORM<GRID<VECTOR<float,2> > >;
-template class PROJECTION_COLLIDABLE_UNIFORM<GRID<VECTOR<float,3> > >;
-template class PROJECTION_COLLIDABLE_UNIFORM<GRID<VECTOR<double,1> > >;
-template class PROJECTION_COLLIDABLE_UNIFORM<GRID<VECTOR<double,2> > >;
-template class PROJECTION_COLLIDABLE_UNIFORM<GRID<VECTOR<double,3> > >;
+template class PROJECTION_COLLIDABLE_UNIFORM<VECTOR<float,1> >;
+template class PROJECTION_COLLIDABLE_UNIFORM<VECTOR<float,2> >;
+template class PROJECTION_COLLIDABLE_UNIFORM<VECTOR<float,3> >;
+template class PROJECTION_COLLIDABLE_UNIFORM<VECTOR<double,1> >;
+template class PROJECTION_COLLIDABLE_UNIFORM<VECTOR<double,2> >;
+template class PROJECTION_COLLIDABLE_UNIFORM<VECTOR<double,3> >;
 }

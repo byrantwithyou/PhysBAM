@@ -19,7 +19,7 @@ template<class TV,class T2> void BOUNDARY_MAC_GRID_PERIODIC<TV,T2>::
 Apply_Boundary_Condition_Face(const GRID<TV>& grid,ARRAY<T2,FACE_INDEX<TV::m> >& u,const T time) const
 {
     TV_INT periods=grid.Domain_Indices().Maximum_Corner();
-    for(int axis=0;axis<GRID<TV>::dimension;axis++)
+    for(int axis=0;axis<TV::m;axis++)
         for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*axis,axis);it.Valid();it.Next()){
             FACE_INDEX<TV::m> face(it.Full_Index());
             face.index(axis)+=periods(axis);
@@ -48,7 +48,7 @@ template<class TV,class T2> void BOUNDARY_MAC_GRID_PERIODIC<TV,T2>::
 Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells) const
 {
     assert(grid.Is_MAC_Grid());
-    for(int axis=0;axis<GRID<TV>::dimension;axis++){
+    for(int axis=0;axis<TV::m;axis++){
         //Fill_Ghost_Cells(grid.Get_Face_Grid(axis,u.Component(axis),u_ghost.Component(axis),0,time,number_of_ghost_cells);
         const ARRAYS_ND_BASE<T2,TV_INT>& u_axis=u.Component(axis);
         ARRAYS_ND_BASE<T2,TV_INT>& u_ghost_axis=u_ghost.Component(axis);
@@ -56,7 +56,7 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2
         GRID<TV> face_grid=grid.Get_Face_Grid(axis);
         TV_INT periods=grid.Domain_Indices().Maximum_Corner();
         VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);
-        for(int face_axis=0;face_axis<GRID<TV>::dimension;face_axis++)for(int axis_side=0;axis_side<2;axis_side++){
+        for(int face_axis=0;face_axis<TV::m;face_axis++)for(int axis_side=0;axis_side<2;axis_side++){
             int side=2*face_axis+axis_side;
             TV_INT period=(axis_side==0?1:-1)*periods[face_axis]*TV_INT::Axis_Vector(face_axis);
             for(NODE_ITERATOR<TV> iterator(face_grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();

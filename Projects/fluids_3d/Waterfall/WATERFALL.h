@@ -17,29 +17,29 @@
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_input,class T_GRID=GRID<VECTOR<T_input,3> > >
-class WATERFALL:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>,public BOUNDARY_OPEN_CALLBACKS<T_GRID>
+template<class T_input,class TV=VECTOR<T_input,3> >
+class WATERFALL:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>,public BOUNDARY_OPEN_CALLBACKS<TV>
 {
-    typedef T_input T;typedef VECTOR<T,3> TV;
+    typedef T_input T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::data_directory;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     int waterfall;
 
-    FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID> inaccurate_union;
+    FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
 
     RANGE<TV> source_box;
     TV source_velocity;
     MATRIX<T,4> world_to_source;
 
     WATERFALL(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>(stream_type,1,fluids_parameters.WATER),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,1,fluids_parameters.WATER),
         rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid)
     {
     }

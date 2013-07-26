@@ -16,20 +16,20 @@
 #include <Incompressible/Collisions_And_Interactions/OBJECTS_IN_CELL.h>
 namespace PhysBAM{
 
-template <class T_GRID>
-class GRID_BASED_COLLISION_GEOMETRY_UNIFORM:public GRID_BASED_COLLISION_GEOMETRY<T_GRID>
+template <class TV>
+class GRID_BASED_COLLISION_GEOMETRY_UNIFORM:public GRID_BASED_COLLISION_GEOMETRY<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<bool,TV::dimension> TV_BOOL;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<bool,TV::dimension> TV_BOOL;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_FACE_ARRAYS_BOOL::template REBIND<VECTOR<bool,T_GRID::dimension> >::TYPE T_FACE_ARRAYS_BOOL_DIMENSION;
+    typedef typename T_FACE_ARRAYS_BOOL::template REBIND<VECTOR<bool,TV::m> >::TYPE T_FACE_ARRAYS_BOOL_DIMENSION;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_MAC_HELPER T_LINEAR_INTERPOLATION_MAC_HELPER;
+    typedef LINEAR_INTERPOLATION_MAC_HELPER<TV> T_LINEAR_INTERPOLATION_MAC_HELPER;
 public:
 
-    typedef GRID_BASED_COLLISION_GEOMETRY<T_GRID> BASE;
+    typedef GRID_BASED_COLLISION_GEOMETRY<TV> BASE;
     using BASE::collision_geometry_collection;using BASE::grid;using BASE::collision_thickness;using BASE::objects_in_cell;using BASE::cell_neighbors_visible;
     using BASE::face_neighbors_visible;using BASE::Get_Body_Penetration;using BASE::occupied_blocks;using BASE::swept_occupied_blocks;using BASE::Is_Active;
     using BASE::Latest_Crossover;using BASE::Any_Simplex_Crossover;using BASE::Intersection_With_Any_Simplicial_Object;
@@ -37,7 +37,7 @@ public:
     const ARRAY<bool,TV_INT>* outside_fluid;
     bool use_collision_face_neighbors;
 
-    GRID_BASED_COLLISION_GEOMETRY_UNIFORM(T_GRID& grid_input);
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM(GRID<TV>& grid_input);
     virtual ~GRID_BASED_COLLISION_GEOMETRY_UNIFORM();
 
     bool Occupied_Cell_Center(const TV_INT& cell_index) const

@@ -11,7 +11,7 @@ namespace PhysBAM{
 
 template<class F> class NONLINEAR_FUNCTION;
 template<class T> struct PARAMETER_SPACE;
-template<class T> struct KRYLOV_VECTOR_BASE;
+template<class T> class KRYLOV_VECTOR_BASE;
 
 template<class T>
 class ITERATIVE_SOLVER 

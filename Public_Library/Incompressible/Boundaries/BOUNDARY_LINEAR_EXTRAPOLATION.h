@@ -18,7 +18,7 @@ template<class TV,class T2>
 class BOUNDARY_LINEAR_EXTRAPOLATION:public BOUNDARY<TV,T2>
 {
     typedef typename TV::SCALAR T;typedef BOUNDARY<TV,T2> BASE;
-    typedef typename GRID<TV>::VECTOR_INT TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
 public:
     using BASE::Find_Ghost_Regions;using BASE::Boundary;
@@ -42,7 +42,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_
 {
     ARRAY<T2,TV_INT>::Put(u,u_ghost); // interior
     VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
-    for(int axis=0;axis<GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
+    for(int axis=0;axis<TV::m;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side,outward_sign=axis_side?-1:1;
         int boundary=Boundary(side,regions(side));
         TV_INT inward_offset=-outward_sign*TV_INT::Axis_Vector(axis);

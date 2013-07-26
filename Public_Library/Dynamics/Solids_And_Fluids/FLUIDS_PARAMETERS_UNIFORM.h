@@ -18,30 +18,30 @@
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS.h>
 namespace PhysBAM{
 
-template<class T_GRID> class MPI_UNIFORM_GRID;
-template<class T_GRID> class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM;
-template<class T_GRID> class EULER_UNIFORM;
+template<class TV> class MPI_UNIFORM_GRID;
+template<class TV> class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM;
+template<class TV> class EULER_UNIFORM;
 template<class TV> class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES;
 template<class TV> class COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES;
-template<class T_GRID> class LAPLACE_UNIFORM;
-template<class T_GRID> class PARTICLE_LEVELSET_EVOLUTION_UNIFORM;
+template<class TV> class LAPLACE_UNIFORM;
+template<class TV> class PARTICLE_LEVELSET_EVOLUTION_UNIFORM;
 
-template<class T_GRID>
-class FLUIDS_PARAMETERS_UNIFORM:public FLUIDS_PARAMETERS<T_GRID>
+template<class TV>
+class FLUIDS_PARAMETERS_UNIFORM:public FLUIDS_PARAMETERS<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef INCOMPRESSIBLE_UNIFORM<T_GRID> T_INCOMPRESSIBLE;
+    typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
+    typedef VECTOR<int,TV::m> TV_INT;typedef INCOMPRESSIBLE_UNIFORM<TV> T_INCOMPRESSIBLE;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef typename REBIND<T_ARRAYS_SCALAR,PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef typename REBIND<T_ARRAYS_SCALAR,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
+    typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
     typedef typename REBIND<T_ADVECTION_SEMI_LAGRANGIAN_SCALAR,SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX;
-    typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<T_GRID> T_FACE_LOOKUP_COLLIDABLE;typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;
+    typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     typedef typename REBIND<T_ARRAYS_SCALAR,SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ARRAYS_SYMMETRIC_MATRIX;
 public:
-    typedef FLUIDS_PARAMETERS<T_GRID> BASE;
+    typedef FLUIDS_PARAMETERS<TV> BASE;
     using BASE::smoke;using BASE::fire;using BASE::water;using BASE::use_body_force;using BASE::grid;
     using BASE::soot_container;using BASE::soot_fuel_container;using BASE::density_container;using BASE::temperature_container;
     using BASE::use_soot_fuel_combustion;using BASE::burn_temperature_threshold;using BASE::burn_rate;
@@ -73,22 +73,22 @@ public:
     using BASE::write_flattened_particles;using BASE::use_poisson;using BASE::simulate;using BASE::use_slip;using BASE::thread_queue;using BASE::number_of_threads;using BASE::removed_positive_particle_buoyancy_constant;
     using BASE::bandwidth_without_maccormack_near_interface;
 
-    MPI_UNIFORM_GRID<T_GRID>* mpi_grid;
-    T_GRID p_grid;
+    MPI_UNIFORM_GRID<TV>* mpi_grid;
+    GRID<TV> p_grid;
 
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> >* particle_levelset_evolution;
-    INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible;
-    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>* particle_levelset_evolution_multiple;
-    INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>* incompressible_multiphase;
-    SPH_EVOLUTION_UNIFORM<T_GRID>* sph_evolution;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution;
+    INCOMPRESSIBLE_UNIFORM<TV>* incompressible;
+    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>* particle_levelset_evolution_multiple;
+    INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>* incompressible_multiphase;
+    SPH_EVOLUTION_UNIFORM<TV>* sph_evolution;
     ARRAY<bool,TV_INT>& maccormack_node_mask;
     ARRAY<bool,TV_INT>& maccormack_cell_mask;
     T_FACE_ARRAYS_BOOL& maccormack_face_mask;
-    ADVECTION_MACCORMACK_UNIFORM<T_GRID,T,T_ADVECTION_SEMI_LAGRANGIAN_SCALAR>& maccormack_semi_lagrangian;
-    EULER_UNIFORM<T_GRID>* euler;
+    ADVECTION_MACCORMACK_UNIFORM<TV,T,T_ADVECTION_SEMI_LAGRANGIAN_SCALAR>& maccormack_semi_lagrangian;
+    EULER_UNIFORM<TV>* euler;
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>* euler_solid_fluid_coupling_utilities;
     COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>* compressible_incompressible_coupling_utilities;
-    PROJECTION_DYNAMICS_UNIFORM<T_GRID>* projection;
+    PROJECTION_DYNAMICS_UNIFORM<TV>* projection;
 
     // multiphase parameters
     ARRAY<T> masses; // used to keep track of mass loss in the driver
@@ -116,9 +116,9 @@ public:
     bool use_modified_projection;
     bool use_surface_solve;
     int projection_scale;
-    VECTOR<bool,T_GRID::dimension> periodic_boundary;
+    VECTOR<bool,TV::m> periodic_boundary;
 
-    FLUIDS_PARAMETERS_UNIFORM(const int number_of_regions,const typename FLUIDS_PARAMETERS<T_GRID>::TYPE type);
+    FLUIDS_PARAMETERS_UNIFORM(const int number_of_regions,const typename FLUIDS_PARAMETERS<TV>::TYPE type);
     virtual ~FLUIDS_PARAMETERS_UNIFORM();
 
 //#####################################################################
@@ -133,21 +133,21 @@ private:
     template<class T_PARTICLES> void Delete_Particles_Inside_Objects(typename T_ARRAYS_SCALAR::template REBIND<T_PARTICLES*>::TYPE& particles,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time);
 public:
-    void Set_Projection(PROJECTION_DYNAMICS_UNIFORM<T_GRID>* projection_input);
+    void Set_Projection(PROJECTION_DYNAMICS_UNIFORM<TV>* projection_input);
     void Update_Fluid_Parameters(const T dt,const T time);
     void Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time);
     void Apply_Isobaric_Fix(const T dt,const T time);
-    void Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>* elliptic_solver,
+    void Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<TV>* elliptic_solver,
             T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    void Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>& elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T time);
+    void Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<TV>& elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T time);
     void Blend_In_External_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
     void Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const T time);
     void Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const T time);
     void Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX& e_ghost,const T time);
     void Combustion(const T dt,const T time);
     void Evolve_Soot(const T dt,const T time);
-    void Sync_Parameters(FLUIDS_PARAMETERS_UNIFORM<T_GRID>& single_parameters,THREADED_UNIFORM_GRID<T_GRID>& threaded_grid);
-    void Distribute_Parameters(FLUIDS_PARAMETERS_UNIFORM<T_GRID>& single_parameters,THREADED_UNIFORM_GRID<T_GRID>& threaded_grid);
+    void Sync_Parameters(FLUIDS_PARAMETERS_UNIFORM<TV>& single_parameters,THREADED_UNIFORM_GRID<TV>& threaded_grid);
+    void Distribute_Parameters(FLUIDS_PARAMETERS_UNIFORM<TV>& single_parameters,THREADED_UNIFORM_GRID<TV>& threaded_grid);
     template<class T_ARRAYS_PARTICLES> int Total_Number_Of_Particles(const T_ARRAYS_PARTICLES& particles) const;
     template<class T_ARRAYS_PARTICLES> void Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_particles,const T_ARRAYS_PARTICLES& particles,
         const std::string& output_directory,const std::string& prefix,const int frame) const;

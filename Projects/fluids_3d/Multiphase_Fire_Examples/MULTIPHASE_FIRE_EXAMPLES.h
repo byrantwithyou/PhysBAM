@@ -15,20 +15,20 @@
 namespace PhysBAM{
 
 template<class T_input>
-class MULTIPHASE_FIRE_EXAMPLES:public MULTIPHASE_FIRE_EXAMPLES_UNIFORM<GRID<VECTOR<T_input,3> > >
+class MULTIPHASE_FIRE_EXAMPLES:public MULTIPHASE_FIRE_EXAMPLES_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
-    typedef MULTIPHASE_FIRE_EXAMPLES_UNIFORM<GRID<TV> > BASE;
+    typedef MULTIPHASE_FIRE_EXAMPLES_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;
     using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;using BASE::pseudo_dirichlet;using BASE::resolution;
     using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::test_number;using BASE::parse_args;
     
     MULTIPHASE_FIRE_EXAMPLES(const STREAM_TYPE stream_type)
-        :MULTIPHASE_FIRE_EXAMPLES_UNIFORM<GRID<TV> >(stream_type)
+        :MULTIPHASE_FIRE_EXAMPLES_UNIFORM<TV>(stream_type)
     {
     }
 

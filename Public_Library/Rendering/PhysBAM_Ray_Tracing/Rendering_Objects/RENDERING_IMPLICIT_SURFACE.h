@@ -13,7 +13,8 @@
 #include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 namespace PhysBAM{
 
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class TV> struct GRID_ARRAYS_POLICY;
+template<class TV> class GRID;
 
 template<class T>
 class RENDERING_IMPLICIT_SURFACE:public RENDERING_OBJECT<T>
@@ -30,8 +31,8 @@ public:
         :implicit_surface(implicit_surface_input)
     {}
 
-    template<class T_GRID>
-    RENDERING_IMPLICIT_SURFACE(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input)
+    template<class TV>
+    RENDERING_IMPLICIT_SURFACE(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input)
     {
         implicit_surface=new LEVELSET_IMPLICIT_OBJECT<TV>(grid_input,phi_input);
     }

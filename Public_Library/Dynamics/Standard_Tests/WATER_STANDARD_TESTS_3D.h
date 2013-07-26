@@ -34,19 +34,19 @@
 #include <Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>
 namespace PhysBAM{
 
-template<class T_GRID> class FLUIDS_PARAMETERS;
+template<class TV> class FLUIDS_PARAMETERS;
 template<class TV> class SOLIDS_FLUIDS_EXAMPLE;
 template<class TV> class RIGID_BODY_COLLECTION;
 
-template<class T_GRID>
+template<class TV>
 class WATER_STANDARD_TESTS_3D
 {
-    typedef typename T_GRID::SCALAR T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,3> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     SOLIDS_FLUIDS_EXAMPLE<TV>& example;
-    FLUIDS_PARAMETERS<T_GRID>& fluids_parameters;
+    FLUIDS_PARAMETERS<TV>& fluids_parameters;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
-    FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID> inaccurate_union;
+    FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
     bool use_inaccurate_body_collisions;
     bool use_variable_density_for_sph,use_two_way_coupling_for_sph,convert_sph_particles_to_fluid,use_analytic_divergence,use_analytic_divergence_for_expansion_only,
          adjust_cell_weights_on_neumann_boundaries,enforce_density_near_interface;
@@ -62,7 +62,7 @@ public:
     mutable RANDOM_NUMBERS<T> height_noise_random;
 
 //#####################################################################
-    WATER_STANDARD_TESTS_3D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS<T_GRID>& fluids_parameters,RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
+    WATER_STANDARD_TESTS_3D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS<TV>& fluids_parameters,RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
     virtual ~WATER_STANDARD_TESTS_3D(){};
     void Initialize(const int test_number_input,const int resolution);
     void Initialize_Advection(const bool always_use_objects=false);

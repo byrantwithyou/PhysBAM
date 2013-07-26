@@ -15,7 +15,7 @@ namespace PhysBAM{
 namespace ARB_PARAMETERS{
 
 template<class T>
-inline void Read_Common_Parameters(const std::string& filename,SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T,3> > >& example,PARAMETER_LIST& parameter_list)
+inline void Read_Common_Parameters(const std::string& filename,SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T,3> >& example,PARAMETER_LIST& parameter_list)
 {
     typedef VECTOR<T,3> TV;
     SOLIDS_PARAMETERS<TV>& solids_parameters=example.solids_parameters;

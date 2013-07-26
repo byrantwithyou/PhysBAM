@@ -13,52 +13,52 @@
 #include <Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 namespace PhysBAM{
 
-template<class T_GRID>
-class MPI_UNIFORM_GRID:public MPI_GRID<T_GRID>
+template<class TV>
+class MPI_UNIFORM_GRID:public MPI_GRID<TV>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
     typedef typename T_ARRAYS_SCALAR::template REBIND<RANGE<TV_INT> >::TYPE T_ARRAYS_BOX_INT;
 public:
-    typedef T_GRID GRID_T;
+    typedef GRID<TV> GRID_T;
 
-    typedef MPI_GRID<T_GRID> BASE;
+    typedef MPI_GRID<TV > BASE;
     using BASE::Exchange_Boundary_Cell_Data;using BASE::local_grid;using BASE::global_grid;using BASE::comm;using BASE::all_neighbor_ranks;using BASE::side_neighbor_ranks;
     using BASE::Get_Unique_Tag;using BASE::Get_Send_Tag;using BASE::Get_Recv_Tag;using BASE::Wrap_Offset;using BASE::all_neighbor_directions;using BASE::all_coordinates;
     using BASE::Restrict_Grid;
 
-    THREADED_UNIFORM_GRID<T_GRID>* threaded_grid;
+    THREADED_UNIFORM_GRID<TV>* threaded_grid;
 
-    MPI_UNIFORM_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),
+    MPI_UNIFORM_GRID(GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),
         const TV_BOOL& periodic_input=TV_BOOL(),MPI::Group* group_input=0);
     
-    MPI_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,const int number_of_threads,T_GRID& local_grid_input,const int number_of_ghost_cells_input,
+    MPI_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,const int number_of_threads,GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,
         const bool skip_mpi=true,const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),const TV_BOOL& periodic_input=TV_BOOL(),MPI::Group* group_input=0);
 
     template<class T_ARRAYS> void Exchange_Boundary_Cell_Data(T_ARRAYS& data,const int bandwidth,const bool include_corners=true) const
     {if(threaded_grid) threaded_grid->Exchange_Boundary_Cell_Data(data,bandwidth,include_corners);
-    else MPI_GRID<T_GRID>::Exchange_Boundary_Cell_Data(*this,data,bandwidth,include_corners);}
+    else MPI_GRID<TV >::Exchange_Boundary_Cell_Data(*this,data,bandwidth,include_corners);}
     
     template<class T_ARRAYS> void Union_Common_Face_Data(T_ARRAYS& data) const
-    {MPI_GRID<T_GRID>::Union_Common_Face_Data(*this,data);}
+    {MPI_GRID<TV >::Union_Common_Face_Data(*this,data);}
 
     template<class T_FACE_ARRAYS_2>
     void Exchange_Boundary_Face_Data(T_FACE_ARRAYS_2& data,const int bandwidth) const
     {if(threaded_grid) threaded_grid->Exchange_Boundary_Face_Data(data,bandwidth);
-    else MPI_GRID<T_GRID>::Exchange_Boundary_Face_Data(*this,data,bandwidth);}
+    else MPI_GRID<TV >::Exchange_Boundary_Face_Data(*this,data,bandwidth);}
 
     template<class T_FACE_ARRAYS_2> void Average_Common_Face_Data(T_FACE_ARRAYS_2& data) const
     {if(threaded_grid) threaded_grid->Average_Common_Face_Data(data);
-    else MPI_GRID<T_GRID>::Average_Common_Face_Data(*this,data);}
+    else MPI_GRID<TV >::Average_Common_Face_Data(*this,data);}
 
     template<class T_FACE_ARRAYS_2> void Copy_Common_Face_Data(T_FACE_ARRAYS_2& data) const
-    {MPI_GRID<T_GRID>::Copy_Common_Face_Data(*this,data);}
+    {MPI_GRID<TV >::Copy_Common_Face_Data(*this,data);}
 
     template<class T_FACE_ARRAYS_2> void Assert_Common_Face_Data(T_FACE_ARRAYS_2& data,const T tolerance=0) const
     {if(threaded_grid) threaded_grid->Assert_Common_Face_Data(data,tolerance);
-    else MPI_GRID<T_GRID>::Assert_Common_Face_Data(*this,data,tolerance);}
+    else MPI_GRID<TV >::Assert_Common_Face_Data(*this,data,tolerance);}
 
     RANGE<TV_INT> Face_Sentinels(const int axis) const
     {return RANGE<TV_INT>(TV_INT(),TV_INT::Axis_Vector(axis));}
@@ -68,9 +68,9 @@ public:
     
     void Synchronize_Dt(T& dt) const
     {if(threaded_grid) threaded_grid->Synchronize_Dt(dt);
-    else MPI_GRID<T_GRID>::Synchronize_Dt(dt);}
+    else MPI_GRID<TV >::Synchronize_Dt(dt);}
     
-    void Initialize(VECTOR<VECTOR<bool,2>,T_GRID::dimension>& domain_walls)
+    void Initialize(VECTOR<VECTOR<bool,2>,TV::m>& domain_walls)
     {if(threaded_grid) threaded_grid->Initialize(domain_walls);
     else BASE::Initialize(domain_walls);}
     
@@ -79,7 +79,7 @@ public:
     else return BASE::Neighbor(axis,axis_side);}
 
 //#####################################################################
-    T_GRID Get_Non_Overlapping_Face_Grid(const int axis) const;
+    GRID<TV> Get_Non_Overlapping_Face_Grid(const int axis) const;
     template<class T_ARRAYS> bool Gather_Cell_Data(const T_ARRAYS& local_data,T_ARRAYS& global_data) const;
     template<class T_ARRAYS> void Scatter_Cell_Data(const T_ARRAYS& global_data,T_ARRAYS& local_data) const;
     template<class T2> MPI_PACKAGE Package_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const RANGE<TV_INT>& region) const;

@@ -20,7 +20,7 @@ COMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input)
     number_of_ghost_cells(3),cfl((T).9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
     euler(mac_grid),euler_solid_fluid_coupling_utilities(euler),compressible_fluid_collection(mac_grid),face_velocities(mac_grid),
     conservation_method(0),boundary(0),pressure_boundary(0),
-    collision_bodies_affecting_fluid(new T_GRID_BASED_COLLISION_GEOMETRY(mac_grid)),
+    collision_bodies_affecting_fluid(new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>(mac_grid)),
     left_wall(true),right_wall(true),bottom_wall(true),top_wall(false),front_wall(true),back_wall(true),timesplit(false),
     set_max_time_step(false),max_time_step(1.e8),spatial_order(3),
     rungekutta_order(3),tolerance((T)1e-8),iterations(0),solve_single_cell_neumann_regions(false),

@@ -22,10 +22,10 @@
 #include <cfloat>
 namespace PhysBAM{
 
-template<class T_GRID> struct INTERPOLATION_POLICY;
-template<class T_GRID> class LEVELSET_CALLBACKS; // TODO: invalid dependency
-template<class T_GRID> struct BOUNDARY_POLICY;
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class TV> struct INTERPOLATION_POLICY;
+template<class TV> class LEVELSET_CALLBACKS; // TODO: invalid dependency
+template<class TV> struct BOUNDARY_POLICY;
+template<class TV> struct GRID_ARRAYS_POLICY;
 template<class TV> class GRID;
 template<class TV,class T2> class BOUNDARY;
 template<class TV> class LEVELSET;
@@ -34,11 +34,10 @@ template<class TV>
 class LEVELSET:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename INTERPOLATION_POLICY<GRID<TV> >::LINEAR_INTERPOLATION_SCALAR T_LINEAR_INTERPOLATION_SCALAR;
-    typedef typename INTERPOLATION_POLICY<GRID<TV> >::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
+    typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
     typedef typename REBIND<T_INTERPOLATION_SCALAR,TV>::TYPE T_INTERPOLATION_VECTOR;
-    typedef typename REBIND<T_LINEAR_INTERPOLATION_SCALAR,TV>::TYPE T_LINEAR_INTERPOLATION_VECTOR;
-    typedef typename INTERPOLATION_POLICY<GRID<TV> >::FACE_LOOKUP T_FACE_LOOKUP;
+    typedef typename REBIND<LINEAR_INTERPOLATION_UNIFORM<TV,T>,TV>::TYPE T_LINEAR_INTERPOLATION_VECTOR;
+    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
@@ -54,11 +53,11 @@ public:
     T half_band_width;
 
     BOUNDARY<TV,T>* boundary;
-    LEVELSET_CALLBACKS<GRID<TV> >* levelset_callbacks;
+    LEVELSET_CALLBACKS<TV>* levelset_callbacks;
     const T_FACE_ARRAYS_BOOL* face_velocities_valid_mask_current;
 //protected:
     BOUNDARY<TV,T>& boundary_default;
-    static T_LINEAR_INTERPOLATION_SCALAR interpolation_default;
+    static LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation_default;
     static T_LINEAR_INTERPOLATION_VECTOR normal_interpolation_default;
     ARRAY<bool,TV_INT> valid_mask_current;
     ARRAY<bool,TV_INT> valid_mask_next;
@@ -110,7 +109,7 @@ public:
     void Set_Custom_Curvature_Interpolation(T_INTERPOLATION_SCALAR& curvature_interpolation_input)
     {curvature_interpolation=&curvature_interpolation_input;}
 
-    void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<GRID<TV> >& levelset_callbacks_input)
+    void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<TV>& levelset_callbacks_input)
     {levelset_callbacks=&levelset_callbacks_input;}
 
     void Set_Face_Velocities_Valid_Mask(const T_FACE_ARRAYS_BOOL* face_velocities_valid_mask_current_input)

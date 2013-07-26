@@ -17,15 +17,15 @@
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_input,class T_GRID=GRID<VECTOR<T_input,3> > >
-class LIGHTHOUSE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>,public BOUNDARY_OPEN_CALLBACKS<T_GRID>
+template<class T_input,class TV=VECTOR<T_input,3> >
+class LIGHTHOUSE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>,public BOUNDARY_OPEN_CALLBACKS<TV>
 {
-    typedef T_input T;typedef VECTOR<T,3> TV;
+    typedef T_input T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::data_directory;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::stream_type;using BASE::solid_body_collection;using BASE::resolution;
     using BASE::test_number;
@@ -35,7 +35,7 @@ public:
 
     T ballistic_particles_as_percentage_of_target;
     T depth,flip_ratio;
-    FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID> inaccurate_union;
+    FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
 
     bool use_two_way_coupling_for_sph,use_variable_density_for_sph,convert_sph_particles_to_fluid,use_analytic_divergence,use_analytic_divergence_for_expansion_only;
     int extra_cells_m_start,extra_cells_m_end,extra_cells_n_start,extra_cells_n_end;
@@ -52,7 +52,7 @@ public:
     ***************/
 
     LIGHTHOUSE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>(stream_type,1,fluids_parameters.WATER),
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,1,fluids_parameters.WATER),
         rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid)
     {
     }
@@ -191,8 +191,8 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::Set_Dirichlet_Boundary_Conditions(time);
-    FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >&>(fluids_parameters);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Set_Dirichlet_Boundary_Conditions(time);
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters);
     if(fluids_parameters_uniform.mpi_grid && fluids_parameters_uniform.mpi_grid->Neighbor(1,2)) return;
 
     T_FACE_ARRAYS_BOOL& psi_N=fluids_parameters.incompressible->projection.elliptic_solver->psi_N;
@@ -209,7 +209,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
-    FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >&>(fluids_parameters);
+    FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters);
     if(fluids_parameters_uniform.mpi_grid && fluids_parameters_uniform.mpi_grid->Neighbor(1,2)) return false;
     
     RANGE<VECTOR<int,3> > right_grid_cells=RANGE<VECTOR<int,3> >(TV_INT(fluids_parameters.grid->counts.x-2,1,1),fluids_parameters.grid->Numbers_Of_Cells());
@@ -277,8 +277,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
 {
-    T_GRID& grid=fluids_parameters.particle_levelset_evolution->grid;
-    SPH_EVOLUTION_UNIFORM<T_GRID>& sph_evolution=*fluids_parameters.sph_evolution;
+    GRID<TV>& grid=fluids_parameters.particle_levelset_evolution->grid;
+    SPH_EVOLUTION_UNIFORM<TV>& sph_evolution=*fluids_parameters.sph_evolution;
     sph_evolution.use_two_way_coupling=use_two_way_coupling_for_sph;
     sph_evolution.use_variable_density_solve=use_variable_density_for_sph;
     sph_evolution.convert_particles_to_fluid=convert_sph_particles_to_fluid;

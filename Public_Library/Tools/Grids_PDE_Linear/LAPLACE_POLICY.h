@@ -6,12 +6,12 @@
 #define __LAPLACE_POLICY__
 
 namespace PhysBAM{
-template<class T_GRID> class LAPLACE_UNIFORM;
+template<class TV> class LAPLACE_UNIFORM;
 
-template<class T_GRID>
+template<class TV>
 struct LAPLACE_POLICY
 {
-    typedef LAPLACE_UNIFORM<T_GRID> LAPLACE;
+    typedef LAPLACE_UNIFORM<TV> LAPLACE;
 };
 }
 #endif

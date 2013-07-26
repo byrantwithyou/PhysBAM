@@ -13,12 +13,12 @@
 namespace PhysBAM{
 
 template<class TV> class RUNGEKUTTA;
-template<class T_GRID> class LEVELSET_ADVECTION;
+template<class TV> class LEVELSET_ADVECTION;
 
-template<class T_GRID>
-class PARTICLE_LEVELSET_EVOLUTION_UNIFORM:public PARTICLE_LEVELSET_EVOLUTION<typename T_GRID::SCALAR>
+template<class TV>
+class PARTICLE_LEVELSET_EVOLUTION_UNIFORM:public PARTICLE_LEVELSET_EVOLUTION<typename TV::SCALAR>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
@@ -30,19 +30,19 @@ public:
     using BASE::track_mass;using BASE::initial_mass;using BASE::runge_kutta_order_levelset;using BASE::runge_kutta_order_particles;using BASE::use_particle_levelset;
     using BASE::use_frozen_velocity;using BASE::cfl_number;using BASE::reseeding_frequency;using BASE::time;using BASE::use_fmm;using BASE::use_reinitialization;
 
-    T_GRID grid;
+    GRID<TV> grid;
     T_ARRAYS_SCALAR phi;
     T_FACE_ARRAYS_SCALAR V;
 
 private:
-    PARTICLE_LEVELSET_UNIFORM<T_GRID>* particle_levelset;
+    PARTICLE_LEVELSET_UNIFORM<TV>* particle_levelset;
     LEVELSET_ADVECTION<TV>* levelset_advection;
 public:
 
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM(const T_GRID& grid_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const int number_of_ghost_cells_input,bool multiphase);
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM(const GRID<TV>& grid_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,const int number_of_ghost_cells_input,bool multiphase);
     virtual ~PARTICLE_LEVELSET_EVOLUTION_UNIFORM();
 
-    virtual PARTICLE_LEVELSET_UNIFORM<T_GRID>& Particle_Levelset(const int i)
+    virtual PARTICLE_LEVELSET_UNIFORM<TV>& Particle_Levelset(const int i)
     {assert(i==0);return *particle_levelset;}
 
     virtual LEVELSET<TV>& Levelset(const int i)
@@ -63,7 +63,7 @@ public:
     virtual  void Track_Mass(const bool track_mass_input=true)
     {track_mass=track_mass_input;if(track_mass){initial_mass=levelset_advection->Approximate_Negative_Material();LOG::cout << "negative volume = " << initial_mass << std::endl;}}
 
-    virtual void Initialize_Domain(const T_GRID& grid_input)
+    virtual void Initialize_Domain(const GRID<TV>& grid_input)
     {assert(grid_input.Is_MAC_Grid());grid=grid_input;phi.Resize(grid.Domain_Indices(particle_levelset->number_of_ghost_cells));V.Resize(grid);
     particle_levelset->Initialize_Particle_Levelset_Grid_Values();
     if(levelset_advection->semi_lagrangian_collidable) particle_levelset->levelset.Initialize_Valid_Masks(grid);}
@@ -77,7 +77,7 @@ public:
     virtual void Set_Number_Particles_Per_Cell(const int number_particles_per_cell)
     {particle_levelset->Set_Number_Particles_Per_Cell(number_particles_per_cell);}
 
-    virtual void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<T_GRID>& levelset_callbacks)
+    virtual void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<TV>& levelset_callbacks)
     {particle_levelset->levelset.Set_Levelset_Callbacks(levelset_callbacks);}
 
     virtual void Initialize_FMM_Initialization_Iterative_Solver(const bool refine_fmm_initialization_with_iterative_solver_input=true,const int fmm_initialization_iterations_input=10,

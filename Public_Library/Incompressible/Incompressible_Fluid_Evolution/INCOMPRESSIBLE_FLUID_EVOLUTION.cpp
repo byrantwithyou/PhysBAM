@@ -13,8 +13,8 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> INCOMPRESSIBLE_FLUID_EVOLUTION<T_GRID>::
-INCOMPRESSIBLE_FLUID_EVOLUTION(const T_GRID& grid_input)
+template<class TV> INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
+INCOMPRESSIBLE_FLUID_EVOLUTION(const GRID<TV>& grid_input)
     :grid(grid_input.Get_MAC_Grid()),max_time_step(100),boundary_default(*new BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>)
 { 
     boundary=&boundary_default;
@@ -23,7 +23,7 @@ INCOMPRESSIBLE_FLUID_EVOLUTION(const T_GRID& grid_input)
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> INCOMPRESSIBLE_FLUID_EVOLUTION<T_GRID>::
+template<class TV> INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
 ~INCOMPRESSIBLE_FLUID_EVOLUTION()
 {
     delete &boundary_default;
@@ -32,7 +32,7 @@ template<class T_GRID> INCOMPRESSIBLE_FLUID_EVOLUTION<T_GRID>::
 //#####################################################################
 // Function Advance_One_Time_Step_Convection
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_FLUID_EVOLUTION<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
 Advance_One_Time_Step_Convection(const T dt,const T time,const T_FACE_ARRAYS_SCALAR& advecting_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect,const int number_of_ghost_cells)
 {
     // TODO: make efficient if advection velocities are same as advected velocities
@@ -48,7 +48,7 @@ Advance_One_Time_Step_Convection(const T dt,const T time,const T_FACE_ARRAYS_SCA
 //#####################################################################
 // Function Advance_One_Time_Step_Forces
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_FLUID_EVOLUTION<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
 Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const int number_of_ghost_cells)
 {
     T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
@@ -59,7 +59,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
 //#####################################################################
 // Function Advance_One_Time_Step_Implicit_Part
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_FLUID_EVOLUTION<T_GRID>::
+template<class TV> void INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
 Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     // boundary conditions
@@ -77,14 +77,14 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
 //#####################################################################
 // Function CFL
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR INCOMPRESSIBLE_FLUID_EVOLUTION<T_GRID>::
+template<class TV> typename TV::SCALAR INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
 CFL(T_FACE_ARRAYS_SCALAR& face_velocities) const
 {
     // advection should define its own cfl?
     T dt_convection=0;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         T local_V_norm=0;
-        for(int axis=0;axis<T_GRID::dimension;axis++)
+        for(int axis=0;axis<TV::m;axis++)
             local_V_norm+=grid.one_over_dX[axis]*maxabs(face_velocities(axis,grid.First_Face_Index_In_Cell(axis,cell)),
                 face_velocities(axis,grid.Second_Face_Index_In_Cell(axis,cell)));
         dt_convection=max(dt_convection,local_V_norm);}
@@ -96,8 +96,8 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities) const
 //#####################################################################
 // Function Initialize_Grids
 //#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_FLUID_EVOLUTION<T_GRID>::
-Initialize_Grids(const T_GRID& grid_input)
+template<class TV> void INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
+Initialize_Grids(const GRID<TV>& grid_input)
 {
     grid=grid_input.Get_MAC_Grid();
     for(int k=0;k<fluids_forces.m;k++) fluids_forces(k)->Initialize_Grids(grid);
@@ -105,18 +105,18 @@ Initialize_Grids(const T_GRID& grid_input)
 //#####################################################################
 // Function Add_Force
 //#####################################################################
-template<class T_GRID> int INCOMPRESSIBLE_FLUID_EVOLUTION<T_GRID>::
-Add_Force(INCOMPRESSIBLE_FLUIDS_FORCES<T_GRID>* force)
+template<class TV> int INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
+Add_Force(INCOMPRESSIBLE_FLUIDS_FORCES<TV>* force)
 {
     fluids_forces.Append(force);
     return fluids_forces.Size();
 }
 //#####################################################################
 namespace PhysBAM{
-template class INCOMPRESSIBLE_FLUID_EVOLUTION<GRID<VECTOR<float,1> > >;
-template class INCOMPRESSIBLE_FLUID_EVOLUTION<GRID<VECTOR<float,2> > >;
-template class INCOMPRESSIBLE_FLUID_EVOLUTION<GRID<VECTOR<float,3> > >;
-template class INCOMPRESSIBLE_FLUID_EVOLUTION<GRID<VECTOR<double,1> > >;
-template class INCOMPRESSIBLE_FLUID_EVOLUTION<GRID<VECTOR<double,2> > >;
-template class INCOMPRESSIBLE_FLUID_EVOLUTION<GRID<VECTOR<double,3> > >;
+template class INCOMPRESSIBLE_FLUID_EVOLUTION<VECTOR<float,1> >;
+template class INCOMPRESSIBLE_FLUID_EVOLUTION<VECTOR<float,2> >;
+template class INCOMPRESSIBLE_FLUID_EVOLUTION<VECTOR<float,3> >;
+template class INCOMPRESSIBLE_FLUID_EVOLUTION<VECTOR<double,1> >;
+template class INCOMPRESSIBLE_FLUID_EVOLUTION<VECTOR<double,2> >;
+template class INCOMPRESSIBLE_FLUID_EVOLUTION<VECTOR<double,3> >;
 }

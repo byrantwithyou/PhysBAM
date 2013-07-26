@@ -11,7 +11,7 @@ using namespace PhysBAM;
 // Function e
 //#####################################################################
 // internal energy
-template<class T_GRID> typename T_GRID::SCALAR REACTIVE_EULER<T_GRID>::
+template<class TV> typename TV::SCALAR REACTIVE_EULER<TV>::
 e(const T rho,const T rho_u,const T E)
 {
     return E/rho-sqr(rho_u/rho)/2;
@@ -20,7 +20,7 @@ e(const T rho,const T rho_u,const T E)
 // Function e
 //#####################################################################
 // internal energy
-template<class T_GRID> typename T_GRID::SCALAR REACTIVE_EULER<T_GRID>::
+template<class TV> typename TV::SCALAR REACTIVE_EULER<TV>::
 e(const T rho,const T rho_u,const T rho_v,const T E)
 {
     return E/rho-(sqr(rho_u/rho)+sqr(rho_v/rho))/2;
@@ -29,17 +29,17 @@ e(const T rho,const T rho_u,const T rho_v,const T E)
 // Function e
 //#####################################################################
 // internal energy - 3D
-template<class T_GRID> typename T_GRID::SCALAR REACTIVE_EULER<T_GRID>::
+template<class TV> typename TV::SCALAR REACTIVE_EULER<TV>::
 e(const T rho,const T rho_u,const T rho_v,const T rho_w,const T E)
 {
     return E/rho-(sqr(rho_u/rho)+sqr(rho_v/rho)+sqr(rho_w/rho))/2;
 }
 //#####################################################################
 #if 0
-template class REACTIVE_EULER<GRID<VECTOR<float,1> > >;
-template class REACTIVE_EULER<GRID<VECTOR<float,2> > >;
-template class REACTIVE_EULER<GRID<VECTOR<float,3> > >;
-template class REACTIVE_EULER<GRID<VECTOR<double,1> > >;
-template class REACTIVE_EULER<GRID<VECTOR<double,2> > >;
-template class REACTIVE_EULER<GRID<VECTOR<double,3> > >;
+template class REACTIVE_EULER<VECTOR<float,1> >;
+template class REACTIVE_EULER<VECTOR<float,2> >;
+template class REACTIVE_EULER<VECTOR<float,3> >;
+template class REACTIVE_EULER<VECTOR<double,1> >;
+template class REACTIVE_EULER<VECTOR<double,2> >;
+template class REACTIVE_EULER<VECTOR<double,3> >;
 #endif

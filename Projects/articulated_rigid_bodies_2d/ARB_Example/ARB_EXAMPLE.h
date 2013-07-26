@@ -24,11 +24,11 @@
 namespace PhysBAM{
 
 template<class T_input,class RW>
-class ARB_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
+class ARB_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;
 public:
-    typedef VECTOR<T,2> TV;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    typedef VECTOR<T,2> TV;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;
     using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solid_body_collection;using BASE::solids_evolution;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::test_number;
@@ -99,7 +99,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     tests.Add_Gravity();
     solid_body_collection.Update_Simulated_Particles();
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Initialize_Bodies();
 }
 //#####################################################################
 // Function Two_Tumbling

@@ -15,7 +15,7 @@ namespace PhysBAM{
 template<class TV>
 class VORTICITY_UNIFORM
 {
-    typedef typename TV::SCALAR T;typedef typename REBIND<TV,int>::TYPE TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename TV::SPIN T_SPIN;
 
 private:

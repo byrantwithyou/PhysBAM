@@ -13,7 +13,7 @@ using namespace PhysBAM;
 // Function Conservation_Solver
 //#####################################################################
 // psi is size (0,m) - U is size 3 by (-3,m+3) with 3 ghost cells - Fx is size 3 by (0,m)
-template<class T_GRID,int d> void CONSERVATION_ENO_RF<T_GRID,d>::
+template<class TV,int d> void CONSERVATION_ENO_RF<TV,d>::
 Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
         const VECTOR<bool,2>& outflow_boundaries,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux)
 {
@@ -26,7 +26,7 @@ Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi
 //#####################################################################
 // Function Conservation_Solver_Helper
 //#####################################################################
-template<class T_GRID,int d> template<int eno_order> void CONSERVATION_ENO_RF<T_GRID,d>::
+template<class TV,int d> template<int eno_order> void CONSERVATION_ENO_RF<TV,d>::
 Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
         const VECTOR<bool,2>& outflow_boundaries)
 {
@@ -72,24 +72,24 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
             else flux(i)(k)=flux_total;}
         else if(eno_order == 2) for(k=0;k<d;k++){ 
             if(lambda_left(k)*lambda_right(k) > 0)
-                if(lambda(k) > 0) flux_total=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i)(0),Dflux(k,i-1)(1),Dflux(k,i)(1));
-                else flux_total=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i+1)(0),-Dflux(k,i+1)(1),-Dflux(k,i)(1));
+                if(lambda(k) > 0) flux_total=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,Dflux(k,i)(0),Dflux(k,i-1)(1),Dflux(k,i)(1));
+                else flux_total=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,Dflux(k,i+1)(0),-Dflux(k,i+1)(1),-Dflux(k,i)(1));
             else{
                 T alpha=Alpha(lambda_left,lambda_right,k,d);
-                T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i)(0)+alpha*Dstate(k,i)(0),Dflux(k,i-1)(1)+alpha*Dstate(k,i-1)(1),Dflux(k,i)(1)+alpha*Dstate(k,i)(1));
-                T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i+1)(0)-alpha*Dstate(k,i+1)(0),-(Dflux(k,i+1)(1)-alpha*Dstate(k,i+1)(1)),-(Dflux(k,i)(1)-alpha*Dstate(k,i)(1)));
+                T flux_left=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,Dflux(k,i)(0)+alpha*Dstate(k,i)(0),Dflux(k,i-1)(1)+alpha*Dstate(k,i-1)(1),Dflux(k,i)(1)+alpha*Dstate(k,i)(1));
+                T flux_right=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,Dflux(k,i+1)(0)-alpha*Dstate(k,i+1)(0),-(Dflux(k,i+1)(1)-alpha*Dstate(k,i+1)(1)),-(Dflux(k,i)(1)-alpha*Dstate(k,i)(1)));
                 flux_total=(T).5*(flux_left+flux_right);}
             if(!eigensystem.All_Eigenvalues_Same()) for(int kk=0;kk<d;kk++) flux(i)(kk)+=flux_total*R(k,kk);
             else flux(i)(k)=flux_total;}
         else if(eno_order == 3) for(k=0;k<d;k++){
             if(lambda_left(k)*lambda_right(k) > 0)
-                if(lambda(k) > 0) flux_total=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i)(0),Dflux(k,i-1)(1),Dflux(k,i)(1),Dflux(k,i-3)(2),Dflux(k,i-1)(2),Dflux(k,i)(2));
-                else flux_total=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i+1)(0),-Dflux(k,i+1)(1),-Dflux(k,i)(1),Dflux(k,i+1)(2),Dflux(k,i)(2),Dflux(k,i-1)(2));
+                if(lambda(k) > 0) flux_total=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,Dflux(k,i)(0),Dflux(k,i-1)(1),Dflux(k,i)(1),Dflux(k,i-3)(2),Dflux(k,i-1)(2),Dflux(k,i)(2));
+                else flux_total=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,Dflux(k,i+1)(0),-Dflux(k,i+1)(1),-Dflux(k,i)(1),Dflux(k,i+1)(2),Dflux(k,i)(2),Dflux(k,i-1)(2));
             else{
                 T alpha=Alpha(lambda_left,lambda_right,k,d);
-                T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i)(0)+alpha*Dstate(k,i)(0),Dflux(k,i-1)(1)+alpha*Dstate(k,i-1)(1),Dflux(k,i)(1)+alpha*Dstate(k,i)(1),
+                T flux_left=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,Dflux(k,i)(0)+alpha*Dstate(k,i)(0),Dflux(k,i-1)(1)+alpha*Dstate(k,i-1)(1),Dflux(k,i)(1)+alpha*Dstate(k,i)(1),
                     Dflux(k,i-3)(2)+alpha*Dstate(k,i-3)(2),Dflux(k,i-1)(2)+alpha*Dstate(k,i-1)(2),Dflux(k,i)(2)+alpha*Dstate(k,i)(2));
-                T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i+1)(0)-alpha*Dstate(k,i+1)(0),-(Dflux(k,i+1)(1)-alpha*Dstate(k,i+1)(1)),-(Dflux(k,i)(1)-alpha*Dstate(k,i)(1)),
+                T flux_right=ADVECTION_SEPARABLE_UNIFORM<TV,T>::ENO(dx,Dflux(k,i+1)(0)-alpha*Dstate(k,i+1)(0),-(Dflux(k,i+1)(1)-alpha*Dstate(k,i+1)(1)),-(Dflux(k,i)(1)-alpha*Dstate(k,i)(1)),
                     Dflux(k,i+1)(2)-alpha*Dstate(k,i+1)(2),Dflux(k,i)(2)-alpha*Dstate(k,i)(2),Dflux(k,i-1)(2)-alpha*Dstate(k,i-1)(2));
                 flux_total=(T).5*(flux_left+flux_right);}
             if(!eigensystem.All_Eigenvalues_Same()) for(int kk=0;kk<d;kk++) flux(i)(kk)+=flux_total*R(k,kk);
@@ -101,19 +101,19 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
     if(save_fluxes) for(i=0;i<m;i++) if(psi_ghost(i) || psi_ghost(i+1)) flux_temp(i)=flux(i);
 }
 //#####################################################################
-#define INSTANTIATION_HELPER(T_GRID) \
-    template class CONSERVATION_ENO_RF<T_GRID,1>; \
-    template class CONSERVATION_ENO_RF<T_GRID,2>; \
-    template class CONSERVATION_ENO_RF<T_GRID,3>; \
-    template class CONSERVATION_ENO_RF<T_GRID,4>; \
-    template class CONSERVATION_ENO_RF<T_GRID,5>; \
-    template class CONSERVATION_ENO_RF<T_GRID,6>;
+#define INSTANTIATION_HELPER(TV) \
+    template class CONSERVATION_ENO_RF<GRID<TV>,1>; \
+    template class CONSERVATION_ENO_RF<GRID<TV>,2>; \
+    template class CONSERVATION_ENO_RF<GRID<TV>,3>; \
+    template class CONSERVATION_ENO_RF<GRID<TV>,4>; \
+    template class CONSERVATION_ENO_RF<GRID<TV>,5>; \
+    template class CONSERVATION_ENO_RF<GRID<TV>,6>;
 #define P(...) __VA_ARGS__
 #if 0 // broken
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,1> >))
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,2> >))
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,3> >))
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,1> >))
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,2> >))
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,3> >))
+INSTANTIATION_HELPER(P(VECTOR<float,1>))
+INSTANTIATION_HELPER(P(VECTOR<float,2>))
+INSTANTIATION_HELPER(P(VECTOR<float,3>))
+INSTANTIATION_HELPER(P(VECTOR<double,1>))
+INSTANTIATION_HELPER(P(VECTOR<double,2>))
+INSTANTIATION_HELPER(P(VECTOR<double,3>))
 #endif

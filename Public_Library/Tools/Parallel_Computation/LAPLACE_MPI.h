@@ -19,20 +19,21 @@
 namespace PhysBAM{
 
 template<class T> class PCG_SPARSE;
-template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class T> class MPI_UNIFORM_GRID;
+template<class TV> struct GRID_ARRAYS_POLICY;
 class SPARSE_MATRIX_PARTITION;
 
-template<class T_GRID>
+template<class TV>
 class LAPLACE_MPI:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename MPI_GRID_POLICY<T_GRID>::MPI_GRID T_MPI_GRID;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename LAPLACE_POLICY<T_GRID>::LAPLACE T_LAPLACE;
-    typedef typename T_GRID::INDEX T_INDEX;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename LAPLACE_POLICY<TV>::LAPLACE T_LAPLACE;
+    typedef TV_INT T_INDEX;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename MPI_GRID_POLICY<T_GRID>::PARALLEL_GRID T_PARALLEL_GRID;
+    typedef GRID<TV> T_PARALLEL_GRID;
 public:
-    T_MPI_GRID*& mpi_grid;
-    const T_GRID& local_grid;
+    MPI_UNIFORM_GRID<TV>*& mpi_grid;
+    const GRID<TV>& local_grid;
     PCG_SPARSE<T>& local_pcg;
     PCG_SPARSE_THREADED<TV>* local_pcg_threaded;
     int& number_of_regions;
@@ -52,7 +53,7 @@ public:
 
 //#####################################################################
     void Synchronize_Solution_Regions();
-    void Update_Solution_Regions_For_Solid_Fluid_Coupling(const T_MPI_GRID& mpi_grid);
+    void Update_Solution_Regions_For_Solid_Fluid_Coupling(const MPI_UNIFORM_GRID<TV>& mpi_grid);
     virtual void Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<T_INDEX> >& matrix_index_to_cell_index_array)=0;
     int Get_Total_Number_Of_Threads(const int input,const int color);
     void Solve_Threaded(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,ARRAY<INTERVAL<int> >& interior_indices,ARRAY<ARRAY<INTERVAL<int> > >& ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const T tolerance,const int color,const int multi_proc_mode);
