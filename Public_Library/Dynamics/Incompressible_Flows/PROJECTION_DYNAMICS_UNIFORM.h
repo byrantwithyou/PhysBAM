@@ -10,12 +10,11 @@
 #include <Tools/Data_Structures/TRIPLE.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/PROJECTION_COLLIDABLE_UNIFORM.h>
-#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY_UNIFORM.h>
 #include <Dynamics/Incompressible_Flows/PROJECTION_DYNAMICS.h>
-#include <Dynamics/Interpolation/FIRE_INTERPOLATION_POLICY.h>
 namespace PhysBAM{
 
 template<class TV> class DETONATION_SHOCK_DYNAMICS;
+template<class TV> class FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM;
 
 template<class TV>
 class PROJECTION_DYNAMICS_UNIFORM:public PROJECTION_COLLIDABLE_UNIFORM<TV>,public PROJECTION_DYNAMICS<typename TV::SCALAR>
@@ -24,7 +23,7 @@ class PROJECTION_DYNAMICS_UNIFORM:public PROJECTION_COLLIDABLE_UNIFORM<TV>,publi
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef typename FIRE_INTERPOLATION_POLICY<TV>::FACE_LOOKUP_FIRE_MULTIPHASE T_FACE_LOOKUP_FIRE_MULTIPHASE;
+    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> T_FACE_LOOKUP_FIRE_MULTIPHASE;
 public:
     typedef PROJECTION_COLLIDABLE_UNIFORM<TV> BASE;
     using BASE::use_non_zero_divergence;using BASE::p_grid;using BASE::poisson;using BASE::elliptic_solver;using BASE::laplace;using BASE::p;using BASE::collidable_solver;using BASE::use_divergence_multiplier;using BASE::divergence;

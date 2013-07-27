@@ -22,7 +22,7 @@ template<class T> class MPI_UNIFORM_GRID;
 // Constructor
 //#####################################################################
 template<class TV> LAPLACE_MPI<TV>::
-LAPLACE_MPI(T_LAPLACE& laplace)
+LAPLACE_MPI(LAPLACE_UNIFORM<TV>& laplace)
     :mpi_grid(laplace.mpi_grid),local_grid(laplace.grid),local_pcg(laplace.pcg),number_of_regions(laplace.number_of_regions),number_of_global_regions(-1),filled_region_colors(laplace.filled_region_colors),
     filled_region_touches_dirichlet(laplace.filled_region_touches_dirichlet),solve_neumann_regions(laplace.solve_neumann_regions),psi_N(laplace.psi_N)
 {
@@ -133,7 +133,7 @@ Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,con
 #else
 
 //#####################################################################
-template<class TV> LAPLACE_MPI<TV>::LAPLACE_MPI(T_LAPLACE& laplace):mpi_grid(laplace.mpi_grid),local_grid(laplace.grid),local_pcg(laplace.pcg),
+template<class TV> LAPLACE_MPI<TV>::LAPLACE_MPI(LAPLACE_UNIFORM<TV>& laplace):mpi_grid(laplace.mpi_grid),local_grid(laplace.grid),local_pcg(laplace.pcg),
     number_of_regions(laplace.number_of_regions),filled_region_colors(laplace.filled_region_colors),filled_region_touches_dirichlet(laplace.filled_region_touches_dirichlet),
     solve_neumann_regions(laplace.solve_neumann_regions),psi_N(laplace.psi_N),groups(0),communicators(0){}
 template<class TV> LAPLACE_MPI<TV>::~LAPLACE_MPI(){}

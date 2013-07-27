@@ -10,7 +10,6 @@
 #include <Tools/Data_Structures/TRIPLE.h>
 #include <Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
-#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
 namespace PhysBAM{
 
 template<class TV>

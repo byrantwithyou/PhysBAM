@@ -208,7 +208,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
     if(!viscous_only){
         if(projection.flame){
             FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> face_velocities_fire(face_velocities,projection,projection.poisson_collidable->levelset_multiple);
-            typename FIRE_INTERPOLATION_POLICY<TV>::AVERAGING_FIRE_MULTIPHASE averaging;
+            AVERAGING_UNIFORM<TV,FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> > averaging;
             for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
                 TV V=averaging.Face_To_Face_Vector(grid,iterator.Axis(),iterator.Face_Index(),face_velocities_fire);
                 dt_convection=max(dt_convection,TV::Dot_Product(grid.one_over_dX,abs(V)));}}

@@ -13,7 +13,6 @@
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <Incompressible/Advection_Collidable/ADVECTION_COLLIDABLE_FORWARD.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_POLICY_UNIFORM.h>
-#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
 
 namespace PhysBAM {
 

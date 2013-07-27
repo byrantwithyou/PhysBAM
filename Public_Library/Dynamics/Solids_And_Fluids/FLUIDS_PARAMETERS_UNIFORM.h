@@ -12,7 +12,6 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
-#include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE_POLICY.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_FORWARD.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS.h>

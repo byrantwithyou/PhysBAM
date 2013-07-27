@@ -10,7 +10,6 @@
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Incompressible/Incompressible_Flows/PROJECTION_REFINEMENT_UNIFORM.h>
-#include <Dynamics/Interpolation/FIRE_INTERPOLATION_POLICY.h>
 namespace PhysBAM{
 
 template<class TV>
@@ -20,7 +19,7 @@ class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM:public PROJECTION_REFINEMENT_UN
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef typename FIRE_INTERPOLATION_POLICY<TV>::FACE_LOOKUP_FIRE_MULTIPHASE T_FACE_LOOKUP_FIRE_MULTIPHASE;
+    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> T_FACE_LOOKUP_FIRE_MULTIPHASE;
 public:
     typedef PROJECTION_REFINEMENT_UNIFORM<TV> BASE;
     using BASE::fine_mpi_grid;using BASE::collidable_solver;using BASE::elliptic_solver;using BASE::p;using BASE::coarse_mpi_grid;using BASE::solid_wall;using BASE::fine_psi_N;using BASE::poisson;

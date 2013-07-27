@@ -6,7 +6,6 @@
 #define __ADVECTION_COLLIDABLE_POLICY_UNIFORM__
 
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
-#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY_UNIFORM.h>
 
 namespace PhysBAM{
 

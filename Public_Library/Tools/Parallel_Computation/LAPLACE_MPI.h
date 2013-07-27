@@ -9,7 +9,6 @@
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Grids_PDE_Linear/LAPLACE_POLICY.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Parallel_Computation/MPI_GRID.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
@@ -22,12 +21,13 @@ template<class T> class PCG_SPARSE;
 template<class T> class MPI_UNIFORM_GRID;
 template<class TV> struct GRID_ARRAYS_POLICY;
 class SPARSE_MATRIX_PARTITION;
+template<class TV> class LAPLACE_UNIFORM;
 
 template<class TV>
 class LAPLACE_MPI:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;typedef typename LAPLACE_POLICY<TV>::LAPLACE T_LAPLACE;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef TV_INT T_INDEX;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef GRID<TV> T_PARALLEL_GRID;
@@ -47,7 +47,7 @@ public:
     ARRAY<MPI::Group>* groups;
     ARRAY<MPI::Intracomm>* communicators;
 
-    LAPLACE_MPI(T_LAPLACE& laplace);
+    LAPLACE_MPI(LAPLACE_UNIFORM<TV>& laplace);
     virtual ~LAPLACE_MPI();
 
 

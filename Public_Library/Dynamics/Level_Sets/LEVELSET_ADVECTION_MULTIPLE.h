@@ -8,7 +8,6 @@
 #define __LEVELSET_ADVECTION_MULTIPLE__
 
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
-#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 
 namespace PhysBAM {

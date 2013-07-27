@@ -8,7 +8,6 @@
 #define __ADVECTION_WRAPPER_COLLIDABLE_FACE__
 
 #include <Tools/Advection/ADVECTION.h>
-#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
 
 namespace PhysBAM{
 

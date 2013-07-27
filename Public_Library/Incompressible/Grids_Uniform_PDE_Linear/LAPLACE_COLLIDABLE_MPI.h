@@ -13,18 +13,17 @@
 #include <Tools/Parallel_Computation/MPI_GRID.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
-#include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE_POLICY.h>
 namespace PhysBAM{
 
 template<class T> class PCG_SPARSE;
 template<class TV> struct GRID_ARRAYS_POLICY;
 template<class T> class MPI_UNIFORM_GRID;
+template<class TV> class LAPLACE_COLLIDABLE_UNIFORM;
 
 template<class TV>
 class LAPLACE_COLLIDABLE_MPI:public NONCOPYABLE
 {
-    typedef typename TV::SCALAR T;typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
-    typedef VECTOR<int,TV::m> TV_INT;typedef typename LAPLACE_COLLIDABLE_POLICY<TV>::LAPLACE T_LAPLACE_COLLIDABLE;
+    typedef typename TV::SCALAR T;typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;typedef VECTOR<int,TV::m> TV_INT;
     typedef TV_INT T_INDEX;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef GRID<TV> T_PARALLEL_GRID;
@@ -43,7 +42,7 @@ public:
     ARRAY<MPI::Group>* groups;
     ARRAY<MPI::Intracomm>* communicators;
 
-    LAPLACE_COLLIDABLE_MPI(T_LAPLACE_COLLIDABLE& laplace);
+    LAPLACE_COLLIDABLE_MPI(LAPLACE_COLLIDABLE_UNIFORM<TV>& laplace);
     virtual ~LAPLACE_COLLIDABLE_MPI();
 
 //#####################################################################

@@ -11,7 +11,6 @@
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
-#include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY_POLICY.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
@@ -28,7 +27,6 @@ class FLUID_COLLISION_BODY_INACCURATE_UNION:public COLLISION_GEOMETRY<TV>
     typedef typename T_FACE_ARRAYS_T::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
     typedef typename T_FACE_ARRAYS_T::template REBIND<COLLISION_GEOMETRY_ID>::TYPE T_FACE_ARRAYS_COLLISION_GEOMETRY_ID;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
-    typedef typename IMPLICIT_OBJECT_ON_A_RAY_POLICY<TV>::TYPE T_IMPLICIT_OBJECT_ON_A_RAY;
     typedef LINEAR_INTERPOLATION_MAC_HELPER<TV> T_LINEAR_INTERPOLATION_MAC_HELPER;
     typedef typename GRID<TV>::BLOCK T_BLOCK;
     typedef COLLISION_GEOMETRY<TV> BASE;
@@ -85,7 +83,7 @@ public:
     {return levelset(location)<=contour_value;}
 
     bool Simplex_Closest_Non_Intersecting_Point(RAY<TV>& ray) const PHYSBAM_OVERRIDE
-    {T_IMPLICIT_OBJECT_ON_A_RAY implicit_object_on_a_ray(levelset,ray);
+    {IMPLICIT_OBJECT_ON_A_RAY<LEVELSET_IMPLICIT_OBJECT<TV> > implicit_object_on_a_ray(levelset,ray);
     if(implicit_object_on_a_ray(0)<=0){ray.t_max=0;return true;}
     if(implicit_object_on_a_ray(ray.t_max)>0) return false;
     ITERATIVE_SOLVER<T> solver;solver.tolerance=(T).001*grid.dX.Min();
@@ -94,7 +92,7 @@ public:
     return true;}
 
     bool Simplex_Intersection(RAY<TV>& ray) const PHYSBAM_OVERRIDE
-    {T_IMPLICIT_OBJECT_ON_A_RAY implicit_object_on_a_ray(levelset,ray);
+    {IMPLICIT_OBJECT_ON_A_RAY<LEVELSET_IMPLICIT_OBJECT<TV> > implicit_object_on_a_ray(levelset,ray);
     if(implicit_object_on_a_ray(0)<=0){ray.t_max=0;return true;}
     if(implicit_object_on_a_ray(ray.t_max)>0) return false;
     ITERATIVE_SOLVER<T> solver;solver.tolerance=(T).001*grid.dX.Min();

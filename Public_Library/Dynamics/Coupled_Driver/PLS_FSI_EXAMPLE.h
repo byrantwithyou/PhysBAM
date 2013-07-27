@@ -37,7 +37,6 @@ class PLS_FSI_EXAMPLE:public EXAMPLE<TV_input>,public EXAMPLE_FORCES_AND_VELOCIT
     typedef TV_input TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename MATRIX_POLICY<TV>::TRANSFORMATION_MATRIX T_TRANSFORMATION_MATRIX;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;
-    typedef typename INTERPOLATION_COLLIDABLE_POLICY<TV>::AVERAGING T_AVERAGING;
 public:
     typedef EXAMPLE<TV> BASE;using BASE::parse_args;using BASE::Set_Write_Substeps_Level;
     using BASE::output_directory;using BASE::first_frame;using BASE::restart;using BASE::Write_Frame_Title;using BASE::stream_type;

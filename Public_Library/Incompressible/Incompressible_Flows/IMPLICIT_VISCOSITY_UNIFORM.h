@@ -9,7 +9,6 @@
 
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
-#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY_UNIFORM.h>
 namespace PhysBAM{
 
 template<class TV> class LAPLACE_UNIFORM;

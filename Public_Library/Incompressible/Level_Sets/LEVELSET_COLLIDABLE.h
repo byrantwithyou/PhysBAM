@@ -18,7 +18,6 @@
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Vectors/SCALAR_POLICY.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
-#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY_UNIFORM.h>
 #include <cassert>
 #include <cfloat>
 namespace PhysBAM{

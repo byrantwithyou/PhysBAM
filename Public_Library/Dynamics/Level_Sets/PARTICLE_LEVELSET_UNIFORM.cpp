@@ -406,7 +406,7 @@ Second_Order_Runge_Kutta_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_F
     T_FACE_LOOKUP_COLLIDABLE V_lookup_collidable(V_lookup,*levelset.collision_body_list,levelset.face_velocities_valid_mask_current);
     typename T_FACE_LOOKUP_COLLIDABLE::LOOKUP V_lookup_collidable_lookup(V_lookup_collidable,V_lookup);
     LINEAR_INTERPOLATION_UNIFORM<TV,T> linear_interpolation; // use for second step since particle may not be in initial block
-    T_LINEAR_INTERPOLATION_COLLIDABLE_FACE_SCALAR linear_interpolation_collidable;
+    LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM<TV,T> linear_interpolation_collidable;
     COLLISION_GEOMETRY_ID body_id;int aggregate_id;T start_phi,end_phi;TV body_normal,body_velocity;int number_of_deleted_particles=0,number_of_non_occupied_cells=0,number_of_occupied_cells=0;
     const T one_over_dt=1/dt;
 
@@ -1041,7 +1041,7 @@ template<class TV> template<class T_FACE_LOOKUP_LOOKUP> int PARTICLE_LEVELSET_UN
 Remove_Escaped_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const ARRAY<bool>& escaped,const int sign,
     PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*& removed_particles,const T_FACE_LOOKUP_LOOKUP& V,const T radius_fraction,const T time)
 {
-    T_LINEAR_INTERPOLATION_COLLIDABLE_FACE_SCALAR linear_interpolation_collidable;
+    LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM<TV,T> linear_interpolation_collidable;
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
     int removed=0;T one_over_radius_multiplier=-sign/radius_fraction;
     // TODO: limit the amount of mass removed - don't let the particles just set their own radii
@@ -1080,7 +1080,7 @@ Fix_Momentum_With_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const T_ARRAYS
     
     bool done=true;
     LINEAR_INTERPOLATION_UNIFORM<TV,T> linear_interpolation;
-    T_LINEAR_INTERPOLATION_COLLIDABLE_FACE_SCALAR linear_interpolation_collidable;
+    LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM<TV,T> linear_interpolation_collidable;
     for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
         T local_momentum_lost=linear_interpolation.Clamped_To_Array(levelset.grid,momentum_lost,iterator.Location());
         if(local_momentum_lost==0) continue; //Nothing to add
@@ -1089,7 +1089,7 @@ Fix_Momentum_With_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const T_ARRAYS
         if(!removed_particles){
             if(!force){done=false;continue;}
             else removed_particles=template_removed_particles.Clone();}
-        T_LINEAR_INTERPOLATION_COLLIDABLE_FACE_SCALAR linear_interpolation_collidable;
+        LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM<TV,T> linear_interpolation_collidable;
         bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block_uniform):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(-1);
         for(int k=removed_particles->Size()-1;k>=0;k--){T fraction=local_momentum_lost/removed_particles->Size();
             removed_particles->V(k)+=fraction/mass_scaling;}
@@ -1109,7 +1109,7 @@ Fix_Momentum_With_Escaped_Particles(const TV& location,const T_FACE_ARRAYS_SCALA
     T_FACE_LOOKUP_COLLIDABLE V_lookup_collidable(V_lookup,*levelset.collision_body_list,levelset.face_velocities_valid_mask_current);
     typename T_FACE_LOOKUP_COLLIDABLE::LOOKUP V_lookup_collidable_lookup(V_lookup_collidable,V_lookup);
     LINEAR_INTERPOLATION_UNIFORM<TV,T> linear_interpolation;
-    T_LINEAR_INTERPOLATION_COLLIDABLE_FACE_SCALAR linear_interpolation_collidable;
+    LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM<TV,T> linear_interpolation_collidable;
     TV_INT block=levelset.grid.Closest_Node(location);
     
     BLOCK_UNIFORM<TV> block_uniform(levelset.grid,block);
