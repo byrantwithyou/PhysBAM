@@ -30,7 +30,7 @@ using namespace __gnu_cxx;
 // Constructor
 //##################################################################### 
 template<class TV> PARTICLE_LEVELSET_UNIFORM<TV>::
-PARTICLE_LEVELSET_UNIFORM(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,const int number_of_ghost_cells_input)
+PARTICLE_LEVELSET_UNIFORM(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,const int number_of_ghost_cells_input)
     :PARTICLE_LEVELSET<TV>(grid_input,phi_input,collision_body_list_input,number_of_ghost_cells_input),mpi_grid(0),thread_queue(0)
 {
 #ifdef USE_PTHREADS
@@ -187,7 +187,7 @@ Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* V,ARRAY<T_ARRAYS_P
         Modify_Levelset_Using_Escaped_Particles(levelset.phi,positive_particles,0,1);Modify_Levelset_Using_Escaped_Particles(levelset.phi,negative_particles,0,-1);
         if(reincorporate_removed_particles_everywhere) Modify_Levelset_Using_Escaped_Particles(levelset.phi,removed_negative_particles,V,-1);}
     else{
-        T_ARRAYS_SCALAR phi_minus(levelset.phi),phi_plus(levelset.phi);
+        ARRAY<T,TV_INT> phi_minus(levelset.phi),phi_plus(levelset.phi);
         Modify_Levelset_Using_Escaped_Particles(phi_minus,negative_particles,0,-1);Modify_Levelset_Using_Escaped_Particles(phi_plus,positive_particles,0,1);
         if(other_positive_particles)for(int i=0;i<other_positive_particles->m;i++)Modify_Levelset_Using_Escaped_Particles(phi_plus,*(*other_positive_particles)(i),0,1);
         if(reincorporate_removed_particles_everywhere) Modify_Levelset_Using_Escaped_Particles(phi_minus,removed_negative_particles,V,-1);
@@ -197,19 +197,19 @@ Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* V,ARRAY<T_ARRAYS_P
 // Function Modify_Levelset_Using_Escaped_Particles
 //#####################################################################
 template<class TV> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Modify_Levelset_Using_Escaped_Particles(T_ARRAYS_SCALAR& phi,T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR* V,const int sign)
+Modify_Levelset_Using_Escaped_Particles(ARRAY<T,TV_INT>& phi,T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR* V,const int sign)
 {
     T one_over_radius_multiplier=-sign/outside_particle_distance_multiplier;
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices());domain.max_corner+=TV_INT::All_Ones_Vector();
     Consistency_Check(domain,particles);
-    DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(levelset.grid.Domain_Indices(),thread_queue).template Run<T_ARRAYS_SCALAR&,T_ARRAYS_PARTICLES&,T_FACE_ARRAYS_SCALAR*,int,T>(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Modify_Levelset_Using_Escaped_Particles_Threaded,phi,particles,V,sign,one_over_radius_multiplier);
+    DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(levelset.grid.Domain_Indices(),thread_queue).template Run<ARRAY<T,TV_INT>&,T_ARRAYS_PARTICLES&,T_FACE_ARRAYS_SCALAR*,int,T>(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Modify_Levelset_Using_Escaped_Particles_Threaded,phi,particles,V,sign,one_over_radius_multiplier);
     Consistency_Check(domain,particles);
 }
 //#####################################################################
 // Function Modify_Levelset_Using_Escaped_Particles
 //#####################################################################
 template<class TV> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi,T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR* V,const int sign,const T one_over_radius_multiplier)
+Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi,T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR* V,const int sign,const T one_over_radius_multiplier)
 {
     RANGE<TV_INT> range_domain(domain);range_domain.max_corner+=TV_INT::All_Ones_Vector();
     for(NODE_ITERATOR<TV> iterator(levelset.grid,range_domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
@@ -233,7 +233,7 @@ Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_
 // Function Update_Particles_To_Reflect_Mass_Conservation
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Update_Particles_To_Reflect_Mass_Conservation(T_ARRAYS_SCALAR& phi_old,const bool update_particle_cells,const bool verbose)
+Update_Particles_To_Reflect_Mass_Conservation(ARRAY<T,TV_INT>& phi_old,const bool update_particle_cells,const bool verbose)
 {
     LEVELSET<TV> levelset_old(levelset.grid,phi_old);
     Update_Particles_To_Reflect_Mass_Conservation(levelset_old,negative_particles,PARTICLE_LEVELSET_NEGATIVE,update_particle_cells,verbose);
@@ -1072,7 +1072,7 @@ Remove_Escaped_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTIC
 // Function Remove_Escaped_Particles
 //#####################################################################
 template<class TV> bool PARTICLE_LEVELSET_UNIFORM<TV>::
-Fix_Momentum_With_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const T_ARRAYS_SCALAR& momentum_lost,const T radius_fraction,const T mass_scaling,const T time,const bool force)
+Fix_Momentum_With_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const ARRAY<T,TV_INT>& momentum_lost,const T radius_fraction,const T mass_scaling,const T time,const bool force)
 {
     T_FACE_LOOKUP V_lookup(V);
     T_FACE_LOOKUP_COLLIDABLE V_lookup_collidable(V_lookup,*levelset.collision_body_list,levelset.face_velocities_valid_mask_current);

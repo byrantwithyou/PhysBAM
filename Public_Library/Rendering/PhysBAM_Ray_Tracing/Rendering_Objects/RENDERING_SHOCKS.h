@@ -22,14 +22,13 @@ template<class T>
 class RENDERING_SHOCKS:public RENDERING_VOXELS<T>
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     using RENDERING_VOXELS<T>::box;using RENDERING_VOXELS<T>::Intersection;using RENDERING_VOXELS<T>::World_Space_Vector;using RENDERING_VOXELS<T>::Object_Space_Vector;
     using RENDERING_VOXELS<T>::Object_Space_Ray;using RENDERING_VOXELS<T>::Object_Space_Point;
 
     const GRID<TV>& grid;
-    const T_ARRAYS_SCALAR& density;
-    const T_ARRAYS_SCALAR& pressure;
+    const ARRAY<T,TV_INT>& density;
+    const ARRAY<T,TV_INT>& pressure;
     T gradient_threshold;
     T refraction_multiplier;
     T volumetric_step,fine_volumetric_step;
@@ -40,7 +39,7 @@ public:
     mutable TV last_intersection_point;
     mutable T last_intersection_t;
 
-    RENDERING_SHOCKS(const GRID<TV>& grid_input,const T_ARRAYS_SCALAR& density_input,const T_ARRAYS_SCALAR& pressure_input,
+    RENDERING_SHOCKS(const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& density_input,const ARRAY<T,TV_INT>& pressure_input,
         const T gradient_threshold_input,const T refraction_multiplier_input,const T volumetric_step_input,
         const T fine_volumetric_step_input,const T skip_next_intersection_factor_input,
         const bool use_pressure_for_intersection_input,const bool use_pressure_for_rarefaction_input)

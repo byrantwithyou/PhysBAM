@@ -242,7 +242,7 @@ Initialize()
 
         int extrapolation_ghost_cells=2*example.fluids_parameters.number_of_ghost_cells+2;
         T extrapolation_bandwidth=(T)(extrapolation_ghost_cells-1);
-        T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
+        ARRAY<T,TV_INT> exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
         particle_levelset_evolution->Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time,extrapolation_ghost_cells);
 //        Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,particle_levelset_evolution->Particle_Levelset(0).levelset,extrapolation_bandwidth);
         if(!example.two_phase) 
@@ -354,7 +354,7 @@ Extrapolate_Velocity_Across_Interface(T time,T dt)
     SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>& slip=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*example.solids_evolution);
     ARRAY<bool,FACE_INDEX<TV::m> >& valid_faces=slip.solved_faces;
     int extrapolation_ghost_cells=2*example.fluids_parameters.number_of_ghost_cells+2;
-    T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
+    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
     particle_levelset_evolution->Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,phi_ghost,0,time+dt,extrapolation_ghost_cells);
     int band_width=extrapolation_ghost_cells-1;
     T delta=band_width*grid.dX.Max();
@@ -472,7 +472,7 @@ Advect_Fluid(const T dt,const int substep)
 
     int extrapolation_ghost_cells=2*fluids_parameters.number_of_ghost_cells+2;
     T extrapolation_bandwidth=(T)(extrapolation_ghost_cells-1);
-    T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
+    ARRAY<T,TV_INT> exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
     particle_levelset_evolution->Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time+dt,extrapolation_ghost_cells);
     if(example.convection_order>1){
         for(RUNGEKUTTA<ARRAY<T,FACE_INDEX<TV::dimension> > > rk(face_velocities,example.convection_order,dt,time);rk.Valid();rk.Next()){

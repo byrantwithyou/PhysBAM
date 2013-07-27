@@ -26,7 +26,6 @@ template<class TV,class T_WATER_STANDARD_TESTS>
 class WATER_STANDARD_TESTS_MULTIPHASE:public T_WATER_STANDARD_TESTS
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     typedef T_WATER_STANDARD_TESTS BASE;
     using BASE::world_to_source;using BASE::rigid_body_collection;using BASE::sources;using BASE::fluids_parameters;using BASE::grid;using BASE::example;using BASE::Initial_Phi;using BASE::sphere;

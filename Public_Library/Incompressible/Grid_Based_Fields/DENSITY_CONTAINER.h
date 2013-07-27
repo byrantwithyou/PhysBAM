@@ -19,7 +19,6 @@ template<class TV>
 class DENSITY_CONTAINER:public GRID_AND_ARRAY_CONTAINER<TV,typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename ADVECTION_COLLIDABLE_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL;typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;
@@ -29,7 +28,7 @@ public:
     using BASE::array;using BASE::grid;
     using BASE::boundary_default;using BASE::boundary;using BASE::Set_To_Constant_Value;using BASE::Set_Custom_Advection;
 
-    T_ARRAYS_SCALAR& density;
+    ARRAY<T,TV_INT>& density;
     T ambient_density;
 
 private:
@@ -55,7 +54,7 @@ public:
     void Initialize_Array(const int ghost_cells=0,const bool initialize_new_elements=true,const bool copy_existing_elements=true) PHYSBAM_OVERRIDE;
     void Use_Semi_Lagrangian_Collidable_Advection(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list,const T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input);
     void Fill_Beta_At_Faces(const T dt,const T time,T_FACE_ARRAYS_SCALAR& beta_face) const;
-    void Get_Ghost_Density(const T dt,const T time,const int number_of_ghost_cells,T_ARRAYS_SCALAR& density_ghost) const;
+    void Get_Ghost_Density(const T dt,const T time,const int number_of_ghost_cells,ARRAY<T,TV_INT>& density_ghost) const;
 //#####################################################################
 };      
 }

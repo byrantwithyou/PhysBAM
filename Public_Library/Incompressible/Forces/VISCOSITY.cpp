@@ -12,7 +12,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> VISCOSITY<TV>::
-VISCOSITY(LAPLACE_UNIFORM<TV>& elliptic_solver_input,const T_ARRAYS_SCALAR& variable_viscosity_input,const T density_input,const T viscosity_input,bool implicit_viscosity_input,
+VISCOSITY(LAPLACE_UNIFORM<TV>& elliptic_solver_input,const ARRAY<T,TV_INT>& variable_viscosity_input,const T density_input,const T viscosity_input,bool implicit_viscosity_input,
     bool use_explicit_part_of_implicit_viscosity_input,bool use_variable_viscosity_input,int maximum_implicit_viscosity_iterations_input,bool use_psi_R_input)
     :elliptic_solver(elliptic_solver_input),density(density_input),viscosity(viscosity_input),implicit_viscosity(implicit_viscosity_input),
     use_explicit_part_of_implicit_viscosity(use_explicit_part_of_implicit_viscosity_input),variable_viscosity(variable_viscosity_input),use_variable_viscosity(use_variable_viscosity_input),

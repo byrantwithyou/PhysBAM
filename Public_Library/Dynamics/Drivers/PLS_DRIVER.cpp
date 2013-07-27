@@ -201,7 +201,7 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
         T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(example.incompressible.grid,example.number_of_ghost_cells,false);
         example.incompressible.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
 
-        T_ARRAYS_SCALAR phi_back(example.mac_grid.Domain_Indices(example.number_of_ghost_cells));
+        ARRAY<T,TV_INT> phi_back(example.mac_grid.Domain_Indices(example.number_of_ghost_cells));
         example.phi_boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.Particle_Levelset(0).levelset.phi,phi_back,dt,time,example.number_of_ghost_cells);
         LOG::Time("Advect Levelset");
         PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi",0,1);
@@ -294,7 +294,7 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
 
         LOG::Time("extrapolating velocity across interface");
         int band_width=example.number_of_ghost_cells+1;
-        T_ARRAYS_SCALAR exchanged_phi_ghost(example.mac_grid.Domain_Indices(2*band_width+2));
+        ARRAY<T,TV_INT> exchanged_phi_ghost(example.mac_grid.Domain_Indices(2*band_width+2));
         example.particle_levelset_evolution.Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.phi,exchanged_phi_ghost,0,time+dt,2*band_width+2);
         example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,band_width,0,TV());
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after extrapolate",0,1);

@@ -18,11 +18,11 @@ class INCOMPRESSIBLE_MULTIPHASE_UNIFORM:public INCOMPRESSIBLE_UNIFORM<TV>
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
+    typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;typedef VECTOR<int,TV::m> T_VECTOR_INT;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<typename TV::SPIN>::TYPE T_ARRAYS_SPIN;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<typename TV::SPIN>::TYPE T_ARRAYS_SPIN;
 public:
     typedef INCOMPRESSIBLE_UNIFORM<TV> BASE;
     using BASE::use_force;using BASE::viscosity;using BASE::use_variable_viscosity;using BASE::use_variable_vorticity_confinement;using BASE::dt_old;using BASE::gravity;
@@ -45,7 +45,7 @@ public:
     for(int i=0;i<use_multiphase_strain.m;i++)if(use_multiphase_strain(i))strains(i)=new FLUID_STRAIN_UNIFORM<TV>(grid);}
 
     // overrides version from BASE
-    void Advance_One_Time_Step_Forces(const T dt,const T time,const bool implicit_viscosity=false,const T_ARRAYS_SCALAR* phi_ghost=0)
+    void Advance_One_Time_Step_Forces(const T dt,const T time,const bool implicit_viscosity=false,const ARRAY<T,TV_INT>* phi_ghost=0)
     {PHYSBAM_NOT_IMPLEMENTED();/*PHYSBAM_ASSERT(!phi_ghost);Advance_One_Time_Step_Forces(dt,time,implicit_viscosity,0,0);*/}
 
     // overrides version from BASE
@@ -53,13 +53,13 @@ public:
     {PHYSBAM_NOT_IMPLEMENTED();/*Advance_One_Time_Step_Convection(dt,time,face_velocities_to_advect,0);*/}
     
 //#####################################################################
-    void Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<T_ARRAYS_SCALAR>* phi_ghost,
+    void Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<ARRAY<T,TV_INT>>* phi_ghost,
         const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells);
     void Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& advecting_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells);
     void Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity=false);
     void Calculate_Pressure_Jump(const T dt,const T time);
     T CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid=false,const bool viscous_only=false) const;
-    void Set_Dirichlet_Boundary_Conditions(ARRAY<T_ARRAYS_SCALAR>& phis,const ARRAY<bool>& dirichlet_regions,const ARRAY<T>* pressures=0);
+    void Set_Dirichlet_Boundary_Conditions(ARRAY<ARRAY<T,TV_INT>>& phis,const ARRAY<bool>& dirichlet_regions,const ARRAY<T>* pressures=0);
     void Add_Surface_Tension(LEVELSET<TV>& levelset,const T time);
     void Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& F) PHYSBAM_OVERRIDE;
 protected:

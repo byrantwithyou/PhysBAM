@@ -54,7 +54,7 @@ Alpha(const ARRAY<T,VECTOR<int,1> >& lambda_left,const ARRAY<T,VECTOR<int,1> >& 
 //#####################################################################
 template<class TV,int d> void CONSERVATION<TV,d>::
 Compute_Delta_Flux_For_Clamping_Variable(const GRID<TV>& grid,const int number_of_ghost_cells,T dt,const int clamped_variable_index,const T clamped_value,const T_FACE_ARRAYS_BOOL& psi_N,
-    const T_ARRAYS_DIMENSION_SCALAR& U,const T_FACE_ARRAYS_DIMENSION_SCALAR& flux,T_FACE_ARRAYS_DIMENSION_SCALAR& delta_flux,T_ARRAYS_DIMENSION_SCALAR& rhs,T_ARRAYS_SCALAR& overshoot_percentages)
+    const T_ARRAYS_DIMENSION_SCALAR& U,const T_FACE_ARRAYS_DIMENSION_SCALAR& flux,T_FACE_ARRAYS_DIMENSION_SCALAR& delta_flux,T_ARRAYS_DIMENSION_SCALAR& rhs,ARRAY<T,TV_INT>& overshoot_percentages)
 {
     TV one_over_dx=grid.one_over_dX;
     VECTOR<bool,TV::m*2> clamp_flux;
@@ -158,7 +158,7 @@ Compute_Flux_With_Clamping(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCALAR&
     // Use this rhs to update the fluxes for the clamped variable
     T_FACE_ARRAYS_DIMENSION_SCALAR delta_flux(grid);
     T_ARRAYS_DIMENSION_SCALAR delta_rhs(U_domain_indices,true);
-    T_ARRAYS_SCALAR overshoot_percentages(grid.Domain_Indices());
+    ARRAY<T,TV_INT> overshoot_percentages(grid.Domain_Indices());
 
     Compute_Delta_Flux_For_Clamping_Variable(grid,U_domain_indices.max_corner.x-grid.Domain_Indices().max_corner.x,dt,clamped_variable_index,clamped_value,psi_N,U,fluxes,delta_flux,rhs,
         overshoot_percentages);
@@ -206,7 +206,7 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
 
     Compute_Flux(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs,thinshell,eigensystems_auxiliary,fluxes_auxiliary);
 
-    T_ARRAYS_SCALAR rho_dt(grid.Domain_Indices()), e_dt(grid.Domain_Indices());
+    ARRAY<T,TV_INT> rho_dt(grid.Domain_Indices()), e_dt(grid.Domain_Indices());
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T clamp_rho_cell=clamp_rho*U_ghost(cell_index)(0);
         if(rhs(cell_index)(0)>0 && U_ghost(cell_index)(0)>=clamp_rho_cell) rho_dt(cell_index)=(U_ghost(cell_index)(0)-clamp_rho_cell)/rhs(cell_index)(0);

@@ -21,7 +21,7 @@ class GRID_BASED_COLLISION_GEOMETRY:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef TV_INT T_INDEX;typedef typename GRID<TV>::BLOCK T_BLOCK;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_FACE_ARRAYS_BOOL::template REBIND<VECTOR<bool,TV::m> >::TYPE T_FACE_ARRAYS_BOOL_DIMENSION;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;

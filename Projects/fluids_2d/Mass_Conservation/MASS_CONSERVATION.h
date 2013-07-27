@@ -37,7 +37,6 @@ class MASS_CONSERVATION:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef GRID<TV> T_GRID;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;typedef VECTOR<int,2> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::fluids_parameters;
     using BASE::fluid_collection;using BASE::parse_args;
@@ -224,8 +223,8 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     if((test_number==11 || test_number==12) && frame && frame%40==0){
         GRID<TV>& grid=*fluids_parameters.grid;
-        T_ARRAYS_SCALAR copy_phis=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi;
-        T_ARRAYS_SCALAR copy_volumes;
+        ARRAY<T,TV_INT> copy_phis=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi;
+        ARRAY<T,TV_INT> copy_volumes;
         fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi.Fill((T)1);
         TV position_offset;
         if(test_number==11){
@@ -337,7 +336,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.refine_fmm_initialization_with_iterative_solver=true;
     if(test_number==12){
         // invert everything around y=50
-        T_ARRAYS_SCALAR copy_phis=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi;
+        ARRAY<T,TV_INT> copy_phis=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi;
         // fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi.Fill((T)1);
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index();

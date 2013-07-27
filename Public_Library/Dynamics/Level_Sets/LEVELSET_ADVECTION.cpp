@@ -107,7 +107,7 @@ template<class TV> typename TV::SCALAR LEVELSET_ADVECTION<TV>::
 Approximate_Negative_Material(const T interface_thickness,const T time) const
 {
     GRID<TV>& grid=levelset->grid;
-    T_ARRAYS_SCALAR& phi=levelset->phi;
+    ARRAY<T,TV_INT>& phi=levelset->phi;
     GRID<TV> node_grid=grid.Is_MAC_Grid()?grid.Get_Regular_Grid_At_MAC_Positions():grid;
     T interface_half_width=interface_thickness*grid.dX.Max()/2,volume=0;
     for(NODE_ITERATOR<TV> iterator(node_grid);iterator.Valid();iterator.Next()) volume+=LEVELSET_UTILITIES<T>::Heaviside(-phi(iterator.Node_Index()),interface_half_width);
@@ -121,7 +121,7 @@ template<class TV> typename TV::SCALAR LEVELSET_ADVECTION<TV>::
 Approximate_Positive_Material(const T interface_thickness,const T time) const
 {
     GRID<TV>& grid=levelset->grid;
-    T_ARRAYS_SCALAR& phi=levelset->phi;
+    ARRAY<T,TV_INT>& phi=levelset->phi;
     GRID<TV> node_grid=grid.Is_MAC_Grid()?grid.Get_Regular_Grid_At_MAC_Positions():grid;
     T interface_half_width=interface_thickness*grid.dX.Max()/2,volume=0;
     for(NODE_ITERATOR<TV> iterator(node_grid);iterator.Valid();iterator.Next()) volume+=LEVELSET_UTILITIES<T>::Heaviside(phi(iterator.Node_Index()),interface_half_width);
@@ -135,7 +135,7 @@ Euler_Step(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocity,const T dt,const T t
 {
     GRID<TV>& grid=levelset->grid;
     BOUNDARY<TV,T>* boundary=levelset->boundary;
-    T_ARRAYS_SCALAR& phi=levelset->phi;
+    ARRAY<T,TV_INT>& phi=levelset->phi;
     assert(grid.Is_MAC_Grid());
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(number_of_ghost_cells));
     boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);
@@ -201,15 +201,15 @@ template<class TV> void LEVELSET_ADVECTION<TV>::
 Euler_Step(const ARRAY<TV,TV_INT>& V,const T dt,const T time,const int number_of_ghost_cells)
 {
     GRID<TV>& grid=levelset->grid;
-    T_ARRAYS_SCALAR& phi=levelset->phi;
-    T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(number_of_ghost_cells));levelset->boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);
+    ARRAY<T,TV_INT>& phi=levelset->phi;
+    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(number_of_ghost_cells));levelset->boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);
 
     if(local_semi_lagrangian_advection){
         LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi_ghost(cell)) <= levelset->half_band_width)
             phi(cell)=interpolation.Clamped_To_Array(grid,phi_ghost,iterator.Location()-dt*V(cell));}}
     else if(local_advection_spatial_order){
-        T_ARRAYS_SCALAR rhs(grid.Domain_Indices());
+        ARRAY<T,TV_INT> rhs(grid.Domain_Indices());
         Euler_Step_High_Order(grid,V,phi,phi_ghost,rhs,local_advection_spatial_order,levelset->half_band_width);
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi(cell)) <= levelset->half_band_width) phi(cell)-=dt*rhs(cell);}}
     else // use the advection routine in the level set base class

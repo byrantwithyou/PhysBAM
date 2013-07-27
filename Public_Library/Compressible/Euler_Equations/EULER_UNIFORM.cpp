@@ -236,7 +236,7 @@ Advance_One_Time_Step_Forces(const T dt,const T time)
 // Function Compute_Cavitation_Velocity
 //#####################################################################
 template<class TV> void EULER_UNIFORM<TV>::
-Compute_Cavitation_Velocity(T_ARRAYS_SCALAR& rho_n, T_FACE_ARRAYS_SCALAR& face_velocities_n, T_ARRAYS_DIMENSION_SCALAR& momentum_n)
+Compute_Cavitation_Velocity(ARRAY<T,TV_INT>& rho_n, T_FACE_ARRAYS_SCALAR& face_velocities_n, T_ARRAYS_DIMENSION_SCALAR& momentum_n)
 {
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
         if(!euler_projection.elliptic_solver->psi_N.Component(axis)(face_index)){
@@ -256,7 +256,7 @@ Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep
     last_dt=dt;
 
     // Store time n density values
-    T_ARRAYS_SCALAR rho_n(grid.Domain_Indices(0));T_ARRAYS_DIMENSION_SCALAR momentum_n(grid.Domain_Indices(0));T_FACE_ARRAYS_SCALAR face_velocities_n(grid);
+    ARRAY<T,TV_INT> rho_n(grid.Domain_Indices(0));T_ARRAYS_DIMENSION_SCALAR momentum_n(grid.Domain_Indices(0));T_FACE_ARRAYS_SCALAR face_velocities_n(grid);
     if(apply_cavitation_correction){
         for(CELL_ITERATOR<TV> iterator(grid,0);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             rho_n(cell_index)=U_ghost(cell_index)(0);}
@@ -410,7 +410,7 @@ CFL(const T time) const
         TV max_lambdas;TV max_grad_p_over_rho,max_grad_p;
 
         Fill_Ghost_Cells(last_dt,time,3);
-        T_ARRAYS_SCALAR p_approx(grid.Domain_Indices(1));
+        ARRAY<T,TV_INT> p_approx(grid.Domain_Indices(1));
         for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())
             p_approx(iterator.Cell_Index())=eos->p(U_ghost(iterator.Cell_Index())(0),e(U_ghost,iterator.Cell_Index()));
         T_FACE_ARRAYS_SCALAR p_approx_face(grid);

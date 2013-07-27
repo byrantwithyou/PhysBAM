@@ -21,7 +21,6 @@ class DSD_FIRE_BALL_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,
     typedef T_input T;
 public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef GRID<TV> T_GRID;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
@@ -170,7 +169,7 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,F
 void Initialize_Phi() PHYSBAM_OVERRIDE
 {
     GRID<TV>& grid=*fluids_parameters.grid;
-    ARRAY<T_ARRAYS_SCALAR>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
+    ARRAY<ARRAY<T,TV_INT>>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) phis(1)(iterator.Cell_Index())=source_sphere.Signed_Distance(iterator.Location());
     phis(2).Copy(-1,phis(1));
 }
@@ -180,7 +179,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     GRID<TV>& grid=*fluids_parameters.grid;
-    ARRAY<T_ARRAYS_SCALAR>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
+    ARRAY<ARRAY<T,TV_INT>>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
         if(source_sphere.Lazy_Inside(iterator.Location())) phis(1)(iterator.Cell_Index())=-grid.dX.x;
     return false;

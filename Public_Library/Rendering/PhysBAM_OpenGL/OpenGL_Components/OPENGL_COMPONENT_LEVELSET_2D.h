@@ -15,7 +15,6 @@ template<class T,class RW=T>
 class OPENGL_COMPONENT_LEVELSET_2D:public OPENGL_COMPONENT
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const std::string filename_set_input="");
     virtual ~OPENGL_COMPONENT_LEVELSET_2D();

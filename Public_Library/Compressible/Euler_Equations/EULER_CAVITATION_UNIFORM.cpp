@@ -177,7 +177,7 @@ Apply_Pressure_To_Density(const T dt)
     T_FACE_ARRAYS_SCALAR grad_p_cavitation_face(euler.grid);
     ARRAYS_UTILITIES<TV,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler.grid,grad_p_cavitation_face,p_cavitation);
 
-    T_ARRAYS_SCALAR laplacian_p_cavitation_cell(euler.grid.Domain_Indices(0));
+    ARRAY<T,TV_INT> laplacian_p_cavitation_cell(euler.grid.Domain_Indices(0));
     ARRAYS_UTILITIES<TV,T>::Compute_Divergence_At_Cells_From_Face_Data(euler.grid,laplacian_p_cavitation_cell,grad_p_cavitation_face);
 
     for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){
@@ -203,7 +203,7 @@ Apply_Pressure_To_Internal_Energy(const T dt)
     T_FACE_ARRAYS_SCALAR grad_p_cavitation_face(euler.grid);
     ARRAYS_UTILITIES<TV,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler.grid,grad_p_cavitation_face,p_cavitation);
 
-    T_ARRAYS_SCALAR laplacian_p_cavitation_cell(euler.grid.Domain_Indices(0));
+    ARRAY<T,TV_INT> laplacian_p_cavitation_cell(euler.grid.Domain_Indices(0));
     ARRAYS_UTILITIES<TV,T>::Compute_Divergence_At_Cells_From_Face_Data(euler.grid,laplacian_p_cavitation_cell,grad_p_cavitation_face);
 
     for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){
@@ -213,7 +213,7 @@ Apply_Pressure_To_Internal_Energy(const T dt)
     euler.Invalidate_Ghost_Cells();
 }
 template<class TV> void EULER_CAVITATION_UNIFORM<TV>::
-Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,T_FACE_ARRAYS_SCALAR& p_face,const T_ARRAYS_SCALAR& p_cell)
+Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,T_FACE_ARRAYS_SCALAR& p_face,const ARRAY<T,TV_INT>& p_cell)
 {
     TV_INT first_cell_index,second_cell_index;int axis;
     for(FACE_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){
@@ -229,7 +229,7 @@ Apply_Pressure(const T dt,const T time, T_FACE_ARRAYS_SCALAR& face_velocities)
     if(clamp_density) 
     {
         // Store time star density values
-        T_ARRAYS_SCALAR rho_star(euler.grid.Domain_Indices(0));
+        ARRAY<T,TV_INT> rho_star(euler.grid.Domain_Indices(0));
         for(CELL_ITERATOR<TV> iterator(euler.grid,0);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             rho_star(cell_index)=euler.U_ghost(cell_index)(0);}
 

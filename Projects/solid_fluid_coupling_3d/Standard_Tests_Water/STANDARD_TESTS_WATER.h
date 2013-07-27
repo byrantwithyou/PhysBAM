@@ -63,7 +63,6 @@ class STANDARD_TESTS_WATER:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3
 {
     typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef GRID<TV> T_GRID;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;

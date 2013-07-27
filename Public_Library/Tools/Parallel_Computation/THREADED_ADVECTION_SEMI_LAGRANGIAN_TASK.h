@@ -20,7 +20,7 @@ template<class TV,class T2> class BOUNDARY;
 template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION>
 class ADVECTION_SEMI_LAGRANGIAN_TASK_NODE:public THREAD_QUEUE::TASK
 {    
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
 
 public:
@@ -59,7 +59,7 @@ public:
 template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION>
 class ADVECTION_SEMI_LAGRANGIAN_TASK_CELL:public THREAD_QUEUE::TASK
 {    
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
 
 public:
@@ -102,7 +102,7 @@ public:
 template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION>
 class ADVECTION_SEMI_LAGRANGIAN_TASK_FACE:public THREAD_QUEUE::TASK
 {    
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
 
 public:

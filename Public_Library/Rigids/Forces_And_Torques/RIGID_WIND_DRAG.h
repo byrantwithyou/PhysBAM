@@ -26,7 +26,6 @@ public:
     typedef typename BASE::FREQUENCY_DATA RIGID_FREQUENCY_DATA;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT T_SIMPLICIAL_OBJECT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     RIGID_BODY<TV>* rigid_body;
     bool use_constant_wind;
@@ -37,7 +36,7 @@ public:
     GRID<TV> V_grid;
     ARRAY<TV,TV_INT> *spatially_varying_wind;
     T wind_density;
-    T_ARRAYS_SCALAR *spatially_varying_wind_density,*spatially_varying_wind_pressure;
+    ARRAY<T,TV_INT> *spatially_varying_wind_density,*spatially_varying_wind_pressure;
     T linear_normal_viscosity; // uses vertex normals
     mutable T surface_area;
 private:
@@ -67,10 +66,10 @@ public:
     void Set_Wind_Density(const T wind_density_input)
     {wind_density=wind_density_input;}
 
-    void Set_Wind_Density(T_ARRAYS_SCALAR& density_input)
+    void Set_Wind_Density(ARRAY<T,TV_INT>& density_input)
     {spatially_varying_wind_density=&density_input;}
 
-    void Set_Wind_Pressure(T_ARRAYS_SCALAR& pressure_input) // only valid for volumetric objects
+    void Set_Wind_Pressure(ARRAY<T,TV_INT>& pressure_input) // only valid for volumetric objects
     {spatially_varying_wind_pressure=&pressure_input;}
 
     void Use_Linear_Normal_Viscosity(const T viscosity_input)

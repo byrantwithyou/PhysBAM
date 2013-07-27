@@ -44,7 +44,7 @@ template<class TV> FLUID_STRAIN_UNIFORM<TV>::
 //#####################################################################
 template<class TV> void FLUID_STRAIN_UNIFORM<TV>::
 Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T density,const T heaviside_bandwidth,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& V,
-    const T_ARRAYS_SCALAR& phi_ghost,const int number_of_ghost_cells)
+    const ARRAY<T,TV_INT>& phi_ghost,const int number_of_ghost_cells)
 {
     T_ARRAYS_SYMMETRIC_MATRIX e_ghost(grid.Domain_Indices(number_of_ghost_cells),false);e_boundary->Fill_Ghost_Cells(grid,e,e_ghost,dt,time,number_of_ghost_cells);
 
@@ -81,7 +81,7 @@ Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T dens
 // Function Update_Strain_Equation
 //#####################################################################
 template<class TV> void FLUID_STRAIN_UNIFORM<TV>::
-Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T_ARRAYS_SCALAR& phi_ghost,const int number_of_ghost_cells)
+Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const ARRAY<T,TV_INT>& phi_ghost,const int number_of_ghost_cells)
 {
     if(!cfl_called) PHYSBAM_WARNING("Using strain without calling strain CFL");
     ARRAY<TV,TV_INT> V(grid.Domain_Indices(1));
@@ -113,7 +113,7 @@ Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE
 // Function Extrapolate_Strain_Across_Interface
 //#####################################################################
 template<class TV> void FLUID_STRAIN_UNIFORM<TV>::
-Extrapolate_Strain_Across_Interface(T_ARRAYS_SCALAR& phi_ghost,const T band_width)
+Extrapolate_Strain_Across_Interface(ARRAY<T,TV_INT>& phi_ghost,const T band_width)
 {
     T delta=band_width*grid.dX.Max();
     for(CELL_ITERATOR<TV> iterator(grid,0);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(phi_ghost(cell)>=delta) e(cell)=SYMMETRIC_MATRIX<T,TV::m>();}

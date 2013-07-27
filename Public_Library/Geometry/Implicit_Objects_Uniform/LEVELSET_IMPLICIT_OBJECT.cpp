@@ -17,7 +17,7 @@ template<class TV> LINEAR_INTERPOLATION_UNIFORM<TV,TV> LEVELSET_IMPLICIT_OBJECT<
 // Constructor
 //#####################################################################
 template<class TV> LEVELSET_IMPLICIT_OBJECT<TV>::
-LEVELSET_IMPLICIT_OBJECT(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input)
+LEVELSET_IMPLICIT_OBJECT(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input)
     :levelset(grid_input,phi_input),V(0),velocity_interpolation(&default_velocity_interpolation),need_destroy_data(false)
 {
     Update_Box();Update_Minimum_Cell_Size();
@@ -36,7 +36,7 @@ template<class TV> LEVELSET_IMPLICIT_OBJECT<TV>::
 template<class TV> LEVELSET_IMPLICIT_OBJECT<TV>* LEVELSET_IMPLICIT_OBJECT<TV>::
 Create()
 {
-    LEVELSET_IMPLICIT_OBJECT* levelset_implicit_object=new LEVELSET_IMPLICIT_OBJECT(*(new GRID<TV>),*(new T_ARRAYS_SCALAR));
+    LEVELSET_IMPLICIT_OBJECT* levelset_implicit_object=new LEVELSET_IMPLICIT_OBJECT(*(new GRID<TV>),*(new ARRAY<T,TV_INT>));
     levelset_implicit_object->need_destroy_data=true;return levelset_implicit_object;
 }
 //#####################################################################

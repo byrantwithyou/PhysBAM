@@ -16,7 +16,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> HEAT_UNIFORM<TV>::
-HEAT_UNIFORM(GRID<TV>& grid_input,T_ARRAYS_SCALAR& Q_input)
+HEAT_UNIFORM(GRID<TV>& grid_input,ARRAY<T,TV_INT>& Q_input)
     :grid(grid_input),Q(Q_input),laplace(grid,Q)
 {}
 //#####################################################################

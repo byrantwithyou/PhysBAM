@@ -67,7 +67,7 @@ Advance_One_Time_Step_Convection(const T dt,const T time,const T_FACE_ARRAYS_SCA
 // Function Advance_One_Time_Step_Forces
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
-Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const T_ARRAYS_SCALAR* phi_ghost,const int number_of_ghost_cells)
+Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<T,TV_INT>* phi_ghost,const int number_of_ghost_cells)
 {
     T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
     boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
@@ -132,7 +132,7 @@ Apply_Pressure_Kinetic_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_A
 // Function Correct_Kinetic_Energy
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
-Add_Energy_With_Vorticity(T_FACE_ARRAYS_SCALAR& face_velocities,const VECTOR<VECTOR<bool,2>,TV::dimension>& domain_boundary,const T dt,const T time,const int number_of_ghost_cells,LEVELSET<TV>* lsv,T_ARRAYS_SCALAR* density)
+Add_Energy_With_Vorticity(T_FACE_ARRAYS_SCALAR& face_velocities,const VECTOR<VECTOR<bool,2>,TV::dimension>& domain_boundary,const T dt,const T time,const int number_of_ghost_cells,LEVELSET<TV>* lsv,ARRAY<T,TV_INT>* density)
 {
     use_vorticity_weights=true;
     vorticity_weights.Resize(grid);
@@ -218,7 +218,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
     T dt_surface_tension=0;
     if(nonzero_surface_tension){
         LEVELSET<TV>& levelset=*projection.collidable_solver->levelset;levelset.Compute_Curvature();
-        T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(ghost_cells));levelset.boundary->Fill_Ghost_Cells(grid,levelset.phi,phi_ghost,0,0,ghost_cells); // TODO: use real dt, time
+        ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));levelset.boundary->Fill_Ghost_Cells(grid,levelset.phi,phi_ghost,0,0,ghost_cells); // TODO: use real dt, time
         T kappa_cfl=0;
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
@@ -249,7 +249,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
 // Function Extrapolate_Velocity_Across_Interface
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
-Extrapolate_Velocity_Across_Interface(T_FACE_ARRAYS_SCALAR& face_velocities,const T_ARRAYS_SCALAR& phi_ghost,const bool enforce_divergence_free,const T band_width,
+Extrapolate_Velocity_Across_Interface(T_FACE_ARRAYS_SCALAR& face_velocities,const ARRAY<T,TV_INT>& phi_ghost,const bool enforce_divergence_free,const T band_width,
     const T damping,const TV& air_speed,const T_FACE_ARRAYS_BOOL_DIMENSION* face_neighbors_visible,const T_FACE_ARRAYS_BOOL* fixed_faces_input)
 {
     T delta=band_width*grid.dX.Max();
@@ -270,12 +270,12 @@ Extrapolate_Velocity_Across_Interface(T_FACE_ARRAYS_SCALAR& face_velocities,cons
             extrapolate.Set_Band_Width(band_width);extrapolate.Set_Custom_Seed_Done(&fixed_face);
             if(face_neighbors_visible) extrapolate.Set_Collision_Aware_Extrapolation(face_neighbors_visible->Component(axis));
             extrapolate.Extrapolate(0,false);
-            T_ARRAYS_SCALAR::Get(face_velocities.Component(axis),face_velocity);
+            ARRAY<T,TV_INT>::Get(face_velocities.Component(axis),face_velocity);
             if(damping) for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::INTERIOR_REGION,ghost_cells,axis);iterator.Valid();iterator.Next()){TV_INT index=iterator.Face_Index();
                 if(!fixed_face(index) && phi_face(index)<delta) face_velocity(index)=(1-damping)*face_velocity(index)+damping*air_speed[axis];}}}
     else{
         for(int axis=0;axis<TV::m;axis++){
-            GRID<TV> face_grid=grid.Get_Face_Grid(axis);T_ARRAYS_SCALAR phi_face(face_grid.Domain_Indices(),false);T_ARRAYS_BASE& face_velocity=face_velocities.Component(axis);
+            GRID<TV> face_grid=grid.Get_Face_Grid(axis);ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),false);T_ARRAYS_BASE& face_velocity=face_velocities.Component(axis);
             ARRAY<bool,TV_INT> fixed_face;
             if(fixed_faces_input) fixed_face=fixed_faces_input->Component(axis); else fixed_face=ARRAY<bool,TV_INT>(face_grid.Domain_Indices());
             for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
@@ -290,8 +290,8 @@ Extrapolate_Velocity_Across_Interface(T_FACE_ARRAYS_SCALAR& face_velocities,cons
 
     // make extrapolated velocity divergence free
     if(enforce_divergence_free){
-        T_ARRAYS_SCALAR p_new(grid.Domain_Indices(1));ARRAY<bool,TV_INT> psi_D_new(grid.Domain_Indices(1));T_FACE_ARRAYS_BOOL psi_N_new(grid);
-        T_ARRAYS_SCALAR::Exchange(p_new,projection.p);ARRAY<bool,TV_INT>::Exchange(psi_D_new,projection.elliptic_solver->psi_D);
+        ARRAY<T,TV_INT> p_new(grid.Domain_Indices(1));ARRAY<bool,TV_INT> psi_D_new(grid.Domain_Indices(1));T_FACE_ARRAYS_BOOL psi_N_new(grid);
+        ARRAY<T,TV_INT>::Exchange(p_new,projection.p);ARRAY<bool,TV_INT>::Exchange(psi_D_new,projection.elliptic_solver->psi_D);
         T_FACE_ARRAYS_BOOL::Exchange(psi_N_new,projection.elliptic_solver->psi_N);
         projection.elliptic_solver->Set_Dirichlet_Outer_Boundaries();
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
@@ -302,14 +302,14 @@ Extrapolate_Velocity_Across_Interface(T_FACE_ARRAYS_SCALAR& face_velocities,cons
                 for(int i=0;i<GRID<TV>::number_of_neighbors_per_cell;i++) if(phi_ghost(index)<phi_ghost(iterator.Cell_Neighbor(i))){local_maximum=false;break;}
                 if(local_maximum)projection.elliptic_solver->psi_D(index)=true;}}
         projection.Make_Divergence_Free(face_velocities,0,0); // TODO: use real dt/time
-        T_ARRAYS_SCALAR::Exchange(p_new,projection.p);ARRAY<bool,TV_INT>::Exchange(psi_D_new,projection.elliptic_solver->psi_D);
+        ARRAY<T,TV_INT>::Exchange(p_new,projection.p);ARRAY<bool,TV_INT>::Exchange(psi_D_new,projection.elliptic_solver->psi_D);
         T_FACE_ARRAYS_BOOL::Exchange(psi_N_new,projection.elliptic_solver->psi_N);} // restore pressure for use as initial guess for incompressible projection
 }
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
-Set_Dirichlet_Boundary_Conditions(const T_ARRAYS_SCALAR* phi,const T pressure)
+Set_Dirichlet_Boundary_Conditions(const ARRAY<T,TV_INT>* phi,const T pressure)
 {
     ARRAY<bool,TV_INT>& psi_D=projection.elliptic_solver->psi_D;
     if(phi) for(CELL_ITERATOR<TV> iterator(projection.p_grid);iterator.Valid();iterator.Next()) if((*phi)(iterator.Cell_Index())>0){
@@ -323,7 +323,7 @@ Set_Dirichlet_Boundary_Conditions(const T_ARRAYS_SCALAR* phi,const T pressure)
 // Function Set_Dirichlet_Boundary_Conditions
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
-Set_Dirichlet_Boundary_Conditions(const T_ARRAYS_SCALAR* phi,const T_ARRAYS_SCALAR& pressure)
+Set_Dirichlet_Boundary_Conditions(const ARRAY<T,TV_INT>* phi,const ARRAY<T,TV_INT>& pressure)
 {
     ARRAY<bool,TV_INT>& psi_D=projection.elliptic_solver->psi_D;
     if(phi) for(CELL_ITERATOR<TV> iterator(projection.p_grid);iterator.Valid();iterator.Next()) if((*phi)(iterator.Cell_Index())>0){
@@ -341,7 +341,7 @@ Add_Surface_Tension(LEVELSET<TV>& levelset,const T time)
 {
     
     LAPLACE_UNIFORM<TV>& elliptic_solver=*projection.elliptic_solver;GRID<TV>& p_grid=elliptic_solver.grid;
-    T_ARRAYS_SCALAR& phi=levelset.phi;
+    ARRAY<T,TV_INT>& phi=levelset.phi;
     LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
 
     if(projection.collidable_solver->second_order_cut_cell_method) for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
@@ -388,14 +388,13 @@ Apply_Vorticity_Confinement_Force(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<TV
 //#####################################################################
 // Function Compute_Vorticity_Confinement_Force_Helper
 //#####################################################################
-template<class TV,class T_FACE_ARRAYS,class T_ARRAYS_TV> static void 
-Compute_Vorticity_Confinement_Force_Helper(const GRID<TV>& grid,const T_FACE_ARRAYS& face_velocities_ghost,T_ARRAYS_TV& F,const INCOMPRESSIBLE_UNIFORM<TV>& incompressible)
+template<class TV,class T_FACE_ARRAYS,class TV_INT> static void 
+Compute_Vorticity_Confinement_Force_Helper(const GRID<TV>& grid,const T_FACE_ARRAYS& face_velocities_ghost,ARRAY<TV,TV_INT>& F,const INCOMPRESSIBLE_UNIFORM<TV>& incompressible)
 {
-    typedef typename TV::SCALAR T;typedef typename T_ARRAYS_TV::template REBIND<T>::TYPE T_ARRAYS_SCALAR;
-    typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename T_ARRAYS_TV::template REBIND<typename TV::SPIN>::TYPE T_ARRAYS_SPIN;typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
+    typedef typename TV::SCALAR T;
+    typedef typename ARRAY<TV,TV_INT>::template REBIND<typename TV::SPIN>::TYPE T_ARRAYS_SPIN;typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     T_ARRAYS_SPIN vorticity(grid.Cell_Indices(2),false);
-    T_ARRAYS_SCALAR vorticity_magnitude(grid.Cell_Indices(2));
+    ARRAY<T,TV_INT> vorticity_magnitude(grid.Cell_Indices(2));
     if(incompressible.collision_body_list){
         FACE_LOOKUP_UNIFORM<TV> face_velocities_lookup_uniform(face_velocities_ghost);
         FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> face_velocities_lookup(face_velocities_lookup_uniform,*incompressible.collision_body_list,&incompressible.valid_mask);
@@ -419,8 +418,8 @@ Compute_Vorticity_Confinement_Force_Helper(const GRID<TV>& grid,const T_FACE_ARR
 //#####################################################################
 // Function Compute_Vorticity_Confinement_Force_Helper
 //#####################################################################
-template<class T,class T_FACE_ARRAYS,class T_ARRAYS_TV> static void
-Compute_Vorticity_Confinement_Force_Helper(const GRID<VECTOR<T,1> >&,const T_FACE_ARRAYS&,T_ARRAYS_TV&,const INCOMPRESSIBLE_UNIFORM<VECTOR<T,1> >&)
+template<class T,class T_FACE_ARRAYS,class TV_INT> static void
+Compute_Vorticity_Confinement_Force_Helper(const GRID<VECTOR<T,1> >&,const T_FACE_ARRAYS&,ARRAY<VECTOR<T,1>,TV_INT>&,const INCOMPRESSIBLE_UNIFORM<VECTOR<T,1> >&)
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }

@@ -24,7 +24,6 @@ class MULTIPHASE_FIRE_EXAMPLES:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_inp
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;
@@ -134,7 +133,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
             if(.45<iterator.Location().x&&iterator.Location().x<=.55) flame_speed_multiplier.Component(iterator.Axis())(iterator.Face_Index())=1;
 
         T ignition_temperature=1150; // 1100 is .5 as fast as 1000, 1150 is .25 as fast as 1000.
-        T_ARRAYS_SCALAR temp_temperature(fluids_parameters.grid->Domain_Indices(3));
+        ARRAY<T,TV_INT> temp_temperature(fluids_parameters.grid->Domain_Indices(3));
         BOUNDARY<TV,T> boundary;boundary.Fill_Ghost_Cells(*fluids_parameters.grid,fluids_parameters.temperature_container.temperature,temp_temperature,dt,time,3);
         SMOOTH::Smooth<T,TV::m>(temp_temperature,5,0);
         if(fluids_parameters.mpi_grid)fluids_parameters.mpi_grid->Exchange_Boundary_Cell_Data(temp_temperature,1);
@@ -145,10 +144,10 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
         ARRAY<ARRAY<T,VECTOR<int,2> > >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
         T reaction_bandwidth_times_edge_length=reaction_bandwidth*fluids_parameters.grid->dX.Min();
 
-        T_ARRAYS_SCALAR& phi1=phis(1);
+        ARRAY<T,TV_INT>& phi1=phis(1);
         //T_FAST_LEVELSET levelset1(fluids_parameters.grid,phi1);
         //levelset1.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.dX.Min());levelset1.Fast_Marching_Method();
-        T_ARRAYS_SCALAR& phi2=phis(2);
+        ARRAY<T,TV_INT>& phi2=phis(2);
         //T_FAST_LEVELSET levelset2(fluids_parameters.grid,phi2);
         //levelset2.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.dX.Min());levelset2.Fast_Marching_Method();
         for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
@@ -170,7 +169,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
 {
-    T_ARRAYS_SCALAR phi;LEVELSET<TV> levelset(*fluids_parameters.grid,phi);
+    ARRAY<T,TV_INT> phi;LEVELSET<TV> levelset(*fluids_parameters.grid,phi);
     T_FACE_ARRAYS_SCALAR& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
 
     if(test_number==1){

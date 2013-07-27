@@ -13,7 +13,7 @@ template<class TV,class T2>
 class ARRAYS_UTILITIES
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::template REBIND<T2>::TYPE TV_T2;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<T2>::TYPE T_ARRAYS_DIMENSION_T2;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<T2>::TYPE T_ARRAYS_DIMENSION_T2;
     typedef typename T_ARRAYS_DIMENSION_T2::template REBIND<TV_T2>::TYPE T_ARRAYS_DIMENSION_VECTOR_T2;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<T2,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T2;

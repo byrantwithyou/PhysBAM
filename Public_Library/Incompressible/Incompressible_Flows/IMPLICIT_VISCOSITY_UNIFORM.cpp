@@ -17,7 +17,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> IMPLICIT_VISCOSITY_UNIFORM<TV>::
-IMPLICIT_VISCOSITY_UNIFORM(LAPLACE_UNIFORM<TV>& elliptic_solver_input,const T_ARRAYS_SCALAR& variable_viscosity_input,const T density_input,const T viscosity_input,T_MPI_GRID* mpi_grid_input,
+IMPLICIT_VISCOSITY_UNIFORM(LAPLACE_UNIFORM<TV>& elliptic_solver_input,const ARRAY<T,TV_INT>& variable_viscosity_input,const T density_input,const T viscosity_input,T_MPI_GRID* mpi_grid_input,
     const int axis_input,bool use_variable_viscosity_input,bool use_psi_R_input)
     :elliptic_solver(elliptic_solver_input),variable_viscosity(variable_viscosity_input),density(density_input),viscosity(viscosity_input),
     mpi_grid(mpi_grid_input),axis(axis_input),heat_solver(0),use_variable_viscosity(use_variable_viscosity_input),use_psi_R(use_psi_R_input)
@@ -69,7 +69,7 @@ Viscous_Update(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const 
 // Function Variable_Viscosity_Explicit_Part
 //#####################################################################
 template<class TV> void IMPLICIT_VISCOSITY_UNIFORM<TV>::
-Variable_Viscosity_Explicit_Part(const T density,const T_ARRAYS_SCALAR& variable_viscosity,const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T time)
+Variable_Viscosity_Explicit_Part(const T density,const ARRAY<T,TV_INT>& variable_viscosity,const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T time)
 {
     TV one_over_DX=grid.one_over_dX;
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){

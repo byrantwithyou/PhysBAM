@@ -15,7 +15,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> LEVELSET_MULTIPLE<TV>::
-LEVELSET_MULTIPLE(GRID<TV>& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const bool use_external_levelsets_input)
+LEVELSET_MULTIPLE(GRID<TV>& grid_input,ARRAY<ARRAY<T,TV_INT>>& phis_input,const bool use_external_levelsets_input)
     :grid(grid_input),phis(phis_input),levelset_callbacks(0),use_external_levelsets(use_external_levelsets_input)
 {
     if(!use_external_levelsets) Recreate_Levelsets();
@@ -43,7 +43,7 @@ Recreate_Levelsets()
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class TV> void LEVELSET_MULTIPLE<TV>::
-Fill_Ghost_Cells(ARRAY<T_ARRAYS_SCALAR >& phi_ghost,const T time,const int number_of_ghost_cells) 
+Fill_Ghost_Cells(ARRAY<ARRAY<T,TV_INT> >& phi_ghost,const T time,const int number_of_ghost_cells) 
 {
     for(int i=0;i<levelsets.m;i++) levelsets(i)->boundary->Fill_Ghost_Cells(grid,levelsets(i)->phi,phi_ghost(i),0,time,number_of_ghost_cells);
 }

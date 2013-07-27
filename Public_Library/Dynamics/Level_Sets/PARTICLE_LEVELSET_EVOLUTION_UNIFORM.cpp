@@ -88,7 +88,7 @@ Advance_One_Time_Step(T_FACE_ARRAYS_SCALAR* face_velocities,const T dt)
 template<class TV> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
 Advance_Levelset(const T dt)
 {
-    for(RUNGEKUTTA<T_ARRAYS_SCALAR> rk(phi,runge_kutta_order_levelset,dt,time);rk.Valid();){
+    for(RUNGEKUTTA<ARRAY<T,TV_INT>> rk(phi,runge_kutta_order_levelset,dt,time);rk.Valid();){
         if(rk.substep==0 || !use_frozen_velocity) particle_levelset->levelset.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset->levelset,V,rk.time);
         levelset_advection->Euler_Step(V,dt,rk.time,particle_levelset->number_of_ghost_cells);
         rk.Next();

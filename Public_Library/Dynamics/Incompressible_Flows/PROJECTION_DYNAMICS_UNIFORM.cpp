@@ -125,7 +125,7 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
         TV dx=p_grid.dX,one_over_dx=Inverse(dx);
         int ghost_cells=1;
         if(poisson->multiphase){
-            ARRAY<T_ARRAYS_SCALAR> phis_ghost;phis_ghost.Resize(poisson_collidable->levelset_multiple->levelsets.m);
+            ARRAY<ARRAY<T,TV_INT>> phis_ghost;phis_ghost.Resize(poisson_collidable->levelset_multiple->levelsets.m);
             for(int i=0;i<poisson_collidable->levelset_multiple->levelsets.m;i++){phis_ghost(i).Resize(p_grid.Domain_Indices(ghost_cells),false);
                 poisson_collidable->levelset_multiple->levelsets(i)->boundary->Fill_Ghost_Cells(p_grid,poisson_collidable->levelset_multiple->levelsets(i)->phi,phis_ghost(i),dt,time,ghost_cells);}
             LEVELSET_MULTIPLE<TV> levelset_multiple(p_grid,phis_ghost);
@@ -136,7 +136,7 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
                     face_velocities.Component(axis)(face_index)+=poisson->beta_face.Component(axis)(face_index)*one_over_dx[axis]*
                         LEVELSET_MULTIPLE<TV>::Sign(region_1,region_2)*poisson_collidable->u_jump_face.Component(axis)(face_index);}}}
         else{
-            T_ARRAYS_SCALAR phi_ghost(p_grid.Domain_Indices(ghost_cells));poisson_collidable->levelset->boundary->Fill_Ghost_Cells(p_grid,poisson_collidable->levelset->phi,phi_ghost,dt,time,ghost_cells);
+            ARRAY<T,TV_INT> phi_ghost(p_grid.Domain_Indices(ghost_cells));poisson_collidable->levelset->boundary->Fill_Ghost_Cells(p_grid,poisson_collidable->levelset->phi,phi_ghost,dt,time,ghost_cells);
             for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
                 int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
                 if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(second_cell),phi_ghost(first_cell)) && !psi_N.Component(axis)(face_index) && !(psi_D(second_cell)&&psi_D(first_cell))){
@@ -170,9 +170,9 @@ Set_Up_For_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_den
                 if(!elliptic_solver_save_for_sph->psi_D(cell_1) || !elliptic_solver_save_for_sph->psi_D(cell_2)) elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;}}}
     else if(use_one_way_coupling){
         face_velocities_save_for_sph=new T_FACE_ARRAYS_SCALAR(face_velocities);
-        p_save_for_sph=new T_ARRAYS_SCALAR(p);
-        divergence_save_for_sph=new T_ARRAYS_SCALAR(divergence);
-        divergence_multiplier_save_for_sph=new T_ARRAYS_SCALAR(divergence_multiplier);
+        p_save_for_sph=new ARRAY<T,TV_INT>(p);
+        divergence_save_for_sph=new ARRAY<T,TV_INT>(divergence);
+        divergence_multiplier_save_for_sph=new ARRAY<T,TV_INT>(divergence_multiplier);
         use_divergence_multiplier_save_for_sph=use_divergence_multiplier;
         use_non_zero_divergence_save_for_sph=use_non_zero_divergence;
         elliptic_solver->psi_D_save_for_sph=new ARRAY<bool,TV_INT>(elliptic_solver->psi_D);

@@ -21,7 +21,6 @@ class BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D:public BOUNDARY<TV,VECTOR<typename 
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,2> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     T angle;
     bool left_constant_extrapolation;

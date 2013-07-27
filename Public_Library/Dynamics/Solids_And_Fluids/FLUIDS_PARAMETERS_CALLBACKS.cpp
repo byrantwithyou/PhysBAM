@@ -78,27 +78,27 @@ Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
-Get_Variable_Surface_Tension(T_ARRAYS_SCALAR& surface_tension,const T time)
+Get_Variable_Surface_Tension(ARRAY<T,TV_INT>& surface_tension,const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
-Get_Variable_Viscosity(T_ARRAYS_SCALAR& viscosity,const T time)
+Get_Variable_Viscosity(ARRAY<T,TV_INT>& viscosity,const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
-Get_Variable_Vorticity_Confinement(T_ARRAYS_SCALAR& variable_vorticity_confinement,const T time)
+Get_Variable_Vorticity_Confinement(ARRAY<T,TV_INT>& variable_vorticity_confinement,const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
-Get_Divergence(T_ARRAYS_SCALAR& divergence,const T dt,const T time)
+Get_Divergence(ARRAY<T,TV_INT>& divergence,const T dt,const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
-Get_External_Velocity(ARRAY<TV,TV_INT>& V_blend,T_ARRAYS_SCALAR& blend,const T time)
+Get_External_Velocity(ARRAY<TV,TV_INT>& V_blend,ARRAY<T,TV_INT>& blend,const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }

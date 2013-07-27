@@ -165,7 +165,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     T_FACE_ARRAYS_SCALAR preset_velocities=face_velocities;
     particle_velocities.Resize(grid.Domain_Indices(3),false,false);particle_velocities.Fill(0);
     valid_particle_face_velocities.Resize(grid.Domain_Indices(3),false,false);valid_particle_face_velocities.Fill(false);
-    cell_weight=T_ARRAYS_SCALAR(grid.Domain_Indices(1));face_weight=T_FACE_ARRAYS_SCALAR(grid,1);
+    cell_weight=ARRAY<T,TV_INT>(grid.Domain_Indices(1));face_weight=T_FACE_ARRAYS_SCALAR(grid,1);
     
     LOG::Time("rasterize velocities to grid");
     Rasterize_Velocities_To_Grid(particle_velocities,cell_weight,face_weight);
@@ -339,7 +339,7 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
 // Function Rasterize_Velocities_To_Grid
 //#####################################################################
 template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
-Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,T_ARRAYS_SCALAR& cell_weight,T_FACE_ARRAYS_SCALAR& face_weight)
+Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,ARRAY<T,TV_INT>& cell_weight,T_FACE_ARRAYS_SCALAR& face_weight)
 {
     Calculate_SPH_Constants();
 
@@ -402,7 +402,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
     T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& positive_particles=particle_levelset.positive_particles;
     T_ARRAYS_ARRAY_PAIR_TV_INT_INT removed_negative_particles_affecting_cell(grid.Domain_Indices());
     T_ARRAYS_ARRAY_SCALAR one_over_total_removed_negative_particle_cell_weight(grid.Block_Indices(1));
-    T_ARRAYS_SCALAR removed_negative_particle_cell_weight(grid.Domain_Indices());
+    ARRAY<T,TV_INT> removed_negative_particle_cell_weight(grid.Domain_Indices());
     
     for(NODE_ITERATOR<TV> node_iterator(grid,1);node_iterator.Valid();node_iterator.Next()){
         TV_INT block=node_iterator.Node_Index();

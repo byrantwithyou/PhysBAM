@@ -20,8 +20,7 @@ class EULER_PROJECTION:public NONCOPYABLE
     typedef VECTOR<int,TV::m> TV_INT;
     typedef TV_INT INDEX;
     typedef VECTOR<T,TV::m+2> TV_U;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV_U>::TYPE T_ARRAYS_U;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_U>::TYPE T_ARRAYS_U;
 
 public:
     EULER_PROJECTION()
@@ -31,7 +30,7 @@ public:
     {}
     //#####################################################################
 
-    static void Compute_One_Over_rho_c_squared(const GRID<TV>& grid,const T_ARRAYS_U& U_ghost,const EOS<T>* eos,T_ARRAYS_SCALAR& one_over_rho_c_squared)
+    static void Compute_One_Over_rho_c_squared(const GRID<TV>& grid,const T_ARRAYS_U& U_ghost,const EOS<T>* eos,ARRAY<T,TV_INT>& one_over_rho_c_squared)
     {
         for(CELL_ITERATOR<TV>  iterator(grid,grid.number_of_ghost_cells);iterator.Valid();iterator.Next()){
             INDEX cell_index=iterator.Cell_Index();

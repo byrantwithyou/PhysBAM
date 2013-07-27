@@ -20,7 +20,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> LAPLACE_UNIFORM<TV>::
-LAPLACE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue_input)
+LAPLACE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue_input)
     :grid(grid_input),u(u_input),pcg_threaded(0),mpi_grid(0),psi_D_save_for_sph(0),psi_N_save_for_sph(0),enforce_compatibility(enforce_compatibility_input),solve_single_cell_neumann_regions(false),use_psi_R(false),thread_queue(thread_queue_input)
 {
     if(thread_queue){

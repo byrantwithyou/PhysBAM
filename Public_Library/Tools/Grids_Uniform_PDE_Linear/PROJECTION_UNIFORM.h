@@ -17,7 +17,7 @@ template<class TV>
 class PROJECTION_UNIFORM:public PROJECTION<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
+    typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
@@ -26,15 +26,15 @@ public:
     using PROJECTION<T>::use_non_zero_divergence;
     
     GRID<TV> p_grid; // p_grid is a cell centered MAC grid
-    T_ARRAYS_SCALAR p;
-    T_ARRAYS_SCALAR p_save_for_projection;
+    ARRAY<T,TV_INT> p;
+    ARRAY<T,TV_INT> p_save_for_projection;
     T_FACE_ARRAYS_SCALAR face_velocities_save_for_projection;
     LAPLACE_UNIFORM<TV>* elliptic_solver;
     LAPLACE_UNIFORM<TV>* laplace; 
     POISSON_UNIFORM<TV>* poisson;     
-    T_ARRAYS_SCALAR divergence; // use this to set up a non-zero divergence
+    ARRAY<T,TV_INT> divergence; // use this to set up a non-zero divergence
     bool use_divergence_multiplier;
-    T_ARRAYS_SCALAR divergence_multiplier;
+    ARRAY<T,TV_INT> divergence_multiplier;
     THREAD_QUEUE* thread_queue;
 
     PROJECTION_UNIFORM(const GRID<TV>& mac_grid,const bool use_variable_beta=false,const bool use_poisson=false,THREAD_QUEUE* thread_queue=0);

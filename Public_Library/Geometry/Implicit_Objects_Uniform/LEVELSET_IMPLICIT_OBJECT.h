@@ -17,7 +17,6 @@ template<class TV>
 class LEVELSET_IMPLICIT_OBJECT:public IMPLICIT_OBJECT<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     enum WORKAROUND {d=TV::m};
     typedef VECTOR<T,d-1> T_PRINCIPAL_CURVATURES;
 public:
@@ -35,7 +34,7 @@ protected:
     bool need_destroy_data;
 public:
 
-    LEVELSET_IMPLICIT_OBJECT(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input);
+    LEVELSET_IMPLICIT_OBJECT(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input);
     virtual ~LEVELSET_IMPLICIT_OBJECT();
 
     void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE

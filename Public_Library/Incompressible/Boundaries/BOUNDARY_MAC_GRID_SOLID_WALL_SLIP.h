@@ -17,18 +17,18 @@ template<class TV>
 class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP:public BOUNDARY<TV,typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
 public:
     typedef BOUNDARY<TV,T> BASE;
     using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;using BASE::Fill_Single_Ghost_Region;using BASE::Boundary;using BASE::Find_Ghost_Regions;
 
-    const T_ARRAYS_SCALAR* phi;
+    const ARRAY<T,TV_INT>* phi;
 
     BOUNDARY_MAC_GRID_SOLID_WALL_SLIP(const TV_SIDES& constant_extrapolation=TV_SIDES());
     ~BOUNDARY_MAC_GRID_SOLID_WALL_SLIP();
 
-    void Set_Phi(T_ARRAYS_SCALAR& phi_input)
+    void Set_Phi(ARRAY<T,TV_INT>& phi_input)
     {phi=&phi_input;}
 
 //#####################################################################

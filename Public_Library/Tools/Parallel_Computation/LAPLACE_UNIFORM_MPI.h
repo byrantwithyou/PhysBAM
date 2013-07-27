@@ -27,8 +27,8 @@ class LAPLACE_UNIFORM_MPI:public LAPLACE_MPI<TV>
 {
     typedef typename TV::SCALAR T;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
-    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     typedef LAPLACE_MPI<TV> BASE;
     using BASE::mpi_grid;using BASE::local_grid;using BASE::filled_region_ranks;using BASE::partitions;using BASE::number_of_regions;using BASE::solve_neumann_regions;using BASE::psi_N;

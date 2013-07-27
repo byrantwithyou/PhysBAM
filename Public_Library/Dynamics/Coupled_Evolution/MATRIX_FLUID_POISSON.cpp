@@ -17,7 +17,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> MATRIX_FLUID_POISSON<TV>::
 MATRIX_FLUID_POISSON(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,
-    const T_ARRAYS_SCALAR& one_over_rho_c_squared_input)
+    const ARRAY<T,TV_INT>& one_over_rho_c_squared_input)
     :index_map(index_map_input),one_over_rho_c_squared(one_over_rho_c_squared_input)
 {
 }

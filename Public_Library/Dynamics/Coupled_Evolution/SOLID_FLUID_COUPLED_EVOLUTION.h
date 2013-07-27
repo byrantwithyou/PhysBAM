@@ -31,9 +31,9 @@ template<class TV_input>
 class SOLID_FLUID_COUPLED_EVOLUTION:public NEWMARK_EVOLUTION<TV_input>
 {
     typedef TV_input TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<PAIR<int,T> > FACE_WEIGHT_ELEMENTS;typedef ARRAY<FACE_WEIGHT_ELEMENTS*,FACE_INDEX<TV::m> > T_FACE_ARRAYS_FACE_WEIGHT_ELEMENTS;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> > >::TYPE T_ARRAYS_STRUCTURE_SIMPLEX_LIST;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> > >::TYPE T_ARRAYS_STRUCTURE_SIMPLEX_LIST;
     typedef typename MESH_POLICY<TV::dimension-1>::MESH T_BOUNDARY_MESH;
     typedef typename MESH_POLICY<TV::dimension>::MESH T_MESH;typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension>::OBJECT T_OBJECT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_BOUNDARY_SIMPLEX;typedef VECTOR<int,TV::dimension> T_BOUNDARY_ELEMENT;typedef VECTOR<int,TV::dimension+1> T_ELEMENT;
@@ -91,10 +91,10 @@ public:
     ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > J_rigid_kinematic;
     ARRAY<ARRAY<TV_INT> > matrix_index_to_cell_index_array;
 
-    T_ARRAYS_SCALAR& Get_Pressure()
+    ARRAY<T,TV_INT>& Get_Pressure()
     {return (fluids_parameters.compressible ? fluids_parameters.euler->euler_projection.p : fluids_parameters.incompressible->projection.p);}
     
-    bool Negative(const GRID<TV>& grid,const int axis,const TV_INT& face_index,const T_ARRAYS_SCALAR& phi)
+    bool Negative(const GRID<TV>& grid,const int axis,const TV_INT& face_index,const ARRAY<T,TV_INT>& phi)
     {// this check is potentially expensive! leave inefficient for the moment
     TV_INT cells[GRID<TV>::number_of_cells_per_node];
     for(int node=0;node<GRID<TV>::number_of_nodes_per_face;node++){

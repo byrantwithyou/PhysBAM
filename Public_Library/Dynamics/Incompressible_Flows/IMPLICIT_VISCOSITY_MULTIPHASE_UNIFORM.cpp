@@ -15,7 +15,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<TV>::
-IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM(PROJECTION_DYNAMICS_UNIFORM<TV>& projection_input,const T_ARRAYS_SCALAR& variable_viscosity_input,const ARRAY<T>& densities_input,const ARRAY<T>& viscosities_input,T_MPI_GRID* mpi_grid_input,const int axis_input,bool use_variable_viscosity_input)
+IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM(PROJECTION_DYNAMICS_UNIFORM<TV>& projection_input,const ARRAY<T,TV_INT>& variable_viscosity_input,const ARRAY<T>& densities_input,const ARRAY<T>& viscosities_input,T_MPI_GRID* mpi_grid_input,const int axis_input,bool use_variable_viscosity_input)
     :IMPLICIT_VISCOSITY_UNIFORM<TV>(*projection_input.elliptic_solver,variable_viscosity_input,(T)0,(T)0,mpi_grid_input,axis_input,use_variable_viscosity_input,false),projection(projection_input),densities(densities_input),viscosities(viscosities_input)
 {}
 //#####################################################################

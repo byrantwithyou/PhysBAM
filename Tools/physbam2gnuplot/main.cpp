@@ -16,7 +16,7 @@ template<class TV,class RW>
 class PHYSBAM_TO_GNUPLOT_CONVERTER
 {
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename TV::SCALAR T;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;
 
     const std::string input_directory,output_directory;
     GNUPLOT_OUTPUT gnuplot_output;
@@ -29,15 +29,15 @@ public:
 
     void Convert(const int frame,const std::string variable_name="")
     {GRID<TV> grid;FILE_UTILITIES::Read_From_File<RW>(input_directory+"/common/grid",grid);
-    if(variable_name.size()) Convert_Data<T_ARRAYS_SCALAR>(variable_name,grid,frame);
-    if(convert_density) Convert_Data<T_ARRAYS_SCALAR>("density",grid,frame);
-    if(convert_momentum) Convert_Data<T_ARRAYS_SCALAR>("momentum",grid,frame);
-    if(convert_energy) Convert_Data<T_ARRAYS_SCALAR>("energy",grid,frame);
-    if(convert_velocity) Convert_Data<T_ARRAYS_SCALAR>("centered_velocities",grid,frame);
-    if(convert_pressure) Convert_Data<T_ARRAYS_SCALAR>("pressure",grid,frame);
-    if(convert_internal_energy) Convert_Data<T_ARRAYS_SCALAR>("internal_energy",grid,frame);
-    if(convert_entropy) Convert_Data<T_ARRAYS_SCALAR>("entropy",grid,frame);
-    if(convert_machnumber) Convert_Data<T_ARRAYS_SCALAR>("machnumber",grid,frame);
+    if(variable_name.size()) Convert_Data<ARRAY<T,TV_INT>>(variable_name,grid,frame);
+    if(convert_density) Convert_Data<ARRAY<T,TV_INT>>("density",grid,frame);
+    if(convert_momentum) Convert_Data<ARRAY<T,TV_INT>>("momentum",grid,frame);
+    if(convert_energy) Convert_Data<ARRAY<T,TV_INT>>("energy",grid,frame);
+    if(convert_velocity) Convert_Data<ARRAY<T,TV_INT>>("centered_velocities",grid,frame);
+    if(convert_pressure) Convert_Data<ARRAY<T,TV_INT>>("pressure",grid,frame);
+    if(convert_internal_energy) Convert_Data<ARRAY<T,TV_INT>>("internal_energy",grid,frame);
+    if(convert_entropy) Convert_Data<ARRAY<T,TV_INT>>("entropy",grid,frame);
+    if(convert_machnumber) Convert_Data<ARRAY<T,TV_INT>>("machnumber",grid,frame);
     }
 
     void Convert_All_Frames(const int first_frame,const int last_frame,const std::string variable_name="")

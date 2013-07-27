@@ -21,8 +21,7 @@ class COMPRESSIBLE_EXAMPLE:public EXAMPLE<TV_input>
     typedef TV_input TV;
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef EXAMPLE<TV> BASE;

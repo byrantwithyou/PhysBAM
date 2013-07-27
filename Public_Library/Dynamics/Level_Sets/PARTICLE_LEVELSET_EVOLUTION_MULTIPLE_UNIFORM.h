@@ -17,15 +17,15 @@ template<class TV>
 class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM:public PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 public:
     typedef PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV> BASE;
     using BASE::track_mass;using BASE::runge_kutta_order_levelset;using BASE::runge_kutta_order_particles;using BASE::use_particle_levelset;using BASE::use_frozen_velocity;
     using BASE::cfl_number;using BASE::reseeding_frequency;using BASE::time;using BASE::use_fmm;using BASE::use_reinitialization;using BASE::V;using BASE::grid;
 
-    ARRAY<T_ARRAYS_SCALAR> phis;
+    ARRAY<ARRAY<T,TV_INT>> phis;
     PARTICLE_LEVELSET_MULTIPLE_UNIFORM<TV>& particle_levelset_multiple;
     ARRAY<T> initial_mass;
 

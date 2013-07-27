@@ -21,16 +21,15 @@ class MATRIX_FLUID_POISSON:public NONCOPYABLE
     enum WORKAROUND {d=TV::dimension};
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::dimension> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     const COLLISION_AWARE_INDEX_MAP<TV>& index_map;
-    const T_ARRAYS_SCALAR& one_over_rho_c_squared;
+    const ARRAY<T,TV_INT>& one_over_rho_c_squared;
 public:
     SPARSE_MATRIX_FLAT_NXN<T> poisson;
     ARRAY<int> map;
 
     MATRIX_FLUID_POISSON(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,
-        const T_ARRAYS_SCALAR& one_over_rho_c_squared_input);
+        const ARRAY<T,TV_INT>& one_over_rho_c_squared_input);
 
 //#####################################################################
     void Compute(const SPARSE_MATRIX_FLAT_MXN<T>& gradient,const ARRAY<T>& one_over_fluid_mass,const T dt,const bool use_preconditioner);

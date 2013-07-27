@@ -18,7 +18,7 @@ template<class TV,class T2,class T_NESTED_ADVECTION>
 class ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM:public ADVECTION<TV,T2>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     T_NESTED_ADVECTION& nested_advection;
     const PROJECTION_DYNAMICS_UNIFORM<TV>& projection;

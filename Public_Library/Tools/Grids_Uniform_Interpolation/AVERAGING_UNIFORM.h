@@ -12,7 +12,7 @@ template<class TV,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_UNIFORM<TV>
 class AVERAGING_UNIFORM
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
 
     typedef T_FACE_LOOKUP FACE_LOOKUP;
@@ -36,12 +36,12 @@ public:
     return value/GRID<TV>::number_of_nodes_per_face;}
 
     // Note this never has to be replaced because it is phi averaged to the faces, not the velocities
-    T Cell_To_Face(const GRID<TV>& grid,const int axis,const TV_INT& face_index,const T_ARRAYS_SCALAR& u_cell) const
+    T Cell_To_Face(const GRID<TV>& grid,const int axis,const TV_INT& face_index,const ARRAY<T,TV_INT>& u_cell) const
     {TV_INT cell1,cell2;grid.Cells_Touching_Face(axis,face_index,cell1,cell2);
     return (T).5*(u_cell(cell1)+u_cell(cell2));}
 
     // Note this never has to be replaced because it is phi averaged to the faces, not the velocities
-    T Cell_To_Face(const GRID<TV>& grid,const FACE_INDEX<TV::m>& face_index,const T_ARRAYS_SCALAR& u_cell) const
+    T Cell_To_Face(const GRID<TV>& grid,const FACE_INDEX<TV::m>& face_index,const ARRAY<T,TV_INT>& u_cell) const
     {return Cell_To_Face(grid,face_index.axis,face_index.index,u_cell);}
 
     TV Face_To_Face_Vector(const GRID<TV>& grid,const int axis,const TV_INT& face_index,const T_FACE_LOOKUP& u_face) const

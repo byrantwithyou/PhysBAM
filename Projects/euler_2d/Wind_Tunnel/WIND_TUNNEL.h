@@ -36,7 +36,6 @@ class WIND_TUNNEL:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >,publi
 public:
     typedef T_input T;typedef VECTOR<T,2> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename T_ARRAYS_BASE::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;

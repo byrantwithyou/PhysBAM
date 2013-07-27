@@ -18,7 +18,6 @@ template<class TV>
 class LEVELSET_ADVECTION_MULTIPLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     LEVELSET_MULTIPLE<TV>& levelsets;

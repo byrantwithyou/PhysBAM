@@ -58,7 +58,7 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
         //Zero_Out_Neumann_Pocket_Velocities(face_velocities); TODO: Why is this here?
         ARRAY<bool,TV_INT>& psi_D=elliptic_solver->psi_D;
         T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver->psi_N;
-        T_ARRAYS_SCALAR& phi=collidable_solver->levelset->phi;
+        ARRAY<T,TV_INT>& phi=collidable_solver->levelset->phi;
         TV dx=p_grid.dX,one_over_dx=Inverse(dx);
         if(scale_by_dt) p*=dt;
         if(laplace){

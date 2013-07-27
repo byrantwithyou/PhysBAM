@@ -18,7 +18,6 @@ template<class TV>
 class TEMPERATURE_CONTAINER:public GRID_AND_ARRAY_CONTAINER<TV,typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename ADVECTION_COLLIDABLE_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;
@@ -27,7 +26,7 @@ public:
     typedef GRID_AND_ARRAY_CONTAINER<TV,T> BASE;
     using BASE::grid;using BASE::array;using BASE::boundary_default;using BASE::boundary;using BASE::Set_To_Constant_Value;using BASE::Set_Custom_Advection;
 
-    T_ARRAYS_SCALAR& temperature;
+    ARRAY<T,TV_INT>& temperature;
     T ambient_temperature;
     T cooling_constant;
     T hot_point;

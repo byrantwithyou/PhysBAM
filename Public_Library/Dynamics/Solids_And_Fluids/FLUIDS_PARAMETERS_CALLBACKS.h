@@ -25,7 +25,6 @@ class FLUIDS_PARAMETERS_CALLBACKS:public BOUNDARY_CONDITIONS_CALLBACKS<TV>
 {    
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;
 public:
@@ -50,11 +49,11 @@ public:
     virtual void Adjust_Density_And_Temperature_With_Sources(const T time);
     virtual void Get_Flame_Speed_Multiplier(const T dt,const T time);
     virtual void Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time);
-    virtual void Get_Variable_Surface_Tension(T_ARRAYS_SCALAR& surface_tension,const T time);
-    virtual void Get_Variable_Viscosity(T_ARRAYS_SCALAR& viscosity,const T time);
-    virtual void Get_Variable_Vorticity_Confinement(T_ARRAYS_SCALAR& variable_vorticity_confinement,const T time);
-    virtual void Get_Divergence(T_ARRAYS_SCALAR& divergence,const T dt,const T time);
-    virtual void Get_External_Velocity(ARRAY<TV,TV_INT>& V_blend,T_ARRAYS_SCALAR& blend,const T time);
+    virtual void Get_Variable_Surface_Tension(ARRAY<T,TV_INT>& surface_tension,const T time);
+    virtual void Get_Variable_Viscosity(ARRAY<T,TV_INT>& viscosity,const T time);
+    virtual void Get_Variable_Vorticity_Confinement(ARRAY<T,TV_INT>& variable_vorticity_confinement,const T time);
+    virtual void Get_Divergence(ARRAY<T,TV_INT>& divergence,const T dt,const T time);
+    virtual void Get_External_Velocity(ARRAY<TV,TV_INT>& V_blend,ARRAY<T,TV_INT>& blend,const T time);
     virtual TV Get_Analytic_Velocity(const TV& location,const T time) const;
     virtual void Update_Refinement(const T dt,const T time);
     virtual void Topology_Changed();

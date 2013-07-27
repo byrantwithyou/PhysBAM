@@ -18,7 +18,7 @@ class POISSON_UNIFORM:public POISSON<typename TV::SCALAR>,public LAPLACE_UNIFORM
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     using LAPLACE_UNIFORM<TV>::grid;using POISSON<T>::use_variable_beta;using POISSON<T>::beta_given_on_faces;
@@ -28,11 +28,11 @@ public:
     using LAPLACE_UNIFORM<TV>::filled_region_touches_dirichlet;using LAPLACE_UNIFORM<TV>::solve_neumann_regions;
 
     T_FACE_ARRAYS_SCALAR beta_face;
-    T_ARRAYS_SCALAR variable_beta;
+    ARRAY<T,TV_INT> variable_beta;
     T_FACE_ARRAYS_SCALAR divergence_face_weights;
 public:
 
-    POISSON_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input);
+    POISSON_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input);
     virtual ~POISSON_UNIFORM();
 
     void Set_Variable_beta(const bool beta_given_on_faces_input=false)

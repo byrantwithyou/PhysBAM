@@ -26,8 +26,8 @@ class SOLIDS_FLUIDS_EXAMPLE_UNIFORM:public SOLIDS_FLUIDS_EXAMPLE<TV>,public LEVE
     public FLUIDS_PARAMETERS_CALLBACKS<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef VECTOR<int,TV::m> T_VECTOR_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<char>::TYPE T_ARRAYS_CHAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef VECTOR<int,TV::m> T_VECTOR_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<char>::TYPE T_ARRAYS_CHAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename MATRIX_POLICY<TV>::TRANSFORMATION_MATRIX T_TRANSFORMATION_MATRIX;
     typedef typename TV::SPIN T_ANGULAR_VELOCITY;

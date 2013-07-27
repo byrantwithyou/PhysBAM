@@ -21,7 +21,7 @@ template<class T>
 class OPENGL_GRID_2D : public OPENGL_OBJECT
 {
 public:
-    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
     typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     GRID<TV>      &grid;
     ARRAY<bool,TV_INT> *active_cell_mask,*ghost_cell_mask;

@@ -21,7 +21,7 @@ class POISSON_COLLIDABLE_UNIFORM:public POISSON_UNIFORM<TV>,public LAPLACE_COLLI
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 
 public:
@@ -38,22 +38,22 @@ public:
     using COLLIDABLE_BASE::second_order_cut_cell_method;using COLLIDABLE_BASE::second_order_cut_cell_threshold;
     using COLLIDABLE_BASE::levelset;using COLLIDABLE_BASE::u_interface;
 
-    T_ARRAYS_SCALAR u_jump,beta_un_jump; // [u] and [beta un] on the grid
+    ARRAY<T,TV_INT> u_jump,beta_un_jump; // [u] and [beta un] on the grid
     T_FACE_ARRAYS_SCALAR beta_interface_face; // 2nd order method
     T_FACE_ARRAYS_SCALAR u_jump_face;
     //LEVELSET<TV>* levelset; // used in second order accurate cut cell method
     LEVELSET_MULTIPLE<TV>* levelset_multiple;
     //T_FACE_ARRAYS_SCALAR u_interface; // interface boundary condition - 2nd order method
 private:
-    ARRAY<T_ARRAYS_SCALAR> phis_default;
+    ARRAY<ARRAY<T,TV_INT>> phis_default;
     LEVELSET_MULTIPLE<TV> levelset_multiple_default;
 protected:
     T dt;
     bool dt_is_set;
 public:
 
-    POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input);
-    POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
+    POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input);
+    POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
         const bool enforce_compatibility_input);
     virtual ~POISSON_COLLIDABLE_UNIFORM();
 
@@ -78,14 +78,14 @@ public:
     void Set_Up_Second_Order_Cut_Cell_Method(const bool use_second_order_cut_cell_method_input=true) PHYSBAM_OVERRIDE;
     void Initialize_Grid(const GRID<TV>& grid_input) PHYSBAM_OVERRIDE;
     void Compute_beta_And_Add_Jumps_To_b(const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Find_Constant_beta(T_FACE_ARRAYS_SCALAR& beta_face,const T_ARRAYS_SCALAR& phi_ghost);
-    void Find_Constant_beta(const T_ARRAYS_SCALAR& phi_ghost);
-    void Find_Constant_beta_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost);
+    void Find_Constant_beta(T_FACE_ARRAYS_SCALAR& beta_face,const ARRAY<T,TV_INT>& phi_ghost);
+    void Find_Constant_beta(const ARRAY<T,TV_INT>& phi_ghost);
+    void Find_Constant_beta_Multiphase(ARRAY<ARRAY<T,TV_INT>>& phis_ghost);
     virtual void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index) PHYSBAM_OVERRIDE;
 private:
-    void Add_Jump_To_b(const T_ARRAYS_SCALAR& phi_ghost);
-    void Add_Jump_To_b_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost);
-    void Add_Derivative_Jump_To_b(const T_ARRAYS_SCALAR& phi_ghost);
+    void Add_Jump_To_b(const ARRAY<T,TV_INT>& phi_ghost);
+    void Add_Jump_To_b_Multiphase(ARRAY<ARRAY<T,TV_INT>>& phis_ghost);
+    void Add_Derivative_Jump_To_b(const ARRAY<T,TV_INT>& phi_ghost);
     void Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index);
 //#####################################################################
 };

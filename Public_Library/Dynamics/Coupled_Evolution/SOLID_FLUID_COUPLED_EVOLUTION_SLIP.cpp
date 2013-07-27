@@ -561,7 +561,7 @@ Apply_Viscosity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
             fluids_parameters.callbacks->Get_Reflection_Conditions(boundary_condition_collection.psi_R,time);
             poisson->psi_R=boundary_condition_collection.psi_R;}
 
-        T_ARRAYS_SCALAR variable_viscosity;
+        ARRAY<T,TV_INT> variable_viscosity;
         VISCOSITY<TV> viscosity_helper(*poisson,variable_viscosity,fluids_parameters.density,fluids_parameters.viscosity,fluids_parameters.implicit_viscosity,false,false,1000,fluids_parameters.use_psi_R);
 
         LOG::cout<<"KE before viscosity: "<<std::endl;

@@ -72,7 +72,7 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
             ARRAY<PAIR<T,INDEX> > weights;
             ARRAY<ARRAY<int>,INDEX> donors;donors.Resize(grid.Domain_Indices(3));
             ARRAY<ARRAY<int>,INDEX> receivers;receivers.Resize(grid.Domain_Indices(3));
-            T_ARRAYS_SCALAR sigma;sigma.Resize(grid.Domain_Indices(3));
+            ARRAY<T,TV_INT> sigma;sigma.Resize(grid.Domain_Indices(3));
 
             for(FACE_ITERATOR<TV> iterator(grid,2);iterator.Valid();iterator.Next()){
                 FACE_INDEX<TV::dimension> face_index=iterator.Full_Index();

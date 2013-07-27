@@ -21,7 +21,6 @@ class OPENGL_MAC_VELOCITY_FIELD_2D:public OPENGL_VECTOR_FIELD_2D<ARRAY<VECTOR<T_
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     using OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >::size;
 

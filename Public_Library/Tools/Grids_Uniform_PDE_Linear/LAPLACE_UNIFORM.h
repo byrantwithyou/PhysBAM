@@ -29,8 +29,7 @@ class LAPLACE_UNIFORM:public LAPLACE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
 public:
@@ -40,8 +39,8 @@ public:
     using LAPLACE<T>::tolerance;using LAPLACE<T>::number_of_regions;using LAPLACE<T>::solve_neumann_regions;using LAPLACE<T>::Find_Tolerance;
 
     GRID<TV> grid;
-    T_ARRAYS_SCALAR& u;
-    T_ARRAYS_SCALAR f; // f will be modified and reused as b in Ax=b for PCG
+    ARRAY<T,TV_INT>& u;
+    ARRAY<T,TV_INT> f; // f will be modified and reused as b in Ax=b for PCG
     PCG_SPARSE<T> pcg;
     PCG_SPARSE_THREADED<TV>* pcg_threaded;
     T_ARRAYS_INT filled_region_colors;
@@ -64,7 +63,7 @@ public:
 #endif
 public:
 
-    LAPLACE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue_input=0);
+    LAPLACE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue_input=0);
     virtual ~LAPLACE_UNIFORM();
 
     bool All_Cell_Faces_Neumann(const TV_INT& cell_index) const

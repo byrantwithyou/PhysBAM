@@ -24,8 +24,7 @@ class FLUID_STRAIN_UNIFORM:public FLUID_STRAIN<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ARRAYS_SYMMETRIC_MATRIX;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ARRAYS_SYMMETRIC_MATRIX;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
     typedef typename REBIND<T_ADVECTION_SEMI_LAGRANGIAN_SCALAR,SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX;
 public:
@@ -60,14 +59,14 @@ public:
 
 //#####################################################################
     void Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
-        const T_ARRAYS_SCALAR& phi_ghost,const int number_of_ghost_cells);
+        const ARRAY<T,TV_INT>& phi_ghost,const int number_of_ghost_cells);
     void Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
         const LEVELSET_MULTIPLE<TV>& levelset,const int region,const int number_of_ghost_cells);
 private:
     void Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T density,const T heaviside_bandwidth,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
-        ARRAY<TV,TV_INT>& V,const T_ARRAYS_SCALAR& phi_ghost,const int number_of_ghost_cells);
+        ARRAY<TV,TV_INT>& V,const ARRAY<T,TV_INT>& phi_ghost,const int number_of_ghost_cells);
 public:
-    void Extrapolate_Strain_Across_Interface(T_ARRAYS_SCALAR& phi_ghost,const T band_width=3);
+    void Extrapolate_Strain_Across_Interface(ARRAY<T,TV_INT>& phi_ghost,const T band_width=3);
     T CFL(const T density) const;
 //#####################################################################
 };
@@ -79,8 +78,7 @@ class FLUID_STRAIN_UNIFORM<VECTOR<T,1> >:public FLUID_STRAIN<T>
     typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
 public:
 //#####################################################################
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ARRAYS_SYMMETRIC_MATRIX;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename ARRAY<T,TV_INT>::template REBIND<SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ARRAYS_SYMMETRIC_MATRIX;
 
     T_ARRAYS_SYMMETRIC_MATRIX e; // strain tensor
     BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> >* e_boundary;

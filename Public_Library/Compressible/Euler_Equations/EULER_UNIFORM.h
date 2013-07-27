@@ -29,7 +29,7 @@ class EULER_UNIFORM:public EULER<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
@@ -65,7 +65,7 @@ public:
 private:
     mutable T_ARRAYS_DIMENSION_SCALAR U_ghost_private; // Forces us to only touch U_ghost through the const reference and let Fill_Ghost_Cells be the only thing modifying the variable;
     T_FACE_ARRAYS_DIMENSION_SCALAR fluxes_pressure;
-    T_ARRAYS_SCALAR added_internal_energy;
+    ARRAY<T,TV_INT> added_internal_energy;
     mutable bool ghost_cells_valid;
     mutable int ghost_cells_valid_ring;
 public:
@@ -97,7 +97,7 @@ public:
     void Fill_Ghost_Cells(const T dt,const T time,const int ghost_cells) const;
     void Get_Dirichlet_Boundary_Conditions(const T dt,const T time);
     void Advance_One_Time_Step_Forces(const T dt,const T time);
-    void Compute_Cavitation_Velocity(T_ARRAYS_SCALAR& rho_n, T_FACE_ARRAYS_SCALAR& face_velocities_n, T_ARRAYS_DIMENSION_SCALAR& momentum_n);
+    void Compute_Cavitation_Velocity(ARRAY<T,TV_INT>& rho_n, T_FACE_ARRAYS_SCALAR& face_velocities_n, T_ARRAYS_DIMENSION_SCALAR& momentum_n);
     void Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep,const int rk_order);
     void Advance_One_Time_Step_Implicit_Part(const T dt,const T time);
     void Clamp_Internal_Energy(const T dt,const T time); // TODO(kwatra): Do we really need dt, time here?

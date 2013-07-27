@@ -28,9 +28,9 @@ class MERGER
 public:
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename T_FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<VECTOR<T,TV::m+2> >::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef typename T_FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<VECTOR<T,TV::m+2> >::TYPE T_ARRAYS_DIMENSION_SCALAR;
     
 
     const int number_of_processes;
@@ -101,7 +101,7 @@ public:
     template<class T_LIST_2> bool Merge_Lists(const std::string& filename);
     template<class T_PARTICLES> bool Merge_Particles(const std::string& filename);
     template<class T_ARRAYS> void Scale_Cell_Data(T_ARRAYS& array){PHYSBAM_NOT_IMPLEMENTED();}
-    void Scale_Cell_Data(T_ARRAYS_SCALAR& array);
+    void Scale_Cell_Data(ARRAY<T,TV_INT>& array);
 //#####################################################################
 };
 //#####################################################################
@@ -121,51 +121,51 @@ Merge(const int frame)
     FILE_UTILITIES::Create_Directory(output_directory+"/"+f);
     if(merge_compressible){
         Merge_Cell_Data<T_ARRAYS_DIMENSION_SCALAR>(f+"euler_U",0);
-        Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"density",0);
-        Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"pressure",0);
-        Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"temperature",0);
+        Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"density",0);
+        Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"pressure",0);
+        Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"temperature",0);
         Merge_Cell_Data<ARRAY<TV,TV_INT> >(f+"centered_velocities",0);
-        if(FILE_UTILITIES::File_Exists(input_directory+"/2/"+f+"soot")) Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"soot",0);
-        if(FILE_UTILITIES::File_Exists(input_directory+"/2/"+f+"soot_fuel")) Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"soot_fuel",0);
+        if(FILE_UTILITIES::File_Exists(input_directory+"/2/"+f+"soot")) Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"soot",0);
+        if(FILE_UTILITIES::File_Exists(input_directory+"/2/"+f+"soot_fuel")) Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"soot_fuel",0);
         if(merge_debug_data){
             Merge_Cell_Data<ARRAY<bool,TV_INT> >(f+"psi_D",1);
             Merge_Face_Data<T_FACE_ARRAYS_BOOL>(f+"psi_N",1);
-            Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"density_gradient",0,true);
+            Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"density_gradient",0,true);
             Merge_Cell_Data<ARRAY<bool,TV_INT> >(f+"euler_psi",1);
-            Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"energy",0);
-            Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"enthalpy",0);
-            Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"entropy",0);
-            Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"internal_energy",0);
-            Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"machnumber",0);
-            Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"speedofsound",0);
-            Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"velocity_plus_c",0);
-            Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"velocity_minus_c",0);
-            Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"pressure_gradient",0,true);}
+            Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"energy",0);
+            Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"enthalpy",0);
+            Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"entropy",0);
+            Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"internal_energy",0);
+            Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"machnumber",0);
+            Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"speedofsound",0);
+            Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"velocity_plus_c",0);
+            Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"velocity_minus_c",0);
+            Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"pressure_gradient",0,true);}
         T time;FILE_UTILITIES::Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/1/%d/time",input_directory.c_str(),frame),time);
         FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%s/%d/time",output_directory.c_str(),frame),time);
         std::string levelset_file=input_directory+"/1"+f+"levelset";
         if(FILE_UTILITIES::File_Exists(levelset_file)){
-            Merge_Levelset<T_ARRAYS_SCALAR>(f+"levelset",3);
+            Merge_Levelset<ARRAY<T,TV_INT>>(f+"levelset",3);
             for(int number_of_sets=1;;number_of_sets++){
                 std::string filename=STRING_UTILITIES::string_sprintf("%d/levelset_%d",frame,number_of_sets);LOG::cout<<"merging "<<filename<<std::endl;
-                if(!Merge_Levelset<T_ARRAYS_SCALAR>(filename,3)) break;}}}
+                if(!Merge_Levelset<ARRAY<T,TV_INT>>(filename,3)) break;}}}
     else{
         if(merge_levelset){
-            Merge_Levelset<T_ARRAYS_SCALAR>(f+"levelset",3);
+            Merge_Levelset<ARRAY<T,TV_INT>>(f+"levelset",3);
             for(int number_of_sets=1;;number_of_sets++){
                 std::string filename=STRING_UTILITIES::string_sprintf("%d/levelset_%d",frame,number_of_sets);LOG::cout<<"merging "<<filename<<std::endl;
-                if(!Merge_Levelset<T_ARRAYS_SCALAR>(filename,3)) break;}}
-        if(merge_object_levelset) Merge_Levelset<T_ARRAYS_SCALAR>(f+"object_levelset",3);
+                if(!Merge_Levelset<ARRAY<T,TV_INT>>(filename,3)) break;}}
+        if(merge_object_levelset) Merge_Levelset<ARRAY<T,TV_INT>>(f+"object_levelset",3);
         if(merge_debug_data){
-            Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"pressure",1);
+            Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"pressure",1);
             Merge_Cell_Data<T_ARRAYS_INT>(f+"colors",0); // TODO: consider changing this back to 1
             Merge_Cell_Data<ARRAY<bool,TV_INT> >(f+"psi_D",1);
             Merge_Face_Data<T_FACE_ARRAYS_BOOL>(f+"psi_N",1);
             Merge_Particles<PARTICLE_LEVELSET_PARTICLES<TV> >(f+"negative_particles");}
         if(merge_velocities) Merge_Face_Data<T_FACE_ARRAYS>(f+"mac_velocities",3);
-        if(merge_temperatures) Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"temperature",3);
-        Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"reaction_speed",3);
-        if(merge_densities) Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"density",3);
+        if(merge_temperatures) Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"temperature",3);
+        Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"reaction_speed",3);
+        if(merge_densities) Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"density",3);
         if(merge_particles){
             for(int number_of_sets=1;;number_of_sets++){
                 std::string filename=STRING_UTILITIES::string_sprintf("%d/negative_particles_%d",frame,number_of_sets);LOG::cout<<"merging "<<filename<<std::endl;
@@ -222,7 +222,7 @@ Merge_Cell_Data(const std::string& filename,const int verify_bandwidth,const boo
 // Function Scale_Cell_Data
 //#####################################################################
 template<class T,class TV,class RW> void MERGER<T,TV,RW>::
-Scale_Cell_Data(T_ARRAYS_SCALAR& array)
+Scale_Cell_Data(ARRAY<T,TV_INT>& array)
 {
     T max_val=array.Max();
     if(max_val)
@@ -304,7 +304,7 @@ Merge_Particles(const std::string& filename)
 {
     // read
     int process_without_particles=0;
-    ARRAY<typename T_ARRAYS_SCALAR::template REBIND<T_PARTICLES*>::TYPE> local_data(number_of_fluid_processes);
+    ARRAY<typename ARRAY<T,TV_INT>::template REBIND<T_PARTICLES*>::TYPE> local_data(number_of_fluid_processes);
     for(int p=0;p<number_of_fluid_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p+fluid_proc_offset))+filename;
         if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping merge"<<std::endl;return false;}
         FILE_UTILITIES::Read_From_File<RW>(name,local_data(p));}
@@ -312,9 +312,9 @@ Merge_Particles(const std::string& filename)
     if(process_without_particles){
         for(int p=0;p<number_of_fluid_processes;p++)if(local_data(p).Size().x){
             LOG::cerr<<filename<<": process "<<p<<" has particles but process "<<process_without_particles<<" does not."<<std::endl;exit(1);}
-        FILE_UTILITIES::Write_To_File<RW>(output_directory+"/"+filename,typename T_ARRAYS_SCALAR::template REBIND<T_PARTICLES*>::TYPE());return true;}
+        FILE_UTILITIES::Write_To_File<RW>(output_directory+"/"+filename,typename ARRAY<T,TV_INT>::template REBIND<T_PARTICLES*>::TYPE());return true;}
     // merge
-    typename T_ARRAYS_SCALAR::template REBIND<T_PARTICLES*>::TYPE global_data(grid.Node_Indices());
+    typename ARRAY<T,TV_INT>::template REBIND<T_PARTICLES*>::TYPE global_data(grid.Node_Indices());
     for(int p=0;p<number_of_fluid_processes;p++){
         RANGE<TV_INT> region=local_grids(p)->Interior_Region(RANGE<TV_INT>(TV_INT(),TV_INT::All_Ones_Vector())),interior_region=region.Thickened(-1);
         // copy interior particles

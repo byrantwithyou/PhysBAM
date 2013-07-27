@@ -17,8 +17,7 @@ class COMPRESSIBLE_FLUID_COLLECTION:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
 public:
     const GRID<TV>& grid;
 

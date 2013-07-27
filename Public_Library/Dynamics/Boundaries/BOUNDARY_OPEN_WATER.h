@@ -18,7 +18,7 @@ template<class TV>
 class BOUNDARY_OPEN_WATER:public BOUNDARY<TV,typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
 public:
     typedef BOUNDARY<TV,T> BASE;

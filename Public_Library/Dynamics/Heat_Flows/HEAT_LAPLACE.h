@@ -29,18 +29,18 @@ template<class T_LAPLACE>
 class HEAT_LAPLACE:public T_LAPLACE
 {
     typedef typename T_LAPLACE::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_LAPLACE::GRID_T T_GRID;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename REBIND<T_ARRAYS_SCALAR,int>::TYPE T_ARRAYS_INT;
+    typedef typename REBIND<ARRAY<T,TV_INT>,int>::TYPE T_ARRAYS_INT;
 public:
     typedef T_LAPLACE BASE;
     using BASE::filled_region_touches_dirichlet;using BASE::Solve;using BASE::Find_Solution_Regions;using BASE::f;
 
     T coefficient;
 
-    HEAT_LAPLACE(GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input)
+    HEAT_LAPLACE(GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input)
         :T_LAPLACE(grid_input,u_input,true,false,false),coefficient(1)
     {}
 
-    HEAT_LAPLACE(GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid_input,const bool multiphase_input)
+    HEAT_LAPLACE(GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid_input,const bool multiphase_input)
         :T_LAPLACE(grid_input,u_input,initialize_grid_input,multiphase_input,false),coefficient(1)
     {}
 

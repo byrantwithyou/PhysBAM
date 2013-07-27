@@ -15,7 +15,7 @@ template<class TV>
 class LOCAL_GRID
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
 

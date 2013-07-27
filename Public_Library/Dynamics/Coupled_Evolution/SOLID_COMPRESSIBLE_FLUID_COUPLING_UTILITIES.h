@@ -25,9 +25,8 @@ class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES
     typedef typename TV::SCALAR T;
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<CUT_CELLS<T,TV::dimension>*>::TYPE T_ARRAYS_CUT_CELLS;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<CUT_CELLS<T,TV::dimension>*>::TYPE T_ARRAYS_CUT_CELLS;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
@@ -49,11 +48,11 @@ public:
     ARRAY<bool,TV_INT> cells_inside_fluid_time_n,outside_fluid;
     EULER_FLUID_FORCES<TV>* euler_fluid_forces;
     T_FACE_ARRAYS_SCALAR pressure_at_faces;
-    T_ARRAYS_SCALAR phi_all_solids_negated;
+    ARRAY<T,TV_INT> phi_all_solids_negated;
 
     ARRAY<bool,TV_INT> near_interface;
     T_ARRAYS_CUT_CELLS cut_cells_n,cut_cells_n_p_half,cut_cells_np1;
-    T_ARRAYS_SCALAR cell_volumes_n,cell_volumes_n_p_half,cell_volumes_np1;
+    ARRAY<T,TV_INT> cell_volumes_n,cell_volumes_n_p_half,cell_volumes_np1;
 
     ARRAY<bool,TV_INT> psi_n,psi_n_p_half,psi_np1,uncovered_cells_n_p_half;
     ARRAY<TV,TV_INT> advection_velocities_n;
@@ -68,13 +67,13 @@ public:
     void Update_Cut_Out_Grid();
     void Fill_Uncovered_Cells();
     void Fill_Solid_Cells(bool fill_pressure_only=false);
-    void Project_Fluid_Pressure_At_Neumann_Faces(const T_ARRAYS_SCALAR& p_ghost,T_FACE_ARRAYS_SCALAR& p_face) const;
+    void Project_Fluid_Pressure_At_Neumann_Faces(const ARRAY<T,TV_INT>& p_ghost,T_FACE_ARRAYS_SCALAR& p_face) const;
     void Apply_Isobaric_Fix(const T dt,const T time);
     void Extract_Time_N_Data_For_Explicit_Fluid_Forces();
 private:
     void Get_Neumann_Data(const TV& location,const T max_distance,TV& normal_direction,T& object_velocity_normal_component,TV& reflected_point) const;
     void Get_Neumann_Data(const TV& location,const T max_distance,TV& object_velocity,TV& reflected_point) const;
-    void Extrapolate_State_Into_Solids(T_ARRAYS_SCALAR& phi_all_solids_negated,const int number_of_ghost_cells,const int number_of_cells_to_extrapolate);
+    void Extrapolate_State_Into_Solids(ARRAY<T,TV_INT>& phi_all_solids_negated,const int number_of_ghost_cells,const int number_of_cells_to_extrapolate);
     void Compute_Phi_Solids(const int number_of_ghost_cells);
 //#####################################################################
 public:

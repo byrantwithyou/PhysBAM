@@ -15,7 +15,7 @@ template<class TV>
 class SCATTERED_INTERPOLATION
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<ARRAY<int>,TV_INT> T_ARRAYS_ARRAY_INT;
+    typedef ARRAY<ARRAY<int>,TV_INT> T_ARRAYS_ARRAY_INT;
 public:
     T radius_of_influence;
     bool use_tent_weights;

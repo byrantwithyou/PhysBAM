@@ -275,7 +275,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
         PHYSBAM_DEBUG_WRITE_SUBSTEP("before poisson setup for coupled solve (sf coupled evolution)",0,1);
 
-        T_ARRAYS_SCALAR& p=Get_Pressure();
+        ARRAY<T,TV_INT>& p=Get_Pressure();
         if(dt && !fluids_parameters.compressible) p*=dt; // RESCALE PRESSURE FOR A BETTER INITIAL GUESS!
         if(dt && fluids_parameters.compressible) fluids_parameters.euler->euler_projection.Scale_Pressure_By_Dt(dt);
  
@@ -382,7 +382,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             x_array.v(i).Resize(n);p_array.v(i).Resize(n);ap_array.v(i).Resize(n);
             ar_array.v(i).Resize(n);r_array.v(i).Resize(n);z_array.v(i).Resize(n);zaq_array.v(i).Resize(n);}
 
-        T_ARRAYS_SCALAR& p=Get_Pressure();
+        ARRAY<T,TV_INT>& p=Get_Pressure();
         for(int i=0;i<A_array.m;i++){
             const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
             for(int j=0;j<A.n;j++) x_array.v(i)(j)=p(matrix_index_to_cell_index_array(i)(j));}}
@@ -490,7 +490,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         rigid_deformable_collisions->rigid_body_collisions.Remove_Contact_Joints();}
 
     if(fluids){
-        T_ARRAYS_SCALAR& p=Get_Pressure();
+        ARRAY<T,TV_INT>& p=Get_Pressure();
         // Copy pressures back into pressure array
         for(int i=0;i<x_array.v.m;i++) for(int j=0;j<x_array.v(i).m;j++) p(matrix_index_to_cell_index_array(i)(j))=x_array.v(i)(j);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("unscaled final pressures (sf coupled evolution)",0,1);
@@ -642,7 +642,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Set_Dirichlet_Boundary_Conditions(const T time)
 {
     POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
-    T_ARRAYS_SCALAR& p=Get_Pressure();
+    ARRAY<T,TV_INT>& p=Get_Pressure();
     const GRID<TV>& grid=Get_Grid();
 
     // Set all cells inside a solid to be dirichlet
@@ -799,7 +799,7 @@ Compute_W(const T current_position_time)
             // check whether this face can see fluid
             // cast a ray left and right
             // TODO: must exchange solid velocities to do this! for parallel.  Alt, just do solid explicit part on all procs.
-            T_ARRAYS_SCALAR& phi=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).levelset.phi;
+            ARRAY<T,TV_INT>& phi=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).levelset.phi;
             ARRAY<COLLISION_GEOMETRY_ID> objects;collision_bodies.objects_in_cell.Get_Objects_For_Cells(first_cell_index,second_cell_index,collision_bodies.collision_geometry_collection.bodies.m,objects);if(!objects.m) continue;
             COLLISION_GEOMETRY_ID body_id;bool occluded=true;
             RAY<TV> ray(iterator.First_Cell_Center(),TV::Axis_Vector(axis),true);ray.t_max=(T).5*grid.dX[axis];ray.semi_infinite=false;
@@ -1073,7 +1073,7 @@ Apply_Pressure(const T dt,const T time)
     Apply_Solid_Boundary_Conditions(time,false,face_velocities);
     if(fluids_parameters.compressible){
         Average_Solid_Projected_Face_Velocities_For_Energy_Update(solid_projected_face_velocities_star,face_velocities,face_velocities);
-        T_ARRAYS_SCALAR p_ghost;
+        ARRAY<T,TV_INT> p_ghost;
         euler_projection.Get_Ghost_Pressures(dt,time,euler_projection.elliptic_solver->psi_D,euler_projection.elliptic_solver->psi_N,euler_projection.p,p_ghost);
         T_FACE_ARRAYS_SCALAR p_face;
         euler_projection.Get_Pressure_At_Faces(dt,time,p_ghost,p_face);

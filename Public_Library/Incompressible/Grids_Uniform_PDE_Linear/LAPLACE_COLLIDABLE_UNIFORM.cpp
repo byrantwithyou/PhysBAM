@@ -20,7 +20,7 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> LAPLACE_COLLIDABLE_UNIFORM<TV>::
-LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue)
+LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue)
     :BASE(grid_input,u_input,initialize_grid,enforce_compatibility_input,thread_queue),levelset_default(new LEVELSET<TV>(grid,phi_default))
 {
 }
@@ -28,7 +28,7 @@ LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,c
 // Constructor
 //#####################################################################
 template<class TV> LAPLACE_COLLIDABLE_UNIFORM<TV>::
-LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
+LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
     const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue)
     :BASE(grid_input,u_input,initialize_grid,enforce_compatibility_input,thread_queue),levelset_default(new LEVELSET<TV>(grid,phi_default))
 {

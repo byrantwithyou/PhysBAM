@@ -20,7 +20,6 @@ template<class TV>
 class IMPLICIT_OBJECT_COMBINED_EULERIAN:public IMPLICIT_OBJECT<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
     enum WORKAROUND {d=TV::m};
 public:

@@ -58,7 +58,7 @@ Initialize_Grid()
 // Function p
 //#####################################################################
 template<class TV> void EULER_PROJECTION_UNIFORM<TV>::
-Get_Pressure(T_ARRAYS_SCALAR& pressure) const
+Get_Pressure(ARRAY<T,TV_INT>& pressure) const
 {
     if(transition_to_using_implicit_pressure){
         LOG::cout<<"using implicit pressure, is_pressure_scaled="<<is_pressure_scaled<<std::endl;
@@ -88,7 +88,7 @@ Fill_Face_Weights_For_Projection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& b
 // Function Get_Ghost_Density
 //#####################################################################
 template<class TV> void EULER_PROJECTION_UNIFORM<TV>::
-Get_Ghost_Density(const T dt,const T time,const int number_of_ghost_cells,T_ARRAYS_SCALAR& density_ghost) const
+Get_Ghost_Density(const T dt,const T time,const int number_of_ghost_cells,ARRAY<T,TV_INT>& density_ghost) const
 {
     euler->Fill_Ghost_Cells(dt,time,number_of_ghost_cells);
     for(CELL_ITERATOR<TV> iterator(euler->grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){
@@ -127,7 +127,7 @@ Project(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     Compute_Pressure(face_velocities,dt,time);
 
-    T_ARRAYS_SCALAR p_ghost;
+    ARRAY<T,TV_INT> p_ghost;
     Get_Ghost_Pressures(dt,time,elliptic_solver->psi_D,elliptic_solver->psi_N,p,p_ghost);
     T_FACE_ARRAYS_SCALAR p_face;
     Get_Pressure_At_Faces(dt,time,p_ghost,p_face);
@@ -210,7 +210,7 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_
     TV one_over_dx=euler->grid.one_over_dX;
 
     //Advect pressure using Hamilton Jacobi
-    T_ARRAYS_SCALAR p_ghost(euler->grid.Domain_Indices(3));
+    ARRAY<T,TV_INT> p_ghost(euler->grid.Domain_Indices(3));
     Get_Pressure(p_ghost);
     pressure_boundary->Fill_Ghost_Cells(euler->grid,p_ghost,p_ghost,dt,0,3);
 
@@ -220,7 +220,7 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_
         v_cell(cell_index)=euler->Get_Velocity(U_ghost,cell_index);}
 
     FLOOD_FILL<1> find_connected_components;
-    T_ARRAYS_SCALAR rhs(euler->grid.Domain_Indices());ARRAY<T,VECTOR<int,1> > p_1d,u,u_px;
+    ARRAY<T,TV_INT> rhs(euler->grid.Domain_Indices());ARRAY<T,VECTOR<int,1> > p_1d,u,u_px;
     for(int axis=0;axis<TV::m;axis++){
         GRID<VECTOR<T,1> > grid_1d=euler->grid.Get_1D_Grid(axis);
         p_1d.Resize(grid_1d.Domain_Indices(3));u.Resize(grid_1d.Domain_Indices(3));u_px.Resize(grid_1d.Domain_Indices(3));
@@ -296,7 +296,7 @@ Compute_Density_Weighted_Face_Velocities(const GRID<TV>& face_grid,T_FACE_ARRAYS
 // Function Compute_Face_Pressure_From_Cell_Pressures
 //#####################################################################
 template<class TV> void EULER_PROJECTION_UNIFORM<TV>::
-Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,T_FACE_ARRAYS_SCALAR& p_face,const T_ARRAYS_SCALAR& p_cell)
+Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,T_FACE_ARRAYS_SCALAR& p_face,const ARRAY<T,TV_INT>& p_cell)
 {
     TV_INT first_cell_index,second_cell_index;int axis;
     for(FACE_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){
@@ -314,7 +314,7 @@ Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,const T_ARRA
 //#####################################################################
 template<class TV> void EULER_PROJECTION_UNIFORM<TV>::
 Get_Ghost_Pressures(const T dt,const T time,const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,
-    const T_ARRAYS_SCALAR& pressure,T_ARRAYS_SCALAR& p_ghost)
+    const ARRAY<T,TV_INT>& pressure,ARRAY<T,TV_INT>& p_ghost)
 {
     assert(!is_pressure_scaled);
         
@@ -335,7 +335,7 @@ Get_Ghost_Pressures(const T dt,const T time,const ARRAY<bool,TV_INT>& psi_D,cons
 // Function Get_Pressure_At_Faces
 //#####################################################################
 template<class TV> void EULER_PROJECTION_UNIFORM<TV>::
-Get_Pressure_At_Faces(const T dt,const T time,const T_ARRAYS_SCALAR& p_ghost,T_FACE_ARRAYS_SCALAR& p_face)
+Get_Pressure_At_Faces(const T dt,const T time,const ARRAY<T,TV_INT>& p_ghost,T_FACE_ARRAYS_SCALAR& p_face)
 {
     euler->Fill_Ghost_Cells(dt,time,1);
     p_face.Resize(euler->grid);
@@ -349,7 +349,7 @@ Get_Pressure_At_Faces(const T dt,const T time,const T_ARRAYS_SCALAR& p_ghost,T_F
 // Function Apply_Pressure
 //#####################################################################
 template<class TV> void EULER_PROJECTION_UNIFORM<TV>::
-Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face,const T_FACE_ARRAYS_SCALAR& face_velocities_star,
+Apply_Pressure(const ARRAY<T,TV_INT>& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face,const T_FACE_ARRAYS_SCALAR& face_velocities_star,
     const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,const T dt,const T time)
 {
     assert(!is_pressure_scaled);
@@ -360,11 +360,11 @@ Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face
 // Function Apply_Pressure
 //#####################################################################
 template<class TV> void EULER_PROJECTION_UNIFORM<TV>::
-Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face,const T_FACE_ARRAYS_SCALAR& face_velocities_star,
+Apply_Pressure(const ARRAY<T,TV_INT>& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face,const T_FACE_ARRAYS_SCALAR& face_velocities_star,
     const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,const T dt,const T time,
     T_FACE_ARRAYS_DIMENSION_SCALAR *fluxes,EULER_UNIFORM<TV>* euler)
 {
-    T_ARRAYS_SCALAR p_hat(p_ghost);
+    ARRAY<T,TV_INT> p_hat(p_ghost);
     T_FACE_ARRAYS_SCALAR p_hat_face(p_face);
     p_hat*=dt;
     p_hat_face*=dt;

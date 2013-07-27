@@ -27,17 +27,16 @@ class HEAT_UNIFORM:public HEAT<typename TV::SCALAR>
 {
 private:
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
 
     using HEAT<T>::max_time_step;using HEAT<T>::density;using HEAT<T>::specific_heat;using HEAT<T>::thermal_conductivity;using HEAT<T>::kappa;
 public:
 
     GRID<TV>& grid;
-    T_ARRAYS_SCALAR& Q;
+    ARRAY<T,TV_INT>& Q;
     HEAT_LAPLACE<LAPLACE_COLLIDABLE_UNIFORM<TV> > laplace;
 
-    HEAT_UNIFORM(GRID<TV>& grid_input,T_ARRAYS_SCALAR& Q_input);
+    HEAT_UNIFORM(GRID<TV>& grid_input,ARRAY<T,TV_INT>& Q_input);
     ~HEAT_UNIFORM();
 
 //#####################################################################

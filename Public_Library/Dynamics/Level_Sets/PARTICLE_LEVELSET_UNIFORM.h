@@ -24,13 +24,13 @@ template<class TV>
 class PARTICLE_LEVELSET_UNIFORM:public PARTICLE_LEVELSET<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename GRID<TV>::BLOCK T_BLOCK;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<char>::TYPE T_ARRAYS_CHAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<bool> >::TYPE T_ARRAYS_ARRAY_BOOL;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<TV>*>::TYPE T_ARRAYS_ARRAY_TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef typename GRID<TV>::BLOCK T_BLOCK;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<char>::TYPE T_ARRAYS_CHAR;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<ARRAY<bool> >::TYPE T_ARRAYS_ARRAY_BOOL;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<ARRAY<TV>*>::TYPE T_ARRAYS_ARRAY_TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef LINEAR_INTERPOLATION_MAC_HELPER<TV> T_LINEAR_INTERPOLATION_MAC_HELPER;
     typedef typename LINEAR_INTERPOLATION_UNIFORM<TV,T>::template REBIND<TV>::TYPE T_LINEAR_INTERPOLATION_VECTOR;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;
@@ -59,7 +59,7 @@ public:
     pthread_barrier_t cell_barr;
 #endif
 
-    PARTICLE_LEVELSET_UNIFORM(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,const int number_of_ghost_cells_input);
+    PARTICLE_LEVELSET_UNIFORM(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,const int number_of_ghost_cells_input);
     ~PARTICLE_LEVELSET_UNIFORM();
 
     void Set_Thread_Queue(THREAD_QUEUE* thread_queue_input)
@@ -70,7 +70,7 @@ public:
     void Adjust_Particle_Radii();
     void Adjust_Particle_Radii_Threaded(RANGE<TV_INT>& domain);
     void Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* V,ARRAY<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES*>* other_positive_particles=0);
-    void Update_Particles_To_Reflect_Mass_Conservation(T_ARRAYS_SCALAR& phi_old,const bool update_particle_cells=true,const bool verbose=false);
+    void Update_Particles_To_Reflect_Mass_Conservation(ARRAY<T,TV_INT>& phi_old,const bool update_particle_cells=true,const bool verbose=false);
     void Update_Particles_To_Reflect_Mass_Conservation(const LEVELSET<TV>& levelset_old,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const bool update_particle_cells,const bool verbose);
     void Euler_Step_Particles(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,const bool use_second_order_for_nonremoved_particles=false,
@@ -115,7 +115,7 @@ public:
     void Identify_And_Remove_Escaped_Positive_Particles(const T_FACE_ARRAYS_SCALAR& V,const T radius_fraction=1.5,const T time=0,const bool verbose=true);
     void Reincorporate_Removed_Particles(const T radius_fraction,const T mass_scaling,T_FACE_ARRAYS_SCALAR* V,const bool conserve_momentum_for_removed_negative_particles=true);
     void Reincorporate_Removed_Particles_Threaded(RANGE<TV_INT>& domain,const T radius_fraction,const T mass_scaling,T_FACE_ARRAYS_SCALAR* V);
-    bool Fix_Momentum_With_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const T_ARRAYS_SCALAR& momentum_lost,const T radius_fraction,const T mass_scaling,const T time,const bool force=true);
+    bool Fix_Momentum_With_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const ARRAY<T,TV_INT>& momentum_lost,const T radius_fraction,const T mass_scaling,const T time,const bool force=true);
     bool Fix_Momentum_With_Escaped_Particles(const TV& location,const T_FACE_ARRAYS_SCALAR& V,const T momentum_lost,const T radius_fraction,const T mass_scaling,const T time,const bool force=true);
 
     void Delete_Particles_Far_From_Interface(const int discrete_band=4);
@@ -124,7 +124,7 @@ public:
     void Delete_Particles_Far_From_Interface_Part_Three(RANGE<TV_INT>& domain,T_ARRAYS_CHAR& near_interface);
     void Add_Negative_Particle(const TV& particle_location,const TV& particle_velocity,const unsigned short quantized_collision_distance);
     void Exchange_Overlap_Particles();
-    template<class T_ARRAYS_PARTICLES> void Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi,T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR* V,const int sign,const T one_over_radius_multiplier);
+    template<class T_ARRAYS_PARTICLES> void Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi,T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR* V,const int sign,const T one_over_radius_multiplier);
 protected:
 #ifdef USE_PTHREADS
     bool Attract_Individual_Particle_To_Interface_And_Adjust_Radius(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles,
@@ -136,7 +136,7 @@ protected:
         RANDOM_NUMBERS<T>& local_random,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index);
 #endif
     void Adjust_Particle_Radii(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int sign);
-    template<class T_ARRAYS_PARTICLES> void Modify_Levelset_Using_Escaped_Particles(T_ARRAYS_SCALAR& phi,T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR* V,const int sign);
+    template<class T_ARRAYS_PARTICLES> void Modify_Levelset_Using_Escaped_Particles(ARRAY<T,TV_INT>& phi,T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR* V,const int sign);
     int Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& other_particles,const int sign,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,ARRAY<bool,TV_INT>* cell_centered_mask);
     void Reseed_Add_Particles_Threaded_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& other_particles,const int sign,ARRAY<bool,TV_INT>* cell_centered_mask,ARRAY<int,TV_INT>& number_of_particles_to_add);

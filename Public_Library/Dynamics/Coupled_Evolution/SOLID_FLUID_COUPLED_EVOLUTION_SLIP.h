@@ -33,8 +33,7 @@ class SOLID_FLUID_COUPLED_EVOLUTION_SLIP:public NEWMARK_EVOLUTION<TV_input>,publ
 {
     typedef TV_input TV;typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
@@ -67,14 +66,14 @@ protected:
     GRID<TV>& grid;
     T_FACE_ARRAYS_SCALAR fluids_face_velocities; // Stores combined compressible-incompressible face velocities.
 public:
-    T_ARRAYS_SCALAR pressure;
-    T_ARRAYS_SCALAR density;
+    ARRAY<T,TV_INT> pressure;
+    ARRAY<T,TV_INT> density;
     T_FACE_ARRAYS_BOOL solved_faces;
 protected:
     ARRAY<TV,TV_INT> centered_velocity;
-    T_ARRAYS_SCALAR one_over_rho_c_squared;
-    T_ARRAYS_SCALAR p_advected_over_rho_c_squared_dt;
-    T_ARRAYS_SCALAR p_advected;
+    ARRAY<T,TV_INT> one_over_rho_c_squared;
+    ARRAY<T,TV_INT> p_advected_over_rho_c_squared_dt;
+    ARRAY<T,TV_INT> p_advected;
 
 public:
     FRACTURE_PATTERN<T>* fracture_pattern;

@@ -24,15 +24,15 @@ class SPH_EVOLUTION_UNIFORM:public NONCOPYABLE
     typedef typename TV::SCALAR T;
     STATIC_ASSERT((IS_SAME<typename GRID<TV>::GRID_TAG,UNIFORM_TAG<TV> >::value));
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<PAIR<TV_INT,int> > >::TYPE T_ARRAYS_ARRAY_PAIR_TV_INT_INT;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<T> >::TYPE T_ARRAYS_ARRAY_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV_INT>::TYPE T_ARRAYS_TV_INT;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<ARRAY<PAIR<TV_INT,int> > >::TYPE T_ARRAYS_ARRAY_PAIR_TV_INT_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<ARRAY<T> >::TYPE T_ARRAYS_ARRAY_SCALAR;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_INT>::TYPE T_ARRAYS_TV_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
 public:
 
     GRID<TV> grid;
@@ -57,7 +57,7 @@ public:
     bool use_two_way_coupling;
     bool convert_particles_to_fluid;
     int maximum_phi_refinement_depth;
-    T_ARRAYS_SCALAR cell_weight;
+    ARRAY<T,TV_INT> cell_weight;
 private:
     T radius,radius_plus_half_dx_squared,one_over_radius_squared;
     TV radius_vector;
@@ -91,7 +91,7 @@ public:
     void Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time);
     void Set_Divergence_And_Multiplier(const TV_INT cell,const ARRAY<bool,TV_INT>& cells_valid,const T time);
     void Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    void Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,T_ARRAYS_SCALAR& cell_weight,T_FACE_ARRAYS_SCALAR& face_weight);
+    void Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,ARRAY<T,TV_INT>& cell_weight,T_FACE_ARRAYS_SCALAR& face_weight);
     void Calculate_Particle_Deltas(const T_FACE_ARRAYS_SCALAR& minus_face_delta,ARRAY<TV>& delta_velocity,ARRAY<TV>& delta_weight);
     void Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR* face_velocities);
     template<class T_ARRAYS_PARTICLES> void Move_Particles_Off_Grid_Boundaries(T_ARRAYS_PARTICLES& particles,const T tolerance) const;

@@ -16,7 +16,7 @@ template<class TV>
 class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM:public PROJECTION_REFINEMENT_UNIFORM<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
+    typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> T_FACE_LOOKUP_FIRE_MULTIPHASE;
@@ -32,7 +32,7 @@ public:
     LINEAR_INTERPOLATION_UNIFORM<TV,T> phi_interpolation;
     PROJECTION_DYNAMICS_UNIFORM<TV> levelset_projection;
     LEVELSET<TV> &levelset,coarse_levelset;
-    T_ARRAYS_SCALAR phi_ghost,coarse_phi,local_phi;
+    ARRAY<T,TV_INT> phi_ghost,coarse_phi,local_phi;
     bool surface_solve;
     int buffer;
 public:

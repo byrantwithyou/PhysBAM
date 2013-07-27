@@ -308,7 +308,7 @@ Advance_To_Target_Time(const T target_time)
 
         //Extrapolate Velocity 7%
         LOG::Time("Extrapolate Velocity");
-        T_ARRAYS_SCALAR exchanged_phi_ghost(example.mac_grid.Domain_Indices(8));
+        ARRAY<T,TV_INT> exchanged_phi_ghost(example.mac_grid.Domain_Indices(8));
         example.particle_levelset_evolution.Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.phi,exchanged_phi_ghost,0,time+dt,8);
         example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,3,0,TV());
 

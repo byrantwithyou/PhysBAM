@@ -203,7 +203,7 @@ Restore_After_Projection(T_FACE_ARRAYS_SCALAR& face_velocities)
 template<class TV> void PROJECTION_UNIFORM<TV>::
 Exchange_Pressures_For_Projection()
 {
-    T_ARRAYS_SCALAR::Exchange(p,p_save_for_projection);
+    ARRAY<T,TV_INT>::Exchange(p,p_save_for_projection);
 }
 //#####################################################################
 // Function Calculate_Kinetic_Energy_Error

@@ -19,7 +19,7 @@ class FLOOD_FILL_MPI:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;typedef VECTOR<int,TV::m> TV_INT;
-    typedef TV_INT T_INDEX;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef TV_INT T_INDEX;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<int,TV_INT> T_ARRAYS_INT;typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;
     typedef GRID<TV> T_PARALLEL_GRID;
 public:

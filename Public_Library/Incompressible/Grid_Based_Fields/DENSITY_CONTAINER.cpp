@@ -53,7 +53,7 @@ Initialize_Array(const int ghost_cells,const bool initialize_new_elements,const 
 template<class TV> void DENSITY_CONTAINER<TV>::
 Fill_Beta_At_Faces(const T dt,const T time,T_FACE_ARRAYS_SCALAR& beta_face) const
 {
-    T_ARRAYS_SCALAR density_ghost(grid.Cell_Indices(1),false);
+    ARRAY<T,TV_INT> density_ghost(grid.Cell_Indices(1),false);
     boundary->Fill_Ghost_Cells(grid,density,density_ghost,dt,time,1);
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
         TV_INT face_index=iterator.Face_Index();
@@ -65,7 +65,7 @@ Fill_Beta_At_Faces(const T dt,const T time,T_FACE_ARRAYS_SCALAR& beta_face) cons
 // Function Get_Ghost_Density
 //#####################################################################
 template<class TV> void DENSITY_CONTAINER<TV>::
-Get_Ghost_Density(const T dt,const T time,const int number_of_ghost_cells,T_ARRAYS_SCALAR& density_ghost) const
+Get_Ghost_Density(const T dt,const T time,const int number_of_ghost_cells,ARRAY<T,TV_INT>& density_ghost) const
 {
     boundary->Fill_Ghost_Cells(grid,density,density_ghost,dt,time,number_of_ghost_cells);
 }

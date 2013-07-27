@@ -20,7 +20,7 @@ template<class TV>
 class PROJECTION_DYNAMICS_UNIFORM:public PROJECTION_COLLIDABLE_UNIFORM<TV>,public PROJECTION_DYNAMICS<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
+    typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> T_FACE_LOOKUP_FIRE_MULTIPHASE;
@@ -37,7 +37,7 @@ public:
 
 protected:
     bool use_divergence_multiplier_save_for_sph,use_non_zero_divergence_save_for_sph;
-    T_ARRAYS_SCALAR *p_save_for_sph,*divergence_save_for_sph,*divergence_multiplier_save_for_sph;
+    ARRAY<T,TV_INT> *p_save_for_sph,*divergence_save_for_sph,*divergence_multiplier_save_for_sph;
     T_FACE_ARRAYS_SCALAR *face_velocities_save_for_sph;
     LAPLACE_UNIFORM<TV>* elliptic_solver_save_for_sph;
     LAPLACE_COLLIDABLE_UNIFORM<TV>* laplace_save_for_sph;

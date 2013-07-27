@@ -19,33 +19,32 @@ class IMPLICIT_VISCOSITY_UNIFORM:public NONCOPYABLE
 {
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef AVERAGING_UNIFORM<TV> T_AVERAGING;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
 
 protected:
     LAPLACE_UNIFORM<TV>& elliptic_solver;
-    const T_ARRAYS_SCALAR& variable_viscosity;
+    const ARRAY<T,TV_INT>& variable_viscosity;
     T density;
     T viscosity;
     T_MPI_GRID* mpi_grid;
     const int axis;
     GRID<TV> face_grid; // a mac grid with the faces of the axis as cells
     LAPLACE_UNIFORM<TV>* heat_solver;
-    T_ARRAYS_SCALAR u;
+    ARRAY<T,TV_INT> u;
     bool use_variable_viscosity;
     bool use_psi_R;
 public:
 
-    IMPLICIT_VISCOSITY_UNIFORM(LAPLACE_UNIFORM<TV>& elliptic_solver_input,const T_ARRAYS_SCALAR& variable_viscosity_input,const T density_input,const T viscosity_input,T_MPI_GRID* mpi_grid_input,
+    IMPLICIT_VISCOSITY_UNIFORM(LAPLACE_UNIFORM<TV>& elliptic_solver_input,const ARRAY<T,TV_INT>& variable_viscosity_input,const T density_input,const T viscosity_input,T_MPI_GRID* mpi_grid_input,
         const int axis_input,bool use_variable_viscosity_input,bool use_psi_R_input);
     virtual ~IMPLICIT_VISCOSITY_UNIFORM();
 
 //#####################################################################
     void Viscous_Update(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T time,const int maximum_implicit_viscosity_iterations);
-    static void Variable_Viscosity_Explicit_Part(const T density,const T_ARRAYS_SCALAR& variable_viscosity,const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T time);
+    static void Variable_Viscosity_Explicit_Part(const T density,const ARRAY<T,TV_INT>& variable_viscosity,const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T time);
 protected:
     virtual void Allocate_Heat_Solver();
     virtual void Setup_Viscosity(const T dt);

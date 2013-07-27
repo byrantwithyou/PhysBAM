@@ -21,8 +21,7 @@ class GRID_BASED_COLLISION_GEOMETRY_UNIFORM:public GRID_BASED_COLLISION_GEOMETRY
 {
     typedef typename TV::SCALAR T;typedef VECTOR<bool,TV::dimension> TV_BOOL;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_FACE_ARRAYS_BOOL::template REBIND<VECTOR<bool,TV::m> >::TYPE T_FACE_ARRAYS_BOOL_DIMENSION;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;

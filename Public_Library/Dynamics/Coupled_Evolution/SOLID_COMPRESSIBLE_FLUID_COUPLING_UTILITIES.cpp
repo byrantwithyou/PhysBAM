@@ -143,7 +143,7 @@ Fill_Uncovered_Cells()
 // Function Extrapolate_State_Into_Solids
 //#####################################################################
 template<class TV> void SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>::
-Extrapolate_State_Into_Solids(T_ARRAYS_SCALAR& phi_all_solids_negated,const int number_of_ghost_cells,const int number_of_cells_to_extrapolate)
+Extrapolate_State_Into_Solids(ARRAY<T,TV_INT>& phi_all_solids_negated,const int number_of_ghost_cells,const int number_of_cells_to_extrapolate)
 {
     assert(!euler.timesplit || !thinshell);
     T_ARRAYS_DIMENSION_SCALAR U_extrapolated(euler.grid.Domain_Indices(number_of_ghost_cells));
@@ -225,7 +225,7 @@ Fill_Solid_Cells(bool fill_pressure_only)
 // Function Project_Fluid_Pressure_At_Neumann_Faces
 //#####################################################################
 template<class TV> void SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>::
-Project_Fluid_Pressure_At_Neumann_Faces(const T_ARRAYS_SCALAR& p_ghost,T_FACE_ARRAYS_SCALAR& p_face) const
+Project_Fluid_Pressure_At_Neumann_Faces(const ARRAY<T,TV_INT>& p_ghost,T_FACE_ARRAYS_SCALAR& p_face) const
 {
     // Bp
     const RANGE<TV>& domain=euler.grid.domain;
@@ -293,7 +293,7 @@ template<class TV> void SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>::
 Extract_Time_N_Data_For_Explicit_Fluid_Forces()
 {
     if(!fluid_affects_solid || euler.timesplit) return;
-    T_ARRAYS_SCALAR p_approx(euler.grid.Domain_Indices(1));
+    ARRAY<T,TV_INT> p_approx(euler.grid.Domain_Indices(1));
     for(CELL_ITERATOR<TV> iterator(euler.grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         p_approx(cell_index)=euler.eos->p(euler.U_ghost(cell_index)(0),euler.e(euler.U_ghost,cell_index));}
     euler.euler_projection.Compute_Face_Pressure_From_Cell_Pressures(euler.grid,euler.U_ghost,euler.psi,pressure_at_faces,p_approx);
@@ -378,7 +378,7 @@ Update_Np1_Collision_Data(const T dt)
             for(CELL_ITERATOR<TV> iterator(euler.grid,euler.grid.Clamp_To_Cell(collision_body.Axis_Aligned_Bounding_Box().Thickened(euler.grid.dX.Max()*(T)2),0));iterator.Valid();iterator.Next()){
                 if(collision_body.Inside(iterator.Location(),collision_thickness_over_two)) psi_np1(iterator.Cell_Index())=false;}}
 
-    T_ARRAYS_SCALAR::Put(cell_volumes_np1,cell_volumes_n); cell_volumes_np1.Fill(euler.grid.Cell_Size());
+    ARRAY<T,TV_INT>::Put(cell_volumes_np1,cell_volumes_n); cell_volumes_np1.Fill(euler.grid.Cell_Size());
     for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(!psi_np1(cell_index) || (cut_cells_np1(cell_index) && !cut_cells_np1(cell_index)->dominant_element)) cell_volumes_np1(cell_index)=0;

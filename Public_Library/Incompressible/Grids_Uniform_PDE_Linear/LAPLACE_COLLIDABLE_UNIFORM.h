@@ -25,8 +25,7 @@ class LAPLACE_COLLIDABLE_UNIFORM:public LAPLACE_UNIFORM<TV>,public LAPLACE_COLLI
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
 public:
@@ -43,12 +42,12 @@ public:
     //LEVELSET<TV>* levelset; // used in second order accurate cut cell method
     //T_FACE_ARRAYS_SCALAR u_interface; // interface boundary condition - 2nd order method
 protected:
-    T_ARRAYS_SCALAR phi_default;
+    ARRAY<T,TV_INT> phi_default;
     LEVELSET<TV>* levelset_default;
 public:
 
-    LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue=0);
-    LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
+    LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue=0);
+    LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
         const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue=0);
     virtual ~LAPLACE_COLLIDABLE_UNIFORM();
 

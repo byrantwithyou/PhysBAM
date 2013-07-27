@@ -300,7 +300,7 @@ template<class TV> template<class GEOMETRY> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T
 Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORMATION_MATRIX& world_to_source)
 {
     T bandwidth=3*fluids_parameters.grid->dX.Min();
-    ARRAY<T_ARRAYS_SCALAR>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
+    ARRAY<ARRAY<T,TV_INT>>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
     for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         TV source_X=world_to_source.Homogeneous_Times(iterator.Location());
         if(source.Inside(source_X,-bandwidth)){
@@ -420,7 +420,7 @@ Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multi
                     projection.Flame_Speed_Face_Multiphase(axis,face,fuel_region,product_region)*
                     (levelset_multiple.Phi(fuel_region,cell2)-levelset_multiple.Phi(fuel_region,cell1))*grid.one_over_dX[axis];}}}
     if(fluids_parameters.pseudo_dirichlet_regions.Number_True()>0){
-        T_ARRAYS_SCALAR phi_for_pseudo_dirichlet_regions;GRID<TV> grid_temp(grid);LEVELSET<TV> levelset_for_pseudo_dirichlet_regions(grid_temp,phi_for_pseudo_dirichlet_regions);
+        ARRAY<T,TV_INT> phi_for_pseudo_dirichlet_regions;GRID<TV> grid_temp(grid);LEVELSET<TV> levelset_for_pseudo_dirichlet_regions(grid_temp,phi_for_pseudo_dirichlet_regions);
         fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Get_Single_Levelset(fluids_parameters.pseudo_dirichlet_regions,levelset_for_pseudo_dirichlet_regions,false);
         fluids_parameters.incompressible->Extrapolate_Velocity_Across_Interface(V_levelset,phi_for_pseudo_dirichlet_regions);}
 }

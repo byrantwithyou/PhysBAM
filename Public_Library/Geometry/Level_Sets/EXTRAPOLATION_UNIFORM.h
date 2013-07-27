@@ -22,7 +22,6 @@ class EXTRAPOLATION_UNIFORM:public EXTRAPOLATION<TV,T2>
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     template<class T3> struct REBIND{typedef EXTRAPOLATION_UNIFORM<TV,T3> TYPE;};
     typedef  EXTRAPOLATION<TV,T2> BASE;

@@ -19,11 +19,10 @@ class INCOMPRESSIBLE_FLUID_COLLECTION:public NONCOPYABLE
     typedef typename TV::SCALAR T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     const GRID<TV>& grid;
     T_FACE_ARRAYS_SCALAR face_velocities;
-    T_ARRAYS_SCALAR viscosity;
+    ARRAY<T,TV_INT> viscosity;
     //DENSITY_CONTAINER<TV> density_container;
     //TEMPERATURE_CONTAINER<TV> temperature_container;
     

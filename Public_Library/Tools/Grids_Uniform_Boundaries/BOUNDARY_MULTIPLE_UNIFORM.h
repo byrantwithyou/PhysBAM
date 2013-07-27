@@ -14,7 +14,6 @@ template<class TV,class T2>
 class BOUNDARY_MULTIPLE_UNIFORM:public BOUNDARY<TV,T2>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename T_ARRAYS_BASE::template REBIND<T2>::TYPE T_ARRAYS_DIMENSION_T2;
     typedef VECTOR<BOUNDARY<TV,T2>*,2*TV::m> T_BOUNDARY_FACE_VECTOR;

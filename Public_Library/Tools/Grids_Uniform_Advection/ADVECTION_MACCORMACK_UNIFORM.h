@@ -15,7 +15,7 @@ template<class TV,class T2,class T_NESTED_ADVECTION>
 class ADVECTION_MACCORMACK_UNIFORM:public ADVECTION<TV,T2>
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;
 private:
     // false to use 1st order advection

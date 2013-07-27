@@ -15,7 +15,7 @@ template<class TV,class T_FACE_LOOKUP>
 class AVERAGING_COLLIDABLE_UNIFORM
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     typedef T_FACE_LOOKUP FACE_LOOKUP;
@@ -42,7 +42,7 @@ public:
         value[axis]=(T).5*(lookup(axis,grid.First_Face_Index_In_Cell(axis,cell_index))+lookup(axis,grid.Second_Face_Index_In_Cell(axis,cell_index)));
     return value;}
 
-    T Cell_To_Face(const GRID<TV>& grid,const int axis,const TV_INT& face_index,const T_ARRAYS_SCALAR& u_cell) const // this never needs to set starting points doesn't use velocities
+    T Cell_To_Face(const GRID<TV>& grid,const int axis,const TV_INT& face_index,const ARRAY<T,TV_INT>& u_cell) const // this never needs to set starting points doesn't use velocities
     {FACE_ITERATOR<TV> iterator(grid,axis,face_index);
     TV_INT cell1,cell2;grid.Cells_Touching_Face(axis,face_index,cell1,cell2);
     if(body_list.Occupied_Face_Center(iterator)){

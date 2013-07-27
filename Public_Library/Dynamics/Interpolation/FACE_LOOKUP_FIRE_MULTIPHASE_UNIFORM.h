@@ -17,7 +17,7 @@ class FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;typedef PROJECTION_DYNAMICS_UNIFORM<TV> T_PROJECTION;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
 public:
     typedef T ELEMENT;
         

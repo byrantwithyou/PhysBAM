@@ -51,9 +51,9 @@ Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,cons
     curvature_old.Set_Velocity(&V);curvature_old.Euler_Step(dt,time,number_of_ghost_cells);
 
     LOG::Time("Fill ghost phis and normals");
-    T_ARRAYS_SCALAR& phi=levelset.phi;
+    ARRAY<T,TV_INT>& phi=levelset.phi;
     ARRAY<TV,TV_INT>& normals=*levelset.normals;
-    T_ARRAYS_SCALAR phi_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);
+    ARRAY<T,TV_INT> phi_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);
     ARRAY<TV,TV_INT> normals_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary_vector->Fill_Ghost_Cells(grid,normals,normals_ghost,dt,time,number_of_ghost_cells);
 
     LOG::Time("Update state variables");
@@ -94,9 +94,9 @@ Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,cons
         else if(Dn.array(index)>Dcj_max_clamp){Dn_dot.array(index)=min((T)0,Dn_dot.array(index));Dn.array(index)=min(Dn.array(index),Dcj_max_clamp);}}
 
     LOG::Time("Extrapolation");
-    T_ARRAYS_SCALAR Dn_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary->Fill_Ghost_Cells(grid,Dn.array,Dn_ghost,dt,time,number_of_ghost_cells);
-    T_ARRAYS_SCALAR Dn_dot_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary->Fill_Ghost_Cells(grid,Dn_dot.array,Dn_dot_ghost,dt,time,number_of_ghost_cells);
-    T_ARRAYS_SCALAR curvature_old_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary->Fill_Ghost_Cells(grid,curvature_old.array,curvature_old_ghost,dt,time,number_of_ghost_cells);
+    ARRAY<T,TV_INT> Dn_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary->Fill_Ghost_Cells(grid,Dn.array,Dn_ghost,dt,time,number_of_ghost_cells);
+    ARRAY<T,TV_INT> Dn_dot_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary->Fill_Ghost_Cells(grid,Dn_dot.array,Dn_dot_ghost,dt,time,number_of_ghost_cells);
+    ARRAY<T,TV_INT> curvature_old_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary->Fill_Ghost_Cells(grid,curvature_old.array,curvature_old_ghost,dt,time,number_of_ghost_cells);
     LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
         if(abs(phi(index))>(T)nb_width*grid.dX.x){Dn.array(index)=Dcj;continue;}//to make 'reaction_speed' files compact
@@ -131,9 +131,9 @@ Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,cons
 // Function Make_NB_Indices
 //#####################################################################
 template<class TV> void DETONATION_SHOCK_DYNAMICS<TV>::
-Make_NB_Indices(GRID<TV> &grid,T_ARRAYS_SCALAR &phi,ARRAY<TV_INT>& indices_interface,const T dt,const T time,int number_of_ghost_cells)
+Make_NB_Indices(GRID<TV> &grid,ARRAY<T,TV_INT> &phi,ARRAY<TV_INT>& indices_interface,const T dt,const T time,int number_of_ghost_cells)
 {
-    T_ARRAYS_SCALAR phi_ghost;
+    ARRAY<T,TV_INT> phi_ghost;
     if(number_of_ghost_cells>0){   
         phi_ghost.Resize(grid.Cell_Indices(number_of_ghost_cells));
         boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);}
@@ -151,7 +151,7 @@ Make_NB_Indices(GRID<TV> &grid,T_ARRAYS_SCALAR &phi,ARRAY<TV_INT>& indices_inter
 // Function Closest_Point_On_Boundary
 //#####################################################################
 template<class TV> bool DETONATION_SHOCK_DYNAMICS<TV>::
-Closest_Point_On_Boundary(T_ARRAYS_SCALAR &phi_ghost,ARRAY<TV,TV_INT> &normals_ghost,const TV& location,TV& new_location,const T tolerance,const int max_iterations) const
+Closest_Point_On_Boundary(ARRAY<T,TV_INT> &phi_ghost,ARRAY<TV,TV_INT> &normals_ghost,const TV& location,TV& new_location,const T tolerance,const int max_iterations) const
 {
     RANGE<TV> box=grid.Ghost_Domain(3);
     LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;

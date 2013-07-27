@@ -19,17 +19,16 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
 
     STATIC_ASSERT((IS_SAME<T_ARRAYS,T_ARRAYS_DIMENSION_SCALAR>::value));
     STATIC_ASSERT((IS_SAME<T_ARRAYS_BOOL_INPUT,ARRAY<bool,TV_INT> >::value));
 
     RANGE<TV_INT> domain_indices=grid.Domain_Indices(number_of_ghost_cells);
     ARRAY<TV,TV_INT> velocity(domain_indices),velocity_plus_c(domain_indices),velocity_minus_c(domain_indices),momentum(domain_indices);
-    T_ARRAYS_SCALAR density(domain_indices),energy(domain_indices),internal_energy(domain_indices),temperature(domain_indices),
+    ARRAY<T,TV_INT> density(domain_indices),energy(domain_indices),internal_energy(domain_indices),temperature(domain_indices),
         pressure(domain_indices),entropy(domain_indices),enthalpy(domain_indices),speedofsound(domain_indices),
         machnumber(domain_indices),density_gradient(domain_indices),pressure_gradient(domain_indices);
     for(CELL_ITERATOR<TV> iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
@@ -90,9 +89,9 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
 
     const GRID<TV>& grid=compressible_fluid_collection.grid;

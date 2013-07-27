@@ -28,7 +28,6 @@ template<class TV>
 class SMOKE_STANDARD_TESTS_2D
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     SOLIDS_FLUIDS_EXAMPLE<TV>& example;

@@ -20,7 +20,7 @@ class IMPLICIT_OBJECT_INTERSECTOR
 {
 private:
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename BASIC_GEOMETRY_POLICY<TV>::HYPERPLANE T_HYPERPLANE;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename BASIC_GEOMETRY_POLICY<TV>::HYPERPLANE T_HYPERPLANE;
     typedef VECTOR<int,TV::dimension+1> T_ELEMENT;typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension>::SIMPLEX T_SIMPLEX;
     typedef IMPLICIT_OBJECT<TV> BASE;
     
@@ -33,7 +33,7 @@ public:
     ARRAY<T_ELEMENT> cell_refinement_simplices;
     ARRAY<T> cell_phis;
     ARRAY<TV> cell_particle_X;
-    T_ARRAYS_SCALAR grid_nodal_phis;
+    ARRAY<T,TV_INT> grid_nodal_phis;
 
     IMPLICIT_OBJECT_INTERSECTOR(const IMPLICIT_OBJECT<TV>& implicit_object_input);
     virtual ~IMPLICIT_OBJECT_INTERSECTOR();

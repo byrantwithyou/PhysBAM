@@ -11,7 +11,7 @@
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 using namespace PhysBAM;
 template<class TV> POISSON_UNIFORM<TV>::
-POISSON_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input)
+POISSON_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input)
     :POISSON<T>(multiphase_input),LAPLACE_UNIFORM<TV>(grid_input,u_input,false,enforce_compatibility_input)
 {
     Initialize_Grid(grid_input);

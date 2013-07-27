@@ -75,7 +75,7 @@ Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
     Set_Beta_Face_For_Boundary_Conditions(coarse_face_velocities);
     if(false) if(POISSON_COLLIDABLE_UNIFORM<TV>* poisson_collidable=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<TV>*>(poisson)){
         T_FACE_ARRAYS_SCALAR beta_face_new(coarse_grid);
-        T_ARRAYS_SCALAR phi_ghost(coarse_grid.Domain_Indices(3),false);levelset.boundary->Fill_Ghost_Cells(coarse_grid,coarse_phi,phi_ghost,0,0,ghost);
+        ARRAY<T,TV_INT> phi_ghost(coarse_grid.Domain_Indices(3),false);levelset.boundary->Fill_Ghost_Cells(coarse_grid,coarse_phi,phi_ghost,0,0,ghost);
         poisson_collidable->Find_Constant_beta(beta_face_new,phi_ghost);
         for(FACE_ITERATOR<TV> iterator(coarse_grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> index=iterator.Full_Index();poisson->beta_face(index)*=beta_face_new(index);}}
     for(CELL_ITERATOR<TV> iterator(coarse_grid);iterator.Valid();iterator.Next()) if(Contains_Outside(iterator.Cell_Index(),levelset.phi,0)){

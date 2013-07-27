@@ -17,7 +17,7 @@ namespace PhysBAM{
 template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> //  T_AVERAGING=AVERAGING_UNIFORM<TV>, T_INTERPOLATION=LINEAR_INTERPOLATION_UNIFORM<TV,T2>
 class ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA:public ADVECTION<TV,T2,typename T_AVERAGING::FACE_LOOKUP>
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
 public:
     using ADVECTION<TV,T2,typename T_AVERAGING::FACE_LOOKUP>::Update_Advection_Equation_Cell;

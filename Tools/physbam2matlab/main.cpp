@@ -16,7 +16,6 @@ class PHYSBAM_TO_MATLAB_CONVERTER
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     const std::string input_directory,output_directory;
     MATLAB_OUTPUT matlab_output;
@@ -31,14 +30,14 @@ public:
     void Convert(const int frame)
     {GRID<TV> grid;FILE_UTILITIES::Read_From_File<RW>(input_directory+"/common/grid",grid);
     matlab_output.Write_Header_File(output_directory+"/header",grid,frame);
-    if(convert_density) Convert_Data<T_ARRAYS_SCALAR>("density",frame);
-    if(convert_momentum) Convert_Data<T_ARRAYS_SCALAR>("momentum",frame);
-    if(convert_energy) Convert_Data<T_ARRAYS_SCALAR>("energy",frame);
-    if(convert_velocity) Convert_Data<T_ARRAYS_SCALAR>("centered_velocities",frame);
-    if(convert_pressure) Convert_Data<T_ARRAYS_SCALAR>("pressure",frame);
-    if(convert_internal_energy) Convert_Data<T_ARRAYS_SCALAR>("internal_energy",frame);
-    if(convert_entropy) Convert_Data<T_ARRAYS_SCALAR>("entropy",frame);
-    if(convert_machnumber) Convert_Data<T_ARRAYS_SCALAR>("machnumber",frame);
+    if(convert_density) Convert_Data<ARRAY<T,TV_INT>>("density",frame);
+    if(convert_momentum) Convert_Data<ARRAY<T,TV_INT>>("momentum",frame);
+    if(convert_energy) Convert_Data<ARRAY<T,TV_INT>>("energy",frame);
+    if(convert_velocity) Convert_Data<ARRAY<T,TV_INT>>("centered_velocities",frame);
+    if(convert_pressure) Convert_Data<ARRAY<T,TV_INT>>("pressure",frame);
+    if(convert_internal_energy) Convert_Data<ARRAY<T,TV_INT>>("internal_energy",frame);
+    if(convert_entropy) Convert_Data<ARRAY<T,TV_INT>>("entropy",frame);
+    if(convert_machnumber) Convert_Data<ARRAY<T,TV_INT>>("machnumber",frame);
     }
 
     void Convert_All_Frames(const int first_frame,const int last_frame)

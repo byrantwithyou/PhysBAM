@@ -19,10 +19,9 @@ template<class TV>
 class PARTICLE_LEVELSET_EVOLUTION_UNIFORM:public PARTICLE_LEVELSET_EVOLUTION<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<RUNGEKUTTA<ARRAY_VIEW<TV> >*>::TYPE T_ARRAYS_RUNGEKUTTA;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<RUNGEKUTTA<ARRAY_VIEW<TV> >*>::TYPE T_ARRAYS_RUNGEKUTTA;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
@@ -31,7 +30,7 @@ public:
     using BASE::use_frozen_velocity;using BASE::cfl_number;using BASE::reseeding_frequency;using BASE::time;using BASE::use_fmm;using BASE::use_reinitialization;
 
     GRID<TV> grid;
-    T_ARRAYS_SCALAR phi;
+    ARRAY<T,TV_INT> phi;
     T_FACE_ARRAYS_SCALAR V;
 
 private:

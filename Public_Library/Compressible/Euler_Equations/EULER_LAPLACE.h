@@ -20,20 +20,20 @@ template<class T_LAPLACE>
 class EULER_LAPLACE:public T_LAPLACE
 {
     typedef typename T_LAPLACE::GRID_T::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename REBIND<T_ARRAYS_SCALAR,int>::TYPE T_ARRAYS_INT;
+    typedef typename REBIND<ARRAY<T,TV_INT>,int>::TYPE T_ARRAYS_INT;
     typedef TV_INT INDEX;
 public:
     typedef T_LAPLACE BASE;
     using BASE::filled_region_touches_dirichlet;using BASE::Solve;using BASE::Find_Solution_Regions;using BASE::f;
     using BASE::grid;using BASE::solve_neumann_regions;using BASE::dt;using BASE::dt_is_set;using BASE::Initialize_Grid;
 
-    const T_ARRAYS_SCALAR& one_over_rho_c_squared;
+    const ARRAY<T,TV_INT>& one_over_rho_c_squared;
 
-    EULER_LAPLACE(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const T_ARRAYS_SCALAR& one_over_rho_c_squared_input)
+    EULER_LAPLACE(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const ARRAY<T,TV_INT>& one_over_rho_c_squared_input)
         :T_LAPLACE(grid_input,u_input,true,false,false),one_over_rho_c_squared(one_over_rho_c_squared_input)
     {}
 
-    EULER_LAPLACE(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const T_ARRAYS_SCALAR& one_over_rho_c_squared_input,const bool flag)
+    EULER_LAPLACE(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const ARRAY<T,TV_INT>& one_over_rho_c_squared_input,const bool flag)
         :T_LAPLACE(grid_input,u_input,flag,flag,false),one_over_rho_c_squared(one_over_rho_c_squared_input)
     {}
 

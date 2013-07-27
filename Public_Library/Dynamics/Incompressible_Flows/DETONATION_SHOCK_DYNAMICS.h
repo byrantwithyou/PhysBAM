@@ -21,9 +21,9 @@ class DETONATION_SHOCK_DYNAMICS
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<VECTOR<T,3> >::TYPE T_ARRAYS_RGB;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<VECTOR<T,3> >::TYPE T_ARRAYS_RGB;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
 public:
     GRID<TV>& grid;
@@ -55,8 +55,8 @@ public:
 //#####################################################################
     void Initialize_Grid();
     void Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,const int number_of_ghost_cells);
-    void Make_NB_Indices(GRID<TV> &grid,T_ARRAYS_SCALAR &phi,ARRAY<TV_INT>& indices_interface,const T dt,const T time,int number_of_ghost_cells);
-    bool Closest_Point_On_Boundary(T_ARRAYS_SCALAR &phi_ghost,ARRAY<TV,TV_INT> &normals_ghost,const TV& location,TV& new_location,const T tolerance=0,const int max_iterations=1) const;
+    void Make_NB_Indices(GRID<TV> &grid,ARRAY<T,TV_INT> &phi,ARRAY<TV_INT>& indices_interface,const T dt,const T time,int number_of_ghost_cells);
+    bool Closest_Point_On_Boundary(ARRAY<T,TV_INT> &phi_ghost,ARRAY<TV,TV_INT> &normals_ghost,const TV& location,TV& new_location,const T tolerance=0,const int max_iterations=1) const;
     T Normal_Flame_Speed(const int axis,const TV_INT& face_index) const;
 //#####################################################################
 };

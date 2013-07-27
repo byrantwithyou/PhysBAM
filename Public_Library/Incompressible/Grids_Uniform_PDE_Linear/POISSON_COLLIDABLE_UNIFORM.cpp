@@ -16,7 +16,7 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> POISSON_COLLIDABLE_UNIFORM<TV>::
-POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input)
+POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input)
     :BASE(grid_input,u_input,initialize_grid,multiphase_input,enforce_compatibility_input),levelset_multiple(0),
     levelset_multiple_default(grid,phis_default,false),dt(0),dt_is_set(false)
 {
@@ -26,7 +26,7 @@ POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,c
 // Constructor
 //#####################################################################
 template<class TV> POISSON_COLLIDABLE_UNIFORM<TV>::
-POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,T_ARRAYS_SCALAR& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
+POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
     const bool enforce_compatibility_input)
     :BASE(grid_input,u_input,initialize_grid,multiphase_input,enforce_compatibility_input),levelset_multiple(0),
     levelset_multiple_default(grid,phis_default,false),dt(0),dt_is_set(false)
@@ -49,14 +49,14 @@ Compute_beta_And_Add_Jumps_To_b(const T dt,const T time)
 {
     int ghost_cells=3;
     if(!multiphase){
-        T_ARRAYS_SCALAR phi_ghost;
+        ARRAY<T,TV_INT> phi_ghost;
         if((!use_variable_beta && !beta_given_on_faces) || u_jumps || beta_un_jumps){
             assert(levelset);phi_ghost.Resize(grid.Domain_Indices(ghost_cells),false);levelset->boundary->Fill_Ghost_Cells(grid,levelset->phi,phi_ghost,dt,time,ghost_cells);}
         if(!beta_given_on_faces){if(use_variable_beta) Find_Variable_beta();else Find_Constant_beta(phi_ghost);}
         if(u_jumps) Add_Jump_To_b(phi_ghost);
         if(beta_un_jumps) Add_Derivative_Jump_To_b(phi_ghost);}
     else{
-        ARRAY<T_ARRAYS_SCALAR> phis_ghost;
+        ARRAY<ARRAY<T,TV_INT>> phis_ghost;
         if((!use_variable_beta && !beta_given_on_faces) || u_jumps || beta_un_jumps){assert(levelset_multiple);
             phis_ghost.Resize(levelset_multiple->phis.m);
             for(int i=0;i<phis_ghost.m;i++){phis_ghost(i).Resize(grid.Domain_Indices(ghost_cells),false);
@@ -69,7 +69,7 @@ Compute_beta_And_Add_Jumps_To_b(const T dt,const T time)
 // Function Find_Constant_beta
 //#####################################################################
 template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
-Find_Constant_beta(const T_ARRAYS_SCALAR& phi_ghost)
+Find_Constant_beta(const ARRAY<T,TV_INT>& phi_ghost)
 {
     Find_Constant_beta(beta_face,phi_ghost);
 }
@@ -78,7 +78,7 @@ Find_Constant_beta(const T_ARRAYS_SCALAR& phi_ghost)
 //#####################################################################
 // only set up for jump conditons - doesn't work for Dirichlet boundary conditions yet 
 template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
-Find_Constant_beta(T_FACE_ARRAYS_SCALAR& beta_face,const T_ARRAYS_SCALAR& phi_ghost)
+Find_Constant_beta(T_FACE_ARRAYS_SCALAR& beta_face,const ARRAY<T,TV_INT>& phi_ghost)
 {
     assert(!multiphase);
     
@@ -105,7 +105,7 @@ Find_Constant_beta(T_FACE_ARRAYS_SCALAR& beta_face,const T_ARRAYS_SCALAR& phi_gh
 //#####################################################################
 // only set up for jump conditons - doesn't work for Dirichlet boundary conditions yet 
 template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
-Find_Constant_beta_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost)
+Find_Constant_beta_Multiphase(ARRAY<ARRAY<T,TV_INT>>& phis_ghost)
 {
     LEVELSET_MULTIPLE<TV> levelset(grid,phis_ghost);levelset.Recreate_Levelsets();
 
@@ -145,7 +145,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
 //#####################################################################
 // b is negative
 template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
-Add_Jump_To_b(const T_ARRAYS_SCALAR& phi_ghost)
+Add_Jump_To_b(const ARRAY<T,TV_INT>& phi_ghost)
 {
     assert(!multiphase);
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
@@ -162,7 +162,7 @@ Add_Jump_To_b(const T_ARRAYS_SCALAR& phi_ghost)
 //#####################################################################
 // b is negative
 template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
-Add_Jump_To_b_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost)
+Add_Jump_To_b_Multiphase(ARRAY<ARRAY<T,TV_INT>>& phis_ghost)
 {
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
     LEVELSET_MULTIPLE<TV> levelset(grid,phis_ghost);levelset.Recreate_Levelsets();
@@ -178,7 +178,7 @@ Add_Jump_To_b_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost)
 //#####################################################################
 // b is negative
 template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
-Add_Derivative_Jump_To_b(const T_ARRAYS_SCALAR& phi_ghost)
+Add_Derivative_Jump_To_b(const ARRAY<T,TV_INT>& phi_ghost)
 {
     assert(!multiphase);
     TV one_over_dx=Inverse(grid.dX);

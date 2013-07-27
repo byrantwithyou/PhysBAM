@@ -15,7 +15,6 @@ template<class TV>
 class VORTICITY_CONFINEMENT:public INCOMPRESSIBLE_FLUIDS_FORCES<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
@@ -23,7 +22,7 @@ public:
     T_FACE_ARRAYS_BOOL* valid_mask;
     bool use_variable_vorticity_confinement;
     T vorticity_confinement;
-    T_ARRAYS_SCALAR variable_vorticity_confinement;
+    ARRAY<T,TV_INT> variable_vorticity_confinement;
 
     VORTICITY_CONFINEMENT(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>* collision_body_list=0,T_FACE_ARRAYS_BOOL* valid_mask=0,const bool use_variable_vorticity_confinement=false,const T vorticity_confinement=.3);
     virtual ~VORTICITY_CONFINEMENT();

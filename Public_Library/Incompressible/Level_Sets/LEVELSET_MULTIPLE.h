@@ -18,7 +18,7 @@ template<class TV>
 class LEVELSET_MULTIPLE:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
     typedef INTERPOLATION_UNIFORM<TV,TV> T_INTERPOLATION_VECTOR;
@@ -26,12 +26,12 @@ public:
     typedef TV VECTOR_T;
 
     GRID<TV>& grid;
-    ARRAY<T_ARRAYS_SCALAR>& phis;
+    ARRAY<ARRAY<T,TV_INT>>& phis;
     LEVELSET_CALLBACKS<TV>* levelset_callbacks;
     ARRAY<LEVELSET<TV>*> levelsets;
     bool use_external_levelsets;
 
-    LEVELSET_MULTIPLE(GRID<TV>& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const bool use_external_levelsets_input=false);
+    LEVELSET_MULTIPLE(GRID<TV>& grid_input,ARRAY<ARRAY<T,TV_INT>>& phis_input,const bool use_external_levelsets_input=false);
     ~LEVELSET_MULTIPLE();
 
     T Phi(const int region,const TV_INT& index) const
@@ -94,7 +94,7 @@ public:
 
 //#####################################################################
     void Recreate_Levelsets();
-    void Fill_Ghost_Cells(ARRAY<T_ARRAYS_SCALAR >& phi_ghost,const T time,const int number_of_ghost_cells);
+    void Fill_Ghost_Cells(ARRAY<ARRAY<T,TV_INT> >& phi_ghost,const T time,const int number_of_ghost_cells);
     void Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input);
     void Set_Custom_Secondary_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input);
     void Set_Custom_Normal_Interpolation(T_INTERPOLATION_VECTOR& normal_interpolation_input);

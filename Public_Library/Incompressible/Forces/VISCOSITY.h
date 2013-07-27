@@ -17,19 +17,18 @@ class VISCOSITY:public INCOMPRESSIBLE_FLUIDS_FORCES<TV>
     
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     LAPLACE_UNIFORM<TV>& elliptic_solver;
 public:
     T density;
     T viscosity;
     bool implicit_viscosity;
     bool use_explicit_part_of_implicit_viscosity;
-    const T_ARRAYS_SCALAR& variable_viscosity;
+    const ARRAY<T,TV_INT>& variable_viscosity;
     bool use_variable_viscosity;
     int maximum_implicit_viscosity_iterations;
     bool use_psi_R;
 
-    VISCOSITY(LAPLACE_UNIFORM<TV>& elliptic_solver_input,const T_ARRAYS_SCALAR& variable_viscosity_input,const T density_input,const T viscosity_input,bool implicit_viscosity_input,
+    VISCOSITY(LAPLACE_UNIFORM<TV>& elliptic_solver_input,const ARRAY<T,TV_INT>& variable_viscosity_input,const T density_input,const T viscosity_input,bool implicit_viscosity_input,
         bool use_explicit_part_of_implicit_viscosity_input,bool use_variable_viscosity_input,int maximum_implicit_viscosity_iterations_input,bool use_psi_R_input);
     virtual ~VISCOSITY();
 
