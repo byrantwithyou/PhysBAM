@@ -17,8 +17,6 @@ class PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM:public PROJECTION_REFINEMENT_UN
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> T_FACE_LOOKUP_FIRE_MULTIPHASE;
 public:
     typedef PROJECTION_REFINEMENT_UNIFORM<TV> BASE;
@@ -42,17 +40,17 @@ public:
 
 //#####################################################################
     virtual void Initialize_Grid(const GRID<TV>& mac_grid);
-    virtual void Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities);
+    virtual void Set_Coarse_Boundary_Conditions(ARRAY<T,FACE_INDEX<TV::m> >& coarse_face_velocities);
     bool Set_Local_Boundary_Conditions(GRID<TV>& local_grid,PROJECTION_UNIFORM<TV>& local_projection,TV_INT coarse_index);
     void Set_Local_Phi_From_Fine_Phi(GRID<TV>& local_mac_grid,ARRAY<T,TV_INT>& local_phi,const ARRAY<T,TV_INT>& fine_phi,TV_INT cell_index);
-    virtual void Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,GRID<TV>& local_grid,T_FACE_ARRAYS_SCALAR& local_face_velocities,FAST_PROJECTION_DYNAMICS_UNIFORM<TV>& local_projection,const T dt,const T time,TV_INT cell_index);
+    virtual void Local_Projection_PCG(ARRAY<T,FACE_INDEX<TV::m> >& fine_face_velocities,GRID<TV>& local_grid,ARRAY<T,FACE_INDEX<TV::m> >& local_face_velocities,FAST_PROJECTION_DYNAMICS_UNIFORM<TV>& local_projection,const T dt,const T time,TV_INT cell_index);
     bool Contains_Inside(TV_INT cell_index,const ARRAY<T,TV_INT>& levelset_phi,int buffer);
     bool Contains_Outside(TV_INT cell_index,const ARRAY<T,TV_INT>& levelset_phi,int buffer);
     void Set_Coarse_Phi_From_Fine_Phi(ARRAY<T,TV_INT>& coarse_phi,const ARRAY<T,TV_INT>& fine_phi);
     void Set_Levelset_Boundary_Conditions(const GRID<TV>& levelset_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& levelset_velocities,const ARRAY<T,TV_INT>& levelset_phi,const T time);
-    void Map_Fine_To_Levelset_For_Constraints(T_FACE_ARRAYS_SCALAR& face_velocities);
-    virtual void Map_Fine_To_Coarse(T_FACE_ARRAYS_SCALAR& coarse_face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities);
-    virtual void Map_Coarse_To_Fine(const T_FACE_ARRAYS_SCALAR& coarse_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    void Map_Fine_To_Levelset_For_Constraints(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
+    virtual void Map_Fine_To_Coarse(ARRAY<T,FACE_INDEX<TV::m> >& coarse_face_velocities,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
+    virtual void Map_Coarse_To_Fine(const ARRAY<T,FACE_INDEX<TV::m> >& coarse_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
 //#####################################################################
 };
 }

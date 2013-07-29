@@ -21,7 +21,6 @@ class TEMPERATURE_CONTAINER:public GRID_AND_ARRAY_CONTAINER<TV,typename TV::SCAL
     typedef typename ADVECTION_COLLIDABLE_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;
-    typedef typename REBIND<ARRAY<T,FACE_INDEX<TV::m> >,bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
     typedef GRID_AND_ARRAY_CONTAINER<TV,T> BASE;
     using BASE::grid;using BASE::array;using BASE::boundary_default;using BASE::boundary;using BASE::Set_To_Constant_Value;using BASE::Set_Custom_Advection;
@@ -61,7 +60,7 @@ public:
     void Euler_Step(const T dt,const T time,const int number_of_ghost_cells) PHYSBAM_OVERRIDE;
     void Apply_Cooling(const T dt,const T time);
     void Apply_Individual_Cooling(T& temperature,const T constant);
-    void Use_Semi_Lagrangian_Collidable_Advection(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list,const T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input);
+    void Use_Semi_Lagrangian_Collidable_Advection(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list,const ARRAY<bool,FACE_INDEX<TV::m> >& face_velocities_valid_mask_input);
 //#####################################################################
 };
 }

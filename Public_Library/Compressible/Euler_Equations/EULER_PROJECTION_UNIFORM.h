@@ -22,8 +22,7 @@ template<class TV>
 class EULER_PROJECTION_UNIFORM:public EULER_PROJECTION<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
+    typedef typename ARRAY<T,FACE_INDEX<TV::m> >::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
     typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     typedef CELL_ITERATOR<VECTOR<T,TV::m-1> > CELL_ITERATOR_LOWER_DIM;
@@ -38,7 +37,7 @@ public:
     bool is_pressure_scaled;
     T dt_scale_pressure;
     ARRAY<T,TV_INT> p_dirichlet;
-    T_FACE_ARRAYS_SCALAR face_velocities,face_velocities_save;
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities,face_velocities_save;
     T_FACE_ARRAYS_DIMENSION_SCALAR *fluxes;
     EULER_UNIFORM<TV>* euler;
     EULER_LAPLACE<POISSON_COLLIDABLE_UNIFORM<TV> >* elliptic_solver;
@@ -64,10 +63,10 @@ public:
     EULER_PROJECTION_UNIFORM(EULER_UNIFORM<TV>* euler_input);
     virtual ~EULER_PROJECTION_UNIFORM();
 
-    void Save_State(T_FACE_ARRAYS_SCALAR& face_velocities_s)
+    void Save_State(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_s)
     {face_velocities_s.Copy(face_velocities);}
 
-    void Restore_State(T_FACE_ARRAYS_SCALAR& face_velocities_s)
+    void Restore_State(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_s)
     {face_velocities.Copy(face_velocities_s);}
 
     void Scale_Pressure_By_Dt(const T dt)
@@ -97,31 +96,31 @@ public:
 
 //#####################################################################
 private:
-    void Compute_Pressure(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    void Compute_Pressure(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
     template<class FACE_LOOKUP> void Compute_Divergence(const FACE_LOOKUP &face_lookup);
 public:
     virtual void Initialize_Grid();
     void Get_Pressure(ARRAY<T,TV_INT>& pressure) const;
-    void Fill_Face_Weights_For_Projection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& beta_face);
+    void Fill_Face_Weights_For_Projection(const T dt,const T time,ARRAY<T,FACE_INDEX<TV::m> >& beta_face);
     void Get_Ghost_Density(const T dt,const T time,const int number_of_ghost_cells,ARRAY<T,TV_INT>& density_ghost) const;
     void Get_Ghost_Centered_Velocity(const T dt,const T time,const int number_of_ghost_cells,ARRAY<TV,TV_INT>& centered_velocity_ghost) const;
-    void Make_Boundary_Faces_Neumann(T_FACE_ARRAYS_BOOL& psi_N);
-    void Project(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    void Make_Boundary_Faces_Neumann(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
+    void Project(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
     void Get_Dirichlet_Boundary_Conditions(const T_ARRAYS_DIMENSION_SCALAR& U_dirichlet);
     void Set_Dirichlet_Boundary_Conditions(const T time);
-    void Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_ARRAYS_SCALAR face_velocities_for_solid_faces,const T dt);
-    void Compute_Right_Hand_Side(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    void Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<T,FACE_INDEX<TV::m> > face_velocities_for_solid_faces,const T dt);
+    void Compute_Right_Hand_Side(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
     void Compute_One_Over_rho_c_Squared();
-    void Compute_Density_Weighted_Face_Velocities(const T dt,const T time,const T_FACE_ARRAYS_BOOL& psi_N);
-    static void Compute_Density_Weighted_Face_Velocities(const GRID<TV>& face_grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T_FACE_ARRAYS_BOOL& psi_N);
-    static void Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,T_FACE_ARRAYS_SCALAR& p_face,const ARRAY<T,TV_INT>& p_cell);
-    void Get_Ghost_Pressures(const T dt,const T time,const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,
+    void Compute_Density_Weighted_Face_Velocities(const T dt,const T time,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
+    static void Compute_Density_Weighted_Face_Velocities(const GRID<TV>& face_grid,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
+    static void Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,ARRAY<T,FACE_INDEX<TV::m> >& p_face,const ARRAY<T,TV_INT>& p_cell);
+    void Get_Ghost_Pressures(const T dt,const T time,const ARRAY<bool,TV_INT>& psi_D,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,
         const ARRAY<T,TV_INT>& pressure,ARRAY<T,TV_INT>& p_ghost);
-    void Get_Pressure_At_Faces(const T dt,const T time,const ARRAY<T,TV_INT>& p_ghost,T_FACE_ARRAYS_SCALAR& p_face);
-    void Apply_Pressure(const ARRAY<T,TV_INT>& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face,const T_FACE_ARRAYS_SCALAR& face_velocities_star,
-        const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,const T dt,const T time);
-    static void Apply_Pressure(const ARRAY<T,TV_INT>& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face,const T_FACE_ARRAYS_SCALAR& face_velocities_star,
-            const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,const T dt,const T time,
+    void Get_Pressure_At_Faces(const T dt,const T time,const ARRAY<T,TV_INT>& p_ghost,ARRAY<T,FACE_INDEX<TV::m> >& p_face);
+    void Apply_Pressure(const ARRAY<T,TV_INT>& p_ghost,const ARRAY<T,FACE_INDEX<TV::m> >& p_face,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_star,
+        const ARRAY<bool,TV_INT>& psi_D,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T dt,const T time);
+    static void Apply_Pressure(const ARRAY<T,TV_INT>& p_ghost,const ARRAY<T,FACE_INDEX<TV::m> >& p_face,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_star,
+            const ARRAY<bool,TV_INT>& psi_D,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T dt,const T time,
             T_FACE_ARRAYS_DIMENSION_SCALAR *fluxes,EULER_UNIFORM<TV>* euler);
     bool Consistent_Boundary_Conditions() const;
     void Log_Parameters() const;

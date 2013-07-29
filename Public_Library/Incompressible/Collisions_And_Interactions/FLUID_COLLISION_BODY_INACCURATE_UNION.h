@@ -23,7 +23,6 @@ class FLUID_COLLISION_BODY_INACCURATE_UNION:public COLLISION_GEOMETRY<TV>
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T;
-    typedef typename T_FACE_ARRAYS_T::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_FACE_ARRAYS_T::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
     typedef typename T_FACE_ARRAYS_T::template REBIND<COLLISION_GEOMETRY_ID>::TYPE T_FACE_ARRAYS_COLLISION_GEOMETRY_ID;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
@@ -40,7 +39,7 @@ public:
     LEVELSET_IMPLICIT_OBJECT<TV> levelset;
 private:
     T_FACE_ARRAYS_T face_velocities;
-    T_FACE_ARRAYS_BOOL face_velocities_set;
+    ARRAY<bool,FACE_INDEX<TV::m> > face_velocities_set;
     LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
 public:
 

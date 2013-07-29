@@ -180,7 +180,7 @@ Adjust_Particle_Radii(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES
 // Function Modify_Levelset_Using_Escaped_Particles
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* V,ARRAY<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES*>* other_positive_particles)
+Modify_Levelset_Using_Escaped_Particles(ARRAY<T,FACE_INDEX<TV::m> >* V,ARRAY<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES*>* other_positive_particles)
 {
     if(bias_towards_negative_particles){
         if(other_positive_particles)for(int i=0;i<other_positive_particles->m;i++)Modify_Levelset_Using_Escaped_Particles(levelset.phi,*(*other_positive_particles)(i),0,1);
@@ -197,19 +197,19 @@ Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* V,ARRAY<T_ARRAYS_P
 // Function Modify_Levelset_Using_Escaped_Particles
 //#####################################################################
 template<class TV> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Modify_Levelset_Using_Escaped_Particles(ARRAY<T,TV_INT>& phi,T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR* V,const int sign)
+Modify_Levelset_Using_Escaped_Particles(ARRAY<T,TV_INT>& phi,T_ARRAYS_PARTICLES& particles,ARRAY<T,FACE_INDEX<TV::m> >* V,const int sign)
 {
     T one_over_radius_multiplier=-sign/outside_particle_distance_multiplier;
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices());domain.max_corner+=TV_INT::All_Ones_Vector();
     Consistency_Check(domain,particles);
-    DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(levelset.grid.Domain_Indices(),thread_queue).template Run<ARRAY<T,TV_INT>&,T_ARRAYS_PARTICLES&,T_FACE_ARRAYS_SCALAR*,int,T>(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Modify_Levelset_Using_Escaped_Particles_Threaded,phi,particles,V,sign,one_over_radius_multiplier);
+    DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(levelset.grid.Domain_Indices(),thread_queue).template Run<ARRAY<T,TV_INT>&,T_ARRAYS_PARTICLES&,ARRAY<T,FACE_INDEX<TV::m> >*,int,T>(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Modify_Levelset_Using_Escaped_Particles_Threaded,phi,particles,V,sign,one_over_radius_multiplier);
     Consistency_Check(domain,particles);
 }
 //#####################################################################
 // Function Modify_Levelset_Using_Escaped_Particles
 //#####################################################################
 template<class TV> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi,T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR* V,const int sign,const T one_over_radius_multiplier)
+Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi,T_ARRAYS_PARTICLES& particles,ARRAY<T,FACE_INDEX<TV::m> >* V,const int sign,const T one_over_radius_multiplier)
 {
     RANGE<TV_INT> range_domain(domain);range_domain.max_corner+=TV_INT::All_Ones_Vector();
     for(NODE_ITERATOR<TV> iterator(levelset.grid,range_domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
@@ -275,7 +275,7 @@ Update_Particles_To_Reflect_Mass_Conservation(const LEVELSET<TV>& levelset_old,T
 // Function Euler_Step_Particles
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Euler_Step_Particles(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,const bool use_second_order_for_nonremoved_particles,const bool update_particle_cells_after_euler_step,
+Euler_Step_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,const T dt,const T time,const bool use_second_order_for_nonremoved_particles,const bool update_particle_cells_after_euler_step,
     const bool verbose,const bool analytic_test)
 {
     if(use_second_order_for_nonremoved_particles){
@@ -330,10 +330,10 @@ Euler_Step_Removed_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& parti
 // Function Euler_Step_Particles
 //#####################################################################
 template<class TV> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Euler_Step_Particles_Wrapper(const T_FACE_ARRAYS_SCALAR& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,
+Euler_Step_Particles_Wrapper(const ARRAY<T,FACE_INDEX<TV::m> >& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,
     const bool update_particle_cells_after_euler_step,const bool assume_particles_in_correct_blocks,const bool enforce_domain_boundaries)
 {
-    T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(levelset.grid,number_of_ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;face_velocities_ghost.Resize(levelset.grid,number_of_ghost_cells,false);
     levelset.boundary->Fill_Ghost_Faces(levelset.grid,V,face_velocities_ghost,time,number_of_ghost_cells);
     Euler_Step_Particles(face_velocities_ghost,particles,particle_type,dt,time,update_particle_cells_after_euler_step,assume_particles_in_correct_blocks,enforce_domain_boundaries);
 }
@@ -341,12 +341,12 @@ Euler_Step_Particles_Wrapper(const T_FACE_ARRAYS_SCALAR& V,T_ARRAYS_PARTICLES& p
 // Function Euler_Step_Particles
 //#####################################################################
 template<class TV> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Euler_Step_Particles(const T_FACE_ARRAYS_SCALAR& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,
+Euler_Step_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,
     const bool update_particle_cells_after_euler_step,const bool assume_particles_in_correct_blocks,const bool enforce_domain_boundaries)
 {
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices());domain.max_corner+=TV_INT::All_Ones_Vector();
     Consistency_Check(domain,particles);
-    DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(domain,thread_queue).template Run<const T_FACE_ARRAYS_SCALAR&,T_ARRAYS_PARTICLES&,PARTICLE_LEVELSET_PARTICLE_TYPE,T,T,bool,bool>(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Euler_Step_Particles_Threaded,V,particles,particle_type,dt,time,assume_particles_in_correct_blocks,enforce_domain_boundaries);
+    DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(domain,thread_queue).template Run<const ARRAY<T,FACE_INDEX<TV::m> >&,T_ARRAYS_PARTICLES&,PARTICLE_LEVELSET_PARTICLE_TYPE,T,T,bool,bool>(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Euler_Step_Particles_Threaded,V,particles,particle_type,dt,time,assume_particles_in_correct_blocks,enforce_domain_boundaries);
     Consistency_Check(domain,particles);
     if(update_particle_cells_after_euler_step) Update_Particle_Cells(particles);
     Consistency_Check(domain,particles);
@@ -355,7 +355,7 @@ Euler_Step_Particles(const T_FACE_ARRAYS_SCALAR& V,T_ARRAYS_PARTICLES& particles
 // Function Euler_Step_Particles
 //#####################################################################
 template<class TV> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Euler_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_FACE_ARRAYS_SCALAR& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,
+Euler_Step_Particles_Threaded(RANGE<TV_INT>& domain,const ARRAY<T,FACE_INDEX<TV::m> >& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,
     const bool assume_particles_in_correct_blocks,const bool enforce_domain_boundaries)
 {
     if(assume_particles_in_correct_blocks){
@@ -386,12 +386,12 @@ Euler_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_FACE_ARRAYS_SCALAR& 
 // Function Second_Order_Runge_Kutta_Step_Particles
 //#####################################################################
 template<class TV> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Second_Order_Runge_Kutta_Step_Particles(const T_FACE_ARRAYS_SCALAR& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,
+Second_Order_Runge_Kutta_Step_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,
     const bool update_particle_cells_after_euler_step,const bool verbose)
 {
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices());domain.max_corner+=TV_INT::All_Ones_Vector();
     Consistency_Check(domain,particles);
-    DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(domain,thread_queue).template Run<const T_FACE_ARRAYS_SCALAR&,T_ARRAYS_PARTICLES&,const PARTICLE_LEVELSET_PARTICLE_TYPE,T,T,bool>(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Second_Order_Runge_Kutta_Step_Particles_Threaded,V,particles,particle_type,dt,time,verbose);
+    DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(domain,thread_queue).template Run<const ARRAY<T,FACE_INDEX<TV::m> >&,T_ARRAYS_PARTICLES&,const PARTICLE_LEVELSET_PARTICLE_TYPE,T,T,bool>(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Second_Order_Runge_Kutta_Step_Particles_Threaded,V,particles,particle_type,dt,time,verbose);
     Consistency_Check(domain,particles);
     if(update_particle_cells_after_euler_step) Update_Particle_Cells(particles);
     Consistency_Check(domain,particles);
@@ -400,7 +400,7 @@ Second_Order_Runge_Kutta_Step_Particles(const T_FACE_ARRAYS_SCALAR& V,T_ARRAYS_P
 // Function Second_Order_Runge_Kutta_Step_Particles
 //#####################################################################
 template<class TV> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Second_Order_Runge_Kutta_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_FACE_ARRAYS_SCALAR& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,const bool verbose)
+Second_Order_Runge_Kutta_Step_Particles_Threaded(RANGE<TV_INT>& domain,const ARRAY<T,FACE_INDEX<TV::m> >& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,const bool verbose)
 {
     T_FACE_LOOKUP V_lookup(V);
     T_FACE_LOOKUP_COLLIDABLE V_lookup_collidable(V_lookup,*levelset.collision_body_list,levelset.face_velocities_valid_mask_current);
@@ -970,14 +970,14 @@ Delete_Particles_Outside_Grid(const T domain_boundary,const int axis,PARTICLE_LE
 // Function Identify_And_Remove_Escaped_Particles
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Identify_And_Remove_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const T radius_fraction,const T time,const bool verbose)
+Identify_And_Remove_Escaped_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,const T radius_fraction,const T time,const bool verbose)
 {
     escaped_positive_particles.Resize(levelset.grid.Domain_Indices(3));
     escaped_negative_particles.Resize(levelset.grid.Domain_Indices(3));
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices());domain.max_corner+=TV_INT::All_Ones_Vector();
     Consistency_Check(domain,positive_particles);
     Consistency_Check(domain,negative_particles);
-    DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(domain,thread_queue).template Run<const T_FACE_ARRAYS_SCALAR&,T,T,bool>(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Identify_And_Remove_Escaped_Particles_Threaded,V,radius_fraction,time,verbose);
+    DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(domain,thread_queue).template Run<const ARRAY<T,FACE_INDEX<TV::m> >&,T,T,bool>(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Identify_And_Remove_Escaped_Particles_Threaded,V,radius_fraction,time,verbose);
     Consistency_Check(domain,positive_particles);
     Consistency_Check(domain,negative_particles);
 }
@@ -985,7 +985,7 @@ Identify_And_Remove_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const T radi
 // Function Identify_And_Remove_Escaped_Particles
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Identify_And_Remove_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,const T_FACE_ARRAYS_SCALAR& V,const T radius_fraction,const T time,const bool verbose)
+Identify_And_Remove_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,const ARRAY<T,FACE_INDEX<TV::m> >& V,const T radius_fraction,const T time,const bool verbose)
 {
     T_FACE_LOOKUP V_lookup(V);
     T_FACE_LOOKUP_COLLIDABLE V_lookup_collidable(V_lookup,*levelset.collision_body_list,levelset.face_velocities_valid_mask_current);
@@ -1016,7 +1016,7 @@ Identify_And_Remove_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,const T_FAC
 // Function Identify_And_Remove_Escaped_Particles
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Identify_And_Remove_Escaped_Positive_Particles(const T_FACE_ARRAYS_SCALAR& V,const T radius_fraction,const T time,const bool verbose)
+Identify_And_Remove_Escaped_Positive_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,const T radius_fraction,const T time,const bool verbose)
 {
     T_FACE_LOOKUP V_lookup(V);
     T_FACE_LOOKUP_COLLIDABLE V_lookup_collidable(V_lookup,*levelset.collision_body_list,levelset.face_velocities_valid_mask_current);
@@ -1072,7 +1072,7 @@ Remove_Escaped_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTIC
 // Function Remove_Escaped_Particles
 //#####################################################################
 template<class TV> bool PARTICLE_LEVELSET_UNIFORM<TV>::
-Fix_Momentum_With_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const ARRAY<T,TV_INT>& momentum_lost,const T radius_fraction,const T mass_scaling,const T time,const bool force)
+Fix_Momentum_With_Escaped_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,const ARRAY<T,TV_INT>& momentum_lost,const T radius_fraction,const T mass_scaling,const T time,const bool force)
 {
     T_FACE_LOOKUP V_lookup(V);
     T_FACE_LOOKUP_COLLIDABLE V_lookup_collidable(V_lookup,*levelset.collision_body_list,levelset.face_velocities_valid_mask_current);
@@ -1103,7 +1103,7 @@ Fix_Momentum_With_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const ARRAY<T,
 // Function Remove_Escaped_Particles
 //#####################################################################
 template<class TV> bool PARTICLE_LEVELSET_UNIFORM<TV>::
-Fix_Momentum_With_Escaped_Particles(const TV& location,const T_FACE_ARRAYS_SCALAR& V,const T momentum_lost,const T radius_fraction,const T mass_scaling,const T time,const bool force)
+Fix_Momentum_With_Escaped_Particles(const TV& location,const ARRAY<T,FACE_INDEX<TV::m> >& V,const T momentum_lost,const T radius_fraction,const T mass_scaling,const T time,const bool force)
 {
     T_FACE_LOOKUP V_lookup(V);
     T_FACE_LOOKUP_COLLIDABLE V_lookup_collidable(V_lookup,*levelset.collision_body_list,levelset.face_velocities_valid_mask_current);
@@ -1144,12 +1144,12 @@ Remove_Escaped_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTIC
 // Function Reincorporate_Removed_Particles
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Reincorporate_Removed_Particles(const T radius_fraction,const T mass_scaling,T_FACE_ARRAYS_SCALAR* V,const bool conserve_momentum_for_removed_negative_particles)
+Reincorporate_Removed_Particles(const T radius_fraction,const T mass_scaling,ARRAY<T,FACE_INDEX<TV::m> >* V,const bool conserve_momentum_for_removed_negative_particles)
 {
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices());domain.max_corner+=TV_INT::All_Ones_Vector();
     Consistency_Check(domain,positive_particles);
     Consistency_Check(domain,negative_particles);
-    DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(domain,thread_queue).template Run<T,T,T_FACE_ARRAYS_SCALAR*>(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Reincorporate_Removed_Particles_Threaded,radius_fraction,mass_scaling,conserve_momentum_for_removed_negative_particles?V:0);
+    DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(domain,thread_queue).template Run<T,T,ARRAY<T,FACE_INDEX<TV::m> >*>(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Reincorporate_Removed_Particles_Threaded,radius_fraction,mass_scaling,conserve_momentum_for_removed_negative_particles?V:0);
     Consistency_Check(domain,positive_particles);
     Consistency_Check(domain,negative_particles);
 }
@@ -1157,7 +1157,7 @@ Reincorporate_Removed_Particles(const T radius_fraction,const T mass_scaling,T_F
 // Function Reincorporate_Removed_Particles
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_UNIFORM<TV>::
-Reincorporate_Removed_Particles_Threaded(RANGE<TV_INT>& domain,const T radius_fraction,const T mass_scaling,T_FACE_ARRAYS_SCALAR* V)
+Reincorporate_Removed_Particles_Threaded(RANGE<TV_INT>& domain,const T radius_fraction,const T mass_scaling,ARRAY<T,FACE_INDEX<TV::m> >* V)
 {
     if(use_removed_positive_particles){
         for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(removed_positive_particles(block))
@@ -1171,7 +1171,7 @@ Reincorporate_Removed_Particles_Threaded(RANGE<TV_INT>& domain,const T radius_fr
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_UNIFORM<TV>::
 Reincorporate_Removed_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES<TV>*& particles,const int sign,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& removed_particles,
-    const T radius_fraction,const T mass_scaling,T_FACE_ARRAYS_SCALAR* V)
+    const T radius_fraction,const T mass_scaling,ARRAY<T,FACE_INDEX<TV::m> >* V)
 {
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
     T one_over_radius_multiplier=-sign/radius_fraction;

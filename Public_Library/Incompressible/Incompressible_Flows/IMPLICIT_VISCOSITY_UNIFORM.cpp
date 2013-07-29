@@ -38,7 +38,7 @@ template<class TV> IMPLICIT_VISCOSITY_UNIFORM<TV>::
 // Function Viscous_Update
 //#####################################################################
 template<class TV> void IMPLICIT_VISCOSITY_UNIFORM<TV>::
-Viscous_Update(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T time,const int maximum_implicit_viscosity_iterations)
+Viscous_Update(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,const T dt,const T time,const int maximum_implicit_viscosity_iterations)
 {
     const T_ARRAYS_BASE& velocity_component_ghost=face_velocities_ghost.Component(axis);
 
@@ -69,7 +69,7 @@ Viscous_Update(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const 
 // Function Variable_Viscosity_Explicit_Part
 //#####################################################################
 template<class TV> void IMPLICIT_VISCOSITY_UNIFORM<TV>::
-Variable_Viscosity_Explicit_Part(const T density,const ARRAY<T,TV_INT>& variable_viscosity,const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T time)
+Variable_Viscosity_Explicit_Part(const T density,const ARRAY<T,TV_INT>& variable_viscosity,const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,const T dt,const T time)
 {
     TV one_over_DX=grid.one_over_dX;
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -119,12 +119,12 @@ Setup_Viscosity(const T dt)
 // Function Setup_Boundary_Conditions
 //#####################################################################
 template<class TV> void IMPLICIT_VISCOSITY_UNIFORM<TV>::
-Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities)
+Setup_Boundary_Conditions(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
-    const T_FACE_ARRAYS_BOOL& p_psi_N=elliptic_solver.psi_N;const ARRAY<bool,TV_INT>& p_psi_D=elliptic_solver.psi_D;
-    T_FACE_ARRAYS_BOOL& psi_N=heat_solver->psi_N;ARRAY<bool,TV_INT>& psi_D=heat_solver->psi_D;
-    const T_FACE_ARRAYS_SCALAR& p_psi_R=elliptic_solver.psi_R;
-    T_FACE_ARRAYS_SCALAR& psi_R=heat_solver->psi_R;
+    const ARRAY<bool,FACE_INDEX<TV::m> >& p_psi_N=elliptic_solver.psi_N;const ARRAY<bool,TV_INT>& p_psi_D=elliptic_solver.psi_D;
+    ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=heat_solver->psi_N;ARRAY<bool,TV_INT>& psi_D=heat_solver->psi_D;
+    const ARRAY<T,FACE_INDEX<TV::m> >& p_psi_R=elliptic_solver.psi_R;
+    ARRAY<T,FACE_INDEX<TV::m> >& psi_R=heat_solver->psi_R;
 
     // dirichlet velocity boundary condition where we have neumann condition for the pressure
     for(CELL_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;

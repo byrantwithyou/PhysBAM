@@ -125,8 +125,8 @@ Update_Advection_Equation_Cell_Lookup(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,c
 // Function Update_Advection_Equation_Cell
 //#####################################################################
 template<class TV,class T2,class T_AVERAGING> void ADVECTION_SEPARABLE_UNIFORM<TV,T2,T_AVERAGING>::
-Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,const T_FACE_LOOKUP& V,BOUNDARY<TV,T>& boundary,
-    const T dt,const T time,const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
+Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& Z,const T_FACE_LOOKUP& Z_ghost,const T_FACE_LOOKUP& V,BOUNDARY<TV,T>& boundary,
+    const T dt,const T time,const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,ARRAY<T,FACE_INDEX<TV::m> >* Z_min,ARRAY<T,FACE_INDEX<TV::m> >* Z_max)
 {
     assert(!Z_min && !Z_max);
 

@@ -556,8 +556,8 @@ Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const GRID<TV>& local_gri
 //#####################################################################
 // Function Exchange_Boundary_Face_Data
 //#####################################################################
-template<class TV> template<class T_MPI_GRID,class T_FACE_ARRAYS> void MPI_GRID<TV>::
-Exchange_Boundary_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data,const int bandwidth) const
+template<class TV> template<class T_MPI_GRID,class ARRAY<T,FACE_INDEX<TV::m> >> void MPI_GRID<TV>::
+Exchange_Boundary_Face_Data(const T_MPI_GRID& mpi_grid,ARRAY<T,FACE_INDEX<TV::m> >& data,const int bandwidth) const
 {   
     RANGE<VECTOR<int,1> > boundary_band(0,bandwidth-1),ghost_band(-bandwidth,-1);
     ARRAY<MPI_PACKAGE> packages;ARRAY<MPI::Request> requests;
@@ -581,8 +581,8 @@ Exchange_Boundary_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data,const
 //#####################################################################
 // Function Average_Common_Face_Data
 //#####################################################################
-template<class TV> template<class T_MPI_GRID,class T_FACE_ARRAYS> void MPI_GRID<TV>::
-Average_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
+template<class TV> template<class T_MPI_GRID,class ARRAY<T,FACE_INDEX<TV::m> >> void MPI_GRID<TV>::
+Average_Common_Face_Data(const T_MPI_GRID& mpi_grid,ARRAY<T,FACE_INDEX<TV::m> >& data) const
 {
     //PHYSBAM_NOT_IMPLEMENTED(); // TODO: we probably don't need this function, but I'll leave it here for now
 
@@ -612,8 +612,8 @@ Average_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
 //#####################################################################
 // Function Union_Common_Face_Data
 //#####################################################################
-template<class TV> template<class T_MPI_GRID,class T_FACE_ARRAYS_BOOL> void MPI_GRID<TV>::
-Union_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS_BOOL& data) const
+template<class TV> template<class T_MPI_GRID,class ARRAY<bool,FACE_INDEX<TV::m> > > void MPI_GRID<TV>::
+Union_Common_Face_Data(const T_MPI_GRID& mpi_grid,ARRAY<bool,FACE_INDEX<TV::m> >& data) const
 {
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(TV::m);
     for(int axis=0;axis<TV::m;axis++)Find_Boundary_Regions(regions(axis),mpi_grid.Parallel_Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
@@ -641,8 +641,8 @@ Union_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS_BOOL& data) cons
 //#####################################################################
 // Function Copy_Common_Face_Data
 //#####################################################################
-template<class TV> template<class T_MPI_GRID,class T_FACE_ARRAYS> void MPI_GRID<TV>::
-Copy_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
+template<class TV> template<class T_MPI_GRID,class ARRAY<T,FACE_INDEX<TV::m> >> void MPI_GRID<TV>::
+Copy_Common_Face_Data(const T_MPI_GRID& mpi_grid,ARRAY<T,FACE_INDEX<TV::m> >& data) const
 {
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(TV::m);
     for(int axis=0;axis<TV::m;axis++)Find_Boundary_Regions(regions(axis),mpi_grid.Parallel_Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
@@ -662,8 +662,8 @@ Copy_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
 //#####################################################################
 // Function Assert_Common_Face_Data
 //#####################################################################
-template<class TV> template<class T_MPI_GRID,class T_FACE_ARRAYS> void MPI_GRID<TV>::
-Assert_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data,const T tolerance) const
+template<class TV> template<class T_MPI_GRID,class ARRAY<T,FACE_INDEX<TV::m> >> void MPI_GRID<TV>::
+Assert_Common_Face_Data(const T_MPI_GRID& mpi_grid,ARRAY<T,FACE_INDEX<TV::m> >& data,const T tolerance) const
 {   
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(TV::m);
     for(int axis=0;axis<TV::m;axis++)Find_Boundary_Regions(regions(axis),mpi_grid.Parallel_Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);

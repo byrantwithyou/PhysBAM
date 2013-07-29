@@ -24,9 +24,6 @@ class INCOMPRESSIBLE_UNIFORM:public INCOMPRESSIBLE<TV>
     typedef typename ADVECTION_COLLIDABLE_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_FACE_ARRAYS_BOOL::template REBIND<VECTOR<bool,TV::m> >::TYPE T_FACE_ARRAYS_BOOL_DIMENSION;
     typedef EXTRAPOLATION_UNIFORM<TV,T> T_EXTRAPOLATION_SCALAR;typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
     typedef typename TV::SPIN T_SPIN;typedef typename ARRAY<T,TV_INT>::template REBIND<T_SPIN>::TYPE T_ARRAYS_SPIN;
 public:
@@ -43,14 +40,14 @@ public:
     PROJECTION_DYNAMICS_UNIFORM<TV>& projection;
     ARRAY<T,TV_INT> variable_surface_tension;
     ARRAY<T,TV_INT> variable_viscosity;
-    T_FACE_ARRAYS_SCALAR force;
-    T_FACE_ARRAYS_SCALAR potential_energy;
+    ARRAY<T,FACE_INDEX<TV::m> > force;
+    ARRAY<T,FACE_INDEX<TV::m> > potential_energy;
     ARRAY<T,TV_INT> variable_vorticity_confinement;
     FLUID_STRAIN_UNIFORM<TV>* strain;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>* collision_body_list;
     bool momentum_conserving_vorticity;    
     bool use_vorticity_weights;
-    T_FACE_ARRAYS_SCALAR vorticity_weights;
+    ARRAY<T,FACE_INDEX<TV::m> > vorticity_weights;
     T energy_clamp;
     int vc_projection_direction;
     T buoyancy_constant;
@@ -77,26 +74,26 @@ public:
     void Use_Variable_Vorticity_Confinement(const bool use_variable_vorticity_confinement_input=true);
     void Use_Variable_Vorticity_Confinement(GRID<TV>& grid,const bool use_variable_vorticity_confinement_input=true);
     void Use_Strain();
-    void Apply_Pressure_Kinetic_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_ARRAYS_SCALAR& face_velocities_old,const T dt,const T time);
-    void Add_Energy_With_Vorticity(T_FACE_ARRAYS_SCALAR& face_velocities,const VECTOR<VECTOR<bool,2>,TV::dimension>& domain_boundary,const T dt,const T time,const int number_of_ghost_cells,LEVELSET<TV>* lsv=0,ARRAY<T,TV_INT>* density=0);
-    void Advance_One_Time_Step_Convection(const T dt,const T time,const T_FACE_ARRAYS_SCALAR& advecting_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect,const int number_of_ghost_cells);
-    void Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<T,TV_INT>* phi_ghost,const int number_of_ghost_cells);
-    void Add_Gravity_Threaded(RANGE<TV_INT>&domain,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,int axis);
-    void Add_Body_Force_Threaded(RANGE<TV_INT>&domain,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,int axis);
-    void Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity=false,BOUNDARY<TV,T>* projection_boundary=0,
+    void Apply_Pressure_Kinetic_Energy(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_new,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_old,const T dt,const T time);
+    void Add_Energy_With_Vorticity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const VECTOR<VECTOR<bool,2>,TV::dimension>& domain_boundary,const T dt,const T time,const int number_of_ghost_cells,LEVELSET<TV>* lsv=0,ARRAY<T,TV_INT>* density=0);
+    void Advance_One_Time_Step_Convection(const T dt,const T time,const ARRAY<T,FACE_INDEX<TV::m> >& advecting_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_to_advect,const int number_of_ghost_cells);
+    void Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<T,TV_INT>* phi_ghost,const int number_of_ghost_cells);
+    void Add_Gravity_Threaded(RANGE<TV_INT>&domain,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,int axis);
+    void Add_Body_Force_Threaded(RANGE<TV_INT>&domain,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,int axis);
+    void Advance_One_Time_Step_Implicit_Part(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const bool implicit_viscosity=false,BOUNDARY<TV,T>* projection_boundary=0,
         bool use_levelset_viscosity=false,BOUNDARY_CONDITIONS_CALLBACKS<TV>* bc_callbacks=0,bool print_viscosity_matrix=false);
-    int Real_CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous_only,T input_dt) const;
-    T CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid=false,const bool viscous_only=false) const;
-    void Apply_Vorticity_Confinement_Force(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<TV,TV_INT>& F);
-    virtual void Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& F);
-    void Extrapolate_Velocity_Across_Interface(T_FACE_ARRAYS_SCALAR& face_velocities_input,const ARRAY<T,TV_INT>& phi_ghost,const bool enforce_divergence_free=false,const T band_width=3,
-        const T damping=0,const TV& air_speed=TV(),const T_FACE_ARRAYS_BOOL_DIMENSION* face_neighbors_visible=0,const T_FACE_ARRAYS_BOOL* fixed_faces_input=0);
+    int Real_CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool inviscid,const bool viscous_only,T input_dt) const;
+    T CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool inviscid=false,const bool viscous_only=false) const;
+    void Apply_Vorticity_Confinement_Force(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<TV,TV_INT>& F);
+    virtual void Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& F);
+    void Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_input,const ARRAY<T,TV_INT>& phi_ghost,const bool enforce_divergence_free=false,const T band_width=3,
+        const T damping=0,const TV& air_speed=TV(),const ARRAY<VECTOR<bool,TV::m>,FACE_INDEX<TV::m> >* face_neighbors_visible=0,const ARRAY<bool,FACE_INDEX<TV::m> >* fixed_faces_input=0);
     void Set_Dirichlet_Boundary_Conditions(const ARRAY<T,TV_INT>* phi,const T pressure);
     void Set_Dirichlet_Boundary_Conditions(const ARRAY<T,TV_INT>* phi,const ARRAY<T,TV_INT>& pressure);
     void Add_Surface_Tension(LEVELSET<TV>& levelset,const T time);
-    void Use_Maccormack_Advection(const ARRAY<bool,TV_INT>* node_mask, const ARRAY<bool,TV_INT>* cell_mask, const T_FACE_ARRAYS_BOOL* face_mask);
-    bool Consistent_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& face_velocities) const;
-    void Implicit_Viscous_Update(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    void Use_Maccormack_Advection(const ARRAY<bool,TV_INT>* node_mask, const ARRAY<bool,TV_INT>* cell_mask, const ARRAY<bool,FACE_INDEX<TV::m> >* face_mask);
+    bool Consistent_Boundary_Conditions(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) const;
+    void Implicit_Viscous_Update(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
 //#####################################################################
 };
 }

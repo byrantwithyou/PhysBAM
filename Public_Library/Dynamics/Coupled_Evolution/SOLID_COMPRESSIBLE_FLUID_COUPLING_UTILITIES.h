@@ -27,10 +27,8 @@ class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES
     typedef VECTOR<int,TV::m> TV_INT;
     typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef typename ARRAY<T,TV_INT>::template REBIND<CUT_CELLS<T,TV::dimension>*>::TYPE T_ARRAYS_CUT_CELLS;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
+    typedef typename ARRAY<T,FACE_INDEX<TV::m> >::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
+    typedef typename ARRAY<T,FACE_INDEX<TV::m> >::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
     typedef typename LINEAR_INTERPOLATION_UNIFORM<TV,T>::template REBIND<TV_DIMENSION>::TYPE T_LINEAR_INTERPOLATION_DIMENSION;
 
 public:
@@ -44,10 +42,10 @@ public:
     TV_DIMENSION solid_state;
 
     T_ARRAYS_DIMENSION_SCALAR U_n;
-    T_FACE_ARRAYS_BOOL solid_fluid_face_time_n;
+    ARRAY<bool,FACE_INDEX<TV::m> > solid_fluid_face_time_n;
     ARRAY<bool,TV_INT> cells_inside_fluid_time_n,outside_fluid;
     EULER_FLUID_FORCES<TV>* euler_fluid_forces;
-    T_FACE_ARRAYS_SCALAR pressure_at_faces;
+    ARRAY<T,FACE_INDEX<TV::m> > pressure_at_faces;
     ARRAY<T,TV_INT> phi_all_solids_negated;
 
     ARRAY<bool,TV_INT> near_interface;
@@ -67,7 +65,7 @@ public:
     void Update_Cut_Out_Grid();
     void Fill_Uncovered_Cells();
     void Fill_Solid_Cells(bool fill_pressure_only=false);
-    void Project_Fluid_Pressure_At_Neumann_Faces(const ARRAY<T,TV_INT>& p_ghost,T_FACE_ARRAYS_SCALAR& p_face) const;
+    void Project_Fluid_Pressure_At_Neumann_Faces(const ARRAY<T,TV_INT>& p_ghost,ARRAY<T,FACE_INDEX<TV::m> >& p_face) const;
     void Apply_Isobaric_Fix(const T dt,const T time);
     void Extract_Time_N_Data_For_Explicit_Fluid_Forces();
 private:

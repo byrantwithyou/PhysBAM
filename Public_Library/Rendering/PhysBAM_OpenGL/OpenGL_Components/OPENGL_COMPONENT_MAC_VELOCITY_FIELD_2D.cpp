@@ -152,7 +152,7 @@ Reinitialize()
                 else return;
                 tmp_filename=STRING_UTILITIES::string_sprintf(directory_adaptive.c_str(),i)+FILE_UTILITIES::Get_Frame_Filename(filename_active_faces.c_str(),frame);
                 LOG::cout<<"Reading active faces from"<<tmp_filename<<std::endl;
-                if(FILE_UTILITIES::File_Exists(tmp_filename)){if(!opengl_adaptive_mac_velocity_fields(i)->active_faces) opengl_adaptive_mac_velocity_fields(i)->active_faces=new T_FACE_ARRAYS_BOOL();
+                if(FILE_UTILITIES::File_Exists(tmp_filename)){if(!opengl_adaptive_mac_velocity_fields(i)->active_faces) opengl_adaptive_mac_velocity_fields(i)->active_faces=new ARRAY<bool,FACE_INDEX<TV::m> >();
                     FILE_UTILITIES::Read_From_File<bool>(tmp_filename,*opengl_adaptive_mac_velocity_fields(i)->active_faces);}
                 opengl_adaptive_mac_velocity_fields(i)->Update();}
             else{
@@ -176,7 +176,7 @@ Update_Divergence()
     if(draw_divergence && valid){
         GRID<TV>& grid=opengl_mac_velocity_field->grid;
         ARRAY_VIEW<T,VECTOR<int,2> > &u=opengl_mac_velocity_field->u,&v=opengl_mac_velocity_field->v;
-        static T_FACE_ARRAYS_BOOL psi_N;
+        static ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
         static ARRAY<bool,TV_INT> psi_D;
         bool got_all_psi=true;
         if(!psi_N_psi_D_basedir.empty()){
@@ -209,7 +209,7 @@ Update_Streamlines()
     RANDOM_NUMBERS<T> random;
     if(use_seed_for_streamlines) random.Set_Seed(streamline_seed);
     LINEAR_INTERPOLATION_UNIFORM<TV,T> linear_interpolation;
-    T_FACE_ARRAYS_SCALAR mac_velocity_field(grid);
+    ARRAY<T,FACE_INDEX<TV::m> > mac_velocity_field(grid);
     mac_velocity_field.Component(0)=opengl_mac_velocity_field->u;
     mac_velocity_field.Component(1)=opengl_mac_velocity_field->v;
     FACE_LOOKUP_UNIFORM<TV> V_lookup(mac_velocity_field);

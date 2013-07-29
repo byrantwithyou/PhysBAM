@@ -111,7 +111,7 @@ Initialize_Domain(const GRID<TV>& grid_input)
 // Function Save_State 
 //#####################################################################
 template<class TV> void EULER_UNIFORM<TV>::
-Save_State(T_ARRAYS_DIMENSION_SCALAR& U_s,T_FACE_ARRAYS_SCALAR& face_velocities_s,bool& need_to_remove_added_internal_energy_s)
+Save_State(T_ARRAYS_DIMENSION_SCALAR& U_s,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_s,bool& need_to_remove_added_internal_energy_s)
 {
     U_s.Copy(U);
     euler_projection.Save_State(face_velocities_s);
@@ -121,7 +121,7 @@ Save_State(T_ARRAYS_DIMENSION_SCALAR& U_s,T_FACE_ARRAYS_SCALAR& face_velocities_
 // Function Restore_State 
 //#####################################################################
 template<class TV> void EULER_UNIFORM<TV>::
-Restore_State(T_ARRAYS_DIMENSION_SCALAR& U_s,T_FACE_ARRAYS_SCALAR& face_velocities_s,bool& need_to_remove_added_internal_energy_s)
+Restore_State(T_ARRAYS_DIMENSION_SCALAR& U_s,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_s,bool& need_to_remove_added_internal_energy_s)
 {
     U.Copy(U_s);
     euler_projection.Restore_State(face_velocities_s);
@@ -236,7 +236,7 @@ Advance_One_Time_Step_Forces(const T dt,const T time)
 // Function Compute_Cavitation_Velocity
 //#####################################################################
 template<class TV> void EULER_UNIFORM<TV>::
-Compute_Cavitation_Velocity(ARRAY<T,TV_INT>& rho_n, T_FACE_ARRAYS_SCALAR& face_velocities_n, T_ARRAYS_DIMENSION_SCALAR& momentum_n)
+Compute_Cavitation_Velocity(ARRAY<T,TV_INT>& rho_n, ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_n, T_ARRAYS_DIMENSION_SCALAR& momentum_n)
 {
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
         if(!euler_projection.elliptic_solver->psi_N.Component(axis)(face_index)){
@@ -256,7 +256,7 @@ Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep
     last_dt=dt;
 
     // Store time n density values
-    ARRAY<T,TV_INT> rho_n(grid.Domain_Indices(0));T_ARRAYS_DIMENSION_SCALAR momentum_n(grid.Domain_Indices(0));T_FACE_ARRAYS_SCALAR face_velocities_n(grid);
+    ARRAY<T,TV_INT> rho_n(grid.Domain_Indices(0));T_ARRAYS_DIMENSION_SCALAR momentum_n(grid.Domain_Indices(0));ARRAY<T,FACE_INDEX<TV::m> > face_velocities_n(grid);
     if(apply_cavitation_correction){
         for(CELL_ITERATOR<TV> iterator(grid,0);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             rho_n(cell_index)=U_ghost(cell_index)(0);}
@@ -413,7 +413,7 @@ CFL(const T time) const
         ARRAY<T,TV_INT> p_approx(grid.Domain_Indices(1));
         for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())
             p_approx(iterator.Cell_Index())=eos->p(U_ghost(iterator.Cell_Index())(0),e(U_ghost,iterator.Cell_Index()));
-        T_FACE_ARRAYS_SCALAR p_approx_face(grid);
+        ARRAY<T,FACE_INDEX<TV::m> > p_approx_face(grid);
         euler_projection.Compute_Face_Pressure_From_Cell_Pressures(grid,U_ghost,psi,p_approx_face,p_approx);
         ARRAY<TV,TV_INT> grad_p_approx(grid.Domain_Indices());ARRAYS_UTILITIES<TV,T>::Compute_Gradient_At_Cells_From_Face_Data(grid,grad_p_approx,p_approx_face);
 

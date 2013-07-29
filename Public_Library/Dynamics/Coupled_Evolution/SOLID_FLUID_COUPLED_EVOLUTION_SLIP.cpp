@@ -201,7 +201,7 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
 // Function Apply_Pressure
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
-Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt)
+Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt)
 {
 }
 //#####################################################################
@@ -251,7 +251,7 @@ Setup_Solids(const T dt,const T current_velocity_time,const T current_position_t
 // Function Setup_Fluids
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
-Setup_Fluids(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T current_position_time,const T dt,const bool leakproof_solve)
+Setup_Fluids(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T current_position_time,const T dt,const bool leakproof_solve)
 {
     // TODO(kwatra): should we call with both incompressible and compressible face velocities to make sure psi_N faces are set correctly.
     if(solids_fluids_parameters.mpi_solid_fluid && solids_fluids_parameters.mpi_solid_fluid->Solid_Node()) return;
@@ -281,7 +281,7 @@ Setup_Fluids(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T curren
 // Function Solve
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
-Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update,const bool leakproof_solve)
+Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update,const bool leakproof_solve)
 {
     static int solve_id=-1;solve_id++;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
@@ -395,7 +395,7 @@ Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T cu
         coupled_system->Interpolate_Solid_Velocity_To_Coupled_Faces(V,coupled_faces_solid_interpolated_velocity_np1);
         if(velocity_update || leakproof_solve){
             coupled_system->Get_Pressure(coupled_x,pressure);
-            T_FACE_ARRAYS_SCALAR p_face;
+            ARRAY<T,FACE_INDEX<TV::m> > p_face;
             euler_projection.Get_Ghost_Pressures(dt,current_position_time,boundary_condition_collection.psi_D,boundary_condition_collection.psi_N,pressure,pressure);
             euler_projection.Get_Pressure_At_Faces(dt,current_position_time,pressure,p_face);
             coupled_system->Zero_Coupling_Faces_Values(p_face);
@@ -446,7 +446,7 @@ Output_Iterators(const STREAM_TYPE stream_type,const char* output_directory,int 
 // Function Make_Divergence_Free
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
-Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T time)
+Make_Divergence_Free(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,const T time)
 {
     Solve(incompressible_face_velocities,dt,time,time,false,true);
 }
@@ -460,7 +460,7 @@ Apply_Second_Order_Cut_Cell_Method(const T_ARRAYS_INT& cell_index_to_divergence_
     // modify div_active to work for second order cut cell
     // assume only one color for the moment
     POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*poisson;
-    T_FACE_ARRAYS_BOOL& psi_N=poisson->psi_N;
+    ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=poisson->psi_N;
     ARRAY<bool,TV_INT>& psi_D=poisson->psi_D;
     // TODO: this will not work for multiphase, obviously
     assert(fluids_parameters.number_of_regions==1); // this should not be called for gas or multiphase
@@ -538,7 +538,7 @@ Simulate_Solids() const
 // Function Apply_Viscosity
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
-Apply_Viscosity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     if(fluids_parameters.use_coupled_implicit_viscosity) return;
 
@@ -583,7 +583,7 @@ Apply_Viscosity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 // Function Warn_For_Exposed_Dirichlet_Cell
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
-Warn_For_Exposed_Dirichlet_Cell(const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N)
+Warn_For_Exposed_Dirichlet_Cell(const ARRAY<bool,TV_INT>& psi_D,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N)
 {
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(!psi_D(cell_index)) continue;
@@ -612,7 +612,7 @@ Set_Cached_Psi_N_And_Coupled_Face_Data(const COLLISION_AWARE_INDEX_MAP<TV>& inde
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
 Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,const ARRAY<FACE_INDEX<TV::dimension> >& indexed_faces,
-    const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_data,T_FACE_ARRAYS_SCALAR& face_data)
+    const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_data,ARRAY<T,FACE_INDEX<TV::m> >& face_data)
 {
     for(COUPLING_CONSTRAINT_ID i(0);i<number_of_coupling_faces;i++){
         FACE_INDEX<TV::dimension> face_index=indexed_faces(Value(i));
@@ -623,7 +623,7 @@ Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,con
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
 Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const COLLISION_AWARE_INDEX_MAP<TV>& index_map,
-    const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const T_FACE_ARRAYS_BOOL& psi_N_domain,T_FACE_ARRAYS_BOOL& psi_N,
+    const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N_domain,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,
     ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_velocities)
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
@@ -644,7 +644,7 @@ Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const COLLISION_AWARE_INDEX_
 // Function Get_Coupled_Faces_And_Interpolated_Solid_Velocities
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
-Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const T time,T_FACE_ARRAYS_BOOL& psi_N,T_FACE_ARRAYS_SCALAR& face_velocities)
+Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const T time,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     if(cached_coupling_face_data){
         assert(time==time_cached);

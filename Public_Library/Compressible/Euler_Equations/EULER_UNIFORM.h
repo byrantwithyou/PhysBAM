@@ -30,8 +30,7 @@ class EULER_UNIFORM:public EULER<TV>
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
+    typedef typename ARRAY<T,FACE_INDEX<TV::m> >::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
     typedef EULER<TV> BASE;
     typedef VECTOR<bool,TV::m> TV_BOOL;
@@ -60,7 +59,7 @@ public:
     EULER_CAVITATION_UNIFORM<TV> euler_cavitation_internal_energy;
     T e_min,last_dt;
     TV_INT pressure_flux_dimension_indices;
-    T_FACE_ARRAYS_SCALAR force;
+    ARRAY<T,FACE_INDEX<TV::m> > force;
     TV_DIMENSION initial_total_conserved_quantity,accumulated_boundary_flux;
 private:
     mutable T_ARRAYS_DIMENSION_SCALAR U_ghost_private; // Forces us to only touch U_ghost through the const reference and let Fill_Ghost_Cells be the only thing modifying the variable;
@@ -87,8 +86,8 @@ public:
     void Set_Custom_Boundary(T_BOUNDARY& boundary_input);
     void Set_Body_Force(const bool use_force_input=true);
     void Initialize_Domain(const GRID<TV>& grid_input);
-    void Save_State(T_ARRAYS_DIMENSION_SCALAR& U_save,T_FACE_ARRAYS_SCALAR& face_velocities_save,bool& need_to_remove_added_internal_energy_save);
-    void Restore_State(T_ARRAYS_DIMENSION_SCALAR& U_save,T_FACE_ARRAYS_SCALAR& face_velocities_save,bool& need_to_remove_added_internal_energy_save);
+    void Save_State(T_ARRAYS_DIMENSION_SCALAR& U_save,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_save,bool& need_to_remove_added_internal_energy_save);
+    void Restore_State(T_ARRAYS_DIMENSION_SCALAR& U_save,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_save,bool& need_to_remove_added_internal_energy_save);
     void Get_Cell_Velocities(const T dt,const T time,const int ghost_cells,ARRAY<TV,TV_INT>& centered_velocities);
     void Compute_Total_Conserved_Quantity(const bool update_boundary_flux,const T dt,TV_DIMENSION& total_conserved_quantity);
     void Invalidate_Ghost_Cells();
@@ -97,7 +96,7 @@ public:
     void Fill_Ghost_Cells(const T dt,const T time,const int ghost_cells) const;
     void Get_Dirichlet_Boundary_Conditions(const T dt,const T time);
     void Advance_One_Time_Step_Forces(const T dt,const T time);
-    void Compute_Cavitation_Velocity(ARRAY<T,TV_INT>& rho_n, T_FACE_ARRAYS_SCALAR& face_velocities_n, T_ARRAYS_DIMENSION_SCALAR& momentum_n);
+    void Compute_Cavitation_Velocity(ARRAY<T,TV_INT>& rho_n, ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_n, T_ARRAYS_DIMENSION_SCALAR& momentum_n);
     void Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep,const int rk_order);
     void Advance_One_Time_Step_Implicit_Part(const T dt,const T time);
     void Clamp_Internal_Energy(const T dt,const T time); // TODO(kwatra): Do we really need dt, time here?

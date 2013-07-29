@@ -60,7 +60,7 @@ void Adjust_Phi_With_Sources(const T time)
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_BOOL& psi_N,const T time)
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time)
 {
     GRID<TV>& u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid,&w_grid=fluids_parameters.w_grid;
     ARRAY<T,VECTOR<int,3> >& u=fluids_parameters.incompressible.projection.u,&v=fluids_parameters.incompressible.projection.v,&w=fluids_parameters.incompressible.projection.w;

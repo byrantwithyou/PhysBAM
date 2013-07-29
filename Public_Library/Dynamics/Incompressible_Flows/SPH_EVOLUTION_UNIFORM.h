@@ -24,9 +24,7 @@ class SPH_EVOLUTION_UNIFORM:public NONCOPYABLE
     typedef typename TV::SCALAR T;
     STATIC_ASSERT((IS_SAME<typename GRID<TV>::GRID_TAG,UNIFORM_TAG<TV> >::value));
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename ARRAY<T,TV_INT>::template REBIND<ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
     typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef typename ARRAY<T,TV_INT>::template REBIND<ARRAY<PAIR<TV_INT,int> > >::TYPE T_ARRAYS_ARRAY_PAIR_TV_INT_INT;
@@ -41,7 +39,7 @@ public:
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution;
     SPH_PARTICLES<TV> sph_particles;
-    T_FACE_ARRAYS_BOOL valid_particle_face_velocities;
+    ARRAY<bool,FACE_INDEX<TV::m> > valid_particle_face_velocities;
 
     T particle_radius;
     T target_particles_per_unit_volume;
@@ -64,9 +62,9 @@ private:
     T target_particles_per_cell,target_minus_ballistic_particles_per_cell,one_over_target_particles_per_cell,one_over_target_minus_ballistic_particles_per_cell,ballistic_particles_per_cell;
 
     T_ARRAYS_ARRAY_INT particles_in_cell;
-    T_FACE_ARRAYS_SCALAR face_weight;
+    ARRAY<T,FACE_INDEX<TV::m> > face_weight;
     ARRAY<T> one_over_total_particle_cell_weight,one_over_total_particle_face_weight;
-    T_FACE_ARRAYS_SCALAR particle_velocities;
+    ARRAY<T,FACE_INDEX<TV::m> > particle_velocities;
     RANDOM_NUMBERS<T> random;
 public:
 
@@ -85,15 +83,15 @@ public:
     T CFL() const;
     template<class T_ARRAYS_PARTICLES> void Copy_Particle_Attributes_From_Array(T_ARRAYS_PARTICLES& particles);
     template<class T_ARRAYS_PARTICLES> void Copy_Particle_Attributes_To_Array(T_ARRAYS_PARTICLES& particles) const;
-    template<class T_ARRAYS_PARTICLES> void Make_Incompressible(T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    void Make_Incompressible(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    template<class T_ARRAYS_PARTICLES> void Make_Incompressible(T_ARRAYS_PARTICLES& particles,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
+    void Make_Incompressible(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
     void Calculate_SPH_Constants();
-    void Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time);
+    void Set_Up_For_Projection(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time);
     void Set_Divergence_And_Multiplier(const TV_INT cell,const ARRAY<bool,TV_INT>& cells_valid,const T time);
-    void Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    void Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,ARRAY<T,TV_INT>& cell_weight,T_FACE_ARRAYS_SCALAR& face_weight);
-    void Calculate_Particle_Deltas(const T_FACE_ARRAYS_SCALAR& minus_face_delta,ARRAY<TV>& delta_velocity,ARRAY<TV>& delta_weight);
-    void Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR* face_velocities);
+    void Postprocess_Particles(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
+    void Rasterize_Velocities_To_Grid(ARRAY<T,FACE_INDEX<TV::m> >& velocities,ARRAY<T,TV_INT>& cell_weight,ARRAY<T,FACE_INDEX<TV::m> >& face_weight);
+    void Calculate_Particle_Deltas(const ARRAY<T,FACE_INDEX<TV::m> >& minus_face_delta,ARRAY<TV>& delta_velocity,ARRAY<TV>& delta_weight);
+    void Modify_Levelset_And_Particles_To_Create_Fluid(const T time,ARRAY<T,FACE_INDEX<TV::m> >* face_velocities);
     template<class T_ARRAYS_PARTICLES> void Move_Particles_Off_Grid_Boundaries(T_ARRAYS_PARTICLES& particles,const T tolerance) const;
 //#####################################################################
 };

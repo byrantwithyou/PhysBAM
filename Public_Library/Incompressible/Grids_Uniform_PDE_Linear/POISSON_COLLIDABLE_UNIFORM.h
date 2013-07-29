@@ -22,7 +22,6 @@ class POISSON_COLLIDABLE_UNIFORM:public POISSON_UNIFORM<TV>,public LAPLACE_COLLI
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 
 public:
     typedef POISSON_UNIFORM<TV> BASE;
@@ -39,11 +38,11 @@ public:
     using COLLIDABLE_BASE::levelset;using COLLIDABLE_BASE::u_interface;
 
     ARRAY<T,TV_INT> u_jump,beta_un_jump; // [u] and [beta un] on the grid
-    T_FACE_ARRAYS_SCALAR beta_interface_face; // 2nd order method
-    T_FACE_ARRAYS_SCALAR u_jump_face;
+    ARRAY<T,FACE_INDEX<TV::m> > beta_interface_face; // 2nd order method
+    ARRAY<T,FACE_INDEX<TV::m> > u_jump_face;
     //LEVELSET<TV>* levelset; // used in second order accurate cut cell method
     LEVELSET_MULTIPLE<TV>* levelset_multiple;
-    //T_FACE_ARRAYS_SCALAR u_interface; // interface boundary condition - 2nd order method
+    //ARRAY<T,FACE_INDEX<TV::m> > u_interface; // interface boundary condition - 2nd order method
 private:
     ARRAY<ARRAY<T,TV_INT>> phis_default;
     LEVELSET_MULTIPLE<TV> levelset_multiple_default;
@@ -78,7 +77,7 @@ public:
     void Set_Up_Second_Order_Cut_Cell_Method(const bool use_second_order_cut_cell_method_input=true) PHYSBAM_OVERRIDE;
     void Initialize_Grid(const GRID<TV>& grid_input) PHYSBAM_OVERRIDE;
     void Compute_beta_And_Add_Jumps_To_b(const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Find_Constant_beta(T_FACE_ARRAYS_SCALAR& beta_face,const ARRAY<T,TV_INT>& phi_ghost);
+    void Find_Constant_beta(ARRAY<T,FACE_INDEX<TV::m> >& beta_face,const ARRAY<T,TV_INT>& phi_ghost);
     void Find_Constant_beta(const ARRAY<T,TV_INT>& phi_ghost);
     void Find_Constant_beta_Multiphase(ARRAY<ARRAY<T,TV_INT>>& phis_ghost);
     virtual void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index) PHYSBAM_OVERRIDE;

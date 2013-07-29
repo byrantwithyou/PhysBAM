@@ -26,7 +26,6 @@ class TWO_PHASE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
     typedef T_input T;
 public:
     typedef VECTOR<T,3> TV;typedef GRID<TV> T_GRID;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef VECTOR<int,TV::m> TV_INT;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV > BASE;
@@ -56,7 +55,7 @@ public:
     void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
     bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE {return false;}
     void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
-    void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_BOOL& psi_N,const T time) PHYSBAM_OVERRIDE {}
+    void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE {}
     void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
 
 //#####################################################################
@@ -170,8 +169,8 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Set_Dirichlet_Boundary_Conditions(time);
     if(test_number!=3) return;
     //TODO: Is there a good place to set Neuman conditions?
-    T_FACE_ARRAYS_BOOL& psi_N=fluids_parameters.incompressible_multiphase->projection.elliptic_solver->psi_N;
-    T_FACE_ARRAYS_SCALAR& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
+    ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=fluids_parameters.incompressible_multiphase->projection.elliptic_solver->psi_N;
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
 
     RANGE<TV_INT> right_grid_cells=RANGE<TV_INT>(TV_INT(fluids_parameters.grid->counts.x-2,1,1),fluids_parameters.grid->Numbers_Of_Cells());
     for(int axis=0;axis<TV::m;axis++){

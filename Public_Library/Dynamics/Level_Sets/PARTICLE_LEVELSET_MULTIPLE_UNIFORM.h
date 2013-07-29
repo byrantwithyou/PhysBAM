@@ -16,7 +16,6 @@ class PARTICLE_LEVELSET_MULTIPLE_UNIFORM:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     T min_collision_distance_factor,max_collision_distance_factor,max_minus_min_collision_distance_factor_over_max_short;
 
@@ -72,13 +71,13 @@ public:
     void Adjust_Particle_Radii()
     {for(int i=0;i<particle_levelsets.m;i++) particle_levelsets(i)->Adjust_Particle_Radii();}
 
-    void Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* face_velocities)
+    void Modify_Levelset_Using_Escaped_Particles(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities)
     {for(int i=0;i<particle_levelsets.m;i++){
         ARRAY<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES*> other_positive_particles(particle_levelsets.m-1);
         int index=0;for(int j=0;j<particle_levelsets.m;j++)if(i!=j)other_positive_particles(index++)=&particle_levelsets(j)->negative_particles;
         particle_levelsets(i)->Modify_Levelset_Using_Escaped_Particles(face_velocities,&other_positive_particles);}}
 
-    void Euler_Step_Particles(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time=0,const bool use_second_order_for_nonremoved_particles=false,const bool update_particle_cells_after_euler_step=true,const bool verbose=true)
+    void Euler_Step_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,const T dt,const T time=0,const bool use_second_order_for_nonremoved_particles=false,const bool update_particle_cells_after_euler_step=true,const bool verbose=true)
     {for(int i=0;i<particle_levelsets.m;i++) particle_levelsets(i)->Euler_Step_Particles(V,dt,time,use_second_order_for_nonremoved_particles,update_particle_cells_after_euler_step,verbose);}
 
     void Euler_Step_Removed_Particles(const T dt,const T time,const bool update_particle_cells_after_euler_step=true,const bool verbose=true)

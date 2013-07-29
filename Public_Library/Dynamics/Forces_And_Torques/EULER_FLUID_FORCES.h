@@ -18,8 +18,6 @@ template<class TV>
 class EULER_FLUID_FORCES:public SOLIDS_FORCES<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef SOLIDS_FORCES<TV> BASE;
     typedef typename BASE::RIGID_FREQUENCY_DATA RIGID_FREQUENCY_DATA;
     typedef typename BASE::DEFORMABLE_FREQUENCY_DATA DEFORMABLE_FREQUENCY_DATA;
@@ -27,14 +25,14 @@ class EULER_FLUID_FORCES:public SOLIDS_FORCES<TV>
     using BASE::particles;
 
     GRID<TV> grid;
-    const T_FACE_ARRAYS_SCALAR& pressure_at_faces;
-    const T_FACE_ARRAYS_BOOL& solid_fluid_face;
+    const ARRAY<T,FACE_INDEX<TV::m> >& pressure_at_faces;
+    const ARRAY<bool,FACE_INDEX<TV::m> >& solid_fluid_face;
     const ARRAY<bool,TV_INT>& cells_inside_fluid;
     const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>* collision_bodies_affecting_fluid;
 
 public:
-    EULER_FLUID_FORCES(const GRID<TV>& grid_input,const T_FACE_ARRAYS_SCALAR& pressure_at_faces_input,
-        const T_FACE_ARRAYS_BOOL& solid_fluid_face_input,const ARRAY<bool,TV_INT>& cells_inside_fluid_input,
+    EULER_FLUID_FORCES(const GRID<TV>& grid_input,const ARRAY<T,FACE_INDEX<TV::m> >& pressure_at_faces_input,
+        const ARRAY<bool,FACE_INDEX<TV::m> >& solid_fluid_face_input,const ARRAY<bool,TV_INT>& cells_inside_fluid_input,
         const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>* collision_bodies_affecting_fluid_input,DEFORMABLE_PARTICLES<TV>& particles_input,
         RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);
 

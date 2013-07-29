@@ -14,7 +14,7 @@ using namespace PhysBAM;
 using namespace std;
 //#####################################################################
 template<class T> OPENGL_MAC_VELOCITY_FIELD_2D<T>::
-OPENGL_MAC_VELOCITY_FIELD_2D(GRID<TV> &grid, ARRAY<T,FACE_INDEX<2> > &face_velocities_input,ARRAY<bool,TV_INT> *active_cells_input,T_FACE_ARRAYS_BOOL *active_faces_input)
+OPENGL_MAC_VELOCITY_FIELD_2D(GRID<TV> &grid, ARRAY<T,FACE_INDEX<2> > &face_velocities_input,ARRAY<bool,TV_INT> *active_cells_input,ARRAY<bool,FACE_INDEX<TV::m> > *active_faces_input)
     : OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(vector_field,vector_locations),
      grid(grid),face_velocities(face_velocities_input),u(face_velocities.Component(0)),v(face_velocities.Component(1)),active_cells(active_cells_input),active_faces(active_faces_input)
 {

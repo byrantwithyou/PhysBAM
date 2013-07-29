@@ -18,7 +18,6 @@ template<class TV,class T2,class T_NESTED_ADVECTION>
 class ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM:public ADVECTION<TV,T2>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     T_NESTED_ADVECTION& nested_advection;
     const PROJECTION_DYNAMICS_UNIFORM<TV>& projection;
@@ -39,9 +38,9 @@ public:
     {FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> V_lookup(face_velocities.V_face,projection,&levelset_multiple_n_plus_one);
     nested_advection.Update_Advection_Equation_Cell_Lookup(grid,Z,Z_ghost,V_lookup,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);}
 
-    void Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const FACE_LOOKUP_UNIFORM<TV>& Z_ghost,
+    void Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& Z,const FACE_LOOKUP_UNIFORM<TV>& Z_ghost,
         const FACE_LOOKUP_UNIFORM<TV>& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
-        const FACE_LOOKUP_UNIFORM<TV>* Z_min_ghost,const FACE_LOOKUP_UNIFORM<TV>* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
+        const FACE_LOOKUP_UNIFORM<TV>* Z_min_ghost,const FACE_LOOKUP_UNIFORM<TV>* Z_max_ghost,ARRAY<T,FACE_INDEX<TV::m> >* Z_min,ARRAY<T,FACE_INDEX<TV::m> >* Z_max)
     {const LEVELSET_MULTIPLE<TV>* levelset_multiple_n=projection.poisson_collidable->levelset_multiple; //assumes poisson's internal levelset is at time n
     FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> Z_ghost_lookup(Z_ghost.V_face,projection,levelset_multiple_n);
     FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> V_lookup(face_velocities.V_face,projection,&levelset_multiple_n_plus_one);

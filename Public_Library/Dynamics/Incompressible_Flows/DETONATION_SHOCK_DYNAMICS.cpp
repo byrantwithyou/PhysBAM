@@ -41,7 +41,7 @@ Initialize_Grid()
 // Function Advance_One_Time_Step
 //#####################################################################
 template<class TV> void DETONATION_SHOCK_DYNAMICS<TV>::
-Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,const int number_of_ghost_cells)
+Advance_One_Time_Step(const ARRAY<T,FACE_INDEX<TV::m> >& V,const T dt,const T time,const int number_of_ghost_cells)
 {
     LOG::SCOPE scope("DSD Advance","DSD Advance (order=%d, dt=%f)",3,dt);
 

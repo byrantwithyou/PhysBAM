@@ -28,8 +28,8 @@ class LAPLACE_MPI:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef TV_INT T_INDEX;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef TV_INT T_INDEX;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef GRID<TV> T_PARALLEL_GRID;
 public:
     MPI_UNIFORM_GRID<TV>*& mpi_grid;
@@ -41,7 +41,7 @@ public:
     T_ARRAYS_INT& filled_region_colors;
     ARRAY<bool>& filled_region_touches_dirichlet;
     bool& solve_neumann_regions;
-    T_FACE_ARRAYS_BOOL& psi_N;
+    ARRAY<bool,FACE_INDEX<TV::m> >& psi_N;
     ARRAY<ARRAY<int> > filled_region_ranks;
     ARRAY<SPARSE_MATRIX_PARTITION> partitions;
     ARRAY<MPI::Group>* groups;

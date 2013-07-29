@@ -21,7 +21,6 @@ template<class TV,class T2>
 class GRID_AND_ARRAY_CONTAINER:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
 public:
     GRID<TV>& grid;
@@ -33,7 +32,7 @@ private:
     T_ADVECTION_SEMI_LAGRANGIAN_SCALAR& advection_default;
 protected:
     BOUNDARY<TV,T>& boundary_default; 
-    const T_FACE_ARRAYS_SCALAR* face_velocities;
+    const ARRAY<T,FACE_INDEX<TV::m> >* face_velocities;
     const ARRAY<TV,TV_INT>* cell_velocities;
 public:
 
@@ -58,7 +57,7 @@ public:
     void Set_To_Constant_Value(const T2& value)
     {array.Fill(value);}
 
-    void Set_Velocity(const T_FACE_ARRAYS_SCALAR* face_velocities_input)
+    void Set_Velocity(const ARRAY<T,FACE_INDEX<TV::m> >* face_velocities_input)
     {face_velocities=face_velocities_input;}
     
     void Set_Velocity(const ARRAY<TV,TV_INT>* cell_velocities_input)

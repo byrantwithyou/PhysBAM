@@ -21,8 +21,6 @@ class PROJECTION_DYNAMICS_UNIFORM:public PROJECTION_COLLIDABLE_UNIFORM<TV>,publi
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> T_FACE_LOOKUP_FIRE_MULTIPHASE;
 public:
     typedef PROJECTION_COLLIDABLE_UNIFORM<TV> BASE;
@@ -32,13 +30,13 @@ public:
     using PROJECTION_DYNAMICS<T>::flame;using PROJECTION_DYNAMICS<T>::flame_speed_constants;using BASE::Enforce_Velocity_Compatibility;
     
     bool use_flame_speed_multiplier;
-    T_FACE_ARRAYS_SCALAR flame_speed_multiplier;
+    ARRAY<T,FACE_INDEX<TV::m> > flame_speed_multiplier;
     DETONATION_SHOCK_DYNAMICS<TV>* dsd;
 
 protected:
     bool use_divergence_multiplier_save_for_sph,use_non_zero_divergence_save_for_sph;
     ARRAY<T,TV_INT> *p_save_for_sph,*divergence_save_for_sph,*divergence_multiplier_save_for_sph;
-    T_FACE_ARRAYS_SCALAR *face_velocities_save_for_sph;
+    ARRAY<T,FACE_INDEX<TV::m> > *face_velocities_save_for_sph;
     LAPLACE_UNIFORM<TV>* elliptic_solver_save_for_sph;
     LAPLACE_COLLIDABLE_UNIFORM<TV>* laplace_save_for_sph;
     POISSON_COLLIDABLE_UNIFORM<TV>* poisson_save_for_sph;
@@ -55,10 +53,10 @@ public:
     T Face_Velocity_With_Ghost_Value_Multiphase(const T_ARRAYS_BASE& face_velocities_ghost,const int axis,const TV_INT& face_index,const int current_region,const int face_region) const
     {assert(flame);return face_velocities_ghost(face_index)-Face_Jump_Multiphase(axis,face_index,current_region,face_region);}
 
-    T Face_Velocity_With_Ghost_Value_Multiphase(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const int axis,const TV_INT& face_index,const int current_region) const
+    T Face_Velocity_With_Ghost_Value_Multiphase(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,const int axis,const TV_INT& face_index,const int current_region) const
     {return Face_Velocity_With_Ghost_Value_Multiphase(face_velocities_ghost.Component(axis),axis,face_index,current_region);}
 
-    T Face_Velocity_With_Ghost_Value_Multiphase(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const int axis,const TV_INT& face_index,const int current_region,const int face_region) const
+    T Face_Velocity_With_Ghost_Value_Multiphase(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,const int axis,const TV_INT& face_index,const int current_region,const int face_region) const
     {return Face_Velocity_With_Ghost_Value_Multiphase(face_velocities_ghost.Component(axis),axis,face_index,current_region,face_region);}
 
     T Face_Jump_Multiphase(const int axis,const TV_INT& face_index,const int current_region) const
@@ -68,12 +66,12 @@ public:
     virtual void Initialize_Grid(const GRID<TV>& mac_grid);
     void Initialize_Dsd(const LEVELSET_MULTIPLE<TV>& levelset_multiple,const ARRAY<bool>& is_fuel_region);
     void Initialize_Dsd(const LEVELSET<TV>& levelset,const ARRAY<bool>& fuel_region);
-    virtual void Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    virtual void Make_Divergence_Free(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
     void Compute_Divergence(const T_FACE_LOOKUP_FIRE_MULTIPHASE& face_lookup,LAPLACE_UNIFORM<TV>* solver);
-    void Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt=false);
-    void Set_Up_For_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_density_solve=false,const bool use_one_way_coupling=false);
-    void Restore_After_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_density_solve=false,const bool use_one_way_coupling=false);
-    void Update_Phi_And_Move_Velocity_Discontinuity(T_FACE_ARRAYS_SCALAR& face_velocities,LEVELSET_MULTIPLE<TV>& levelset_multiple,const T time,const bool update_phi_only=false);
+    void Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt=false);
+    void Set_Up_For_SPH(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool use_variable_density_solve=false,const bool use_one_way_coupling=false);
+    void Restore_After_SPH(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool use_variable_density_solve=false,const bool use_one_way_coupling=false);
+    void Update_Phi_And_Move_Velocity_Discontinuity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,LEVELSET_MULTIPLE<TV>& levelset_multiple,const T time,const bool update_phi_only=false);
     template<class FACE_LOOKUP> void Compute_Divergence(const FACE_LOOKUP &face_lookup,LAPLACE_UNIFORM<TV>* solver);
     T Flame_Speed_Face_Multiphase(const int axis,const TV_INT& face_index,const int fuel_region,const int product_region) const;
     void Use_Flame_Speed_Multiplier(const bool use_flame_speed_multiplier_input=true);

@@ -73,8 +73,6 @@ template<class T_input>
 class KANG:public PLS_FSI_EXAMPLE<VECTOR<T_input,2> >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;
-    typedef ARRAY<bool,FACE_INDEX<2> > T_FACE_ARRAYS_BOOL;
 public:
     typedef PLS_FSI_EXAMPLE<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
@@ -146,7 +144,7 @@ public:
     void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE;
     void Initialize_Velocities() PHYSBAM_OVERRIDE;
     void Set_Dirichlet_Boundary_Conditions(const T time);
-    void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_BOOL& psi_N,const T time) PHYSBAM_OVERRIDE;
+    void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE;
     void Initialize_Bodies() PHYSBAM_OVERRIDE;
     void Kang_Circle();
     void Poisson_Test();

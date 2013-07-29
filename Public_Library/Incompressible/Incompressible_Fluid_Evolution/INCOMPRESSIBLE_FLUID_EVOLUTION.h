@@ -20,7 +20,6 @@ template<class TV>
 class INCOMPRESSIBLE_FLUID_EVOLUTION:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     
     GRID<TV> grid;
@@ -50,11 +49,11 @@ public:
     {return Find_Type<T_FORCE>(fluids_forces,index);}
 
 //#####################################################################
-    void Advance_One_Time_Step_Convection(const T dt,const T time,const T_FACE_ARRAYS_SCALAR& advecting_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect,const int number_of_ghost_cells);
-    void Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const int number_of_ghost_cells);
-    void Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    void Advance_One_Time_Step_Convection(const T dt,const T time,const ARRAY<T,FACE_INDEX<TV::m> >& advecting_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_to_advect,const int number_of_ghost_cells);
+    void Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const int number_of_ghost_cells);
+    void Advance_One_Time_Step_Implicit_Part(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
     void Initialize_Grids(const GRID<TV>& grid_input);
-    T CFL(T_FACE_ARRAYS_SCALAR& face_velocities) const;
+    T CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) const;
     int Add_Force(INCOMPRESSIBLE_FLUIDS_FORCES<TV>* force);
 //#####################################################################
 };

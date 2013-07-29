@@ -69,7 +69,7 @@ Display(const int in_color) const
         VECTOR<T,2> max_corner=grid.Node(grid.numbers_of_cells+ghost_cells);
 
         ARRAY<bool,TV_INT> *cell_mask=0;
-        T_FACE_ARRAYS_BOOL *face_mask=0;
+        ARRAY<bool,FACE_INDEX<TV::m> > *face_mask=0;
         ARRAY<bool,TV_INT> *node_mask=0;
         if(draw_mask_type==0) cell_mask=active_cell_mask;
         else if(draw_mask_type==1){cell_mask=ghost_cell_mask;ghost_cells=ghost_cells?4:0;}
@@ -236,13 +236,13 @@ Reinitialize()
 
     filename=STRING_UTILITIES::string_sprintf("%s/%d/active_face_mask",basedir.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(filename)){
-        if(!active_face_mask) active_face_mask=new T_FACE_ARRAYS_BOOL();
+        if(!active_face_mask) active_face_mask=new ARRAY<bool,FACE_INDEX<TV::m> >();
         active_face_mask->Clean_Memory();
         FILE_UTILITIES::Read_From_File<bool>(filename,*active_face_mask);}
 
     filename=STRING_UTILITIES::string_sprintf("%s/%d/ghost_face_mask",basedir.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(filename)){
-        if(!ghost_face_mask) ghost_face_mask=new T_FACE_ARRAYS_BOOL();
+        if(!ghost_face_mask) ghost_face_mask=new ARRAY<bool,FACE_INDEX<TV::m> >();
         ghost_face_mask->Clean_Memory();
         FILE_UTILITIES::Read_From_File<bool>(filename,*ghost_face_mask);}
 

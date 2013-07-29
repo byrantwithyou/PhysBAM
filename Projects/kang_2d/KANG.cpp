@@ -305,7 +305,7 @@ Set_Dirichlet_Boundary_Conditions(const T time)
 // Function Get_Source_Velocities
 //#####################################################################
 template<class T> void KANG<T>::
-Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_BOOL& psi_N,const T time)
+Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time)
 {
 }
 //#####################################################################

@@ -18,14 +18,14 @@ template<class T>
 class LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,2> >
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename GRID<TV>::BLOCK T_BLOCK;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef typename GRID<TV>::BLOCK T_BLOCK;
     typedef TV_INT T_INDEX;
 public:
     VECTOR<T,2> base,center,one_over_DX;
     T u2,u5,slope_u12,slope_u23,slope_u45,slope_u56; // standard y-x major ordering
     T v2,v5,slope_v12,slope_v23,slope_v45,slope_v56; // x-y major ordering for symmetry with u
     
-    LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const T_FACE_ARRAYS_SCALAR& face_velocities);
+    LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
 
     VECTOR<T,2> Interpolate_Face(const VECTOR<T,2>& X) const;
 
@@ -50,7 +50,7 @@ public:
     {return VECTOR<T,2>(Interpolate_Face_X_Transformed(block,face_velocities,DX),Interpolate_Face_Y_Transformed(block,face_velocities,DX));}
 
     // assumes face_velocities are 0 where not valid
-    static VECTOR<T,2> Interpolate_Face_Normalized(const T_BLOCK& block,const T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_BOOL& face_velocities_valid,const VECTOR<T,2>& X,
+    static VECTOR<T,2> Interpolate_Face_Normalized(const T_BLOCK& block,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const ARRAY<bool,FACE_INDEX<TV::m> >& face_velocities_valid,const VECTOR<T,2>& X,
         const VECTOR<T,2>& default_value=TV());
 
     template<class T_FACE_LOOKUP>
@@ -69,7 +69,7 @@ public:
     return VECTOR<VECTOR<T,2>,2>(VECTOR<T,2>(x_extrema.x,y_extrema.x),VECTOR<T,2>(x_extrema.y,y_extrema.y));}
 
 private:
-    static void Block_Transfer(const T_BLOCK& source_block,const T_FACE_ARRAYS_BOOL& source_values,const BLOCK_UNIFORM<TV>& destination_block,
+    static void Block_Transfer(const T_BLOCK& source_block,const ARRAY<bool,FACE_INDEX<TV::m> >& source_values,const BLOCK_UNIFORM<TV>& destination_block,
         ARRAY<T,FACE_INDEX<2> >& destination_values)
     {for(int i=0;i<GRID<TV>::number_of_faces_per_block/TV::m;i++){
         destination_block.Face_X_Reference(destination_values,i)=(T)source_block.Face_X_Value(source_values,i);

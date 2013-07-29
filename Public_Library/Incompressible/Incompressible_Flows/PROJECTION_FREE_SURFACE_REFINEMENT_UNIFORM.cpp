@@ -52,7 +52,7 @@ Initialize_Grid(const GRID<TV>& mac_grid)
 // Function Set_Coarse_Boundary_Conditions
 //#####################################################################
 template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
-Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
+Set_Coarse_Boundary_Conditions(ARRAY<T,FACE_INDEX<TV::m> >& coarse_face_velocities)
 {
     int ghost=max(3,coarse_scale);
     phi_boundary->Fill_Ghost_Cells(fine_grid,levelset.phi,phi_ghost,0,0,ghost);
@@ -74,7 +74,7 @@ Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
                 elliptic_solver->psi_D(cell)=true;p(cell)=0;}}
     Set_Beta_Face_For_Boundary_Conditions(coarse_face_velocities);
     if(false) if(POISSON_COLLIDABLE_UNIFORM<TV>* poisson_collidable=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<TV>*>(poisson)){
-        T_FACE_ARRAYS_SCALAR beta_face_new(coarse_grid);
+        ARRAY<T,FACE_INDEX<TV::m> > beta_face_new(coarse_grid);
         ARRAY<T,TV_INT> phi_ghost(coarse_grid.Domain_Indices(3),false);levelset.boundary->Fill_Ghost_Cells(coarse_grid,coarse_phi,phi_ghost,0,0,ghost);
         poisson_collidable->Find_Constant_beta(beta_face_new,phi_ghost);
         for(FACE_ITERATOR<TV> iterator(coarse_grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> index=iterator.Full_Index();poisson->beta_face(index)*=beta_face_new(index);}}
@@ -110,7 +110,7 @@ Set_Local_Phi_From_Fine_Phi(GRID<TV>& local_mac_grid,ARRAY<T,TV_INT>& local_phi,
 // Function Local_Projection_PCG
 //#####################################################################
 template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
-Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,GRID<TV>& local_grid,T_FACE_ARRAYS_SCALAR& local_face_velocities,FAST_PROJECTION_DYNAMICS_UNIFORM<TV>& local_projection,const T dt,const T time,TV_INT cell_index)
+Local_Projection_PCG(ARRAY<T,FACE_INDEX<TV::m> >& fine_face_velocities,GRID<TV>& local_grid,ARRAY<T,FACE_INDEX<TV::m> >& local_face_velocities,FAST_PROJECTION_DYNAMICS_UNIFORM<TV>& local_projection,const T dt,const T time,TV_INT cell_index)
 {
     if(surface_solve && Contains_Outside(cell_index,phi_ghost,buffer)) return;
     if(!surface_solve && !Contains_Inside(cell_index,phi_ghost,buffer)) return;
@@ -205,7 +205,7 @@ Set_Levelset_Boundary_Conditions(const GRID<TV>& levelset_grid,ARRAY<T,FACE_INDE
 // Function Map_Fine_To_Coarse
 //#####################################################################
 template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
-Map_Fine_To_Levelset_For_Constraints(T_FACE_ARRAYS_SCALAR& face_velocities)
+Map_Fine_To_Levelset_For_Constraints(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     for(FACE_ITERATOR<TV> iterator(fine_grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face=iterator.Full_Index();
         if(fine_psi_N(face)) face_velocities(face)=face_velocities_save(face);}
@@ -214,7 +214,7 @@ Map_Fine_To_Levelset_For_Constraints(T_FACE_ARRAYS_SCALAR& face_velocities)
 // Function Map_Fine_To_Coarse
 //#####################################################################
 template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
-Map_Fine_To_Coarse(T_FACE_ARRAYS_SCALAR& coarse_face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities)
+Map_Fine_To_Coarse(ARRAY<T,FACE_INDEX<TV::m> >& coarse_face_velocities,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     phi_boundary->Fill_Ghost_Cells(fine_grid,levelset.phi,phi_ghost,0,0,3);    
     Set_Coarse_Phi_From_Fine_Phi(coarse_phi,phi_ghost);
@@ -225,7 +225,7 @@ Map_Fine_To_Coarse(T_FACE_ARRAYS_SCALAR& coarse_face_velocities,const T_FACE_ARR
 // Function Map_Coarse_To_Fine
 //#####################################################################
 template<class TV> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>::
-Map_Coarse_To_Fine(const T_FACE_ARRAYS_SCALAR& coarse_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Map_Coarse_To_Fine(const ARRAY<T,FACE_INDEX<TV::m> >& coarse_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     int ghost=max(buffer+coarse_scale,3);
     phi_boundary->Fill_Ghost_Cells(fine_grid,levelset.phi,phi_ghost,dt,time,ghost);    

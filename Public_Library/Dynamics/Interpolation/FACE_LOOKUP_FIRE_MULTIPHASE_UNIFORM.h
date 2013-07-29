@@ -17,21 +17,20 @@ class FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;typedef PROJECTION_DYNAMICS_UNIFORM<TV> T_PROJECTION;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
 public:
     typedef T ELEMENT;
         
-    const T_FACE_ARRAYS& V_face;
+    const ARRAY<T,FACE_INDEX<TV::m> >& V_face;
 protected:
     const T_PROJECTION& projection;
     const LEVELSET_MULTIPLE<TV>* levelset_multiple;
 public:
 
-    FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM(const T_FACE_ARRAYS& V_face_input,const T_PROJECTION& projection_input,const LEVELSET_MULTIPLE<TV>* levelset_multiple_input=0)
+    FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM(const ARRAY<T,FACE_INDEX<TV::m> >& V_face_input,const T_PROJECTION& projection_input,const LEVELSET_MULTIPLE<TV>* levelset_multiple_input=0)
         :V_face(V_face_input),projection(projection_input),levelset_multiple(levelset_multiple_input)
     {}
 
-    const T_FACE_ARRAYS& Raw_Data() const
+    const ARRAY<T,FACE_INDEX<TV::m> >& Raw_Data() const
     {return V_face;}
 
     class LOOKUP
@@ -41,7 +40,7 @@ public:
         const int reference_region;
     public:
         typedef T ELEMENT;
-        const T_FACE_ARRAYS& V_face;
+        const ARRAY<T,FACE_INDEX<TV::m> >& V_face;
 
         LOOKUP(const FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV>& face_lookup_input,const int reference_region_input)
             :face_lookup(face_lookup_input),reference_region(reference_region_input),V_face(face_lookup.V_face)

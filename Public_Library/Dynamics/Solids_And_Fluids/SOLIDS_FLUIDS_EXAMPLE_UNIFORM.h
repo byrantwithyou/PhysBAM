@@ -27,8 +27,7 @@ class SOLIDS_FLUIDS_EXAMPLE_UNIFORM:public SOLIDS_FLUIDS_EXAMPLE<TV>,public LEVE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<int,TV::m> T_VECTOR_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<char>::TYPE T_ARRAYS_CHAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef typename ARRAY<T,TV_INT>::template REBIND<char>::TYPE T_ARRAYS_CHAR;
     typedef typename MATRIX_POLICY<TV>::TRANSFORMATION_MATRIX T_TRANSFORMATION_MATRIX;
     typedef typename TV::SPIN T_ANGULAR_VELOCITY;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;
@@ -50,13 +49,13 @@ public:
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<TV>::TYPE type);
     virtual ~SOLIDS_FLUIDS_EXAMPLE_UNIFORM();
 
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,T_FACE_ARRAYS_SCALAR& V_levelset,const T time) const PHYSBAM_OVERRIDE
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
     {if(fluids_parameters.analytic_test) Get_Analytic_Velocities(time);V_levelset=fluid_collection.incompressible_fluid_collection.face_velocities;}
 
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) PHYSBAM_OVERRIDE
     {fluids_parameters.Adjust_Particle_For_Domain_Boundaries(particles,index,V,particle_type,dt,time);}
 
-    void Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time) PHYSBAM_OVERRIDE
+    void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time) PHYSBAM_OVERRIDE
     {if(fluids_parameters.fire||fluids_parameters.smoke) fluids_parameters.Get_Body_Force(force,dt,time);else PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
 
     virtual void Update_Fluid_Parameters(const T dt,const T time)
@@ -79,7 +78,7 @@ public:
     virtual void Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
     void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE;
     template<class GEOMETRY> void Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity);
-    template<class GEOMETRY> void Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity,const T_FACE_ARRAYS_BOOL& invalid_mask);
+    template<class GEOMETRY> void Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity,const ARRAY<bool,FACE_INDEX<TV::m> >& invalid_mask);
     template<class GEOMETRY> void Adjust_Phi_With_Source(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source);
     template<class GEOMETRY> void Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORMATION_MATRIX& world_to_source);
     template<class GEOMETRY> void Get_Source_Reseed_Mask(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,ARRAY<bool,TV_INT>*& cell_centered_mask,const bool reset_mask);
@@ -87,10 +86,10 @@ public:
         const T source_temperature);
     void Revalidate_Fluid_Scalars();
     void Revalidate_Phi_After_Modify_Levelset();
-    void Revalidate_Fluid_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities);
+    void Revalidate_Fluid_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
     void Post_Velocity_Advection_Callback(const T dt,const T time){}
-    void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,T_FACE_ARRAYS_SCALAR& V_levelset,const T time) const PHYSBAM_OVERRIDE;
+    void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE;
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const PHYSBAM_OVERRIDE;
     void Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum_fluid_velocity,const bool include_removed_particle_velocities);
     void Read_Output_Files_Fluids(const int frame) PHYSBAM_OVERRIDE;
     virtual void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE;

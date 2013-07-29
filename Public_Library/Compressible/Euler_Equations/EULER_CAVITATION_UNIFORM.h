@@ -17,8 +17,7 @@ template<class TV>
 class EULER_CAVITATION_UNIFORM
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
+    typedef typename ARRAY<T,FACE_INDEX<TV::m> >::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
     typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef CELL_ITERATOR<VECTOR<T,TV::m-1> > CELL_ITERATOR_LOWER_DIM;
     typedef CELL_ITERATOR<VECTOR<T,1> > CELL_ITERATOR_1D;
@@ -37,15 +36,15 @@ public:
     EULER_CAVITATION_UNIFORM(EULER_UNIFORM<TV>& euler_input, const bool clamp_density_input, const T epsilon_input);
     ~EULER_CAVITATION_UNIFORM();
 
-    void Apply_Cavitation_Correction(const T dt,const T time, T_FACE_ARRAYS_SCALAR& face_velocities);
+    void Apply_Cavitation_Correction(const T dt,const T time, ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
     bool Is_Density_Clamped();
 
 private:
-    void Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,T_FACE_ARRAYS_SCALAR& p_face,const ARRAY<T,TV_INT>& p_cell);
+    void Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,ARRAY<T,FACE_INDEX<TV::m> >& p_face,const ARRAY<T,TV_INT>& p_cell);
     void Compute_Pressure(const T dt,const T time);
     void Compute_Clamped_Momentum_Divergence(const T dt);
     void Compute_Clamped_Internal_Energy_Divergence(const T dt);
-    void Apply_Pressure(const T dt,const T time, T_FACE_ARRAYS_SCALAR& face_velocities);
+    void Apply_Pressure(const T dt,const T time, ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
     void Apply_Pressure_To_Density(const T dt);
     void Apply_Pressure_To_Internal_Energy(const T dt);
     void Initialize_Grid();

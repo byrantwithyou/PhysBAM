@@ -96,7 +96,7 @@ public:
     template<class T_MPI_GRID,class T_FACE_ARRAYS> void Average_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const;
     template<class T_MPI_GRID,class T_FACE_ARRAYS> void Copy_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const;
     template<class T_MPI_GRID,class T_FACE_ARRAYS> void Assert_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data,const T tolerance=0) const;
-    template<class T_MPI_GRID,class T_FACE_ARRAYS_BOOL> void Union_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS_BOOL& data) const;
+    template<class T_MPI_GRID,class T_FACE_SCALAR> void Union_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_SCALAR& data) const;
     void Find_Boundary_Regions(ARRAY<RANGE<TV_INT> >& regions,const RANGE<TV_INT>& sentinels,const bool skip_common_boundary,const RANGE<VECTOR<int,1> >& band,const bool include_corners,
         const bool include_ghost_regions=true) const;
     void Find_Boundary_Regions(ARRAY<RANGE<VECTOR<int,1> > >& regions,const RANGE<VECTOR<int,1> >& sentinels,const bool skip_common_boundary,const RANGE<VECTOR<int,1> >& band,const bool include_corners,

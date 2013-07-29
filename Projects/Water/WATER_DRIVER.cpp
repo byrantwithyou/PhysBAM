@@ -181,7 +181,7 @@ Initialize()
 template<class TV> void WATER_DRIVER<TV>::
 Run(RANGE<TV_INT>& domain,const T dt,const T time)
 {
-    T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(example.incompressible.grid,3,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;face_velocities_ghost.Resize(example.incompressible.grid,3,false);
     example.incompressible.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
     LINEAR_INTERPOLATION_UNIFORM<TV,TV> interpolation;
     PARTICLE_LEVELSET_UNIFORM<TV>& pls=example.particle_levelset_evolution.Particle_Levelset(0);
@@ -226,7 +226,7 @@ Advance_To_Target_Time(const T target_time)
         example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_fluid_speed+2*max_particle_collision_distance+(T).5*example.mac_grid.dX.Max(),10);
 
         LOG::Time("Adjust Phi With Objects");
-        T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(example.incompressible.grid,example.number_of_ghost_cells,false);
+        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;face_velocities_ghost.Resize(example.incompressible.grid,example.number_of_ghost_cells,false);
         example.incompressible.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
 
         example.Adjust_Phi_With_Objects(time);

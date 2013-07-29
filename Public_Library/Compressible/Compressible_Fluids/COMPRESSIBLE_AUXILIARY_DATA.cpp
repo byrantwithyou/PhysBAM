@@ -19,7 +19,6 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
     typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
 
@@ -49,7 +48,7 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
             velocity_plus_c(cell)=velocity(cell)+speedofsound(cell)*TV::All_Ones_Vector();
             velocity_minus_c(cell)=velocity(cell)-speedofsound(cell)*TV::All_Ones_Vector();}}
 
-    T_FACE_ARRAYS_SCALAR density_flux(grid),momentum_flux(grid),energy_flux(grid);
+    ARRAY<T,FACE_INDEX<TV::m> > density_flux(grid),momentum_flux(grid),energy_flux(grid);
     if(fluxes){
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT face_index=iterator.Face_Index();
@@ -89,10 +88,9 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
+    typedef typename ARRAY<T,FACE_INDEX<TV::m> >::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
 
     const GRID<TV>& grid=compressible_fluid_collection.grid;
     const T_ARRAYS_DIMENSION_SCALAR& U=compressible_fluid_collection.U;

@@ -10,7 +10,7 @@
 #include <Tools/Vectors/VECTOR_2D.h>
 using namespace PhysBAM;
 template<class T> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,2> >::
-LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const T_FACE_ARRAYS_SCALAR& face_velocities)
+LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
     :base(block.Minimum_Corner()),center(block.Center()),one_over_DX(block.One_Over_DX())
 {
     FACE_LOOKUP_UNIFORM<TV> face_velocities_lookup(face_velocities);
@@ -38,7 +38,7 @@ Interpolate_Face(const VECTOR<T,2>& X) const
 }
 // assumes face_velocities are 0 where not valid
 template<class T> VECTOR<T,2> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,2> >::
-Interpolate_Face_Normalized(const T_BLOCK& block,const T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_BOOL& face_velocities_valid,const VECTOR<T,2>& X,const VECTOR<T,2>& default_value)
+Interpolate_Face_Normalized(const T_BLOCK& block,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const ARRAY<bool,FACE_INDEX<TV::m> >& face_velocities_valid,const VECTOR<T,2>& X,const VECTOR<T,2>& default_value)
 {
     static const GRID<TV> valid_values_grid=GRID<TV>(TV_INT()+2,RANGE<TV>::Unit_Box()).Get_MAC_Grid_At_Regular_Positions();
     static const BLOCK_UNIFORM<TV> valid_values_block(valid_values_grid,VECTOR<int,2>(2,2));

@@ -22,8 +22,6 @@ class COMPRESSIBLE_EXAMPLE:public EXAMPLE<TV_input>
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef EXAMPLE<TV> BASE;
     enum workaround1{d=TV::m};
 
@@ -39,7 +37,7 @@ public:
     EULER_UNIFORM<TV> euler;
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV> euler_solid_fluid_coupling_utilities;
     COMPRESSIBLE_FLUID_COLLECTION<TV> compressible_fluid_collection;
-    T_FACE_ARRAYS_SCALAR face_velocities;
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities;
 
     CONSERVATION<TV,TV::m+2>* conservation_method;
     BOUNDARY_REFLECTION_UNIFORM<TV,VECTOR<T,TV::m+2> >* boundary;

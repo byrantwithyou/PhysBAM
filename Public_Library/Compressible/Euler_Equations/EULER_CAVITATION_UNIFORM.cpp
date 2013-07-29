@@ -174,7 +174,7 @@ Compute_Pressure(const T dt,const T time)
 template<class TV> void EULER_CAVITATION_UNIFORM<TV>::
 Apply_Pressure_To_Density(const T dt)
 {
-    T_FACE_ARRAYS_SCALAR grad_p_cavitation_face(euler.grid);
+    ARRAY<T,FACE_INDEX<TV::m> > grad_p_cavitation_face(euler.grid);
     ARRAYS_UTILITIES<TV,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler.grid,grad_p_cavitation_face,p_cavitation);
 
     ARRAY<T,TV_INT> laplacian_p_cavitation_cell(euler.grid.Domain_Indices(0));
@@ -200,7 +200,7 @@ Is_Density_Clamped()
 template<class TV> void EULER_CAVITATION_UNIFORM<TV>::
 Apply_Pressure_To_Internal_Energy(const T dt)
 {
-    T_FACE_ARRAYS_SCALAR grad_p_cavitation_face(euler.grid);
+    ARRAY<T,FACE_INDEX<TV::m> > grad_p_cavitation_face(euler.grid);
     ARRAYS_UTILITIES<TV,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler.grid,grad_p_cavitation_face,p_cavitation);
 
     ARRAY<T,TV_INT> laplacian_p_cavitation_cell(euler.grid.Domain_Indices(0));
@@ -213,7 +213,7 @@ Apply_Pressure_To_Internal_Energy(const T dt)
     euler.Invalidate_Ghost_Cells();
 }
 template<class TV> void EULER_CAVITATION_UNIFORM<TV>::
-Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,T_FACE_ARRAYS_SCALAR& p_face,const ARRAY<T,TV_INT>& p_cell)
+Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,ARRAY<T,FACE_INDEX<TV::m> >& p_face,const ARRAY<T,TV_INT>& p_cell)
 {
     TV_INT first_cell_index,second_cell_index;int axis;
     for(FACE_ITERATOR<TV> iterator(face_grid);iterator.Valid();iterator.Next()){
@@ -224,7 +224,7 @@ Compute_Face_Pressure_From_Cell_Pressures(const GRID<TV>& face_grid,T_FACE_ARRAY
 // Apply_Pressure
 //#####################################################################
 template<class TV> void EULER_CAVITATION_UNIFORM<TV>::
-Apply_Pressure(const T dt,const T time, T_FACE_ARRAYS_SCALAR& face_velocities)
+Apply_Pressure(const T dt,const T time, ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     if(clamp_density) 
     {
@@ -237,11 +237,11 @@ Apply_Pressure(const T dt,const T time, T_FACE_ARRAYS_SCALAR& face_velocities)
 
         euler.Fill_Ghost_Cells(dt,time,1);
 
-        T_FACE_ARRAYS_SCALAR p_face;
+        ARRAY<T,FACE_INDEX<TV::m> > p_face;
         p_face.Resize(euler.grid);
         Compute_Face_Pressure_From_Cell_Pressures(euler.grid,p_face,p_cavitation);
 
-        T_FACE_ARRAYS_SCALAR grad_p_cavitation_face(euler.grid);
+        ARRAY<T,FACE_INDEX<TV::m> > grad_p_cavitation_face(euler.grid);
         ARRAYS_UTILITIES<TV,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler.grid,grad_p_cavitation_face,p_cavitation);
         for(FACE_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face_index=iterator.Full_Index();
             TV_INT first_cell_index=iterator.First_Cell_Index(), second_cell_index=iterator.Second_Cell_Index();
@@ -250,7 +250,7 @@ Apply_Pressure(const T dt,const T time, T_FACE_ARRAYS_SCALAR& face_velocities)
             face_velocities(face_index)=(rho_star_face*face_velocities(face_index) - dt*grad_p_cavitation_face(face_index))/rho_np1_face;}
 
 
-        //T_FACE_ARRAYS_SCALAR face_velocities;
+        //ARRAY<T,FACE_INDEX<TV::m> > face_velocities;
         //face_velocities.Resize(euler.grid);
         //EULER_PROJECTION_UNIFORM<TV>::Compute_Density_Weighted_Face_Velocities(euler.grid,face_velocities,euler.U_ghost,elliptic_solver->psi_N);
 
@@ -263,7 +263,7 @@ Apply_Pressure(const T dt,const T time, T_FACE_ARRAYS_SCALAR& face_velocities)
 // Apply_Pressure
 //#####################################################################
 template<class TV> void EULER_CAVITATION_UNIFORM<TV>::
-Apply_Cavitation_Correction(const T dt,const T time, T_FACE_ARRAYS_SCALAR& face_velocities)
+Apply_Cavitation_Correction(const T dt,const T time, ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     Compute_Pressure(dt,time);
     Apply_Pressure(dt,time,face_velocities);

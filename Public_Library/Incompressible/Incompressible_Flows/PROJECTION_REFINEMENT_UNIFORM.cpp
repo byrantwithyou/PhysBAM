@@ -18,7 +18,7 @@ using namespace PhysBAM;
 template<class TV> PROJECTION_REFINEMENT_UNIFORM<TV>::
 PROJECTION_REFINEMENT_UNIFORM(const GRID<TV>& mac_grid,const int scale,const T alpha_in,const bool flame_input,const bool multiphase,const bool use_variable_beta,const bool use_poisson)
     :PROJECTION_DYNAMICS_UNIFORM<TV>(GRID<TV>(TV_INT(),RANGE<TV>(),true),flame_input,multiphase,use_variable_beta,use_poisson),thread_queue(0),coarse_mpi_grid(0),fine_mpi_grid(0),
-    fast_local_projection(scale),beta_face(use_poisson?poisson->beta_face:*new T_FACE_ARRAYS_SCALAR()),alpha(alpha_in),coarse_scale(scale)
+    fast_local_projection(scale),beta_face(use_poisson?poisson->beta_face:*new ARRAY<T,FACE_INDEX<TV::m> >()),alpha(alpha_in),coarse_scale(scale)
 {
     for(int i=0;i<TV::dimension;i++) for(int j=1;j<2;j++){domain_boundary(i)(j)=true;solid_wall(i)(j)=false;}
     scale_face_inverse=(T)((TV::dimension==2)?(1./scale):(1./(scale*scale)));
@@ -87,7 +87,7 @@ Average_Velocities_From_Fine_To_Coarse(ARRAY<T,FACE_INDEX<TV::dimension> >& coar
 // Function Set_Beta_Face_For_Boundary_Conditions
 //#####################################################################
 template<class TV> void PROJECTION_REFINEMENT_UNIFORM<TV>::
-Set_Beta_Face_For_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
+Set_Beta_Face_For_Boundary_Conditions(ARRAY<T,FACE_INDEX<TV::m> >& coarse_face_velocities)
 { 
     for(FACE_ITERATOR<TV> iterator(coarse_grid);iterator.Valid();iterator.Next()) beta_face.Component(iterator.Axis())(iterator.Face_Index())=0;
     FACE_INDEX<TV::dimension> fine_index;
@@ -109,7 +109,7 @@ Set_Beta_Face_For_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velociti
 // Function Set_Coarse_Boundary_Conditions
 //#####################################################################
 template<class TV> void PROJECTION_REFINEMENT_UNIFORM<TV>::
-Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
+Set_Coarse_Boundary_Conditions(ARRAY<T,FACE_INDEX<TV::m> >& coarse_face_velocities)
 {
     for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(domain_boundary(axis)(axis_side)){ //Need to check mpi as smaller solves are never using mpi (for now)
@@ -127,7 +127,7 @@ Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
 // Function Map_Fine_To_Coarse
 //#####################################################################
 template<class TV> void PROJECTION_REFINEMENT_UNIFORM<TV>::
-Map_Fine_To_Coarse(T_FACE_ARRAYS_SCALAR& coarse_face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities)
+Map_Fine_To_Coarse(ARRAY<T,FACE_INDEX<TV::m> >& coarse_face_velocities,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     fine_psi_N=elliptic_solver->psi_N;
     BASE::Initialize_Grid(coarse_grid);
@@ -147,7 +147,7 @@ Map_Fine_To_Coarse(T_FACE_ARRAYS_SCALAR& coarse_face_velocities,const T_FACE_ARR
 // Function Map_Coarse_To_Fine
 //#####################################################################
 template<class TV> void PROJECTION_REFINEMENT_UNIFORM<TV>::
-Map_Coarse_To_Fine(const T_FACE_ARRAYS_SCALAR& coarse_face_velocities,T_FACE_ARRAYS_SCALAR& fine_face_velocities)
+Map_Coarse_To_Fine(const ARRAY<T,FACE_INDEX<TV::m> >& coarse_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& fine_face_velocities)
 {
     for(CELL_ITERATOR<TV> iterator(coarse_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         ARRAY<T,FACE_INDEX<TV::dimension> > sum(RANGE<TV_INT>(TV_INT::All_Ones_Vector(),TV_INT::All_Ones_Vector()));sum.Fill(0);
@@ -179,7 +179,7 @@ Map_Coarse_To_Fine(const T_FACE_ARRAYS_SCALAR& coarse_face_velocities,T_FACE_ARR
 // Function Map_Fine_To_Local_Boundary_For_Cell
 //#####################################################################
 template<class TV> void PROJECTION_REFINEMENT_UNIFORM<TV>::
-Map_Fine_To_Local_Boundary_For_Cell(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& local_face_velocities,T_FACE_ARRAYS_SCALAR& fine_face_velocities,TV_INT coarse_cell_index)
+Map_Fine_To_Local_Boundary_For_Cell(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& local_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& fine_face_velocities,TV_INT coarse_cell_index)
 {
     for(FACE_ITERATOR<TV> local_iterator(local_mac_grid,0,GRID<TV>::BOUNDARY_REGION);local_iterator.Valid();local_iterator.Next()){
         FACE_INDEX<TV::dimension> fine_index=FACE_INDEX<TV::dimension>(local_iterator.Axis(),coarse_cell_index*coarse_scale+local_iterator.Face_Index()-coarse_scale*TV_INT::All_Ones_Vector());
@@ -189,7 +189,7 @@ Map_Fine_To_Local_Boundary_For_Cell(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<
 // Function Map_Fine_To_Local_Interior_For_Cell
 //#####################################################################
 template<class TV> void PROJECTION_REFINEMENT_UNIFORM<TV>::
-Map_Fine_To_Local_Interior_For_Cell(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& local_face_velocities,T_FACE_ARRAYS_SCALAR& fine_face_velocities,TV_INT coarse_cell_index,bool zero_out)
+Map_Fine_To_Local_Interior_For_Cell(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& local_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& fine_face_velocities,TV_INT coarse_cell_index,bool zero_out)
 {
     for(FACE_ITERATOR<TV> local_iterator(local_mac_grid,0,GRID<TV>::INTERIOR_REGION);local_iterator.Valid();local_iterator.Next()){
         FACE_INDEX<TV::dimension> fine_index=FACE_INDEX<TV::dimension>(local_iterator.Axis(),coarse_cell_index*coarse_scale+local_iterator.Face_Index()-coarse_scale*TV_INT::All_Ones_Vector());
@@ -212,7 +212,7 @@ Map_Fine_To_Local_Boundaries_For_Cell(GRID<TV>& local_mac_grid,ARRAY<bool,FACE_I
 // Function Map_Fine_To_Local_Interior_For_Cell
 //#####################################################################
 template<class TV> void PROJECTION_REFINEMENT_UNIFORM<TV>::
-Map_Local_To_Fine_Interior_For_Cell(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& local_face_velocities,T_FACE_ARRAYS_SCALAR& fine_face_velocities,TV_INT cell_index)
+Map_Local_To_Fine_Interior_For_Cell(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& local_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& fine_face_velocities,TV_INT cell_index)
 {
     for(FACE_ITERATOR<TV> local_iterator(local_mac_grid,0,GRID<TV>::INTERIOR_REGION);local_iterator.Valid();local_iterator.Next()){
         fine_face_velocities(FACE_INDEX<TV::dimension>(local_iterator.Axis(),cell_index*coarse_scale+local_iterator.Face_Index()-coarse_scale*TV_INT::All_Ones_Vector()))=local_face_velocities(local_iterator.Full_Index());}
@@ -221,7 +221,7 @@ Map_Local_To_Fine_Interior_For_Cell(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<
 // Function Local_Projection_PCG
 //#####################################################################
 template<class TV> void PROJECTION_REFINEMENT_UNIFORM<TV>::
-Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,GRID<TV>& local_grid,T_FACE_ARRAYS_SCALAR& local_face_velocities,FAST_PROJECTION_DYNAMICS_UNIFORM<TV>& local_projection,const T dt,const T time,TV_INT cell_index)
+Local_Projection_PCG(ARRAY<T,FACE_INDEX<TV::m> >& fine_face_velocities,GRID<TV>& local_grid,ARRAY<T,FACE_INDEX<TV::m> >& local_face_velocities,FAST_PROJECTION_DYNAMICS_UNIFORM<TV>& local_projection,const T dt,const T time,TV_INT cell_index)
 { 
     Map_Fine_To_Local_Boundary_For_Cell(local_grid,local_face_velocities,fine_face_velocities,cell_index);
     Map_Fine_To_Local_Interior_For_Cell(local_grid,local_face_velocities,fine_face_velocities,cell_index,false);
@@ -239,7 +239,7 @@ Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,GRID<TV>& local_
 // Function Threaded_Local_Projection_PCG
 //#####################################################################
 template<class TV> void PROJECTION_REFINEMENT_UNIFORM<TV>::
-Threaded_Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,const T dt,const T time)
+Threaded_Local_Projection_PCG(ARRAY<T,FACE_INDEX<TV::m> >& fine_face_velocities,const T dt,const T time)
 {
     for(CELL_ITERATOR<TV> iterator(coarse_grid);iterator.Valid();iterator.Next()){
         REFINEMENT_TASK<TV> *refinement_task=new REFINEMENT_TASK<TV>();
@@ -251,7 +251,7 @@ Threaded_Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,const T
 // Function Local_Projection_PCG
 //#####################################################################
 template<class TV> void PROJECTION_REFINEMENT_UNIFORM<TV>::
-Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,const T dt,const T time)
+Local_Projection_PCG(ARRAY<T,FACE_INDEX<TV::m> >& fine_face_velocities,const T dt,const T time)
 {
     for(CELL_ITERATOR<TV> iterator(coarse_grid);iterator.Valid();iterator.Next()) Local_Projection_PCG(fine_face_velocities,local_grid,local_face_velocities,fast_local_projection,dt,time,iterator.Cell_Index());
 }
@@ -259,7 +259,7 @@ Local_Projection_PCG(T_FACE_ARRAYS_SCALAR& fine_face_velocities,const T dt,const
 // Function Map_Coarse_To_Fine
 //#####################################################################
 template<class TV> void PROJECTION_REFINEMENT_UNIFORM<TV>::
-Map_Coarse_To_Fine(const T_FACE_ARRAYS_SCALAR& coarse_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Map_Coarse_To_Fine(const ARRAY<T,FACE_INDEX<TV::m> >& coarse_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     Map_Coarse_To_Fine(coarse_face_velocities,face_velocities);
     if(thread_queue) Threaded_Local_Projection_PCG(face_velocities,dt,time);
@@ -271,7 +271,7 @@ Map_Coarse_To_Fine(const T_FACE_ARRAYS_SCALAR& coarse_face_velocities,T_FACE_ARR
 // Function Make_Divergence_Free
 //#####################################################################
 template<class TV> void PROJECTION_REFINEMENT_UNIFORM<TV>::
-Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Make_Divergence_Free(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     Map_Fine_To_Coarse(coarse_face_velocities,face_velocities);
     BASE::Make_Divergence_Free(coarse_face_velocities,dt,time);

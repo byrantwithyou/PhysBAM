@@ -30,7 +30,6 @@ class LAPLACE_UNIFORM:public LAPLACE<typename TV::SCALAR>
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
     typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
 public:
     typedef TV VECTOR_T;
@@ -45,14 +44,14 @@ public:
     PCG_SPARSE_THREADED<TV>* pcg_threaded;
     T_ARRAYS_INT filled_region_colors;
     ARRAY<bool> filled_region_touches_dirichlet;
-    T_FACE_ARRAYS_BOOL psi_N;
-    T_FACE_ARRAYS_SCALAR psi_R;
+    ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
+    ARRAY<T,FACE_INDEX<TV::m> > psi_R;
     ARRAY<bool,TV_INT> psi_D;
     TV_BOOL periodic_boundary;
     LAPLACE_UNIFORM_MPI<TV>* laplace_mpi;
     MPI_UNIFORM_GRID<TV>* mpi_grid;
     ARRAY<bool,TV_INT>* psi_D_save_for_sph;
-    T_FACE_ARRAYS_BOOL* psi_N_save_for_sph;
+    ARRAY<bool,FACE_INDEX<TV::m> >* psi_N_save_for_sph;
     bool enforce_compatibility;
     bool solve_single_cell_neumann_regions;
     bool use_psi_R;

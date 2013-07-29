@@ -88,7 +88,7 @@ Compute_Grid_Visibility()
 // Function Compute_Psi_N
 //#####################################################################
 template<class TV> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
-Compute_Psi_N(T_FACE_ARRAYS_BOOL& psi_N,T_FACE_ARRAYS_SCALAR* face_velocities) const
+Compute_Psi_N(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,FACE_INDEX<TV::m> >* face_velocities) const
 {
     if(!collision_geometry_collection.bodies.m) return;
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -109,7 +109,7 @@ Compute_Psi_N(T_FACE_ARRAYS_BOOL& psi_N,T_FACE_ARRAYS_SCALAR* face_velocities) c
 // Function Compute_Psi_N
 //#####################################################################
 template<class TV> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
-Compute_Psi_N_Zero_Velocity(T_FACE_ARRAYS_BOOL& psi_N,T_FACE_ARRAYS_SCALAR* face_velocities) const
+Compute_Psi_N_Zero_Velocity(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,FACE_INDEX<TV::m> >* face_velocities) const
 {
     if(!collision_geometry_collection.bodies.m) return;
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){

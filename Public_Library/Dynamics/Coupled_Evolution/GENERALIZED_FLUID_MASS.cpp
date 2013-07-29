@@ -14,7 +14,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> GENERALIZED_FLUID_MASS<TV>::
-GENERALIZED_FLUID_MASS(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,const T_FACE_ARRAYS_SCALAR& beta_input,const ARRAY<T>& constrained_beta_input)
+GENERALIZED_FLUID_MASS(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,const ARRAY<T,FACE_INDEX<TV::m> >& beta_input,const ARRAY<T>& constrained_beta_input)
     :index_map(index_map_input),beta(beta_input),constrained_beta(constrained_beta_input)
 {
 }

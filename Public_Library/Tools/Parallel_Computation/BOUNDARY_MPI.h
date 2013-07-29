@@ -20,7 +20,7 @@ template<class TV,class T2=typename TV::SCALAR>
 class BOUNDARY_MPI:public BOUNDARY<TV,T2>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
+    typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
     typedef ARRAY<T2,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T2;
 public:

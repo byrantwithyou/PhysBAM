@@ -15,7 +15,6 @@ class INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS
 {
     typedef typename TV::SCALAR T;typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 
 public:
     INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS()
@@ -25,8 +24,8 @@ public:
 
 //#####################################################################
     virtual void Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const GRID<TV>& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U,
-        const ARRAY<bool,TV_INT>& euler_psi,const ARRAY<T,TV_INT>& p_cell,T_FACE_ARRAYS_SCALAR& p_face) const=0;
-    virtual void Fill_Incompressible_Beta_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& beta_face) const=0;
+        const ARRAY<bool,TV_INT>& euler_psi,const ARRAY<T,TV_INT>& p_cell,ARRAY<T,FACE_INDEX<TV::m> >& p_face) const=0;
+    virtual void Fill_Incompressible_Beta_Face(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& beta_face) const=0;
 //#####################################################################
 };  
 }   

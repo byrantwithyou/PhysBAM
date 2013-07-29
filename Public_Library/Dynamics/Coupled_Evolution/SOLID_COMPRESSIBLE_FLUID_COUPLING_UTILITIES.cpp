@@ -184,7 +184,7 @@ Compute_Phi_Solids(const int number_of_ghost_cells)
     ARRAY<TV_INT> seed_indices;
     phi_all_solids_negated.Fill(-FLT_MAX);
     outside_fluid.Fill(false);
-    T_FACE_ARRAYS_BOOL kinematic_faces(euler.grid.Domain_Indices(1));kinematic_faces.Fill(false);
+    ARRAY<bool,FACE_INDEX<TV::m> > kinematic_faces(euler.grid.Domain_Indices(1));kinematic_faces.Fill(false);
 
     for(COLLISION_GEOMETRY_ID id(0);id<collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
         if(collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(id)){
@@ -225,7 +225,7 @@ Fill_Solid_Cells(bool fill_pressure_only)
 // Function Project_Fluid_Pressure_At_Neumann_Faces
 //#####################################################################
 template<class TV> void SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>::
-Project_Fluid_Pressure_At_Neumann_Faces(const ARRAY<T,TV_INT>& p_ghost,T_FACE_ARRAYS_SCALAR& p_face) const
+Project_Fluid_Pressure_At_Neumann_Faces(const ARRAY<T,TV_INT>& p_ghost,ARRAY<T,FACE_INDEX<TV::m> >& p_face) const
 {
     // Bp
     const RANGE<TV>& domain=euler.grid.domain;

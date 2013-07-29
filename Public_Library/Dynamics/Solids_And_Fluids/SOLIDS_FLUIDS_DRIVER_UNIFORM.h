@@ -18,7 +18,6 @@ template<class TV>
 class SOLIDS_FLUIDS_DRIVER_UNIFORM:public SOLIDS_FLUIDS_DRIVER<TV>
 {
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
 
     typedef SOLIDS_FLUIDS_DRIVER<TV> BASE;
@@ -56,7 +55,7 @@ public:
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE;
     T Compute_Dt(const T time,const T target_time,bool& done);
     void Write_Output_Files(const int frame) PHYSBAM_OVERRIDE;
-    void Integrate_Fluid_Non_Advection_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const int substep);
+    void Integrate_Fluid_Non_Advection_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const int substep);
     void Setup_Solids(const T time,const int substep);
     void Setup_Fluids(const T time);
     void Solid_Position_Update(const T dt,const int substep);

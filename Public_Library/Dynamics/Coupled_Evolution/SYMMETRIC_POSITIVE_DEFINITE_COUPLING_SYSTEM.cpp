@@ -96,7 +96,7 @@ Get_Pressure(const VECTOR_T& V,ARRAY<T,TV_INT>& fluid_pressures) const
 // Function Zero_Coupling_Faces_Values
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Zero_Coupling_Faces_Values(T_FACE_ARRAYS_SCALAR& face_array) const
+Zero_Coupling_Faces_Values(ARRAY<T,FACE_INDEX<TV::m> >& face_array) const
 {
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info);iterator.Valid();iterator.Next())
         face_array(iterator.Full_Index())=0;
@@ -201,8 +201,8 @@ Interpolate_Solid_Velocity_To_Coupled_Faces(const GENERALIZED_VELOCITY<TV>& soli
 // Function Apply_One_Sided_Interpolation_At_Coupling_Faces
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Apply_One_Sided_Interpolation_At_Coupling_Faces(const T_FACE_ARRAYS_BOOL& psi_N_domain_boundary,
-    const bool use_one_sided_face_velocty_interpolation,T_FACE_ARRAYS_SCALAR& fluids_velocity)
+Apply_One_Sided_Interpolation_At_Coupling_Faces(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N_domain_boundary,
+    const bool use_one_sided_face_velocty_interpolation,ARRAY<T,FACE_INDEX<TV::m> >& fluids_velocity)
 {
     beta_face.Resize(index_map.grid);
     constrained_beta_face.Resize(index_map.indexed_constraints.m);
@@ -225,9 +225,9 @@ Apply_One_Sided_Interpolation_At_Coupling_Faces(const T_FACE_ARRAYS_BOOL& psi_N_
 // Function Compute
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Compute(int ghost_cells,const T dt_input,const T current_velocity_time,const T_FACE_ARRAYS_BOOL& psi_N_domain_boundary,
+Compute(int ghost_cells,const T dt_input,const T current_velocity_time,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N_domain_boundary,
     const bool disable_thinshell,const bool use_one_sided_face_velocty_interpolation,
-    T_FACE_ARRAYS_SCALAR& fluids_velocity,T mu,bool use_second_order_cut_cell,const LEVELSET<TV>* levelset_input)
+    ARRAY<T,FACE_INDEX<TV::m> >& fluids_velocity,T mu,bool use_second_order_cut_cell,const LEVELSET<TV>* levelset_input)
 {
     solve_id++;
     if(!solid_interpolation) solid_interpolation=new MATRIX_SOLID_INTERPOLATION<TV>(index_map.iterator_info);
@@ -743,7 +743,7 @@ Test_Incompressibility(const ARRAY<T,FACE_INDEX<TV::dimension> >& fluid_velocity
 // Function Set_Coupling_Faces
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Set_Coupling_Faces(const int ghost_cells,T_FACE_ARRAYS_BOOL& psi_N) const
+Set_Coupling_Faces(const int ghost_cells,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N) const
 {
     typename GRID<TV>::REGION region_type=ghost_cells?GRID<TV>::INTERIOR_REGION:GRID<TV>::WHOLE_REGION;
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info,ghost_cells,region_type);iterator.Valid();iterator.Next())
@@ -753,9 +753,9 @@ Set_Coupling_Faces(const int ghost_cells,T_FACE_ARRAYS_BOOL& psi_N) const
 // Function Show_Constraints
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Show_Constraints(T_FACE_ARRAYS_BOOL& psi_N) const
+Show_Constraints(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N) const
 {
-    T_FACE_ARRAYS_BOOL store_psi_N=psi_N;
+    ARRAY<bool,FACE_INDEX<TV::m> > store_psi_N=psi_N;
     psi_N.Fill(false);
     int ghost_cells=0;
     typename GRID<TV>::REGION region_type=ghost_cells?GRID<TV>::INTERIOR_REGION:GRID<TV>::WHOLE_REGION;

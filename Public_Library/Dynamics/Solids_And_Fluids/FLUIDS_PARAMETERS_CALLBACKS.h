@@ -25,8 +25,6 @@ class FLUIDS_PARAMETERS_CALLBACKS:public BOUNDARY_CONDITIONS_CALLBACKS<TV>
 {    
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;
 public:
 
     FLUIDS_PARAMETERS_CALLBACKS()
@@ -36,19 +34,19 @@ public:
 
 //#####################################################################
     virtual void Initialize_Phi();
-    virtual void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_BOOL& psi_N,const T time);
-    virtual void Get_Reflection_Conditions(T_FACE_ARRAYS_SCALAR& psi_R,const T time);
-    virtual void Get_Source_Velocities_Masked(const T time,const T_FACE_ARRAYS_BOOL& invalid_mask);
+    virtual void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time);
+    virtual void Get_Reflection_Conditions(ARRAY<T,FACE_INDEX<TV::m> >& psi_R,const T time);
+    virtual void Get_Source_Velocities_Masked(const T time,const ARRAY<bool,FACE_INDEX<TV::m> >& invalid_mask);
     virtual void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time);
-    virtual void Get_Object_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    virtual void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    virtual void Get_Object_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
+    virtual void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
     virtual void Get_Analytic_Velocities(const T time) const;
     virtual void Set_Dirichlet_Boundary_Conditions(const T time);
     virtual void Move_Grid_Explicitly(const T time);
     virtual void Adjust_Soot_With_Sources(const T time);
     virtual void Adjust_Density_And_Temperature_With_Sources(const T time);
     virtual void Get_Flame_Speed_Multiplier(const T dt,const T time);
-    virtual void Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time);
+    virtual void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time);
     virtual void Get_Variable_Surface_Tension(ARRAY<T,TV_INT>& surface_tension,const T time);
     virtual void Get_Variable_Viscosity(ARRAY<T,TV_INT>& viscosity,const T time);
     virtual void Get_Variable_Vorticity_Confinement(ARRAY<T,TV_INT>& variable_vorticity_confinement,const T time);

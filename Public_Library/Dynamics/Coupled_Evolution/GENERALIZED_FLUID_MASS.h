@@ -19,16 +19,15 @@ class GENERALIZED_FLUID_MASS:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typena
 {
     enum WORKAROUND {d=TV::dimension};
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 
     const COLLISION_AWARE_INDEX_MAP<TV>& index_map;
-    const T_FACE_ARRAYS_SCALAR& beta; // 1/rho
+    const ARRAY<T,FACE_INDEX<TV::m> >& beta; // 1/rho
     const ARRAY<T>& constrained_beta;
 
 public:
     ARRAY<T> one_over_fluid_mass_at_faces;
 
-    GENERALIZED_FLUID_MASS(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,const T_FACE_ARRAYS_SCALAR& beta_input,const ARRAY<T>& constrained_beta_input);
+    GENERALIZED_FLUID_MASS(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,const ARRAY<T,FACE_INDEX<TV::m> >& beta_input,const ARRAY<T>& constrained_beta_input);
     virtual ~GENERALIZED_FLUID_MASS();
 
     void Compute();

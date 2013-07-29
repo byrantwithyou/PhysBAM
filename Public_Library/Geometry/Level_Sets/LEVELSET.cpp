@@ -47,7 +47,7 @@ template<class TV> LEVELSET<TV>::
 // Function CFL
 //#####################################################################
 template<class TV> typename TV::SCALAR LEVELSET<TV>::
-CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
+CFL(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) const
 {
     T dt_convection=0;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();

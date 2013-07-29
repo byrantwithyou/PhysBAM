@@ -27,7 +27,6 @@ template<class T_input>
 class SPHERICAL:public EULER_1D<T_input>
 {
     typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<T,3> TV_DIMENSION;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
     using EULER_1D<T>::boundary;using EULER_1D<T>::conservation;using EULER_1D<T>::eos;using EULER_1D<T>::grid;using EULER_1D<T>::U;
     using EULER_1D<T>::cut_out_grid;using EULER_1D<T>::psi_pointer;using EULER_1D<T>::eigensystem_F;using EULER_1D<T>::Set_Custom_Equation_Of_State;

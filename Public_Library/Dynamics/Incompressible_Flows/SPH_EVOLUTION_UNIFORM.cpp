@@ -96,7 +96,7 @@ Copy_Particle_Attributes_To_Array(T_ARRAYS_PARTICLES& particles) const
 // Function Make_Incompressible
 //#####################################################################
 template<class TV> template<class T_ARRAYS_PARTICLES> void SPH_EVOLUTION_UNIFORM<TV>::
-Make_Incompressible(T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Make_Incompressible(T_ARRAYS_PARTICLES& particles,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     Copy_Particle_Attributes_From_Array(particles);
     Make_Incompressible(face_velocities,dt,time);Copy_Particle_Attributes_To_Array(particles);
@@ -105,7 +105,7 @@ Make_Incompressible(T_ARRAYS_PARTICLES& particles,T_FACE_ARRAYS_SCALAR& face_vel
 // Function Make_Incompressible
 //#####################################################################
 template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
-Make_Incompressible(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Make_Incompressible(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     LOG::SCOPE scope("SPH_INCOMPRESSIBLE","sph incompressible (time=%f,dt=%f)",time,dt);
     Set_Up_For_Projection(face_velocities,time);
@@ -133,7 +133,7 @@ Calculate_SPH_Constants()
 // Function Set_Up_For_Projection
 //#####################################################################
 template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
-Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
+Set_Up_For_Projection(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time)
 {
     Calculate_SPH_Constants();
 
@@ -162,10 +162,10 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
 
     LOG::Time("initializing");
     PROJECTION_DYNAMICS_UNIFORM<TV>& projection=incompressible.projection;
-    T_FACE_ARRAYS_SCALAR preset_velocities=face_velocities;
+    ARRAY<T,FACE_INDEX<TV::m> > preset_velocities=face_velocities;
     particle_velocities.Resize(grid.Domain_Indices(3),false,false);particle_velocities.Fill(0);
     valid_particle_face_velocities.Resize(grid.Domain_Indices(3),false,false);valid_particle_face_velocities.Fill(false);
-    cell_weight=ARRAY<T,TV_INT>(grid.Domain_Indices(1));face_weight=T_FACE_ARRAYS_SCALAR(grid,1);
+    cell_weight=ARRAY<T,TV_INT>(grid.Domain_Indices(1));face_weight=ARRAY<T,FACE_INDEX<TV::m> >(grid,1);
     
     LOG::Time("rasterize velocities to grid");
     Rasterize_Velocities_To_Grid(particle_velocities,cell_weight,face_weight);
@@ -249,7 +249,7 @@ Set_Divergence_And_Multiplier(const TV_INT cell,const ARRAY<bool,TV_INT>& cells_
 // Function Postprocess_Particles
 //#####################################################################
 template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
-Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Postprocess_Particles(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     Calculate_SPH_Constants();
 
@@ -280,7 +280,7 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
     if(flip_ratio!=1){
         LOG::Time(STRING_UTILITIES::string_sprintf("applying FLIP to PIC with ratio %f",flip_ratio));
         int ghost_cells=3;
-        T_FACE_ARRAYS_SCALAR face_velocities_ghost(grid,ghost_cells);
+        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(grid,ghost_cells);
         incompressible.boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,ghost_cells);
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
             if(incompressible.projection.elliptic_solver->psi_N(axis,face)){int valid_neighbors=0;T face_velocity=0;
@@ -339,7 +339,7 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
 // Function Rasterize_Velocities_To_Grid
 //#####################################################################
 template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
-Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,ARRAY<T,TV_INT>& cell_weight,T_FACE_ARRAYS_SCALAR& face_weight)
+Rasterize_Velocities_To_Grid(ARRAY<T,FACE_INDEX<TV::m> >& velocities,ARRAY<T,TV_INT>& cell_weight,ARRAY<T,FACE_INDEX<TV::m> >& face_weight)
 {
     Calculate_SPH_Constants();
 
@@ -369,7 +369,7 @@ Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,ARRAY<T,TV_INT>& c
 // Function Calculate_Particle_Deltas
 //#####################################################################
 template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
-Calculate_Particle_Deltas(const T_FACE_ARRAYS_SCALAR& minus_face_delta,ARRAY<TV>& delta_velocity,ARRAY<TV>& delta_weight)
+Calculate_Particle_Deltas(const ARRAY<T,FACE_INDEX<TV::m> >& minus_face_delta,ARRAY<TV>& delta_velocity,ARRAY<TV>& delta_weight)
 {
     Calculate_SPH_Constants();
 
@@ -387,7 +387,7 @@ Calculate_Particle_Deltas(const T_FACE_ARRAYS_SCALAR& minus_face_delta,ARRAY<TV>
 // Function Create_Fluid_From_Particles
 //#####################################################################
 template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
-Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR* face_velocities)
+Modify_Levelset_And_Particles_To_Create_Fluid(const T time,ARRAY<T,FACE_INDEX<TV::m> >* face_velocities)
 {
     Calculate_SPH_Constants();
 

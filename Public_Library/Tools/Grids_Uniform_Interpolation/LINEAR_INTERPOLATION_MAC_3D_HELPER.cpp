@@ -9,7 +9,7 @@
 #include <Tools/Vectors/VECTOR_3D.h>
 using namespace PhysBAM;
 template<class T> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
-LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const T_FACE_ARRAYS& face_velocities)
+LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
     :base(block.Minimum_Corner()),center(block.Center()),one_over_DX(block.One_Over_DX())
 {
     FACE_LOOKUP_UNIFORM<TV> face_velocities_lookup(face_velocities);
@@ -63,7 +63,7 @@ Interpolate_Face(const TV& X) const
         :LINEAR_INTERPOLATION<T,T>::Trilinear(w2,w5,w8,w11,one_over_DX.x,one_over_DX.y,center.z,base.x,base.y,slope_w23,slope_w56,slope_w89,slope_w11_12,zxy));
 }
 template<class T> void LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
-Block_Transfer(const T_BLOCK& source_block,const T_FACE_ARRAYS_BOOL& source_values,const BLOCK_UNIFORM<TV>& destination_block,ARRAY<T,FACE_INDEX<3> >& destination_values)
+Block_Transfer(const T_BLOCK& source_block,const ARRAY<bool,FACE_INDEX<TV::m> >& source_values,const BLOCK_UNIFORM<TV>& destination_block,ARRAY<T,FACE_INDEX<3> >& destination_values)
 {
     for(int i=0;i<GRID<TV>::number_of_faces_per_block/TV::m;i++){
         destination_block.Face_X_Reference(destination_values,i)=(T)source_block.Face_X_Value(source_values,i);
@@ -71,7 +71,7 @@ Block_Transfer(const T_BLOCK& source_block,const T_FACE_ARRAYS_BOOL& source_valu
         destination_block.Face_Z_Reference(destination_values,i)=(T)source_block.Face_Z_Value(source_values,i);}
 }
 template<class T> VECTOR<T,3> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >::
-Interpolate_Face_Normalized(const T_BLOCK& block,const T_FACE_ARRAYS& face_velocities,const T_FACE_ARRAYS_BOOL& face_velocities_valid,const TV& X,const TV& default_value)
+Interpolate_Face_Normalized(const T_BLOCK& block,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const ARRAY<bool,FACE_INDEX<TV::m> >& face_velocities_valid,const TV& X,const TV& default_value)
 {
     static const GRID<TV> valid_values_grid=GRID<TV>(TV_INT()+2,RANGE<TV>::Unit_Box()).Get_MAC_Grid_At_Regular_Positions();
     static const BLOCK_UNIFORM<TV> valid_values_block(valid_values_grid,VECTOR<int,3>(2,2,2));

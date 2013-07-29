@@ -26,9 +26,7 @@ template<class T,class TV,class RW>
 class MERGER
 {
 public:
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename T_FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef typename ARRAY<T,TV_INT>::template REBIND<VECTOR<T,TV::m+2> >::TYPE T_ARRAYS_DIMENSION_SCALAR;
     
@@ -129,7 +127,7 @@ Merge(const int frame)
         if(FILE_UTILITIES::File_Exists(input_directory+"/2/"+f+"soot_fuel")) Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"soot_fuel",0);
         if(merge_debug_data){
             Merge_Cell_Data<ARRAY<bool,TV_INT> >(f+"psi_D",1);
-            Merge_Face_Data<T_FACE_ARRAYS_BOOL>(f+"psi_N",1);
+            Merge_Face_Data<ARRAY<bool,FACE_INDEX<TV::m> >>(f+"psi_N",1);
             Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"density_gradient",0,true);
             Merge_Cell_Data<ARRAY<bool,TV_INT> >(f+"euler_psi",1);
             Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"energy",0);
@@ -160,9 +158,9 @@ Merge(const int frame)
             Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"pressure",1);
             Merge_Cell_Data<T_ARRAYS_INT>(f+"colors",0); // TODO: consider changing this back to 1
             Merge_Cell_Data<ARRAY<bool,TV_INT> >(f+"psi_D",1);
-            Merge_Face_Data<T_FACE_ARRAYS_BOOL>(f+"psi_N",1);
+            Merge_Face_Data<ARRAY<bool,FACE_INDEX<TV::m> >>(f+"psi_N",1);
             Merge_Particles<PARTICLE_LEVELSET_PARTICLES<TV> >(f+"negative_particles");}
-        if(merge_velocities) Merge_Face_Data<T_FACE_ARRAYS>(f+"mac_velocities",3);
+        if(merge_velocities) Merge_Face_Data<ARRAY<T,FACE_INDEX<TV::m> >>(f+"mac_velocities",3);
         if(merge_temperatures) Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"temperature",3);
         Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"reaction_speed",3);
         if(merge_densities) Merge_Cell_Data<ARRAY<T,TV_INT>>(f+"density",3);

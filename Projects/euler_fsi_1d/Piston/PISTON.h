@@ -38,7 +38,6 @@ class PISTON:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,1> >,CONSERVATI
 {
 public:
     typedef T_input T;typedef VECTOR<T,1> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,1> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
 
 public:
@@ -196,8 +195,8 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 {
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Set_Dirichlet_Boundary_Conditions(time);
     EULER_UNIFORM<TV>& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters)).euler);
-    T_FACE_ARRAYS_BOOL& psi_N=euler.euler_projection.elliptic_solver->psi_N;
-    T_FACE_ARRAYS_SCALAR& face_velocities=euler.euler_projection.face_velocities;
+    ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=euler.euler_projection.elliptic_solver->psi_N;
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=euler.euler_projection.face_velocities;
 
    T piston_position=piston_initial_position+piston_speed*time;
    if(test_number==1){TV_INT face_index=euler.grid.Cell(TV(piston_position),0);

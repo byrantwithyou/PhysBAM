@@ -71,7 +71,7 @@ Apply_Individual_Cooling(T& temperature,const T constant)
 // Function Use_Semi_Lagrangian_Collidable_Advection
 //#####################################################################
 template<class TV> void TEMPERATURE_CONTAINER<TV>::
-Use_Semi_Lagrangian_Collidable_Advection(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list,const T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input)
+Use_Semi_Lagrangian_Collidable_Advection(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list,const ARRAY<bool,FACE_INDEX<TV::m> >& face_velocities_valid_mask_input)
 {
     assert(!nested_semi_lagrangian_collidable&&!semi_lagrangian_collidable);
     nested_semi_lagrangian_collidable=new T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL(body_list,valid_mask_current,valid_mask_next,ambient_temperature,false);

@@ -39,7 +39,7 @@ Set_Radius(const T radius_input)
 // Function Compute_Body_Force
 //#####################################################################
 template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
-Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& force,const T dt,const T time)
+Compute_Body_Force(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& force,const T dt,const T time)
 {
     ARRAY<T,TV_INT> grid_vorticity_magnitude(grid.Domain_Indices(2),false);
     VORTICITY_UNIFORM<TV>::Vorticity(grid,FACE_LOOKUP_UNIFORM<TV>(face_velocities_ghost),grid_vorticity,grid_vorticity_magnitude);
@@ -111,7 +111,7 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV
 // Function Compute_Body_Force
 //#####################################################################
 template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
-Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
+Compute_Body_Force(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time)
 {
     ARRAY<TV,TV_INT> cell_force(grid.Domain_Indices(1),false);
     Compute_Body_Force(face_velocities_ghost,cell_force,dt,time);
@@ -122,7 +122,7 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRA
 // Function Euler_Step
 //#####################################################################
 template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
-Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T time)
+Euler_Step(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,const T dt,const T time)
 {
     LOG::Time("Advancing vorticity particles");
     

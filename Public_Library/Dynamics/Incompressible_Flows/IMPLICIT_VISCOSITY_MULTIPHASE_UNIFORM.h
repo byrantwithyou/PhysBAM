@@ -21,7 +21,6 @@ template<class TV>
 class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM:public IMPLICIT_VISCOSITY_UNIFORM<TV>
 {
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef AVERAGING_UNIFORM<TV> T_AVERAGING;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
@@ -41,7 +40,7 @@ public:
 private:
     void Allocate_Heat_Solver() PHYSBAM_OVERRIDE;
     void Setup_Viscosity(const T dt) PHYSBAM_OVERRIDE;
-    void Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities) PHYSBAM_OVERRIDE;
+    void Setup_Boundary_Conditions(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) PHYSBAM_OVERRIDE;
     void Calculate_Velocity_Jump();
     void Debug_Write(const std::string& output_directory_input);
 //#####################################################################

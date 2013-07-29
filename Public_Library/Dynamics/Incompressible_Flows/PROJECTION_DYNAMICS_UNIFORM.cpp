@@ -79,7 +79,7 @@ Initialize_Dsd(const LEVELSET<TV>& levelset,const ARRAY<bool>& fuel_region)
 // Function Make_Divergence_Free
 //#####################################################################
 template<class TV> void PROJECTION_DYNAMICS_UNIFORM<TV>::
-Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Make_Divergence_Free(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     // find f - divergence of the velocity
     if(flame) Compute_Divergence(T_FACE_LOOKUP_FIRE_MULTIPHASE(face_velocities,*this,poisson_collidable->levelset_multiple),elliptic_solver);
@@ -114,14 +114,14 @@ Compute_Divergence(const T_FACE_LOOKUP_FIRE_MULTIPHASE& face_lookup,LAPLACE_UNIF
 // Function Apply_Pressure
 //#####################################################################
 template<class TV> void PROJECTION_DYNAMICS_UNIFORM<TV>::
-Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt)
+Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt)
 {
     BASE::Apply_Pressure(face_velocities,dt,time,scale_by_dt);
 
     // fix the jump in pressure - interior only
     if(poisson && poisson->u_jumps){
         ARRAY<bool,TV_INT>& psi_D=elliptic_solver->psi_D;
-        T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver->psi_N;
+        ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=elliptic_solver->psi_N;
         TV dx=p_grid.dX,one_over_dx=Inverse(dx);
         int ghost_cells=1;
         if(poisson->multiphase){
@@ -147,7 +147,7 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
 // Function Set_Up_For_SPH
 //#####################################################################
 template<class TV> void PROJECTION_DYNAMICS_UNIFORM<TV>::
-Set_Up_For_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_density_solve,const bool use_one_way_coupling)
+Set_Up_For_SPH(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool use_variable_density_solve,const bool use_one_way_coupling)
 {
     if(use_variable_density_solve){
         POISSON_COLLIDABLE_UNIFORM<TV>* poisson_for_sph=new POISSON_COLLIDABLE_UNIFORM<TV>(p_grid,p,true,false,true);
@@ -169,14 +169,14 @@ Set_Up_For_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_den
                 TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
                 if(!elliptic_solver_save_for_sph->psi_D(cell_1) || !elliptic_solver_save_for_sph->psi_D(cell_2)) elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;}}}
     else if(use_one_way_coupling){
-        face_velocities_save_for_sph=new T_FACE_ARRAYS_SCALAR(face_velocities);
+        face_velocities_save_for_sph=new ARRAY<T,FACE_INDEX<TV::m> >(face_velocities);
         p_save_for_sph=new ARRAY<T,TV_INT>(p);
         divergence_save_for_sph=new ARRAY<T,TV_INT>(divergence);
         divergence_multiplier_save_for_sph=new ARRAY<T,TV_INT>(divergence_multiplier);
         use_divergence_multiplier_save_for_sph=use_divergence_multiplier;
         use_non_zero_divergence_save_for_sph=use_non_zero_divergence;
         elliptic_solver->psi_D_save_for_sph=new ARRAY<bool,TV_INT>(elliptic_solver->psi_D);
-        elliptic_solver->psi_N_save_for_sph=new T_FACE_ARRAYS_BOOL(elliptic_solver->psi_N);
+        elliptic_solver->psi_N_save_for_sph=new ARRAY<bool,FACE_INDEX<TV::m> >(elliptic_solver->psi_N);
         for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
             if(!(*elliptic_solver->psi_D_save_for_sph)(cell_1) || !(*elliptic_solver->psi_D_save_for_sph)(cell_2)) elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;}}
@@ -187,7 +187,7 @@ Set_Up_For_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_den
 // Function Restore_After_SPH
 //#####################################################################
 template<class TV> void PROJECTION_DYNAMICS_UNIFORM<TV>::
-Restore_After_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_density_solve,const bool use_one_way_coupling)
+Restore_After_SPH(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool use_variable_density_solve,const bool use_one_way_coupling)
 {
     if(use_variable_density_solve){
         delete poisson;poisson=poisson_collidable=poisson_save_for_sph;
@@ -212,7 +212,7 @@ Restore_After_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_
 // Function Update_Phi_And_Move_Velocity_Discontinuity
 //#####################################################################
 template<class TV> void PROJECTION_DYNAMICS_UNIFORM<TV>::
-Update_Phi_And_Move_Velocity_Discontinuity(T_FACE_ARRAYS_SCALAR& face_velocities,LEVELSET_MULTIPLE<TV>& levelset_multiple,const T time,const bool update_phi_only)
+Update_Phi_And_Move_Velocity_Discontinuity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,LEVELSET_MULTIPLE<TV>& levelset_multiple,const T time,const bool update_phi_only)
 {
     assert(flame);
     int ghost_cells=3;

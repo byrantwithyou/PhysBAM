@@ -489,7 +489,7 @@ Advance_To_Target_Time(const T target_time)
 // Function Integrate_Fluid_Non_Advection_Forces
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Integrate_Fluid_Non_Advection_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const int substep)
+Integrate_Fluid_Non_Advection_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const int substep)
 {
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     int number_of_regions=fluids_parameters.number_of_regions;
@@ -666,7 +666,6 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
     INCOMPRESSIBLE_UNIFORM<TV>* incompressible=fluids_parameters.incompressible;
     EULER_UNIFORM<TV>* euler=fluids_parameters.euler;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 
     // TODO: time+dt in this function may want to be time when this is used for initial object compatible velocity
 
@@ -723,7 +722,7 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
         if(euler){
             if(euler->timesplit && !euler->perform_rungekutta_for_implicit_part){
                 LOG::Time("compressible implicit update");
-                T_FACE_ARRAYS_SCALAR& incompressible_face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
+                ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
                 euler->Clamp_Internal_Energy(dt_projection,time_projection+dt_projection);
                 fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_projection.elliptic_solver,euler->euler_projection.face_velocities,dt_projection,time_projection+dt_projection);
                 if(number_of_regions==1){
@@ -769,10 +768,10 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
         else{
             if(fluids_parameters.second_order_cut_cell_method) PHYSBAM_NOT_IMPLEMENTED(); // TAMAR: can you add the code for this when 2nd order works
             ARRAY<bool,TV_INT> psi_D_old=incompressible->projection.elliptic_solver->psi_D;ARRAY<T,TV_INT> p_old=incompressible->projection.p;
-            T_FACE_ARRAYS_SCALAR& face_velocities=example.fluid_collection.incompressible_fluid_collection.face_velocities;
+            ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=example.fluid_collection.incompressible_fluid_collection.face_velocities;
             incompressible_multiphase->Set_Dirichlet_Boundary_Conditions(particle_levelset_evolution_multiple->phis,fluids_parameters.pseudo_dirichlet_regions);
             // TODO: check me
-            T_FACE_ARRAYS_SCALAR air_velocities_save=face_velocities;
+            ARRAY<T,FACE_INDEX<TV::m> > air_velocities_save=face_velocities;
             ARRAY<T,TV_INT> phi_for_pseudo_dirichlet_regions;LEVELSET<TV> levelset_for_pseudo_dirichlet_regions(grid,phi_for_pseudo_dirichlet_regions);
             particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Get_Single_Levelset(fluids_parameters.pseudo_dirichlet_regions,
                 levelset_for_pseudo_dirichlet_regions,false);
@@ -784,7 +783,7 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
             for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
                 if(incompressible_multiphase->projection.elliptic_solver->psi_D(iterator.Cell_Index()))incompressible->projection.p(iterator.Cell_Index())=p_old(iterator.Cell_Index());
             incompressible->projection.elliptic_solver->psi_D=psi_D_old;
-            T_FACE_ARRAYS_BOOL psi_N_old=incompressible_multiphase->projection.elliptic_solver->psi_N;
+            ARRAY<bool,FACE_INDEX<TV::m> > psi_N_old=incompressible_multiphase->projection.elliptic_solver->psi_N;
             for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
                 TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();int region_1,region_2;T phi_1,phi_2;
                 particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Minimum_Regions(cell_1,cell_2,region_1,region_2,phi_1,phi_2);
@@ -901,12 +900,11 @@ Advect_Fluid(const T dt,const int substep)
     EULER_UNIFORM<TV>* euler=fluids_parameters.euler;
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>* euler_solid_fluid_coupling_utilities=fluids_parameters.euler_solid_fluid_coupling_utilities;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 
     LOG::SCOPE scalar_scope("SCALAR SCOPE");
 
     // TODO: make sure this is in the right place
-    T_FACE_ARRAYS_BOOL region_inside_pseudo_dirichlet_region;
+    ARRAY<bool,FACE_INDEX<TV::m> > region_inside_pseudo_dirichlet_region;
     if(fluids_parameters.pseudo_dirichlet_regions.Number_True()>0){
         region_inside_pseudo_dirichlet_region.Resize(grid);
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -914,11 +912,11 @@ Advect_Fluid(const T dt,const int substep)
             region_inside_pseudo_dirichlet_region.Component(iterator.Axis())(iterator.Face_Index())=fluids_parameters.pseudo_dirichlet_regions(region);}}
 
     // important to compute ghost velocity values for particles near domain boundaries
-    T_FACE_ARRAYS_SCALAR projected_face_velocities_ghost,face_velocities_ghost;
-    T_FACE_ARRAYS_SCALAR* advection_face_velocities_ghost=0;
+    ARRAY<T,FACE_INDEX<TV::m> > projected_face_velocities_ghost,face_velocities_ghost;
+    ARRAY<T,FACE_INDEX<TV::m> >* advection_face_velocities_ghost=0;
     if(incompressible){
         if(number_of_regions<=1){
-            T_FACE_ARRAYS_SCALAR& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
+            ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
             face_velocities_ghost.Resize(incompressible->grid,example.fluids_parameters.number_of_ghost_cells,false);
             if(Two_Way_Coupled() && solids_fluids_parameters.use_leakproof_solve){
                 projected_face_velocities_ghost.Resize(incompressible->grid,example.fluids_parameters.number_of_ghost_cells,false);
@@ -1001,7 +999,7 @@ Advect_Fluid(const T dt,const int substep)
     LOG::Time("updating velocity (explicit part)"); // TODO: fix vorticity confinement for thin shells
     if(fluids_parameters.analytic_test) example.Get_Analytic_Velocities(time+dt);
     else if(!fluids_parameters.compressible||number_of_regions==1){
-        T_FACE_ARRAYS_SCALAR& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
+        ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
         if(number_of_regions>=2){
             if(Two_Way_Coupled() && solids_fluids_parameters.use_leakproof_solve){
                 incompressible_multiphase->Advance_One_Time_Step_Convection(dt,time,*advection_face_velocities_ghost,incompressible_multiphase->projection.face_velocities_save_for_projection,&fluids_parameters.pseudo_dirichlet_regions,fluids_parameters.number_of_ghost_cells);

@@ -19,7 +19,6 @@ template<class TV,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_COLLIDABLE_U
 class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM:public ADVECTION<TV,typename TV::SCALAR,T_FACE_LOOKUP>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list;
 private:
@@ -27,10 +26,10 @@ private:
     LINEAR_INTERPOLATION_UNIFORM<TV,T,typename T_FACE_LOOKUP::NESTED_LOOKUP> linear_interpolation;
     AVERAGING_UNIFORM<TV,typename T_FACE_LOOKUP::NESTED_LOOKUP> averaging;
     AVERAGING_COLLIDABLE_UNIFORM<TV,T_FACE_LOOKUP> averaging_collidable;
-    T_FACE_ARRAYS_BOOL& face_velocities_valid_mask;
+    ARRAY<bool,FACE_INDEX<TV::m> >& face_velocities_valid_mask;
 public:
 
-    ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list_input,T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input)
+    ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list_input,ARRAY<bool,FACE_INDEX<TV::m> >& face_velocities_valid_mask_input)
         :body_list(body_list_input),averaging_collidable(body_list,0),
          face_velocities_valid_mask(face_velocities_valid_mask_input)
     {}
@@ -38,10 +37,10 @@ public:
     virtual ~ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM()
     {}
 
-    void Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
+    void Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& Z,const T_FACE_LOOKUP& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
-        const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
-    {T_FACE_ARRAYS_BOOL face_velocities_valid_mask_next(grid,3,false);
+        const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,ARRAY<T,FACE_INDEX<TV::m> >* Z_min,ARRAY<T,FACE_INDEX<TV::m> >* Z_max)
+    {ARRAY<bool,FACE_INDEX<TV::m> > face_velocities_valid_mask_next(grid,3,false);
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT face=iterator.Face_Index();int axis=iterator.Axis();
         if(!body_list.Swept_Occupied_Face_Center(iterator)){
@@ -70,7 +69,7 @@ public:
                     const typename T_FACE_LOOKUP::LOOKUP &Z_min_lookup=Z_min_ghost->Starting_Point_Face(axis,face),&Z_max_lookup=Z_max_ghost->Starting_Point_Face(axis,face);
                     VECTOR<T,2> extrema=linear_interpolation_collidable.Extrema_Clamped_To_Array_Face_Component(axis,grid,Z_min_lookup,Z_max_lookup,interpolation_point);
                     Z_min->Component(axis)(face)=extrema.x;Z_max->Component(axis)(face)=extrema.y;}}}}
-    T_FACE_ARRAYS_BOOL::Exchange(face_velocities_valid_mask,face_velocities_valid_mask_next);
+    ARRAY<bool,FACE_INDEX<TV::m> >::Exchange(face_velocities_valid_mask,face_velocities_valid_mask_next);
     // ghost values should always be valid
     for(FACE_ITERATOR<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
         face_velocities_valid_mask(iterator.Full_Index())=true;}
@@ -80,7 +79,7 @@ public:
     if(body_list.collision_geometry_collection.Intersection_Between_Points(from,to,body_id,aggregate_id,point)) return body_list.Object_Velocity(body_id,aggregate_id,point)[axis];
     else return default_value;}
 
-    void Average_To_Invalidated_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_values)
+    void Average_To_Invalidated_Face(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& face_values)
     {// average values collision aware in Gauss-Jacobi fashion
     typename TV::template REBIND<ARRAY<PAIR<TV_INT,bool> > >::TYPE face_invalid_indices; // index and bool true if entry has been validated on iteration
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(!face_velocities_valid_mask.Component(iterator.Axis())(iterator.Face_Index())) 

@@ -21,7 +21,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> FLOOD_FILL_MPI<TV>::
-FLOOD_FILL_MPI(const T_MPI_GRID& mpi_grid_input,const GRID<TV>& local_grid_input,const T_FACE_ARRAYS_BOOL& psi_N_input,int& number_of_regions_input,T_ARRAYS_INT& colors_input,
+FLOOD_FILL_MPI(const T_MPI_GRID& mpi_grid_input,const GRID<TV>& local_grid_input,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N_input,int& number_of_regions_input,T_ARRAYS_INT& colors_input,
     ARRAY<ARRAY<int> >& color_ranks_input,ARRAY<bool>* color_touches_uncolorable_input)
     :mpi_grid(mpi_grid_input),local_grid(local_grid_input),psi_N(psi_N_input),number_of_regions(number_of_regions_input),colors(colors_input),color_ranks(color_ranks_input),
     color_touches_uncolorable(color_touches_uncolorable_input)
@@ -359,7 +359,7 @@ template<class TV> int FLOOD_FILL_MPI<TV>::Synchronize_Colors(){PHYSBAM_FUNCTION
 
 //#####################################################################
 #define INSTANTIATION_HELPER(T,TV) \
-    template FLOOD_FILL_MPI<TV>::FLOOD_FILL_MPI(const T_MPI_GRID&,const GRID<TV>&,const T_FACE_ARRAYS_BOOL&,int&,T_ARRAYS_INT&,ARRAY<ARRAY<int> >&,ARRAY<bool>*); \
+    template FLOOD_FILL_MPI<TV>::FLOOD_FILL_MPI(const T_MPI_GRID&,const GRID<TV>&,const ARRAY<bool,FACE_INDEX<TV::m> >&,int&,T_ARRAYS_INT&,ARRAY<ARRAY<int> >&,ARRAY<bool>*); \
     template FLOOD_FILL_MPI<TV>::~FLOOD_FILL_MPI(); \
     template int FLOOD_FILL_MPI<TV>::Synchronize_Colors();
 #define P(...) __VA_ARGS__

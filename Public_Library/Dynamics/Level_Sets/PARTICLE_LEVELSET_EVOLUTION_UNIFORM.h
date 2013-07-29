@@ -22,8 +22,6 @@ class PARTICLE_LEVELSET_EVOLUTION_UNIFORM:public PARTICLE_LEVELSET_EVOLUTION<typ
     typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
     typedef typename ARRAY<T,TV_INT>::template REBIND<RUNGEKUTTA<ARRAY_VIEW<TV> >*>::TYPE T_ARRAYS_RUNGEKUTTA;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
     typedef PARTICLE_LEVELSET_EVOLUTION<T> BASE;
     using BASE::track_mass;using BASE::initial_mass;using BASE::runge_kutta_order_levelset;using BASE::runge_kutta_order_particles;using BASE::use_particle_levelset;
@@ -31,7 +29,7 @@ public:
 
     GRID<TV> grid;
     ARRAY<T,TV_INT> phi;
-    T_FACE_ARRAYS_SCALAR V;
+    ARRAY<T,FACE_INDEX<TV::m> > V;
 
 private:
     PARTICLE_LEVELSET_UNIFORM<TV>* particle_levelset;
@@ -104,15 +102,15 @@ public:
     particle_levelset->cfl_number=cfl_number_input;}
 
 //#####################################################################
-    virtual void Advance_To_Time(T_FACE_ARRAYS_SCALAR* face_velocities,const T stopping_time,const bool verbose=true);
+    virtual void Advance_To_Time(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities,const T stopping_time,const bool verbose=true);
     virtual T Time_Step(const T stopping_time,bool& limited_by_stopping_time);
     virtual T CFL(const bool need_to_get_velocity=true,const bool analytic_test=false);
-    virtual void Advance_One_Time_Step(T_FACE_ARRAYS_SCALAR* face_velocities,const T dt);
+    virtual void Advance_One_Time_Step(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities,const T dt);
     virtual void Advance_Levelset(const T dt);
-    virtual void Advance_Particles(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const bool analytic_test=false);
+    virtual void Advance_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const bool analytic_test=false);
     virtual T Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time);
     virtual T Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time);
-    virtual void Modify_Levelset_And_Particles(T_FACE_ARRAYS_SCALAR* face_velocities);
+    virtual void Modify_Levelset_And_Particles(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities);
     virtual void Reseed_Particles(const T time,const int time_step=0,ARRAY<bool,TV_INT>* cell_centered_mask=0,const bool verbose=true);
 //#####################################################################
 };

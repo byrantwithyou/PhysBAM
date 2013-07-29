@@ -19,7 +19,7 @@ template<class TV> LEVELSET_CALLBACKS<TV>::
 // Function Get_Levelset_Velocity
 //#####################################################################
 template<class TV> void LEVELSET_CALLBACKS<TV>::
-Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time) const
+Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& face_velocity,const T time) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
@@ -27,7 +27,7 @@ Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,T_FACE_ARRAYS_
 // Function Get_Levelset_Velocity
 //#####################################################################
 template<class TV> void LEVELSET_CALLBACKS<TV>::
-Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time) const
+Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& face_velocity,const T time) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }

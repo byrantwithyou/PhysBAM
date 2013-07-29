@@ -19,7 +19,6 @@ class LEVELSET_MULTIPLE:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
     typedef INTERPOLATION_UNIFORM<TV,TV> T_INTERPOLATION_VECTOR;
 public:
@@ -107,7 +106,7 @@ public:
     int Inside_Region_Face(const int axis,const TV_INT& face_index) const; // does not assume exactly one Phi<0
     void Two_Minimum_Regions(const TV_INT& index,int& minimum_region,int& second_minimum_region,T& minimum_phi,T& second_minimum_phi) const;
     void Two_Minimum_Regions(const TV& location,int& minimum_region,int& second_minimum_region,T& minimum_phi,T& second_minimum_phi) const;
-    T CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const;
+    T CFL(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) const;
     T CFL(const ARRAY<TV,TV_INT>& velocity) const;
     bool Is_Projected_At_Nodes();
     void Compute_Normals(const T time=0);

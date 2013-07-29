@@ -26,15 +26,14 @@ class HYBRID_SL_ENO_CONSERVATION:public CONSERVATION<TV,d>
     typedef VECTOR<int,TV::m> TV_INT;typedef TV_INT INDEX;
     typedef VECTOR<bool,2*TV::m> TV_BOOL;
     typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename REBIND<ARRAY<T,FACE_INDEX<TV::m> >,bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
+    typedef typename ARRAY<T,FACE_INDEX<TV::m> >::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
     typedef CONSERVATION<TV,d> BASE;
 
-    const T_FACE_ARRAYS_BOOL& flux_face;
+    const ARRAY<bool,FACE_INDEX<TV::m> >& flux_face;
     CONSERVATION<TV,d> *conservation;
 
 public:
-    HYBRID_SL_ENO_CONSERVATION(const T_FACE_ARRAYS_BOOL& flux_face_in, CONSERVATION<TV,d> *conservation_law_solver)
+    HYBRID_SL_ENO_CONSERVATION(const ARRAY<bool,FACE_INDEX<TV::m> >& flux_face_in, CONSERVATION<TV,d> *conservation_law_solver)
         : flux_face(flux_face_in),conservation(conservation_law_solver)
     {conservation->Save_Fluxes();}
 
@@ -69,8 +68,8 @@ public:
     {BASE::Log_Parameters();conservation->Log_Parameters();}
 
     virtual void Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
-        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
-        const T_FACE_ARRAYS_SCALAR& face_velocities,const bool thinshell=false,const TV_BOOL& outflow_boundaries=TV_BOOL(),VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>* eigensystems_auxiliary=0,
+        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,
+        const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool thinshell=false,const TV_BOOL& outflow_boundaries=TV_BOOL(),VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>* eigensystems_auxiliary=0,
         T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary=0);
 };
 }

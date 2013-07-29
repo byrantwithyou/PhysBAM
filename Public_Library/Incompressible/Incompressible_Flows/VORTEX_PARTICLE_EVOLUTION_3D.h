@@ -16,7 +16,6 @@ template<class T>
 class VORTEX_PARTICLE_EVOLUTION_3D:public NONCOPYABLE
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
 public:
     VORTICITY_PARTICLES<VECTOR<T,3> > vorticity_particles;
@@ -50,9 +49,9 @@ private:
     T Gaussian_Kernel(T distance_squared);
 public:
 //    void Set_Radius(const T radius_input=(T).01);
-    void Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& force,const T dt,const T time);
-    void Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& force,const T dt,const T time);
-    void Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T time);
+    void Compute_Body_Force(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& force,const T dt,const T time);
+    void Compute_Body_Force(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time);
+    void Euler_Step(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,const T dt,const T time);
     void Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const;
     void Read_Output_Files(const STREAM_TYPE stream_type,const std::string& input_directory,const int frame);
 //#####################################################################

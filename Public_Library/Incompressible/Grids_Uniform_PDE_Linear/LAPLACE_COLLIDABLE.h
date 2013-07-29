@@ -15,13 +15,12 @@ template<class TV>
 class LAPLACE_COLLIDABLE
 {
     typedef typename TV::SCALAR T;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 
 public:
     bool second_order_cut_cell_method;
     T second_order_cut_cell_threshold;
     LEVELSET<TV>* levelset; // used in second order accurate cut cell method
-    T_FACE_ARRAYS_SCALAR u_interface; // interface boundary condition - 2nd order method
+    ARRAY<T,FACE_INDEX<TV::m> > u_interface; // interface boundary condition - 2nd order method
 
 protected:
     LAPLACE_COLLIDABLE()

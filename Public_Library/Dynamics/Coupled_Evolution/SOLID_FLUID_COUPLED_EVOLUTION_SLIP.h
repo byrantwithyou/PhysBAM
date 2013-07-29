@@ -34,9 +34,7 @@ class SOLID_FLUID_COUPLED_EVOLUTION_SLIP:public NEWMARK_EVOLUTION<TV_input>,publ
     typedef TV_input TV;typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef typename ARRAY<T,FACE_INDEX<TV::m> >::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
 
 protected:
     typedef NEWMARK_EVOLUTION<TV> BASE;
@@ -64,11 +62,11 @@ public:
 protected:
 
     GRID<TV>& grid;
-    T_FACE_ARRAYS_SCALAR fluids_face_velocities; // Stores combined compressible-incompressible face velocities.
+    ARRAY<T,FACE_INDEX<TV::m> > fluids_face_velocities; // Stores combined compressible-incompressible face velocities.
 public:
     ARRAY<T,TV_INT> pressure;
     ARRAY<T,TV_INT> density;
-    T_FACE_ARRAYS_BOOL solved_faces;
+    ARRAY<bool,FACE_INDEX<TV::m> > solved_faces;
 protected:
     ARRAY<TV,TV_INT> centered_velocity;
     ARRAY<T,TV_INT> one_over_rho_c_squared;
@@ -81,7 +79,7 @@ private:
     ARRAY<TV> pressure_impulses;
     ARRAY<TWIST<TV> > pressure_impulses_twist;
 
-    T_FACE_ARRAYS_BOOL cached_psi_N;
+    ARRAY<bool,FACE_INDEX<TV::m> > cached_psi_N;
     ARRAY<T,COUPLING_CONSTRAINT_ID> coupling_face_velocities_cached;
     COUPLING_CONSTRAINT_ID number_of_coupling_faces_cached;
     ARRAY<FACE_INDEX<TV::dimension> > indexed_faces_cached;
@@ -115,25 +113,25 @@ public:
     bool Simulate_Solids() const;
     void Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update) PHYSBAM_OVERRIDE;
     void Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies) PHYSBAM_OVERRIDE;
-    void Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt=false);
+    void Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt=false);
     BACKWARD_EULER_SYSTEM<TV>* Setup_Solids(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update,const bool leakproof_solve);
-    void Setup_Fluids(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T current_position_time,const T dt,const bool leakproof_solve);
-    void Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update,const bool leakproof_solve);
-    void Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    void Setup_Fluids(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T current_position_time,const T dt,const bool leakproof_solve);
+    void Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update,const bool leakproof_solve);
+    void Make_Divergence_Free(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
     void Apply_Second_Order_Cut_Cell_Method(const T_ARRAYS_INT& cell_index_to_divergence_matrix_index,const T_FACE_ARRAYS_INT& face_index_to_matrix_index,ARRAY<T>& b);
-    void Apply_Viscosity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    void Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
     void Setup_Boundary_Condition_Collection();
 private:
-    void Warn_For_Exposed_Dirichlet_Cell(const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N);
+    void Warn_For_Exposed_Dirichlet_Cell(const ARRAY<bool,TV_INT>& psi_D,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
     void Set_Cached_Psi_N_And_Coupled_Face_Data(const COLLISION_AWARE_INDEX_MAP<TV>& index_map,
         const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const T time);
     void Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,const ARRAY<FACE_INDEX<TV_input::dimension> >& indexed_faces,
-        const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_data,T_FACE_ARRAYS_SCALAR& face_data);
+        const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_data,ARRAY<T,FACE_INDEX<TV::m> >& face_data);
     void Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const COLLISION_AWARE_INDEX_MAP<TV>& index_map,
-        const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const T_FACE_ARRAYS_BOOL& psi_N_domain,T_FACE_ARRAYS_BOOL& psi_N,
+        const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N_domain,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,
         ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_velocities);
 public:
-    void Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const T time,T_FACE_ARRAYS_BOOL& psi_N,T_FACE_ARRAYS_SCALAR& face_velocities);
+    void Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const T time,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
     void Output_Iterators(const STREAM_TYPE stream_type,const char* output_directory,int frame) const;
 //#####################################################################
 };

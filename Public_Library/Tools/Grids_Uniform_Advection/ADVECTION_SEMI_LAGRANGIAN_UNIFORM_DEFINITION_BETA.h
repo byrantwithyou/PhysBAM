@@ -37,13 +37,13 @@ Update_Advection_Equation_Cell_Lookup(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,c
 }
 
 template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
+Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& Z,const T_FACE_LOOKUP& Z_ghost,
     const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
-    const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
+    const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,ARRAY<T,FACE_INDEX<TV::m> >* Z_min,ARRAY<T,FACE_INDEX<TV::m> >* Z_max)
 {
     for(int axis=0;axis<TV::dimension;axis++){
         RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner+=TV_INT::Axis_Vector(axis);
-        DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>,TV>(domain,thread_queue).template Run<int,const GRID<TV>&,T_FACE_ARRAYS_SCALAR&,const T_FACE_LOOKUP&,const T_FACE_LOOKUP&,BOUNDARY<TV,T>&,T,T,const T_FACE_LOOKUP*,const T_FACE_LOOKUP*,T_FACE_ARRAYS_SCALAR*,T_FACE_ARRAYS_SCALAR*>(*this,&ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::Update_Advection_Equation_Face_Lookup_Threaded,axis,grid,Z,Z_ghost,face_velocities,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);}
+        DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>,TV>(domain,thread_queue).template Run<int,const GRID<TV>&,ARRAY<T,FACE_INDEX<TV::m> >&,const T_FACE_LOOKUP&,const T_FACE_LOOKUP&,BOUNDARY<TV,T>&,T,T,const T_FACE_LOOKUP*,const T_FACE_LOOKUP*,ARRAY<T,FACE_INDEX<TV::m> >*,ARRAY<T,FACE_INDEX<TV::m> >*>(*this,&ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::Update_Advection_Equation_Face_Lookup_Threaded,axis,grid,Z,Z_ghost,face_velocities,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);}
 }
 
 template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::
@@ -97,9 +97,9 @@ Update_Advection_Equation_Cell_Lookup_Threaded(RANGE<TV_INT>& domain,const GRID<
 }
 
 template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Face_Lookup_Threaded(RANGE<TV_INT>& domain,int axis,const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
+Update_Advection_Equation_Face_Lookup_Threaded(RANGE<TV_INT>& domain,int axis,const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& Z,const T_FACE_LOOKUP& Z_ghost,
     const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
-    const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
+    const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,ARRAY<T,FACE_INDEX<TV::m> >* Z_min,ARRAY<T,FACE_INDEX<TV::m> >* Z_max)
 {
     T_INTERPOLATION interpolation;T_AVERAGING averaging;
     if(Z_min && Z_max) for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next()){

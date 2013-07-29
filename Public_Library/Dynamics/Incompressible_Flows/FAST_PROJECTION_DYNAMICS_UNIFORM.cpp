@@ -71,7 +71,7 @@ Initialize_Grid(const GRID<TV>& mac_grid)
 // Function Make_Divergence_Free
 //#####################################################################
 template<class TV> void FAST_PROJECTION_DYNAMICS_UNIFORM<TV>::
-Make_Divergence_Free_Fast(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Make_Divergence_Free_Fast(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     Compute_Divergence(FACE_LOOKUP_UNIFORM<TV>(face_velocities),elliptic_solver);
     for(CELL_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){

@@ -23,8 +23,8 @@ Euler_Step(const T dt,const T time)
     for(int i=-ghost_cells;i<m+ghost_cells;i++) if(U_ghost(i)(0) < min_height){U_ghost(i)(0)=min_height;U_ghost(i)(1)=0;}
 
     ARRAY<bool,VECTOR<int,1> > psi(0,m);psi.Fill(true); // no cut out grids
-    T_FACE_ARRAYS_BOOL psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
-    T_FACE_ARRAYS_SCALAR face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());
+    ARRAY<bool,FACE_INDEX<TV::m> > psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());
     VECTOR<EIGENSYSTEM<T,VECTOR<T,2> >*,1> eigensystem(&eigensystem_F);
     conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystem,eigensystem,psi_N,face_velocities);
     boundary->Apply_Boundary_Condition(grid,U,time+dt); 

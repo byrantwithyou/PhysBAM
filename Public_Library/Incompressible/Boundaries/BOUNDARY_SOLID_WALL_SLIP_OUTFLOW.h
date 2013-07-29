@@ -13,8 +13,7 @@ namespace PhysBAM{
 template<class TV>
 class BOUNDARY_SOLID_WALL_SLIP_OUTFLOW:public BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>
 {
-    typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;typedef typename GRID<TV>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV> BASE;
     using BASE::Constant_Extrapolation;using BASE::lower_threshold;using BASE::upper_threshold;using BASE::clamp_below;using BASE::clamp_above;
@@ -27,17 +26,17 @@ public:
     {}
 
 //#####################################################################
-    void Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAYS_SCALAR& u_ghost,const T time,const int number_of_ghost_cells=3) const PHYSBAM_OVERRIDE;
+    void Fill_Ghost_Faces(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& u,ARRAY<T,FACE_INDEX<TV::m> >& u_ghost,const T time,const int number_of_ghost_cells=3) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class TV> void BOUNDARY_SOLID_WALL_SLIP_OUTFLOW<TV>::
-Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_ARRAYS_SCALAR& u_ghost,const T time,const int number_of_ghost_cells) const
+Fill_Ghost_Faces(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& u,ARRAY<T,FACE_INDEX<TV::m> >& u_ghost,const T time,const int number_of_ghost_cells) const
 {
     assert(grid.Is_MAC_Grid());
-    T_FACE_ARRAYS_SCALAR::Put(u,u_ghost); // interior
+    ARRAY<T,FACE_INDEX<TV::m> >::Put(u,u_ghost); // interior
     lower_threshold=upper_threshold=0;
     for(int face_axis=0;face_axis<TV::m;face_axis++){
         GRID<TV> face_grid=grid.Get_Face_Grid(face_axis);

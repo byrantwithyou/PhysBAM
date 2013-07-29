@@ -58,7 +58,7 @@ CFL(const bool need_to_get_velocity,const bool analytic_test)
 // Function Advance_To_Time
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
-Advance_To_Time(T_FACE_ARRAYS_SCALAR* face_velocities,const T stopping_time,const bool verbose)
+Advance_To_Time(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities,const T stopping_time,const bool verbose)
 {
     int substep=0;bool done=false;
     while(!done){substep++;
@@ -73,7 +73,7 @@ Advance_To_Time(T_FACE_ARRAYS_SCALAR* face_velocities,const T stopping_time,cons
 // Function Advance_One_Time_Step
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
-Advance_One_Time_Step(T_FACE_ARRAYS_SCALAR* face_velocities,const T dt)
+Advance_One_Time_Step(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities,const T dt)
 {
     LOG::Time("advancing levelset");
     Advance_Levelset(dt);
@@ -98,7 +98,7 @@ Advance_Levelset(const T dt)
 // Function Advance_Particles
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
-Advance_Particles(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const bool analytic_test)
+Advance_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const bool analytic_test)
 {
     if(use_particle_levelset){
         time-=dt; // to fix up time advancement due to Advance_Levelset()
@@ -175,7 +175,7 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const 
 // Function Modify_Levelset_And_Particles
 //#####################################################################
 template<class TV> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>::
-Modify_Levelset_And_Particles(T_FACE_ARRAYS_SCALAR* face_velocities)
+Modify_Levelset_And_Particles(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities)
 {
     // TODO: a call for creating particles from the geometry if necessary
     if(use_particle_levelset){

@@ -17,7 +17,7 @@ template<class TV,class T_NESTED_LOOKUP> // T_NESTED_LOOKUP=FACE_LOOKUP_UNIFORM<
 class FACE_LOOKUP_COLLIDABLE_UNIFORM
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<bool,FACE_INDEX<TV::m> > FACE_ARRAYS_BOOL;
 public:
     template<class T_NESTED_LOOKUP_2> struct REBIND_NESTED_LOOKUP{typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV,T_NESTED_LOOKUP_2> TYPE;};
@@ -34,7 +34,7 @@ public:
         :nested_face_lookup(nested_face_lookup_input),body_list(body_list_input),valid_value_mask(valid_value_mask_input)
     {}
 
-    const T_FACE_ARRAYS& Raw_Data() const
+    const ARRAY<T,FACE_INDEX<TV::m> >& Raw_Data() const
     {return nested_face_lookup.Raw_Data();}
 
     const T_NESTED_LOOKUP& Nested() const

@@ -26,8 +26,8 @@ Euler_Step(const T dt,const T time)
     if(ground) BOUNDARY<TV,T>().Fill_Ghost_Cells(grid,*ground,ground_ghost,dt,time,ghost_cells);
     for(int i=-ghost_cells;i<grid.counts.x+ghost_cells;i++) eta_ghost(i)=U_ghost(i)(0)+ground_ghost(i);
 
-    T_FACE_ARRAYS_BOOL psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
-    T_FACE_ARRAYS_SCALAR face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());
+    ARRAY<bool,FACE_INDEX<TV::m> > psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());
     conservation->Save_Fluxes();
     VECTOR<EIGENSYSTEM<T,VECTOR<T,2> >*,1> eigensystem(&eigensystem_F);
     conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystem,eigensystem,psi_N,face_velocities);

@@ -30,7 +30,7 @@ template<class TV> DENSITY_CONTAINER<TV>::
 // Function Use_Semi_Lagrangian_Collidable_Advection
 //#####################################################################
 template<class TV> void DENSITY_CONTAINER<TV>::
-Use_Semi_Lagrangian_Collidable_Advection(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list,const T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input)
+Use_Semi_Lagrangian_Collidable_Advection(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list,const ARRAY<bool,FACE_INDEX<TV::m> >& face_velocities_valid_mask_input)
 {
     assert(!nested_semi_lagrangian_collidable&&!semi_lagrangian_collidable);
     nested_semi_lagrangian_collidable=new T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL(body_list,valid_mask_current,valid_mask_next,ambient_density,false);
@@ -51,7 +51,7 @@ Initialize_Array(const int ghost_cells,const bool initialize_new_elements,const 
 // Function Fill_Beta_At_Faces
 //#####################################################################
 template<class TV> void DENSITY_CONTAINER<TV>::
-Fill_Beta_At_Faces(const T dt,const T time,T_FACE_ARRAYS_SCALAR& beta_face) const
+Fill_Beta_At_Faces(const T dt,const T time,ARRAY<T,FACE_INDEX<TV::m> >& beta_face) const
 {
     ARRAY<T,TV_INT> density_ghost(grid.Cell_Indices(1),false);
     boundary->Fill_Ghost_Cells(grid,density,density_ghost,dt,time,1);

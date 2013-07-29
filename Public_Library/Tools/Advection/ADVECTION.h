@@ -30,7 +30,6 @@ template<class TV,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=typename GRID<T
 class ADVECTION:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
 
     ADVECTION()
@@ -40,13 +39,13 @@ public:
     {}
 
     void Update_Advection_Equation_Cell(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
-        const T_FACE_ARRAYS_SCALAR& face_velocities,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
+        const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost=0,const ARRAY<T2,TV_INT>* Z_max_ghost=0,ARRAY<T2,TV_INT>* Z_min=0,ARRAY<T2,TV_INT>* Z_max=0)
     {Update_Advection_Equation_Cell_Lookup(grid,Z,Z_ghost,T_FACE_LOOKUP(face_velocities),boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);}
 
-    void Update_Advection_Equation_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_ARRAYS_SCALAR& Z_ghost,
-        const T_FACE_ARRAYS_SCALAR& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
-        const T_FACE_ARRAYS_SCALAR* Z_min_ghost=0,const T_FACE_ARRAYS_SCALAR* Z_max_ghost=0,T_FACE_ARRAYS_SCALAR* Z_min=0,T_FACE_ARRAYS_SCALAR* Z_max=0)
+    void Update_Advection_Equation_Face(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& Z,const ARRAY<T,FACE_INDEX<TV::m> >& Z_ghost,
+        const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
+        const ARRAY<T,FACE_INDEX<TV::m> >* Z_min_ghost=0,const ARRAY<T,FACE_INDEX<TV::m> >* Z_max_ghost=0,ARRAY<T,FACE_INDEX<TV::m> >* Z_min=0,ARRAY<T,FACE_INDEX<TV::m> >* Z_max=0)
     {if(Z_min_ghost && Z_max_ghost){
         T_FACE_LOOKUP Z_min_lookup(*Z_min_ghost),Z_max_lookup(*Z_max_ghost);
         Update_Advection_Equation_Face_Lookup(grid,Z,T_FACE_LOOKUP(Z_ghost),T_FACE_LOOKUP(face_velocities),boundary,dt,time,&Z_min_lookup,&Z_max_lookup,Z_min,Z_max);}
@@ -66,9 +65,9 @@ public:
         const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T2>& boundary,const T dt,const T time,
         const ARRAY<T2,TV_INT>* Z_min_ghost=0,const ARRAY<T2,TV_INT>* Z_max_ghost=0,ARRAY<T2,TV_INT>* Z_min=0,ARRAY<T2,TV_INT>* Z_max=0)
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual void Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
+    virtual void Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& Z,const T_FACE_LOOKUP& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
-        const T_FACE_LOOKUP* Z_min_ghost=0,const T_FACE_LOOKUP* Z_max_ghost=0,T_FACE_ARRAYS_SCALAR* Z_min=0,T_FACE_ARRAYS_SCALAR* Z_max=0)
+        const T_FACE_LOOKUP* Z_min_ghost=0,const T_FACE_LOOKUP* Z_max_ghost=0,ARRAY<T,FACE_INDEX<TV::m> >* Z_min=0,ARRAY<T,FACE_INDEX<TV::m> >* Z_max=0)
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 //#####################################################################
 };

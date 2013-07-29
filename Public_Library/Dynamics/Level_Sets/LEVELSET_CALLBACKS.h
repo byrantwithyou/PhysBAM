@@ -21,7 +21,6 @@ template<class TV>
 class LEVELSET_CALLBACKS
 {    
     typedef typename TV::SCALAR T;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
 
     LEVELSET_CALLBACKS()
@@ -30,8 +29,8 @@ public:
     virtual ~LEVELSET_CALLBACKS();
 
 //#####################################################################
-    virtual void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time=0) const;
-    virtual void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time=0) const;
+    virtual void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& face_velocity,const T time=0) const;
+    virtual void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& face_velocity,const T time=0) const;
     virtual void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time);
     virtual bool Adjust_Particle_For_Objects(TV& X,TV& V,const T r, const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time);

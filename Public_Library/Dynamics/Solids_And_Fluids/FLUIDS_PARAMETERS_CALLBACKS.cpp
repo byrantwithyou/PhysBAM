@@ -14,16 +14,16 @@ Initialize_Phi()
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
 template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
-Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_BOOL& psi_N,const T time)
+Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
-Get_Reflection_Conditions(T_FACE_ARRAYS_SCALAR& psi_R,const T time)
+Get_Reflection_Conditions(ARRAY<T,FACE_INDEX<TV::m> >& psi_R,const T time)
 {
 }
 template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
-Get_Source_Velocities_Masked(const T time,const T_FACE_ARRAYS_BOOL& invalid_mask)
+Get_Source_Velocities_Masked(const T time,const ARRAY<bool,FACE_INDEX<TV::m> >& invalid_mask)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
@@ -33,12 +33,12 @@ Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time)
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
-Get_Object_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Get_Object_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
-Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
@@ -73,7 +73,7 @@ Get_Flame_Speed_Multiplier(const T dt,const T time)
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
-Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
+Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }

@@ -15,7 +15,6 @@ class BOUNDARY_REFLECTION_WATER:public BOUNDARY<TV,T2>
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename GRID<TV>::FACE_ARRAYS_SCALAR T_FACE_ARRAYS_SCALAR;
 public:
     typedef BOUNDARY<TV,T2> BASE;
     using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;
@@ -24,7 +23,7 @@ public:
     T tolerance;
 private:
     ARRAY<T,TV_INT>* phi;
-    T_FACE_ARRAYS_SCALAR* V;
+    ARRAY<T,FACE_INDEX<TV::m> >* V;
 public:
 
     BOUNDARY_REFLECTION_WATER(const bool left_constant_extrapolation_input=false,const bool right_constant_extrapolation_input=false,const bool bottom_constant_extrapolation_input=false,
@@ -40,7 +39,7 @@ public:
     void Use_Extrapolation_Mode(const bool use=true)
     {use_extrapolation_mode=use;}
 
-    void Set_Phi_And_Velocity_Pointers(ARRAY<T,TV_INT>& phi_input,T_FACE_ARRAYS_SCALAR& V_input)
+    void Set_Phi_And_Velocity_Pointers(ARRAY<T,TV_INT>& phi_input,ARRAY<T,FACE_INDEX<TV::m> >& V_input)
     {phi=&phi_input;V=&V_input;}
 
     void Set_Tolerance(const T tolerance_input=(T)9.8/24)  // dt*gravity where dt=1/24 is based on the length of a frame

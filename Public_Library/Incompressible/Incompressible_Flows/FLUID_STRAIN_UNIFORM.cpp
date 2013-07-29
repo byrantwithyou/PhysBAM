@@ -43,7 +43,7 @@ template<class TV> FLUID_STRAIN_UNIFORM<TV>::
 // Function Update_Strain_Equation_Helper_Cell_Centered
 //#####################################################################
 template<class TV> void FLUID_STRAIN_UNIFORM<TV>::
-Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T density,const T heaviside_bandwidth,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& V,
+Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T density,const T heaviside_bandwidth,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& V,
     const ARRAY<T,TV_INT>& phi_ghost,const int number_of_ghost_cells)
 {
     T_ARRAYS_SYMMETRIC_MATRIX e_ghost(grid.Domain_Indices(number_of_ghost_cells),false);e_boundary->Fill_Ghost_Cells(grid,e,e_ghost,dt,time,number_of_ghost_cells);
@@ -81,7 +81,7 @@ Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T dens
 // Function Update_Strain_Equation
 //#####################################################################
 template<class TV> void FLUID_STRAIN_UNIFORM<TV>::
-Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const ARRAY<T,TV_INT>& phi_ghost,const int number_of_ghost_cells)
+Update_Strain_Equation(const T dt,const T time,const T density,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,const ARRAY<T,TV_INT>& phi_ghost,const int number_of_ghost_cells)
 {
     if(!cfl_called) PHYSBAM_WARNING("Using strain without calling strain CFL");
     ARRAY<TV,TV_INT> V(grid.Domain_Indices(1));
@@ -96,7 +96,7 @@ Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCA
 // Function Update_Strain_Equation
 //#####################################################################
 template<class TV> void FLUID_STRAIN_UNIFORM<TV>::
-Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
+Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,
     const LEVELSET_MULTIPLE<TV>& levelset,const int region,const int number_of_ghost_cells)
 {
     if(!cfl_called) PHYSBAM_WARNING("Using strain without calling strain CFL");

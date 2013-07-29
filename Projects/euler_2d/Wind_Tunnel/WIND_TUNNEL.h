@@ -35,7 +35,6 @@ class WIND_TUNNEL:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >,publi
 {
 public:
     typedef T_input T;typedef VECTOR<T,2> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename T_ARRAYS_BASE::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
@@ -233,8 +232,8 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 {
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Set_Dirichlet_Boundary_Conditions(time);
     EULER_UNIFORM<TV >& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV >&>(fluids_parameters)).euler);
-    T_FACE_ARRAYS_BOOL& psi_N=euler.euler_projection.elliptic_solver->psi_N;
-    T_FACE_ARRAYS_SCALAR& face_velocities=euler.euler_projection.face_velocities;
+    ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=euler.euler_projection.elliptic_solver->psi_N;
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=euler.euler_projection.face_velocities;
     RANGE<TV> domain=fluids_parameters.euler->grid.Domain();
     TV domain_center=domain.Center();
 
@@ -339,7 +338,7 @@ void Woodward_Collela_Fix(bool fix_entropy,bool fix_enthalpy)
 void Fedkiw_Isobaric_Fix(bool fix_only_6_cells)
 {
     EULER_UNIFORM<TV >& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV >&>(fluids_parameters)).euler);
-    T_FACE_ARRAYS_BOOL& psi_N=euler.euler_projection.elliptic_solver->psi_N;
+    ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=euler.euler_projection.elliptic_solver->psi_N;
     EOS_GAMMA<T>* gamma_law=dynamic_cast<EOS_GAMMA<T>*>(euler.eos);  // This isobaric fix depends on the EOS being a gamma law
     const T gamma=gamma_law->gamma;
     // Could do the one-ring and two-ring calculations somewhere before we begin...

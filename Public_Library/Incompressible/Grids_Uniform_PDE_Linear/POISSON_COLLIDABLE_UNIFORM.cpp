@@ -78,7 +78,7 @@ Find_Constant_beta(const ARRAY<T,TV_INT>& phi_ghost)
 //#####################################################################
 // only set up for jump conditons - doesn't work for Dirichlet boundary conditions yet 
 template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
-Find_Constant_beta(T_FACE_ARRAYS_SCALAR& beta_face,const ARRAY<T,TV_INT>& phi_ghost)
+Find_Constant_beta(ARRAY<T,FACE_INDEX<TV::m> >& beta_face,const ARRAY<T,TV_INT>& phi_ghost)
 {
     assert(!multiphase);
     

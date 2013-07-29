@@ -27,7 +27,6 @@ template<class T_input>
 class CYLINDRICAL:public EULER_2D<T_input>
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<T,4> TV_DIMENSION;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
     using EULER_2D<T>::boundary;using EULER_2D<T>::conservation;using EULER_2D<T>::eos;using EULER_2D<T>::grid;using EULER_2D<T>::U;
     using EULER_2D<T>::cut_out_grid;using EULER_2D<T>::psi_pointer;using EULER_2D<T>::eigensystem_F;using EULER_2D<T>::eigensystem_G;

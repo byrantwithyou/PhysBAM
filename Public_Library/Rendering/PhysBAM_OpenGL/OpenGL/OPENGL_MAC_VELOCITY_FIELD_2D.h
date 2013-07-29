@@ -21,7 +21,6 @@ class OPENGL_MAC_VELOCITY_FIELD_2D:public OPENGL_VECTOR_FIELD_2D<ARRAY<VECTOR<T_
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:
-    typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     using OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >::size;
 
     enum VELOCITY_MODE { FACE_CENTERED, CELL_CENTERED };
@@ -32,9 +31,9 @@ public:
     ARRAY_VIEW<T,VECTOR<int,2> > &u,&v;
     ARRAY<TV> vector_field,vector_locations;
     ARRAY<bool,TV_INT> *active_cells;
-    T_FACE_ARRAYS_BOOL *active_faces;
+    ARRAY<bool,FACE_INDEX<TV::m> > *active_faces;
 
-    OPENGL_MAC_VELOCITY_FIELD_2D(GRID<TV> &grid,ARRAY<T,FACE_INDEX<2> > &face_velocities_input,ARRAY<bool,TV_INT> *active_cells_input=0,T_FACE_ARRAYS_BOOL *active_faces_input=0);
+    OPENGL_MAC_VELOCITY_FIELD_2D(GRID<TV> &grid,ARRAY<T,FACE_INDEX<2> > &face_velocities_input,ARRAY<bool,TV_INT> *active_cells_input=0,ARRAY<bool,FACE_INDEX<TV::m> > *active_faces_input=0);
     virtual ~OPENGL_MAC_VELOCITY_FIELD_2D();
 
     void Update();  // Call when grid/u/v change

@@ -28,7 +28,7 @@ Euler_Step_Node(ARRAY_VIEW<TV> X,const GRID<TV>& grid,const ARRAY<TV,TV_INT>& U,
 // Function Euler_Step_Face
 //#####################################################################
 template<class TV> void EULER_STEP_PARTICLES<TV>::
-Euler_Step_Face(ARRAY_VIEW<TV> X,const GRID<TV>& grid,const T_FACE_ARRAYS& face_velocities,const T dt)
+Euler_Step_Face(ARRAY_VIEW<TV> X,const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt)
 {
     FACE_LOOKUP_UNIFORM<TV> lookup(face_velocities);
     for(int k=0;k<X.Size();k++){

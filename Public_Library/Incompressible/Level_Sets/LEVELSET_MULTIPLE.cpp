@@ -207,7 +207,7 @@ Two_Minimum_Regions(const TV& location,int& minimum_region,int& second_minimum_r
 // Function CFL
 //#####################################################################
 template<class TV> typename TV::SCALAR LEVELSET_MULTIPLE<TV>::
-CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
+CFL(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) const
 {
     T minimum_cfl=FLT_MAX;
     for(int i=0;i<levelsets.m;i++) minimum_cfl=min(minimum_cfl,levelsets(i)->CFL(face_velocities));

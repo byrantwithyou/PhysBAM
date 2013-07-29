@@ -28,7 +28,6 @@ template<class TV>
 class SMOKE_STANDARD_TESTS_2D
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     SOLIDS_FLUIDS_EXAMPLE<TV>& example;
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters;
@@ -46,8 +45,8 @@ public:
     T rotation_angle;
     FRAME<TV> rotation_frame;
     int left_box,right_box;
-    T_FACE_ARRAYS_SCALAR beta_face;
-    T_FACE_ARRAYS_SCALAR divergence_face_weights;
+    ARRAY<T,FACE_INDEX<TV::m> > beta_face;
+    ARRAY<T,FACE_INDEX<TV::m> > divergence_face_weights;
     
     SMOKE_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters,INCOMPRESSIBLE_FLUID_COLLECTION<TV>& incompressible_fluid_collection,
         RIGID_BODY_COLLECTION<TV>& rigid_body_collection);

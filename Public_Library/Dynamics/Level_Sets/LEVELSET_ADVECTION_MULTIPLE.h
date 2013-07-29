@@ -18,7 +18,6 @@ template<class TV>
 class LEVELSET_ADVECTION_MULTIPLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     LEVELSET_MULTIPLE<TV>& levelsets;
     ARRAY<LEVELSET_ADVECTION<TV> > levelset_advections;
@@ -33,7 +32,7 @@ public:
     void Set_Custom_Advection(ADVECTION<TV,T>& advection_input)
     {for(int i=0;i<levelset_advections.m;i++)levelset_advections(i).Set_Custom_Advection(advection_input);}
     
-    void Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const int number_of_ghost_cells)
+    void Euler_Step(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const int number_of_ghost_cells)
     {for(int i=0;i<levelset_advections.m;i++) levelset_advections(i).Euler_Step(face_velocities,dt,time,number_of_ghost_cells);}
     
     void Euler_Step(const ARRAY<TV,TV_INT>& velocity,const T dt,const T time,const int number_of_ghost_cells)

@@ -21,7 +21,6 @@ template<class T_input,class TV=VECTOR<T_input,3> >
 class LIGHTHOUSE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>,public BOUNDARY_OPEN_CALLBACKS<TV>
 {
     typedef T_input T;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 public:
@@ -195,8 +194,8 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_uniform=dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters);
     if(fluids_parameters_uniform.mpi_grid && fluids_parameters_uniform.mpi_grid->Neighbor(1,2)) return;
 
-    T_FACE_ARRAYS_BOOL& psi_N=fluids_parameters.incompressible->projection.elliptic_solver->psi_N;
-    T_FACE_ARRAYS_SCALAR& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
+    ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=fluids_parameters.incompressible->projection.elliptic_solver->psi_N;
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
 
     RANGE<VECTOR<int,3> > right_grid_cells=RANGE<VECTOR<int,3> >(TV_INT(fluids_parameters.grid->counts.x-2,1,1),fluids_parameters.grid->Numbers_Of_Cells());
     for(int axis=0;axis<3;axis++){
@@ -291,7 +290,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Body_Force
 //#####################################################################
-void Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time) PHYSBAM_OVERRIDE
+void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time) PHYSBAM_OVERRIDE
 {
     BASE::Get_Body_Force(force,dt,time);
 }

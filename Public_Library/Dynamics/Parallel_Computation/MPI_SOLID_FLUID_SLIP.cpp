@@ -204,8 +204,8 @@ Exchange_Coupled_Deformable_Particle_List(ARRAY<int>* fluid_list,ARRAY<ARRAY<int
 // Function Find_Matrix_Indices
 //#####################################################################
 template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::
-Find_Matrix_Indices(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_divergence_cells,T_ARRAYS_INT& cell_index_to_matrix_index,T_FACE_ARRAYS_INT& face_ghost_cell_index,
-    ARRAY<int>& face_ghost_cell_index_map,T_FACE_ARRAYS_INT& face_lambdas,INTERVAL<int>& divergence_indices,int& cell_count)
+Find_Matrix_Indices(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_divergence_cells,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<int,SIDED_FACE_INDEX<TV::m> >& face_ghost_cell_index,
+    ARRAY<int>& face_ghost_cell_index_map,ARRAY<int,SIDED_FACE_INDEX<TV::m> >& face_lambdas,INTERVAL<int>& divergence_indices,int& cell_count)
 {
     assert(local_grid.Is_MAC_Grid());
     cell_count=0;
@@ -232,7 +232,7 @@ Find_Matrix_Indices(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_d
 //#####################################################################
 template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::
 Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_divergence_cells,const int region_index,const RANGE<TV_INT>& region,
-    T_ARRAYS_INT& cell_index_to_matrix_index,T_FACE_ARRAYS_INT& face_ghost_cell_index,ARRAY<int>& face_ghost_cell_index_map,T_FACE_ARRAYS_INT& face_lambdas,INTERVAL<int>& divergence_indices,int& cell_count)
+    T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<int,SIDED_FACE_INDEX<TV::m> >& face_ghost_cell_index,ARRAY<int>& face_ghost_cell_index_map,ARRAY<int,SIDED_FACE_INDEX<TV::m> >& face_lambdas,INTERVAL<int>& divergence_indices,int& cell_count)
 {
     if(region_index>=0)
         partition.ghost_indices(region_index).min_corner=cell_count;
@@ -372,7 +372,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT
 // Function Find_Matrix_Indices_In_Region
 //#####################################################################
 template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::
-Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_divergence_cells,const int domain_side,const RANGE<TV_INT>& region,const T_ARRAYS_INT& cell_index_to_matrix_index,const T_FACE_ARRAYS_INT& face_ghost_cell_index,const T_FACE_ARRAYS_INT& face_lambdas)
+Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_divergence_cells,const int domain_side,const RANGE<TV_INT>& region,const T_ARRAYS_INT& cell_index_to_matrix_index,const ARRAY<int,SIDED_FACE_INDEX<TV::m> >& face_ghost_cell_index,const ARRAY<int,SIDED_FACE_INDEX<TV::m> >& face_lambdas)
 {
     int axis=domain_side/2,cell_side=domain_side&1;
     RANGE<TV_INT> face_region=region;if(!cell_side) face_region+=TV_INT::Axis_Vector(axis);
@@ -506,8 +506,8 @@ template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::Parallel_Solve_Fluid_Part(FLUI
 template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI_SLIP<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array,GENERALIZED_VELOCITY<TV>& p_array,GENERALIZED_VELOCITY<TV>& ap_array,
     GENERALIZED_VELOCITY<TV>& ar_array,GENERALIZED_VELOCITY<TV>& r_array,GENERALIZED_VELOCITY<TV>& z_array,GENERALIZED_VELOCITY<TV>& zaq_array,const int min_iterations,const int max_iterations,const T tolerance){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::Exchange_Coupled_Deformable_Particle_List(ARRAY<int>* fluid_list,ARRAY<ARRAY<int> >* results){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::Find_Matrix_Indices(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_divergence_cells,T_ARRAYS_INT& cell_index_to_matrix_index,T_FACE_ARRAYS_INT& face_ghost_cell_index,ARRAY<int>& face_ghost_cell_index_map,T_FACE_ARRAYS_INT& face_lambdas,INTERVAL<int>& divergence_indices,int &cell_count){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_divergence_cells,const int domain_side,const RANGE<TV_INT>& region,const T_ARRAYS_INT& cell_index_to_matrix_index,const T_FACE_ARRAYS_INT& face_ghost_cell_index,const T_FACE_ARRAYS_INT& face_lambdas){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::Find_Matrix_Indices(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_divergence_cells,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<int,SIDED_FACE_INDEX<TV::m> >& face_ghost_cell_index,ARRAY<int>& face_ghost_cell_index_map,ARRAY<int,SIDED_FACE_INDEX<TV::m> >& face_lambdas,INTERVAL<int>& divergence_indices,int &cell_count){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_divergence_cells,const int domain_side,const RANGE<TV_INT>& region,const T_ARRAYS_INT& cell_index_to_matrix_index,const ARRAY<int,SIDED_FACE_INDEX<TV::m> >& face_ghost_cell_index,const ARRAY<int,SIDED_FACE_INDEX<TV::m> >& face_lambdas){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 //#####################################################################
 #endif
 #define INSTANTIATION_HELPER_UNIFORM(T,d) \

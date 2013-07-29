@@ -17,7 +17,6 @@ template<class TV>
 class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM:public PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef typename ARRAY<T,TV_INT>::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 public:
@@ -56,15 +55,15 @@ public:
     void Seed_Particles(const T time) PHYSBAM_OVERRIDE;
     void Delete_Particles_Outside_Grid() PHYSBAM_OVERRIDE;
     void Set_CFL_Number(const T cfl_number_input) PHYSBAM_OVERRIDE;
-    void Advance_To_Time(T_FACE_ARRAYS_SCALAR* face_velocities,const T stopping_time,const bool verbose=true) PHYSBAM_OVERRIDE;
+    void Advance_To_Time(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities,const T stopping_time,const bool verbose=true) PHYSBAM_OVERRIDE;
     T Time_Step(const T stopping_time,bool& limited_by_stopping_time) PHYSBAM_OVERRIDE;
     T CFL(const bool need_to_get_velocity=true,const bool analytic_test=false) PHYSBAM_OVERRIDE;
-    void Advance_One_Time_Step(T_FACE_ARRAYS_SCALAR* face_velocities,const T dt) PHYSBAM_OVERRIDE;
+    void Advance_One_Time_Step(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities,const T dt) PHYSBAM_OVERRIDE;
     void Advance_Levelset(const T dt) PHYSBAM_OVERRIDE;
-    void Advance_Particles(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const bool analytic_test=false) PHYSBAM_OVERRIDE;
+    void Advance_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const bool analytic_test=false) PHYSBAM_OVERRIDE;
     T Advance_Particles(ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time) PHYSBAM_OVERRIDE;
     T Advance_Particles(ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time) PHYSBAM_OVERRIDE;
-    void Modify_Levelset_And_Particles(T_FACE_ARRAYS_SCALAR* face_velocities) PHYSBAM_OVERRIDE;
+    void Modify_Levelset_And_Particles(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities) PHYSBAM_OVERRIDE;
     void Reseed_Particles(const T time,const int time_step=0,ARRAY<bool,TV_INT>* cell_centered_mask=0,const bool verbose=true) PHYSBAM_OVERRIDE;
     void Fill_Levelset_Ghost_Cells(const T time) PHYSBAM_OVERRIDE;
 //#####################################################################

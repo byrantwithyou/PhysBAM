@@ -19,8 +19,6 @@ class INCOMPRESSIBLE_MULTIPHASE_UNIFORM:public INCOMPRESSIBLE_UNIFORM<TV>
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;typedef VECTOR<int,TV::m> T_VECTOR_INT;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
     typedef typename ARRAY<T,TV_INT>::template REBIND<typename TV::SPIN>::TYPE T_ARRAYS_SPIN;
 public:
@@ -32,7 +30,7 @@ public:
     using BASE::projection;using BASE::grid;using BASE::boundary;using BASE::force;using BASE::variable_vorticity_confinement;using BASE::strain;using BASE::variable_viscosity;
     using BASE::maximum_implicit_viscosity_iterations;using BASE::Extrapolate_Velocity_Across_Interface;
 
-    T_FACE_ARRAYS_SCALAR viscous_force;
+    ARRAY<T,FACE_INDEX<TV::m> > viscous_force;
     LEVELSET<TV>* levelset_for_dirichlet_regions;
     ARRAY<FLUID_STRAIN_UNIFORM<TV>*> strains;
 
@@ -49,22 +47,22 @@ public:
     {PHYSBAM_NOT_IMPLEMENTED();/*PHYSBAM_ASSERT(!phi_ghost);Advance_One_Time_Step_Forces(dt,time,implicit_viscosity,0,0);*/}
 
     // overrides version from BASE
-    void Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect)
+    void Advance_One_Time_Step_Convection(const T dt,const T time,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_to_advect)
     {PHYSBAM_NOT_IMPLEMENTED();/*Advance_One_Time_Step_Convection(dt,time,face_velocities_to_advect,0);*/}
     
 //#####################################################################
-    void Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<ARRAY<T,TV_INT>>* phi_ghost,
+    void Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<ARRAY<T,TV_INT>>* phi_ghost,
         const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells);
-    void Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& advecting_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells);
-    void Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity=false);
+    void Advance_One_Time_Step_Convection(const T dt,const T time,ARRAY<T,FACE_INDEX<TV::m> >& advecting_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_to_advect,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells);
+    void Advance_One_Time_Step_Implicit_Part(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const bool implicit_viscosity=false);
     void Calculate_Pressure_Jump(const T dt,const T time);
-    T CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid=false,const bool viscous_only=false) const;
+    T CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool inviscid=false,const bool viscous_only=false) const;
     void Set_Dirichlet_Boundary_Conditions(ARRAY<ARRAY<T,TV_INT>>& phis,const ARRAY<bool>& dirichlet_regions,const ARRAY<T>* pressures=0);
     void Add_Surface_Tension(LEVELSET<TV>& levelset,const T time);
-    void Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& F) PHYSBAM_OVERRIDE;
+    void Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& F) PHYSBAM_OVERRIDE;
 protected:
     void Discretize_Explicit_Viscous_Terms(const T dt){PHYSBAM_NOT_IMPLEMENTED();}
-    void Implicit_Viscous_Update(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
+    void Implicit_Viscous_Update(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
 //#####################################################################
 };
 }

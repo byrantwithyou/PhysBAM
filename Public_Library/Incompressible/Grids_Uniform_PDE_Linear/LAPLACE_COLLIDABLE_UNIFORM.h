@@ -26,7 +26,6 @@ class LAPLACE_COLLIDABLE_UNIFORM:public LAPLACE_UNIFORM<TV>,public LAPLACE_COLLI
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
     typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
 public:
     typedef LAPLACE_UNIFORM<TV> BASE;
@@ -40,7 +39,7 @@ public:
     using COLLIDABLE_BASE::levelset;using COLLIDABLE_BASE::u_interface;using BASE::filled_region_colors;
 
     //LEVELSET<TV>* levelset; // used in second order accurate cut cell method
-    //T_FACE_ARRAYS_SCALAR u_interface; // interface boundary condition - 2nd order method
+    //ARRAY<T,FACE_INDEX<TV::m> > u_interface; // interface boundary condition - 2nd order method
 protected:
     ARRAY<T,TV_INT> phi_default;
     LEVELSET<TV>* levelset_default;

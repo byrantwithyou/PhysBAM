@@ -275,7 +275,7 @@ Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& worl
 // Function Get_Source_Velocities
 //#####################################################################
 template<class TV> template<class GEOMETRY> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
-Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity,const T_FACE_ARRAYS_BOOL& invalid_mask)
+Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity,const ARRAY<bool,FACE_INDEX<TV::m> >& invalid_mask)
 {
     for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
         if(!invalid_mask(axis,face_index) && source.Lazy_Inside(world_to_source.Homogeneous_Times(iterator.Location()))){
@@ -369,7 +369,7 @@ Revalidate_Phi_After_Modify_Levelset()
 // Function Revalidate_Fluid_Velocity
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
-Revalidate_Fluid_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities)
+Revalidate_Fluid_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     if(fluids_parameters.incompressible->nested_nested_semi_lagrangian_fire_multiphase_collidable) 
         fluids_parameters.incompressible->nested_nested_semi_lagrangian_fire_multiphase_collidable->Average_To_Invalidated_Face(*fluids_parameters.grid,face_velocities);
@@ -382,7 +382,7 @@ Revalidate_Fluid_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities)
 // Function Get_Object_Velocities
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
-Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     if(fluids_parameters.solid_affects_fluid && (fluids_parameters.fluid_affects_solid || fluids_parameters.use_slip)){
         if(!fluids_parameters.use_slip){
@@ -397,9 +397,9 @@ Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,T_FACE_ARRAYS_SCALAR&
 // Function Get_Levelset_Velocity
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
-Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,T_FACE_ARRAYS_SCALAR& V_levelset,const T time) const
+Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const
 {
-    if(!fluids_parameters.use_reacting_flow) T_FACE_ARRAYS_SCALAR::Put(fluid_collection.incompressible_fluid_collection.face_velocities,V_levelset);
+    if(!fluids_parameters.use_reacting_flow) ARRAY<T,FACE_INDEX<TV::m> >::Put(fluid_collection.incompressible_fluid_collection.face_velocities,V_levelset);
     else{
         const PROJECTION_DYNAMICS_UNIFORM<TV>& projection=fluids_parameters.incompressible_multiphase->projection;
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();

@@ -19,7 +19,7 @@ class MPI_UNIFORM_GRID:public MPI_GRID<TV>
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
+    typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
     typedef typename ARRAY<T,TV_INT>::template REBIND<RANGE<TV_INT> >::TYPE T_ARRAYS_BOX_INT;
 public:
     typedef GRID<TV> GRID_T;

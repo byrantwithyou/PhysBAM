@@ -39,7 +39,6 @@ class SOLID_FLUID_COUPLED_EVOLUTION:public NEWMARK_EVOLUTION<TV_input>
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_BOUNDARY_SIMPLEX;typedef VECTOR<int,TV::dimension> T_BOUNDARY_ELEMENT;typedef VECTOR<int,TV::dimension+1> T_ELEMENT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension>::SIMPLEX T_SIMPLEX;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename TV::SPIN T_SPIN;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT T_THIN_SHELL;typedef typename T_THIN_SHELL::MESH T_THIN_SHELL_MESH;
     typedef VECTOR<int,TV::dimension> T_THIN_SHELL_ELEMENT;typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_THIN_SHELL_SIMPLEX;
@@ -62,8 +61,8 @@ protected:
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies;
     T_FACE_ARRAYS_FACE_WEIGHT_ELEMENTS dual_cell_weights;
     T_FACE_ARRAYS_FACE_WEIGHT_ELEMENTS rigid_body_dual_cell_weights;
-    T_FACE_ARRAYS_SCALAR dual_cell_fluid_volume;
-    T_FACE_ARRAYS_BOOL dual_cell_contains_solid;
+    ARRAY<T,FACE_INDEX<TV::m> > dual_cell_fluid_volume;
+    ARRAY<bool,FACE_INDEX<TV::m> > dual_cell_contains_solid;
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection;
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters;
@@ -72,13 +71,13 @@ protected:
     ARRAY<TV> rigid_body_updated_center_of_mass;
     ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> > rigid_body_fluid_inertia;
     ARRAY<TV> ar_full,z_full,zaq_full;ARRAY<TWIST<TV> > rigid_ar_full,rigid_z_full,rigid_zaq_full; // extra vectors for conjugate residual
-    T_FACE_ARRAYS_SCALAR solid_projected_face_velocities_star;
+    ARRAY<T,FACE_INDEX<TV::m> > solid_projected_face_velocities_star;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> coupled_vectors;
 
     POISSON_COLLIDABLE_UNIFORM<TV>* Get_Poisson()
     {return (fluids_parameters.compressible ? fluids_parameters.euler->euler_projection.elliptic_solver : fluids_parameters.incompressible->projection.poisson_collidable);}
 
-    T_FACE_ARRAYS_SCALAR& Get_Face_Velocities()
+    ARRAY<T,FACE_INDEX<TV::m> >& Get_Face_Velocities()
     {return fluids_parameters.compressible ? fluids_parameters.euler->euler_projection.face_velocities:fluid_collection.incompressible_fluid_collection.face_velocities;}
 
     const GRID<TV>& Get_Grid()
@@ -123,8 +122,8 @@ public:
     void Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors);
     void Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<ARRAY<T> >& right_hand_side,const ARRAY<INTERVAL<int> >& interior_regions,const int colors);
     void Apply_Pressure(const T dt,const T time);
-    void Average_Solid_Projected_Face_Velocities_For_Energy_Update(const T_FACE_ARRAYS_SCALAR& solid_projected_face_velocities_star,const T_FACE_ARRAYS_SCALAR& solid_projected_face_velocities_np1,T_FACE_ARRAYS_SCALAR& face_velocities);
-    void Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_FACE_ARRAYS_SCALAR& face_velocities);
+    void Average_Solid_Projected_Face_Velocities_For_Energy_Update(const ARRAY<T,FACE_INDEX<TV::m> >& solid_projected_face_velocities_star,const ARRAY<T,FACE_INDEX<TV::m> >& solid_projected_face_velocities_np1,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
+    void Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
     void Set_Neumann_and_Dirichlet_Boundary_Conditions(const T time);
 //#####################################################################
 };

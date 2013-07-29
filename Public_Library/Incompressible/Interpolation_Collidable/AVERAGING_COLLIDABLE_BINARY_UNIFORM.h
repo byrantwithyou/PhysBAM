@@ -15,7 +15,6 @@ class AVERAGING_COLLIDABLE_BINARY_UNIFORM
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     typedef T_FACE_LOOKUP FACE_LOOKUP;
 

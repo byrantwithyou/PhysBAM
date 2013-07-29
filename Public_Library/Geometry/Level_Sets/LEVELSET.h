@@ -38,7 +38,6 @@ class LEVELSET:public NONCOPYABLE
     typedef typename REBIND<T_INTERPOLATION_SCALAR,TV>::TYPE T_INTERPOLATION_VECTOR;
     typedef typename REBIND<LINEAR_INTERPOLATION_UNIFORM<TV,T>,TV>::TYPE T_LINEAR_INTERPOLATION_VECTOR;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
-    typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     T small_number;
@@ -54,7 +53,7 @@ public:
 
     BOUNDARY<TV,T>* boundary;
     LEVELSET_CALLBACKS<TV>* levelset_callbacks;
-    const T_FACE_ARRAYS_BOOL* face_velocities_valid_mask_current;
+    const ARRAY<bool,FACE_INDEX<TV::m> >* face_velocities_valid_mask_current;
 //protected:
     BOUNDARY<TV,T>& boundary_default;
     static LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation_default;
@@ -112,7 +111,7 @@ public:
     void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<TV>& levelset_callbacks_input)
     {levelset_callbacks=&levelset_callbacks_input;}
 
-    void Set_Face_Velocities_Valid_Mask(const T_FACE_ARRAYS_BOOL* face_velocities_valid_mask_current_input)
+    void Set_Face_Velocities_Valid_Mask(const ARRAY<bool,FACE_INDEX<TV::m> >* face_velocities_valid_mask_current_input)
     {
         face_velocities_valid_mask_current=face_velocities_valid_mask_current_input;
     }
@@ -203,7 +202,7 @@ public:
     {return Compute_Curvature(phi,index);}
 
 //#####################################################################
-    T CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const;
+    T CFL(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) const;
     T CFL(const ARRAY<TV,TV_INT>& velocity) const;
     TV Iterative_Find_Interface(TV left,TV right,const int iterations=3) const;
     void Compute_Gradient(ARRAY<TV,TV_INT>& gradient,const T time=0) const;

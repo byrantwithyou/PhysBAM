@@ -41,7 +41,7 @@ Get_State_At_Location(const GRID<VECTOR<T,1> >& grid_1d,const ARRAY<TV_DIMENSION
 // Function Fill_Ghost_Cells_Neumann
 //#####################################################################
 template<class TV,class TV_DIMENSION> void BOUNDARY_OBJECT<TV,TV_DIMENSION>::
-Fill_Ghost_Cells_Neumann(const GRID<VECTOR<T,1> >& grid_1d,ARRAY<TV_DIMENSION,VECTOR<int,1> >& U_1d,const T_FACE_ARRAYS_SCALAR& face_velocities,const VECTOR<int,TV::m-1>& node_lower_dimension,const int axis,
+Fill_Ghost_Cells_Neumann(const GRID<VECTOR<T,1> >& grid_1d,ARRAY<TV_DIMENSION,VECTOR<int,1> >& U_1d,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const VECTOR<int,TV::m-1>& node_lower_dimension,const int axis,
     const int ghost_cells,const bool use_exact_neumann_face_location,const VECTOR<int,2>& domain,const VECTOR<int,2>& region_boundaries,const VECTOR<bool,2>& psi_N,CONSERVATION_CALLBACKS<T>* callbacks)
 {
     TV_DIMENSION u_1d;

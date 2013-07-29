@@ -21,9 +21,6 @@ class GRID_BASED_COLLISION_GEOMETRY:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef TV_INT T_INDEX;typedef typename GRID<TV>::BLOCK T_BLOCK;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_FACE_ARRAYS_BOOL::template REBIND<VECTOR<bool,TV::m> >::TYPE T_FACE_ARRAYS_BOOL_DIMENSION;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
 public:
     COLLISION_BODY_COLLECTION<TV> collision_geometry_collection;
@@ -37,7 +34,7 @@ public:
     ARRAY<bool,TV_INT> occupied_blocks;
     ARRAY<bool,TV_INT> swept_occupied_blocks;
     ARRAY<VECTOR<bool,TV::m>,TV_INT> cell_neighbors_visible; // length TV::m, order: right top back (for dyadic, tree is fully refined where this would have any effect)
-    T_FACE_ARRAYS_BOOL_DIMENSION face_neighbors_visible; // length is TV::m, order: right top back (for dyadic, tree is fully refined where this would have any effect)
+    ARRAY<VECTOR<bool,TV::m>,FACE_INDEX<TV::m> > face_neighbors_visible; // length is TV::m, order: right top back (for dyadic, tree is fully refined where this would have any effect)
 
     GRID_BASED_COLLISION_GEOMETRY(GRID<TV>& grid_input);
     virtual ~GRID_BASED_COLLISION_GEOMETRY();

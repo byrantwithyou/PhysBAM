@@ -65,8 +65,6 @@ class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 public:
     typedef T_input T;typedef VECTOR<T,3> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,3> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*TV::m> T_FACE_VECTOR_BOOL;
 
@@ -608,7 +606,7 @@ void Read_Soot_Velocities()
     std::string soot_velocity_file=soot_data_dir+"/mac_velocities";
     T_GRID soot_grid;
     ARRAY<T,TV_INT> soot_values;
-    T_FACE_ARRAYS_SCALAR soot_mac_velocities;
+    ARRAY<T,FACE_INDEX<TV::m> > soot_mac_velocities;
     FILE_UTILITIES::Read_From_File(stream_type,soot_grid_file,soot_grid);
     FILE_UTILITIES::Read_From_File(stream_type,soot_velocity_file,soot_mac_velocities);
     T soot_dx_over_2=soot_grid.dX.Max()*(T).5;
@@ -724,7 +722,7 @@ void Adjust_Soot_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_BOOL& psi_N,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
     if(!use_smoke_sourcing) return;
     if(!incompressible) PHYSBAM_FATAL_ERROR("this shouldn't be called in compressible case");

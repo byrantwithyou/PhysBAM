@@ -21,7 +21,7 @@ namespace PhysBAM{
 template<class T>
 class BURGERS_1D
 {
-    typedef VECTOR<T,1> TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef VECTOR<T,1> TV;
 public:
     BOUNDARY<TV,TV>* boundary;
     CONSERVATION<TV,1>* conservation;

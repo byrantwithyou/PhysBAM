@@ -29,7 +29,7 @@ template<class TV> VISCOSITY<TV>::
 // Function Add_Explicit_Forces
 //#####################################################################
 template<class TV> void VISCOSITY<TV>::
-Add_Explicit_Forces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Add_Explicit_Forces(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     if(dt && use_variable_viscosity && (!implicit_viscosity || use_explicit_part_of_implicit_viscosity)){
         if(!implicit_viscosity) PHYSBAM_NOT_IMPLEMENTED();
@@ -39,7 +39,7 @@ Add_Explicit_Forces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& face_veloci
 // Function Add_Implicit_Forces_Before_Projection
 //#####################################################################
 template<class TV> void VISCOSITY<TV>::
-Add_Implicit_Forces_Before_Projection(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Add_Implicit_Forces_Before_Projection(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     if(!dt || (!use_variable_viscosity && viscosity==0)) return;
     for(int axis=0;axis<TV::m;axis++){

@@ -13,7 +13,7 @@ namespace PhysBAM{
 template<class TV>
 class BLOCK_UNIFORM
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
     const GRID<TV>& grid;
     const TV_INT block_index;
@@ -50,21 +50,21 @@ public:
     typename T_FACE_LOOKUP::ELEMENT Face_X_Value(const T_FACE_LOOKUP& face_value,const int block_face_index) const
     {return face_value(0,Face_X(block_face_index));}
 
-    T& Face_X_Reference(T_FACE_ARRAYS_SCALAR& face_value,const int block_face_index) const
+    T& Face_X_Reference(ARRAY<T,FACE_INDEX<TV::m> >& face_value,const int block_face_index) const
     {return face_value(0,Face_X(block_face_index));}
 
     template<class T_FACE_LOOKUP>
     typename T_FACE_LOOKUP::ELEMENT Face_Y_Value(const T_FACE_LOOKUP& face_value,const int block_face_index) const
     {assert(TV::m>=2);return face_value(1,Face_Y(block_face_index));}
 
-    T& Face_Y_Reference(T_FACE_ARRAYS_SCALAR& face_value,const int block_face_index) const
+    T& Face_Y_Reference(ARRAY<T,FACE_INDEX<TV::m> >& face_value,const int block_face_index) const
     {assert(TV::m>=2);return face_value(1,Face_Y(block_face_index));}
 
     template<class T_FACE_LOOKUP>
     typename T_FACE_LOOKUP::ELEMENT Face_Z_Value(const T_FACE_LOOKUP& face_value,const int block_face_index) const
     {assert(TV::m==3);return face_value(2,Face_Z(block_face_index));}
 
-    T& Face_Z_Reference(T_FACE_ARRAYS_SCALAR& face_value,const int block_face_index) const
+    T& Face_Z_Reference(ARRAY<T,FACE_INDEX<TV::m> >& face_value,const int block_face_index) const
     {assert(TV::m==3);return face_value(2,Face_Z(block_face_index));}
 
     FACE_INDEX<TV::dimension> Face_X_Index(const int block_face_index) const

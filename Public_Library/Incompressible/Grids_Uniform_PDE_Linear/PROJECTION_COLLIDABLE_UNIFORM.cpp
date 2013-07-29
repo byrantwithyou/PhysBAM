@@ -51,13 +51,13 @@ Initialize_Grid(const GRID<TV>& mac_grid)
 // Function Apply_Pressure
 //#####################################################################
 template<class TV> void PROJECTION_COLLIDABLE_UNIFORM<TV>::
-Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt)
+Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt)
 {
     // find divergence free u, v and w 
     if(collidable_solver->second_order_cut_cell_method){
         //Zero_Out_Neumann_Pocket_Velocities(face_velocities); TODO: Why is this here?
         ARRAY<bool,TV_INT>& psi_D=elliptic_solver->psi_D;
-        T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver->psi_N;
+        ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=elliptic_solver->psi_N;
         ARRAY<T,TV_INT>& phi=collidable_solver->levelset->phi;
         TV dx=p_grid.dX,one_over_dx=Inverse(dx);
         if(scale_by_dt) p*=dt;

@@ -51,7 +51,7 @@ namespace PhysBAM{
 template<class TV> FLUIDS_PARAMETERS_UNIFORM<TV>::
 FLUIDS_PARAMETERS_UNIFORM(const int number_of_regions_input,const typename FLUIDS_PARAMETERS<TV>::TYPE type)
     :FLUIDS_PARAMETERS<TV>(type),mpi_grid(0),particle_levelset_evolution(0),incompressible(0),particle_levelset_evolution_multiple(0),incompressible_multiphase(0),sph_evolution(0),
-    maccormack_node_mask(*new ARRAY<bool,TV_INT>),maccormack_cell_mask(*new ARRAY<bool,TV_INT>),maccormack_face_mask(*new T_FACE_ARRAYS_BOOL),
+    maccormack_node_mask(*new ARRAY<bool,TV_INT>),maccormack_cell_mask(*new ARRAY<bool,TV_INT>),maccormack_face_mask(*new ARRAY<bool,FACE_INDEX<TV::m> >),
     maccormack_semi_lagrangian(*new ADVECTION_MACCORMACK_UNIFORM<TV,T,T_ADVECTION_SEMI_LAGRANGIAN_SCALAR>(semi_lagrangian,&maccormack_node_mask,&maccormack_cell_mask,
         &maccormack_face_mask)),euler(0),euler_solid_fluid_coupling_utilities(0),compressible_incompressible_coupling_utilities(0),projection(0),use_reacting_flow(false),
     use_flame_speed_multiplier(false),use_dsd(false),use_psi_R(false),use_levelset_viscosity(false),print_viscosity_matrix(false),use_second_order_pressure(false),
@@ -84,7 +84,7 @@ Initialize_Number_Of_Regions(const int number_of_regions_input)
 // Function Initialize_Fluid_Evolution
 //#####################################################################
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Initialize_Fluid_Evolution(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities)
+Initialize_Fluid_Evolution(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities)
 {
     if(number_of_threads>1){
         if(!thread_queue)thread_queue=new THREAD_QUEUE(number_of_threads);
@@ -319,7 +319,7 @@ Update_Fluid_Parameters(const T dt,const T time)
 //#####################################################################
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<TV>* elliptic_solver,
-        T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+        ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     elliptic_solver->psi_N.Fill(false);elliptic_solver->psi_D.Fill(false);
     if(incompressible){
@@ -339,9 +339,9 @@ Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<TV>* elliptic_solv
 // Function Set_Domain_Boundary_Conditions
 //#####################################################################
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<TV>& elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
+Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<TV>& elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time)
 {
-    ARRAY<bool,TV_INT>& psi_D=elliptic_solver.psi_D;T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver.psi_N;
+    ARRAY<bool,TV_INT>& psi_D=elliptic_solver.psi_D;ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=elliptic_solver.psi_N;
 
     for(int axis=0;axis<TV::m;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
@@ -378,7 +378,7 @@ Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<TV>& elliptic_solver,T_FACE_ARRAY
 //#####################################################################
 // flames and smoke have a buoyancy force
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
+Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time)
 {
     if(smoke){
         ARRAY<T,TV_INT> density_ghost(grid->Domain_Indices(number_of_ghost_cells),false),temperature_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
@@ -405,12 +405,12 @@ Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
             force.Component(1)(iterator.Face_Index())=one_over_densities(region)*temperature_buoyancy_constant*(temperature-temperature_container.ambient_temperature);}}
 }
 template<> void FLUIDS_PARAMETERS_UNIFORM<VECTOR<double,1> >::
-Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
+Get_Body_Force(ARRAY<T,FACE_INDEX<1> >& force,const T dt,const T time)
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }
 template<> void FLUIDS_PARAMETERS_UNIFORM<VECTOR<float,1> >::
-Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
+Get_Body_Force(ARRAY<T,FACE_INDEX<1> >& force,const T dt,const T time)
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }
@@ -426,7 +426,7 @@ Apply_Isobaric_Fix(const T dt,const T time)
 // Function Blend_In_External_Velocity
 //#####################################################################
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Blend_In_External_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Blend_In_External_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     if(use_external_velocity){
         ARRAY<TV,TV_INT> V_blend(grid->Domain_Indices(1));ARRAY<T,TV_INT> blend(grid->Domain_Indices(1));callbacks->Get_External_Velocity(V_blend,blend,time);
@@ -443,7 +443,7 @@ Blend_In_External_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,cons
 // Function Move_Grid
 //#####################################################################
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const T time)
+Move_Grid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const TV_INT& shift_domain,const T time)
 {
     TV_INT max_shift=2*TV_INT::All_Ones_Vector();
     TV_INT remaining_shift=shift_domain;
@@ -466,7 +466,7 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const
 
         {ARRAY<T,TV_INT> phi_ghost(grid->Domain_Indices(number_of_ghost_cells),false);phi_boundary->Fill_Ghost_Cells(*grid,particle_levelset_evolution->phi,phi_ghost,0,time,number_of_ghost_cells);
         ARRAY<T,TV_INT>::Limited_Shifted_Get(particle_levelset_evolution->phi,phi_ghost,temp_shift);}
-        {T_FACE_ARRAYS_SCALAR face_velocities_ghost(*grid,number_of_ghost_cells,false);fluid_boundary->Fill_Ghost_Faces(*grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
+        {ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(*grid,number_of_ghost_cells,false);fluid_boundary->Fill_Ghost_Faces(*grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
         for(int axis=0;axis<TV::m;axis++)
             ARRAY<T,TV_INT>::Limited_Shifted_Get(face_velocities.Component(axis),face_velocities_ghost.Component(axis),temp_shift);}
         {ARRAY<T,TV_INT> p_ghost(p_grid.Domain_Indices(number_of_ghost_cells),false);BOUNDARY<TV,T>().Fill_Ghost_Cells(p_grid,incompressible->projection.p,p_ghost,0,time,number_of_ghost_cells);
@@ -484,7 +484,7 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const
 // Function Move_Grid
 //#####################################################################
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
+Move_Grid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time)
 {
     assert(!smoke && !fire);
 

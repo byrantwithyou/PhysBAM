@@ -13,7 +13,7 @@ template<class TV,class T_NESTED_LOOKUP> // T_NESTED_LOOKUP=FACE_LOOKUP_UNIFORM<
 class FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<bool,FACE_INDEX<TV::m> > FACE_ARRAYS_BOOL;
 public:
     template<class T_NESTED_LOOKUP_2> struct REBIND_NESTED_LOOKUP{typedef FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM<TV,T_NESTED_LOOKUP_2> TYPE;};
@@ -29,7 +29,7 @@ public:
     FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM(const T_NESTED_LOOKUP& nested_face_lookup_input,const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list_input,
         const FACE_ARRAYS_BOOL* valid_value_mask_input);
 
-    const T_FACE_ARRAYS& Raw_Data() const
+    const ARRAY<T,FACE_INDEX<TV::m> >& Raw_Data() const
     {return nested_face_lookup.Raw_Data();}
 
     const T_NESTED_LOOKUP& Nested() const

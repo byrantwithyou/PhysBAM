@@ -19,19 +19,19 @@ class FLOOD_FILL_MPI:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;typedef VECTOR<int,TV::m> TV_INT;
-    typedef TV_INT T_INDEX;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;
+    typedef TV_INT T_INDEX;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
     typedef GRID<TV> T_PARALLEL_GRID;
 public:
     const T_MPI_GRID& mpi_grid;
     const GRID<TV>& local_grid;
-    const T_FACE_ARRAYS_BOOL& psi_N;
+    const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N;
     int& number_of_regions;
     T_ARRAYS_INT& colors;
     ARRAY<ARRAY<int> >& color_ranks;
     ARRAY<bool>* color_touches_uncolorable;
 
-    FLOOD_FILL_MPI(const T_MPI_GRID& mpi_grid_input,const GRID<TV>& local_grid_input,const T_FACE_ARRAYS_BOOL& psi_N_input,int& number_of_regions_input,T_ARRAYS_INT& colors_input,
+    FLOOD_FILL_MPI(const T_MPI_GRID& mpi_grid_input,const GRID<TV>& local_grid_input,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N_input,int& number_of_regions_input,T_ARRAYS_INT& colors_input,
         ARRAY<ARRAY<int> >& color_ranks_input,ARRAY<bool>* color_touches_uncolorable);
     virtual ~FLOOD_FILL_MPI();
 

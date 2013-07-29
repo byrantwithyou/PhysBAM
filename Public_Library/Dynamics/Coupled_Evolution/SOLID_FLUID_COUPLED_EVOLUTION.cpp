@@ -208,7 +208,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         }
     if(fluids){
         POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
-        T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
+        ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=Get_Face_Velocities();
         const GRID<TV>& grid=Get_Grid();
 
         if(fluids_parameters.compressible){
@@ -243,7 +243,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         poisson.Compute_beta_And_Add_Jumps_To_b(dt,current_position_time);
         
         // Set up fluids RHS (poisson->f)
-        T_FACE_ARRAYS_SCALAR copy_face_velocities(face_velocities);
+        ARRAY<T,FACE_INDEX<TV::m> > copy_face_velocities(face_velocities);
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
             if(dual_cell_contains_solid(axis,face_index)) face_velocities(axis,face_index)=(T)0;} // These faces should not be pulled to the RHS, so zero them out
@@ -315,7 +315,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
         if(!fluids_parameters.compressible){
             PHYSBAM_DEBUG_WRITE_SUBSTEP("using face velocities to set up solid RHS (sf coupled evolution)",0,1);
-            T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
+            ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=Get_Face_Velocities();
             for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
                 const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();TV axis_vector=TV::Axis_Vector(axis);
                 const TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
@@ -533,7 +533,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<TV>* B)
 {
-    T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=Get_Face_Velocities();
     POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
     const GRID<TV>& grid=Get_Grid();
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
@@ -542,9 +542,9 @@ Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<
     ARRAY<PAIR<int,int> > rigid_simplices;
     ARRAY<T> deformable_simplex_forces;
     ARRAY<T> rigid_simplex_jet_velocities;
-    T_FACE_ARRAYS_BOOL modified_face(grid);modified_face.Fill(false);
-    T_FACE_ARRAYS_SCALAR modified_face_weight(grid);modified_face_weight.Fill(0);
-    T_FACE_ARRAYS_SCALAR modified_face_velocities(grid);modified_face_velocities.Fill(0);
+    ARRAY<bool,FACE_INDEX<TV::m> > modified_face(grid);modified_face.Fill(false);
+    ARRAY<T,FACE_INDEX<TV::m> > modified_face_weight(grid);modified_face_weight.Fill(0);
+    ARRAY<T,FACE_INDEX<TV::m> > modified_face_velocities(grid);modified_face_velocities.Fill(0);
     // TODO: rewind velocities if we modify them here, otherwise may be doing extra contribution
     TV orientation;
     if(solids_evolution_callbacks->Get_Solid_Source_Velocities(deformable_simplices,deformable_simplex_forces,rigid_simplices,rigid_simplex_jet_velocities,orientation,time)){
@@ -615,7 +615,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Set_Neumann_and_Dirichlet_Boundary_Conditions(const T time)
 {
     POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
-    T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=Get_Face_Velocities();
     poisson.psi_N.Copy(dual_cell_contains_solid);poisson.psi_D.Fill(false);
     fluids_parameters.Set_Domain_Boundary_Conditions(poisson,face_velocities,time);
 
@@ -674,7 +674,7 @@ Compute_W(const T current_position_time)
 {
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=Get_Face_Velocities();
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     const GRID<TV>& grid=Get_Grid();
     rigid_body_count=0;kinematic_rigid_bodies.Remove_All();
@@ -1067,7 +1067,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Apply_Pressure(const T dt,const T time)
 {
     EULER_PROJECTION_UNIFORM<TV>& euler_projection=fluids_parameters.euler->euler_projection;
-    T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=Get_Face_Velocities();
     //TODO(kwatra): move this logic to driver
     if(fluids_parameters.compressible && !fluids_parameters.euler->timesplit) return;
     Apply_Solid_Boundary_Conditions(time,false,face_velocities);
@@ -1075,7 +1075,7 @@ Apply_Pressure(const T dt,const T time)
         Average_Solid_Projected_Face_Velocities_For_Energy_Update(solid_projected_face_velocities_star,face_velocities,face_velocities);
         ARRAY<T,TV_INT> p_ghost;
         euler_projection.Get_Ghost_Pressures(dt,time,euler_projection.elliptic_solver->psi_D,euler_projection.elliptic_solver->psi_N,euler_projection.p,p_ghost);
-        T_FACE_ARRAYS_SCALAR p_face;
+        ARRAY<T,FACE_INDEX<TV::m> > p_face;
         euler_projection.Get_Pressure_At_Faces(dt,time,p_ghost,p_face);
         fluids_parameters.euler_solid_fluid_coupling_utilities->Project_Fluid_Pressure_At_Neumann_Faces(p_ghost,p_face); // Bp
         euler_projection.Apply_Pressure(p_ghost,p_face,face_velocities,euler_projection.elliptic_solver->psi_D,euler_projection.elliptic_solver->psi_N,dt,time);}
@@ -1099,7 +1099,7 @@ Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<ARRAY<T> >& right_hand_side,const
 // Function Average_Solid_Projected_Face_Velocities_For_Energy_Update
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
-Average_Solid_Projected_Face_Velocities_For_Energy_Update(const T_FACE_ARRAYS_SCALAR& solid_projected_face_velocities_star,const T_FACE_ARRAYS_SCALAR& solid_projected_face_velocities_np1,T_FACE_ARRAYS_SCALAR& face_velocities)
+Average_Solid_Projected_Face_Velocities_For_Energy_Update(const ARRAY<T,FACE_INDEX<TV::m> >& solid_projected_face_velocities_star,const ARRAY<T,FACE_INDEX<TV::m> >& solid_projected_face_velocities_np1,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     for(FACE_ITERATOR<TV> iterator(Get_Grid());iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
         if(dual_cell_contains_solid(axis,face_index)){
@@ -1109,7 +1109,7 @@ Average_Solid_Projected_Face_Velocities_For_Energy_Update(const T_FACE_ARRAYS_SC
 // Function Apply_Solid_Boundary_Conditions
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
-Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_FACE_ARRAYS_SCALAR& face_velocities)
+Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;

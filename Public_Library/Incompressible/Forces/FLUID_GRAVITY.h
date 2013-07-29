@@ -16,7 +16,6 @@ class FLUID_GRAVITY:public INCOMPRESSIBLE_FLUIDS_FORCES<TV>
 {
     
     typedef typename TV::SCALAR T;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     T gravity;
     TV gravity_direction;
@@ -29,11 +28,11 @@ public:
     {}
 
 //#####################################################################
-    void Add_Explicit_Forces(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE
+    void Add_Explicit_Forces(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE
     {for(int axis=0;axis<TV::m;axis++) if(gravity_direction[axis]) face_velocities.Component(axis)+=dt*gravity*gravity_direction[axis];}
-    void Add_Implicit_Forces_Projection(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE {}
+    void Add_Implicit_Forces_Projection(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Initialize_Grids(const GRID<TV>& grid) PHYSBAM_OVERRIDE {}
-    T CFL(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& face_velocities) PHYSBAM_OVERRIDE
+    T CFL(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) PHYSBAM_OVERRIDE
     {return abs(gravity)*(gravity_direction/grid.DX()).Sum_Abs();}
 //#####################################################################
 };

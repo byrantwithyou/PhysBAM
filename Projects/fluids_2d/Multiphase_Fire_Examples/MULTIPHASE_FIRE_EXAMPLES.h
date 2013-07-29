@@ -23,8 +23,6 @@ class MULTIPHASE_FIRE_EXAMPLES:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_inp
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;
     using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;using BASE::Get_Source_Velocities;using BASE::resolution;
@@ -125,7 +123,7 @@ static int Number_Of_Regions(int test_number)
 //#####################################################################
 void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    T_FACE_ARRAYS_SCALAR& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
+    ARRAY<T,FACE_INDEX<TV::m> >& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
     flame_speed_multiplier.Fill(0);
 
     if(test_number==1){
@@ -170,7 +168,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
 void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
 {
     ARRAY<T,TV_INT> phi;LEVELSET<TV> levelset(*fluids_parameters.grid,phi);
-    T_FACE_ARRAYS_SCALAR& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
+    ARRAY<T,FACE_INDEX<TV::m> >& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
 
     if(test_number==1){
         fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Get_Single_Levelset(fluids_parameters.fuel_region,levelset,false);
@@ -236,7 +234,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==2){
         Get_Source_Velocities(RANGE<TV>(TV(0,(T).1),TV((T).1,(T).3)),MATRIX<T,3>::Identity_Matrix(),VECTOR<T,2>((T).2,0));

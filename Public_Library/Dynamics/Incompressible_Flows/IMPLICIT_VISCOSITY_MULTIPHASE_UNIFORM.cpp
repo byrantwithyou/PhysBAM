@@ -64,7 +64,7 @@ Setup_Viscosity(const T dt)
 // Function Setup_Boundary_Conditions
 //#####################################################################
 template<class TV> void IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<TV>::
-Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities)
+Setup_Boundary_Conditions(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     IMPLICIT_VISCOSITY_UNIFORM<TV>::Setup_Boundary_Conditions(face_velocities);
     // set neumann b.c. at zero viscosity faces

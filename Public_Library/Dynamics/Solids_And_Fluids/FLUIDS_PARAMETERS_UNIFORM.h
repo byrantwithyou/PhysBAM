@@ -33,7 +33,6 @@ class FLUIDS_PARAMETERS_UNIFORM:public FLUIDS_PARAMETERS<TV>
     typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef typename REBIND<ARRAY<T,TV_INT>,PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef typename REBIND<ARRAY<T,TV_INT>,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
     typedef typename REBIND<T_ADVECTION_SEMI_LAGRANGIAN_SCALAR,SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX;
     typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
@@ -81,7 +80,7 @@ public:
     SPH_EVOLUTION_UNIFORM<TV>* sph_evolution;
     ARRAY<bool,TV_INT>& maccormack_node_mask;
     ARRAY<bool,TV_INT>& maccormack_cell_mask;
-    T_FACE_ARRAYS_BOOL& maccormack_face_mask;
+    ARRAY<bool,FACE_INDEX<TV::m> >& maccormack_face_mask;
     ADVECTION_MACCORMACK_UNIFORM<TV,T,T_ADVECTION_SEMI_LAGRANGIAN_SCALAR>& maccormack_semi_lagrangian;
     EULER_UNIFORM<TV>* euler;
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>* euler_solid_fluid_coupling_utilities;
@@ -121,7 +120,7 @@ public:
 
 //#####################################################################
     virtual void Initialize_Grids();
-    void Initialize_Fluid_Evolution(T_FACE_ARRAYS_SCALAR& face_velocities);
+    void Initialize_Fluid_Evolution(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
     void Use_Fluid_Coupling_Defaults() PHYSBAM_OVERRIDE;
     void Use_No_Fluid_Coupling_Defaults() PHYSBAM_OVERRIDE;
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time);
@@ -133,14 +132,14 @@ private:
 public:
     void Set_Projection(PROJECTION_DYNAMICS_UNIFORM<TV>* projection_input);
     void Update_Fluid_Parameters(const T dt,const T time);
-    void Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time);
+    void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time);
     void Apply_Isobaric_Fix(const T dt,const T time);
     void Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<TV>* elliptic_solver,
-            T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    void Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<TV>& elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T time);
-    void Blend_In_External_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    void Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const T time);
-    void Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const T time);
+            ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
+    void Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<TV>& elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time);
+    void Blend_In_External_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
+    void Move_Grid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time);
+    void Move_Grid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const TV_INT& shift_domain,const T time);
     void Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX& e_ghost,const T time);
     void Combustion(const T dt,const T time);
     void Evolve_Soot(const T dt,const T time);

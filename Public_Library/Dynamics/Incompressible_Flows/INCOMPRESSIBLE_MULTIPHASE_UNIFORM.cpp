@@ -42,18 +42,18 @@ template<class TV> INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 // Function Advance_One_Time_Step_Explicit_Part
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
-Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& advecting_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells)
+Advance_One_Time_Step_Convection(const T dt,const T time,ARRAY<T,FACE_INDEX<TV::m> >& advecting_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_to_advect,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells)
 {
     // TODO: make efficient if advection velocities are same as advected velocities
-    T_FACE_ARRAYS_SCALAR advection_face_velocities_ghost;advection_face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > advection_face_velocities_ghost;advection_face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
     boundary->Fill_Ghost_Faces(grid,advecting_face_velocities,advection_face_velocities_ghost,time,number_of_ghost_cells);
-    T_FACE_ARRAYS_SCALAR face_velocities_to_advect_ghost;face_velocities_to_advect_ghost.Resize(grid,number_of_ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_to_advect_ghost;face_velocities_to_advect_ghost.Resize(grid,number_of_ghost_cells,false);
     boundary->Fill_Ghost_Faces(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,time,number_of_ghost_cells);
 
     // update convection
     if(pseudo_dirichlet_regions->Number_True()>0){
-        T_FACE_ARRAYS_SCALAR face_velocities_liquid=face_velocities_to_advect;T_FACE_ARRAYS_SCALAR advection_face_velocities_ghost_extrapolated=advection_face_velocities_ghost;
-        T_FACE_ARRAYS_SCALAR face_velocities_to_advect_ghost_extrapolated=face_velocities_to_advect_ghost;
+        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_liquid=face_velocities_to_advect;ARRAY<T,FACE_INDEX<TV::m> > advection_face_velocities_ghost_extrapolated=advection_face_velocities_ghost;
+        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_to_advect_ghost_extrapolated=face_velocities_to_advect_ghost;
         ARRAY<T,TV_INT> phi_for_pseudo_dirichlet_regions;GRID<TV> grid_temp(grid);
         LEVELSET<TV> levelset_for_pseudo_dirichlet_regions(grid_temp,phi_for_pseudo_dirichlet_regions);
         projection.poisson_collidable->levelset_multiple->Get_Single_Levelset(*pseudo_dirichlet_regions,levelset_for_pseudo_dirichlet_regions,false);
@@ -72,16 +72,16 @@ Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& a
 // Function Advance_One_Time_Step_Explicit_Part
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
-Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<ARRAY<T,TV_INT>>* phi_ghost,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells)
+Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<ARRAY<T,TV_INT>>* phi_ghost,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells)
 {
-    T_FACE_ARRAYS_SCALAR face_velocities_ghost(grid.Domain_Indices(number_of_ghost_cells),false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(grid.Domain_Indices(number_of_ghost_cells),false);
     boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
 
     // update strain and apply elastic forces
     for(int i=0;i<strains.m;i++)if(strains(i)){
         // extrapolate the velocity across the interface to get better strain boundaries
         ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(number_of_ghost_cells));projection.poisson_collidable->levelset_multiple->levelsets(i)->boundary->Fill_Ghost_Cells(grid,projection.poisson_collidable->levelset_multiple->phis(i),phi_ghost,dt,time,number_of_ghost_cells);
-        T_FACE_ARRAYS_SCALAR face_velocities_temp=face_velocities_ghost;
+        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_temp=face_velocities_ghost;
         for(int axis=0;axis<TV::m;axis++){
             GRID<TV> face_grid=grid.Get_Face_Grid(axis);ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),false);T_ARRAYS_BASE& face_velocity=face_velocities_temp.Component(axis);
             for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next())
@@ -144,7 +144,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
 // Function Advance_One_Time_Step_Implicit_Part
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
-Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity)
+Advance_One_Time_Step_Implicit_Part(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const bool implicit_viscosity)
 {
     // boundary conditions
     boundary->Apply_Boundary_Condition_Face(grid,face_velocities,time+dt);
@@ -200,7 +200,7 @@ Calculate_Pressure_Jump(const T dt,const T time)
 // Function CFL
 //#####################################################################
 template<class TV> typename TV::SCALAR INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
-CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous_only) const
+CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool inviscid,const bool viscous_only) const
 {
     TV DX=grid.dX,sqr_DX=DX*DX,max_abs_V;
     // convection
@@ -301,7 +301,7 @@ Add_Surface_Tension(LEVELSET<TV>& levelset,const T time)
 // Function Implicit_Viscous_Update
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
-Implicit_Viscous_Update(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Implicit_Viscous_Update(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     for(int axis=0;axis<TV::m;axis++){
         IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<TV> implicit_viscosity(projection,variable_viscosity,projection.densities,viscosities,mpi_grid,axis,use_variable_viscosity);
@@ -311,7 +311,7 @@ Implicit_Viscous_Update(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T
 // Function Compute_Vorticity_Confinement_Force
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
-Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& F)
+Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& F)
 {
     T_ARRAYS_SPIN vorticity(grid.Cell_Indices(2),false);ARRAY<T,TV_INT> vorticity_magnitude(grid.Cell_Indices(2));
     if(projection.flame){FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> face_velocities_lookup(face_velocities_ghost,projection,projection.poisson_collidable->levelset_multiple);

@@ -14,17 +14,17 @@ template<class TV>
 class FACE_LOOKUP_UNIFORM
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
+    typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef T ELEMENT;
         
-    const T_FACE_ARRAYS& V_face;
+    const ARRAY<T,FACE_INDEX<TV::m> >& V_face;
 
-    FACE_LOOKUP_UNIFORM(const T_FACE_ARRAYS& V_face_input)
+    FACE_LOOKUP_UNIFORM(const ARRAY<T,FACE_INDEX<TV::m> >& V_face_input)
         :V_face(V_face_input)
     {}
 
-    const T_FACE_ARRAYS& Raw_Data() const
+    const ARRAY<T,FACE_INDEX<TV::m> >& Raw_Data() const
     {return V_face;}
 
     int Number_Of_Ghost_Cells() const

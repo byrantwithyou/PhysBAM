@@ -36,20 +36,18 @@ class SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM:public KRYLOV_SYSTEM_BASE<type
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::dimension> TV_INT;
     typedef COUPLED_SYSTEM_VECTOR<TV> VECTOR_T;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 protected:
     using BASE::use_preconditioner;using BASE::Test_System;
 
     GENERALIZED_MASS<TV>* solid_mass; // M
     const ARRAY<bool,TV_INT>& outside_fluid;
-    const T_FACE_ARRAYS_BOOL& inactive_faces;
+    const ARRAY<bool,FACE_INDEX<TV::m> >& inactive_faces;
     const ARRAY<T,TV_INT>& density;
     const ARRAY<TV,TV_INT>& centered_velocity;
     ARRAY<T> constrained_fluid_velocity;
-    T_FACE_ARRAYS_SCALAR beta_face;
+    ARRAY<T,FACE_INDEX<TV::m> > beta_face;
     ARRAY<T> constrained_beta_face;
     const ARRAY<T,TV_INT>& one_over_rho_c_squared;
     ARRAY<T> one_over_rho_c_squared_flat;
@@ -125,7 +123,7 @@ public:
     void Project(KRYLOV_VECTOR_BASE<T>& bV) const PHYSBAM_OVERRIDE;
     //void Project() const;
     void Get_Pressure(const VECTOR_T& V,ARRAY<T,TV_INT>& fluid_pressures) const;
-    void Zero_Coupling_Faces_Values(T_FACE_ARRAYS_SCALAR& face_array) const;
+    void Zero_Coupling_Faces_Values(ARRAY<T,FACE_INDEX<TV::m> >& face_array) const;
     void Apply_Lambda_To_Euler_State(const VECTOR_T& V,const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupled_faces_solid_interpolated_velocity_n,
         const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupled_faces_solid_interpolated_velocity_np1,ARRAY<TV_DIMENSION,TV_INT>& U) const;
     void Interpolate_Solid_Velocity_To_Coupled_Faces(const GENERALIZED_VELOCITY<TV>& solids_velocity,ARRAY<T,COUPLING_CONSTRAINT_ID>& coupled_faces_solid_interpolated_velocity);
@@ -138,8 +136,8 @@ public:
     void Test_Matrix() const;
     void Test_Incompressibility(const ARRAY<T,FACE_INDEX<TV::dimension> >& fluid_velocity,const ARRAY<T>& constrained_fluid_velocity) const;
     void Test_Viscosity(const VECTOR_T& V,const VECTOR_T& B) const;
-    void Set_Coupling_Faces(const int ghost_cells,T_FACE_ARRAYS_BOOL& psi_N) const;
-    void Show_Constraints(T_FACE_ARRAYS_BOOL& psi_N) const;
+    void Set_Coupling_Faces(const int ghost_cells,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N) const;
+    void Show_Constraints(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N) const;
     void Check_Constraints(const GENERALIZED_VELOCITY<TV>& solids_rhs,const ARRAY<T,FACE_INDEX<TV::dimension> >& fluids_rhs,const ARRAY<T>& constrained_rhs) const;
     void Compute_Lambda_Diagonal_Preconditioner();
     void Compute_Full_Preconditioner();
@@ -162,10 +160,10 @@ public:
     void Fill_Extra_Velocities(ARRAY<T>& fluid_velocity_vector) const;
 //#####################################################################
     void Resize_Coupled_System_Vector(VECTOR_T& b) const;
-    void Apply_One_Sided_Interpolation_At_Coupling_Faces(const T_FACE_ARRAYS_BOOL& psi_N_domain_boundary,
-        const bool use_one_sided_face_velocty_interpolation,T_FACE_ARRAYS_SCALAR& fluids_velocity);
-    void Compute(int ghost_cells,const T dt_input,const T current_velocity_time,const T_FACE_ARRAYS_BOOL& psi_N_domain_boundary,const bool disable_thinshell,
-        const bool use_one_sided_face_velocty_interpolation,T_FACE_ARRAYS_SCALAR& fluids_velocity,T mu,bool use_second_order_cut_cell,const LEVELSET<TV>* levelset);
+    void Apply_One_Sided_Interpolation_At_Coupling_Faces(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N_domain_boundary,
+        const bool use_one_sided_face_velocty_interpolation,ARRAY<T,FACE_INDEX<TV::m> >& fluids_velocity);
+    void Compute(int ghost_cells,const T dt_input,const T current_velocity_time,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N_domain_boundary,const bool disable_thinshell,
+        const bool use_one_sided_face_velocty_interpolation,ARRAY<T,FACE_INDEX<TV::m> >& fluids_velocity,T mu,bool use_second_order_cut_cell,const LEVELSET<TV>* levelset);
     void Set_Up_RHS(VECTOR_T& V,VECTOR_T& F,const GENERALIZED_VELOCITY<TV>& solids_velocity_star,const ARRAY<T,FACE_INDEX<TV::dimension> >& fluids_velocity_star,
         const ARRAY<T,TV_INT>& p_advected_over_rho_c_squared_dt,const ARRAY<T,TV_INT>& p_advected,const ARRAY<T,TV_INT>& fluid_pressures);
     virtual void Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const PHYSBAM_OVERRIDE;

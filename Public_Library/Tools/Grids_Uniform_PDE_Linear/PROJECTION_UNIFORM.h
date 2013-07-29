@@ -18,8 +18,6 @@ class PROJECTION_UNIFORM:public PROJECTION<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
 public:
     typedef PROJECTION<T> BASE;
@@ -28,7 +26,7 @@ public:
     GRID<TV> p_grid; // p_grid is a cell centered MAC grid
     ARRAY<T,TV_INT> p;
     ARRAY<T,TV_INT> p_save_for_projection;
-    T_FACE_ARRAYS_SCALAR face_velocities_save_for_projection;
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_save_for_projection;
     LAPLACE_UNIFORM<TV>* elliptic_solver;
     LAPLACE_UNIFORM<TV>* laplace; 
     POISSON_UNIFORM<TV>* poisson;     
@@ -53,13 +51,13 @@ public:
 
 //#####################################################################
     virtual void Initialize_Grid(const GRID<TV>& mac_grid);
-    virtual void Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    virtual void Calculate_Kinetic_Energy_Error(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<TV,TV_INT>& kinetic_energy_error);
-    void Zero_Out_Neumann_Pocket_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities);
-    virtual void Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt=false);
-    void Enforce_Velocity_Compatibility(T_FACE_ARRAYS_SCALAR& face_velocities);
-    void Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities);
-    void Restore_After_Projection(T_FACE_ARRAYS_SCALAR& face_velocities);
+    virtual void Make_Divergence_Free(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
+    virtual void Calculate_Kinetic_Energy_Error(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<TV,TV_INT>& kinetic_energy_error);
+    void Zero_Out_Neumann_Pocket_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
+    virtual void Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt=false);
+    void Enforce_Velocity_Compatibility(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
+    void Set_Up_For_Projection(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
+    void Restore_After_Projection(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
     void Exchange_Pressures_For_Projection();
     void Compute_Divergence(const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<TV>* solver);
     void Compute_Divergence_Threaded(RANGE<TV_INT>& domain,const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<TV>* solver);

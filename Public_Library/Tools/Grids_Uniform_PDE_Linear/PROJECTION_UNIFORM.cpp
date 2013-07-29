@@ -55,7 +55,7 @@ Initialize_Grid(const GRID<TV>& mac_grid)
 // Function Make_Divergence_Free
 //#####################################################################
 template<class TV> void PROJECTION_UNIFORM<TV>::
-Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Make_Divergence_Free(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     // find f - divergence of the velocity
     Compute_Divergence(T_FACE_LOOKUP(face_velocities),elliptic_solver);
@@ -72,10 +72,10 @@ Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T ti
 // Function Zero_Out_Neumann_Pocket_Velocities
 //#####################################################################
 template<class TV> void PROJECTION_UNIFORM<TV>::
-Zero_Out_Neumann_Pocket_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities)
+Zero_Out_Neumann_Pocket_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     // zero out the velocities in neumann pockets to prevent gravity from accumulating
-    T_FACE_ARRAYS_BOOL &psi_N=elliptic_solver->psi_N;
+    ARRAY<bool,FACE_INDEX<TV::m> > &psi_N=elliptic_solver->psi_N;
     if(!elliptic_solver->solve_neumann_regions){ 
         for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
@@ -88,13 +88,13 @@ Zero_Out_Neumann_Pocket_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities)
 // Function Apply_Pressure
 //#####################################################################
 template<class TV> void PROJECTION_UNIFORM<TV>::
-Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt)
+Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt)
 {
     Zero_Out_Neumann_Pocket_Velocities(face_velocities);
     // find divergence free u, v and w 
     TV dx=p_grid.dX,one_over_dx=Inverse(dx);
     ARRAY<bool,TV_INT>& psi_D=elliptic_solver->psi_D;
-    T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver->psi_N;
+    ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=elliptic_solver->psi_N;
     if(scale_by_dt) p*=dt;
     if(laplace) 
         for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
@@ -136,7 +136,7 @@ Compute_Divergence_Threaded(RANGE<TV_INT>& domain,const T_FACE_LOOKUP& face_look
 // For each Neumann region, modifies divergence in cells touching its boundary so that the sum of f in the region is zero. Also modifies each bounding face velocity to the desired velocity
 // (or the average of the desired velocity if the face joins two different Neumann regions).
 template<class TV> void PROJECTION_UNIFORM<TV>::
-Enforce_Velocity_Compatibility(T_FACE_ARRAYS_SCALAR& face_velocities)
+Enforce_Velocity_Compatibility(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     bool found_neumann_region=false;
     for(int color=0;color<elliptic_solver->number_of_regions;color++)if(!elliptic_solver->filled_region_touches_dirichlet(color)){found_neumann_region=true;break;}
@@ -185,7 +185,7 @@ Enforce_Velocity_Compatibility(T_FACE_ARRAYS_SCALAR& face_velocities)
 // Function Set_Up_For_Projection
 //#####################################################################
 template<class TV> void PROJECTION_UNIFORM<TV>::
-Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities)
+Set_Up_For_Projection(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     face_velocities_save_for_projection.Copy(face_velocities);
 }
@@ -193,9 +193,9 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities)
 // Function Restore_After_Projection
 //#####################################################################
 template<class TV> void PROJECTION_UNIFORM<TV>::
-Restore_After_Projection(T_FACE_ARRAYS_SCALAR& face_velocities)
+Restore_After_Projection(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
-    T_FACE_ARRAYS_SCALAR::Exchange(face_velocities,face_velocities_save_for_projection);
+    ARRAY<T,FACE_INDEX<TV::m> >::Exchange(face_velocities,face_velocities_save_for_projection);
 }
 //#####################################################################
 // Function Exchange_Pressures_For_Projection
@@ -209,7 +209,7 @@ Exchange_Pressures_For_Projection()
 // Function Calculate_Kinetic_Energy_Error
 //#####################################################################
 template<class TV> void PROJECTION_UNIFORM<TV>::
-Calculate_Kinetic_Energy_Error(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<TV,TV_INT>& kinetic_energy_error)
+Calculate_Kinetic_Energy_Error(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<TV,TV_INT>& kinetic_energy_error)
 {
     PHYSBAM_FATAL_ERROR();
 }

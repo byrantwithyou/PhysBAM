@@ -17,8 +17,6 @@ class PROJECTION_COLLIDABLE_UNIFORM:public PROJECTION_UNIFORM<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
     typedef PROJECTION_UNIFORM<TV> BASE;
     using BASE::p_grid;using BASE::p;using BASE::elliptic_solver;using BASE::poisson;using BASE::laplace;using BASE::Zero_Out_Neumann_Pocket_Velocities;
@@ -33,7 +31,7 @@ public:
 
 //#####################################################################
     virtual void Initialize_Grid(const GRID<TV>& mac_grid) PHYSBAM_OVERRIDE;
-    virtual void Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt=false) PHYSBAM_OVERRIDE;
+    virtual void Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt=false) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

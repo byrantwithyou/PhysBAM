@@ -33,12 +33,12 @@ template<class TV> INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
 // Function Advance_One_Time_Step_Convection
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
-Advance_One_Time_Step_Convection(const T dt,const T time,const T_FACE_ARRAYS_SCALAR& advecting_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect,const int number_of_ghost_cells)
+Advance_One_Time_Step_Convection(const T dt,const T time,const ARRAY<T,FACE_INDEX<TV::m> >& advecting_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_to_advect,const int number_of_ghost_cells)
 {
     // TODO: make efficient if advection velocities are same as advected velocities
     // find ghost cells
-    T_FACE_ARRAYS_SCALAR advection_face_velocities_ghost(grid,number_of_ghost_cells,false);
-    T_FACE_ARRAYS_SCALAR face_velocities_to_advect_ghost(grid,number_of_ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > advection_face_velocities_ghost(grid,number_of_ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_to_advect_ghost(grid,number_of_ghost_cells,false);
     boundary->Fill_Ghost_Faces(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,time,number_of_ghost_cells);
     boundary->Fill_Ghost_Faces(grid,advecting_face_velocities,advection_face_velocities_ghost,time,number_of_ghost_cells);
     
@@ -49,9 +49,9 @@ Advance_One_Time_Step_Convection(const T dt,const T time,const T_FACE_ARRAYS_SCA
 // Function Advance_One_Time_Step_Forces
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
-Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const int number_of_ghost_cells)
+Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const int number_of_ghost_cells)
 {
-    T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
     boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
     for(int k=0;k<fluids_forces.m;k++) fluids_forces(k)->Add_Explicit_Forces(grid,face_velocities_ghost,face_velocities,dt,time);
     boundary->Apply_Boundary_Condition_Face(grid,face_velocities,time+dt);
@@ -60,7 +60,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
 // Function Advance_One_Time_Step_Implicit_Part
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
-Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
+Advance_One_Time_Step_Implicit_Part(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
     // boundary conditions
     boundary->Apply_Boundary_Condition_Face(grid,face_velocities,time+dt);
@@ -69,7 +69,7 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
     //assert(Consistent_Boundary_Conditions(face_velocities));
 
     int ghost_cells=3;
-    T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(grid,ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;face_velocities_ghost.Resize(grid,ghost_cells,false);
     boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,ghost_cells);
     for(int k=0;k<fluids_forces.m;k++) fluids_forces(k)->Add_Implicit_Forces_Before_Projection(grid,face_velocities_ghost,face_velocities,dt,time);
     for(int k=0;k<fluids_forces.m;k++) fluids_forces(k)->Add_Implicit_Forces_Projection(grid,face_velocities_ghost,face_velocities,dt,time);
@@ -78,7 +78,7 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
 // Function CFL
 //#####################################################################
 template<class TV> typename TV::SCALAR INCOMPRESSIBLE_FLUID_EVOLUTION<TV>::
-CFL(T_FACE_ARRAYS_SCALAR& face_velocities) const
+CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) const
 {
     // advection should define its own cfl?
     T dt_convection=0;

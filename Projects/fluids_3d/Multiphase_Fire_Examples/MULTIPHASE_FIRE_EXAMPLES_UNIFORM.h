@@ -20,7 +20,6 @@ template<class TV>
 class MULTIPHASE_FIRE_EXAMPLES_UNIFORM:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;using BASE::Adjust_Phi_With_Source;
@@ -173,7 +172,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    T_FACE_ARRAYS_SCALAR& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
+    ARRAY<T,FACE_INDEX<TV::m> >& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
     flame_speed_multiplier.Fill(0);
 
     if(test_number==1){
@@ -219,7 +218,7 @@ void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
     if(test_number==3) return;
 
     ARRAY<T,TV_INT> phi;LEVELSET<TV> levelset(*fluids_parameters.grid,phi);
-    T_FACE_ARRAYS_SCALAR& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
+    ARRAY<T,FACE_INDEX<TV::m> >& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
     TEMPERATURE_CONTAINER<TV>& temperature=fluids_parameters.temperature_container;
     DENSITY_CONTAINER<TV>& density=fluids_parameters.density_container;
 
@@ -309,7 +308,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,cons
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
    if(test_number==2){
        Get_Source_Velocities(outer_cylinder1,MATRIX<T,4>::Identity_Matrix(),VECTOR<T,3>());
