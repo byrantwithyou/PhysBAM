@@ -15,7 +15,7 @@ template<class TV>
 class REFINEMENT_TASK:public THREAD_QUEUE::TASK
 {
     typedef typename TV::SCALAR T;    
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     
 public:
     PROJECTION_REFINEMENT_UNIFORM<TV>* projection;

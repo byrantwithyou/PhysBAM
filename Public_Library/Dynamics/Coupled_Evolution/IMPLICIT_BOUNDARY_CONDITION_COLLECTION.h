@@ -17,7 +17,6 @@ template<class TV>
 class IMPLICIT_BOUNDARY_CONDITION_COLLECTION
 {
     typedef VECTOR<int,TV::dimension> TV_INT;typedef typename TV::SCALAR T;
-    typedef VECTOR<bool,TV::dimension> TV_BOOL;
 public:
     ARRAY<bool,TV_INT> psi_D;
     ARRAY<bool,FACE_INDEX<TV::dimension> > psi_N;
@@ -30,10 +29,10 @@ public:
 
     bool set_all_neumann_cells_to_dirichlet,zero_all_dirichlet_face_velocities,use_psi_R;
     bool use_boundary_condition_info;
-    TV_BOOL periodic_boundary;
+    VECTOR<bool,TV::m> periodic_boundary;
 
     IMPLICIT_BOUNDARY_CONDITION_COLLECTION(BOUNDARY_CONDITIONS_CALLBACKS<TV>* callback_input,bool set_all_neumann_cells_to_dirichlet_input,
-        bool zero_all_dirichlet_face_velocities_input,bool use_psi_R_input,bool use_boundary_condition_info_input,TV_BOOL periodic_boundary_input);
+        bool zero_all_dirichlet_face_velocities_input,bool use_psi_R_input,bool use_boundary_condition_info_input,VECTOR<bool,TV::m> periodic_boundary_input);
     ~IMPLICIT_BOUNDARY_CONDITION_COLLECTION();
 
     void Add_Boundary_Condition(IMPLICIT_BOUNDARY_CONDITION<TV>* boundary_condition)

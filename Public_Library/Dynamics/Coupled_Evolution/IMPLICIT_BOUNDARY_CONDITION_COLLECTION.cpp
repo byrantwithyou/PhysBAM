@@ -11,7 +11,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>::
 IMPLICIT_BOUNDARY_CONDITION_COLLECTION(BOUNDARY_CONDITIONS_CALLBACKS<TV>* callback_input,bool set_all_neumann_cells_to_dirichlet_input,
-    bool zero_all_dirichlet_face_velocities_input,bool use_psi_R_input,bool use_boundary_condition_info_input,TV_BOOL periodic_boundary_input)
+    bool zero_all_dirichlet_face_velocities_input,bool use_psi_R_input,bool use_boundary_condition_info_input,VECTOR<bool,TV::m> periodic_boundary_input)
     :callback(callback_input),set_all_neumann_cells_to_dirichlet(set_all_neumann_cells_to_dirichlet_input),zero_all_dirichlet_face_velocities(zero_all_dirichlet_face_velocities_input),
     use_psi_R(use_psi_R_input),use_boundary_condition_info(use_boundary_condition_info_input),periodic_boundary(periodic_boundary_input)
 {

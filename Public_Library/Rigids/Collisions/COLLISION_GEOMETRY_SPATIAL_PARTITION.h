@@ -24,7 +24,7 @@ class COLLISION_GEOMETRY_SPATIAL_PARTITION:public NONCOPYABLE
 {
 private:
     typedef typename TV::SCALAR T;
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
 
     T_ARRAY& collision_bodies;
     ARRAY<RANGE<TV_INT>,ID> voxel_range;

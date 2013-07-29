@@ -14,7 +14,7 @@ namespace PhysBAM{
 template<class TV>
 class NORMAL_JOINT:public JOINT<TV>
 {
-    typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
+    typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;
     typedef JOINT<TV> BASE;using BASE::J;using BASE::J_inverse;using BASE::F_pj;
 
 public:

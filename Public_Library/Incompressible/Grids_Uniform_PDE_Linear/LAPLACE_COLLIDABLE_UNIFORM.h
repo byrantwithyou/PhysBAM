@@ -24,8 +24,8 @@ template<class TV>
 class LAPLACE_COLLIDABLE_UNIFORM:public LAPLACE_UNIFORM<TV>,public LAPLACE_COLLIDABLE<TV>
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
 public:
     typedef LAPLACE_UNIFORM<TV> BASE;

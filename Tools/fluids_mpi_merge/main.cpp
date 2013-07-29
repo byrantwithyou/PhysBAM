@@ -27,8 +27,8 @@ class MERGER
 {
 public:
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<VECTOR<T,TV::m+2> >::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
+    typedef ARRAY<VECTOR<T,TV::m+2> ,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     
 
     const int number_of_processes;

@@ -27,7 +27,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> MPI_GRID<TV>::
-MPI_GRID(GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,const bool skip_initialization,const TV_INT& processes_per_dimension,const TV_BOOL& periodic_input,
+MPI_GRID(GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,const bool skip_initialization,const TV_INT& processes_per_dimension,const VECTOR<bool,TV::m>& periodic_input,
     MPI::Group* group_input)
     :local_grid(local_grid_input),number_of_ghost_cells(number_of_ghost_cells_input),comm(0),group(group_input),current_tag(0),periodic(periodic_input),ignore_boundary_faces(false)
 {
@@ -133,7 +133,7 @@ Initialize_Communicator(const bool manual,MPI::Group* group)
         // lay out process ranks on grid
         Fill_Process_Ranks(process_grid,process_ranks,axes);
         // fill in ghost process_ranks for periodic domains
-        if(periodic!=TV_BOOL()) for(NODE_ITERATOR<TV> iterator(process_grid,1,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){
+        if(periodic!=VECTOR<bool,TV::m>()) for(NODE_ITERATOR<TV> iterator(process_grid,1,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){
             TV_INT node=iterator.Node_Index(),wrapped_node=node;
             for(int axis=0;axis<TV::m;axis++) if(periodic[axis]) wrapped_node[axis]=(node[axis]+process_grid.Counts()[axis])%process_grid.Counts()[axis];
             process_ranks(node)=process_ranks(wrapped_node);}
@@ -925,7 +925,7 @@ Reduce_Add(const T2& local_value) const
 #else
 
 //#####################################################################
-template<class TV> MPI_GRID<TV>::MPI_GRID(GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,const bool,const TV_INT&,const TV_BOOL&,MPI::Group* group_input)
+template<class TV> MPI_GRID<TV>::MPI_GRID(GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,const bool,const TV_INT&,const VECTOR<bool,TV::m>&,MPI::Group* group_input)
     :local_grid(local_grid_input),number_of_ghost_cells(number_of_ghost_cells_input){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> MPI_GRID<TV>::~MPI_GRID(){}
 template<class TV> void MPI_GRID<TV>::Initialize_Communicator(const bool manual,MPI::Group* group){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}

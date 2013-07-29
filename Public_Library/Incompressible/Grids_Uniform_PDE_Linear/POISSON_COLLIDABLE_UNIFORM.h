@@ -21,7 +21,7 @@ class POISSON_COLLIDABLE_UNIFORM:public POISSON_UNIFORM<TV>,public LAPLACE_COLLI
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
 
 public:
     typedef POISSON_UNIFORM<TV> BASE;

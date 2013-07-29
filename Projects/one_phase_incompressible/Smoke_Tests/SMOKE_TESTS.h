@@ -21,7 +21,7 @@ template<class TV>
 class SMOKE_TESTS:public INCOMPRESSIBLE_EXAMPLE<TV>
 {
     typedef typename TV::SCALAR T;
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef INCOMPRESSIBLE_EXAMPLE<TV> BASE;
 
     CYLINDER<T> source_box_3d;

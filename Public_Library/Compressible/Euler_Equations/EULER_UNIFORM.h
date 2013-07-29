@@ -29,12 +29,11 @@ class EULER_UNIFORM:public EULER<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef typename ARRAY<T,FACE_INDEX<TV::m> >::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<TV_DIMENSION,FACE_INDEX<TV::m> > T_FACE_ARRAYS_DIMENSION_SCALAR;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
     typedef EULER<TV> BASE;
-    typedef VECTOR<bool,TV::m> TV_BOOL;
-    typedef typename T_ARRAYS_DIMENSION_SCALAR::ELEMENT T_ARRAYS_ELEMENT;
+    typedef TV_DIMENSION T_ARRAYS_ELEMENT;
     typedef BOUNDARY<TV,TV_DIMENSION> T_BOUNDARY;
 protected:
     using BASE::max_time_step;using BASE::cut_out_grid;using BASE::gravity;using BASE::downward_direction;

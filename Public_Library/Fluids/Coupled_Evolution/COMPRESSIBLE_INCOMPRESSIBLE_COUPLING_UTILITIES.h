@@ -16,7 +16,7 @@ template<class TV>
 class COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES:public INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<VECTOR<T,TV::m+2> >::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<VECTOR<T,TV::m+2>,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
 
 private:
     const ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities_;

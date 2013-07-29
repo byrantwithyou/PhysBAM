@@ -18,7 +18,7 @@ template<class TV>
 class SMOKE_EXAMPLE
 {
     typedef typename TV::SCALAR T;
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     enum workaround1{d=TV::m};
 
 public:

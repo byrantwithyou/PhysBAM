@@ -17,7 +17,7 @@ template<class TV>
 class INCOMPRESSIBLE_FLUID_COLLECTION:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
 public:
     const GRID<TV>& grid;
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities;

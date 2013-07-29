@@ -24,8 +24,8 @@ template<class TV>
 class MPI_GRID:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
 public:
     GRID<TV>& local_grid;
     int number_of_ghost_cells;
@@ -46,11 +46,11 @@ public:
 private:
     mutable int current_tag;
 public:
-    TV_BOOL periodic;
+    VECTOR<bool,TV::m> periodic;
     bool ignore_boundary_faces;
 
     MPI_GRID(GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),
-        const TV_BOOL& periodic_input=TV_BOOL(),MPI::Group* group_input=0);
+        const VECTOR<bool,TV::m>& periodic_input=VECTOR<bool,TV::m>(),MPI::Group* group_input=0);
     ~MPI_GRID();
 
     int Number_Of_Processors() const

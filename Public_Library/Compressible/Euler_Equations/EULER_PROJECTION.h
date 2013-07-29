@@ -20,7 +20,7 @@ class EULER_PROJECTION:public NONCOPYABLE
     typedef VECTOR<int,TV::m> TV_INT;
     typedef TV_INT INDEX;
     typedef VECTOR<T,TV::m+2> TV_U;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_U>::TYPE T_ARRAYS_U;
+    typedef ARRAY<TV_U,TV_INT> T_ARRAYS_U;
 
 public:
     EULER_PROJECTION()

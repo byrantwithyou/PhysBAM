@@ -20,7 +20,7 @@ class INCOMPRESSIBLE_MULTIPHASE_UNIFORM:public INCOMPRESSIBLE_UNIFORM<TV>
     typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<typename TV::SPIN>::TYPE T_ARRAYS_SPIN;
+    typedef ARRAY<typename TV::SPIN,TV_INT> T_ARRAYS_SPIN;
 public:
     typedef INCOMPRESSIBLE_UNIFORM<TV> BASE;
     using BASE::use_force;using BASE::viscosity;using BASE::use_variable_viscosity;using BASE::use_variable_vorticity_confinement;using BASE::dt_old;using BASE::gravity;

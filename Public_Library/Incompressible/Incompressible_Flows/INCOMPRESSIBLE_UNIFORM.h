@@ -25,7 +25,7 @@ class INCOMPRESSIBLE_UNIFORM:public INCOMPRESSIBLE<TV>
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef EXTRAPOLATION_UNIFORM<TV,T> T_EXTRAPOLATION_SCALAR;typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
-    typedef typename TV::SPIN T_SPIN;typedef typename ARRAY<T,TV_INT>::template REBIND<T_SPIN>::TYPE T_ARRAYS_SPIN;
+    typedef typename TV::SPIN T_SPIN;typedef ARRAY<T_SPIN,TV_INT> T_ARRAYS_SPIN;
 public:
     typedef INCOMPRESSIBLE<TV> BASE;
     using BASE::use_force;using BASE::surface_tension;using BASE::use_variable_surface_tension;using BASE::viscosity;using BASE::use_variable_viscosity;

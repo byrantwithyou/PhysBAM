@@ -20,7 +20,7 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
 
     STATIC_ASSERT((IS_SAME<T_ARRAYS,T_ARRAYS_DIMENSION_SCALAR>::value));
     STATIC_ASSERT((IS_SAME<T_ARRAYS_BOOL_INPUT,ARRAY<bool,TV_INT> >::value));
@@ -89,8 +89,8 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef typename ARRAY<T,FACE_INDEX<TV::m> >::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<TV_DIMENSION,FACE_INDEX<TV::m> > T_FACE_ARRAYS_DIMENSION_SCALAR;
 
     const GRID<TV>& grid=compressible_fluid_collection.grid;
     const T_ARRAYS_DIMENSION_SCALAR& U=compressible_fluid_collection.U;

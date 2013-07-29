@@ -25,7 +25,7 @@ class LAPLACE_COLLIDABLE_MPI:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;typedef VECTOR<int,TV::m> TV_INT;
     typedef TV_INT T_INDEX;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
     typedef GRID<TV> T_PARALLEL_GRID;
 public:
     T_MPI_GRID*& mpi_grid;

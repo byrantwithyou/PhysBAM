@@ -22,14 +22,12 @@ class FLUID_COLLISION_BODY_INACCURATE_UNION:public COLLISION_GEOMETRY<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_T;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T;
-    typedef typename T_FACE_ARRAYS_T::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
-    typedef typename T_FACE_ARRAYS_T::template REBIND<COLLISION_GEOMETRY_ID>::TYPE T_FACE_ARRAYS_COLLISION_GEOMETRY_ID;
+    typedef ARRAY<int,FACE_INDEX<TV::m> > T_FACE_ARRAYS_INT;
+    typedef ARRAY<COLLISION_GEOMETRY_ID,FACE_INDEX<TV::m> > T_FACE_ARRAYS_COLLISION_GEOMETRY_ID;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
     typedef LINEAR_INTERPOLATION_MAC_HELPER<TV> T_LINEAR_INTERPOLATION_MAC_HELPER;
     typedef typename GRID<TV>::BLOCK T_BLOCK;
     typedef COLLISION_GEOMETRY<TV> BASE;
-
 public:
     GRID_BASED_COLLISION_GEOMETRY<TV> collision_bodies;
     using BASE::collision_geometries_for_rasterization;
@@ -38,7 +36,7 @@ public:
     T_ARRAYS_T phi;
     LEVELSET_IMPLICIT_OBJECT<TV> levelset;
 private:
-    T_FACE_ARRAYS_T face_velocities;
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities;
     ARRAY<bool,FACE_INDEX<TV::m> > face_velocities_set;
     LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
 public:

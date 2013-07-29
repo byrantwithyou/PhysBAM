@@ -16,7 +16,7 @@ template<class TV>
 class EULER_EIGENSYSTEM:public EIGENSYSTEM<typename TV::SCALAR,VECTOR<typename TV::SCALAR,TV::m+2> >,public EULER<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+2> TV_DIMENSION;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     typedef EULER<TV> EULER_BASE;
     typedef EIGENSYSTEM<T,TV_DIMENSION> EIGENSYSTEM_BASE;
 public:

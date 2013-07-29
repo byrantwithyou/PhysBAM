@@ -22,12 +22,12 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> MPI_UNIFORM_GRID<TV>::
 MPI_UNIFORM_GRID(GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,const bool skip_initialization,const TV_INT& processes_per_dimension,
-    const TV_BOOL& periodic_input,MPI::Group* group_input)
+    const VECTOR<bool,TV::m>& periodic_input,MPI::Group* group_input)
     :MPI_GRID<TV >(local_grid_input,number_of_ghost_cells_input,skip_initialization,processes_per_dimension,periodic_input,group_input)
 {}
 template<class TV> MPI_UNIFORM_GRID<TV>::
 MPI_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,const int number_of_threads,GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,
-    const bool skip_mpi,const bool skip_initialization,const TV_INT& processes_per_dimension,const TV_BOOL& periodic_input,MPI::Group* group_input)
+    const bool skip_mpi,const bool skip_initialization,const TV_INT& processes_per_dimension,const VECTOR<bool,TV::m>& periodic_input,MPI::Group* group_input)
     :MPI_GRID<TV >(local_grid_input,number_of_ghost_cells_input,skip_mpi,processes_per_dimension,periodic_input,group_input)
 {
     PHYSBAM_ASSERT(skip_mpi); //If using threading can't use mpi yet
@@ -174,46 +174,16 @@ template<class TV> template<class T_ARRAYS> void MPI_UNIFORM_GRID<TV>::Scatter_C
 
 //#####################################################################
 namespace PhysBAM{
-#define P(...) __VA_ARGS__
-#ifdef USE_MPI
-#define INSTANTIATION_HELPER_LENGTH(TV,length) \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Cell_Data(T_ARRAYS_BASE::REBIND<VECTOR<TV::SCALAR,length> >::TYPE&,const RANGE<TV_INT>&) const;
-#define INSTANTIATION_HELPER_MPI(T,TV,d)                            \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Cell_Data(T_ARRAYS_BASE&,const RANGE<TV_INT>&) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Cell_Data(T_ARRAYS_BASE::REBIND<int>::TYPE&,const RANGE<TV_INT>&) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Cell_Data(T_ARRAYS_BASE::REBIND<bool>::TYPE&,const RANGE<TV_INT>&) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Cell_Data(T_ARRAYS_BASE::REBIND<MATRIX<TV::SCALAR,1> >::TYPE&,const RANGE<TV_INT>&) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Cell_Data(T_ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<TV::SCALAR,2> >::TYPE&,const RANGE<TV_INT>&) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Cell_Data(T_ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<TV::SCALAR,3> >::TYPE&,const RANGE<TV_INT>&) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >& data,const ARRAY<RANGE<TV_INT> >& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<bool>::TYPE& data,const ARRAY<RANGE<TV_INT> >& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<VECTOR<T,d> >::TYPE& data,const ARRAY<RANGE<TV_INT> >& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<VECTOR<T,d+2> >::TYPE& data,const ARRAY<RANGE<TV_INT> >& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<MATRIX<T,1> >::TYPE& data,const ARRAY<RANGE<TV_INT> >& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE& data,const ARRAY<RANGE<TV_INT> >& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE& data,const ARRAY<RANGE<TV_INT> >& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<VECTOR<T,d+3> >::TYPE& data,const ARRAY<RANGE<TV_INT> >& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Common_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >& data,const int,const RANGE<TV_INT>& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Common_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<bool>::TYPE& data,const int,const RANGE<TV_INT>& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Common_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<VECTOR<T,d> >::TYPE& data,const int,const RANGE<TV_INT>& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Common_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<VECTOR<T,d+2> >::TYPE& data,const int,const RANGE<TV_INT>& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Common_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<MATRIX<T,1> >::TYPE& data,const int,const RANGE<TV_INT>& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Common_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE& data,const int,const RANGE<TV_INT>& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Common_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE& data,const int,const RANGE<TV_INT>& region) const; \
-    template MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Common_Face_Data(ARRAY<T,FACE_INDEX<TV::m> >::REBIND<VECTOR<T,d+3> >::TYPE& data,const int,const RANGE<TV_INT>& region) const; \
-    INSTANTIATION_HELPER_LENGTH(P(TV),1);INSTANTIATION_HELPER_LENGTH(P(TV),2);INSTANTIATION_HELPER_LENGTH(P(TV),3);INSTANTIATION_HELPER_LENGTH(P(TV),4);INSTANTIATION_HELPER_LENGTH(P(TV),5);
-#else
-#define INSTANTIATION_HELPER_MPI(T,TV,d)
-#endif
-#define INSTANTIATION_HELPER(T,TV,d)      \
-    template class MPI_UNIFORM_GRID<TV>; \
-    template bool MPI_UNIFORM_GRID<TV>::Gather_Cell_Data(const T_ARRAYS_BASE&,T_ARRAYS_BASE&) const; \
-    template void MPI_UNIFORM_GRID<TV>::Scatter_Cell_Data(const T_ARRAYS_BASE&,T_ARRAYS_BASE&) const; \
-    INSTANTIATION_HELPER_MPI(T,P(TV),d)
-INSTANTIATION_HELPER(float,P(VECTOR<float,1>),1);
-INSTANTIATION_HELPER(float,P(VECTOR<float,2>),2);
-INSTANTIATION_HELPER(float,P(VECTOR<float,3>),3);
-INSTANTIATION_HELPER(double,P(VECTOR<double,1>),1);
-INSTANTIATION_HELPER(double,P(VECTOR<double,2>),2);
-INSTANTIATION_HELPER(double,P(VECTOR<double,3>),3);
+template GRID<VECTOR<double,1> > MPI_UNIFORM_GRID<VECTOR<double,1> >::Get_Non_Overlapping_Face_Grid(int) const;
+template MPI_UNIFORM_GRID<VECTOR<double,1> >::MPI_UNIFORM_GRID(GRID<VECTOR<double,1> >&,int,bool,VECTOR<int,1> const&,VECTOR<bool,1> const&,MPI::Group*);
+template GRID<VECTOR<double,2> > MPI_UNIFORM_GRID<VECTOR<double,2> >::Get_Non_Overlapping_Face_Grid(int) const;
+template MPI_UNIFORM_GRID<VECTOR<double,2> >::MPI_UNIFORM_GRID(GRID<VECTOR<double,2> >&,int,bool,VECTOR<int,2> const&,VECTOR<bool,2> const&,MPI::Group*);
+template GRID<VECTOR<double,3> > MPI_UNIFORM_GRID<VECTOR<double,3> >::Get_Non_Overlapping_Face_Grid(int) const;
+template MPI_UNIFORM_GRID<VECTOR<double,3> >::MPI_UNIFORM_GRID(GRID<VECTOR<double,3> >&,int,bool,VECTOR<int,3> const&,VECTOR<bool,3> const&,MPI::Group*);
+template GRID<VECTOR<float,1> > MPI_UNIFORM_GRID<VECTOR<float,1> >::Get_Non_Overlapping_Face_Grid(int) const;
+template MPI_UNIFORM_GRID<VECTOR<float,1> >::MPI_UNIFORM_GRID(GRID<VECTOR<float,1> >&,int,bool,VECTOR<int,1> const&,VECTOR<bool,1> const&,MPI::Group*);
+template GRID<VECTOR<float,2> > MPI_UNIFORM_GRID<VECTOR<float,2> >::Get_Non_Overlapping_Face_Grid(int) const;
+template MPI_UNIFORM_GRID<VECTOR<float,2> >::MPI_UNIFORM_GRID(GRID<VECTOR<float,2> >&,int,bool,VECTOR<int,2> const&,VECTOR<bool,2> const&,MPI::Group*);
+template GRID<VECTOR<float,3> > MPI_UNIFORM_GRID<VECTOR<float,3> >::Get_Non_Overlapping_Face_Grid(int) const;
+template MPI_UNIFORM_GRID<VECTOR<float,3> >::MPI_UNIFORM_GRID(GRID<VECTOR<float,3> >&,int,bool,VECTOR<int,3> const&,VECTOR<bool,3> const&,MPI::Group*);
 }

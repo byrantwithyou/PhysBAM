@@ -391,7 +391,7 @@ Apply_Vorticity_Confinement_Force(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,A
 template<class TV,class T,class TV_INT> static void 
 Compute_Vorticity_Confinement_Force_Helper(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& F,const INCOMPRESSIBLE_UNIFORM<TV>& incompressible)
 {
-    typedef typename ARRAY<TV,TV_INT>::template REBIND<typename TV::SPIN>::TYPE T_ARRAYS_SPIN;typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
+    typedef ARRAY<typename TV::SPIN,TV_INT> T_ARRAYS_SPIN;typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     T_ARRAYS_SPIN vorticity(grid.Cell_Indices(2),false);
     ARRAY<T,TV_INT> vorticity_magnitude(grid.Cell_Indices(2));
     if(incompressible.collision_body_list){

@@ -20,7 +20,7 @@ class PLS_FSI_DRIVER:public DRIVER<TV>,public NONCOPYABLE
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef DRIVER<TV> BASE;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     using BASE::time;
 public:
     using BASE::output_number;using BASE::Write_Output_Files;using BASE::Read_Time;using BASE::Write_Time;

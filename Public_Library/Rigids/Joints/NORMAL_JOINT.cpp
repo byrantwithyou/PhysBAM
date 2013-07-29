@@ -72,7 +72,7 @@ Prismatic_Component_Translation() const
 template<class TV> void NORMAL_JOINT<TV>::
 Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix) const
 {
-    TV_BOOL constrain;
+    VECTOR<bool,TV::m> constrain;
     constrain(0)=x_min>=x_max;
     Constraint_Matrix_Helper(parent_frame.r*F_pj().r,constrained_matrix,unconstrained_matrix,constrain);
 }

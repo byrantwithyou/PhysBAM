@@ -81,7 +81,7 @@ public:
 
     void Average_To_Invalidated_Face(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& face_values)
     {// average values collision aware in Gauss-Jacobi fashion
-    typename TV::template REBIND<ARRAY<PAIR<TV_INT,bool> > >::TYPE face_invalid_indices; // index and bool true if entry has been validated on iteration
+    VECTOR<ARRAY<PAIR<TV_INT,bool> >,TV::m> face_invalid_indices; // index and bool true if entry has been validated on iteration
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(!face_velocities_valid_mask.Component(iterator.Axis())(iterator.Face_Index())) 
         face_invalid_indices[iterator.Axis()].Append(PAIR<TV_INT,bool>(iterator.Face_Index(),false));
     

@@ -251,7 +251,7 @@ Delete_Particles_Inside_Objects(const T time)
 // Function Delete_Particles_Inside_Objects
 //#####################################################################
 template<class TV> template<class T_PARTICLES> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Delete_Particles_Inside_Objects(typename ARRAY<T,TV_INT>::template REBIND<T_PARTICLES*>::TYPE& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time)
+Delete_Particles_Inside_Objects(ARRAY<T_PARTICLES*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time)
 {
     for(NODE_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         BLOCK_UNIFORM<TV> block(*grid,block_index);

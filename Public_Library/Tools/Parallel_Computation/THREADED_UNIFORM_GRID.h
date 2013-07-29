@@ -25,8 +25,7 @@ class THREADED_UNIFORM_GRID:public MPI_GRID<TV>
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<RANGE<TV_INT> >::TYPE T_ARRAYS_BOX_INT;
+    typedef ARRAY<RANGE<TV_INT> ,TV_INT> T_ARRAYS_BOX_INT;
 public:
     typedef GRID<TV> GRID_T;
 
@@ -45,7 +44,7 @@ public:
 #endif
 
     THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,const int number_of_threads,GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,
-        const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),const TV_BOOL& periodic_input=TV_BOOL());
+        const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),const VECTOR<bool,TV::m>& periodic_input=VECTOR<bool,TV::m>());
 
     RANGE<TV_INT> Face_Sentinels(const int axis) const
     {return RANGE<TV_INT>(TV_INT(),TV_INT::Axis_Vector(axis));}

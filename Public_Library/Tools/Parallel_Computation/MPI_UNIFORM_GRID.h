@@ -19,8 +19,7 @@ class MPI_UNIFORM_GRID:public MPI_GRID<TV>
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<RANGE<TV_INT> >::TYPE T_ARRAYS_BOX_INT;
+    typedef ARRAY<RANGE<TV_INT> ,TV_INT> T_ARRAYS_BOX_INT;
 public:
     typedef GRID<TV> GRID_T;
 
@@ -32,10 +31,10 @@ public:
     THREADED_UNIFORM_GRID<TV>* threaded_grid;
 
     MPI_UNIFORM_GRID(GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),
-        const TV_BOOL& periodic_input=TV_BOOL(),MPI::Group* group_input=0);
+        const VECTOR<bool,TV::m>& periodic_input=VECTOR<bool,TV::m>(),MPI::Group* group_input=0);
     
     MPI_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,const int number_of_threads,GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,
-        const bool skip_mpi=true,const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),const TV_BOOL& periodic_input=TV_BOOL(),MPI::Group* group_input=0);
+        const bool skip_mpi=true,const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),const VECTOR<bool,TV::m>& periodic_input=VECTOR<bool,TV::m>(),MPI::Group* group_input=0);
 
     template<class T_ARRAYS> void Exchange_Boundary_Cell_Data(T_ARRAYS& data,const int bandwidth,const bool include_corners=true) const
     {if(threaded_grid) threaded_grid->Exchange_Boundary_Cell_Data(data,bandwidth,include_corners);

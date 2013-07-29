@@ -14,8 +14,8 @@ template<class TV>
 class COMPRESSIBLE_DRIVER:public DRIVER<TV>
 {
     typedef typename TV::SCALAR T;
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef VECTOR<int,TV::m> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
+    typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     typedef DRIVER<TV> BASE;
 
     using BASE::time;using BASE::Write_Substep;using BASE::Write_Output_Files;

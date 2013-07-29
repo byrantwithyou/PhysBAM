@@ -31,9 +31,9 @@ template<class TV_input>
 class SOLID_FLUID_COUPLED_EVOLUTION:public NEWMARK_EVOLUTION<TV_input>
 {
     typedef TV_input TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
     typedef ARRAY<PAIR<int,T> > FACE_WEIGHT_ELEMENTS;typedef ARRAY<FACE_WEIGHT_ELEMENTS*,FACE_INDEX<TV::m> > T_FACE_ARRAYS_FACE_WEIGHT_ELEMENTS;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> > >::TYPE T_ARRAYS_STRUCTURE_SIMPLEX_LIST;
+    typedef ARRAY<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV_INT> T_ARRAYS_STRUCTURE_SIMPLEX_LIST;
     typedef typename MESH_POLICY<TV::dimension-1>::MESH T_BOUNDARY_MESH;
     typedef typename MESH_POLICY<TV::dimension>::MESH T_MESH;typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension>::OBJECT T_OBJECT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_BOUNDARY_SIMPLEX;typedef VECTOR<int,TV::dimension> T_BOUNDARY_ELEMENT;typedef VECTOR<int,TV::dimension+1> T_ELEMENT;

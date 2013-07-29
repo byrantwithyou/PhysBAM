@@ -21,7 +21,7 @@ template<class TV>
 class INCOMPRESSIBLE_EXAMPLE:public RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>
 {
     typedef typename TV::SCALAR T;
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     enum workaround1{d=TV::m};
 
 public:

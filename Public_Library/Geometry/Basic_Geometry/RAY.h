@@ -21,7 +21,7 @@ class RAY
 public:
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     TV endpoint; // endpoint of the ray where t=0
     TV direction; // direction the ray sweeps out - unit vector
     bool semi_infinite; // indicates whether the ray is semi_infinite or should stop at t_max

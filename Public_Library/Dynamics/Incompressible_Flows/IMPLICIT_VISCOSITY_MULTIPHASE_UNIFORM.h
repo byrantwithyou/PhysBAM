@@ -21,7 +21,7 @@ template<class TV>
 class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM:public IMPLICIT_VISCOSITY_UNIFORM<TV>
 {
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
     typedef AVERAGING_UNIFORM<TV> T_AVERAGING;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
 public:

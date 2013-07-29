@@ -17,7 +17,7 @@ template<class TV>
 class BOUNDARY_OBJECT_SOLID_VELOCITY:public BOUNDARY_OBJECT<TV,VECTOR<typename TV::SCALAR,TV::m+2> >
 {
     typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+2> TV_DIMENSION;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     typedef typename T_ARRAYS_DIMENSION_SCALAR::ELEMENT T_ARRAYS_ELEMENT;
     enum{d=TV::m+2};
 public:

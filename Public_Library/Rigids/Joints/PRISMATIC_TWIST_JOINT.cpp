@@ -31,7 +31,7 @@ template<class TV> void PRISMATIC_TWIST_JOINT<TV>::
 Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_linear_velocity) const
 {
     ROTATION<TV> joint_orientation=parent_frame.r*F_pj().r;
-    TV_BOOL equality_constraint=Equality_Constraint();
+    VECTOR<bool,TV::m> equality_constraint=Equality_Constraint();
     for(int i=0;i<TV::dimension;i++) if(equality_constraint(i)){
         TV u=joint_orientation.Rotated_Axis(i);
         relative_linear_velocity-=TV::Dot_Product(relative_linear_velocity,u)*u;}

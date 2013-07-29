@@ -15,11 +15,11 @@ template<class TV>
 class PRISMATIC_TWIST_JOINT:public ANGLE_JOINT<TV>
 {
     typedef typename TV::SCALAR T;typedef ANGLE_JOINT<TV> BASE;typedef typename TV::SPIN T_SPIN;
-    using BASE::J;using BASE::F_pj;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
+    using BASE::J;using BASE::F_pj;
 
 public:
     using BASE::Constraint_Matrix_Helper;
-    TV_BOOL constrain;
+    VECTOR<bool,TV::m> constrain;
     TV prismatic_min,prismatic_max;
 
     PRISMATIC_TWIST_JOINT()
@@ -27,11 +27,11 @@ public:
 
     virtual ~PRISMATIC_TWIST_JOINT();
 
-    void Set_Prismatic_Constraints(const TV_BOOL& constrain_input,const TV& min=TV(),const TV& max=TV())
+    void Set_Prismatic_Constraints(const VECTOR<bool,TV::m>& constrain_input,const TV& min=TV(),const TV& max=TV())
     {constrain=constrain_input;prismatic_min=min;prismatic_max=max;}
 
 private:
-    TV_BOOL Equality_Constraint() const
+    VECTOR<bool,TV::m> Equality_Constraint() const
     {return TV::Componentwise_And(constrain,TV::Componentwise_Greater_Equal(prismatic_min,prismatic_max));}
 public:
 //#####################################################################

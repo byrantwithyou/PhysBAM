@@ -30,7 +30,7 @@ class FLUIDS_PARAMETERS_UNIFORM:public FLUIDS_PARAMETERS<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef VECTOR<int,TV::m> TV_INT;typedef INCOMPRESSIBLE_UNIFORM<TV> T_INCOMPRESSIBLE;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     typedef typename REBIND<ARRAY<T,TV_INT>,PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef typename REBIND<ARRAY<T,TV_INT>,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
     typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
@@ -127,7 +127,7 @@ public:
     void Delete_Particles_Inside_Objects(const T time);
     void Initialize_Number_Of_Regions(const int number_of_regions_input);
 private:
-    template<class T_PARTICLES> void Delete_Particles_Inside_Objects(typename ARRAY<T,TV_INT>::template REBIND<T_PARTICLES*>::TYPE& particles,
+    template<class T_PARTICLES> void Delete_Particles_Inside_Objects(ARRAY<T_PARTICLES*,TV_INT>& particles,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time);
 public:
     void Set_Projection(PROJECTION_DYNAMICS_UNIFORM<TV>* projection_input);

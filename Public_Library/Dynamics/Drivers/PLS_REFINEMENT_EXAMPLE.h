@@ -26,7 +26,7 @@ template<class TV_input>
 class PLS_REFINEMENT_EXAMPLE:public LEVELSET_CALLBACKS<TV_input>,public RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV_input>
 {
     typedef TV_input TV;typedef typename TV::SCALAR T;
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef BOUNDARY_PHI_WATER<TV> T_BOUNDARY_PHI_WATER;
     enum workaround1{d=TV::m};
 

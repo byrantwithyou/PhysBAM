@@ -20,8 +20,8 @@ class COMPRESSIBLE_EXAMPLE:public EXAMPLE<TV_input>
 {
     typedef TV_input TV;
     typedef typename TV::SCALAR T;
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef VECTOR<int,TV::m> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
+    typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     typedef EXAMPLE<TV> BASE;
     enum workaround1{d=TV::m};
 

@@ -18,7 +18,7 @@ class POISSON_UNIFORM:public POISSON<typename TV::SCALAR>,public LAPLACE_UNIFORM
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
 public:
     using LAPLACE_UNIFORM<TV>::grid;using POISSON<T>::use_variable_beta;using POISSON<T>::beta_given_on_faces;
     using POISSON<T>::use_weighted_divergence;using POISSON<T>::multiphase;

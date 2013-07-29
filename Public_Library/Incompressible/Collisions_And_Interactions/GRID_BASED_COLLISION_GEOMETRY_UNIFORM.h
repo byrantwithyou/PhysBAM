@@ -19,9 +19,9 @@ namespace PhysBAM{
 template <class TV>
 class GRID_BASED_COLLISION_GEOMETRY_UNIFORM:public GRID_BASED_COLLISION_GEOMETRY<TV>
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<bool,TV::dimension> TV_BOOL;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef typename ARRAY<T,FACE_INDEX<TV::m> >::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
+    typedef ARRAY<int,FACE_INDEX<TV::m> > T_FACE_ARRAYS_INT;
     typedef LINEAR_INTERPOLATION_MAC_HELPER<TV> T_LINEAR_INTERPOLATION_MAC_HELPER;
 public:
 

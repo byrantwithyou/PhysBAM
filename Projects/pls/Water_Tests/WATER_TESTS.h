@@ -19,7 +19,7 @@ template<class TV>
 class WATER_TESTS:public PLS_EXAMPLE<TV>
 {
     typedef typename TV::SCALAR T;
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef PLS_EXAMPLE<TV> BASE;
 
     CYLINDER<T> source_cyl;

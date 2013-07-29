@@ -21,8 +21,8 @@ class DETONATION_SHOCK_DYNAMICS
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<VECTOR<T,3> >::TYPE T_ARRAYS_RGB;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
+    typedef ARRAY<VECTOR<T,3> ,TV_INT> T_ARRAYS_RGB;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
 public:
     GRID<TV>& grid;

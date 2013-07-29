@@ -16,7 +16,7 @@ template<class TV>
 class INCOMPRESSIBLE_DRIVER
 {
     typedef typename TV::SCALAR T;
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
 
 protected:
     int current_frame;

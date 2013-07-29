@@ -16,7 +16,7 @@ namespace PhysBAM{
 template<class TV,class T2>
 class BOUNDARY_REFLECTION_ATTENUATION:public BOUNDARY_REFLECTION_UNIFORM<TV,T2>
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef VECTOR<bool,TV::m> TV_BOOL;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
 public:
     typedef BOUNDARY_REFLECTION_UNIFORM<TV,T2> BASE;

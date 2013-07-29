@@ -33,8 +33,8 @@ class SOLID_FLUID_COUPLED_EVOLUTION_SLIP:public NEWMARK_EVOLUTION<TV_input>,publ
 {
     typedef TV_input TV;typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef typename ARRAY<T,FACE_INDEX<TV::m> >::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
+    typedef ARRAY<int,FACE_INDEX<TV::m> > T_FACE_ARRAYS_INT;
 
 protected:
     typedef NEWMARK_EVOLUTION<TV> BASE;

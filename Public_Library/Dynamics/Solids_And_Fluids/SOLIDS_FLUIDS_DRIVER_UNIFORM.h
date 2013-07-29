@@ -18,7 +18,7 @@ template<class TV>
 class SOLIDS_FLUIDS_DRIVER_UNIFORM:public SOLIDS_FLUIDS_DRIVER<TV>
 {
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
 
     typedef SOLIDS_FLUIDS_DRIVER<TV> BASE;
 public:

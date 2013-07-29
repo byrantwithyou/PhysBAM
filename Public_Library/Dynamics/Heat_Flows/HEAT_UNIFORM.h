@@ -27,7 +27,7 @@ class HEAT_UNIFORM:public HEAT<typename TV::SCALAR>
 {
 private:
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
 
     using HEAT<T>::max_time_step;using HEAT<T>::density;using HEAT<T>::specific_heat;using HEAT<T>::thermal_conductivity;using HEAT<T>::kappa;
 public:

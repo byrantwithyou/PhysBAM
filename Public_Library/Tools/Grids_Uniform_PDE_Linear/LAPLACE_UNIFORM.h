@@ -28,8 +28,8 @@ template<class TV>
 class LAPLACE_UNIFORM:public LAPLACE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
-    typedef typename ARRAY<T,TV_INT>::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
 public:
     typedef TV VECTOR_T;
@@ -47,7 +47,7 @@ public:
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
     ARRAY<T,FACE_INDEX<TV::m> > psi_R;
     ARRAY<bool,TV_INT> psi_D;
-    TV_BOOL periodic_boundary;
+    VECTOR<bool,TV::m> periodic_boundary;
     LAPLACE_UNIFORM_MPI<TV>* laplace_mpi;
     MPI_UNIFORM_GRID<TV>* mpi_grid;
     ARRAY<bool,TV_INT>* psi_D_save_for_sph;

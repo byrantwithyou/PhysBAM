@@ -44,7 +44,7 @@ Initialize_Grids()
     collision_geometry_collection.Set_Collision_Body_Thickness(collision_thickness);
 
     assert(grid.Is_MAC_Grid());
-    TV_BOOL all_true;all_true.Fill(true);
+    VECTOR<bool,TV::m> all_true;all_true.Fill(true);
     cell_neighbors_visible.Resize(grid.Domain_Indices(3),false);cell_neighbors_visible.Fill(all_true); // initialize here so collision aware redistancing works in Initialize
     face_neighbors_visible.Resize(grid,1,false);face_neighbors_visible.Fill(all_true);
 }
@@ -66,7 +66,7 @@ Compute_Occupied_Blocks(const bool with_body_motion,const T extra_thickness,cons
 template<class TV> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
 Compute_Grid_Visibility()
 {
-    TV_BOOL all_true;all_true.Fill(true);
+    VECTOR<bool,TV::m> all_true;all_true.Fill(true);
     cell_neighbors_visible.Fill(all_true);face_neighbors_visible.Fill(all_true);
     if(!collision_geometry_collection.bodies.m) return;
 
