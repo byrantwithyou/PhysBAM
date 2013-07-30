@@ -25,8 +25,8 @@ public:
         :implicit_object(implicit_object_input),ray(ray_input)
     {}
 
-    T operator()(const T x) const PHYSBAM_OVERRIDE
-    {return implicit_object(ray.Point(x));}
+    void Compute(const T x,T* ddf,T* df,T* f) const PHYSBAM_OVERRIDE
+    {assert(f && !df && !ddf);*f=implicit_object(ray.Point(x));}
 
 //#####################################################################
 };   

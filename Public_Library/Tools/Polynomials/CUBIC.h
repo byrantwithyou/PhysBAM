@@ -27,7 +27,7 @@ public:
 
     CUBIC(const T c3_input,const T c2_input,const T c1_input,const T c0_input);
     void Coefficients_From_Interpolation(T x1,T y1,T x2,T y2,T x3,T y3,T x4,T y4);
-    T operator()(const T x) const PHYSBAM_OVERRIDE;
+    void Compute(const T x,T* ddf,T* df,T* f) const;
     T Prime(const T x) const PHYSBAM_OVERRIDE;
     void Compute_Roots_Noniterative_In_Interval(const T xmin,const T xmax);
     void Compute_Roots_Noniterative();

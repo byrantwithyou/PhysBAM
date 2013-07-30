@@ -22,13 +22,15 @@ public:
 
     QUADRATIC();
     QUADRATIC(const T a_input,const T b_input,const T c_input);
+    ~QUADRATIC();
 
-    T operator()(const T x) const PHYSBAM_OVERRIDE
+    T Value(const T x) const
     {return (a*x+b)*x+c;}
 
     T Discriminant() const
     {return sqr(b)-4*a*c;}
 
+    void Compute(const T x,T* ddf,T* df,T* f) const PHYSBAM_OVERRIDE;
     void Coefficients_From_Interpolation(T x1,T y1,T x2,T y2,T x3,T y3);
     void Compute_Roots();
     void Compute_Roots_In_Interval(const T xmin,const T xmax);

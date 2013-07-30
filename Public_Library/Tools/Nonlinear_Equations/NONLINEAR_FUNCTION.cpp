@@ -5,6 +5,26 @@
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 namespace PhysBAM{
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class T> NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>::
+~NONLINEAR_FUNCTION()
+{
+}
+//#####################################################################
+// operator()
+//#####################################################################
+template<class T> T NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>::
+operator()(const KRYLOV_VECTOR_BASE<T>& x) const
+{
+    T E=0;
+    Compute(x,0,0,&E);
+    return E;
+}
+//#####################################################################
+// Function Test
+//#####################################################################
 template<class T> void NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>::
 Test(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>& h) const
 {
@@ -51,7 +71,6 @@ Test(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>& h) const
     delete a;
     delete b;
 }
-
 template class NONLINEAR_FUNCTION<double(KRYLOV_VECTOR_BASE<double>&)>;
 template class NONLINEAR_FUNCTION<float(KRYLOV_VECTOR_BASE<float>&)>;
 }

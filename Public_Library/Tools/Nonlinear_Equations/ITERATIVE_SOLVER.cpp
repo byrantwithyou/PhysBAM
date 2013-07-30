@@ -10,6 +10,7 @@
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Tools/Nonlinear_Equations/LINE_SEARCH.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
+#include <Tools/Nonlinear_Equations/PARAMETRIC_LINE.h>
 #include <cfloat>
 #include <cmath>
 using namespace PhysBAM;

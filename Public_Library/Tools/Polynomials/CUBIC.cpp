@@ -26,12 +26,14 @@ CUBIC(const T c3_input,const T c2_input,const T c1_input,const T c0_input)
     :c3(c3_input),c2(c2_input),c1(c1_input),c0(c0_input),roots(0),error_tolerance((T)1e-14),number_of_extrema(0)
 {}
 //#####################################################################
-// Function operator()
+// Function Compute
 //#####################################################################
-template<class T> T CUBIC<T>::
-operator()(const T x) const
+template<class T> void CUBIC<T>::
+Compute(const T x,T* ddf,T* df,T* f) const
 {
-    return Value(x);
+    if(f) *f=((c3*x+c2)*x+c1)*x+c0;
+    if(df) *df=(3*c3*x+2*c2)*x+c1;
+    if(ddf) *ddf=6*c3*x+2*c2;
 }
 //#####################################################################
 // Function Prime

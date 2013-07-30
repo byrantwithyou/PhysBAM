@@ -6,6 +6,7 @@
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Nonlinear_Equations/LINE_SEARCH.h>
+#include <Tools/Nonlinear_Equations/PARAMETRIC_LINE.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include "LOCAL_NEWTONS_METHOD.h"
 using namespace PhysBAM;

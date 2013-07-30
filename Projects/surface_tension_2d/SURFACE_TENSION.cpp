@@ -636,9 +636,12 @@ struct SINE_DIST:public NONLINEAR_FUNCTION<T(T)>
 {
     T X,Y;
     virtual ~SINE_DIST(){}
-    virtual T operator()(const T x) const
+    virtual void Compute(const T x,T* ddf,T* df,T* f) const PHYSBAM_OVERRIDE
     {
-        return (x-X)+(sin(x)-Y)*cos(x);
+        T s=sin(x),c=cos(x);
+        if(f) *f=(x-X)+(s-Y)*c;
+        if(df) *df=1+c*c-(s-Y)*s;
+        if(ddf) *ddf=(Y-4*s)*c;
     }
 };
 //#####################################################################

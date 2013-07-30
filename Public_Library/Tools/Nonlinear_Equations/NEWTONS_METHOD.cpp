@@ -7,6 +7,7 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Nonlinear_Equations/LINE_SEARCH.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
+#include <Tools/Nonlinear_Equations/PARAMETRIC_LINE.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 using namespace PhysBAM;
 void (*NM_Flush_State)(const char*)=0;
