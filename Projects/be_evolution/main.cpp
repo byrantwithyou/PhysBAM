@@ -124,7 +124,7 @@ public:
     {
         nm.max_iterations=100000;
         nm.max_krylov_iterations=2000;
-        nm.krylov_tolerance=1e-12;
+        nm.krylov_tolerance=1;
         nm.fail_on_krylov_not_converged=false;
         nm.use_cg=false;
         nm.tolerance=1e-5;
@@ -186,6 +186,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-resolution",&res,"res","resolution");
     parse_args.Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
     parse_args.Add("-kry_it",&simulation.nm.max_krylov_iterations,"iter","maximum iterations for Krylov solver");
+    parse_args.Add("-kry_tol",&simulation.nm.krylov_tolerance,"tol","tolerance for Krylov solver");
     parse_args.Add("-newton_it",&simulation.nm.max_iterations,"iter","maximum iterations for Newton");
     parse_args.Add("-newton_tol",&simulation.nm.tolerance,"tol","tolerance for Newton");
     parse_args.Add("-kry_fail",&simulation.nm.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
