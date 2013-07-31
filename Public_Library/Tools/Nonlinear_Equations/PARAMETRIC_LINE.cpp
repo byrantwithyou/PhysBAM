@@ -17,7 +17,7 @@ template<class T> PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)>::
 // Function Compute
 //#####################################################################
 template<class T> void PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)>::
-Compute(const T t,T* ddg,T* dg,T* g) const PHYSBAM_OVERRIDE
+Compute(const T t,T* ddg,T* dg,T* g) const
 {
     tmp.Copy(t,dx,x);
     PHYSBAM_ASSERT((!ddg || system) && (!dg || tmp2));
