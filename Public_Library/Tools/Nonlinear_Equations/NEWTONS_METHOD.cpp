@@ -24,6 +24,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
     CONJUGATE_GRADIENT<T> cg;
     KRYLOV_SOLVER<T>* krylov=&minres;
     if(use_cg) krylov=&cg;
+    krylov->relative_tolerance=true;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     T phi=(1+sqrt(5))/2;
 
@@ -40,12 +41,13 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         printf("%g %g %g (%g %g)\n", E, abs(E-last_E), norm_grad, progress_tolerance, tolerance);
 
         sprintf(buff,"newton %d   %g %g %g", i, E, abs(E-last_E), norm_grad);
-        if(NM_Flush_State) NM_Flush_State(buff);
+//        if(NM_Flush_State) NM_Flush_State(buff);
 
         if((abs(E-last_E)<progress_tolerance&&0) || norm_grad<tolerance){result=true;break;}
         dx*=0;
         tm.Copy(-1,grad);
-        if(!krylov->Solve(sys,dx,tm,av,krylov_tolerance,0,max_krylov_iterations) && fail_on_krylov_not_converged)
+        T local_krylov_tolerance=std::min((T).5,krylov_tolerance*norm_grad);
+        if(!krylov->Solve(sys,dx,tm,av,local_krylov_tolerance,0,max_krylov_iterations) && fail_on_krylov_not_converged)
             break;
 
         printf("A   %g\n", sys.Inner_Product(dx,grad));
