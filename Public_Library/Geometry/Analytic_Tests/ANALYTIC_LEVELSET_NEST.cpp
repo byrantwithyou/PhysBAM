@@ -67,10 +67,10 @@ find(const TV& X,T t,int c,TV* N) const
     return out_dist;
 }
 namespace PhysBAM{
-template class ANALYTIC_LEVELSET_NEST<VECTOR<float,1> >;
-template class ANALYTIC_LEVELSET_NEST<VECTOR<float,2> >;
-template class ANALYTIC_LEVELSET_NEST<VECTOR<float,3> >;
-template class ANALYTIC_LEVELSET_NEST<VECTOR<double,1> >;
-template class ANALYTIC_LEVELSET_NEST<VECTOR<double,2> >;
-template class ANALYTIC_LEVELSET_NEST<VECTOR<double,3> >;
+template struct ANALYTIC_LEVELSET_NEST<VECTOR<float,1> >;
+template struct ANALYTIC_LEVELSET_NEST<VECTOR<float,2> >;
+template struct ANALYTIC_LEVELSET_NEST<VECTOR<float,3> >;
+template struct ANALYTIC_LEVELSET_NEST<VECTOR<double,1> >;
+template struct ANALYTIC_LEVELSET_NEST<VECTOR<double,2> >;
+template struct ANALYTIC_LEVELSET_NEST<VECTOR<double,3> >;
 }

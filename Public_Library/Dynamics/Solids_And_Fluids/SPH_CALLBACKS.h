@@ -14,7 +14,7 @@
 namespace PhysBAM{
 
 template<class TV> struct GRID_ARRAYS_POLICY;
-template<class TV> struct GRID;
+template<class TV> class GRID;
 
 template<class TV>
 class SPH_CALLBACKS

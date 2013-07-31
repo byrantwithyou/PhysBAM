@@ -44,7 +44,7 @@ public:
 #endif
 
     THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,const int number_of_threads,GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,
-        const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),const VECTOR<bool,TV::m>& periodic_input=VECTOR<bool,TV::m>());
+        const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),const VECTOR<bool,TV::m>& periodic_input=(VECTOR<bool,TV::m>()));
 
     RANGE<TV_INT> Face_Sentinels(const int axis) const
     {return RANGE<TV_INT>(TV_INT(),TV_INT::Axis_Vector(axis));}

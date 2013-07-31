@@ -181,6 +181,8 @@ Add(const TRIANGLE_3D<T> &t,int pa)
 {
     return primitives.Append(SURFACE_PRIMITIVE<T>(t,pa>=0?pa:primitives.m));
 }
+namespace PhysBAM{
 template class HIDDEN_SURFACE_PRIMITIVES<float>;
 template class HIDDEN_SURFACE_PRIMITIVES<double>;
+}
 #endif

@@ -54,10 +54,10 @@ Store(const int point_index,const int face_index)
 }
 //####################################################################
 namespace PhysBAM{
-template class TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<double,2> >;
-template class TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<double,3> >;
-template class TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<float,2> >;
-template class TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<float,3> >;
+template struct TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<double,2> >;
+template struct TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<double,3> >;
+template struct TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<float,2> >;
+template struct TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<float,3> >;
 template void BOX_HIERARCHY<VECTOR<double,2> >::Intersection_List<BOX_VISITOR_MPI<TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<double,2> > > >(BOX_HIERARCHY<VECTOR<double,2> > const&,BOX_VISITOR_MPI<TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<double,2> > >&,double) const;
 template void BOX_HIERARCHY<VECTOR<double,2> >::Intersection_List<TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<double,2> > >(BOX_HIERARCHY<VECTOR<double,2> > const&,TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<double,2> >&,double) const;
 template void BOX_HIERARCHY<VECTOR<double,3> >::Intersection_List<BOX_VISITOR_MPI<TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<double,3> > > >(BOX_HIERARCHY<VECTOR<double,3> > const&,BOX_VISITOR_MPI<TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<VECTOR<double,3> > >&,double) const;

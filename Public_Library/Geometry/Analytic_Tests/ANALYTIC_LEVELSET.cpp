@@ -31,10 +31,10 @@ Test(const RANGE<TV>& domain) const
     LOG::cout<<"analytic level set diff test "<<errl<<"   "<<X<<std::endl;
 }
 namespace PhysBAM{
-template class ANALYTIC_LEVELSET<VECTOR<float,1> >;
-template class ANALYTIC_LEVELSET<VECTOR<float,2> >;
-template class ANALYTIC_LEVELSET<VECTOR<float,3> >;
-template class ANALYTIC_LEVELSET<VECTOR<double,1> >;
-template class ANALYTIC_LEVELSET<VECTOR<double,2> >;
-template class ANALYTIC_LEVELSET<VECTOR<double,3> >;
+template struct ANALYTIC_LEVELSET<VECTOR<float,1> >;
+template struct ANALYTIC_LEVELSET<VECTOR<float,2> >;
+template struct ANALYTIC_LEVELSET<VECTOR<float,3> >;
+template struct ANALYTIC_LEVELSET<VECTOR<double,1> >;
+template struct ANALYTIC_LEVELSET<VECTOR<double,2> >;
+template struct ANALYTIC_LEVELSET<VECTOR<double,3> >;
 }

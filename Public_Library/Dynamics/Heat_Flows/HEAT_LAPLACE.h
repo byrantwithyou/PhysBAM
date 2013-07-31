@@ -23,7 +23,7 @@
 namespace PhysBAM{
 
 template<class TV> struct GRID_ARRAYS_POLICY;
-template<class TV> struct GRID;
+template<class TV> class GRID;
 
 template<class T_LAPLACE>
 class HEAT_LAPLACE:public T_LAPLACE

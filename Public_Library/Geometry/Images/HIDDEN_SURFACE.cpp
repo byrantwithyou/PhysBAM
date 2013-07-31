@@ -124,6 +124,8 @@ Break_Component(DIRECTED_GRAPH<>& graph,ARRAY<int>& node_map)
     }
     Break_Graph(new_graph,node_map);
 }
+namespace PhysBAM{
 template class HIDDEN_SURFACE<float>;
 template class HIDDEN_SURFACE<double>;
+}
 #endif

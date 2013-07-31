@@ -50,7 +50,7 @@ public:
     bool ignore_boundary_faces;
 
     MPI_GRID(GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),
-        const VECTOR<bool,TV::m>& periodic_input=VECTOR<bool,TV::m>(),MPI::Group* group_input=0);
+        const VECTOR<bool,TV::m>& periodic_input=(VECTOR<bool,TV::m>()),MPI::Group* group_input=0);
     ~MPI_GRID();
 
     int Number_Of_Processors() const

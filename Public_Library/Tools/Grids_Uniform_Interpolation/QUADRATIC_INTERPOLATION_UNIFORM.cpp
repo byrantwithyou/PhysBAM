@@ -158,6 +158,7 @@ From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV&
 {
     return From_Base_Node_Helper(grid,u,X,index);
 }
+namespace PhysBAM{
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,1>,VECTOR<double,1> >;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,1>,double>;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,2>,VECTOR<double,2> >;
@@ -170,3 +171,4 @@ template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,2>,VECTOR<float,2> >
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,2>,float>;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,3>,VECTOR<float,3> >;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,3>,float>;
+}

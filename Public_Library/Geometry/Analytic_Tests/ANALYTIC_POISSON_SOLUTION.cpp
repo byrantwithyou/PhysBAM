@@ -26,10 +26,10 @@ Test(const TV& X) const
     LOG::cout<<"analytic poisson solution diff test "<<erru<<"   "<<(L-AL)<<std::endl;
 }
 namespace PhysBAM{
-template class ANALYTIC_POISSON_SOLUTION<VECTOR<float,1> >;
-template class ANALYTIC_POISSON_SOLUTION<VECTOR<float,2> >;
-template class ANALYTIC_POISSON_SOLUTION<VECTOR<float,3> >;
-template class ANALYTIC_POISSON_SOLUTION<VECTOR<double,1> >;
-template class ANALYTIC_POISSON_SOLUTION<VECTOR<double,2> >;
-template class ANALYTIC_POISSON_SOLUTION<VECTOR<double,3> >;
+template struct ANALYTIC_POISSON_SOLUTION<VECTOR<float,1> >;
+template struct ANALYTIC_POISSON_SOLUTION<VECTOR<float,2> >;
+template struct ANALYTIC_POISSON_SOLUTION<VECTOR<float,3> >;
+template struct ANALYTIC_POISSON_SOLUTION<VECTOR<double,1> >;
+template struct ANALYTIC_POISSON_SOLUTION<VECTOR<double,2> >;
+template struct ANALYTIC_POISSON_SOLUTION<VECTOR<double,3> >;
 }

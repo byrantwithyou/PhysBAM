@@ -23,10 +23,10 @@ Test(const RANGE<TV>& domain) const
         analytic_solution(i)->Test(X);
 }
 namespace PhysBAM{
-template class ANALYTIC_POISSON_TEST<VECTOR<float,1> >;
-template class ANALYTIC_POISSON_TEST<VECTOR<float,2> >;
-template class ANALYTIC_POISSON_TEST<VECTOR<float,3> >;
-template class ANALYTIC_POISSON_TEST<VECTOR<double,1> >;
-template class ANALYTIC_POISSON_TEST<VECTOR<double,2> >;
-template class ANALYTIC_POISSON_TEST<VECTOR<double,3> >;
+template struct ANALYTIC_POISSON_TEST<VECTOR<float,1> >;
+template struct ANALYTIC_POISSON_TEST<VECTOR<float,2> >;
+template struct ANALYTIC_POISSON_TEST<VECTOR<float,3> >;
+template struct ANALYTIC_POISSON_TEST<VECTOR<double,1> >;
+template struct ANALYTIC_POISSON_TEST<VECTOR<double,2> >;
+template struct ANALYTIC_POISSON_TEST<VECTOR<double,3> >;
 }
