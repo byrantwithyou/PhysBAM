@@ -471,6 +471,14 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
     Flush_Frame<TV>(__FUNCTION__);
     combined_color.array-=bc_colors;
 }
+template<class TV>
+struct CROSSING
+{
+    typename TV::SCALAR theta;
+    int c0;
+    int c1;
+    TV X;
+};
 //#####################################################################
 // Function Cut_Stencil_With_Pairwise_Phi
 //#####################################################################
@@ -481,13 +489,6 @@ Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE
     typedef typename MARCHING_CUBES_COLOR<TV>::BOUNDARY_ELEMENT BOUNDARY_ELEMENT;
     typedef typename MARCHING_CUBES_COLOR<TV>::INTERFACE_ELEMENT INTERFACE_ELEMENT;
     typedef VECTOR<T,(1<<TV::m)> PHI;
-    struct CROSSING
-    {
-        T theta;
-        int c0;
-        int c1;
-        TV X;
-    };
 
     int vertices_of_side[4][2]={{0,1},{1,3},{3,2},{2,0}};
 
@@ -497,7 +498,7 @@ Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE
         full_mask&=self.pairwise_data(bits(j)+cell).valid_flags;
 
     VECTOR<int,(1<<TV::m)> colors(self.combined_color.Subset(bits+cell));
-    VECTOR<ARRAY<CROSSING>,4> crossings;
+    VECTOR<ARRAY<CROSSING<TV> >,4> crossings;
     for(int a=0;a<self.phi.m;a++)
         if(full_mask&(1<<a))
             for(int b=a+1;b<self.phi.m;b++)
@@ -508,7 +509,7 @@ Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE
                         int v0=vertices_of_side[e][0],v1=vertices_of_side[e][1];
                         T p0=phis(v0),p1=phis(v1);
                         if((p0>0)==(p1>0)) continue;
-                        CROSSING t={p0/(p0-p1),a,b};
+                        CROSSING<TV> t={p0/(p0-p1),a,b};
                         TV X0=self.grid.Node(cell+bits(v0)),X1=self.grid.Node(cell+bits(v1));
                         t.X=X0+t.theta*(X1-X0);
                         if(p0>0) exchange(t.c0,t.c1);
@@ -516,8 +517,8 @@ Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE
 
     ARRAY<int> best(self.phi.m),index(self.phi.m);
     for(int e=0;e<4;e++){
-        ARRAY<CROSSING>& ar=crossings(e);
-        ar.Sort([](const CROSSING& a,const CROSSING& b){return a.theta<b.theta;});
+        ARRAY<CROSSING<TV> >& ar=crossings(e);
+        ar.Sort([](const CROSSING<TV>& a,const CROSSING<TV>& b){return a.theta<b.theta;});
         int c0=colors(vertices_of_side[e][0]),c1=colors(vertices_of_side[e][1]),k=0;
         ARRAY<int> pa(ar.m);
         best.Fill(-INT_MAX);
@@ -535,7 +536,7 @@ Cut_Cell_With_Pairwise_Phi_Helper(TRIPLE_JUNCTION_CORRECTION<TV>& self,HASHTABLE
     //     LOG::cout<<colors<<std::endl;
     // for(int e=0;e<4;e++){
     //     LOG::cout<<e<<" : ";
-    //     ARRAY<CROSSING>& ar=crossings(e);
+    //     ARRAY<CROSSING<TV> >& ar=crossings(e);
     //     for(int i=0;i<ar.m;i++){
     //         LOG::cout<<ar(i).c0<<"  "<<ar(i).c1<<"     ";
     //     }
