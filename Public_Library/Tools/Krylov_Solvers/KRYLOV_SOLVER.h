@@ -17,7 +17,7 @@ template<class T>
 class KRYLOV_SOLVER
 {
 public:
-    bool print_diagnostics,print_residuals;
+    bool print_diagnostics,print_residuals,relative_tolerance;
     T nullspace_tolerance; // don't attempt to invert eigenvalues approximately less than nullspace_tolerance*max_eigenvalue
     int* iterations_used;
     T residual_magnitude_squared,nullspace_measure; // extra convergence information
@@ -29,7 +29,7 @@ public:
 //#####################################################################
     static void Ensure_Size(ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const KRYLOV_VECTOR_BASE<T>& v,int size);
     virtual bool Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,
-        ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,const int min_iterations,const int max_iterations)=0;
+        ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,T tolerance,const int min_iterations,const int max_iterations)=0;
 //#####################################################################
 };
 }

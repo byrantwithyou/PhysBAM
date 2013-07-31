@@ -22,8 +22,8 @@ template<class T> CONJUGATE_RESIDUAL<T>::
 // Function Solve
 //#####################################################################
 template<class T> bool CONJUGATE_RESIDUAL<T>::
-Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,
-    const int min_iterations,const int max_iterations)
+Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,
+    ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,T tolerance,const int min_iterations,const int max_iterations)
 {
     Ensure_Size(av,x,5);
     KRYLOV_VECTOR_BASE<T>& p=*av(0);
@@ -44,6 +44,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
             r=b;system.Multiply(x,p);r-=p;system.Project(r);}
         // stopping conditions
         convergence_norm=system.Convergence_Norm(r);
+        if(relative_tolerance && iterations==0) tolerance*=convergence_norm;
         if(print_residuals) LOG::cout<<convergence_norm<<std::endl;
         residual_magnitude_squared=(T)system.Inner_Product(r,r);
         nullspace_measure=(residual_magnitude_squared>small_number*small_number*100)?abs(rho_old/residual_magnitude_squared):0;

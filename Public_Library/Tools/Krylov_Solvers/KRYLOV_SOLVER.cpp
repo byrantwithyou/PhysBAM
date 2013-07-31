@@ -10,7 +10,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> KRYLOV_SOLVER<T>::
 KRYLOV_SOLVER()
-    :print_diagnostics(true),print_residuals(false),nullspace_tolerance((T)1e-5),iterations_used(0),residual_magnitude_squared(0),nullspace_measure(0),restart_iterations(0)
+    :print_diagnostics(true),print_residuals(false),relative_tolerance(false),nullspace_tolerance((T)1e-5),iterations_used(0),residual_magnitude_squared(0),
+    nullspace_measure(0),restart_iterations(0)
 {
 }
 //#####################################################################

@@ -20,8 +20,8 @@ template<class T> CONJUGATE_GRADIENT<T>::
 // Function Solve
 //#####################################################################
 template<class T> bool CONJUGATE_GRADIENT<T>::
-Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,
-    const int min_iterations,const int max_iterations)
+Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,
+    ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,T tolerance,const int min_iterations,const int max_iterations)
 {
     Ensure_Size(av,x,3+system.use_preconditioner);
     KRYLOV_VECTOR_BASE<T>& q=*av(0);
@@ -37,10 +37,12 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         bool restart=!iterations || (restart_iterations && iterations%restart_iterations==0);
         if(restart){
             if(print_residuals) LOG::cout<<"restarting cg"<<std::endl;
-            r=b;system.Multiply(x,q);r-=q;system.Project(r);}
+            r=b;system.Multiply(x,q);r-=q;system.Project(r);
+}
         // stopping conditions
         system.Project_Nullspace(r);
         convergence_norm=system.Convergence_Norm(r);
+        if(relative_tolerance && iterations==0) tolerance*=convergence_norm;
         if(print_residuals) LOG::cout<<convergence_norm<<std::endl;
         if(convergence_norm<=tolerance && (iterations>=min_iterations || convergence_norm<small_number)){
             if(print_diagnostics) LOG::Stat("cg iterations",iterations);if(iterations_used) *iterations_used=iterations;return true;}

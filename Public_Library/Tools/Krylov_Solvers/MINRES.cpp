@@ -32,7 +32,7 @@ Print_Diagnostics(int iterations)
 //#####################################################################
 template<class T> bool MINRES<T>::
 Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,
-    ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,const int min_iterations,const int max_iterations)
+    ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,T tolerance,const int min_iterations,const int max_iterations)
 {
     Ensure_Size(av,x,12);
     KRYLOV_VECTOR_BASE<T>& u=*av(0);
@@ -77,6 +77,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
             system.Project(vtemp);
             const KRYLOV_VECTOR_BASE<T>& b_hat = system.Precondition(vtemp,z); //Hoping to make b_hat = M*b;
             T theta = sqrt((T) system.Inner_Product(vtemp,b_hat));
+            if(relative_tolerance && iterations==0) tolerance*=theta;
             if(theta<=0){Print_Diagnostics(iterations);return true;}
             vk_hat.Copy(1/theta, b_hat);
             vk.Copy(1/theta, vtemp);

@@ -32,7 +32,7 @@ Print_Diagnostics(int iterations)
 //#####################################################################
 template<class T> bool LANCZOS_CONJUGATE_GRADIENT<T>::
 Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,
-    ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,const int min_iterations,const int max_iterations)
+    ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,T tolerance,const int min_iterations,const int max_iterations)
 {
     Ensure_Size(av,x,5);
     KRYLOV_VECTOR_BASE<T>& vk=*av(0);
@@ -55,6 +55,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
             vk.Copy(-1,vk,b);
             T th=sqrt(system.Inner_Product(vk,vk));
             if(th<=0){Print_Diagnostics(iterations);return true;}
+            if(relative_tolerance && iterations==0) tolerance*=th;
             vk.Copy(1/th,vk);
             vkm1*=0;
             dkm1=0;

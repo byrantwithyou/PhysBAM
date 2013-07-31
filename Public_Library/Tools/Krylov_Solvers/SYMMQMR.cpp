@@ -24,7 +24,7 @@ template<class T> SYMMQMR<T>::
 //#####################################################################
 template<class T> bool SYMMQMR<T>::
 Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,
-    ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,const int min_iterations,const int max_iterations)
+    ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,T tolerance,const int min_iterations,const int max_iterations)
 {
     Ensure_Size(av,x,4+system.use_preconditioner);
     KRYLOV_VECTOR_BASE<T>& p=*av(0);
@@ -42,6 +42,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         if(restart){
             if(print_residuals) LOG::cout<<"restarting symmqmr"<<std::endl;
             r=b;system.Multiply(x,p);r-=p;system.Project(r);
+            if(relative_tolerance && iterations==0) tolerance*=(T)system.Convergence_Norm(r);
             tau_old=sqrt((T)system.Inner_Product(r,r));
             p=system.Precondition(r,z);
             nu_old=(T)0;

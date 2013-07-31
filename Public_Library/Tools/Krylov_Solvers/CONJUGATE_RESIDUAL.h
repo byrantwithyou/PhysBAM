@@ -21,7 +21,8 @@ class CONJUGATE_RESIDUAL:public KRYLOV_SOLVER<T>
 {
     typedef KRYLOV_SOLVER<T> BASE;
 public:
-    using BASE::restart_iterations;using BASE::residual_magnitude_squared;using BASE::iterations_used;using BASE::print_diagnostics;using BASE::print_residuals;
+    using BASE::restart_iterations;using BASE::residual_magnitude_squared;using BASE::iterations_used;
+    using BASE::print_diagnostics;using BASE::print_residuals;using BASE::relative_tolerance;
     using BASE::nullspace_measure;using BASE::nullspace_tolerance;using BASE::Solve;using BASE::Ensure_Size;
 
     CONJUGATE_RESIDUAL()
@@ -31,7 +32,7 @@ public:
 
 //#####################################################################
     virtual bool Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,
-        ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,const int min_iterations,const int max_iterations) PHYSBAM_OVERRIDE;
+        ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,T tolerance,const int min_iterations,const int max_iterations) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

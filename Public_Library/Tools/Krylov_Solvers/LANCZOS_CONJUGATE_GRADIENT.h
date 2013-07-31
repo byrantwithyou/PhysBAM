@@ -15,7 +15,8 @@ class LANCZOS_CONJUGATE_GRADIENT:public KRYLOV_SOLVER<T>
 {
     typedef KRYLOV_SOLVER<T> BASE;
 public:
-    using BASE::restart_iterations;using BASE::residual_magnitude_squared;using BASE::iterations_used;using BASE::print_diagnostics;using BASE::print_residuals;
+    using BASE::restart_iterations;using BASE::residual_magnitude_squared;using BASE::iterations_used;
+    using BASE::print_diagnostics;using BASE::print_residuals;using BASE::relative_tolerance;
     using BASE::nullspace_measure;using BASE::nullspace_tolerance;using BASE::Solve;using BASE::Ensure_Size;
 
     LANCZOS_CONJUGATE_GRADIENT()
@@ -25,7 +26,7 @@ public:
 
 //#####################################################################
     bool Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,
-        ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,const int min_iterations,const int max_iterations);
+        ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,T tolerance,const int min_iterations,const int max_iterations);
     void Print_Diagnostics(int iterations);
 //#####################################################################
 };
