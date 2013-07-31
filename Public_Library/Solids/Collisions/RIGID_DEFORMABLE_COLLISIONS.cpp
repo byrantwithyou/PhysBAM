@@ -427,7 +427,7 @@ Update_Rigid_Deformable_Contact_Pair(RIGID_BODY<TV>& rigid_body,const int partic
         rigid_body.Update_Angular_Velocity();
         return false;} // do nothing in case of separating pair
 
-    T depth;if(!process_contact_unconditionally && !rigid_body.Implicit_Geometry_Lazy_Inside_And_Value(particles.X(particle_index),depth,collision_body_thickness)){
+    T depth;if(!rigid_body.Implicit_Geometry_Lazy_Inside_And_Value(particles.X(particle_index),depth,collision_body_thickness) && !process_contact_unconditionally){
         exchange(rigid_frame_save(rigid_body.particle_index),rigid_body.Frame());
         rigid_body.Update_Angular_Velocity();
         return false;}

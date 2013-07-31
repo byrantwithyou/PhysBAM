@@ -93,8 +93,8 @@ public:
     void Delete_Binding(const int parent_particle);
     void Make_Active_Parent(const int parent_particle,ARRAY<PAIR<int,RIGID_CLUSTER_CONSTITUENT_ID> >& child_list);
     void Set_Binding_Active(const int parent_rigid_body_index,const bool active=0);
-    void Deactivate_And_Return_Clusters(ARRAY<int>& active_bindings=0);
-    void Reactivate_Bindings(const ARRAY<int>& active_bindings=0);
+    void Deactivate_And_Return_Clusters(ARRAY<int>& active_bindings);
+    void Reactivate_Bindings(const ARRAY<int>& active_bindings);
     void Save_Bindings_State();
     void Restore_Bindings_State();
     int Size() const{return reverse_bindings.Size();}
