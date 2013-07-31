@@ -187,12 +187,14 @@ int main(int argc,char* argv[])
     parse_args.Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
     parse_args.Add("-kry_it",&simulation.nm.max_krylov_iterations,"iter","maximum iterations for Krylov solver");
     parse_args.Add("-newton_it",&simulation.nm.max_iterations,"iter","maximum iterations for Newton");
+    parse_args.Add("-newton_tol",&simulation.nm.tolerance,"tol","tolerance for Newton");
     parse_args.Add("-kry_fail",&simulation.nm.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
     parse_args.Add("-angle_tol",&simulation.nm.angle_tolerance,"tol","gradient descent tolerance");
     parse_args.Add("-seed",&seed,"fixed seed","set random seed");
     parse_args.Add("-dt",&dt,"step","time step size");
     parse_args.Add("-pt",&do_pt,"point test");
     parse_args.Add("-steps",&steps,"steps","number of time steps");
+    parse_args.Add("-wolfe",&simulation.nm.use_wolfe_search,"use wolfe conditions line search");
     parse_args.Parse();
 
     LOG::cout<<std::setprecision(16);
