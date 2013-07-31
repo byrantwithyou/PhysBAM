@@ -18,7 +18,9 @@
 #include "MPM_SYSTEM.h"
 #include "MPM_VECTOR.h"
 #include "TIMING.h"
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 namespace PhysBAM{
 using ::std::exp;
 //#####################################################################

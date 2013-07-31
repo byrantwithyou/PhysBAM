@@ -27,7 +27,9 @@
 #include "SURFACE_RECONSTRUCTION_ANISOTROPIC_KERNAL.h"
 #include "SURFACE_RECONSTRUCTION_ZHU_AND_BRIDSON.h"
 #include "TIMING.h"
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 using namespace PhysBAM;
 
 template<class TV>

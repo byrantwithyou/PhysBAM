@@ -23,7 +23,9 @@
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include "MPMAC.h"
 #include "TIMING.h"
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 using namespace PhysBAM;
 
 template<class TV>
