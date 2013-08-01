@@ -23,8 +23,10 @@ public:
     using BASE::restart_iterations;using BASE::residual_magnitude_squared;using BASE::iterations_used;
     using BASE::print_diagnostics;using BASE::print_residuals;using BASE::relative_tolerance;
     using BASE::nullspace_measure;using BASE::nullspace_tolerance;using BASE::Solve;using BASE::Ensure_Size;
+    bool finish_before_indefiniteness;
 
     CONJUGATE_GRADIENT()
+        :finish_before_indefiniteness(false)
     {}
 
     virtual ~CONJUGATE_GRADIENT();

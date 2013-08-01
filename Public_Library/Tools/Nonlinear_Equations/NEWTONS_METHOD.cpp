@@ -22,6 +22,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
     KRYLOV_VECTOR_BASE<T>& tm=*x.Clone_Default();
     MINRES<T> minres;
     CONJUGATE_GRADIENT<T> cg;
+    cg.finish_before_indefiniteness=true;
     KRYLOV_SOLVER<T>* krylov=&minres;
     if(use_cg) krylov=&cg;
     krylov->relative_tolerance=true;
