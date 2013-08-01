@@ -31,6 +31,7 @@ struct LINE_SEARCH
     static bool Line_Search_Wolfe_Conditions(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,T c1,T c2,T x_max=FLT_MAX);
     static bool Line_Search_Wolfe_Conditions_Zoom(NONLINEAR_FUNCTION<T(T)>& F,WOLFE_HELPER lo,WOLFE_HELPER hi,WOLFE_HELPER x0,T& x,T c1,T c2);
     static T Best_Value(const BRACKET& s);
+    static T New_Point_Interpolation(const WOLFE_HELPER& lo,const WOLFE_HELPER& hi);
 };
 }
 #endif

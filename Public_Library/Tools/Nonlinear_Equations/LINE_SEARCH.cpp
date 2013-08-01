@@ -6,8 +6,8 @@
 #include <Tools/Math_Tools/min.h>
 #include <Tools/Nonlinear_Equations/LINE_SEARCH.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
-#include <limits>
 #include <cmath>
+#include <limits>
 using std::abs;
 using namespace PhysBAM;
 //#####################################################################
@@ -107,6 +107,21 @@ Line_Search_Wolfe_Conditions(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,T c1,T c2,
     return false;
 }
 //#####################################################################
+// Function New_Point_Interpolation
+//#####################################################################
+template<class T> T LINE_SEARCH<T>::
+New_Point_Interpolation(const WOLFE_HELPER& lo,const WOLFE_HELPER& hi)
+{
+    T k=hi.fa-lo.fa,a=-2*k+lo.dfa+hi.dfa,b=3*k-2*lo.dfa-hi.dfa,c=lo.dfa;
+    T r=b*b-3*a*c;
+    if(r>0){
+        T s=sqrt(r),num=s-b,den=3*a;
+        if(den<0){num=-num;den=-den;}
+        if(num>(T).1*den && num<(T).9*den)
+            return lo.a+num/den*(hi.a-lo.a);}
+    return (lo.a+hi.a)/2;
+}
+//#####################################################################
 // Function Line_Search_Wolfe_Conditions_Zoom
 //#####################################################################
 template<class T> bool LINE_SEARCH<T>::
@@ -115,7 +130,7 @@ Line_Search_Wolfe_Conditions_Zoom(NONLINEAR_FUNCTION<T(T)>& F,WOLFE_HELPER lo,WO
     T min_interval=abs(hi.a-lo.a)*std::numeric_limits<T>::epsilon();
     while(abs(hi.a-lo.a)>min_interval)
     {
-        WOLFE_HELPER xj={(lo.a+hi.a)/2};
+        WOLFE_HELPER xj={New_Point_Interpolation(lo,hi)};
         F.Compute(xj.a,0,&xj.dfa,&xj.fa);
         if(xj.fa>x0.fa+c1*xj.a*x0.dfa || xj.fa>=x0.fa) hi=xj;
         else if(abs(xj.dfa)<=-c2*x0.dfa){
