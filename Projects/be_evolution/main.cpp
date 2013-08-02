@@ -126,7 +126,6 @@ public:
         nm.max_krylov_iterations=2000;
         nm.krylov_tolerance=1;
         nm.fail_on_krylov_not_converged=false;
-        nm.use_cg=false;
         nm.tolerance=1e-5;
         nm.angle_tolerance=1e-2;
     }
@@ -181,7 +180,7 @@ int main(int argc,char* argv[])
     PARSE_ARGS parse_args(argc,argv);
     LOG::Initialize_Logging(false,false,1<<30,true);
     LOG::cout<<parse_args.Print_Arguments()<<std::endl;
-    parse_args.Add("-cg",&simulation.nm.use_cg,"use CG instead of minres");
+    parse_args.Add_Not("-mr",&simulation.nm.use_cg,"use minres instead of cg");
     parse_args.Add("-o",&output_directory,"dir","output directory");
     parse_args.Add("-resolution",&res,"res","resolution");
     parse_args.Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
@@ -195,7 +194,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-dt",&dt,"step","time step size");
     parse_args.Add("-pt",&do_pt,"point test");
     parse_args.Add("-steps",&steps,"steps","number of time steps");
-    parse_args.Add("-wolfe",&simulation.nm.use_wolfe_search,"use wolfe conditions line search");
+    parse_args.Add_Not("-gss",&simulation.nm.use_wolfe_search,"use golden section search instead of wolfe conditions line search");
     parse_args.Parse();
 
     LOG::cout<<std::setprecision(16);
@@ -217,7 +216,6 @@ int main(int argc,char* argv[])
     else random.Fill_Uniform(simulation.solid_body_collection.deformable_body_collection.particles.X,-1,1);
 
     simulation.solid_body_collection.Update_Simulated_Particles();
-
     Flush_State("frame %d");
     for(int frame=1;frame<=steps;frame++)
     {
