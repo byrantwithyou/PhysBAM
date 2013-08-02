@@ -10,7 +10,6 @@
 #define __RGB_HEADER__
 
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <cstring>
 namespace PhysBAM{

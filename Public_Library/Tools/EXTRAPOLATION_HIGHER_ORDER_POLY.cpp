@@ -2,6 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Arrays/ARRAY.h>
 #include <Tools/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>

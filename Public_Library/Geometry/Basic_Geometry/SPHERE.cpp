@@ -4,7 +4,6 @@
 //#####################################################################
 // Class SPHERE
 //##################################################################### 
-#include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/choice.h>
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Vectors/VECTOR.h>

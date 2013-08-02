@@ -7,6 +7,7 @@
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Log/LOG.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 #include <Tools/Particles/PARTICLES.h>

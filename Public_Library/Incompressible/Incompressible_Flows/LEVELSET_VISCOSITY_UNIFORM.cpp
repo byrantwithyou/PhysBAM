@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
+#include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Incompressible/Incompressible_Flows/LEVELSET_VISCOSITY_UNIFORM.h>
 #include <Incompressible/Incompressible_Flows/LEVELSET_VISCOSITY_UNIFORM_SYSTEM.h>

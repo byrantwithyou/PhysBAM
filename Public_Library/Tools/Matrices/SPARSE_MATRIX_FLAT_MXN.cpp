@@ -5,6 +5,7 @@
 // Class SPARSE_MATRIX_FLAT_MXN
 //#####################################################################
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/Inverse.h>
 #include <Tools/Math_Tools/sqr.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>

@@ -9,6 +9,7 @@
 
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 

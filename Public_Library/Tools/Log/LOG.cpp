@@ -51,28 +51,28 @@ class LOG_COUT_BUFFER:public std::stringbuf
 {
     int sync()
     {if(!Instance()->suppress_cout && Instance()->current_entry->depth<Instance()->verbosity_level){
-        if(LOG_ENTRY::start_on_separate_line) putchar('\n');
+        if(LOG_ENTRY::start_on_separate_line) ::std::putchar('\n');
         std::string buffer=str();
         for(size_t start=0;start<buffer.length();){
             size_t end=buffer.find('\n',start);
-            if(LOG_ENTRY::needs_indent){printf("%*s",2*Instance()->current_entry->depth+2,"");LOG_ENTRY::needs_indent=false;}
-            fputs(buffer.substr(start,end-start).c_str(),stdout);
-            if(end!=std::string::npos){putchar('\n');LOG_ENTRY::needs_indent=true;start=end+1;}
+            if(LOG_ENTRY::needs_indent){::std::printf("%*s",2*Instance()->current_entry->depth+2,"");LOG_ENTRY::needs_indent=false;}
+            ::std::fputs(buffer.substr(start,end-start).c_str(),stdout);
+            if(end!=std::string::npos){::std::putchar('\n');LOG_ENTRY::needs_indent=true;start=end+1;}
             else break;}
         LOG_ENTRY::start_on_separate_line=false;Instance()->current_entry->end_on_separate_line=true;
         fflush(stdout);}
     if(Instance()->log_file){
-        if(LOG_ENTRY::log_file_start_on_separate_line) putc('\n',Instance()->log_file);
+        if(LOG_ENTRY::log_file_start_on_separate_line) ::std::putc('\n',Instance()->log_file);
         std::string buffer=str();
         for(size_t start=0;start<buffer.length();){
             size_t end=buffer.find('\n',start);
             if(LOG_ENTRY::log_file_needs_indent){
-                fprintf(Instance()->log_file,"%*s",2*Instance()->current_entry->depth+2,"");LOG_ENTRY::log_file_needs_indent=false;
-                if(Instance()->xml) fputs("<print>",Instance()->log_file);}
-            fputs(buffer.substr(start,end-start).c_str(),Instance()->log_file);
+                ::std::fprintf(Instance()->log_file,"%*s",2*Instance()->current_entry->depth+2,"");LOG_ENTRY::log_file_needs_indent=false;
+                if(Instance()->xml) ::std::fputs("<print>",Instance()->log_file);}
+            ::std::fputs(buffer.substr(start,end-start).c_str(),Instance()->log_file);
             if(end!=std::string::npos){
-                if(Instance()->xml) fputs("</print>",Instance()->log_file);
-                putc('\n',Instance()->log_file);LOG_ENTRY::log_file_needs_indent=true;start=end+1;}
+                if(Instance()->xml) ::std::fputs("</print>",Instance()->log_file);
+                ::std::putc('\n',Instance()->log_file);LOG_ENTRY::log_file_needs_indent=true;start=end+1;}
             else break;}
         LOG_ENTRY::log_file_start_on_separate_line=false;Instance()->current_entry->log_file_end_on_separate_line=true;
         fflush(Instance()->log_file);}
@@ -85,17 +85,17 @@ class LOG_CERR_BUFFER:public std::stringbuf
 {
     int sync()
     {if(!Instance()->suppress_cerr){
-        if(LOG_ENTRY::start_on_separate_line) putchar('\n');LOG_ENTRY::start_on_separate_line=false;
-        fputs(str().c_str(),stderr);}
+        if(LOG_ENTRY::start_on_separate_line) ::std::putchar('\n');LOG_ENTRY::start_on_separate_line=false;
+        ::std::fputs(str().c_str(),stderr);}
     if(Instance()->log_file){
-        if(LOG_ENTRY::log_file_start_on_separate_line) putc('\n',Instance()->log_file);LOG_ENTRY::log_file_start_on_separate_line=false;
+        if(LOG_ENTRY::log_file_start_on_separate_line) ::std::putc('\n',Instance()->log_file);LOG_ENTRY::log_file_start_on_separate_line=false;
         std::string buffer=str();
         for(size_t start=0;start<buffer.length();){
             size_t end=buffer.find('\n',start);
-            if(Instance()->xml) fputs("<error><!--",Instance()->log_file);
-            fputs(buffer.substr(start,end-start).c_str(),Instance()->log_file);
-            if(Instance()->xml) fputs("--></error>",Instance()->log_file);
-            putc('\n',Instance()->log_file);
+            if(Instance()->xml) ::std::fputs("<error><!--",Instance()->log_file);
+            ::std::fputs(buffer.substr(start,end-start).c_str(),Instance()->log_file);
+            if(Instance()->xml) ::std::fputs("--></error>",Instance()->log_file);
+            ::std::putc('\n',Instance()->log_file);
             if(end!=std::string::npos) start=end+1;
             else break;}}
     str("");return std::stringbuf::sync();}
@@ -175,14 +175,14 @@ Copy_Log_To_File(const std::string& filename,const bool append)
     if(log_file && log_file_temporary){
         temporary_file=log_file;log_file=0;}
     if(log_file){
-        if(LOG_ENTRY::log_file_start_on_separate_line) putc('\n',log_file);
+        if(LOG_ENTRY::log_file_start_on_separate_line) ::std::putc('\n',log_file);
         Instance()->root->Dump_Log(log_file);
         fclose(log_file);log_file=0;}
     if(!filename.empty()){
         if(append){
             log_file=fopen(filename.c_str(),"a");
             if(!log_file) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Can't open log file %s for append",filename.c_str()));
-            putc('\n',log_file);}
+            ::std::putc('\n',log_file);}
         else{
             log_file=fopen(filename.c_str(),"w");
             if(!log_file) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Can't open log file %s for writing",filename.c_str()));}
@@ -237,15 +237,15 @@ void Stat_Helper(const std::string& label,const std::stringstream& s)
     LOG_CLASS* instance=Instance();
     if(instance->suppress_timing) return;
     if(instance->current_entry->depth<instance->verbosity_level){
-        if(LOG_ENTRY::start_on_separate_line) putchar('\n');
-        if(LOG_ENTRY::needs_indent) printf("%*s",2*instance->current_entry->depth+2,"");
-        printf("%s = %s\n",label.c_str(),s.str().c_str());
+        if(LOG_ENTRY::start_on_separate_line) ::std::putchar('\n');
+        if(LOG_ENTRY::needs_indent) ::std::printf("%*s",2*instance->current_entry->depth+2,"");
+        ::std::printf("%s = %s\n",label.c_str(),s.str().c_str());
         LOG_ENTRY::start_on_separate_line=false;LOG_ENTRY::needs_indent=instance->current_entry->end_on_separate_line=true;}
     if(instance->log_file){
-        if(LOG_ENTRY::log_file_start_on_separate_line) putc('\n',instance->log_file);
-        if(LOG_ENTRY::log_file_needs_indent) fprintf(instance->log_file,"%*s",2*instance->current_entry->depth+2,"");
-        if(instance->xml) fprintf(instance->log_file,"<stat name=\"%s\" value=\"%s\"/>\n",label.c_str(),s.str().c_str());
-        else fprintf(instance->log_file,"%s = %s\n",label.c_str(),s.str().c_str());
+        if(LOG_ENTRY::log_file_start_on_separate_line) ::std::putc('\n',instance->log_file);
+        if(LOG_ENTRY::log_file_needs_indent) ::std::fprintf(instance->log_file,"%*s",2*instance->current_entry->depth+2,"");
+        if(instance->xml) ::std::fprintf(instance->log_file,"<stat name=\"%s\" value=\"%s\"/>\n",label.c_str(),s.str().c_str());
+        else ::std::fprintf(instance->log_file,"%s = %s\n",label.c_str(),s.str().c_str());
         LOG_ENTRY::log_file_start_on_separate_line=false;LOG_ENTRY::log_file_needs_indent=instance->current_entry->log_file_end_on_separate_line=true;}
 }
 //#####################################################################
@@ -289,10 +289,10 @@ void
 Dump_Log_Helper(LOG_CLASS& instance,const bool suppress_cout)
 {
     if(instance.suppress_timing) return;
-    if(LOG_ENTRY::start_on_separate_line){putchar('\n');LOG_ENTRY::start_on_separate_line=false;}
+    if(LOG_ENTRY::start_on_separate_line){::std::putchar('\n');LOG_ENTRY::start_on_separate_line=false;}
     if(!suppress_cout) instance.root->Dump_Log(stdout);
     if(instance.log_file){
-        if(LOG_ENTRY::log_file_start_on_separate_line){putc('\n',instance.log_file);LOG_ENTRY::log_file_start_on_separate_line=false;}
+        if(LOG_ENTRY::log_file_start_on_separate_line){::std::putc('\n',instance.log_file);LOG_ENTRY::log_file_start_on_separate_line=false;}
         if(!instance.xml) instance.root->Dump_Log(instance.log_file);}
 }
 }

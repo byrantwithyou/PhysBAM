@@ -9,7 +9,6 @@
 
 #include <Tools/Arrays/ARRAY_BASE.h>
 #include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/ONE.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Vectors/VECTOR.h>
@@ -338,23 +337,6 @@ public:
     void Move_Contents_By_Offset(const VECTOR<int,1>& offset)
     {STATIC_ASSERT(d==1);TV_INT i,s(TV_INT::Componentwise_Greater_Equal(offset,TV_INT())),c(s*2-1),e(s*domain.Edge_Lengths()),a(domain.max_corner-e),b(domain.min_corner+e);
     for(i.x=a.x;i.x<=b.x;i.x+=c.x) (*this)(i)=(*this)(i+offset);}
-
-    void Print_Grid_Array(VECTOR<int,1> counts,int ghost_cells=0)
-    {for(int i=-ghost_cells;i<counts.x+ghost_cells;i++) LOG::cout<<(operator()(VECTOR<int,1>(i)));LOG::cout<<std::endl;}
-
-    void Print_Grid_Array(VECTOR<int,2> counts,int ghost_cells=0)
-    {for(int i=-ghost_cells;i<counts.x+ghost_cells;i++){
-        for(int j=-ghost_cells;j<counts.y+ghost_cells;j++) LOG::cout<<(operator()(VECTOR<int,2>(i,j)));
-        LOG::cout<<std::endl;}
-    LOG::cout<<std::endl;}
-
-    void Print_Grid_Array(VECTOR<int,3> counts,int ghost_cells=0)
-    {for(int i=-ghost_cells;i<counts.x+ghost_cells;i++){
-        for(int j=-ghost_cells;j<counts.y+ghost_cells;j++){
-            for(int k=-ghost_cells;k<counts.z+ghost_cells;k++) LOG::cout<<(operator()(VECTOR<int,3>(i,j,k)));
-            LOG::cout<<std::endl;}
-        LOG::cout<<std::endl;}
-    LOG::cout<<std::endl;}
 
 //#####################################################################
 };

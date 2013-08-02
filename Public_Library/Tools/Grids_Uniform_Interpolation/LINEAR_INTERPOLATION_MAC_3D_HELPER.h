@@ -7,6 +7,8 @@
 #ifndef __LINEAR_INTERPOLATION_MAC_3D_HELPER__
 #define __LINEAR_INTERPOLATION_MAC_3D_HELPER__
 
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Data_Structures/PAIR.h>
 #include <Tools/Grids_Uniform/BLOCK_UNIFORM.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>

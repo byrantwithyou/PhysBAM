@@ -5,6 +5,7 @@
 #include <Tools/Grids_Uniform/FACE_INDEX.h>
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Tools/Log/LOG.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>

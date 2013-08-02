@@ -9,6 +9,7 @@
 
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Log/LOG.h>
 #include <Tools/Parallel_Computation/ITERATOR_TASK.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <climits>

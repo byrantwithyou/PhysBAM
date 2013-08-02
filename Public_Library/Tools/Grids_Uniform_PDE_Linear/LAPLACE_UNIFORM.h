@@ -12,7 +12,6 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE.h>
-#include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/maxabs.h>
 #include <Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <Tools/Parallel_Computation/LAPLACE_UNIFORM_MPI.h>

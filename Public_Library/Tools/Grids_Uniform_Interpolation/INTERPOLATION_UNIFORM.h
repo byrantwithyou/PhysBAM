@@ -5,6 +5,7 @@
 #ifndef __INTERPOLATION_UNIFORM__
 #define __INTERPOLATION_UNIFORM__
 
+#include <Tools/Arrays/ARRAY.h>
 #include <Tools/Grids_Uniform/BLOCK_UNIFORM.h>
 #include <Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM_FORWARD.h>

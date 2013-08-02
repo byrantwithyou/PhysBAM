@@ -4,6 +4,7 @@
 //#####################################################################
 // Class SPARSE_MATRIX_FLAT_NXN
 //#####################################################################
+#include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/sqr.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <Tools/Parallel_Computation/INT_ITERATOR_THREADED.h>

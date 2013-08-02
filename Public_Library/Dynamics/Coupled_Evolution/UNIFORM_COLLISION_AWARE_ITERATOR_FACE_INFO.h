@@ -6,6 +6,7 @@
 //#####################################################################
 #ifndef __UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO__
 #define __UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO__
+#include <Tools/Arrays/ARRAY.h>
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Data_Structures/TRIPLE.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>

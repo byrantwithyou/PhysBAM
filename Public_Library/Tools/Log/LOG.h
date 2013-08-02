@@ -185,4 +185,5 @@ LOG_CLASS::Time_Helper(format);}
 //##################################################################### 
 }
 }
+#include <Tools/Log/LOG_PRINTF.h>
 #endif

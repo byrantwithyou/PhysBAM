@@ -7,6 +7,7 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Log/LOG.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Dynamics/Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h>
