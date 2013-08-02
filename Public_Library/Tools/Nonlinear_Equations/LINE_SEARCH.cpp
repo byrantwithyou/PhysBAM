@@ -89,10 +89,10 @@ template<class T> bool LINE_SEARCH<T>::
 Line_Search_Wolfe_Conditions(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,T c1,T c2,T x_max)
 {
     PHYSBAM_ASSERT(0<c1 && c1<c2 && c2<1);
-    WOLFE_HELPER a0={0};
-    F.Compute(0,0,&a0.dfa,&a0.fa);
+    WOLFE_HELPER a0={a};
+    F.Compute(a0.a,0,&a0.dfa,&a0.fa);
     PHYSBAM_ASSERT(a0.dfa<0);
-    WOLFE_HELPER x0=a0,x1={1};
+    WOLFE_HELPER x0=a0,x1={b};
     for(;x1.a<=x_max;x1.a*=2){
         F.Compute(x1.a,0,&x1.dfa,&x1.fa);
         if(x1.fa>a0.fa+c1*x1.a*a0.dfa || x1.fa>=x0.fa)
@@ -103,7 +103,7 @@ Line_Search_Wolfe_Conditions(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,T c1,T c2,
         if(x1.dfa>=0)
             return Line_Search_Wolfe_Conditions_Zoom(F,x1,x0,a0,x,c1,c2);
         x0=x1;}
-    x=0;
+    x=a;
     return false;
 }
 //#####################################################################
@@ -139,8 +139,8 @@ Line_Search_Wolfe_Conditions_Zoom(NONLINEAR_FUNCTION<T(T)>& F,WOLFE_HELPER lo,WO
         else{
             if(((hi.a>lo.a) && xj.dfa>=0) || ((hi.a<lo.a) && xj.dfa<=0)) hi=lo;
             lo=xj;}}
-    if(lo.a>0) x=lo.a;
-    x=1;
+    if(lo.a>x0.a) x=lo.a;
+    else x=x0.a;
     return true;
 }
 namespace PhysBAM{
