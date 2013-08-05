@@ -9,6 +9,7 @@
 
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;
