@@ -32,7 +32,6 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Level_Sets/LEVELSET_MAKER.h>
 #include <Geometry/Tessellation/RANGE_TESSELLATION.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER_HASH.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
@@ -58,6 +57,7 @@
 #include <Deformables/Forces/SEGMENT_BENDING_SPRINGS.h>
 #include <Deformables/Forces/TRIANGLE_BENDING_ELEMENTS.h>
 #include <Deformables/Forces/TRIANGLE_BENDING_SPRINGS.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>

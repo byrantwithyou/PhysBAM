@@ -51,7 +51,6 @@
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
@@ -68,6 +67,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Rigids/Rigid_Bodies/RIGID_CLUSTER_CONSTITUENT_ID.h>
 #include <Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>

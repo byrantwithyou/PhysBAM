@@ -8,8 +8,8 @@
 #include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
+#include <Ray_Tracing/Rendering/RENDER_WORLD.h>
+#include <Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
 #include "GENERIC_RENDER_EXAMPLE.h"
 using namespace PhysBAM;
 //#####################################################################

@@ -4,12 +4,12 @@
 //#####################################################################
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_DIRECTIONAL_LIGHT.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_POINT_LIGHT.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_RECTANGLE_LIGHT.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_SPOTLIGHT.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_VOXEL_FIRE_LIGHT.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_LIGHT_SHADER.h>
+#include <Ray_Tracing/Rendering_Lights/RENDERING_DIRECTIONAL_LIGHT.h>
+#include <Ray_Tracing/Rendering_Lights/RENDERING_POINT_LIGHT.h>
+#include <Ray_Tracing/Rendering_Lights/RENDERING_RECTANGLE_LIGHT.h>
+#include <Ray_Tracing/Rendering_Lights/RENDERING_SPOTLIGHT.h>
+#include <Ray_Tracing/Rendering_Lights/RENDERING_VOXEL_FIRE_LIGHT.h>
+#include <Ray_Tracing/Rendering_Shaders/RENDERING_LIGHT_SHADER.h>
 #include "GENERIC_RENDER_EXAMPLE.h"
 using namespace PhysBAM;
 //#####################################################################

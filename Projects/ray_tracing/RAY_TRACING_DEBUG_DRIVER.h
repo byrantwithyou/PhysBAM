@@ -6,8 +6,8 @@
 //##################################################################### 
 #ifndef __RAY_TRACING_DEBUG_DRIVER__
 #define __RAY_TRACING_DEBUG_DRIVER__
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering/RAY_TRACER_DEBUG_DATA.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
+#include <Ray_Tracing/Rendering/RAY_TRACER_DEBUG_DATA.h>
+#include <Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include <fstream>
 #include <iostream>
 #include <typeinfo>

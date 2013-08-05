@@ -21,7 +21,7 @@ variables.AddVariables(
     BoolVariable('shared','Build shared libraries',1),
     BoolVariable('wrapper','Build wrapper executable file',1),
     BoolVariable('shared_objects','Build shareable objects when without shared libraries',1),
-    BoolVariable('USE_RENDERING','Use Rendering',0),
+    BoolVariable('USE_RAY_TRACING','Use ray tracing',0),
     BoolVariable('compile_id_types_as_int','Treat ID types as int to avoid possible performance consequences',0),
     BoolVariable('fast_math','compile with -ffast-math',0),
     BoolVariable('install_programs','install programs into source directories',1),
@@ -220,7 +220,7 @@ def Link_Flags(env):
         env.Append(RPATH=[Dir(public_library).abspath])
     if not env['shared'] or not env['single_so']:
         if env['USE_OPENGL']: env.Append(LIBS=['PhysBAM_OpenGL'+library_suffix])
-        if env['USE_RENDERING']: env.Append(LIBS=['PhysBAM_Rendering'+library_suffix])
+        if env['USE_RAY_TRACING']: env.Append(LIBS=['PhysBAM_Ray_Tracing'+library_suffix])
     env.Append(LIBS=common_libraries)
     for name,lib in external_libraries.items():
         if env['USE_'+name.upper()]:

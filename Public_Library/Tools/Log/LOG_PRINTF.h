@@ -7,8 +7,8 @@
 #ifndef __LOG_PRINTF__
 #define __LOG_PRINTF__
 #include <Tools/Log/LOG.h>
-#include <cstdio>
 #include <climits>
+#include <cstdio>
 namespace PhysBAM{
 namespace LOG_REAL{
 

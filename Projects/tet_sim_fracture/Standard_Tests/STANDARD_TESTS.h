@@ -21,7 +21,6 @@
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/RIGID_BODY_INTERSECTIONS.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
@@ -38,6 +37,7 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Fracture/FRACTURE_OBJECT.h>
 #include <Solids/Fracture/FRACTURE_TETRAHEDRALIZED_VOLUME.h>

@@ -13,20 +13,20 @@
 #include <Dynamics/Level_Sets/REMOVED_PARTICLES_PROCESSING.h>
 #include <Dynamics/Level_Sets/UNIFORM_REMOVED_PARTICLES_PROCESSING.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_BOX.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_CYLINDER.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_IMPLICIT_SURFACE.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_OBJECT.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_PARTICLES.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_PLANE.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_SEGMENTED_CURVE.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_SHOCKS.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_SPHERE.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_TRIANGLE.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_TRIANGULATED_SURFACE.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_UNIFORM_VOXELS.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_WALL.h>
+#include <Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_BOX.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_CYLINDER.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_IMPLICIT_SURFACE.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_OBJECT.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_PARTICLES.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_PLANE.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_SEGMENTED_CURVE.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_SHOCKS.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_SPHERE.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_TRIANGLE.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_TRIANGULATED_SURFACE.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_UNIFORM_VOXELS.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_WALL.h>
 #include "GENERIC_RENDER_EXAMPLE.h"
 using namespace PhysBAM;
 //#####################################################################

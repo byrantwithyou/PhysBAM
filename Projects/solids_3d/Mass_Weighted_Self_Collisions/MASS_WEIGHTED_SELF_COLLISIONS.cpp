@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Grids_Uniform/GRID.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -13,6 +12,7 @@
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include "MASS_WEIGHTED_SELF_COLLISIONS.h"
 using namespace PhysBAM;

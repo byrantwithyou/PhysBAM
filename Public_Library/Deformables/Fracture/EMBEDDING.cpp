@@ -9,6 +9,7 @@
 #include <Deformables/Fracture/EMBEDDED_TRIANGULATED_OBJECT.h>
 #include <Deformables/Fracture/EMBEDDING.h>
 #include <Deformables/Fracture/TRIANGLES_OF_MATERIAL.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 using namespace PhysBAM;
 namespace PhysBAM{
 bool Register_Solids_Structures(){
@@ -28,6 +29,10 @@ bool Register_Solids_Structures(){
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<TRIANGLES_OF_MATERIAL<VECTOR<double,3> > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<double,2> > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<EMBEDDED_TRIANGULATED_OBJECT<VECTOR<double,3> > >();
+    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<FREE_PARTICLES<VECTOR<double,3> > >();
+    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<FREE_PARTICLES<VECTOR<double,2> > >();
+    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<FREE_PARTICLES<VECTOR<float,3> > >();
+    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<FREE_PARTICLES<VECTOR<float,2> > >();
     return true;
 }
 bool registered_solids_structures_asdf=Register_Solids_Structures();

@@ -5,7 +5,7 @@
 #ifndef __IMAGE_WINDOW__
 #define __IMAGE_WINDOW__
 
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_PRIMITIVES.h> // To get gl, glu in a portable manner
+#include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h> // To get gl, glu in a portable manner
 
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Vectors/VECTOR.h>

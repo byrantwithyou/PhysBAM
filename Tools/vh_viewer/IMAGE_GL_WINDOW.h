@@ -19,8 +19,8 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Images/IMAGE.h>
 #include <Tools/Vectors/VECTOR_2D.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TEXTURED_RECT.h>
+#include <OpenGL/OpenGL/OPENGL_COLOR.h>
+#include <OpenGL/OpenGL/OPENGL_TEXTURED_RECT.h>
 #include "../vh_segment/VH_LEVELSET_BUILDER.h"
 #include "VIEWER_WINDOW.h"
 

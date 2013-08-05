@@ -10,7 +10,6 @@
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
 #include <Deformables/Bindings/PARTICLE_BINDING.h>
@@ -21,6 +20,7 @@
 #include <Deformables/Forces/IMPLICIT_ZERO_LENGTH_SPRINGS.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/TRIANGLE_BENDING_ELEMENTS.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <Dynamics/Meshing/RED_GREEN_TRIANGLES.h>

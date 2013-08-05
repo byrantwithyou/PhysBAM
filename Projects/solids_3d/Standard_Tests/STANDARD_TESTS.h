@@ -72,7 +72,6 @@
 #include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
@@ -97,6 +96,7 @@
 #include <Deformables/Forces/TRIANGLE_BENDING_SPRINGS.h>
 #include <Deformables/Fracture/EMBEDDED_MATERIAL_SURFACE.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Forces_And_Torques/WIND_DRAG_3D.h>

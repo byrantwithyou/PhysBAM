@@ -19,7 +19,6 @@
 #include <Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <Geometry/Tessellation/RANGE_TESSELLATION.h>
 #include <Geometry/Tessellation/TORUS_TESSELLATION.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
@@ -33,6 +32,7 @@
 #include <Deformables/Forces/DEFORMABLE_GRAVITY.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Deformables/Standard_Tests/DEFORMABLES_STANDARD_TESTS.h>
 using namespace PhysBAM;
 //#####################################################################

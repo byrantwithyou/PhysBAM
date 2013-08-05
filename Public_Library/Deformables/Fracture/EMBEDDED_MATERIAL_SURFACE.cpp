@@ -5,7 +5,6 @@
 // Class EMBEDDED_MATERIAL_SURFACE
 //##################################################################### 
 #include <Tools/Log/LOG.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
@@ -13,6 +12,7 @@
 #include <Deformables/Fracture/EMBEDDED_MATERIAL_SURFACE.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #include <Deformables/Fracture/TRIANGLES_OF_MATERIAL.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

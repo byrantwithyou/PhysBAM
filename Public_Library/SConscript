@@ -9,7 +9,7 @@ env=env.Copy()
 ignore=["build","install","Documentation"]
 exclude=[]
 #directories=Find_Directories(lambda x: x not in ignore)
-directories=['Rendering', 'Dynamics', 'Fluids', 'Compressible', 'Incompressible', 'Solids', 'Deformables', 'Rigids', 'Geometry', 'Tools']
+directories=['Ray_Tracing', 'OpenGL', 'Dynamics', 'Fluids', 'Compressible', 'Incompressible', 'Solids', 'Deformables', 'Rigids', 'Geometry', 'Tools']
 
 if env['install_headers'] and env['INSTALL_PATH']:
     install_include=os.path.join(env['INSTALL_PATH'],'include','physbam','')
@@ -44,10 +44,10 @@ if env['shared'] and env['single_so']:
     env.Depends('.',lib)
 else:
     Sublibrary(env,'OpenGL',common=0,parent='.')
-    Sublibrary(env,'Rendering',common=0,parent='.')
+    Sublibrary(env,'Ray_Tracing',common=0,parent='.')
     if env['shared']:
         if env["PLATFORM"].startswith("win32"):
-            exclude_regex=re.compile("OpenGL|Rendering|CVS")
+            exclude_regex=re.compile("OpenGL|Ray_Tracing|CVS")
             Automatic_Circular_DLLs(env,filter(lambda x:not exclude_regex.search(x),directories))
         else:
             common_libraries.append('PhysBAM_Incompressible');

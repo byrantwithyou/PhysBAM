@@ -8,7 +8,6 @@
 #include <Tools/Parsing/PARAMETER_LIST.h>
 #include <Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
@@ -17,10 +16,11 @@
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #include <Deformables/Fracture/TRIANGLES_OF_MATERIAL.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_SEGMENTED_CURVE.h>
+#include <Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_SEGMENTED_CURVE.h>
 #include "GENERIC_RENDER_EXAMPLE.h"
 using namespace PhysBAM;
 //#####################################################################

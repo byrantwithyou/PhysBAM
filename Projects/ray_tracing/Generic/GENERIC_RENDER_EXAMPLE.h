@@ -16,9 +16,9 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_TRIANGULATED_SURFACE.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_UNIFORM_GRID_ACCELERATOR.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/VOLUMETRIC_SHADER.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_TRIANGULATED_SURFACE.h>
+#include <Ray_Tracing/Rendering_Objects/RENDERING_UNIFORM_GRID_ACCELERATOR.h>
+#include <Ray_Tracing/Rendering_Shaders/VOLUMETRIC_SHADER.h>
 #include <list>
 #include "../RAY_TRACING_EXAMPLE.h"
 namespace PhysBAM{

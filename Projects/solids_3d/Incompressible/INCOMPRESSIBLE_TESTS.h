@@ -35,7 +35,6 @@
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Deformables/Bindings/BINDING_LIST.h>
@@ -50,6 +49,7 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/BINDING_SPRINGS.h>
 #include <Deformables/Forces/INCOMPRESSIBLE_FINITE_VOLUME.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>

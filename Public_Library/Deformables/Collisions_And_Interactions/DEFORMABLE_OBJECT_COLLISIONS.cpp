@@ -7,7 +7,6 @@
 #include <Tools/Arrays/CONSTANT_ARRAY.h>
 #include <Tools/Arrays/PROJECTED_ARRAY.h>
 #include <Tools/Utilities/Find_Type.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
@@ -23,6 +22,7 @@
 #include <Deformables/Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Fracture/EMBEDDED_MATERIAL_SURFACE.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

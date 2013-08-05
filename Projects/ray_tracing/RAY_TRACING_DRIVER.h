@@ -12,7 +12,7 @@
 #include <Tools/Log/PROGRESS_INDICATOR.h>
 #include <Tools/Math_Tools/integer_log.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
+#include <Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include "RAY_TRACING_EXAMPLE.h"
 namespace PhysBAM{
 

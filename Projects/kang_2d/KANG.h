@@ -28,7 +28,6 @@
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
@@ -44,6 +43,7 @@
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SEGMENT_BENDING_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>

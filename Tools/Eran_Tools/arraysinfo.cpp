@@ -4,7 +4,7 @@
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR_2D.h>
 #include <Tools/Vectors/VECTOR_3D.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
+#include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <fstream>
 #include <iostream>
 

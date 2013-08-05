@@ -10,11 +10,11 @@
 #include <Tools/Math_Tools/RANGE.h>
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.h>
 #include <Deformables/Fracture/EMBEDDING.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Segmented_Curve

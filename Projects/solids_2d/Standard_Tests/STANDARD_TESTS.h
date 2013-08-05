@@ -43,7 +43,6 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Parallel_Computation/PARTITION_ID.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_STATE.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
@@ -64,6 +63,7 @@
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SEGMENT_BENDING_ELEMENTS.h>
 #include <Deformables/Forces/SEGMENT_BENDING_SPRINGS.h>
+#include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
