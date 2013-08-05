@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Tools/Math_Tools/exchange.h>
 #include <Tools/Math_Tools/min.h>
+#include <Tools/Math_Tools/maxabs.h>
 #include <Tools/Nonlinear_Equations/LINE_SEARCH.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
 #include <cmath>
@@ -93,15 +94,19 @@ Line_Search_Wolfe_Conditions(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,T c1,T c2,
     F.Compute(a0.a,0,&a0.dfa,&a0.fa);
     PHYSBAM_ASSERT(a0.dfa<0);
     WOLFE_HELPER x0=a0,x1={b};
-    for(;x1.a<=x_max;x1.a*=2){
+    for(;x1.a<=x_max;x1.a=2*x1.a-x0.a){
         F.Compute(x1.a,0,&x1.dfa,&x1.fa);
-        if(x1.fa>a0.fa+c1*x1.a*a0.dfa || x1.fa>=x0.fa)
-            return Line_Search_Wolfe_Conditions_Zoom(F,x0,x1,a0,x,c1,c2);
+        if(x1.fa>a0.fa+c1*x1.a*a0.dfa || x1.fa>=x0.fa){
+            if(!Line_Search_Wolfe_Conditions_Zoom(F,x0,x1,a0,x,c1,c2))
+                Line_Search_Derivative_Bisection(F,a,b,x,std::numeric_limits<T>::epsilon()*100,x_max);
+            return true;}
         if(abs(x1.dfa)<=-c2*a0.dfa){
             x=x1.a;
             return true;}
-        if(x1.dfa>=0)
-            return Line_Search_Wolfe_Conditions_Zoom(F,x1,x0,a0,x,c1,c2);
+        if(x1.dfa>=0){
+            if(!Line_Search_Wolfe_Conditions_Zoom(F,x1,x0,a0,x,c1,c2))
+                Line_Search_Derivative_Bisection(F,a,b,x,std::numeric_limits<T>::epsilon()*100,x_max);
+            return true;}
         x0=x1;}
     x=a;
     return false;
@@ -139,9 +144,52 @@ Line_Search_Wolfe_Conditions_Zoom(NONLINEAR_FUNCTION<T(T)>& F,WOLFE_HELPER lo,WO
         else{
             if(((hi.a>lo.a) && xj.dfa>=0) || ((hi.a<lo.a) && xj.dfa<=0)) hi=lo;
             lo=xj;}}
-    if(lo.a>x0.a) x=lo.a;
-    else x=x0.a;
-    return true;
+    return false;
+}
+//#####################################################################
+// Function Line_Search_Derivative_Bisection
+//#####################################################################
+template<class T> void LINE_SEARCH<T>::
+Line_Search_Derivative_Bisection(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,T allowed_relative_increase,T x_max)
+{
+    WOLFE_HELPER x0={a},x1={b};
+    F.Compute(x0.a,0,&x0.dfa,&x0.fa);
+    WOLFE_HELPER a0=x0;
+    PHYSBAM_ASSERT(a0.dfa<0);
+    F.Compute(x1.a,0,&x1.dfa,&x1.fa);
+    if(x1.fa-a0.fa<=allowed_relative_increase*abs(a0.fa)){
+        x=b;
+        return;}
+
+    Line_Search_Upper_Trust_Interval(F,x0,x1,a0,allowed_relative_increase);
+
+    if(x1.dfa>0){
+        T min_interval_width=maxabs(x1.a-a0.a,x1.a,a0.a)*std::numeric_limits<T>::epsilon()*2;
+        while(x1.a-x0.a>min_interval_width){
+            WOLFE_HELPER xj={(x1.a+x0.a)/2};
+            F.Compute(xj.a,0,&xj.dfa,&xj.fa);
+            if(xj.fa-a0.fa>allowed_relative_increase*abs(a0.fa)){
+                x1=xj;
+                Line_Search_Upper_Trust_Interval(F,x0,x1,a0,allowed_relative_increase);
+                if(x1.dfa<=0) break;}
+            else if(xj.dfa<=0) x0=xj;
+            else x1=xj;}}
+    x=x1.a;
+}
+//#####################################################################
+// Function Line_Search_Upper_Trust_Interval
+//#####################################################################
+template<class T> void LINE_SEARCH<T>::
+Line_Search_Upper_Trust_Interval(NONLINEAR_FUNCTION<T(T)>& F,WOLFE_HELPER x0,WOLFE_HELPER& x1,WOLFE_HELPER a0,T allowed_relative_increase)
+{
+    T min_interval_width=maxabs(x1.a-a0.a,x1.a,a0.a)*std::numeric_limits<T>::epsilon()*2;
+    while(x1.a-x0.a>min_interval_width){
+        printf("%.16g %.16g  %.16g %.16g  %.16g %.16g\n",x0.a,x1.a,x0.fa,x1.fa,x0.dfa,x1.dfa);
+        WOLFE_HELPER xj={(x1.a+x0.a)/2};
+        F.Compute(xj.a,0,&xj.dfa,&xj.fa);
+        if(xj.fa-a0.fa>allowed_relative_increase*abs(a0.fa)) x1=xj;
+        else x0=xj;}
+    x1=x0;
 }
 namespace PhysBAM{
 template struct LINE_SEARCH<float>;

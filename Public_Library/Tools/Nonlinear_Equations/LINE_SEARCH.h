@@ -32,6 +32,8 @@ struct LINE_SEARCH
     static bool Line_Search_Wolfe_Conditions_Zoom(NONLINEAR_FUNCTION<T(T)>& F,WOLFE_HELPER lo,WOLFE_HELPER hi,WOLFE_HELPER x0,T& x,T c1,T c2);
     static T Best_Value(const BRACKET& s);
     static T New_Point_Interpolation(const WOLFE_HELPER& lo,const WOLFE_HELPER& hi);
+    static void Line_Search_Derivative_Bisection(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,T allowed_relative_increase,T x_max=FLT_MAX);
+    static void Line_Search_Upper_Trust_Interval(NONLINEAR_FUNCTION<T(T)>& F,WOLFE_HELPER x0,WOLFE_HELPER& x1,WOLFE_HELPER a0,T allowed_relative_increase);
 };
 }
 #endif
