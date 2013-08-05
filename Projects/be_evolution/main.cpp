@@ -8,6 +8,7 @@
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -197,6 +198,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-steps",&steps,"steps","number of time steps");
     parse_args.Add_Not("-gss",&simulation.nm.use_wolfe_search,"use golden section search instead of wolfe conditions line search");
     parse_args.Parse();
+    if(!simulation.nm.use_wolfe_search) simulation.nm.use_golden_section_search=true;
 
     LOG::cout<<std::setprecision(16);
 
