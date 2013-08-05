@@ -5,10 +5,11 @@
 #ifndef __RENDERING_BLEND_IMPLICIT_SURFACE_SHADER__
 #define __RENDERING_BLEND_IMPLICIT_SURFACE_SHADER__
 
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_TRIANGULATED_SURFACE.h>
+#include <Tools/Math_Tools/INTERVAL.h>
 #include <Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_BLEND_SHADER.h>
 namespace PhysBAM{
 
+template<class TV> class IMPLICIT_OBJECT;
 template<class T>
 class RENDERING_BLEND_IMPLICIT_SURFACE_SHADER:public RENDERING_BLEND_SHADER<T>
 {

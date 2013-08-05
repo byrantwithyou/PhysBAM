@@ -18,7 +18,6 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
-#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.h>
 namespace PhysBAM{
 
@@ -31,19 +30,10 @@ template<class TV_input>
 class SOLID_FLUID_COUPLED_EVOLUTION:public NEWMARK_EVOLUTION<TV_input>
 {
     typedef TV_input TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
-    typedef ARRAY<PAIR<int,T> > FACE_WEIGHT_ELEMENTS;typedef ARRAY<FACE_WEIGHT_ELEMENTS*,FACE_INDEX<TV::m> > T_FACE_ARRAYS_FACE_WEIGHT_ELEMENTS;
-    typedef ARRAY<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV_INT> T_ARRAYS_STRUCTURE_SIMPLEX_LIST;
-    typedef typename MESH_POLICY<TV::dimension-1>::MESH T_BOUNDARY_MESH;
-    typedef typename MESH_POLICY<TV::dimension>::MESH T_MESH;typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension>::OBJECT T_OBJECT;
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_BOUNDARY_SIMPLEX;typedef VECTOR<int,TV::dimension> T_BOUNDARY_ELEMENT;typedef VECTOR<int,TV::dimension+1> T_ELEMENT;
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension>::SIMPLEX T_SIMPLEX;
-    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
+    typedef ARRAY<PAIR<int,T> > FACE_WEIGHT_ELEMENTS;
     typedef typename TV::SPIN T_SPIN;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT T_THIN_SHELL;typedef typename T_THIN_SHELL::MESH T_THIN_SHELL_MESH;
     typedef VECTOR<int,TV::dimension> T_THIN_SHELL_ELEMENT;typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_THIN_SHELL_SIMPLEX;
-    typedef FIELD_PROJECTOR<SPARSE_MATRIX_ENTRY<T>,int,&SPARSE_MATRIX_ENTRY<T>::j> T_PROJECTED_INDEX;
-    typedef FIELD_PROJECTOR<SPARSE_MATRIX_ENTRY<T>,T,&SPARSE_MATRIX_ENTRY<T>::a> T_PROJECTED_VALUE;
 protected:
     typedef NEWMARK_EVOLUTION<TV> BASE;
     using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::example_forces_and_velocities;
@@ -59,8 +49,8 @@ public:
 protected:
     ARRAY<int> kinematic_rigid_bodies;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies;
-    T_FACE_ARRAYS_FACE_WEIGHT_ELEMENTS dual_cell_weights;
-    T_FACE_ARRAYS_FACE_WEIGHT_ELEMENTS rigid_body_dual_cell_weights;
+    ARRAY<FACE_WEIGHT_ELEMENTS*,FACE_INDEX<TV::m> > dual_cell_weights;
+    ARRAY<FACE_WEIGHT_ELEMENTS*,FACE_INDEX<TV::m> > rigid_body_dual_cell_weights;
     ARRAY<T,FACE_INDEX<TV::m> > dual_cell_fluid_volume;
     ARRAY<bool,FACE_INDEX<TV::m> > dual_cell_contains_solid;
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters;
@@ -118,8 +108,8 @@ public:
     void Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<TV>* B=0);
     void Set_Dirichlet_Boundary_Conditions(const T time);
     void Compute_W(const T current_position_time);
-    void Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors);
-    void Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors);
+    void Compute_Coupling_Terms_Deformable(const ARRAY<int,TV_INT>& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors);
+    void Compute_Coupling_Terms_Rigid(const ARRAY<int,TV_INT>& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors);
     void Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<ARRAY<T> >& right_hand_side,const ARRAY<INTERVAL<int> >& interior_regions,const int colors);
     void Apply_Pressure(const T dt,const T time);
     void Average_Solid_Projected_Face_Velocities_For_Energy_Update(const ARRAY<T,FACE_INDEX<TV::m> >& solid_projected_face_velocities_star,const ARRAY<T,FACE_INDEX<TV::m> >& solid_projected_face_velocities_np1,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);

@@ -15,7 +15,6 @@
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering/RENDERING_RAY.h>
 #include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_OBJECT_ACCELERATION_PRIMITIVE.h>
 #include <iostream>
 #include <string>

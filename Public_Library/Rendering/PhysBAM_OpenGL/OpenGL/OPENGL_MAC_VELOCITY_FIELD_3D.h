@@ -8,7 +8,6 @@
 #define __OPENGL_MAC_VELOCITY_FIELD_3D__
 
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_VECTOR_FIELD_3D.h>
 
 namespace PhysBAM{

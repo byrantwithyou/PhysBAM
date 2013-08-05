@@ -37,6 +37,7 @@
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/BINDING_SPRINGS.h>
+#include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Fluids/Fluids/FLUID_COLLECTION.h>
@@ -150,7 +151,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         B(B_full,rigid_B_full,solid_body_collection);
     GENERALIZED_MASS<TV> mass(solid_body_collection);
 
-    T_ARRAYS_INT cell_index_to_matrix_index;
+    ARRAY<int,TV_INT> cell_index_to_matrix_index;
     ARRAY<INTERVAL<int> > interior_regions;
     int number_of_regions=0;
     ARRAY<SPARSE_MATRIX_FLAT_NXN<T> > A_array;
@@ -253,7 +254,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         if(fluids_parameters.compressible){
             fluids_parameters.euler->euler_projection.Compute_Density_Weighted_Face_Velocities(dt,current_position_time,fluids_parameters.euler->euler_projection.elliptic_solver->psi_N);
             fluids_parameters.euler->euler_projection.Compute_Right_Hand_Side(face_velocities,dt,current_position_time);}
-        else fluids_parameters.incompressible->projection.Compute_Divergence(T_FACE_LOOKUP(face_velocities),&poisson);
+        else fluids_parameters.incompressible->projection.Compute_Divergence(FACE_LOOKUP_UNIFORM<TV>(face_velocities),&poisson);
 
         // restore face velocities for mixed faces
         face_velocities.Copy(copy_face_velocities);
@@ -679,7 +680,7 @@ Compute_W(const T current_position_time)
     const GRID<TV>& grid=Get_Grid();
     rigid_body_count=0;kinematic_rigid_bodies.Remove_All();
 
-    T_ARRAYS_STRUCTURE_SIMPLEX_LIST structure_simplex_list(grid.Domain_Indices(1));
+    ARRAY<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV_INT> structure_simplex_list(grid.Domain_Indices(1));
     for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies_affecting_fluid.collision_geometry_collection.bodies.m;i++)
         if(collision_bodies_affecting_fluid.collision_geometry_collection.Is_Active(i)){
             COLLISION_GEOMETRY<TV>& body=*collision_bodies_affecting_fluid.collision_geometry_collection.bodies(i);
@@ -821,7 +822,7 @@ Compute_W(const T current_position_time)
 // Function Compute_Coupling_Terms_Deformable
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
-Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors)
+Compute_Coupling_Terms_Deformable(const ARRAY<int,TV_INT>& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors)
 {
     ARRAY<ARRAY<int> > row_counts(colors);
     for(int i=0;i<colors;i++) row_counts(i).Resize(solid_body_collection.deformable_body_collection.dynamic_particles.Size()*TV::dimension); // TODO: fix // TODO: is this right?
@@ -896,7 +897,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
 // Function Compute_Coupling_Terms_Rigid
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
-Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors)
+Compute_Coupling_Terms_Rigid(const ARRAY<int,TV_INT>& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors)
 {
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     ARRAY<ARRAY<int> > row_counts(colors),kinematic_row_counts(colors);

@@ -10,12 +10,12 @@
 #include <Tools/Data_Structures/FORCE_ELEMENTS.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <Tools/Math_Tools/FACTORIAL.h>
+#include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLES_COLLISIONS_FORWARD.h>
-#include <Deformables/Forces/FINITE_VOLUME.h>
 namespace PhysBAM{
 
 template<class TV> class MPI_SOLIDS;

@@ -11,7 +11,6 @@
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 namespace PhysBAM{
 

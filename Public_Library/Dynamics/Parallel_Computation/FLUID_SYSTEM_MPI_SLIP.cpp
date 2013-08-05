@@ -4,16 +4,17 @@
 //#####################################################################
 // Class FLUID_SYSTEM_MPI_SLIP
 //#####################################################################
+#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Log/LOG.h>
+#include <Tools/Vectors/Dot_Product.h>
+#include <Tools/Vectors/TWIST.h>
+#include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 #include <Dynamics/Parallel_Computation/FLUID_SYSTEM_MPI_SLIP.h>
 #ifdef USE_MPI
 #include <Tools/Parallel_Computation/MPI_PACKAGE.h>
 #include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #endif
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Vectors/Dot_Product.h>
-#include <Tools/Vectors/TWIST.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

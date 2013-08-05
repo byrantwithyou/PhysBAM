@@ -10,6 +10,8 @@
 #include <Tools/Matrices/FRAME.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 #include <Dynamics/Standard_Tests/WATER_STANDARD_TESTS_2D.h>

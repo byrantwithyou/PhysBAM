@@ -32,8 +32,6 @@
 #include <Geometry/Basic_Geometry/LINE_2D.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>
-#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS.h>
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE.h>

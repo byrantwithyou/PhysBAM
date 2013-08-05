@@ -7,7 +7,6 @@
 #include <Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Rendering/PhysBAM_Ray_Tracing/Rendering/BLACKBODY.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering/RENDERING_RAY_DEBUG.h>
 #include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_VOXELS.h>
 #include <Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/VOLUMETRIC_SHADER.h>
 namespace PhysBAM{

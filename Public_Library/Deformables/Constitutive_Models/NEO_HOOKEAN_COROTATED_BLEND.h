@@ -12,8 +12,6 @@
 #include <Deformables/Constitutive_Models/DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
-#include <Deformables/Constitutive_Models/QUINTIC_HEAVISIDE_TRANSITION.h>
-
 namespace PhysBAM{
 
 using ::std::log;

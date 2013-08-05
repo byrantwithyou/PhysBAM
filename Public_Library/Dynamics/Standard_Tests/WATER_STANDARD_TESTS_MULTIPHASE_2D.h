@@ -15,7 +15,6 @@
 #define __WATER_STANDARD_TESTS_MULTIPHASE_2D__
 
 #include <Tools/Random_Numbers/NOISE.h>
-#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Dynamics/Standard_Tests/WATER_STANDARD_TESTS_2D.h>
 #include <Dynamics/Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE.h>
 namespace PhysBAM{

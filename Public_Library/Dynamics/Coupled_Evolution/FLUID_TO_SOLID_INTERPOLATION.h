@@ -11,7 +11,6 @@
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <Dynamics/Coupled_Evolution/COUPLING_CONSTRAINT_ID.h>
 #include <Dynamics/Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_BASE.h>
 
 namespace PhysBAM{

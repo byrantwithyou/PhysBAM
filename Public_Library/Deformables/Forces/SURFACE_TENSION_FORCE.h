@@ -9,7 +9,7 @@
 
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
-#include <Deformables/Forces/POINTWISE_DEFORMABLE_FORCE.h>
+#include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 
 template<class TV>

@@ -5,7 +5,10 @@
 #ifndef __RENDERING_LAMBERTIAN_SHADER__
 #define __RENDERING_LAMBERTIAN_SHADER__
 
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering/RENDERING_RAY_DEBUG.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Math_Tools/constants.h>
+#include <Tools/Parsing/STRING_UTILITIES.h>
+#include <Geometry/Basic_Geometry/RAY.h>
 #include <Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{
 

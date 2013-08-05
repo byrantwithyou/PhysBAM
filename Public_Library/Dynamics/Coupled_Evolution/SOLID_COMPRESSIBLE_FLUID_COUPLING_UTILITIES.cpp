@@ -367,7 +367,7 @@ Update_Np1_Collision_Data(const T dt)
     collision_bodies_affecting_fluid->Compute_Occupied_Blocks(false,(T)2*euler.grid.dX.Min(),5);  // static occupied blocks
 
     cut_cells_n.Delete_Pointers_And_Clean_Memory();cut_cells_n.Resize(euler.grid.Domain_Indices(1)); // TODO(jontg): Swap instead of Deleting, Resizing and Putting
-    T_ARRAYS_CUT_CELLS::Put(cut_cells_np1,cut_cells_n);
+    T_ARRAYS_CUT_CELL::Put(cut_cells_np1,cut_cells_n);
     CUT_CELL_COMPUTATIONS::Compute_Cut_Geometries(euler.grid,1,*collision_bodies_affecting_fluid,cut_cells_np1);
 
     ARRAY<bool,TV_INT>::Put(psi_np1,psi_n); psi_np1.Fill(true);
@@ -493,8 +493,8 @@ template<class TV> void Fill_Fluid_Velocity(const GRID<TV>& grid, const ARRAY<bo
 
 template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const typename TV::SCALAR collision_thickness,const typename TV::SCALAR dt,const ARRAY<TV,VECTOR<int,TV::dimension> >& advection_velocity,const ARRAY<bool,VECTOR<int,TV::dimension> >& near_interface_mask,
                                                    const ARRAY<bool,VECTOR<int,TV::dimension> >& swept_cells,const ARRAY<bool,VECTOR<int,TV::dimension> >& psi_np1,ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,FACE_INDEX<TV::dimension> > flux_boundary_conditions,
-                                                   const ARRAY<CUT_CELLS<typename TV::SCALAR,TV::dimension>*,VECTOR<int,TV::dimension> >& cut_cells_n,  const ARRAY<typename TV::SCALAR,VECTOR<int,TV::dimension> >& cell_volumes_n,  const ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,VECTOR<int,TV::dimension> >& U_n,
-                                                   const ARRAY<CUT_CELLS<typename TV::SCALAR,TV::dimension>*,VECTOR<int,TV::dimension> >& cut_cells_np1,const ARRAY<typename TV::SCALAR,VECTOR<int,TV::dimension> >& cell_volumes_np1,      ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,VECTOR<int,TV::dimension> >& U_np1)
+                                                   const ARRAY<CUT_CELL<typename TV::SCALAR,TV::dimension>*,VECTOR<int,TV::dimension> >& cut_cells_n,  const ARRAY<typename TV::SCALAR,VECTOR<int,TV::dimension> >& cell_volumes_n,  const ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,VECTOR<int,TV::dimension> >& U_n,
+                                                   const ARRAY<CUT_CELL<typename TV::SCALAR,TV::dimension>*,VECTOR<int,TV::dimension> >& cut_cells_np1,const ARRAY<typename TV::SCALAR,VECTOR<int,TV::dimension> >& cell_volumes_np1,      ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,VECTOR<int,TV::dimension> >& U_np1)
 {   // TODO(jontg): Sparse data representation.
     typedef typename TV::SCALAR T; typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -530,7 +530,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
             if(swept_cells(cell_index)){
                 LOG::cout<<"Swept cell "<<cell_index<<" encountered"<<std::endl;
                 if(near_interface(cell_index)){ // Backward cast to populate a newly uncovered cell
-                    CUT_CELLS<T,TV::dimension>* cut_cells=cut_cells_np1(cell_index);
+                    CUT_CELL<T,TV::dimension>* cut_cells=cut_cells_np1(cell_index);
                     if(cut_cells) for(int poly=0;poly<cut_cells->geometry.Size();poly++){
                         if(cut_cells->visibility(poly).Contains(cell_index)){
                             if(cut_cells->visibility(poly).Size()<=1) LOG::cout<<"Lost material in uncovered cell "<<cell_index<<" which has no visible neighbors at t_np1"<<std::endl;
@@ -544,7 +544,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                                         Add_Weight_To_Advection(weight, neighbor, cell_index, weights, donors, receivers, sigma);}}}}}
                     else LOG::cout<<"Cell "<<cell_index<<" is swept but is not a cut cell at t_np1!"<<std::endl;}
 
-                CUT_CELLS<T,TV::dimension>* cut_cells=cut_cells_n(cell_index); // Push out any data from a newly covered cell
+                CUT_CELL<T,TV::dimension>* cut_cells=cut_cells_n(cell_index); // Push out any data from a newly covered cell
                 if(cut_cells) for(int poly=0;poly<cut_cells->geometry.Size();poly++){
                         if(cut_cells->visibility(poly).Contains(cell_index)){
                             if(cut_cells->visibility(poly).Size()==1) LOG::cout<<"Lost material in uncovered cell "<<cell_index<<" which has no visible neighbors at t_n"<<std::endl;
@@ -574,7 +574,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
 
                 for(CELL_ITERATOR<TV> intersecting_iter(grid,affected_cells);intersecting_iter.Valid();intersecting_iter.Next()){
                     TV_INT donor_cell=intersecting_iter.Cell_Index();
-                    CUT_CELLS<T,TV::dimension>* cut_cells=cut_cells_n(donor_cell);
+                    CUT_CELL<T,TV::dimension>* cut_cells=cut_cells_n(donor_cell);
                     if(!cut_cells){
                         if(swept_cells(donor_cell)) continue;// already handled in *forward* step above
                         if(near_interface(donor_cell) && (!visibility || visibility->Contains(donor_cell))){
@@ -623,7 +623,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                     for(CELL_ITERATOR<TV> intersecting_iter(grid,affected_cells);intersecting_iter.Valid();intersecting_iter.Next()){
                         TV_INT receiver_cell=intersecting_iter.Cell_Index();
                         if(swept_cells(receiver_cell)) continue; // already handled in *backward* step above
-                        CUT_CELLS<T,TV::dimension>* cut_cells=cut_cells_np1(receiver_cell);
+                        CUT_CELL<T,TV::dimension>* cut_cells=cut_cells_np1(receiver_cell);
                         if(!cut_cells){
                             if(near_interface(receiver_cell) && (!visibility || visibility->Contains(donor_cell))){
                                 T weight=cell_postimage.Intersection_Area(intersecting_iter.Bounding_Box());

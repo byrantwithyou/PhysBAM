@@ -8,6 +8,7 @@
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <Tools/Vectors/Dot_Product.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>

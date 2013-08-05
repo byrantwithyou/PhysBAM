@@ -5,8 +5,10 @@
 #ifndef __RENDERING_TORRANCE_SPARROW_SHADER__
 #define __RENDERING_TORRANCE_SPARROW_SHADER__
 
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Math_Tools/constants.h>
+#include <Geometry/Basic_Geometry/RAY.h>
 #include <Rendering/PhysBAM_Ray_Tracing/Rendering/FRESNEL.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering/RENDERING_RAY_DEBUG.h>
 #include <Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{
 

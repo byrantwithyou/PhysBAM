@@ -19,7 +19,6 @@
 
 #include <Compressible/Euler_Equations/EULER.h>
 #include <Compressible/Euler_Equations/EULER_CAVITATION_UNIFORM.h>
-#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 #include <Compressible/Euler_Equations/EULER_PROJECTION_UNIFORM.h>
 namespace PhysBAM{
 template<class T> class MPI_UNIFORM_GRID;

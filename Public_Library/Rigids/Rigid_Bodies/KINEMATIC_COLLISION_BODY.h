@@ -9,7 +9,6 @@
 
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 namespace PhysBAM{
 

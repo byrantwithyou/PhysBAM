@@ -9,7 +9,6 @@
 
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SCALAR_FIELD_2D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_2D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TRIANGULATED_AREA.h>

@@ -8,7 +8,6 @@
 #define __TETRAHEDRAL_MESHING__
 
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <Dynamics/Meshing/LEVEL_SET_FORCES_AND_VELOCITIES.h>
 namespace PhysBAM{

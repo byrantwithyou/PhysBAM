@@ -8,7 +8,6 @@
 #define __BASIC_VISUALIZATION__
 
 #include <Tools/Arrays/ARRAY.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_BASIC_CALLBACKS.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SELECTION.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WORLD.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>

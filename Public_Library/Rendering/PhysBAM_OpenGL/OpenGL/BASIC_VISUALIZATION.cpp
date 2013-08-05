@@ -6,6 +6,7 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/BASIC_VISUALIZATION.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_AXES.h>
+#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_BASIC_CALLBACKS.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LIGHT.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_PREFERENCES.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WINDOW.h>

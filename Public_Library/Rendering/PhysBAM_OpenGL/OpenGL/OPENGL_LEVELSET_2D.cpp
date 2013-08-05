@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_2D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TRIANGULATED_AREA.h>
 using namespace PhysBAM;

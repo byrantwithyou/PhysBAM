@@ -37,6 +37,7 @@
 #include <Deformables/Constitutive_Models/SIMPLE_PLASTICITY.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
+#include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Fracture/FRACTURE_OBJECT.h>
 #include <Solids/Fracture/FRACTURE_TETRAHEDRALIZED_VOLUME.h>

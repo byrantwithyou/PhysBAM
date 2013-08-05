@@ -14,7 +14,6 @@
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Deformables/Fracture/EMBEDDING_POLICY.h>
 #include <Solids/Fracture/FRACTURE_OBJECT.h>
-#include <Solids/Fracture/VIRTUAL_NODES.h>
 namespace PhysBAM{
 
 template<class TV> class HYPOTHETICAL_CUT_TRIANGLES;

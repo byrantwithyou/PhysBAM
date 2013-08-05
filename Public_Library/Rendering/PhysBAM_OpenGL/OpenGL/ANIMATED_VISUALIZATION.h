@@ -8,7 +8,6 @@
 #define __ANIMATED_VISUALIZATION__
 
 #include <Rendering/PhysBAM_OpenGL/OpenGL/BASIC_VISUALIZATION.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 #include <climits>
 
 namespace PhysBAM

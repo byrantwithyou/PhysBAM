@@ -16,7 +16,6 @@
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
-#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 namespace MPI{class Group;class Intracomm;class Request;class Status;class Op;}
 namespace PhysBAM{
 

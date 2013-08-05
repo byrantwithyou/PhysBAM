@@ -7,7 +7,6 @@
 #include <Tools/Grids_Uniform/FACE_INDEX.h>
 #include <Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
 #include <Tools/Vectors/VECTOR.h>
-#include <Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
 namespace PhysBAM{
 
 template<class TV> class PLS_FC_EXAMPLE;
@@ -20,7 +19,6 @@ class PLS_FC_DRIVER
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
-    typedef ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     
     int current_frame;
     T time;

@@ -8,7 +8,6 @@
 #define __OPENGL_COMPONENT_PARTICLES_2D__
 
 #include <Tools/Arrays/ARRAY.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_POINTS_2D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_VECTOR_FIELD_2D.h>

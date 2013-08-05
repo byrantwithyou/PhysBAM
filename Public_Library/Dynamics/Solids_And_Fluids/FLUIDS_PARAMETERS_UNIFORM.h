@@ -10,6 +10,7 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_FORWARD.h>
@@ -28,15 +29,8 @@ template<class TV> class PARTICLE_LEVELSET_EVOLUTION_UNIFORM;
 template<class TV>
 class FLUIDS_PARAMETERS_UNIFORM:public FLUIDS_PARAMETERS<TV>
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef VECTOR<int,TV::m> TV_INT;typedef INCOMPRESSIBLE_UNIFORM<TV> T_INCOMPRESSIBLE;
-    typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
-    typedef typename REBIND<ARRAY<T,TV_INT>,PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
-    typedef typename REBIND<ARRAY<T,TV_INT>,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
-    typedef typename REBIND<T_ADVECTION_SEMI_LAGRANGIAN_SCALAR,SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX;
-    typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
-    typedef typename REBIND<ARRAY<T,TV_INT>,SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ARRAYS_SYMMETRIC_MATRIX;
 public:
     typedef FLUIDS_PARAMETERS<TV> BASE;
     using BASE::smoke;using BASE::fire;using BASE::water;using BASE::use_body_force;using BASE::grid;
@@ -140,7 +134,7 @@ public:
     void Blend_In_External_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
     void Move_Grid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time);
     void Move_Grid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const TV_INT& shift_domain,const T time);
-    void Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX& e_ghost,const T time);
+    void Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& e_ghost,const T time);
     void Combustion(const T dt,const T time);
     void Evolve_Soot(const T dt,const T time);
     void Sync_Parameters(FLUIDS_PARAMETERS_UNIFORM<TV>& single_parameters,THREADED_UNIFORM_GRID<TV>& threaded_grid);

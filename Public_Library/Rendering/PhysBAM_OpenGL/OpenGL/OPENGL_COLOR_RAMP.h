@@ -12,7 +12,7 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_COLOR_RAMP : public OPENGL_COLOR_MAP<T>
+class OPENGL_COLOR_RAMP:public OPENGL_COLOR_MAP<T>
 {
 public:
 

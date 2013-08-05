@@ -9,10 +9,8 @@
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_DEBUG_PARTICLES_2D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_VECTOR_FIELD_2D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 
 namespace PhysBAM

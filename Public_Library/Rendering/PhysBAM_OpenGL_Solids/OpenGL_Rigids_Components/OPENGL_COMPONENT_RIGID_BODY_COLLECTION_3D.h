@@ -10,8 +10,6 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Data_Structures/PAIR.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR_MAP.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_IMPLICIT_SURFACE.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_MULTIVIEW.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_MATERIAL.h>

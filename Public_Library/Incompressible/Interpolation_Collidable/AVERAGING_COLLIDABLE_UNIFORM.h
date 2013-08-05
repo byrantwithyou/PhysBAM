@@ -6,7 +6,6 @@
 #define __AVERAGING_COLLIDABLE_UNIFORM__
 
 #include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
-#include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY.h>
 namespace PhysBAM{
 
 template<class TV> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;

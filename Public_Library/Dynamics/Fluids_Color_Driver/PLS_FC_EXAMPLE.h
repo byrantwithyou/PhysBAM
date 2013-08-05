@@ -14,8 +14,6 @@
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Finite_Elements/LEVELSET_COLOR.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
-#include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 namespace PhysBAM{
 

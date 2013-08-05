@@ -27,7 +27,7 @@ bool Is_Occluded_Cell_Center(VECTOR<T,d> centroid,VECTOR<T,d> cell_center,OBJECT
 // Function Compute_Cut_Geometries 1-D
 //#####################################################################
 template<class T>
-void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_cells,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<T,1> >& collision_bodies_affecting_fluid,ARRAY<CUT_CELLS<T,1>*,VECTOR<int,1> >& cut_cells){
+void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_cells,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<T,1> >& collision_bodies_affecting_fluid,ARRAY<CUT_CELL<T,1>*,VECTOR<int,1> >& cut_cells){
     typedef VECTOR<T,1> TV;
     typedef VECTOR<int,1> TV_INT;
     for(CELL_ITERATOR<TV> iterator(grid,num_ghost_cells);iterator.Valid();iterator.Next()){
@@ -35,7 +35,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_c
         ARRAY<COLLISION_GEOMETRY_ID> collision_objects;collision_bodies_affecting_fluid.objects_in_cell.Get_Objects_For_Cell(index,collision_objects);
         if(!collision_objects.Size()) cut_cells(index)=0;
         else{
-            cut_cells(index) = new CUT_CELLS<T,1>();cut_cells(index)->dominant_element=0;
+            cut_cells(index) = new CUT_CELL<T,1>();cut_cells(index)->dominant_element=0;
             RANGE<TV> cell_volume=iterator.Bounding_Box();
             RAY<TV> l_to_r_ray(cell_volume.min_corner,cell_volume.max_corner-cell_volume.min_corner,true);l_to_r_ray.t_max=l_to_r_ray.direction.Normalize();l_to_r_ray.semi_infinite=false;
             RAY<TV> r_to_l_ray(cell_volume.max_corner,cell_volume.min_corner-cell_volume.max_corner,true);r_to_l_ray.t_max=r_to_l_ray.direction.Normalize();r_to_l_ray.semi_infinite=false;
@@ -79,7 +79,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_c
 // Function Compute_Cut_Geometries 2-D
 //#####################################################################
 template<class T>
-void Compute_Cut_Geometries(const GRID<VECTOR<T,2> >& grid,const int num_ghost_cells,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<T,2> >& collision_bodies_affecting_fluid,ARRAY<CUT_CELLS<T,2>*,VECTOR<int,2> >& cut_cells)
+void Compute_Cut_Geometries(const GRID<VECTOR<T,2> >& grid,const int num_ghost_cells,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<T,2> >& collision_bodies_affecting_fluid,ARRAY<CUT_CELL<T,2>*,VECTOR<int,2> >& cut_cells)
 {
     PHYSBAM_NOT_IMPLEMENTED();
     // ARRAY<TV_INT> neighbor_offsets(8);
@@ -95,7 +95,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,2> >& grid,const int num_ghost_c
     //     if(!collision_objects.Size()) cut_cells(index)=0;
     //     else{
     //         LOG::cout<<"There are "<<collision_objects.Size()<<" objects which cut the cell of interest"<<std::endl;
-    //         cut_cells(index) = new CUT_CELLS<T,2>();cut_cells(index)->dominant_element=0;
+    //         cut_cells(index) = new CUT_CELL<T,2>();cut_cells(index)->dominant_element=0;
     //         POLYGON<TV> full_cell_volume(iterator.Bounding_Box());
 
     //         if(!cut_cells(index)->geometry.Size()){delete cut_cells(index);cut_cells(index)=0;}}}
@@ -104,14 +104,14 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,2> >& grid,const int num_ghost_c
 // Function Compute_Cut_Geometries 3-D
 //#####################################################################
 template<class T>
-void Compute_Cut_Geometries(const GRID<VECTOR<T,3> >& grid,const int num_ghost_cells,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<T,3> >& collision_bodies_affecting_fluid,ARRAY<CUT_CELLS<T,3>*,VECTOR<int,3> >& cut_cells)
+void Compute_Cut_Geometries(const GRID<VECTOR<T,3> >& grid,const int num_ghost_cells,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<T,3> >& collision_bodies_affecting_fluid,ARRAY<CUT_CELL<T,3>*,VECTOR<int,3> >& cut_cells)
 {PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
-template void Compute_Cut_Geometries(const GRID<VECTOR<float,1> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<float,1> >&,ARRAY<CUT_CELLS<float,1>*,VECTOR<int,1> >&);
-template void Compute_Cut_Geometries(const GRID<VECTOR<float,2> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<float,2> >&,ARRAY<CUT_CELLS<float,2>*,VECTOR<int,2> >&);
-template void Compute_Cut_Geometries(const GRID<VECTOR<float,3> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<float,3> >&,ARRAY<CUT_CELLS<float,3>*,VECTOR<int,3> >&);
-template void Compute_Cut_Geometries(const GRID<VECTOR<double,1> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<double,1> >&,ARRAY<CUT_CELLS<double,1>*,VECTOR<int,1> >&);
-template void Compute_Cut_Geometries(const GRID<VECTOR<double,2> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<double,2> >&,ARRAY<CUT_CELLS<double,2>*,VECTOR<int,2> >&);
-template void Compute_Cut_Geometries(const GRID<VECTOR<double,3> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<double,3> >&,ARRAY<CUT_CELLS<double,3>*,VECTOR<int,3> >&);
+template void Compute_Cut_Geometries(const GRID<VECTOR<float,1> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<float,1> >&,ARRAY<CUT_CELL<float,1>*,VECTOR<int,1> >&);
+template void Compute_Cut_Geometries(const GRID<VECTOR<float,2> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<float,2> >&,ARRAY<CUT_CELL<float,2>*,VECTOR<int,2> >&);
+template void Compute_Cut_Geometries(const GRID<VECTOR<float,3> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<float,3> >&,ARRAY<CUT_CELL<float,3>*,VECTOR<int,3> >&);
+template void Compute_Cut_Geometries(const GRID<VECTOR<double,1> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<double,1> >&,ARRAY<CUT_CELL<double,1>*,VECTOR<int,1> >&);
+template void Compute_Cut_Geometries(const GRID<VECTOR<double,2> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<double,2> >&,ARRAY<CUT_CELL<double,2>*,VECTOR<int,2> >&);
+template void Compute_Cut_Geometries(const GRID<VECTOR<double,3> >&,const int,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<VECTOR<double,3> >&,ARRAY<CUT_CELL<double,3>*,VECTOR<int,3> >&);
 }
 }

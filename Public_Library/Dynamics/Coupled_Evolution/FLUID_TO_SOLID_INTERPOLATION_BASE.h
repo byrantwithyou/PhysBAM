@@ -10,7 +10,6 @@
 #include <Tools/Data_Structures/TRIPLE.h>
 #include <Tools/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Dynamics/Coupled_Evolution/COUPLING_CONSTRAINT_ID.h>
 
 namespace PhysBAM{
 

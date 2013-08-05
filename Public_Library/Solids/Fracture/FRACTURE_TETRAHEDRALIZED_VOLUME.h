@@ -7,7 +7,6 @@
 #ifndef __FRACTURE_TETRAHEDRALIZED_VOLUME__
 #define __FRACTURE_TETRAHEDRALIZED_VOLUME__
 
-#include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #include <Solids/Fracture/FRACTURE_OBJECT.h>
 namespace PhysBAM{
 

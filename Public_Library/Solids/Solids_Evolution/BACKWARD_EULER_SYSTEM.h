@@ -11,9 +11,7 @@
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_MASS.h>
-#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
-#include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 namespace PhysBAM{
 //#####################################################################
@@ -21,6 +19,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> class SOLIDS_EVOLUTION;
 template<class TV> struct PRECOMPUTE_PROJECT;
+template<class TV> class ARTICULATED_RIGID_BODY;
 template<class TV>
 class GENERALIZED_MASS
 {

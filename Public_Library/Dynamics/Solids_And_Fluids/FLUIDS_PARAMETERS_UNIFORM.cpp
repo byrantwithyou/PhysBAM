@@ -106,7 +106,7 @@ Initialize_Fluid_Evolution(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velo
             if(use_modified_projection) projection=new PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>(*grid,particle_levelset_evolution->Particle_Levelset(0).levelset,projection_scale,1,use_surface_solve,fire,false,use_poisson,use_poisson);
             else projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*grid,fire,false,false,use_poisson,thread_queue);}
         projection->elliptic_solver->thread_queue=thread_queue;        
-        incompressible=new T_INCOMPRESSIBLE(*grid,*projection);
+        incompressible=new INCOMPRESSIBLE_UNIFORM<TV>(*grid,*projection);
         phi_boundary=&phi_boundary_water; // override default
         phi_boundary_water.Set_Velocity_Pointer(incompressible_face_velocities);
         boundary_mac_slip.Set_Phi(particle_levelset_evolution->phi);}
@@ -114,7 +114,7 @@ Initialize_Fluid_Evolution(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velo
         if(!projection){
             if(use_modified_projection) projection=new PROJECTION_REFINEMENT_UNIFORM<TV>(*grid,projection_scale,1,fire,false,use_poisson,use_poisson);
             else projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*grid,fire,false,false,use_poisson);}
-        incompressible=new T_INCOMPRESSIBLE(*grid,*projection);}
+        incompressible=new INCOMPRESSIBLE_UNIFORM<TV>(*grid,*projection);}
 
     if(sph){
         sph_evolution=new SPH_EVOLUTION_UNIFORM<TV>(*grid,*incompressible,*this);
@@ -504,7 +504,7 @@ Move_Grid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time)
 // Function Adjust_Strain_For_Object
 //#####################################################################
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX& e_ghost,const T time)
+Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& e_ghost,const T time)
 {
     assert(!smoke && !fire);
     if(adhesion_coefficient==1 && !adhesion_normal_strain) return;
@@ -779,7 +779,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
                     for(int i=0;i<number_of_regions;i++){
                         if(incompressible_multiphase->strains(i)){
                             std::string i_dot_f=STRING_UTILITIES::string_sprintf("%d.%s",i,f.c_str()); // TODO(jontg): ...
-                            T_ARRAYS_SYMMETRIC_MATRIX e_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
+                            ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> e_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
                             incompressible_multiphase->strains(i)->e_boundary->Fill_Ghost_Cells(*grid,incompressible_multiphase->strains(i)->e,e_ghost,0,0,number_of_ghost_cells); // TODO: use real dt/time
                             FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/strain_"+i_dot_f,e_ghost);}}}}
 

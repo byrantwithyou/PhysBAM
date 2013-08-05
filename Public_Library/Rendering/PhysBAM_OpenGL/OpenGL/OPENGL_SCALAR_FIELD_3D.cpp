@@ -6,6 +6,7 @@
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
+#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_GRID_3D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_POINTS_3D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SCALAR_FIELD_3D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TEXTURED_RECT.h>

@@ -21,7 +21,6 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SHAPES.h>
 #include <cstring> // for gcc 2.96 for memset
 namespace PhysBAM{
 

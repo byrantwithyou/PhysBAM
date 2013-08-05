@@ -9,16 +9,10 @@
 
 #include <Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_HEXAHEDRALIZED_VOLUME.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_POINT_SIMPLICES_1D.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_POINTS_3D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SELECTION.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TETRAHEDRALIZED_VOLUME.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TRIANGULATED_SURFACE.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_VECTOR_FIELD_3D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 namespace PhysBAM{

@@ -25,8 +25,6 @@
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Rigids/Collisions/PARTICLE_LEVELSET_VISITOR.h>
-#include <Rigids/Collisions/RIGID_BODY_PARTICLE_INTERSECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 
 namespace PhysBAM{

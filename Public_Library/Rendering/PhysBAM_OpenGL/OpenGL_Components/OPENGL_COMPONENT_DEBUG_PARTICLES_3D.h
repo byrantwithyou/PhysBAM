@@ -8,10 +8,8 @@
 #define __OPENGL_COMPONENT_DEBUG_PARTICLES_3D__
 
 #include <Tools/Arrays/ARRAY.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_DEBUG_PARTICLES_3D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_VECTOR_FIELD_3D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 
 namespace PhysBAM

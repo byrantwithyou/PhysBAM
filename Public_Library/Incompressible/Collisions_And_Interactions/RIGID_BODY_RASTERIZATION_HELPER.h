@@ -14,7 +14,6 @@
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <Incompressible/Collisions_And_Interactions/RIGID_BODY_RASTERIZATION_UNIFORM.h>
 namespace PhysBAM{
 template<class TV> struct GRID_ARRAYS_POLICY;
 template<class TV,class COLLISION_GEOMETRY_ID> class OBJECTS_IN_CELL;

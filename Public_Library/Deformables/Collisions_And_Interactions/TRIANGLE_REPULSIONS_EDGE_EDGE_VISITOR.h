@@ -9,7 +9,6 @@
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Vectors/VECTOR_3D.h>
-#include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
 namespace PhysBAM{
 template<class TV> struct REPULSION_PAIR;
 template<class TV> class STRUCTURE_INTERACTION_GEOMETRY;

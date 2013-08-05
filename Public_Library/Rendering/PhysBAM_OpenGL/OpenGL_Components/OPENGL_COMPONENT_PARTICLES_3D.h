@@ -8,8 +8,6 @@
 #define __OPENGL_COMPONENT_PARTICLES_3D__
 
 #include <Tools/Arrays/ARRAY.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_GRID_3D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_POINTS_3D.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_VECTOR_FIELD_3D.h>

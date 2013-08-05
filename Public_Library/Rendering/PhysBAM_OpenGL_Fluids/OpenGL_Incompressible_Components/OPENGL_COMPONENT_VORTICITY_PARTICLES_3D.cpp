@@ -4,6 +4,7 @@
 //#####################################################################
 // Class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D
 //#####################################################################
+#include <Incompressible/Particles/VORTICITY_PARTICLES.h>
 #include <Rendering/PhysBAM_OpenGL_Fluids/OpenGL_Incompressible_Components/OPENGL_COMPONENT_VORTICITY_PARTICLES_3D.h>
 using namespace PhysBAM;
 

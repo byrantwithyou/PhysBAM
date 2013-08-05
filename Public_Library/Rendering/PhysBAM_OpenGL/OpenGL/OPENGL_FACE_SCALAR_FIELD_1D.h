@@ -8,9 +8,8 @@
 #define __OPENGL_FACE_SCALAR_FIELD_1D__
 
 #include <Tools/Grids_Uniform/GRID.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR_MAP.h>
+#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>
-#include <Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_POINTS_2D.h>
 
 namespace PhysBAM{
 

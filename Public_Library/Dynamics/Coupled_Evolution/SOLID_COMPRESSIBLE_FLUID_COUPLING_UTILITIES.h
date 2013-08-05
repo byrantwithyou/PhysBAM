@@ -26,7 +26,7 @@ class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
-    typedef ARRAY<CUT_CELLS<T,TV::dimension>*,TV_INT> T_ARRAYS_CUT_CELLS;
+    typedef ARRAY<CUT_CELL<T,TV::dimension>*,TV_INT> T_ARRAYS_CUT_CELL;
     typedef ARRAY<int,FACE_INDEX<TV::m> > T_FACE_ARRAYS_INT;
     typedef ARRAY<TV_DIMENSION,FACE_INDEX<TV::m> > T_FACE_ARRAYS_DIMENSION_SCALAR;
     typedef LINEAR_INTERPOLATION_UNIFORM<TV,TV_DIMENSION> T_LINEAR_INTERPOLATION_DIMENSION;
@@ -49,7 +49,7 @@ public:
     ARRAY<T,TV_INT> phi_all_solids_negated;
 
     ARRAY<bool,TV_INT> near_interface;
-    T_ARRAYS_CUT_CELLS cut_cells_n,cut_cells_n_p_half,cut_cells_np1;
+    T_ARRAYS_CUT_CELL cut_cells_n,cut_cells_n_p_half,cut_cells_np1;
     ARRAY<T,TV_INT> cell_volumes_n,cell_volumes_n_p_half,cell_volumes_np1;
 
     ARRAY<bool,TV_INT> psi_n,psi_n_p_half,psi_np1,uncovered_cells_n_p_half;

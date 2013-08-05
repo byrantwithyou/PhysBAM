@@ -12,11 +12,11 @@
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Log/LOG.h>
 #include <Geometry/Basic_Geometry/ELLIPSOID.h>
+#include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 namespace PhysBAM{
 
 template<class TV> class LEVELSET_IMPLICIT_OBJECT;
 template<class T> class REMOVED_PARTICLES_BLENDER_3D;
-template<class TV> class PARTICLE_LEVELSET_REMOVED_PARTICLES;
 
 template<class T>
 class REMOVED_PARTICLES_PROCESSING:public NONCOPYABLE

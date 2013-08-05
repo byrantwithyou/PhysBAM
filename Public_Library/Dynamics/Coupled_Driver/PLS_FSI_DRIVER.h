@@ -11,7 +11,6 @@
 #include <Tools/Ordinary_Differential_Equations/DRIVER.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Dynamics/Coupled_Driver/PLS_FSI_EXAMPLE.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.h>
 namespace PhysBAM{
 
 template<class TV>

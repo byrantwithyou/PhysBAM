@@ -10,10 +10,6 @@
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Rigids/Rigid_Bodies/RIGID_BODY_MASS.h>
-#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
-#include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 namespace PhysBAM{
 template<class TV> class SOLIDS_EVOLUTION;

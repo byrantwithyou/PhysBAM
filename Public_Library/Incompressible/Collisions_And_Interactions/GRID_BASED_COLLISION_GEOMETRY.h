@@ -8,7 +8,6 @@
 #define __GRID_BASED_COLLISION_GEOMETRY__
 
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
-#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>

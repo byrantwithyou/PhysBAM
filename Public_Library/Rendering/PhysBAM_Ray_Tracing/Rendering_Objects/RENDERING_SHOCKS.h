@@ -12,7 +12,6 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
-#include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 #include <Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_VOXELS.h>
 namespace PhysBAM{
 

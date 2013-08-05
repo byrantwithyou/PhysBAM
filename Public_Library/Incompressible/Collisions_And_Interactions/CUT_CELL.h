@@ -13,7 +13,7 @@
 #include <Geometry/Basic_Geometry/POLYGON.h>
 namespace PhysBAM {
 template<class T,int d>
-class CUT_CELLS
+class CUT_CELL
 {
   public:
     int dominant_element;

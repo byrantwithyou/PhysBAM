@@ -8,13 +8,15 @@
 #define __FLUID_SYSTEM_MPI__
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
-#include <Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
+#include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 namespace PhysBAM{
 //#####################################################################
 // Class FLUID_SYSTEM_MPI
 //#####################################################################
 template<class T> class SPARSE_MATRIX_FLAT_MXN;
+template<class T> class SPARSE_MATRIX_FLAT_NXN;
 template<class TV> class MPI_SOLID_FLUID;
+template<class TV> class GENERALIZED_VELOCITY;
 template<class TV>
 class FLUID_SYSTEM_MPI:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 {

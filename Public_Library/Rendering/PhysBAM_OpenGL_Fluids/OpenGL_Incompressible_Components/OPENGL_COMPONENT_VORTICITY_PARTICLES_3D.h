@@ -7,7 +7,6 @@
 #ifndef __OPENGL_COMPONENT_VORTICITY_PARTICLES_3D__
 #define __OPENGL_COMPONENT_VORTICITY_PARTICLES_3D__
 
-#include <Incompressible/Particles/VORTICITY_PARTICLES.h>
 #include <Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_3D.h>
 
 namespace PhysBAM{

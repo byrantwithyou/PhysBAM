@@ -13,7 +13,6 @@
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
-#include <Deformables/Constitutive_Models/NEO_HOOKEAN_ENERGY.h>
 namespace PhysBAM{
 
 template<class T>
