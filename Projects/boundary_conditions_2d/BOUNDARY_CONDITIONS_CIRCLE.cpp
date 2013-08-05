@@ -1,4 +1,5 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Log/LOG.h>
 #include <climits>
 #include <cstdio>
 #include "BOUNDARY_CONDITIONS_CIRCLE.h"

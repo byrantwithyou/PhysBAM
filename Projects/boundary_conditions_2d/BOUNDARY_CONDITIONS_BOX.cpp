@@ -1,4 +1,5 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Log/LOG.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <climits>
 #include <cstdio>

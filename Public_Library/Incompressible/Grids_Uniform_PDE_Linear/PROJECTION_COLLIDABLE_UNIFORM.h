@@ -7,7 +7,6 @@
 #ifndef __PROJECTION_COLLIDABLE_UNIFORM__
 #define __PROJECTION_COLLIDABLE_UNIFORM__
 
-#include <Tools/Data_Structures/TRIPLE.h>
 #include <Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 namespace PhysBAM{

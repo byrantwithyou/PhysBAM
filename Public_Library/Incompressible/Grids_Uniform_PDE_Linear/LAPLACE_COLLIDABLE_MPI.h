@@ -9,7 +9,7 @@
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <Tools/Parallel_Computation/MPI_GRID.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>

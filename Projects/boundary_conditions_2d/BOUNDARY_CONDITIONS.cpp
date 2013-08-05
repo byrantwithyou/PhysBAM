@@ -1,5 +1,6 @@
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Log/LOG.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include "BOUNDARY_CONDITIONS.h"
 

@@ -8,7 +8,6 @@
 #define __PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM__
 
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Incompressible/Incompressible_Flows/PROJECTION_REFINEMENT_UNIFORM.h>
 namespace PhysBAM{
 

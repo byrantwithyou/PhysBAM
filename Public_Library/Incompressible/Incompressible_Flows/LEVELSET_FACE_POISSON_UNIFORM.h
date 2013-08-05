@@ -8,7 +8,6 @@
 #define __LEVELSET_FACE_POISSON_UNIFORM__
 
 #include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>

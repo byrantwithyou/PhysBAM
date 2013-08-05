@@ -12,8 +12,6 @@
 #include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
 #include <Tools/Grids_Uniform_PDE_Linear/LAPLACE_UNIFORM.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/maxabs.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE.h>
 namespace PhysBAM{
 
