@@ -14,7 +14,6 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_BASIC.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_HEIGHTFIELD_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_3D.h>
-#include <Ray_Tracing/Rendering/RGB_COLORS.h>
 #include <fstream>
 #include <sstream>
 #include <string>
