@@ -5,39 +5,58 @@
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
+#include <Tools/Log/LOG.h>
 #include <Tools/Matrices/MATRIX.h>
+#include <Tools/Matrices/MATRIX_MXN.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
+#include <Tools/Symbolics/PROGRAM.h>
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <climits>
 #include <boost/function.hpp>
 using namespace PhysBAM;
 
-template<class TV>
-class MINIMIZATION_OBJECTIVE:public NONLINEAR_FUNCTION<typename TV::SCALAR(KRYLOV_VECTOR_BASE<typename TV::SCALAR>&)>
+template<class T>
+class MINIMIZATION_OBJECTIVE:public NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>
 {
-    typedef typename TV::SCALAR T;
 public:
-    typedef KRYLOV_VECTOR_WRAPPER<T,TV> VECTOR_T;
-    typedef MATRIX_SYSTEM<MATRIX<T,TV::m>,T,VECTOR_T> SYSTEM_T;
+    typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > VECTOR_T;
+    typedef MATRIX_SYSTEM<MATRIX_MXN<T>,T,VECTOR_T> SYSTEM_T;
 
-    boost::function<T(TV)> f;
-    boost::function<TV(TV)> df;
-    boost::function<MATRIX<T,TV::m>(TV)> ddf;
+    ARRAY<int> grad_vars;
+    ARRAY<int> hess_vars;
+    PROGRAM<T> program;
 
-    MINIMIZATION_OBJECTIVE(boost::function<T(TV)> f,boost::function<TV(TV)> df,boost::function<MATRIX<T,TV::m>(TV)> ddf)
-        :f(f),df(df),ddf(ddf)
-    {}
+    MINIMIZATION_OBJECTIVE(std::string function,std::string vars,char out)
+    {
+        grad_vars.Resize(vars.size());
+        hess_vars.Resize(vars.size()*vars.size());
+        char buff[2]={out,0};
+        program.var_out.Append(buff);
+        for(int i=0;i<grad_vars.m;i++){
+            buff[0]=vars[i];
+            program.var_in.Append(buff);}
+        program.Parse(function.c_str(),false);
+        for(int i=0;i<grad_vars.m;i++) grad_vars(i)=program.Diff(0,i);
+        for(int i=0;i<grad_vars.m;i++) for(int j=0;j<grad_vars.m;j++) hess_vars(i*grad_vars.m+j)=program.Diff(grad_vars(i),j);
+        program.Optimize();
+        program.Finalize();
+        program.Print();
+        LOG::printf("program %i %p\n", program.num_tmp,&program);
+    }
 
     virtual ~MINIMIZATION_OBJECTIVE(){}
 
     void Compute(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const PHYSBAM_OVERRIDE
     {
-        TV y=static_cast<const VECTOR_T&>(x).v;
-        if(e) *e=f(y);
-        if(g) static_cast<VECTOR_T*>(g)->v=df(y);
-        if(h) const_cast<MATRIX<T,TV::m>&>(static_cast<SYSTEM_T*>(h)->A)=ddf(y);
+        LOG::printf("program %i %p\n", program.num_tmp,&program);
+        PROGRAM_CONTEXT<T> context(program);
+        context.data_in=static_cast<const VECTOR_T&>(x).v;
+        program.Execute(context);
+        if(e) *e=context.data_out(0);
+        if(g) for(int i=0;i<grad_vars.m;i++) static_cast<VECTOR_T*>(g)->v(i)=context.data_out(grad_vars(i));
+        if(h) for(int i=0;i<grad_vars.m;i++) for(int j=0;j<grad_vars.m;j++) const_cast<MATRIX_MXN<T>&>(static_cast<SYSTEM_T*>(h)->A)(i,j)=context.data_out(i*grad_vars.m+j);
     }
 };
 
@@ -46,16 +65,18 @@ int main(int argc,char* argv[])
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
     typedef double T;
-    typedef VECTOR<T,2> TV;
-    typedef KRYLOV_VECTOR_WRAPPER<T,TV> VECTOR_T;
-    typedef MATRIX_SYSTEM<MATRIX<T,TV::m>,T,VECTOR_T> SYSTEM_T;
+    typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>> VECTOR_T;
+    typedef MATRIX_SYSTEM<MATRIX_MXN<T>,T,VECTOR_T> SYSTEM_T;
 
-    MATRIX<T,TV::m> matrix;
+    const char* vars=argv[1];
+    char out_var=*argv[2];
+    const char* function=argv[3];
+
+    int n=strlen(vars);
+    MATRIX_MXN<T> matrix(n,n);
     SYSTEM_T system(matrix);
 
-    MINIMIZATION_OBJECTIVE<TV> obj([](TV x){return sqr(x.Magnitude_Squared()-1);},
-        [](TV x){return 4*(x.Magnitude_Squared()-1)*x;},
-        [](TV x){return MATRIX<T,TV::m>::Outer_Product(x,x)*8+4*(x.Magnitude_Squared()-1);});
+    MINIMIZATION_OBJECTIVE<T> obj(function, vars, out_var);
 
     NEWTONS_METHOD<T> nm;
     nm.max_iterations=100000;
@@ -66,7 +87,8 @@ int main(int argc,char* argv[])
     nm.angle_tolerance=1e-2;
 
     VECTOR_T x0;
-    x0.v=TV(1e-6,1+1e-5);
+    x0.v.Resize(n);
+    for(int i=0;i<n;i++) x0.v(i)=atof(argv[4+i]);
     obj.Test(x0,system);
 
     bool converged=nm.Newtons_Method(obj,system,x0);
