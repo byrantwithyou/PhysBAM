@@ -22,12 +22,15 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
     KRYLOV_VECTOR_BASE<T>& grad=*x.Clone_Default();
     KRYLOV_VECTOR_BASE<T>& dx=*x.Clone_Default();
     KRYLOV_VECTOR_BASE<T>& tm=*x.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>& tmp0=*x.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>& tmp1=*x.Clone_Default();
     MINRES<T> minres;
     CONJUGATE_GRADIENT<T> cg;
     cg.finish_before_indefiniteness=true;
     KRYLOV_SOLVER<T>* krylov=&minres;
     if(use_cg) krylov=&cg;
     krylov->relative_tolerance=true;
+//    krylov->print_residuals=true;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     T phi=(1+sqrt(5))/2;
 
@@ -49,9 +52,19 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         if((abs(E-last_E)<progress_tolerance&&0) || norm_grad<tolerance){result=true;break;}
         dx*=0;
         tm.Copy(-1,grad);
-        T local_krylov_tolerance=std::min((T).5,krylov_tolerance*norm_grad);
+        T local_krylov_tolerance=std::min((T).5,krylov_tolerance*(T)sqrt(norm_grad));
+        LOG::printf("local_krylov_tolerance %g\n",local_krylov_tolerance);
         if(!krylov->Solve(sys,dx,tm,av,local_krylov_tolerance,0,max_krylov_iterations) && fail_on_krylov_not_converged)
             break;
+
+        sys.Multiply(dx,tm);
+        tm.Copy(1,tm,grad);
+        T res=sqrt(sys.Inner_Product(tm,tm));
+        LOG::printf("computed resid %g\n",res);
+
+        static int solve_id=0;
+//        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",sys,tmp0,tmp1);
+        solve_id++;
 
         LOG::printf("A   %g\n", sys.Inner_Product(dx,grad));
         if(use_gradient_descent_failsafe){
@@ -99,6 +112,8 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
     delete &grad;
     delete &dx;
     delete &tm;
+    delete &tmp0;
+    delete &tmp1;
 
     return result;
 }
