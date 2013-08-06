@@ -10,8 +10,9 @@
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Nonlinear_Equations/PARAMETRIC_LINE.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <boost/function.hpp>
 using namespace PhysBAM;
-void (*NM_Flush_State)(const char*)=0;
+boost::function<void(const char*)> NM_Flush_State=0;
 //#####################################################################
 // Constructor
 //#####################################################################
