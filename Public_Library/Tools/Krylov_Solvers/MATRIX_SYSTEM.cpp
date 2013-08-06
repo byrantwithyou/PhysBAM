@@ -5,6 +5,7 @@
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
 #include <Tools/Matrices/MATRIX.h>
+#include <Tools/Matrices/MATRIX_MXN.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
@@ -123,4 +124,6 @@ template struct MATRIX_SYSTEM<MATRIX<double,3,3>,double,KRYLOV_VECTOR_WRAPPER<do
 template struct MATRIX_SYSTEM<MATRIX<double,4,4>,double,KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,4> >,MATRIX<double,4,4> >;
 template struct MATRIX_SYSTEM<MATRIX<double,5,5>,double,KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,5> >,MATRIX<double,5,5> >;
 template struct MATRIX_SYSTEM<MATRIX<double,6,6>,double,KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,6> >,MATRIX<double,6,6> >;
+template struct MATRIX_SYSTEM<MATRIX_MXN<float>,float,KRYLOV_VECTOR_WRAPPER<float,ARRAY<float,int> >,MATRIX_MXN<float> >;
+template struct MATRIX_SYSTEM<MATRIX_MXN<double>,double,KRYLOV_VECTOR_WRAPPER<double,ARRAY<double,int> >,MATRIX_MXN<double> >;
 }
