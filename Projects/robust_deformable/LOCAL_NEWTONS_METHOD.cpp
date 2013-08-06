@@ -3,11 +3,12 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
+#include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Log/LOG.h>
-#include <Tools/Nonlinear_Equations/LINE_SEARCH.h>
 #include <Tools/Nonlinear_Equations/PARAMETRIC_LINE.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include "LOCAL_LINE_SEARCH.h"
 #include "LOCAL_NEWTONS_METHOD.h"
 using namespace PhysBAM;
 //#####################################################################
@@ -69,12 +70,17 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
             while(pl(phi*a)<=pl(a)) a*=phi;
             T tau=(T).5*(sqrt((T)5)-1);
             T A=pl(0),B=pl(tau),C=pl(1-tau),D=pl(a),mx=max(A,B,C,D),mn=min(A,B,C,D);
-            if(!LINE_SEARCH<T>::Line_Search_Golden_Section(pl,a,0,a,max_golden_section_iterations,(T).25*tolerance))
+            if(!LOCAL_LINE_SEARCH<T>::Line_Search_Golden_Section(pl,a,0,a,max_golden_section_iterations,(T).25*tolerance))
                 break;
             if(mx-mn<=1e-10*maxabs(mx,mn)){
                 printf("OVERRIDE\n");
                 a=-1;}}
+        if(use_wolfe_conditions){
+            PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,neg_dx,grad,&grad,&sys);
+            if(!LOCAL_LINE_SEARCH<T>::Line_Search_For_Wolfe_Conditions(pl,dx_dot_grad,a,c1,c2,a,max_wolfe_iterations,a_tolerance))
+                break;}
 
+        printf("%lf\n",a);
         x.Copy(a,neg_dx,x);
         last_E=E;}
 
