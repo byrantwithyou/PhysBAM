@@ -172,11 +172,11 @@ int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    bool use_2d=true;
+    bool use_2d=false;
     PARSE_ARGS parse_args(argc,argv);
     LOG::Initialize_Logging(false,false,1<<30,true);
     LOG::cout<<parse_args.Print_Arguments()<<std::endl;
-    parse_args.Add_Not("-2d",&use_2d,"Use 2D");
+    parse_args.Add("-2d",&use_2d,"Use 2D");
     parse_args.Parse(true);
 
     if(use_2d)
