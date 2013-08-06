@@ -43,20 +43,18 @@ public:
         program.Optimize();
         program.Finalize();
         program.Print();
-        LOG::printf("program %i %p\n", program.num_tmp,&program);
     }
 
     virtual ~MINIMIZATION_OBJECTIVE(){}
 
     void Compute(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const PHYSBAM_OVERRIDE
     {
-        LOG::printf("program %i %p\n", program.num_tmp,&program);
         PROGRAM_CONTEXT<T> context(program);
         context.data_in=static_cast<const VECTOR_T&>(x).v;
         program.Execute(context);
         if(e) *e=context.data_out(0);
         if(g) for(int i=0;i<grad_vars.m;i++) static_cast<VECTOR_T*>(g)->v(i)=context.data_out(grad_vars(i));
-        if(h) for(int i=0;i<grad_vars.m;i++) for(int j=0;j<grad_vars.m;j++) const_cast<MATRIX_MXN<T>&>(static_cast<SYSTEM_T*>(h)->A)(i,j)=context.data_out(i*grad_vars.m+j);
+        if(h) for(int i=0;i<grad_vars.m;i++) for(int j=0;j<grad_vars.m;j++) const_cast<MATRIX_MXN<T>&>(static_cast<SYSTEM_T*>(h)->A)(i,j)=context.data_out(hess_vars(i*grad_vars.m+j));
     }
 };
 
@@ -85,13 +83,17 @@ int main(int argc,char* argv[])
     nm.fail_on_krylov_not_converged=false;
     nm.tolerance=1e-5;
     nm.angle_tolerance=1e-2;
+//    nm.use_golden_section_search=true;
+//    nm.use_wolfe_search=false;
 
     VECTOR_T x0;
     x0.v.Resize(n);
     for(int i=0;i<n;i++) x0.v(i)=atof(argv[4+i]);
     obj.Test(x0,system);
+    LOG::printf("Initial guess: %.16P\n", x0.v);
 
     bool converged=nm.Newtons_Method(obj,system,x0);
+    LOG::printf("Final solution: %.16P\n", x0.v);
     PHYSBAM_ASSERT(converged);
 
 
