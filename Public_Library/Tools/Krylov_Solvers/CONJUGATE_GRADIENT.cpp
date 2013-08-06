@@ -58,6 +58,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         T s_dot_q=(T)system.Inner_Product(s,q);
         if(s_dot_q<=0){
             if(finish_before_indefiniteness){
+                LOG::cout<<"finish_before_indefiniteness"<<std::endl;
                 if(iterations==0) x=b;
                 if(print_diagnostics) LOG::Stat("cg iterations",iterations);
                 if(iterations_used) *iterations_used=iterations;
