@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

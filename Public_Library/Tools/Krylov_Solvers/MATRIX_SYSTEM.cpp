@@ -4,7 +4,9 @@
 //#####################################################################
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
+#include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -81,6 +83,22 @@ Set_Preconditioner(const T_MATRIX_PRECON& preconditioner,VECTOR_T& vector)
     temp_vector=&vector;
 }
 //#####################################################################
+// Function Apply_Preconditioner_Helper
+//#####################################################################
+template<class T,class VECTOR_T> static void
+Apply_Preconditioner_Helper(SPARSE_MATRIX_FLAT_NXN<T>* P,const VECTOR_T& vr,VECTOR_T& vz,VECTOR_T* temp_vector)
+{
+    P->Solve_Forward_Substitution(vr.v,temp_vector->v,true);
+    P->Solve_Backward_Substitution(temp_vector->v,vz.v,false,true);
+}
+//#####################################################################
+// Function Apply_Preconditioner_Helper
+//#####################################################################
+template<class MATRIX_T,class VECTOR_T> static void
+Apply_Preconditioner_Helper(MATRIX_T* P,const VECTOR_T& vr,VECTOR_T& vz,VECTOR_T* temp_vector)
+{
+}
+//#####################################################################
 // Function Apply_Preconditioner
 //#####################################################################
 template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON> void MATRIX_SYSTEM<T_MATRIX,T,VECTOR_T,T_MATRIX_PRECON>::
@@ -88,10 +106,21 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
 {
     const VECTOR_T& vr=dynamic_cast<const VECTOR_T&>(r);
     VECTOR_T& vz=dynamic_cast<VECTOR_T&>(z);
-    P->Solve_Forward_Substitution(vr.v,temp_vector->v,true);
-    P->Solve_Backward_Substitution(temp_vector->v,vz.v,false,true);
+    Apply_Preconditioner_Helper(P,vr,vz,temp_vector);
 }
 namespace PhysBAM{
 template struct MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<float>,float,KRYLOV_VECTOR_WRAPPER<float,ARRAY<float> > >;
 template struct MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<double>,double,KRYLOV_VECTOR_WRAPPER<double,ARRAY<double> > >;
+template struct MATRIX_SYSTEM<MATRIX<float,1,1>,float,KRYLOV_VECTOR_WRAPPER<float,VECTOR<float,1> >,MATRIX<float,1,1> >;
+template struct MATRIX_SYSTEM<MATRIX<float,2,2>,float,KRYLOV_VECTOR_WRAPPER<float,VECTOR<float,2> >,MATRIX<float,2,2> >;
+template struct MATRIX_SYSTEM<MATRIX<float,3,3>,float,KRYLOV_VECTOR_WRAPPER<float,VECTOR<float,3> >,MATRIX<float,3,3> >;
+template struct MATRIX_SYSTEM<MATRIX<float,4,4>,float,KRYLOV_VECTOR_WRAPPER<float,VECTOR<float,4> >,MATRIX<float,4,4> >;
+template struct MATRIX_SYSTEM<MATRIX<float,5,5>,float,KRYLOV_VECTOR_WRAPPER<float,VECTOR<float,5> >,MATRIX<float,5,5> >;
+template struct MATRIX_SYSTEM<MATRIX<float,6,6>,float,KRYLOV_VECTOR_WRAPPER<float,VECTOR<float,6> >,MATRIX<float,6,6> >;
+template struct MATRIX_SYSTEM<MATRIX<double,1,1>,double,KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,1> >,MATRIX<double,1,1> >;
+template struct MATRIX_SYSTEM<MATRIX<double,2,2>,double,KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,2> >,MATRIX<double,2,2> >;
+template struct MATRIX_SYSTEM<MATRIX<double,3,3>,double,KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,3> >,MATRIX<double,3,3> >;
+template struct MATRIX_SYSTEM<MATRIX<double,4,4>,double,KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,4> >,MATRIX<double,4,4> >;
+template struct MATRIX_SYSTEM<MATRIX<double,5,5>,double,KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,5> >,MATRIX<double,5,5> >;
+template struct MATRIX_SYSTEM<MATRIX<double,6,6>,double,KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,6> >,MATRIX<double,6,6> >;
 }

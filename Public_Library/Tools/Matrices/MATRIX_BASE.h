@@ -210,6 +210,10 @@ public:
     {assert(y.Size()==Columns());typename PRODUCT<T_MATRIX,typename VECTOR_TYPE<T_VECTOR>::TYPE>::TYPE result((INITIAL_SIZE)Rows());
     Add_Times(Derived(),y.Derived(),result);return result;}
 
+    template<class T_VECTOR,class T_VECTOR2>
+    void Times(const ARRAY_BASE<T,T_VECTOR>& y,ARRAY_BASE<T,T_VECTOR2>& z) const
+    {z.Fill(T());Add_Times(Derived(),y.Derived(),z.Derived());}
+
     template<int d>
     typename PRODUCT<T_MATRIX,DIAGONAL_MATRIX<T,d> >::TYPE operator*(const DIAGONAL_MATRIX<T,d>& A) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);typename PRODUCT<T_MATRIX,DIAGONAL_MATRIX<T,d> >::TYPE M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());

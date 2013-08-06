@@ -121,6 +121,14 @@ Raw_Get(int i)
 //#####################################################################
 // Function Clone_Default_Helper
 //#####################################################################
+template<class T,int d>
+static KRYLOV_VECTOR_BASE<T>* Clone_Default_Helper(const KRYLOV_VECTOR_WRAPPER<T,VECTOR<T,d> >& v)
+{
+    typedef VECTOR<T,d> TV;
+    KRYLOV_VECTOR_WRAPPER<T,TV>* c=new KRYLOV_VECTOR_WRAPPER<T,TV>;
+    c->deep_copy=true;
+    return c;
+}
 template<class T,class TV>
 static KRYLOV_VECTOR_BASE<T>* Clone_Default_Helper(const KRYLOV_VECTOR_WRAPPER<T,TV>& v)
 {
@@ -176,6 +184,10 @@ Clone_Default() const
 //#####################################################################
 // Function Resize_Helper
 //#####################################################################
+template<class T,int d>
+static void Resize_Helper(KRYLOV_VECTOR_WRAPPER<T,VECTOR<T,d> >& v,const KRYLOV_VECTOR_WRAPPER<T,VECTOR<T,d> >& w)
+{
+}
 template<class T,class TV>
 static void Resize_Helper(KRYLOV_VECTOR_WRAPPER<T,TV>& v,const KRYLOV_VECTOR_WRAPPER<T,TV>& w)
 {
@@ -258,4 +270,16 @@ template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,3>
 template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,3>,int>,ARRAY<int>&> >::~KRYLOV_VECTOR_WRAPPER();
 template KRYLOV_VECTOR_WRAPPER<double,ARRAY<double>&>::KRYLOV_VECTOR_WRAPPER(ARRAY<double>&);
 template KRYLOV_VECTOR_WRAPPER<double,ARRAY<double>&>::~KRYLOV_VECTOR_WRAPPER();
+template class KRYLOV_VECTOR_WRAPPER<float,VECTOR<float,1> >;
+template class KRYLOV_VECTOR_WRAPPER<float,VECTOR<float,2> >;
+template class KRYLOV_VECTOR_WRAPPER<float,VECTOR<float,3> >;
+template class KRYLOV_VECTOR_WRAPPER<float,VECTOR<float,4> >;
+template class KRYLOV_VECTOR_WRAPPER<float,VECTOR<float,5> >;
+template class KRYLOV_VECTOR_WRAPPER<float,VECTOR<float,6> >;
+template class KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,1> >;
+template class KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,2> >;
+template class KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,3> >;
+template class KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,4> >;
+template class KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,5> >;
+template class KRYLOV_VECTOR_WRAPPER<double,VECTOR<double,6> >;
 }
