@@ -209,47 +209,61 @@ Diff(int diff_expr,int diff_var)
     def_use_stale=true;
     return var_out.m+extra_out++;
 }
+
+enum op_parse_info_flags {flag_dest_is_src0=1,flag_num_ok_after=2};
+
+const char * op_chars="+-!*/^<>=!|&";
+
 struct OPERATOR_DEFINITIONS
 {
-    HASHTABLE<std::string,op_type> no_arg,unary,binary,chain;
+    HASHTABLE<std::string,OP_PARSE_INFO> op_lookup[2];
+    HASHTABLE<std::string,op_type> func_lookup;
 
+    bool right_to_left[prec_hi+1];
+    
     OPERATOR_DEFINITIONS()
     {
-        unary.Set("+",op_copy);
-        unary.Set("-",op_neg);
-        unary.Set("*",op_copy);
-        unary.Set("neg",op_neg);
-        unary.Set("inv",op_inv);
-        unary.Set("sqrt",op_sqrt);
-        unary.Set("exp",op_exp);
-        unary.Set("ln",op_ln);
-        unary.Set("!",op_not);
-        unary.Set("not",op_not);
+        op_lookup[1].Set("+",OP_PARSE_INFO(op_copy,prec_neg,flag_num_ok_after));
+        op_lookup[1].Set("-",OP_PARSE_INFO(op_neg,prec_neg,flag_num_ok_after));
+        op_lookup[1].Set("!",OP_PARSE_INFO(op_not,prec_neg,flag_num_ok_after));
 
-        binary.Set("+",op_add);
-        binary.Set("-",op_sub);
-        binary.Set("*",op_mul);
-        binary.Set("/",op_div);
-        binary.Set("^",op_pow);
-        binary.Set("<",op_lt);
-        binary.Set("<=",op_le);
-        binary.Set(">",op_gt);
-        binary.Set(">=",op_ge);
-        binary.Set("==",op_eq);
-        binary.Set("!=",op_ne);
-        binary.Set("||",op_or);
-        binary.Set("or",op_or);
-        binary.Set("&&",op_and);
-        binary.Set("and",op_and);
+        op_lookup[0].Set("+",OP_PARSE_INFO(op_add,prec_add,flag_num_ok_after));
+        op_lookup[0].Set("-",OP_PARSE_INFO(op_sub,prec_add,flag_num_ok_after));
+        op_lookup[0].Set("*",OP_PARSE_INFO(op_mul,prec_mul,flag_num_ok_after));
+        op_lookup[0].Set("/",OP_PARSE_INFO(op_div,prec_mul,flag_num_ok_after));
+        op_lookup[0].Set("^",OP_PARSE_INFO(op_pow,prec_neg,flag_num_ok_after));
+        op_lookup[0].Set("<",OP_PARSE_INFO(op_lt,prec_comp,flag_num_ok_after));
+        op_lookup[0].Set("<=",OP_PARSE_INFO(op_le,prec_comp,flag_num_ok_after));
+        op_lookup[0].Set(">",OP_PARSE_INFO(op_gt,prec_comp,flag_num_ok_after));
+        op_lookup[0].Set(">=",OP_PARSE_INFO(op_ge,prec_comp,flag_num_ok_after));
+        op_lookup[0].Set("==",OP_PARSE_INFO(op_eq,prec_eq,flag_num_ok_after));
+        op_lookup[0].Set("!=",OP_PARSE_INFO(op_ne,prec_eq,flag_num_ok_after));
+        op_lookup[0].Set("||",OP_PARSE_INFO(op_or,prec_or,flag_num_ok_after));
+        op_lookup[0].Set("&&",OP_PARSE_INFO(op_and,prec_and,flag_num_ok_after));
+        op_lookup[0].Set("=",OP_PARSE_INFO(op_copy,prec_assign,flag_num_ok_after));
+        op_lookup[0].Set("+=",OP_PARSE_INFO(op_add,prec_assign,flag_dest_is_src0|flag_num_ok_after));
+        op_lookup[0].Set("-=",OP_PARSE_INFO(op_sub,prec_assign,flag_dest_is_src0|flag_num_ok_after));
+        op_lookup[0].Set("*=",OP_PARSE_INFO(op_mul,prec_assign,flag_dest_is_src0|flag_num_ok_after));
+        op_lookup[0].Set("/=",OP_PARSE_INFO(op_div,prec_assign,flag_dest_is_src0|flag_num_ok_after));
+        op_lookup[0].Set("^=",OP_PARSE_INFO(op_pow,prec_assign,flag_dest_is_src0|flag_num_ok_after));
 
-        chain.Set("+",op_add);
-        chain.Set("-",op_sub);
-        chain.Set("*",op_mul);
-        chain.Set("/",op_div);
-        chain.Set("||",op_or);
-        chain.Set("or",op_or);
-        chain.Set("&&",op_and);
-        chain.Set("and",op_and);
+        func_lookup.Set("inv",op_inv);
+        func_lookup.Set("sqrt",op_sqrt);
+        func_lookup.Set("exp",op_exp);
+        func_lookup.Set("ln",op_ln);
+
+        right_to_left[prec_lo]=false;
+        right_to_left[prec_assign]=true;
+        right_to_left[prec_cond]=true;
+        right_to_left[prec_or]=false;
+        right_to_left[prec_and]=false;
+        right_to_left[prec_eq]=false;
+        right_to_left[prec_comp]=false;
+        right_to_left[prec_add]=false;
+        right_to_left[prec_mul]=false;
+        right_to_left[prec_neg]=true;
+        right_to_left[prec_func]=false;
+        right_to_left[prec_hi]=false;
     }
 } op_tokens;
 //#####################################################################
@@ -276,7 +290,7 @@ Parse(const char* str,bool keep_all_vars)
 
     LOG::cout<<dict<<"  "<<num_tmp<<std::endl;
 
-    while(Parse_Command(str)!=-1){}
+    Parse_Command(str);
 
     if(keep_all_vars){
         HASHTABLE<std::string> known;
@@ -294,7 +308,7 @@ Parse(const char* str,bool keep_all_vars)
     ARRAY<INSTRUCTION> zero_inst;
     for(int i=0;i<var_out.m;i++){
         INSTRUCTION in1={op_copy,i|mem_out,dict.Get(var_out(i)),-1};
-        code_blocks.Last()->code.Append(in1);
+        code_blocks(last_block)->code.Append(in1);
         INSTRUCTION in2={op_copy,dict.Get(var_out(i)),Add_Constant(0),-1};
         zero_inst.Append(in2);}
     zero_inst.Append_Elements(code_blocks(0)->code);
@@ -305,46 +319,163 @@ Parse(const char* str,bool keep_all_vars)
     Make_SSA();
 }
 //#####################################################################
+// Function Pop_Op_Stack
+//#####################################################################
+template<class T> void PROGRAM<T>::
+Pop_Op_Stack(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack)
+{
+    PHYSBAM_ASSERT(op_stack.m>0);
+    OP_PARSE_INFO op=op_stack.Pop();
+    if(op.prec==prec_cond){
+        PHYSBAM_ASSERT(block_stack.m>0);
+        CODE_BLOCK<T>* C=block_stack.Pop();
+        PHYSBAM_ASSERT(data_stack.m>1);
+        int tos=data_stack.Pop();
+        INSTRUCTION in_C={op_copy,data_stack.Last(),tos,-1};
+        C->code.Append(in_C);
+        return;}
+    if(op.prec==prec_nest){LOG::cout<<"Expected '"<<(char)op.op<<"' but found ';'."<<std::endl;PHYSBAM_FATAL_ERROR("");}
+
+    INSTRUCTION in={op.op,-1,-1,-1};
+    if(op_flags_table[op.op]&flag_reg_src1){PHYSBAM_ASSERT(data_stack.m>0);in.src1=data_stack.Pop();}
+    if(op_flags_table[op.op]&flag_reg_src0){PHYSBAM_ASSERT(data_stack.m>0);in.src0=data_stack.Pop();}
+    if(op.op==op_copy && op.prec==prec_assign){PHYSBAM_ASSERT(data_stack.m>0);in.dest=data_stack.Pop();}
+    else if(op.flags&flag_dest_is_src0) in.dest=in.src0;
+    else if(op_flags_table[op.op]&flag_reg_dest) in.dest=num_tmp++;
+    if(op_flags_table[op.op]&flag_reg_dest) data_stack.Append(in.dest);
+    block_stack.Last()->code.Append(in);
+}
+//#####################################################################
+// Function Unwind_Stack
+//#####################################################################
+template<class T> void PROGRAM<T>::
+Unwind_Match(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,char match)
+{
+    while(op_stack.m && op_stack.Last().prec>prec_nest) Pop_Op_Stack(block_stack,data_stack,op_stack);
+    if(!op_stack.m){LOG::cout<<"Expected ';' but found '"<<match<<"'."<<std::endl;PHYSBAM_FATAL_ERROR("");}
+    else if(op_stack.Last().prec!=prec_nest){LOG::cout<<"Invalid token on op stack."<<std::endl;PHYSBAM_FATAL_ERROR("");}
+    else if(op_stack.Last().op!=match){LOG::cout<<"Expected '"<<(char)op_stack.Last().op<<"' but found '"<<match<<"'."<<std::endl;PHYSBAM_FATAL_ERROR("");}
+    else op_stack.Pop();
+}
+//#####################################################################
+// Function Unwind_Stack
+//#####################################################################
+template<class T> void PROGRAM<T>::
+Unwind_To_Prec(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,int prec)
+{
+    while(op_stack.m && op_stack.Last().prec>prec)
+        Pop_Op_Stack(block_stack,data_stack,op_stack);
+    if(!op_tokens.right_to_left[prec]) 
+        while(op_stack.m && op_stack.Last().prec==prec)
+            Pop_Op_Stack(block_stack,data_stack,op_stack);
+}
+//#####################################################################
+// Function Unwind_Stack
+//#####################################################################
+template<class T> void PROGRAM<T>::
+Unwind_Op_Stack(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack)
+{
+    while(op_stack.m)
+        Pop_Op_Stack(block_stack,data_stack,op_stack);
+}
+//#####################################################################
+// Function Unwind_Stack
+//#####################################################################
+template<class T> bool PROGRAM<T>::
+Try_Operator(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,bool& num_ok,const std::string& str)
+{
+    OP_PARSE_INFO opi;
+    if(op_tokens.op_lookup[num_ok].Get(str,opi)){
+        Unwind_To_Prec(block_stack,data_stack,op_stack,opi.prec);
+        num_ok=opi.flags&flag_num_ok_after;
+        op_stack.Append(opi);
+        return true;}
+
+    if(op_tokens.op_lookup[1-num_ok].Contains(str)){
+        LOG::cout<<"Unexpected operator '"<<str<<"'."<<std::endl;
+        PHYSBAM_FATAL_ERROR();}
+    return false;
+}
+//#####################################################################
 // Function Parse_Command
 //#####################################################################
-template<class T> int PROGRAM<T>::
-Parse_Command(const char*& str)
+template<class T> void PROGRAM<T>::
+Parse_Command(const char* str)
 {
-    str+=strspn(str, " \t\n");
-    if(!*str || *str==')') return -1;
+    bool num_ok=true;
+    ARRAY<int> data_stack;
+    ARRAY<OP_PARSE_INFO> op_stack;
+    ARRAY<CODE_BLOCK<T>*> block_stack;
 
-    // Number
-    char* endptr=0;
-    double d=strtod(str,&endptr);
-    if(endptr>str){
-        str=endptr;
-        return Add_Constant(d);}
+    block_stack.Append(code_blocks.Last());
 
-    // Variable
-    if(isalpha(*str) || *str=='_'){
-        int len=strspn(str, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
-        std::string var(str,len);
-        str+=len;
-        int reg;
-        if(dict.Get(var,reg)) return reg;
-        reg=num_tmp++;
-        dict.Set(var,reg);
-        return reg;}
+    while(1)
+    {
+        if(*str==';' || !*str){
+            Unwind_Op_Stack(block_stack,data_stack,op_stack);
 
-    // List
-    op_type type;
-    if(*str=='('){
-        str++;
-        str+=strspn(str, " \t\n");
-        int len=strcspn(str, " \t\n");
-        std::string op(str,len);
-        str+=len;
-        int cur=Parse_Command(str);
-        if(op=="if"){
-            CODE_BLOCK<T>* A=code_blocks.Last();
+            if(data_stack.m>1){
+                LOG::cout<<"Detected extra tokens on data stack while parsing."<<std::endl;
+                PHYSBAM_FATAL_ERROR();}
+
+            if(block_stack.m!=1){
+                LOG::cout<<"Detected extra tokens on block stack while parsing."<<std::endl;
+                PHYSBAM_FATAL_ERROR();}
+
+            if(num_ok){
+                if(data_stack.m){
+                    LOG::cout<<"Unexpected ';'."<<std::endl;
+                    PHYSBAM_FATAL_ERROR();}
+                if(!*str) break;
+                str++;
+                num_ok=true;
+                continue;}
+
+            if(!data_stack.m){
+                LOG::cout<<"Empty data stack at end of statement."<<std::endl;
+                PHYSBAM_FATAL_ERROR();}
+
+            data_stack.Pop();
+            if(!*str) break;
+            str++;
+            num_ok=true;
+            continue;}
+
+        if(isspace(*str)){str++;continue;}
+
+        if(*str=='('){
+            str++;
+            OP_PARSE_INFO opi(')');
+            op_stack.Append(opi);
+            num_ok=true;
+            continue;}
+
+        if(*str==')'){
+            if(num_ok){
+                LOG::cout<<"Unexpected ')'."<<std::endl;
+                PHYSBAM_FATAL_ERROR();}
+            str++;
+            Unwind_Match(block_stack,data_stack,op_stack,')');
+            num_ok=false;
+            continue;}
+
+        if(*str=='?'){
+            str++;
+            if(num_ok){
+                LOG::cout<<"Unexpected '?'."<<std::endl;
+                PHYSBAM_FATAL_ERROR();}
+            Unwind_To_Prec(block_stack,data_stack,op_stack,prec_cond);
+            num_ok=true;
+
+            CODE_BLOCK<T>* A=block_stack.Pop();
             CODE_BLOCK<T>* B=new CODE_BLOCK<T>;
             CODE_BLOCK<T>* C=new CODE_BLOCK<T>;
             CODE_BLOCK<T>* D=new CODE_BLOCK<T>;
+            for(int s=0;s<2;s++){
+                CODE_BLOCK<T>* P=A->next[s];
+                D->next[s]=P;
+                if(P) P->prev[P->prev[1]==A]=D;}
+
             A->next[0]=B;
             A->next[1]=C;
             D->prev[0]=B;
@@ -354,67 +485,92 @@ Parse_Command(const char*& str)
             C->prev[0]=A;
             C->next[0]=D;
             B->id=code_blocks.Append(B);
-            int if_out=num_tmp++;
-            INSTRUCTION in_B={op_copy,if_out,Parse_Command(str),-1};
-            B->code.Append(in_B);
             C->id=code_blocks.Append(C);
-            INSTRUCTION in_C={op_copy,if_out,Parse_Command(str),-1};
-            C->code.Append(in_C);
-            INSTRUCTION in_A={op_br_z,C->id,cur,B->id};
-            A->code.Append(in_A);
-            cur=if_out;
             D->id=code_blocks.Append(D);
-            if(Parse_Command(str)!=-1){
-                LOG::cout<<"Three arguments expected for 'if'"<<std::endl;
-                PHYSBAM_FATAL_ERROR();}}
-        else if(cur==-1){
-            if(op_tokens.no_arg.Get(op,type)){
-                INSTRUCTION in={type,num_tmp++,-1,-1};
-                cur=in.dest;
-                code_blocks.Last()->code.Append(in);}
-            else{
-                LOG::cout<<"Expected no-arg operator but got '"<<op<<"'"<<std::endl;
-                PHYSBAM_FATAL_ERROR();}}
-        else{
-            int next=Parse_Command(str);
-            if(next==-1){
-                if(op_tokens.unary.Get(op,type)){
-                    INSTRUCTION in={type,num_tmp++,cur,-1};
-                    cur=in.dest;
-                    code_blocks.Last()->code.Append(in);}
-                else{
-                    LOG::cout<<"Expected unary operator but got '"<<op<<"'"<<std::endl;
-                    PHYSBAM_FATAL_ERROR();}}
-            else if(op_tokens.chain.Get(op,type)){
-                while(next!=-1){
-                    INSTRUCTION in={type,num_tmp++,cur,next};
-                    cur=in.dest;
-                    code_blocks.Last()->code.Append(in);
-                    next=Parse_Command(str);}}
-            else if(op_tokens.binary.Get(op,type)){
-                if(Parse_Command(str)!=-1){
-                    LOG::cout<<"Expected chaining operator but got '"<<op<<"'"<<std::endl;
+            block_stack.Append(D);
+            block_stack.Append(C);
+            block_stack.Append(B);
+
+            INSTRUCTION in_A={op_br_z,C->id,data_stack.Pop(),B->id};
+            A->code.Append(in_A);
+            data_stack.Append(num_tmp++);
+
+            op_stack.Append(OP_PARSE_INFO(':'));}
+
+        if(*str==':'){
+            str++;
+            if(num_ok){
+                LOG::cout<<"Unexpected ':'."<<std::endl;
+                PHYSBAM_FATAL_ERROR();}
+            Unwind_Match(block_stack,data_stack,op_stack,':');
+            num_ok=true;
+
+            CODE_BLOCK<T>* B=block_stack.Pop();
+            int tos=data_stack.Pop();
+            INSTRUCTION in_B={op_copy,data_stack.Last(),tos,-1};
+            B->code.Append(in_B);
+            op_stack.Append(OP_PARSE_INFO(op_nop,prec_cond,0));}
+
+        // Number
+        if(isdigit(*str) || *str=='.'){
+            char* endptr=0;
+            double d=strtod(str,&endptr);
+            if(!num_ok){
+                LOG::cout<<"Number unexpected"<<std::endl;
+                PHYSBAM_FATAL_ERROR("");}
+            str=endptr;
+            data_stack.Append(Add_Constant(d));
+            num_ok=false;
+            continue;}
+
+        // Variable or operator
+        if(isalpha(*str) || *str=='_'){
+            int len=strspn(str, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
+            std::string var(str,len);
+            str+=len;
+
+            if(Try_Operator(block_stack,data_stack,op_stack,num_ok,var))
+                continue;
+
+            op_type type;
+            if(op_tokens.func_lookup.Get(var,type)){
+                if(!num_ok){
+                    LOG::cout<<"Function unexpected"<<std::endl;
                     PHYSBAM_FATAL_ERROR();}
-                INSTRUCTION in={type,num_tmp++,cur,next};
-                cur=in.dest;
-                code_blocks.Last()->code.Append(in);}
-            else if(op=="=" || op=="setq"){
-                if(Parse_Command(str)!=-1){
-                    LOG::cout<<"Expected chaining operator but got '"<<op<<"'"<<std::endl;
-                    PHYSBAM_FATAL_ERROR();}
-                INSTRUCTION in={op_copy,cur,next,-1};
-                cur=in.dest;
-                code_blocks.Last()->code.Append(in);}
-            else{
-                LOG::cout<<"Unrecognized operator '"<<op<<"'"<<std::endl;
-                PHYSBAM_FATAL_ERROR();}}
-        str+=strspn(str, " \t\n");
-        if(*str++==')') return cur;
-        LOG::cout<<"Expected ) but got '"<<*--str<<"'"<<std::endl;
+                Unwind_To_Prec(block_stack,data_stack,op_stack,prec_func);
+                num_ok=false;
+
+                OP_PARSE_INFO opi={type,prec_func,0};
+                op_stack.Append(opi);
+                continue;}
+
+            int reg;
+            if(!dict.Get(var,reg)){
+                reg=num_tmp++;
+                dict.Set(var,reg);}
+            data_stack.Append(reg);
+            num_ok=false;
+            continue;}
+
+        // Simple operators
+        if(strchr(op_chars,*str)){
+            if(str[1] && strchr(op_chars,str[1])){
+                char var[3]={*str,str[1],0};
+                if(Try_Operator(block_stack,data_stack,op_stack,num_ok,var)){
+                    str+=2;
+                    continue;}}
+            char var[3]={*str,0};
+            if(Try_Operator(block_stack,data_stack,op_stack,num_ok,var)){
+                str++;
+                continue;}}
+
+        LOG::cout<<"Unrecognized character found: '"<<*str<<std::endl;
         PHYSBAM_FATAL_ERROR();}
 
-    LOG::cout<<"Expected token but got '"<<*str<<"'"<<std::endl;
-    PHYSBAM_FATAL_ERROR();
+    PHYSBAM_ASSERT(!op_stack.m);
+    PHYSBAM_ASSERT(!data_stack.m);
+    PHYSBAM_ASSERT(block_stack.m==1);
+    last_block=block_stack.Pop()->id;
 }
 const char* messages[op_last]={
     "nop\n",
@@ -469,10 +625,10 @@ Print() const
     for(int i=0;i<code_blocks.m;i++){
         if(!code_blocks(i)) continue;
         if(code_blocks(i)->prev[0])
-            printf(messages[op_label],i);
+            printf(messages[op_label],'L',i);
         Print(code_blocks(i)->code);
         if(code_blocks(i)->next[0])
-            printf(messages[op_jmp],code_blocks(i)->next[0]->id);}
+            printf(messages[op_jmp],'L',code_blocks(i)->next[0]->id);}
 
     printf("\nflat code:\n");
     Print(flat_code);
@@ -671,7 +827,11 @@ Leave_SSA()
         for(int j=0;j<code_blocks(i)->code.m;j++){
             INSTRUCTION& o=code_blocks(i)->code(j);
             if(o.type!=op_phi) break;
-            if(o.src0==o.src1) var_map(o.dest)=o.src0;
+            if(o.src0==o.src1){
+                if((o.dest&mem_mask)==mem_reg) var_map(o.dest)=o.src0;
+                else{
+                    o.type=op_copy;
+                    continue;}}
             else{
                 INSTRUCTION in0={op_copy,o.dest,o.src0,-1};
                 INSTRUCTION in1={op_copy,o.dest,o.src1,-1};
@@ -741,8 +901,6 @@ Relabel_Registers(ARRAY<int>& var_map)
                 o.src1=new_map(o.src1);}}
 
     num_tmp=k;
-    for(HASHTABLE<std::string,int>::ITERATOR it(dict);it.Valid();it.Next())
-        it.Data()=new_map(it.Data());
 
     var_map.Exchange(new_map);
 }
@@ -936,14 +1094,24 @@ Simplify_Phis()
     // Replace phi's with unreachble input by a copy.
     for(int bl=0;bl<code_blocks.m;bl++){
         if(!code_blocks(bl)) continue;
+        ARRAY<INSTRUCTION>& code=code_blocks(bl)->code;
         if(!code_blocks(bl)->prev[0] || !code_blocks(bl)->prev[1]){
             int j=!code_blocks(bl)->prev[0];
-            for(int ip=0;ip<code_blocks(bl)->code.m;ip++){
-                INSTRUCTION& o=code_blocks(bl)->code(ip);
+            for(int ip=0;ip<code.m;ip++){
+                INSTRUCTION& o=code(ip);
                 if(o.type!=op_phi) break;
                 o.type=op_copy;
                 if(j) o.src0=o.src1;}
-            code_blocks(bl)->prev[0]=code_blocks(bl)->prev[j];}}
+            code_blocks(bl)->prev[0]=code_blocks(bl)->prev[j];}
+        else{
+            int num_phi=0;
+            while(num_phi<code.m && code(num_phi).type==op_phi) num_phi++;
+            for(int ip=0;ip<num_phi;ip++){
+                INSTRUCTION& o=code(ip);
+                assert(o.type==op_phi);
+                if(o.src0==o.src1){
+                    o.type=op_copy;
+                    std::swap(code(ip),code(--num_phi));}}}}
     def_use_stale=true;
 
     LOG::cout<<__FUNCTION__<<std::endl;
@@ -963,6 +1131,7 @@ Remove_Dead_Code()
             for(int s=0;s<2;s++) if(B->next[s]) Detach_Next(B,s);
             delete B;
             code_blocks(bl)=0;}}
+    Simplify_Phis();
 
     // Merge basic blocks
     for(int bl=0;bl<code_blocks.m;bl++){
@@ -1107,7 +1276,7 @@ Reduce_In_Place(INSTRUCTION& o)
             if(o.src1==const_0){o.type=op_copy;o.src0=const_0;break;}
             if(o.src1==const_1){o.type=op_copy;break;}
             if(o.src1==Add_Constant(2)){o.type=op_mul;o.src1=o.src0;break;}
-            if(o.src1==Add_Constant(-1)){o.type=op_neg;break;}
+            if(o.src1==Add_Constant(-1)){o.type=op_inv;break;}
             break;
         case op_lt:
         case op_gt:

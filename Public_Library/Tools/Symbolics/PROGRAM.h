@@ -46,6 +46,23 @@ struct CODE_BLOCK
     CODE_BLOCK(){prev[0]=0;prev[1]=0;next[0]=0;next[1]=0;}
 };
 
+enum parse_prec {
+    prec_lo,prec_nest,prec_assign,prec_cond,prec_or,prec_and,
+    prec_eq,prec_comp,prec_add,prec_mul,prec_neg,
+    prec_func,prec_hi};
+
+struct OP_PARSE_INFO
+{
+    op_type op;
+    parse_prec prec;
+    int flags;
+
+    OP_PARSE_INFO(){}
+    OP_PARSE_INFO(op_type op,parse_prec prec,int flags): op(op),prec(prec),flags(flags) {}
+    OP_PARSE_INFO(char ch): op((op_type)ch),prec(prec_nest),flags(0) {}
+};
+std::ostream& operator<<(std::ostream& o,const OP_PARSE_INFO& opi) {return o<<"("<<opi.op<<" "<<opi.prec<<" "<<opi.flags<<")";}
+
 /*
   constants(0)=0
   constants(1)=1
@@ -57,6 +74,7 @@ struct PROGRAM
     int extra_out;
     int num_tmp;
     int num_labels;
+    int last_block;
     ARRAY<T> constants;
     std::map<T,int> constant_lookup;
     ARRAY<CODE_BLOCK<T>*> code_blocks;
@@ -75,7 +93,7 @@ struct PROGRAM
     };
 
     PROGRAM()
-        :extra_out(0),num_tmp(0),num_labels(0),finalized(false),def_use_stale(true)
+        :extra_out(0),num_tmp(0),num_labels(0),last_block(0),finalized(false),def_use_stale(true)
     {
     }
     void Execute(ARRAY<T>& reg) const;
@@ -102,7 +120,12 @@ struct PROGRAM
     const INSTRUCTION& Get_Instruction(const VECTOR<int,2>& I) const {return code_blocks(I.x)->code(I.y);}
 
 protected:
-    int Parse_Command(const char*& str);
+    void Parse_Command(const char* str);
+    void Pop_Op_Stack(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack);
+    void Unwind_Match(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,char match);
+    void Unwind_To_Prec(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,int prec);
+    void Unwind_Op_Stack(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack);
+    bool Try_Operator(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,bool& num_ok,const std::string& str);
     void Make_SSA();
     void Make_SSA_Relabel(int& count,ARRAY<ARRAY<int> >& S,HASHTABLE<int>& V_used,const ARRAY<ARRAY<int> >& idom_tree_children,int bl);
     void Leave_SSA();
