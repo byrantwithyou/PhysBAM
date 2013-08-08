@@ -88,20 +88,25 @@ Line_Search_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,int max_iter
 template<class T> bool LOCAL_LINE_SEARCH<T>::
 Line_Search_For_Wolfe_Conditions(NONLINEAR_FUNCTION<T(T)>& F,T gx,T a,T c1,T c2,T& x,int max_iterations,T a_tolerance)
 {
-    std::ofstream xdata("xdata.dat");
-    std::ofstream ydata("ydata.dat");
-    std::ofstream gdata("gdata.dat");
+    // std::ofstream xdata("xdata.dat");
+    // std::ofstream ydata("ydata.dat");
+    // std::ofstream gdata("gdata.dat");
 
-    for(int j=0;j<=150;++j){
-        ydata << F(-0.01*(T)j) << "\n";
-        xdata << 0.01*(T)j << "\n";
-        gdata << F.Prime(-0.01*(T)j) << "\n";
-    }
-    xdata.close();
-    ydata.close();
-    gdata.close();
-    getchar();
-
+    // T minF=1.0;
+    // T tempF=1e15;
+    // for(int j=0;j<=100;++j){
+    //     ydata << F(-0.01*(T)j) << "\n";
+    //     xdata << 0.01*(T)j << "\n";
+    //     gdata << -F.Prime(-0.01*(T)j) << "\n";
+    //     if(F(-0.01*(T)j) < tempF){
+    //         tempF=F(-0.01*(T)j);
+    //         minF=0.01*(T)j;}
+    // }
+    // xdata.close();
+    // ydata.close();
+    // gdata.close();
+    // printf("minF: %lf, dif: %lf\n", minF, F(0.0)-tempF);
+    
     T a_i=a;
     T aBefore=0;
     int i;
@@ -140,30 +145,32 @@ Zoom_Interval(NONLINEAR_FUNCTION<T(T)>& F,T gx,T gx_ai,T F_0,T a_lo,T a_hi,T c1,
     T F_lo=F(a_lo);
     T F_hi=F(a_hi);
     T gx_lo=gx_ai;
-    //T gx_hi=F.Prime(a_hi);
+    T gx_hi=F.Prime(a_hi);
     T gx_aj;
     for(j=0;j<max_iterations;j++){
-        a_j=Interpolate_Quadratic_Alpha(F_lo,F_hi,gx_lo,a_lo,a_hi);
+        //a_j=Interpolate_Quadratic_Alpha(F_lo,F_hi,gx_lo,a_lo,a_hi);
+        a_j=Interpolate_Quadratic_Alpha(F_hi,F_lo,gx_hi,a_hi,a_lo);
         //a_j=Interpolate_Cubic_Alpha(F_lo,F_hi,gx_lo,gx_hi,a_lo,a_hi);
+        //if(a_j==-1.0) return -1;
         //printf("%lf\n",a_j);
         F_temp=F(a_j);
         if(F_temp>=F_lo){
             a_hi=a_j;
-            F_hi=F_temp;}
-            //gx_hi=F.Prime(a_hi);}
+            F_hi=F_temp;
+            gx_hi=F.Prime(a_hi);}
         else{
             gx_aj=F.Prime(a_j);
             if(fabs(gx_aj)<=c2*gx){
                 return a_j;}
             if(gx_aj*(a_hi-a_lo)>=0){
                 a_hi=a_lo;
-                F_hi=F_lo;}
-                //gx_hi=gx_lo;}
+                F_hi=F_lo;
+                gx_hi=gx_lo;}
             a_lo=a_j;
             F_lo=F_temp;
             gx_lo=gx_aj;}
     }
-    return -1.0;
+    return -1e-3;
 }
 //####################################################################
 // Function Interpolate_Quadratic_Alpha
@@ -183,7 +190,9 @@ Interpolate_Quadratic_Alpha(T Fa1,T Fa2,T gx_a1,T a1,T a2)
 template<class T> T LOCAL_LINE_SEARCH<T>::
 Interpolate_Cubic_Alpha(T Fa1,T Fa2,T gx_a1,T gx_a2,T a1,T a2)
  {
+     printf("gx_lo: %lf, gx_hi: %lf\n",Fa1,Fa2);
      T d1=gx_a1+gx_a2-(T)3*(Fa1-Fa2)/(a1-a2);
+     if(d1*d1-gx_a1*gx_a2<0) return -1.0;
      T d2=sqrt(d1*d1-gx_a1*gx_a2);
 
      return a2-(a2-a1)*(gx_a2+d2-d1)/(gx_a2-gx_a1+(T)2*d2);
