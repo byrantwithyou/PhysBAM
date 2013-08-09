@@ -45,7 +45,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         F.Compute(x,&sys,&grad,&E);
         T norm_grad=sqrt(sys.Inner_Product(grad,grad));
 //        PHYSBAM_ASSERT(abs(E-last_E)>=progress_tolerance);
-        LOG::printf("%g %g %g (%g %g)\n", E, abs(E-last_E), norm_grad, progress_tolerance, tolerance);
+        LOG::printf("GRAD STATS %g %g %g\n", E, abs(E-last_E), norm_grad);
 
 //        sprintf(buff,"newton %d   %g %g %g", i, E, abs(E-last_E), norm_grad);
 //        if(NM_Flush_State) NM_Flush_State(buff);
