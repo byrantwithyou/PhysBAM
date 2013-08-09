@@ -36,45 +36,49 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
 
     bool result=false;
 
-    char buff[1000];
+//    char buff[1000];
 
     T last_E=FLT_MAX;
-    for(int i=0;i<max_iterations;i++){
+    int local_max_iterations=max_iterations;
+    for(int i=0;i<local_max_iterations;i++){
         T E=0;
         F.Compute(x,&sys,&grad,&E);
         T norm_grad=sqrt(sys.Inner_Product(grad,grad));
 //        PHYSBAM_ASSERT(abs(E-last_E)>=progress_tolerance);
         LOG::printf("%g %g %g (%g %g)\n", E, abs(E-last_E), norm_grad, progress_tolerance, tolerance);
 
-        sprintf(buff,"newton %d   %g %g %g", i, E, abs(E-last_E), norm_grad);
+//        sprintf(buff,"newton %d   %g %g %g", i, E, abs(E-last_E), norm_grad);
 //        if(NM_Flush_State) NM_Flush_State(buff);
 
-        if((abs(E-last_E)<progress_tolerance&&0) || norm_grad<tolerance){result=true;break;}
+        if(norm_grad<tolerance){result=true;break;}
+        if(norm_grad<countdown_tolerance){
+            result=true;
+            local_max_iterations=std::min(local_max_iterations,i+countdown_iterations);}
         dx*=0;
         tm.Copy(-1,grad);
         T local_krylov_tolerance=std::min((T).5,krylov_tolerance*(T)sqrt(norm_grad));
-        LOG::printf("local_krylov_tolerance %g\n",local_krylov_tolerance);
+//        LOG::printf("local_krylov_tolerance %g\n",local_krylov_tolerance);
         if(!krylov->Solve(sys,dx,tm,av,local_krylov_tolerance,0,max_krylov_iterations) && fail_on_krylov_not_converged)
             break;
 
         sys.Multiply(dx,tm);
         tm.Copy(1,tm,grad);
-        T res=sqrt(sys.Inner_Product(tm,tm));
-        LOG::printf("computed resid %g\n",res);
+//        T res=sqrt(sys.Inner_Product(tm,tm));
+//        LOG::printf("computed resid %g\n",res);
 
         static int solve_id=0;
 //        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",sys,tmp0,tmp1);
         solve_id++;
 
-        LOG::printf("A   %g\n", sys.Inner_Product(dx,grad));
+//        LOG::printf("A   %g\n", sys.Inner_Product(dx,grad));
         if(use_gradient_descent_failsafe){
             T norm_dx=sqrt(sys.Inner_Product(dx,dx)),inner=sys.Inner_Product(dx,grad);
-            LOG::printf("angle %g\n", inner/(norm_dx*norm_grad));
+//            LOG::printf("angle %g\n", inner/(norm_dx*norm_grad));
             if(inner>=angle_tolerance*norm_dx*norm_grad){
                 dx*=-1;
-                puts("LOOK BACKWARDS");}
+                LOG::puts("LOOK BACKWARDS");}
             else if(inner>=-angle_tolerance*norm_dx*norm_grad){
-                puts("GRADIENT");
+                LOG::puts("GRADIENT");
                 dx.Copy(-norm_dx/norm_grad,grad);}}
 
         T n_grad=sqrt(sys.Inner_Product(grad,grad));
@@ -84,7 +88,6 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         T dx_H_dx=sys.Inner_Product(dx,tm);
         sys.Multiply(grad,tm);
         T grad_H_grad=sys.Inner_Product(grad,tm);
-        LOG::printf("RAW %g %g    %g    %g %g\n", n_grad,n_dx,    dx_dot_grad/n_dx/n_grad,     grad_H_grad/n_grad/n_grad,dx_H_dx/n_dx/n_dx);
 
         T a=1;
         if(use_wolfe_search){
@@ -104,7 +107,8 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
                 LOG::printf("OVERRIDE\n");
                 a=1;}}
 
-        LOG::printf("alpha %g\n",a);
+        LOG::printf("RAW %g %g    %g    %g %g  %g\n", n_grad,n_dx,    dx_dot_grad/n_dx/n_grad,     grad_H_grad/n_grad/n_grad,dx_H_dx/n_dx/n_dx,  a);
+        if(a<=0) break;
         x.Copy(a,dx,x);
         last_E=E;}
 

@@ -82,7 +82,7 @@ void Init_Test(SIMULATION<VECTOR<T,3> >& simulation,STREAM_TYPE stream_type,PARS
 
     int test_number=0,resolution=6,seed=-1;
     bool enforce_definiteness=false;
-    T stiffness=(T)1e6,poissons_ratio=(T).3,scale=(T).5;
+    T stiffness=(T)1e6,poissons_ratio=(T).3;
     TV nonuniform_scale=TV((T).5,(T).9,(T)1.2);
     parse_args.Extra_Optional(&test_number,"example number","example number to run");
     parse_args.Add("-seed",&seed,"fixed seed","set random seed");
@@ -90,7 +90,6 @@ void Init_Test(SIMULATION<VECTOR<T,3> >& simulation,STREAM_TYPE stream_type,PARS
     parse_args.Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
     parse_args.Add("-stiff",&stiffness,"stiffness","constitutive model stiffness");
     parse_args.Add("-pr",&poissons_ratio,"ratio","constitutive model poissons ratio");
-    parse_args.Add("-scale",&scale,"scale","scale factor");
     parse_args.Add("-nonuniform_scale",&nonuniform_scale,"scale","scale factor");
     parse_args.Parse();
 
@@ -140,6 +139,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-kry_tol",&simulation.nm.krylov_tolerance,"tol","tolerance for Krylov solver");
     parse_args.Add("-newton_it",&simulation.nm.max_iterations,"iter","maximum iterations for Newton");
     parse_args.Add("-newton_tol",&simulation.nm.tolerance,"tol","tolerance for Newton");
+    parse_args.Add("-newton_cd_tol",&simulation.nm.countdown_tolerance,"tol","tolerance for Newton");
     parse_args.Add("-kry_fail",&simulation.nm.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
     parse_args.Add("-angle_tol",&simulation.nm.angle_tolerance,"tol","gradient descent tolerance");
     parse_args.Add("-dt",&dt,"step","time step size");

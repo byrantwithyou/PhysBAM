@@ -2,9 +2,10 @@
 // Copyright 2009.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/exchange.h>
-#include <Tools/Math_Tools/min.h>
 #include <Tools/Math_Tools/maxabs.h>
+#include <Tools/Math_Tools/min.h>
 #include <Tools/Nonlinear_Equations/LINE_SEARCH.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
 #include <cmath>
@@ -98,14 +99,14 @@ Line_Search_Wolfe_Conditions(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,T c1,T c2,
         F.Compute(x1.a,0,&x1.dfa,&x1.fa);
         if(x1.fa>a0.fa+c1*x1.a*a0.dfa || x1.fa>=x0.fa){
             if(!Line_Search_Wolfe_Conditions_Zoom(F,x0,x1,a0,x,c1,c2))
-                Line_Search_Derivative_Bisection(F,a,b,x,std::numeric_limits<T>::epsilon()*100,x_max);
+                Line_Search_Derivative_Bisection(F,a,b,x,pow(std::numeric_limits<T>::epsilon(),2./3),x_max);
             return true;}
         if(abs(x1.dfa)<=-c2*a0.dfa){
             x=x1.a;
             return true;}
         if(x1.dfa>=0){
             if(!Line_Search_Wolfe_Conditions_Zoom(F,x1,x0,a0,x,c1,c2))
-                Line_Search_Derivative_Bisection(F,a,b,x,std::numeric_limits<T>::epsilon()*100,x_max);
+                Line_Search_Derivative_Bisection(F,a,b,x,pow(std::numeric_limits<T>::epsilon(),2./3),x_max);
             return true;}
         x0=x1;}
     x=a;
@@ -144,6 +145,11 @@ Line_Search_Wolfe_Conditions_Zoom(NONLINEAR_FUNCTION<T(T)>& F,WOLFE_HELPER lo,WO
         else{
             if(((hi.a>lo.a) && xj.dfa>=0) || ((hi.a<lo.a) && xj.dfa<=0)) hi=lo;
             lo=xj;}}
+    if(lo.a-x0.a>=min_interval*100){
+        LOG::printf("take decrease on zoom with %g\n",lo.a);
+        x=lo.a;
+        return true;}
+    LOG::printf("exit zoom on %g\n",lo.a);
     return false;
 }
 //#####################################################################
@@ -184,7 +190,7 @@ Line_Search_Upper_Trust_Interval(NONLINEAR_FUNCTION<T(T)>& F,WOLFE_HELPER x0,WOL
 {
     T min_interval_width=maxabs(x1.a-a0.a,x1.a,a0.a)*std::numeric_limits<T>::epsilon()*2;
     while(x1.a-x0.a>min_interval_width){
-        printf("%.16g %.16g  %.16g %.16g  %.16g %.16g\n",x0.a,x1.a,x0.fa,x1.fa,x0.dfa,x1.dfa);
+//        LOG::printf("%.16g %.16g  %.16g %.16g  %.16g %.16g\n",x0.a,x1.a,x0.fa,x1.fa,x0.dfa,x1.dfa);
         WOLFE_HELPER xj={(x1.a+x0.a)/2};
         F.Compute(xj.a,0,&xj.dfa,&xj.fa);
         if(xj.fa-a0.fa>allowed_relative_increase*abs(a0.fa)) x1=xj;
