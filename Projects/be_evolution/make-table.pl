@@ -134,6 +134,9 @@ for my $log (@logs)
     my $num_newton=$num_alpha;
     $table1 .= sprintf("%2d & \\verb|%s| \\\\\n", $i, $command);
 
+    if($num_steps==0) $num_steps=1;
+    if($num_cg==0) $num_cg=1;
+    if($num_alpha==0) $num_alpha=1;
     $table2 .= sprintf("%2d & %6.1f & %6d & %6.1f & %6d & %6d & %6.1f & %6d & %10d & %#8.3g & %#8.3g \\\\\n", $i, $time,
                           $num_newton, $num_newton/$num_steps, $max_newton,
                           $tot_cg_iter, $tot_cg_iter/$num_cg, $max_cg,
