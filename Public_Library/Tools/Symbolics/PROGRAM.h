@@ -8,43 +8,15 @@
 #define __PROGRAM__
 
 #include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Symbolics/CODE_BLOCK.h>
+#include <Tools/Symbolics/CODE_BLOCK_NODE.h>
+#include <Tools/Symbolics/INSTRUCTION.h>
+#include <Tools/Symbolics/PROGRAM_CONTEXT.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <map>
 #include <string>
 namespace PhysBAM{
-
-enum op_type {
-    op_nop,op_copy,op_add,op_sub,op_mul,op_div,op_neg,op_inv,
-    op_sqrt,op_exp,op_ln,op_pow,
-    op_lt,op_le,op_gt,op_ge,op_eq,op_ne,op_not,op_or,op_and,
-    op_br_z,op_br_nz,op_jmp,op_label,op_phi,
-    op_last
-};
-
-const int mem_shift=28;
-const int mem_mask=0xF0000000;
-const int mem_reg=0x00000000;
-const int mem_const=0x10000000;
-const int mem_in=0x20000000;
-const int mem_out=0x30000000;
-
-struct INSTRUCTION
-{
-    op_type type;
-    int dest,src0,src1;
-};
-
-template<class T>
-struct CODE_BLOCK
-{
-    CODE_BLOCK *prev[2],*next[2];
-    ARRAY<INSTRUCTION> code;
-    HASHTABLE<int> in,out;
-    int id;
-
-    CODE_BLOCK(){prev[0]=0;prev[1]=0;next[0]=0;next[1]=0;}
-};
 
 enum parse_prec {
     prec_lo,prec_nest,prec_assign,prec_cond,prec_or,prec_and,
@@ -61,13 +33,19 @@ struct OP_PARSE_INFO
     OP_PARSE_INFO(op_type op,parse_prec prec,int flags): op(op),prec(prec),flags(flags) {}
     OP_PARSE_INFO(char ch): op((op_type)ch),prec(prec_nest),flags(0) {}
 };
-std::ostream& operator<<(std::ostream& o,const OP_PARSE_INFO& opi) {return o<<"("<<opi.op<<" "<<opi.prec<<" "<<opi.flags<<")";}
+inline std::ostream& operator<<(std::ostream& o,const OP_PARSE_INFO& opi) {return o<<"("<<opi.op<<" "<<opi.prec<<" "<<opi.flags<<")";}
+
+template<class T>
+struct DISTRIBUTE_HELPER
+{
+    T coeff;
+    ARRAY<int> product;
+};
 
 /*
   constants(0)=0
   constants(1)=1
  */
-template<class T> struct PROGRAM_CONTEXT;
 template<class T>
 struct PROGRAM
 {
@@ -77,14 +55,14 @@ struct PROGRAM
     int last_block;
     ARRAY<T> constants;
     std::map<T,int> constant_lookup;
-    ARRAY<CODE_BLOCK<T>*> code_blocks;
+    ARRAY<CODE_BLOCK*> code_blocks;
     ARRAY<INSTRUCTION> flat_code;
     ARRAY<std::string> var_in,var_out;
     HASHTABLE<std::string,int> dict;
     bool finalized;
-    VECTOR<ARRAY<VECTOR<int,2> >,4> defs;
-    VECTOR<ARRAY<HASHTABLE<VECTOR<int,2> > >,4> uses;
-    bool def_use_stale;
+    VECTOR<ARRAY<CODE_BLOCK_NODE*>,4> defs;
+    VECTOR<ARRAY<HASHTABLE<CODE_BLOCK_NODE*> >,4> uses;
+    bool debug;
 
     struct VARIABLE_STATE
     {
@@ -93,7 +71,7 @@ struct PROGRAM
     };
 
     PROGRAM()
-        :extra_out(0),num_tmp(0),num_labels(0),last_block(0),finalized(false),def_use_stale(true)
+        :extra_out(0),num_tmp(0),num_labels(0),last_block(0),finalized(false),debug(false)
     {
     }
     void Execute(ARRAY<T>& reg) const;
@@ -105,63 +83,63 @@ struct PROGRAM
     int Diff(int diff_expr,int diff_var);
     void Parse(const char* str,bool keep_all_vars=false);
     void Print() const;
+    void Print(const INSTRUCTION& I) const;
     void Print(const ARRAY<INSTRUCTION>& code) const;
+    void Print(const CODE_BLOCK* B) const;
     void Optimize();
     int Add_Constant(T x);
     void Finalize();
 
-    VECTOR<int,2> Get_Def(int var) const {return defs(var>>mem_shift)(var&~mem_mask);}
-    void Set_Def(int var,const VECTOR<int,2>& def) {defs(var>>mem_shift)(var&~mem_mask)=def;}
-    const HASHTABLE<VECTOR<int,2> >& Get_Uses(int var) const {return uses(var>>mem_shift)(var&~mem_mask);}
-    HASHTABLE<VECTOR<int,2> >& Get_Uses(int var) {return uses(var>>mem_shift)(var&~mem_mask);}
-    void Add_Use(int var,const VECTOR<int,2>& use) {uses(var>>mem_shift)(var&~mem_mask).Set(use);}
-    const HASHTABLE<VECTOR<int,2> >& Get_Uses(const VECTOR<int,2>& I) const {return Get_Uses(Get_Instruction(I).dest);}
-    INSTRUCTION& Get_Instruction(const VECTOR<int,2>& I) {return code_blocks(I.x)->code(I.y);}
-    const INSTRUCTION& Get_Instruction(const VECTOR<int,2>& I) const {return code_blocks(I.x)->code(I.y);}
+    CODE_BLOCK_NODE* Get_Def(int var) const {return defs(var>>mem_shift)(var&~mem_mask);}
+    void Set_Def(int var,CODE_BLOCK_NODE* def) {defs(var>>mem_shift)(var&~mem_mask)=def;}
+    const HASHTABLE<CODE_BLOCK_NODE*>& Get_Uses(int var) const {return uses(var>>mem_shift)(var&~mem_mask);}
+    HASHTABLE<CODE_BLOCK_NODE*>& Get_Uses(int var) {return uses(var>>mem_shift)(var&~mem_mask);}
+    const HASHTABLE<CODE_BLOCK_NODE*>& Get_Uses(const CODE_BLOCK_NODE* N) const {return Get_Uses(N->inst.dest);}
+    void Remove_Use_Def(CODE_BLOCK_NODE* N);
+    void Add_Use_Def(CODE_BLOCK_NODE* N);
+    void Delete_Instruction(CODE_BLOCK_NODE* N);
 
 protected:
     void Parse_Command(const char* str);
-    void Pop_Op_Stack(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack);
-    void Unwind_Match(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,char match);
-    void Unwind_To_Prec(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,int prec);
-    void Unwind_Op_Stack(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack);
-    bool Try_Operator(ARRAY<CODE_BLOCK<T>*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,bool& num_ok,const std::string& str);
+    void Pop_Op_Stack(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack);
+    void Unwind_Match(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,char match);
+    void Unwind_To_Prec(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,int prec);
+    void Unwind_Op_Stack(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack);
+    bool Try_Operator(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,bool& num_ok,const std::string& str);
     void Make_SSA();
     void Make_SSA_Relabel(int& count,ARRAY<ARRAY<int> >& S,HASHTABLE<int>& V_used,const ARRAY<ARRAY<int> >& idom_tree_children,int bl);
     void Leave_SSA();
-    void Compute_In_Out(CODE_BLOCK<T>* block);
+    void Compute_In_Out(CODE_BLOCK* block);
     void Compute_In_Out();
     void Relabel_Registers(ARRAY<int>& var_map);
     void Update_Use_Def();
     void Copy_Propagation();
     void Simplify_Phis();
     void Sparse_Conditional_Constant_Propagation();
-    void SCCP_Visit_Instruction(const VECTOR<int,2>& I,VECTOR<ARRAY<VARIABLE_STATE>,4>& variable_state,
-        ARRAY<CODE_BLOCK<T>*>& block_worklist,ARRAY<VECTOR<int,2> >& op_worklist,ARRAY<bool>& block_exec);
+    void SCCP_Visit_Instruction(CODE_BLOCK_NODE* N,VECTOR<ARRAY<VARIABLE_STATE>,4>& variable_state,
+        ARRAY<CODE_BLOCK*>& block_worklist,ARRAY<CODE_BLOCK_NODE*>& op_worklist,ARRAY<bool>& block_exec);
     void Remove_Dead_Code();
-    void Detach_Next(CODE_BLOCK<T>* B,int j);
+    void Detach_Next(CODE_BLOCK* B,int j);
     void Propagate_Copy(int old_var,int new_var);
-    void Local_Common_Expresssion_Elimination(CODE_BLOCK<T>* B);
+    void Local_Common_Expresssion_Elimination(CODE_BLOCK* B);
     void Local_Common_Expresssion_Elimination();
-    void Reduce_In_Place(INSTRUCTION& o);
+    void Local_Arithmatic_Optimizations();
+    void Reduce_In_Place(CODE_BLOCK_NODE* N);
     void Compress_Registers();
     void Eliminate_Unused_Register(int var);
     void Eliminate_Unused_Constant(int var);
+    CODE_BLOCK_NODE* Add_Raw_Instruction_To_Block_After(CODE_BLOCK* B,CODE_BLOCK_NODE* N,op_type type,int dest,int src0,int src1);
+    CODE_BLOCK_NODE* Add_Raw_Instruction_To_Block_Before(CODE_BLOCK* B,CODE_BLOCK_NODE* N,op_type type,int dest,int src0,int src1);
+    void Propagate_Copy_And_Remove_Instruction(CODE_BLOCK_NODE* N);
+    void Simplify_With_Distributive_Law_Helper_Prod(int var,ARRAY<CODE_BLOCK_NODE*>& extra_nodes,DISTRIBUTE_HELPER<T>& prod);
+    void Simplify_With_Distributive_Law_Helper(int var,T coeff,ARRAY<CODE_BLOCK_NODE*>& extra_nodes,ARRAY<DISTRIBUTE_HELPER<T> >& summands);
+    int Simplify_With_Distributive_Law_Emit_Prod(DISTRIBUTE_HELPER<T>& prod,CODE_BLOCK_NODE* before,bool& need_neg);
+    int Simplify_With_Distributive_Law_Emit_Simple(ARRAY<DISTRIBUTE_HELPER<T> >& summands,CODE_BLOCK_NODE* before,bool& need_neg);
+    int Simplify_With_Distributive_Law_Emit_Consts(ARRAY<DISTRIBUTE_HELPER<T> >& summands,CODE_BLOCK_NODE* before,bool& need_neg);
+    int Simplify_With_Distributive_Law_Emit(ARRAY<DISTRIBUTE_HELPER<T> >& summands,CODE_BLOCK_NODE* before,bool& need_neg);
+    CODE_BLOCK_NODE* Simplify_With_Distributive_Law(CODE_BLOCK_NODE* N);
+    void Simplify_With_Distributive_Law();
+    void Change_Instruction(CODE_BLOCK_NODE* N,op_type type,int dest,int src0,int src1);
 };
-template<class T>
-struct PROGRAM_CONTEXT
-{
-    ARRAY<T> reg;
-    ARRAY_VIEW<T> data_in,data_out;
-
-    PROGRAM_CONTEXT(const PROGRAM<T>& prog)
-        :reg(prog.num_tmp+prog.var_in.m+prog.var_out.m+prog.extra_out+prog.constants.m),
-        data_in(reg.Array_View(prog.num_tmp,prog.var_in.m)),
-        data_out(reg.Array_View(prog.num_tmp+prog.var_in.m,prog.var_out.m+prog.extra_out))
-    {
-        reg.Array_View(prog.num_tmp+prog.var_in.m+prog.var_out.m+prog.extra_out,prog.constants.m)=prog.constants;
-    }
-};
-
 }
 #endif
