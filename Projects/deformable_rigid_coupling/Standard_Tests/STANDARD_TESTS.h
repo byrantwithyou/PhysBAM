@@ -248,11 +248,11 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     if(test_number==8){
         T desired_x=(T)two_pi/16;
         ROTATION<TV> desired_rotation=ROTATION<TV>(desired_x*sin(4*time),TV(0,1,0));
-        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.Num_Joints();i++){JOINT<TV>& joint=*arb.joint_mesh.Joints(i);
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(desired_rotation);}}
     if(test_number==14){
         T sim_time=max((T)0,time-start_time);
-        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.Num_Joints();i++){JOINT<TV>& joint=*arb.joint_mesh.Joints(i);
             TV previous=Sidewinding_Position(sim_time,(i-1)*joint_separation);
             TV current=Sidewinding_Position(sim_time,i*joint_separation);
             TV next=Sidewinding_Position(sim_time,(i+1)*joint_separation);
@@ -263,7 +263,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(joint_frame);}}
     if(test_number==16 || test_number==19){
         T sim_time=max((T)0,time-start_time);
-        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.Num_Joints();i++){JOINT<TV>& joint=*arb.joint_mesh.Joints(i);
             ROTATION<TV> previous_orientation;
             ROTATION<TV> next_orientation(sin((T)two_pi*sim_time/period),TV(0,1,0));
             ROTATION<TV> joint_frame=joint.frame_jp.r*initial_orientation.Inverse()*previous_orientation.Inverse()*next_orientation*initial_orientation*joint.frame_cj.r;
@@ -271,7 +271,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(joint_frame);}}
     if(test_number==17 || test_number==18){
         T sim_time=max((T)0,time-start_time);
-        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.Num_Joints();i++){JOINT<TV>& joint=*arb.joint_mesh.Joints(i);
             int maggot=(i+1)/2;
             ROTATION<TV> previous_orientation;
             ROTATION<TV> next_orientation(sin((T)two_pi*sim_time/periods(maggot)+phases(maggot)),TV(0,1,0));

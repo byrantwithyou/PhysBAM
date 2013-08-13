@@ -21,11 +21,19 @@ class JOINT_MESH
     typedef typename TV::SCALAR T;
     DYNAMIC_LIST<JOINT<TV>,JOINT_ID> dynamic_list;
 public:
-    const ARRAY<JOINT<TV>*>& joints; // reference to array for traditional naming
     UNDIRECTED_GRAPH<int,JOINT_ID> undirected_graph;
 
     JOINT_MESH();
     ~JOINT_MESH();
+
+    JOINT<TV>* Joints(int index)
+    {return (JOINT<TV>*)dynamic_list.core.array(index);}
+
+    const JOINT<TV>* Joints(int index) const
+    {return (JOINT<TV>*)dynamic_list.core.array(index);}
+
+    int Num_Joints() const
+    {return dynamic_list.core.array.m;}
 
     void Add_Articulation(const int parent_id,const int child_id,JOINT<TV>* joint)
     {undirected_graph.Add_Edge(parent_id,child_id,Add_Joint(joint));}
@@ -83,9 +91,6 @@ public:
 
     void Remove_Joint(JOINT_ID joint_id)
     {dynamic_list.Remove_Element(joint_id);}
-
-    const ARRAY<JOINT_ID>& Active_Elements() const
-    {return dynamic_list.Active_Elements();}
 
 //#####################################################################
     JOINT_ID Add_Joint(JOINT<TV>* new_joint_input);

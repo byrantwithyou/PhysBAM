@@ -179,8 +179,8 @@ Update_From_Edge_In_Breadth_First_Directed_Graph(const int root,const JOINT_ID e
 template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Update_Joint_Frames()
 {
-    for(int i=0;i<joint_mesh.joints.m;i++){
-        JOINT<TV>& joint=*joint_mesh.joints(i);
+    for(int i=0;i<joint_mesh.Num_Joints();i++){
+        JOINT<TV>& joint=*joint_mesh.Joints(i);
         joint.Set_Joint_Frame(joint.Compute_Current_Joint_Frame(*Parent(joint.id_number),*Child(joint.id_number)),false);}
 }
 //#####################################################################
@@ -419,8 +419,8 @@ Initialize_Poststabilization_Projection()
     if(!use_poststab_in_cg) return;
     v_to_lambda.Remove_All();lambda_to_delta_v.Remove_All();
     v_to_lambda.Resize(joint_mesh.Size());lambda_to_delta_v.Resize(joint_mesh.Size());
-    for(int i=0;i<joint_mesh.joints.m;i++){
-        JOINT<TV>& joint=*joint_mesh.joints(i);JOINT_ID joint_id=joint.id_number;RIGID_BODY<TV>* rigid_bodies[]={Parent(joint_id),Child(joint_id)};
+    for(int i=0;i<joint_mesh.Num_Joints();i++){
+        JOINT<TV>& joint=*joint_mesh.Joints(i);JOINT_ID joint_id=joint.id_number;RIGID_BODY<TV>* rigid_bodies[]={Parent(joint_id),Child(joint_id)};
         if(rigid_bodies[0]->Has_Infinite_Inertia() && rigid_bodies[1]->Has_Infinite_Inertia()){
             lambda_to_delta_v(joint_id).Resize(2*(s+d),0);v_to_lambda(joint_id).Resize(0,2*(s+d));continue;}
 
@@ -466,7 +466,7 @@ Generate_Process_List_Using_Contact_Graph(const RIGID_BODY_CONTACT_GRAPH<TV>& co
 {
     process_list.Exact_Resize(contact_graph.Number_Of_Levels());
     for(int level=0;level<process_list.m;level++) process_list(level).Remove_All();
-    for(int joint=0;joint<joint_mesh.joints.m;joint++){JOINT_ID joint_id=joint_mesh.joints(joint)->id_number;
+    for(int joint=0;joint<joint_mesh.Num_Joints();joint++){JOINT_ID joint_id=joint_mesh.Joints(joint)->id_number;
         const int parent_id=Parent_Id(joint_id),child_id=Child_Id(joint_id);
         const int level_of_joint=max(contact_graph.directed_graph.Level_Of_Node(parent_id),contact_graph.directed_graph.Level_Of_Node(child_id));
         process_list(level_of_joint).Append(joint_id);}
@@ -484,7 +484,7 @@ Apply_Poststabilization(bool test_system,bool print_matrix,const bool target_pd,
         Apply_Poststabilization_With_CG(0,false,test_system,print_matrix);
         return;}
 
-    for(int k=0;k<poststabilization_iterations;k++) for(int i=0;i<joint_mesh.joints.m;i++){JOINT<TV>& joint=*joint_mesh.joints(i);
+    for(int k=0;k<poststabilization_iterations;k++) for(int i=0;i<joint_mesh.Num_Joints();i++){JOINT<TV>& joint=*joint_mesh.Joints(i);
         if((angular_damping_only && !joint.angular_damping) || (skip_global_post_stabilized_joints && joint.global_post_stabilization)) continue;
         Apply_Poststabilization_To_Joint(joint.id_number,target_pd);}
 }
@@ -517,7 +517,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame)
 template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame)
 {
-    if(joint_mesh.joints.m>0 && !(check_stale && !is_stale)){
+    if(joint_mesh.Num_Joints()>0 && !(check_stale && !is_stale)){
         if(check_stale){
             if(!frame_list) frame_list=new ARRAY<int>;frame_list->Append(frame);
             FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/common/arb_state_list",directory.c_str()),*frame_list);

@@ -51,15 +51,15 @@ Compute_Position_Based_State(const T dt,const T time)
 
     // build global poststabilization matrix
     ARRAY<ARRAY<PAIR<int,bool> >,int> joints_on_rigid_body(rigid_body_collection.rigid_body_particles.Size()); // stores joint id and whether it's parent for joint.
-    ARRAY<TV> joint_location(joint_mesh.joints.m);
-    ARRAY<MATRIX_MXN<T> > joint_constraint_matrix(joint_mesh.joints.m),joint_muscle_control_matrix(joint_mesh.joints.m);
-    joint_constrained_dimensions.Resize(joint_mesh.joints.m);joint_constrained_dimensions.Fill(0);
-    joint_muscle_control_dimensions.Resize(joint_mesh.joints.m);joint_muscle_control_dimensions.Fill(0);
-    joint_angular_constraint_matrix.Resize(joint_mesh.joints.m); // angular directions constrained by joint or PD
-    joint_angular_muscle_control_matrix.Resize(joint_mesh.joints.m); // angular directions which are unconstrained (free for muscle to try to control)
+    ARRAY<TV> joint_location(joint_mesh.Num_Joints());
+    ARRAY<MATRIX_MXN<T> > joint_constraint_matrix(joint_mesh.Num_Joints()),joint_muscle_control_matrix(joint_mesh.Num_Joints());
+    joint_constrained_dimensions.Resize(joint_mesh.Num_Joints());joint_constrained_dimensions.Fill(0);
+    joint_muscle_control_dimensions.Resize(joint_mesh.Num_Joints());joint_muscle_control_dimensions.Fill(0);
+    joint_angular_constraint_matrix.Resize(joint_mesh.Num_Joints()); // angular directions constrained by joint or PD
+    joint_angular_muscle_control_matrix.Resize(joint_mesh.Num_Joints()); // angular directions which are unconstrained (free for muscle to try to control)
 
-    for(int i=0;i<joint_mesh.joints.m;i++){
-        JOINT<TV>& joint=*joint_mesh.joints(i);RIGID_BODY<TV>& parent=*Parent(joint.id_number),&child=*Child(joint.id_number);
+    for(int i=0;i<joint_mesh.Num_Joints();i++){
+        JOINT<TV>& joint=*joint_mesh.Joints(i);RIGID_BODY<TV>& parent=*Parent(joint.id_number),&child=*Child(joint.id_number);
         if(parent.Has_Infinite_Inertia() && child.Has_Infinite_Inertia()) continue;
         joints_on_rigid_body(Parent_Id(joint.id_number)).Append(PAIR<int,bool>(i,true));
         joints_on_rigid_body(Child_Id(joint.id_number)).Append(PAIR<int,bool>(i,false));
@@ -89,15 +89,15 @@ Compute_Position_Based_State(const T dt,const T time)
             joint_muscle_control_matrix(i)=MATRIX_MXN<T>(6,joint_muscle_control_dimensions(i));
             joint_muscle_control_matrix(i).Set_Submatrix(3,0,joint_angular_muscle_control_matrix(i));}}
 
-    joint_offset_in_post_stabilization_matrix.Resize(joint_mesh.joints.m);
-    for(int i=0;i<joint_mesh.joints.m;i++) joint_offset_in_post_stabilization_matrix(i)=(i==0)?0:joint_offset_in_post_stabilization_matrix(i-1)+joint_constrained_dimensions(i-1);
+    joint_offset_in_post_stabilization_matrix.Resize(joint_mesh.Num_Joints());
+    for(int i=0;i<joint_mesh.Num_Joints();i++) joint_offset_in_post_stabilization_matrix(i)=(i==0)?0:joint_offset_in_post_stabilization_matrix(i-1)+joint_constrained_dimensions(i-1);
     int total_constrained_dimensions=joint_constrained_dimensions.Sum();
     global_post_stabilization_matrix_11=MATRIX_MXN<T>(total_constrained_dimensions,total_constrained_dimensions);
     LOG::cout<<"*** Total constrained dimensions "<<total_constrained_dimensions<<std::endl;
 
     if(use_muscle_actuators){
-        joint_offset_in_muscle_control_matrix.Resize(joint_mesh.joints.m);
-        for(int i=0;i<joint_mesh.joints.m;i++) joint_offset_in_muscle_control_matrix(i)=(i==0)?0:joint_offset_in_muscle_control_matrix(i-1)+joint_muscle_control_dimensions(i-1);
+        joint_offset_in_muscle_control_matrix.Resize(joint_mesh.Num_Joints());
+        for(int i=0;i<joint_mesh.Num_Joints();i++) joint_offset_in_muscle_control_matrix(i)=(i==0)?0:joint_offset_in_muscle_control_matrix(i-1)+joint_muscle_control_dimensions(i-1);
         int total_muscle_control_dimensions=joint_muscle_control_dimensions.Sum();assert(total_muscle_control_dimensions);
         global_post_stabilization_matrix_12=MATRIX_MXN<T>(total_constrained_dimensions,muscle_list->muscles.m);
         global_post_stabilization_matrix_21=MATRIX_MXN<T>(total_muscle_control_dimensions,total_constrained_dimensions);
@@ -112,8 +112,8 @@ Compute_Position_Based_State(const T dt,const T time)
 
             // joints that won't take part in global post stabilization are skipped
             // we currently assume that a connected component must either be all in or all out of global post stabilization but not mixed
-            if(!joint_mesh.joints(joint_index_1)->global_post_stabilization || !joint_mesh.joints(joint_index_2)->global_post_stabilization){
-                //assert(!joint_mesh.joints(joint_index_1)->global_post_stabilization && !joint_mesh.joints(joint_index_2)->global_post_stabilization);
+            if(!joint_mesh.Joints(joint_index_1)->global_post_stabilization || !joint_mesh.Joints(joint_index_2)->global_post_stabilization){
+                //assert(!joint_mesh.Joints(joint_index_1)->global_post_stabilization && !joint_mesh.Joints(joint_index_2)->global_post_stabilization);
                 continue;}
 
             // compute 6x6 matrix assuming impulse applied at r2 and measured at r1
@@ -145,8 +145,8 @@ Compute_Position_Based_State(const T dt,const T time)
     if(use_muscle_actuators){
         if(!muscle_list) new MUSCLE_LIST<TV>(rigid_body_collection);
         muscle_list->Initialize_Muscle_Attachments_On_Rigid_Body();
-        for(int i=0;i<joint_mesh.joints.m;i++) if(joint_mesh.joints(i)->global_post_stabilization){
-            int parent_id=Parent_Id(joint_mesh.joints(i)->id_number),child_id=Child_Id(joint_mesh.joints(i)->id_number);
+        for(int i=0;i<joint_mesh.Num_Joints();i++) if(joint_mesh.Joints(i)->global_post_stabilization){
+            int parent_id=Parent_Id(joint_mesh.Joints(i)->id_number),child_id=Child_Id(joint_mesh.Joints(i)->id_number);
             // joint should not have any muscle control dimensions if both bodies have infinite inertia
             assert(!rigid_body_collection.Rigid_Body(parent_id).Has_Infinite_Inertia() || !rigid_body_collection.Rigid_Body(child_id).Has_Infinite_Inertia());
             int body_indices[]={parent_id,child_id};
@@ -437,9 +437,9 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
         // build constrained and muscle controlled delta relative joint velocities (also get joint locations)
         ARRAY<T> constrained_delta_relative_joint_velocities(global_post_stabilization_matrix_11.n),joint_constraint_impulses,muscle_controlled_delta_relative_joint_velocities;
         if(use_muscle_actuators){muscle_activations.Resize(muscle_list->muscles.m);muscle_controlled_delta_relative_joint_velocities.Resize(global_post_stabilization_matrix_21.m);}
-        ARRAY<TV> joint_locations(joint_mesh.joints.m);
-        for(int i=0;i<joint_mesh.joints.m;i++) if(joint_constrained_dimensions(i) || joint_muscle_control_dimensions(i)){
-            TWIST<TV> delta_relative_twist;Delta_Relative_Twist(joint_mesh.joints(i)->id_number,true,joint_locations(i),delta_relative_twist);
+        ARRAY<TV> joint_locations(joint_mesh.Num_Joints());
+        for(int i=0;i<joint_mesh.Num_Joints();i++) if(joint_constrained_dimensions(i) || joint_muscle_control_dimensions(i)){
+            TWIST<TV> delta_relative_twist;Delta_Relative_Twist(joint_mesh.Joints(i)->id_number,true,joint_locations(i),delta_relative_twist);
             if(joint_constrained_dimensions(i)){
                 assert(joint_constrained_dimensions(i)>=3); // assume unconstrained linear directions, constrained angular directions
                 int istart=joint_offset_in_post_stabilization_matrix(i);
@@ -473,23 +473,23 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
             joint_constraint_impulses=global_post_stabilization_matrix_11_inverse*(constrained_delta_relative_joint_velocities-global_post_stabilization_matrix_12*muscle_impulse_magnitudes);}
 
         // apply poststabilization impulses
-        for(int i=0;i<joint_mesh.joints.m;i++) if(joint_constrained_dimensions(i)){
+        for(int i=0;i<joint_mesh.Num_Joints();i++) if(joint_constrained_dimensions(i)){
             assert(joint_constrained_dimensions(i)>=3); // unconstrained linear directions, constrained angular directions
             int istart=joint_offset_in_post_stabilization_matrix(i);
             TV impulse(joint_constraint_impulses.Array_View(istart,(int)TV::m));
             TV angular_impulse;for(int ii=0;ii<joint_constrained_dimensions(i)-3;ii++){
                 TV u;joint_angular_constraint_matrix(i).Get_Column(ii,u);angular_impulse+=joint_constraint_impulses(istart+ii+2)*u;}
-            RIGID_BODY<TV>::Apply_Impulse(*Parent(joint_mesh.joints(i)->id_number),*Child(joint_mesh.joints(i)->id_number),joint_locations(i),impulse,angular_impulse);}}
+            RIGID_BODY<TV>::Apply_Impulse(*Parent(joint_mesh.Joints(i)->id_number),*Child(joint_mesh.Joints(i)->id_number),joint_locations(i),impulse,angular_impulse);}}
 
     // the second flag will cause poststabilization to be applied to joints not processed by global post stabilization
     Apply_Poststabilization(use_pd_actuators,global_post_stabilization);
 
     if(use_angular_damping){
         // precompute damped stuff
-        precomputed_desired_damped_angular_velocities.Resize(joint_mesh.joints.m);
+        precomputed_desired_damped_angular_velocities.Resize(joint_mesh.Num_Joints());
         int njoints=0;
-        for(int i=0;i<joint_mesh.joints.m;i++) if(joint_mesh.joints(i)->angular_damping){
-            njoints++;JOINT<TV>& joint=*joint_mesh.joints(i);RIGID_BODY<TV> &parent=*Parent(joint.id_number),&child=*Child(joint.id_number);
+        for(int i=0;i<joint_mesh.Num_Joints();i++) if(joint_mesh.Joints(i)->angular_damping){
+            njoints++;JOINT<TV>& joint=*joint_mesh.Joints(i);RIGID_BODY<TV> &parent=*Parent(joint.id_number),&child=*Child(joint.id_number);
             parent.Update_Angular_Velocity();child.Update_Angular_Velocity();
             precomputed_desired_damped_angular_velocities(i)=(std::exp(-joint.angular_damping*dt)-1)*RIGID_BODY<TV>::Relative_Angular_Velocity(parent,child);}
             LOG::cout<<"Angular damping of "<<njoints<<" joints"<<std::endl;
@@ -510,12 +510,12 @@ Create_Joint_Function(const JOINT_ID joint_id)
 template<class T> void ARTICULATED_RIGID_BODY<VECTOR<T,3> >::
 Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
 {
-    if(joint_mesh.joints.m==0) return;
+    if(joint_mesh.Num_Joints()==0) return;
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(STRING_UTILITIES::string_sprintf("%s/%d/arb_info",output_directory.c_str(),frame));
     TYPED_OSTREAM typed_output(*output,stream_type);
-    Write_Binary(typed_output,joint_mesh.joints.m*2);
-    for(int i=0;i<joint_mesh.joints.m;i++){
-        JOINT<TV>& joint=*joint_mesh.joints(i);
+    Write_Binary(typed_output,joint_mesh.Num_Joints()*2);
+    for(int i=0;i<joint_mesh.Num_Joints();i++){
+        JOINT<TV>& joint=*joint_mesh.Joints(i);
         const RIGID_BODY<TV> &parent=*Parent(joint.id_number),&child=*Child(joint.id_number);
         TV ap1=parent.World_Space_Point(joint.F_pj().t),ap2=child.World_Space_Point(joint.F_cj().t);
         Write_Binary(typed_output,ap1,parent.Frame()*joint.F_pj(),ap2,child.Frame()*joint.F_pj());}

@@ -722,7 +722,7 @@ void Test_System_Poststabilization()
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
     arb.Initialize_Poststabilization_Projection();
 
-    for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT_ID joint_id=arb.joint_mesh.joints(i)->id_number;
+    for(int i=0;i<arb.joint_mesh.Num_Joints();i++){JOINT_ID joint_id=arb.joint_mesh.Joints(i)->id_number;
         // check that the projection matrices are projections
         LOG::cout<<"--------------- JOINT = "<<joint_id<<"---------------"<<std::endl;
         MATRIX_MXN<T> P=-arb.lambda_to_delta_v(joint_id)*arb.v_to_lambda(joint_id)+1;

@@ -485,7 +485,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
         T desired_x=(T)two_pi/16;
         ROTATION<TV> desired_rotation=ROTATION<TV>(desired_x*sin(4*time),TV(0,1,0));
-        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.Num_Joints();i++){JOINT<TV>& joint=*arb.joint_mesh.Joints(i);
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(desired_rotation);}}
 }
 //#####################################################################

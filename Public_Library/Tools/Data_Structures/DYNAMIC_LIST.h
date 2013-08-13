@@ -104,12 +104,6 @@ public:
     ID2 Number_Of_Active_Elements() const
     {return ID2(core.array.Size());}
 
-    const ARRAY<ID,ID2>& Active_Elements() const
-    {return reinterpret_cast<const ARRAY<ID,ID2>&>(core.index_to_id_map);}
-
-    const ARRAY<T*,ID2>& Active_List()
-    {return reinterpret_cast<const ARRAY<T*,ID2>&>(core.array);}
-
     void Clean_Memory()
     {core.Clean_Memory();}
 

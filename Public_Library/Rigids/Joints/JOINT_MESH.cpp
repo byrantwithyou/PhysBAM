@@ -20,7 +20,6 @@ enum JOINT_TYPE {POINT_JOINT_TYPE=1,RIGID_JOINT_TYPE,TYPE_ANGLE_JOINT,PRISMATIC_
 //#####################################################################
 template<class TV> JOINT_MESH<TV>::
 JOINT_MESH()
-    :joints(dynamic_list.Active_List())
 {}
 //#####################################################################
 // Destructor
@@ -47,17 +46,17 @@ Read(TYPED_ISTREAM& input,const std::string& directory,const int frame) // assum
     ARRAY<JOINT_ID> needs_init;
     if(!input.type.use_doubles) dynamic_list.template Read<float>(prefix,needs_init);
     else dynamic_list.template Read<double>(prefix,needs_init);
-    for(int i=0;i<joints.m;i++){JOINT_TYPE joint_type;Read_Binary(input,joint_type);
-        delete joints(i);
-        ARRAY<JOINT<TV>*>& nonconst_joints=const_cast<ARRAY<JOINT<TV>*>&>(joints);        
+    for(int i=0;i<dynamic_list.core.array.m;i++){JOINT_TYPE joint_type;Read_Binary(input,joint_type);
+        void*& joint_ptr=dynamic_list.core.array(i);
+        delete (JOINT<TV>*)joint_ptr;
         switch(joint_type){
-            case POINT_JOINT_TYPE: nonconst_joints(i)=new POINT_JOINT<TV>();break;
-            case RIGID_JOINT_TYPE: nonconst_joints(i)=new RIGID_JOINT<TV>();break;
-            case TYPE_ANGLE_JOINT: nonconst_joints(i)=new ANGLE_JOINT<TV>();break;
-            case PRISMATIC_TWIST_JOINT_TYPE: nonconst_joints(i)=new PRISMATIC_TWIST_JOINT<TV>();break;
-            case NORMAL_JOINT_TYPE: nonconst_joints(i)=new NORMAL_JOINT<TV>();break;
+            case POINT_JOINT_TYPE: joint_ptr=new POINT_JOINT<TV>();break;
+            case RIGID_JOINT_TYPE: joint_ptr=new RIGID_JOINT<TV>();break;
+            case TYPE_ANGLE_JOINT: joint_ptr=new ANGLE_JOINT<TV>();break;
+            case PRISMATIC_TWIST_JOINT_TYPE: joint_ptr=new PRISMATIC_TWIST_JOINT<TV>();break;
+            case NORMAL_JOINT_TYPE: joint_ptr=new NORMAL_JOINT<TV>();break;
             default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Invalid joint type %d",joint_type));}
-        Read_Binary(input,*joints(i));}
+        Read_Binary(input,*(JOINT<TV>*)joint_ptr);}
     Read_Binary(input,undirected_graph);
 }
 //#####################################################################
@@ -70,16 +69,16 @@ Write(TYPED_OSTREAM& output,const std::string& directory,const int frame) const
     if(!output.type.use_doubles)
         dynamic_list.template Write<float>(prefix);
     else dynamic_list.template Write<double>(prefix);
-    for(int i=0;i<joints.m;i++){
+    for(int i=0;i<Num_Joints();i++){
         JOINT_TYPE joint_type;
-        const std::type_info& type=typeid(*joints(i));
+        const std::type_info& type=typeid(*Joints(i));
         if(type==typeid(POINT_JOINT<TV>)) joint_type=POINT_JOINT_TYPE;
         else if(type==typeid(RIGID_JOINT<TV>)) joint_type=RIGID_JOINT_TYPE;
         else if(type==typeid(ANGLE_JOINT<TV>)) joint_type=TYPE_ANGLE_JOINT;
         else if(type==typeid(PRISMATIC_TWIST_JOINT<TV>)) joint_type=PRISMATIC_TWIST_JOINT_TYPE;
         else if(type==typeid(NORMAL_JOINT<TV>)) joint_type=NORMAL_JOINT_TYPE;
         else PHYSBAM_NOT_IMPLEMENTED(STRING_UTILITIES::string_sprintf("Don't know how to write out a joint of type %s",type.name()));
-        Write_Binary(output,joint_type,*joints(i));}
+        Write_Binary(output,joint_type,*Joints(i));}
     Write_Binary(output,undirected_graph);
 }
 //#####################################################################

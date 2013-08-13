@@ -842,12 +842,12 @@ Read_Articulated_Information(const std::string& filename)
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 Update_Articulation_Points()
 {
-    int num_points=2*articulated_rigid_body->joint_mesh.joints.m;
+    int num_points=2*articulated_rigid_body->joint_mesh.Num_Joints();
     articulation_points.Exact_Resize(num_points);
     joint_frames.Exact_Resize(num_points);
     for(int i=0;i<num_points;i+=2){
         int index=i/2;
-        JOINT<TV>* joint=articulated_rigid_body->joint_mesh.joints(index);
+        JOINT<TV>* joint=articulated_rigid_body->joint_mesh.Joints(index);
         RIGID_BODY<TV>* parent=articulated_rigid_body->Parent(joint->id_number),*child=articulated_rigid_body->Child(joint->id_number);
         articulation_points(i)=parent->World_Space_Point(joint->F_pj().t);articulation_points(i+1)=child->World_Space_Point(joint->F_cj().t);
         joint_frames(i)=parent->Frame()*joint->F_pj();joint_frames(i+1)=child->Frame()*joint->F_cj();}
@@ -1017,7 +1017,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
     else if(selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_3D){
         OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T> *real_selection=(OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>*)selection;
         int articulation_id=real_selection->joint_id;int joint_index=(articulation_id+1/2);
-        JOINT<TV>& joint=*articulated_rigid_body->joint_mesh.joints(joint_index);JOINT_ID joint_id=joint.id_number;
+        JOINT<TV>& joint=*articulated_rigid_body->joint_mesh.Joints(joint_index);JOINT_ID joint_id=joint.id_number;
         const RIGID_BODY<TV> *parent=articulated_rigid_body->Parent(joint_id),*child=articulated_rigid_body->Child(joint_id);
         output_stream<<"Joint id "<<joint_id<<" ("<<(!joint.name.empty()?joint.name:"UNNAMED")<<")"<<std::endl;
         const char* joint_type_string;
