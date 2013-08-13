@@ -141,8 +141,6 @@ Dynamic_Tests(int size,int count) const
 
     return ok;
 }
-#ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
-MATRIX_TESTS<float> matrix_tests;
-#else
 MATRIX_TESTS<double> matrix_tests;
-#endif
+template bool MATRIX_TESTS<double>::Assert_Equal<MATRIX_MXN<double>,MATRIX_MXN<double> >(MATRIX_MXN<double> const&,MATRIX_MXN<double> const&,double) const;
+template bool MATRIX_TESTS<float>::Assert_Equal<MATRIX_MXN<float>,MATRIX_MXN<float> >(MATRIX_MXN<float> const&,MATRIX_MXN<float> const&,float) const;

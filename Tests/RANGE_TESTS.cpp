@@ -449,9 +449,5 @@ public:
     {return 4;}
 //#####################################################################
 };
-#ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
-static RANGE_TESTS<float> box_tests;
-#else
 static RANGE_TESTS<double> box_tests;
-#endif
 }

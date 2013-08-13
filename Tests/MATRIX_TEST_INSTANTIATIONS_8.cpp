@@ -1,9 +1,5 @@
 #include "MATRIX_TEST_DEFINITIONS.h"
-#ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
-typedef float T;
-#else
 typedef double T;
-#endif
 template bool MATRIX_TESTS<T>::Arbitrary_Test_Two_Sizes<DIAGONAL_MATRIX<T,2>,MATRIX_MXN<T> >(DIAGONAL_MATRIX<T,2>,MATRIX_MXN<T>,int) const;
 template bool MATRIX_TESTS<T>::Arbitrary_Test_Two_Sizes<DIAGONAL_MATRIX<T,3>,MATRIX_MXN<T> >(DIAGONAL_MATRIX<T,3>,MATRIX_MXN<T>,int) const;
 template bool MATRIX_TESTS<T>::Arbitrary_Test_Two_Sizes<MATRIX<T,1,1>,MATRIX_MXN<T> >(MATRIX<T,1,1>,MATRIX_MXN<T>,int) const;
