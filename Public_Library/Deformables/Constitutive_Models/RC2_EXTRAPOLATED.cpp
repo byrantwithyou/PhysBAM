@@ -451,7 +451,7 @@ static void Test_Model_Helper(const char* str,const MATRIX<T,d>& a0, const MATRI
 {
     for(int i=0;i<TV::m;i++){
         TV av=(da1(i)+da0(i))*df/2/e;
-        TV dif=(a1.Transposed().Column(i)-a0.Transposed().Column(i))/e;
+        TV dif=(a1.Row(i)-a0.Row(i))/e;
         char buff[1000];
         sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());
         LOG::cout<<buff;}

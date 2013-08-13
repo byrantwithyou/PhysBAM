@@ -89,6 +89,12 @@ public:
     void Set_Column(const int j,const VECTOR<T,1>& v)
     {assert(j==0);x11=v.x;}
 
+    VECTOR<T,1> Row(const int j) const
+    {assert(j==0);return VECTOR<T,1>(x11);}
+
+    void Set_Row(const int j,const VECTOR<T,1>& v)
+    {assert(j==0);x11=v.x;}
+
     bool operator==(const MATRIX& A) const
     {return x11==A.x11;}
 

@@ -61,6 +61,9 @@ public:
     VECTOR<T,1> Column(const int axis) const
     {assert(axis==0);return VECTOR<T,1>(x11);}
 
+    VECTOR<T,1> Row(const int axis) const
+    {return Column(axis);}
+
     T& operator()(int i,int j)
     {assert(i==0 && j==0);return x11;}
 

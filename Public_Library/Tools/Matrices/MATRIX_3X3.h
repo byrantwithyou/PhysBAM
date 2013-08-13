@@ -99,6 +99,12 @@ public:
     void Set_Column(const int j,const VECTOR<T,3>& v)
     {assert((unsigned)j<3);x[3*j]=v.x;x[3*j+1]=v.y;x[3*j+2]=v.z;}
 
+    VECTOR<T,3> Row(const int j) const
+    {assert((unsigned)j<3);return VECTOR<T,3>(x[j],x[j+3],x[j+6]);}
+
+    void Set_Row(const int j,const VECTOR<T,3>& v)
+    {assert((unsigned)j<3);x[j]=v(0);x[j+3]=v(1);x[j+6]=v(2);}
+
     bool operator==(const MATRIX& A) const
     {for(int i=0;i<9;i++) if(x[i]!=A.x[i]) return false;return true;}
 

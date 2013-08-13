@@ -51,6 +51,9 @@ public:
     VECTOR<T,0> Column(const int axis) const
     {PHYSBAM_FATAL_ERROR();}
 
+    VECTOR<T,0> Row(const int axis) const
+    {PHYSBAM_FATAL_ERROR();}
+
     T& operator()(int i,int j)
     {PHYSBAM_FATAL_ERROR();}
 

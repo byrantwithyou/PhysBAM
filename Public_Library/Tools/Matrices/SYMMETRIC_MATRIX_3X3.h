@@ -87,6 +87,9 @@ public:
     VECTOR<T,3> Column(const int axis) const
     {assert((unsigned)axis<(unsigned)3);return axis==0?VECTOR<T,3>(x11,x21,x31):axis==1?VECTOR<T,3>(x21,x22,x32):VECTOR<T,3>(x31,x32,x33);}
 
+    VECTOR<T,3> Row(const int axis) const
+    {return Column(axis);}
+
     bool operator==(const SYMMETRIC_MATRIX& A) const
     {return x11==A.x11 && x21==A.x21 && x31==A.x31 && x22==A.x22 && x32==A.x32 && x33==A.x33;}
 
