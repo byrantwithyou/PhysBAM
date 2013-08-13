@@ -181,6 +181,23 @@ Set_Color(const TV& color)
     stream<<color.x<<" "<<color.y<<" "<<color.z<<" setrgbcolor"<<std::endl;
 }
 //#####################################################################
+// Function Get_Helper
+//#####################################################################
+static void
+Get_Helper(MATRIX<float,4>& proj,MATRIX<float,4>& model,float* view)
+{
+    glGetFloatv(GL_PROJECTION_MATRIX,(GLfloat*)proj.x);
+    glGetFloatv(GL_MODELVIEW_MATRIX,(GLfloat*)model.x);
+    glGetFloatv(GL_VIEWPORT,(GLfloat*)view);
+}
+static void
+Get_Helper(MATRIX<double,4>& proj,MATRIX<double,4>& model,double* view)
+{
+    glGetDoublev(GL_PROJECTION_MATRIX,(GLdouble*)proj.x);
+    glGetDoublev(GL_MODELVIEW_MATRIX,(GLdouble*)model.x);
+    glGetDoublev(GL_VIEWPORT,(GLdouble*)view);
+}
+//#####################################################################
 // Function Transform_Buffer
 //#####################################################################
 template<class T> void OPENGL_EPS_OUTPUT<T>::
@@ -189,15 +206,7 @@ Transform_Buffer()
 #ifndef USE_OPENGLES
     MATRIX<T,4> proj,model;
     T view[4];
-
-    if(sizeof(T)==sizeof(float)){
-        glGetFloatv(GL_PROJECTION_MATRIX,(GLfloat*)proj.x);
-        glGetFloatv(GL_MODELVIEW_MATRIX,(GLfloat*)model.x);
-        glGetFloatv(GL_VIEWPORT,(GLfloat*)view);}
-    else{
-        glGetDoublev(GL_PROJECTION_MATRIX,(GLdouble*)proj.x);
-        glGetDoublev(GL_MODELVIEW_MATRIX,(GLdouble*)model.x);
-        glGetDoublev(GL_VIEWPORT,(GLdouble*)view);}
+    Get_Helper(proj,model,view);
 
     for(int i=0;i<buffer.m;i++){
         VECTOR<T,4> obj=buffer(i).Append(1);
