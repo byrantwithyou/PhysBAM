@@ -191,6 +191,9 @@ public:
     static SYMMETRIC_MATRIX Outer_Product(const VECTOR<T,0>& u)
     {return SYMMETRIC_MATRIX();}
 
+    static SYMMETRIC_MATRIX Symmetric_Outer_Product(const VECTOR<T,0>& u,const VECTOR<T,0>& v)
+    {return SYMMETRIC_MATRIX();}
+
     static SYMMETRIC_MATRIX Identity_Matrix()
     {return SYMMETRIC_MATRIX();}
 

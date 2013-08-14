@@ -27,6 +27,8 @@ using ::std::exp;
 using ::std::sin;
 using ::std::cos;
 using ::std::abs;
+using ::std::floor;
+using ::std::ceil;
 
 template<class T_ARRAY,class T_INDICES> class INDIRECT_ARRAY;
 

@@ -208,6 +208,9 @@ public:
     static SYMMETRIC_MATRIX Outer_Product(const VECTOR<T,2>& u)
     {return SYMMETRIC_MATRIX(u.x*u.x,u.x*u.y,u.y*u.y);}
 
+    static SYMMETRIC_MATRIX Symmetric_Outer_Product(const VECTOR<T,2>& u,const VECTOR<T,2>& v)
+    {return SYMMETRIC_MATRIX(2*v.x*u.x,v.x*u.y+v.y*u.x,2*v.y*u.y);}
+
     static SYMMETRIC_MATRIX Identity_Matrix()
     {return SYMMETRIC_MATRIX(1,0,1);}
 
