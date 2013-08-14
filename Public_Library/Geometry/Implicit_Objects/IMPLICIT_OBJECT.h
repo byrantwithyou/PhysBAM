@@ -68,6 +68,7 @@ public:
     virtual T_CURVATURES Principal_Curvatures(const TV& X) const;
     virtual T Integration_Step(const T phi) const;
     virtual T Minimum_Cell_Size() const;
+    void Test_Diff(const RANGE<TV>& range,bool test_hess=true) const;
 //#####################################################################
 };
 }

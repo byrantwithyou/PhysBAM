@@ -6,6 +6,7 @@
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
@@ -169,6 +170,29 @@ Boundary(const TV& location,const T thickness_over_two) const
     return !Inside(location,thickness_over_two) && !Outside(location,thickness_over_two);
 }
 //#####################################################################
+// Function Test_Diff
+//#####################################################################
+template<class TV> void IMPLICIT_OBJECT<TV>::
+Test_Diff(const RANGE<TV>& range,bool test_hess) const
+{
+    T e=(T)1e-6;
+    RANDOM_NUMBERS<T> rand;
+    TV X,dX;
+    rand.Fill_Uniform(X,range);
+    rand.Fill_Uniform(dX,-e,e);
+
+    T p0=Signed_Distance(X),p1=Signed_Distance(X+dX);
+    TV n0=Normal(X),n1=Normal(X+dX);
+    T diff_pa=(p1-p0)/e,diff_pb=dX.Dot(n0+n1)/(2*e);
+    LOG::printf("IMPLICIT_OBJECT test pt %P\n", X);
+    LOG::printf("IMPLICIT_OBJECT diff test %g   (%g %g)\n", abs(diff_pa-diff_pb)/maxabs(diff_pa,diff_pb,(T)1e-30),diff_pa,diff_pb);
+    if(test_hess){
+        SYMMETRIC_MATRIX<T,TV::m> H0=Hessian(X),H1=Hessian(X+dX);
+        TV hess_pa=(n1-n0)/e,hess_pb=(H0+H1)*dX/(2*e);
+        T mag_pa=hess_pa.Magnitude(),mag_pb=hess_pb.Magnitude();
+        LOG::printf("IMPLICIT_OBJECT hess test %g   (%g %g)\n", (hess_pa-hess_pb).Magnitude()/maxabs(mag_pa,mag_pb,(T)1e-30),mag_pa,mag_pb);}
+}
+//#####################################################################
 // Undefined Functions
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT<TV>::Update_Box(){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
@@ -205,7 +229,13 @@ INSTANTIATION_HELPER(float,1)
 INSTANTIATION_HELPER(float,2)
 INSTANTIATION_HELPER(float,3)
 template bool IMPLICIT_OBJECT<VECTOR<float,3> >::Intersection(RAY<VECTOR<float,3> >&,const float) const;
+template void IMPLICIT_OBJECT<VECTOR<float,1> >::Test_Diff(RANGE<VECTOR<float,1> > const&,bool) const;
+template void IMPLICIT_OBJECT<VECTOR<float,2> >::Test_Diff(RANGE<VECTOR<float,2> > const&,bool) const;
+template void IMPLICIT_OBJECT<VECTOR<float,3> >::Test_Diff(RANGE<VECTOR<float,3> > const&,bool) const;
 INSTANTIATION_HELPER(double,1)
 INSTANTIATION_HELPER(double,2)
 INSTANTIATION_HELPER(double,3)
 template bool IMPLICIT_OBJECT<VECTOR<double,3> >::Intersection(RAY<VECTOR<double,3> >&,const double) const;
+template void IMPLICIT_OBJECT<VECTOR<double,1> >::Test_Diff(RANGE<VECTOR<double,1> > const&,bool) const;
+template void IMPLICIT_OBJECT<VECTOR<double,2> >::Test_Diff(RANGE<VECTOR<double,2> > const&,bool) const;
+template void IMPLICIT_OBJECT<VECTOR<double,3> >::Test_Diff(RANGE<VECTOR<double,3> > const&,bool) const;
