@@ -4,6 +4,8 @@
 //#####################################################################
 // Class ORIENTED_BOX
 //##################################################################### 
+#include <Tools/Math_Tools/AUTO_DIFF.h>
+#include <Tools/Math_Tools/AUTO_HESS.h>
 #include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 namespace PhysBAM{
@@ -92,16 +94,25 @@ Normal(const TV& X) const
 {
     TV lengths=edges.Column_Magnitudes();
     if(lengths.Contains(0)) PHYSBAM_NOT_IMPLEMENTED();
-    TV DX=edges.Transpose_Times(X-Center()),DX_clamp=DX;
-    bool outside=false;
-    for(int i=0;i<d;i++){
-        if(abs(DX[i])>=(T).5*lengths[i]) outside=true;
-        else DX_clamp[i]=0;}
-    if(outside)
-        return edges*DX_clamp.Normalized();
-    else{
-        int axis=DX.Dominant_Axis();
-        return sign_nonzero(DX[axis])*edges.Column(axis);}
+    MATRIX<T,TV::m> M=DIAGONAL_MATRIX<T,TV::m>(lengths).Inverse()*edges.Transposed();
+    AUTO_DIFF<TV,TV> t(M*X,M),phi=abs(t-M*Center())-(T).5*lengths;
+    if(phi.x.All_Less_Equal(TV())) return max(phi).dx;
+    for(int i=0;i<TV::m;i++) if(phi.x(i)<0) phi.Set_Entry(i,AUTO_DIFF<T,TV>());
+    return phi.Magnitude().dx;
+}
+//#####################################################################
+// Function Hessian
+//#####################################################################
+template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> ORIENTED_BOX<TV>::
+Hessian(const TV& X) const
+{
+    TV lengths=edges.Column_Magnitudes();
+    if(lengths.Contains(0)) PHYSBAM_NOT_IMPLEMENTED();
+    MATRIX<T,TV::m> M=DIAGONAL_MATRIX<T,TV::m>(lengths).Inverse()*edges.Transposed();
+    AUTO_HESS<TV,TV> t(M*X,M),phi=abs(t-M*Center())-(T).5*lengths;
+    if(phi.x.All_Less_Equal(TV())) return max(phi).ddx;
+    for(int i=0;i<TV::m;i++) if(phi.x(i)<0) phi.Set_Entry(i,AUTO_HESS<T,TV>());
+    return phi.Magnitude().ddx;
 }
 //#####################################################################
 // Function Name
@@ -120,6 +131,7 @@ Name()
     template bool ORIENTED_BOX<VECTOR<T,d> >::Separating_Test(const RANGE<VECTOR<T,d> >& box,const VECTOR<T,d> & direction) const; \
     template void ORIENTED_BOX<VECTOR<T,d> >::Project_Points_Onto_Line(const VECTOR<T,d> & direction,T& line_min,T& line_max) const; \
     template T ORIENTED_BOX<VECTOR<T,d> >::Signed_Distance(const VECTOR<T,d>& X) const; \
+    template SYMMETRIC_MATRIX<T,d> ORIENTED_BOX<VECTOR<T,d> >::Hessian(const VECTOR<T,d>&) const; \
     template VECTOR<T,d> ORIENTED_BOX<VECTOR<T,d> >::Normal(const VECTOR<T,d>& X) const;
 
 INSTANTIATION_HELPER(float,1);

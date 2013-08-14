@@ -7,6 +7,7 @@
 #ifndef __PLANE__
 #define __PLANE__
 
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
@@ -89,6 +90,9 @@ public:
 
     VECTOR<T,2> Principal_Curvatures(const TV& X) const
     {return VECTOR<T,2>();}
+
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const
+    {return SYMMETRIC_MATRIX<T,TV::m>();}
 
     static std::string Name()
     {return "PLANE<T>";}

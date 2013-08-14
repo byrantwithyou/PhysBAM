@@ -12,6 +12,7 @@
 #include <Tools/Math_Tools/max.h>
 #include <Tools/Math_Tools/min.h>
 #include <Tools/Math_Tools/ZERO.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Utilities/STATIC_ASSERT.h>
 #include <Tools/Vectors/SCALAR_POLICY.h>
 #include <Tools/Vectors/VECTOR.h>
@@ -336,6 +337,7 @@ public:
     TV Normal(const TV& X) const;
     TV Surface(const TV& X) const;
     T Signed_Distance(const TV& X) const;
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const;
     static std::string Name();
 //#####################################################################
 };

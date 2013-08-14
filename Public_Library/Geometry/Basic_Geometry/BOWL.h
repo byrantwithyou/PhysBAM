@@ -33,15 +33,6 @@ public:
         outer_radius=inner_radius+thickness;
     }
 
-    struct HELPER
-    {
-        T radius;            // from cylindric coordinates 
-        TV radial;           // from cylindric coordinates 
-        VECTOR<T,2> dX;      // position on vertical slice *relative* to the concentric quarter-circles center
-        T dr;
-        T signed_distance,c1,c2;
-    };
-
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,hole_radius,depth,thickness,height,inner_radius,outer_radius);}
 
@@ -50,13 +41,11 @@ public:
 
 //#####################################################################
     RANGE<TV> Bounding_Box() const;
-    void Compute_Helper(const TV& X,HELPER& h) const;
     T Signed_Distance(const TV& X) const;
     TV Surface(const TV& X) const;
-    TV Surface(const TV& X,const HELPER& h) const;
     TV Normal(const TV& X) const;
-    TV Normal(const TV& X,const HELPER& h) const;
     TV Normal(const TV& X,const int aggregate) const;
+    SYMMETRIC_MATRIX<T,3> Hessian(const TV& X) const PHYSBAM_FLATTEN;
     VECTOR<T,2> Principal_Curvatures(const TV& X) const;
     bool Lazy_Inside(const TV& X) const;
     bool Lazy_Outside(const TV& X) const;

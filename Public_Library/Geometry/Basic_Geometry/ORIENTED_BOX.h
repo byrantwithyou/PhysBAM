@@ -14,6 +14,7 @@
 #include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 
@@ -123,6 +124,7 @@ public:
     bool Intersection(const RANGE<TV>& box) const;
     T Signed_Distance(const TV& X) const;
     TV Normal(const TV& X) const;
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const;
     bool Separating_Test(const ORIENTED_BOX& box,const TV& plane_normal_direction) const;
     bool Separating_Test(const RANGE<TV>& box,const TV& plane_normal_direction) const;
     static std::string Name();

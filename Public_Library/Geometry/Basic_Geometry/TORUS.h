@@ -9,6 +9,7 @@
 
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Vectors/Dot_Product.h>
 #include <string>
 namespace PhysBAM{
@@ -56,6 +57,7 @@ public:
     void Write(std::ostream& output) const
     {Write_Binary<RW>(output,center,axis,inner_radius,outer_radius);}
 
+    SYMMETRIC_MATRIX<T,3> Hessian(const TV& X) const PHYSBAM_FLATTEN;
 //#####################################################################
 };   
 }

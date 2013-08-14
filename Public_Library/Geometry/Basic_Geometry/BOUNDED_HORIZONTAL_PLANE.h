@@ -32,6 +32,9 @@ public:
     T Signed_Distance(const TV& location) const
     {return location.y;}
 
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const
+    {return SYMMETRIC_MATRIX<T,TV::m>();}
+
     bool Inside(const TV& location,const T thickness_over_two) const
     {return location.y<=-thickness_over_two;}
 

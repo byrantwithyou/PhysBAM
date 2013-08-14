@@ -4,6 +4,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
@@ -56,9 +57,27 @@ Normal(const TV& X) const
         TV phis_max=X-max_corner,phis_min=min_corner-X;
         TV normal;
         for(int i=0;i<d;i++){
-            T phi=max(phis_min[i],phis_max[i]);
-            normal[i]=phi>0?(phis_max[i]>phis_min[i]?phi:-phi):0;}
+            T phi=max(phis_min(i),phis_max(i));
+            normal(i)=phi>0?(phis_max(i)>phis_min(i)?phi:-phi):0;}
         return normal.Normalized();}
+}
+//#####################################################################
+// Function Hessian
+//#####################################################################
+template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> RANGE<TV>::
+Hessian(const TV& X) const
+{
+    if(Lazy_Inside(X)) return SYMMETRIC_MATRIX<T,TV::m>();
+    TV phis_max=X-max_corner,phis_min=min_corner-X;
+    TV normal,D_normal_diag;
+
+    for(int i=0;i<d;i++){
+        T phi=max(phis_min(i),phis_max(i));
+        if(phi>0){
+            normal(i)=phis_max(i)>phis_min(i)?phi:-phi;
+            D_normal_diag(i)=1;}}
+    T norm=normal.Normalize();
+    return (DIAGONAL_MATRIX<T,TV::m>(D_normal_diag)-SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(normal))/norm;
 }
 //#####################################################################
 // Function Name
@@ -74,6 +93,7 @@ Name()
     template VECTOR<T,d> RANGE<VECTOR<T,d> >::Normal(const int) const; \
     template VECTOR<T,d> RANGE<VECTOR<T,d> >::Normal(const VECTOR<T,d>&) const; \
     template VECTOR<T,d> RANGE<VECTOR<T,d> >::Surface(const VECTOR<T,d>&) const; \
+    template SYMMETRIC_MATRIX<T,d> RANGE<VECTOR<T,d> >::Hessian(const VECTOR<T,d>&) const; \
     template VECTOR<T,d>::SCALAR RANGE<VECTOR<T,d> >::Signed_Distance(const VECTOR<T,d>&) const;
 
 INSTANTIATION_HELPER(float,1);

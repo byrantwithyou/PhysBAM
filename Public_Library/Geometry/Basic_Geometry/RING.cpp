@@ -4,6 +4,7 @@
 //#####################################################################
 // Class RING
 //##################################################################### 
+#include <Tools/Math_Tools/AUTO_HESS.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
@@ -88,6 +89,18 @@ Normal(const TV& X,const int aggregate) const
         return plane1.Normal();
     else 
         return plane2.Normal();
+}
+//#####################################################################
+// Function Hessian
+//#####################################################################
+template<class T> SYMMETRIC_MATRIX<T,3> RING<T>::
+Hessian(const TV& X) const
+{
+    AUTO_HESS<TV,TV> Y=AUTO_HESS<TV,TV>::From_Var(X),v=Y-plane1.x1;
+    AUTO_HESS<T,TV> plane1_phi=v.Dot(plane1.normal),plane_phi=max(plane1_phi,-height-plane1_phi);
+    AUTO_HESS<T,TV> radius=(v-plane1_phi*plane1.normal).Magnitude();
+    AUTO_HESS<T,TV> radial_phi=max(radius-outer_radius,inner_radius-radius);
+    return radial_phi.x>0 && plane_phi.x>0?sqrt(sqr(radial_phi)+sqr(plane_phi)).ddx:max(radial_phi,plane_phi).ddx;
 }
 //#####################################################################
 // Function Principal_Curvatures

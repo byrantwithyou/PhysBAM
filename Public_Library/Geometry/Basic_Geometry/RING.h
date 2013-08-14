@@ -54,6 +54,7 @@ public:
     TV Surface(const TV& X) const;
     TV Normal(const TV& X) const;
     TV Normal(const TV& X,const int aggregate) const;
+    SYMMETRIC_MATRIX<T,3> Hessian(const TV& X) const PHYSBAM_FLATTEN;
     VECTOR<T,2> Principal_Curvatures(const TV& X) const;
     bool Lazy_Inside(const TV& X) const;
     bool Lazy_Outside(const TV& X) const;

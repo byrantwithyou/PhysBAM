@@ -10,6 +10,7 @@
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Math_Tools/ONE.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Utilities/TYPE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR_1D.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_FORWARD.h>
@@ -57,6 +58,9 @@ public:
 
     TV Normal(const TV& location) const
     {return Normal();}
+
+    SYMMETRIC_MATRIX<T,1> Hessian(const TV& X) const
+    {return SYMMETRIC_MATRIX<T,1>();}
 
     static ONE Clamped_Barycentric_Coordinates(const TV& location,const TV& x1)
     {return ONE();}

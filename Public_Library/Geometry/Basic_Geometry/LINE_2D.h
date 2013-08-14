@@ -8,6 +8,7 @@
 #define __LINE_2D__
 
 #include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Vectors/VECTOR_2D.h>
 #include <cfloat>
 namespace PhysBAM{
@@ -39,6 +40,9 @@ public:
 
     T Signed_Distance(const TV& location) const
     {return TV::Dot_Product(normal,location-x1);}
+
+    SYMMETRIC_MATRIX<T,2> Hessian(const TV& X) const
+    {return SYMMETRIC_MATRIX<T,2>();}
 
     // inside is the half space behind the normal
     bool Inside(const TV& location,const T thickness_over_two) const

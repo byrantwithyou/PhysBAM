@@ -4,7 +4,11 @@
 //#####################################################################
 // Class BOWL
 //##################################################################### 
+#include <Tools/Log/LOG.h>
+#include <Tools/Math_Tools/AUTO_DIFF.h>
+#include <Tools/Math_Tools/AUTO_HESS.h>
 #include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Polynomials/QUADRATIC.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/BOWL.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
@@ -18,88 +22,70 @@ Bounding_Box() const
     return CYLINDER<T>(TV(0,0,0),TV(0,depth+thickness,0),outer_radius).Bounding_Box();
 }
 //#####################################################################
-// Function Compute_Helper
-//#####################################################################
-template<class T> void BOWL<T>::
-Compute_Helper(const TV& X,HELPER& h) const
-{
-    h.radial=X-TV(0,X.y,0);
-    h.radius=h.radial.Normalize();
-    h.dX=VECTOR<T,2>(h.radius-hole_radius,X.y);
-    if( (h.dX.x>=0 && h.dX.y>=0) || (h.dX.x<=0 && h.dX.y<=0) )
-    {
-        h.dr=h.dX.Magnitude()*((h.dX.x>=0 && h.dX.y>=0)?(T)1:(T)(-1))-(depth+height)*0.5;
-        h.signed_distance=abs(h.dr)-thickness*0.5;
-        if (h.dr>0)
-        {
-            h.c1=-1/height;
-            h.c2=-h.dX.x/(height*h.radius);
-        }
-        else
-        {
-            h.c1=abs(h.dX.x)/(depth*h.radius);
-            h.c2=1/depth;
-        }
-    }
-    else
-    {
-        T max_value = max(h.dX.x,h.dX.y);
-        T min_value = min(h.dX.x,h.dX.y);
-        if (max_value<depth) h.signed_distance=VECTOR<T,2>(min_value,max_value-depth).Magnitude();
-        else if (max_value>height) h.signed_distance=VECTOR<T,2>(min_value,max_value-height).Magnitude();
-        else h.signed_distance=-min_value;
-
-        if (h.dX.x>h.dX.y)
-        {
-            h.c1=0;
-            h.c2=0;
-        }
-        else
-        {
-            h.c1=-1/hole_radius;
-            h.c2=0;
-        }
-    }
-}
-//#####################################################################
 // Function Signed_Distance
 //#####################################################################
 template<class T> T BOWL<T>::
 Signed_Distance(const TV& X) const
 {
-    HELPER h;
-    Compute_Helper(X,h);
-    return h.signed_distance;
+    T radius=::std::hypot(X.x,X.z);
+    T dX_x=radius-hole_radius,dX_y=X.y,dX_mag=::std::hypot(dX_x,dX_y);
+
+    if((dX_x>=0 && dX_y>=0) || (dX_x<=0 && dX_y<=0)){
+        T dr=dX_mag*((dX_x>=0 && dX_y>=0)?(T)1:(T)(-1))-(depth+height)*0.5;
+        return abs(dr)-thickness*(T)0.5;}
+    T max_value=max(dX_x,dX_y);
+    T min_value=min(dX_x,dX_y);
+    if(max_value<depth) return ::std::hypot(min_value,max_value-depth);
+    if(max_value>height) return ::std::hypot(min_value,max_value-height);
+    return -min_value;
 }
 //#####################################################################
-// Function Surface
+// Function Compute_Helper
+//#####################################################################
+template<class T,class TV> static AUTO_DIFF<T,TV>
+Compute_Diff_Helper(const BOWL<T>& b,const TV& X) PHYSBAM_FLATTEN;
+template<class T,class TV> static AUTO_DIFF<T,TV>
+Compute_Diff_Helper(const BOWL<T>& b,const TV& X)
+{
+    AUTO_DIFF<T,TV> radius=hypot(AUTO_DIFF<T,TV>::From_Var(X,0),AUTO_DIFF<T,TV>::From_Var(X,2));
+    AUTO_DIFF<T,TV> dX_x=radius-b.hole_radius,dX_y=AUTO_DIFF<T,TV>::From_Var(X,1),dX_mag=hypot(dX_x,dX_y);
+
+    if((dX_x.x>=0 && dX_y.x>=0) || (dX_x.x<=0 && dX_y.x<=0)){
+        AUTO_DIFF<T,TV> dr=dX_mag*((dX_x.x>=0 && dX_y.x>=0)?(T)1:(T)(-1))-(b.depth+b.height)*0.5;
+        return (abs(dr)-b.thickness*(T)0.5);}
+    AUTO_DIFF<T,TV> max_value=max(dX_x,dX_y);
+    AUTO_DIFF<T,TV> min_value=min(dX_x,dX_y);
+    if(max_value.x<b.depth) return hypot(min_value,max_value-b.depth);
+    if(max_value.x>b.height) return hypot(min_value,max_value-b.height);
+    return -min_value;
+}
+//#####################################################################
+// Function Compute_Helper
+//#####################################################################
+template<class T,class TV> static AUTO_HESS<T,TV>
+Compute_Hess_Helper(const BOWL<T>& b,const TV& X) PHYSBAM_FLATTEN;
+template<class T,class TV> static AUTO_HESS<T,TV>
+Compute_Hess_Helper(const BOWL<T>& b,const TV& X)
+{
+    AUTO_HESS<T,TV> radius=hypot(AUTO_HESS<T,TV>::From_Var(X,0),AUTO_HESS<T,TV>::From_Var(X,2));
+    AUTO_HESS<T,TV> dX_x=radius-b.hole_radius,dX_y=AUTO_HESS<T,TV>::From_Var(X,1),dX_mag=hypot(dX_x,dX_y);
+
+    if((dX_x.x>=0 && dX_y.x>=0) || (dX_x.x<=0 && dX_y.x<=0)){
+        AUTO_HESS<T,TV> dr=dX_mag*((dX_x.x>=0 && dX_y.x>=0)?(T)1:(T)(-1))-(b.depth+b.height)*0.5;
+        return (abs(dr)-b.thickness*(T)0.5);}
+    AUTO_HESS<T,TV> max_value=max(dX_x,dX_y);
+    AUTO_HESS<T,TV> min_value=min(dX_x,dX_y);
+    if(max_value.x<b.depth) return hypot(min_value,max_value-b.depth);
+    if(max_value.x>b.height) return hypot(min_value,max_value-b.height);
+    return -min_value;
+}
+//#####################################################################
+// Function Normal
 //#####################################################################
 template<class T> VECTOR<T,3> BOWL<T>::
-Surface(const TV& X,const HELPER& h) const
+Normal(const TV& X) const
 {
-    VECTOR<T,2> slice_surface;
-    if( (h.dX.x>=0 && h.dX.y>=0) || (h.dX.x<=0 && h.dX.y<=0) )
-    {
-        VECTOR<T,2> dX_Normalized=h.dX;
-        dX_Normalized.Normalize();
-        slice_surface=dX_Normalized*((h.dr>=0)?height:depth);
-    }
-    else
-    {
-        if (h.dX.x>h.dX.y)
-        {
-            if (h.dX.x<depth) slice_surface=VECTOR<T,2>(depth,0);
-            else if (h.dX.x>height) slice_surface=VECTOR<T,2>(height,0);
-            else slice_surface=VECTOR<T,2>(h.dX.x,0);
-        }
-        else
-        {
-            if (h.dX.y<depth) slice_surface=VECTOR<T,2>(0,depth);
-            else if (h.dX.y>height) slice_surface=VECTOR<T,2>(0,height);
-            else slice_surface=VECTOR<T,2>(0,h.dX.y);
-        }
-    }
-    return h.radial*slice_surface.x+TV(0,slice_surface.y,0);
+    return Compute_Diff_Helper(*this,X).dx;
 }
 //#####################################################################
 // Function Suface
@@ -107,37 +93,8 @@ Surface(const TV& X,const HELPER& h) const
 template<class T> VECTOR<T,3> BOWL<T>::
 Surface(const TV& X) const 
 {
-    HELPER h;
-    Compute_Helper(X,h);
-    return Surface(X,h);
-}
-//#####################################################################
-// Function Normal
-//#####################################################################
-template<class T> VECTOR<T,3> BOWL<T>::
-Normal(const TV& X,const HELPER& h) const
-{
-    VECTOR<T,2> slice_normal;
-    if( (h.dX.x>=0 && h.dX.y>=0) || (h.dX.x<=0 && h.dX.y<=0) )
-    {
-        slice_normal=(h.dX*((h.dr>=0||(h.dX.x<=0 && h.dX.y<=0))?(T)1:(T)(-1)));
-        slice_normal.Normalize();
-    }
-    else
-    {
-        slice_normal=((h.dX.x>h.dX.y)?VECTOR<T,2>(0,-1):VECTOR<T,2>(-1,0));
-    }
-    return h.radial*slice_normal.x+TV(0,slice_normal.y,0);
-}
-//#####################################################################
-// Function Normal
-//#####################################################################
-template<class T> VECTOR<T,3> BOWL<T>::
-Normal(const TV& X) const 
-{
-    HELPER h;
-    Compute_Helper(X,h);
-    return Normal(X,h);
+    AUTO_DIFF<T,TV> diff=Compute_Diff_Helper(*this,X);
+    return X-diff.dx*diff.x;
 }
 //#####################################################################
 // Function Normal
@@ -148,14 +105,40 @@ Normal(const TV& X,const int aggregate) const
     return Normal(X);
 }
 //#####################################################################
+// Function Hessian
+//#####################################################################
+template<class T> SYMMETRIC_MATRIX<T,3> BOWL<T>::
+Hessian(const TV& X) const
+{
+    return Compute_Hess_Helper(*this,X).ddx;
+}
+template<class T> inline VECTOR<T,0> Principal_Curvatures_Helper(const VECTOR<T,1>& N,const SYMMETRIC_MATRIX<T,1>& H)
+{
+    return VECTOR<T,0>();
+}
+template<class T> inline VECTOR<T,1> Principal_Curvatures_Helper(const VECTOR<T,2>& N,const SYMMETRIC_MATRIX<T,2>& H)
+{
+    VECTOR<T,2> tangent=N.Perpendicular();
+    return VECTOR<T,1>(tangent.Dot(H*tangent));
+}
+template<class T> inline VECTOR<T,2> Principal_Curvatures_Helper(const VECTOR<T,3>& N,const SYMMETRIC_MATRIX<T,3>& H)
+{
+    SYMMETRIC_MATRIX<T,3> P=(T)1-SYMMETRIC_MATRIX<T,3>::Outer_Product(N),M=SYMMETRIC_MATRIX<T,3>::Conjugate(P,H);
+    T trace=M.Trace();
+    QUADRATIC<T> quadratic(-1,trace,sqr(M(1,1))-M(0,1)*M(1,2)+sqr(M(2,1))-M(0,1)*M(2,3)+sqr(M(2,2))-M(1,2)*M(2,3));
+    quadratic.Compute_Roots();
+    if(quadratic.roots == 0) (T).5*VECTOR<T,2>(trace,trace);
+    else if(quadratic.roots == 1) return VECTOR<T,2>(quadratic.root1,quadratic.root1);
+    return VECTOR<T,2>(quadratic.root1,quadratic.root2);
+}
+//#####################################################################
 // Function Principal_Curvatures
 //#####################################################################
 template<class T> VECTOR<T,2> BOWL<T>::
 Principal_Curvatures(const TV& X) const
 {
-    HELPER h;
-    Compute_Helper(X,h);
-    return VECTOR<T,2>(h.c1,h.c2);
+    AUTO_HESS<T,TV> phi=Compute_Hess_Helper(*this,X);
+    return Principal_Curvatures_Helper(phi.dx,phi.ddx);
 }
 //#####################################################################
 // Function Lazy_Inside

@@ -1,3 +1,4 @@
+#include <Tools/Math_Tools/AUTO_HESS.h>
 #include <Tools/Math_Tools/sqr.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Geometry/Basic_Geometry/SMOOTH_GEAR.h>
@@ -53,7 +54,7 @@ Bounding_Box() const
 template<class T> void SMOOTH_GEAR<VECTOR<T,2> >::
 Compute_Helper(const TV& X,HELPER& h) const
 {
-    h.a=atan2(X.y,X.x);
+    h.a=::std::atan2(X.y,X.x);
     h.d=X.Magnitude();
     h.k=floor(h.a/den);
     h.b=h.a-h.k*den;
@@ -130,6 +131,26 @@ template<class T> VECTOR<T,2> SMOOTH_GEAR<VECTOR<T,2> >::
 Normal(const TV& X,const int aggregate) const
 {
     return Normal(X);
+}
+//#####################################################################
+// Function Hessian
+//#####################################################################
+template<class T> SYMMETRIC_MATRIX<T,2> SMOOTH_GEAR<VECTOR<T,2> >::
+Hessian(const TV& X) const
+{
+    AUTO_HESS<T,TV> X0=AUTO_HESS<T,TV>::From_Var(X,0),X1=AUTO_HESS<T,TV>::From_Var(X,1);
+    AUTO_HESS<T,TV> a=atan2(X1,X0);
+    AUTO_HESS<T,TV> d=hypot(X0,X1);
+    T k=floor(a.x/den);
+    AUTO_HESS<T,TV> b=a-k*den;
+    if(2*b.x>den) b=den-b;
+    AUTO_HESS<TV,TV> Y=AUTO_HESS<TV,TV>(cos(b),sin(b))*d;
+    bool ui=Co.y*(Y(0).x-ci)>Y(1).x*(Co.x-ci);
+    TV P=ui?Ci:Co;
+    AUTO_HESS<TV,TV> dY=Y-P;
+    AUTO_HESS<T,TV> m=dY.Magnitude();
+    AUTO_HESS<T,TV> sd=ui?m-s:s-m;
+    return sd.ddx;
 }
 //#####################################################################
 // Function Principal_Curvatures
@@ -264,6 +285,29 @@ template<class T> VECTOR<T,3> SMOOTH_GEAR<VECTOR<T,3> >::
 Normal(const TV& X,const int aggregate) const
 {
     return Normal(X);
+}
+//#####################################################################
+// Function Hessian
+//#####################################################################
+template<class T> SYMMETRIC_MATRIX<T,3> SMOOTH_GEAR<VECTOR<T,3> >::
+Hessian(const TV& X) const
+{
+    AUTO_HESS<T,TV> X0=AUTO_HESS<T,TV>::From_Var(X,0),X1=AUTO_HESS<T,TV>::From_Var(X,1),X2=AUTO_HESS<T,TV>::From_Var(X,2);
+    AUTO_HESS<T,TV> a=atan2(X1,X0);
+    AUTO_HESS<T,TV> d=hypot(X0,X1);
+    T k=floor(a.x/g.den);
+    AUTO_HESS<T,TV> b=a-k*g.den;
+    if(2*b.x>g.den) b=g.den-b;
+    AUTO_HESS<TV,TV> Y=AUTO_HESS<TV,TV>(cos(b)*d,sin(b)*d,AUTO_HESS<T,TV>::From_Const(0));
+    bool ui=g.Co.y*(Y(0).x-g.ci)>Y(1).x*(g.Co.x-g.ci);
+    TV P(ui?g.Ci:g.Co);
+    AUTO_HESS<TV,TV> dY=Y-P;
+    AUTO_HESS<T,TV> m=dY.Magnitude();
+    AUTO_HESS<T,TV> sd=ui?m-g.s:g.s-m;
+    AUTO_HESS<T,TV> wd=abs(X2)-w;
+    if(wd.x<0) return max(sd,wd).ddx;
+    if(sd.x<0) return wd.ddx;
+    return hypot(wd,sd).ddx;
 }
 //#####################################################################
 // Function Principal_Curvatures

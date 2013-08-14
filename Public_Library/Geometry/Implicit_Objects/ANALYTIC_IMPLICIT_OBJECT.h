@@ -87,6 +87,9 @@ public:
     VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE
     {return analytic.Principal_Curvatures(X);}
 
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const PHYSBAM_OVERRIDE
+    {return analytic.Hessian(X);}
+
     void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
     {Read_Binary(input,analytic);Update_Box();}
 

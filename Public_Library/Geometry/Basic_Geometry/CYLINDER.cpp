@@ -4,6 +4,7 @@
 //#####################################################################
 // Class CYLINDER
 //##################################################################### 
+#include <Tools/Math_Tools/cube.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 using namespace PhysBAM;
@@ -108,6 +109,39 @@ Normal(const TV& location) const
         return cylinder_distance/magnitude*infinite_cylinder_normal+plane2_distance/magnitude*plane2.normal;}
     else if(cylinder_distance>plane2_distance) return infinite_cylinder_normal;
     return plane2.normal;
+}
+//#####################################################################
+// Function Hessian
+//#####################################################################
+template<class T> SYMMETRIC_MATRIX<T,3> CYLINDER<T>::
+Hessian(const TV& X) const
+{
+    TV v=X-plane1.x1;
+    T plane1_distance=TV::Dot_Product(v,plane1.normal),plane_distance=max(plane1_distance,-height-plane1_distance);
+    TV infinite_cylinder_normal=v-plane1_distance*plane1.normal;
+    T norm_infinite_cylinder_normal=infinite_cylinder_normal.Normalize();
+    T cylinder_distance=norm_infinite_cylinder_normal-radius;
+
+    bool edge=(cylinder_distance>0 && plane_distance>0),face=plane_distance>cylinder_distance;
+    if(!edge && face) return SYMMETRIC_MATRIX<T,3>();
+
+    TV diff_cylinder_distance=infinite_cylinder_normal-plane1.normal.Dot(infinite_cylinder_normal)*plane1.normal;
+    T norm2_v=v.Magnitude_Squared();
+    T Hd=cube(norm_infinite_cylinder_normal);
+    SYMMETRIC_MATRIX<T,3> H1=norm2_v-SYMMETRIC_MATRIX<T,3>::Outer_Product(v);
+    SYMMETRIC_MATRIX<T,3> H2=norm2_v*SYMMETRIC_MATRIX<T,3>::Outer_Product(plane1.normal);
+    SYMMETRIC_MATRIX<T,3> H3=plane1_distance*SYMMETRIC_MATRIX<T,3>::Symmetric_Outer_Product(plane1.normal,v);
+    SYMMETRIC_MATRIX<T,3> hess_cylinder_distance=(H1-H2+H3-sqr(plane1_distance))/Hd;
+    if(!edge) return hess_cylinder_distance;
+
+    TV diff_plane_distance=(plane1_distance>-height-plane1_distance)?plane1.normal:-plane1.normal;
+    T a=sqrt(sqr(cylinder_distance)+sqr(plane_distance));
+    TV da=(cylinder_distance*diff_cylinder_distance+plane_distance*diff_plane_distance)/a;
+    SYMMETRIC_MATRIX<T,3> A1=SYMMETRIC_MATRIX<T,3>::Outer_Product(diff_cylinder_distance);
+    SYMMETRIC_MATRIX<T,3> A2=cylinder_distance*hess_cylinder_distance;
+    SYMMETRIC_MATRIX<T,3> A3=SYMMETRIC_MATRIX<T,3>::Outer_Product(plane1.normal);
+    SYMMETRIC_MATRIX<T,3> A4=SYMMETRIC_MATRIX<T,3>::Outer_Product(da);
+    return (A1+A2+A3-A4)/a;
 }
 //#####################################################################
 // Function Bounding_Box

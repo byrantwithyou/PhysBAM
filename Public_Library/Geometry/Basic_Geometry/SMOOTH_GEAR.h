@@ -52,6 +52,7 @@ public:
     TV Normal(const TV& X) const;
     TV Normal(const TV& X,const HELPER& h) const;
     TV Normal(const TV& X,const int aggregate) const;
+    SYMMETRIC_MATRIX<T,2> Hessian(const TV& X) const;
     VECTOR<T,1> Principal_Curvatures(const TV& X) const;
     bool Lazy_Inside(const TV& X) const;
     bool Lazy_Outside(const TV& X) const;
@@ -88,6 +89,7 @@ public:
     TV Surface(const TV& X) const;
     TV Normal(const TV& X) const;
     TV Normal(const TV& X,const int aggregate) const;
+    SYMMETRIC_MATRIX<T,3> Hessian(const TV& X) const;
     VECTOR<T,2> Principal_Curvatures(const TV& X) const;
     bool Lazy_Inside(const TV& X) const;
     bool Lazy_Outside(const TV& X) const;

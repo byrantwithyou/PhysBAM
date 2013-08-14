@@ -11,6 +11,7 @@
 #include <Tools/Math_Tools/constants.h>
 #include <Tools/Math_Tools/pow.h>
 #include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 namespace PhysBAM{
 
 template<class TV>
@@ -35,6 +36,9 @@ public:
 
     TV Normal(const TV& location) const
     {return (location-center).Normalized();}
+
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const
+    {TV z=X-center;T w=z.Normalize();return ((T)1-SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(z))/w;}
 
     bool Inside(const TV& location,const T thickness_over_two) const
     {return (location-center).Magnitude_Squared() <= sqr(radius-thickness_over_two);}

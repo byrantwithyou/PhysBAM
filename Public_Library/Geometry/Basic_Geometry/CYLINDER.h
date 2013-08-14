@@ -61,6 +61,7 @@ public:
 //#####################################################################
     TV Normal(const TV& location) const;
     TV Normal(const TV& location,const int aggregate) const;
+    SYMMETRIC_MATRIX<T,3> Hessian(const TV& X) const;
     bool Inside(const TV& location,const T thickness_over_two) const;
     bool Lazy_Inside(const TV& location) const;
     bool Outside(const TV& location,const T thickness_over_two) const;
