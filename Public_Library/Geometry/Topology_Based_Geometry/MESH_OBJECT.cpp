@@ -211,7 +211,7 @@ Filled_Volume_Helper(const T_SIMPLICIAL_OBJECT& object, typename ENABLE_IF<(T_SI
     const TV base=object.particles.X(object.mesh.elements(0)[0]);
     T scaled_volume=0; // (d+1)!*volume
     for(int t=0;t<object.mesh.elements.m;t++){const VECTOR<int,d+1>& nodes=object.mesh.elements(t);
-        MATRIX<T,TV::m,d+1> DX;for(int i=0;i<nodes.m;i++) DX.Column(i)=object.particles.X(nodes[i])-base;
+        MATRIX<T,TV::m,d+1> DX;for(int i=0;i<nodes.m;i++) DX.Set_Column(i,object.particles.X(nodes[i])-base);
         scaled_volume+=DX.Parallelepiped_Measure();}
     return (T)1/FACTORIAL<d+1>::value*scaled_volume;
 }

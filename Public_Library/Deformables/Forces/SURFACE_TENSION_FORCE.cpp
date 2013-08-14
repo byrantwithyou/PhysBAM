@@ -39,12 +39,12 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 //#####################################################################
 template<class T> static void Tangential_Helper(MATRIX<T,3,2>& tangential,const VECTOR<T,3>& normal)
 {
-    tangential.Column(1)=normal.Unit_Orthogonal_Vector();
-    tangential.Column(2)=normal.Cross_Product(normal,tangential.Column(1));
+    tangential.Set_Column(1,normal.Unit_Orthogonal_Vector());
+    tangential.Set_Column(2,normal.Cross_Product(normal,tangential.Column(1)));
 }
 template<class T> static void Tangential_Helper(MATRIX<T,2,1>& tangential,const VECTOR<T,2>& normal)
 {
-    tangential.Column(1)=normal.Orthogonal_Vector();
+    tangential.Set_Column(1,normal.Orthogonal_Vector());
 }
 template<class T> static void Tangential_Helper(MATRIX<T,1,0>& tangential,const VECTOR<T,1>& normal)
 {

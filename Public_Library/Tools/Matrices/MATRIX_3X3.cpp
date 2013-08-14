@@ -65,11 +65,11 @@ Fast_Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& singular_
     if(Determinant()<0) singular_values.x33=-singular_values.x33; // 9m+5a
 
     // compute singular vectors
-    U.Column(0)=(*this*V.Column(0)).Normalized(); // 15m+8a+1d+1s
+    U.Set_Column(0,(*this*V.Column(0)).Normalized()); // 15m+8a+1d+1s
     VECTOR<T,3> v1_orthogonal=U.Column(0).Unit_Orthogonal_Vector(); // 6m+2a+1d+1s
     MATRIX<T,3,2> other_v(v1_orthogonal,VECTOR<T,3>::Cross_Product(U.Column(0),v1_orthogonal)); // 6m+3a
-    U.Column(1)=other_v*(other_v.Transpose_Times(*this*V.Column(1))).Normalized(); // 6m+3a + 6m+4a + 9m+6a + 6m+2a+1d+1s = 27m+15a+1d+1s
-    U.Column(2)=VECTOR<T,3>::Cross_Product(U.Column(0),U.Column(1)); // 6m+3a
+    U.Set_Column(1,other_v*(other_v.Transpose_Times(*this*V.Column(1))).Normalized()); // 6m+3a + 6m+4a + 9m+6a + 6m+2a+1d+1s = 27m+15a+1d+1s
+    U.Set_Column(2,VECTOR<T,3>::Cross_Product(U.Column(0),U.Column(1))); // 6m+3a
 }
 //#####################################################################
 // Function Fast_Indefinite_Polar_Decomposition

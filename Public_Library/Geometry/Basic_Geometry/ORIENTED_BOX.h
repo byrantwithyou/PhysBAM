@@ -106,7 +106,7 @@ public:
         Generate_Unit_Direction(u,i);
         u*=thickness;
         box.corner-=u;
-        box.edges.Column(i)+=u+u;}
+        box.edges.Set_Column(i,box.edges.Column(i)+(u+u));}
     return box;}
 
     VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const

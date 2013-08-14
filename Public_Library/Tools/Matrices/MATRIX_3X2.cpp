@@ -24,10 +24,10 @@ Fast_Singular_Value_Decomposition(MATRIX<T,3,2>& U,DIAGONAL_MATRIX<T,2>& singula
     DIAGONAL_MATRIX<T,2> lambda;Normal_Equations_Matrix().Solve_Eigenproblem(lambda,V);
     if(lambda.x22<0) lambda=lambda.Clamp_Min(0);
     singular_values=lambda.Sqrt();
-    U.Column(1)=(*this*V.Column(1)).Normalized();
+    U.Set_Column(1,(*this*V.Column(1)).Normalized());
     VECTOR<T,3> other=VECTOR<T,3>::Cross_Product(Weighted_Normal(),U.Column(1));
     T other_magnitude=other.Magnitude();
-    U.Column(2)=other_magnitude?other/other_magnitude:U.Column(1).Unit_Orthogonal_Vector();
+    U.Set_Column(2,other_magnitude?other/other_magnitude:U.Column(1).Unit_Orthogonal_Vector());
 }
 //#####################################################################
 // Function Fast_Indefinite_Polar_Decomposition

@@ -56,10 +56,10 @@ public:
     const T& operator()(const int i,const int j=0) const
     {PHYSBAM_FATAL_ERROR();}
 
-    VECTOR<T,0>& Column(const int i)
+    VECTOR<T,0> Column(const int i) const
     {PHYSBAM_FATAL_ERROR();}
 
-    const VECTOR<T,0>& Column(const int i) const
+    void Set_Column(const int i,const VECTOR<T,0>& )
     {PHYSBAM_FATAL_ERROR();}
 
     bool Valid_Index(const int i,const int j) const

@@ -93,11 +93,11 @@ public:
     bool Valid_Index(const int i,const int j) const
     {return (unsigned)i<3 && (unsigned)j<3;}
 
-    VECTOR<T,3>& Column(const int j)
-    {assert((unsigned)j<3);return *(VECTOR<T,3>*)(x+3*j);}
+    VECTOR<T,3> Column(const int j) const
+    {assert((unsigned)j<3);return VECTOR<T,3>(x[3*j],x[3*j+1],x[3*j+2]);}
 
-    const VECTOR<T,3>& Column(const int j) const
-    {assert((unsigned)j<3);return *(const VECTOR<T,3>*)(x+3*j);}
+    void Set_Column(const int j,const VECTOR<T,3>& v)
+    {assert((unsigned)j<3);x[3*j]=v.x;x[3*j+1]=v.y;x[3*j+2]=v.z;}
 
     bool operator==(const MATRIX& A) const
     {for(int i=0;i<9;i++) if(x[i]!=A.x[i]) return false;return true;}

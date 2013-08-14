@@ -22,8 +22,8 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const RING<T>& rin
     surface->mesh.Initialize_Torus_Mesh(4,n);
     GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.Add_Elements(4*n);
     MATRIX<T,3,2> radial_basis;
-    radial_basis.Column(0)=ring.plane1.normal.Orthogonal_Vector();
-    radial_basis.Column(1)=TV::Cross_Product(ring.plane1.normal,radial_basis.Column(0));
+    radial_basis.Set_Column(0,ring.plane1.normal.Orthogonal_Vector());
+    radial_basis.Set_Column(1,TV::Cross_Product(ring.plane1.normal,radial_basis.Column(0)));
     for(int i=0,p=0;i<n;++i){
         TV radial=radial_basis*COMPLEX<T>::Unit_Polar(T(2*pi/n)*i).Vector();
         particles.X(p++)=ring.plane1.x1+ring.inner_radius*radial;

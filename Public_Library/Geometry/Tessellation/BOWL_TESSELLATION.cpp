@@ -22,8 +22,8 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const BOWL<T>& bow
     surface->mesh.Initialize_Torus_Mesh(2*(n_vertical+1),n_radial);
     GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.Add_Elements(2*(n_vertical+1)*n_radial);
     MATRIX<T,3,2> radial_basis;
-    radial_basis.Column(0)=TV(0,0,1);
-    radial_basis.Column(1)=TV(1,0,0);
+    radial_basis.Set_Column(0,TV(0,0,1));
+    radial_basis.Set_Column(1,TV(1,0,0));
     for(int i=0,p=0;i<n_radial;++i){
         TV radial=radial_basis*COMPLEX<T>::Unit_Polar(T(2*pi/n_radial)*i).Vector();
         for (int j=n_vertical; j>=0; j--){

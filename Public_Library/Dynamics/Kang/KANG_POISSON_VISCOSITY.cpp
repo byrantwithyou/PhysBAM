@@ -88,7 +88,7 @@ Viscosity_Jump(const TV_INT& cell) const
         celln(d)--;
         TV v1=face_velocities_ghost.Cell_Centered_Average(celln);
         TV v2=face_velocities_ghost.Cell_Centered_Average(cellp);
-        du.Column(d)=(T).5*fluids_parameters.grid->one_over_dX(d)*(v2-v1);}
+        du.Set_Column(d,(T).5*fluids_parameters.grid->one_over_dX(d)*(v2-v1));}
 
     T dmu=fluids_parameters.outside_viscosity-fluids_parameters.viscosity;
     MATRIX<T,TV::m> NN=MATRIX<T,TV::m>::Outer_Product(N,N),TT=(T)1-NN;

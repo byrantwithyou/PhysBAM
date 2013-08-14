@@ -170,7 +170,7 @@ template<class T> void Set_Inversion_Based_On_Implicit_Surface(FINITE_VOLUME<VEC
 {
     VECTOR<T,3> normal=implicit_surface.Normal(fvm.strain_measure.mesh_object.Centroid(triangle));
     if(VECTOR<T,3>::Dot_Product(normal,fvm.U(triangle).Weighted_Normal())<0){
-        fvm.Fe_hat(triangle).x22*=-1;fvm.U(triangle).Column(1)*=-1;}
+        fvm.Fe_hat(triangle).x22*=-1;fvm.U(triangle).Set_Column(1,-fvm.U(triangle).Column(1));}
 }}
 template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Update_Position_Based_State(const T time,const bool is_position_update)
