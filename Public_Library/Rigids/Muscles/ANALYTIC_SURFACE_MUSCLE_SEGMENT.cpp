@@ -58,7 +58,7 @@ Set_Current_Activation(const T activation)
 {
     MUSCLE_SEGMENT<TV>::Set_Current_Activation(activation);
     activation_factor=0;
-    for(int i=0;i<min(activation_memory,activations->Size());i++){T activation=min(max((T)0,(*activations)(i)),(T)1);activation_factor+=log(1+activation);}
+    for(int i=0;i<min(activation_memory,activations->Size());i++){T activation=min(max((T)0,(*activations)(i)),(T)1);activation_factor+=::std::log(1+activation);}
     activation_factor/=min(activation_memory,activations->Size());activation_factor=1-activation_factor;
     assert(activation_factor<=1);assert(activation_factor>=0);
 }
