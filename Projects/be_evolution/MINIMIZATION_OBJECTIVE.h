@@ -21,14 +21,15 @@ public:
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     T dt,time,a,b,c;
     ARRAY<TWIST<TV> > fake_rigid_x;
-    GENERALIZED_VELOCITY<TV> x1,v1,&x0,&v0,&d;
+    mutable GENERALIZED_VELOCITY<TV> x1,v1;
+    GENERALIZED_VELOCITY<TV> &x0,&v0,&dv;
     GENERALIZED_VELOCITY<TV> &tmp0,&tmp1;
     BACKWARD_EULER_SYSTEM<TV> system;
 
     MINIMIZATION_OBJECTIVE(SOLID_BODY_COLLECTION<TV>& solid_body_collection,T dt,T time);
     virtual ~MINIMIZATION_OBJECTIVE();
 
-    void Compute(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const PHYSBAM_OVERRIDE;
+    void Compute(const KRYLOV_VECTOR_BASE<T>& dv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const PHYSBAM_OVERRIDE;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const PHYSBAM_OVERRIDE;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const PHYSBAM_OVERRIDE;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BR) const PHYSBAM_OVERRIDE;

@@ -17,16 +17,11 @@ MINIMIZATION_OBJECTIVE(SOLID_BODY_COLLECTION<TV>& solid_body_collection,T dt,T t
     x1(solid_body_collection.deformable_body_collection.particles.X,fake_rigid_x,solid_body_collection),
     v1(solid_body_collection.deformable_body_collection.particles.V,solid_body_collection.rigid_body_collection.rigid_body_particles.twist,solid_body_collection),
     x0(static_cast<GENERALIZED_VELOCITY<TV>&>(*x1.Clone_Default())),v0(static_cast<GENERALIZED_VELOCITY<TV>&>(*x1.Clone_Default())),
-    d(static_cast<GENERALIZED_VELOCITY<TV>&>(*x1.Clone_Default())),tmp0(static_cast<GENERALIZED_VELOCITY<TV>&>(*x1.Clone_Default())),
+    dv(static_cast<GENERALIZED_VELOCITY<TV>&>(*x1.Clone_Default())),tmp0(static_cast<GENERALIZED_VELOCITY<TV>&>(*x1.Clone_Default())),
     tmp1(static_cast<GENERALIZED_VELOCITY<TV>&>(*x1.Clone_Default())),system(0,solid_body_collection,dt,time,time,0,0,0,true,true)
 {
     x0=x1;
     v0=v1;
-    a=1/(dt*dt);
-    b=-a;
-    c=-1/dt;
-    d.Copy(b,x0);
-    d.Copy(c,v0,d);
 }
 //#####################################################################
 // Destructor
@@ -36,7 +31,6 @@ template<class TV> MINIMIZATION_OBJECTIVE<TV>::
 {
     delete &x0;
     delete &v0;
-    delete &d;
     delete &tmp0;
     delete &tmp1;
 }
@@ -44,27 +38,26 @@ template<class TV> MINIMIZATION_OBJECTIVE<TV>::
 // Function Compute
 //#####################################################################
 template<class TV> void MINIMIZATION_OBJECTIVE<TV>::
-Compute(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const
+Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const
 {
+    const GENERALIZED_VELOCITY<TV>& dv=debug_cast<const GENERALIZED_VELOCITY<TV>&>(Bdv);
     PHYSBAM_ASSERT(!h || h==this);
 
-    tmp0.Copy(a,x,d);
-
-    const_cast<MINIMIZATION_OBJECTIVE<TV>*>(this)->v1.Copy(-1,x0,x);
-    const_cast<MINIMIZATION_OBJECTIVE<TV>*>(this)->v1*=1/dt;
-    const_cast<MINIMIZATION_OBJECTIVE<TV>*>(this)->x1.Copy(1,x);
+    v1.Copy(1,dv,v0);
+    x1.Copy(dt,v1,x0);
     solid_body_collection.Update_Position_Based_State(time,true);
+
+    system.projection_data.mass.Multiply(dv,tmp0,false);
 
     if(e){
         T ke=0,pe=0;
         solid_body_collection.Compute_Energy(time,ke,pe);
-        *e=system.Inner_Product(tmp0,tmp0)/(2*a)+pe;}
+        *e=Inner_Product(dv,tmp0)/2+pe;}
 
     if(g){
         tmp1*=0;
         solid_body_collection.Add_Velocity_Independent_Forces(tmp1.V.array,tmp1.rigid_V.array,time);
-        system.projection_data.mass.Multiply(tmp0,debug_cast<GENERALIZED_VELOCITY<TV>&>(*g),false);
-        *g-=tmp1;}
+        g->Copy(-dt,tmp1,tmp0);}
 }
 //#####################################################################
 // Function Multiply
@@ -74,9 +67,9 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 {
     const GENERALIZED_VELOCITY<TV>& V=debug_cast<const GENERALIZED_VELOCITY<TV>&>(BV);
     GENERALIZED_VELOCITY<TV>& F=debug_cast<GENERALIZED_VELOCITY<TV>&>(BF);
-    solid_body_collection.Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,-1,time);
+    solid_body_collection.Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,-dt*dt,time);
     system.projection_data.mass.Multiply(V,tmp0,false);
-    F.Copy(a,tmp0,F);
+    F+=tmp0;
 }
 //#####################################################################
 // Function Inner_Product
