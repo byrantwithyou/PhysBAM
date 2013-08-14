@@ -7,6 +7,7 @@
 #include <Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
 #include <Geometry/Basic_Geometry/BOWL.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
+#include <Geometry/Basic_Geometry/LINE_2D.h>
 #include <Geometry/Basic_Geometry/RING.h>
 #include <Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
@@ -17,6 +18,7 @@
 #include <Geometry/Tessellation/CYLINDER_TESSELLATION.h>
 #include <Geometry/Tessellation/GEAR_TESSELLATION.h>
 #include <Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
+#include <Geometry/Tessellation/PLANE_TESSELLATION.h>
 #include <Geometry/Tessellation/RANGE_TESSELLATION.h>
 #include <Geometry/Tessellation/RING_TESSELLATION.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
@@ -271,6 +273,20 @@ Add_Analytic_Smooth_Gear(const TV& dimensions,int cogs,int levels)
     return rigid_body;
 }
 //#####################################################################
+// Function Add_Analytic_Smooth_Gear
+//#####################################################################
+template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
+Add_Analytic_Plane(const TV& normal,const TV& X,T surface_size,int elements_per_side)
+{
+    typedef typename BASIC_GEOMETRY_POLICY<TV>::HYPERPLANE T_OBJECT;
+    RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
+    T_OBJECT plane(normal,X);
+    rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<T_OBJECT>(plane));
+    rigid_body.Add_Structure(*TESSELLATION::Tessellate_Boundary(plane,surface_size,elements_per_side));
+    rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
+    return rigid_body;
+}
+//#####################################################################
 // Function Add_Analytic_Sphere
 //#####################################################################
 template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
@@ -372,6 +388,10 @@ template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::
 template void RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Make_Lathe_Chain(FRAME<VECTOR<float,3> > const&,float,float,float);
 template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Smooth_Gear(VECTOR<float,2> const&,int,int);
 template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Sphere(float,float,int);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Plane(VECTOR<float,3> const&,VECTOR<float,3> const&,float,int);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Plane(VECTOR<double,3> const&,VECTOR<double,3> const&,double,int);
+template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Plane(VECTOR<float,2> const&,VECTOR<float,2> const&,float,int);
+template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Plane(VECTOR<double,2> const&,VECTOR<double,2> const&,double,int);
 template RIGIDS_STANDARD_TESTS<VECTOR<double,1> >::RIGIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,RIGID_BODY_COLLECTION<VECTOR<double,1> >&);
 template RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::RIGIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,RIGID_BODY_COLLECTION<VECTOR<double,3> >&);
 template RIGIDS_STANDARD_TESTS<VECTOR<float,1> >::RIGIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,RIGID_BODY_COLLECTION<VECTOR<float,1> >&);

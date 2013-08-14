@@ -24,7 +24,6 @@ public:
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
 
     RIGIDS_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& data_directory,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);
-
 //#####################################################################
     RIGID_BODY<TV>& Add_Rigid_Body(const std::string& name,const T scaling_factor,const T friction,const bool read_implicit=true,const bool always_read_object=false);
     RIGID_BODY<TV>& Add_Ground(const T friction=(T).3,const T height=0,const T coefficient_of_restitution=(T).5,const T scale=(T)1);
@@ -37,6 +36,7 @@ public:
     RIGID_BODY<TV>& Add_Analytic_Bowl(const T height,const T outer_radius,const T inner_radius,int res_radial=32,int res_vertical=8);
     RIGID_BODY<TV>& Add_Analytic_Sphere(const T radius,const T density,int levels=4);
     RIGID_BODY<TV>& Add_Analytic_Smooth_Gear(const TV& dimensions,int cogs,int levels=4);
+    RIGID_BODY<TV>& Add_Analytic_Plane(const TV& normal,const TV& X,T surface_size=1000,int elements_per_side=1);
     void Make_Lathe_Chain(const FRAME<TV>& frame,const T scale=1,const T friction=(T).6,const T cor=(T).3);
     void Set_Joint_Frames(JOINT_ID id,const TV& location);
     JOINT_ID Connect_With_Point_Joint(RIGID_BODY<TV>& parent,RIGID_BODY<TV>& child,const TV& location);
