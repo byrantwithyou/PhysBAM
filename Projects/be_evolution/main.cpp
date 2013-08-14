@@ -14,8 +14,10 @@
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
@@ -60,28 +62,26 @@ public:
 };
 
 template<class T,class TV,class TV_INT> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT&
-Insert_Cube(SOLID_BODY_COLLECTION<TV>& solid_body_collection,SOLIDS_STANDARD_TESTS<TV>& tests,TV_INT resolution,const RANGE<TV>& range,T stiffness,T poissons_ratio,bool enforce_definiteness=false)
+Insert_Cube(SOLIDS_STANDARD_TESTS<TV>& tests,TV_INT resolution,const RANGE<TV>& range,T stiffness,T poissons_ratio,bool enforce_definiteness=false)
 {
     GRID<TV> cube_grid(resolution,range);
     typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT& obj=tests.Create_Mattress(cube_grid);
-    solid_body_collection.Add_Force(Create_Finite_Volume(obj,new COROTATED_FIXED<T,TV::m>(stiffness,poissons_ratio,0)));
-    for(int i=0;i<solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
-        solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
+    tests.solid_body_collection.Add_Force(Create_Finite_Volume(obj,new COROTATED_FIXED<T,TV::m>(stiffness,poissons_ratio,0)));
+    for(int i=0;i<tests.solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
+        tests.solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(enforce_definiteness) tests.solid_body_collection.Enforce_Definiteness(true);
     return obj;
 }
 
 template<class TV,class T> IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>*
-Add_Ground(SOLID_BODY_COLLECTION<TV>& solid_body_collection,T stiffness=(T)1e4,T separation_parameter=(T)1e-4,
+Add_Ground(SOLIDS_STANDARD_TESTS<TV>& tests,T stiffness=(T)1e4,T separation_parameter=(T)1e-4,
     T length_scale=1,T y=0,TV normal=TV::Axis_Vector(1))
 {
-    PLANE<T> plane(normal,normal*y);
-    IMPLICIT_OBJECT<TV>* implicit_object=new ANALYTIC_IMPLICIT_OBJECT<PLANE<T> >(plane);
+    RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Plane(normal,normal*y,10,5);
     IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>* penalty_force=
-        new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(solid_body_collection.deformable_body_collection.particles,
-            implicit_object,stiffness,separation_parameter,length_scale);
-    penalty_force->own_implicit_object=true;
-    solid_body_collection.Add_Force(penalty_force);
+        new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(tests.solid_body_collection.deformable_body_collection.particles,
+            rigid_body.implicit_object,stiffness,separation_parameter,length_scale);
+     tests.solid_body_collection.Add_Force(penalty_force);
     return penalty_force;
 }
 
@@ -118,26 +118,26 @@ void Init_Test(SIMULATION<VECTOR<T,3> >& simulation,STREAM_TYPE stream_type,PARS
 
     switch(test_number){
         case 0:
-            Insert_Cube(simulation.solid_body_collection,tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness);
+            Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness);
             break;
 
         case 1:
-            random.Fill_Uniform(Insert_Cube(simulation.solid_body_collection,tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness).particles.X,-1,1);
+            random.Fill_Uniform(Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness).particles.X,-1,1);
             break;
 
         case 2:
-            Insert_Cube(simulation.solid_body_collection,tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness).particles.X.Fill(TV());
+            Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness).particles.X.Fill(TV());
             break;
 
         case 3:{
-            ARRAY_VIEW<TV> X=Insert_Cube(simulation.solid_body_collection,tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness).particles.X;
+            ARRAY_VIEW<TV> X=Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness).particles.X;
             for(int i=0;i<X.m;i++) X(i)*=nonuniform_scale;}
             break;
 
         case 4:{
-            TETRAHEDRALIZED_VOLUME<T>& tv=Insert_Cube(simulation.solid_body_collection,tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness);
+            TETRAHEDRALIZED_VOLUME<T>& tv=Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness);
             simulation.solid_body_collection.Add_Force(new DEFORMABLE_GRAVITY<TV>(particles,tv.mesh));
-            Add_Ground(simulation.solid_body_collection,(T)1e4,(T)1e-4,(T)1,(T)-2);}
+            Add_Ground(tests,(T)1e4,(T)2e-2,(T).3,(T)-2);}
             break;
 
         default:
