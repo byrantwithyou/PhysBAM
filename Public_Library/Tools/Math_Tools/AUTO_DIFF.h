@@ -239,6 +239,9 @@ struct AUTO_DIFF<TV,TV>
     AUTO_DIFF<T,TV> operator()(int i) const
     {return AUTO_DIFF<T,TV>(x(i),dx.Row(i));}
 
+    void Set_Entry(int i,const AUTO_DIFF<T,TV>& a)
+    {x(i)=a.x;dx.Set_Row(i,a.dx);}
+
     AUTO_DIFF operator-() const
     {return AUTO_DIFF(-x,-dx);}
 
@@ -315,6 +318,54 @@ inline AUTO_DIFF<TV,TV> operator*(const AUTO_DIFF<typename TV::SCALAR,TV>& a,con
 template<class TV>
 inline AUTO_DIFF<TV,TV> operator*(typename TV::SCALAR a,const AUTO_DIFF<TV,TV>& v)
 {return v*a;}
+
+template<class T>
+inline AUTO_DIFF<VECTOR<T,0>,VECTOR<T,0> > abs(const AUTO_DIFF<VECTOR<T,0>,VECTOR<T,0> >& a)
+{return AUTO_DIFF<VECTOR<T,0>,VECTOR<T,0> >();}
+
+template<class T>
+inline AUTO_DIFF<VECTOR<T,1>,VECTOR<T,1> > abs(const AUTO_DIFF<VECTOR<T,1>,VECTOR<T,1> >& a)
+{return AUTO_DIFF<VECTOR<T,1>,VECTOR<T,1> >(abs(a(0)));}
+
+template<class T>
+inline AUTO_DIFF<VECTOR<T,2>,VECTOR<T,2> > abs(const AUTO_DIFF<VECTOR<T,2>,VECTOR<T,2> >& a)
+{return AUTO_DIFF<VECTOR<T,2>,VECTOR<T,2> >(abs(a(0)),abs(a(1)));}
+
+template<class T>
+inline AUTO_DIFF<VECTOR<T,3>,VECTOR<T,3> > abs(const AUTO_DIFF<VECTOR<T,3>,VECTOR<T,3> >& a)
+{return AUTO_DIFF<VECTOR<T,3>,VECTOR<T,3> >(abs(a(0)),abs(a(1)),abs(a(2)));}
+
+template<class T>
+inline AUTO_DIFF<T,VECTOR<T,0> > max(const AUTO_DIFF<VECTOR<T,0>,VECTOR<T,0> >& a)
+{return AUTO_DIFF<T,VECTOR<T,0> >();}
+
+template<class T>
+inline AUTO_DIFF<T,VECTOR<T,1> > max(const AUTO_DIFF<VECTOR<T,1>,VECTOR<T,1> >& a)
+{return a(0);}
+
+template<class T>
+inline AUTO_DIFF<T,VECTOR<T,2> > max(const AUTO_DIFF<VECTOR<T,2>,VECTOR<T,2> >& a)
+{return max(a(0),a(1));}
+
+template<class T>
+inline AUTO_DIFF<T,VECTOR<T,3> > max(const AUTO_DIFF<VECTOR<T,3>,VECTOR<T,3> >& a)
+{return max(a(0),max(a(1),a(2)));}
+
+template<class T>
+inline AUTO_DIFF<T,VECTOR<T,0> > min(const AUTO_DIFF<VECTOR<T,0>,VECTOR<T,0> >& a)
+{return AUTO_DIFF<T,VECTOR<T,0> >();}
+
+template<class T>
+inline AUTO_DIFF<T,VECTOR<T,1> > min(const AUTO_DIFF<VECTOR<T,1>,VECTOR<T,1> >& a)
+{return a(0);}
+
+template<class T>
+inline AUTO_DIFF<T,VECTOR<T,2> > min(const AUTO_DIFF<VECTOR<T,2>,VECTOR<T,2> >& a)
+{return min(a(0),a(1));}
+
+template<class T>
+inline AUTO_DIFF<T,VECTOR<T,3> > min(const AUTO_DIFF<VECTOR<T,3>,VECTOR<T,3> >& a)
+{return min(a(0),min(a(1),a(2)));}
 
 }
 #endif
