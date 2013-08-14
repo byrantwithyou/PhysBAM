@@ -2,10 +2,10 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class LOCAL_NEWTONS_METHOD
+// Class LOCAL_TRUST_REGION_NEWTONS_METHOD
 //#####################################################################
-#ifndef __LOCAL_NEWTONS_METHOD__
-#define __LOCAL_NEWTONS_METHOD__
+#ifndef __LOCAL_TRUST_REGION_NEWTONS_METHOD__
+#define __LOCAL_TRUST_REGION_NEWTONS_METHOD__
 
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
@@ -13,35 +13,37 @@
 
 namespace PhysBAM{
 template <class T>
-struct LOCAL_NEWTONS_METHOD
+struct LOCAL_TRUST_REGION_NEWTONS_METHOD
 {
-    bool use_golden_section_search;
-    bool use_wolfe_conditions;
-    bool use_gradient_descent_failsafe;
+    T eta0;
+    T eta1;
+    T eta2;
+    T sigma1;
+    T sigma2;
+    T sigma3;
+    T use_gradient_descent_failsafe;
+    T tr_revise_torelance;
     T tolerance;
     T progress_tolerance;
     int max_iterations;
     T krylov_tolerance;
     bool fail_on_krylov_not_converged;
     int max_krylov_iterations;
-    int max_golden_section_iterations;
-    int max_wolfe_iterations;
-    T a_tolerance;
     T angle_tolerance;
     bool use_cg;
-    T c1;
-    T c2;
-
-    LOCAL_NEWTONS_METHOD()
-        :use_golden_section_search(true),use_wolfe_conditions(false),use_gradient_descent_failsafe(true),tolerance((T)5e-10),
+    bool use_dogleg;
+    bool use_trcg;
+    LOCAL_TRUST_REGION_NEWTONS_METHOD()
+        :eta0((T)1e-4),eta1((T)0.25),eta2((T)0.75),sigma1((T)0.25),sigma2((T)0.5),sigma3((T)4),
+        use_gradient_descent_failsafe(true),tr_revise_torelance((T)0.20),tolerance((T)5e-10),
         progress_tolerance((T)5e-10),max_iterations(100),krylov_tolerance((T)1e-10),fail_on_krylov_not_converged(false),
-        max_krylov_iterations(100000),max_golden_section_iterations(10*sizeof(T)),max_wolfe_iterations(10*sizeof(T)),a_tolerance(-(T)2.0),angle_tolerance(0),use_cg(false),c1(0.0001),c2(0.9)
+        max_krylov_iterations(100000),angle_tolerance(0),use_cg(false),use_dogleg(false),use_trcg(true)
     {}
 
-    ~LOCAL_NEWTONS_METHOD(){}
+    ~LOCAL_TRUST_REGION_NEWTONS_METHOD(){}
 
     // Minimize F(x)
-    bool Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYSTEM_BASE<T>& sys,KRYLOV_VECTOR_BASE<T>& x);
+    bool Trust_Region_Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYSTEM_BASE<T>& sys,KRYLOV_VECTOR_BASE<T>& x);
 };
 }
 #endif

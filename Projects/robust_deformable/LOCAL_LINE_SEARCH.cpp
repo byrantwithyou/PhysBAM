@@ -80,6 +80,7 @@ Line_Search_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,int max_iter
         t=s.a+s.b-s.m;
         Update_Interval(s,t,F(t));}
     x=Best_Value(s);
+    printf("------------------------------------%d\n",i);
     return i<=max_iterations;
 }
 //####################################################################
@@ -114,6 +115,8 @@ Line_Search_For_Wolfe_Conditions(NONLINEAR_FUNCTION<T(T)>& F,T gx,T a,T c1,T c2,
     T F_max=0;
     T F_0=F(0);
     T gx_ai;
+    printf("-----------------------------------------------------------test\n");
+    PHYSBAM_ASSERT(gx<0);
     for(i=0;i<max_iterations;i++){
         F_i=F(a_i);
         if(F_i-F_0>c1*gx*a_i){
@@ -131,6 +134,10 @@ Line_Search_For_Wolfe_Conditions(NONLINEAR_FUNCTION<T(T)>& F,T gx,T a,T c1,T c2,
             a_i=Interpolate_Quadratic_Alpha(F_i,F_max,gx_ai,a_i,a_tolerance);}}
 
     x = a_i;
+    printf("-----------------------------------------------------------test\n");
+   PHYSBAM_ASSERT(x>=0); 
+   PHYSBAM_ASSERT(F(x)<=F_0);
+ 
     return i<=max_iterations;
 }
 //####################################################################
@@ -148,10 +155,9 @@ Zoom_Interval(NONLINEAR_FUNCTION<T(T)>& F,T gx,T gx_ai,T F_0,T a_lo,T a_hi,T c1,
     T gx_hi=F.Prime(a_hi);
     T gx_aj;
     for(j=0;j<max_iterations;j++){
-        //a_j=Interpolate_Quadratic_Alpha(F_lo,F_hi,gx_lo,a_lo,a_hi);
-        a_j=Interpolate_Quadratic_Alpha(F_hi,F_lo,gx_hi,a_hi,a_lo);
-        //a_j=Interpolate_Cubic_Alpha(F_lo,F_hi,gx_lo,gx_hi,a_lo,a_hi);
-        //if(a_j==-1.0) return -1;
+        //a_j=Interpolate_Quadratic_Alpha(F_hi,F_lo,gx_hi,a_hi,a_lo);
+        a_j=Interpolate_Cubic_Alpha(F_lo,F_hi,gx_lo,gx_hi,a_lo,a_hi);
+        if(a_j==-1.0) return -1;
         //printf("%lf\n",a_j);
         F_temp=F(a_j);
         if(F_temp>=F_lo){

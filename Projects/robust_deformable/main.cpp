@@ -21,6 +21,7 @@
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <climits>
 #include "LOCAL_NEWTONS_METHOD.h"
+#include "LOCAL_TRUST_REGION_NEWTONS_METHOD.h"
 
 using namespace PhysBAM;
 
@@ -119,7 +120,8 @@ class SIMULATION
 public:
     SOLID_BODY_COLLECTION<TV> solid_body_collection;
     T time;
-    LOCAL_NEWTONS_METHOD<T> nm;
+    //LOCAL_NEWTONS_METHOD<T> nm;
+    LOCAL_TRUST_REGION_NEWTONS_METHOD<T> nm;
 
     SIMULATION()
     {
@@ -142,7 +144,8 @@ public:
         *x0=obj.x0;
         obj.Test(*x0,obj);
 
-        bool converged=nm.Newtons_Method(obj,obj,*x0);
+        //bool converged=nm.Newtons_Method(obj,obj,*x0);
+        bool converged=nm.Trust_Region_Newtons_Method(obj,obj,*x0);
         PHYSBAM_ASSERT(converged);
         delete x0;
     }
