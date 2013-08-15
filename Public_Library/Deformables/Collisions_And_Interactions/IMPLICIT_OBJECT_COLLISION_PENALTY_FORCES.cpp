@@ -138,7 +138,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
 {
     for(int i=0;i<penetrating_particles.m;i++){
         int p=penetrating_particles(i);
-        F(p)-=H_pe(p)*V(p);}
+        F(p)-=H_pe(i)*V(p);}
 }
 //#####################################################################
 // Function Enforce_Definiteness
