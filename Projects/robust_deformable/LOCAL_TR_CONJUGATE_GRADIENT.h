@@ -10,7 +10,7 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
-//#include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
+
 namespace PhysBAM{
 
 // see Golub and Van Loan, 10.2.6, p. 529 for details
@@ -19,10 +19,10 @@ namespace PhysBAM{
 // approximate total flops = 2v + 10n
 
 template<class T_MATRIX> struct IS_MATRIX;
-enum KRYLOV_SOLVER_TYPE {krylov_solver_cg,krylov_solver_cr,krylov_solver_symmqmr};
+//enum KRYLOV_SOLVER_TYPE {krylov_solver_cg,krylov_solver_cr,krylov_solver_symmqmr};
 
 template<class T>
-class KRYLOV_SOLVER
+class LOCAL_KRYLOV_SOLVER
 {
 public:
     bool print_diagnostics,print_residuals,relative_tolerance;
@@ -31,8 +31,8 @@ public:
     T residual_magnitude_squared,nullspace_measure; // extra convergence information
     int restart_iterations;
 
-    KRYLOV_SOLVER();
-    virtual ~KRYLOV_SOLVER();
+    LOCAL_KRYLOV_SOLVER();
+    virtual ~LOCAL_KRYLOV_SOLVER();
 
 //#####################################################################
     static void Ensure_Size(ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const KRYLOV_VECTOR_BASE<T>& v,int size);
@@ -42,9 +42,9 @@ public:
 };
 
 template<class T>
-class LOCAL_TR_CONJUGATE_GRADIENT:public KRYLOV_SOLVER<T>
+class LOCAL_TR_CONJUGATE_GRADIENT:public LOCAL_KRYLOV_SOLVER<T>
 {
-    typedef KRYLOV_SOLVER<T> BASE;
+    typedef LOCAL_KRYLOV_SOLVER<T> BASE;
 public:
     using BASE::restart_iterations;using BASE::residual_magnitude_squared;using BASE::iterations_used;
     using BASE::print_diagnostics;using BASE::print_residuals;using BASE::relative_tolerance;

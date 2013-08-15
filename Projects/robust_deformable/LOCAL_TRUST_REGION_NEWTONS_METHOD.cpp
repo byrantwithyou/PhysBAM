@@ -2,9 +2,9 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-//#include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
+#include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-//#include <Tools/Krylov_Solvers/MINRES.h>
+#include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include "LOCAL_TRUST_REGION_NEWTONS_METHOD.h"
@@ -21,11 +21,11 @@ Trust_Region_Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>&
     KRYLOV_VECTOR_BASE<T>& tm=*x.Clone_Default();
     KRYLOV_VECTOR_BASE<T>& pu=*x.Clone_Default();
     KRYLOV_VECTOR_BASE<T>& pk=*x.Clone_Default();
-//    MINRES<T> minres;
-    //   CONJUGATE_GRADIENT<T> cg;
+    MINRES<T> minres;
+    CONJUGATE_GRADIENT<T> cg;
     LOCAL_TR_CONJUGATE_GRADIENT<T> trcg;
-//    KRYLOV_SOLVER<T>* krylov=&minres;
-//    if(use_cg) krylov=&cg;
+    KRYLOV_SOLVER<T>* krylov=&minres;
+    if(use_cg) krylov=&cg;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
 
     bool result=false;
@@ -48,8 +48,8 @@ Trust_Region_Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>&
             if(norm_pu>=trust_region&&i>0&&trust_region>(T)0.05){pk.Copy(trust_region/norm_pu,pu);printf("unconstrained\n");}
             else{
                 dx*=0;
-                //              if(!krylov->Solve(sys,dx,grad,av,krylov_tolerance,0,max_krylov_iterations) && fail_on_krylov_not_converged)
-                //  break;
+                if(!krylov->Solve(sys,dx,grad,av,krylov_tolerance,0,max_krylov_iterations) && fail_on_krylov_not_converged)
+                    break;
 
                 dx*=-1;
                 T dx_dx=sys.Inner_Product(dx,dx);
@@ -106,7 +106,7 @@ Trust_Region_Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>&
         printf("rho: %g  n_pk: %g  trustRegion: %g  E-testE: %g\n",actred/prered,n_pk,trust_region,actred);
         PHYSBAM_ASSERT(trust_region>(T)1e-10);
         if(actred>eta0*prered){x.Copy((T)1,pk,x);E=testE;printf("success\n");}
-        else if(trust_region<(T)0.001){x.Copy((T)-1,pk,x);F.Compute(x,0,0,&testE);printf("backword\n");if(E-testE<(T)-1e2){printf("backback\n");T teste;x.Copy((T)0.5,pk,x);F.Compute(x,0,0,&teste);x.Copy((T)0.5,pk,x);F.Compute(x,0,0,&E);printf("whichi:%g %g\n",teste,E);}}
+        else if(trust_region<(T)0.001){x.Copy((T)-1,pk,x);F.Compute(x,0,0,&E);printf("backword\n");trust_region=(T)0.01;}//if the trust region is improper small, it will expand again.
         else{printf("trust region faild\n");}
 
         last_E=E;}

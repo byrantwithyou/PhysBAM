@@ -13,8 +13,8 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T> KRYLOV_SOLVER<T>::
-KRYLOV_SOLVER()
+template<class T> LOCAL_KRYLOV_SOLVER<T>::
+LOCAL_KRYLOV_SOLVER()
     :print_diagnostics(true),print_residuals(false),relative_tolerance(false),nullspace_tolerance((T)1e-5),iterations_used(0),residual_magnitude_squared(0),
     nullspace_measure(0),restart_iterations(0)
 {
@@ -22,14 +22,14 @@ KRYLOV_SOLVER()
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T> KRYLOV_SOLVER<T>::
-~KRYLOV_SOLVER()
+template<class T> LOCAL_KRYLOV_SOLVER<T>::
+~LOCAL_KRYLOV_SOLVER()
 {
 }
 //#####################################################################
 // Function Ensure_Size
 //#####################################################################
-template<class T> void KRYLOV_SOLVER<T>::
+template<class T> void LOCAL_KRYLOV_SOLVER<T>::
 Ensure_Size(ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const KRYLOV_VECTOR_BASE<T>& v,int size)
 {
     for(int i=0,m=min(size,av.m);i<m;i++)
@@ -42,8 +42,8 @@ Ensure_Size(ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const KRYLOV_VECTOR_BASE<T>& v,int
         av(i)=v.Clone_Default();
 }
 namespace PhysBAM{
-template class KRYLOV_SOLVER<float>;
-template class KRYLOV_SOLVER<double>;
+template class LOCAL_KRYLOV_SOLVER<float>;
+template class LOCAL_KRYLOV_SOLVER<double>;
 }
 
 

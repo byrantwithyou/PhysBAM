@@ -32,12 +32,11 @@ struct LOCAL_TRUST_REGION_NEWTONS_METHOD
     T angle_tolerance;
     bool use_cg;
     bool use_dogleg;
-    bool use_trcg;
     LOCAL_TRUST_REGION_NEWTONS_METHOD()
         :eta0((T)1e-4),eta1((T)0.25),eta2((T)0.75),sigma1((T)0.25),sigma2((T)0.5),sigma3((T)4),
         use_gradient_descent_failsafe(true),tr_revise_torelance((T)0.20),tolerance((T)5e-10),
         progress_tolerance((T)5e-10),max_iterations(100),krylov_tolerance((T)1e-10),fail_on_krylov_not_converged(false),
-        max_krylov_iterations(100000),angle_tolerance(0),use_cg(false),use_dogleg(false),use_trcg(true)
+        max_krylov_iterations(100000),angle_tolerance(0),use_cg(false),use_dogleg(false)
     {}
 
     ~LOCAL_TRUST_REGION_NEWTONS_METHOD(){}
