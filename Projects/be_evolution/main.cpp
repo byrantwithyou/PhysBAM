@@ -62,14 +62,11 @@ public:
 };
 
 template<class T,class TV,class TV_INT> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT&
-Insert_Cube(SOLIDS_STANDARD_TESTS<TV>& tests,TV_INT resolution,const RANGE<TV>& range,T stiffness,T poissons_ratio,bool enforce_definiteness=false)
+Insert_Cube(SOLIDS_STANDARD_TESTS<TV>& tests,TV_INT resolution,const RANGE<TV>& range,T stiffness,T poissons_ratio)
 {
     GRID<TV> cube_grid(resolution,range);
     typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT& obj=tests.Create_Mattress(cube_grid);
     tests.solid_body_collection.Add_Force(Create_Finite_Volume(obj,new COROTATED_FIXED<T,TV::m>(stiffness,poissons_ratio,0)));
-    for(int i=0;i<tests.solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
-        tests.solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(enforce_definiteness) tests.solid_body_collection.Enforce_Definiteness(true);
     return obj;
 }
 
@@ -99,13 +96,11 @@ void Init_Test(SIMULATION<VECTOR<T,3> >& simulation,STREAM_TYPE stream_type,PARS
     typedef VECTOR<int,TV::m> TV_INT;
 
     int test_number=0,resolution=6,seed=-1;
-    bool enforce_definiteness=false;
     T stiffness=(T)1e6,poissons_ratio=(T).3;
     TV nonuniform_scale=TV((T).5,(T).9,(T)1.2);
     parse_args.Extra_Optional(&test_number,"example number","example number to run");
     parse_args.Add("-seed",&seed,"fixed seed","set random seed");
     parse_args.Add("-resolution",&resolution,"res","resolution");
-    parse_args.Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
     parse_args.Add("-stiff",&stiffness,"stiffness","constitutive model stiffness");
     parse_args.Add("-pr",&poissons_ratio,"ratio","constitutive model poissons ratio");
     parse_args.Add("-nonuniform_scale",&nonuniform_scale,"scale","scale factor");
@@ -118,26 +113,33 @@ void Init_Test(SIMULATION<VECTOR<T,3> >& simulation,STREAM_TYPE stream_type,PARS
 
     switch(test_number){
         case 0:
-            Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness);
+            Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio);
             break;
 
         case 1:
-            random.Fill_Uniform(Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness).particles.X,-1,1);
+            random.Fill_Uniform(Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio).particles.X,-1,1);
             break;
 
         case 2:
-            Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness).particles.X.Fill(TV());
+            Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio).particles.X.Fill(TV());
             break;
 
         case 3:{
-            ARRAY_VIEW<TV> X=Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness).particles.X;
+            ARRAY_VIEW<TV> X=Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio).particles.X;
             for(int i=0;i<X.m;i++) X(i)*=nonuniform_scale;}
             break;
 
         case 4:{
-            TETRAHEDRALIZED_VOLUME<T>& tv=Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio,enforce_definiteness);
+            TETRAHEDRALIZED_VOLUME<T>& tv=Insert_Cube(tests,TV_INT()+resolution,RANGE<TV>::Centered_Box(),stiffness,poissons_ratio);
             simulation.solid_body_collection.Add_Force(new DEFORMABLE_GRAVITY<TV>(particles,tv.mesh));
-            Add_Ground(tests,(T)1e4,(T)2e-2,(T).3,(T)-2);}
+            Add_Ground(tests,(T)1e4,(T)2e-2,(T).1,(T)-2);}
+            break;
+
+        case 5:{
+            TETRAHEDRALIZED_VOLUME<T>& tv=tests.Create_Tetrahedralized_Volume(tests.data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,1000);
+            simulation.solid_body_collection.Add_Force(Create_Finite_Volume(tv,new COROTATED_FIXED<T,TV::m>(stiffness,poissons_ratio,0)));
+            simulation.solid_body_collection.Add_Force(new DEFORMABLE_GRAVITY<TV>(particles,tv.mesh));
+            Add_Ground(tests,(T)1e4,(T)2e-2,(T).1,(T)0);}
             break;
 
         default:
@@ -153,10 +155,13 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     typedef VECTOR<int,TV::m> TV_INT;
     STREAM_TYPE stream_type((RW()));
     std::string output_directory="output";
+    bool enforce_definiteness=false;
 
     int steps=10;
-    T dt=.1;
+    T dt=1./240;
     SIMULATION<TV> simulation;
+    SOLID_BODY_COLLECTION<TV>& solid_body_collection=simulation.solid_body_collection;
+    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
 
     parse_args.Add_Not("-mr",&simulation.nm.use_cg,"use minres instead of cg");
     parse_args.Add("-o",&output_directory,"dir","output directory");
@@ -170,6 +175,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-dt",&dt,"step","time step size");
     parse_args.Add("-steps",&steps,"steps","number of time steps");
     parse_args.Add_Not("-gss",&simulation.nm.use_wolfe_search,"use golden section search instead of wolfe conditions line search");
+    parse_args.Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
     parse_args.Parse(true);
 
     if(!simulation.nm.use_wolfe_search) simulation.nm.use_golden_section_search=true;
@@ -181,8 +187,11 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     NM_Flush_State=[&](const char* str){viewer_wrapper.Flush_State(str);};
 
     Init_Test(simulation,stream_type,parse_args);
+    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++)
+        deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
 
-    simulation.solid_body_collection.Update_Simulated_Particles();
+    solid_body_collection.Update_Simulated_Particles();
     NM_Flush_State("frame %d");
     for(int frame=1;frame<=steps;frame++)
     {
