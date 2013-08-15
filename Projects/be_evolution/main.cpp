@@ -157,8 +157,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     std::string output_directory="output";
     bool enforce_definiteness=false;
 
-    int steps=10;
-    T dt=1./240;
+    int frames=120,steps_per_frame=10;
+    T frame_dt=1./24,dt=frame_dt/steps_per_frame;
     SIMULATION<TV> simulation;
     SOLID_BODY_COLLECTION<TV>& solid_body_collection=simulation.solid_body_collection;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
@@ -173,12 +173,15 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-kry_fail",&simulation.nm.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
     parse_args.Add("-angle_tol",&simulation.nm.angle_tolerance,"tol","gradient descent tolerance");
     parse_args.Add("-dt",&dt,"step","time step size");
-    parse_args.Add("-steps",&steps,"steps","number of time steps");
-    parse_args.Add_Not("-gss",&simulation.nm.use_wolfe_search,"use golden section search instead of wolfe conditions line search");
+    parse_args.Add("-frames",&frames,"frames","number of frames of simulation");
+    parse_args.Add("-spf",&steps_per_frame,"steps","number of time steps per frame");
+    parse_args.Add("-gss",&simulation.nm.use_golden_section_search,"use golden section search instead of wolfe conditions line search");
     parse_args.Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
     parse_args.Parse(true);
 
-    if(!simulation.nm.use_wolfe_search) simulation.nm.use_golden_section_search=true;
+    frame_dt=dt*steps_per_frame;
+
+    if(simulation.nm.use_golden_section_search) simulation.nm.use_wolfe_search=false;
 
     LOG::cout<<std::setprecision(16);
 
@@ -193,11 +196,11 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     solid_body_collection.Update_Simulated_Particles();
     NM_Flush_State("frame %d");
-    for(int frame=1;frame<=steps;frame++)
-    {
-        simulation.Advance_One_Time_Step_Position(dt);
-        NM_Flush_State("frame %d");
-    }
+
+    for(int frame=1;frame<=frames;frame++){
+        for(int s=0;s<steps_per_frame;s++)
+            simulation.Advance_One_Time_Step_Position(dt);
+        NM_Flush_State("frame %d");}
 
     LOG::Finish_Logging();
 }
