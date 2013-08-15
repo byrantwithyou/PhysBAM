@@ -33,7 +33,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
     T last_E=FLT_MAX;
     for(int i=0;i<max_iterations;i++){
         T E=0;
-        F.Compute(x,&sys,&grad,&E); //Edata << E << "\n";
+        F.Compute(x,&sys,&grad,&E);
         T norm_grad=sqrt(sys.Inner_Product(grad,grad));
 //        PHYSBAM_ASSERT(abs(E-last_E)>=progress_tolerance);
         printf("%g %g %g (%g %g)\n", E, abs(E-last_E), norm_grad, progress_tolerance, tolerance);

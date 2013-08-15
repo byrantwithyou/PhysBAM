@@ -92,7 +92,6 @@ Trust_Region_Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>&
         T pk_dot_grad=sys.Inner_Product(pk,grad);
 
         T actred=E-testE;
-        //PHYSBAM_ASSERT(actred>=0);
         T prered=-(pk_dot_grad+0.5*pk_H_pk);
         T alpha;
         if(actred+pk_dot_grad>=0){alpha=sigma3;}
@@ -104,9 +103,9 @@ Trust_Region_Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>&
         else{trust_region=max(trust_region,min(alpha*n_pk,sigma3*trust_region));printf("expand: ");}
         printf("%g -> %g\n",previous_tr,trust_region);
         printf("rho: %g  n_pk: %g  trustRegion: %g  E-testE: %g\n",actred/prered,n_pk,trust_region,actred);
-        PHYSBAM_ASSERT(trust_region>(T)1e-10);
+        //PHYSBAM_ASSERT(trust_region>(T)1e-10);
         if(actred>eta0*prered){x.Copy((T)1,pk,x);E=testE;printf("success\n");}
-        else if(trust_region<(T)0.001){x.Copy((T)-1,pk,x);F.Compute(x,0,0,&E);printf("backword\n");trust_region=(T)0.01;}//if the trust region is improper small, it will expand again.
+        else if(trust_region<(T)0.001){x.Copy((T)-0.5,pk,x);F.Compute(x,0,0,&E);printf("backword\n");trust_region=(T)0.01;}//if the trust region is improper small, it will expand again.
         else{printf("trust region faild\n");}
 
         last_E=E;}
