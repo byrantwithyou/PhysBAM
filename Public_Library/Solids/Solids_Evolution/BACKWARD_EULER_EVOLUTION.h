@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2006-2007, Geoffrey Irving, Craig Schroeder, Andrew Selle, Tamar Shinar, Joseph Teran.
+// Copyright 2013.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class BACKWARD_EULER_EVOLUTION
@@ -8,35 +8,40 @@
 #define __BACKWARD_EULER_EVOLUTION__
 
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 namespace PhysBAM{
+
+template<class T> struct NEWTONS_METHOD;
+template<class TV> class BACKWARD_EULER_MINIMIZATION_OBJECTIVE;
+template<class TV> class BACKWARD_EULER_SYSTEM;
+template<class TV> class BACKWARD_EULER_MINIMIZATION_SYSTEM;
+template<class TV> class GENERALIZED_VELOCITY;
 
 template<class TV>
 class BACKWARD_EULER_EVOLUTION:public SOLIDS_EVOLUTION<TV>
 {
     typedef typename TV::SCALAR T;
-public:
+    typedef typename TV::SPIN T_SPIN;
     typedef SOLIDS_EVOLUTION<TV> BASE;
-    using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::Euler_Step_Position;
-private:
-    using BASE::B_full;using BASE::rigid_B_full;using BASE::krylov_vectors;using BASE::example_forces_and_velocities;
-    mutable ARRAY<TV> dV_full;
-public:
+  public:
+    using BASE::krylov_vectors;using BASE::world_space_rigid_mass;using BASE::world_space_rigid_mass_inverse;using BASE::time;
+    using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::kinematic_evolution;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::example_forces_and_velocities;
 
-    BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities);
+    NEWTONS_METHOD<T>& newtons_method;
+    BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>& minimization_system;
+    BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>& minimization_objective;
+    GENERALIZED_VELOCITY<TV>& dv;
 
-    bool Use_CFL() const PHYSBAM_OVERRIDE
-    {return true;}
-
-    void Initialize_Rigid_Bodies(const T frame_rate, const bool restart) PHYSBAM_OVERRIDE
-    {PHYSBAM_NOT_IMPLEMENTED();}
+    BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input);
+    virtual ~BACKWARD_EULER_EVOLUTION();
 
 //#####################################################################
-    void Advance_One_Time_Step_Position(const T dt,const T time,const bool solids) PHYSBAM_OVERRIDE {PHYSBAM_NOT_IMPLEMENTED();}
+    bool Use_CFL() const PHYSBAM_OVERRIDE;
+    void Advance_One_Time_Step_Position(const T dt,const T time,const bool solids) PHYSBAM_OVERRIDE;
     void Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) PHYSBAM_OVERRIDE;
-private:
-    void One_Newton_Step_Backward_Euler(const T dt,const T time,ARRAY_VIEW<const TV> V_save,ARRAY<TV>& dV_full);
+    void Initialize_Rigid_Bodies(const T frame_rate, const bool restart) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

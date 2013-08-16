@@ -1,6 +1,4 @@
 # SConscript
 
 Import('env Automatic_Program')
-Automatic_Program(env,"be_evolution",["main.cpp","MINIMIZATION_OBJECTIVE.cpp","SIMULATION.cpp"])
-Automatic_Program(env,"be_evolution_2d",["main_2d.cpp","MINIMIZATION_OBJECTIVE.cpp","SIMULATION.cpp"])
-Automatic_Program(env,"basic",["basic.cpp"])
+Automatic_Program(env,"be_evolution",["main.cpp"])
