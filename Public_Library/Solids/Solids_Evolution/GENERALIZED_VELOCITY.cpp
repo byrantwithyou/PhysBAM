@@ -210,7 +210,7 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     const GENERALIZED_VELOCITY<TV>& gv=debug_cast<const GENERALIZED_VELOCITY<TV>&>(v);
     Resize_Helper(V.array,gv.V.array);
     Resize_Helper(rigid_V.array,gv.rigid_V.array);
-    Resize_Helper(kinematic_and_static_rigid_V.array,gv.kinematic_and_static_rigid_V.array);
+    kinematic_and_static_rigid_V.array.Set(rigid_V.array);
 }
 //#####################################################################
 namespace PhysBAM{
