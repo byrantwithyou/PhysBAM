@@ -15,6 +15,7 @@ namespace PhysBAM{
 template<class TV> class SOLID_BODY_COLLECTION;
 template<class TV> class BACKWARD_EULER_MINIMIZATION_SYSTEM;
 template<class TV> class BACKWARD_EULER_SYSTEM;
+template<class TV> class IMPLICIT_OBJECT;
 
 template<class TV>
 class BACKWARD_EULER_MINIMIZATION_OBJECTIVE:public NONLINEAR_FUNCTION<typename TV::SCALAR(KRYLOV_VECTOR_BASE<typename TV::SCALAR>&)>
@@ -28,12 +29,19 @@ public:
     GENERALIZED_VELOCITY<TV> &v0,&tmp0,&tmp1;
     BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>& minimization_system;
     T dt,time;
+    ARRAY<IMPLICIT_OBJECT<TV>*> collision_objects;
+    T collision_thickness;
 
     BACKWARD_EULER_MINIMIZATION_OBJECTIVE(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>& minimization_system);
     virtual ~BACKWARD_EULER_MINIMIZATION_OBJECTIVE();
 
     void Reset();
     void Compute(const KRYLOV_VECTOR_BASE<T>& dv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const PHYSBAM_OVERRIDE;
+    void Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& dv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const;
+    void Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const;
+    void Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const PHYSBAM_OVERRIDE;
+    void Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& dv) const;
+    void Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv);
 };
 }
 #endif

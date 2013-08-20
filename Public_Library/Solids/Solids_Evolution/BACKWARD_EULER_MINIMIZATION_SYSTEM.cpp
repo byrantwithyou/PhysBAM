@@ -65,8 +65,11 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BR) const
 // Function Project
 //#####################################################################
 template<class TV> void BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::
-Project(KRYLOV_VECTOR_BASE<T>& V) const
+Project(KRYLOV_VECTOR_BASE<T>& BV) const
 {
+    GENERALIZED_VELOCITY<TV>& V=debug_cast<GENERALIZED_VELOCITY<TV>&>(BV);
+    for(int i=0;i<colliding_particles.m;i++)
+        V.V.array(colliding_particles(i)).Project_Orthogonal_To_Unit_Direction(colliding_normals(i));
 }
 //#####################################################################
 // Function Project_Nullspace

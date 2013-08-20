@@ -86,6 +86,8 @@
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_EVOLUTION.h>
+#include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h>
+#include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h>
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
@@ -149,6 +151,7 @@ public:
     bool project_nullspace;
     BACKWARD_EULER_EVOLUTION<TV>* backward_euler_evolution;
     bool use_penalty_collisions;
+    bool use_constraint_collisions;
     T penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length;
     bool enforce_definiteness;
 
@@ -163,8 +166,8 @@ public:
         ether_drag(0),sigma_range(3),image_size(500),pin_corners(false),rand_seed(1234),
         use_rand_seed(false),use_residuals(false),use_newmark(false),use_newmark_be(false),project_nullspace(false),
         backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
-        use_penalty_collisions(true),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),penalty_collisions_length(1),
-        enforce_definiteness(false)
+        use_penalty_collisions(true),use_constraint_collisions(false),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
+        penalty_collisions_length(1),enforce_definiteness(false)
     {
         this->fixed_dt=1./240;
     }
@@ -265,6 +268,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Not("-mr",&backward_euler_evolution->newtons_method.use_cg,"use minres instead of cg");
     parse_args->Add("-gss",&backward_euler_evolution->newtons_method.use_golden_section_search,"use golden section search instead of wolfe conditions line search");
     parse_args->Add_Not("-no_penalty",&use_penalty_collisions,"gradient descent tolerance");
+    parse_args->Add("-constraints",&use_constraint_collisions,"use constrained optimization for collisions");
     parse_args->Add("-penalty_stiffness",&penalty_collisions_stiffness,"tol","gradient descent tolerance");
     parse_args->Add("-penalty_separation",&penalty_collisions_separation,"tol","gradient descent tolerance");
     parse_args->Add("-penalty_length",&penalty_collisions_length,"tol","gradient descent tolerance");
@@ -285,9 +289,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.implicit_solve_parameters.project_nullspace_frequency=project_nullspace;
     if(use_newmark || use_newmark_be) backward_euler_evolution=0;
     else{delete solids_evolution;solids_evolution=backward_euler_evolution;}
+    if(backward_euler_evolution->newtons_method.use_golden_section_search)
+        backward_euler_evolution->newtons_method.use_wolfe_search=false;
 
     switch(test_number){
-        case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 57: case 77: case 80:
+        case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 57: case 77: case 80: case 8:
             if(!resolution) resolution=10;
             mattress_grid=GRID<TV>(TV_INT(resolution+1,resolution+1,resolution+1),RANGE<TV>(TV((T)-1,(T)-1,(T)-1),TV((T)1,(T)1,(T)1)));
             break;
@@ -551,6 +557,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
     //solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;
 
+
+    if(use_constraint_collisions) use_penalty_collisions=false;
     if(use_penalty_collisions){
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
         solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
@@ -577,7 +585,7 @@ void Get_Initial_Data()
     switch(test_number){
         case 1: case 7:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
-            tests.Add_Ground();
+            tests.Add_Ground(0,1.99);
             break;}
         case 2:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
@@ -637,7 +645,7 @@ void Get_Initial_Data()
         case 8:{
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)));
             tests.Create_Mattress(mattress_grid,true,&initial_state);
-            // tests.Add_Ground();
+            tests.Add_Ground();
             break;}
         case 80:{
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)));
@@ -1998,6 +2006,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         for(int b=0;b<rigid_body_collection.rigid_body_particles.number;b++)
             solid_body_collection.Add_Force(new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,
                     rigid_body_collection.Rigid_Body(b).implicit_object,penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));
+    else if(use_constraint_collisions)
+        for(int b=0;b<rigid_body_collection.rigid_body_particles.number;b++)
+            backward_euler_evolution->minimization_objective.collision_objects.Append(rigid_body_collection.Rigid_Body(b).implicit_object);
     else
         for(int i=0;i<deformable_body_collection.structures.m;i++){
             deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.structures(i));

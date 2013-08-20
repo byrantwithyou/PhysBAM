@@ -21,7 +21,11 @@ public:
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     T dt,time;
 
+    ARRAY<int> colliding_particles;
+    ARRAY<TV> colliding_normals;
+
     BACKWARD_EULER_MINIMIZATION_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection);
+
     virtual ~BACKWARD_EULER_MINIMIZATION_SYSTEM();
 
     void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const PHYSBAM_OVERRIDE;
