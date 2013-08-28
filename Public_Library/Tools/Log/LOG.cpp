@@ -60,7 +60,7 @@ class LOG_COUT_BUFFER:public std::stringbuf
             if(end!=std::string::npos){::std::putchar('\n');LOG_ENTRY::needs_indent=true;start=end+1;}
             else break;}
         LOG_ENTRY::start_on_separate_line=false;Instance()->current_entry->end_on_separate_line=true;
-        fflush(stdout);}
+        ::std::fflush(stdout);}
     if(Instance()->log_file){
         if(LOG_ENTRY::log_file_start_on_separate_line) ::std::putc('\n',Instance()->log_file);
         std::string buffer=str();
@@ -75,7 +75,7 @@ class LOG_COUT_BUFFER:public std::stringbuf
                 ::std::putc('\n',Instance()->log_file);LOG_ENTRY::log_file_needs_indent=true;start=end+1;}
             else break;}
         LOG_ENTRY::log_file_start_on_separate_line=false;Instance()->current_entry->log_file_end_on_separate_line=true;
-        fflush(Instance()->log_file);}
+        ::std::fflush(Instance()->log_file);}
     str("");return std::stringbuf::sync();}
 };
 //#####################################################################
@@ -190,13 +190,13 @@ Copy_Log_To_File(const std::string& filename,const bool append)
             Instance()->root->Dump_Names(log_file);
             LOG_ENTRY::log_file_start_on_separate_line=LOG_ENTRY::log_file_needs_indent=Instance()->current_entry->log_file_end_on_separate_line=true;}
         else{
-            fflush(temporary_file);fseek(temporary_file,0,SEEK_SET);
+            ::std::fflush(temporary_file);fseek(temporary_file,0,SEEK_SET);
             ARRAY<char> buffer(4096,false);
             for(;;){
                 int n=(int)fread(buffer.Get_Array_Pointer(),sizeof(char),buffer.m,temporary_file);
                 fwrite(buffer.Get_Array_Pointer(),sizeof(char),n,log_file);
                 if(n<buffer.m) break;}
-            fflush(log_file);}}
+            ::std::fflush(log_file);}}
     if(temporary_file) fclose(temporary_file);
     log_file_temporary=false;
 }

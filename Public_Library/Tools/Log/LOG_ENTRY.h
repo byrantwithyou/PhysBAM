@@ -41,39 +41,39 @@ public:
 
     void Start(LOG_CLASS& instance)
     {if(depth<=verbosity_level){
-        if(start_on_separate_line) putchar('\n');start_on_separate_line=needs_indent=true;
-        printf("%*s%-*s",2*depth,"",50-2*depth,name.c_str());fflush(stdout);}
+        if(start_on_separate_line) ::std::putchar('\n');start_on_separate_line=needs_indent=true;
+        ::std::printf("%*s%-*s",2*depth,"",50-2*depth,name.c_str());::std::fflush(stdout);}
     if(instance.log_file){
-        if(log_file_start_on_separate_line) putc('\n',instance.log_file);log_file_start_on_separate_line=log_file_needs_indent=true;
+        if(log_file_start_on_separate_line) ::std::putc('\n',instance.log_file);log_file_start_on_separate_line=log_file_needs_indent=true;
         if(instance.xml) Start_XML(instance);
-        else fprintf(instance.log_file,"%*s%-*s",2*depth,"",50-2*depth,name.c_str());
-        fflush(instance.log_file);}
+        else ::std::fprintf(instance.log_file,"%*s%-*s",2*depth,"",50-2*depth,name.c_str());
+        ::std::fflush(instance.log_file);}
     timer_start_time=TIMER::Singleton()->Peek_Time(timer_id);}
 
     virtual void Start_XML(LOG_CLASS& instance)
-    {fprintf(instance.log_file,"%*s<scope name=\"%s\">",2*depth,"",name.c_str());}
+    {::std::fprintf(instance.log_file,"%*s<scope name=\"%s\">",2*depth,"",name.c_str());}
 
     void Stop(LOG_CLASS& instance)
     {double time_since_start=(TIMER::Singleton()->Peek_Time(timer_id)-timer_start_time)/1000;
     if(depth<=verbosity_level){
         if(end_on_separate_line){
-            if(start_on_separate_line) putchar('\n');
-            printf("%*sEND %-*s",2*depth,"",50-2*depth-4,name.c_str());}
+            if(start_on_separate_line) ::std::putchar('\n');
+            ::std::printf("%*sEND %-*s",2*depth,"",50-2*depth-4,name.c_str());}
         end_on_separate_line=false;start_on_separate_line=needs_indent=true;
-        printf("%8.4f s",time_since_start);fflush(stdout);}
+        ::std::printf("%8.4f s",time_since_start);::std::fflush(stdout);}
     if(instance.log_file){
         if(instance.xml){
             if(log_file_end_on_separate_line){
-                if(log_file_start_on_separate_line) putc('\n',instance.log_file);
-                fprintf(instance.log_file,"%*s",2*depth,"");}
+                if(log_file_start_on_separate_line) ::std::putc('\n',instance.log_file);
+                ::std::fprintf(instance.log_file,"%*s",2*depth,"");}
             log_file_end_on_separate_line=false;log_file_start_on_separate_line=log_file_needs_indent=true;
-            fprintf(instance.log_file,"<time value=\"%f\"/></scope>",time_since_start);fflush(instance.log_file);}
+            ::std::fprintf(instance.log_file,"<time value=\"%f\"/></scope>",time_since_start);::std::fflush(instance.log_file);}
         else{
             if(log_file_end_on_separate_line){
-                if(log_file_start_on_separate_line) putc('\n',instance.log_file);
-                fprintf(instance.log_file,"%*sEND %-*s",2*depth,"",50-2*depth-4,name.c_str());}
+                if(log_file_start_on_separate_line) ::std::putc('\n',instance.log_file);
+                ::std::fprintf(instance.log_file,"%*sEND %-*s",2*depth,"",50-2*depth-4,name.c_str());}
             log_file_end_on_separate_line=false;log_file_start_on_separate_line=log_file_needs_indent=true;
-            fprintf(instance.log_file,"%8.4f s",time_since_start);fflush(instance.log_file);}}
+            ::std::fprintf(instance.log_file,"%8.4f s",time_since_start);::std::fflush(instance.log_file);}}
     time+=time_since_start;}
 
     virtual LOG_ENTRY* Get_Stop_Time(LOG_CLASS& instance)
@@ -89,10 +89,10 @@ public:
     {Stop(instance);return parent->Get_Pop_Scope(instance);}
 
     virtual void Dump_Log(FILE* output)
-    {fprintf(output,"%*s%-*s%8.4f s\n",2*depth,"",50-2*depth,name.c_str(),time);fflush(output);}
+    {::std::fprintf(output,"%*s%-*s%8.4f s\n",2*depth,"",50-2*depth,name.c_str(),time);::std::fflush(output);}
 
     virtual void Dump_Names(FILE* output)
-    {fprintf(output,"%*s%-*s",2*depth,"",50-2*depth,name.c_str());fflush(output);}
+    {::std::fprintf(output,"%*s%-*s",2*depth,"",50-2*depth,name.c_str());::std::fflush(output);}
 
 //##################################################################### 
 };

@@ -53,7 +53,7 @@ public:
     {fprintf(instance.log_file,"%*s<scope id=\"%s\" name=\"%s\">",2*depth,"",scope_identifier.c_str(),name.c_str());}
 
     void Dump_Log(FILE* output) PHYSBAM_OVERRIDE
-    {fprintf(output,"%*s%-*s%8.4f\n",2*depth,"",50-2*depth,scope_identifier.c_str(),time);fflush(output);
+    {fprintf(output,"%*s%-*s%8.4f\n",2*depth,"",50-2*depth,scope_identifier.c_str(),time);::std::fflush(output);
     for(int i=0;i<children.m;i++) children(i)->Dump_Log(output);}
 
     void Dump_Names(FILE* output) PHYSBAM_OVERRIDE
