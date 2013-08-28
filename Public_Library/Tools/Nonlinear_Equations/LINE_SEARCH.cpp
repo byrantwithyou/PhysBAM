@@ -67,7 +67,7 @@ Line_Search_Quadratic_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,in
     return i<=max_iterations;
 }
 //#####################################################################
-// Function Line_Search_Quadratic_Golden_Section
+// Function Line_Search_Golden_Section
 //#####################################################################
 template<class T> bool LINE_SEARCH<T>::
 Line_Search_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,int max_iterations,T interval_tolerance)
@@ -78,7 +78,7 @@ Line_Search_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,int max_iter
     int i;
     interval_tolerance*=abs(s.a)+abs(s.b);
     for(i=0;i<max_iterations;i++){
-        if(abs(s.b-s.a)<interval_tolerance) break;
+        if(s.a > a && abs(s.b-s.a)<interval_tolerance) break;
         t=s.a+s.b-s.m;
         Update_Interval(s,t,F(t));}
     x=Best_Value(s);
