@@ -264,6 +264,9 @@ public:
     VECTOR Projected_Orthogonal_To_Unit_Direction(const VECTOR& direction) const
     {return *this-Dot_Product(*this,direction)*direction;}
 
+    void Project_Orthogonal_To_Unit_Direction(const VECTOR& direction)
+    {*this-=Dot_Product(*this,direction)*direction;}
+
     static VECTOR<T,1> Cross_Product(const VECTOR<T,0>,const VECTOR&)
     {return VECTOR<T,1>();}
 
