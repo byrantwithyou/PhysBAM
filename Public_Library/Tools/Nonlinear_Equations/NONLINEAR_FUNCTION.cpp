@@ -71,6 +71,13 @@ Test(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>& h) const
     delete a;
     delete b;
 }
+//#####################################################################
+// Function Make_Feasible
+//#####################################################################
+template<class T> void NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>::
+Make_Feasible(KRYLOV_VECTOR_BASE<T>& x) const
+{
+}
 template class NONLINEAR_FUNCTION<double(KRYLOV_VECTOR_BASE<double>&)>;
 template class NONLINEAR_FUNCTION<float(KRYLOV_VECTOR_BASE<float>&)>;
 }
