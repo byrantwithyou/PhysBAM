@@ -654,7 +654,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 {
     if(id==kinematic_id) twist=curve.Derivative(time);
     if(id==kinematic_id2) twist=curve2.Derivative(time);
-    return false;
+    return true;
 }
 //#####################################################################
 // Function Set_External_Velocities

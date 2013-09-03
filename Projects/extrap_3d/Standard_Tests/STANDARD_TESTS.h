@@ -2257,7 +2257,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
     if(id==kinematic_id6) twist=curve6.Derivative(time);
     if(id==kinematic_id7) twist=curve7.Derivative(time);
     if(id==kinematic_id8) twist=curve8.Derivative(time);
-    return false;
+    return true;
 }
 //#####################################################################
 // Function Preprocess_Substep
