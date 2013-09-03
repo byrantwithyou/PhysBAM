@@ -26,8 +26,10 @@ class BACKWARD_EULER_EVOLUTION:public SOLIDS_EVOLUTION<TV>
     typedef typename TV::SPIN T_SPIN;
     typedef SOLIDS_EVOLUTION<TV> BASE;
   public:
-    using BASE::krylov_vectors;using BASE::world_space_rigid_mass;using BASE::world_space_rigid_mass_inverse;using BASE::time;
-    using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::kinematic_evolution;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::example_forces_and_velocities;
+    using BASE::krylov_vectors;using BASE::world_space_rigid_mass;using BASE::world_space_rigid_mass_inverse;
+    using BASE::time;using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::kinematic_evolution;
+    using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::example_forces_and_velocities;
+    using BASE::Set_External_Positions;using BASE::Set_External_Velocities;
 
     NEWTONS_METHOD<T>& newtons_method;
     BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>& minimization_system;

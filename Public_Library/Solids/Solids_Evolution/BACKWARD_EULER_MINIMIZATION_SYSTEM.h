@@ -12,6 +12,7 @@
 #include <Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
 namespace PhysBAM{
 template<class TV> class SOLID_BODY_COLLECTION;
+template<class TV> class EXAMPLE_FORCES_AND_VELOCITIES;
 
 template<class TV>
 class BACKWARD_EULER_MINIMIZATION_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
@@ -23,8 +24,9 @@ public:
 
     ARRAY<int> colliding_particles;
     ARRAY<TV> colliding_normals;
+    EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities;
 
-    BACKWARD_EULER_MINIMIZATION_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection);
+    BACKWARD_EULER_MINIMIZATION_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection,EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities);
 
     virtual ~BACKWARD_EULER_MINIMIZATION_SYSTEM();
 

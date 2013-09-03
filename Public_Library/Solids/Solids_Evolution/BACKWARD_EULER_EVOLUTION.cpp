@@ -25,7 +25,7 @@ using namespace PhysBAM;
 template<class TV> BACKWARD_EULER_EVOLUTION<TV>::
 BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input)
     :SOLIDS_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input,example_forces_and_velocities_input),newtons_method(*new NEWTONS_METHOD<T>),
-    minimization_system(*new BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>(solid_body_collection)),
+    minimization_system(*new BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>(solid_body_collection,&example_forces_and_velocities_input)),
     minimization_objective(*new BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>(solid_body_collection,minimization_system)),
     dv(static_cast<GENERALIZED_VELOCITY<TV>&>(*minimization_objective.v1.Clone_Default())),
     tmp0(static_cast<GENERALIZED_VELOCITY<TV>&>(*minimization_objective.v1.Clone_Default())),
@@ -65,6 +65,9 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     solid_body_collection.Print_Energy(time,0);
 
+    Set_External_Positions(particles.X,time);
+    Set_External_Velocities(particles.V,time,time);
+
     minimization_objective.dt=dt;
     minimization_objective.time=time;
     minimization_system.dt=dt;
@@ -82,6 +85,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
 
     minimization_objective.Adjust_For_Collision(dv);
     minimization_objective.Compute_Unconstrained(dv,0,&tmp0,0);
+    solid_body_collection.Print_Energy(time+dt,1);
     tmp1=tmp0;
     minimization_objective.Project_Gradient_And_Prune_Constraints(tmp1);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before friction",1,1);
@@ -95,9 +99,10 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         if(t_mag<=coefficient_of_friction*normal_force/particles.mass(p))
             v.Project_On_Unit_Direction(n);
         else v-=coefficient_of_friction/particles.mass(p)*normal_force*t;}
+    solid_body_collection.Print_Energy(time+dt,2);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after friction",1,1);
 
-    solid_body_collection.Print_Energy(time+dt,1);
+    solid_body_collection.Print_Energy(time+dt,3);
 }
 //#####################################################################
 // Function Initialize_Rigid_Bodies

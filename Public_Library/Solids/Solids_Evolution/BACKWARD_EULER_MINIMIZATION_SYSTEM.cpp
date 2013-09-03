@@ -6,6 +6,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h>
 namespace PhysBAM{
@@ -13,8 +14,8 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::
-BACKWARD_EULER_MINIMIZATION_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection)
-    :KRYLOV_SYSTEM_BASE<T>(false,false),solid_body_collection(solid_body_collection),dt(0),time(0)
+BACKWARD_EULER_MINIMIZATION_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection,EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities)
+    :KRYLOV_SYSTEM_BASE<T>(false,false),solid_body_collection(solid_body_collection),dt(0),time(0),example_forces_and_velocities(example_forces_and_velocities)
 {
 }
 //#####################################################################
@@ -70,6 +71,8 @@ Project(KRYLOV_VECTOR_BASE<T>& BV) const
     GENERALIZED_VELOCITY<TV>& V=debug_cast<GENERALIZED_VELOCITY<TV>&>(BV);
     for(int i=0;i<colliding_particles.m;i++)
         V.V.array(colliding_particles(i)).Project_Orthogonal_To_Unit_Direction(colliding_normals(i));
+
+    if(example_forces_and_velocities) example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(V.V.array,time,time);
 }
 //#####################################################################
 // Function Project_Nullspace

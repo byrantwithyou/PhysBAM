@@ -8,6 +8,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h>
@@ -137,6 +138,8 @@ Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg) const
             minimization_system.colliding_particles.Remove_Index_Lazy(i);
             minimization_system.colliding_normals.Remove_Index_Lazy(i);}
         else gv-=gv_n*n;}
+    if(minimization_system.example_forces_and_velocities)
+        minimization_system.example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(g.V.array,time,time);
 }
 //#####################################################################
 // Function Make_Feasible
