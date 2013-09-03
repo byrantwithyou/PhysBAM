@@ -27,6 +27,7 @@ public:
     R Prime(const T1 x) const {R r=0;Compute(x,0,&r,0);return r;}
     R Prime_Prime(const T1 x) const {R r=0;Compute(x,&r,0,0);return r;}
     virtual void Compute(const T1 x,R* ddf,R* df,R* f) const=0;
+    void Test(const T1 x,bool test_second_diff);
 //#####################################################################
 };
 

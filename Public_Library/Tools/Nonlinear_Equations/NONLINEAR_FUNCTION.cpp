@@ -6,6 +6,29 @@
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 namespace PhysBAM{
 //#####################################################################
+// Function Test
+//#####################################################################
+template<class R,class T1> void NONLINEAR_FUNCTION<R(T1)>::
+Test(const T1 x,bool test_second_diff)
+{
+    T1 eps=(T1)1e-6;
+    RANDOM_NUMBERS<T1> random;
+    T1 dx=random.Get_Uniform_Number(-eps,eps);
+
+    R e0=0,e1=0,g0=0,g1=0,h0=0,h1=0;
+    Compute(x,test_second_diff?&h0:0,&g0,&e0);
+    Compute(x+dx,test_second_diff?&h1:0,&g1,&e1);
+    R test0a=(g1+g0)/2;
+    R test0b=(e1-e0)/dx;
+    R test0=(test0b-test0a)/max(abs(test0a),(R)1e-20);
+    R test1a=(h1+h0)/2;
+    R test1b=(g1-g0)/dx;
+    R test1=(test1b-test1a)/max(abs(test1a),(R)1e-20);
+
+    LOG::cout<<"first diff test "<<test0a<<"    "<<test0b<<"    "<<test0<<std::endl;
+    if(test_second_diff) LOG::cout<<"second diff test "<<test1a<<"    "<<test1b<<"    "<<test1<<std::endl;
+}
+//#####################################################################
 // Destructor
 //#####################################################################
 template<class T> NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>::
@@ -80,4 +103,6 @@ Make_Feasible(KRYLOV_VECTOR_BASE<T>& x) const
 }
 template class NONLINEAR_FUNCTION<double(KRYLOV_VECTOR_BASE<double>&)>;
 template class NONLINEAR_FUNCTION<float(KRYLOV_VECTOR_BASE<float>&)>;
+template class NONLINEAR_FUNCTION<double(double)>;
+template class NONLINEAR_FUNCTION<float(float)>;
 }
