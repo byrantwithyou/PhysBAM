@@ -6,10 +6,13 @@
 //#####################################################################
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
+#include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_EVOLUTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h>
@@ -24,7 +27,9 @@ BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BO
     :SOLIDS_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input,example_forces_and_velocities_input),newtons_method(*new NEWTONS_METHOD<T>),
     minimization_system(*new BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>(solid_body_collection)),
     minimization_objective(*new BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>(solid_body_collection,minimization_system)),
-    dv(static_cast<GENERALIZED_VELOCITY<TV>&>(*minimization_objective.v1.Clone_Default()))
+    dv(static_cast<GENERALIZED_VELOCITY<TV>&>(*minimization_objective.v1.Clone_Default())),
+    tmp0(static_cast<GENERALIZED_VELOCITY<TV>&>(*minimization_objective.v1.Clone_Default())),
+    tmp1(static_cast<GENERALIZED_VELOCITY<TV>&>(*minimization_objective.v1.Clone_Default())),coefficient_of_friction((T).1)
 {
     newtons_method.max_iterations=100000;
     newtons_method.max_krylov_iterations=2000;
@@ -40,6 +45,8 @@ template<class TV> BACKWARD_EULER_EVOLUTION<TV>::
 ~BACKWARD_EULER_EVOLUTION()
 {
     delete &dv;
+    delete &tmp0;
+    delete &tmp1;
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Position
@@ -55,6 +62,7 @@ template<class TV> void BACKWARD_EULER_EVOLUTION<TV>::
 Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
 {
     LOG::SCOPE scope("Advance_One_Time_Step_Position");
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     solid_body_collection.Print_Energy(time,0);
 
     minimization_objective.dt=dt;
@@ -63,12 +71,31 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     minimization_system.time=time;
     minimization_objective.Reset();
     dv.Resize(minimization_objective.v1);
+    tmp0.Resize(minimization_objective.v1);
+    tmp1.Resize(minimization_objective.v1);
     dv*=0;
     minimization_objective.Test(dv,minimization_system);
 
     bool converged=newtons_method.Newtons_Method(minimization_objective,minimization_system,dv);
     PHYSBAM_ASSERT(converged);
 // TODO for rigid bodies    R.Normalize(), update angular momentum
+
+    minimization_objective.Adjust_For_Collision(dv);
+    minimization_objective.Compute_Unconstrained(dv,0,&tmp0,0);
+    tmp1=tmp0;
+    minimization_objective.Project_Gradient_And_Prune_Constraints(tmp1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before friction",1,1);
+    for(int i=0;i<minimization_system.colliding_particles.m;i++){
+        int p=minimization_system.colliding_particles(i);
+        TV n=minimization_system.colliding_normals(i);
+        T normal_force=n.Dot(tmp0.V.array(p)-tmp1.V.array(p));
+        TV& v=minimization_objective.v1.V.array(p);
+        TV t=v.Projected_Orthogonal_To_Unit_Direction(n);
+        T t_mag=t.Normalize();
+        if(t_mag<=coefficient_of_friction*normal_force/particles.mass(p))
+            v.Project_On_Unit_Direction(n);
+        else v-=coefficient_of_friction/particles.mass(p)*normal_force*t;}
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after friction",1,1);
 
     solid_body_collection.Print_Energy(time+dt,1);
 }
