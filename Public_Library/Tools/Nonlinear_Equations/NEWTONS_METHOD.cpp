@@ -52,7 +52,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
             local_max_iterations=std::min(local_max_iterations,i+countdown_iterations);}
         dx*=0;
         tm.Copy(-1,grad);
-        T local_krylov_tolerance=std::min((T).5,krylov_tolerance*(T)sqrt(norm_grad));
+        T local_krylov_tolerance=std::min((T).5,krylov_tolerance*(T)sqrt(std::max(norm_grad,tolerance)));
         if(!krylov->Solve(sys,dx,tm,av,local_krylov_tolerance,0,max_krylov_iterations) && fail_on_krylov_not_converged)
             break;
 
