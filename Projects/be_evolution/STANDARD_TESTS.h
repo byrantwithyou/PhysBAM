@@ -12,7 +12,6 @@
 //    6. Smash test - small boxes, large sphere
 //    7. Plane test - ball
 //    8. Falling mattress
-//    9. Testing rigid objects stuff
 //   11. Increasing gravity (individual)
 //   16. Smash test - large boxes, small mattress
 //   17. Matress, no gravity, random start
@@ -349,7 +348,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 7:
         case 8:
         case 80:
-        case 9:
         case 10:
         case 11:
         case 16:
@@ -559,7 +557,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
 
     if(use_constraint_collisions) use_penalty_collisions=false;
-    if(use_penalty_collisions){
+    if(use_penalty_collisions || use_constraint_collisions){
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
         solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
         solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
@@ -652,16 +650,6 @@ void Get_Initial_Data()
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_20K.tet.gz", // adaptive_torus_float.tet
                                                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(15,5,0),ROTATION<TV>(-T(pi/2),TV(1,0,0)))),true,true,density,1.0);
             break;}
-        case 9:{
-            RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("cylinder",(T)1.0,(T).5);
-            RIGID_BODY<TV>& box2=tests.Add_Analytic_Cylinder(10,1);
-            box1.Frame().r=ROTATION<TV>((T)pi/2.0,TV(1,0,0));//ROTATION<TV>::From_Euler_Angles(-(T)pi/10,7*(T)pi/16,0);
-            box1.Frame().t=TV(0,-6,0);
-            box2.Frame().t=TV(0,6,0);
-            box1.is_static=false;
-            box2.is_static=false;
-            break;
-        }
         case 10:{
             last_frame=1200;
             for(int i=0;i<7;i++){
@@ -1610,7 +1598,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             for(int i=0;i<deformable_body_collection.particles.X.m;i++) deformable_body_collection.particles.X(i).y=3;
             break;}
-        case 9: case 56:{break;}
+        case 56:{break;}
         case 11:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)5e4,(T).45,(T).01);
