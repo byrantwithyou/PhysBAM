@@ -360,7 +360,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         case 5:
         case 6:
-            frame_rate=24;
             last_frame=(int)(3*frame_rate);
             solids_parameters.cfl=(T)5.9;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -393,22 +392,19 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;//This gets turned off later then back on
             //std::cout << "rame collisions are " << override_collisions << std::endl;
             //}
-            frame_rate=120;
-            last_frame=420;
+            last_frame=84;
             break;
         case 30:
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
-            frame_rate=150;
             break;
         case 31:
             solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=1e-4;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            last_frame=5000;
-            frame_rate=240;
+            last_frame=500;
             break;
         case 59:
         case 60:
@@ -417,8 +413,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            last_frame=3000;
-            frame_rate=240;
+            last_frame=300;
             break;
         case 32:
             // solids_parameters.cfl=(T)5;
@@ -438,8 +433,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
-            frame_rate=120;
-            last_frame=10*300;
+            last_frame=600;
             break;
         case 43:
         case 58:
@@ -451,8 +445,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
-            frame_rate=120;
-            last_frame=1500;
+            last_frame=300;
             break;
         case 34:
             solids_parameters.cfl=(T)5;
@@ -480,8 +473,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             if (override_no_collisions) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            frame_rate=960;
-            last_frame=1000;
+            last_frame=250;
             break;
         case 41:
             solids_parameters.cfl=(T)5;
@@ -497,8 +489,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
                 solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
                 solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
             }
-            frame_rate=600;
-            last_frame=1000;
+            last_frame=40;
             break;
         case 52:
             solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=2e-4;
@@ -513,11 +504,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
                 solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
                 solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
             }
-            frame_rate=360;
-            last_frame=4000;
+            last_frame=250;
             break;
         case 47:
-            frame_rate=24;
             last_frame=480;
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
@@ -526,7 +515,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             break;
         case 49:
-            frame_rate=24;
             last_frame=480;
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
