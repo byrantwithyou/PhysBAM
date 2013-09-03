@@ -111,8 +111,8 @@ public:
     bool test_forces;
     bool with_bunny,with_hand,with_big_arm,gears_of_pain;
     bool override_collisions,override_no_collisions;
-    int kinematic_id,kinematic_id2,kinematic_id3,kinematic_id4,kinematic_id5,kinematic_id6,kinematic_id7,kinematic_id8;
-    INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2,curve3,curve4,curve5,curve6,curve7,curve8;
+    ARRAY<int> kinematic_ids;
+    ARRAY<INTERPOLATION_CURVE<T,FRAME<TV> > > curves;
     bool print_matrix;
     int resolution;
     int fishes,jello_size,number_of_jellos;
@@ -631,12 +631,13 @@ void Get_Initial_Data()
             top_box.Frame().t=TV(0,(T)2,0);
             bottom_box.is_static=true;
             top_box.is_static=false;
-            kinematic_id=top_box.particle_index;
+            kinematic_ids.Append(top_box.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(top_box.particle_index)=true;
-            curve.Add_Control_Point(0,FRAME<TV>(TV(0,(T)2,0)));
-            curve.Add_Control_Point(1,FRAME<TV>(TV(0,(T)1,0)));
-            curve.Add_Control_Point(2,FRAME<TV>(TV(0,(T)1,0)));
-            curve.Add_Control_Point(3,FRAME<TV>(TV(0,(T)2,0)));
+            curves.Resize(1);
+            curves(0).Add_Control_Point(0,FRAME<TV>(TV(0,(T)2,0)));
+            curves(0).Add_Control_Point(1,FRAME<TV>(TV(0,(T)1,0)));
+            curves(0).Add_Control_Point(2,FRAME<TV>(TV(0,(T)1,0)));
+            curves(0).Add_Control_Point(3,FRAME<TV>(TV(0,(T)2,0)));
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1,0))),true,true,density,.4);
             tests.Add_Ground();
             break;}
@@ -672,12 +673,13 @@ void Get_Initial_Data()
             box2.Frame().t=TV(0,11,0);
             box1.is_static=true;
             box2.is_static=false;
-            kinematic_id=box2.particle_index;
+            kinematic_ids.Append(box2.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(box2.particle_index)=true;
-            curve.Add_Control_Point(0,FRAME<TV>(TV(0,11,0)));
-            curve.Add_Control_Point(5,FRAME<TV>(TV(0,8,0)));
-            curve.Add_Control_Point(6,FRAME<TV>(TV(0,8,0)));
-            curve.Add_Control_Point(11,FRAME<TV>(TV(0,11,0)));
+            curves.Resize(1);
+            curves(0).Add_Control_Point(0,FRAME<TV>(TV(0,11,0)));
+            curves(0).Add_Control_Point(5,FRAME<TV>(TV(0,8,0)));
+            curves(0).Add_Control_Point(6,FRAME<TV>(TV(0,8,0)));
+            curves(0).Add_Control_Point(11,FRAME<TV>(TV(0,11,0)));
             last_frame=250;
             break;}
         case 77: {
@@ -711,10 +713,11 @@ void Get_Initial_Data()
             box_side_4.coefficient_of_friction=0;
             box_top.coefficient_of_friction=0;
 
-            kinematic_id=box_top.particle_index;
+            kinematic_ids.Append(box_top.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(box_top.particle_index)=true;
-            curve.Add_Control_Point(0,FRAME<TV>(TV(0,2,0)));
-            curve.Add_Control_Point(10,FRAME<TV>(TV(0,0,0)));
+            curves.Resize(1);
+            curves(0).Add_Control_Point(0,FRAME<TV>(TV(0,2,0)));
+            curves(0).Add_Control_Point(10,FRAME<TV>(TV(0,0,0)));
             last_frame=300;
             break;}
         case 17:
@@ -736,14 +739,15 @@ void Get_Initial_Data()
             cylinder2.Frame().r=ROTATION<TV>((T)pi/2.0,TV(0,0,1));
             cylinder1.is_static=false;
             cylinder2.is_static=false;
-            kinematic_id= cylinder1.particle_index;
+            kinematic_ids.Append(cylinder1.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(cylinder1.particle_index)=true;
-            kinematic_id2=cylinder2.particle_index;
+            kinematic_ids.Append(cylinder2.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(cylinder2.particle_index)=true;
+            curves.Resize(2);
             T period=10.0;T start=0.0;T radius=6.0;int pts=75;T freq=.25;
             for(int ind=0;ind<pts;ind++){
-                curve.Add_Control_Point(start+freq*ind,FRAME<TV>(TV(radius*sin(2.0*pi*freq*ind/period),radius*cos(2.0*pi*freq*ind/period),0)));
-                curve2.Add_Control_Point(start+freq*ind,FRAME<TV>(TV(-radius*sin(2.0*pi*freq*ind/period),-radius*cos(2.0*pi*freq*ind/period),0)));
+                curves(0).Add_Control_Point(start+freq*ind,FRAME<TV>(TV(radius*sin(2.0*pi*freq*ind/period),radius*cos(2.0*pi*freq*ind/period),0)));
+                curves(1).Add_Control_Point(start+freq*ind,FRAME<TV>(TV(-radius*sin(2.0*pi*freq*ind/period),-radius*cos(2.0*pi*freq*ind/period),0)));
             }
             last_frame=1000;
             break;}
@@ -760,10 +764,11 @@ void Get_Initial_Data()
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.125,density,5);
             sphere.is_static=false;
             tests.Add_Ground();
-            kinematic_id=sphere.particle_index;
+            kinematic_ids.Append(sphere.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(sphere.particle_index)=true;
-            curve.Add_Control_Point(0,FRAME<TV>(TV(0,0.5,-10)));
-            curve.Add_Control_Point(20,FRAME<TV>(TV(0,0.5,90)));
+            curves.Resize(1);
+            curves(0).Add_Control_Point(0,FRAME<TV>(TV(0,0.5,-10)));
+            curves(0).Add_Control_Point(20,FRAME<TV>(TV(0,0.5,90)));
 
             RIGID_BODY<TV>& ball1=tests.Add_Analytic_Sphere(0.065,density,6);
             ball1.Frame().t=TV(0.27,0.645,-0.12);
@@ -831,9 +836,9 @@ void Get_Initial_Data()
             torus2.is_static=false;
             torus2.coefficient_of_friction=0.05;
 
-            kinematic_id=torus1.particle_index;
+            kinematic_ids.Append(torus1.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(torus1.particle_index)=true;
-            kinematic_id2=torus2.particle_index;
+            kinematic_ids.Append(torus2.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(torus2.particle_index)=true;
 
             T x_start=11.2;
@@ -841,15 +846,16 @@ void Get_Initial_Data()
             T t_stop =2;
             T t_rot  =8;
 
-            curve.Add_Control_Point(0,FRAME<TV>(TV(x_start,0,0),ROTATION<TV>((T)0,TV(1,0,0))));
-            curve.Add_Control_Point(t_stop,FRAME<TV>(TV(x_stop,0,0),ROTATION<TV>((T)0,TV(1,0,0))));
+            curves.Resize(2);
+            curves(0).Add_Control_Point(0,FRAME<TV>(TV(x_start,0,0),ROTATION<TV>((T)0,TV(1,0,0))));
+            curves(0).Add_Control_Point(t_stop,FRAME<TV>(TV(x_stop,0,0),ROTATION<TV>((T)0,TV(1,0,0))));
 
-            for(int i=0;i<47;i++) curve.Add_Control_Point(t_rot+i*2,FRAME<TV>(TV(x_stop,0,0),ROTATION<TV>((T)pi/2.0*i,TV(1,0,0))));
+            for(int i=0;i<47;i++) curves(0).Add_Control_Point(t_rot+i*2,FRAME<TV>(TV(x_stop,0,0),ROTATION<TV>((T)pi/2.0*i,TV(1,0,0))));
 
-            curve2.Add_Control_Point(0,FRAME<TV>(TV(-x_start,0,0),ROTATION<TV>((T)0,TV(1,0,0))));
-            curve2.Add_Control_Point(t_stop,FRAME<TV>(TV(-x_stop,0,0),ROTATION<TV>((T)0,TV(1,0,0))));
+            curves(1).Add_Control_Point(0,FRAME<TV>(TV(-x_start,0,0),ROTATION<TV>((T)0,TV(1,0,0))));
+            curves(1).Add_Control_Point(t_stop,FRAME<TV>(TV(-x_stop,0,0),ROTATION<TV>((T)0,TV(1,0,0))));
 
-            for(int i=0;i<47;i++) curve2.Add_Control_Point(t_rot+i*2,FRAME<TV>(TV(-x_stop,0,0),ROTATION<TV>((T)-pi/2.0*i,TV(1,0,0))));
+            for(int i=0;i<47;i++) curves(1).Add_Control_Point(t_rot+i*2,FRAME<TV>(TV(-x_stop,0,0),ROTATION<TV>((T)-pi/2.0*i,TV(1,0,0))));
 
             break;}
         case 33:{
@@ -866,23 +872,24 @@ void Get_Initial_Data()
             gear2.coefficient_of_friction=1;
             cylinder.coefficient_of_friction=0;
 
-            kinematic_id=gear1.particle_index;
+            kinematic_ids.Append(gear1.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(gear1.particle_index)=true;
-            kinematic_id2=gear2.particle_index;
+            kinematic_ids.Append(gear2.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(gear2.particle_index)=true;
-            kinematic_id3=cylinder.particle_index;
+            kinematic_ids.Append(cylinder.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(cylinder.particle_index)=true;
 
             T angular_velocity=1;
             T scale=1;
 
-            curve3.Add_Control_Point(0,FRAME<TV>(TV(0,4-y_translate,0),ROTATION<TV>(0,TV(0,0,1))));
-            curve3.Add_Control_Point(2,FRAME<TV>(TV(0,4-y_translate,0),ROTATION<TV>(0,TV(0,0,1))));
-            curve3.Add_Control_Point(4,FRAME<TV>(TV(0,2-y_translate,0),ROTATION<TV>(0,TV(0,0,1))));
+            curves.Resize(3);
+            curves(2).Add_Control_Point(0,FRAME<TV>(TV(0,4-y_translate,0),ROTATION<TV>(0,TV(0,0,1))));
+            curves(2).Add_Control_Point(2,FRAME<TV>(TV(0,4-y_translate,0),ROTATION<TV>(0,TV(0,0,1))));
+            curves(2).Add_Control_Point(4,FRAME<TV>(TV(0,2-y_translate,0),ROTATION<TV>(0,TV(0,0,1))));
 
             for(int i=0;i<60;i++){
-                curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-(T).4*scale,1.5*scale-y_translate,-.75*scale),ROTATION<TV>(-i,TV(0,0,1))));
-                curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV((T).4*scale,1.5*scale-y_translate,-.75*scale),ROTATION<TV>(i,TV(0,0,1))));}
+                curves(0).Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-(T).4*scale,1.5*scale-y_translate,-.75*scale),ROTATION<TV>(-i,TV(0,0,1))));
+                curves(1).Add_Control_Point(i/angular_velocity,FRAME<TV>(TV((T).4*scale,1.5*scale-y_translate,-.75*scale),ROTATION<TV>(i,TV(0,0,1))));}
 
             tests.Add_Ground();
             break;}
@@ -916,29 +923,30 @@ void Get_Initial_Data()
             gear5.coefficient_of_friction=input_friction;
             gear6.coefficient_of_friction=input_friction;
 
-            kinematic_id=gear1.particle_index;
+            kinematic_ids.Append(gear1.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(gear1.particle_index)=true;
-            kinematic_id2=gear2.particle_index;
+            kinematic_ids.Append(gear2.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(gear2.particle_index)=true;
-            kinematic_id3=gear3.particle_index;
+            kinematic_ids.Append(gear3.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(gear3.particle_index)=true;
-            kinematic_id4=gear4.particle_index;
+            kinematic_ids.Append(gear4.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(gear4.particle_index)=true;
-            kinematic_id5=gear5.particle_index;
+            kinematic_ids.Append(gear5.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(gear5.particle_index)=true;
-            kinematic_id6=gear6.particle_index;
+            kinematic_ids.Append(gear6.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(gear6.particle_index)=true;
 
             T angular_velocity=1;T gear_dx;
             if (gears_of_pain) gear_dx=(T).377;else gear_dx=(T).4;
 
+            curves.Resize(8);
             for(int i=0;i<60;i++){
-                curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-gear_dx*scale,1.5*scale,-.75*scale),ROTATION<TV>(-i,TV(0,0,1))));//.4 is default, gears barely touch at .375
-                curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(gear_dx*scale,1.5*scale,-.75*scale),ROTATION<TV>(i,TV(0,0,1))));
-                curve3.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-gear_dx*scale,1.5*scale,-1.75*scale),ROTATION<TV>(-i,TV(0,0,1))));//.4 is default, gears barely touch at .375
-                curve4.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(gear_dx*scale,1.5*scale,-1.75*scale),ROTATION<TV>(i,TV(0,0,1))));
-                curve5.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-gear_dx*scale,1.5*scale,.25*scale),ROTATION<TV>(-i,TV(0,0,1))));//.4 is default, gears barely touch at .375
-                curve6.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(gear_dx*scale,1.5*scale,.25*scale),ROTATION<TV>(i,TV(0,0,1))));
+                curves(0).Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-gear_dx*scale,1.5*scale,-.75*scale),ROTATION<TV>(-i,TV(0,0,1))));//.4 is default, gears barely touch at .375
+                curves(1).Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(gear_dx*scale,1.5*scale,-.75*scale),ROTATION<TV>(i,TV(0,0,1))));
+                curves(2).Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-gear_dx*scale,1.5*scale,-1.75*scale),ROTATION<TV>(-i,TV(0,0,1))));//.4 is default, gears barely touch at .375
+                curves(3).Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(gear_dx*scale,1.5*scale,-1.75*scale),ROTATION<TV>(i,TV(0,0,1))));
+                curves(4).Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-gear_dx*scale,1.5*scale,.25*scale),ROTATION<TV>(-i,TV(0,0,1))));//.4 is default, gears barely touch at .375
+                curves(5).Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(gear_dx*scale,1.5*scale,.25*scale),ROTATION<TV>(i,TV(0,0,1))));
             }
 
             RIGID_BODY<TV>& box0=tests.Add_Analytic_Box(TV(2.0*scale,.1*scale,2.0*scale));
@@ -964,29 +972,22 @@ void Get_Initial_Data()
             // box2.is_static=true;
             // box3.is_static=false;
 
-            /* box3.coefficient_of_friction=.5;
-             kinematic_id3=box3.particle_index;
-             rigid_body_collection.rigid_body_particles.kinematic(box3.particle_index)=true;
-             curve3.Add_Control_Point(0,FRAME<TV>(TV(0,3.0*scale,-1.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
-             curve3.Add_Control_Point(.1,FRAME<TV>(TV(0,3.0*scale,-1.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
-             curve3.Add_Control_Point(.11,FRAME<TV>(TV(0,3.0*scale,-3.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));*/
-
-            box0.coefficient_of_friction=.05;
-            kinematic_id8=box0.particle_index;
-            rigid_body_collection.rigid_body_particles.kinematic(box0.particle_index)=true;
-            curve8.Add_Control_Point(0,FRAME<TV>(TV(0,4.0*scale,-0.0*scale)));
-            curve8.Add_Control_Point(1.5+hand_scale,FRAME<TV>(TV(0,4.0*scale,-0.0*scale),ROTATION<TV>(0*(T)pi/2.0,TV(1,0,0))));
-            curve8.Add_Control_Point(1.53+hand_scale,FRAME<TV>(TV(0,3.1*scale,-1.0*scale),ROTATION<TV>((T)pi/2.0,TV(1,0,0))));
-
             T drop_time;
             if(gears_of_pain) drop_time=(T)17;else drop_time=(T)17;
             cylinder.Frame().t=TV(0,5.0*scale,0*scale);
             cylinder.is_static=false;
-            kinematic_id7=cylinder.particle_index;
+            kinematic_ids.Append(cylinder.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(cylinder.particle_index)=true;
-            curve7.Add_Control_Point(0,FRAME<TV>(TV(0,5.0*scale,0*scale)));
-            curve7.Add_Control_Point(drop_time,FRAME<TV>(TV(0,5.0*scale,0*scale)));
-            curve7.Add_Control_Point(drop_time+(T)1,FRAME<TV>(TV(0,2.0*scale,0*scale)));
+            curves(6).Add_Control_Point(0,FRAME<TV>(TV(0,5.0*scale,0*scale)));
+            curves(6).Add_Control_Point(drop_time,FRAME<TV>(TV(0,5.0*scale,0*scale)));
+            curves(6).Add_Control_Point(drop_time+(T)1,FRAME<TV>(TV(0,2.0*scale,0*scale)));
+
+            box0.coefficient_of_friction=.05;
+            kinematic_ids.Append(box0.particle_index);
+            rigid_body_collection.rigid_body_particles.kinematic(box0.particle_index)=true;
+            curves(7).Add_Control_Point(0,FRAME<TV>(TV(0,4.0*scale,-0.0*scale)));
+            curves(7).Add_Control_Point(1.5+hand_scale,FRAME<TV>(TV(0,4.0*scale,-0.0*scale),ROTATION<TV>(0*(T)pi/2.0,TV(1,0,0))));
+            curves(7).Add_Control_Point(1.53+hand_scale,FRAME<TV>(TV(0,3.1*scale,-1.0*scale),ROTATION<TV>((T)pi/2.0,TV(1,0,0))));
 
             RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(input_friction);
             inclined_floor.Frame().t=TV(0,.0*scale,0);
@@ -999,9 +1000,10 @@ void Get_Initial_Data()
             RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder((T)32,radius,64);
             cylinder.is_static=false;
             cylinder.coefficient_of_friction=1e8;
-            kinematic_id=cylinder.particle_index;
+            kinematic_ids.Append(cylinder.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(cylinder.particle_index)=true;
-            for(int i=0;i<128;i++) curve.Add_Control_Point(i,FRAME<TV>(TV(-25+i*velocity,radius*1.05,0),ROTATION<TV>(-i*velocity/radius,TV(0,0,1))));
+            curves.Resize(1);
+            for(int i=0;i<128;i++) curves(0).Add_Control_Point(i,FRAME<TV>(TV(-25+i*velocity,radius*1.05,0),ROTATION<TV>(-i*velocity/radius,TV(0,0,1))));
 
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,2,0)));
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,3,0))),true,true,density,3);
@@ -1141,75 +1143,76 @@ void Get_Initial_Data()
             box7.Frame().t=TV((T)0*bound,board_height,0.9*bound);
             box8.Frame().t=TV((T)0*bound,board_height,1.2*bound);
 
-            curve.Add_Control_Point(0,FRAME<TV>(box1.Frame().t));
-            curve.Add_Control_Point(.2,FRAME<TV>(box1.Frame().t));
-            //curve.Add_Control_Point(.21,FRAME<TV>(box1.Frame().t-TV(0,.2*board_height,0)));
-            //curve.Add_Control_Point(.23,FRAME<TV>(box1.Frame().t-TV(-2.5*bound,.2*board_height,0)));
-            curve2.Add_Control_Point(0,FRAME<TV>(box2.Frame().t));
-            curve2.Add_Control_Point(.2,FRAME<TV>(box2.Frame().t));
-            curve2.Add_Control_Point(.27,FRAME<TV>(box2.Frame().t-TV(0,dy,0)));
-            //curve2.Add_Control_Point(.31,FRAME<TV>(box2.Frame().t-TV(0,dy+.2*board_height,0)));
-            //curve2.Add_Control_Point(.33,FRAME<TV>(box2.Frame().t-TV(-2.5*bound,dy+.2*board_height,0)));
-            curve3.Add_Control_Point(0,FRAME<TV>(box3.Frame().t));
-            curve3.Add_Control_Point(.2,FRAME<TV>(box3.Frame().t));
-            curve3.Add_Control_Point(.33,FRAME<TV>(box3.Frame().t-TV(0,2.0*dy,0)));
-            //curve3.Add_Control_Point(.41,FRAME<TV>(box3.Frame().t-TV(0,2.0*dy+.2*board_height,0)));
-            //curve3.Add_Control_Point(.43,FRAME<TV>(box3.Frame().t-TV(-2.5*bound,2.0*dy+.2*board_height,0)));
-            curve4.Add_Control_Point(0,FRAME<TV>(box4.Frame().t));
-            curve4.Add_Control_Point(.2,FRAME<TV>(box4.Frame().t));
-            curve4.Add_Control_Point(.40,FRAME<TV>(box4.Frame().t-TV(0,3.0*dy,0)));
-            //curve4.Add_Control_Point(.51,FRAME<TV>(box4.Frame().t-TV(0,3.0*dy+.2*board_height,0)));
-            //curve4.Add_Control_Point(.53,FRAME<TV>(box4.Frame().t-TV(-2.5*bound,3.0*dy+.2*board_height,0)));
-            curve5.Add_Control_Point(0,FRAME<TV>(box5.Frame().t));
-            curve5.Add_Control_Point(.2,FRAME<TV>(box5.Frame().t));
-            curve5.Add_Control_Point(.47,FRAME<TV>(box5.Frame().t-TV(0,4.0*dy,0)));
-            //curve5.Add_Control_Point(.61,FRAME<TV>(box5.Frame().t-TV(0,4.0*dy+.2*board_height,0)));
-            //curve5.Add_Control_Point(.63,FRAME<TV>(box5.Frame().t-TV(-2.5*bound,4.0*dy+.2*board_height,0)));
-            curve6.Add_Control_Point(0,FRAME<TV>(box6.Frame().t));
-            curve6.Add_Control_Point(.2,FRAME<TV>(box6.Frame().t));
-            curve6.Add_Control_Point(.53,FRAME<TV>(box6.Frame().t-TV(0,5.0*dy,0)));
-            //curve6.Add_Control_Point(.71,FRAME<TV>(box6.Frame().t-TV(0,5.0*dy+.2*board_height,0)));
-            //curve6.Add_Control_Point(.73,FRAME<TV>(box6.Frame().t-TV(-2.5*bound,5.0*dy+.2*board_height,0)));
-            curve7.Add_Control_Point(0,FRAME<TV>(box7.Frame().t));
-            curve7.Add_Control_Point(.2,FRAME<TV>(box7.Frame().t));
-            curve7.Add_Control_Point(.60,FRAME<TV>(box7.Frame().t-TV(0,6.0*dy,0)));
-            //curve7.Add_Control_Point(.81,FRAME<TV>(box7.Frame().t-TV(0,6.0*dy+.2*board_height,0)));
-            //curve7.Add_Control_Point(.83,FRAME<TV>(box7.Frame().t-TV(-2.5*bound,6.0*dy+.2*board_height,0)));
-            curve8.Add_Control_Point(0,FRAME<TV>(box8.Frame().t));
-            curve8.Add_Control_Point(.2,FRAME<TV>(box8.Frame().t));
-            curve8.Add_Control_Point(.67,FRAME<TV>(box8.Frame().t-TV(0,7.0*dy,0)));
-            //curve8.Add_Control_Point(.91,FRAME<TV>(box8.Frame().t-TV(0,7.0*dy+.2*board_height,0)));
-            //curve8.Add_Control_Point(.93,FRAME<TV>(box8.Frame().t-TV(-2.5*bound,7.0*dy+.2*board_height,0)));
-    /*        curve2.Add_Control_Point(0,FRAME<TV>(box2.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curve2.Add_Control_Point(.3,FRAME<TV>(box2.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curve2.Add_Control_Point(.35,FRAME<TV>(box2.Frame().t,ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
-            curve3.Add_Control_Point(.0,FRAME<TV>(box3.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curve3.Add_Control_Point(.4,FRAME<TV>(box3.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curve3.Add_Control_Point(.45,FRAME<TV>(box3.Frame().t,ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
-            curve4.Add_Control_Point(.0,FRAME<TV>(box4.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curve4.Add_Control_Point(.5,FRAME<TV>(box4.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curve4.Add_Control_Point(.55,FRAME<TV>(box4.Frame().t,ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
-            curve5.Add_Control_Point(.0,FRAME<TV>(box5.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curve5.Add_Control_Point(.6,FRAME<TV>(box5.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curve5.Add_Control_Point(.65,FRAME<TV>(box5.Frame().t,ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));*/
+            curves.Resize(8);
+            curves(0).Add_Control_Point(0,FRAME<TV>(box1.Frame().t));
+            curves(0).Add_Control_Point(.2,FRAME<TV>(box1.Frame().t));
+            //curves(0).Add_Control_Point(.21,FRAME<TV>(box1.Frame().t-TV(0,.2*board_height,0)));
+            //curves(0).Add_Control_Point(.23,FRAME<TV>(box1.Frame().t-TV(-2.5*bound,.2*board_height,0)));
+            curves(1).Add_Control_Point(0,FRAME<TV>(box2.Frame().t));
+            curves(1).Add_Control_Point(.2,FRAME<TV>(box2.Frame().t));
+            curves(1).Add_Control_Point(.27,FRAME<TV>(box2.Frame().t-TV(0,dy,0)));
+            //curves(1).Add_Control_Point(.31,FRAME<TV>(box2.Frame().t-TV(0,dy+.2*board_height,0)));
+            //curves(1).Add_Control_Point(.33,FRAME<TV>(box2.Frame().t-TV(-2.5*bound,dy+.2*board_height,0)));
+            curves(2).Add_Control_Point(0,FRAME<TV>(box3.Frame().t));
+            curves(2).Add_Control_Point(.2,FRAME<TV>(box3.Frame().t));
+            curves(2).Add_Control_Point(.33,FRAME<TV>(box3.Frame().t-TV(0,2.0*dy,0)));
+            //curves(2).Add_Control_Point(.41,FRAME<TV>(box3.Frame().t-TV(0,2.0*dy+.2*board_height,0)));
+            //curves(2).Add_Control_Point(.43,FRAME<TV>(box3.Frame().t-TV(-2.5*bound,2.0*dy+.2*board_height,0)));
+            curves(3).Add_Control_Point(0,FRAME<TV>(box4.Frame().t));
+            curves(3).Add_Control_Point(.2,FRAME<TV>(box4.Frame().t));
+            curves(3).Add_Control_Point(.40,FRAME<TV>(box4.Frame().t-TV(0,3.0*dy,0)));
+            //curves(3).Add_Control_Point(.51,FRAME<TV>(box4.Frame().t-TV(0,3.0*dy+.2*board_height,0)));
+            //curves(3).Add_Control_Point(.53,FRAME<TV>(box4.Frame().t-TV(-2.5*bound,3.0*dy+.2*board_height,0)));
+            curves(4).Add_Control_Point(0,FRAME<TV>(box5.Frame().t));
+            curves(4).Add_Control_Point(.2,FRAME<TV>(box5.Frame().t));
+            curves(4).Add_Control_Point(.47,FRAME<TV>(box5.Frame().t-TV(0,4.0*dy,0)));
+            //curves(4).Add_Control_Point(.61,FRAME<TV>(box5.Frame().t-TV(0,4.0*dy+.2*board_height,0)));
+            //curves(4).Add_Control_Point(.63,FRAME<TV>(box5.Frame().t-TV(-2.5*bound,4.0*dy+.2*board_height,0)));
+            curves(5).Add_Control_Point(0,FRAME<TV>(box6.Frame().t));
+            curves(5).Add_Control_Point(.2,FRAME<TV>(box6.Frame().t));
+            curves(5).Add_Control_Point(.53,FRAME<TV>(box6.Frame().t-TV(0,5.0*dy,0)));
+            //curves(5).Add_Control_Point(.71,FRAME<TV>(box6.Frame().t-TV(0,5.0*dy+.2*board_height,0)));
+            //curves(5).Add_Control_Point(.73,FRAME<TV>(box6.Frame().t-TV(-2.5*bound,5.0*dy+.2*board_height,0)));
+            curves(6).Add_Control_Point(0,FRAME<TV>(box7.Frame().t));
+            curves(6).Add_Control_Point(.2,FRAME<TV>(box7.Frame().t));
+            curves(6).Add_Control_Point(.60,FRAME<TV>(box7.Frame().t-TV(0,6.0*dy,0)));
+            //curves(6).Add_Control_Point(.81,FRAME<TV>(box7.Frame().t-TV(0,6.0*dy+.2*board_height,0)));
+            //curves(6).Add_Control_Point(.83,FRAME<TV>(box7.Frame().t-TV(-2.5*bound,6.0*dy+.2*board_height,0)));
+            curves(7).Add_Control_Point(0,FRAME<TV>(box8.Frame().t));
+            curves(7).Add_Control_Point(.2,FRAME<TV>(box8.Frame().t));
+            curves(7).Add_Control_Point(.67,FRAME<TV>(box8.Frame().t-TV(0,7.0*dy,0)));
+            //curves(7).Add_Control_Point(.91,FRAME<TV>(box8.Frame().t-TV(0,7.0*dy+.2*board_height,0)));
+            //curves(7).Add_Control_Point(.93,FRAME<TV>(box8.Frame().t-TV(-2.5*bound,7.0*dy+.2*board_height,0)));
+    /*        curves(1).Add_Control_Point(0,FRAME<TV>(box2.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curves(1).Add_Control_Point(.3,FRAME<TV>(box2.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curves(1).Add_Control_Point(.35,FRAME<TV>(box2.Frame().t,ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
+            curves(2).Add_Control_Point(.0,FRAME<TV>(box3.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curves(2).Add_Control_Point(.4,FRAME<TV>(box3.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curves(2).Add_Control_Point(.45,FRAME<TV>(box3.Frame().t,ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
+            curves(3).Add_Control_Point(.0,FRAME<TV>(box4.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curves(3).Add_Control_Point(.5,FRAME<TV>(box4.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curves(3).Add_Control_Point(.55,FRAME<TV>(box4.Frame().t,ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
+            curves(4).Add_Control_Point(.0,FRAME<TV>(box5.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curves(4).Add_Control_Point(.6,FRAME<TV>(box5.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curves(4).Add_Control_Point(.65,FRAME<TV>(box5.Frame().t,ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));*/
 
-               //         curve3.Add_Control_Point(0,FRAME<TV>(TV(0,3.0*scale,-1.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
+               //         curves(2).Add_Control_Point(0,FRAME<TV>(TV(0,3.0*scale,-1.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
             box1.is_static=false;
-            kinematic_id=box1.particle_index;
+            kinematic_ids.Append(box1.particle_index);
             box2.is_static=false;
-            kinematic_id2=box2.particle_index;
+            kinematic_ids.Append(box2.particle_index);
             box3.is_static=false;
-            kinematic_id3=box3.particle_index;
+            kinematic_ids.Append(box3.particle_index);
             box4.is_static=false;
-            kinematic_id4=box4.particle_index;
+            kinematic_ids.Append(box4.particle_index);
             box5.is_static=false;
-            kinematic_id5=box5.particle_index;
+            kinematic_ids.Append(box5.particle_index);
             box6.is_static=false;
-            kinematic_id6=box6.particle_index;
+            kinematic_ids.Append(box6.particle_index);
             box7.is_static=false;
-            kinematic_id7=box7.particle_index;
+            kinematic_ids.Append(box7.particle_index);
             box8.is_static=false;
-            kinematic_id8=box8.particle_index;
+            kinematic_ids.Append(box8.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(box1.particle_index)=true;
             rigid_body_collection.rigid_body_particles.kinematic(box2.particle_index)=true;
             rigid_body_collection.rigid_body_particles.kinematic(box3.particle_index)=true;
@@ -1218,9 +1221,6 @@ void Get_Initial_Data()
             rigid_body_collection.rigid_body_particles.kinematic(box6.particle_index)=true;
             rigid_body_collection.rigid_body_particles.kinematic(box7.particle_index)=true;
             rigid_body_collection.rigid_body_particles.kinematic(box8.particle_index)=true;
-
-
-
             break;
         }
         case 42:
@@ -1465,15 +1465,16 @@ void Get_Initial_Data()
             RIGID_BODY<TV>& gear2=tests.Add_Analytic_Smooth_Gear(TV(radius,cog_rad,1),cogs,8);
             gear1.coefficient_of_friction=2;
             gear2.coefficient_of_friction=2;
-            kinematic_id=gear1.particle_index;
+            kinematic_ids.Append(gear1.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(gear1.particle_index)=true;
-            kinematic_id2=gear2.particle_index;
+            kinematic_ids.Append(gear2.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(gear2.particle_index)=true;
             T angular_velocity=1;
 
+            curves.Resize(2);
             for(int i=0;i<60;i++){
-                curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-sep,1.5,0),ROTATION<TV>(-i,TV(0,0,1))*ROTATION<TV>(pi/(2*cogs),TV(0,0,1))));
-                curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(sep,1.5,0),ROTATION<TV>(i,TV(0,0,1))*ROTATION<TV>(pi/(2*cogs),TV(0,0,1))));}
+                curves(0).Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-sep,1.5,0),ROTATION<TV>(-i,TV(0,0,1))*ROTATION<TV>(pi/(2*cogs),TV(0,0,1))));
+                curves(1).Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(sep,1.5,0),ROTATION<TV>(i,TV(0,0,1))*ROTATION<TV>(pi/(2*cogs),TV(0,0,1))));}
 
             tests.Add_Ground();
             break;}
@@ -1994,7 +1995,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         for(int b=0;b<rigid_body_collection.rigid_body_particles.number;b++)
             solid_body_collection.Add_Force(new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,
                     rigid_body_collection.Rigid_Body(b).implicit_object,penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));
-    else if(use_constraint_collisions)
+    else if(use_constraint_collisions && backward_euler_evolution)
         for(int b=0;b<rigid_body_collection.rigid_body_particles.number;b++)
             backward_euler_evolution->minimization_objective.collision_objects.Append(rigid_body_collection.Rigid_Body(b).implicit_object);
     else
@@ -2004,6 +2005,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.structures(i));}
 
     if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
+    if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);
 
     for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
     for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
@@ -2182,46 +2184,38 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 {
     if(test_number==41)
     {
-        if(id==kinematic_id)
-        {if(time >= .2) frame=FRAME<TV>(TV(1,plateau,0));else frame=curve.Value(time);}
-        if(id==kinematic_id2)
-        {if(time >= .27) frame=FRAME<TV>(TV(2,plateau,0));else frame=curve2.Value(time);}
-        if(id==kinematic_id3)
-        {if(time >= .33) frame=FRAME<TV>(TV(3,plateau,0));else frame=curve3.Value(time);}
-        if(id==kinematic_id4)
-        {if(time >= .4) frame=FRAME<TV>(TV(4,plateau,0));else frame=curve4.Value(time);}
-        if(id==kinematic_id5)
-        {if(time >= .47) frame=FRAME<TV>(TV(5,plateau,0));else frame=curve5.Value(time);}
-        if(id==kinematic_id6)
-        {if(time >= .53) frame=FRAME<TV>(TV(6,plateau,0));else frame=curve6.Value(time);}
-        if(id==kinematic_id7)
-        {if(time >= .6) frame=FRAME<TV>(TV(7,plateau,0));else frame=curve7.Value(time);}
-        if(id==kinematic_id8)
-        {if(time >= .67) frame=FRAME<TV>(TV(8,plateau,0));else frame=curve8.Value(time);}
+        if(id==kinematic_ids(0))
+        {if(time>=.2) frame=FRAME<TV>(TV(1,plateau,0));else frame=curves(0).Value(time);}
+        if(id==kinematic_ids(1))
+        {if(time>=.27) frame=FRAME<TV>(TV(2,plateau,0));else frame=curves(1).Value(time);}
+        if(id==kinematic_ids(2))
+        {if(time>=.33) frame=FRAME<TV>(TV(3,plateau,0));else frame=curves(2).Value(time);}
+        if(id==kinematic_ids(3))
+        {if(time>=.4) frame=FRAME<TV>(TV(4,plateau,0));else frame=curves(3).Value(time);}
+        if(id==kinematic_ids(4))
+        {if(time>=.47) frame=FRAME<TV>(TV(5,plateau,0));else frame=curves(4).Value(time);}
+        if(id==kinematic_ids(5))
+        {if(time>=.53) frame=FRAME<TV>(TV(6,plateau,0));else frame=curves(5).Value(time);}
+        if(id==kinematic_ids(6))
+        {if(time>=.6) frame=FRAME<TV>(TV(7,plateau,0));else frame=curves(6).Value(time);}
+        if(id==kinematic_ids(7))
+        {if(time>=.67) frame=FRAME<TV>(TV(8,plateau,0));else frame=curves(7).Value(time);}
         return;
     }
-    if(id==kinematic_id) frame=curve.Value(time);
-    if(id==kinematic_id2) frame=curve2.Value(time);
-    if(id==kinematic_id3) frame=curve3.Value(time);
-    if(id==kinematic_id4) frame=curve4.Value(time);
-    if(id==kinematic_id5) frame=curve5.Value(time);
-    if(id==kinematic_id6) frame=curve6.Value(time);
-    if(id==kinematic_id7) frame=curve7.Value(time);
-    if(id==kinematic_id8) frame=curve8.Value(time);
+    for(int i=0;i<kinematic_ids.m;i++)
+        if(id==kinematic_ids(i)){
+            frame=curves(i).Value(time);
+            break;}
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities
 //#####################################################################
 bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 {
-    if(id==kinematic_id) twist=curve.Derivative(time);
-    if(id==kinematic_id2) twist=curve2.Derivative(time);
-    if(id==kinematic_id3) twist=curve3.Derivative(time);
-    if(id==kinematic_id4) twist=curve4.Derivative(time);
-    if(id==kinematic_id5) twist=curve5.Derivative(time);
-    if(id==kinematic_id6) twist=curve6.Derivative(time);
-    if(id==kinematic_id7) twist=curve7.Derivative(time);
-    if(id==kinematic_id8) twist=curve8.Derivative(time);
+    for(int i=0;i<kinematic_ids.m;i++)
+        if(id==kinematic_ids(i)){
+            twist=curves(i).Derivative(time);
+            return true;}
     return false;
 }
 //#####################################################################
