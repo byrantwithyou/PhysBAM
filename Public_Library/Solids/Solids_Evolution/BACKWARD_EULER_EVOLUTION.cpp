@@ -37,6 +37,7 @@ BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BO
     newtons_method.fail_on_krylov_not_converged=false;
     newtons_method.tolerance=1e-5;
     newtons_method.angle_tolerance=1e-2;
+    minimization_system.tmp=&tmp1;
 }
 //#####################################################################
 // Destructor
@@ -89,16 +90,15 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     tmp1=tmp0;
     minimization_objective.Project_Gradient_And_Prune_Constraints(tmp1);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before friction",1,1);
-    for(int i=0;i<minimization_system.colliding_particles.m;i++){
-        int p=minimization_system.colliding_particles(i);
-        TV n=minimization_system.colliding_normals(i);
-        T normal_force=n.Dot(tmp0.V.array(p)-tmp1.V.array(p));
-        TV& v=minimization_objective.v1.V.array(p);
-        TV t=v.Projected_Orthogonal_To_Unit_Direction(n);
+    for(int i=0;i<minimization_system.collisions.m;i++){
+        const typename BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::COLLISION& c=minimization_system.collisions(i);
+        T normal_force=c.n.Dot(tmp0.V.array(c.p)-tmp1.V.array(c.p));
+        TV& v=minimization_objective.v1.V.array(c.p);
+        TV t=v.Projected_Orthogonal_To_Unit_Direction(c.n);
         T t_mag=t.Normalize();
-        if(t_mag<=coefficient_of_friction*normal_force/particles.mass(p))
-            v.Project_On_Unit_Direction(n);
-        else v-=coefficient_of_friction/particles.mass(p)*normal_force*t;}
+        if(t_mag<=coefficient_of_friction*normal_force/particles.mass(c.p))
+            v.Project_On_Unit_Direction(c.n);
+        else v-=coefficient_of_friction/particles.mass(c.p)*normal_force*t;}
     solid_body_collection.Print_Energy(time+dt,2);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after friction",1,1);
 

@@ -23,6 +23,7 @@ template<class TV>
 class BACKWARD_EULER_MINIMIZATION_OBJECTIVE:public NONLINEAR_FUNCTION<typename TV::SCALAR(KRYLOV_VECTOR_BASE<typename TV::SCALAR>&)>
 {
     typedef typename TV::SCALAR T;
+    typedef typename BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::COLLISION COLLISION;
 public:
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     mutable GENERALIZED_VELOCITY<TV> v1;

@@ -15,7 +15,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::
 BACKWARD_EULER_MINIMIZATION_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection,EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities)
-    :KRYLOV_SYSTEM_BASE<T>(false,false),solid_body_collection(solid_body_collection),dt(0),time(0),example_forces_and_velocities(example_forces_and_velocities)
+    :KRYLOV_SYSTEM_BASE<T>(false,false),solid_body_collection(solid_body_collection),dt(0),time(0),tmp(0),example_forces_and_velocities(example_forces_and_velocities)
 {
 }
 //#####################################################################
@@ -33,17 +33,28 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 {
     const GENERALIZED_VELOCITY<TV>& V=debug_cast<const GENERALIZED_VELOCITY<TV>&>(BV);
     GENERALIZED_VELOCITY<TV>& F=debug_cast<GENERALIZED_VELOCITY<TV>&>(BF);
+    GENERALIZED_VELOCITY<TV>& t=debug_cast<GENERALIZED_VELOCITY<TV>&>(*tmp);
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
 
-    solid_body_collection.Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,-dt*dt,time);
+    t=V;
+    for(int i=0;i<collisions.m;i++){
+        const COLLISION& c=collisions(i);
+        t.V.array(c.p).Project_Orthogonal_To_Unit_Direction(c.n);}
 
-    for(int p=0;p<particles.number;p++) F.V.array(p)+=particles.mass(p)*V.V.array(p);
+    solid_body_collection.Implicit_Velocity_Independent_Forces(t.V.array,t.rigid_V.array,F.V.array,F.rigid_V.array,-dt*dt,time);
+
+    for(int p=0;p<particles.number;p++) F.V.array(p)+=particles.mass(p)*t.V.array(p);
 
     for(int p=0;p<rigid_body_particles.number;p++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
         if(rigid_body.Has_Infinite_Inertia()) continue;
-        F.rigid_V.array(p)+=rigid_body.Inertia_Times(V.rigid_V.array(p));}
+        F.rigid_V.array(p)+=rigid_body.Inertia_Times(t.rigid_V.array(p));}
+
+    for(int i=0;i<collisions.m;i++){
+        const COLLISION& c=collisions(i);
+        TV& v=F.V.array(c.p),tt=t.V.array(c.p);
+        v-=c.n*c.n.Dot(v)+c.H*tt*c.n_dE+c.n.Dot(tt)*c.H_dE+c.H_dE.Dot(tt)*c.n;}
 }
 //#####################################################################
 // Function Inner_Product
@@ -69,9 +80,6 @@ template<class TV> void BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::
 Project(KRYLOV_VECTOR_BASE<T>& BV) const
 {
     GENERALIZED_VELOCITY<TV>& V=debug_cast<GENERALIZED_VELOCITY<TV>&>(BV);
-    for(int i=0;i<colliding_particles.m;i++)
-        V.V.array(colliding_particles(i)).Project_Orthogonal_To_Unit_Direction(colliding_normals(i));
-
     if(example_forces_and_velocities) example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(V.V.array,time,time);
 }
 //#####################################################################

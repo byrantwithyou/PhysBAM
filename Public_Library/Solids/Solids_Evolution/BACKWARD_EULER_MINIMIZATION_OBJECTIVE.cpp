@@ -44,6 +44,9 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
     tmp1=dv;
     Adjust_For_Collision(tmp1);
     Compute_Unconstrained(tmp1,h,g,e);
+    if(h)
+        for(int i=0;i<minimization_system.collisions.m;i++)
+            minimization_system.collisions(i).phi=0;
     if(g) Project_Gradient_And_Prune_Constraints(*g);
 }
 //#####################################################################
@@ -92,8 +95,7 @@ template<class TV> void BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
 Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
 {
     GENERALIZED_VELOCITY<TV>& dv=debug_cast<GENERALIZED_VELOCITY<TV>&>(Bdv);
-    minimization_system.colliding_particles.Remove_All();
-    minimization_system.colliding_normals.Remove_All();
+    minimization_system.collisions.Remove_All();
     if(!collision_objects.m) return;
 
     for(int p=0;p<dv.V.array.m;p++){
@@ -111,14 +113,14 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
                 deepest_index=j;}}
         if(deepest_index==-1) continue;
         IMPLICIT_OBJECT<TV>* io=collision_objects(deepest_index);
+        COLLISION c={p,deepest_phi,0,io->Extended_Normal(X),TV(),io->Hessian(X)};
+        minimization_system.collisions.Append(c);
         for(int i=0;i<5 && abs(deepest_phi)>collision_thickness;i++){
             X-=deepest_phi*io->Extended_Normal(X);
             deepest_phi=io->Extended_Phi(X);}
         V=(X-X0(p))/dt;
         dV=V-v0.V.array(p);
-        dv.V.array(p)=dV;
-        minimization_system.colliding_particles.Append(p);
-        minimization_system.colliding_normals.Append(io->Extended_Normal(X));}
+        dv.V.array(p)=dV;}
 }
 //#####################################################################
 // Function Project_Gradient_And_Prune_Constraints
@@ -127,16 +129,14 @@ template<class TV> void BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
 Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg) const
 {
     GENERALIZED_VELOCITY<TV>& g=debug_cast<GENERALIZED_VELOCITY<TV>&>(Bg);
-    int sep=0;
-    for(int i=minimization_system.colliding_particles.m-1;i>=0;i--){
-        int p=minimization_system.colliding_particles(i);
-        TV n=minimization_system.colliding_normals(i),&gv=g.V.array(p);
-        T gv_n=gv.Dot(n);
-        if(gv_n<0){
-            sep++;
-            minimization_system.colliding_particles.Remove_Index_Lazy(i);
-            minimization_system.colliding_normals.Remove_Index_Lazy(i);}
-        else gv-=gv_n*n;}
+    for(int i=minimization_system.collisions.m-1;i>=0;i--){
+        COLLISION& c=minimization_system.collisions(i);
+        TV &gv=g.V.array(c.p);
+        c.n_dE=gv.Dot(c.n);
+        if(c.n_dE<0) minimization_system.collisions.Remove_Index_Lazy(i);
+        else{
+            c.H_dE=c.H*gv;
+            gv-=c.n_dE*c.n+c.phi*c.H_dE;}}
     if(minimization_system.example_forces_and_velocities)
         minimization_system.example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(g.V.array,time,time);
 }
@@ -212,11 +212,10 @@ Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv)
     minimization_system.Project(*ddv);
     b->Copy(1,*t0,*ddv);
 
-    ARRAY<int> ai=minimization_system.colliding_particles;
-    ARRAY<TV> an=minimization_system.colliding_normals;
+    ARRAY<COLLISION> ac;
+    ac.Exchange(minimization_system.collisions);
     Adjust_For_Collision(*b);
-    minimization_system.colliding_particles=ai;
-    minimization_system.colliding_normals=an;
+    ac.Exchange(minimization_system.collisions);
     ddv->Copy(-1,*t0,*b);
 
     minimization_system.Multiply(*ddv,*a);
