@@ -21,6 +21,8 @@ Test_[0-9]*
 *.dvi
 *.ps
 *~
+*.taghl
+tags
 a.out
 Public_Data
 tmp-gdb-cmd-args.txt
