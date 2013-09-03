@@ -46,7 +46,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         sprintf(buff,"newton %d   %g %g %g", i, E, abs(E-last_E), norm_grad);
         PHYSBAM_DEBUG_WRITE_SUBSTEP(buff,1,1);
 
-        if(norm_grad<tolerance){result=true;break;}
+        if(norm_grad<tolerance && (i || !norm_grad)){result=true;break;}
         if(norm_grad<countdown_tolerance){
             result=true;
             local_max_iterations=std::min(local_max_iterations,i+countdown_iterations);}
