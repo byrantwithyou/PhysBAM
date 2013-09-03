@@ -7,6 +7,8 @@
 #ifndef __BACKWARD_EULER_MINIMIZATION_OBJECTIVE__
 #define __BACKWARD_EULER_MINIMIZATION_OBJECTIVE__
 #include <Tools/Arrays/ARRAY.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Tools/Data_Structures/PAIR.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
@@ -31,6 +33,7 @@ public:
     T dt,time;
     ARRAY<IMPLICIT_OBJECT<TV>*> collision_objects;
     T collision_thickness;
+    HASHTABLE<PAIR<int,int> > disabled_collision;
 
     BACKWARD_EULER_MINIMIZATION_OBJECTIVE(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>& minimization_system);
     virtual ~BACKWARD_EULER_MINIMIZATION_OBJECTIVE();
@@ -42,6 +45,7 @@ public:
     void Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const PHYSBAM_OVERRIDE;
     void Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& dv) const;
     void Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv);
+    void Disable_Current_Colliding_Pairs(T thickness=0);
 };
 }
 #endif

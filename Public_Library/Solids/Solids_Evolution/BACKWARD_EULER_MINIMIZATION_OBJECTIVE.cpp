@@ -96,7 +96,6 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
     minimization_system.colliding_normals.Remove_All();
     if(!collision_objects.m) return;
 
-    int adjustments=0;
     for(int p=0;p<dv.V.array.m;p++){
         TV dV=dv.V.array(p);
         TV V=v0.V.array(p)+dV;
@@ -104,6 +103,7 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
         T deepest_phi=collision_thickness;
         int deepest_index=-1;
         for(int j=0;j<collision_objects.m;j++){
+            if(disabled_collision.Contains(PAIR<int,int>(j,p))) continue;
             IMPLICIT_OBJECT<TV>* io=collision_objects(j);
             T phi=io->Extended_Phi(X);
             if(phi<deepest_phi){
@@ -112,7 +112,6 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
         if(deepest_index==-1) continue;
         IMPLICIT_OBJECT<TV>* io=collision_objects(deepest_index);
         for(int i=0;i<5 && abs(deepest_phi)>collision_thickness;i++){
-            adjustments++;
             X-=deepest_phi*io->Extended_Normal(X);
             deepest_phi=io->Extended_Phi(X);}
         V=(X-X0(p))/dt;
@@ -168,6 +167,19 @@ Reset()
     v0=v1;
     tmp0.Resize(v1);
     tmp1.Resize(v1);
+}
+//#####################################################################
+// Function Disable_Current_Colliding_Pairs
+//#####################################################################
+template<class TV> void BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
+Disable_Current_Colliding_Pairs(T thickness)
+{
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    for(int j=0;j<collision_objects.m;j++){
+        IMPLICIT_OBJECT<TV>* io=collision_objects(j);
+        for(int p=0;p<particles.X.m;p++){
+            T phi=io->Extended_Phi(particles.X(p));
+            if(phi<=thickness) disabled_collision.Set(PAIR<int,int>(j,p));}}
 }
 //#####################################################################
 // Function Test_Diff
