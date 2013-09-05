@@ -36,6 +36,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
 
     T last_E=FLT_MAX;
     int local_max_iterations=max_iterations;
+    F.Make_Feasible(x);
     for(int i=0;i<local_max_iterations;i++){
         T E=0;
         F.Compute(x,&sys,&grad,&E);
