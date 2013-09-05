@@ -2312,7 +2312,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     if(test_number==48){
         stuck_particles.Remove_All();
         T r=std::max((T)0,hole-time*stretch);
-        if(time>1.2*hole/stretch) r=std::min((time-1.2*hole/stretch)*stretch,hole);
+        if(time>1.2*hole/stretch) r=std::min((time-(T)1.2*hole/stretch)*stretch,hole);
         for(int i=0;i<particles.X.m;i++)
             if(particles.X(i).Magnitude()>r){
                 stuck_particles.Append(i);
@@ -2364,7 +2364,7 @@ void Preprocess_Frame(const int frame)
             for(int i=0;i<m;i++)
             for(int j=0;j<n;j++)
             for(int ij=0;ij<mn;ij++){
-                particles.V(i+m*j+m*n*ij+(k-1)*m*n*mn)=0.1*TV(-sin(sin(187*k)*5*i/(T)m),-cos(cos(217*k)*6*j/(T)n),sin(5*ij*sin(471*k)/(T)mn));}
+                particles.V(i+m*j+m*n*ij+(k-1)*m*n*mn)=(T)0.1*TV(-sin(sin(187*k)*5*i/(T)m),-cos(cos(217*k)*6*j/(T)n),sin(5*ij*sin(471*k)/(T)mn));}
 
             for(int k_other=k+1;k_other<jello_centers.m;k_other++){
                 TV center=TV();
