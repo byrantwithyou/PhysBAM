@@ -496,7 +496,7 @@ void Coupled_Stack()
             rigid_body.Frame().t=TV(0,(T)(2*i+1),0);
             rigid_body.Set_Mass(6000);}
         else{
-            tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(7,7,7),RANGE<TV>(TV(-(T)1,(T)(2*i),-(T)1),TV((T)1,(T)(2*i+2),(T)1))),1000);}}
+            tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(7,7,7),RANGE<TV>(TV(-(T)1,(T)(2*i),-(T)1),TV((T)1,(T)(2*i+2),(T)1))),true,0,1000);}}
  
     maximum_fall_speed=105;
 //    T v=maximum_fall_speed,g=solids_parameters.gravity,t=4;
@@ -726,7 +726,7 @@ void Torsion_Spring()
     rigid_body4.Set_Mass(30);
 
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(33,5,5),RANGE<TV>(TV(-8,(T)1.5,-.5),TV(0,(T)2.5,.5))),1000);
+    tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(33,5,5),RANGE<TV>(TV(-8,(T)1.5,-.5),TV(0,(T)2.5,.5))),true,0,1000);
 
     tests.Bind_Particles_In_Rigid_Body(rigid_body1);
     tests.Bind_Particles_In_Rigid_Body(rigid_body3);
@@ -887,7 +887,7 @@ void Brush_And_Wheel()
     kinematic_id=box.particle_index;
 
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(33,5,5),RANGE<TV>(TV(-1,(T)3.1,-(T).5),TV((T)4.5,(T)4.1,(T).5))),1000);
+    tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(33,5,5),RANGE<TV>(TV(-1,(T)3.1,-(T).5),TV((T)4.5,(T)4.1,(T).5))),true,0,1000);
     tests.Bind_Particles_In_Rigid_Body(box);
     tests.Add_Ground((T).5,-2,1);
 }
@@ -1065,7 +1065,7 @@ void Cubes_Friction()
 
     frame.t.z+=(T).2;
     RIGID_BODY_STATE<TV> state(frame,twist);
-    tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(5,5,5),RANGE<TV>(TV(-(T)1,-(T)1,-(T)1),TV((T)1,(T)1,(T)1))*box_size),false,&state);
+    tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(5,5,5),RANGE<TV>(TV(-(T)1,-(T)1,-(T)1),TV((T)1,(T)1,(T)1))*box_size),false,&state,1000);
 
     FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();solid_body_collection.deformable_body_collection.Add_Structure(&free_particles);
     int particle_rest=solid_body_collection.deformable_body_collection.particles.Add_Element();

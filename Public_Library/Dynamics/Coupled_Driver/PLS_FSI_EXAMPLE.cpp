@@ -62,7 +62,7 @@ PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions)
     :BASE(stream_type),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
     solid_body_collection(*new SOLID_BODY_COLLECTION<TV>),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
     fluids_parameters(number_of_regions,FLUIDS_PARAMETERS<TV>::WATER),fluid_collection(*fluids_parameters.grid),resolution(8),convection_order(1),
-    use_pls_evolution_for_structure(false),two_phase(false),use_kang(false),print_matrix(false),test_system(false),kang_poisson_viscosity(0),m(1),s(1),kg(1),
+    use_pls_evolution_for_structure(false),two_phase(false),use_kang(false),print_matrix(false),test_system(false),kang_poisson_viscosity(0),
     opt_skip_debug_data(false),opt_solidscg(false),opt_solidscr(false),opt_solidssymmqmr(false)
 {
     Set_Minimum_Collision_Thickness();
@@ -98,9 +98,6 @@ Register_Options()
     parse_args->Add("-rigidcfl",&solids_parameters.rigid_body_evolution_parameters.rigid_cfl,"cfl","rigid CFL");
     parse_args->Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
     parse_args->Add("-resolution",&resolution,"resolution","simulation resolution");
-    parse_args->Add("-m",&m,"scale","length unit");
-    parse_args->Add("-s",&s,"scale","time unit");
-    parse_args->Add("-kg",&kg,"scale","mass unit");
 }
 //#####################################################################
 // Function Parse_Options

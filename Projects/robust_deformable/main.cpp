@@ -186,7 +186,7 @@ int main(int argc,char* argv[])
     VIEWER_OUTPUT<TV> vo(stream_type,grid,output_directory);
     SOLIDS_STANDARD_TESTS<TV> tests(stream_type,getenv("PHYSBAM_DATA_DIRECTORY"),simulation.solid_body_collection);
     GRID<TV> cube_grid(TV_INT()+res,RANGE<TV>::Centered_Box());
-    TETRAHEDRALIZED_VOLUME<T>& tv=tests.Create_Mattress(cube_grid);
+    TETRAHEDRALIZED_VOLUME<T>& tv=tests.Create_Mattress(cube_grid,true,0,1000);
     simulation.solid_body_collection.Add_Force(Create_Finite_Volume(tv,new COROTATED_FIXED<T,3>(1e6,0.3,0)));
     for(int i=0;i<simulation.solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
         simulation.solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;

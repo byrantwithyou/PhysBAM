@@ -301,14 +301,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     switch(test_number){
         case 1:
-            tests.Create_Mattress(mattress_grid,true);
+            tests.Create_Mattress(mattress_grid,true,0,100);
             break;
         case 4:
         case 24:
         case 25:
         case 26:
         case 27:
-            tests.Create_Mattress(mattress_grid,true);
+            tests.Create_Mattress(mattress_grid,true,0,100);
             break;
         case 2:
         case 3:
@@ -355,20 +355,20 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Copy_And_Add_Structure(triangulated_area);
             break;}
         case 7:{
-            tests.Create_Segmented_Curve(300,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
+            tests.Create_Segmented_Curve(300,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))),1,100);
             tests.Add_Ground();
             break;}
         case 8: 
         case 13:{
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))),100);
             tests.Add_Ground();
             break;}
         case 23:{
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,200))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,200))),100);
             tests.Add_Ground();
             break;}
         case 9:{
-            tests.Create_Mattress(mattress_grid,false,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T).5))));
+            tests.Create_Mattress(mattress_grid,false,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T).5))),100);
             tests.Add_Ground();
             break;}
         case 10:{
@@ -395,18 +395,18 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Add_Ground();
             break;}
         case 14:{
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(4,4))));
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(8,4))));
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(12,4))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))),100);
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(4,4))),100);
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(8,4))),100);
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(12,4))),100);
             tests.Add_Ground();
             break;}
         case 15:{
-            for(int i=0;i<parameter;i++) tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1.2*i))));
+            for(int i=0;i<parameter;i++) tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1.2*i))),100);
             tests.Add_Ground();
             break;}
         case 16: {
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1))),100);
             RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("square",10,(T)0);
             RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",10,(T)0);
             box1.Frame().t=TV(0,-10);
@@ -422,7 +422,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             last_frame=250;
             break;}
         case 22: {
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0))),100);
             RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("square",1,(T)0);
             RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",1,(T)0);
             box1.Frame().t=TV(0,-2);
@@ -440,10 +440,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 17:
         case 18:
         case 19:{
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0))),100);
             break;}
         case 20:{
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))),100);
             //RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("circle",4,(T)0);
             RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",(T).2,(T)0);
             //box1.Frame().t=TV(0,-10);
@@ -458,7 +458,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             curve.Add_Control_Point(11,FRAME<TV>(TV(0,12)));
             break;}
         case 21:{
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))),100);
             RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("square",1,(T)0);
             box1.Frame().t=TV(0,-6);
             box1.is_static=true;

@@ -22,7 +22,7 @@ EXAMPLE(const STREAM_TYPE stream_type_input)
     stored_data_directory(data_directory),stored_output_directory(output_directory),opt_all_verbose(false),user_dt(false),
     user_frame_rate(false),user_max_dt(false),user_first_frame(false),user_last_frame(false),user_data_directory(false),
     user_output_directory(false),opt_query_output(false),opt_nolog(false),opt_verbosity(1<<30),stored_first_frame(0),
-    stored_last_frame(0),stored_dt(0),stored_frame_rate(24),stored_max_dt(0)
+    stored_last_frame(0),stored_dt(0),stored_frame_rate(24),stored_max_dt(0),m(1),s(1),kg(1)
 {
 }
 //#####################################################################
@@ -110,6 +110,9 @@ Register_Options()
     parse_args->Add("-d",&stored_data_directory,&user_data_directory,"dir","data directory");
     parse_args->Add("-o",&stored_output_directory,&user_output_directory,"dir","output directory");
     parse_args->Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
+    parse_args->Add("-m",&m,"scale","length unit");
+    parse_args->Add("-s",&s,"scale","time unit");
+    parse_args->Add("-kg",&kg,"scale","mass unit");
     if(mpi_world) parse_args->Add("-all_verbose",&opt_all_verbose,"all mpi processes write to stdout (not just the first)");
 }
 //#####################################################################
@@ -122,6 +125,10 @@ Parse_Options()
     if(mpi_world && !opt_all_verbose && mpi_world->initialized && mpi_world->rank) opt_verbosity=0;
     need_finish_logging=true;
     LOG::Initialize_Logging(opt_verbosity<10,false,opt_verbosity,!opt_nolog);
+    stored_dt*=s;
+    stored_frame_rate/=s;
+    stored_max_dt*=s;
+    frame_rate/=s;
 }
 //#####################################################################
 // Function Override_Options

@@ -32,8 +32,8 @@ public:
     SOLIDS_STANDARD_TESTS(STREAM_TYPE stream_type,const std::string& data_directory,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input);
     virtual ~SOLIDS_STANDARD_TESTS(){}
 
-    TRIANGULATED_AREA<T>& Create_Mattress(const GRID<TV>& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>& initial_state)
-    {return Create_Mattress(mattress_grid,use_constant_mass,&initial_state);}
+    TRIANGULATED_AREA<T>& Create_Mattress(const GRID<TV>& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>& initial_state,const T density)
+    {return Create_Mattress(mattress_grid,use_constant_mass,&initial_state,density);}
 
     template<class T_OBJECT> void
     Substitute_Soft_Bindings_For_Embedded_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bindings,HASHTABLE<int,int>* persistent_soft_bindings=0)

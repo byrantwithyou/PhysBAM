@@ -153,7 +153,7 @@ TETRAHEDRALIZED_VOLUME<T>& Create_Deformable_Mattress()
     // 1 read in mattress
     TV_INT counts(31,4,7);TV min_corner(-counts.x*(T).25,0,-counts.z*(T).20),max_corner(counts.x*(T).25,counts.y*(T).5,counts.z*(T).20);
     GRID<TV> mattress_grid(counts,RANGE<TV>(min_corner,max_corner));
-    TETRAHEDRALIZED_VOLUME<T>& mattress=tests.Create_Mattress(mattress_grid);
+    TETRAHEDRALIZED_VOLUME<T>& mattress=tests.Create_Mattress(mattress_grid,true,0,1000);
     mattress.Update_Number_Nodes();
 
     // 2 create duplicate mattress surface

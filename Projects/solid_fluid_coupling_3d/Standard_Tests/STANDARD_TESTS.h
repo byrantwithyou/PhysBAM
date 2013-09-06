@@ -409,7 +409,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         surface.mesh.Initialize_Adjacent_Elements();
     }
     else if(test_number==2){
-        solids_tests.Create_Mattress(mattress_grid,true);
+        solids_tests.Create_Mattress(mattress_grid,true,0,1000);
         deformable_object_enslaved_nodes.Resize(mattress_grid.counts.y*mattress_grid.counts.z);
         deformable_object_enslaved_nodes=IDENTITY_ARRAY<int>(mattress_grid.counts.y*mattress_grid.counts.z);
     }

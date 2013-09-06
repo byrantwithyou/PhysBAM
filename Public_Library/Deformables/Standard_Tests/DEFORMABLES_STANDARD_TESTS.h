@@ -49,7 +49,7 @@ public:
     virtual ~DEFORMABLES_STANDARD_TESTS();
 
     TRIANGULATED_AREA<T>& Create_Mattress(const GRID<TV>& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>& initial_state)
-    {return Create_Mattress(mattress_grid,use_constant_mass,&initial_state);}
+    {return Create_Mattress(mattress_grid,use_constant_mass,&initial_state,1000);}
 
     template<class T_OBJECT> void
     Substitute_Soft_Bindings_For_Embedded_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bindings,HASHTABLE<int,int>* persistent_soft_bindings=0)
@@ -71,7 +71,7 @@ public:
     T_STRUCTURE& Copy_And_Add_Structure(T_STRUCTURE& structure,ARRAY<int>* particle_indices=0);
     void Set_Initial_Particle_Configuration(GEOMETRY_PARTICLES<TV>& particles,const RIGID_BODY_STATE<TV>& state,const bool relative_to_box_center);
     T_SEGMENTED_CURVE& Create_Segmented_Curve(const GRID<VECTOR<T,1> >& square_grid,const RIGID_BODY_STATE<TV>& initial_state,const T density);
-    T_SEGMENTED_CURVE& Create_Segmented_Curve(const int m,const RIGID_BODY_STATE<TV>& initial_state,const T initial_radius=(T)1,const T density=(T)100);
+    T_SEGMENTED_CURVE& Create_Segmented_Curve(const int m,const RIGID_BODY_STATE<TV>& initial_state,const T initial_radius,const T density);
     TETRAHEDRALIZED_VOLUME<T>& Create_Tetrahedralized_Volume(const std::string& filename,const RIGID_BODY_STATE<TV>& initial_state,const bool relative_to_box_center,
         const bool use_constant_mass,const T density,const T scale=1);
     T_TRIANGULATED_OBJECT& Create_Triangulated_Object(const GRID<TV>& square_grid,const RIGID_BODY_STATE<TV>& initial_state,const T density);
@@ -79,8 +79,8 @@ public:
         const bool use_constant_mass,const T scale=1);
     T_SEGMENTED_CURVE& Create_Segmented_Curve(const std::string& filename,const RIGID_BODY_STATE<TV>& initial_state,const bool relative_to_box_center,
         const bool use_constant_mass);
-    TRIANGULATED_AREA<T>& Create_Mattress(const GRID<VECTOR<T,2> >& mattress_grid,const bool use_constant_mass=true,const RIGID_BODY_STATE<TV>* initial_state=0,const T density=(T)1000,const bool reverse_triangles=false);
-    TETRAHEDRALIZED_VOLUME<T>& Create_Mattress(const GRID<VECTOR<T,3> >& mattress_grid,const bool use_constant_mass=true,const RIGID_BODY_STATE<TV>* initial_state=0,const T density=(T)1000);
+    TRIANGULATED_AREA<T>& Create_Mattress(const GRID<VECTOR<T,2> >& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>* initial_state,const T density,const bool reverse_triangles=false);
+    TETRAHEDRALIZED_VOLUME<T>& Create_Mattress(const GRID<VECTOR<T,3> >& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>* initial_state,const T density);
     template<class T_SHAPE>
     EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>& Create_Embedded_Tetrahedralized_Volume(const T_SHAPE& shape,const RIGID_BODY_STATE<TV>& initial_state,const bool relative_to_box_center);
     template<class T_OBJECT> void

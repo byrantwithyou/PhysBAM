@@ -661,7 +661,7 @@ void Get_Initial_Data()
             break;}
         case 8:{
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)));
-            tests.Create_Mattress(mattress_grid,true,&initial_state);
+            tests.Create_Mattress(mattress_grid,true,&initial_state,1000);
             // tests.Add_Ground();
             break;}
         case 80:{
@@ -683,18 +683,18 @@ void Get_Initial_Data()
             last_frame=1200;
             for(int i=0;i<7;i++){
                 RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(4*i,1,0)));
-                tests.Create_Mattress(mattress_grid,true,&initial_state);}
+                tests.Create_Mattress(mattress_grid,true,&initial_state,1000);}
             tests.Add_Ground();
             break;}
         case 11:{
             last_frame=1200;
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,1,0)));
-            tests.Create_Mattress(mattress_grid,true,&initial_state);
+            tests.Create_Mattress(mattress_grid,true,&initial_state,1000);
             tests.Add_Ground();
             break;}
         case 16: {
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)));
-            tests.Create_Mattress(mattress_grid,true,&initial_state);
+            tests.Create_Mattress(mattress_grid,true,&initial_state,1000);
             RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(20,20,20));
             RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(20,20,20));
             box1.Frame().t=TV(0,-11,0);
@@ -711,7 +711,7 @@ void Get_Initial_Data()
             break;}
         case 77: {
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)));
-            tests.Create_Mattress(mattress_grid,true,&initial_state);
+            tests.Create_Mattress(mattress_grid,true,&initial_state,1000);
 
             RIGID_BODY<TV>& box_bottom=tests.Add_Analytic_Box(TV(6,2,6));
             RIGID_BODY<TV>& box_side_1=tests.Add_Analytic_Box(TV(2,6,6));
@@ -752,11 +752,11 @@ void Get_Initial_Data()
         case 25:
         case 26: case 23: case 57:
         case 27:{
-            tests.Create_Mattress(mattress_grid,true,0);
+            tests.Create_Mattress(mattress_grid,true,0,1000);
             break;}
         case 28: {
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)));
-            tests.Create_Mattress(mattress_grid,true,&initial_state);
+            tests.Create_Mattress(mattress_grid,true,&initial_state,1000);
             RIGID_BODY<TV>& cylinder1=tests.Add_Analytic_Cylinder(10,1);
             cylinder1.Frame().t=TV(0,6,0);
             cylinder1.Frame().r=ROTATION<TV>((T)pi/2.0,TV(1,0,0));
@@ -1034,7 +1034,7 @@ void Get_Initial_Data()
 
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,2,0)));
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,3,0))),true,true,density,3);
-            // tests.Create_Mattress(mattress_grid,true,&initial_state);
+            // tests.Create_Mattress(mattress_grid,true,&initial_state,1000);
             tests.Add_Ground(1e8);
             break;}
         case 35:{
@@ -1043,10 +1043,10 @@ void Get_Initial_Data()
             RIGID_BODY_STATE<TV> initial_state3(FRAME<TV>(TV(-.1,6,0),ROTATION<TV>(T(pi/4),TV(1,1,1))));
             RIGID_BODY_STATE<TV> initial_state4(FRAME<TV>(TV(0,1.5,0),ROTATION<TV>(T(0),TV(1,1,1))));
 
-            tests.Create_Mattress(mattress_grid1,true,&initial_state1);
-            tests.Create_Mattress(mattress_grid2,true,&initial_state2);
-            tests.Create_Mattress(mattress_grid2,true,&initial_state3);
-            tests.Create_Mattress(mattress_grid3,true,&initial_state4);
+            tests.Create_Mattress(mattress_grid1,true,&initial_state1,1000);
+            tests.Create_Mattress(mattress_grid2,true,&initial_state2,1000);
+            tests.Create_Mattress(mattress_grid2,true,&initial_state3,1000);
+            tests.Create_Mattress(mattress_grid3,true,&initial_state4,1000);
             tests.Add_Ground();
             break;
         }
@@ -1056,10 +1056,10 @@ void Get_Initial_Data()
             //RIGID_BODY_STATE<TV> initial_state3(FRAME<TV>(TV(-.1,6,0),ROTATION<TV>(T(pi/4),TV(1,1,1))));
             //RIGID_BODY_STATE<TV> initial_state4(FRAME<TV>(TV(0,1.5,0),ROTATION<TV>(T(0),TV(1,1,1))));
 
-            tests.Create_Mattress(mattress_grid1,true,&initial_state1);
-            //tests.Create_Mattress(mattress_grid2,true,&initial_state2);
-            //tests.Create_Mattress(mattress_grid2,true,&initial_state3);
-            //tests.Create_Mattress(mattress_grid3,true,&initial_state4);
+            tests.Create_Mattress(mattress_grid1,true,&initial_state1,1000);
+            //tests.Create_Mattress(mattress_grid2,true,&initial_state2,1000);
+            //tests.Create_Mattress(mattress_grid2,true,&initial_state3,1000);
+            //tests.Create_Mattress(mattress_grid3,true,&initial_state4,1000);
             tests.Add_Ground();
             break;
         }
@@ -1067,8 +1067,8 @@ void Get_Initial_Data()
         {
             RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(1.7,5.2,1.6),ROTATION<TV>(T(pi/4),TV(1.3,0.3,0.7))));
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(0,2.2,0),ROTATION<TV>(T(pi/7),TV(0.5,2,0.3))));
-            tests.Create_Mattress(mattress_grid,true,&initial_state1);
-            tests.Create_Mattress(mattress_grid,true,&initial_state2);
+            tests.Create_Mattress(mattress_grid,true,&initial_state1,1000);
+            tests.Create_Mattress(mattress_grid,true,&initial_state2,1000);
             tests.Add_Ground();
             break;
         }
@@ -1080,7 +1080,7 @@ void Get_Initial_Data()
             {
                 jello_centers.Append(TV(5.3*sin(277*i),15+2*cos(123*i),5.3*cos(297*i)));
                 RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(i),ROTATION<TV>(10*sin(178*i),TV(sin(145*i),cos(345*i),cos(478*i)))));
-                tests.Create_Mattress(mattress_grid,true,&initial_state);
+                tests.Create_Mattress(mattress_grid,true,&initial_state,1000);
             }
             tests.Add_Ground();
             break;
@@ -1089,8 +1089,8 @@ void Get_Initial_Data()
         {
             RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(0.07,0.3,0.09),ROTATION<TV>(T(pi/0.103),TV(1.35,0.785,1.675))));
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(0,0.01,0)));
-            tests.Create_Mattress(mattress_grid,true,&initial_state1);
-            tests.Create_Mattress(mattress_grid,true,&initial_state2);
+            tests.Create_Mattress(mattress_grid,true,&initial_state1,1000);
+            tests.Create_Mattress(mattress_grid,true,&initial_state2,1000);
             tests.Add_Ground();
             break;
         }
@@ -1100,8 +1100,8 @@ void Get_Initial_Data()
             jello_centers.Append(TV(0.266, 0.029,-0.013));
             RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(0),ROTATION<TV>(T(pi/0.13),TV(1.3,1.5,0.7))));
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(jello_centers(1),ROTATION<TV>(T(pi/0.076),TV(0.7,1,0.1))));
-            tests.Create_Mattress(mattress_grid,true,&initial_state1);
-            tests.Create_Mattress(mattress_grid,true,&initial_state2);
+            tests.Create_Mattress(mattress_grid,true,&initial_state1,1000);
+            tests.Create_Mattress(mattress_grid,true,&initial_state2,1000);
             tests.Add_Ground();
             break;
         }
@@ -1136,9 +1136,9 @@ void Get_Initial_Data()
 //                     new_center=TV(rand.Get_Uniform_Number(-bound,bound),rand.Get_Uniform_Number(-bound,bound),rand.Get_Uniform_Number(-bound,bound));
                 new_rotate=rand.Get_Uniform_Number(-(T)pi,(T)pi);
                 RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(i),ROTATION<TV>(new_rotate,new_center)));
-                if (i % 5 ==0) {tests.Create_Mattress(mattress_grid3,true,&initial_state1);}
-                else if (i % 5 ==1) {tests.Create_Mattress(mattress_grid2,true,&initial_state1);}
-                else {tests.Create_Mattress(mattress_grid1,true,&initial_state1);}
+                if (i % 5 ==0) {tests.Create_Mattress(mattress_grid3,true,&initial_state1,1000);}
+                else if (i % 5 ==1) {tests.Create_Mattress(mattress_grid2,true,&initial_state1,1000);}
+                else {tests.Create_Mattress(mattress_grid1,true,&initial_state1,1000);}
             }
             if(sloped_floor){
             RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(input_friction);
@@ -1262,7 +1262,7 @@ void Get_Initial_Data()
                 count++;
                 jello_centers.Append(TV(-100+i*5,j*5+3,k*5+sin(75*count)));
                 RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(count),ROTATION<TV>(10*sin(178*count),TV(sin(145*count),cos(345*count),cos(478*count)))));
-                tests.Create_Mattress(mattress_grid,true,&initial_state);
+                tests.Create_Mattress(mattress_grid,true,&initial_state,1000);
             }
             tests.Add_Ground();
             break;
@@ -1298,7 +1298,7 @@ void Get_Initial_Data()
                 count++;
                 jello_centers.Append(TV(i*0.05,50,0));
                 RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(count),ROTATION<TV>(10*sin(178*i),TV(sin(145*i),cos(345*i),cos(478*i)))));
-                tests.Create_Mattress(mattress_grid,true,&initial_state);
+                tests.Create_Mattress(mattress_grid,true,&initial_state,1000);
             }
             
             // int number_of_boxes=128;
@@ -1361,8 +1361,8 @@ void Get_Initial_Data()
             jello_centers.Append(TV(10,3.5,-1));
             RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(0),ROTATION<TV>(T(pi/4),TV(1.3,1.5,0.7))));
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(jello_centers(1),ROTATION<TV>(T(pi/5),TV(0.7,1,0.1))));
-            tests.Create_Mattress(mattress_grid,true,&initial_state1);
-            tests.Create_Mattress(mattress_grid,true,&initial_state2);
+            tests.Create_Mattress(mattress_grid,true,&initial_state1,1000);
+            tests.Create_Mattress(mattress_grid,true,&initial_state2,1000);
             tests.Add_Ground();
             break;
         }
@@ -1507,7 +1507,7 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 48:{
-            tests.Create_Mattress(GRID<TV>(TV_INT()+(parameter?parameter:10)+1,RANGE<TV>::Centered_Box()));
+            tests.Create_Mattress(GRID<TV>(TV_INT()+(parameter?parameter:10)+1,RANGE<TV>::Centered_Box()),true,0,1000);
             break;}
         case 53:{
             TETRAHEDRALIZED_VOLUME<T>* tv=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
@@ -1553,7 +1553,7 @@ void Get_Initial_Data()
                                                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(15,5,0),ROTATION<TV>(-T(pi/2),TV(1,0,0)))),true,true,density,1.0);
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(20,(T)5,0))),true,true,density,1.0);
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(25,5,0)));
-            tests.Create_Mattress(mattress_grid,true,&initial_state);
+            tests.Create_Mattress(mattress_grid,true,&initial_state,1000);
             break;}
         case 100:{
             TETRAHEDRALIZED_VOLUME<T>* tv=TETRAHEDRALIZED_VOLUME<T>::Create(particles);

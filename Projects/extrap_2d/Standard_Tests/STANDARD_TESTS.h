@@ -347,12 +347,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 25:
         case 26:
         case 27: case 270: case 30:
-            tests.Create_Mattress(mattress_grid,true);
+            tests.Create_Mattress(mattress_grid,true,0,1000);
             if(test_number==30) contrail.Resize(2*mattress_grid.counts.Product());
             break;
         case 8: 
         case 13:{
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))),1000);
             tests.Add_Ground();
             break;}
         case 23:{

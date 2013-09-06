@@ -444,7 +444,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             GRID<TV> mattress_grid(TV_INT(5,10,5),RANGE<TV>(TV((T)-.25,(T).8,(T)-.30),TV((T).25,(T)5.10,(T).30)));
             tetrahedralized_volume.Initialize_Cube_Mesh_And_Particles(mattress_grid);
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(tetrahedralized_volume,1000,true);
-            tests.Create_Mattress(mattress_grid);
+            tests.Create_Mattress(mattress_grid,true,0,1000);
             solids_parameters.deformable_object_collision_parameters.collide_with_interior=false;
             tests.Add_Ground((T).3);
 

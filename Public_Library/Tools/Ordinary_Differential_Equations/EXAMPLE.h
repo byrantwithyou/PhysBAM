@@ -52,6 +52,7 @@ public:
     bool opt_query_output,opt_nolog;
     int opt_verbosity,stored_first_frame,stored_last_frame;
     T stored_dt,stored_frame_rate,stored_max_dt;
+    T m,s,kg;
     
     EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~EXAMPLE();
