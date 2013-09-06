@@ -81,14 +81,27 @@ fprintf_with_format(std::ostream& out,char *format,int len,const PRINTF_FORMAT_F
     return fprintf_formatted_item(out,format,len,flags,value);
 }
 
-template<typename T,typename... Args> typename DISABLE_IF<IS_INTEGRAL<typename REMOVE_REFERENCE<T>::TYPE>::value,int>::TYPE
-fprintf_fill_format(std::ostream& out,const char *format,int len,PRINTF_FORMAT_FLAGS& flags,T&& param,Args&&... args)
+template<typename T,typename... Args> int
+fprintf_fill_format(std::ostream& out,const char *format,int len,PRINTF_FORMAT_FLAGS& flags)
 {
     throw std::runtime_error("invalid format string.");
 }
 
-template<typename T,typename... Args>
-int fprintf_fill_format(std::ostream& out,const char *format,int len,PRINTF_FORMAT_FLAGS& flags,int param,
+template<typename T,typename... Args> int
+fprintf_fill_format(std::ostream& out,const char *format,int len,PRINTF_FORMAT_FLAGS& flags,T&& param)
+{
+    throw std::runtime_error("invalid format string.");
+}
+
+template<typename T,typename U,typename... Args> typename DISABLE_IF<IS_INTEGRAL<typename REMOVE_REFERENCE<T>::TYPE>::value,int>::TYPE
+fprintf_fill_format(std::ostream& out,const char *format,int len,PRINTF_FORMAT_FLAGS& flags,T&& param,
+    U&& value,Args&&... args)
+{
+    throw std::runtime_error("invalid format string.");
+}
+
+template<typename T,typename... Args> int
+fprintf_fill_format(std::ostream& out,const char *format,int len,PRINTF_FORMAT_FLAGS& flags,int param,
     T&& value,Args&&... args)
 {
     if(flags.width<0){
