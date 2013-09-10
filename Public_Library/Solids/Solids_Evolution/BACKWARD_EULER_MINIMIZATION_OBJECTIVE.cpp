@@ -47,7 +47,7 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
     if(h)
         for(int i=0;i<minimization_system.collisions.m;i++)
             minimization_system.collisions(i).phi=0;
-    if(g) Project_Gradient_And_Prune_Constraints(*g);
+    if(g) Project_Gradient_And_Prune_Constraints(*g,h);
 }
 //#####################################################################
 // Function Compute
@@ -126,14 +126,14 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
 // Function Project_Gradient_And_Prune_Constraints
 //#####################################################################
 template<class TV> void BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
-Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg) const
+Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep) const
 {
     GENERALIZED_VELOCITY<TV>& g=debug_cast<GENERALIZED_VELOCITY<TV>&>(Bg);
     for(int i=minimization_system.collisions.m-1;i>=0;i--){
         COLLISION& c=minimization_system.collisions(i);
         TV &gv=g.V.array(c.p);
         c.n_dE=gv.Dot(c.n);
-        if(c.n_dE<0) minimization_system.collisions.Remove_Index_Lazy(i);
+        if(allow_sep && c.n_dE<0) minimization_system.collisions.Remove_Index_Lazy(i);
         else{
             c.H_dE=c.H*gv;
             gv-=c.n_dE*c.n+c.phi*c.H_dE;}}

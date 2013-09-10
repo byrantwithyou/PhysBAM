@@ -88,7 +88,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     minimization_objective.Compute_Unconstrained(dv,0,&tmp0,0);
     solid_body_collection.Print_Energy(time+dt,1);
     tmp1=tmp0;
-    minimization_objective.Project_Gradient_And_Prune_Constraints(tmp1);
+    minimization_objective.Project_Gradient_And_Prune_Constraints(tmp1,true);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before friction",1,1);
     for(int i=0;i<minimization_system.collisions.m;i++){
         const typename BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::COLLISION& c=minimization_system.collisions(i);
