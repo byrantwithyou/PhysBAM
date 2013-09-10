@@ -43,7 +43,7 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
 {
     const GENERALIZED_VELOCITY<TV>& dv=debug_cast<const GENERALIZED_VELOCITY<TV>&>(Bdv);
     tmp1=dv;
-    if (h)
+    if(h)
         minimization_system.forced_collisions.Clean_Memory();
     Adjust_For_Collision(tmp1);
     Compute_Unconstrained(tmp1,h,g,e);
@@ -53,7 +53,7 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
     if(g) Project_Gradient_And_Prune_Constraints(*g,h);
     if(h){
         for(int i=0;i<minimization_system.collisions.m;i++){
-            COLLISION c = minimization_system.collisions(i);
+            const COLLISION& c = minimization_system.collisions(i);
             minimization_system.forced_collisions.Insert(c.p,c.object);}}
 }
 //#####################################################################
@@ -111,14 +111,17 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
         TV X=X0(p)+dt*V;
         T deepest_phi=collision_thickness;
         int deepest_index=-1;
-        int force_collision=minimization_system.forced_collisions.Get_Default(p,-1);
-        for(int j=0;j<collision_objects.m;j++){
-            if(disabled_collision.Contains(PAIR<int,int>(j,p))) continue;
-            IMPLICIT_OBJECT<TV>* io=collision_objects(j);
-            T phi=io->Extended_Phi(X);
-            if(phi<deepest_phi || force_collision==j){
-                deepest_phi=phi;
-                deepest_index=j;}}
+        if(int* object_index=minimization_system.forced_collisions.Get_Pointer(p)){
+            deepest_index=*object_index;
+            deepest_phi=collision_objects(deepest_index)->Extended_Phi(X);}
+        else
+            for(int j=0;j<collision_objects.m;j++){
+                if(disabled_collision.Contains(PAIR<int,int>(j,p))) continue;
+                IMPLICIT_OBJECT<TV>* io=collision_objects(j);
+                T phi=io->Extended_Phi(X);
+                if(phi<deepest_phi){
+                    deepest_phi=phi;
+                    deepest_index=j;}}
         if(deepest_index==-1) continue;
         IMPLICIT_OBJECT<TV>* io=collision_objects(deepest_index);
         COLLISION c={deepest_index,p,deepest_phi,0,io->Extended_Normal(X),TV(),io->Hessian(X)};
