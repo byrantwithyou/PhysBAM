@@ -13,7 +13,7 @@ Test(const T1 x,bool test_second_diff)
 {
     T1 eps=(T1)1e-6;
     RANDOM_NUMBERS<T1> random;
-    T1 dx=random.Get_Uniform_Number(-eps,eps);
+    T1 dx=random.Get_Uniform_Number(eps/2,eps);
 
     R e0=0,e1=0,g0=0,g1=0,h0=0,h1=0;
     Compute(x,test_second_diff?&h0:0,&g0,&e0);
