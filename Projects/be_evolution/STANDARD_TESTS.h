@@ -283,7 +283,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.implicit_solve_parameters.project_nullspace_frequency=project_nullspace;
     if(use_newmark || use_newmark_be) backward_euler_evolution=0;
     else{delete solids_evolution;solids_evolution=backward_euler_evolution;}
-    if(backward_euler_evolution->newtons_method.use_golden_section_search)
+    if(backward_euler_evolution && backward_euler_evolution->newtons_method.use_golden_section_search)
         backward_euler_evolution->newtons_method.use_wolfe_search=false;
 
     unit_rho=kg/pow<TV::m>(m);
@@ -298,10 +298,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
     input_youngs_modulus*=unit_p;
     ether_drag/=s;
     penalty_collisions_stiffness*=unit_J;
-    backward_euler_evolution->newtons_method.tolerance*=unit_N*s;
-    backward_euler_evolution->newtons_method.krylov_tolerance/=sqrt(unit_N*s);
     density*=unit_rho;
-    backward_euler_evolution->minimization_objective.collision_thickness*=m;
+    if(backward_euler_evolution){
+        backward_euler_evolution->newtons_method.tolerance*=unit_N*s;
+        backward_euler_evolution->newtons_method.krylov_tolerance/=sqrt(unit_N*s);
+        backward_euler_evolution->minimization_objective.collision_thickness*=m;}
 
     switch(test_number){
         case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 57: case 77: case 80: case 8:
