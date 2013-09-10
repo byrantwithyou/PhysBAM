@@ -372,7 +372,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         case 5:
         case 6:
-            last_frame=(int)(3*frame_rate);
+            last_frame=72;
             solids_parameters.cfl=(T)5.9;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
