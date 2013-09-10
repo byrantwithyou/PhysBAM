@@ -15,7 +15,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::
 BACKWARD_EULER_MINIMIZATION_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection,EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities)
-    :KRYLOV_SYSTEM_BASE<T>(false,false),solid_body_collection(solid_body_collection),dt(0),time(0),tmp(0),example_forces_and_velocities(example_forces_and_velocities)
+    :KRYLOV_SYSTEM_BASE<T>(false,false),solid_body_collection(solid_body_collection),dt(0),time(0),tmp(0),forced_collisions(),example_forces_and_velocities(example_forces_and_velocities)
 {
 }
 //#####################################################################

@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -42,12 +43,18 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
 {
     const GENERALIZED_VELOCITY<TV>& dv=debug_cast<const GENERALIZED_VELOCITY<TV>&>(Bdv);
     tmp1=dv;
+    if (h)
+        minimization_system.forced_collisions.Clean_Memory();
     Adjust_For_Collision(tmp1);
     Compute_Unconstrained(tmp1,h,g,e);
     if(h)
         for(int i=0;i<minimization_system.collisions.m;i++)
             minimization_system.collisions(i).phi=0;
     if(g) Project_Gradient_And_Prune_Constraints(*g,h);
+    if(h){
+        for(int i=0;i<minimization_system.collisions.m;i++){
+            COLLISION c = minimization_system.collisions(i);
+            minimization_system.forced_collisions.Insert(c.p,c.object);}}
 }
 //#####################################################################
 // Function Compute
@@ -104,16 +111,17 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
         TV X=X0(p)+dt*V;
         T deepest_phi=collision_thickness;
         int deepest_index=-1;
+        int force_collision=minimization_system.forced_collisions.Get_Default(p,-1);
         for(int j=0;j<collision_objects.m;j++){
             if(disabled_collision.Contains(PAIR<int,int>(j,p))) continue;
             IMPLICIT_OBJECT<TV>* io=collision_objects(j);
             T phi=io->Extended_Phi(X);
-            if(phi<deepest_phi){
+            if(phi<deepest_phi || force_collision==j){
                 deepest_phi=phi;
                 deepest_index=j;}}
         if(deepest_index==-1) continue;
         IMPLICIT_OBJECT<TV>* io=collision_objects(deepest_index);
-        COLLISION c={p,deepest_phi,0,io->Extended_Normal(X),TV(),io->Hessian(X)};
+        COLLISION c={deepest_index,p,deepest_phi,0,io->Extended_Normal(X),TV(),io->Hessian(X)};
         minimization_system.collisions.Append(c);
         for(int i=0;i<5 && abs(deepest_phi)>collision_thickness;i++){
             X-=deepest_phi*io->Extended_Normal(X);
