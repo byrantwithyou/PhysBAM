@@ -26,10 +26,10 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const TORUS<T>& to
     TRIANGLE_MESH& mesh=surface->mesh;mesh.number_nodes=m*n;mesh.elements.Preallocate(2*m*n);
     for(int i=0;i<m;++i){
         T axial=torus.inner_radius*cos(i*mscale),inplane=torus.inner_radius*sin(i*mscale)+torus.outer_radius;
-        for(int j=0;j<n;++j){
+        for(int j=0;j<n;j++){
             T cj=cos(j*nscale),sj=sin(j*nscale);
-            particles.X(i+j*m+1)=transform*TV(cj*inplane,sj*inplane,axial);
-            int ni=(i+1)%m,nj=(j+1)%n,p00=i+j*m+1,p01=i+nj*m+1,p10=ni+j*m+1,p11=p10+p01-p00;
+            particles.X(i+j*m)=transform*TV(cj*inplane,sj*inplane,axial);
+            int ni=(i+1)%m,nj=(j+1)%n,p00=i+j*m,p01=i+nj*m,p10=ni+j*m,p11=p10+p01-p00;
             mesh.elements.Append(VECTOR<int,3>(p00,p10,p01));
             mesh.elements.Append(VECTOR<int,3>(p11,p01,p10));}}
     return surface;
