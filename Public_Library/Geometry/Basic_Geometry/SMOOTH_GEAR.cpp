@@ -1,4 +1,4 @@
-#include <Tools/Math_Tools/AUTO_HESS.h>
+#include <Tools/Auto_Diff/AUTO_HESS.h>
 #include <Tools/Math_Tools/sqr.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Geometry/Basic_Geometry/SMOOTH_GEAR.h>

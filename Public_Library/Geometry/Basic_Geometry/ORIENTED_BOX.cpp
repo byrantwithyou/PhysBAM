@@ -4,8 +4,8 @@
 //#####################################################################
 // Class ORIENTED_BOX
 //##################################################################### 
-#include <Tools/Math_Tools/AUTO_DIFF.h>
-#include <Tools/Math_Tools/AUTO_HESS.h>
+#include <Tools/Auto_Diff/AUTO_DIFF.h>
+#include <Tools/Auto_Diff/AUTO_HESS.h>
 #include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 namespace PhysBAM{

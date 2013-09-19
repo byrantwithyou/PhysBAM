@@ -2,7 +2,7 @@
 // Copyright 2006-2007, Geoffrey Irving, Craig Schroeder, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Math_Tools/AUTO_HESS.h>
+#include <Tools/Auto_Diff/AUTO_HESS.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
 namespace PhysBAM{
 //#####################################################################

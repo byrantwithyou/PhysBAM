@@ -4,9 +4,9 @@
 //#####################################################################
 // Class BOWL
 //##################################################################### 
+#include <Tools/Auto_Diff/AUTO_DIFF.h>
+#include <Tools/Auto_Diff/AUTO_HESS.h>
 #include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/AUTO_DIFF.h>
-#include <Tools/Math_Tools/AUTO_HESS.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <Tools/Vectors/VECTOR.h>

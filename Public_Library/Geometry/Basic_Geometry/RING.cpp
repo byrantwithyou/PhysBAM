@@ -4,7 +4,7 @@
 //#####################################################################
 // Class RING
 //##################################################################### 
-#include <Tools/Math_Tools/AUTO_HESS.h>
+#include <Tools/Auto_Diff/AUTO_HESS.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
