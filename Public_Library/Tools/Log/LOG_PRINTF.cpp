@@ -248,5 +248,7 @@ int puts(const char *s)
     return EOF;
 }
 template int fprintf_formatted_item_builtin<float>(std::ostream&,char const*,int,float);
+template int fprintf_formatted_item_builtin<double>(std::ostream&,char const*,int,double);
+template int fprintf_formatted_item_builtin<int>(std::ostream&,char const*,int,int);
 }
 }
