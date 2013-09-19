@@ -7,8 +7,8 @@
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include "LOCAL_TRUST_REGION_NEWTONS_METHOD.h"
 #include "LOCAL_TR_CONJUGATE_GRADIENT.h"
+#include "LOCAL_TRUST_REGION_NEWTONS_METHOD.h"
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
