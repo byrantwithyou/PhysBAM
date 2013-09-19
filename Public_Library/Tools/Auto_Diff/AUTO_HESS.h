@@ -59,7 +59,7 @@ struct AUTO_HESS<typename TV::SCALAR,TV>
     {return AUTO_HESS(x*a.x,a.x*dx+x*a.dx,a.x*ddx+x*a.ddx+SYMMETRIC_MATRIX<T,TV::m>::Symmetric_Outer_Product(dx,a.dx));}
 
     AUTO_HESS operator/(const AUTO_HESS& a) const
-    {T z=x/a.x,ax2=sqr(a.x);return AUTO_HESS(z,(dx-z*a.dx)/a.x,a.x*ddx+2*z/ax2*a.ddx-SYMMETRIC_MATRIX<T,TV::m>::Symmetric_Outer_Product(dx,a.dx/ax2));}
+    {T z=x/a.x,ax2=sqr(a.x);TV q=dx-z*a.dx;return AUTO_HESS(z,q/a.x,ddx/a.x-z*a.ddx/a.x-SYMMETRIC_MATRIX<T,TV::m>::Symmetric_Outer_Product(q,a.dx/ax2));}
 
     AUTO_HESS operator+(T a) const
     {return AUTO_HESS(x+a,dx,ddx);}
