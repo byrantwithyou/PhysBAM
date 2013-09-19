@@ -390,8 +390,7 @@ Test_Energy(const T time)
         deformables_forces(i)->Update_Position_Based_State(time,true);
         T W=F.Dot(dX)/2;
         T dPE=(PE1-PE2)/e,dW=W/e,rel=(dPE-dW)/max(abs(dW),(T)1e-20);
-        LOG::cout<<"potential energy test d phi "<<dPE<<"  W "<<dW<<"   rel "<<rel<<"   "<<typeid(*deformables_forces(i)).name()<<std::endl;
-    }
+        LOG::cout<<"potential energy test d phi "<<dPE<<"  W "<<dW<<"   rel "<<rel<<"   "<<typeid(*deformables_forces(i)).name()<<std::endl;}
 }
 //#####################################################################
 // Function Test_Force_Derivatives
@@ -422,8 +421,7 @@ Test_Force_Derivatives(const T time)
         T MF=sqrt(F.Magnitude_Squared());
         T MG=sqrt(G.Magnitude_Squared());
         T MD=sqrt((F-G).Magnitude_Squared());
-        LOG::cout<<"force derivative error "<<MD<<" vs "<<MF<<"   "<<MG<<"   rel "<<MD/max((T)1e-30,MF,MG)<<"    "<<typeid(*deformables_forces(i)).name()<<std::endl;
-    }
+        LOG::cout<<"force derivative error "<<MD<<" vs "<<MF<<"   "<<MG<<"   rel "<<MD/max((T)1e-30,MF,MG)<<"    "<<typeid(*deformables_forces(i)).name()<<std::endl;}
 }
 //#####################################################################
 // Function Read_Static_Variables
