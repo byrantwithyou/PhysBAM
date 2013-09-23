@@ -17,14 +17,12 @@
 namespace PhysBAM{
 namespace HETERO_DIFF{
 
-template<int m,int a,int b> struct T_FLAGS;
-
 // symmetric T_ijk=T_ikj
 template<class TV>
 struct SYMMETRIC_TENSOR
 {
-    typedef T_FLAGS<0,0,1> FLAGS;
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR SCALAR;typedef SCALAR T;
+    enum {m=TV::m,n=TV::m,p=TV::m};
     VECTOR<SYMMETRIC_MATRIX<T,TV::m>,TV::m> x;
 
     SYMMETRIC_TENSOR operator-() const
@@ -41,8 +39,8 @@ struct SYMMETRIC_TENSOR
 template<class TV>
 struct TENSOR
 {
-    typedef T_FLAGS<0,0,1> FLAGS;
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR SCALAR;typedef SCALAR T;
+    enum {m=TV::m,n=TV::m,p=TV::m};
     VECTOR<MATRIX<T,TV::m>,TV::m> x;
 
     TENSOR(){}
@@ -67,8 +65,8 @@ struct TENSOR
 template<class TV>
 struct ZERO_TENSOR
 {
-    typedef T_FLAGS<0,0,0> FLAGS;
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR SCALAR;typedef SCALAR T;
+    enum {m=TV::m,n=TV::m,p=TV::m};
     ZERO_TENSOR operator-() const
     {return *this;}
 
@@ -83,11 +81,11 @@ struct ZERO_TENSOR
 template<class TV>
 struct VEC_ID_TENSOR_0
 {
-    typedef T_FLAGS<1,0,0> FLAGS;
     TV v;
     explicit VEC_ID_TENSOR_0(TV v=TV()): v(v) {}
 
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR SCALAR;typedef SCALAR T;
+    enum {m=TV::m,n=TV::m,p=TV::m};
     VEC_ID_TENSOR_0 operator-() const
     {return VEC_ID_TENSOR_0(-v);}
 
@@ -102,11 +100,11 @@ struct VEC_ID_TENSOR_0
 template<class TV>
 struct VEC_ID_TENSOR_1
 {
-    typedef T_FLAGS<1,0,1> FLAGS;
     TV v;
     explicit VEC_ID_TENSOR_1(TV v=TV()): v(v) {}
 
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR SCALAR;typedef SCALAR T;
+    enum {m=TV::m,n=TV::m,p=TV::m};
     VEC_ID_TENSOR_1 operator-() const
     {return VEC_ID_TENSOR_1(-v);}
 
@@ -121,11 +119,11 @@ struct VEC_ID_TENSOR_1
 template<class TV>
 struct VEC_ID_TENSOR_2
 {
-    typedef T_FLAGS<1,1,0> FLAGS;
     TV v;
     explicit VEC_ID_TENSOR_2(TV v=TV()): v(v) {}
 
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR SCALAR;typedef SCALAR T;
+    enum {m=TV::m,n=TV::m,p=TV::m};
     VEC_ID_TENSOR_2 operator-() const
     {return VEC_ID_TENSOR_2(-v);}
 
@@ -140,11 +138,11 @@ struct VEC_ID_TENSOR_2
 template<class TV>
 struct VEC_ID_TENSOR_12
 {
-    typedef T_FLAGS<1,1,1> FLAGS;
     TV v;
     explicit VEC_ID_TENSOR_12(TV v=TV()): v(v) {}
 
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR SCALAR;typedef SCALAR T;
+    enum {m=TV::m,n=TV::m,p=TV::m};
     VEC_ID_TENSOR_12 operator-() const
     {return VEC_ID_TENSOR_12(-v);}
 
@@ -159,10 +157,10 @@ struct VEC_ID_TENSOR_12
 template<class TV>
 struct PERM_TENSOR
 {
-    typedef T_FLAGS<0,1,1> FLAGS;
     STATIC_ASSERT(TV::m==3);
 
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR SCALAR;typedef SCALAR T;
+    enum {m=TV::m,n=TV::m,p=TV::m};
     T x;
 
     explicit PERM_TENSOR(T x=T()): x(x) {}
@@ -177,44 +175,21 @@ struct PERM_TENSOR
     {return PERM_TENSOR(x/a);}
 };
 
-template<int m,int a,int b> struct T_FLAGS
-{
-    enum WA{mask=m,mask_a=a,mask_b=b};
+template<class T> struct IS_TENSOR{static const int value=0;};
+template<class TV> struct IS_TENSOR<ZERO_TENSOR<TV> > {static const int value=1;};
+template<class TV> struct IS_TENSOR<TENSOR<TV> > {static const int value=1;};
+template<class TV> struct IS_TENSOR<SYMMETRIC_TENSOR<TV> > {static const int value=1;};
+template<class TV> struct IS_TENSOR<VEC_ID_TENSOR_0<TV> > {static const int value=1;};
+template<class TV> struct IS_TENSOR<VEC_ID_TENSOR_1<TV> > {static const int value=1;};
+template<class TV> struct IS_TENSOR<VEC_ID_TENSOR_2<TV> > {static const int value=1;};
+template<class TV> struct IS_TENSOR<VEC_ID_TENSOR_12<TV> > {static const int value=1;};
+template<class TV> struct IS_TENSOR<PERM_TENSOR<TV> > {static const int value=1;};
 
-    T_FLAGS<m,a,b> operator+() const {return T_FLAGS<m,a,b>();}
-    T_FLAGS<m,a,b> operator-() const {return T_FLAGS<m,a,b>();}
-
-    template<int m2,int a2,int b2>
-    T_FLAGS<m&m2&~(a^a2)&~(b^b2),a&a2&~(m^m2)&~(b^b2),b|b2|(((a^a2)|(m^m2))&(m|a)&(m2|a2))>
-    operator+(T_FLAGS<m2,a2,b2> x) const
-    {return T_FLAGS<m&m2&~(a^a2)&~(b^b2),a&a2&~(m^m2)&~(b^b2),b|b2|(((a^a2)|(m^m2))&(m|a)&(m2|a2))>();}
-
-    template<int m2,int a2,int b2>
-    T_FLAGS<m&m2&~(a^a2)&~(b^b2),a&a2&~(m^m2)&~(b^b2),b|b2|(((a^a2)|(m^m2))&(m|a)&(m2|a2))>
-    operator-(T_FLAGS<m2,a2,b2> x) const
-    {return T_FLAGS<m&m2&~(a^a2)&~(b^b2),a&a2&~(m^m2)&~(b^b2),b|b2|(((a^a2)|(m^m2))&(m|a)&(m2|a2))>();}
-
-    T_FLAGS<m,a,b> operator*(double s) const {return T_FLAGS<m,a,b>();}
-    T_FLAGS<m,a,b> operator/(double s) const {return T_FLAGS<m,a,b>();}
-};
-
-template<class TV,class R> struct CH_TEN;
-template<class TV> struct CH_TEN<TV,T_FLAGS<0,0,0> > {typedef ZERO_TENSOR<TV> TYPE;};
-template<class TV> struct CH_TEN<TV,T_FLAGS<0,0,1> > {typedef TENSOR<TV> TYPE;};
-template<class TV> struct CH_TEN<TV,T_FLAGS<0,1,1> > {typedef PERM_TENSOR<TV> TYPE;};
-template<class TV> struct CH_TEN<TV,T_FLAGS<1,0,0> > {typedef VEC_ID_TENSOR_0<TV> TYPE;};
-template<class TV> struct CH_TEN<TV,T_FLAGS<1,0,1> > {typedef VEC_ID_TENSOR_1<TV> TYPE;};
-template<class TV> struct CH_TEN<TV,T_FLAGS<1,1,0> > {typedef VEC_ID_TENSOR_2<TV> TYPE;};
-template<class TV> struct CH_TEN<TV,T_FLAGS<1,1,1> > {typedef VEC_ID_TENSOR_12<TV> TYPE;};
-
-template<class TV,class R> struct CH_SYM_TEN;
-template<class TV> struct CH_SYM_TEN<TV,T_FLAGS<0,0,0> > {typedef ZERO_TENSOR<TV> TYPE;};
-template<class TV> struct CH_SYM_TEN<TV,T_FLAGS<0,0,1> > {typedef SYMMETRIC_TENSOR<TV> TYPE;};
-template<class TV> struct CH_SYM_TEN<TV,T_FLAGS<1,0,0> > {typedef VEC_ID_TENSOR_0<TV> TYPE;};
-template<class TV> struct CH_SYM_TEN<TV,T_FLAGS<1,1,1> > {typedef VEC_ID_TENSOR_12<TV> TYPE;};
-
-#define MK_TEN(TV,R) typename CH_TEN<TV,decltype(R)>::TYPE
-#define MK_SYM_TEN(TV,R) typename CH_SYM_TEN<TV,decltype(R)>::TYPE
+template<class T> struct IS_SYM_TENSOR{static const int value=0;};
+template<class TV> struct IS_SYM_TENSOR<ZERO_TENSOR<TV> > {static const int value=1;};
+template<class TV> struct IS_SYM_TENSOR<SYMMETRIC_TENSOR<TV> > {static const int value=1;};
+template<class TV> struct IS_SYM_TENSOR<VEC_ID_TENSOR_0<TV> > {static const int value=1;};
+template<class TV> struct IS_SYM_TENSOR<VEC_ID_TENSOR_12<TV> > {static const int value=1;};
 
 template<class TV,class TN>
 ZERO_MAT<TV> Contract_0(const TN& t,ZERO_VEC<TV> z){return ZERO_MAT<TV>();}
@@ -252,15 +227,6 @@ SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> Contract_0(const VEC_ID_TENSOR_12<TV
 
 template<class TV>
 MATRIX<typename TV::SCALAR,TV::m> Contract_0(const PERM_TENSOR<TV>& t,const TV& v) {return MATRIX<typename TV::SCALAR,TV::m>::Cross_Product_Matrix(-t.x*v);}
-
-template<int m,int a,int b> M_FLAGS<0,0> C0(T_FLAGS<m,a,b>,V_FLAGS<0>);
-M_FLAGS<1,0> C0(T_FLAGS<0,0,1>,V_FLAGS<1>);
-M_FLAGS<0,0> C0(T_FLAGS<0,0,0>,V_FLAGS<1>);
-M_FLAGS<1,1> C0(T_FLAGS<1,0,0>,V_FLAGS<1>);
-M_FLAGS<1,0> C0(T_FLAGS<1,0,1>,V_FLAGS<1>);
-M_FLAGS<1,0> C0(T_FLAGS<1,1,0>,V_FLAGS<1>);
-M_FLAGS<1,0> C0(T_FLAGS<1,1,1>,V_FLAGS<1>);
-M_FLAGS<1,0> C0(T_FLAGS<0,1,1>,V_FLAGS<1>);
 
 template<class TV,class MAT>
 ZERO_TENSOR<TV> Tensor_Product_0(const MAT& t,ZERO_VEC<TV> z){return ZERO_TENSOR<TV>();}
@@ -352,11 +318,6 @@ VEC_ID_TENSOR_12<TV> Symmetric_Tensor_Product_12(ID_MAT<TV> m,const TV& v) {retu
 
 template<class TV>
 VEC_ID_TENSOR_12<TV> Symmetric_Tensor_Product_12(SCALE_MAT<TV> m,const TV& v) {return VEC_ID_TENSOR_12<TV>(m.x*v);}
-
-template<int m2,int s2> T_FLAGS<0,0,0> Stp12(V_FLAGS<0>,M_FLAGS<m2,s2>);
-T_FLAGS<0,0,0> Stp12(V_FLAGS<1>,M_FLAGS<0,0>);
-T_FLAGS<0,0,1> Stp12(V_FLAGS<1>,M_FLAGS<1,0>);
-template<int m> T_FLAGS<1,1,1> Stp12(V_FLAGS<1>,M_FLAGS<m,1>);
 
 template<class TV> TENSOR<TV> operator+(const TENSOR<TV>& a,const TENSOR<TV>& b)
 {
@@ -618,13 +579,6 @@ template<class TV> TENSOR<TV> Contract_0(const PERM_TENSOR<TV>& a,const MATRIX<t
     return t;
 }
 
-template<int m,int a,int b> T_FLAGS<0,0,0> C0(T_FLAGS<m,a,b>,M_FLAGS<0,0>);
-template<int m,int a,int b> T_FLAGS<m,a,b> C0(T_FLAGS<m,a,b>,M_FLAGS<0,1>);
-template<int m,int a,int b> T_FLAGS<m,a,b> C0(T_FLAGS<m,a,b>,M_FLAGS<1,1>);
-T_FLAGS<0,0,0> C0(T_FLAGS<0,0,0>,M_FLAGS<1,0>);
-T_FLAGS<1,0,0> C0(T_FLAGS<1,0,0>,M_FLAGS<1,0>);
-template<int m,int a,int b> T_FLAGS<0,0,1> C0(T_FLAGS<m,a,b>,M_FLAGS<1,0>);
-
 template<class TV> ZERO_TENSOR<TV> Contract_1(const ZERO_TENSOR<TV>& p,const MATRIX<typename TV::SCALAR,TV::m>& m) {return ZERO_TENSOR<TV>();}
 template<class TV> ZERO_TENSOR<TV> Contract_1(const ZERO_TENSOR<TV>& p,const ZERO_MAT<TV>& m) {return ZERO_TENSOR<TV>();}
 template<class TV> ZERO_TENSOR<TV> Contract_1(const ZERO_TENSOR<TV>& p,ID_MAT<TV> m) {return ZERO_TENSOR<TV>();}
@@ -652,13 +606,6 @@ template<class TV> ZERO_TENSOR<TV> Contract_1(const PERM_TENSOR<TV>& p,const ZER
 template<class TV> PERM_TENSOR<TV> Contract_1(const PERM_TENSOR<TV>& p,ID_MAT<TV> m) {return p;}
 template<class TV> PERM_TENSOR<TV> Contract_1(const PERM_TENSOR<TV>& p,SCALE_MAT<TV> m) {return p*m.x;}
 
-template<int m,int a,int b> T_FLAGS<0,0,0> C1(T_FLAGS<m,a,b>,M_FLAGS<0,0>);
-template<int m,int a,int b> T_FLAGS<m,a,b> C1(T_FLAGS<m,a,b>,M_FLAGS<0,1>);
-template<int m,int a,int b> T_FLAGS<m,a,b> C1(T_FLAGS<m,a,b>,M_FLAGS<1,1>);
-T_FLAGS<0,0,0> C1(T_FLAGS<0,0,0>,M_FLAGS<1,0>);
-T_FLAGS<1,0,1> C1(T_FLAGS<1,0,1>,M_FLAGS<1,0>);
-template<int m,int a,int b> T_FLAGS<0,0,1> C1(T_FLAGS<m,a,b>,M_FLAGS<1,0>);
-
 template<class TV> TENSOR<TV> Contract_2(const TENSOR<TV>& p,const MATRIX<typename TV::SCALAR,TV::m>& m)
 {
     TENSOR<TV> t;
@@ -676,13 +623,6 @@ template<class TV> TENSOR<TV> Contract_2(const PERM_TENSOR<TV>& p,const MATRIX<t
 template<class TV> ZERO_TENSOR<TV> Contract_2(const PERM_TENSOR<TV>& p,const ZERO_MAT<TV>& m) {return ZERO_TENSOR<TV>();}
 template<class TV> PERM_TENSOR<TV> Contract_2(const PERM_TENSOR<TV>& p,ID_MAT<TV> m) {return p;}
 template<class TV> PERM_TENSOR<TV> Contract_2(const PERM_TENSOR<TV>& p,SCALE_MAT<TV> m) {return p*m.x;}
-
-template<int m,int a,int b> T_FLAGS<0,0,0> C2(T_FLAGS<m,a,b>,M_FLAGS<0,0>);
-template<int m,int a,int b> T_FLAGS<m,a,b> C2(T_FLAGS<m,a,b>,M_FLAGS<0,1>);
-template<int m,int a,int b> T_FLAGS<m,a,b> C2(T_FLAGS<m,a,b>,M_FLAGS<1,1>);
-T_FLAGS<0,0,0> C2(T_FLAGS<0,0,0>,M_FLAGS<1,0>);
-T_FLAGS<1,1,0> C2(T_FLAGS<1,1,0>,M_FLAGS<1,0>);
-template<int m,int a,int b> T_FLAGS<0,0,1> C2(T_FLAGS<m,a,b>,M_FLAGS<1,0>);
 
 template<class TV> ZERO_TENSOR<TV> Symmetric_Double_Contract_12(const PERM_TENSOR<TV>&t,const ZERO_MAT<TV>& cm1,const ZERO_MAT<TV>& cm2){return ZERO_TENSOR<TV>();}
 template<class TV> ZERO_TENSOR<TV> Symmetric_Double_Contract_12(const PERM_TENSOR<TV>&t,const ZERO_MAT<TV>& cm1,const ID_MAT<TV>& cm2){return ZERO_TENSOR<TV>();}
@@ -716,7 +656,15 @@ template<class TV> SYMMETRIC_TENSOR<TV> Symmetric_Double_Contract_12(const PERM_
     return s;
 }
 
-template<int m,int s,int m2,int s2> T_FLAGS<0,0,(m&~s&(m2|s2))|(m2&~s2&(m|s))> Sdc12(T_FLAGS<0,1,1>,M_FLAGS<m,s>,M_FLAGS<m2,s2>);
+template<class T_TEN> typename ENABLE_IF<IS_TENSOR<T_TEN>::value,T_TEN>::TYPE Choose(const T_TEN& a,const T_TEN& b);
+template<class T_TEN,class T_TEN2> typename ENABLE_IF<IS_TENSOR<T_TEN>::value&&IS_TENSOR<T_TEN2>::value&&(!IS_SYM_TENSOR<T_TEN>::value || !IS_SYM_TENSOR<T_TEN2>::value),TENSOR<VECTOR<typename T_TEN::SCALAR,T_TEN::m> > >::TYPE Choose(const T_TEN& a,const T_TEN2& b);
+template<class T_TEN,class T_TEN2> typename ENABLE_IF<IS_SYM_TENSOR<T_TEN>::value && IS_SYM_TENSOR<T_TEN2>::value,SYMMETRIC_TENSOR<VECTOR<typename T_TEN::SCALAR,T_TEN::m> > >::TYPE Choose(const T_TEN& a,const T_TEN2& b);
+template<class TV,class T_TEN> T_TEN Choose(const T_TEN& a,const ZERO_TENSOR<TV>& b);
+template<class TV,class T_TEN> T_TEN Choose(const ZERO_TENSOR<TV>& a,const T_TEN& b);
+template<class TV> ZERO_TENSOR<TV> Choose(const ZERO_TENSOR<TV>& a,const ZERO_TENSOR<TV>& b);
+
+template<class T_TEN> typename ENABLE_IF<IS_TENSOR<T_TEN>::value>::TYPE Fill_From(T_TEN& a,const T_TEN& b){a=b;}
+template<class T_TEN,class T_TEN2> typename ENABLE_IF<IS_TENSOR<T_TEN>::value&&IS_TENSOR<T_TEN2>::value>::TYPE Fill_From(T_TEN& a,const T_TEN2& b){return T_TEN()+b;}
 }
 }
 #endif
