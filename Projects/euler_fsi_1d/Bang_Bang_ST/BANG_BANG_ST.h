@@ -33,7 +33,7 @@ template <class T_input>
 class BANG_BANG_ST:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,1> >
 {
 public:
-    typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;typedef GRID<TV> T_GRID;
+    typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
 

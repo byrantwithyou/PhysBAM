@@ -19,7 +19,6 @@ int main(int argc,char* argv[])
     typedef double T;
     typedef float RW;
     typedef VECTOR<T,2> TV;
-    typedef GRID<TV> T_GRID;
     STREAM_TYPE stream_type((RW()));
 
     bool opt_water=false;

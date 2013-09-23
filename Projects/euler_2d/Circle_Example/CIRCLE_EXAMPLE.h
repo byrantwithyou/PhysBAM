@@ -44,7 +44,7 @@ template<class T_input>
 class CIRCLE_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
 public:
-    typedef T_input T;typedef VECTOR<T,2> TV;;typedef GRID<TV> T_GRID;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
+    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*TV::m> T_FACE_VECTOR_BOOL;
@@ -594,7 +594,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     elliptic_solver->psi_D(TV_INT(0,1))=true;
     //elliptic_solver->u(TV_INT(0,1))=state_outside(3);
 
-    //for(CELL_ITERATOR<TV> iterator(fluids_parameters.euler->grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
+    //for(CELL_ITERATOR<TV> iterator(fluids_parameters.euler->grid,1,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){
      //   TV_INT cell_index=iterator.Cell_Index();
       //  elliptic_solver->u(cell_index)=state_outside(3);}
 

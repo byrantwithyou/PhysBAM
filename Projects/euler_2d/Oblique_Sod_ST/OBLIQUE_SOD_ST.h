@@ -31,7 +31,7 @@ template<class T_input>
 class OBLIQUE_SOD_ST:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
 public: 
-    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;typedef GRID<TV> T_GRID;
+    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::stream_type;using BASE::parse_args;
     using BASE::resolution;

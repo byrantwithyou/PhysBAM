@@ -34,7 +34,7 @@ template<class T_input>
 class WIND_TUNNEL:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >,public BOUNDARY<VECTOR<T_input,2>,VECTOR<T_input,4> >
 {
 public:
-    typedef T_input T;typedef VECTOR<T,2> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
+    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename T_ARRAYS_BASE::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;

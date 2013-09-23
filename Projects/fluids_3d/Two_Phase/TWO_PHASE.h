@@ -25,7 +25,7 @@ class TWO_PHASE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;
 public:
-    typedef VECTOR<T,3> TV;typedef GRID<TV> T_GRID;
+    typedef VECTOR<T,3> TV;
     typedef VECTOR<int,TV::m> TV_INT;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV > BASE;

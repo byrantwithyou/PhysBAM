@@ -20,7 +20,7 @@ class DSD_FIRE_BALL_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,
 {
     typedef T_input T;
 public:
-    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef GRID<TV> T_GRID;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;

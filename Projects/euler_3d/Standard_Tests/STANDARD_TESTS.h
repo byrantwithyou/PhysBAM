@@ -63,7 +63,7 @@ template<class T_input>
 class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
 public:
-    typedef T_input T;typedef VECTOR<T,3> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,3> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
+    typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*TV::m> T_FACE_VECTOR_BOOL;
@@ -604,7 +604,7 @@ void Read_Soot_Velocities()
     ARRAY<VECTOR<T,5> ,VECTOR<int,3> >& U=fluids_parameters.euler->U;
     std::string soot_grid_file=soot_data_dir+"/grid";
     std::string soot_velocity_file=soot_data_dir+"/mac_velocities";
-    T_GRID soot_grid;
+    GRID<TV> soot_grid;
     ARRAY<T,TV_INT> soot_values;
     ARRAY<T,FACE_INDEX<TV::m> > soot_mac_velocities;
     FILE_UTILITIES::Read_From_File(stream_type,soot_grid_file,soot_grid);
@@ -687,7 +687,7 @@ void Adjust_Soot_With_Sources(const T time) PHYSBAM_OVERRIDE
     if(read_soot_from_file && time==(T)0){
         std::string soot_grid_file=soot_data_dir+"/grid";
         std::string soot_file=soot_data_dir+"/density";
-        T_GRID soot_grid;
+        GRID<TV> soot_grid;
         ARRAY<T,TV_INT> soot_values;
         FILE_UTILITIES::Read_From_File(stream_type,soot_grid_file,soot_grid);
         FILE_UTILITIES::Read_From_File(stream_type,soot_file,soot_values);

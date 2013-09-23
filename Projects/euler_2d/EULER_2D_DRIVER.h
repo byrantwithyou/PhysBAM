@@ -26,7 +26,6 @@ template<class T>
 class EULER_2D_DRIVER
 {
 public:
-    typedef GRID<TV> T_GRID;
     EULER_2D_EXAMPLE<T>& example;
     T time,time_per_frame;
     int total_steps;

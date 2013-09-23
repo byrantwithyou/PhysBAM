@@ -28,7 +28,7 @@ template<class TV> class GRID;
 template<class T_LAPLACE>
 class HEAT_LAPLACE:public T_LAPLACE
 {
-    typedef typename T_LAPLACE::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_LAPLACE::GRID_T T_GRID;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename T_LAPLACE::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename REBIND<ARRAY<T,TV_INT>,int>::TYPE T_ARRAYS_INT;
 public:
     typedef T_LAPLACE BASE;

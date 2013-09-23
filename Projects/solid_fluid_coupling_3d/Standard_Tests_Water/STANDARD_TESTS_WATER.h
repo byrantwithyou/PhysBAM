@@ -62,7 +62,6 @@ template<class T_input>
 class STANDARD_TESTS_WATER:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
-    typedef GRID<TV> T_GRID;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
@@ -73,7 +72,7 @@ public:
 
     WATER_STANDARD_TESTS_3D<TV> water_tests;
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
-    T_GRID mattress_grid;
+    GRID<TV> mattress_grid;
     int deformable_object_id;
     T solid_density;
     T stiffness_ratio;
@@ -195,7 +194,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=240;
             fluids_parameters.density=(T)1000;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            mattress_grid=T_GRID(TV_INT(sub_test*20,sub_test*5,sub_test*20),RANGE<TV>(TV((T).3,(T).6,(T).3),TV((T).7,(T).72,(T).7)));
+            mattress_grid=GRID<TV>(TV_INT(sub_test*20,sub_test*5,sub_test*20),RANGE<TV>(TV((T).3,(T).6,(T).3),TV((T).7,(T).72,(T).7)));
             (*fluids_parameters.grid).Initialize(TV_INT(10*resolution+1,10*resolution+1,10*resolution+1),RANGE<TV>(TV((T)0,(T)0,(T)0),TV((T)1,(T)1,(T)1)));
             //solids_parameters.implicit_solve_parameters.cg_iterations=1000;
             if(!opt_iterations) solids_parameters.implicit_solve_parameters.cg_iterations=500;
@@ -219,8 +218,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solid_density=(T)30000;
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
             (*fluids_parameters.grid).Initialize(TV_INT(2*resolution+1,2*resolution+1,10*resolution+1),RANGE<TV>(TV((T)0,(T)0,(T)0),TV((T).2,(T).2,(T)1)));
-            mattress_grid=T_GRID(TV_INT()+20,RANGE<TV>(TV((T).05,(T).05,(T).9),TV((T).15,(T).15,(T)1.05)));
-            //mattress_grid=T_GRID(20,20,(T).05,(T).15,(T).8,(T).95);
+            mattress_grid=GRID<TV>(TV_INT()+20,RANGE<TV>(TV((T).05,(T).05,(T).9),TV((T).15,(T).15,(T)1.05)));
+            //mattress_grid=GRID<TV>(20,20,(T).05,(T).15,(T).8,(T).95);
             break;
         case 4:
             solids_parameters.rigid_body_collision_parameters.use_push_out=true;
@@ -733,7 +732,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solids_tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_44K.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T).5,(T).75,(T).5),ROTATION<TV>(-(T)half_pi,TV::Axis_Vector(1)))),true,true,1000,(T).15);
             
-//                mattress_grid=T_GRID(sub_test*20,sub_test*5,sub_test*20,(T).3,(T).7,(T).6,(T).72,(T).3,(T).7);
+//                mattress_grid=GRID<TV>(sub_test*20,sub_test*5,sub_test*20,(T).3,(T).7,(T).6,(T).72,(T).3,(T).7);
             tetrahedralized_volume.Check_Signed_Volumes_And_Make_Consistent(true);
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(tetrahedralized_volume,solid_density,true);
             break;}

@@ -37,7 +37,7 @@ template<class T_input>
 class PISTON:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,1> >,CONSERVATION_CALLBACKS<T_input>
 {
 public:
-    typedef T_input T;typedef VECTOR<T,1> TV;typedef GRID<TV> T_GRID;typedef VECTOR<int,1> TV_INT;
+    typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
 
 public:
@@ -115,7 +115,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(eno_scheme==1) fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
     else if(eno_scheme==2) fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
     else fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
-    //fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_RF<T_GRID,TV::m+2>;
+    //fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_RF<GRID<TV>,TV::m+2>;
     fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
     fluids_parameters.compressible_rungekutta_order=rk_order;
     fluids_parameters.compressible_conservation_method->Save_Fluxes();

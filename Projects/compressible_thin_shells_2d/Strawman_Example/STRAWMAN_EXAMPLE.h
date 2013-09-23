@@ -35,7 +35,6 @@ class STRAWMAN_EXAMPLE : public EXAMPLE<TV>,LEVELSET_CALLBACKS<TV>
     typedef EXAMPLE<TV> BASE;
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,2> TV_INT;
-    typedef GRID<TV> T_GRID;
     typedef ARRAY<T,TV_INT> T_ARRAY_SCALAR;
     typedef BOUNDARY_PHI_WATER<TV> T_BOUNDARY_PHI_WATER;
 
@@ -247,7 +246,7 @@ void Fill_Solid_Cells(const T time,const T solid_boundary,T_ARRAY_SCALAR& rho,T_
     if(fill_ghost_region) num_ghost_cells=solid_clamped_tn.y+3;
 
     // Fill the ghost region
-    for(CELL_ITERATOR<TV> iterator(grid,3,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();TV location=iterator.Location();
         rho(cell_index)=analytic_solution(location,time);
         velocity(cell_index)=fluid_velocity_field(location,time);
@@ -294,7 +293,7 @@ void Fill_Uncovered_Cells(const T& dt,const T& time,T_ARRAY_SCALAR& scalar_field
                 for(int i=1-num_ghost_cells;i<=resolution+num_ghost_cells;++i){TV_INT cell_index(i,solid_clamped_tn.y);
                     TV stencil_center=grid.Center(cell_index)-(T)2*(solid_boundary-grid.Center(cell_index).y)*TV(fluid_tangential_velocity,solid_velocity);
 
-                    T_GRID stencil_grid(TV_INT::All_Ones_Vector(),RANGE<TV>(-(T).5*grid.DX(),(T).5*grid.DX()),true);
+                    GRID<TV> stencil_grid(TV_INT::All_Ones_Vector(),RANGE<TV>(-(T).5*grid.DX(),(T).5*grid.DX()),true);
                     T_ARRAY_SCALAR stencil_scalar_field(stencil_grid.Domain_Indices()),stencil_scalar_field_ghost(stencil_grid.Domain_Indices(3));
                     ARRAY<TV,TV_INT> stencil_velocity(stencil_grid.Domain_Indices(3));
 
@@ -363,7 +362,7 @@ void Euler_Step(const T dt, const T time){
 
     Fill_Uncovered_Cells(dt,time,rho,rho_tmp);
     Fill_Uncovered_Cells(dt,time,phi,phi_tmp);
-    for(CELL_ITERATOR<TV> iterator(grid,3,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();TV location=iterator.Location(),t0_location=location-(time+dt)*velocity(cell_index);
         rho(cell_index)=analytic_solution(location,time+dt);
         phi(cell_index)=initial_phi(t0_location);}

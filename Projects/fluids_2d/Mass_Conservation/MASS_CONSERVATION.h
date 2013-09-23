@@ -36,7 +36,7 @@ template<class T_input,class RW=T_input>
 class MASS_CONSERVATION:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 {
     typedef T_input T;
-    typedef VECTOR<T,2> TV;typedef GRID<TV> T_GRID;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;typedef VECTOR<int,2> TV_INT;
+    typedef VECTOR<T,2> TV;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;typedef VECTOR<int,2> TV_INT;
 public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::fluids_parameters;
     using BASE::fluid_collection;using BASE::parse_args;

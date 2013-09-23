@@ -28,7 +28,6 @@ template <class T>
 class EULER_2D_EXAMPLE
 {
 public:
-    typedef GRID<TV> T_GRID;
     //time
     T initial_time,final_time;
     T frame_rate;                        

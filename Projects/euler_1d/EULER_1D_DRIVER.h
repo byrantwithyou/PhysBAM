@@ -25,7 +25,6 @@ template<class T>
 class EULER_1D_DRIVER
 {
 public:
-    typedef GRID<TV> T_GRID;
     EULER_1D_EXAMPLE<T>& example;
     T time,time_per_frame;
     int total_steps;
@@ -104,7 +103,7 @@ void Advance_One_Frame(const T stopping_time)
 //#####################################################################
 void Advance_One_Time_Step(const T dt,const bool verbose) 
 {
-    RUNGEKUTTA<T,ARRAY<T,3,VECTOR<int,1> >,T_GRID> rungekutta_u(U);
+    RUNGEKUTTA<T,ARRAY<T,3,VECTOR<int,1> >,GRID<TV> > rungekutta_u(U);
     rungekutta_u.Set_Grid_And_Boundary_Condition(euler.grid,*(euler.boundary));
     rungekutta_u.Set_Order(example.rungekutta_order);
     rungekutta_u.Set_Time(time);
