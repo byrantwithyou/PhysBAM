@@ -127,7 +127,7 @@ public:
     {
         nm.max_iterations=100000;
         nm.max_krylov_iterations=2000;
-        nm.krylov_tolerance=1e-12;
+        nm.krylov_tolerance=1e-5;
         nm.fail_on_krylov_not_converged=false;
         nm.use_cg=false;
         nm.tolerance=1e-5;
