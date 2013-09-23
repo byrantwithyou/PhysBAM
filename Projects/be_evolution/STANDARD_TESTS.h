@@ -64,6 +64,7 @@
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
+#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
@@ -74,6 +75,7 @@
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
+#include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
@@ -2001,6 +2003,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.structures(i));
             if(solids_parameters.triangle_collision_parameters.perform_self_collision)
                 solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.structures(i));}
+
+
+    for(int b=0;b<deformable_body_collection.structures.m;b++){
+      TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(b);
+      LEVELSET_IMPLICIT_OBJECT<TV>* undeformed_levelset=tests.Initialize_Implicit_Surface(tetrahedralized_volume.Get_Boundary_Object(),100);
+      ARRAY<T> undeformed_phi(particles.X.m);
+      for(int i=0;i<particles.X.m;i++)
+        undeformed_phi(i)=undeformed_levelset->Extended_Phi(particles.X(i));
+      solid_body_collection.Add_Force(new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,&tetrahedralized_volume,undeformed_phi,
+            penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));}
 
     if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);
