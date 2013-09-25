@@ -18,12 +18,12 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
-DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TETRAHEDRALIZED_VOLUME<T>* collision_body,ARRAY<T>& undeformed_phi,
+DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TETRAHEDRALIZED_VOLUME<T>& collision_body,ARRAY<T>& undeformed_phi,
         T stiffness,T separation_parameter,T length_scale)
     :DEFORMABLES_FORCES<TV>(particles),collision_body(collision_body),undeformed_phi(undeformed_phi),stiffness(stiffness),separation_parameter(separation_parameter),
     length_scale(length_scale),pe(0)
 {
-    collision_body->Initialize_Hierarchy();
+    collision_body.Initialize_Hierarchy();
 }
 //#####################################################################
 // Destructor
@@ -52,58 +52,55 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
 Update_Position_Based_State_Particle(int p)
 {
-    TETRAHEDRON_MESH& tetrahedron_mesh=collision_body->mesh;
+    TETRAHEDRON_MESH& tetrahedron_mesh=collision_body.mesh;
     ARRAY<int> particles_to_ignore;
     particles_to_ignore.Append(p);
-    TV x = particles.X(p);
+    TV x=particles.X(p);
     ARRAY<int> intersection_list;
-    collision_body->hierarchy->Intersection_List(x,intersection_list);
-    int i,j,k,l;
+    collision_body.hierarchy->Intersection_List(x,intersection_list);
     for(int n=0;n<intersection_list.m;n++){
         int t=intersection_list(n);
         VECTOR<int,4> nodes=tetrahedron_mesh.elements(t);
-        for(int q=0;q<particles_to_ignore.m;q++) 
-            if(nodes.Contains(particles_to_ignore(q))) continue;
+        if(nodes.Contains(p)) continue;
+        int i,j,k,l;
         nodes.Get(i,j,k,l);
-        TV w=TETRAHEDRON<T>::First_Three_Barycentric_Coordinates(x,particles.X(i),particles.X(j),particles.X(k),particles.X(l));
-        T min_weight=min(w.x,w.y,w.z,1-w.x-w.y-w.z);
-        if(min_weight<separation_parameter) continue;
-        T phix = undeformed_phi(i)*w.x+undeformed_phi(j)*w.y+undeformed_phi(k)*w.z+undeformed_phi(l)*(1-w.x-w.y-w.z);
-        if(phix>separation_parameter) continue;
-        penetrating_particles.Append(VECTOR<int,5>(p,i,j,k,l));
+        VECTOR<T,TV::m+1> w=TETRAHEDRON<T>::Barycentric_Coordinates(x,particles.X.Subset(nodes));
+        if(w.Min()<-1e-12) continue;
+        if(undeformed_phi.Subset(nodes).Weighted_Sum(w)>separation_parameter) continue;
+        penetrating_particles.Append(nodes.Insert(p,0));
         auto X=From_Var<4,0>(particles.X(p)-particles.X(l));
         auto A=From_Var<4,1>(particles.X(i)-particles.X(l));
         auto B=From_Var<4,2>(particles.X(j)-particles.X(l));
         auto C=From_Var<4,3>(particles.X(k)-particles.X(l));
-        auto B_cross_C = B.Cross(C);
-        auto Det = A.Dot(B_cross_C);
-        auto Y = X/Det;
-        auto wA = Y.Dot(B_cross_C);
-        auto C_cross_A = C.Cross(A);
-        auto wB = Y.Dot(C_cross_A); 
-        auto A_cross_B = A.Cross(B);
-        auto wC = Y.Dot(A_cross_B); 
-        auto wD = 1 - (wA + wB +wC);
-        auto phi = undeformed_phi(i)*wA+undeformed_phi(j)*wB+undeformed_phi(k)*wC+undeformed_phi(l)*wD;
-        auto s = (separation_parameter-phi)/length_scale;
-        auto ee = stiffness*(exp(s)-s-1);
-        pe += ee.x;
+        auto B_cross_C=B.Cross(C);
+        auto Det=A.Dot(B_cross_C);
+        auto Y=X/Det;
+        auto wA=Y.Dot(B_cross_C);
+        auto C_cross_A=C.Cross(A);
+        auto wB=Y.Dot(C_cross_A); 
+        auto A_cross_B=A.Cross(B);
+        auto wC=Y.Dot(A_cross_B); 
+        auto wD=1-(wA+wB+wC);
+        auto phi=undeformed_phi(i)*wA+undeformed_phi(j)*wB+undeformed_phi(k)*wC+undeformed_phi(l)*wD;
+        auto s=(separation_parameter-phi)/length_scale;
+        auto ee=stiffness*(exp(s)-s-1);
+        pe+=ee.x;
         VECTOR<TV,5> de;
         for(int i=0;i<4;i++){
-            de(i)=ee.dx(i);
-            de(4) -= ee.dx(i);}
+            TV t=ee.dx(i);
+            de(i)=t;
+            de(4)-=t;}
         grad_pe.Append(de);
         VECTOR<VECTOR<MATRIX<T,TV::m>,5>,5> he; 
         for(int i=0;i<4;i++){
-            he(i)(4)=MATRIX<T,TV::m>();
             for(int j=0;j<4;j++){
-                he(i)(j)=ee.ddx(i,j);
-                he(i)(4) -= ee.ddx(i,j);
-                he(4)(4) += ee.ddx(i,j);}
+                MATRIX<T,TV::m> t=ee.ddx(i,j);
+                he(i)(j)=t;
+                he(i)(4)-=t;
+                he(4)(4)+=t;}
             he(4)(i)=he(i)(4).Transposed();}
-        H_pe.Append(he); 
-        return;
-    }
+        H_pe.Append(he);
+        break;}
 }
 //#####################################################################
 // Function Update_Position_Based_State
@@ -115,7 +112,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
     penetrating_particles.Remove_All();
     grad_pe.Remove_All();
     H_pe.Remove_All();
-    collision_body->hierarchy->Update_Boxes(separation_parameter);
+    collision_body.hierarchy->Update_Boxes(separation_parameter);
     if(colliding_particles.m)
         for(int pp=0;pp<colliding_particles.m;pp++){
             int p=colliding_particles(pp);
@@ -130,10 +127,8 @@ Update_Position_Based_State(const T time,const bool is_position_update)
 template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    for(int pp=0;pp<penetrating_particles.m;pp++){
-        for(int i=0;i<penetrating_particles(pp).m;i++){
-            int p = penetrating_particles(pp)(i);
-            F(p)-=grad_pe(pp)(i);}}
+    for(int pp=0;pp<penetrating_particles.m;pp++)
+        F.Subset(penetrating_particles(pp))-=grad_pe(pp);
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -189,11 +184,11 @@ template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     for(int pp=0;pp<penetrating_particles.m;pp++){
-        for(int i=0;i<penetrating_particles(pp).m;i++){
-            int p = penetrating_particles(pp)(i);
-            for(int j=0;j<penetrating_particles(pp).m;j++){
-                int q = penetrating_particles(pp)(j);
-                F(p)-=H_pe(pp)(i)(j)*V(q);}}}
+        const VECTOR<int,TV::m+2>& n=penetrating_particles(pp);
+        for(int i=0;i<n.m;i++){
+            int p=n(i);
+            for(int j=0;j<n.m;j++)
+                F(p)-=H_pe(pp)(i)(j)*V(n(j));}}
 }
 //#####################################################################
 // Function Enforce_Definiteness

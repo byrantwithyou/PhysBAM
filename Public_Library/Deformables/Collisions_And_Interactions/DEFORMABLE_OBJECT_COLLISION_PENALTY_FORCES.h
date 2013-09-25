@@ -21,7 +21,7 @@ class DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES:public DEFORMABLES_FORCES<TV>
     typedef DEFORMABLES_FORCES<TV> BASE;
 public:
     using BASE::particles;
-    TETRAHEDRALIZED_VOLUME<T>* collision_body;
+    TETRAHEDRALIZED_VOLUME<T>& collision_body;
     ARRAY<T> undeformed_phi;
     ARRAY<int> colliding_particles;
 
@@ -29,12 +29,12 @@ public:
     T separation_parameter;
     T length_scale;
 
-    ARRAY<VECTOR<int,5>> penetrating_particles;
+    ARRAY<VECTOR<int,TV::m+2> > penetrating_particles;
     T pe;
-    ARRAY<VECTOR<TV,5>> grad_pe;
-    ARRAY<VECTOR<VECTOR<MATRIX<T,TV::m>,5>,5> > H_pe;
+    ARRAY<VECTOR<TV,TV::m+2> > grad_pe;
+    ARRAY<VECTOR<VECTOR<MATRIX<T,TV::m>,TV::m+2>,TV::m+2> > H_pe;
 
-    DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TETRAHEDRALIZED_VOLUME<T>* collision_body,ARRAY<T>& undeformed_phi,
+    DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TETRAHEDRALIZED_VOLUME<T>& collision_body,ARRAY<T>& undeformed_phi,
         T stiffness=(T)1e4,T separation_parameter=(T)1e-4,T length_scale=1);
     virtual ~DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES();
 

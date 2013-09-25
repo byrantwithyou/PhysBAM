@@ -2011,7 +2011,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
       ARRAY<T> undeformed_phi(particles.X.m);
       for(int i=0;i<particles.X.m;i++)
         undeformed_phi(i)=undeformed_levelset->Extended_Phi(particles.X(i));
-      solid_body_collection.Add_Force(new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,&tetrahedralized_volume,undeformed_phi,
+      solid_body_collection.Add_Force(new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,tetrahedralized_volume,undeformed_phi,
             penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));}
 
     if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
