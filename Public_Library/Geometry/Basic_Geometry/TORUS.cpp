@@ -2,7 +2,7 @@
 // Copyright 2006-2007, Geoffrey Irving, Craig Schroeder, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Auto_Diff/AUTO_HESS.h>
+#include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
 namespace PhysBAM{
 //#####################################################################
@@ -11,10 +11,10 @@ namespace PhysBAM{
 template<class T> SYMMETRIC_MATRIX<T,3> TORUS<T>::
 Hessian(const TV& X) const
 {
-    AUTO_HESS<TV,TV> x=AUTO_HESS<TV,TV>::From_Var(X)-center;
-    AUTO_HESS<T,TV> axial=x.Dot(axis),radial=(x-axial*axis).Magnitude();
-    AUTO_HESS<T,TV> ret=hypot(radial-outer_radius,axial)-inner_radius;
-    return ret.ddx;
+    auto x=From_Var<1,0>(X)-center;
+    auto axial=x.Dot(axis);
+    auto ret=hypot((x-axial*axis).Magnitude()-outer_radius,axial)-inner_radius;
+    return ret.ddx(0);
 }
 template class TORUS<float>;
 template class TORUS<double>;

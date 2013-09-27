@@ -38,7 +38,7 @@ struct HESSIAN
 
     MATRIX<T,TV::m> operator()(int i,int j) const {MATRIX<T,TV::m> m;Get(m,x,i,j);return m;}
 
-    SYMMETRIC_MATRIX<T,TV::m> operator()(int i) const {SYMMETRIC_MATRIX<T,TV::m> m;Get_Helper(m,x,i);return m;}
+    SYMMETRIC_MATRIX<T,TV::m> operator()(int i) const {SYMMETRIC_MATRIX<T,TV::m> m;Get_Diag(m,x,i);return m;}
 };
 
 template<class TV,class MAT,class MAT2>

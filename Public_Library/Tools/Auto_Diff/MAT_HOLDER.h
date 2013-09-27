@@ -54,9 +54,9 @@ void Get_Helper(OUT& o,const MAT_HOLDER<OBJ,COL,BASE>& m,int i,int j)
     Fill_From(o,m.x);
 }
 
-template<class OUT> void Get_Diag(OUT& o,MAT_END& v,int i) {PHYSBAM_FATAL_ERROR();}
+template<class OUT> void Get_Diag(OUT& o,const MAT_END& v,int i) {PHYSBAM_FATAL_ERROR();}
 template<class OUT,class OBJ,class COL,class BASE>
-void Get_Diag(OUT& o,MAT_HOLDER<OBJ,COL,BASE>& m,int i)
+void Get_Diag(OUT& o,const MAT_HOLDER<OBJ,COL,BASE>& m,int i)
 {
     if(i>0) return Get_Diag(o,m.z,i-1);
     Fill_From(o,m.x);
