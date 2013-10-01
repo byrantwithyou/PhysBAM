@@ -41,10 +41,10 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         T E=0;
         F.Compute(x,&sys,&grad,&E);
         T norm_grad=sqrt(sys.Inner_Product(grad,grad));
-        LOG::printf("GRAD STATS %g %g %g\n", E, abs(E-last_E), norm_grad);
+        LOG::printf("GRAD STATS %g %g %g\n", E, (E-last_E), norm_grad);
 
         char buff[1000];
-        sprintf(buff,"newton %d   %g %g %g", i, E, abs(E-last_E), norm_grad);
+        sprintf(buff,"newton %d   %g %g %g", i, E, (E-last_E), norm_grad);
         PHYSBAM_DEBUG_WRITE_SUBSTEP(buff,1,1);
 
         if(norm_grad<tolerance && (i || !norm_grad)){result=true;break;}

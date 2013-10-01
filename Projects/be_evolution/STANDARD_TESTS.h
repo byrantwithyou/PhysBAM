@@ -12,6 +12,7 @@
 //    6. Smash test - small boxes, large sphere
 //    7. Plane test - ball
 //    8. Falling mattress
+//    9. Deformable ball falling on a deformable ball
 //   11. Increasing gravity (individual)
 //   16. Smash test - large boxes, small mattress
 //   17. Matress, no gravity, random start
@@ -375,6 +376,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         case 5:
         case 6:
+        case 9:
             last_frame=72;
             solids_parameters.cfl=(T)5.9;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -646,6 +648,11 @@ void Get_Initial_Data()
         case 8:{
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)*m));
             tests.Create_Mattress(mattress_grid,true,&initial_state,density);
+            tests.Add_Ground();
+            break;}
+        case 9:{
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1,0)*m)),true,true,density,.5*m);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0.1,(T)3,0)*m)),true,true,density,.5*m);
             tests.Add_Ground();
             break;}
         case 80:{
@@ -1586,6 +1593,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             if(test_number==80) particles.X.template Project<T,&TV::x>()*=-(T).97;
             if(test_number==80) particles.X.template Project<T,&TV::y>()*=(T).98;
             break;}
+        case 9:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(0);
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true,9.8*m/(s*s)));
+            Add_Constitutive_Model(tetrahedralized_volume1,(T)1e5*unit_p,(T).45,(T).01*s);
+            Add_Constitutive_Model(tetrahedralized_volume2,(T)1e5*unit_p,(T).45,(T).01*s);
+            break;}
         case 77:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5*unit_p,(T).45,(T).01*s);
@@ -2006,13 +2020,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
 
     for(int b=0;b<deformable_body_collection.structures.m;b++){
+      DEFORMABLE_PARTICLES<TV>& undeformed_particles=*particles.Clone();
       TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(b);
-      LEVELSET_IMPLICIT_OBJECT<TV>* undeformed_levelset=tests.Initialize_Implicit_Surface(tetrahedralized_volume.Get_Boundary_Object(),100);
-      ARRAY<T> undeformed_phi(particles.X.m);
-      for(int i=0;i<particles.X.m;i++)
-        undeformed_phi(i)=undeformed_levelset->Extended_Phi(particles.X(i));
-      solid_body_collection.Add_Force(new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,tetrahedralized_volume,undeformed_phi,
-            penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));}
+      if(!tetrahedralized_volume.triangulated_surface) tetrahedralized_volume.Initialize_Triangulated_Surface();
+      TRIANGULATED_SURFACE<T>* triangulated_surface=tetrahedralized_volume.triangulated_surface;
+      TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(triangulated_surface->mesh,undeformed_particles));
+      LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*tests.Initialize_Implicit_Surface(undeformed_triangulated_surface,100);
+      solid_body_collection.Add_Force(new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,undeformed_particles,tetrahedralized_volume,
+            undeformed_triangulated_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation));}
 
     if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);

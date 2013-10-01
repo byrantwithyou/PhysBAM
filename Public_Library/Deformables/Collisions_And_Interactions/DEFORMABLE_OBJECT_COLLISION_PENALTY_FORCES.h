@@ -13,6 +13,8 @@
 namespace PhysBAM{
 
 template<class T> class TETRAHEDRALIZED_VOLUME;
+template<class T> class TRIANGULATED_SURFACE;
+template<class TV> class IMPLICIT_OBJECT;
 
 template<class TV>
 class DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES:public DEFORMABLES_FORCES<TV>
@@ -21,21 +23,25 @@ class DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES:public DEFORMABLES_FORCES<TV>
     typedef DEFORMABLES_FORCES<TV> BASE;
 public:
     using BASE::particles;
+    DEFORMABLE_PARTICLES<TV> &undeformed_particles;
     TETRAHEDRALIZED_VOLUME<T>& collision_body;
-    ARRAY<T> undeformed_phi;
+    TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface;
+    TRIANGULATED_SURFACE<T>& triangulated_surface;
+    IMPLICIT_OBJECT<TV>& implicit_surface;
     ARRAY<int> colliding_particles;
+    ARRAY<int> closest_surface_triangle;
+    ARRAY<ARRAY<VECTOR<int,TV::m> > > extra_surface_triangles;
 
     T stiffness;
     T separation_parameter;
-    T length_scale;
 
-    ARRAY<VECTOR<int,TV::m+2> > penetrating_particles;
+    ARRAY<VECTOR<int,TV::m+1> > penetrating_particles;
     T pe;
-    ARRAY<VECTOR<TV,TV::m+2> > grad_pe;
-    ARRAY<VECTOR<VECTOR<MATRIX<T,TV::m>,TV::m+2>,TV::m+2> > H_pe;
+    ARRAY<VECTOR<TV,TV::m+1> > grad_pe;
+    ARRAY<VECTOR<VECTOR<MATRIX<T,TV::m>,TV::m+1>,TV::m+1> > H_pe;
 
-    DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TETRAHEDRALIZED_VOLUME<T>& collision_body,ARRAY<T>& undeformed_phi,
-        T stiffness=(T)1e4,T separation_parameter=(T)1e-4,T length_scale=1);
+    DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES(DEFORMABLE_PARTICLES<TV>& particles,DEFORMABLE_PARTICLES<TV>& undeformed_particles,TETRAHEDRALIZED_VOLUME<T>& collision_body,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface,IMPLICIT_OBJECT<TV>& implicit_surface,
+        T stiffness=(T)1e4,T separation_parameter=(T)1e-4);
     virtual ~DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES();
 
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;
@@ -54,6 +60,12 @@ public:
     void Initialize_CFL(ARRAY_VIEW<typename BASE::FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
     void Update_Position_Based_State_Particle(int p);
+    void Update_Penetrating_Particles(int p);
+    void Update_Surface_Triangles();
+    void Penalty(VECTOR<int,4> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he);
+    void Penalty(VECTOR<int,3> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he);
+    void Penalty(VECTOR<int,2> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he);
+    int Closest_Surface_Triangle(const TV&location,const T max_depth);
 //#####################################################################
 };
 }
