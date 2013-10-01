@@ -226,6 +226,7 @@ template void MUSCLE<VECTOR<float,2> >::Apply_Fixed_Impulse_At_All_Points(float)
 template MUSCLE<VECTOR<float,2> >::MUSCLE(MUSCLE_FORCE_CURVE<float> const&);
 template void MUSCLE<VECTOR<float,2> >::Set_Segment_Activations(float);
 template void MUSCLE<VECTOR<float,2> >::Update_Segments();
+template float MUSCLE<VECTOR<float,2> >::Total_Length() const;
 template class MUSCLE<VECTOR<double,3> >;
 template MUSCLE<VECTOR<double,1> >::MUSCLE(MUSCLE_FORCE_CURVE<double> const&);
 template void MUSCLE<VECTOR<double,1> >::Set_Segment_Activations(double);
@@ -234,4 +235,5 @@ template void MUSCLE<VECTOR<double,2> >::Apply_Fixed_Impulse_At_All_Points(doubl
 template MUSCLE<VECTOR<double,2> >::MUSCLE(MUSCLE_FORCE_CURVE<double> const&);
 template void MUSCLE<VECTOR<double,2> >::Set_Segment_Activations(double);
 template void MUSCLE<VECTOR<double,2> >::Update_Segments();
+template double MUSCLE<VECTOR<double,2> >::Total_Length() const;
 }
