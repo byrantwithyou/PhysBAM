@@ -20,10 +20,11 @@ class EPS_FILE:public VECTOR_IMAGE<T>
 {
 public:
     using VECTOR_IMAGE<T>::stream;using VECTOR_IMAGE<T>::output_box;using VECTOR_IMAGE<T>::bounding_box;using VECTOR_IMAGE<T>::cur_format;
-    typedef VECTOR<T,2> TV;
+    using VECTOR_IMAGE<T>::Bound;
+    typedef VECTOR<T,2> TV;typedef VECTOR<T,3> TV3;
     int head_offset;
 
-    VECTOR<T,3> effective_color;
+    TV3 effective_color;
     T effective_line_width,effective_point_radius,effective_line_opacity,effective_fill_opacity;
 
     EPS_FILE(const std::string& filename,const RANGE<TV>& box=RANGE<TV>(TV(),TV(500,500)));
@@ -31,12 +32,21 @@ public:
 
     void Emit(const std::string& str);
     void Emit(const TV &pt);
+    void Emit(const TV3 &col);
 
     void Update_Effective_Formatting();
     void Mt(const TV &pt);
     void Lt(const TV &pt);
     void Stroke();
     void Fill();
+
+    void Emit_Gouraud_Triangle(const TV &a,const TV &b,const TV &c,const TV3 &col_a,const TV3 &col_b,const TV3 &col_c);
+    void Use_Normal_Cap();
+    void Use_Round_Cap();
+    void Use_Extended_Cap();
+    void Use_Miter_Join();
+    void Use_Round_Join();
+    void Use_Bevel_Join();
 
 protected:
     virtual void Emit_Object(const TV &a,const TV &b); // line

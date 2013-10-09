@@ -49,6 +49,14 @@ Emit(const TV &pt)
     stream<<pt.x<<" "<<pt.y<<" ";
 }
 //#####################################################################
+// Function Emit
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Emit(const TV3 &col)
+{
+    stream<<col.x<<" "<<col.y<<" "<<col.z<<" ";
+}
+//#####################################################################
 // Function Compute_Transform
 //#####################################################################
 template<class T> void EPS_FILE<T>::
@@ -220,6 +228,70 @@ Lt(const TV &pt)
 {
     Emit(pt);
     Emit("lineto");
+}
+//#####################################################################
+// Function Emit_Gouraud_Triangle
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Emit_Gouraud_Triangle(const TV &a,const TV &b,const TV &c,const TV3 &col_a,const TV3 &col_b,const TV3 &col_c)
+{
+    Bound(a);
+    Bound(b);
+    Bound(c);
+    Emit("<< /ShadingType 4 /ColorSpace [ /DeviceRGB ] /DataSource [ ");
+    Emit("0");Emit(a);Emit(col_a);
+    Emit("0");Emit(b);Emit(col_b);
+    Emit("0");Emit(c);Emit(col_c);
+    Emit("] >> shfill");
+    stream<<std::endl;
+}
+//#####################################################################
+// Function Use_Normal_Cap
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Use_Normal_Cap()
+{
+    Emit("0 setlinecap");
+}
+//#####################################################################
+// Function Use_Round_Cap
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Use_Round_Cap()
+{
+    Emit("1 setlinecap");
+}
+//#####################################################################
+// Function Use_Extended_Cap
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Use_Extended_Cap()
+{
+    Emit("2 setlinecap");
+}
+//#####################################################################
+// Function Use_Miter_Join
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Use_Miter_Join()
+{
+    Emit("0 setlinejoin");
+}
+//#####################################################################
+// Function Use_Round_Join
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Use_Round_Join()
+{
+    Emit("1 setlinejoin");
+}
+//#####################################################################
+// Function Use_Bevel_Join
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Use_Bevel_Join()
+{
+    Emit("2 setlinejoin");
 }
 namespace PhysBAM{
 template class EPS_FILE<float>;
