@@ -38,13 +38,10 @@ template<class TV> DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
     triangulated_surface.avoid_normal_interpolation_across_sharp_edges=false;
     collision_body.Initialize_Hierarchy();
     ARRAY<bool> surface_node(particles.X.m);
-    for(int i=0; i<triangulated_surface.mesh.elements.m; i++){
-        VECTOR<int,3> nodes=triangulated_surface.mesh.elements(i);
-        for(int j = 0; j<3;j++)
-            surface_node(nodes(j)) = true;}
-    for(int i=0; i<collision_body.mesh.elements.m; i++){
+    surface_node.Subset(triangulated_surface.mesh.elements.Flattened()).Fill(true);
+    for(int i=0;i<collision_body.mesh.elements.m;i++){
         VECTOR<int,4> nodes=collision_body.mesh.elements(i);
-        for(int j = 0; j<4;j++)
+        for(int j=0;j<4;j++)
             if(surface_node(nodes(j)))
                 extra_surface_triangles(nodes(j)).Append(nodes.Remove_Index(j));}
 }
@@ -70,6 +67,21 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
 }
 //#####################################################################
+// Function Closest_Surface_Triangle
+//#####################################################################
+template<class TV> int DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
+Estimate_Closest_Undeformed_Surface_Triangle(const TV& X,int p) const
+{
+    ARRAY<int> nearby_surface_triangles;
+    TV surface_location=implicit_surface.Closest_Point_On_Boundary(X);
+    for(T thickness=separation_parameter;;thickness*=(T)2){
+        undeformed_triangulated_surface.hierarchy->Intersection_List(surface_location,nearby_surface_triangles,thickness);
+        for(int i=0;i<nearby_surface_triangles.m;i++){
+            int ct=nearby_surface_triangles(i);
+            if(!triangulated_surface.mesh.elements(ct).Contains(p))
+                return ct;}}
+}
+//#####################################################################
 // Function Update_Penetrating Particles
 //#####################################################################
 template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
@@ -84,53 +96,42 @@ Update_Penetrating_Particles(int p)
     for(int n=0;n<intersection_list.m;n++){
         bool ignore=false;
         int t=intersection_list(n);
-        VECTOR<int,4> nodes=tetrahedron_mesh.elements(t);
-        for(int q=0;q<particles_to_ignore.m;q++) if(nodes.Contains(particles_to_ignore(q))) ignore=true;
-        if(!ignore){
-            VECTOR<T,TV::m+1> w=TETRAHEDRON<T>::Barycentric_Coordinates(x,particles.X.Subset(nodes));
-            if(w.Min()<-1e-12) continue;
-            ARRAY<int> nearby_surface_triangles;
-            int ct = closest_surface_triangle(p);
-            if(ct==-1){
-                TV X = undeformed_particles.X.Subset(nodes).Weighted_Sum(w);
-                TV surface_location=implicit_surface.Closest_Point_On_Boundary(X);
-                for(T thickness=separation_parameter;!nearby_surface_triangles.m;thickness*=(T)2){
-                    undeformed_triangulated_surface.hierarchy->Intersection_List(surface_location,nearby_surface_triangles,thickness);
-                }
-                ct=nearby_surface_triangles(0);
-                while(triangulated_surface.mesh.elements(ct).Contains(p))
-                    ct= (ct+1)%triangulated_surface.mesh.elements.m;
-            }
-            TRIANGLE_3D<T> surface_triangle=(*triangulated_surface.triangle_list)(ct);
-            TV weights,projected_point=surface_triangle.Closest_Point(x,weights);
-            T closest_distance_squared=(x-projected_point).Magnitude_Squared();
-            T closest_distance=sqrt(closest_distance_squared);
-            triangulated_surface.hierarchy->Intersection_List(x,nearby_surface_triangles,1.05*closest_distance);
-            PHYSBAM_ASSERT(nearby_surface_triangles.m!=0);
-            for(int k=0;k<nearby_surface_triangles.m;k++){
-                int tri = nearby_surface_triangles(k);
-                if(triangulated_surface.mesh.elements(tri).Contains(p)) continue;
-                surface_triangle=(*triangulated_surface.triangle_list)(tri);
-                TV new_point=surface_triangle.Closest_Point(x,weights);
-                T new_distance_squared=(x-new_point).Magnitude_Squared();
-                if(new_distance_squared < closest_distance_squared){
-                    closest_distance_squared=new_distance_squared;
-                    ct = tri;}}
-            closest_surface_triangle(p)= ct;
-            VECTOR<int,3> surface_nodes=triangulated_surface.mesh.elements(ct);
-            ARRAY<VECTOR<int,3> > extra = extra_surface_triangles(p);
-            for(int k=0;k<extra.m;k++){
-                TRIANGLE_3D<T> t(particles.X.Subset(extra(k)));
-                TV new_point=t.Closest_Point(x,weights);
-                T new_distance_squared=(x-new_point).Magnitude_Squared();
-                if(new_distance_squared < closest_distance_squared){
-                    closest_distance_squared=new_distance_squared;
-                    surface_nodes=extra(k);}}
-            penetrating_particles.Append(surface_nodes.Insert(p,0));
-            particles_to_ignore.Append(nodes(0));
-            particles_to_ignore.Append(nodes(1));
-            particles_to_ignore.Append(nodes(2));
-            particles_to_ignore.Append(nodes(3));}}
+        const VECTOR<int,4>& nodes=tetrahedron_mesh.elements(t);
+        for(int q=0;q<particles_to_ignore.m;q++)
+            if(nodes.Contains(particles_to_ignore(q))){
+                ignore=true;
+                break;}
+        if(ignore) continue;
+        const VECTOR<T,TV::m+1>& w=TETRAHEDRON<T>::Barycentric_Coordinates(x,particles.X.Subset(nodes));
+        if(w.Min()<-1e-12) continue;
+        ARRAY<int> nearby_surface_triangles;
+        int ct=closest_surface_triangle(p);
+        if(ct==-1) ct=Estimate_Closest_Undeformed_Surface_Triangle(undeformed_particles.X.Subset(nodes).Weighted_Sum(w),p);
+        TV weights,projected_point=(*triangulated_surface.triangle_list)(ct).Closest_Point(x,weights);
+        T closest_distance_squared=(x-projected_point).Magnitude_Squared();
+        T closest_distance=sqrt(closest_distance_squared);
+        triangulated_surface.hierarchy->Intersection_List(x,nearby_surface_triangles,1.05*closest_distance);
+        PHYSBAM_ASSERT(nearby_surface_triangles.m!=0);
+        for(int k=0;k<nearby_surface_triangles.m;k++){
+            int tri=nearby_surface_triangles(k);
+            if(triangulated_surface.mesh.elements(tri).Contains(p)) continue;
+            TV new_point=(*triangulated_surface.triangle_list)(tri).Closest_Point(x,weights);
+            T new_distance_squared=(x-new_point).Magnitude_Squared();
+            if(new_distance_squared<closest_distance_squared){
+                closest_distance_squared=new_distance_squared;
+                ct=tri;}}
+        closest_surface_triangle(p)=ct;
+        TV_INT surface_nodes=triangulated_surface.mesh.elements(ct);
+        const ARRAY<TV_INT>& extra=extra_surface_triangles(p);
+        for(int k=0;k<extra.m;k++){
+            TRIANGLE_3D<T> t(particles.X.Subset(extra(k)));
+            TV new_point=t.Closest_Point(x,weights);
+            T new_distance_squared=(x-new_point).Magnitude_Squared();
+            if(new_distance_squared<closest_distance_squared){
+                closest_distance_squared=new_distance_squared;
+                surface_nodes=extra(k);}}
+        penetrating_particles.Append(surface_nodes.Insert(p,0));
+        particles_to_ignore.Append_Elements(nodes);}
 }
 //#####################################################################
 // Function Update_Surface_Triangles
@@ -167,7 +168,8 @@ Update_Position_Based_State(const T time,const bool is_position_update)
 // Function Penalty
 //#####################################################################
 template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
-Penalty(VECTOR<int,4> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he){
+Penalty(VECTOR<int,4> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he)
+{
     auto w=From_Var<3,0>(X(nodes(0))-X(nodes(3)));
     auto v=From_Var<3,1>(X(nodes(1))-X(nodes(3)));
     auto u=From_Var<3,2>(X(nodes(2))-X(nodes(3)));
@@ -197,8 +199,12 @@ Penalty(VECTOR<int,4> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<in
             he(nodes(3))(nodes(3))+=t;}
         he(nodes(3))(nodes(i))=he(nodes(i))(nodes(3)).Transposed();}
 }
+//#####################################################################
+// Function Penalty
+//#####################################################################
 template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
-Penalty(VECTOR<int,3> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he){
+Penalty(VECTOR<int,3> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he)
+{
     auto w=From_Var<2,0>(X(nodes(0))-X(nodes(2)));
     auto v=From_Var<2,1>(X(nodes(1))-X(nodes(2)));
     auto vv=v.Dot(v);
@@ -220,8 +226,12 @@ Penalty(VECTOR<int,3> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<in
             he(nodes(2))(nodes(2))+=t;}
         he(nodes(2))(nodes(i))=he(nodes(i))(nodes(2)).Transposed();}
 }
+//#####################################################################
+// Function Penalty
+//#####################################################################
 template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
-Penalty(VECTOR<int,2> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he){
+Penalty(VECTOR<int,2> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he)
+{
     auto w=From_Var<1,0>(X(nodes(0))-X(nodes(1)));
     auto phi_sq=w.Magnitude_Squared();
     auto ee=stiffness*phi_sq;
@@ -239,61 +249,38 @@ Penalty(VECTOR<int,2> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<in
 // Function Update_Position_Based_State_Particle
 //#####################################################################
 template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
-Update_Position_Based_State_Particle(int pp){
+Update_Position_Based_State_Particle(int pp)
+{
     const VECTOR<int,TV::m+1>& nodes=penetrating_particles(pp);
     T e;
     VECTOR<TV,TV::m+1> de;
-    VECTOR<VECTOR<MATRIX<T,TV::m>,TV::m+1>,TV::m+1> he; 
-    TV location = particles.X(nodes(0));
+    VECTOR<VECTOR<MATRIX<T,TV::m>,TV::m+1>,TV::m+1> he;
+    TV location=particles.X(nodes(0));
     TRIANGLE_3D<T> t(particles.X.Subset(nodes.Remove_Index(0)));
     TV weights=t.Barycentric_Coordinates(location);
-    const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& > X = particles.X.Subset(nodes);
+    const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,4>& > X=particles.X.Subset(nodes);
     if(weights.x<0){
         T a23=SEGMENT_3D<T>::Interpolation_Fraction(location,t.X.y,t.X.z); // Check edge X.y--X.z
         if(a23<0){
-            if(weights.z<0){ // Closest point is on edge X.x--X.y
-                VECTOR<int,3> n1(0,1,2);
-                Penalty(n1, X, e, de, he);}
-            else{
-                VECTOR<int,2> n1(0,2);
-                Penalty(n1, X, e, de, he);}} // Closest point is t.X.y
+            if(weights.z<0) Penalty(VECTOR<int,3>(0,1,2),X,e,de,he); // Closest point is on edge X.x--X.y
+            else Penalty(VECTOR<int,2>(0,2),X,e,de,he);} // Closest point is t.X.y
         else if(a23>1){
-            if(weights.y<0){ // Closest point is on edge t.X.x--t.X.z
-                VECTOR<int,3> n1(0,1,3);
-                Penalty(n1, X, e, de, he);}
-            else{
-                VECTOR<int,2> n1(0,3);
-                Penalty(n1, X, e, de, he);}} // Closest point is t.X.z
-        else{
-            VECTOR<int,3> n1(0,2,3);
-            Penalty(n1, X, e, de, he);}} // Closest point is on edge t.X.y--t.X.z
+            if(weights.y<0) Penalty(VECTOR<int,3>(0,1,3),X,e,de,he); // Closest point is on edge t.X.x--t.X.z
+            else Penalty(VECTOR<int,2>(0,3),X,e,de,he);} // Closest point is t.X.z
+        else Penalty(VECTOR<int,3>(0,2,3),X,e,de,he);} // Closest point is on edge t.X.y--t.X.z
     else if(weights.y<0){
         T a13=SEGMENT_3D<T>::Interpolation_Fraction(location,t.X.x,t.X.z); // Check edge t.X.x--t.X.z
         if(a13<0){
-            if(weights.z<0){ // Closest point is on edge t.X.x--t.X.y
-                VECTOR<int,3> n1(0,1,2);
-                Penalty(n1, X, e, de, he);}
-            else{
-                VECTOR<int,2> n1(0,1);
-                Penalty(n1, X, e, de, he);}} // Closest point is t.X.x
-        else if(a13>1){
-            VECTOR<int,2> n1(0,3);
-            Penalty(n1, X, e, de, he);} // Closest point is t.X.z
-        else{
-            VECTOR<int,3> n1(0,1,3);
-            Penalty(n1, X, e, de, he);}} // Closest point is on edge t.X.x--t.X.z
-    else if(weights.z<0){ // Closest point is on edge t.X.x--t.X.y
-        VECTOR<int,3> n1(0,1,2);
-        Penalty(n1, X, e, de, he);}
-    else{
-        VECTOR<int,4> n1(0,1,2,3);
-        Penalty(n1, X, e, de, he);
-    }
+            if(weights.z<0) Penalty(VECTOR<int,3>(0,1,2),X,e,de,he); // Closest point is on edge t.X.x--t.X.y
+            else Penalty(VECTOR<int,2>(0,1),X,e,de,he);} // Closest point is t.X.x
+        else if(a13>1) Penalty(VECTOR<int,2>(0,3),X,e,de,he); // Closest point is t.X.z
+        else Penalty(VECTOR<int,3>(0,1,3),X,e,de,he);} // Closest point is on edge t.X.x--t.X.z
+    else if(weights.z<0) Penalty(VECTOR<int,3>(0,1,2),X,e,de,he); // Closest point is on edge t.X.x--t.X.y
+    else Penalty(VECTOR<int,4>(0,1,2,3),X,e,de,he);
     pe+=e;
     grad_pe.Append(de);
     H_pe.Append(he);
 }
-
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
 //#####################################################################

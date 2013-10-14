@@ -19,7 +19,7 @@ template<class TV> class IMPLICIT_OBJECT;
 template<class TV>
 class DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES:public DEFORMABLES_FORCES<TV>
 {
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef DEFORMABLES_FORCES<TV> BASE;
 public:
     using BASE::particles;
@@ -65,7 +65,7 @@ public:
     void Penalty(VECTOR<int,4> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he);
     void Penalty(VECTOR<int,3> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he);
     void Penalty(VECTOR<int,2> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he);
-    int Closest_Surface_Triangle(const TV&location,const T max_depth);
+    int Estimate_Closest_Undeformed_Surface_Triangle(const TV& X,int p) const;
 //#####################################################################
 };
 }
