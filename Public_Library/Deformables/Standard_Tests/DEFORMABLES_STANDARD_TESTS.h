@@ -81,6 +81,7 @@ public:
         const bool use_constant_mass);
     TRIANGULATED_AREA<T>& Create_Mattress(const GRID<VECTOR<T,2> >& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>* initial_state,const T density,const bool reverse_triangles=false);
     TETRAHEDRALIZED_VOLUME<T>& Create_Mattress(const GRID<VECTOR<T,3> >& mattress_grid,const bool use_constant_mass,const RIGID_BODY_STATE<TV>* initial_state,const T density);
+    TETRAHEDRALIZED_VOLUME<T>& Create_Cylinder(const CYLINDER<T>& cylinder,int num_elements_height,int num_elements_radius,const bool use_constant_mass,const RIGID_BODY_STATE<TV>* initial_state,const T density);
     template<class T_SHAPE>
     EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>& Create_Embedded_Tetrahedralized_Volume(const T_SHAPE& shape,const RIGID_BODY_STATE<TV>& initial_state,const bool relative_to_box_center);
     template<class T_OBJECT> void

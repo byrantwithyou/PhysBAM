@@ -226,6 +226,24 @@ Create_Mattress(const GRID<VECTOR<T,3> >& mattress_grid,const bool use_constant_
     return copy;
 }
 //#####################################################################
+// Function Create_Cylinder
+//#####################################################################
+template<class TV> TETRAHEDRALIZED_VOLUME<typename TV::SCALAR>& DEFORMABLES_STANDARD_TESTS<TV>::
+Create_Cylinder(const CYLINDER<T>& cylinder,int num_elements_height,int num_elements_radius,const bool use_constant_mass,const RIGID_BODY_STATE<TV>* initial_state,const T density)
+{
+    PHYSBAM_ASSERT(density>0);
+    DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
+    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
+    tetrahedralized_volume.Initialize_Cylinder_Mesh_And_Particles(cylinder,num_elements_height,num_elements_radius);
+    LOG::cout<<"Adding Cylinder - Total Tetrahedra : "<<tetrahedralized_volume.mesh.elements.m<<std::endl;
+    particles.Store_Velocity();
+    Set_Mass_Of_Particles(tetrahedralized_volume,density,use_constant_mass);
+    if(initial_state) Set_Initial_Particle_Configuration(particles,*initial_state,true);
+    TETRAHEDRALIZED_VOLUME<T>& copy=Copy_And_Add_Structure(tetrahedralized_volume);
+    delete &particles;
+    return copy;
+}
+//#####################################################################
 // Function Create_Embedded_Tetrahedralized_Volume
 //#####################################################################
 template<class TV> template<class T_SHAPE> EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<typename TV::SCALAR>& DEFORMABLES_STANDARD_TESTS<TV>::
@@ -662,3 +680,5 @@ template DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::DEFORMABLES_STANDARD_TES
 template DEFORMABLES_STANDARD_TESTS<VECTOR<float,1> >::DEFORMABLES_STANDARD_TESTS(STREAM_TYPE,DEFORMABLE_BODY_COLLECTION<VECTOR<float,1> >&);
 template DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::DEFORMABLES_STANDARD_TESTS(STREAM_TYPE,DEFORMABLE_BODY_COLLECTION<VECTOR<float,2> >&);
 template DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::DEFORMABLES_STANDARD_TESTS(STREAM_TYPE,DEFORMABLE_BODY_COLLECTION<VECTOR<float,3> >&);
+template TETRAHEDRALIZED_VOLUME<double>& DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Create_Cylinder(CYLINDER<double> const&,int,int,bool,RIGID_BODY_STATE<VECTOR<double,3> > const*,double);
+template TETRAHEDRALIZED_VOLUME<float>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Create_Cylinder(CYLINDER<float> const&,int,int,bool,RIGID_BODY_STATE<VECTOR<float,3> > const*,float);

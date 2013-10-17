@@ -74,6 +74,8 @@ public:
     void Initialize_Octahedron_Mesh_And_Particles(const GRID<TV>& grid);
     void Initialize_Cube_Mesh_And_Particles(const GRID<TV>& grid);
     void Initialize_Prismatic_Cube_Mesh_And_Particles(const GRID<TV>& grid);
+    void Initialize_Cylinder_Mesh_And_Particles(const CYLINDER<T>& cyl,int num_elements_height,int num_elements_radius);
+    void Initialize_Swept_Mesh_And_Particles(const TRIANGULATED_AREA<T>& ta,int layers,const FRAME<TV>& start_frame,const TV& sweep_offset);
     void Check_Signed_Volumes_And_Make_Consistent(bool verbose=true);
     void Initialize_Triangulated_Surface();
     T Minimum_Volume(int* index=0) const;
