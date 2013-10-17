@@ -40,3 +40,10 @@ boundary_conditions_2d/projection
 boundary_conditions_2d/projection3
 mpm/mpm_2d
 mpm/mpm_3d
+be_evolution/be_evolution
+be_evolution/be_evolution_2d
+be_evolution/basic
+be_evolution/be_evolution_profile
+mple/mple_2d
+mple/mple_3d
+mpm/mpmac_2d
