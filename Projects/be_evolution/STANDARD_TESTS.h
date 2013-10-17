@@ -52,6 +52,8 @@
 //   57. Two-direction stretch
 //   58. Various objects through gears
 //   59. Random armadillo
+//   60. Random armadillo
+//   61. Elbow cylinder
 //   77. Squeeze in a box
 //  100. Primary contour field
 //#####################################################################
@@ -62,6 +64,7 @@
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
@@ -74,9 +77,9 @@
 #include <Deformables/Bindings/RIGID_BODY_BINDING.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
+#include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
-#include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
@@ -385,7 +388,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27: case 23: case 53: case 54: case 55: case 57: case 100: case 48:
+        case 27: case 23: case 53: case 54: case 55: case 57: case 100: case 48: case 61:
             attachment_velocity=0.2;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -1536,6 +1539,9 @@ void Get_Initial_Data()
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(25,5,0)*m));
             tests.Create_Mattress(mattress_grid,true,&initial_state,density);
             break;}
+        case 61:{
+            tests.Create_Cylinder(CYLINDER<T>(),8,4,true,0,1000);
+            break;}
         case 100:{
             TETRAHEDRALIZED_VOLUME<T>* tv=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
             particles.Add_Elements(4);
@@ -1982,6 +1988,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 54:
         case 48:
         case 53:{
+            T youngs_modulus=1e5*unit_p;
+            T poissons_ratio=.45;
+            T damping=0.01*s;
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
+            if(test_number==55) particles.X(1).x=stretch;
+            break;}
+        case 61:{
             T youngs_modulus=1e5*unit_p;
             T poissons_ratio=.45;
             T damping=0.01*s;
