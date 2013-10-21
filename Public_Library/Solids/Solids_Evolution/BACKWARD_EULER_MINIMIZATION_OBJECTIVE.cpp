@@ -83,12 +83,17 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
         frame.t=frame0(p).t+dt*twist.linear;
         frame.r=ROTATION<TV>::From_Rotation_Vector(dt*twist.angular)*frame0(p).r;
         tmp0.rigid_V.array(p)=rigid_body.Inertia_Times(d_twist);}
-    solid_body_collection.Update_Position_Based_State(time,true);
 
-    if(e){
-        T ke=0,pe=0;
-        solid_body_collection.Compute_Energy(time,ke,pe);
-        *e=minimization_system.Inner_Product(dv,tmp0)/2+pe;}
+    T energy = minimization_system.Inner_Product(dv,tmp0)/2;
+    if(h){
+        solid_body_collection.energy_early_out=FLT_MAX;
+        solid_body_collection.Update_Position_Based_State_Early_Out(time,true,energy);
+        solid_body_collection.energy_early_out=energy;
+    }
+    else
+        solid_body_collection.Update_Position_Based_State_Early_Out(time,true,energy);
+
+    if(e) *e=energy;
 
     if(g){
         tmp1*=0;
