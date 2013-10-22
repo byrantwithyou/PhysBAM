@@ -163,7 +163,7 @@ Initialize_Swept_Mesh_And_Particles(const TRIANGULATED_AREA<T>& ta,int layers,co
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Initialize_Cylinder_Mesh_And_Particles(const CYLINDER<T>& cyl,int num_elements_height,int num_elements_radius)
 {
-    TRIANGULATED_AREA<T>* ta=TESSELLATION::Generate_Triangles(SPHERE<VECTOR<T,2> >(),num_elements_radius);
+    TRIANGULATED_AREA<T>* ta=TESSELLATION::Generate_Triangles(SPHERE<VECTOR<T,2> >(VECTOR<T,2>(),cyl.radius),num_elements_radius);
     TV axis=cyl.plane2.x1-cyl.plane1.x1;
     Initialize_Swept_Mesh_And_Particles(*ta,num_elements_height,FRAME<TV>(cyl.plane1.x1,ROTATION<TV>::From_Rotated_Vector(TV(0,0,1),axis)),axis);
     delete ta;
