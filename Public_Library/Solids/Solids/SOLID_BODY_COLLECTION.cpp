@@ -381,7 +381,7 @@ Add_Force(SOLIDS_FORCES<TV>* force)
 {
     solids_forces.Append(force);
     force->Set_CFL_Number(cfl_number);
-    return solids_forces.m;
+    return solids_forces.m-1;
 }
 //#####################################################################
 // Function Add_Force
@@ -391,7 +391,7 @@ Add_Force(DEFORMABLES_FORCES<TV>* force)
 {
     deformable_body_collection.deformables_forces.Append(force);
     force->Set_CFL_Number(cfl_number);
-    return deformable_body_collection.deformables_forces.m;
+    return deformable_body_collection.deformables_forces.m-1;
 }
 //#####################################################################
 // Function Add_Force
@@ -401,7 +401,7 @@ Add_Force(RIGIDS_FORCES<TV>* force)
 {
     rigid_body_collection.rigids_forces.Append(force);
     force->Set_CFL_Number(cfl_number);
-    return rigid_body_collection.rigids_forces.m;
+    return rigid_body_collection.rigids_forces.m-1;
 }
 //#####################################################################
 namespace PhysBAM{
