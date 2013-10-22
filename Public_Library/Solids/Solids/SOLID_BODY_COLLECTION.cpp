@@ -79,11 +79,9 @@ Update_Simulated_Particles()
 template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update)
 {
-    for(int k=0;k<solids_forces.m;k++) if(solids_forces(k)->use_position_based_state) solids_forces(k)->Update_Position_Based_State(time);
-    for(int k=0;k<rigid_body_collection.rigids_forces.m;k++)
-        if(rigid_body_collection.rigids_forces(k)->use_position_based_state) rigid_body_collection.rigids_forces(k)->Update_Position_Based_State(time);
-    for(int k=0;k<deformable_body_collection.deformables_forces.m;k++)
-        if(deformable_body_collection.deformables_forces(k)->use_position_based_state) deformable_body_collection.deformables_forces(k)->Update_Position_Based_State(time,is_position_update);
+    for(int k=0;k<solids_forces.m;k++) solids_forces(k)->Update_Position_Based_State(time);
+    for(int k=0;k<rigid_body_collection.rigids_forces.m;k++) rigid_body_collection.rigids_forces(k)->Update_Position_Based_State(time);
+    for(int k=0;k<deformable_body_collection.deformables_forces.m;k++) deformable_body_collection.deformables_forces(k)->Update_Position_Based_State(time,is_position_update);
 }
 //#####################################################################
 // Function Update_Position_Based_State
@@ -92,18 +90,18 @@ template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Update_Position_Based_State_Early_Out(const T time,const bool is_position_update, T& energy)
 {
     for(int k=0;k<solids_forces.m;k++){
-        if(solids_forces(k)->use_position_based_state) solids_forces(k)->Update_Position_Based_State(time);
+        solids_forces(k)->Update_Position_Based_State(time);
         energy+=solids_forces(k)->Potential_Energy(time);
     }
     //Gravitational Potential can be negative so wait to early out until after it is added
     if(energy>energy_early_out) return;
     for(int k=0;k<rigid_body_collection.rigids_forces.m;k++){
-        if(rigid_body_collection.rigids_forces(k)->use_position_based_state) rigid_body_collection.rigids_forces(k)->Update_Position_Based_State(time);
+        rigid_body_collection.rigids_forces(k)->Update_Position_Based_State(time);
         energy+=rigid_body_collection.rigids_forces(k)->Potential_Energy(time);
         if(energy>energy_early_out) return;
     }
     for(int k=0;k<deformable_body_collection.deformables_forces.m;k++){
-        if(deformable_body_collection.deformables_forces(k)->use_position_based_state) deformable_body_collection.deformables_forces(k)->Update_Position_Based_State(time,is_position_update);
+        deformable_body_collection.deformables_forces(k)->Update_Position_Based_State(time,is_position_update);
         energy+=deformable_body_collection.deformables_forces(k)->Potential_Energy(time);
         if(energy>energy_early_out) return;
     }

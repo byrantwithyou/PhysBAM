@@ -64,7 +64,6 @@ public:
     bool limit_time_step_by_strain_rate;
     T max_strain_per_time_step; // for limiting the timestep in the CFL calculation
     bool use_velocity_independent_forces,use_velocity_dependent_forces,use_force_differential,use_implicit_velocity_independent_forces;
-    bool use_position_based_state;
     int unique_id;
     bool compute_half_forces;
 

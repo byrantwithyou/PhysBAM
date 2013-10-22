@@ -313,7 +313,7 @@ CFL_Strain_Rate()
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update)
 {
-    for(int k=0;k<deformables_forces.m;k++) if(deformables_forces(k)->use_position_based_state) deformables_forces(k)->Update_Position_Based_State(time,is_position_update);
+    for(int k=0;k<deformables_forces.m;k++) deformables_forces(k)->Update_Position_Based_State(time,is_position_update);
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces

@@ -14,7 +14,7 @@ using namespace PhysBAM;
 template<class TV> DEFORMABLES_FORCES<TV>::
 DEFORMABLES_FORCES(DEFORMABLE_PARTICLES<TV>& particles)
     :particles(particles),cfl_number((T)1),allow_external_cfl_number(true),cfl_initialized(false),use_velocity_independent_forces(true),
-    use_velocity_dependent_forces(true),use_force_differential(true),use_implicit_velocity_independent_forces(false),use_position_based_state(true),
+    use_velocity_dependent_forces(true),use_force_differential(true),use_implicit_velocity_independent_forces(false),
     unique_id(Get_Unique_Id()),compute_half_forces(false)
 {
     Use_Rest_State_For_Strain_Rate(false);

@@ -278,8 +278,7 @@ Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,A
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Update_Position_Based_State(const T time)
 {
-    for(int k=0;k<rigids_forces.m;k++)
-        if(rigids_forces(k)->use_position_based_state) rigids_forces(k)->Update_Position_Based_State(time);
+    for(int k=0;k<rigids_forces.m;k++) rigids_forces(k)->Update_Position_Based_State(time);
 }
 //#####################################################################
 // Function Compute_Energy
