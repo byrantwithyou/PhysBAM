@@ -44,7 +44,6 @@ public:
     bool print_energy;
     bool simulate;
     int iterations_used_diagnostic;
-    T energy_early_out;
 
     SOLID_BODY_COLLECTION();
     virtual ~SOLID_BODY_COLLECTION();
@@ -86,7 +85,6 @@ public:
     void Update_Simulated_Particles();
     void Delete_Forces();
     void Update_Position_Based_State(const T time,const bool is_position_update);
-    void Update_Position_Based_State_Early_Out(const T time,const bool is_position_update,T& energy);
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const;
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const;
     void Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T scale,

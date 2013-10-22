@@ -35,6 +35,8 @@ public:
     ARRAY<IMPLICIT_OBJECT<TV>*> collision_objects;
     T collision_thickness;
     HASHTABLE<PAIR<int,int> > disabled_collision;
+    HASHTABLE<int> solids_forces_lazy,rigids_forces_lazy,deformables_forces_lazy;
+    mutable T last_energy;
 
     BACKWARD_EULER_MINIMIZATION_OBJECTIVE(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>& minimization_system);
     virtual ~BACKWARD_EULER_MINIMIZATION_OBJECTIVE();
@@ -47,6 +49,7 @@ public:
     void Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& dv,bool allow_sep) const;
     void Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv);
     void Disable_Current_Colliding_Pairs(T thickness=0);
+    T Update_Position_Based_State_Early_Out(T time,bool is_position_update,T energy_early_out) const;
 };
 }
 #endif
