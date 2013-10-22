@@ -159,6 +159,7 @@ public:
     bool enforce_definiteness;
     T unit_rho,unit_p,unit_N,unit_J;
     T density;
+    bool use_penalty_self_collisions;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),test_forces(false),
@@ -171,8 +172,9 @@ public:
         ether_drag(0),image_size(500),pin_corners(false),rand_seed(1234),
         use_rand_seed(false),use_residuals(false),use_newmark(false),use_newmark_be(false),project_nullspace(false),
         backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
-        use_penalty_collisions(true),use_constraint_collisions(false),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
-        penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10))
+        use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
+        penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),
+        use_penalty_self_collisions(true)
     {
         this->fixed_dt=1./240;
     }
@@ -217,6 +219,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=5;
     solids_parameters.implicit_solve_parameters.cg_iterations=1000;
     solids_parameters.implicit_solve_parameters.cg_tolerance=1e-3;
+    backward_euler_evolution->newtons_method.tolerance=1;
     parse_args->Add("-test_forces",&test_forces,"use fully implicit forces");
     parse_args->Add("-with_bunny",&with_bunny,"use bunny");
     parse_args->Add("-with_hand",&with_hand,"use hand");
@@ -268,12 +271,13 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-angle_tol",&backward_euler_evolution->newtons_method.angle_tolerance,"tol","gradient descent tolerance");
     parse_args->Add_Not("-mr",&backward_euler_evolution->newtons_method.use_cg,"use minres instead of cg");
     parse_args->Add("-gss",&backward_euler_evolution->newtons_method.use_golden_section_search,"use golden section search instead of wolfe conditions line search");
-    parse_args->Add_Not("-no_penalty",&use_penalty_collisions,"do not use penalty collisions");
-    parse_args->Add("-constraints",&use_constraint_collisions,"use constrained optimization for collisions");
+    parse_args->Add("-use_penalty",&use_penalty_collisions,"use penalty collisions");
+    parse_args->Add_Not("-no_constraints",&use_constraint_collisions,"disable constrained optimization for collisions");
     parse_args->Add("-penalty_stiffness",&penalty_collisions_stiffness,"tol","penalty collisions stiffness");
     parse_args->Add("-penalty_separation",&penalty_collisions_separation,"tol","penalty collisions separation");
     parse_args->Add("-penalty_length",&penalty_collisions_length,"tol","penalty collisions length scale");
     parse_args->Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
+    parse_args->Add_Not("-no_self",&use_penalty_self_collisions,"disable penalty self collisions");
 }
 //#####################################################################
 // Function Parse_Options
@@ -2032,16 +2036,17 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             if(solids_parameters.triangle_collision_parameters.perform_self_collision)
                 solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.structures(i));}
 
-
-    for(int b=0;b<deformable_body_collection.structures.m;b++){
-      DEFORMABLE_PARTICLES<TV>& undeformed_particles=*particles.Clone();
-      TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(b);
-      if(!tetrahedralized_volume.triangulated_surface) tetrahedralized_volume.Initialize_Triangulated_Surface();
-      TRIANGULATED_SURFACE<T>* triangulated_surface=tetrahedralized_volume.triangulated_surface;
-      TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(triangulated_surface->mesh,undeformed_particles));
-      LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*tests.Initialize_Implicit_Surface(undeformed_triangulated_surface,100);
-      solid_body_collection.Add_Force(new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,undeformed_particles,tetrahedralized_volume,
-            undeformed_triangulated_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation));}
+    if(use_penalty_self_collisions)
+        for(int b=0;b<deformable_body_collection.structures.m;b++){
+            DEFORMABLE_PARTICLES<TV>& undeformed_particles=*particles.Clone();
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(b);
+            if(!tetrahedralized_volume.triangulated_surface) tetrahedralized_volume.Initialize_Triangulated_Surface();
+            TRIANGULATED_SURFACE<T>* triangulated_surface=tetrahedralized_volume.triangulated_surface;
+            TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(triangulated_surface->mesh,undeformed_particles));
+            LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*tests.Initialize_Implicit_Surface(undeformed_triangulated_surface,100);
+            int force_id=solid_body_collection.Add_Force(new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,undeformed_particles,tetrahedralized_volume,
+                    undeformed_triangulated_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation));
+            if(backward_euler_evolution) backward_euler_evolution->minimization_objective.deformables_forces_lazy.Set(force_id);}
 
     if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);
