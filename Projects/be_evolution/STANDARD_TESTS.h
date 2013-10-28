@@ -13,6 +13,7 @@
 //    7. Plane test - ball
 //    8. Falling mattress
 //    9. Deformable ball falling on a deformable ball
+//   10. Tori free falling to the ground
 //   11. Increasing gravity (individual)
 //   16. Smash test - large boxes, small mattress
 //   17. Matress, no gravity, random start
@@ -328,7 +329,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         backward_euler_evolution->minimization_objective.collision_thickness*=m;}
 
     switch(test_number){
-        case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 57: case 77: case 80: case 8:
+        case 17: case 18: case 24: case 25: case 27: case 11: case 23: case 57: case 77: case 80: case 8:
             if(!resolution) resolution=10;
             mattress_grid=GRID<TV>(TV_INT(resolution+1,resolution+1,resolution+1),RANGE<TV>(TV((T)-1,(T)-1,(T)-1),TV((T)1,(T)1,(T)1))*m);
             break;
@@ -392,14 +393,14 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 56:
         case 77:
             solids_parameters.cfl=(T)5;
-            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
             break;
         case 5:
         case 6:
         case 9:
             last_frame=72;
             solids_parameters.cfl=(T)5.9;
-            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             break;
         case 24:
@@ -681,17 +682,30 @@ void Get_Initial_Data()
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0.1,(T)3,0)*m)),true,true,density,.5*m);
             tests.Add_Ground();
             break;}
+        case 10:{
+            int n = 3;
+            T drop_height = 3*m;
+            T horizontal_spacing = 2.1*m;
+            T vertical_spacing = 3.1*m;
+            T width = (n-1)*(horizontal_spacing); 
+            for(int i=0;i<n;i++)
+              for(int j=0;j<n;j++)
+                for(int k=0;k<n;k++)
+                  tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
+                      RIGID_BODY_STATE<TV>(FRAME<TV>(TV((-horizontal_spacing*i+width/2),(drop_height+vertical_spacing*j),(-horizontal_spacing*k+width/2)),ROTATION<TV>(-T((i+j+k)*pi/2),TV(0,1,0)))),true,true,density,m);
+            T hole_radius=width/2;
+            T depth=2*drop_height;
+            T thickness=1*m;
+            RIGID_BODY<TV>& bowl=tests.Add_Analytic_Bowl(hole_radius,depth,thickness,128,32);
+            bowl.Frame().r=ROTATION<TV>((T)pi,TV(1,0,0));
+            bowl.Frame().t=TV(0,depth,0);
+            bowl.is_static=true;
+            tests.Add_Ground();
+            break;}
         case 80:{
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)*m));
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_20K.tet.gz", // adaptive_torus_float.tet
                                                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(15,5,0)*m,ROTATION<TV>(-T(pi/2),TV(1,0,0)))),true,true,density,m);
-            break;}
-        case 10:{
-            last_frame=1200;
-            for(int i=0;i<7;i++){
-                RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(4*i,1,0)*m));
-                tests.Create_Mattress(mattress_grid,true,&initial_state,density);}
-            tests.Add_Ground();
             break;}
         case 11:{
             last_frame=1200;
@@ -1643,6 +1657,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true,9.8*m/(s*s)));
             Add_Constitutive_Model(tetrahedralized_volume1,(T)1e5*unit_p,(T).45,(T).01*s);
             Add_Constitutive_Model(tetrahedralized_volume2,(T)1e5*unit_p,(T).45,(T).01*s);
+            break;}
+        case 10:{
+            for(int i=0; i<27; i++){
+              TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
+              Add_Constitutive_Model(tetrahedralized_volume,(T)1e6*unit_p,(T).45,(T).01*s);}
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true,9.8*m/(s*s)));
             break;}
         case 77:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
