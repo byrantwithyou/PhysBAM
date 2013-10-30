@@ -30,13 +30,13 @@ const int in_flag=0x100;
 
 void pr(const PL& p,const char* s="")
 {
-    for(int j=0;j<12;j++)
+    for(int j=0;j<max_pts;j++)
     {
         if(!p(j)) continue;
         for(int i=0;i<8;i++)
             if(p(j)&(1<<i))
                 putchar("abcdrstu"[i]);
-        if(j!=11) putchar(' ');
+        if(j!=max_pts-1) putchar(' ');
     }
     printf("%s",s);
 }
@@ -54,6 +54,20 @@ struct HISTORY
     int first_poly,first_empty_in,first_empty_out;
     int reduction;
 };
+
+void pr(const HISTORY& h,const char* s="")
+{
+    pr(h.poly," + ");
+    pr(h.in," + ");
+    pr(h.out," + ");
+    for(int i=0;i<h.num_tests;i++){
+        int n=h.tests(i);
+        putchar(n>=0?'+':'-');
+        for(int j=0;j<8;j++)
+            if(n&(1<<j)) putchar("abcdrstu"[j]);
+        putchar(' ');}
+    printf("%s",s);
+}
 
 ARRAY<PL> poly_list;
 HASHTABLE<PL,int> poly_lookup;
@@ -127,17 +141,18 @@ bool Evolve_History(HISTORY& h)
         pl(n_pl++)=h.poly(j);
         h.ded_tests[h.num_ded_tests++]=rest_flag|(1<<h.p)|h.poly(j);}
 
-    int num_pl_1=1;
-    PL pl_0=pl,pl_1;
-    pl_1(0)=pl_0(0);
-    pl_0(0)=0;
-    for(int i=0;i<max_pts;i++)
-        for(int j=0;j<max_pts;j++){
-            int is=pl_1(i)&pl_0(j);
-            if(is&(is-1)){
-                pl_1(num_pl_1++)=pl_0(j);
-                pl_0(j)=0;}}
-    if(num_pl_1!=n_pl) return false;
+    if(n_pl>1){
+        int num_pl_1=1;
+        PL pl_0=pl,pl_1;
+        pl_1(0)=pl_0(0);
+        pl_0(0)=0;
+        for(int i=0;i<max_pts;i++)
+            for(int j=0;j<max_pts;j++){
+                int is=pl_1(i)&pl_0(j);
+                if(is&(is-1)){
+                    pl_1(num_pl_1++)=pl_0(j);
+                    pl_0(j)=0;}}
+        if(num_pl_1!=n_pl) return false;}
 
     h.poly=h.in;
     int first_empty_poly=h.first_empty_in;
@@ -272,6 +287,9 @@ int main(int argc, char* argv[])
     printf("%i %i %i\n", num_tests,num_ded_tests,num_safe);
     printf("%i %i\n",poly_list.m,poly_lookup.Size());
 
+    poly_reductions.Resize(poly_list.m);
+    reduction_rules.Resize(poly_list.m);
+
     Add_Primitive(VECTOR<int,4>(7,11,13,14));
     Add_Primitive(VECTOR<int,4>(7,19,21,22));
     Add_Primitive(VECTOR<int,4>(19,35,49,50));
@@ -289,11 +307,12 @@ int main(int argc, char* argv[])
         for(int f=0;f<8;f++){
             int fi=0;
             PL face;
-            for(int j=0;j<12;j++)
+            for(int j=0;j<max_pts;j++)
                 if(poly_list(i)(j)&(1<<f))
                     face(fi++)=poly_list(i)(j);
             if(fi) face_hash.Get_Or_Insert(face).Append(i);}
 
+    printf("Do faces %i\n",face_hash.Size());
     for(HASHTABLE<PL,ARRAY<int> >::ITERATOR it(face_hash);it.Valid();it.Next()){
         const ARRAY<int>& ar=it.Data();
         const PL& f=it.Key();
@@ -309,7 +328,7 @@ int main(int argc, char* argv[])
         for(int i=0;i<ar.m;i++){
             int m=0;
             PL& a=poly_list(ar(i));
-            for(int j=0;j<12;j++) m|=a(j);
+            for(int j=0;j<max_pts;j++) m|=a(j);
             masks.Append(m);}
 
         for(int i=0;i<ar.m;i++)
@@ -320,7 +339,7 @@ int main(int argc, char* argv[])
                 VECTOR<bool,256> m;
                 m.Subset(a).Fill(true);
                 bool bad=false;
-                for(int k=0;k<12;k++){
+                for(int k=0;k<max_pts;k++){
                     int l=b(k);
                     if(l && !(l&face_plane) && m(l)){
                         bad=true;
@@ -343,10 +362,12 @@ int main(int argc, char* argv[])
                     reduction_rules(jj).Append(rj);
                     reduction_rules(kk).Append(rk);}}}
 
+    printf("Consider reductions %i\n",reductions.m);
     for(int r=0;r<reductions.m;r++){
         int poly=reductions(r).c;
+        printf("%i : %i\n",r,reduction_rules(poly).m);
         for(int s=0;s<reduction_rules(poly).m;s++){
-            const REDUCTION& red=reduction_rules(r)(s);
+            const REDUCTION& red=reduction_rules(poly)(s);
             for(int i=0;i<poly_reductions(red.a).m;i++){
                 int ra=poly_reductions(red.a)(i);
                 REDUCTION nr={r,ra,red.b,2,reductions(r).cost+reductions(ra).cost};
@@ -361,6 +382,7 @@ int main(int argc, char* argv[])
 
     // TODO: make reverse sweep through reductions in case later one is better than earlier one
 
+    printf("Find unreduced %i\n",reductions.m);
     for(int i=0;i<final_history.m;i++){
         HISTORY& h=final_history(i);
         int p_id=poly_lookup.Get(h.poly);
@@ -380,54 +402,6 @@ int main(int argc, char* argv[])
         if(h.reduction==-1){
             LOG::printf("Failed to reduce %P  ",h.poly);
             pr(h.poly,"\n");}}
-
-
-
-
-/*
-// type 0 = a, type 1 = a + b, type 2 = a - b
-struct REDUCTION
-{
-    int a,b,type,cost;
-};
-
-ARRAY<PL> primitives;
-
-ARRAY<REDUCTION> reductions;
-
-ARRAY<ARRAY<REDUCTION> > reduction_rules;
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     return 0;
 }
