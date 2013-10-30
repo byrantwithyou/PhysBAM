@@ -212,7 +212,13 @@ public:
     void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
   //  bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return true;}
    // void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE {}
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
+    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+    {
+        DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
+        DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
+        for(int i=0;i<constrained_particles.m;i++) Add_Debug_Particle(particles.X(constrained_particles(i)),TV(1,0,0));
+        for(int i=0;i<externally_forced.m;i++) Add_Debug_Particle(particles.X(externally_forced(i)),TV(0,1,0));
+    }
 
 //#####################################################################
 // Function Register_Options
@@ -396,12 +402,18 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27: case 23: case 53: case 54: case 55: case 57: case 100: case 48: case 61:
+        case 27: case 23: case 53: case 54: case 55: case 57: case 100: case 48:
             attachment_velocity=0.2;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             last_frame=2000;
+            break;
+        case 61:
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+            last_frame=180;
             break;
         case 28:
             attachment_velocity=0.4;
@@ -1548,14 +1560,22 @@ void Get_Initial_Data()
             tests.Create_Mattress(mattress_grid,true,&initial_state,density);
             break;}
         case 61:{
-            tests.Create_Cylinder(CYLINDER<T>(TV(-rod_length/2,0,0),TV(rod_length/2,0,0),rod_radius),(int)ceil(4/rod_radius*rod_length),4,true,0,1000);
+            int num_sides=3;
+            tests.Create_Cylinder(CYLINDER<T>(TV(-rod_length/2,0,0),TV(rod_length/2,0,0),rod_radius),(int)ceil(num_sides/rod_radius*rod_length),num_sides,true,0,1000);
             for(int i=0;i<particles.X.m;i++){
-                if(particles.X(i).x>rod_length/2-attachment_length) constrained_particles.Append(i);
-                if(-particles.X(i).x>rod_length/2-attachment_length) externally_forced.Append(i);}
+                T x=particles.X(i).x;
+                ARRAY<int>& ar=(x>=0)?constrained_particles:externally_forced;
+                x=abs(x);
+                if(x>rod_length/2-attachment_length) ar.Append(i);
+                if(x>attachment_length && particles.X(i).Projected_Orthogonal_To_Unit_Direction(TV(1,0,0)).Magnitude() < .1) ar.Append(i);}
+            for(int i=0;i<constrained_particles.m;i++) Add_Debug_Particle(particles.X(constrained_particles(i)),TV(1,0,0));
+            for(int i=0;i<externally_forced.m;i++) Add_Debug_Particle(particles.X(externally_forced(i)),TV(0,1,0));
             initial_positions=particles.X;
             constrained_velocities.Resize(constrained_particles.m);
             scalar_curve.Add_Control_Point(0,0);
-            scalar_curve.Add_Control_Point(2,-pi);
+            scalar_curve.Add_Control_Point(2,-.85*pi);
+            scalar_curve.Add_Control_Point(3,-.85*pi);
+            scalar_curve.Add_Control_Point(5,0);
             break;}
         case 100:{
             TETRAHEDRALIZED_VOLUME<T>* tv=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
@@ -2122,7 +2142,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     if(test_number==61){
         TV axis(0,0,1),d_angle_axis=scalar_curve.Derivative(velocity_time)*axis;
         ROTATION<TV> rot(scalar_curve.Value(velocity_time),axis);
-        for(int i=0;i<externally_forced.m;i++) V(externally_forced(i))=rot.Rotate(d_angle_axis.Cross(initial_positions(i)));}
+        for(int i=0;i<externally_forced.m;i++) V(externally_forced(i))=rot.Rotate(d_angle_axis.Cross(initial_positions(externally_forced(i))));}
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -2131,7 +2151,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==61){
         ROTATION<TV> rot(scalar_curve.Value(time),TV(0,0,1));
-        for(int i=0;i<externally_forced.m;i++) X(externally_forced(i))=rot.Rotate(initial_positions(i));}
+        for(int i=0;i<externally_forced.m;i++) X(externally_forced(i))=rot.Rotate(initial_positions(externally_forced(i)));}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
