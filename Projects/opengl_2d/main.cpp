@@ -699,7 +699,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/debug_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>(filename);
-        Add_Component(component,"Debug particles",'w',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE|BASIC_VISUALIZATION::OWNED);
+        Add_Component(component,"Debug particles",'w',BASIC_VISUALIZATION::SELECTABLE|BASIC_VISUALIZATION::OWNED);
         opengl_world.Append_Bind_Key('W',component->Toggle_Draw_Velocities_CB());
         opengl_world.Append_Bind_Key('h',component->Toggle_Arrowhead_CB());
         opengl_world.Append_Bind_Key('=',component->Increase_Vector_Size_CB());
