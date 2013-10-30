@@ -20,21 +20,20 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const BOWL<T>& bow
     typedef VECTOR<T,3> TV;
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
     surface->mesh.Initialize_Torus_Mesh(2*(n_vertical+1),n_radial);
-    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.Add_Elements(2*(n_vertical+1)*n_radial);
+    GEOMETRY_PARTICLES<TV>& particles=surface->particles;
+    particles.Add_Elements(2*(n_vertical+1)*n_radial);
     MATRIX<T,3,2> radial_basis;
     radial_basis.Set_Column(0,TV(0,0,1));
     radial_basis.Set_Column(1,TV(1,0,0));
-    for(int i=0,p=0;i<n_radial;++i){
+    TV depth_axis(0,1,0);
+    for(int i=0,p=0;i<n_radial;i++){
         TV radial=radial_basis*COMPLEX<T>::Unit_Polar(T(2*pi/n_radial)*i).Vector();
-        for (int j=n_vertical; j>=0; j--){
+        for(int j=n_vertical;j>=0;j--){
             TV spherical=radial_basis*COMPLEX<T>::Unit_Polar(T(0.5*pi/n_vertical)*j).Vector();
-            particles.X(p++)=radial*(bowl.hole_radius+spherical.z*bowl.height);
-            particles.X(p).y=bowl.height*spherical.x;}
-        for (int j=0; j<n_vertical; j++){
+            particles.X(p++)=radial*(bowl.hole_radius+spherical.z*bowl.height)+bowl.height*spherical.x*depth_axis;}
+        for(int j=0;j<=n_vertical;j++){
             TV spherical=radial_basis*COMPLEX<T>::Unit_Polar(T(0.5*pi/n_vertical)*j).Vector();
-            particles.X(p++)=radial*(bowl.hole_radius+spherical.z*bowl.depth);
-            particles.X(p).y=bowl.depth*spherical.x;}
-    }
+            particles.X(p++)=radial*(bowl.hole_radius+spherical.z*bowl.depth)+bowl.depth*spherical.x*depth_axis;}}
     return surface;
 }
 //#####################################################################
