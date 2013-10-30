@@ -42,6 +42,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         F.Compute(x,&sys,&grad,&E);
         T norm_grad=sqrt(sys.Inner_Product(grad,grad));
         LOG::printf("GRAD STATS %g %g %g\n", E, (E-last_E), norm_grad);
+        if(max_newton_step_size && norm_grad>max_newton_step_size){grad*=max_newton_step_size/norm_grad;norm_grad=max_newton_step_size;}
 
         char buff[1000];
         sprintf(buff,"newton %d   %g %g %g", i, E, (E-last_E), norm_grad);

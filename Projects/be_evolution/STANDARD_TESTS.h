@@ -230,6 +230,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     solids_parameters.implicit_solve_parameters.cg_iterations=1000;
     solids_parameters.implicit_solve_parameters.cg_tolerance=1e-3;
     backward_euler_evolution->newtons_method.tolerance=1;
+    backward_euler_evolution->newtons_method.max_newton_step_size=1000;
+    backward_euler_evolution->newtons_method.max_krylov_iterations=100;
     parse_args->Add("-test_forces",&test_forces,"use fully implicit forces");
     parse_args->Add("-with_bunny",&with_bunny,"use bunny");
     parse_args->Add("-with_hand",&with_hand,"use hand");
@@ -277,6 +279,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-newton_it",&backward_euler_evolution->newtons_method.max_iterations,"iter","maximum iterations for Newton");
     parse_args->Add("-newton_tol",&backward_euler_evolution->newtons_method.tolerance,"tol","tolerance for Newton");
     parse_args->Add("-newton_cd_tol",&backward_euler_evolution->newtons_method.countdown_tolerance,"tol","tolerance for Newton");
+    parse_args->Add("-newton_max_step",&backward_euler_evolution->newtons_method.max_newton_step_size,"size","Limit newton step to this size");
     parse_args->Add("-kry_fail",&backward_euler_evolution->newtons_method.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
     parse_args->Add("-angle_tol",&backward_euler_evolution->newtons_method.angle_tolerance,"tol","gradient descent tolerance");
     parse_args->Add_Not("-mr",&backward_euler_evolution->newtons_method.use_cg,"use minres instead of cg");
