@@ -3,9 +3,11 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
@@ -111,6 +113,17 @@ Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>&
     MARCHING_CUBES<TV>::Create_Surface(surface,grid,phi);
     Dump_Surface(surface,color,bgcolor);
 }
+//#####################################################################
+// Function Dump_Levelset
+//#####################################################################
+template<class TV,class T> void PhysBAM::
+Dump_Levelset(const GRID<TV>& grid,const IMPLICIT_OBJECT<TV>& phi,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor)
+{
+    ARRAY<T,VECTOR<int,TV::m> > phi_array(grid.Numbers_Of_Nodes());
+    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next())
+        phi_array(it.index)=phi.Extended_Phi(it.Location());
+    Dump_Levelset(grid,phi_array,color,bgcolor);
+}
 namespace PhysBAM{
 template class DEBUG_PARTICLES<VECTOR<float,1> >;
 template class DEBUG_PARTICLES<VECTOR<float,2> >;
@@ -158,6 +171,10 @@ template void Dump_Levelset<VECTOR<double,3>,VECTOR<int,3>,double>(GRID<VECTOR<d
 template void Dump_Levelset<VECTOR<float,1>,VECTOR<int,1>,float>(GRID<VECTOR<float,1> > const&,ARRAY<float,VECTOR<int,1> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
 template void Dump_Levelset<VECTOR<float,2>,VECTOR<int,2>,float>(GRID<VECTOR<float,2> > const&,ARRAY<float,VECTOR<int,2> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
 template void Dump_Levelset<VECTOR<float,3>,VECTOR<int,3>,float>(GRID<VECTOR<float,3> > const&,ARRAY<float,VECTOR<int,3> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
+template void Dump_Levelset<VECTOR<double,1>,double>(GRID<VECTOR<double,1> > const&,IMPLICIT_OBJECT<VECTOR<double,1> > const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
+template void Dump_Levelset<VECTOR<double,2>,double>(GRID<VECTOR<double,2> > const&,IMPLICIT_OBJECT<VECTOR<double,2> > const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
+template void Dump_Levelset<VECTOR<double,3>,double>(GRID<VECTOR<double,3> > const&,IMPLICIT_OBJECT<VECTOR<double,3> > const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
+template void Dump_Levelset<VECTOR<float,1>,float>(GRID<VECTOR<float,1> > const&,IMPLICIT_OBJECT<VECTOR<float,1> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
+template void Dump_Levelset<VECTOR<float,2>,float>(GRID<VECTOR<float,2> > const&,IMPLICIT_OBJECT<VECTOR<float,2> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
+template void Dump_Levelset<VECTOR<float,3>,float>(GRID<VECTOR<float,3> > const&,IMPLICIT_OBJECT<VECTOR<float,3> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
 }
-
-
