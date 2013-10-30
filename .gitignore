@@ -4,6 +4,7 @@ build
 *_nocona
 *_nocona_debug
 *_debug
+*_optdebug
 
 *.gz
 *.pyc
