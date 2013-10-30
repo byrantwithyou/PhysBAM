@@ -144,7 +144,7 @@ Initialize_Prismatic_Cube_Mesh_And_Particles(const GRID<TV>& grid)
     for(int k=0;k<mn;k++) for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(TV_INT(i,j,k));
 }
 //#####################################################################
-// Function Initialize_Prismatic_Cube_Mesh_And_Particles
+// Function Initialize_Swept_Mesh_And_Particles
 //#####################################################################
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Initialize_Swept_Mesh_And_Particles(const TRIANGULATED_AREA<T>& ta,int layers,const FRAME<TV>& start_frame,const TV& sweep_offset)
@@ -158,7 +158,7 @@ Initialize_Swept_Mesh_And_Particles(const TRIANGULATED_AREA<T>& ta,int layers,co
     mesh.Initialize_Swept_Mesh(ta.mesh,layers);
 }
 //#####################################################################
-// Function Initialize_Prismatic_Cube_Mesh_And_Particles
+// Function Initialize_Cylinder_Mesh_And_Particles
 //#####################################################################
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Initialize_Cylinder_Mesh_And_Particles(const CYLINDER<T>& cyl,int num_elements_height,int num_elements_radius)
