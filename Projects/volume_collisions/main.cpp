@@ -206,6 +206,7 @@ struct REDUCTION
     long long deps[4];
 };
 
+
 ARRAY<PL> primitives;
 
 ARRAY<REDUCTION> reductions;
@@ -216,8 +217,68 @@ ARRAY<ARRAY<REDUCTION> > reduction_rules;
 
 VECTOR<int,256> maps[24*24];
 
+void pr_red(int i)
+{
+    const REDUCTION& r=reductions(i);
+    printf("(");
+    pr(poly_list(r.c)," : ");
+    for(int j=0;j<256;j++)
+        if(r.deps[j/64]&(1LL<<(j%64))){
+            for(int k=0;k<8;k++) if(j&(1<<k)) putchar("abcdrstu"[k]);
+            putchar(' ');}
+
+    for(int i=0;i<4;i++) printf(" %016llx",r.deps[i]);
+    if(r.type==0) printf("PRIM)");
+    else if(r.type==3){
+        printf(" REPLACE ");
+        pr_red(r.a);
+        printf(")");}
+    else{
+        pr_red(r.a);
+        if(r.type==1) printf(" + ");
+        else printf(" - ");
+        pr_red(r.b);
+        printf(")");}
+}
+
+long long num_cmp=0;
+// 0=equal, 1=r better, 2=s better, 3=neither better
+int cmp(const REDUCTION& r,const REDUCTION& s)
+{
+    num_cmp++;
+    int r_worse=r.cost>s.cost;
+    int s_worse=s.cost>r.cost;
+    for(int j=0;j<4;j++){
+        if(s.deps[j]&~r.deps[j]) s_worse=1;
+        if(r.deps[j]&~s.deps[j]) r_worse=1;}
+    return s_worse+2*r_worse;
+}
+
+void Insert_Reduction(const REDUCTION& nr,ARRAY<ARRAY<int> >& worklist)
+{
+//    if(nr.c==0) printf("INSERT\n");
+    ARRAY<int>& ar=poly_reductions(nr.c);
+    bool needed=true;
+    bool ch=false;
+    for(int i=0;i<ar.m;i++){
+        REDUCTION& s=reductions(ar(i));
+        if(s.cost==1000) continue;
+        int cm=cmp(s,nr);
+//        if(nr.c==0) printf("cmp %i\n",cm);
+        if(cm<2) needed=false;
+        else if(cm==2){s.cost=1000;s.a=reductions.m;s.type=3;ch=true;}}
+    PHYSBAM_ASSERT(!ch || needed);
+    if(needed){
+        int in=reductions.Append(nr);
+        if(nr.c==0) printf("add %i\n",in);
+        ar.Append(in);
+        if(nr.c==0) pr_red(in);
+        if(nr.c==0) printf("\n");
+        worklist(nr.cost).Append(in);}
+}
+
 template<int n>
-void Add_Primitive(const VECTOR<int,n>& v)
+void Add_Primitive(const VECTOR<int,n>& v,ARRAY<ARRAY<int> >& worklist)
 {
     PL pl(VECTOR<int,max_pts-n>().Append_Elements(v));
 
@@ -227,23 +288,10 @@ void Add_Primitive(const VECTOR<int,n>& v)
         int k=primitives.Append(u);
         int w=poly_lookup.Get(u);
         REDUCTION r={k,-1,w,0,1};
-        for(int j=0;j<n;j++)
-            r.deps[v(j)/64]|=1<<(v(j)&63);
-        poly_reductions(w).Append(reductions.Append(r));}
-}
-
-void Add_If_Better(const REDUCTION& r)
-{
-    ARRAY<int>& ar=poly_reductions(r.c);
-    for(int i=0;i<ar.m;i++){
-        const REDUCTION& s=reductions(ar(i));
-        bool diff=false;
-        for(int j=0;j<4;j++)
-            if(s.deps[j]&~r.deps[j]){
-                diff=true;
-                break;}
-        if(!diff && r.cost>=s.cost) return;}
-    ar.Append(reductions.Append(r));
+        for(int j=0;j<max_pts;j++)
+            if(u(j))
+                r.deps[u(j)/64]|=(1LL<<(u(j)&63));
+        Insert_Reduction(r,worklist);}
 }
 
 int main(int argc, char* argv[])
@@ -276,6 +324,7 @@ int main(int argc, char* argv[])
     Evolve_History(init_hist);
 
     printf("%i\n", final_history.m);
+    pr(final_history(0).poly,"\n");
 
     int num_tests=0,num_ded_tests=0,num_safe=0;
 
@@ -290,17 +339,20 @@ int main(int argc, char* argv[])
     poly_reductions.Resize(poly_list.m);
     reduction_rules.Resize(poly_list.m);
 
-    Add_Primitive(VECTOR<int,4>(7,11,13,14));
-    Add_Primitive(VECTOR<int,4>(7,19,21,22));
-    Add_Primitive(VECTOR<int,4>(19,35,49,50));
-    Add_Primitive(VECTOR<int,4>(49,81,97,112));
-    Add_Primitive(VECTOR<int,4>(112,176,208,224));
-    Add_Primitive(VECTOR<int,6>(7,11,21,22,25,26));
-    Add_Primitive(VECTOR<int,6>(49,81,112,161,193,224));
-    Add_Primitive(VECTOR<int,6>(7,19,21,38,50,52));
-    Add_Primitive(VECTOR<int,6>(19,21,35,37,50,52));
-    Add_Primitive(VECTOR<int,6>(19,35,49,82,98,112));
-    Add_Primitive(VECTOR<int,6>(19,35,81,82,97,98));
+    ARRAY<ARRAY<int> > worklist(100);
+
+    Add_Primitive(VECTOR<int,4>(),worklist);
+    Add_Primitive(VECTOR<int,4>(7,11,13,14),worklist);
+    Add_Primitive(VECTOR<int,4>(7,19,21,22),worklist);
+    Add_Primitive(VECTOR<int,4>(19,35,49,50),worklist);
+    Add_Primitive(VECTOR<int,4>(49,81,97,112),worklist);
+    Add_Primitive(VECTOR<int,4>(112,176,208,224),worklist);
+    Add_Primitive(VECTOR<int,6>(7,11,21,22,25,26),worklist);
+    Add_Primitive(VECTOR<int,6>(49,81,112,161,193,224),worklist);
+    Add_Primitive(VECTOR<int,6>(7,19,21,38,50,52),worklist);
+    Add_Primitive(VECTOR<int,6>(19,21,35,37,50,52),worklist);
+    Add_Primitive(VECTOR<int,6>(19,35,49,82,98,112),worklist);
+    Add_Primitive(VECTOR<int,6>(19,35,81,82,97,98),worklist);
 
     HASHTABLE<PL,ARRAY<int> > face_hash;
     for(int i=0;i<poly_list.m;i++)
@@ -363,45 +415,60 @@ int main(int argc, char* argv[])
                     reduction_rules(kk).Append(rk);}}}
 
     printf("Consider reductions %i\n",reductions.m);
-    for(int r=0;r<reductions.m;r++){
-        int poly=reductions(r).c;
-        printf("%i : %i\n",r,reduction_rules(poly).m);
-        for(int s=0;s<reduction_rules(poly).m;s++){
-            const REDUCTION& red=reduction_rules(poly)(s);
-            for(int i=0;i<poly_reductions(red.a).m;i++){
-                int ra=poly_reductions(red.a)(i);
-                REDUCTION nr={r,ra,red.b,2,reductions(r).cost+reductions(ra).cost};
-                if(red.type==2) exchange(nr.a,nr.b);
-                for(int q=0;q<4;q++) nr.deps[q]=reductions(r).deps[q]|reductions(ra).deps[q];
-                Add_If_Better(nr);}
-            for(int i=0;i<poly_reductions(red.b).m;i++){
-                int rb=poly_reductions(red.b)(i);
-                REDUCTION nr={r,rb,red.a,3-red.type,reductions(r).cost+reductions(rb).cost};
-                for(int q=0;q<4;q++) nr.deps[q]=reductions(r).deps[q]|reductions(rb).deps[q];
-                Add_If_Better(nr);}}}
+    for(int c=0;c<worklist.m;c++){
+        for(int w=0;w<worklist(c).m;w++){
+            int r=worklist(c)(w);
+            if(reductions(r).cost>c) continue;
+            int poly=reductions(r).c;
+            if(w%10000==0){
+                printf("(%i %i : %i) %i : %i (%i %lli)   ",c,w,worklist(c).m,r,reduction_rules(poly).m,reductions.m,num_cmp);
+                for(int i=0;i<15;i++) printf(" %i",worklist(i).m);
+                printf("\n");}
+            for(int s=0;s<reduction_rules(poly).m;s++){
+                const REDUCTION& red=reduction_rules(poly)(s);
+                for(int i=0;i<poly_reductions(red.a).m;i++){
+                    int ra=poly_reductions(red.a)(i);
+                    if(reductions(ra).cost>reductions(r).cost) continue;
+                    REDUCTION nr={r,ra,red.b,2,reductions(r).cost+reductions(ra).cost};
+                    if(red.type==2) exchange(nr.a,nr.b);
+                    for(int q=0;q<4;q++) nr.deps[q]=reductions(r).deps[q]|reductions(ra).deps[q];
+                    Insert_Reduction(nr,worklist);}
+                for(int i=0;i<poly_reductions(red.b).m;i++){
+                    int rb=poly_reductions(red.b)(i);
+                    if(reductions(rb).cost>reductions(r).cost) continue;
+                    REDUCTION nr={r,rb,red.a,3-red.type,reductions(r).cost+reductions(rb).cost};
+                    for(int q=0;q<4;q++) nr.deps[q]=reductions(r).deps[q]|reductions(rb).deps[q];
+                    Insert_Reduction(nr,worklist);}}}}
 
     // TODO: make reverse sweep through reductions in case later one is better than earlier one
 
     printf("Find unreduced %i\n",reductions.m);
     for(int i=0;i<final_history.m;i++){
         HISTORY& h=final_history(i);
+        pr(h.poly,"\n");
         int p_id=poly_lookup.Get(h.poly);
+        printf("id %i : %i\n",p_id,poly_reductions(p_id).m);
         for(int j=0;j<poly_reductions(p_id).m;j++){
             int ri=poly_reductions(p_id)(j);
             const REDUCTION& r=reductions(ri);
+            printf("cost (%i) %i\n",ri,r.cost);
+            pr_red(ri);
+            printf("\n");
             bool ok=true;
             for(int k=0;k<4;k++)
                 for(int l=0;l<64;l++)
-                    if(r.deps[k]&(1<<l))
-                        if(!h.safe(64*k+l))
-                            ok=false;
+                    if(r.deps[k]&(1LL<<l))
+                        if(!h.safe(64*k+l)){
+                            for(int q=0;q<8;q++) if((64*k+l)&(1<<q)) putchar("abcdrstu"[q]);puts("  (UNSAFE)");
+                            ok=false;}
             if(!ok) continue;
             PHYSBAM_ASSERT(h.reduction==-1);
             h.reduction=ri;
             break;}
         if(h.reduction==-1){
             LOG::printf("Failed to reduce %P  ",h.poly);
-            pr(h.poly,"\n");}}
+            pr(h.poly,"\n");
+            return 0;}}
 
     return 0;
 }
