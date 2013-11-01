@@ -13,7 +13,7 @@
 #include <boost/function.hpp>
 using namespace PhysBAM;
 //#####################################################################
-// Constructor
+// Function Newtons_Method
 //#####################################################################
 template <class T> bool NEWTONS_METHOD<T>::
 Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYSTEM_BASE<T>& sys,KRYLOV_VECTOR_BASE<T>& x)
@@ -21,8 +21,6 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
     KRYLOV_VECTOR_BASE<T>& grad=*x.Clone_Default();
     KRYLOV_VECTOR_BASE<T>& dx=*x.Clone_Default();
     KRYLOV_VECTOR_BASE<T>& tm=*x.Clone_Default();
-    KRYLOV_VECTOR_BASE<T>& tmp0=*x.Clone_Default();
-    KRYLOV_VECTOR_BASE<T>& tmp1=*x.Clone_Default();
     MINRES<T> minres;
     CONJUGATE_GRADIENT<T> cg;
     cg.finish_before_indefiniteness=true;
@@ -30,7 +28,6 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
     if(use_cg) krylov=&cg;
     krylov->relative_tolerance=true;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
-    T phi=(1+sqrt(5))/2;
 
     bool result=false;
 
@@ -41,12 +38,13 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         T E=0;
         F.Compute(x,&sys,&grad,&E);
         T norm_grad=sqrt(sys.Inner_Product(grad,grad));
-        LOG::printf("GRAD STATS %g %g %g\n", E, (E-last_E), norm_grad);
+        if(debug) LOG::printf("GRAD STATS %g %g %g\n", E, (E-last_E), norm_grad);
         if(max_newton_step_size && norm_grad>max_newton_step_size){grad*=max_newton_step_size/norm_grad;norm_grad=max_newton_step_size;}
 
-        char buff[1000];
-        sprintf(buff,"newton %d   %g %g %g", i, E, (E-last_E), norm_grad);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP(buff,1,1);
+        if(debug){
+            char buff[1000];
+            sprintf(buff,"newton %d   %g %g %g", i, E, (E-last_E), norm_grad);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP(buff,1,1);}
 
         if(norm_grad<tolerance && (i || !norm_grad)){result=true;break;}
         if(norm_grad<countdown_tolerance){
@@ -58,50 +56,9 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         if(!krylov->Solve(sys,dx,tm,av,local_krylov_tolerance,0,max_krylov_iterations) && fail_on_krylov_not_converged)
             break;
 
-        sys.Multiply(dx,tm);
-        tm.Copy(1,tm,grad);
+        if(use_gradient_descent_failsafe) Make_Downhill_Direction(sys,dx,grad,norm_grad);
 
-        static int solve_id=0;
-//        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",sys,tmp0,tmp1);
-        solve_id++;
-
-        if(use_gradient_descent_failsafe){
-            T norm_dx=sqrt(sys.Inner_Product(dx,dx)),inner=sys.Inner_Product(dx,grad);
-            if(inner>angle_tolerance*norm_dx*norm_grad){
-                dx*=-1;
-                LOG::puts("LOOK BACKWARDS");}
-            else if(inner>=-angle_tolerance*norm_dx*norm_grad){
-                LOG::puts("GRADIENT");
-                dx.Copy(-norm_dx/norm_grad,grad);}}
-
-        T n_grad=sqrt(sys.Inner_Product(grad,grad));
-        T n_dx=sqrt(sys.Inner_Product(dx,dx));
-        T dx_dot_grad=sys.Inner_Product(dx,grad);
-        sys.Multiply(dx,tm);
-        T dx_H_dx=sys.Inner_Product(dx,tm);
-        sys.Multiply(grad,tm);
-        T grad_H_grad=sys.Inner_Product(grad,tm);
-
-        T a=1;
-        if(use_wolfe_search){
-            PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,dx,grad,&tm);
-            if(!LINE_SEARCH<T>::Line_Search_Wolfe_Conditions(pl,0,1,a,(T)1e-4,(T).9)){
-                result=false;
-                break;}}
-        else if(use_golden_section_search){
-            PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,dx,grad);
-            a*=phi;
-            while(pl(phi*a)<=pl(a)) a*=phi;
-            T tau=(T).5*(sqrt((T)5)-1);
-            T A=pl(0),B=pl(tau),C=pl(1-tau),D=pl(a),mx=max(A,B,C,D),mn=min(A,B,C,D);
-            if(!LINE_SEARCH<T>::Line_Search_Golden_Section(pl,0,a,a,max_golden_section_iterations,(T).25*tolerance))
-                break;
-            if(mx-mn<=1e-10*maxabs(mx,mn)){
-                LOG::printf("OVERRIDE\n");
-                a=1;}}
-
-        LOG::printf("RAW %g %g    %g    %g %g  %g\n", n_grad,n_dx,    dx_dot_grad/n_dx/n_grad,     grad_H_grad/n_grad/n_grad,dx_H_dx/n_dx/n_dx,  a);
-
+        T a=Line_Search(F,x,dx,grad,tm);
         if(a<=0) break;
         x.Copy(a,dx,x);
         F.Make_Feasible(x);
@@ -111,10 +68,47 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
     delete &grad;
     delete &dx;
     delete &tm;
-    delete &tmp0;
-    delete &tmp1;
 
     return result;
+}
+//#####################################################################
+// Function Make_Downhill_Direction
+//#####################################################################
+template <class T> void NEWTONS_METHOD<T>::
+Make_Downhill_Direction(const KRYLOV_SYSTEM_BASE<T>& sys,KRYLOV_VECTOR_BASE<T>& dx,const KRYLOV_VECTOR_BASE<T>& grad,T norm_grad)
+{
+    T norm_dx=sqrt(sys.Inner_Product(dx,dx)),inner=sys.Inner_Product(dx,grad);
+    if(inner>angle_tolerance*norm_dx*norm_grad){
+        dx*=-1;
+        if(debug) LOG::puts("LOOK BACKWARDS");}
+    else if(inner>=-angle_tolerance*norm_dx*norm_grad){
+        if(debug) LOG::puts("GRADIENT");
+        dx.Copy(-norm_dx/norm_grad,grad);}
+}
+//#####################################################################
+// Function Line_Search
+//#####################################################################
+template <class T> T NEWTONS_METHOD<T>::
+Line_Search(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& dx,KRYLOV_VECTOR_BASE<T>& tmp,KRYLOV_VECTOR_BASE<T>& tmp2)
+{
+    T a=1;
+    if(use_wolfe_search){
+        PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,dx,tmp,&tmp2);
+        if(!LINE_SEARCH<T>::Line_Search_Wolfe_Conditions(pl,0,1,a,(T)1e-4,(T).9)) return 0;}
+    else if(use_golden_section_search){
+        PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,dx,tmp);
+        T phi=(1+sqrt(5))/2;
+        a*=phi;
+        while(pl(phi*a)<=pl(a)) a*=phi;
+        T tau=(T).5*(sqrt((T)5)-1);
+        T A=pl(0),B=pl(tau),C=pl(1-tau),D=pl(a),mx=max(A,B,C,D),mn=min(A,B,C,D);
+        if(!LINE_SEARCH<T>::Line_Search_Golden_Section(pl,0,a,a,max_golden_section_iterations,(T).25*tolerance)) return 0;
+        if(mx-mn<=1e-10*maxabs(mx,mn)){
+            if(debug) LOG::printf("OVERRIDE\n");
+            a=1;}}
+
+    if(debug) LOG::printf("ALPHA  %g\n", a);
+    return a;
 }
 namespace PhysBAM{
 template struct NEWTONS_METHOD<float>;
