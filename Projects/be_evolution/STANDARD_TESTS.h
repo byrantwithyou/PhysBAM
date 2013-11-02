@@ -2296,7 +2296,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     if(test_forces){
         solid_body_collection.deformable_body_collection.Test_Energy(time);
         solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
-    if(test_number==10 || test_number==11) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=10*time*m/(s*s*s);
+    if(test_number==11) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=10*time*m/(s*s*s);
     if(test_number==33)
     {
         TETRAHEDRALIZED_VOLUME<T>& tet_volume=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
