@@ -85,6 +85,7 @@
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Deformables/Forces/ELASTIC_ETHER_DRAG.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
@@ -166,6 +167,7 @@ public:
     T rod_radius;
     T attachment_length;
     ARRAY<TV> initial_positions;
+    T save_dt;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),test_forces(false),
@@ -330,7 +332,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         backward_euler_evolution->minimization_objective.collision_thickness*=m;}
 
     switch(test_number){
-        case 17: case 18: case 24: case 25: case 27: case 11: case 23: case 57: case 77: case 80: case 8:
+        case 17: case 18: case 24: case 25: case 27: case 11: case 23: case 57: case 77: case 80: case 8: case 12:
             if(!resolution) resolution=10;
             mattress_grid=GRID<TV>(TV_INT(resolution+1,resolution+1,resolution+1),RANGE<TV>(TV((T)-1,(T)-1,(T)-1),TV((T)1,(T)1,(T)1))*m);
             break;
@@ -385,6 +387,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
        // case 4:
         case 7:
         case 8:
+        case 12:
         case 80:
         case 10:
         case 11:
@@ -678,17 +681,21 @@ void Get_Initial_Data()
             tests.Create_Mattress(mattress_grid,true,&initial_state,density);
             tests.Add_Ground();
             break;}
+        case 12:{
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)*m));
+            tests.Create_Mattress(mattress_grid,true,&initial_state,density);
+            break;}
         case 9:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1,0)*m)),true,true,density,.5*m);
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0.1,(T)3,0)*m)),true,true,density,.5*m);
             tests.Add_Ground();
             break;}
         case 10:{
-            int n = 3;
-            T drop_height = 3*m;
-            T horizontal_spacing = 2.1*m;
-            T vertical_spacing = 3.1*m;
-            T width = (n-1)*(horizontal_spacing); 
+            int n=3;
+            T drop_height=3*m;
+            T horizontal_spacing=2.1*m;
+            T vertical_spacing=3.1*m;
+            T width=(n-1)*(horizontal_spacing); 
             for(int i=0;i<n;i++)
               for(int j=0;j<n;j++)
                 for(int k=0;k<n;k++)
@@ -864,19 +871,19 @@ void Get_Initial_Data()
 
         case 32:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0)*m)),true,true,density,m);
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0)*m)),true,true,density,m);
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-2.8,0,0)*m,ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,m);
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-2.8,0,0)*m,ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,m);
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(2.8,0,0)*m,ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,m);
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(2.8,0,0)*m,ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,m);
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-5.6,0,0)*m)),true,true,density,m);
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-5.6,0,0)*m)),true,true,density,m);
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(5.6,0,0)*m)),true,true,density,m);
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(5.6,0,0)*m)),true,true,density,m);
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-8.4,0,0)*m,ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,m);
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-8.4,0,0)*m,ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,m);
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(8.4,0,0)*m,ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,m);
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(8.4,0,0)*m,ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,m);
 
             RIGID_BODY<TV>& torus1=tests.Add_Analytic_Torus((T).5,(T)2,32,64);
             torus1.is_static=false;
@@ -892,9 +899,9 @@ void Get_Initial_Data()
             rigid_body_collection.rigid_body_particles.kinematic(torus2.particle_index)=true;
 
             T x_start=11.2;
-            T x_stop =15;
-            T t_stop =2;
-            T t_rot  =8;
+            T x_stop=15;
+            T t_stop=2;
+            T t_rot=8;
 
             curves.Resize(2);
             curves(0).Add_Control_Point(0,FRAME<TV>(TV(x_start,0,0)*m,ROTATION<TV>((T)0,TV(1,0,0))));
@@ -1075,14 +1082,7 @@ void Get_Initial_Data()
         }
         case 36:{
             RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(0,8,0)*m,ROTATION<TV>(T(0),TV(1,0,1))));
-            //RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(8,1.2,0)*m,ROTATION<TV>(T(pi/6),TV(0,1,0))));
-            //RIGID_BODY_STATE<TV> initial_state3(FRAME<TV>(TV(-.1,6,0)*m,ROTATION<TV>(T(pi/4),TV(1,1,1))));
-            //RIGID_BODY_STATE<TV> initial_state4(FRAME<TV>(TV(0,1.5,0)*m,ROTATION<TV>(T(0),TV(1,1,1))));
-
             tests.Create_Mattress(mattress_grid1,true,&initial_state1,density);
-            //tests.Create_Mattress(mattress_grid2,true,&initial_state2,density);
-            //tests.Create_Mattress(mattress_grid2,true,&initial_state3,density);
-            //tests.Create_Mattress(mattress_grid3,true,&initial_state4,density);
             tests.Add_Ground();
             break;
         }
@@ -1150,13 +1150,10 @@ void Get_Initial_Data()
                     if (new_center.z < -.5*bound) new_center.y=(T).5*(new_center.y+2.0*bound+3.0*(new_center.z+bound));
                     else new_center.y=.3*(new_center.y+bound)+.5*max_jello_size+board_height+.2*bound;
                     for(int j=0;j<i&&(!stuck);j++){
-                        //LOG::cout << i << " " << j << " " << new_center << " " << jello_centers(j) << " " << (new_center-jello_centers(j)).Magnitude() << " " << (T)8*max_jello_size*max_jello_size << std::endl;
                         if((new_center-jello_centers(j)).Magnitude()<=(T)2*max_jello_size) stuck=true;
-                       // if ((new_center.x-jello_centers(j).x)*(new_center.x-jello_centers(j).x)+(new_center.y-jello_centers(j).y)*(new_center.y-jello_centers(j).y)+(new_center.z-jello_centers(j).z)*(new_center.z-jello_centers(j).z)<=(T)4*max_jello_size*max_jello_size) stuck=true;
                 }}while(stuck);
                 jello_centers.Append(new_center);
                 rand.Fill_Uniform(new_center,-bound,bound);
-//                     new_center=TV(rand.Get_Uniform_Number(-bound,bound),rand.Get_Uniform_Number(-bound,bound),rand.Get_Uniform_Number(-bound,bound));
                 new_rotate=rand.Get_Uniform_Number(-(T)pi,(T)pi);
                 RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(i)*m,ROTATION<TV>(new_rotate,new_center)));
                 if (i % 5 ==0) {tests.Create_Mattress(mattress_grid3,true,&initial_state1,density);}
@@ -1196,57 +1193,27 @@ void Get_Initial_Data()
             curves.Resize(8);
             curves(0).Add_Control_Point(0,FRAME<TV>(box1.Frame().t));
             curves(0).Add_Control_Point(.2,FRAME<TV>(box1.Frame().t));
-            //curves(0).Add_Control_Point(.21,FRAME<TV>(box1.Frame().t-TV(0,.2*board_height,0)));
-            //curves(0).Add_Control_Point(.23,FRAME<TV>(box1.Frame().t-TV(-2.5*bound,.2*board_height,0)));
             curves(1).Add_Control_Point(0,FRAME<TV>(box2.Frame().t));
             curves(1).Add_Control_Point(.2,FRAME<TV>(box2.Frame().t));
             curves(1).Add_Control_Point(.27,FRAME<TV>(box2.Frame().t-TV(0,dy,0)));
-            //curves(1).Add_Control_Point(.31,FRAME<TV>(box2.Frame().t-TV(0,dy+.2*board_height,0)));
-            //curves(1).Add_Control_Point(.33,FRAME<TV>(box2.Frame().t-TV(-2.5*bound,dy+.2*board_height,0)));
             curves(2).Add_Control_Point(0,FRAME<TV>(box3.Frame().t));
             curves(2).Add_Control_Point(.2,FRAME<TV>(box3.Frame().t));
             curves(2).Add_Control_Point(.33,FRAME<TV>(box3.Frame().t-TV(0,2.0*dy,0)));
-            //curves(2).Add_Control_Point(.41,FRAME<TV>(box3.Frame().t-TV(0,2.0*dy+.2*board_height,0)));
-            //curves(2).Add_Control_Point(.43,FRAME<TV>(box3.Frame().t-TV(-2.5*bound,2.0*dy+.2*board_height,0)));
             curves(3).Add_Control_Point(0,FRAME<TV>(box4.Frame().t));
             curves(3).Add_Control_Point(.2,FRAME<TV>(box4.Frame().t));
             curves(3).Add_Control_Point(.40,FRAME<TV>(box4.Frame().t-TV(0,3.0*dy,0)));
-            //curves(3).Add_Control_Point(.51,FRAME<TV>(box4.Frame().t-TV(0,3.0*dy+.2*board_height,0)));
-            //curves(3).Add_Control_Point(.53,FRAME<TV>(box4.Frame().t-TV(-2.5*bound,3.0*dy+.2*board_height,0)));
             curves(4).Add_Control_Point(0,FRAME<TV>(box5.Frame().t));
             curves(4).Add_Control_Point(.2,FRAME<TV>(box5.Frame().t));
             curves(4).Add_Control_Point(.47,FRAME<TV>(box5.Frame().t-TV(0,4.0*dy,0)));
-            //curves(4).Add_Control_Point(.61,FRAME<TV>(box5.Frame().t-TV(0,4.0*dy+.2*board_height,0)));
-            //curves(4).Add_Control_Point(.63,FRAME<TV>(box5.Frame().t-TV(-2.5*bound,4.0*dy+.2*board_height,0)));
             curves(5).Add_Control_Point(0,FRAME<TV>(box6.Frame().t));
             curves(5).Add_Control_Point(.2,FRAME<TV>(box6.Frame().t));
             curves(5).Add_Control_Point(.53,FRAME<TV>(box6.Frame().t-TV(0,5.0*dy,0)));
-            //curves(5).Add_Control_Point(.71,FRAME<TV>(box6.Frame().t-TV(0,5.0*dy+.2*board_height,0)));
-            //curves(5).Add_Control_Point(.73,FRAME<TV>(box6.Frame().t-TV(-2.5*bound,5.0*dy+.2*board_height,0)));
             curves(6).Add_Control_Point(0,FRAME<TV>(box7.Frame().t));
             curves(6).Add_Control_Point(.2,FRAME<TV>(box7.Frame().t));
             curves(6).Add_Control_Point(.60,FRAME<TV>(box7.Frame().t-TV(0,6.0*dy,0)));
-            //curves(6).Add_Control_Point(.81,FRAME<TV>(box7.Frame().t-TV(0,6.0*dy+.2*board_height,0)));
-            //curves(6).Add_Control_Point(.83,FRAME<TV>(box7.Frame().t-TV(-2.5*bound,6.0*dy+.2*board_height,0)));
             curves(7).Add_Control_Point(0,FRAME<TV>(box8.Frame().t));
             curves(7).Add_Control_Point(.2,FRAME<TV>(box8.Frame().t));
             curves(7).Add_Control_Point(.67,FRAME<TV>(box8.Frame().t-TV(0,7.0*dy,0)));
-            //curves(7).Add_Control_Point(.91,FRAME<TV>(box8.Frame().t-TV(0,7.0*dy+.2*board_height,0)));
-            //curves(7).Add_Control_Point(.93,FRAME<TV>(box8.Frame().t-TV(-2.5*bound,7.0*dy+.2*board_height,0)));
-    /*        curves(1).Add_Control_Point(0,FRAME<TV>(box2.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curves(1).Add_Control_Point(.3,FRAME<TV>(box2.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curves(1).Add_Control_Point(.35,FRAME<TV>(box2.Frame().t,ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
-            curves(2).Add_Control_Point(.0,FRAME<TV>(box3.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curves(2).Add_Control_Point(.4,FRAME<TV>(box3.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curves(2).Add_Control_Point(.45,FRAME<TV>(box3.Frame().t,ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
-            curves(3).Add_Control_Point(.0,FRAME<TV>(box4.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curves(3).Add_Control_Point(.5,FRAME<TV>(box4.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curves(3).Add_Control_Point(.55,FRAME<TV>(box4.Frame().t,ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
-            curves(4).Add_Control_Point(.0,FRAME<TV>(box5.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curves(4).Add_Control_Point(.6,FRAME<TV>(box5.Frame().t,ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-            curves(4).Add_Control_Point(.65,FRAME<TV>(box5.Frame().t,ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));*/
-
-               //         curves(2).Add_Control_Point(0,FRAME<TV>(TV(0,3.0*scale,-1.4*scale)*m,ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
             box1.is_static=false;
             kinematic_ids.Append(box1.particle_index);
             box2.is_static=false;
@@ -1322,57 +1289,6 @@ void Get_Initial_Data()
                 tests.Create_Mattress(mattress_grid,true,&initial_state,density);
             }
 
-            // int number_of_boxes=128;
-            // T height=0.08;
-            // T width=0.02;
-            // T radius=0.035;
-
-            // ARRAY<RIGID_BODY<TV>*> boxes;
-
-            // for(int i=0;i<number_of_boxes;i++)
-            // {
-                // T phi=2*pi*(i-1)/number_of_boxes;
-
-                // boxes.Append(&tests.Add_Analytic_Box(TV(width,height,width))*m);
-                // boxes(i)->Frame().t=TV((radius+width/2)*sin(phi),height/2,(radius+width/2)*cos(phi));
-                // boxes(i)->Frame().r=ROTATION<TV>((T)phi,TV(0,1,0));
-                // boxes(i)->is_static=true;
-                // boxes(i)->coefficient_of_friction=0.3;
-            // }
-
-            /*RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(0.07,0.07,0.07)*m);
-            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(0.07,0.07,0.07)*m);
-            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(0.07,0.07,0.07)*m);
-            RIGID_BODY<TV>& box4=tests.Add_Analytic_Box(TV(0.07,0.07,0.07)*m);
-            RIGID_BODY<TV>& box5=tests.Add_Analytic_Box(TV(0.07,0.07,0.07)*m);
-            RIGID_BODY<TV>& box6=tests.Add_Analytic_Box(TV(0.07,0.07,0.07)*m);
-            RIGID_BODY<TV>& box7=tests.Add_Analytic_Box(TV(0.07,0.07,0.07)*m);
-            RIGID_BODY<TV>& box8=tests.Add_Analytic_Box(TV(0.07,0.07,0.07)*m);
-
-            box1.Frame().t=TV(0.07,0.035,0)*m;
-            box2.Frame().t=TV(-0.07,0.035,0)*m;
-            box3.Frame().t=TV(0,0.035,0.07)*m;
-            box4.Frame().t=TV(0,0.035,-0.07)*m;
-
-            box5.Frame().t=TV(0.07/sqrt(2),0.035,0.07/sqrt(2))*m;
-            box6.Frame().t=TV(-0.07/sqrt(2),0.035,0.07/sqrt(2))*m;
-            box7.Frame().t=TV(-0.07/sqrt(2),0.035,-0.07/sqrt(2))*m;
-            box8.Frame().t=TV(0.07/sqrt(2),0.035,-0.07/sqrt(2))*m;
-
-            box5.Frame().r=ROTATION<TV>((T)pi/4.0,TV(0,1,0));
-            box6.Frame().r=ROTATION<TV>((T)pi/4.0,TV(0,1,0));
-            box7.Frame().r=ROTATION<TV>((T)pi/4.0,TV(0,1,0));
-            box8.Frame().r=ROTATION<TV>((T)pi/4.0,TV(0,1,0));
-
-            box1.is_static=true;
-            box2.is_static=true;
-            box3.is_static=true;
-            box4.is_static=true;
-            box5.is_static=true;
-            box6.is_static=true;
-            box7.is_static=true;
-            box8.is_static=true;*/
-
             tests.Add_Ground();
             break;
         }
@@ -1395,26 +1311,8 @@ void Get_Initial_Data()
             torus1.Frame().t=TV(10,10,0)*m;
             torus1.Frame().r=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
             last_frame=240;
-            /*RIGID_BODY<TV>& torus2=tests.Add_Analytic_Shell((T).9,(T)1,(T).2,64);
-            torus2.is_static=true;
-            torus2.coefficient_of_friction=0.05;
-            torus2.Frame().t=TV(0,3,0)*m;
-            torus2.Frame().r=ROTATION<TV>((T)pi/2.0,TV(0,0,1));*/
-
-
-            ///tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_21K.tet",
-               //                                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0)*m)),true,true,density,m);
-            //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
-              //                                  RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-4.8,2,0)*m,ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,m);
-            //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/SubmarineFluidMesh.tet",
-              //                                  RIGID_BODY_STATE<TV>(FRAME<TV>(TV(4.8,4,0)*m,ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,m);
-           // tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/snake_22K.tet",
-             //                                   RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-9.6,0,0)*m)),true,true,density,m);
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,10,0)*m,ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,m);
-            //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/shell-2-5K.tet",
-              //                                  RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-14.4,0,0)*m,ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,m);
-
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,10,0)*m,ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,m);
             tests.Add_Ground(1);
             break;
         }
@@ -1422,24 +1320,18 @@ void Get_Initial_Data()
         {
             fishes=5;
             for(int i=0;i<fishes;i++)
-            {
-              //  jello_centers.Append(TV(-500+i*5,-1000,0));
                 tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
-                                                    RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-10*i,10,0)*m,ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,m);
-
-            }
+                    RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-10*i,10,0)*m,ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,m);
             T boxsize=(T)2;
             RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(3*boxsize,boxsize,boxsize)*m);
             RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(3*boxsize,boxsize,boxsize)*m);
             RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(boxsize,boxsize,boxsize)*m);
             RIGID_BODY<TV>& box4=tests.Add_Analytic_Box(TV(boxsize,boxsize,boxsize)*m);
 
-
             box1.Frame().t=TV(0,.5*boxsize,boxsize);
             box2.Frame().t=TV(0,.5*boxsize,-boxsize);
             box3.Frame().t=TV(-boxsize,.5*boxsize,0);
             box4.Frame().t=TV(boxsize,.5*boxsize,0);
-
 
             box1.is_static=true;
             box2.is_static=true;
@@ -1685,6 +1577,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)5e4*unit_p,(T).45,(T).01*s);
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true,9.8*m/(s*s)));
+            break;}
+        case 12:{
+            solid_body_collection.Add_Force(new ELASTIC_ETHER_DRAG<TV>(deformable_body_collection.particles,true,.6,1,save_dt));
+            deformable_body_collection.particles.V.Fill(TV(1,2,-3));
             break;}
         case 17:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
@@ -2294,6 +2190,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 //#####################################################################
 void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
+    save_dt=dt;
     if(test_forces){
         solid_body_collection.deformable_body_collection.Test_Energy(time);
         solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
