@@ -77,7 +77,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     dv.Resize(minimization_objective.v1);
     tmp0.Resize(minimization_objective.v1);
     tmp1.Resize(minimization_objective.v1);
-    dv*=0;
+    minimization_objective.Initial_Guess(dv);
     minimization_objective.Test(dv,minimization_system);
 
     bool converged=newtons_method.Newtons_Method(minimization_objective,minimization_system,dv);

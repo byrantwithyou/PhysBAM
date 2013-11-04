@@ -197,6 +197,26 @@ Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const
     Adjust_For_Collision(dv);
 }
 //#####################################################################
+// Function Initial_Guess
+//#####################################################################
+template<class TV> void BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
+Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv) const
+{
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
+    GENERALIZED_VELOCITY<TV>& dv=debug_cast<GENERALIZED_VELOCITY<TV>&>(Bdv);
+    T e0=0,e1=0;
+    dv*=0;
+    Compute(dv,0,&tmp0,&e0);
+    for(int p=0;p<particles.number;p++) dv.V.array(p)=tmp0.V.array(p)/-particles.mass(p);
+    for(int p=0;p<rigid_body_particles.number;p++){
+        RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
+        if(rigid_body.Has_Infinite_Inertia()) continue;
+        dv.rigid_V.array(p)=-rigid_body.Inertia_Inverse_Times(tmp0.rigid_V.array(p));}
+    Compute(dv,0,0,&e1);
+    if(e1>e0) dv*=0;
+}
+//#####################################################################
 // Function Reset
 //#####################################################################
 template<class TV> void BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
