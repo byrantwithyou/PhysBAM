@@ -286,32 +286,6 @@ Enforce_Definiteness(const bool enforce_definiteness_input)
     constitutive_model.enforce_definiteness=enforce_definiteness_input;
 }
 //#####################################################################
-// Function Add_Force_Differential
-//#####################################################################
-template<class TV,int d> void FINITE_VOLUME<TV,d>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
-{
-    if(node_stiffness && edge_stiffness){
-        for(FORCE_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
-            dF(p)+=(*node_stiffness)(p)*dX(p);}
-        for(FORCE_ITERATOR iterator(*force_segments);iterator.Valid();iterator.Next()){int e=iterator.Data();
-            int m,n;strain_measure.mesh.segment_mesh->elements(e).Get(m,n);
-            dF(m)+=(*edge_stiffness)(e)*dX(n);dF(n)+=(*edge_stiffness)(e).Transpose_Times(dX(m));}}
-    else if(anisotropic_model){
-        if(!dPi_dFe && !dP_dFe) PHYSBAM_FATAL_ERROR();
-        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-            T_MATRIX dDs=strain_measure.Ds(dX,t),dG;
-            if(dP_dFe) dG=U(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dP_dFe)(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
-            else dG=U(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dPi_dFe)(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
-            strain_measure.Distribute_Force(dF,t,dG);}}
-    else{
-        if(!dPi_dFe) PHYSBAM_FATAL_ERROR();
-        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-            T_MATRIX dDs=strain_measure.Ds(dX,t);
-            T_MATRIX dG=U(t)*isotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),(*dPi_dFe)(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
-            strain_measure.Distribute_Force(dF,t,dG);}}
-}
-//#####################################################################
 // Function Intialize_CFL
 //#####################################################################
 template<class TV,int d> void FINITE_VOLUME<TV,d>::

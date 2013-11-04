@@ -128,26 +128,26 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
         for(int k=0;k<8;k++) F(strain_measure.mesh.elements(e)(k))+=U_P_hat*De_inverse_hat(e)(g)(k);}}
 }
 //#####################################################################
-// Function Add_Force_Differential
+// Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class T> void FINITE_VOLUME_HEXAHEDRONS<T>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> VV,ARRAY_VIEW<TV> F,const T time) const
 {
     if(!dPi_dFe && !dP_dFe) PHYSBAM_FATAL_ERROR();
     if(anisotropic_model)
         for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int e=iterator.Data();for(int g=0;g<8;g++){
             int gauss_index=8*(e-1)+g;
-            MATRIX<T,3> dF_hat=U(e)(g).Transpose_Times(strain_measure.Gradient(dX,De_inverse_hat,g,e));
+            MATRIX<T,3> dF_hat=U(e)(g).Transpose_Times(strain_measure.Gradient(VV,De_inverse_hat,g,e));
             MATRIX<T,3> U_dP_hat;
             if(dP_dFe) U_dP_hat=U(e)(g)*anisotropic_model->dP_From_dF(dF_hat,Fe_hat(e)(g),(*V)(e)(g),(*dP_dFe)(e)(g),Be_scales(e)(g),gauss_index);
             else U_dP_hat=U(e)(g)*anisotropic_model->dP_From_dF(dF_hat,Fe_hat(e)(g),(*V)(e)(g),(*dPi_dFe)(e)(g),Be_scales(e)(g),gauss_index);
-            for(int k=0;k<8;k++) dF(strain_measure.mesh.elements(e)(k))+=U_dP_hat*De_inverse_hat(e)(g)(k);}}
+            for(int k=0;k<8;k++) F(strain_measure.mesh.elements(e)(k))+=U_dP_hat*De_inverse_hat(e)(g)(k);}}
     else
         for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int e=iterator.Data();for(int g=0;g<8;g++){
             int gauss_index=8*(e-1)+g;
-            MATRIX<T,3> dF_hat=U(e)(g).Transpose_Times(strain_measure.Gradient(dX,De_inverse_hat,g,e));
+            MATRIX<T,3> dF_hat=U(e)(g).Transpose_Times(strain_measure.Gradient(VV,De_inverse_hat,g,e));
             MATRIX<T,3> U_dP_hat=U(e)(g)*isotropic_model->dP_From_dF(dF_hat,(*dPi_dFe)(e)(g),Be_scales(e)(g),gauss_index);
-            for(int k=0;k<8;k++) dF(strain_measure.mesh.elements(e)(k))+=U_dP_hat*De_inverse_hat(e)(g)(k);}}
+            for(int k=0;k<8;k++) F(strain_measure.mesh.elements(e)(k))+=U_dP_hat*De_inverse_hat(e)(g)(k);}}
 }
 //#####################################################################
 // Function Intialize_CFL

@@ -78,10 +78,10 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
             F(k.y)+=f;}
 }
 //#####################################################################
-// Function Add_Force_Differential
+// Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void SURFACE_TENSION_FORCE<TV>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
 }
 //#####################################################################
@@ -89,13 +89,6 @@ Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) c
 //#####################################################################
 template<class TV> void SURFACE_TENSION_FORCE<TV>::
 Enforce_Definiteness(const bool enforce_definiteness_input)
-{
-}
-//#####################################################################
-// Function Add_Implicit_Velocity_Independent_Forces
-//#####################################################################
-template<class TV> void SURFACE_TENSION_FORCE<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
 }
 //#####################################################################

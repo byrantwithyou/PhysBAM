@@ -76,14 +76,6 @@ Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) co
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
 //#####################################################################
-// Function Add_Force_Differential
-//#####################################################################
-template<class TV> void DEFORMABLES_FORCES<TV>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
-{
-    PHYSBAM_FUNCTION_IS_NOT_DEFINED();
-}
-//#####################################################################
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void DEFORMABLES_FORCES<TV>::

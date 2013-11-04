@@ -207,6 +207,14 @@ Create_Altitude_Springs_Base(DEFORMABLE_PARTICLES<TV>& particles,T_MESH& mesh,co
     return las;
 }
 //#####################################################################
+// Function Add_Implicit_Velocity_Independent_Forces
+//#####################################################################
+template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+{
+    PHYSBAM_FUNCTION_IS_NOT_DEFINED();
+}
+//#####################################################################
 namespace PhysBAM{
 template class LINEAR_ALTITUDE_SPRINGS<VECTOR<float,2>,2>;
 template class LINEAR_ALTITUDE_SPRINGS<VECTOR<float,3>,2>;

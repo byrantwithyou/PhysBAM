@@ -341,29 +341,6 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
         F(state.nodes[0])+=force;F(state.nodes[1])-=force;}
 }
 //#####################################################################
-// Function Add_Force_Differential
-//#####################################################################
-template<class TV> void LINEAR_SPRINGS<TV>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
-{
-    if(!youngs_modulus.m) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
-        const STATE& state=states(s);
-        int node1,node2;segment_mesh.elements(s).Get(node1,node2);
-        TV dl=dX(node2)-dX(node1),dl_projected=dl.Projected_On_Unit_Direction(state.direction);
-        TV dforce=constant_youngs_modulus/restlength(s)*dl_projected; // Component of dF along direction of the spring
-        if(current_lengths(s)>visual_restlength(s)) // Component of dF normal to the spring
-            dforce+=constant_youngs_modulus/restlength(s)*(1-visual_restlength(s)/current_lengths(s))*(dl-dl_projected);
-        dF(node1)+=dforce;dF(node2)-=dforce;}
-    else for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
-        const STATE& state=states(s);
-        int node1,node2;segment_mesh.elements(s).Get(node1,node2);
-        TV dl=dX(node2)-dX(node1),dl_projected=dl.Projected_On_Unit_Direction(state.direction),dforce;
-        dforce+=youngs_modulus(s)/restlength(s)*dl_projected; // Component of dF along direction of the spring
-        if(current_lengths(s)>visual_restlength(s)) // Component of dF normal to the spring
-            dforce+=youngs_modulus(s)/restlength(s)*(1-visual_restlength(s)/current_lengths(s))*(dl-dl_projected); // Component of dF normal to the spring
-        dF(node1)+=dforce;dF(node2)-=dforce;}
-}
-//#####################################################################
 // Function Initialize_CFL
 //#####################################################################
 template<class TV> void LINEAR_SPRINGS<TV>::

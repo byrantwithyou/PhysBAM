@@ -83,7 +83,7 @@ Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) // 1 is criti
 template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    Add_Force_Differential(particles.X,F,time);
+    Add_Implicit_Velocity_Independent_Forces(particles.X,F,time);
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -116,14 +116,6 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
         F(node1)+=force;F(node2)-=force;}
 }
 //#####################################################################
-// Function Add_Force_Differential
-//#####################################################################
-template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
-{
-    Add_Implicit_Velocity_Independent_Forces(dX,dF,time);
-}
-//#####################################################################
 // Function Potential_Energy
 //#####################################################################
 template<class TV> typename TV::SCALAR IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
@@ -136,6 +128,9 @@ Potential_Energy(const T time) const
         potential_energy+=(T).5*stiff*(particles.X(node2)-particles.X(node1)).Magnitude_Squared();}
     return potential_energy;
 }
+//#####################################################################
+// Function Create_Edge_Zero_Length_Springs
+//#####################################################################
 template<class T,class TV> IMPLICIT_ZERO_LENGTH_SPRINGS<TV>* PhysBAM::
 Create_Edge_Zero_Length_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const T stiffness,const T overdamping_fraction,const bool verbose)
 {

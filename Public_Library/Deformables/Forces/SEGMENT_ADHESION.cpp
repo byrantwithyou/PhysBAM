@@ -368,12 +368,6 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
         F(state.nodes[2])+=((T)1-state.weights[1])*force;F(state.nodes[3])+=state.weights[1]*force;}
 }
 //#####################################################################
-// Function Add_Force_Differential
-//#####################################################################
-template<class TV> void SEGMENT_ADHESION<TV>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
-{}
-//#####################################################################
 // Function Enforce_Definiteness
 //#####################################################################
 template<class TV> void SEGMENT_ADHESION<TV>::
@@ -412,6 +406,11 @@ Read_State(STREAM_TYPE stream_type,const std::string& filename)
 {
     FILE_UTILITIES::Read_From_File(stream_type,filename,*springs);
     LOG::cout<<"READING: Number of springs: "<<springs->Size()<<std::endl;
+}
+template<class TV> void SEGMENT_ADHESION<TV>::
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+{
+    PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
 //#####################################################################
 namespace PhysBAM{

@@ -169,12 +169,6 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
     }
 }
 //#####################################################################
-// Function Add_Force_Differential
-//#####################################################################
-template<class TV> void GUIDE_ADHESION<TV>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
-{}
-//#####################################################################
 // Function Enforce_Definiteness
 //#####################################################################
 template<class TV> void GUIDE_ADHESION<TV>::
@@ -203,6 +197,14 @@ template<class TV> void GUIDE_ADHESION<TV>::
 Write_State(STREAM_TYPE stream_type,const std::string& filename)
 {   
     FILE_UTILITIES::Write_To_File(stream_type,filename,*springs);
+}
+//#####################################################################
+// Function Add_Implicit_Velocity_Independent_Forces
+//#####################################################################
+template<class TV> void GUIDE_ADHESION<TV>::
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+{
+    PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
 //#####################################################################
 namespace PhysBAM{

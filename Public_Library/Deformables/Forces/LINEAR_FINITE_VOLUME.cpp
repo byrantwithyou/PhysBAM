@@ -123,24 +123,14 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
         STRAIN_MEASURE<TV,d>::Distribute_Force(F,mesh.elements(t),G);}
 }
 //#####################################################################
-// Function Add_Force_Differential
+// Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV,int d> void LINEAR_FINITE_VOLUME<TV,d>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-        MATRIX<T,TV::m,d> dG=Stress_Differential(dX,t)*Bm(t);
-        STRAIN_MEASURE<TV,d>::Distribute_Force(dF,mesh.elements(t),dG);}
-}
-//#####################################################################
-// Function Add_Force_Differential
-//#####################################################################
-template<class TV,int d> void LINEAR_FINITE_VOLUME<TV,d>::
-Add_Force_Differential(const ARRAY<SYMMETRIC_MATRIX<T,TV::m> >& stress_differential,ARRAY_VIEW<TV> dF) const
-{
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-        MATRIX<T,TV::m,d> dG=stress_differential(t)*Bm(t);
-        STRAIN_MEASURE<TV,d>::Distribute_Force(dF,mesh.elements(t),dG);}
+        MATRIX<T,TV::m,d> dG=Stress_Differential(V,t)*Bm(t);
+        STRAIN_MEASURE<TV,d>::Distribute_Force(F,mesh.elements(t),dG);}
 }
 //#####################################################################
 // Function Intialize_CFL

@@ -257,6 +257,14 @@ Copy_Back_Save_Quantities(const ARRAY<int>& node_map_to_saved)
         (*sine_half_elastic_angle)(q)=(*sine_half_elastic_angle_save)(q_save);}
 }
 //#####################################################################
+// Function Add_Implicit_Velocity_Independent_Forces
+//#####################################################################
+template<class TV> void TRIANGLE_BENDING_ELEMENTS<TV>::
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+{
+    PHYSBAM_FUNCTION_IS_NOT_DEFINED();
+}
+//#####################################################################
 namespace PhysBAM{
 template class TRIANGLE_BENDING_ELEMENTS<float>;
 template class TRIANGLE_BENDING_ELEMENTS<double>;

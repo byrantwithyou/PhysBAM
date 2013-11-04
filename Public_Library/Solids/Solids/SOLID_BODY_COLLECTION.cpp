@@ -140,7 +140,7 @@ Force_Differential(ARRAY_VIEW<const TV> dX_full,ARRAY_VIEW<TV> dF_full,const T t
     assert(dX_full.Size()==deformable_body_collection.particles.Size() && dF_full.Size()==deformable_body_collection.particles.Size());
     dF_full.Subset(deformable_body_collection.simulated_particles).Fill(TV());
     for(int k=0;k<deformable_body_collection.deformables_forces.m;k++)
-        if(deformable_body_collection.deformables_forces(k)->use_force_differential) deformable_body_collection.deformables_forces(k)->Add_Force_Differential(dX_full,dF_full,time);
+        if(deformable_body_collection.deformables_forces(k)->use_force_differential) deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(dX_full,dF_full,time);
 }
 //#####################################################################
 // Function Enforce_Definiteness

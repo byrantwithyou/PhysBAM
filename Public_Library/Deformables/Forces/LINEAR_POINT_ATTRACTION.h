@@ -32,9 +32,8 @@ public:
 
 //#####################################################################
     void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE;
-    void Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const PHYSBAM_OVERRIDE;
-    void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE;
     void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
+    void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE;
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
     int Velocity_Dependent_Forces_Size() const PHYSBAM_OVERRIDE;

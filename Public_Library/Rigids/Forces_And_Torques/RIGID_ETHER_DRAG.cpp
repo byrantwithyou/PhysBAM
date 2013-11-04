@@ -49,14 +49,23 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TW
         else if(use_constant_wind) rigid_F(k).linear-=constant_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*rigid_V(k).linear;
         if(constant_wind_angular_viscosity) rigid_F(k).angular-=constant_wind_angular_viscosity*rigid_V(k).angular;}
 }
+//#####################################################################
+// Function Add_Implicit_Velocity_Independent_Forces
+//#####################################################################
 template<class TV> void RIGID_ETHER_DRAG<TV>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
 }
+//#####################################################################
+// Function Enforce_Definiteness
+//#####################################################################
 template<class TV> void RIGID_ETHER_DRAG<TV>::
 Enforce_Definiteness(const bool enforce_definiteness_input)
 {
 }
+//#####################################################################
+// Function Add_Implicit_Velocity_Independent_Forces
+//#####################################################################
 template<class TV> void RIGID_ETHER_DRAG<TV>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {

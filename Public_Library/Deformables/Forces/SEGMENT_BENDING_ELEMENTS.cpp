@@ -125,6 +125,14 @@ CFL_Strain_Rate() const
     return Robust_Divide((T)pi*max_strain_per_time_step,max_dtheta_dt);
 }
 //#####################################################################
+// Function Add_Implicit_Velocity_Independent_Forces
+//#####################################################################
+template<class TV> void SEGMENT_BENDING_ELEMENTS<TV>::
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+{
+    PHYSBAM_FUNCTION_IS_NOT_DEFINED();
+}
+//#####################################################################
 namespace PhysBAM{
 template class SEGMENT_BENDING_ELEMENTS<float>;
 template class SEGMENT_BENDING_ELEMENTS<double>;

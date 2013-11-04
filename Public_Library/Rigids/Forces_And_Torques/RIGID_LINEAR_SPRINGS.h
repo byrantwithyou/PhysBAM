@@ -51,7 +51,7 @@ public:
     virtual ~RIGID_LINEAR_SPRINGS();
 
     void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE
-    {} // Add_Force_Differential always enforces definiteness
+    {}
 
 //#####################################################################
     void Add_Spring(int body1,int body2,const TV& r1,const TV& r2);

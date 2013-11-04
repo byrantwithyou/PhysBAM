@@ -140,14 +140,6 @@ Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) co
     PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
-// Function Add_Force_Differential
-//#####################################################################
-template<class TV> void COLLISION_AREA_PENALTY_FORCE<TV>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
-{
-    PHYSBAM_FATAL_ERROR();
-}
-//#####################################################################
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void COLLISION_AREA_PENALTY_FORCE<TV>::
