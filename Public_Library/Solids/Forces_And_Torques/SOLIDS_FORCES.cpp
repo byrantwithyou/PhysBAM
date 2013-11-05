@@ -58,11 +58,6 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
 template<class TV> void SOLIDS_FORCES<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
-{
-    PHYSBAM_FUNCTION_IS_NOT_DEFINED();
-}
-template<class TV> void SOLIDS_FORCES<TV>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();

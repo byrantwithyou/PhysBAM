@@ -182,9 +182,9 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         if(solid_body_collection.deformable_body_collection.soft_bindings.Need_Bindings_Mapped()){
             solid_body_collection.deformable_body_collection.soft_bindings.Map_Forces_From_Parents(B.V.array,B.rigid_V.array);
             solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(B.V.array);
-            for(int k=0;k<solid_body_collection.solids_forces.m;k++){
-                if(dynamic_cast<BINDING_SPRINGS<TV>*>(solid_body_collection.solids_forces(k)))
-                    solid_body_collection.solids_forces(k)->Add_Implicit_Velocity_Independent_Forces(particles.X,B.V.array,current_velocity_time+dt);}
+            for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++){
+                if(dynamic_cast<BINDING_SPRINGS<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(k)))
+                    solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(particles.X,B.V.array,current_velocity_time+dt);}
             solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B.V.array);}
 
         // TODO: Make sure this runs for the solid node of an MPI coupled sim
