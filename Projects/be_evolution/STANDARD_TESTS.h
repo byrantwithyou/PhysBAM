@@ -706,6 +706,7 @@ void Get_Initial_Data()
             T depth=2*drop_height;
             T thickness=1*m;
             RIGID_BODY<TV>& bowl=tests.Add_Analytic_Bowl(hole_radius,depth,thickness,128,32);
+            bowl.coefficient_of_friction=0.3;
             bowl.Frame().r=ROTATION<TV>((T)pi,TV(1,0,0));
             bowl.Frame().t=TV(0,depth,0);
             bowl.is_static=true;
@@ -1555,7 +1556,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 10:{
             for(int i=0; i<27; i++){
               TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
-              Add_Constitutive_Model(tetrahedralized_volume,(T)1e6*unit_p,(T).45,(T).01*s);}
+              Add_Constitutive_Model(tetrahedralized_volume,(T)5e5*unit_p,(T).45,(T).01*s);}
             Add_Gravity();
             break;}
         case 77:{
