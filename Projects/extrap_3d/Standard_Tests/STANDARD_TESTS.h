@@ -1767,7 +1767,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume7=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(6);
             Add_Constitutive_Model(tetrahedralized_volume7,youngs_modulus,poissons_ratio,damping);
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=g;
+            solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity.y=-g;
             break;}
         case 43:
         case 33:{
@@ -1775,7 +1775,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume,1e4,0.35,0.005);
 
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=0;
+            solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=TV();
             break;}
         case 58:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(0);
@@ -2267,7 +2267,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     if(test_forces){
         solid_body_collection.deformable_body_collection.Test_Energy(time);
         solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
-    if(test_number==10 || test_number==11) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=10*time;
+    if(test_number==10 || test_number==11) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity.y=-10*time;
     if(test_number==33)
     {
         TETRAHEDRALIZED_VOLUME<T>& tet_volume= solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
@@ -2280,7 +2280,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             if(fvm.Fe_hat(t).x11<3)
                 for(int i=0;i<4;i++) solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=true;
 
-        if (time >=1 ) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=9.8;
+        if (time >=1 ) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity.y=-9.8;
     }
     if(test_number==58)
     {

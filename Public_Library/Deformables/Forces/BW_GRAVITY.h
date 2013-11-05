@@ -21,20 +21,16 @@ public:
     typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA DEFORMABLE_FREQUENCY_DATA;
 
-    T gravity;
-    TV downward_direction;
+    TV gravity;
     FORCE_ELEMENTS force_particles;
 public:
 
-    BW_GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,const T gravity_input,const TV& downward_direction_input)
-        :DEFORMABLES_FORCES<TV>(particles_input),gravity(gravity_input),downward_direction(downward_direction_input)
+    BW_GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,const TV& gravity_input)
+        :DEFORMABLES_FORCES<TV>(particles_input),gravity(gravity_input)
     {}
 
     virtual ~BW_GRAVITY()
     {}
-
-    void Set_Gravity(const TV& gravity_vector)
-    {downward_direction=gravity_vector;gravity=downward_direction.Normalize();}
 
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
     {}

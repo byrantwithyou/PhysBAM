@@ -37,7 +37,7 @@ Initialize(const int test_number_input,const int resolution)
     fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,TV::m>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(false));
     fluids_parameters.domain_walls(1)(0)=true;
     fluids_parameters.use_vorticity_confinement=true;fluids_parameters.confinement_parameter=(T).15;
-    fluids_parameters.kolmogorov=(T)0;fluids_parameters.gravity=(T)0;
+    fluids_parameters.kolmogorov=(T)0;fluids_parameters.gravity=TV();
     rho=(T)1;fluids_parameters.rho_bottom=(T)1;fluids_parameters.rho_top=(T).65;
     fluids_parameters.density_buoyancy_constant=fluids_parameters.temperature_buoyancy_constant=0;
     fluids_parameters.temperature_container.Set_Cooling_Constant(0);fluids_parameters.temperature_products=(T)3000;

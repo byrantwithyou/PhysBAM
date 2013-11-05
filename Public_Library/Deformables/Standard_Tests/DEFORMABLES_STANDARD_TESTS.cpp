@@ -57,7 +57,7 @@ template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
 Add_Gravity()
 {
     // add gravity on all deformable particles
-    deformable_body_collection.Add_Force(new DEFORMABLE_GRAVITY<TV>(deformable_body_collection.particles,true,true));
+    deformable_body_collection.Add_Force(new DEFORMABLE_GRAVITY<TV>(deformable_body_collection.particles,true));
 }
 //#####################################################################
 // Function Copy_And_Add_Structure

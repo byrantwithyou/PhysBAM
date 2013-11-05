@@ -229,7 +229,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.removed_positive_particle_buoyancy_constant=0;
     //solid_body_collection.print_residuals=true;
 
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.density=(T)100;
     fluids_parameters.use_vorticity_confinement=false;
     fluids_parameters.use_density=fluids_parameters.use_temperature=false;
@@ -501,7 +501,7 @@ void Rigid_Circle()
     Add_Volumetric_Body_To_Fluid_Simulation(rigid_body);
 
     fluids_parameters.grid->Initialize(TV_INT(resolution,(T)1.5*resolution)+1,RANGE<TV>(TV(),TV(1,(T)1.5)));
-    fluids_parameters.gravity=(T)9.8;
+    fluids_parameters.gravity.y=-(T)9.8;
     fluids_parameters.domain_walls[1][1]=true;
     fluids_parameters.domain_walls[1][2]=true;
     fluids_parameters.domain_walls[2][1]=true;

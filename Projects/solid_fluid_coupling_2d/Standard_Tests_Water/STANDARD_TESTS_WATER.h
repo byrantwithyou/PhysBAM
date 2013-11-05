@@ -163,7 +163,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     // T default_removed_positive_particle_buoyancy_constant=fluids_parameters.removed_positive_particle_buoyancy_constant;
     fluids_parameters.removed_positive_particle_buoyancy_constant=0;
         
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
         
     solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
         

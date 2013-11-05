@@ -30,7 +30,7 @@ public:
         komolgorov=(T)0;
         incompressible_enforce_compatibility=false;
         rho=(T)1.;T_air=T(0.);T_burnt=(T)2.;
-        gravity=(T)0;
+        gravity=TV();
         cooling_constant=(T)0;
         write_matlab_files=true;
         write_output_files=true;

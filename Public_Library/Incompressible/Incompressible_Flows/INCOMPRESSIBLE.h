@@ -41,8 +41,7 @@ public:
     ADVECTION<TV,T>* advection;
 protected:               
     T max_time_step;
-    T gravity;
-    TV downward_direction;
+    TV gravity;
     T surface_tension;
     T viscosity;
     T vorticity_confinement;
@@ -90,12 +89,6 @@ public:
         
     void Set_Max_Time_Step(const T max_time_step_input=1e8)
     {max_time_step=max_time_step_input;}
-
-    void Set_Gravity(const T gravity_input=9.8)
-    {gravity=gravity_input;downward_direction=TV::m>1?-TV::Axis_Vector(1):TV();}
-
-    void Set_Gravity(const T gravity_input,const TV& downward_direction_input)
-    {gravity=gravity_input;downward_direction=downward_direction_input;}
 
     void Set_Surface_Tension(const T surface_tension_input=0)
     {surface_tension=surface_tension_input;use_variable_surface_tension=false;nonzero_surface_tension=(surface_tension!=0);}

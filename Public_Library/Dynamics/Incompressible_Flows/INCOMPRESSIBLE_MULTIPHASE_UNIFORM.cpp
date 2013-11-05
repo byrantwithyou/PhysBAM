@@ -92,7 +92,7 @@ Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const 
         strains(i)->Update_Strain_Equation_Multiphase(dt,time,projection.densities(i),face_velocities,face_velocities_temp,*projection.poisson_collidable->levelset_multiple,i,number_of_ghost_cells);}
 
     // update gravity
-    if(gravity) for(int axis=0;axis<TV::m;axis++) if(downward_direction[axis]) face_velocities.Component(axis)+=dt*gravity*downward_direction[axis];
+    for(int axis=0;axis<TV::m;axis++) if(gravity[axis]) face_velocities.Component(axis)+=dt*gravity[axis];
     
     // update body force
     if(use_force) for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) 
@@ -244,7 +244,7 @@ CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool inviscid,const bool 
     if(use_force) max_force=force.Max_Abs();
     T dt_force=0;
     if(use_force) dt_force=(max_force/DX).Sum_Abs();
-    if(gravity) dt_force+=abs(gravity)*(downward_direction/DX).Sum_Abs();
+    dt_force+=(gravity/DX).Sum_Abs();
     T strain_cfl=FLT_MAX;
     if(strain){
         for(int i=0;i<strains.m;i++)if(strains(i))

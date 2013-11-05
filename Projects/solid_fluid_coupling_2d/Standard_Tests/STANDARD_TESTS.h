@@ -123,8 +123,8 @@ public:
     int circle_refinement;
     T scale_length;
     bool use_solid;
-    T fluid_gravity;
-    T solid_gravity;
+    TV fluid_gravity;
+    TV solid_gravity;
     T solid_width;
     T solid_density;
     int widen_domain;
@@ -145,7 +145,7 @@ public:
         :BASE(stream_type,0,fluids_parameters.SMOKE),
         solids_tests(stream_type,data_directory,solid_body_collection),deformable_object_id(0),mass_multiplier(1),stiffness_multiplier((T)1),damping_multiplier((T)1),
         bending_stiffness_multiplier((T)1),bending_damping_multiplier((T)1),rigid_body_id(0),flow_particles(false),run_self_tests(false),print_poisson_matrix(false),
-        print_index_map(false),print_matrix(false),print_each_matrix(false),output_iterators(false),circle_refinement(0),scale_length(1),use_solid(false),fluid_gravity((T)9.8),solid_gravity((T)9.8),
+        print_index_map(false),print_matrix(false),print_each_matrix(false),output_iterators(false),circle_refinement(0),scale_length(1),use_solid(false),fluid_gravity(0,(T)9.8),solid_gravity(0,(T)9.8),
         solid_width((T).1111),solid_density(100),widen_domain(0),period(10),max_dt(0),beam_elements_width(2),beam_elements_length(40),solid_resolution(216),
         use_viscosity(false),use_solid_width(false),use_solid_density(false)
     {
@@ -194,8 +194,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-use_viscous_forces",&use_viscous_forces,"use_viscous_forces");
     parse_args->Add("-scale_length",&scale_length,"value","scale_length");
     parse_args->Add("-use_solid",&use_solid,"use_solid");
-    parse_args->Add("-fluid_gravity",&fluid_gravity,"value","fluid_gravity");
-    parse_args->Add("-solid_gravity",&solid_gravity,"value","solid_gravity");
+    parse_args->Add("-fluid_gravity",&fluid_gravity.y,"value","fluid_gravity");
+    parse_args->Add("-solid_gravity",&solid_gravity.y,"value","solid_gravity");
     parse_args->Add("-solid_width",&solid_width,&use_solid_width,"value","solid_width");
     parse_args->Add("-solid_density",&solid_density,&use_solid_density,"value","solid_density");
     parse_args->Add("-widen_domain",&widen_domain,"value","widen_domain");
@@ -224,6 +224,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.temperature_container.Set_Cooling_Constant(0);
     solids_parameters.implicit_solve_parameters.cg_iterations=fluids_parameters.incompressible_iterations;
     fluids_parameters.use_coupled_implicit_viscosity=use_viscous_forces;
+    solid_gravity=-solid_gravity;
+    fluid_gravity=-fluid_gravity;
 
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
 
@@ -257,13 +259,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.removed_positive_particle_buoyancy_constant=0;
     //solid_body_collection.print_residuals=true;
 
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
 
     switch(test_number){
         case 1:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-            fluids_parameters.gravity=(T)9.8;
+            fluids_parameters.gravity.y=-(T)9.8;
             fluids_parameters.density=(T)1;
             (*fluids_parameters.grid).Initialize(TV_INT(resolution+1,(int)(1.5*resolution)+1),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)1.5)));
             fluids_parameters.use_density=fluids_parameters.use_temperature=false;
@@ -272,7 +274,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             //last_frame=1000;
             (*fluids_parameters.grid).Initialize(TV_INT(resolution+1,(int)(1.5*resolution)+1),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)1.5)));
             //fluids_parameters.density=(T)300;
-            fluids_parameters.gravity=(T)9.8;
+            fluids_parameters.gravity.y=-(T)9.8;
             fluids_parameters.density=(T)1000;
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
             velocity_multiplier=10;
@@ -314,7 +316,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         case 9:
             last_frame=5000;
-            fluids_parameters.gravity=(T)9.8;
+            fluids_parameters.gravity.y=-(T)9.8;
             fluids_parameters.density=(T)1000;
             fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][0]=true;//fluids_parameters.domain_walls[1][1]=true;
             (*fluids_parameters.grid).Initialize(TV_INT(2*resolution+1,5*resolution+1),RANGE<TV>(TV((T)-2,(T)0),TV((T)2,(T)10)));
@@ -324,7 +326,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 11:
             fluids_parameters.grid->Initialize(TV_INT(resolution+1,(int)(1.5*resolution)+1),RANGE<TV>(TV(0,0),TV(1,1.5)));
             last_frame=1000;
-            fluids_parameters.gravity=(T)9.8;
+            fluids_parameters.gravity.y=-(T)9.8;
             fluids_parameters.density=(T)1000;
             fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
             velocity_multiplier=5;
@@ -349,7 +351,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=1000;
             (*fluids_parameters.grid).Initialize(TV_INT((int)(1.5*resolution)+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)));
             //fluids_parameters.density=(T)300;
-            fluids_parameters.gravity=(T)9.8;
+            fluids_parameters.gravity.y=-(T)9.8;
             fluids_parameters.density=(T)1000;
             fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;
             velocity_multiplier=10;
@@ -358,7 +360,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 30:
             (*fluids_parameters.grid).Initialize(TV_INT((int)(1.5*resolution)+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)));
             last_frame=1000;
-            fluids_parameters.gravity=(T)9.8;
+            fluids_parameters.gravity.y=-(T)9.8;
             fluids_parameters.density=(T).1;
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
 //                velocity_multiplier=10;
@@ -972,7 +974,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
     solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
     
-    T solid_gravity=(T)9.8;
+    TV solid_gravity(0,-(T)9.8);
     switch(test_number){
         case 1:{
 //            SEGMENTED_CURVE_2D<T>* segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>*>(deformable_body_collection.structures(deformable_circle_id));assert(segmented_curve);
@@ -1012,7 +1014,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 4:
         case 5:{
             solids_tests.Add_Ground();
-            solid_gravity=(T).75;
+            solid_gravity.y=-(T).75;
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
             SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.structures(deformable_object_id));
             segmented_curve.Initialize_Hierarchy();
@@ -1092,7 +1094,7 @@ void Uniform_Flow_Test()
 
     last_frame=1000;
     (*fluids_parameters.grid).Initialize(TV_INT(resolution,(int)(2*resolution)),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)2)),true);
-    fluids_parameters.gravity=(T)0;
+    fluids_parameters.gravity.y=-(T)0;
     fluids_parameters.density=(T)100;
     fluids_parameters.domain_walls[0][0]=false;
     fluids_parameters.domain_walls[0][1]=false;
@@ -1126,7 +1128,7 @@ void Deformable_Uniform_Flow_Test()
 
     last_frame=1000;
     (*fluids_parameters.grid).Initialize(TV_INT(resolution,(int)(2*resolution)),RANGE<TV>(TV((T)-.5,(T)-1),TV((T).5,(T)1)),true);
-    fluids_parameters.gravity=(T)0;
+    fluids_parameters.gravity.y=-(T)0;
     fluids_parameters.density=(T)100;
     fluids_parameters.domain_walls[0][0]=false;
     fluids_parameters.domain_walls[0][1]=false;
@@ -1198,7 +1200,7 @@ void Falling_Rigid_Circle_Test()
     LOG::cout<<"VISCOSITY "<<fluids_parameters.viscosity<<std::endl;
     // Xiaodong Wang and Wing Kam Liu, Extended immersed boundary method using FEM and RKPM.  Comput. Methods Appl. Mech. Engrg. 193 (2004) 1305-1321
     T aL=.25; // solid diameter divided by channel width
-    T analytic_v=(density-fluids_parameters.density)*solid_gravity*scale_length*radius*radius/(4*fluids_parameters.viscosity)*(-log(aL)-(T)0.9157+(T)1.7244*sqr(aL)-1.7302*sqr(sqr(aL)));
+    T analytic_v=(density-fluids_parameters.density)*solid_gravity.Magnitude()*scale_length*radius*radius/(4*fluids_parameters.viscosity)*(-log(aL)-(T)0.9157+(T)1.7244*sqr(aL)-1.7302*sqr(sqr(aL)));
 
     PHYSBAM_ASSERT(sizeof(T)==8);
     LOG::cout<<"Analytic solution for terminal velocity: "<<analytic_v<<std::endl;
@@ -1213,7 +1215,7 @@ void Flexible_Beam_Test()
     //RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     (*fluids_parameters.grid).Initialize(TV_INT((int)(2*resolution),resolution),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)),true);
-    fluids_parameters.gravity=(T)0;
+    fluids_parameters.gravity.y=-(T)0;
     fluids_parameters.density=(T)100;
     fluids_parameters.domain_walls[0][0]=false;
     fluids_parameters.domain_walls[0][1]=false;
@@ -1223,10 +1225,6 @@ void Flexible_Beam_Test()
     fluids_parameters.use_density=fluids_parameters.use_temperature=false;
     fluids_parameters.use_body_force=false;
     velocity_multiplier=.25;
-
-//    for(int b=0;b<2;b++){
-//        if(b==1) Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(b));
-//        rigid_body_collection.Rigid_Body(b).is_static=true;}
 
     solid_body_collection.Set_CFL_Number(10);
     
@@ -1249,9 +1247,6 @@ void Flexible_Beam_Test()
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
     solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
 
-    //T solid_gravity=(T)9.8;
-    //solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-        //deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
     triangulated_area.Initialize_Hierarchy();
     DEFORMABLES_FORCES<TV>* spring=Create_Edge_Springs(triangulated_area,(T)400/(1+sqrt((T)2)),(T)2);
     solid_body_collection.Add_Force(spring);
@@ -1271,7 +1266,7 @@ void Vibrating_Circle()
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     (*fluids_parameters.grid).Initialize(TV_INT((int)(2*resolution),resolution),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)),true);
-    fluids_parameters.gravity=(T)0;
+    fluids_parameters.gravity.y=-(T)0;
     fluids_parameters.density=(T)1;
     fluids_parameters.domain_walls[0][0]=false;
     fluids_parameters.domain_walls[0][1]=false;
@@ -1320,7 +1315,7 @@ void Refine_Circle()
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     (*fluids_parameters.grid).Initialize(TV_INT((int)(2*resolution),resolution),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)),true);
-    fluids_parameters.gravity=(T)0;
+    fluids_parameters.gravity.y=-(T)0;
     fluids_parameters.density=(T)1;
     fluids_parameters.domain_walls[0][0]=false;
     fluids_parameters.domain_walls[0][1]=false;
@@ -1370,7 +1365,7 @@ void Analytic_Test()
 
     debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
 
-    fluids_parameters.gravity=(T)9.8*scale_length;
+    fluids_parameters.gravity.y=-(T)9.8*scale_length;
     fluids_parameters.density=(T)100/(scale_length*scale_length);
     fluids_parameters.domain_walls[0][0]=true;
     fluids_parameters.domain_walls[0][1]=true;
@@ -1400,7 +1395,7 @@ void Analytic_Test()
     T rho=fluids_parameters.density;
     TV size=fluids_parameters.grid->domain.Edge_Lengths();
     size.x=(size.x-solid_width)/2;
-    analytic_solution=-(solid_mass*solid_gravity+rho*size.x*size.y*fluids_parameters.gravity)*size.x/(2*size.y*fluids_parameters.viscosity);
+    analytic_solution=-(solid_mass*solid_gravity.Magnitude()+rho*size.x*size.y*fluids_parameters.gravity.Magnitude())*size.x/(2*size.y*fluids_parameters.viscosity);
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
 
     FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),0));
@@ -1419,7 +1414,7 @@ void Flow_Past_Fixed_Cylinder()
 
     debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
 
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.density=1;
     fluids_parameters.viscosity=(T).1;
     fluids_parameters.domain_walls[0][0]=false;
@@ -1459,7 +1454,7 @@ void Vortex_Shedding()
 
     debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
 
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.density=1;
     fluids_parameters.viscosity=(T).01;
     fluids_parameters.use_density=fluids_parameters.use_temperature=false;
@@ -1500,7 +1495,7 @@ void Oscillating_Disk()
     last_frame=(int)frame_rate; // one second;
 
     (*fluids_parameters.grid).Initialize(TV_INT(resolution,resolution),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)1)),true);
-    fluids_parameters.gravity=(T)0;
+    fluids_parameters.gravity.y=-(T)0;
     fluids_parameters.density=(T)1;
     fluids_parameters.domain_walls[0][0]=false;
     fluids_parameters.domain_walls[0][1]=false;
@@ -1568,7 +1563,7 @@ void Flexible_Filament_Test()
     //RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     (*fluids_parameters.grid).Initialize(TV_INT((int)(3*resolution)+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)3,(T)1)));
-    fluids_parameters.gravity=(T)0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.density=(T)100;
     fluids_parameters.domain_walls[0][0]=false;
     fluids_parameters.domain_walls[0][1]=false;
@@ -1581,11 +1576,6 @@ void Flexible_Filament_Test()
     
     GRID<TV> filament_grid(TV_INT(20,5),RANGE<TV>(TV((T).5,(T).475),TV((T)1.25,(T).525)));
     TRIANGULATED_AREA<T>& triangulated_area=solids_tests.Create_Mattress(filament_grid,true,0,200);
-    //GRID<VECTOR<T,1> > filament_grid(10,RANGE<VECTOR<T,1> >(VECTOR<T,1>(.5),VECTOR<T,1>(1)));
-    //RIGID_BODY_STATE<TV> state;
-    //state.frame.t.x=1;
-    //state.frame.t.y=.5;
-    //SEGMENTED_CURVE_2D<T>& segmented_curve=solids_tests.Create_Segmented_Curve(filament_grid,state,200);
     for(int i=0;i<particles.Size();i++)
         if(particles.X(i).x<.501)
             particles.mass(i)=FLT_MAX;
@@ -1603,9 +1593,6 @@ void Flexible_Filament_Test()
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
     solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
 
-    //T solid_gravity=(T)9.8;
-    //solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-        //deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
     triangulated_area.Initialize_Hierarchy();
     DEFORMABLES_FORCES<TV>* spring=Create_Edge_Springs(triangulated_area,(T)100/(1+sqrt((T)2)),(T)2);
     spring->compute_half_forces=true;
@@ -1627,7 +1614,7 @@ void Simple_Fluid_Test()
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     (*fluids_parameters.grid).Initialize(TV_INT((int)(2*resolution),resolution),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)),true);
-    fluids_parameters.gravity=(T)0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.density=(T)100;
     fluids_parameters.domain_walls[0][0]=false;
     fluids_parameters.domain_walls[0][1]=false;
@@ -1658,7 +1645,7 @@ void Coupled_Viscosity_Test()
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     (*fluids_parameters.grid).Initialize(TV_INT((int)(2*resolution),resolution),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)),true);
-    fluids_parameters.gravity=(T)0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.density=(T)100;
     fluids_parameters.domain_walls[0][0]=false;
     fluids_parameters.domain_walls[0][1]=false;
@@ -1691,7 +1678,7 @@ void Sanity_Test_Stokes_No_Viscosity()
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
     fluids_parameters.use_coupled_implicit_viscosity=true;
 
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.density=(T)1000/sqr(scale_length);
     fluids_parameters.use_density=fluids_parameters.use_temperature=false;
     fluids_parameters.viscosity=0;

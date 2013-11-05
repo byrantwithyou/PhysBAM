@@ -77,8 +77,9 @@ Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const 
         assert(!projection.flame);assert(phi_ghost);strain->Update_Strain_Equation(dt,time,projection.density,face_velocities,face_velocities_ghost,*phi_ghost,number_of_ghost_cells);}
 
     // update gravity
-    if(gravity) for(int axis=0;axis<TV::dimension;axis++)
-        DOMAIN_ITERATOR_THREADED_ALPHA<INCOMPRESSIBLE_UNIFORM<TV>,TV>(grid.Face_Indices()[axis],thread_queue).template Run<ARRAY<T,FACE_INDEX<TV::m> >&,const T,int>(*this,&INCOMPRESSIBLE_UNIFORM<TV>::Add_Gravity_Threaded,face_velocities,dt,axis);
+    for(int axis=0;axis<TV::dimension;axis++)
+        if(gravity(axis))
+            DOMAIN_ITERATOR_THREADED_ALPHA<INCOMPRESSIBLE_UNIFORM<TV>,TV>(grid.Face_Indices()[axis],thread_queue).template Run<ARRAY<T,FACE_INDEX<TV::m> >&,const T,int>(*this,&INCOMPRESSIBLE_UNIFORM<TV>::Add_Gravity_Threaded,face_velocities,dt,axis);
 
     // update body force
     if(use_force){
@@ -110,8 +111,9 @@ Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const 
 template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
 Add_Gravity_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,int axis)
 {
-    for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
-        if(downward_direction[axis]) face_velocities.Component(axis)(iterator.Face_Index())+=dt*gravity*downward_direction[axis];}
+    for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next())
+        if(gravity[axis])
+            face_velocities.Component(axis)(iterator.Face_Index())+=dt*gravity[axis];
 }
 template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
 Add_Body_Force_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,int axis)
@@ -240,7 +242,7 @@ CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool inviscid,const bool 
     if(use_force) max_force=force.Max_Abs();
     T dt_force=0;
     if(use_force) dt_force=(max_force*one_over_DX).Sum_Abs();
-    if(gravity) dt_force+=abs(gravity)*(downward_direction*one_over_DX).Sum_Abs();
+    dt_force+=(gravity*one_over_DX).Sum_Abs();
     if(strain) dt_force+=1/strain->CFL(projection.density);
     T dt_overall=(dt_convection+dt_viscosity+sqrt(sqr(dt_convection+dt_viscosity)+4*dt_force+4*sqr(dt_surface_tension)))/2; 
     return 1/max(dt_overall,1/max_time_step);

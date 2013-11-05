@@ -35,7 +35,7 @@ class EULER_UNIFORM:public EULER<TV>
     typedef TV_DIMENSION T_ARRAYS_ELEMENT;
     typedef BOUNDARY<TV,TV_DIMENSION> T_BOUNDARY;
 protected:
-    using BASE::max_time_step;using BASE::cut_out_grid;using BASE::gravity;using BASE::downward_direction;
+    using BASE::max_time_step;using BASE::cut_out_grid;using BASE::gravity;
 public:
     using BASE::boundary;using BASE::conservation;using BASE::eos;using BASE::Get_Velocity;using BASE::e;
     using BASE::Set_Max_Time_Step;using BASE::Set_Custom_Conservation;using BASE::Set_CFL_Number;using BASE::open_boundaries;

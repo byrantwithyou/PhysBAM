@@ -76,7 +76,7 @@ Initialize(const int test_number_input,const int resolution)
         example.first_frame=0;example.last_frame=50;
         grid.Initialize(TV_INT(25*cells+1,10*cells+1),RANGE<TV>(TV(),TV(1,(T).4)));}
     else if(test_number==7){
-        fluids_parameters.gravity=(T)0;
+        fluids_parameters.gravity=TV();
         example.first_frame=0;example.last_frame=100;
         grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(),TV(1,(T)1.5)));}
     else if(test_number==8){
@@ -89,7 +89,7 @@ Initialize(const int test_number_input,const int resolution)
         example.first_frame=0;example.last_frame=1000;
         grid.Initialize(TV_INT(6*cells+1,12*cells+1),RANGE<TV>(TV(),TV((T)1.5,3)));}
     else if(test_number==11){
-        fluids_parameters.gravity=(T)0;
+        fluids_parameters.gravity=TV();
         example.first_frame=0;example.last_frame=100;
         grid.Initialize(TV_INT(4*cells+1,6*cells+1),RANGE<TV>(TV(),TV(1,(T)1.5)));}
     else if(test_number==12){

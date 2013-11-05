@@ -92,7 +92,7 @@ public:
     T sphere_scale;
     int sphere;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
-    T solid_gravity;
+    TV solid_gravity;
     bool use_solids_gravity;
     bool no_solids;
     bool fracture_walls;
@@ -364,8 +364,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
         fluids_parameters.use_temperature=true;
         fluids_parameters.use_fixed_density_boundary=true;
         fluids_parameters.use_fixed_temperature_boundary=true;
-        if(use_incompressible_gravity) fluids_parameters.gravity=(T)9.8;
-        else fluids_parameters.gravity=(T)0;}
+        if(use_incompressible_gravity) fluids_parameters.gravity.y=-(T)9.8;
+        else fluids_parameters.gravity.y=-(T)0;}
 
     // setup solids
     bool simulate_rigids=(test_number==2||test_number==4||test_number==5||test_number==6||test_number==7||test_number==8||test_number==9||test_number==10||test_number==11||test_number==12||test_number==13||test_number==14||test_number==15||test_number==16||test_number==21);
@@ -405,7 +405,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         
         sphere_initial_position=TV((T).65,(T).11,(T)0);
         sphere_scale=(T).25;
-        solid_gravity=(T)9.8;}
+        solid_gravity=TV(0,-(T)9.8,0);}
 
     if(fracture_walls) solids_fluids_parameters.use_fluid_rigid_fracture=true;
 

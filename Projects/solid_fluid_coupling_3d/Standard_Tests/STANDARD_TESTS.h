@@ -160,7 +160,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
             fluids_parameters.density=(T)1000;
-            fluids_parameters.gravity=(T)9.8;
+            fluids_parameters.gravity.y=-(T)9.8;
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
             source_velocity=TV((T)0,(T)1,(T)0);
             source_cylinder=CYLINDER<T>(TV((T).5,(T)0,(T).5),TV((T).5,(T).05,(T).5),(T).15);
@@ -452,7 +452,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(particles.mass);
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
     solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
-    T solid_gravity=(T)9.8;
+    TV solid_gravity(0,-(T)9.8,0);
     if(test_number==1){
         solids_tests.Add_Ground();
         solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
@@ -467,7 +467,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         Add_To_Fluid_Simulation(deformable_collisions);
     }
     else if(test_number==3){
-        solid_gravity=(T)9.8;
         solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
         solids_tests.Add_Ground();
         TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();

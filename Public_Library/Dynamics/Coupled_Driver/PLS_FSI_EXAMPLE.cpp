@@ -394,7 +394,7 @@ Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Update_Fluid_Parameters(const T dt,const T time)
 {
-    fluids_parameters.incompressible->Set_Gravity(fluids_parameters.gravity,fluids_parameters.gravity_direction);
+    fluids_parameters.incompressible->gravity=fluids_parameters.gravity;
     fluids_parameters.incompressible->Set_Body_Force(fluids_parameters.use_body_force);
     fluids_parameters.incompressible->projection.Use_Non_Zero_Divergence(fluids_parameters.use_non_zero_divergence);
     fluids_parameters.incompressible->projection.elliptic_solver->Solve_Neumann_Regions(fluids_parameters.solve_neumann_regions);

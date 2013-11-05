@@ -122,7 +122,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.write_removed_negative_particles=true;
     fluids_parameters.store_particle_ids=true;
     fluids_parameters.delete_fluid_inside_objects=false;
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.enforce_divergence_free_extrapolation=false;
     fluids_parameters.incompressible_tolerance=(T)1e-12;
     fluids_parameters.use_maccormack_for_level_set=false;
@@ -174,14 +174,14 @@ void Parse_Options() PHYSBAM_OVERRIDE
     else if(test_number==8){
         frame_rate=100;
         fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());
-        fluids_parameters.gravity=0;
+        fluids_parameters.gravity=TV();
         source=SPHERE<TV>(TV((T).1,(T).5),(T).08);
         other_source=SPHERE<TV>(TV((T).9,(T).5),(T).08);
         source_velocity=TV((T)2,(T)0);
         initial_water_level=-1;}
     else if(test_number==9){
         fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());
-        fluids_parameters.gravity=0;
+        fluids_parameters.gravity=TV();
         fluids_parameters.surface_tension=(T)1e-5;}
     else if(test_number==10){
         fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());}

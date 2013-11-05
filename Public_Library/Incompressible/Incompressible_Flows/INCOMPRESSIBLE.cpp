@@ -31,7 +31,7 @@ INCOMPRESSIBLE()
 {
     advection=0; // TODO: add a default advection, possibly semi-lagrangian
     Set_Max_Time_Step();
-    Set_Gravity(0);
+    gravity=TV();
     Set_Surface_Tension(0);
     Set_Viscosity(0);
     Set_Vorticity_Confinement(0);

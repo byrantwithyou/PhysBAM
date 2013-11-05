@@ -23,7 +23,7 @@ class INCOMPRESSIBLE_MULTIPHASE_UNIFORM:public INCOMPRESSIBLE_UNIFORM<TV>
 public:
     typedef INCOMPRESSIBLE_UNIFORM<TV> BASE;
     using BASE::use_force;using BASE::viscosity;using BASE::use_variable_viscosity;using BASE::use_variable_vorticity_confinement;using BASE::dt_old;using BASE::gravity;
-    using BASE::downward_direction;using BASE::vorticity_confinements;using BASE::nonzero_viscosity;using BASE::nonzero_surface_tension;using BASE::mpi_grid;
+    using BASE::vorticity_confinements;using BASE::nonzero_viscosity;using BASE::nonzero_surface_tension;using BASE::mpi_grid;
     using BASE::use_explicit_part_of_implicit_viscosity;using BASE::vorticity_confinement;using BASE::max_time_step;using BASE::advection;
     using BASE::Set_Custom_Advection;using BASE::GFM;using BASE::number_of_interface_cells;using BASE::viscosities;using BASE::surface_tensions;
     using BASE::projection;using BASE::grid;using BASE::boundary;using BASE::force;using BASE::variable_vorticity_confinement;using BASE::strain;using BASE::variable_viscosity;

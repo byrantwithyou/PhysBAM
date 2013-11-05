@@ -115,7 +115,7 @@ Parse_Options()
     fluids_parameters.surface_tension*=kg*m/(s*s);
     solids_parameters.use_post_cg_constraints=true;
 
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.use_levelset_viscosity=false;
     fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
     fluids_parameters.number_particles_per_cell=16;
@@ -357,13 +357,13 @@ template<class T> void KANG<T>::
 Kang_Circle()
 {
     if(test_number==3){
-        fluids_parameters.gravity=(T)(8e-4)*m/(s*s);
+        fluids_parameters.gravity.y=-(T)(8e-4)*m/(s*s);
         fluids_parameters.density=(T)10000*kg/(m*m);
         fluids_parameters.outside_density=(T)1000*kg/(m*m);
         fluids_parameters.viscosity=1*kg/s;
         fluids_parameters.surface_tension=(T).5;}
     else if(test_number==1){
-        fluids_parameters.gravity=(T)0*m/(s*s);
+        fluids_parameters.gravity.y=-(T)0*m/(s*s);
         fluids_parameters.density=(T)1000*kg/(m*m);
         fluids_parameters.outside_density=(T)1*kg/(m*m);}
     fluids_parameters.cfl=(T).9;
@@ -378,7 +378,7 @@ Kang_Circle()
 template<class T> void KANG<T>::
 Poisson_Test()
 {
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.density=1;
     fluids_parameters.outside_density=1;
     fluids_parameters.viscosity=0;
@@ -391,7 +391,7 @@ Poisson_Test()
 template<class T> void KANG<T>::
 Poiseuille_Flow_Test()
 {
-    fluids_parameters.gravity=(T)9.8*m/(s*s);
+    fluids_parameters.gravity.y=-(T)9.8*m/(s*s);
     fluids_parameters.density=(T)1*kg/(m*m);
     fluids_parameters.outside_density=(T)2*kg/(m*m);
     fluids_parameters.viscosity=(T)1*kg/s;
@@ -405,7 +405,7 @@ Poiseuille_Flow_Test()
 template<class T> void KANG<T>::
 Couette_Flow_Test()
 {
-    fluids_parameters.gravity=(T)0*m/(s*s);
+    fluids_parameters.gravity.y=-(T)0*m/(s*s);
     fluids_parameters.density=(T)1*kg/(m*m);
     fluids_parameters.outside_density=(T)1*kg/(m*m);
     fluids_parameters.viscosity=(T)1*kg/s;
@@ -421,7 +421,7 @@ Couette_Flow_Test()
 template<class T> void KANG<T>::
 Circular_Couette_Flow_Test()
 {
-    fluids_parameters.gravity=(T)0*m/(s*s);
+    fluids_parameters.gravity.y=-(T)0*m/(s*s);
     fluids_parameters.density=(T)1*kg/(m*m);
     fluids_parameters.outside_density=(T)2*kg/(m*m);
     fluids_parameters.viscosity=(T)1*kg/s;
@@ -437,7 +437,7 @@ Circular_Couette_Flow_Test()
 template<class T> void KANG<T>::
 Radial_Flow_Test()
 {
-    fluids_parameters.gravity=(T)0*m/(s*s);
+    fluids_parameters.gravity.y=-(T)0*m/(s*s);
     fluids_parameters.density=(T)1*kg/(m*m);
     fluids_parameters.outside_density=(T)2*kg/(m*m);
     fluids_parameters.viscosity=(T)1*kg/s;
@@ -453,7 +453,7 @@ Radial_Flow_Test()
 template<class T> void KANG<T>::
 Kang_Example_1()
 {
-    fluids_parameters.gravity=(T)9.8*m/(s*s);
+    fluids_parameters.gravity.y=-(T)9.8*m/(s*s);
     //fluids_parameters.density=(T)1.226*kg/(m*m);
     fluids_parameters.density=(T)1000*kg/(m*m);
     fluids_parameters.outside_density=(T)1000*kg/(m*m);

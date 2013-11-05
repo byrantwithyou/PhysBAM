@@ -64,7 +64,7 @@ public:
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     int sphere;
     INTERPOLATION_CURVE<T,TV> motion_curve;
-    T solid_gravity;
+    TV solid_gravity;
     bool use_solids_gravity;
     bool transition_to_incompressible;
     EOS_SMOOTH_TRANSITION_INCOMPRESSIBLE<EOS_GAMMA<T> >* eos_smooth_transition;
@@ -242,8 +242,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
         fluids_parameters.use_temperature=true;
         fluids_parameters.use_fixed_density_boundary=true;
         fluids_parameters.use_fixed_temperature_boundary=true;
-        if(use_incompressible_gravity) fluids_parameters.gravity=(T)9.8;
-        else fluids_parameters.gravity=(T)0;}
+        if(use_incompressible_gravity) fluids_parameters.gravity.y=(T)9.8;
+        else fluids_parameters.gravity.y=-(T)0;}
 
     if(test_number==2||test_number==3) fluids_parameters.solid_affects_fluid=true;
     bool simulate_rigids=(test_number==4||test_number==5||test_number==6||test_number==7||test_number==9);
@@ -271,7 +271,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     
         solids_parameters.use_rigid_deformable_contact=true;
         solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
-        solid_gravity=(T)9.8;}
+        solid_gravity=TV(0,-(T)9.8);}
 
     motion_curve.Add_Control_Point(0,TV((T).65,(T).11)*grid_size);
     motion_curve.Add_Control_Point((T).04,TV((T).56,(T).02)*grid_size); // .03 was old

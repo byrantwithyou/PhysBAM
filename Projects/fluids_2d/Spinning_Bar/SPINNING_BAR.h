@@ -79,7 +79,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.elastic_modulus=1000;
     fluids_parameters.plasticity_alpha=0;
     fluids_parameters.cfl/=10;
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
     frame_rate*=5;
 
     angular_velocity=5;

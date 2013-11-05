@@ -21,7 +21,7 @@ EULER()
     else conservation->Set_Custom_Object_Boundary(*new BOUNDARY_OBJECT_EULER<TV>);
     eos=&eos_default;
     Set_Max_Time_Step();
-    Set_Gravity(0);
+    gravity=TV();
     Set_CFL_Number();
 }
 //#####################################################################

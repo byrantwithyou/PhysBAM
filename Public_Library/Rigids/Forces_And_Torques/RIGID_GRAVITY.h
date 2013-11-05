@@ -17,27 +17,23 @@ class RIGID_GRAVITY:public RIGID_POINTWISE_FORCE<TV>
 public:
     typedef RIGID_POINTWISE_FORCE<TV> BASE;
     typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
-    T gravity;
-    TV downward_direction;
+    TV gravity;
     
     using BASE::force_rigid_body_particles;using BASE::rigid_body_collection;
 public:
 
     RIGID_GRAVITY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_rigid_body_particles_input,
-        const T gravity_input=9.8,const TV& downward_direction_input=-TV::Axis_Vector(1-(TV::dimension==1)))
-        :BASE(rigid_body_collection_input,influenced_rigid_body_particles_input),gravity(gravity_input),downward_direction(downward_direction_input)
+        const TV& gravity_input=-(T)9.8*TV::Axis_Vector(1-(TV::dimension==1)))
+        :BASE(rigid_body_collection_input,influenced_rigid_body_particles_input),gravity(gravity_input)
     {}
 
     RIGID_GRAVITY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_rigid_body_particles_input,
-        const T gravity_input=9.8,const TV& downward_direction_input=-TV::Axis_Vector(1-(TV::dimension==1)))
-        :BASE(rigid_body_collection_input,influence_all_rigid_body_particles_input),gravity(gravity_input),downward_direction(downward_direction_input)
+        const TV& gravity_input=-(T)9.8*TV::Axis_Vector(1-(TV::dimension==1)))
+        :BASE(rigid_body_collection_input,influence_all_rigid_body_particles_input),gravity(gravity_input)
     {}
 
     virtual ~RIGID_GRAVITY()
     {}
-
-    void Set_Gravity(const TV& gravity_vector)
-    {downward_direction=gravity_vector;gravity=downward_direction.Normalize();}
 
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const PHYSBAM_OVERRIDE
     {}

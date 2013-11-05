@@ -30,7 +30,7 @@ public:
     typedef INCOMPRESSIBLE<TV> BASE;
     using BASE::use_force;using BASE::surface_tension;using BASE::use_variable_surface_tension;using BASE::viscosity;using BASE::use_variable_viscosity;
     using BASE::use_variable_vorticity_confinement;using BASE::dt_old;using BASE::gravity;using BASE::nonzero_surface_tension;using BASE::nonzero_viscosity;
-    using BASE::downward_direction;using BASE::Set_Custom_Advection;using BASE::valid_mask;
+    using BASE::Set_Custom_Advection;using BASE::valid_mask;
     using BASE::use_explicit_part_of_implicit_viscosity;using BASE::vorticity_confinement;using BASE::max_time_step;using BASE::advection;
     using BASE::maximum_implicit_viscosity_iterations;
     

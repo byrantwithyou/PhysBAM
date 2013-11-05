@@ -281,7 +281,7 @@ template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Update_Fluid_Parameters(const T dt,const T time)
 {
     if(!incompressible) return;
-    incompressible->Set_Gravity(gravity,gravity_direction);
+    incompressible->gravity=gravity;
     incompressible->Set_Body_Force(use_body_force);
     incompressible->projection.Use_Non_Zero_Divergence(use_non_zero_divergence);
     incompressible->projection.elliptic_solver->Solve_Neumann_Regions(solve_neumann_regions);
@@ -578,7 +578,6 @@ Distribute_Parameters(FLUIDS_PARAMETERS_UNIFORM<TV>& global_parameters,THREADED_
     threaded_grid.Distribute_Scalar(incompressible->projection.elliptic_solver->psi_D,global_parameters.incompressible->projection.elliptic_solver->psi_D);
     threaded_grid.Distribute_Face_Scalar(incompressible->projection.elliptic_solver->psi_N,global_parameters.incompressible->projection.elliptic_solver->psi_N);
     confinement_parameter=global_parameters.confinement_parameter;
-    gravity_direction=global_parameters.gravity_direction;
     gravity=global_parameters.gravity;
     use_surface_solve=global_parameters.use_surface_solve;
     use_maccormack_for_incompressible=global_parameters.use_maccormack_for_incompressible;

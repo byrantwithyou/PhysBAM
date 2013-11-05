@@ -12,10 +12,9 @@ using namespace PhysBAM;
 template<class TV> void BW_GRAVITY<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    if(!gravity) return;
-    TV acceleration=gravity*downward_direction;
+    if(!gravity.Magnitude_Squared()) return;
     for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){
-        int p=iterator.Data();F(p)+=particles.mass(p)*acceleration;}
+        int p=iterator.Data();F(p)+=particles.mass(p)*gravity;}
 }
 //#####################################################################
 // Function Potential_Energy
@@ -24,9 +23,8 @@ template<class TV> typename TV::SCALAR BW_GRAVITY<TV>::
 Potential_Energy(const T time) const
 {
     T potential_energy=0;
-    TV acceleration=gravity*downward_direction;
     for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
-        potential_energy-=particles.mass(p)*TV::Dot_Product(particles.X(p),acceleration);}
+        potential_energy-=particles.mass(p)*TV::Dot_Product(particles.X(p),gravity);}
     return potential_energy;
 }
 //#####################################################################

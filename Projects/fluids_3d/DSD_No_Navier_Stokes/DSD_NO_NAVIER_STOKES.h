@@ -85,7 +85,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.use_vorticity_confinement=false;
     fluids_parameters.use_vorticity_confinement_fuel=false;
     fluids_parameters.cfl=(T)1.9;
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.fuel_region(1)=true;
 
     //DSD parameters

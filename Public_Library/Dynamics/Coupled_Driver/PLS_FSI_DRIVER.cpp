@@ -459,11 +459,11 @@ Advect_Fluid(const T dt,const int substep)
         PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());
         for(int p=0;p<particles.Size();p++){
             TV X=particles.X(p),V=interpolation.Clamped_To_Array_Face(grid,face_velocities_ghost,X);
-            if(-pls.levelset.Phi(X)>1.5*particles.radius(p)) V-=fluids_parameters.removed_positive_particle_buoyancy_constant*fluids_parameters.gravity_direction; // buoyancy
+            if(-pls.levelset.Phi(X)>1.5*particles.radius(p)) V-=fluids_parameters.removed_positive_particle_buoyancy_constant*fluids_parameters.gravity.Normalized(); // buoyancy
             particles.V(p)=V;}}
     if(pls.use_removed_negative_particles) for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_negative_particles(iterator.Node_Index())){
         PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_negative_particles(iterator.Node_Index());
-        for(int p=0;p<particles.Size();p++) particles.V(p)+=dt*fluids_parameters.gravity*fluids_parameters.gravity_direction; // ballistic
+        for(int p=0;p<particles.Size();p++) particles.V(p)+=dt*fluids_parameters.gravity; // ballistic
         if(fluids_parameters.use_body_force) for(int p=0;p<particles.Size();p++)
             particles.V(p)+=dt*interpolation.Clamped_To_Array_Face(grid,incompressible->force,particles.X(p));} // external forces
 

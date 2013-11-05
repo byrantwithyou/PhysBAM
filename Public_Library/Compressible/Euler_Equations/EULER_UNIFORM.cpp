@@ -220,9 +220,10 @@ template<class TV> void EULER_UNIFORM<TV>::
 Advance_One_Time_Step_Forces(const T dt,const T time)
 {
     // update gravity
-    if(gravity) for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        for(int axis=0;axis<TV::m;axis++){
-            if(downward_direction[axis]) U(cell_index)(axis+1)+=dt*U(cell_index)(0)*gravity*downward_direction[axis];}}
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+        for(int axis=0;axis<TV::m;axis++)
+            if(gravity[axis])
+                U(cell_index)(axis+1)+=dt*U(cell_index)(0)*gravity[axis];}
 
     // update body force
     if(use_force) for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();

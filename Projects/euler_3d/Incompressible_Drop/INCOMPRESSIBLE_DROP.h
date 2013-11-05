@@ -83,7 +83,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.store_particle_ids=true;
     fluids_parameters.use_vorticity_confinement=false;
     fluids_parameters.use_vorticity_confinement_fuel=false;
-    fluids_parameters.gravity=false;
+    fluids_parameters.gravity=TV();
 
     //grid
     int cells=resolution;

@@ -169,7 +169,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         initial_sources_velocity.Append(initial_source1_velocity);
         initial_sources_bounding_box.Append(initial_source1_bounding_box);
 
-        fluids_parameters.gravity=(T)0;
+        fluids_parameters.gravity=TV();
         time_pour_end=-1;
         IMAGE<T>::Read("Density_Targetting/circle.jpg",target_image);
         grid_image.Initialize(target_image.Size(),RANGE<TV>(TV((T)1.5,1),TV((T)2.5,2)));

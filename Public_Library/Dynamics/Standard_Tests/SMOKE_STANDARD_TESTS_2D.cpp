@@ -29,7 +29,7 @@ SMOKE_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNI
     fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,TV::m>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(false));
     fluids_parameters.domain_walls(1)(0)=true;
     fluids_parameters.use_vorticity_confinement=true;fluids_parameters.confinement_parameter=(T).04;        
-    fluids_parameters.kolmogorov=(T)0;fluids_parameters.gravity=0;
+    fluids_parameters.kolmogorov=(T)0;fluids_parameters.gravity=TV();
     rho=1;fluids_parameters.rho_bottom=1;fluids_parameters.rho_top=(T).65;
     fluids_parameters.density_buoyancy_constant=fluids_parameters.temperature_buoyancy_constant=0;
     fluids_parameters.temperature_container.Set_Cooling_Constant(0);fluids_parameters.temperature_products=(T)3000;
@@ -53,7 +53,7 @@ Initialize(const int test_number_input,const int resolution,const T angle_fracti
     else if(test_number==4){
         fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,TV::m>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(true));
         fluids_parameters.use_vorticity_confinement=false;
-        fluids_parameters.gravity=(T)0;
+        fluids_parameters.gravity=TV();
         fluids_parameters.use_poisson=true;  // TODO This is a hack to tell Projection to use poisson rather than laplace
         // TODO: need to call use_variable_beta on the poisson solver if we ACTUALLY want to use variable beta
         fluids_parameters.second_order_cut_cell_method=false;

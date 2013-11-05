@@ -39,8 +39,7 @@ protected:
     bool cut_out_grid; // (1) cut out grid, (0) no cut out grid 
     T max_time_step;
     bool use_force;
-    T gravity;
-    TV downward_direction;
+    TV gravity;
 private:
     BOUNDARY<TV,TV_DIMENSION> boundary_default;
     CONSERVATION_ENO_LLF<TV,d> conservation_default;
@@ -145,12 +144,6 @@ public:
 
     void Set_Max_Time_Step(const T max_time_step_input=1e8)
     {max_time_step=max_time_step_input;}
-
-    void Set_Gravity(const T gravity_input=9.8)
-    {gravity=gravity_input;downward_direction=TV::m>1?-TV::Axis_Vector(1):TV();}
-
-    void Set_Gravity(const T gravity_input,const TV& downward_direction_input)
-    {gravity=gravity_input;downward_direction=downward_direction_input;}
 
     void Set_CFL_Number(const T cfl_number_input=.5)
     {cfl_number=cfl_number_input;}

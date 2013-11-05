@@ -39,7 +39,7 @@ public:
         fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
         last_frame=int(T(20)*frame_rate);
         fluids_parameters.incompressible_iterations=200;
-        fluids_parameters.gravity=0;
+        fluids_parameters.gravity=TV();
         fluids_parameters.density_container.Set_Ambient_Density(0);
         fluids_parameters.temperature_container.Set_Cooling_Constant((T)5000);
         fluids_parameters.temperature_container.Set_Ambient_Temperature((T)283.15);

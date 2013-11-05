@@ -136,7 +136,7 @@ Parse_Options()
     exact_dt*=s;
     solids_parameters.use_post_cg_constraints=true;
 
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.use_levelset_viscosity=false;
     fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
     fluids_parameters.number_particles_per_cell=16;
@@ -325,7 +325,7 @@ template<class T> void STANDARD_TESTS<T>::
 Kang_Circle(bool use_surface)
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    fluids_parameters.gravity=(T)0*m/(s*s);
+    fluids_parameters.gravity.y=-(T)0*m/(s*s);
     fluids_parameters.density=(T)1000*kg/(m*m);
     fluids_parameters.domain_walls[0][0]=true;
     fluids_parameters.domain_walls[0][1]=true;
@@ -742,11 +742,11 @@ FSI_Analytic_Test()
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
-    T solid_gravity=(T)9.8*m/(s*s);
+    TV solid_gravity=TV(0,-(T)9.8*m/(s*s));
     fluids_parameters.surface_tension=0;
     debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
 
-    fluids_parameters.gravity=(T)9.8*m;
+    fluids_parameters.gravity.y=-(T)9.8*m;
     fluids_parameters.density=(T)100/(m*m);
     fluids_parameters.domain_walls[0][0]=true;
     fluids_parameters.domain_walls[0][1]=true;
@@ -774,7 +774,7 @@ FSI_Analytic_Test()
     T rho=fluids_parameters.density;
     TV size=fluids_parameters.grid->domain.Edge_Lengths();
     size.x=(size.x-solid_width)/2;
-    analytic_solution=-(solid_mass*solid_gravity+rho*size.x*size.y*fluids_parameters.gravity)*size.x/(2*size.y*fluids_parameters.viscosity);
+    analytic_solution=-(solid_mass*-solid_gravity.y+rho*size.x*size.y*fluids_parameters.gravity)*size.x/(2*size.y*fluids_parameters.viscosity);
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
 
     FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),0));

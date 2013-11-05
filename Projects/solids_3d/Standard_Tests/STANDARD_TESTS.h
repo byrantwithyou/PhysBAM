@@ -1412,7 +1412,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             if(triangulated_surface.mesh.elements.m != cloth_triangles){
                 LOG::cerr<<"we got "<<triangulated_surface.mesh.elements.m<<" and expected "<<cloth_triangles<<" with side_length="<<side_length<<std::endl;
                 PHYSBAM_FATAL_ERROR();}
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0,(T)64));
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0,TV(0,-64,0)));
             T linear_stiffness=40,linear_damping=2;
             solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
             //T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;

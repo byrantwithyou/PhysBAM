@@ -43,7 +43,7 @@ public:
     {
         //fluids_parameters.cfl=0.75;
         fluids_parameters.cfl=.9;
-        fluids_parameters.gravity=0;
+        fluids_parameters.gravity=TV();
         fluids_parameters.density=1;
         //fluids_parameters.cfl=1.75;
         fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=true;

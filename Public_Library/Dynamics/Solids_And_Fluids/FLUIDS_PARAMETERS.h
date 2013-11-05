@@ -41,8 +41,7 @@ public:
     bool quadtree,octree;
     int number_of_ghost_cells;
     T cfl;
-    T gravity;
-    TV gravity_direction;
+    TV gravity;
     GRID<TV>* grid;
 protected:
     bool need_destroy_grid;

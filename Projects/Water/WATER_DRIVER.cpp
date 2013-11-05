@@ -154,7 +154,7 @@ Initialize()
     example.particle_levelset_evolution.Delete_Particles_Outside_Grid();
     
     //add forces
-    example.incompressible.Set_Gravity();
+    example.incompressible.gravity=-(T)9.8*TV::Axis_Vector(1-(TV::dimension==1));
     example.incompressible.Set_Body_Force(true);
     example.incompressible.projection.Use_Non_Zero_Divergence(false);
     example.incompressible.projection.elliptic_solver->Solve_Neumann_Regions(true);

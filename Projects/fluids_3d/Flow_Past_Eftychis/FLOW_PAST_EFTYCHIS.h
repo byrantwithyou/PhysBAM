@@ -82,7 +82,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     else if(test_number==2){
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=true;
-        fluids_parameters.gravity=0;
+        fluids_parameters.gravity=TV();
         source_sphere.radius=(T).1;
         source_sphere.center=TV((T)-.24,(T).62,(T).25);
         source_vector=TV((T).66666,0,(T)-.66666);
@@ -91,11 +91,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
     else if(test_number==3){
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=true;
-        //fluids_parameters.gravity=0;
+        //fluids_parameters.gravity=TV();
         source_sphere.radius=(T).1;
         source_sphere.center=TV((T)-.24,(T).62,(T).25);
         source_vector=TV((T).66666,0,(T)-.66666);
-        fluids_parameters.gravity_direction=source_vector;
+        fluids_parameters.gravity=source_vector*fluids_parameters.gravity.Magnitude();
         fluids_parameters.confinement_parameter=(T).15;
     }
  

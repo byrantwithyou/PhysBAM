@@ -38,7 +38,7 @@ public:
     using BASE::use_soot_fuel_combustion;using BASE::burn_temperature_threshold;using BASE::burn_rate;
     using BASE::soot_fuel_calorific_value;
     using BASE::domain_walls;
-    using BASE::callbacks;using BASE::gravity;using BASE::gravity_direction;using BASE::phi_boundary;using BASE::fluid_boundary;using BASE::fluid_boundary_water;
+    using BASE::callbacks;using BASE::gravity;using BASE::phi_boundary;using BASE::fluid_boundary;using BASE::fluid_boundary_water;
     using BASE::phi_boundary_water;using BASE::boundary_mac_slip;using BASE::normal_flame_speed;using BASE::curvature_flame_speed;using BASE::surface_tension;
     using BASE::variable_surface_tension;using BASE::viscosity;using BASE::viscosity_fuel;using BASE::variable_viscosity;using BASE::implicit_viscosity;
     using BASE::implicit_viscosity_iterations;using BASE::use_vorticity_confinement;using BASE::confinement_parameter;

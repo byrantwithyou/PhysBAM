@@ -154,7 +154,7 @@ Parse_Options()
     solids_parameters.use_post_cg_constraints=true;
     if(use_phi || remesh) solids_parameters.write_static_variables_every_frame=true;
 
-    fluids_parameters.gravity=0;
+    fluids_parameters.gravity=TV();
     fluids_parameters.use_levelset_viscosity=false;
     fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
     fluids_parameters.number_particles_per_cell=16;
@@ -457,17 +457,17 @@ Kang_Circle(bool use_surface)
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     if(test_number==7){
-        fluids_parameters.gravity=(T)(8e-4)*m/(s*s);
+        fluids_parameters.gravity.y=-(T)(8e-4)*m/(s*s);
         fluids_parameters.density=(T)10000*kg/(m*m);
         fluids_parameters.outside_density=(T)1000*kg/(m*m);
         fluids_parameters.viscosity=1*kg/s;
         fluids_parameters.surface_tension=(T).5;}
     else if(test_number==1 || test_number==3){
-        fluids_parameters.gravity=(T)0*m/(s*s);
+        fluids_parameters.gravity.y=-(T)0*m/(s*s);
         fluids_parameters.density=(T)1000*kg/(m*m);
         fluids_parameters.outside_density=(T)1*kg/(m*m);}
     else if(test_number==10 || test_number==9){
-        fluids_parameters.gravity=(T)0*m/(s*s);
+        fluids_parameters.gravity.y=-(T)0*m/(s*s);
         fluids_parameters.density=(T)10000*kg/(m*m);
         if(two_phase) fluids_parameters.outside_density=(T)1*kg/(m*m);
         else fluids_parameters.outside_density=(T)0;
@@ -476,7 +476,7 @@ Kang_Circle(bool use_surface)
     else if(test_number==11 || test_number==13){
         two_phase=true;
         if(test_number==13) fluids_parameters.second_order_cut_cell_method=true;
-        fluids_parameters.gravity=(T)9.8*m/(s*s);
+        fluids_parameters.gravity.y=-(T)9.8*m/(s*s);
         fluids_parameters.density=(T)1000*kg/(m*m);
         fluids_parameters.outside_density=(T)1.226*kg/(m*m);
         fluids_parameters.viscosity=(T)1.78e-5*kg/s;
@@ -494,7 +494,7 @@ Kang_Circle(bool use_surface)
         if(use_T_nu) frame_rate=(T)last_frame/T_nu;
         else frame_rate=(T)last_frame/(3*T_sig);
         two_phase=true;
-        fluids_parameters.gravity=(T)0*m/(s*s);
+        fluids_parameters.gravity.y=-(T)0*m/(s*s);
         fluids_parameters.density=density*kg/(m*m);
         fluids_parameters.outside_density=density*kg/(m*m);
         // this is dynamic viscosity=kinematic viscosity * density
@@ -1105,11 +1105,11 @@ FSI_Analytic_Test()
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
-    T solid_gravity=(T)9.8*m/(s*s);
+    TV solid_gravity=TV(0,-(T)9.8*m/(s*s));
     fluids_parameters.surface_tension=0;
     debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
 
-    fluids_parameters.gravity=(T)9.8*m;
+    fluids_parameters.gravity.y=-(T)9.8*m;
     fluids_parameters.density=(T)100/(m*m);
     fluids_parameters.domain_walls[0][0]=true;
     fluids_parameters.domain_walls[0][1]=true;
@@ -1137,7 +1137,7 @@ FSI_Analytic_Test()
     T rho=fluids_parameters.density;
     TV size=fluids_parameters.grid->domain.Edge_Lengths();
     size.x=(size.x-solid_width)/2;
-    analytic_solution=-(solid_mass*solid_gravity+rho*size.x*size.y*fluids_parameters.gravity)*size.x/(2*size.y*fluids_parameters.viscosity);
+    analytic_solution=-(solid_mass*-solid_gravity.y+rho*size.x*size.y*-fluids_parameters.gravity.y)*size.x/(2*size.y*fluids_parameters.viscosity);
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
 
     FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),0));
