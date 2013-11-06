@@ -1,4 +1,7 @@
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Tools/Matrices/MATRIX_1X1.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Clamped_To_Array_No_Extrema
@@ -190,3 +193,83 @@ From_Block_Face_Component_Weights(const int axis,const GRID<TV>& grid,const BLOC
 {
     return LINEAR_INTERPOLATION_MAC_HELPER<TV>::Interpolate_Face_Component_Weights(axis,block,u,X);
 }
+namespace{
+//#####################################################################
+// Function From_Base_Node_Helper
+//#####################################################################
+template<class T> VECTOR<T,1>
+From_Base_Node_Gradient_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<T,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
+{
+    int i=index.x;
+    return LINEAR_INTERPOLATION<T,T>::Linear_Gradient(u(index),u(i+1),(X-grid.X(index))*grid.one_over_dX)*grid.one_over_dX;
+}
+//#####################################################################
+// Function From_Base_Node_Helper
+//#####################################################################
+template<class T> VECTOR<T,2>
+From_Base_Node_Gradient_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<T,VECTOR<int,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index)
+{
+    int i=index.x,j=index.y;
+    return LINEAR_INTERPOLATION<T,T>::Bilinear_Gradient(u(index),u(i+1,j),u(i,j+1),u(i+1,j+1),(X-grid.X(index))*grid.one_over_dX)*grid.one_over_dX;
+}
+//#####################################################################
+// Function From_Base_Node_Helper
+//#####################################################################
+template<class T> VECTOR<T,3>
+From_Base_Node_Gradient_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<T,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index)
+{
+    const T *base=&u(index),*basep1=base+u.stride.x;
+    return LINEAR_INTERPOLATION<T,T>::Trilinear_Gradient(*base,*basep1,base[u.stride.y],basep1[u.stride.y],base[1],basep1[1],base[u.stride.y+1],basep1[u.stride.y+1],(X-grid.X(index))*grid.one_over_dX)*grid.one_over_dX;
+}
+}
+//#####################################################################
+// Function Clamped_To_Array
+//#####################################################################
+template<class TV,class T2,class T_FACE_LOOKUP> TV LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Clamped_To_Array_Gradient(const GRID<TV>& grid,const ARRAYS_ND_BASE<T,TV_INT>& u,const TV& X) const
+{
+    TV_INT index=INTERPOLATION_UNIFORM<TV,T,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u,X);
+    return From_Base_Node_Gradient_Helper(grid,u,X,index);
+}
+namespace{
+//#####################################################################
+// Function From_Base_Node_Helper
+//#####################################################################
+template<class T> SYMMETRIC_MATRIX<T,1>
+From_Base_Node_Hessian_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<T,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
+{
+    int i=index.x;
+    SYMMETRIC_MATRIX<T,1> S=LINEAR_INTERPOLATION<T,T>::Linear_Hessian(u(index),u(i+1),(X-grid.X(index))*grid.one_over_dX);
+    return SYMMETRIC_MATRIX<T,1>::Conjugate(DIAGONAL_MATRIX<T,1>(grid.one_over_dX),S);
+}
+//#####################################################################
+// Function From_Base_Node_Helper
+//#####################################################################
+template<class T> SYMMETRIC_MATRIX<T,2>
+From_Base_Node_Hessian_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<T,VECTOR<int,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index)
+{
+    int i=index.x,j=index.y;
+    SYMMETRIC_MATRIX<T,2> S=LINEAR_INTERPOLATION<T,T>::Bilinear_Hessian(u(index),u(i+1,j),u(i,j+1),u(i+1,j+1),(X-grid.X(index))*grid.one_over_dX);
+    return SYMMETRIC_MATRIX<T,2>::Conjugate(DIAGONAL_MATRIX<T,2>(grid.one_over_dX),S);
+}
+//#####################################################################
+// Function From_Base_Node_Helper
+//#####################################################################
+template<class T> SYMMETRIC_MATRIX<T,3>
+From_Base_Node_Hessian_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<T,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index)
+{
+    const T *base=&u(index),*basep1=base+u.stride.x;
+    SYMMETRIC_MATRIX<T,3> S=LINEAR_INTERPOLATION<T,T>::Trilinear_Hessian(*base,*basep1,base[u.stride.y],basep1[u.stride.y],base[1],basep1[1],base[u.stride.y+1],basep1[u.stride.y+1],(X-grid.X(index))*grid.one_over_dX);
+    return SYMMETRIC_MATRIX<T,3>::Conjugate(DIAGONAL_MATRIX<T,3>(grid.one_over_dX),S);
+}
+}
+//#####################################################################
+// Function Clamped_To_Array
+//#####################################################################
+template<class TV,class T2,class T_FACE_LOOKUP> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Clamped_To_Array_Hessian(const GRID<TV>& grid,const ARRAYS_ND_BASE<T,TV_INT>& u,const TV& X) const
+{
+    TV_INT index=INTERPOLATION_UNIFORM<TV,T,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u,X);
+    return From_Base_Node_Hessian_Helper(grid,u,X,index);
+}
+

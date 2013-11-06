@@ -7,6 +7,7 @@
 #ifndef __LINEAR_INTERPOLATION__
 #define __LINEAR_INTERPOLATION__
 
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
@@ -54,6 +55,22 @@ public:
     static T2 Trilinear(const T2& u1,const T2& u2,const T2& u3,const T2& u4,const T2& u5,const T2& u6,const T2& u7,const T2& u8,const VECTOR<T,3>& X);
     static T2 Trilinear(const T2& u1,const T2& u3,const T2& u5,const T2& u7,T one_over_y_top_minus_y_bottom,T one_over_z_back_minus_z_front,const T x_left,const T y_bottom,const T z_front,
         const T2& slope12,const T2& slope34,const T2& slope56,const T2& slope78,const VECTOR<T,3>& X);
+
+    static VECTOR<T2,1> Linear_Gradient(const T2& u_left,const T2& u_right,const VECTOR<T,1>& X)
+    {return VECTOR<T2,1>(u_right-u_left);}
+
+    static VECTOR<T2,2> Bilinear_Gradient(const T2& u1,const T2& u2,const T2& u3,const T2& u4,const VECTOR<T,2>& X)
+    {return VECTOR<T2,2>(Linear(u2-u1,u4-u3,X.y),Linear(u3-u1,u4-u2,X.x));}
+
+    static VECTOR<T2,3> Trilinear_Gradient(const T2& u1,const T2& u2,const T2& u3,const T2& u4,const T2& u5,const T2& u6,const T2& u7,const T2& u8,const VECTOR<T,3>& X);
+
+    static SYMMETRIC_MATRIX<T2,1> Linear_Hessian(const T2& u_left,const T2& u_right,const VECTOR<T,1>& X)
+    {return SYMMETRIC_MATRIX<T2,1>();}
+
+    static SYMMETRIC_MATRIX<T2,2> Bilinear_Hessian(const T2& u1,const T2& u2,const T2& u3,const T2& u4,const VECTOR<T,2>& X)
+    {return SYMMETRIC_MATRIX<T2,2>(T2(),u4-u3-u2+u1,T2());}
+
+    static SYMMETRIC_MATRIX<T2,3> Trilinear_Hessian(const T2& u1,const T2& u2,const T2& u3,const T2& u4,const T2& u5,const T2& u6,const T2& u7,const T2& u8,const VECTOR<T,3>& X);
 
 //#####################################################################
 };

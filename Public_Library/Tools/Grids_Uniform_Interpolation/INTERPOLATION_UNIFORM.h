@@ -83,6 +83,8 @@ public:
     virtual T2 Clamped_To_Array_No_Extrema(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual ARRAY<PAIR<TV_INT,T> > Clamped_To_Array_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual T2 Clamped_To_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+    virtual TV Clamped_To_Array_Gradient(const GRID<TV>& grid,const ARRAYS_ND_BASE<T,TV_INT>& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+    virtual SYMMETRIC_MATRIX<T,TV::m> Clamped_To_Array_Hessian(const GRID<TV>& grid,const ARRAYS_ND_BASE<T,TV_INT>& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual ARRAY<PAIR<TV_INT,T> > From_Base_Node_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual T2 From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual TV From_Block_Face(const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
