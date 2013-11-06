@@ -61,15 +61,18 @@ Test(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>& h) const
 
     for(int i=0,n=dx->Raw_Size();i<n;i++)
         dx->Raw_Get(i)=random.Get_Uniform_Number(-eps,eps);
+    h.Project(*dx);
 
     T e0=0,e1=0;
     Compute(x,&h,g0,&e0);
     h.Multiply(*dx,*a);
+    h.Project(*a);
 
     // new x
     b->Copy(1,x,*dx);
     Compute(*b,&h,g1,&e1);
     h.Multiply(*dx,*b);
+    h.Project(*b);
 
     T test0a=(h.Inner_Product(*g1,*dx)+h.Inner_Product(*g0,*dx))/(2*eps);
     T test0b=(e1-e0)/eps;
