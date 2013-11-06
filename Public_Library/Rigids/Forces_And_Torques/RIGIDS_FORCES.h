@@ -74,7 +74,7 @@ public:
     virtual int Velocity_Dependent_Forces_Size() const;
     virtual void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<T> aggregate,const T time) const;
     virtual void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const;
-    virtual void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const;
+    virtual void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T scale,const T time) const;
     virtual void Enforce_Definiteness(const bool enforce_definiteness_input);
     virtual T CFL_Strain_Rate() const=0;
     virtual void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> rigid_frequency)=0;

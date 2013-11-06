@@ -338,15 +338,12 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,
 // Function Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T scale,const T time) const
 {
     assert(V_full.Size()==particles.Size() && F_full.Size()==particles.Size());
-    INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> F_subset=F_full.Subset(dynamic_particles);
-    F_subset.Fill(TV()); // note we zero here because we will scale the forces below
-    bool added=false;
-    for(int k=0;k<deformables_forces.m;k++) if(deformables_forces(k)->use_implicit_velocity_independent_forces){
-        deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,F_full,time);added=true;}
-    if(added) F_full.Subset(simulated_particles)*=scale;
+    for(int k=0;k<deformables_forces.m;k++)
+        if(deformables_forces(k)->use_implicit_velocity_independent_forces)
+            deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,F_full,scale,time);
 }
 //#####################################################################
 // Function Add_Force
@@ -409,13 +406,12 @@ Test_Force_Derivatives(const T time)
         ARRAY<TV> F(particles.X.m),G(particles.X.m);
         deformables_forces(i)->Update_Position_Based_State(time,true);
         deformables_forces(i)->Add_Velocity_Independent_Forces(F,time);
-        deformables_forces(i)->Add_Implicit_Velocity_Independent_Forces(dX,G,time);
+        deformables_forces(i)->Add_Implicit_Velocity_Independent_Forces(dX,G,(T).5,time);
         F*=-(T)1;
         particles.X.Exchange(X2);
         deformables_forces(i)->Update_Position_Based_State(time,true);
         deformables_forces(i)->Add_Velocity_Independent_Forces(F,time);
-        deformables_forces(i)->Add_Implicit_Velocity_Independent_Forces(dX,G,time);
-        G*=(T).5;
+        deformables_forces(i)->Add_Implicit_Velocity_Independent_Forces(dX,G,(T).5,time);
         particles.X.Exchange(X2);
         deformables_forces(i)->Update_Position_Based_State(time,true);
         T MF=sqrt(F.Magnitude_Squared());

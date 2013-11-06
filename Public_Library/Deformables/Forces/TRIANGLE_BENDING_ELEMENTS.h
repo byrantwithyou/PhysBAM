@@ -121,7 +121,7 @@ public:
     void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE;
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const PHYSBAM_OVERRIDE;
     T CFL_Strain_Rate() const PHYSBAM_OVERRIDE;
     T Compute_Discrete_Shell_Energy();
     void Initialize_Reference_Quantities(const int hash_multiple=2);

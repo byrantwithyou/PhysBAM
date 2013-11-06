@@ -61,19 +61,19 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Velocity_Dependent_Forces
 //#####################################################################
 template<class TV,int d,int m> void BW_FORCES<TV,d,m>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
 {
     for(SIMPLEX_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
         // df_dx * v_0
         for(int i=0;i<m;i++) for(int j=0;j<m;j++){
             MATRIX<T,3> K=-state.stiffness_coefficient*(state.dC_dx(i)*state.dC_dx(j).Transposed()+state.dC_dxi_dxj_times_C(i,j));
-            F(state.nodes[i])+=K*V(state.nodes[j]);}
+            F(state.nodes[i])+=K*V(state.nodes[j])*scale;}
 
         // df_dx * v_0 (damping)
         for(int i=0;i<m;i++) for(int j=0;j<m;j++){
             MATRIX<T,3> K=-state.damping_coefficient*(state.dC_dxi_dxj_times_C_dot(i,j));
-            F(state.nodes[i])+=K*V(state.nodes[j]);}}
+            F(state.nodes[i])+=K*V(state.nodes[j])*scale;}}
 }
 //#####################################################################
 // Function Initialize_CFL

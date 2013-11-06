@@ -260,7 +260,7 @@ Copy_Back_Save_Quantities(const ARRAY<int>& node_map_to_saved)
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void TRIANGLE_BENDING_ELEMENTS<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }

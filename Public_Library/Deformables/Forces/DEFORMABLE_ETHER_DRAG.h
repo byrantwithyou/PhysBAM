@@ -59,7 +59,7 @@ public:
     TV Spatially_Varying_Wind_Velocity(const TV& X) const
     {return vector_interpolation.Clamped_To_Array(V_grid,*spatially_varying_wind,X);}
 
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const PHYSBAM_OVERRIDE
     {}
 
     void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE

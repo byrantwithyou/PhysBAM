@@ -143,7 +143,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TW
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void RIGID_LINEAR_SPRINGS<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T scale,const T time) const
 {
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
@@ -152,7 +152,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,AR
             const TWIST<TV>& twist=rigid_V(segment_mesh.elements(s)(i));
             V(i)=twist.linear+TV::Cross_Product(twist.angular,state.r(i));}
         TV dl=V(1)-V(0),dl_projected=dl.Projected_On_Unit_Direction(state.direction);
-        TV force=youngs_modulus(s)/restlength(s)*dl_projected;
+        TV force=youngs_modulus(s)/restlength(s)*scale*dl_projected;
         Add_Force(rigid_F,state,force);}
 }
 //#####################################################################

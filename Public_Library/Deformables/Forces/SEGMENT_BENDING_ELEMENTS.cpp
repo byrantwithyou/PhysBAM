@@ -128,7 +128,7 @@ CFL_Strain_Rate() const
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void SEGMENT_BENDING_ELEMENTS<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }

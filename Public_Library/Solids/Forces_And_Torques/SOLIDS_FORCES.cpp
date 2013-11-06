@@ -42,40 +42,64 @@ Limit_Time_Step_By_Strain_Rate(const bool limit_time_step_by_strain_rate_input,c
     limit_time_step_by_strain_rate=limit_time_step_by_strain_rate_input;
     assert(max_strain_per_time_step_input>0);max_strain_per_time_step=max_strain_per_time_step_input;
 }
+//#####################################################################
+// Function Velocity_Dependent_Forces_Size
+//#####################################################################
 template<class TV> int SOLIDS_FORCES<TV>::
 Velocity_Dependent_Forces_Size() const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
+//#####################################################################
+// Function Add_Velocity_Dependent_Forces_First_Half
+//#####################################################################
 template<class TV> void SOLIDS_FORCES<TV>::
 Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<T> aggregate,const T time) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
+//#####################################################################
+// Function Add_Velocity_Dependent_Forces_Second_Half
+//#####################################################################
 template<class TV> void SOLIDS_FORCES<TV>::
 Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
+//#####################################################################
+// Function Add_Implicit_Velocity_Independent_Forces
+//#####################################################################
 template<class TV> void SOLIDS_FORCES<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T scale,const T time) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
+//#####################################################################
+// Function Enforce_Definiteness
+//#####################################################################
 template<class TV> void SOLIDS_FORCES<TV>::
 Enforce_Definiteness(const bool enforce_definiteness_input)
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
+//#####################################################################
+// Function Potential_Energy
+//#####################################################################
 template<class TV> typename TV::SCALAR SOLIDS_FORCES<TV>::
 Potential_Energy(const T time) const
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return 0;
 }
+//#####################################################################
+// Function Add_Force_Data
+//#####################################################################
 template<class TV> void SOLIDS_FORCES<TV>::
 Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_name) const
 {
 };
+//#####################################################################
+// Function Update_Position_Based_State
+//#####################################################################
 template<class TV> void SOLIDS_FORCES<TV>::
 Update_Position_Based_State(const T time)
 {

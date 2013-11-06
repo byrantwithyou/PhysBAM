@@ -42,7 +42,9 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
         const COLLISION& c=collisions(i);
         t.V.array(c.p).Project_Orthogonal_To_Unit_Direction(c.n);}
 
-    solid_body_collection.Implicit_Velocity_Independent_Forces(t.V.array,t.rigid_V.array,F.V.array,F.rigid_V.array,-dt*dt,time);
+    F.V.array.Fill(TV());
+    F.rigid_V.array.Fill(TWIST<TV>());
+    solid_body_collection.Add_Implicit_Velocity_Independent_Forces(t.V.array,t.rigid_V.array,F.V.array,F.rigid_V.array,-dt*dt,time);
 
     for(int p=0;p<particles.number;p++) F.V.array(p)+=particles.mass(p)*t.V.array(p);
 

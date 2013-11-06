@@ -83,7 +83,7 @@ Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) // 1 is criti
 template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    Add_Implicit_Velocity_Independent_Forces(particles.X,F,time);
+    Add_Implicit_Velocity_Independent_Forces(particles.X,F,1,time);
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -104,15 +104,15 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
 {
     if(!stiffness.m) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
-        TV force=constant_stiffness*(V(node2)-V(node1));
+        TV force=constant_stiffness*scale*(V(node2)-V(node1));
         F(node1)+=force;F(node2)-=force;}
     else for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
-        TV force=stiffness(s)*(V(node2)-V(node1));
+        TV force=stiffness(s)*scale*(V(node2)-V(node1));
         F(node1)+=force;F(node2)-=force;}
 }
 //#####################################################################

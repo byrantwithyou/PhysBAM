@@ -112,7 +112,7 @@ public:
     void Update_Position_Based_State(const T time,const bool is_position_update);
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F_full,const T time) const;
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T time) const;
-    void Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T scale,const T time) const;
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T scale,const T time) const;
 
     void Test_Energy(const T time);
     void Test_Force_Derivatives(const T time);

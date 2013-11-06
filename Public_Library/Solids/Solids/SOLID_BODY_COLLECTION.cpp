@@ -114,22 +114,20 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST
 // Function Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T scale,
-    const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,
+    const T scale,const T time) const
 {
     assert(V_full.Size()==deformable_body_collection.particles.Size() && F_full.Size()==deformable_body_collection.particles.Size());
     assert(rigid_F_full.Size()==rigid_body_collection.rigid_body_particles.Size());
-    F_full.Subset(deformable_body_collection.dynamic_particles).Fill(TV()); // note we zero here because we will scale the forces below
-    rigid_F_full.Subset(rigid_body_collection.dynamic_rigid_body_particles).Fill(TWIST<TV>()); // note we zero here because we will scale the forces below
-    bool added_d=false,added_r=false;
-    for(int k=0;k<solids_forces.m;k++) if(solids_forces(k)->use_implicit_velocity_independent_forces){
-        solids_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,rigid_V_full,F_full,rigid_F_full,time);added_r=added_d=true;}
-    for(int k=0;k<rigid_body_collection.rigids_forces.m;k++) if(rigid_body_collection.rigids_forces(k)->use_implicit_velocity_independent_forces){
-        rigid_body_collection.rigids_forces(k)->Add_Implicit_Velocity_Independent_Forces(rigid_V_full,rigid_F_full,time);added_r=true;}
-    for(int k=0;k<deformable_body_collection.deformables_forces.m;k++) if(deformable_body_collection.deformables_forces(k)->use_implicit_velocity_independent_forces){
-        deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,F_full,time);added_d=true;}
-    if(added_r) rigid_F_full.Subset(rigid_body_collection.simulated_rigid_body_particles)*=scale;
-    if(added_d) F_full.Subset(deformable_body_collection.simulated_particles)*=scale;
+    for(int k=0;k<solids_forces.m;k++)
+        if(solids_forces(k)->use_implicit_velocity_independent_forces)
+            solids_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,rigid_V_full,F_full,rigid_F_full,scale,time);
+    for(int k=0;k<rigid_body_collection.rigids_forces.m;k++)
+        if(rigid_body_collection.rigids_forces(k)->use_implicit_velocity_independent_forces)
+            rigid_body_collection.rigids_forces(k)->Add_Implicit_Velocity_Independent_Forces(rigid_V_full,rigid_F_full,scale,time);
+    for(int k=0;k<deformable_body_collection.deformables_forces.m;k++)
+        if(deformable_body_collection.deformables_forces(k)->use_implicit_velocity_independent_forces)
+            deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,F_full,scale,time);
 }
 //#####################################################################
 // Function Force_Differential
@@ -140,7 +138,8 @@ Force_Differential(ARRAY_VIEW<const TV> dX_full,ARRAY_VIEW<TV> dF_full,const T t
     assert(dX_full.Size()==deformable_body_collection.particles.Size() && dF_full.Size()==deformable_body_collection.particles.Size());
     dF_full.Subset(deformable_body_collection.simulated_particles).Fill(TV());
     for(int k=0;k<deformable_body_collection.deformables_forces.m;k++)
-        if(deformable_body_collection.deformables_forces(k)->use_force_differential) deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(dX_full,dF_full,time);
+        if(deformable_body_collection.deformables_forces(k)->use_force_differential)
+            deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(dX_full,dF_full,1,time);
 }
 //#####################################################################
 // Function Enforce_Definiteness

@@ -106,7 +106,7 @@ public:
     void Set_Damping(const T damping_input);
     void Enable_Plasticity(const ARRAY<VECTOR<T,d+1> >& plastic_yield_strain_input,const ARRAY<VECTOR<T,d+1> >& plastic_hardening_input,const T plasticity_clamp_ratio_input=4);
     void Enable_Plasticity(const T plastic_yield_strain_input,const T plastic_hardening_input,const T plasticity_clamp_ratio_input=4);
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 

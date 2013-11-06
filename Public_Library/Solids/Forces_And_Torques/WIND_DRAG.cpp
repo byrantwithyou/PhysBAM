@@ -105,7 +105,9 @@ Add_Velocity_Independent_Forces_Helper(TV relative_velocity,int t) const
     force*=optimization(t).area_over_m;
     return force;
 }
-
+//#####################################################################
+// Function Add_Velocity_Independent_Forces
+//#####################################################################
 template<class TV> void WIND_DRAG<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {

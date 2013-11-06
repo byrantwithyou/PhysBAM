@@ -126,11 +126,11 @@ Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) co
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
 {
     for(int i=0;i<penetrating_particles.m;i++){
         int p=penetrating_particles(i);
-        F(p)-=H_pe(i)*V(p);}
+        F(p)-=H_pe(i)*V(p)*scale;}
 }
 //#####################################################################
 // Function Enforce_Definiteness

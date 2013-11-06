@@ -143,16 +143,16 @@ Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) co
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void COLLISION_AREA_PENALTY_FORCE<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
 {
     for(typename HASHTABLE<VECTOR<int,2>,MATRIX<T,TV::m> >::ITERATOR it(volume_collisions.hessian);it.Valid();it.Next())
-        F(it.Key().x)-=2*force_coefficient*volume_collisions.area*(it.Data()*V(it.Key().y));
+        F(it.Key().x)-=2*force_coefficient*scale*volume_collisions.area*(it.Data()*V(it.Key().y));
 
     T tot=0;
     for(typename HASHTABLE<int,TV>::ITERATOR it(volume_collisions.gradient);it.Valid();it.Next())
         tot+=TV::Dot_Product(it.Data(),V(it.Key()));
     for(typename HASHTABLE<int,TV>::ITERATOR it(volume_collisions.gradient);it.Valid();it.Next())
-        F(it.Key())-=2*force_coefficient*tot*it.Data();
+        F(it.Key())-=2*force_coefficient*scale*tot*it.Data();
 }
 //#####################################################################
 // Function Enforce_Definiteness

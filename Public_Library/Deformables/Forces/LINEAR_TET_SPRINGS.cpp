@@ -202,7 +202,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class T> void LINEAR_TET_SPRINGS<T>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         const SPRING_STATE& spring_state=spring_states(t);
@@ -210,12 +210,12 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
             const SPRING_PARAMETER& spring_param=spring_parameters(t)(spring_state.id);
             const VECTOR<int,4>& spring_nodes=spring_state.spring_nodes;
             if(spring_state.id<5){
-                TV force=(spring_param.youngs_modulus/spring_param.restlength*TV::Dot_Product(V(spring_nodes[0])
+                TV force=(spring_param.youngs_modulus/spring_param.restlength*scale*TV::Dot_Product(V(spring_nodes[0])
                         -spring_state.weights.x*V(spring_nodes[1])-spring_state.weights.y*V(spring_nodes[2])-spring_state.weights.z*V(spring_nodes[3]),spring_state.direction))*spring_state.direction;
                 F(spring_nodes[0])-=force;
                 F(spring_nodes[1])+=spring_state.weights.x*force;F(spring_nodes[2])+=spring_state.weights.y*force;F(spring_nodes[3])+=spring_state.weights.z*force;}
             else if(spring_state.id<8){
-                TV force=(spring_param.youngs_modulus/spring_param.restlength*TV::Dot_Product((1-spring_state.weights.x)*V(spring_nodes[0])+spring_state.weights.x*V(spring_nodes[1])
+                TV force=(spring_param.youngs_modulus/spring_param.restlength*scale*TV::Dot_Product((1-spring_state.weights.x)*V(spring_nodes[0])+spring_state.weights.x*V(spring_nodes[1])
                         -(1-spring_state.weights.y)*V(spring_nodes[2])-spring_state.weights.y*V(spring_nodes[3]),spring_state.direction))*spring_state.direction;
                 F(spring_nodes[0])-=(1-spring_state.weights.x)*force;F(spring_nodes[1])-=spring_state.weights.x*force;
                 F(spring_nodes[2])+=(1-spring_state.weights.y)*force;F(spring_nodes[3])+=spring_state.weights.y*force;}}}
