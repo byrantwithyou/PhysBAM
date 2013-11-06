@@ -51,7 +51,7 @@ Enforce_Definiteness(const bool enforce_definiteness_input)
 template<class TV> typename TV::SCALAR RALEIGH_DAMPING_FORCE<TV>::
 Potential_Energy(const T time) const
 {
-    return D_V0.Dot(particles.V)*dt/(2*dt_dv_over_dx);
+    return -D_V0.Dot(particles.V)*dt/(2*dt_dv_over_dx);
 }
 //#####################################################################
 // Function Update_Position_Based_State
