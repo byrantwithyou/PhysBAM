@@ -2365,14 +2365,14 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
 {
     if(input_poissons_ratio!=-1) poissons_ratio=input_poissons_ratio;
     if(input_youngs_modulus!=0) stiffness=input_youngs_modulus;
-    if(0) solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new COROTATED_FIXED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier)));
+    solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new COROTATED_FIXED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier)));
 
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     if(damping*damping_multiplier){
         DEFORMABLES_FORCES<TV>* force=Create_Finite_Volume(tetrahedralized_volume,new COROTATED_FIXED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier));
         force->use_implicit_velocity_independent_forces=true;
         force->Update_Position_Based_State(0,true);
-        if(0)solid_body_collection.Add_Force(new RALEIGH_DAMPING_FORCE<TV>(particles,force,damping*damping_multiplier,1,save_dt));}
+        solid_body_collection.Add_Force(new RALEIGH_DAMPING_FORCE<TV>(particles,force,damping*damping_multiplier,1,save_dt));}
 }
 //#####################################################################
 // Function Add_Gravity
@@ -2381,7 +2381,7 @@ GRAVITY<TV>& Add_Gravity()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     GRAVITY<TV>* g=new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true);
-    if(0) solid_body_collection.Add_Force(g);
+    solid_body_collection.Add_Force(g);
     return *g;
 }
 };
