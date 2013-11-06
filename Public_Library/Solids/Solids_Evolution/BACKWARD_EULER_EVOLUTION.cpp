@@ -12,6 +12,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_EVOLUTION.h>
@@ -77,6 +78,11 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     dv.Resize(minimization_objective.v1);
     tmp0.Resize(minimization_objective.v1);
     tmp1.Resize(minimization_objective.v1);
+
+    for(int i=0;i<solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
+        if(LAGGED_FORCE<TV>* lf=dynamic_cast<LAGGED_FORCE<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(i)))
+            lf->Lagged_Update_Position_Based_State(time);
+
     minimization_objective.Initial_Guess(dv);
     minimization_objective.Test(dv,minimization_system);
 
