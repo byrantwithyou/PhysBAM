@@ -32,7 +32,7 @@ public:
     T x11,x12,x22;
 
     UPPER_TRIANGULAR_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(2),INITIAL_SIZE nn=INITIAL_SIZE(2))
-        :x11(0),x12(0),x22(0)
+        :x11(T()),x12(T()),x22(T())
     {
         STATIC_ASSERT(sizeof(UPPER_TRIANGULAR_MATRIX)==3*sizeof(T));assert(mm==INITIAL_SIZE(2) && nn==INITIAL_SIZE(2));
     }

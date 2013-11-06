@@ -30,7 +30,7 @@ public:
     T x11,x22,x33;
 
     DIAGONAL_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(3),INITIAL_SIZE nn=INITIAL_SIZE(3))
-        :x11(0),x22(0),x33(0)
+        :x11(T()),x22(T()),x33(T())
     {
         STATIC_ASSERT(sizeof(DIAGONAL_MATRIX)==3*sizeof(T));assert(mm==INITIAL_SIZE(3) && nn==INITIAL_SIZE(3));
     }

@@ -27,7 +27,7 @@ public:
     T x11,x21,x22;
 
     SYMMETRIC_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(2),INITIAL_SIZE nn=INITIAL_SIZE(2))
-        :x11(0),x21(0),x22(0)
+        :x11(T()),x21(T()),x22(T())
     {
         assert(mm==INITIAL_SIZE(2) && nn==INITIAL_SIZE(2));
     }
@@ -38,7 +38,7 @@ public:
     {}
 
     SYMMETRIC_MATRIX(const DIAGONAL_MATRIX<T,2>& matrix_input)
-        :x11(matrix_input.x11),x21(0),x22(matrix_input.x22)
+        :x11(matrix_input.x11),x21(T()),x22(matrix_input.x22)
     {}
 
     SYMMETRIC_MATRIX(const T y11,const T y21,const T y22)
@@ -277,6 +277,7 @@ public:
     static SYMMETRIC_MATRIX Conjugate(const MATRIX<T,2,3>& A,const DIAGONAL_MATRIX<T,3>& B);
     static SYMMETRIC_MATRIX Conjugate(const MATRIX<T,2,3>& A,const SYMMETRIC_MATRIX<T,3>& B);
     static SYMMETRIC_MATRIX Conjugate(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const SYMMETRIC_MATRIX& B);
+    static SYMMETRIC_MATRIX Conjugate(const DIAGONAL_MATRIX<T,2>& A,const SYMMETRIC_MATRIX& B);
     static SYMMETRIC_MATRIX Conjugate_With_Transpose(const MATRIX<T,2>& A,const DIAGONAL_MATRIX<T,2>& B);
     static SYMMETRIC_MATRIX Conjugate_With_Transpose(const MATRIX<T,2>& A,const SYMMETRIC_MATRIX& B);
     static SYMMETRIC_MATRIX Conjugate_With_Transpose(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const SYMMETRIC_MATRIX& B);
@@ -352,6 +353,14 @@ Conjugate(const MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B) // 12 mults, 7 ad
 {
     MATRIX<T,2> BA=(A*B).Transposed();
     return SYMMETRIC_MATRIX<T,2>(A.x[0]*BA.x[0]+A.x[2]*BA.x[1],A.x[1]*BA.x[0]+A.x[3]*BA.x[1],A.x[1]*BA.x[2]+A.x[3]*BA.x[3]);
+}
+//#####################################################################
+// Function Conjugate
+//#####################################################################
+template<class T> inline SYMMETRIC_MATRIX<T,2> SYMMETRIC_MATRIX<T,2>::
+Conjugate(const DIAGONAL_MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B) // 6 mults
+{
+    return SYMMETRIC_MATRIX<T,2>(sqr(A.x11)*B.x11,A.x11*A.x22*B.x21,sqr(A.x22)*B.x22);
 }
 //#####################################################################
 // Function Conjugate

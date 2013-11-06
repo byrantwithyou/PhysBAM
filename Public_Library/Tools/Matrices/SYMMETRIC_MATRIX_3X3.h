@@ -29,7 +29,7 @@ public:
     T x11,x21,x31,x22,x32,x33;
 
     SYMMETRIC_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(3),INITIAL_SIZE nn=INITIAL_SIZE(3))
-        :x11(0),x21(0),x31(0),x22(0),x32(0),x33(0)
+        :x11(T()),x21(T()),x31(T()),x22(T()),x32(T()),x33(T())
     {
         STATIC_ASSERT(sizeof(SYMMETRIC_MATRIX)==6*sizeof(T));assert(mm==INITIAL_SIZE(3) && nn==INITIAL_SIZE(3));
     }
@@ -40,7 +40,7 @@ public:
     {}
 
     SYMMETRIC_MATRIX(const DIAGONAL_MATRIX<T,3>& matrix_input)
-        :x11(matrix_input.x11),x21(0),x31(0),x22(matrix_input.x22),x32(0),x33(matrix_input.x33)
+        :x11(matrix_input.x11),x21(T()),x31(T()),x22(matrix_input.x22),x32(T()),x33(matrix_input.x33)
     {}
 
     SYMMETRIC_MATRIX(const T y11,const T y21,const T y31,const T y22,const T y32,const T y33)
@@ -313,6 +313,7 @@ public:
     static SYMMETRIC_MATRIX Conjugate(const MATRIX<T,3>& A,const DIAGONAL_MATRIX<T,3>& B);
     static SYMMETRIC_MATRIX Conjugate(const MATRIX<T,3>& A,const SYMMETRIC_MATRIX& B);
     static SYMMETRIC_MATRIX Conjugate(const SYMMETRIC_MATRIX<T,3>& A,const SYMMETRIC_MATRIX& B);
+    static SYMMETRIC_MATRIX Conjugate(const DIAGONAL_MATRIX<T,3>& A,const SYMMETRIC_MATRIX& B);
     static SYMMETRIC_MATRIX Conjugate(const MATRIX<T,3,2>& A,const DIAGONAL_MATRIX<T,2>& B);
     static SYMMETRIC_MATRIX Conjugate(const MATRIX<T,3,2>& A,const SYMMETRIC_MATRIX<T,2>& B);
     static SYMMETRIC_MATRIX Conjugate_With_Transpose(const MATRIX<T,3>& A,const DIAGONAL_MATRIX<T,3>& B);
@@ -385,6 +386,14 @@ template<class T> inline SYMMETRIC_MATRIX<T,3> SYMMETRIC_MATRIX<T,3>::
 Conjugate(const SYMMETRIC_MATRIX<T,3>& A,const SYMMETRIC_MATRIX<T,3>& B)
 {
     return Times_Transpose_With_Symmetric_Result(A*B,A);
+}
+//#####################################################################
+// Function Conjugate
+//#####################################################################
+template<class T> inline SYMMETRIC_MATRIX<T,3> SYMMETRIC_MATRIX<T,3>::
+Conjugate(const DIAGONAL_MATRIX<T,3>& A,const SYMMETRIC_MATRIX<T,3>& B)
+{
+    return SYMMETRIC_MATRIX(A.x11*A.x11*B.x11,A.x22*A.x11*B.x21,A.x33*A.x11*B.x31,A.x22*A.x22*B.x22,A.x33*A.x22*B.x32,A.x33*A.x33*B.x33);
 }
 //#####################################################################
 // Function Conjugate

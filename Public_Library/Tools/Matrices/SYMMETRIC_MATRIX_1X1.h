@@ -27,7 +27,7 @@ public:
     T x11;
 
     SYMMETRIC_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(1),INITIAL_SIZE nn=INITIAL_SIZE(1))
-        :x11(0)
+        :x11(T())
     {
         assert(mm==INITIAL_SIZE(1) && nn==INITIAL_SIZE(1));
     }
@@ -253,6 +253,9 @@ public:
     {return SYMMETRIC_MATRIX<T,1>(sqr(A.x11)*B.x11);}
 
     static SYMMETRIC_MATRIX Conjugate(const MATRIX<T,1>& A,const SYMMETRIC_MATRIX& B)
+    {return SYMMETRIC_MATRIX<T,1>(sqr(A.x11)*B.x11);}
+
+    static SYMMETRIC_MATRIX Conjugate(const DIAGONAL_MATRIX<T,1>& A,const SYMMETRIC_MATRIX& B)
     {return SYMMETRIC_MATRIX<T,1>(sqr(A.x11)*B.x11);}
 
     static SYMMETRIC_MATRIX Conjugate(const UPPER_TRIANGULAR_MATRIX<T,1>& A,const SYMMETRIC_MATRIX& B)
