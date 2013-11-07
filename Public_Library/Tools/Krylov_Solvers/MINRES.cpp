@@ -53,7 +53,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
     T residual;
 
     //variable setup
-    MATRIX<T,2> G_pp(1,0,0,1),G_p(1,0,0,1);
+    VECTOR<T,2> G_pp,G_p;
     T b_k=0;
     VECTOR<T,2> r;
 
@@ -63,8 +63,8 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         if(restart){
             if(print_residuals) LOG::cout<<"restarting Minres"<<std::endl;
             //Include initial settings here, avoid definitions.
-            G_pp=MATRIX<T,2>::Identity_Matrix();
-            G_p=MATRIX<T,2>::Identity_Matrix();
+            G_pp=VECTOR<T,2>(1,0);
+            G_p=VECTOR<T,2>(1,0);
             system.Multiply(x,vtemp);
             vtemp.Copy(-1,vtemp,b);
             system.Project(vtemp);
@@ -96,16 +96,15 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
 
         //Obtain epsilon, delta, givens rotation matrix, and gamma
         VECTOR<T,2> bl(0,b_k);
-        VECTOR<T,2> et=G_pp*bl;
+        VECTOR<T,2> et=G_pp.Givens_Transpose_Times(bl);
         VECTOR<T,2> ta(et(1),a_k);
-        VECTOR<T,2> ds=G_p*ta;
-        VECTOR<T,2> cs(ds(1),b_k1);
-        T gamma=cs.Normalize();
-        MATRIX<T,2> G_k(cs(0),-cs(1),cs(1),cs(0)); //Givens matrix transposed
+        VECTOR<T,2> ds=G_p.Givens_Transpose_Times(ta);
+        VECTOR<T,2> G_k(ds(1),b_k1);
+        T gamma=G_k.Normalize();
         if(gamma<small_number){Print_Diagnostics(iterations);LOG::cout << "gamma variable close to zero"<<std::endl;return false;}
 
         //Obtain p, c, and r (residual)
-        VECTOR<T,2> pr=G_k*r;
+        VECTOR<T,2> pr=G_k.Givens_Transpose_Times(r);
         residual=abs(pr(1));
 
         vtemp.Copy(1/gamma,vk_hat);
