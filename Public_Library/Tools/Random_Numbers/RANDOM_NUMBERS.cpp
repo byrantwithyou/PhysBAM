@@ -238,8 +238,7 @@ Get_Twist(const T& a)
     template VECTOR<T,d> RANDOM_NUMBERS<T>::Get_Uniform_Vector<VECTOR<T,d> >(RANGE<VECTOR<T,d> > const&); \
     template VECTOR<T,d> RANDOM_NUMBERS<T>::Get_Vector_In_Unit_Sphere<VECTOR<T,d> >(); \
     template ROTATION<VECTOR<T,d> > RANDOM_NUMBERS<T>::Get_Rotation<VECTOR<T,d> >(); \
-    template void RANDOM_NUMBERS<T>::Fill_Uniform<VECTOR<T,d> >(TWIST<VECTOR<T,d> >&,T,T); \
-    template void RANDOM_NUMBERS<T>::Fill_Uniform<VECTOR<T,d> >(ARRAY_BASE<T,VECTOR<T,d> >&,T,T)
+    template void RANDOM_NUMBERS<T>::Fill_Uniform<VECTOR<T,d> >(TWIST<VECTOR<T,d> >&,T,T);
 #define INSTANTIATION_HELPER_V23(T,d) \
     template void RANDOM_NUMBERS<T>::Fill_Uniform<d>(DIAGONAL_MATRIX<T,d>&,T,T); \
     template void RANDOM_NUMBERS<T>::Fill_Uniform<d>(SYMMETRIC_MATRIX<T,d>&,T,T); \
@@ -247,6 +246,10 @@ Get_Twist(const T& a)
 #define IHmn(T,m,n) template void RANDOM_NUMBERS<T>::Fill_Uniform<MATRIX<T,m,n> >(MATRIX_BASE<T,MATRIX<T,m,n> >&,T,T)
 #define IHm(T,m) IHmn(T,m,1);IHmn(T,m,2);IHmn(T,m,3);IHmn(T,m,4);IHmn(T,m,5);IHmn(T,m,6)
 #define IH(T) IHm(T,1);IHm(T,2);IHm(T,3);IHm(T,4);IHm(T,5);IHm(T,6)
+#define INST(T,d) \
+    template VECTOR<T,d> RANDOM_NUMBERS<T>::Get_Uniform_Vector<d>(VECTOR<T,d> const&,VECTOR<T,d> const&); \
+    template void RANDOM_NUMBERS<T,MT19937<T> >::Fill_Uniform<VECTOR<T,d> >(ARRAY_BASE<T,VECTOR<T,d> >&,T,T);
+
 #define INSTANTIATION_HELPER(T) \
     template class RANDOM_NUMBERS<T>; \
     INSTANTIATION_HELPER_V(T,1); \
@@ -258,20 +261,15 @@ Get_Twist(const T& a)
     INSTANTIATION_HELPER_V23(T,3); \
     IH(T);                                                              \
     template void RANDOM_NUMBERS<T>::Fill_Uniform<MATRIX_MXN<T> >(MATRIX_BASE<T,MATRIX_MXN<T> >&,T,T); \
-    template void RANDOM_NUMBERS<T>::Fill_Uniform<VECTOR<T,0> >(ARRAY_BASE<T,VECTOR<T,0> >&,T,T); \
     template void RANDOM_NUMBERS<T>::Fill_Uniform<ARRAY<T> >(ARRAY_BASE<T,ARRAY<T> >&,T,T); \
-    template VECTOR<T,0> RANDOM_NUMBERS<T>::Get_Uniform_Vector<0>(VECTOR<T,0> const&,VECTOR<T,0> const&); \
-    template VECTOR<T,1> RANDOM_NUMBERS<T>::Get_Uniform_Vector<1>(VECTOR<T,1> const&,VECTOR<T,1> const&); \
-    template VECTOR<T,2> RANDOM_NUMBERS<T>::Get_Uniform_Vector<2>(VECTOR<T,2> const&,VECTOR<T,2> const&); \
-    template VECTOR<T,3> RANDOM_NUMBERS<T>::Get_Uniform_Vector<3>(VECTOR<T,3> const&,VECTOR<T,3> const&); \
-    template VECTOR<T,4> RANDOM_NUMBERS<T>::Get_Uniform_Vector<4>(VECTOR<T,4> const&,VECTOR<T,4> const&);
+    INST(T,0);INST(T,1);INST(T,2);INST(T,3); \
+    INST(T,4);INST(T,5);INST(T,6);INST(T,7); \
+    INST(T,8);INST(T,9);INST(T,10);INST(T,11); \
+    INST(T,12);
 
 INSTANTIATION_HELPER(float);
-template void RANDOM_NUMBERS<float,MT19937<float> >::Fill_Uniform<VECTOR<float,4> >(ARRAY_BASE<float,VECTOR<float,4> >&,float,float);
-template void RANDOM_NUMBERS<float,MT19937<float> >::Fill_Uniform<VECTOR<float,8> >(ARRAY_BASE<float,VECTOR<float,8> >&,float,float);
 template void RANDOM_NUMBERS<float,MT19937<float> >::Fill_Uniform<ARRAY_VIEW<float> >(ARRAY_BASE<float, ARRAY_VIEW<float> >&, float, float);
 INSTANTIATION_HELPER(double);
-template void RANDOM_NUMBERS<double,MT19937<double> >::Fill_Uniform<VECTOR<double,4> >(ARRAY_BASE<double,VECTOR<double,4> >&,double,double);
-template void RANDOM_NUMBERS<double,MT19937<double> >::Fill_Uniform<VECTOR<double,8> >(ARRAY_BASE<double,VECTOR<double,8> >&,double,double);
 template void RANDOM_NUMBERS<double,MT19937<double> >::Fill_Uniform<ARRAY_VIEW<double> >(ARRAY_BASE<double, ARRAY_VIEW<double> >&, double, double);
+#undef INST
 }
