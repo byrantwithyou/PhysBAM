@@ -307,6 +307,9 @@ public:
     static T Oriented_Angle_Between(const VECTOR& u,const VECTOR& v)
     {T s=Cross_Product(u,v).x,c=Dot_Product(u,v);return atan2(s,c);}
 
+    VECTOR Givens_Transpose_Times(const VECTOR& u) const
+    {return VECTOR(x*u.x+y*u.y,x*u.y-y*u.x);}
+
     T Sum() const
     {return x+y;}
 
