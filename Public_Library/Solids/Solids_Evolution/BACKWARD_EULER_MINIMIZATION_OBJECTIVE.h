@@ -33,6 +33,7 @@ public:
     BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>& minimization_system;
     T dt,time;
     ARRAY<IMPLICIT_OBJECT<TV>*> collision_objects;
+    ARRAY<T> coefficient_of_friction;
     T collision_thickness;
     HASHTABLE<PAIR<int,int> > disabled_collision;
     HASHTABLE<int> solids_forces_lazy,rigids_forces_lazy,deformables_forces_lazy;

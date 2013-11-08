@@ -30,7 +30,7 @@ BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BO
     minimization_objective(*new BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>(solid_body_collection,minimization_system)),
     dv(static_cast<GENERALIZED_VELOCITY<TV>&>(*minimization_objective.v1.Clone_Default())),
     tmp0(static_cast<GENERALIZED_VELOCITY<TV>&>(*minimization_objective.v1.Clone_Default())),
-    tmp1(static_cast<GENERALIZED_VELOCITY<TV>&>(*minimization_objective.v1.Clone_Default())),coefficient_of_friction((T).1)
+    tmp1(static_cast<GENERALIZED_VELOCITY<TV>&>(*minimization_objective.v1.Clone_Default()))
 {
     newtons_method.max_iterations=100000;
     newtons_method.max_krylov_iterations=2000;
@@ -102,7 +102,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         TV& v=minimization_objective.v1.V.array(c.p);
         TV t=v.Projected_Orthogonal_To_Unit_Direction(c.n);
         T t_mag=t.Normalize();
-        if(t_mag<=coefficient_of_friction*normal_force/particles.mass(c.p))
+        if(t_mag<=minimization_objective.coefficient_of_friction(c.object)*normal_force/particles.mass(c.p))
             v.Project_On_Unit_Direction(c.n);
         else v-=coefficient_of_friction/particles.mass(c.p)*normal_force*t;}
     solid_body_collection.Print_Energy(time+dt,2);

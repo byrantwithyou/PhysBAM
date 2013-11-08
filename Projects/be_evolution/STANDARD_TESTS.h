@@ -1962,8 +1962,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,
                     rigid_body_collection.Rigid_Body(b).implicit_object,penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));
     else if(use_constraint_collisions && backward_euler_evolution)
-        for(int b=0;b<rigid_body_collection.rigid_body_particles.number;b++)
+        for(int b=0;b<rigid_body_collection.rigid_body_particles.number;b++){
             backward_euler_evolution->minimization_objective.collision_objects.Append(rigid_body_collection.Rigid_Body(b).implicit_object);
+            backward_euler_evolution->minimization_objective.coefficient_of_friction.Append(rigid_body_collection.Rigid_Body(b).coefficient_of_friction);}
     else
         for(int i=0;i<deformable_body_collection.structures.m;i++){
             deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.structures(i));
