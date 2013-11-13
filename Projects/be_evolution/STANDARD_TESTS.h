@@ -706,7 +706,7 @@ void Get_Initial_Data()
             T depth=2*drop_height;
             T thickness=1*m;
             RIGID_BODY<TV>& bowl=tests.Add_Analytic_Bowl(hole_radius,depth,thickness,128,32);
-            bowl.coefficient_of_friction=0.3;
+            bowl.coefficient_of_friction=input_friction;
             bowl.Frame().r=ROTATION<TV>((T)pi,TV(1,0,0));
             bowl.Frame().t=TV(0,depth,0);
             bowl.is_static=true;
