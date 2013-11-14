@@ -26,11 +26,7 @@ public:
     {}
 
     static TV_INT Clamped_Index(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& location,int start_offset=0,int end_offset=0) 
-    {TV_INT index;RANGE<TV_INT> u_domain=u.Domain_Indices();RANGE<TV> grid_domain=grid.Domain(); 
-    TV_INT M_start=u_domain.Minimum_Corner(),M_end=u_domain.Maximum_Corner();TV min_X=grid_domain.Minimum_Corner();TV one_over_DX=grid.One_Over_DX(); 
-    for(int axis=0;axis<TV::m;axis++){ 
-        index[axis]=min(M_end[axis]-end_offset-1,M_start[axis]+start_offset+max(0,(int)((location[axis]-min_X[axis])*one_over_DX[axis]-M_start[axis]-start_offset-grid.MAC_offset)));} 
-    return index;}
+    {return clamp(grid.Index(location),u.domain.min_corner+start_offset,u.domain.max_corner-(end_offset+1));}
 
     static TV_INT Clamped_Index_End_Minus_One(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& location)
     {return Clamped_Index(grid,u,location,0,1);}
@@ -42,7 +38,7 @@ public:
     {return Clamped_Index(grid,u,location,1,2);}
 
     void Populate_New_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const GRID<TV>& grid_new,ARRAYS_ND_BASE<T2,TV_INT>& u_new)
-    {for(CELL_ITERATOR<TV> iterator(grid_new,u_new.Domain_Indices());iterator.Valid();iterator.Next()){ // CELL ITERATOR works for nodal
+    {for(CELL_ITERATOR<TV> iterator(grid_new,u_new.domain);iterator.Valid();iterator.Next()){ // CELL ITERATOR works for nodal
         u_new(iterator.Cell_Index())=Clamped_To_Array(grid,u,grid_new.X(iterator.Cell_Index()));}}
 
     void Populate_New_Array(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& u,const GRID<TV>& grid_new,ARRAY<T,FACE_INDEX<TV::m> >& u_new)
@@ -83,8 +79,8 @@ public:
     virtual T2 Clamped_To_Array_No_Extrema(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual ARRAY<PAIR<TV_INT,T> > Clamped_To_Array_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual T2 Clamped_To_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual TV Clamped_To_Array_Gradient(const GRID<TV>& grid,const ARRAYS_ND_BASE<T,TV_INT>& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual SYMMETRIC_MATRIX<T,TV::m> Clamped_To_Array_Hessian(const GRID<TV>& grid,const ARRAYS_ND_BASE<T,TV_INT>& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+    virtual VECTOR<T2,TV::m> Clamped_To_Array_Gradient(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+    virtual SYMMETRIC_MATRIX<T2,TV::m> Clamped_To_Array_Hessian(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual ARRAY<PAIR<TV_INT,T> > From_Base_Node_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual T2 From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual TV From_Block_Face(const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}

@@ -39,8 +39,8 @@ public:
     
     T2 Clamped_To_Array_No_Extrema(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE;
     T2 Clamped_To_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE;
-    TV Clamped_To_Array_Gradient(const GRID<TV>& grid,const ARRAYS_ND_BASE<T,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE;
-    SYMMETRIC_MATRIX<T,TV::m> Clamped_To_Array_Hessian(const GRID<TV>& grid,const ARRAYS_ND_BASE<T,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE;
+    VECTOR<T2,TV::m> Clamped_To_Array_Gradient(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE;
+    SYMMETRIC_MATRIX<T2,TV::m> Clamped_To_Array_Hessian(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE;
     T2 From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE;
     ARRAY<PAIR<TV_INT,T> > Clamped_To_Array_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE;
     ARRAY<PAIR<TV_INT,T> > From_Base_Node_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE;
