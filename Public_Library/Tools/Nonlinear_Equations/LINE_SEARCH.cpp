@@ -13,6 +13,76 @@
 using std::abs;
 using namespace PhysBAM;
 //#####################################################################
+// Function Dump_Line_Log
+//#####################################################################
+template<class T> void
+Dump_Line_Log(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
+{
+    static int dump_id=0;
+    T mn=1e-12,mx=1e4;
+    int n=50;
+    ARRAY<T> pts;
+    ARRAY<T> dpts;
+    T f,df,f0,df0;
+    F.Compute(a,0,&df0,&f0);
+    for(int i=0;i<=n;i++){
+        F.Compute(a-pow((T)2,-(T)i)*(b-a),0,&df,&f);
+        pts.Append(f);
+        dpts.Append(df);}
+    pts.Append(f0);
+    dpts.Append(df0);
+    for(int i=n;i>=0;i--){
+        F.Compute(a+pow((T)2,-(T)i)*(b-a),0,&df,&f);
+        pts.Append(f);
+        dpts.Append(df);}
+
+    FILE* red=fopen("red.txt","w");
+    FILE* green=fopen("green.txt","w");
+    for(int i=0;i<pts.m;i++){
+        T x=pts(i)-f0,p=i-n-1;
+        if(x>=0) fprintf(red,"%.16g %.16g\n",p,log10(clamp(x,mn,mx)));
+        else fprintf(green,"%.16g %.16g\n",p,log10(clamp(-x,mn,mx)));}
+    fclose(red);
+    fclose(green);
+    char buff[1000];
+    sprintf(buff,"gnuplot -e \"set terminal postscript eps color ; set output 'func-%i.eps' ; plot 'red.txt' u 1:2 , 'green.txt' u 1:2\"",dump_id);
+    system(buff);
+
+    LOG::printf("dump func-%i.eps\n",dump_id);
+    dump_id++;
+}
+//#####################################################################
+// Function Dump_Line
+//#####################################################################
+template<class T> void
+Dump_Line(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T c1)
+{
+    static int dump_id=0;
+    int n=50,max_r=14;
+    b-=a;
+    T f,df,f0,df0;
+    F.Compute(a,0,&df0,&f0);
+    FILE* initial=fopen("initial.txt","w");
+    fprintf(initial,"%.16g %.16g\n",a,(T)0);
+    fclose(initial);
+    for(int r=0;r<max_r;r++){
+        FILE* red=fopen("red.txt","w");
+        FILE* green=fopen("green.txt","w");
+        for(int i=-n;i<=n;i++){
+            T x=a+b*i/n;
+            F.Compute(x,0,&df,&f);
+            fprintf(f>=f0?red:green,"%.16g %.16g\n",x,f-f0);}
+        fclose(red);
+        fclose(green);
+        char buff[1000];
+        sprintf(buff,"gnuplot -e \"set terminal postscript eps color ; set output 'func-%03i-%03i.eps' ; plot 'red.txt' u 1:2 , 'green.txt' u 1:2 , 'initial.txt' u 1:2 , %.16g*x w lines ls 1\"",dump_id,r,df0*c1);
+        system(buff);
+
+        LOG::printf("dump func-%03i-%03i.eps\n",dump_id,r);
+        b/=10;}
+    dump_id++;
+}
+//#####################################################################
 // Function Update_Interval
 //#####################################################################
 template<class T> void LINE_SEARCH<T>::
@@ -145,6 +215,7 @@ Line_Search_Wolfe_Conditions_Zoom(NONLINEAR_FUNCTION<T(T)>& F,WOLFE_HELPER lo,WO
         else{
             if(((hi.a>lo.a) && xj.dfa>=0) || ((hi.a<lo.a) && xj.dfa<=0)) hi=lo;
             lo=xj;}}
+    Dump_Line(F,(T)0,max((T)1,hi.a),c1);
     if(lo.a-x0.a>=min_interval*100){
         LOG::printf("take decrease on zoom with %g\n",lo.a);
         x=lo.a;
