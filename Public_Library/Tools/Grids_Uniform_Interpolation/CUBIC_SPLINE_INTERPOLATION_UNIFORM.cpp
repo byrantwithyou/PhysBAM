@@ -13,7 +13,7 @@ template<class T,class T2> static T2
 Cubic_Interpolation(const T2 x[4],T a)
 {
     T2 d20=x[2]-x[0],d30=x[3]-x[0],d21=x[2]-x[1];
-    return (T2).5*(((d30-3*d21)*a-(d30-5*d21-d20))*a+d20)*a+x[1];
+    return (T2).5*(((d30-3*d21)*a-(d30-5*d21+d20))*a+d20)*a+x[1];
 }
 //#####################################################################
 // Function Cubic_Interpolation_Diff
@@ -22,7 +22,7 @@ template<class T,class T2> static T2
 Cubic_Interpolation_Diff(const T2 x[4],T a)
 {
     T2 d20=x[2]-x[0],d30=x[3]-x[0],d21=x[2]-x[1];
-    return (T2).5*((3*(d30-3*d21)*a-2*(d30-5*d21-d20))*a+d20);
+    return (T2).5*((3*(d30-3*d21)*a-2*(d30-5*d21+d20))*a+d20);
 }
 //#####################################################################
 // Function Cubic_Interpolation_Diff2
@@ -31,7 +31,7 @@ template<class T,class T2> static T2
 Cubic_Interpolation_Diff2(const T2 x[4],T a)
 {
     T2 d20=x[2]-x[0],d30=x[3]-x[0],d21=x[2]-x[1];
-    return 3*(d30-3*d21)*a-(d30-5*d21-d20);
+    return 3*(d30-3*d21)*a-(d30-5*d21+d20);
 }
 //#####################################################################
 // Constructor

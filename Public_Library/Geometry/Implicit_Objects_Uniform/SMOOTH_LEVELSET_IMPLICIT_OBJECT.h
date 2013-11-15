@@ -8,6 +8,7 @@
 #define __SMOOTH_LEVELSET_IMPLICIT_OBJECT__
 
 #include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Tools/Grids_Uniform_Interpolation/CUBIC_SPLINE_INTERPOLATION_UNIFORM.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;
@@ -23,6 +24,8 @@ public:
     typedef LEVELSET_IMPLICIT_OBJECT<TV> BASE;
 public:
     using BASE::levelset;using BASE::box;
+
+    CUBIC_SPLINE_INTERPOLATION_UNIFORM<TV,T,FACE_LOOKUP_UNIFORM<TV> > csiu;
 
     SMOOTH_LEVELSET_IMPLICIT_OBJECT(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input);
     virtual ~SMOOTH_LEVELSET_IMPLICIT_OBJECT();
