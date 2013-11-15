@@ -25,6 +25,31 @@ Cubic_Interpolation_Diff(const T2 x[4],T a)
     return (T2).5*((3*(d30-3*d21)*a-2*(d30-5*d21+d20))*a+d20);
 }
 //#####################################################################
+// Function Cubic_Interpolation_Taylor
+//#####################################################################
+template<class T,class T2> static void
+Cubic_Interpolation_Taylor(const T2 x[4],T a,T2& fa,T2& dfa)
+{
+    T2 d20=x[2]-x[0],d30=x[3]-x[0],d21=x[2]-x[1];
+    T2 r=d30-3*d21;
+    T2 s=r-2*d21+d20;
+    fa=(T2).5*((r*a-s)*a+d20)*a+x[1];
+    dfa=(T2).5*((3*r*a-2*s)*a+d20);
+}
+//#####################################################################
+// Function Cubic_Interpolation_Taylor
+//#####################################################################
+template<class T,class T2> static void
+Cubic_Interpolation_Taylor(const T2 x[4],T a,T2& fa,T2& dfa,T2& ddfa)
+{
+    T2 d20=x[2]-x[0],d30=x[3]-x[0],d21=x[2]-x[1];
+    T2 r=d30-3*d21;
+    T2 s=r-2*d21+d20;
+    fa=(T2).5*((r*a-s)*a+d20)*a+x[1];
+    ddfa=3*r*a-s;
+    dfa=(T2).5*((ddfa-s)*a+d20);
+}
+//#####################################################################
 // Function Cubic_Interpolation_Diff2
 //#####################################################################
 template<class T,class T2> static T2
@@ -122,9 +147,8 @@ From_Base_Node_Gradient_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECT
     TV w=(X-grid.X(index))*grid.one_over_dX;
     const T2* b=&u(index-1);
     T2 x[4],x_y[4];
-    for(int i=0;i<4;i++,b+=u.stride.x){
-        x[i]=Cubic_Interpolation(b,w.y);
-        x_y[i]=Cubic_Interpolation_Diff(b,w.y);}
+    for(int i=0;i<4;i++,b+=u.stride.x)
+        Cubic_Interpolation_Taylor(b,w.y,x[i],x_y[i]);
     return VECTOR<T2,2>(Cubic_Interpolation_Diff(x,w.x),Cubic_Interpolation(x_y,w.x))*grid.one_over_dX;
 }
 //#####################################################################
@@ -137,11 +161,9 @@ From_Base_Node_Gradient_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECT
     const T2* b=&u(index-1),*c=b;
     T2 x[4],y[4],x_z[4],y_z[4],x_y[4];
     for(int i=0;i<4;i++,b+=u.stride.x,c=b){
-        for(int j=0;j<4;j++,c+=u.stride.y){
-            y[j]=Cubic_Interpolation(c,w.z);
-            y_z[j]=Cubic_Interpolation_Diff(c,w.z);}
-        x[i]=Cubic_Interpolation(y,w.y);
-        x_y[i]=Cubic_Interpolation_Diff(y,w.y);
+        for(int j=0;j<4;j++,c+=u.stride.y)
+            Cubic_Interpolation_Taylor(c,w.z,y[j],y_z[j]);
+        Cubic_Interpolation_Taylor(y,w.y,x[i],x_y[i]);
         x_z[i]=Cubic_Interpolation(y_z,w.y);}
     return VECTOR<T2,3>(Cubic_Interpolation_Diff(x,w.x),Cubic_Interpolation(x_y,w.x),Cubic_Interpolation(x_z,w.x))*grid.one_over_dX;
 }
@@ -175,10 +197,8 @@ From_Base_Node_Hessian_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTO
     TV w=(X-grid.X(index))*grid.one_over_dX;
     const T2* b=&u(index-1);
     T2 x[4],x_y[4],x_yy[4];
-    for(int i=0;i<4;i++,b+=u.stride.x){
-        x[i]=Cubic_Interpolation(b,w.y);
-        x_y[i]=Cubic_Interpolation_Diff(b,w.y);
-        x_yy[i]=Cubic_Interpolation_Diff2(b,w.y);}
+    for(int i=0;i<4;i++,b+=u.stride.x)
+        Cubic_Interpolation_Taylor(b,w.y,x[i],x_y[i],x_yy[i]);
     SYMMETRIC_MATRIX<T2,2> S(Cubic_Interpolation_Diff2(x,w.x),Cubic_Interpolation_Diff(x_y,w.x),Cubic_Interpolation(x_yy,w.x));
     S.x11*=sqr(grid.one_over_dX.x);
     S.x21*=grid.one_over_dX.x*grid.one_over_dX.y;
@@ -195,15 +215,10 @@ From_Base_Node_Hessian_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTO
     const T2* b=&u(index-1),*c=b;
     T2 x[4],y[4],x_z[4],y_z[4],x_y[4],x_zz[4],y_zz[4],x_yy[4],x_yz[4];
     for(int i=0;i<4;i++,b+=u.stride.x,c=b){
-        for(int j=0;j<4;j++,c+=u.stride.y){
-            y[j]=Cubic_Interpolation(c,w.z);
-            y_z[j]=Cubic_Interpolation_Diff(c,w.z);
-            y_zz[j]=Cubic_Interpolation_Diff2(c,w.z);}
-        x[i]=Cubic_Interpolation(y,w.y);
-        x_y[i]=Cubic_Interpolation_Diff(y,w.y);
-        x_yy[i]=Cubic_Interpolation_Diff2(y,w.y);
-        x_z[i]=Cubic_Interpolation(y_z,w.y);
-        x_yz[i]=Cubic_Interpolation_Diff(y_z,w.y);
+        for(int j=0;j<4;j++,c+=u.stride.y)
+            Cubic_Interpolation_Taylor(c,w.z,y[j],y_z[j],y_zz[j]);
+        Cubic_Interpolation_Taylor(y,w.y,x[i],x_y[i],x_yy[i]);
+        Cubic_Interpolation_Taylor(y_z,w.y,x_z[i],x_yz[i]);
         x_zz[i]=Cubic_Interpolation(y_zz,w.y);}
     SYMMETRIC_MATRIX<T2,3> S(
         Cubic_Interpolation_Diff2(x,w.x),
