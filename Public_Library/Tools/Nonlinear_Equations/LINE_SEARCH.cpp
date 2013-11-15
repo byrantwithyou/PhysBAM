@@ -46,9 +46,12 @@ Dump_Line_Log(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
     fclose(green);
     char buff[1000];
     sprintf(buff,"gnuplot -e \"set terminal postscript eps color ; set output 'func-%i.eps' ; plot 'red.txt' u 1:2 , 'green.txt' u 1:2\"",dump_id);
-    system(buff);
+    if(system(buff)==0)
+        LOG::printf("dump func-%i.eps\n",dump_id);
+    else
+        LOG::printf("dump func-%i.eps failed\n",dump_id);
 
-    LOG::printf("dump func-%i.eps\n",dump_id);
+
     dump_id++;
 }
 //#####################################################################
@@ -76,9 +79,11 @@ Dump_Line(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T c1)
         fclose(green);
         char buff[1000];
         sprintf(buff,"gnuplot -e \"set terminal postscript eps color ; set output 'func-%03i-%03i.eps' ; plot 'red.txt' u 1:2 , 'green.txt' u 1:2 , 'initial.txt' u 1:2 , %.16g*x w lines ls 1\"",dump_id,r,df0*c1);
-        system(buff);
+        if(system(buff)==0)
+            LOG::printf("dump func-%03i-%03i.eps\n",dump_id,r);
+        else
+            LOG::printf("dump func-%03i-%03i.eps failed\n",dump_id,r);
 
-        LOG::printf("dump func-%03i-%03i.eps\n",dump_id,r);
         b/=10;}
     dump_id++;
 }

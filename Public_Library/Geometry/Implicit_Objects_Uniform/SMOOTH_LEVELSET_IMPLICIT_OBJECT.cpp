@@ -19,7 +19,6 @@ template<class TV> SMOOTH_LEVELSET_IMPLICIT_OBJECT<TV>::
 SMOOTH_LEVELSET_IMPLICIT_OBJECT(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input)
     :BASE(grid_input,phi_input)
 {
-    levelset.interpolation=&csiu;
 }
 //#####################################################################
 // Destructor
