@@ -15,6 +15,8 @@
 //    9. Deformable ball falling on a deformable ball
 //   10. Tori free falling to the ground
 //   11. Increasing gravity (individual)
+//   12. Mattress with ether drag
+//   13. Falling mattress hitting level set
 //   16. Smash test - large boxes, small mattress
 //   17. Matress, no gravity, random start
 //   18. Matress, no gravity, point start
@@ -56,6 +58,7 @@
 //   60. Random armadillo
 //   61. Elbow cylinder
 //   77. Squeeze in a box
+//   80. Armadillo
 //  100. Primary contour field
 //#####################################################################
 #ifndef __STANDARD_TESTS__
@@ -70,6 +73,7 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects_Uniform/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
@@ -333,7 +337,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         backward_euler_evolution->minimization_objective.collision_thickness*=m;}
 
     switch(test_number){
-        case 17: case 18: case 24: case 25: case 27: case 11: case 23: case 57: case 77: case 80: case 8: case 12:
+        case 17: case 18: case 24: case 25: case 27: case 11: case 23: case 57: case 77: case 80: case 8: case 12: case 13:
             if(!resolution) resolution=10;
             mattress_grid=GRID<TV>(TV_INT(resolution+1,resolution+1,resolution+1),RANGE<TV>(TV((T)-1,(T)-1,(T)-1),TV((T)1,(T)1,(T)1))*m);
             break;
@@ -389,6 +393,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 7:
         case 8:
         case 12:
+        case 13:
         case 80:
         case 10:
         case 11:
@@ -682,10 +687,6 @@ void Get_Initial_Data()
             tests.Create_Mattress(mattress_grid,true,&initial_state,density);
             tests.Add_Ground();
             break;}
-        case 12:{
-            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)*m));
-            tests.Create_Mattress(mattress_grid,true,&initial_state,density);
-            break;}
         case 9:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1,0)*m)),true,true,density,.5*m);
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0.1,(T)3,0)*m)),true,true,density,.5*m);
@@ -712,16 +713,24 @@ void Get_Initial_Data()
             bowl.is_static=true;
             tests.Add_Ground();
             break;}
-        case 80:{
-            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)*m));
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_20K.tet.gz", // adaptive_torus_float.tet
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(15,5,0)*m,ROTATION<TV>(-T(pi/2),TV(1,0,0)))),true,true,density,m);
-            break;}
         case 11:{
             last_frame=1200;
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,1,0)*m));
             tests.Create_Mattress(mattress_grid,true,&initial_state,density);
             tests.Add_Ground();
+            break;}
+        case 12:{
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)*m));
+            tests.Create_Mattress(mattress_grid,true,&initial_state,density);
+            break;}
+        case 13:{
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)*m));
+            tests.Create_Mattress(mattress_grid,true,&initial_state,density);
+            tests.Add_Ground();
+            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("bowl",3,(T).5);
+            rigid_body.Frame().t.y=1;
+            rigid_body.Frame().r=ROTATION<TV>(-pi/2,TV(1,0,0));
+            rigid_body.is_static=true;
             break;}
         case 16: {
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)*m));
@@ -740,44 +749,6 @@ void Get_Initial_Data()
             curves(0).Add_Control_Point(6,FRAME<TV>(TV(0,8,0)));
             curves(0).Add_Control_Point(11,FRAME<TV>(TV(0,11,0)));
             last_frame=250;
-            break;}
-        case 77: {
-            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)*m));
-            tests.Create_Mattress(mattress_grid,true,&initial_state,density);
-
-            RIGID_BODY<TV>& box_bottom=tests.Add_Analytic_Box(TV(6,2,6)*m);
-            RIGID_BODY<TV>& box_side_1=tests.Add_Analytic_Box(TV(2,6,6)*m);
-            RIGID_BODY<TV>& box_side_2=tests.Add_Analytic_Box(TV(2,6,6)*m);
-            RIGID_BODY<TV>& box_side_3=tests.Add_Analytic_Box(TV(6,6,2)*m);
-            RIGID_BODY<TV>& box_side_4=tests.Add_Analytic_Box(TV(6,6,2)*m);
-            RIGID_BODY<TV>& box_top=tests.Add_Analytic_Box(TV(6,2,6)*m);
-
-            box_bottom.Frame().t=TV(0,-2,0)*m;
-            box_side_1.Frame().t=TV(-2,0,0)*m;
-            box_side_2.Frame().t=TV(2,0,0)*m;
-            box_side_3.Frame().t=TV(0,0,-2)*m;
-            box_side_4.Frame().t=TV(0,0,2)*m;
-
-            box_bottom.is_static=true;
-            box_side_1.is_static=true;
-            box_side_2.is_static=true;
-            box_side_3.is_static=true;
-            box_side_4.is_static=true;
-            box_top.is_static=false;
-
-            box_bottom.coefficient_of_friction=0;
-            box_side_1.coefficient_of_friction=0;
-            box_side_2.coefficient_of_friction=0;
-            box_side_3.coefficient_of_friction=0;
-            box_side_4.coefficient_of_friction=0;
-            box_top.coefficient_of_friction=0;
-
-            kinematic_ids.Append(box_top.particle_index);
-            rigid_body_collection.rigid_body_particles.kinematic(box_top.particle_index)=true;
-            curves.Resize(1);
-            curves(0).Add_Control_Point(0,FRAME<TV>(TV(0,2,0)));
-            curves(0).Add_Control_Point(10,FRAME<TV>(TV(0,0,0)));
-            last_frame=300;
             break;}
         case 17:
         case 18:
@@ -1489,6 +1460,49 @@ void Get_Initial_Data()
             scalar_curve.Add_Control_Point(3,-.85*pi);
             scalar_curve.Add_Control_Point(5,0);
             break;}
+        case 77: {
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)*m));
+            tests.Create_Mattress(mattress_grid,true,&initial_state,density);
+
+            RIGID_BODY<TV>& box_bottom=tests.Add_Analytic_Box(TV(6,2,6)*m);
+            RIGID_BODY<TV>& box_side_1=tests.Add_Analytic_Box(TV(2,6,6)*m);
+            RIGID_BODY<TV>& box_side_2=tests.Add_Analytic_Box(TV(2,6,6)*m);
+            RIGID_BODY<TV>& box_side_3=tests.Add_Analytic_Box(TV(6,6,2)*m);
+            RIGID_BODY<TV>& box_side_4=tests.Add_Analytic_Box(TV(6,6,2)*m);
+            RIGID_BODY<TV>& box_top=tests.Add_Analytic_Box(TV(6,2,6)*m);
+
+            box_bottom.Frame().t=TV(0,-2,0)*m;
+            box_side_1.Frame().t=TV(-2,0,0)*m;
+            box_side_2.Frame().t=TV(2,0,0)*m;
+            box_side_3.Frame().t=TV(0,0,-2)*m;
+            box_side_4.Frame().t=TV(0,0,2)*m;
+
+            box_bottom.is_static=true;
+            box_side_1.is_static=true;
+            box_side_2.is_static=true;
+            box_side_3.is_static=true;
+            box_side_4.is_static=true;
+            box_top.is_static=false;
+
+            box_bottom.coefficient_of_friction=0;
+            box_side_1.coefficient_of_friction=0;
+            box_side_2.coefficient_of_friction=0;
+            box_side_3.coefficient_of_friction=0;
+            box_side_4.coefficient_of_friction=0;
+            box_top.coefficient_of_friction=0;
+
+            kinematic_ids.Append(box_top.particle_index);
+            rigid_body_collection.rigid_body_particles.kinematic(box_top.particle_index)=true;
+            curves.Resize(1);
+            curves(0).Add_Control_Point(0,FRAME<TV>(TV(0,2,0)));
+            curves(0).Add_Control_Point(10,FRAME<TV>(TV(0,0,0)));
+            last_frame=300;
+            break;}
+        case 80:{
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)*m));
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_20K.tet.gz", // adaptive_torus_float.tet
+                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(15,5,0)*m,ROTATION<TV>(-T(pi/2),TV(1,0,0)))),true,true,density,m);
+            break;}
         case 100:{
             TETRAHEDRALIZED_VOLUME<T>* tv=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
             particles.Add_Elements(4);
@@ -1536,6 +1550,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 2:
         case 3:
         case 8:
+        case 13:
         case 80:
         case 16:
         case 5:
@@ -1958,12 +1973,18 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         deformable_body_collection.mpi_solids->Simple_Partition(deformable_body_collection,solid_body_collection.rigid_body_collection,particles.X,processes_per_dimension);}
 
     if(use_penalty_collisions)
-        for(int b=0;b<rigid_body_collection.rigid_body_particles.number;b++)
+        for(int b=0;b<rigid_body_collection.rigid_body_particles.number;b++){
+            IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> > *iot=rigid_body_collection.Rigid_Body(b).implicit_object;
+            if(LEVELSET_IMPLICIT_OBJECT<TV>* lio=dynamic_cast<LEVELSET_IMPLICIT_OBJECT<TV>*>(iot->object_space_implicit_object))
+                iot=new IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >(new SMOOTH_LEVELSET_IMPLICIT_OBJECT<TV>(lio->levelset.grid,lio->levelset.phi),true,iot->transform);
             solid_body_collection.Add_Force(new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,
-                    rigid_body_collection.Rigid_Body(b).implicit_object,penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));
+                    iot,penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));}
     else if(use_constraint_collisions && backward_euler_evolution)
         for(int b=0;b<rigid_body_collection.rigid_body_particles.number;b++){
-            backward_euler_evolution->minimization_objective.collision_objects.Append(rigid_body_collection.Rigid_Body(b).implicit_object);
+            IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> > *iot=rigid_body_collection.Rigid_Body(b).implicit_object;
+            if(LEVELSET_IMPLICIT_OBJECT<TV>* lio=dynamic_cast<LEVELSET_IMPLICIT_OBJECT<TV>*>(iot->object_space_implicit_object))
+                iot=new IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >(new SMOOTH_LEVELSET_IMPLICIT_OBJECT<TV>(lio->levelset.grid,lio->levelset.phi),true,iot->transform);
+            backward_euler_evolution->minimization_objective.collision_objects.Append(iot);
             backward_euler_evolution->minimization_objective.coefficient_of_friction.Append(rigid_body_collection.Rigid_Body(b).coefficient_of_friction);}
     else
         for(int i=0;i<deformable_body_collection.structures.m;i++){
