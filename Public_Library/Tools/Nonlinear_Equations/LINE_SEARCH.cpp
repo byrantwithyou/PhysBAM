@@ -65,20 +65,22 @@ Dump_Line(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T c1)
     b-=a;
     T f,df,f0,df0;
     F.Compute(a,0,&df0,&f0);
-    FILE* initial=fopen("initial.txt","w");
-    fprintf(initial,"%.16g %.16g\n",a,(T)0);
-    fclose(initial);
     for(int r=0;r<max_r;r++){
         FILE* red=fopen("red.txt","w");
         FILE* green=fopen("green.txt","w");
+        FILE* initial=fopen("initial.txt","w");
+        T dx = 0.5*b/n;
+        fprintf(initial,"%.16g %.16g %.16g %.16g\n",a,(T)0,dx,df0*dx);
+        fclose(initial);
         for(int i=-n;i<=n;i++){
             T x=a+b*i/n;
             F.Compute(x,0,&df,&f);
-            fprintf(f>=f0?red:green,"%.16g %.16g\n",x,f-f0);}
+            df *= dx;
+            fprintf(f>=f0?red:green,"%.16g %.16g %.16g %.16g\n",x,f-f0,dx,df);}
         fclose(red);
         fclose(green);
         char buff[1000];
-        sprintf(buff,"gnuplot -e \"set terminal postscript eps color ; set output 'func-%03i-%03i.eps' ; plot 'red.txt' u 1:2 , 'green.txt' u 1:2 , 'initial.txt' u 1:2 , %.16g*x w lines ls 1\"",dump_id,r,df0*c1);
+        sprintf(buff,"gnuplot -e \"set terminal postscript eps color ; set output 'func-%03i-%03i.eps' ; set st ar 1 nohead lc 1 ; set st ar 2 nohead lc 2 ; set st ar 3 nohead lc 3 ; plot 'red.txt' u 1:2:3:4 w vec as 1, 'green.txt' u 1:2:3:4 w vec as 2, 'initial.txt' u 1:2:3:4 w vec as 3 \"",dump_id,r);
         if(system(buff)==0)
             LOG::printf("dump func-%03i-%03i.eps\n",dump_id,r);
         else
