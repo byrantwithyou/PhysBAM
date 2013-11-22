@@ -39,9 +39,11 @@
 #include <Tools/Math_Tools/constants.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/SMOOTH_GEAR.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Images/EPS_FILE.h>
+#include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
@@ -163,6 +165,61 @@ public:
         if(dump_sv) svout.close();
         if(scatter_plot) Dump_Scatter_Plot(frame);
         if(energy_profile_plot) Energy_Profile_Plot(frame);
+
+        if(test_number==34){
+            ARRAY<int> num_elements(solid_body_collection.deformable_body_collection.particles.X.m);
+            ARRAY<DIAGONAL_MATRIX<T,TV::m> > F_ave(solid_body_collection.deformable_body_collection.particles.X.m);
+            ARRAY<DIAGONAL_MATRIX<T,TV::m> > P_ave(solid_body_collection.deformable_body_collection.particles.X.m);
+            FINITE_VOLUME<TV,2>& fv=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
+            for(int i=0;i<fv.strain_measure.mesh.elements.m;i++){
+                num_elements.Subset(fv.strain_measure.mesh.elements(i))+=1;
+                F_ave.Subset(fv.strain_measure.mesh.elements(i))+=fv.Fe_hat(i);
+                P_ave.Subset(fv.strain_measure.mesh.elements(i))+=fv.isotropic_model->P_From_Strain(fv.Fe_hat(i),fv.Be_scales(i),i);}
+
+            ARRAY<T> F_norms(num_elements.m),P_norms(num_elements.m);
+            for(int i=0;i<num_elements.m;i++)
+                if(num_elements(i)){
+                    F_ave(i)/=num_elements(i);
+                    P_ave(i)/=num_elements(i);
+                    F_norms(i)=(F_ave(i)-1).Frobenius_Norm();
+                    P_norms(i)=(P_ave(i)-1).Frobenius_Norm();}
+
+            INTERPOLATED_COLOR_MAP<T> F_map,P_map;
+            F_map.Initialize_Colors(0,3,false,true,false);
+            P_map.Initialize_Colors(0,500,false,true,false);
+            printf("Frame MAX %g %g\n",F_norms.Max(),P_norms.Max());
+
+            typedef VECTOR<T,3> COL;
+            ARRAY<COL> F_colors(num_elements.m),P_colors(num_elements.m);
+            for(int i=0;i<num_elements.m;i++){
+                F_colors(i)=F_map(F_norms(i));
+                P_colors(i)=P_map(P_norms(i));}
+
+            const char* pref[3]={"frame","stress","strain"};
+
+            for(int type=0;type<3;type++){
+                char buff[100];
+                sprintf(buff,"%s-%03d.eps",pref[type],frame);
+                EPS_FILE<T> eps(buff);
+                eps.cur_format.line_width=.05;
+                eps.Use_Round_Join();
+                eps.Use_Round_Cap();
+                eps.Bound(TV(-6,-6));
+                eps.Bound(TV(13,-21));
+                for(int i=0;i<fv.strain_measure.mesh.elements.m;i++){
+                    int a,b,c;
+                    fv.strain_measure.mesh.elements(i).Get(a,b,c);
+                    const TV& A=solid_body_collection.deformable_body_collection.particles.X(a);
+                    const TV& B=solid_body_collection.deformable_body_collection.particles.X(b);
+                    const TV& C=solid_body_collection.deformable_body_collection.particles.X(c);
+                    if(type==1) eps.Emit_Gouraud_Triangle(A,B,C,F_colors(a),F_colors(b),F_colors(c));
+                    if(type==2) eps.Emit_Gouraud_Triangle(A,B,C,P_colors(a),P_colors(b),P_colors(c));}
+                
+                if(!fv.strain_measure.mesh.boundary_mesh) fv.strain_measure.mesh.Initialize_Boundary_Mesh();
+                for(int i=0;i<fv.strain_measure.mesh.boundary_mesh->elements.m;i++){
+                    const TV& A=solid_body_collection.deformable_body_collection.particles.X(fv.strain_measure.mesh.boundary_mesh->elements(i)(0));
+                    const TV& B=solid_body_collection.deformable_body_collection.particles.X(fv.strain_measure.mesh.boundary_mesh->elements(i)(1));
+                    eps.Draw_Object(A,B);}}}
     }
     void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
@@ -305,6 +362,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 18:
         case 19:
         case 29:
+        case 34:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             last_frame=200;
             break;
@@ -484,6 +542,18 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.deformable_body_collection.Add_Structure(ta);
             particles.mass.Fill(1);
             break;}
+        case 34: {
+            TRIANGULATED_AREA<T>* ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),1),12);
+            for(int i=0;i<ta->particles.X.m;i++){
+                T t=atan2(ta->particles.X(i).y,ta->particles.X(i).x);
+                T r2=cos(t)+cos(2*t)+3-.1*cos(5*t)+.5*sin(t);
+                ta->particles.X(i)*=r2;
+                ta->particles.X(i)=ta->particles.X(i).Orthogonal_Vector();}
+            ta->particles.X+=TV(0,(T)2.4);
+            tests.Copy_And_Add_Structure(*ta,0);
+            particles.mass.Fill(1);
+            tests.Add_Ground(.5,-20);
+            break;}
         case 100:{
             TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
             if(parameter==1){
@@ -552,6 +622,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 Place_Triangle(3,2.7,.9,1.8,.4,TV(4.1,-2));}
             break;}
         case 8:
+        case 34:
         case 16:
         case 23:
         case 13:{
