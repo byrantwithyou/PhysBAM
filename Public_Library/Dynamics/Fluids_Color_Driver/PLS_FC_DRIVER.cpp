@@ -13,6 +13,7 @@
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -387,6 +388,11 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%d.txt",solve_id).c_str()).Write("M",iss,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("Z-%d.txt",solve_id).c_str()).Write_Preconditioner("Z",iss,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%d.txt",solve_id).c_str()).Write_Projection("P",iss,*vectors(0));
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
+    if(example.sparse_dump_matrix){
+        SPARSE_MATRIX_FLAT_MXN<T> M;
+        iss.Get_Sparse_Matrix(M);
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%d.txt",solve_id).c_str()).Write("M",M);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
 

@@ -447,6 +447,111 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
 {
     debug_cast<VECTOR_T&>(z).Scale(debug_cast<const VECTOR_T&>(r),debug_cast<const VECTOR_T&>(J));
 }
+//#####################################################################
+// Function Get_Sparse_Matrix
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
+Get_Sparse_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const
+{
+    int size=0;
+    VECTOR<ARRAY<int>,TV::m> first_row_u;
+    ARRAY<int> first_row_p;
+    int first_row_q;
+    for(int i=0;i<TV::m;i++)
+        for(int k=0;k<matrix_uu(i)(i).m;k++){
+            first_row_u(i).Append(size);
+            size+=matrix_uu(i)(i)(k).m;}
+    for(int k=0;k<matrix_pu(0).m;k++){
+        first_row_p.Append(size);
+        size+=matrix_pu(0)(k).m;}
+    first_row_q=size;
+    size+=matrix_qu(0).m?matrix_qu(0)(0).m:0;
+    M.m=size;
+    M.n=size;
+
+    ARRAY<int> row_entries(size),&next_entry=row_entries;
+
+    for(int i=0;i<TV::m;i++){
+        for(int k=0;k<matrix_uu(i)(i).m;k++){
+            const SPARSE_MATRIX_FLAT_MXN<T>& mat=matrix_uu(i)(i)(k);
+            int first_row=first_row_u(i)(k);
+            for(int r=0;r<mat.m;r++)
+                row_entries(first_row+r)+=mat.offsets(r+1)-mat.offsets(r);}
+
+        for(int j=i+1;j<TV::m;j++)
+            for(int k=0;k<matrix_uu(i)(j).m;k++){
+                const SPARSE_MATRIX_FLAT_MXN<T>& mat=matrix_uu(i)(j)(k);
+                int first_row=first_row_u(i)(k);
+                int first_col=first_row_u(j)(k);
+                for(int r=0;r<mat.m;r++){
+                    row_entries(first_row+r)+=mat.offsets(r+1)-mat.offsets(r);
+                    for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++)
+                        row_entries(first_col+mat.A(e).j)++;}}}
+
+    for(int i=0;i<TV::m;i++)
+        for(int k=0;k<matrix_pu(i).m;k++){
+            const SPARSE_MATRIX_FLAT_MXN<T>& mat=matrix_pu(i)(k);
+            int first_row=first_row_p(k);
+            int first_col=first_row_u(i)(k);
+            for(int r=0;r<mat.m;r++){
+                row_entries(first_row+r)+=mat.offsets(r+1)-mat.offsets(r);
+                for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++)
+                    row_entries(first_col+mat.A(e).j)++;}}
+
+    for(int i=0;i<TV::m;i++)
+        for(int k=0;k<matrix_qu(i).m;k++){
+            const SPARSE_MATRIX_FLAT_MXN<T>& mat=matrix_qu(i)(k);
+            int first_row=first_row_q;
+            int first_col=first_row_u(i)(k);
+            for(int r=0;r<mat.m;r++){
+                row_entries(first_row+r)+=mat.offsets(r+1)-mat.offsets(r);
+                for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++)
+                    row_entries(first_col+mat.A(e).j)++;}}
+
+    M.offsets.Append(0);
+    for(int i=0;i<row_entries.m;i++) M.offsets.Append(M.offsets.Last()+row_entries(i));
+    M.A.Resize(M.offsets.Last());
+    next_entry=M.offsets;
+
+    for(int i=0;i<TV::m;i++){
+        for(int k=0;k<matrix_uu(i)(i).m;k++){
+            const SPARSE_MATRIX_FLAT_MXN<T>& mat=matrix_uu(i)(i)(k);
+            int first_row=first_row_u(i)(k);
+            int first_col=first_row_u(i)(k);
+            for(int r=0;r<mat.m;r++)
+                for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++)
+                    M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(first_col+mat.A(e).j,mat.A(e).a);}
+
+        for(int j=i+1;j<TV::m;j++)
+            for(int k=0;k<matrix_uu(i)(j).m;k++){
+                const SPARSE_MATRIX_FLAT_MXN<T>& mat=matrix_uu(i)(j)(k);
+                int first_row=first_row_u(i)(k);
+                int first_col=first_row_u(j)(k);
+                for(int r=0;r<mat.m;r++)
+                    for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++){
+                        M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(first_col+mat.A(e).j,mat.A(e).a);
+                        M.A(next_entry(first_col+mat.A(e).j)++)=SPARSE_MATRIX_ENTRY<T>(first_row+r,mat.A(e).a);}}}
+
+    for(int i=0;i<TV::m;i++)
+        for(int k=0;k<matrix_pu(i).m;k++){
+            const SPARSE_MATRIX_FLAT_MXN<T>& mat=matrix_pu(i)(k);
+            int first_row=first_row_p(k);
+            int first_col=first_row_u(i)(k);
+            for(int r=0;r<mat.m;r++)
+                for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++){
+                    M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(first_col+mat.A(e).j,mat.A(e).a);
+                    M.A(next_entry(first_col+mat.A(e).j)++)=SPARSE_MATRIX_ENTRY<T>(first_row+r,mat.A(e).a);}}
+
+    for(int i=0;i<TV::m;i++)
+        for(int k=0;k<matrix_qu(i).m;k++){
+            const SPARSE_MATRIX_FLAT_MXN<T>& mat=matrix_qu(i)(k);
+            int first_row=first_row_q;
+            int first_col=first_row_u(i)(k);
+            for(int r=0;r<mat.m;r++)
+                for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++){
+                    M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(first_col+mat.A(e).j,mat.A(e).a);
+                    M.A(next_entry(first_col+mat.A(e).j)++)=SPARSE_MATRIX_ENTRY<T>(first_row+r,mat.A(e).a);}}
+}
 namespace PhysBAM{
 template class INTERFACE_STOKES_SYSTEM_COLOR<VECTOR<float,2> >;
 template class INTERFACE_STOKES_SYSTEM_COLOR<VECTOR<float,3> >;

@@ -52,7 +52,7 @@ class FLUIDS_COLOR_BASE:public PLS_FC_EXAMPLE<TV>
 public:
     using BASE::grid;using BASE::output_directory;using BASE::face_velocities;
     using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;using BASE::use_level_set_method;using BASE::use_pls;
-    using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::number_of_colors;
+    using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::sparse_dump_matrix;using BASE::number_of_colors;
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
     using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
     using BASE::particle_levelset_evolution_multiple;using BASE::face_color;using BASE::substeps_delay_frame;
@@ -106,6 +106,7 @@ public:
         parse_args.Add("-steps",&time_steps_per_frame,"steps","number of time steps per frame");
         parse_args.Add("-last_frame",&last_frame,&user_last_frame,"frame","number of frames to simulate");
         parse_args.Add("-dump_matrix",&dump_matrix,"dump out system and rhs");
+        parse_args.Add("-sparse_dump_matrix",&sparse_dump_matrix,"dump out system (efficiently) and rhs");
         parse_args.Add("-use_pls",&use_pls_over_levelset,"use particle level set");
         parse_args.Add("-use_ls",&use_levelset_over_pls,"use level set method");
         parse_args.Add("-mu0",&mu0,&override_mu0,"viscosity","viscosity for first fluid region");

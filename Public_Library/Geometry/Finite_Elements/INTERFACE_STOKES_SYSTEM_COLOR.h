@@ -104,6 +104,7 @@ public:
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const;
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const;
     void Pack(const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u,VECTOR<ARRAY<ARRAY<T> >,TV::m>& v) const;
+    void Get_Sparse_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const;
 private:
     void Set_Jacobi_Preconditioner();
 //#####################################################################

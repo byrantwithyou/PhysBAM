@@ -46,6 +46,7 @@ public:
     bool use_preconditioner;
     int max_iter;
     bool dump_matrix;
+    bool sparse_dump_matrix;
     bool wrap;
     bool use_advection;
     bool use_reduced_advection;
