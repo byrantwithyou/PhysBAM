@@ -199,10 +199,12 @@ void Emit_Camera(std::ofstream& fout,const HASHTABLE<std::string,std::string>& o
     std::ifstream fin(file.c_str());
     while(getline(fin, line))
     {
-        if(sscanf(line.c_str(), " Location = [ %lg %lg %lg ] \n", &loc.x, &loc.y, &loc.z)==3){}
-        else if(sscanf(line.c_str(), " Pseudo_Up = [ %lg %lg %lg ] \n", &up.x, &up.y, &up.z)==3){}
-        else if(sscanf(line.c_str(), " Look_At = [ %lg %lg %lg ] \n", &at.x, &at.y, &at.z)==3){}
-        else if(sscanf(line.c_str(), " Field_Of_View = %lg \n", &angle)==3){}
+        VECTOR<double,TV::m> dloc,dup,dat;
+        double dangle;
+        if(sscanf(line.c_str(), " Location = ( %lg %lg %lg ) \n", &dloc.x, &dloc.y, &dloc.z)==3){loc=TV(dloc);}
+        else if(sscanf(line.c_str(), " Pseudo_Up = ( %lg %lg %lg ) \n", &dup.x, &dup.y, &dup.z)==3){up=TV(dup);}
+        else if(sscanf(line.c_str(), " Look_At = ( %lg %lg %lg ) \n", &dat.x, &dat.y, &dat.z)==3){at=TV(dat);}
+        else if(sscanf(line.c_str(), " Field_Of_View = %lg \n", &dangle)==1){angle=dangle;}
     }
     fout<<"camera { location ";
     Emit_Vector(fout, loc, " look_at ");
