@@ -234,10 +234,10 @@ namespace PhysBAM{
 // Function Attribute_Sample_Registry
 //#####################################################################
 static HASHTABLE<ATTRIBUTE_ID,ARRAY_COLLECTION_ELEMENT_BASE*>&
-Attribute_Sample_Registry()
+Attribute_Sample_Registry(int type=0) // 0 = actual type, 1 = float version, 2 = double version
 {
-    static HASHTABLE<ATTRIBUTE_ID,ARRAY_COLLECTION_ELEMENT_BASE*> registry;
-    return registry;
+    static HASHTABLE<ATTRIBUTE_ID,ARRAY_COLLECTION_ELEMENT_BASE*> registry[3];
+    return registry[type];
 }
 }
 //#####################################################################
@@ -295,7 +295,7 @@ Read(TYPED_ISTREAM& input)
         Read_Binary(input,hashed_id,read_size);
 
         ARRAY_COLLECTION_ELEMENT_BASE* sample_attribute=0;
-        if(!Attribute_Sample_Registry().Get(Type_Only(hashed_id),sample_attribute)){
+        if(!Attribute_Sample_Registry(sizeof(T)==sizeof(float)?1:2).Get(Type_Only(hashed_id),sample_attribute)){
             input.stream.ignore(read_size);continue;}
 
         ATTRIBUTE_INDEX index=Get_Attribute_Index(Id_Only(hashed_id));
@@ -345,8 +345,24 @@ void PhysBAM::Register_Attribute_Sample(ARRAY_COLLECTION_ELEMENT_BASE* element)
 {
     static ELEMENT_SAMPLES_HELPER sample_helper;
     element->id=ATTRIBUTE_ID();
-    PHYSBAM_ASSERT(Attribute_Sample_Registry().Set(Type_Only(element->Hashed_Id()),element));
+    PHYSBAM_ASSERT(Attribute_Sample_Registry(0).Set(Type_Only(element->Hashed_Id()),element));
+    PHYSBAM_ASSERT(Attribute_Sample_Registry(1).Set(Type_Only(element->Hashed_Id()),element));
+    PHYSBAM_ASSERT(Attribute_Sample_Registry(2).Set(Type_Only(element->Hashed_Id()),element));
     sample_helper.samples.Append(element);
+}
+void PhysBAM::Register_Attribute_Sample(ARRAY_COLLECTION_ELEMENT_BASE* element_float,ARRAY_COLLECTION_ELEMENT_BASE* element_double)
+{
+    static ELEMENT_SAMPLES_HELPER sample_helper;
+    element_float->id=ATTRIBUTE_ID();
+    element_double->id=ATTRIBUTE_ID();
+    PHYSBAM_ASSERT(Attribute_Sample_Registry(0).Set(Type_Only(element_float->Hashed_Id()),element_float));
+    PHYSBAM_ASSERT(Attribute_Sample_Registry(1).Set(Type_Only(element_float->Hashed_Id()),element_float));
+    PHYSBAM_ASSERT(Attribute_Sample_Registry(2).Set(Type_Only(element_float->Hashed_Id()),element_double));
+    PHYSBAM_ASSERT(Attribute_Sample_Registry(0).Set(Type_Only(element_double->Hashed_Id()),element_double));
+    PHYSBAM_ASSERT(Attribute_Sample_Registry(1).Set(Type_Only(element_double->Hashed_Id()),element_float));
+    PHYSBAM_ASSERT(Attribute_Sample_Registry(2).Set(Type_Only(element_double->Hashed_Id()),element_double));
+    sample_helper.samples.Append(element_float);
+    sample_helper.samples.Append(element_double);
 }
 //#####################################################################
 namespace PhysBAM{

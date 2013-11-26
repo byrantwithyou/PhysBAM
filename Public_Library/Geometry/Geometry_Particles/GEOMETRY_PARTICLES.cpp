@@ -43,20 +43,10 @@ static int Initialize_Geometry_Particle()
     Register_Attribute_Name(ATTRIBUTE_ID_RADIUS,"radius");
     Register_Attribute_Name(ATTRIBUTE_ID_DISPLAY_SIZE,"display_size");
 
-    #define READ_WRITE_VECTOR_HELPER(T,d) \
-        Register_Attribute_Sample<VECTOR<T,d> >();         \
-        Register_Attribute_Sample<FRAME<VECTOR<T,d> > >(); \
-        Register_Attribute_Sample<TWIST<VECTOR<T,d> > >();
-
-    #define READ_WRITE_SCALAR_HELPER(T) \
-        Register_Attribute_Sample<T>(); \
-        Register_Attribute_Sample<VECTOR<T,0> >(); \
-        Register_Attribute_Sample<DIAGONAL_MATRIX<T,1> >(); \
-        Register_Attribute_Sample<DIAGONAL_MATRIX<T,2> >(); \
-        Register_Attribute_Sample<DIAGONAL_MATRIX<T,3> >(); \
-        Register_Attribute_Sample<MATRIX<T,1,1> >(); \
-        Register_Attribute_Sample<MATRIX<T,0,0> >(); \
-        READ_WRITE_VECTOR_HELPER(T,1);READ_WRITE_VECTOR_HELPER(T,2);READ_WRITE_VECTOR_HELPER(T,3);
+    #define READ_WRITE_VECTOR_HELPER(d) \
+        Register_Attribute_Sample<VECTOR<float,d> ,VECTOR<double,d> >();         \
+        Register_Attribute_Sample<FRAME<VECTOR<float,d> > ,FRAME<VECTOR<double,d> > >(); \
+        Register_Attribute_Sample<TWIST<VECTOR<float,d> > ,TWIST<VECTOR<double,d> > >();
 
     Register_Attribute_Sample<VECTOR<int,1> >();
     Register_Attribute_Sample<VECTOR<int,2> >();
@@ -64,9 +54,14 @@ static int Initialize_Geometry_Particle()
     Register_Attribute_Sample<int>();
     Register_Attribute_Sample<bool>();
     Register_Attribute_Sample<unsigned short>();
-
-    READ_WRITE_SCALAR_HELPER(float);
-    READ_WRITE_SCALAR_HELPER(double);
+    Register_Attribute_Sample<float,double>();
+    Register_Attribute_Sample<VECTOR<float,0> ,VECTOR<double,0> >();
+    Register_Attribute_Sample<DIAGONAL_MATRIX<float,1> ,DIAGONAL_MATRIX<double,1> >();
+    Register_Attribute_Sample<DIAGONAL_MATRIX<float,2> ,DIAGONAL_MATRIX<double,2> >();
+    Register_Attribute_Sample<DIAGONAL_MATRIX<float,3> ,DIAGONAL_MATRIX<double,3> >();
+    Register_Attribute_Sample<MATRIX<float,1,1> ,MATRIX<double,1,1> >();
+    Register_Attribute_Sample<MATRIX<float,0,0> ,MATRIX<double,0,0> >();
+    READ_WRITE_VECTOR_HELPER(1);READ_WRITE_VECTOR_HELPER(2);READ_WRITE_VECTOR_HELPER(3);
 
     return 1;
 }

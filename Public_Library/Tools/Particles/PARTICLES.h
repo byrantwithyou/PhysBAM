@@ -26,7 +26,10 @@ const char* Get_Attribute_Name(const ATTRIBUTE_ID id);
 
 void Register_Attribute_Sample(ARRAY_COLLECTION_ELEMENT_BASE* element);
 
+void Register_Attribute_Sample(ARRAY_COLLECTION_ELEMENT_BASE* element_float,ARRAY_COLLECTION_ELEMENT_BASE* element_double);
+
 template<class E> void Register_Attribute_Sample() {Register_Attribute_Sample(new ARRAY_COLLECTION_ELEMENT<E>);}
+template<class F,class D> void Register_Attribute_Sample() {Register_Attribute_Sample(new ARRAY_COLLECTION_ELEMENT<F>,new ARRAY_COLLECTION_ELEMENT<D>);}
 
 template<class TV>
 class PARTICLES:public CLONEABLE<PARTICLES<TV> >,public NONCOPYABLE
