@@ -91,7 +91,7 @@ Read_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,c
     // read in bindings
     int local_frame=frame;
     std::string binding_state_list_name=prefix+"/common/bindings_list";
-    std::string binding_state_name=prefix+"/"+frame_string+"bindings";
+    std::string binding_state_name=prefix+"/"+frame_string+"/bindings";
     if(FILE_UTILITIES::File_Exists(binding_state_list_name)){
         if(!binding_list.frame_list){
             binding_list.frame_list=new ARRAY<int>;
@@ -101,7 +101,7 @@ Read_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,c
         FILE_UTILITIES::Read_From_File(stream_type,binding_state_name,binding_list);binding_list.last_read=local_frame;}
     local_frame=frame;
     std::string soft_binding_state_list_name=prefix+"/common/soft_bindings_list";
-    std::string soft_binding_state_name=prefix+"/"+frame_string+"soft_bindings";
+    std::string soft_binding_state_name=prefix+"/"+frame_string+"/soft_bindings";
     if(FILE_UTILITIES::File_Exists(soft_binding_state_list_name)){
         if(!soft_bindings.frame_list){soft_bindings.frame_list=new ARRAY<int>;FILE_UTILITIES::Read_From_File(stream_type,soft_binding_state_list_name,*soft_bindings.frame_list);}
         local_frame=(*soft_bindings.frame_list)(soft_bindings.frame_list->Binary_Search(frame));}
