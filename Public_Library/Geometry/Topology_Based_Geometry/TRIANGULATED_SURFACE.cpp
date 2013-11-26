@@ -785,7 +785,7 @@ Create_Compact_Copy() const
     triangle_mesh->elements.Resize(mesh.elements.m);
     for(int i=0;i<mesh.elements.m;i++){const VECTOR<int,3>& element=mesh.elements(i);
         for(int j=0;j<3;j++){
-            int& a=old_to_new.Get_Or_Insert(element(j));
+            int& a=old_to_new.Get_Or_Insert(element(j),-1);
             if(a<0) a=new_to_old.Append(element(j));
             triangle_mesh->elements(i)(j)=a;}}
 
