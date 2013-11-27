@@ -99,7 +99,7 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
         {PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > >& hierarchy=structure.particle_hierarchy;
             structure.point_modified.Resize(hierarchy.box_hierarchy.m,false,false);
             for(int kk=0;kk<hierarchy.leaves;kk++){
-                int p=structure.collision_particles.active_indices(kk);
+                int p=structure.active_indices(kk);
                 structure.point_modified(kk)=recently_modified(p);
                 if(structure.point_modified(kk)) hierarchy.box_hierarchy(kk)=RANGE<TV>::Bounding_Box(X(p),X_self_collision_free(p));}
             hierarchy.Update_Modified_Nonleaf_Boxes(structure.point_modified);}}

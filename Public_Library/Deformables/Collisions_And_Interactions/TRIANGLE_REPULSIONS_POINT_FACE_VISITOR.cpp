@@ -17,7 +17,7 @@ using namespace PhysBAM;
 template<class TV> TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<TV>::
 TRIANGLE_REPULSIONS_POINT_FACE_VISITOR(ARRAY<REPULSION_PAIR<TV> >& pairs,const STRUCTURE_INTERACTION_GEOMETRY<TV>& particle_structure,
     const STRUCTURE_INTERACTION_GEOMETRY<TV>& face_structure,ARRAY_VIEW<const TV> X_other,const TRIANGLE_REPULSIONS<TV>& repulsions,int& pruned)
-    :pairs(pairs),particle_active_indices(particle_structure.collision_particles.active_indices),faces(face_structure.Face_Mesh_Object()->mesh.elements),
+    :pairs(pairs),particle_active_indices(particle_structure.active_indices),faces(face_structure.Face_Mesh_Object()->mesh.elements),
     X_other(X_other),X_self_collision_free(repulsions.geometry.X_self_collision_free),repulsion_thickness(repulsions.repulsion_thickness),
     thickness_multiplier(repulsions.repulsion_thickness_detection_multiplier*repulsions.hierarchy_repulsion_thickness_multiplier),pruned(pruned),
     perform_attractions(repulsions.perform_attractions),intersecting_point_face_pairs(repulsions.geometry.intersecting_point_face_pairs),

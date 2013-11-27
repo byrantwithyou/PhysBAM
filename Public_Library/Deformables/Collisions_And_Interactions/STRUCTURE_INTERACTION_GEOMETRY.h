@@ -11,7 +11,6 @@
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Math_Tools/choice.h>
 #include <Tools/Parallel_Computation/PARTITION_ID.h>
-#include <Tools/Particles/PARTICLES_SUBSET.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
@@ -29,7 +28,7 @@ class STRUCTURE_INTERACTION_GEOMETRY
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,1>::OBJECT T_SEGMENTED_CURVE;
 public:
     GEOMETRY_PARTICLES<TV>& full_particles;
-    PARTICLES_SUBSET<TV,GEOMETRY_PARTICLES<TV> > collision_particles;
+    ARRAY<int> active_indices;
     TRIANGULATED_SURFACE<T>* triangulated_surface;
     T_SEGMENTED_CURVE* segmented_curve;
     POINT_SIMPLICES_1D<T>* point_simplices;
@@ -43,8 +42,8 @@ private:
 public:
 
     STRUCTURE_INTERACTION_GEOMETRY(GEOMETRY_PARTICLES<TV>& full_particles_input)
-        :full_particles(full_particles_input),collision_particles(full_particles),triangulated_surface(0),segmented_curve(0),point_simplices(0),
-        subset(collision_particles.point_cloud.X,collision_particles.active_indices),particle_hierarchy(subset,false,0),need_destroy_segmented_curve(false)
+        :full_particles(full_particles_input),triangulated_surface(0),segmented_curve(0),point_simplices(0),
+        subset(full_particles.X,active_indices),particle_hierarchy(subset,false,0),need_destroy_segmented_curve(false)
     {}
 
     ~STRUCTURE_INTERACTION_GEOMETRY()
@@ -52,18 +51,18 @@ public:
 
     void Clean_Memory()
     {if(need_destroy_segmented_curve) delete segmented_curve;need_destroy_segmented_curve=false;
-    collision_particles.Clean_Memory();triangulated_surface=0;segmented_curve=0;point_simplices=0;particle_hierarchy.Clean_Memory();}
+    active_indices.Clean_Memory();triangulated_surface=0;segmented_curve=0;point_simplices=0;particle_hierarchy.Clean_Memory();}
 
     void Build_Topological_Structure_Of_Hierarchies()
 {
     if(triangulated_surface) triangulated_surface->Initialize_Hierarchy(false);
     if(segmented_curve) segmented_curve->Initialize_Hierarchy(false);
-    ARRAY_VIEW<TV> tmp_view(collision_particles.point_cloud.X.Size(),collision_particles.point_cloud.X.Get_Array_Pointer());
+    ARRAY_VIEW<TV> tmp_view(full_particles.X.Size(),full_particles.X.Get_Array_Pointer());
     subset.array.Exchange(tmp_view);
     particle_hierarchy.Initialize_Hierarchy_Using_KD_Tree();}
 
     const typename IF<d==2,ARRAY<int>,typename IF<d==3,ARRAY<VECTOR<int,2> >,UNUSABLE>::TYPE>::TYPE& Edges() const
-    {return choice<d-1>(unusable,collision_particles.active_indices,segmented_curve->mesh.elements);}
+    {return choice<d-1>(unusable,active_indices,segmented_curve->mesh.elements);}
 
     const typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d-1>::OBJECT* Face_Mesh_Object() const
     {return choice<d-1>(point_simplices,segmented_curve,triangulated_surface);}

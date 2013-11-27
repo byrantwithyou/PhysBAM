@@ -21,7 +21,7 @@ template<class TV> TRIANGLE_COLLISIONS_POINT_FACE_VISITOR<TV>::
 TRIANGLE_COLLISIONS_POINT_FACE_VISITOR(ARRAY<VECTOR<int,d+1> >& pairs_internal,ARRAY<VECTOR<int,d+1> >& pairs_external,
     const STRUCTURE_INTERACTION_GEOMETRY<TV>& particle_structure,const STRUCTURE_INTERACTION_GEOMETRY<TV>& face_structure,
     const TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry,const T collision_thickness,MPI_SOLIDS<TV>* mpi_solids)
-    :pairs_internal(pairs_internal),pairs_external(pairs_external),particle_active_indices(particle_structure.collision_particles.active_indices),
+    :pairs_internal(pairs_internal),pairs_external(pairs_external),particle_active_indices(particle_structure.active_indices),
     faces(face_structure.Face_Mesh_Object()->mesh.elements),X(geometry.deformable_body_collection.particles.X),
     X_self_collision_free(geometry.X_self_collision_free),
     collision_thickness(collision_thickness),point_box_modified(particle_structure.point_modified),face_box_modified(face_structure.Face_Modified()),

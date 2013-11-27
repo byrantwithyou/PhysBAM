@@ -52,19 +52,18 @@ Build_Collision_Geometry(STRUCTURE<TV>& structure)
 {
     Clean_Memory();
     if((segmented_curve=Segmented_Curve(&structure)))
-        segmented_curve->mesh.elements.Flattened().Get_Unique(collision_particles.active_indices);
+        segmented_curve->mesh.elements.Flattened().Get_Unique(active_indices);
     else if((triangulated_surface=Triangulated_Surface(&structure))){
 
-        triangulated_surface->mesh.elements.Flattened().Get_Unique(collision_particles.active_indices);
+        triangulated_surface->mesh.elements.Flattened().Get_Unique(active_indices);
         triangulated_surface->Update_Number_Nodes();
         if(!triangulated_surface->mesh.segment_mesh) triangulated_surface->mesh.Initialize_Segment_Mesh();
         segmented_curve=new T_SEGMENTED_CURVE(*triangulated_surface->mesh.segment_mesh,full_particles); // TODO: This is broken; long term shallow copy of a temporary auxiliary structure
         need_destroy_segmented_curve=true;}
     else if(FREE_PARTICLES<TV>* free_particles=dynamic_cast<FREE_PARTICLES<TV>*>(&structure))
-        collision_particles.active_indices=free_particles->nodes;
+        active_indices=free_particles->nodes;
     else PHYSBAM_FATAL_ERROR();
     if(segmented_curve && !segmented_curve->mesh.incident_elements) segmented_curve->mesh.Initialize_Incident_Elements();
-    collision_particles.Update_Subset_Index_From_Element_Index();
     Build_Topological_Structure_Of_Hierarchies();
 }
 //#####################################################################
@@ -93,8 +92,8 @@ Update_Faces_And_Hierarchies_With_Collision_Free_Positions(ARRAY_VIEW<const T> n
         segmented_curve->hierarchy->Update_Nonleaf_Boxes();}
     if(d==3 && triangulated_surface)
         Update_Faces_And_Hierarchies_With_Collision_Free_Positions_Helper(*triangulated_surface,node_thickness,node_thickness_multiplier,X_old_full);
-    particle_hierarchy.Update_Leaf_Boxes(X_old_full.Subset(collision_particles.active_indices));
-    for(int k=0;k<particle_hierarchy.leaves;k++) particle_hierarchy.box_hierarchy(k).Change_Size(node_thickness_multiplier*node_thickness(collision_particles.active_indices(k)));
+    particle_hierarchy.Update_Leaf_Boxes(X_old_full.Subset(active_indices));
+    for(int k=0;k<particle_hierarchy.leaves;k++) particle_hierarchy.box_hierarchy(k).Change_Size(node_thickness_multiplier*node_thickness(active_indices(k)));
     particle_hierarchy.Update_Nonleaf_Boxes();
 }
 //#####################################################################
@@ -124,8 +123,8 @@ Update_Processor_Masks(const PARTITION_ID processor,const ARRAY<PARTITION_ID>& p
     if(triangulated_surface)
         Update_Processor_Masks_Helper(*triangulated_surface,*triangulated_surface->hierarchy,processor,partition_id_from_particle_index,triangulated_surface_processor_masks);
     point_processor_masks.Resize(particle_hierarchy.box_hierarchy.m);
-    for(int e=0;e<collision_particles.active_indices.m;e++){
-        int p=collision_particles.active_indices(e);PARTITION_ID particle_processor=partition_id_from_particle_index(p);
+    for(int e=0;e<active_indices.m;e++){
+        int p=active_indices(e);PARTITION_ID particle_processor=partition_id_from_particle_index(p);
         point_processor_masks(e)=0;if(particle_processor==processor) point_processor_masks(e)|=2;else if(particle_processor>processor) point_processor_masks(e)|=1;}
     for(int k=particle_hierarchy.leaves;k<point_processor_masks.m;k++) point_processor_masks(k)=point_processor_masks(particle_hierarchy.children(k-particle_hierarchy.leaves)(0))
         | point_processor_masks(particle_hierarchy.children(k-particle_hierarchy.leaves)(1));
