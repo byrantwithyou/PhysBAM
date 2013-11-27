@@ -140,8 +140,8 @@ Read(const STREAM_TYPE stream_type,const std::string& prefix,const std::string& 
     const bool read_from_every_process)
 {
     particles.Store_Mass();
-    Read_Dynamic_Variables(stream_type,prefix,frame);
     if(include_static_variables) Read_Static_Variables(stream_type,static_prefix,static_frame);
+    Read_Dynamic_Variables(stream_type,prefix,frame);
     if(mpi_solids && read_from_every_process) // make sure every process has all the correct data
         mpi_solids->Broadcast_Data(particles.X,particles.V);
 }
@@ -355,6 +355,9 @@ Add_Force(DEFORMABLES_FORCES<TV>* force)
     force->Set_CFL_Number(cfl_number);
     return deformables_forces.m;
 }
+//#####################################################################
+// Function Set_CFL_Number
+//#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Set_CFL_Number(const T cfl_number_input)
 {
@@ -432,8 +435,7 @@ Read_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,co
     // TODO: merge this functionality with dynamic lists to allow for more flexibility
     if(!structures.m){ // // create and read all structures from scratch
         structures.Resize(m);
-        for(int k=0;k<structures.m;k++) structures(k)=STRUCTURE<TV>::Create_Structure(input,particles);
-    }
+        for(int k=0;k<structures.m;k++) structures(k)=STRUCTURE<TV>::Create_Structure(input,particles);}
     else if(structures.m<=m){
         int old_number_of_structures=structures.m;structures.Resize(m);
         for(int k=0;k<old_number_of_structures;k++) structures(k)->Read_Structure(input);
