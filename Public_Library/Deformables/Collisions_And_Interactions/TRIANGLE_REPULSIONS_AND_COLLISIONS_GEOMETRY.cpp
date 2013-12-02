@@ -20,7 +20,6 @@
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <Deformables/Fracture/EMBEDDING.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
 using namespace PhysBAM;
 //#####################################################################

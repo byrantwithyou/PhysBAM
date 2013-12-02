@@ -18,7 +18,6 @@
 #include <Deformables/Forces/BINDING_SPRINGS.h>
 #include <Deformables/Forces/DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
-#include <Deformables/Fracture/EMBEDDING.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
 using namespace PhysBAM;
 //#####################################################################

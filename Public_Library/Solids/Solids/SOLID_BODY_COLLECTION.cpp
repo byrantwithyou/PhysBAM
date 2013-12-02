@@ -15,7 +15,6 @@
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <Deformables/Forces/BINDING_SPRINGS.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
-#include <Deformables/Fracture/EMBEDDING.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
