@@ -632,9 +632,15 @@ Initialize_Swept_Mesh(const TRIANGLE_MESH& tri_mesh,int layers)
     for(int l=0,particle_offset=0;l<layers;l++){
         for(int e=0;e<tri_mesh.elements.m;e++){
             VECTOR<int,3> e0=tri_mesh.elements(e)+particle_offset,e1=e0+tri_mesh.number_nodes;
-            elements.Append(VECTOR<int,4>(e0.x,e0.y,e0.z,e1.x));
-            elements.Append(VECTOR<int,4>(e0.y,e0.z,e1.x,e1.y));
-            elements.Append(VECTOR<int,4>(e0.z,e1.x,e1.y,e1.z));}
+            int a=e0.Arg_Min(),c=e0.Arg_Max(),b=3-a-c;
+            VECTOR<int,4> t0=e0.Append(e1(a)),t1(t0);
+            t1(a)=e1(b);
+            VECTOR<int,4> t2=t1;
+            t2(b)=e1(c);
+            exchange(t1(0),t1(1));
+            elements.Append(t0);
+            elements.Append(t1);
+            elements.Append(t2);}
         particle_offset+=tri_mesh.number_nodes;}
     Set_Number_Nodes(tri_mesh.number_nodes*(layers+1));
 }
