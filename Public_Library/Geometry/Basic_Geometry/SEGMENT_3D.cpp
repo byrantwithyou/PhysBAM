@@ -17,13 +17,13 @@ using namespace PhysBAM;
 // Function Closest_Point_On_Segment
 //#####################################################################
 template<class T> VECTOR<T,3> SEGMENT_3D<T>::
-Closest_Point_On_Segment(const VECTOR<T,3>& point) const
+Closest_Point_On_Segment(const TV& point) const
 {                  
-    VECTOR<T,3> v=X.y-X.x;
-    T denominator=VECTOR<T,3>::Dot_Product(v,v);
+    TV v=X.y-X.x;
+    T denominator=TV::Dot_Product(v,v);
     if(denominator == 0) return X.x; // X.x and X.y are a single point
     else{
-        T t=VECTOR<T,3>::Dot_Product(point-X.x,v)/denominator;
+        T t=TV::Dot_Product(point-X.x,v)/denominator;
         if(t <= 0) return X.x;
         else if(t >= 1) return X.y;
         else{v=X.x+(X.y-X.x)*t;return v;}}
@@ -32,31 +32,31 @@ Closest_Point_On_Segment(const VECTOR<T,3>& point) const
 // Function Distance_From_Point_To_Segment
 //#####################################################################
 template<class T> T SEGMENT_3D<T>::
-Distance_From_Point_To_Segment(const VECTOR<T,3>& point) const
+Distance_From_Point_To_Segment(const TV& point) const
 {                  
-    VECTOR<T,3> v=Closest_Point_On_Segment(point),d=v-point;
+    TV v=Closest_Point_On_Segment(point),d=v-point;
     return d.Magnitude();
 }
 //#####################################################################
 // Function Closest_Point_On_Line
 //#####################################################################
 template<class T> VECTOR<T,3> SEGMENT_3D<T>::
-Closest_Point_On_Line(const VECTOR<T,3>& point) const
+Closest_Point_On_Line(const TV& point) const
 {                  
-    VECTOR<T,3> v=X.y-X.x;
-    T denominator=VECTOR<T,3>::Dot_Product(v,v);
+    TV v=X.y-X.x;
+    T denominator=TV::Dot_Product(v,v);
     if(denominator == 0) return X.x; // X.x and X.y are a single point
     else{
-        T t=VECTOR<T,3>::Dot_Product(point-X.x,v)/denominator;
+        T t=TV::Dot_Product(point-X.x,v)/denominator;
         v=X.x+(X.y-X.x)*t;return v;}
 }
 //#####################################################################
 // Function Distance_From_Point_To_Line
 //#####################################################################
 template<class T> T SEGMENT_3D<T>::
-Distance_From_Point_To_Line(const VECTOR<T,3>& point) const
+Distance_From_Point_To_Line(const TV& point) const
 {                  
-    VECTOR<T,3> v=Closest_Point_On_Line(point),d=v-point;
+    TV v=Closest_Point_On_Line(point),d=v-point;
     return d.Magnitude();
 }
 //#####################################################################
@@ -66,9 +66,9 @@ Distance_From_Point_To_Line(const VECTOR<T,3>& point) const
 template<class T> VECTOR<T,3> SEGMENT_3D<T>::
 Shortest_Vector_Between_Lines(const SEGMENT_3D<T>& segment,VECTOR<T,2>& weights) const
 {
-    VECTOR<T,3> u=X.y-X.x,v=segment.X.y-segment.X.x,w=segment.X.x-X.x;
-    T u_magnitude_squared=u.Magnitude_Squared(),v_magnitude_squared=v.Magnitude_Squared(),u_dot_u=u_magnitude_squared,v_dot_v=v_magnitude_squared,u_dot_v=VECTOR<T,3>::Dot_Product(u,v),
-        u_dot_w=VECTOR<T,3>::Dot_Product(u,w),v_dot_w=VECTOR<T,3>::Dot_Product(v,w);
+    TV u=X.y-X.x,v=segment.X.y-segment.X.x,w=segment.X.x-X.x;
+    T u_magnitude_squared=u.Magnitude_Squared(),v_magnitude_squared=v.Magnitude_Squared(),u_dot_u=u_magnitude_squared,v_dot_v=v_magnitude_squared,u_dot_v=TV::Dot_Product(u,v),
+        u_dot_w=TV::Dot_Product(u,w),v_dot_w=TV::Dot_Product(v,w);
     T denominator=u_dot_u*v_dot_v-sqr(u_dot_v),rhs1=v_dot_v*u_dot_w-u_dot_v*v_dot_w,rhs2=u_dot_v*u_dot_w-u_dot_u*v_dot_w;
     weights.x=rhs1/denominator;weights.y=rhs2/denominator;
     return weights.x*u-w-weights.y*v;
@@ -80,9 +80,9 @@ Shortest_Vector_Between_Lines(const SEGMENT_3D<T>& segment,VECTOR<T,2>& weights)
 template<class T> VECTOR<T,3> SEGMENT_3D<T>::
 Shortest_Vector_Between_Segments(const SEGMENT_3D<T>& segment,VECTOR<T,2>& weights) const
 {
-    VECTOR<T,3> u=X.y-X.x,v=segment.X.y-segment.X.x,w=segment.X.x-X.x;
-    T u_magnitude_squared=u.Magnitude_Squared(),v_magnitude_squared=v.Magnitude_Squared(),u_dot_u=u_magnitude_squared,v_dot_v=v_magnitude_squared,u_dot_v=VECTOR<T,3>::Dot_Product(u,v),
-        u_dot_w=VECTOR<T,3>::Dot_Product(u,w),v_dot_w=VECTOR<T,3>::Dot_Product(v,w);
+    TV u=X.y-X.x,v=segment.X.y-segment.X.x,w=segment.X.x-X.x;
+    T u_magnitude_squared=u.Magnitude_Squared(),v_magnitude_squared=v.Magnitude_Squared(),u_dot_u=u_magnitude_squared,v_dot_v=v_magnitude_squared,u_dot_v=TV::Dot_Product(u,v),
+        u_dot_w=TV::Dot_Product(u,w),v_dot_w=TV::Dot_Product(v,w);
     T denominator=u_dot_u*v_dot_v-sqr(u_dot_v),rhs1=v_dot_v*u_dot_w-u_dot_v*v_dot_w,rhs2=u_dot_v*u_dot_w-u_dot_u*v_dot_w;
     bool check_boundary=false;
     if(rhs1 <= 0 || denominator <= rhs1) check_boundary=true;else weights.x=rhs1/denominator; 
@@ -113,7 +113,7 @@ Shortest_Vector_Between_Segments(const SEGMENT_3D<T>& segment,VECTOR<T,2>& weigh
 //#####################################################################
 // returns the distance, normal and weights
 template<class T> bool SEGMENT_3D<T>::
-Edge_Edge_Interaction(const SEGMENT_3D<T>& segment,const T interaction_distance,T& distance,VECTOR<T,3>& normal,VECTOR<T,TV::m+1>& weights,bool allow_negative_weights) const
+Edge_Edge_Interaction(const SEGMENT_3D<T>& segment,const T interaction_distance,T& distance,TV& normal,VECTOR<T,TV::m+1>& weights,bool allow_negative_weights) const
 {
     VECTOR<T,2> w;
     normal=Shortest_Vector_Between_Segments(segment,w);
@@ -132,15 +132,15 @@ Edge_Edge_Interaction_Data(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v
 {
     if(distance > small_number) normal/=distance;
     else{ // set normal based on relative velocity perpendicular to the two points
-        VECTOR<T,3> relative_velocity=-weights(0)*v1-weights(1)*v2-weights(2)*v3-weights(3)*v4,u=X.y-X.x;
-        normal=relative_velocity-VECTOR<T,3>::Dot_Product(relative_velocity,u)/VECTOR<T,3>::Dot_Product(u,u)*u;
+        TV relative_velocity=-weights(0)*v1-weights(1)*v2-weights(2)*v3-weights(3)*v4,u=X.y-X.x;
+        normal=relative_velocity-TV::Dot_Product(relative_velocity,u)/TV::Dot_Product(u,u)*u;
         T normal_magnitude=normal.Magnitude();
         if(normal_magnitude > small_number) normal/=normal_magnitude;
         else{ // relative velocity perpendicular to the segment is 0, pick any direction perpendicular to the segment
-            if(abs(u.x) > abs(u.y) && abs(u.x) > abs(u.z)) normal=VECTOR<T,3>(0,1,1);
-            else if(abs(u.y) > abs(u.x) && abs(u.y) > abs(u.z)) normal=VECTOR<T,3>(1,0,1);
-            else normal=VECTOR<T,3>(1,1,0);
-            normal=normal-VECTOR<T,3>::Dot_Product(normal,u)/VECTOR<T,3>::Dot_Product(u,u)*u;normal.Normalize();
+            if(abs(u.x) > abs(u.y) && abs(u.x) > abs(u.z)) normal=TV(0,1,1);
+            else if(abs(u.y) > abs(u.x) && abs(u.y) > abs(u.z)) normal=TV(1,0,1);
+            else normal=TV(1,1,0);
+            normal=normal-TV::Dot_Product(normal,u)/TV::Dot_Product(u,u)*u;normal.Normalize();
             if(verbose) LOG::cout << "                                            PICKING RANDOM NORMAL !!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
     }}
 }
@@ -149,7 +149,7 @@ Edge_Edge_Interaction_Data(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v
 //#####################################################################
 template<class T> bool SEGMENT_3D<T>::
 Edge_Edge_Interaction(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const TV& v3,const TV& v4,const T interaction_distance,
-    T& distance,VECTOR<T,3>& normal,VECTOR<T,TV::m+1>& weights,bool allow_negative_weights,const T small_number,const bool exit_early,const bool verbose) const
+    T& distance,TV& normal,VECTOR<T,TV::m+1>& weights,bool allow_negative_weights,const T small_number,const bool exit_early,const bool verbose) const
 {
     if(!Edge_Edge_Interaction(segment,interaction_distance,distance,normal,weights,allow_negative_weights)) return false;
     if(!exit_early) Edge_Edge_Interaction_Data(segment,v1,v2,v3,v4,distance,normal,weights,small_number,verbose);
@@ -163,12 +163,12 @@ Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const
     VECTOR<T,TV::m+1>& weights,const T small_number,const bool exit_early) const
 {
     // find cubic and compute the roots as possible collision times
-    VECTOR<T,3> ABo=X.y-X.x,ABv=dt*(v2-v1),ACo=segment.X.y-segment.X.x,ACv=dt*(v4-v3);
-    VECTOR<T,3> No=VECTOR<T,3>::Cross_Product(ABo,ACo),Nv=VECTOR<T,3>::Cross_Product(ABo,ACv)+VECTOR<T,3>::Cross_Product(ABv,ACo),Na=VECTOR<T,3>::Cross_Product(ABv,ACv);
-    VECTOR<T,3> APo=segment.X.x-X.x,APv=dt*(v3-v1);
+    TV ABo=X.y-X.x,ABv=dt*(v2-v1),ACo=segment.X.y-segment.X.x,ACv=dt*(v4-v3);
+    TV No=TV::Cross_Product(ABo,ACo),Nv=TV::Cross_Product(ABo,ACv)+TV::Cross_Product(ABv,ACo),Na=TV::Cross_Product(ABv,ACv);
+    TV APo=segment.X.x-X.x,APv=dt*(v3-v1);
     
-    CUBIC<double> cubic((double)VECTOR<T,3>::Dot_Product(Na,APv),(double)VECTOR<T,3>::Dot_Product(Nv,APv)+VECTOR<T,3>::Dot_Product(Na,APo),
-                                       (double)VECTOR<T,3>::Dot_Product(No,APv)+VECTOR<T,3>::Dot_Product(Nv,APo),(double)VECTOR<T,3>::Dot_Product(No,APo));
+    CUBIC<double> cubic((double)TV::Dot_Product(Na,APv),(double)TV::Dot_Product(Nv,APv)+TV::Dot_Product(Na,APo),
+                                       (double)TV::Dot_Product(No,APv)+TV::Dot_Product(Nv,APo),(double)TV::Dot_Product(No,APo));
     double xmin=0,xmax=1.000001;
     int num_intervals=0;VECTOR<INTERVAL<double>,3> intervals;
     cubic.Compute_Intervals(xmin,xmax,num_intervals,intervals(0),intervals(1),intervals(2));
@@ -189,7 +189,7 @@ Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const
 // Function Interpolation_Fraction
 //#####################################################################
 template<class T> T SEGMENT_3D<T>::
-Interpolation_Fraction(const VECTOR<T,3>& location) const
+Interpolation_Fraction(const TV& location) const
 {  
     return SEGMENT_3D::Interpolation_Fraction(location,X.x,X.y);
 }
@@ -197,7 +197,7 @@ Interpolation_Fraction(const VECTOR<T,3>& location) const
 // Function Barycentric_Coordinates
 //#####################################################################
 template<class T> VECTOR<T,2> SEGMENT_3D<T>::
-Barycentric_Coordinates(const VECTOR<T,3>& location) const
+Barycentric_Coordinates(const TV& location) const
 {  
     return SEGMENT_3D::Barycentric_Coordinates(location,X.x,X.y);
 }
@@ -205,7 +205,7 @@ Barycentric_Coordinates(const VECTOR<T,3>& location) const
 // Function Clamped_Barycentric_Coordinates
 //#####################################################################
 template<class T> VECTOR<T,2> SEGMENT_3D<T>::
-Clamped_Barycentric_Coordinates(const VECTOR<T,3>& location,const T tolerance) const
+Clamped_Barycentric_Coordinates(const TV& location,const T tolerance) const
 {  
     return SEGMENT_3D::Clamped_Barycentric_Coordinates(location,X.x,X.y);
 }
@@ -213,18 +213,18 @@ Clamped_Barycentric_Coordinates(const VECTOR<T,3>& location,const T tolerance) c
 // Function Interpolation_Fraction
 //#####################################################################
 template<class T> T SEGMENT_3D<T>::
-Interpolation_Fraction(const VECTOR<T,3>& location,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2) 
+Interpolation_Fraction(const TV& location,const TV& x1,const TV& x2) 
 {  
-    VECTOR<T,3> v=x2-x1;
-    T denominator=VECTOR<T,3>::Dot_Product(v,v);
+    TV v=x2-x1;
+    T denominator=TV::Dot_Product(v,v);
     if(denominator==0) return 0; // x1 and x2 are a single point
-    else return VECTOR<T,3>::Dot_Product(location-x1,v)/denominator;
+    else return TV::Dot_Product(location-x1,v)/denominator;
 }
 //#####################################################################
 // Function Barycentric_Coordinates
 //#####################################################################
 template<class T> VECTOR<T,2> SEGMENT_3D<T>::
-Barycentric_Coordinates(const VECTOR<T,3>& location,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2)
+Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2)
 {  
     T t=Interpolation_Fraction(location,x1,x2);
     return VECTOR<T,2>(1-t,t);
@@ -233,12 +233,12 @@ Barycentric_Coordinates(const VECTOR<T,3>& location,const VECTOR<T,3>& x1,const 
 // Function Clamped_Barycentric_Coordinates
 //#####################################################################
 template<class T> VECTOR<T,2> SEGMENT_3D<T>::
-Clamped_Barycentric_Coordinates(const VECTOR<T,3>& location,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const T tolerance)
+Clamped_Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,const T tolerance)
 {  
-    VECTOR<T,3> v=x2-x1;
-    T denominator=VECTOR<T,3>::Dot_Product(v,v);
+    TV v=x2-x1;
+    T denominator=TV::Dot_Product(v,v);
     if(abs(denominator)<tolerance) return VECTOR<T,2>((T).5,(T).5);
-    T a=clamp(VECTOR<T,3>::Dot_Product(location-x1,v)/denominator,(T)0,(T)1);
+    T a=clamp(TV::Dot_Product(location-x1,v)/denominator,(T)0,(T)1);
     return VECTOR<T,2>((T)1-a,a);
 }
 //#####################################################################
