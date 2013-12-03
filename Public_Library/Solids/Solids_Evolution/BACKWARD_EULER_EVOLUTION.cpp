@@ -11,10 +11,14 @@
 #include <Tools/Vectors/VECTOR.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISIONS.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_EVOLUTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h>
@@ -107,6 +111,10 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         else v-=coefficient_of_friction/particles.mass(c.p)*normal_force*t;}
     solid_body_collection.Print_Energy(time+dt,2);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after friction",1,1);
+
+    if(solids_parameters.triangle_collision_parameters.perform_self_collision){
+        solid_body_collection.deformable_body_collection.triangle_repulsions.Adjust_Velocity_For_Self_Repulsion(dt,false);
+        solid_body_collection.deformable_body_collection.triangle_collisions.Adjust_Velocity_For_Self_Collisions(dt,time,false);}
 
     solid_body_collection.Print_Energy(time+dt,3);
 }

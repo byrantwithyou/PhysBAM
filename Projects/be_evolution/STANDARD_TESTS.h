@@ -240,6 +240,16 @@ void Register_Options() PHYSBAM_OVERRIDE
     backward_euler_evolution->newtons_method.tolerance=1;
     backward_euler_evolution->newtons_method.max_newton_step_size=1000;
     backward_euler_evolution->newtons_method.max_krylov_iterations=100;
+    solids_parameters.use_rigid_deformable_contact=false;
+    solids_parameters.rigid_body_collision_parameters.use_push_out=true;
+    solids_parameters.triangle_collision_parameters.use_gauss_jacobi=true;
+    solids_parameters.triangle_collision_parameters.repulsions_limiter_fraction=1;
+    solids_parameters.triangle_collision_parameters.collisions_final_repulsion_limiter_fraction=.1;
+    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+    solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
+    solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
+    solids_parameters.triangle_collision_parameters.collisions_output_number_checked=false;
+    solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
     parse_args->Add("-test_forces",&test_forces,"use fully implicit forces");
     parse_args->Add("-with_bunny",&with_bunny,"use bunny");
     parse_args->Add("-with_hand",&with_hand,"use hand");
@@ -300,6 +310,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-penalty_length",&penalty_collisions_length,"tol","penalty collisions length scale");
     parse_args->Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
     parse_args->Add_Not("-no_self",&use_penalty_self_collisions,"disable penalty self collisions");
+    parse_args->Add("-use_tri_col",&solids_parameters.triangle_collision_parameters.perform_self_collision,"use triangle collisions");
 }
 //#####################################################################
 // Function Parse_Options
@@ -373,17 +384,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     }
 
     solids_parameters.use_trapezoidal_rule_for_velocities=!use_newmark_be;
-    solids_parameters.use_rigid_deformable_contact=false;
-    solids_parameters.rigid_body_collision_parameters.use_push_out=true;
-    solids_parameters.triangle_collision_parameters.use_gauss_jacobi=true;
-    solids_parameters.triangle_collision_parameters.repulsions_limiter_fraction=1;
-    solids_parameters.triangle_collision_parameters.collisions_final_repulsion_limiter_fraction=.1;
-    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
-    solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
-    solids_parameters.triangle_collision_parameters.collisions_output_number_checked=false;
-
-    solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
 
     switch(test_number){
         case 1:
@@ -465,7 +465,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=1e-4;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             last_frame=300;
             break;
@@ -600,7 +599,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     if(use_constraint_collisions) use_penalty_collisions=false;
     if(use_penalty_collisions || use_constraint_collisions){
-        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
         solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
         solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
         solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;}
