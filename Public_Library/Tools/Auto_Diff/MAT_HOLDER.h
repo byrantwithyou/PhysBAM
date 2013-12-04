@@ -30,7 +30,7 @@ struct MAT_HOLDER
     BASE z;
 };
 
-void Fill_From(MAT_END& o,const MAT_END& m) {}
+inline void Fill_From(MAT_END& o,const MAT_END& m) {}
 template<class OBJ,class COL,class BASE,class OBJ2,class COL2,class BASE2>
 void Fill_From(MAT_HOLDER<OBJ2,COL2,BASE2>& o,const MAT_HOLDER<OBJ,COL,BASE>& m)
 {
