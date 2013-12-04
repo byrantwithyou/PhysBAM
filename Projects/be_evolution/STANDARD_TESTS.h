@@ -87,6 +87,7 @@
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_PENALTY.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/ELASTIC_ETHER_DRAG.h>
@@ -2002,6 +2003,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             int force_id=solid_body_collection.Add_Force(new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,undeformed_particles,tetrahedralized_volume,
                     undeformed_triangulated_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation));
             if(backward_euler_evolution) backward_euler_evolution->minimization_objective.deformables_forces_lazy.Set(force_id);}
+
+    if(solids_parameters.triangle_collision_parameters.perform_self_collision){
+      solid_body_collection.Add_Force(new TRIANGLE_REPULSIONS_PENALTY<TV>(particles,deformable_body_collection.triangle_repulsions.point_face_interaction_pairs));
+      solid_body_collection.Add_Force(new TRIANGLE_REPULSIONS_PENALTY<TV>(particles,deformable_body_collection.triangle_repulsions.edge_edge_interaction_pairs));
+    }
 
     if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);
