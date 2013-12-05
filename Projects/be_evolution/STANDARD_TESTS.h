@@ -13,7 +13,7 @@
 //    7. Plane test - ball
 //    8. Falling mattress
 //    9. Deformable ball falling on a deformable ball
-//   10. Tori free falling to the ground
+//   10. Tori free falling into bowl
 //   11. Increasing gravity (individual)
 //   12. Mattress with ether drag
 //   13. Falling mattress hitting level set
@@ -388,7 +388,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     switch(test_number){
         case 1:
-        case 2:
         case 3:
        // case 4:
         case 7:
@@ -396,7 +395,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 12:
         case 13:
         case 80:
-        case 10:
         case 11:
         case 16:
         case 17:
@@ -405,6 +403,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 77:
             solids_parameters.cfl=(T)5;
             /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
+            break;
+        case 2:
+            last_frame=600;
+            break;
+        case 10:
+            last_frame=330;
             break;
         case 5:
         case 6:
