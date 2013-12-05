@@ -444,8 +444,8 @@ Get_Faces_Near_Points(STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1,STRUCTURE_
     TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<TV> visitor(point_face_interaction_pairs,structure_1,structure_2,X_other,*this,pruned);
     if(use_processor_cull && mpi_solids){
         BOX_VISITOR_MPI<TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<TV> > mpi_visitor(visitor,structure_1.point_processor_masks,structure_2.Face_Processor_Masks());
-        structure_1.particle_hierarchy.Intersection_List(structure_2.Face_Hierarchy(),mpi_visitor,0);}
-    else structure_1.particle_hierarchy.Intersection_List(structure_2.Face_Hierarchy(),visitor,0);
+        structure_1.particle_hierarchy.Intersection_List(structure_2.Face_Hierarchy(),mpi_visitor,1e-15);}
+    else structure_1.particle_hierarchy.Intersection_List(structure_2.Face_Hierarchy(),visitor,1e-15);
 
     int checked=point_face_interaction_pairs.m-start_count;
     if(checked){
@@ -480,8 +480,8 @@ Get_Edges_Near_Edges(STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1,STRUCTURE_I
     TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<TV> visitor(edge_edge_interaction_pairs,structure_1,structure_2,X_other,*this,pruned);
     if(use_processor_cull && mpi_solids){
         BOX_VISITOR_MPI<TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<TV> > mpi_visitor(visitor,structure_1.Edge_Processor_Masks(),structure_2.Edge_Processor_Masks());
-        structure_1.Edge_Hierarchy().Intersection_List(structure_2.Edge_Hierarchy(),mpi_visitor,0);}
-    else structure_1.Edge_Hierarchy().Intersection_List(structure_2.Edge_Hierarchy(),visitor,0);
+        structure_1.Edge_Hierarchy().Intersection_List(structure_2.Edge_Hierarchy(),mpi_visitor,1e-15);}
+    else structure_1.Edge_Hierarchy().Intersection_List(structure_2.Edge_Hierarchy(),visitor,1e-15);
 
     int checked=edge_edge_interaction_pairs.m-start_count;
     if(checked){
