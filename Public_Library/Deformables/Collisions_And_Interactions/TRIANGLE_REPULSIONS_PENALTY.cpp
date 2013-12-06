@@ -34,7 +34,7 @@ Lagged_Update_Position_Based_State(const T time)
         TV u=particles.X(interaction_pairs(i).nodes(1))-particles.X(interaction_pairs(i).nodes(0));
         TV v=particles.X(interaction_pairs(i).nodes(2))-particles.X(interaction_pairs(i).nodes(0));
         TV w=particles.X(interaction_pairs(i).nodes(3))-particles.X(interaction_pairs(i).nodes(0));
-        volume.Append(max(u.Dot(v.Cross(w)),(T)0));}
+        volume.Append(std::max(u.Dot(v.Cross(w)),(T)1e-10));}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -131,7 +131,7 @@ Penalty(T original_volume,const VECTOR<int,4>& nodes,const ARRAY_VIEW<TV>&X,T& e
     auto v=From_Var<3,1>(X(nodes(2))-X(nodes(0)));
     auto w=From_Var<3,2>(X(nodes(3))-X(nodes(0)));
     auto a=u.Dot(v.Cross(w));
-    auto ee=stiffness*sqr(a/From_Const<TV,3>(std::max(original_volume,(T)1e-10))-1);
+    auto ee=stiffness*sqr(a/From_Const<TV,3>(original_volume)-1);
     e=ee.x;
     for(int i=1;i<4;i++){
         TV t=ee.dx(i-1);
