@@ -630,9 +630,7 @@ void Get_Initial_Data()
             tests.Add_Ground(0,1.99*m);
             break;}
         case 2:{
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
-                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0)*m)),true,true,density,m);
-            tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0)*m)),true,true,density,m);
             tests.Add_Ground();
             break;}
 

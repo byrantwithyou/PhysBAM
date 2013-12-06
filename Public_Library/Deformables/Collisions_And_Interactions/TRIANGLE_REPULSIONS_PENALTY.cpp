@@ -35,7 +35,6 @@ Lagged_Update_Position_Based_State(const T time)
         TV v=particles.X(interaction_pairs(i).nodes(2))-particles.X(interaction_pairs(i).nodes(0));
         TV w=particles.X(interaction_pairs(i).nodes(3))-particles.X(interaction_pairs(i).nodes(0));
         volume.Append(max(u.Dot(v.Cross(w)),(T)0));}
-    LOG::printf("%p",volume);
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces

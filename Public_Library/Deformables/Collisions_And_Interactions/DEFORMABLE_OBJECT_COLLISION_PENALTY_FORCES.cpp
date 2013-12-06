@@ -91,47 +91,56 @@ Update_Penetrating_Particles(int p)
     TV x=particles.X(p);
     ARRAY<int> intersection_list;
     ARRAY<int> particles_to_ignore;
-    particles_to_ignore.Append(p);
+    int num_collisions=0;
+    T closest_distance_squared=FLT_MAX;
+    TV_INT surface_nodes;
     collision_body.hierarchy->Intersection_List(x,intersection_list);
     for(int n=0;n<intersection_list.m;n++){
         bool ignore=false;
         int t=intersection_list(n);
         const VECTOR<int,4>& nodes=tetrahedron_mesh.elements(t);
+        if(nodes.Contains(p))
+            continue;
         for(int q=0;q<particles_to_ignore.m;q++)
             if(nodes.Contains(particles_to_ignore(q))){
                 ignore=true;
                 break;}
         if(ignore) continue;
         const VECTOR<T,TV::m+1>& w=TETRAHEDRON<T>::Barycentric_Coordinates(x,particles.X.Subset(nodes));
-        if(w.Min()<-1e-12) continue;
-        ARRAY<int> nearby_surface_triangles;
-        int ct=closest_surface_triangle(p);
-        if(ct==-1) ct=Estimate_Closest_Undeformed_Surface_Triangle(undeformed_particles.X.Subset(nodes).Weighted_Sum(w),p);
-        TV weights,projected_point=(*triangulated_surface.triangle_list)(ct).Closest_Point(x,weights);
-        T closest_distance_squared=(x-projected_point).Magnitude_Squared();
-        T closest_distance=sqrt(closest_distance_squared);
-        triangulated_surface.hierarchy->Intersection_List(x,nearby_surface_triangles,1.05*closest_distance);
-        PHYSBAM_ASSERT(nearby_surface_triangles.m!=0);
-        for(int k=0;k<nearby_surface_triangles.m;k++){
-            int tri=nearby_surface_triangles(k);
-            if(triangulated_surface.mesh.elements(tri).Contains(p)) continue;
-            TV new_point=(*triangulated_surface.triangle_list)(tri).Closest_Point(x,weights);
-            T new_distance_squared=(x-new_point).Magnitude_Squared();
-            if(new_distance_squared<closest_distance_squared){
-                closest_distance_squared=new_distance_squared;
-                ct=tri;}}
-        closest_surface_triangle(p)=ct;
-        TV_INT surface_nodes=triangulated_surface.mesh.elements(ct);
-        const ARRAY<TV_INT>& extra=extra_surface_triangles(p);
-        for(int k=0;k<extra.m;k++){
-            TRIANGLE_3D<T> t(particles.X.Subset(extra(k)));
-            TV new_point=t.Closest_Point(x,weights);
-            T new_distance_squared=(x-new_point).Magnitude_Squared();
-            if(new_distance_squared<closest_distance_squared){
-                closest_distance_squared=new_distance_squared;
-                surface_nodes=extra(k);}}
+        if(w.Min()<-1e-20) continue;
+        num_collisions++;
+        TV weights;
+        if(num_collisions==1){
+            ARRAY<int> nearby_surface_triangles;
+            int ct=closest_surface_triangle(p);
+            if(ct==-1) ct=Estimate_Closest_Undeformed_Surface_Triangle(undeformed_particles.X.Subset(nodes).Weighted_Sum(w),p);
+            TV projected_point=(*triangulated_surface.triangle_list)(ct).Closest_Point(x,weights);
+            closest_distance_squared=(x-projected_point).Magnitude_Squared();
+            T closest_distance_upper_bound=sqrt(closest_distance_squared);
+            triangulated_surface.hierarchy->Intersection_List(x,nearby_surface_triangles,1.05*closest_distance_upper_bound);
+            PHYSBAM_ASSERT(nearby_surface_triangles.m!=0);
+            for(int k=0;k<nearby_surface_triangles.m;k++){
+                int tri=nearby_surface_triangles(k);
+                if(triangulated_surface.mesh.elements(tri).Contains(p)) continue;
+                TV new_point=(*triangulated_surface.triangle_list)(tri).Closest_Point(x,weights);
+                T new_distance_squared=(x-new_point).Magnitude_Squared();
+                if(new_distance_squared<closest_distance_squared){
+                    closest_distance_squared=new_distance_squared;
+                    ct=tri;}}
+            closest_surface_triangle(p)=ct;
+            surface_nodes=triangulated_surface.mesh.elements(ct);
+            const ARRAY<TV_INT>& extra=extra_surface_triangles(p);
+            for(int k=0;k<extra.m;k++){
+                TRIANGLE_3D<T> t(particles.X.Subset(extra(k)));
+                TV new_point=t.Closest_Point(x,weights);
+                T new_distance_squared=(x-new_point).Magnitude_Squared();
+                if(new_distance_squared<closest_distance_squared){
+                    closest_distance_squared=new_distance_squared;
+                    surface_nodes=extra(k);}}}
+        particles_to_ignore.Append_Elements(nodes.Remove_Index(w.Arg_Min()));
+    }
+    for(int i=0;i<num_collisions;i++)
         penetrating_particles.Append(surface_nodes.Insert(p,0));
-        particles_to_ignore.Append_Elements(nodes);}
 }
 //#####################################################################
 // Function Update_Surface_Triangles
