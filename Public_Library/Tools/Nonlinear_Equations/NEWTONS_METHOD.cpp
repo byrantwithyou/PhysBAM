@@ -39,7 +39,6 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         F.Compute(x,&sys,&grad,&E);
         T norm_grad=sqrt(sys.Inner_Product(grad,grad));
         if(debug) LOG::printf("GRAD STATS %g %g %g\n", E, (E-last_E), norm_grad);
-        if(max_newton_step_size && norm_grad>max_newton_step_size){grad*=max_newton_step_size/norm_grad;norm_grad=max_newton_step_size;}
 
         if(debug){
             char buff[1000];
@@ -57,6 +56,9 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
             break;
 
         if(use_gradient_descent_failsafe) Make_Downhill_Direction(sys,dx,grad,norm_grad);
+        if(max_newton_step_size){
+            T norm=sqrt(sys.Inner_Product(dx,dx));
+            if(norm>max_newton_step_size) dx*=max_newton_step_size/norm;}
 
         T a=Line_Search(F,x,dx,grad,tm);
         if(a<=0) break;
