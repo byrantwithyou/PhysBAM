@@ -80,7 +80,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         TV u=particles.X(n(1))-particles.X(n(0));
         TV v=particles.X(n(2))-particles.X(n(0));
         TV w=particles.X(n(3))-particles.X(n(0));
-        if(volume(i) < u.Dot(v.Cross(w)))
+        if(volume(i)<u.Dot(v.Cross(w)))
             continue;
         bad_pairs.Append(i);
         T e;
@@ -125,16 +125,16 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
 // Function Penalty
 //#####################################################################
 template<class TV> void TRIANGLE_REPULSIONS_PENALTY<TV>::
-Penalty(T original_volume,const VECTOR<int,4>& nodes, const ARRAY_VIEW<TV, int>&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he)
+Penalty(T original_volume,const VECTOR<int,4>& nodes,const ARRAY_VIEW<TV>&X,T& e,VECTOR<TV,4>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he)
 {
     auto u=From_Var<3,0>(X(nodes(1))-X(nodes(0)));
     auto v=From_Var<3,1>(X(nodes(2))-X(nodes(0)));
     auto w=From_Var<3,2>(X(nodes(3))-X(nodes(0)));
     auto a=u.Dot(v.Cross(w));
-    auto ee=a-From_Const<TV,3>(original_volume);
+    auto ee=stiffness*sqr(a/From_Const<TV,3>(std::max(original_volume,(T)1e-10))-1);
     e=ee.x;
     for(int i=1;i<4;i++){
-        VECTOR<T,3> t=ee.dx(i-1);
+        TV t=ee.dx(i-1);
         de(i)=t;
         de(0)-=t;}
     for(int i=1;i<4;i++){
