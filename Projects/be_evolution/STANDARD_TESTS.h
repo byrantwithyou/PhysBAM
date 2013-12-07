@@ -188,7 +188,7 @@ public:
         backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
         use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
         penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),
-        use_penalty_self_collisions(true),rod_length(4),rod_radius(.3),attachment_length(.5)
+        use_penalty_self_collisions(true),rod_length(4),rod_radius(.3),attachment_length(.6)
     {
         this->fixed_dt=1./240;
     }
