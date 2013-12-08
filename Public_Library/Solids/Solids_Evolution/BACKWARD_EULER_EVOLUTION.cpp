@@ -91,7 +91,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     minimization_objective.Test(dv,minimization_system);
 
     bool converged=newtons_method.Newtons_Method(minimization_objective,minimization_system,dv);
-    PHYSBAM_ASSERT(converged);
+    if(!converged) LOG::printf("WARNING: Newton's method did not converge\n");
 // TODO for rigid bodies    R.Normalize(), update angular momentum
 
     minimization_objective.Adjust_For_Collision(dv);

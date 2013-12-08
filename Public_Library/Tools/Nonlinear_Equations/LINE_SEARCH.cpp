@@ -222,7 +222,6 @@ Line_Search_Wolfe_Conditions_Zoom(NONLINEAR_FUNCTION<T(T)>& F,WOLFE_HELPER lo,WO
         else{
             if(((hi.a>lo.a) && xj.dfa>=0) || ((hi.a<lo.a) && xj.dfa<=0)) hi=lo;
             lo=xj;}}
-    Dump_Line(F,(T)0,max((T)1,hi.a),c1);
     if(lo.a-x0.a>=min_interval*100){
         LOG::printf("take decrease on zoom with %g\n",lo.a);
         x=lo.a;
