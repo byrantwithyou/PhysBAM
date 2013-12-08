@@ -1444,7 +1444,7 @@ void Get_Initial_Data()
             tests.Create_Mattress(mattress_grid,true,&initial_state,density);
             break;}
         case 61:{
-            int num_sides=3;
+            int num_sides=resolution?resolution:3;
             tests.Create_Cylinder(CYLINDER<T>(TV(-rod_length/2,0,0),TV(rod_length/2,0,0),rod_radius),(int)ceil(num_sides/rod_radius*rod_length),num_sides,true,0,1000);
             for(int i=0;i<particles.X.m;i++){
                 T x=particles.X(i).x;
