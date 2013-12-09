@@ -162,6 +162,28 @@ Line_Search_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,int max_iter
     return i<=max_iterations;
 }
 //#####################################################################
+// Function Line_Search_Backtracking
+//#####################################################################
+template<class T> bool LINE_SEARCH<T>::
+Line_Search_Backtracking(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,T c)
+{
+    PHYSBAM_ASSERT(0<c && c<1);
+    WOLFE_HELPER x0={a};
+    F.Compute(x0.a,0,&x0.dfa,&x0.fa);
+    PHYSBAM_ASSERT(x0.dfa<0);
+    WOLFE_HELPER x1={b};
+    T min_interval=abs(a-b)*std::numeric_limits<T>::epsilon();
+    while(abs(x1.a-x0.a)>min_interval){
+        F.Compute(x1.a,0,&x1.dfa,&x1.fa);
+        if(x1.fa<x0.fa+c*x1.a*x0.dfa){
+            x=x1.a;
+            return true;}
+        x1.a=New_Point_Interpolation(x0,x1);
+    }
+    x=a;
+    return false;
+}
+//#####################################################################
 // Function Line_Search_Wolfe_Conditions
 //#####################################################################
 template<class T> bool LINE_SEARCH<T>::

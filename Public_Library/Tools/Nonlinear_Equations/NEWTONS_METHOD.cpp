@@ -97,6 +97,9 @@ Line_Search(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,const KRYLOV_
     if(use_wolfe_search){
         PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,dx,tmp,&tmp2);
         if(!LINE_SEARCH<T>::Line_Search_Wolfe_Conditions(pl,0,1,a,(T)1e-4,(T).9)) return 0;}
+    else if(use_backtracking){
+        PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,dx,tmp,&tmp2);
+        if(!LINE_SEARCH<T>::Line_Search_Backtracking(pl,0,1,a,(T)1e-4)) return 0;}
     else if(use_golden_section_search){
         PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,dx,tmp);
         T phi=(1+sqrt(5))/2;

@@ -164,6 +164,7 @@ public:
     BACKWARD_EULER_EVOLUTION<TV>* backward_euler_evolution;
     bool use_penalty_collisions;
     bool use_constraint_collisions;
+    bool no_line_search;
     T penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length;
     bool enforce_definiteness;
     T unit_rho,unit_p,unit_N,unit_J;
@@ -303,7 +304,9 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-kry_fail",&backward_euler_evolution->newtons_method.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
     parse_args->Add("-angle_tol",&backward_euler_evolution->newtons_method.angle_tolerance,"tol","gradient descent tolerance");
     parse_args->Add_Not("-mr",&backward_euler_evolution->newtons_method.use_cg,"use minres instead of cg");
+    parse_args->Add("-no_line_search",&no_line_search,"disable line search");
     parse_args->Add("-gss",&backward_euler_evolution->newtons_method.use_golden_section_search,"use golden section search instead of wolfe conditions line search");
+    parse_args->Add("-backtrack",&backward_euler_evolution->newtons_method.use_backtracking,"use backtracking line search instead of wolfe conditions line search");
     parse_args->Add("-use_penalty",&use_penalty_collisions,"use penalty collisions");
     parse_args->Add_Not("-no_constraints",&use_constraint_collisions,"disable constrained optimization for collisions");
     parse_args->Add("-penalty_stiffness",&penalty_collisions_stiffness,"tol","penalty collisions stiffness");
@@ -328,6 +331,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(use_newmark || use_newmark_be) backward_euler_evolution=0;
     else{delete solids_evolution;solids_evolution=backward_euler_evolution;}
     if(backward_euler_evolution && backward_euler_evolution->newtons_method.use_golden_section_search)
+        backward_euler_evolution->newtons_method.use_wolfe_search=false;
+    if(backward_euler_evolution && backward_euler_evolution->newtons_method.use_backtracking)
+        backward_euler_evolution->newtons_method.use_wolfe_search=false;
+    if(backward_euler_evolution && no_line_search)
         backward_euler_evolution->newtons_method.use_wolfe_search=false;
 
     unit_rho=kg/pow<TV::m>(m);

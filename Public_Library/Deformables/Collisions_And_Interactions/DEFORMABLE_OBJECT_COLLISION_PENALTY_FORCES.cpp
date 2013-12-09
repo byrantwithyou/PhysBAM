@@ -194,7 +194,7 @@ Penalty(VECTOR<int,4> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<in
     auto b=h/d;
     auto z=a*u+b*v-w;
     auto phi_sq=z.Magnitude_Squared();
-    auto ee=stiffness*phi_sq*sqrt(phi_sq);
+    auto ee=stiffness*phi_sq*sqrt(phi_sq+1e-15);
     e=ee.x;
     for(int i=0;i<3;i++){
         VECTOR<T,3> t=ee.dx(i);
@@ -221,7 +221,7 @@ Penalty(VECTOR<int,3> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<in
     auto a=min(max(vw/vv,0),1);
     auto z=a*v-w;
     auto phi_sq=z.Magnitude_Squared();
-    auto ee=stiffness*phi_sq*sqrt(phi_sq);
+    auto ee=stiffness*phi_sq*sqrt(phi_sq+1e-15);
     e=ee.x;
     for(int i=0;i<2;i++){
         TV t=ee.dx(i);
@@ -243,7 +243,7 @@ Penalty(VECTOR<int,2> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<in
 {
     auto w=From_Var<1,0>(X(nodes(0))-X(nodes(1)));
     auto phi_sq=w.Magnitude_Squared();
-    auto ee=stiffness*phi_sq*sqrt(phi_sq);
+    auto ee=stiffness*phi_sq*sqrt(phi_sq+1e-15);
     e=ee.x;
     TV t=ee.dx(0);
     de(nodes(0))=t;
