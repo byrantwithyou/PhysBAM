@@ -196,17 +196,13 @@ Line_Search_Wolfe_Conditions(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,T c1,T c2,
     WOLFE_HELPER x0=a0,x1={b};
     for(;x1.a<=x_max;x1.a=2*x1.a-x0.a){
         F.Compute(x1.a,0,&x1.dfa,&x1.fa);
-        if(x1.fa>a0.fa+c1*x1.a*a0.dfa || x1.fa>=x0.fa){
-            if(!Line_Search_Wolfe_Conditions_Zoom(F,x0,x1,a0,x,c1,c2))
-                Line_Search_Derivative_Bisection(F,a,b,x,pow(std::numeric_limits<T>::epsilon(),2./3),x_max);
-            return true;}
+        if(x1.fa>a0.fa+c1*x1.a*a0.dfa || x1.fa>=x0.fa)
+            return Line_Search_Wolfe_Conditions_Zoom(F,x0,x1,a0,x,c1,c2);
         if(abs(x1.dfa)<=-c2*a0.dfa){
             x=x1.a;
             return true;}
-        if(x1.dfa>=0){
-            if(!Line_Search_Wolfe_Conditions_Zoom(F,x1,x0,a0,x,c1,c2))
-                Line_Search_Derivative_Bisection(F,a,b,x,pow(std::numeric_limits<T>::epsilon(),2./3),x_max);
-            return true;}
+        if(x1.dfa>=0)
+            return Line_Search_Wolfe_Conditions_Zoom(F,x1,x0,a0,x,c1,c2);
         x0=x1;}
     x=a;
     return false;
