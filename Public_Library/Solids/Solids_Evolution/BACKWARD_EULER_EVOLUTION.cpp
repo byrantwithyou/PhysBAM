@@ -116,6 +116,13 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         solid_body_collection.deformable_body_collection.triangle_repulsions.Adjust_Velocity_For_Self_Repulsion(dt,false);
         solid_body_collection.deformable_body_collection.triangle_collisions.Adjust_Velocity_For_Self_Collisions(dt,time,false);}
 
+    T max_velocity_squared=0;
+    for(int i=0;i<particles.V.m;i++){
+        T v=particles.V(i).Magnitude_Squared();
+        if(v>max_velocity_squared)
+            max_velocity_squared=v;}
+    LOG::printf("Maximum Velocity: %g\n",sqrt(max_velocity_squared));
+
     solid_body_collection.Print_Energy(time+dt,3);
 }
 //#####################################################################
