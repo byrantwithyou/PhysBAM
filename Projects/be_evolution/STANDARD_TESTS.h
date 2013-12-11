@@ -175,6 +175,7 @@ public:
     T attachment_length;
     ARRAY<TV> initial_positions;
     T save_dt;
+    bool self_collide_surface_only;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),test_forces(false),
@@ -189,7 +190,7 @@ public:
         backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
         use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
         penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),
-        use_penalty_self_collisions(true),rod_length(4),rod_radius(.3),attachment_length(.6)
+        use_penalty_self_collisions(true),rod_length(4),rod_radius(.3),attachment_length(.6),self_collide_surface_only(false)
     {
         this->fixed_dt=1./240;
     }
@@ -315,6 +316,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
     parse_args->Add_Not("-no_self",&use_penalty_self_collisions,"disable penalty self collisions");
     parse_args->Add("-use_tri_col",&solids_parameters.triangle_collision_parameters.perform_self_collision,"use triangle collisions");
+    parse_args->Add("-no_self_interior",&self_collide_surface_only,"do not process penalty self collisions against interior particles");
+
 }
 //#####################################################################
 // Function Parse_Options
@@ -2009,8 +2012,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TRIANGULATED_SURFACE<T>* triangulated_surface=tetrahedralized_volume.triangulated_surface;
             TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(triangulated_surface->mesh,undeformed_particles));
             LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*tests.Initialize_Implicit_Surface(undeformed_triangulated_surface,100);
-            int force_id=solid_body_collection.Add_Force(new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,undeformed_particles,tetrahedralized_volume,
-                    undeformed_triangulated_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation));
+            DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>* coll=new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,undeformed_particles,tetrahedralized_volume,
+                undeformed_triangulated_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation);
+            if(self_collide_surface_only){
+                coll->colliding_particles=tetrahedralized_volume.triangulated_surface->mesh.elements.Flattened();
+                coll->colliding_particles.Prune_Duplicates();}
+            int force_id=solid_body_collection.Add_Force(coll);
             if(backward_euler_evolution) backward_euler_evolution->minimization_objective.deformables_forces_lazy.Set(force_id);}
 
     if(solids_parameters.triangle_collision_parameters.perform_self_collision){
