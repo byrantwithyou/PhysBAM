@@ -176,14 +176,14 @@ Delete_Hexahedrons_With_Missing_Nodes()
 void HEXAHEDRON_MESH::
 Delete_Hexahedrons(const ARRAY<int>& deletion_list)
 {
-    int last_index=elements.m;
+    int last_index=elements.m-1;
     for(int k=0;k<deletion_list.m;k++){
         int index=deletion_list(k);
-        if(index > last_index) index=elements(index)(0); // hexahedron was moved, reset index to its new location
+        if(index>last_index) index=elements(index)(0); // hexahedron was moved, reset index to its new location
         for(int kk=0;kk<8;kk++) elements(index)(kk)=elements(last_index)(kk);
         elements(last_index)(0)=index; // remembers where a hexahedron was moved to, in case it needs to be deleted later
         last_index--;}
-    elements.Exact_Resize(last_index);
+    elements.Exact_Resize(last_index+1);
     Refresh_Auxiliary_Structures();
 }
 //#####################################################################

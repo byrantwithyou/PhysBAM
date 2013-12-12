@@ -31,7 +31,7 @@ Clean_Memory()
 void TRIANGLE_SUBDIVISION::
 Refine_Mesh(TRIANGLE_MESH& refined_triangle_mesh,const int start_index_for_new_nodes_input)
 {
-    start_index_for_new_nodes=start_index_for_new_nodes_input?start_index_for_new_nodes_input:triangle_mesh.number_nodes+1;
+    start_index_for_new_nodes=start_index_for_new_nodes_input?start_index_for_new_nodes_input:triangle_mesh.number_nodes;
     if(!triangle_mesh.segment_mesh) delete_segment_mesh=true; // make it below, but delete it when this class is deleted
     bool triangle_edges_defined=triangle_mesh.element_edges!=0;
     if(!triangle_edges_defined)triangle_mesh.Initialize_Element_Edges(); // this makes a segment mesh as well
@@ -42,13 +42,14 @@ Refine_Mesh(TRIANGLE_MESH& refined_triangle_mesh,const int start_index_for_new_n
     for(int t=0;t<triangle_mesh.elements.m;t++){
         int i,j,k;triangle_mesh.elements(t).Get(i,j,k);
         int edge_ij,edge_jk,edge_ki;(*triangle_mesh.element_edges)(t).Get(edge_ij,edge_jk,edge_ki);
-        int ij=start_index_for_new_nodes-1+edge_ij,jk=start_index_for_new_nodes-1+edge_jk,ki=start_index_for_new_nodes-1+edge_ki;
+        int ij=start_index_for_new_nodes+edge_ij,jk=start_index_for_new_nodes+edge_jk,ki=start_index_for_new_nodes+edge_ki;
         refined_triangle_mesh.elements(new_t++).Set(i,ij,ki);
         refined_triangle_mesh.elements(new_t++).Set(j,jk,ij);
         refined_triangle_mesh.elements(new_t++).Set(k,ki,jk);
         refined_triangle_mesh.elements(new_t++).Set(jk,ki,ij);
         refined_triangle_mesh.number_nodes=max(refined_triangle_mesh.number_nodes,i,j,k,ij,jk,ki);} // update the number of nodes
-    
+    refined_triangle_mesh.number_nodes++;
+
     if(!triangle_edges_defined){delete triangle_mesh.element_edges;triangle_mesh.element_edges=0;} 
     // we keep segment_mesh for later use, i.e. it's not deleted!
 }
@@ -58,7 +59,7 @@ Refine_Mesh(TRIANGLE_MESH& refined_triangle_mesh,const int start_index_for_new_n
 void TRIANGLE_SUBDIVISION::
 Refine_Mesh_Dual(TRIANGLE_MESH& refined_triangle_mesh,const int start_index_for_new_nodes_input)
 {
-    start_index_for_new_nodes=start_index_for_new_nodes_input?start_index_for_new_nodes_input:triangle_mesh.number_nodes+1;
+    start_index_for_new_nodes=start_index_for_new_nodes_input?start_index_for_new_nodes_input:triangle_mesh.number_nodes;
     bool adjacent_elements_defined=triangle_mesh.adjacent_elements!=0;if(!adjacent_elements_defined)triangle_mesh.Initialize_Adjacent_Elements();
 
     refined_triangle_mesh.elements.Exact_Resize(3*triangle_mesh.elements.m);
@@ -66,13 +67,13 @@ Refine_Mesh_Dual(TRIANGLE_MESH& refined_triangle_mesh,const int start_index_for_
     int new_t=0;
     for(int t=0;t<triangle_mesh.elements.m;t++){
         assert((*triangle_mesh.adjacent_elements)(t).m==3);  // boundary subdivision unimplemented
-        int tv=start_index_for_new_nodes-1+t;
+        int tv=start_index_for_new_nodes+t;
         int ti,tj,tk;triangle_mesh.elements(t).Get(ti,tj,tk);
         for(int a=0;a<3;a++){
             int s=(*triangle_mesh.adjacent_elements)(t)(a);if(s<t)continue;
             int si,sj,sk;triangle_mesh.elements(s).Get(si,sj,sk);
             if(ti==si||ti==sj||ti==sk){cyclic_shift(ti,tj,tk);if(ti==si||ti==sj||ti==sk)cyclic_shift(ti,tj,tk);}
-            int sv=start_index_for_new_nodes-1+s;
+            int sv=start_index_for_new_nodes+s;
             refined_triangle_mesh.elements(new_t++).Set(tv,tj,sv);
             refined_triangle_mesh.elements(new_t++).Set(tv,sv,tk);}}
     refined_triangle_mesh.number_nodes=triangle_mesh.number_nodes+triangle_mesh.elements.m;
@@ -86,13 +87,13 @@ template<class TV> void TRIANGLE_SUBDIVISION::
 Apply_Linear_Subdivision(ARRAY_VIEW<const TV> base_values,ARRAY_VIEW<TV> subdivided_values)
 {
     typedef typename TV::SCALAR T;
-    PHYSBAM_ASSERT(subdivided_values.Size()==start_index_for_new_nodes-1+triangle_mesh.segment_mesh->elements.m);
+    PHYSBAM_ASSERT(subdivided_values.Size()==start_index_for_new_nodes+triangle_mesh.segment_mesh->elements.m);
     // neighbor_nodes are used to identify which nodes are in the base mesh - construct here and delete when this class is deleted
     if(!triangle_mesh.neighbor_nodes){delete_neighbor_nodes=true;triangle_mesh.Initialize_Neighbor_Nodes();}
     for(int i=0;i<triangle_mesh.number_nodes;i++)if((*triangle_mesh.neighbor_nodes)(i).m) subdivided_values(i)=base_values(i);
     // interpolate values on edges
     for(int k=0;k<triangle_mesh.segment_mesh->elements.m;k++)
-        subdivided_values(start_index_for_new_nodes-1+k)=(T).5*(base_values(triangle_mesh.segment_mesh->elements(k)(0))+base_values(triangle_mesh.segment_mesh->elements(k)(1)));
+        subdivided_values(start_index_for_new_nodes+k)=(T).5*(base_values(triangle_mesh.segment_mesh->elements(k)(0))+base_values(triangle_mesh.segment_mesh->elements(k)(1)));
 }
 //#####################################################################
 // Function Apply_Fractal_Subdivision
@@ -101,7 +102,7 @@ template<class TV> void TRIANGLE_SUBDIVISION::
 Apply_Fractal_Subdivision(ARRAY_VIEW<const TV> base_values,ARRAY_VIEW<TV> subdivided_values,const float power)
 {
     typedef typename TV::SCALAR T;
-    PHYSBAM_ASSERT(subdivided_values.Size()==start_index_for_new_nodes-1+triangle_mesh.segment_mesh->elements.m);
+    PHYSBAM_ASSERT(subdivided_values.Size()==start_index_for_new_nodes+triangle_mesh.segment_mesh->elements.m);
     // neighbor_nodes are used to identify which nodes are in the base mesh - construct here and delete when this class is deleted
     if(!triangle_mesh.neighbor_nodes){delete_neighbor_nodes=true;triangle_mesh.Initialize_Neighbor_Nodes();}
     if(!triangle_mesh.incident_elements){delete_incident_elements=true;triangle_mesh.Initialize_Incident_Elements();}
@@ -121,8 +122,8 @@ Apply_Fractal_Subdivision(ARRAY_VIEW<const TV> base_values,ARRAY_VIEW<TV> subdiv
             int n1,n2,n3;triangle_mesh.elements(adjacent_triangles(i)).Get(n1,n2,n3);
             normal+=PLANE<T>::Normal(base_values(n1),base_values(n2),base_values(n3));}
         normal.Normalize();
-        //subdivided_values(start_index_for_new_nodes-1+k)=midpoint+normal*edge_magnitude*modulus;
-        subdivided_values(start_index_for_new_nodes-1+k)=midpoint+normal*modulus;}
+        //subdivided_values(start_index_for_new_nodes+k)=midpoint+normal*edge_magnitude*modulus;
+        subdivided_values(start_index_for_new_nodes+k)=midpoint+normal*modulus;}
 }
 //#####################################################################
 // Function Apply_Loop_Subdivision
@@ -131,7 +132,7 @@ template<class TV> void TRIANGLE_SUBDIVISION::
 Apply_Loop_Subdivision(ARRAY_VIEW<const TV> base_values,ARRAY_VIEW<TV> subdivided_values)
 {
     typedef typename TV::SCALAR T;
-    PHYSBAM_ASSERT(subdivided_values.Size()==start_index_for_new_nodes-1+triangle_mesh.segment_mesh->elements.m);
+    PHYSBAM_ASSERT(subdivided_values.Size()==start_index_for_new_nodes+triangle_mesh.segment_mesh->elements.m);
     if(!triangle_mesh.topologically_sorted_neighbor_nodes){delete_topologically_sorted_neighbor_nodes=true;triangle_mesh.Initialize_Topologically_Sorted_Neighbor_Nodes();}
     if(!triangle_mesh.boundary_mesh){delete_boundary_mesh=true;triangle_mesh.Initialize_Boundary_Mesh();}
     if(!triangle_mesh.boundary_mesh->neighbor_nodes) triangle_mesh.boundary_mesh->Initialize_Neighbor_Nodes();
@@ -149,21 +150,21 @@ Apply_Loop_Subdivision(ARRAY_VIEW<const TV> base_values,ARRAY_VIEW<TV> subdivide
             subdivided_values(i)=alpha*base_values(i)+(1-alpha)/neighbors(i).m*neighbor_sum;}}
     // edge values
     for(int i=0;i<triangle_mesh.segment_mesh->elements.m;i++){
-        int index=start_index_for_new_nodes-1+i;
+        int index=start_index_for_new_nodes+i;
         int j,end1,end2;triangle_mesh.segment_mesh->elements(i).Get(end1,end2);
         if(boundary_neighbors(end1).m && boundary_neighbors(end2).m && boundary_neighbors(end1).Find(end2,j)) // if boundary edge
             subdivided_values(index)=(T).5*(base_values(end1)+base_values(end2));
         else if(neighbors(end1).m==6 && neighbors(end2).m==6){ // if next to regular vertices (the most common situation)
-            j=0;neighbors(end1).Find(end2,j);assert(j);
-            int common1=neighbors(end1)(j==0?neighbors(end1).m:j-1),common2=neighbors(end1)(j==neighbors(end1).m?1:j+1);
+            j=-1;neighbors(end1).Find(end2,j);assert(j>=0);
+            int common1=neighbors(end1)(j==0?neighbors(end1).m-1:j-1),common2=neighbors(end1)(j==neighbors(end1).m-1?0:j+1);
             subdivided_values(index)=(T).375*(base_values(end1)+base_values(end2))+(T).125*(base_values(common1)+base_values(common2));}
         else{
-            if(neighbors(end1).m != 6){
+            if(neighbors(end1).m!=6){
                 T beta;switch(neighbors(end1).m){
                     case 3:beta=(T).625;break;case 4:beta=(T).640625;break;case 5:beta=(T).65906781074217;break;
                     default:{T lambda=(T).375+(T).25*cos((T)(2*pi)/neighbors(end1).m);beta=lambda*(4+lambda*(5*lambda-8))/(2*(1-lambda));}}
                 subdivided_values(index)=(1-beta)*base_values(end1);
-                int loop_start=0;neighbors(end1).Find(end2,loop_start);assert(loop_start);
+                int loop_start=-1;neighbors(end1).Find(end2,loop_start);assert(loop_start>=0);
                 int j=loop_start;
                 do{
                     T u=cos((T)(2*pi)*(j-loop_start)/neighbors(end1).m);
@@ -173,15 +174,15 @@ Apply_Loop_Subdivision(ARRAY_VIEW<const TV> base_values,ARRAY_VIEW<TV> subdivide
                         default:{T lambda=(T).375+(T).25*cos((T)(2*pi)/neighbors(end1).m);
                             w=2*cube(lambda)/(neighbors(end1).m*(1-lambda))*(1+u)*sqr(1/lambda-(T)1.5+u);}}
                     subdivided_values(index)+=w*base_values(neighbors(end1)(j));
-                    j++;if(j>neighbors(end1).m)j=1;}
+                    j++;if(j>=neighbors(end1).m) j=0;}
                 while(j!=loop_start);}
-            if(neighbors(end2).m != 6){
+            if(neighbors(end2).m!=6){
                 T beta;switch(neighbors(end2).m){
                     case 3:beta=(T).625;break;case 4:beta=(T).640625;break;case 5:beta=(T).65906781074217;break;
                     default:{T lambda=(T).375+(T).25*cos((T)(2*pi)/neighbors(end2).m);beta=lambda*(4+lambda*(5*lambda-8))/(2*(1-lambda));}}
                 if(neighbors(end1).m==6) subdivided_values(index)=(1-beta)*base_values(end2);
                 else{subdivided_values(index)*=(T).5;subdivided_values(index)+=(T).5*(1-beta)*base_values(end2);} // need to average in this case
-                int loop_start=0;neighbors(end2).Find(end1,loop_start);assert(loop_start);
+                int loop_start=-1;neighbors(end2).Find(end1,loop_start);assert(loop_start>=0);
                 int j=loop_start;
                 do{
                     T u=cos((T)(2*pi)*(j-loop_start)/neighbors(end2).m);
@@ -192,7 +193,7 @@ Apply_Loop_Subdivision(ARRAY_VIEW<const TV> base_values,ARRAY_VIEW<TV> subdivide
                             w=2*cube(lambda)/(neighbors(end2).m*(1-lambda))*(1+u)*sqr(1/lambda-(T)1.5+u);}}
                     if(neighbors(end1).m!=6)w*=(T).5; // need to average in this case
                     subdivided_values(index)+=w*base_values(neighbors(end2)(j));
-                    j++;if(j>neighbors(end2).m)j=1;}
+                    j++;if(j>=neighbors(end2).m) j=0;}
                 while(j!=loop_start);}}}
 }
 //#####################################################################
@@ -202,7 +203,7 @@ template<class TV> void TRIANGLE_SUBDIVISION::
 Apply_Root_Three_Subdivision(ARRAY_VIEW<const TV> base_values,ARRAY_VIEW<TV> subdivided_values)
 {
     typedef typename TV::SCALAR T;
-    PHYSBAM_ASSERT(subdivided_values.Size()==start_index_for_new_nodes-1+triangle_mesh.elements.m);
+    PHYSBAM_ASSERT(subdivided_values.Size()==start_index_for_new_nodes+triangle_mesh.elements.m);
     if(!triangle_mesh.neighbor_nodes){delete_neighbor_nodes=true;triangle_mesh.Initialize_Neighbor_Nodes();}
     for(int p=0;p<triangle_mesh.number_nodes;p++){
         int n=(*triangle_mesh.neighbor_nodes)(p).m;if(n<3)continue;T one_over_n=(T)1/n;
@@ -211,7 +212,7 @@ Apply_Root_Three_Subdivision(ARRAY_VIEW<const TV> base_values,ARRAY_VIEW<TV> sub
         subdivided_values(p)=(1-alpha)*base_values(p)+alpha*one_over_n*sum;}
     for(int t=0;t<triangle_mesh.elements.m;t++){
         int i,j,k;triangle_mesh.elements(t).Get(i,j,k);
-        subdivided_values(start_index_for_new_nodes-1+t)=(T)one_third*(base_values(i)+base_values(j)+base_values(k));}
+        subdivided_values(start_index_for_new_nodes+t)=(T)one_third*(base_values(i)+base_values(j)+base_values(k));}
 }
 //#####################################################################
 template void TRIANGLE_SUBDIVISION::Apply_Linear_Subdivision(ARRAY_VIEW<const VECTOR<float,3> > base_values,ARRAY_VIEW<VECTOR<float,3> > subdivided_values);

@@ -247,8 +247,7 @@ void Emit_Interface_Triangles(int* colors)
                     amb[b]=c0;
                     amb[b+1]=c1;}}
     if(amb[0]==-1) return Emit_Interface_Triangles(colors,0);
-    int test_index=interface_triangle_table.m;
-    interface_triangle_table.Append(0);
+    int test_index=interface_triangle_table.Append(0);
     if(amb[2]==-1){
         int hint=amb[0]+8*amb[1];
         Emit_Interface_Triangles(colors,1<<hint); // amb[0] < amb[1]

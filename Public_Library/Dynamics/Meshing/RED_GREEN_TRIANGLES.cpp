@@ -239,22 +239,22 @@ Add_Midpoint(const int segment,const int level,const int tri)
     int i;for(i=0;i<(*meshes(level)->incident_elements)(node1).m;i++){
         int s=(*meshes(level)->incident_elements)(node1)(i);
         if(s != tri && (*index_in_stack(level))(s)<0){
-            int a,b,c;meshes(level)->elements(s).Get(a,b,c);assert(a == node1 || b == node1 || c == node1);
-            if(node2 == a || node2 == b || node2 == c){ // not incident on edge
+            int a,b,c;meshes(level)->elements(s).Get(a,b,c);assert(a==node1 || b==node1 || c==node1);
+            if(node2==a || node2==b || node2==c){ // not incident on edge
                 stack.Append(VECTOR<int,2>(level,s));(*index_in_stack(level))(s)=stack.m;}}}
     // check previous level for triangles incident on the edge
     if(level > 0 && node1 < meshes(level-1)->number_nodes) for(i=0;i<(*meshes(level-1)->incident_elements)(node1).m;i++){
         int s=(*meshes(level-1)->incident_elements)(node1)(i);
         if((*index_in_stack(level-1))(s)<0){
             int a,b,c;meshes(level-1)->elements(s).Get(a,b,c);
-            if(node2 == a || node2 == b || node2 == c){ // not incident on edge
+            if(node2==a || node2==b || node2==c){ // not incident on edge
                 stack.Append(VECTOR<int,2>(level-1,s));(*index_in_stack(level-1))(s)=stack.m;}}}
     // check next level for triangles incident on the edge
     if(level < meshes.m && node1 < meshes(level+1)->number_nodes) for(i=0;i<(*meshes(level+1)->incident_elements)(node1).m;i++){
         int s=(*meshes(level+1)->incident_elements)(node1)(i);
         if((*index_in_stack(level+1))(s)<0){
-            int a,b,c;meshes(level+1)->elements(s).Get(a,b,c);assert(a == node1 || b == node1 || c == node1);
-            if(node2 == a || node2 == b || node2 == c){ // not incident on edge
+            int a,b,c;meshes(level+1)->elements(s).Get(a,b,c);assert(a==node1 || b==node1 || c==node1);
+            if(node2==a || node2==b || node2==c){ // not incident on edge
                 stack.Append(VECTOR<int,2>(level+1,s));(*index_in_stack(level+1))(s)=stack.m;}}}
     // finally make sure that number_nodes in the triangle meshes and the segment mesh is up to date
     if(new_node > segment_mesh.number_nodes){
@@ -271,8 +271,8 @@ Add_Segment(ARRAY<int>& free_edge_indices,const int node1,const int node2)
 {
     assert(!segment_mesh.Segment(node1,node2));
     int index;
-    if(free_edge_indices.m == 0){ // no more empty spots
-        segment_mesh.elements.Append(VECTOR<int,2>(node1,node2));index=segment_mesh.elements.m;segment_midpoints.Append(0);}
+    if(free_edge_indices.m==0){ // no more empty spots
+        index=segment_mesh.elements.Append(VECTOR<int,2>(node1,node2));segment_midpoints.Append(0);}
     else{
         index=free_edge_indices.Pop();assert(segment_midpoints(index)<0);segment_mesh.elements(index).Set(node1,node2);}
     (*segment_mesh.incident_elements)(node1).Append(index);(*segment_mesh.incident_elements)(node2).Append(index);
@@ -285,7 +285,7 @@ Add_Triangle(ARRAY<int>& free_triangle_indices,const int level,const int i,const
 {
     TRIANGLE_MESH& triangle_mesh=*meshes(level);
     int index;
-    if(free_triangle_indices.m == 0){
+    if(free_triangle_indices.m==0){
         index=triangle_mesh.elements.Append(VECTOR<int,3>(i,j,k));
         leaf_number(level)->Append(0);parent(level)->Append(parent_index);
         element_edges(level).Resize(index+1);children(level)->Resize(index+1);index_in_stack(level)->Resize(index+1);}

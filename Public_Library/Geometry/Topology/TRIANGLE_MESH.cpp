@@ -167,8 +167,8 @@ Initialize_Topologically_Sorted_Neighbor_Nodes()
     for(int i=0;i<number_nodes;i++) if(neighbors(i).m){
         (*topologically_sorted_neighbor_nodes)(i).Exact_Resize(neighbors(i).m);
         ARRAY<bool> not_first(neighbors(i).m);for(int j=0;j<neighbors(i).m;j++) if(neighbor_links(i)(j)) not_first(neighbor_links(i)(j))=true;
-        int node_index=0;while(node_index < neighbors(i).m && not_first(node_index)) node_index++; // now find the first node in the linked list
-        if(node_index >= neighbors(i).m) node_index=-1; // if we have a cycle (i is in the interior), just use 0
+        int node_index=0;while(node_index<neighbors(i).m && not_first(node_index)) node_index++; // now find the first node in the linked list
+        if(node_index>=neighbors(i).m) node_index=-1; // if we have a cycle (i is in the interior), just use 0
         for(int j=0;j<neighbors(i).m;j++){(*topologically_sorted_neighbor_nodes)(i)(j)=neighbors(i)(node_index);node_index=neighbor_links(i)(node_index);}}
 }
 //#####################################################################
@@ -315,8 +315,8 @@ Non_Manifold_Nodes(ARRAY<int>& node_list)
     node_list.Remove_All();
 
     for(int i=0;i<number_nodes;i++){
-        if((*neighbor_nodes)(i).m != (*incident_elements)(i).m) node_list.Append(i);
-        else if((*neighbor_nodes)(i).m > 0){
+        if((*neighbor_nodes)(i).m!=(*incident_elements)(i).m) node_list.Append(i);
+        else if((*neighbor_nodes)(i).m>0){
             ARRAY<int> ordered_neighbors;ordered_neighbors.Preallocate((*neighbor_nodes)(i).m);
             ordered_neighbors.Append((*neighbor_nodes)(i)(0));
             bool found_neighbor=true;
@@ -324,11 +324,11 @@ Non_Manifold_Nodes(ARRAY<int>& node_list)
                 int k=ordered_neighbors.Last(); // looking for a new neighbor of node k
                 for(int j=0;j<(*incident_elements)(i).m;j++){
                     int a,b,c;elements((*incident_elements)(i)(j)).Get(a,b,c);
-                    if(a == k || b == k || c == k){int index;
-                        if(a != i && !ordered_neighbors.Find(a,index)){ordered_neighbors.Append(a);found_neighbor=true;break;}
-                        else if(b != i && !ordered_neighbors.Find(b,index)){ordered_neighbors.Append(b);found_neighbor=true;break;}
-                        else if(c != i && !ordered_neighbors.Find(c,index)){ordered_neighbors.Append(c);found_neighbor=true;break;}}}}
-            if(ordered_neighbors.m < (*neighbor_nodes)(i).m) node_list.Append(i);}}
+                    if(a==k || b==k || c==k){int index;
+                        if(a!=i && !ordered_neighbors.Find(a,index)){ordered_neighbors.Append(a);found_neighbor=true;break;}
+                        else if(b!=i && !ordered_neighbors.Find(b,index)){ordered_neighbors.Append(b);found_neighbor=true;break;}
+                        else if(c!=i && !ordered_neighbors.Find(c,index)){ordered_neighbors.Append(c);found_neighbor=true;break;}}}}
+            if(ordered_neighbors.m<(*neighbor_nodes)(i).m) node_list.Append(i);}}
 
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
     if(!neighbor_nodes_defined){delete neighbor_nodes;neighbor_nodes=0;}
@@ -343,7 +343,7 @@ Mark_Edge_Connected_Component_Incident_On_A_Node(const int node,const int triang
     assert(incident_elements); // without this triangle_index_in_incident_elements makes no sense
     assert(adjacent_elements); // too expensive to do this every time, since this is a recursive function
     int triangle=(*incident_elements)(node)(triangle_index_in_incident_elements);
-    if(marked.m != (*incident_elements)(node).m) marked.Resize((*incident_elements)(node).m);
+    if(marked.m!=(*incident_elements)(node).m) marked.Resize((*incident_elements)(node).m);
     marked(triangle_index_in_incident_elements)=true;
     for(int i=0;i<(*adjacent_elements)(triangle).m;i++){
         int adjacent_triangle=(*adjacent_elements)(triangle)(i);
@@ -393,7 +393,7 @@ Triangles_Across_Edge(const int triangle,const int node1,const int node2,ARRAY<i
     assert(incident_elements);
     for(int k=0;k<(*incident_elements)(node1).m;k++){
         int triangle2=(*incident_elements)(node1)(k); // triangle in question
-        if(triangle2 != triangle && Node_In_Triangle(node2,triangle2))triangles_across_edge.Append(triangle2);}
+        if(triangle2!=triangle && Node_In_Triangle(node2,triangle2))triangles_across_edge.Append(triangle2);}
     return triangles_across_edge.m;
 }
 //#####################################################################

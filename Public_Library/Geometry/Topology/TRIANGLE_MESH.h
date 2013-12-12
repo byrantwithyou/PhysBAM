@@ -75,8 +75,8 @@ public:
 
     static void Add_Ordered_Neighbors(ARRAY<int>& nodes,ARRAY<int>& links,const int neighbor1,const int neighbor2)
     {int index1,index2;
-    if(!nodes.Find(neighbor1,index1)){nodes.Append(neighbor1);links.Append(0);index1=nodes.m;}
-    if(!nodes.Find(neighbor2,index2)){nodes.Append(neighbor2);links.Append(0);index2=nodes.m;}
+    if(!nodes.Find(neighbor1,index1)){index1=nodes.Append(neighbor1);links.Append(0);}
+    if(!nodes.Find(neighbor2,index2)){index2=nodes.Append(neighbor2);links.Append(0);}
     links(index1)=index2;}
 
     static bool Face_Reversed_In_Simplex(const VECTOR<int,2>& segment_nodes,const VECTOR<int,3>& triangle_nodes)

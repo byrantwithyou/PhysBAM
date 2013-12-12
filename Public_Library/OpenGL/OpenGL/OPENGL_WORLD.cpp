@@ -529,12 +529,9 @@ GLenum OPENGL_WORLD::Add_Clipping_Plane(const PLANE<float> &plane)
     int index=-1;
     for(int i=0;i<clipping_planes.m;i++)
         if(!clipping_planes(i)){index=i;break;}
-    if(index==-1){
-        clipping_planes.Append(new PLANE<float>(plane));
-        index=clipping_planes.m;
-    } else{
-        clipping_planes(index)=new PLANE<float>(plane);
-    }
+    if(index==-1)
+        index=clipping_planes.Append(new PLANE<float>(plane));
+    else clipping_planes(index)=new PLANE<float>(plane);
     return GL_CLIP_PLANE0+(index-1);
 }
 //#####################################################################
