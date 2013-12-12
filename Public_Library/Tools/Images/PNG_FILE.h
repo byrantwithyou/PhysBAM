@@ -4,8 +4,8 @@
 //#####################################################################
 // Class PNG_FILE (requires libpng)
 //#####################################################################
-#ifndef _PNG_FILE_h
-#define _PNG_FILE_h
+#ifndef __PNG_FILE__
+#define __PNG_FILE__
 
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Vectors/VECTOR_FORWARD.h>
@@ -20,9 +20,9 @@ public:
     {}
     
 //#####################################################################
-    static void Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image);
-    static void Read(const std::string& filename,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& image);
-    template<int d> static void Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image);
+    static void Read(const std::string& filename,ARRAY<VECTOR<T,3>,VECTOR<int,2> >& image);
+    static void Read(const std::string& filename,ARRAY<VECTOR<T,4>,VECTOR<int,2> >& image);
+    template<int d> static void Write(const std::string& filename,const ARRAY<VECTOR<T,d>,VECTOR<int,2> >& image);
     static bool Is_Supported();
 //#####################################################################
 };
