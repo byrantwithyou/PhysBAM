@@ -81,12 +81,10 @@ void Emit_Smooth_Surface(std::ofstream& fout,TRIANGULATED_SURFACE<T>* ts, const 
 
     ARRAY<VECTOR<T,2> > coords;
     ARRAY<VECTOR<int,3> > map;
-    if(const std::string* texture_map_file=options.Get_Pointer("texture_map"))
-    {
+    if(const std::string* texture_map_file=options.Get_Pointer("texture_map")){
         int ignore;
         FILE_UTILITIES::Read_From_File(STREAM_TYPE((RW)0),texture_map_file->c_str(),coords,ignore,map);
-        LOG::cout<<"Texture mapping file data:  "<<texture_map_file<<"  "<<coords.m<<"  "<<ignore<<"  "<<map.m<<"  "<<ts->mesh.elements.m<<std::endl;
-    }
+        LOG::cout<<"Texture mapping file data:  "<<texture_map_file<<"  "<<coords.m<<"  "<<ignore<<"  "<<map.m<<"  "<<ts->mesh.elements.m<<std::endl;}
 
     for(int i=0;i<ts->mesh.elements.m;i++){
         fout<<"smooth_triangle { ";
@@ -102,17 +100,14 @@ void Emit_Smooth_Surface(std::ofstream& fout,TRIANGULATED_SURFACE<T>* ts, const 
         Emit_Vector(fout,X(2),",");
         Emit_Vector(fout,N(2),"");
 
-        if(coords.m)
-        {
+        if(coords.m){
             fout<<"uv_vectors ";
             int uv1,uv2,uv3;map(i).Get(uv1,uv2,uv3);
             Emit_Vector(fout, coords(uv1), " , ");
             Emit_Vector(fout, coords(uv2), " , ");
-            Emit_Vector(fout, coords(uv3), "");
-        }
+            Emit_Vector(fout, coords(uv3), "");}
 
-        fout<<"}\n";
-    }
+        fout<<"}\n";}
 }
 
 void Emit_Rigid_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
@@ -184,9 +179,10 @@ bool Parse_Pair(const char*& str,std::string& key,std::string& value)
         str++;
     }
 
-    const char* end=str+strcspn(str, ec);
-    value=std::string(str, end-str);
-    str=end+!*end;
+    int len=strcspn(str, ec);
+    value=std::string(str, len);
+    str+=len;
+    if(*str) str++;
     str+=strspn(str, " \t");
     return true;
 }
