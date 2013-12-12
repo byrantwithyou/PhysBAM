@@ -96,6 +96,12 @@ Initialize()
     if(example.save_pressure){
         example.pressure_color.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
         example.pressure.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));}
+    if(example.use_polymer_stress){
+        example.polymer_stress.Resize(example.number_of_colors);
+        example.prev_polymer_stress.Resize(example.number_of_colors);
+        for(int i=0;i<example.number_of_colors;i++){
+            example.polymer_stress(i).Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
+            example.prev_polymer_stress(i).Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));}}
 
     example.particle_levelset_evolution_multiple.Initialize_Domain(example.grid,example.collision_bodies_affecting_fluid,example.number_of_colors,false);//false= we use positive and negative particles, not just negative
     example.particle_levelset_evolution_multiple.particle_levelset_multiple.Set_Band_Width(2*example.number_of_ghost_cells);
@@ -226,6 +232,8 @@ Advance_One_Time_Step(bool first_step)
     if(example.use_level_set_method) Update_Level_Set(dt,first_step);
     else if(example.use_pls) Update_Pls(dt);
 
+    if(example.use_polymer_stress) Update_Polymer_Stress(dt);
+
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before velocity advection",0,1);
     Extrapolate_Velocity(example.face_velocities,example.face_color);
     Advection_And_BDF(dt,first_step);
@@ -353,6 +361,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color,true);
     iss.use_preconditioner=example.use_preconditioner;
     iss.use_p_null_mode=example.use_p_null_mode;
+    iss.use_polymer_stress=example.use_polymer_stress;
     ARRAY<T> system_inertia=example.rho,dt_mu(example.mu*dt);
     if(!first_step) system_inertia*=(T)1.5;
     iss.Set_Matrix(dt_mu,example.wrap,&bccl,&system_inertia,&system_inertia);
@@ -377,6 +386,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     vfcl.dt=dt;
 
     iss.Set_RHS(rhs,&vfcl,&example.face_velocities,false);
+    // TODO: call Add_Polymer_Stress_RHS if needed
     iss.Resize_Vector(sol);
 
     MINRES<T> mr;
@@ -434,6 +444,14 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
             assert(k>=0);
             example.pressure(it.index)=sol.p(c)(k)/dt;
             example.pressure_color(it.index)=c;}}
+}
+//#####################################################################
+// Function Update_Polymer_Stress
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Update_Polymer_Stress(T dt)
+{
+    PHYSBAM_NOT_IMPLEMENTED();
 }
 //#####################################################################
 // Function Extrapolate_Velocity

@@ -59,6 +59,7 @@ public:
     bool use_pls;
     bool dump_largest_eigenvector;
     bool save_pressure;
+    bool use_polymer_stress;
 
     GRID<TV> grid;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid;
@@ -73,6 +74,7 @@ public:
     BOUNDARY_MAC_GRID_PERIODIC<TV,int> boundary_int;
     LEVELSET_COLOR<TV> levelset_color;
     DEBUG_PARTICLES<TV>& debug_particles;
+    ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> > polymer_stress,prev_polymer_stress;
 
     PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~PLS_FC_EXAMPLE();

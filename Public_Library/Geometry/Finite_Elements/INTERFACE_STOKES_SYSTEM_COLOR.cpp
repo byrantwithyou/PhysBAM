@@ -34,7 +34,7 @@ using namespace PhysBAM;
 template<class TV> INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,bool mac_phi)
     :BASE(false,false),grid(grid_input),phi_grid(grid.counts*2,grid.domain,true),phi_value(phi_grid.Node_Indices(mac_phi)),phi_color(phi_grid.Node_Indices(mac_phi)),
-    use_p_null_mode(false),use_u_null_mode(false)
+    use_p_null_mode(false),use_u_null_mode(false),use_polymer_stress(false)
 {
     T tol=(grid.dX/TV(grid.counts)).Min();
     if(mac_phi) CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Mac_Level_Set_To_Double_Fine_Grid(grid_input,phi_value_input,phi_color_input,phi_grid,phi_value,phi_color,tol);
@@ -63,9 +63,13 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
     BASIS_STENCIL_UNIFORM<TV,0> p_stencil(grid.dX);
     VECTOR<BASIS_STENCIL_UNIFORM<TV,1>*,TV::m> u_stencil;
     VECTOR<VECTOR<BASIS_STENCIL_UNIFORM<TV,1>*,TV::m>,TV::m> udx_stencil;
+    BASIS_STENCIL_UNIFORM<TV,1> polymer_stress_stencil(grid.dX);
     p_stencil.Set_Center();
     p_stencil.Set_Constant_Stencil();
     p_stencil.Dice_Stencil();
+    polymer_stress_stencil.Set_Center();
+    polymer_stress_stencil.Set_Multilinear_Stencil();
+    polymer_stress_stencil.Dice_Stencil();
     for(int i=0;i<TV::m;i++){
         u_stencil(i)=new BASIS_STENCIL_UNIFORM<TV,1>(grid.dX);
         u_stencil(i)->Set_Face(i);
@@ -75,7 +79,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
             udx_stencil(i)(j)=new BASIS_STENCIL_UNIFORM<TV,1>(*u_stencil(i));
             udx_stencil(i)(j)->Differentiate(j);
             udx_stencil(i)(j)->Dice_Stencil();}}
-    
+
     // GATHER CELL DOMAIN & INTERFACE INFO 
 
     int padding;
@@ -102,6 +106,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
     VECTOR<VECTOR<SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>,TV::m>,TV::m> helper_uu;
     VECTOR<SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>,TV::m> helper_pu,helper_rhs_pu,helper_inertial_rhs;
     VECTOR<SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>,TV::m> helper_qu;
+    VECTOR<VECTOR<SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>,TV::m>,TV::m> helper_polymer_stress_rhs; // u, then diff
 
     for(int i=0;i<TV::m;i++){
         for(int j=i;j<TV::m;j++)
@@ -111,6 +116,10 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
         helper_rhs_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);
         if(system_inertia)
             helper_inertial_rhs(i).Initialize(*u_stencil(i),*u_stencil(i),*cm_u(i),*cm_u(i),*cdi);}
+    if(use_polymer_stress)
+        for(int i=0;i<TV::m;i++)
+            for(int j=0;j<TV::m;j++)
+                helper_polymer_stress_rhs(i)(j).Initialize(*u_stencil(i),polymer_stress_stencil,*cm_u(i),*cm_p,*cdi);
 
     ARRAY<T> double_mu(mu*(T)2),ones(CONSTANT_ARRAY<T>(mu.m,(T)1)),minus_ones(CONSTANT_ARRAY<T>(mu.m,-(T)1));
 
@@ -142,6 +151,11 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
     // RHS pressure blocks
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,*u_stencil(i),ones);
+    // RHS polymer stress blocks
+    if(use_polymer_stress)
+        for(int i=0;i<TV::m;i++)
+            for(int j=0;j<TV::m;j++)
+                biu.Add_Volume_Block(helper_polymer_stress_rhs(i)(j),*udx_stencil(i)(j),polymer_stress_stencil,ones);
 
     biu.Compute_Entries();
         
@@ -155,7 +169,11 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
         helper_rhs_pu(i).Mark_Active_Cells();
         if(system_inertia)
             helper_inertial_rhs(i).Mark_Active_Cells();}
-    
+    if(use_polymer_stress)
+        for(int i=0;i<TV::m;i++)
+            for(int j=i;j<TV::m;j++)
+                helper_polymer_stress_rhs(i)(j).Mark_Active_Cells();
+
     cm_p->Compress_Indices();
     for(int i=0;i<TV::m;i++) cm_u(i)->Compress_Indices();
 
@@ -176,6 +194,11 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
     if(system_inertia)
         for(int i=0;i<TV::m;i++)
             helper_inertial_rhs(i).Build_Matrix(matrix_inertial_rhs(i));
+    if(use_polymer_stress)
+        for(int i=0;i<TV::m;i++)
+            for(int j=0;j<TV::m;j++)
+                helper_polymer_stress_rhs(i)(j).Build_Matrix(matrix_polymer_stress_rhs(i)(j));
+
     // FILL IN THE NULL MODES
     for(int i=0;i<TV::m;i++) inactive_u(i).Resize(cdi->colors);
     inactive_p.Resize(cdi->colors);
@@ -256,8 +279,24 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX
                 int k=cm_u(i)->Get_Index(j,c);
                 if(k>=0) rhs.u(i)(c)(k)+=rhs_surface(i)(c)(j);}
 
+    // TODO: polymer_stress term here
+
     for(int i=0;i<TV::m;i++) matrix_rhs_pu(i).Clean_Memory();
     for(int i=0;i<TV::m;i++) rhs_surface(i).Clean_Memory();
+}
+//#####################################################################
+// Function Set_RHS
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
+Add_Polymer_Stress_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress)
+{
+    VECTOR<VECTOR<ARRAY<ARRAY<T> >,TV::m>,TV::m> S;
+    Pack(polymer_stress,S);
+
+    for(int i=0;i<TV::m;i++)
+        for(int j=0;j<TV::m;j++)
+            for(int c=0;c<cdi->colors;c++)
+                matrix_polymer_stress_rhs(i)(j)(c).Times_Add(S(i)(j)(c),rhs.u(i)(c));
 }
 //#####################################################################
 // Function Set_Jacobi_Preconditioner
@@ -336,6 +375,27 @@ Pack(const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u,VECTOR<ARRAY<ARRAY<T> >,TV::m>
         for(int c=0;c<cdi->colors;c++){
             int k=cm_u(face.axis)->Get_Index(it.index,c);
             if(k>=0) v(face.axis)(c)(k)=u(c)(face);}}
+}
+//#####################################################################
+// Function Pack
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
+Pack(const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress,VECTOR<VECTOR<ARRAY<ARRAY<T> >,TV::m>,TV::m>& S) const
+{
+    for(int i=0;i<TV::m;i++)
+        for(int j=0;j<TV::m;j++){
+            S(i)(j).Resize(cdi->colors);
+            for(int c=0;c<cdi->colors;c++)
+                S(i)(j)(c).Resize(cm_p->dofs(c));}
+
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
+        for(int c=0;c<cdi->colors;c++){
+            int k=cm_p->Get_Index(it.index,c);
+            if(k>=0){
+                SYMMETRIC_MATRIX<T,TV::m> SM=polymer_stress(c)(it.index);
+                for(int i=0;i<TV::m;i++)
+                    for(int j=0;j<TV::m;j++)
+                        S(i)(j)(c)(k)=SM(i,j);}}
 }
 //#####################################################################
 // Function Multiply

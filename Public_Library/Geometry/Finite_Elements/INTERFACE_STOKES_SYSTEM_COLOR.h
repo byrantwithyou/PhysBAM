@@ -64,6 +64,7 @@ public:
     VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m> matrix_rhs_pu,matrix_inertial_rhs;
     VECTOR<ARRAY<ARRAY<T> >,TV::m> rhs_surface;
     ARRAY<T> q_rhs;
+    VECTOR<VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m>,TV::m> matrix_polymer_stress_rhs;
 
     ARRAY<VECTOR_T*> null_modes;
     VECTOR<ARRAY<ARRAY<int> >,TV::m> inactive_u;
@@ -81,11 +82,13 @@ public:
     bool print_rhs;
     bool use_p_null_mode;
     bool use_u_null_mode;
+    bool use_polymer_stress;
 
     static int solve_id;
 
     VECTOR<CELL_MANAGER_COLOR<TV>*,TV::m> cm_u;
     CELL_MANAGER_COLOR<TV> *cm_p;
+    CELL_MANAGER_COLOR<TV> *cm_ps;
     CELL_DOMAIN_INTERFACE_COLOR<TV> *cdi;
 
     INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,bool mac_phi);
@@ -94,6 +97,7 @@ public:
 //#####################################################################
     void Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* system_inertia,ARRAY<T>* rhs_inertia);
     void Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction);
+    void Add_Polymer_Stress_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;
@@ -104,6 +108,7 @@ public:
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const;
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const;
     void Pack(const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u,VECTOR<ARRAY<ARRAY<T> >,TV::m>& v) const;
+    void Pack(const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress,VECTOR<VECTOR<ARRAY<ARRAY<T> >,TV::m>,TV::m>& S) const;
     void Get_Sparse_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const;
 private:
     void Set_Jacobi_Preconditioner();
