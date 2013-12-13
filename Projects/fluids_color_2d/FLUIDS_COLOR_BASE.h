@@ -34,6 +34,8 @@
 #include <Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 #include "ANALYTIC_VELOCITY.h"
+#include "ANALYTIC_POLYMER_STRESS.h"
+
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -81,9 +83,13 @@ public:
     bool override_surface_tension;
     bool use_pls_over_levelset;
     bool use_levelset_over_pls;
+    
+    //False by default, set to true in the appropriate test.
+    bool use_polymer_stress;
     TV gravity;
 
     ARRAY<ANALYTIC_VELOCITY<TV>*> analytic_velocity,initial_analytic_velocity;
+    ARRAY<ANALYTIC_POLYMER_STRESS<TV>*> analytic_polymer_stress;
     ANALYTIC_LEVELSET<TV>* analytic_levelset;
     bool analytic_initial_only;
     int number_of_threads;
@@ -166,6 +172,7 @@ public:
     {
         delete analytic_levelset;
         analytic_velocity.Delete_Pointers_And_Clean_Memory();
+        analytic_polymer_stress.Delete_Pointers_And_Clean_Memory();
     }
 
     void After_Initialize_Example()
@@ -185,6 +192,10 @@ public:
         for(int i=0;i<TV::SPIN::m;i++) spin_count(i)=i;
         for(int i=0;i<TV::m;i++) vector_count(i)=i;
 
+        //Tests 0-31: Tests created prior to selection of examples for 2013 JCP paper
+        //Tests 101-111: Examples 1-11 in 2013 JCP paper, may coincide with Tests 0-31
+        //Tests 201-249: Examples for upcoming polymer stress JCP paper
+        //Tests 250-299: Tests using polymer stress, prior to example selection
         switch(test_number){
             case 0:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
@@ -392,7 +403,6 @@ public:
                 analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(vel));
                 use_p_null_mode=true;
-            
                 break;
             }
             case 104:
@@ -406,10 +416,10 @@ public:
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),spin_count+1,rho1/unit_rho));
                 use_discontinuous_velocity=true;
                 use_p_null_mode=true;
-                break;}
-            case 108:
-                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
-                {
+                break;
+            }
+            case 108:{
+                    grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
                     TV r=TV()+(T).4;
                     r(0)=(T).7;
                     if(!override_mu0) mu0=3*unit_mu;
@@ -423,8 +433,17 @@ public:
                     if(bc_type!=NEUMANN) use_p_null_mode=true;
                     use_pls=true;
                     analytic_initial_only=true;
+                    break;
                 }
+            case 250:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()+1));
+                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_CONST<TV>());
+                use_p_null_mode=true;
+                use_polymer_stress=true;
                 break;
+            }
             default: return false;}
         return true;
     }
