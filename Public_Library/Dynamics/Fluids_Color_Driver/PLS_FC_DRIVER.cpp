@@ -451,6 +451,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Update_Polymer_Stress(T dt)
 {
+    SYMMETRIC_MATRIX<T,TV::m> bum(example.Polymer_Stress(TV(),0,2));
     PHYSBAM_NOT_IMPLEMENTED();
 }
 //#####################################################################

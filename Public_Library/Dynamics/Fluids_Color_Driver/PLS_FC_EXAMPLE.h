@@ -88,6 +88,8 @@ public:
     virtual void Initialize()=0;
     virtual void Begin_Time_Step(const T time)=0;
     virtual void End_Time_Step(const T time)=0;
+    virtual SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress(const TV& X,int color,T time)=0;
+    virtual SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress_Forcing_Term(const TV& X,int color,T time)=0;
     virtual TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time)=0;
     virtual TV Volume_Force(const TV& X,int color,T time)=0;
     virtual TV Velocity_Jump(const TV& X,int color0,int color1,T time)=0;

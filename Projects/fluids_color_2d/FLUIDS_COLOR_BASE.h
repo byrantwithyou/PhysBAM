@@ -58,7 +58,7 @@ public:
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
     using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
     using BASE::particle_levelset_evolution_multiple;using BASE::face_color;using BASE::substeps_delay_frame;
-    using BASE::dump_largest_eigenvector;using BASE::save_pressure;using BASE::pressure;
+    using BASE::dump_largest_eigenvector;using BASE::save_pressure;using BASE::use_polymer_stress;using BASE::pressure;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -69,6 +69,7 @@ public:
     T mu0,mu1;
     T rho0,rho1;
     T unit_mu,unit_rho,unit_st,unit_p;
+    T weiss,weiss_inv;
     T m,s,kg;
     int bc_type;
     bool bc_n,bc_d,bc_s;
@@ -84,8 +85,6 @@ public:
     bool use_pls_over_levelset;
     bool use_levelset_over_pls;
     
-    //False by default, set to true in the appropriate test.
-    bool use_polymer_stress;
     TV gravity;
 
     ARRAY<ANALYTIC_VELOCITY<TV>*> analytic_velocity,initial_analytic_velocity;
@@ -97,7 +96,7 @@ public:
 
     FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),rho0(1),
-        rho1(2),unit_mu(0),unit_rho(0),unit_st(0),unit_p(0),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),
+        rho1(2),unit_mu(0),unit_rho(0),unit_st(0),unit_p(0),weiss(1),weiss_inv(1),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),
         refine(1),surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),
         override_surface_tension(false),use_pls_over_levelset(false),use_levelset_over_pls(false),analytic_initial_only(false),
         number_of_threads(1),override_output_directory(false)
@@ -151,6 +150,7 @@ public:
         dt/=refine;
         time_steps_per_frame*=refine;
         stored_last_frame=last_frame;
+        if(weiss>1e9)weiss_inv=0;else weiss_inv = 1.0/weiss;
         unit_mu=kg*pow<2-TV::m>(m)/s;
         unit_rho=kg/pow<TV::m>(m);
         unit_st=kg*pow<3-TV::m>(m)/(s*s);
@@ -419,22 +419,22 @@ public:
                 break;
             }
             case 108:{
-                    grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
-                    TV r=TV()+(T).4;
-                    r(0)=(T).7;
-                    if(!override_mu0) mu0=3*unit_mu;
-                    if(!override_mu1) mu1=1*unit_mu;
-                    if(!override_rho0) rho0=0.001*unit_rho;
-                    if(!override_rho1) rho1=0.002*unit_rho;
-                    if(!override_surface_tension) surface_tension=(T)10*unit_st;
-                    analytic_levelset=new ANALYTIC_LEVELSET_ELLIPSOID<TV>(TV(),r,0,1);
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
-                    if(bc_type!=NEUMANN) use_p_null_mode=true;
-                    use_pls=true;
-                    analytic_initial_only=true;
-                    break;
-                }
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+                TV r=TV()+(T).4;
+                r(0)=(T).7;
+                if(!override_mu0) mu0=3*unit_mu;
+                if(!override_mu1) mu1=1*unit_mu;
+                if(!override_rho0) rho0=0.001*unit_rho;
+                if(!override_rho1) rho1=0.002*unit_rho;
+                if(!override_surface_tension) surface_tension=(T)10*unit_st;
+                analytic_levelset=new ANALYTIC_LEVELSET_ELLIPSOID<TV>(TV(),r,0,1);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
+                use_pls=true;
+                analytic_initial_only=true;
+                break;
+            }
             case 250:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
@@ -651,6 +651,18 @@ public:
         T p=analytic_velocity(color)->p(X/m,time/s)*unit_p;
         MATRIX<T,TV::m> du=analytic_velocity(color)->du(X/m,time/s)/s;
         return (du+du.Transposed())*mu(color)-p;
+    }
+    
+    SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress(const TV& X,int color,T time)
+    {
+        PHYSBAM_ASSERT(use_polymer_stress);
+        return analytic_polymer_stress(color)->S(X/m,time/s)*unit_p;
+    }
+
+    SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress_Forcing_Term(const TV& X,int color,T time)
+    {
+        PHYSBAM_ASSERT(use_polymer_stress);
+        return analytic_polymer_stress(color)->F_S(X/m,time/s)*unit_p;
     }
 
     TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
