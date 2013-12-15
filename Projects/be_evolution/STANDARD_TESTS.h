@@ -165,6 +165,7 @@ public:
     bool use_penalty_collisions;
     bool use_constraint_collisions;
     bool no_line_search;
+    bool no_descent;
     T penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length;
     bool enforce_definiteness;
     T unit_rho,unit_p,unit_N,unit_J;
@@ -301,6 +302,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-newton_tol",&backward_euler_evolution->newtons_method.tolerance,"tol","tolerance for Newton");
     parse_args->Add("-newton_cd_tol",&backward_euler_evolution->newtons_method.countdown_tolerance,"tol","tolerance for Newton");
     parse_args->Add("-newton_max_step",&backward_euler_evolution->newtons_method.max_newton_step_size,"size","Limit newton step to this size");
+    parse_args->Add("-no_descent",&no_descent,"Don't ensure descent direction");
     parse_args->Add("-debug_newton",&backward_euler_evolution->newtons_method.debug,"Enable diagnostics in Newton's method");
     parse_args->Add("-kry_fail",&backward_euler_evolution->newtons_method.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
     parse_args->Add("-angle_tol",&backward_euler_evolution->newtons_method.angle_tolerance,"tol","gradient descent tolerance");
@@ -339,6 +341,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
         backward_euler_evolution->newtons_method.use_wolfe_search=false;
     if(backward_euler_evolution && no_line_search)
         backward_euler_evolution->newtons_method.use_wolfe_search=false;
+    if(backward_euler_evolution && no_descent)
+        backward_euler_evolution->newtons_method.use_gradient_descent_failsafe=false;
 
     unit_rho=kg/pow<TV::m>(m);
     unit_N=kg*m/(s*s);
