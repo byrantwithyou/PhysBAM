@@ -446,7 +446,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            last_frame=180;
+            last_frame=360;
             break;
         case 28:
             attachment_velocity=0.4;
@@ -1471,9 +1471,9 @@ void Get_Initial_Data()
             initial_positions=particles.X;
             constrained_velocities.Resize(constrained_particles.m);
             scalar_curve.Add_Control_Point(0,0);
-            scalar_curve.Add_Control_Point(2,-.85*pi);
-            scalar_curve.Add_Control_Point(3,-.85*pi);
-            scalar_curve.Add_Control_Point(5,0);
+            scalar_curve.Add_Control_Point(4,-.85*pi);
+            scalar_curve.Add_Control_Point(5,-.85*pi);
+            scalar_curve.Add_Control_Point(9,0);
             break;}
         case 77: {
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)*m));
