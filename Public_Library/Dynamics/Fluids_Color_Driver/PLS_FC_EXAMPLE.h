@@ -94,6 +94,7 @@ public:
     virtual TV Volume_Force(const TV& X,int color,T time)=0;
     virtual TV Velocity_Jump(const TV& X,int color0,int color1,T time)=0;
     virtual void Get_Initial_Velocities()=0;
+    virtual void Get_Initial_Polymer_Stresses()=0;
     int Color_At_Cell(const TV_INT& index) const;
     int Color_At_Cell(const TV_INT& index,T& phi) const;
     void Rebuild_Levelset_Color();

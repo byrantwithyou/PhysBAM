@@ -58,7 +58,7 @@ public:
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
     using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
     using BASE::particle_levelset_evolution_multiple;using BASE::face_color;using BASE::substeps_delay_frame;
-    using BASE::dump_largest_eigenvector;using BASE::save_pressure;using BASE::use_polymer_stress;using BASE::pressure;
+    using BASE::dump_largest_eigenvector;using BASE::save_pressure;using BASE::use_polymer_stress;using BASE::pressure;using BASE::polymer_stress;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -602,6 +602,15 @@ public:
                 int c=face_color(it.Full_Index());
                 if(c<0) continue;
                 face_velocities(c)(it.Full_Index())=analytic_velocity(c)->u(it.Location()/m,0)(it.Axis())*m/s;}
+    }
+
+    void Get_Initial_Polymer_Stresses()
+    {
+        //Right now we are filling in for all colors. We may not want to do that in the future.
+        if(analytic_levelset && analytic_velocity.m)
+            for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
+                for(int c=0;c<analytic_velocity.m;c++)
+                    polymer_stress(c)(it.index)=analytic_polymer_stress(c)->S(it.Location()/m,0)*unit_p;}
     }
 
     void Analytic_Test()

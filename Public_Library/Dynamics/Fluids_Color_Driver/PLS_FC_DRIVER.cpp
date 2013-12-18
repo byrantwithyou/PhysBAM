@@ -139,7 +139,8 @@ Initialize()
         example.prev_face_color.Fill(-9);
         example.particle_levelset_evolution_multiple.Make_Signed_Distance();
         example.Make_Levelsets_Consistent();
-        example.Get_Initial_Velocities();}
+        example.Get_Initial_Velocities();
+        if(example.use_polymer_stress) example.Get_Initial_Polymer_Stresses();}
 
     example.collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
     example.collision_bodies_affecting_fluid.Rasterize_Objects();
@@ -386,7 +387,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     vfcl.dt=dt;
 
     iss.Set_RHS(rhs,&vfcl,&example.face_velocities,false);
-    // TODO: call Add_Polymer_Stress_RHS if needed
+    if(example.use_polymer_stress) Add_Polymer_Stress_RHS(); //if needed
     iss.Resize_Vector(sol);
 
     MINRES<T> mr;
@@ -452,7 +453,23 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Update_Polymer_Stress(T dt)
 {
     SYMMETRIC_MATRIX<T,TV::m> bum(example.Polymer_Stress(TV(),0,2));
-    PHYSBAM_NOT_IMPLEMENTED();
+
+    example.prev_polymer_stress.Exchange(example.polymer_stress);
+        //Right now we are filling in for all colors. We may not want to do that in the future.
+
+            for(CELL_ITERATOR<TV> it(example.grid,1);it.Valid();it.Next()){
+                for(int c=0;c<example.polymer_stress.m;c++)
+                    example.polymer_stress(c)(it.index)=example.Polymer_Stress(it.Location(),c,time+dt);}
+
+}
+//#####################################################################
+// Function Add_Polymer_Stress_RHS
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Add_Polymer_Stress_RHS()
+{
+
+      PHYSBAM_NOT_IMPLEMENTED();
 }
 //#####################################################################
 // Function Extrapolate_Velocity
