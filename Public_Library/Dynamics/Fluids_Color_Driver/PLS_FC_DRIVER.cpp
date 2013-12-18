@@ -387,7 +387,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     vfcl.dt=dt;
 
     iss.Set_RHS(rhs,&vfcl,&example.face_velocities,false);
-    if(example.use_polymer_stress) Add_Polymer_Stress_RHS(); //if needed
+    if(example.use_polymer_stress) iss.Add_Polymer_Stress_RHS(rhs,&vfcl,example.polymer_stress); //if needed
     iss.Resize_Vector(sol);
 
     MINRES<T> mr;
@@ -452,7 +452,6 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Update_Polymer_Stress(T dt)
 {
-    SYMMETRIC_MATRIX<T,TV::m> bum(example.Polymer_Stress(TV(),0,2));
 
     example.prev_polymer_stress.Exchange(example.polymer_stress);
         //Right now we are filling in for all colors. We may not want to do that in the future.
@@ -461,15 +460,6 @@ Update_Polymer_Stress(T dt)
                 for(int c=0;c<example.polymer_stress.m;c++)
                     example.polymer_stress(c)(it.index)=example.Polymer_Stress(it.Location(),c,time+dt);}
 
-}
-//#####################################################################
-// Function Add_Polymer_Stress_RHS
-//#####################################################################
-template<class TV> void PLS_FC_DRIVER<TV>::
-Add_Polymer_Stress_RHS()
-{
-
-      PHYSBAM_NOT_IMPLEMENTED();
 }
 //#####################################################################
 // Function Extrapolate_Velocity

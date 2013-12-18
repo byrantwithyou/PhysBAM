@@ -285,7 +285,7 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX
     for(int i=0;i<TV::m;i++) rhs_surface(i).Clean_Memory();
 }
 //#####################################################################
-// Function Set_RHS
+// Function Add_Polymer_Stress_RHS
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 Add_Polymer_Stress_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress)
