@@ -7,11 +7,21 @@
 #include <Tools/Symbolics/DOMINATORS.h>
 #include <Tools/Symbolics/INSTRUCTION.h>
 #include <Tools/Symbolics/PROGRAM.h>
+#include <Tools/Symbolics/PROGRAM_DEFINITIONS.h>
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <set>
+#include <Tools/Symbolics/PROGRAM_LEX.hpp>
+#include <Tools/Symbolics/PROGRAM_YACC.hpp>
+
+extern int yyparse();
+
 namespace PhysBAM{
+
+ARRAY<std::string> parse_identifiers;
+ARRAY<double> parse_constants;
+PROGRAM_PARSE_NODE* parse_root;
 
 enum op_flags {
     flag_none=0x00,
@@ -27,12 +37,19 @@ int Init_Instructions()
     op_flags_table[op_sub]=flag_reg_dest|flag_reg_src0|flag_reg_src1;
     op_flags_table[op_mul]=flag_reg_dest|flag_reg_src0|flag_reg_src1|flag_can_deduce|flag_commute;
     op_flags_table[op_div]=flag_reg_dest|flag_reg_src0|flag_reg_src1|flag_can_deduce;
+    op_flags_table[op_mod]=flag_reg_dest|flag_reg_src0|flag_reg_src1|flag_can_deduce;
     op_flags_table[op_neg]=flag_reg_dest|flag_reg_src0;
     op_flags_table[op_inv]=flag_reg_dest|flag_reg_src0;
     op_flags_table[op_sqrt]=flag_reg_dest|flag_reg_src0;
     op_flags_table[op_exp]=flag_reg_dest|flag_reg_src0;
     op_flags_table[op_ln]=flag_reg_dest|flag_reg_src0;
     op_flags_table[op_pow]=flag_reg_dest|flag_reg_src0|flag_reg_src1|flag_can_deduce;
+    op_flags_table[op_sin]=flag_reg_dest|flag_reg_src0;
+    op_flags_table[op_cos]=flag_reg_dest|flag_reg_src0;
+    op_flags_table[op_asin]=flag_reg_dest|flag_reg_src0;
+    op_flags_table[op_acos]=flag_reg_dest|flag_reg_src0;
+    op_flags_table[op_atan]=flag_reg_dest|flag_reg_src0;
+    op_flags_table[op_atan2]=flag_reg_dest|flag_reg_src0|flag_reg_src1;
     op_flags_table[op_lt]=flag_reg_dest|flag_reg_src0|flag_reg_src1;
     op_flags_table[op_le]=flag_reg_dest|flag_reg_src0|flag_reg_src1;
     op_flags_table[op_gt]=flag_reg_dest|flag_reg_src0|flag_reg_src1;
@@ -62,12 +79,19 @@ Evaluate_Op(int type,T in0,T in1) const
         case op_sub: return in0-in1;
         case op_mul: return in0*in1;
         case op_div: return in0/in1;
+        case op_mod:{T x=fmod(in0,in1);return x<0?x+abs(in1):x;}
         case op_neg: return -in0;
         case op_inv: return 1/in0;
         case op_sqrt: return sqrt(in0);
         case op_exp: return exp(in0);
         case op_ln: return log(in0);
         case op_pow: return pow(in0,in1);
+        case op_sin: return sin(in0);
+        case op_cos: return cos(in0);
+        case op_asin: return asin(in0);
+        case op_acos: return acos(in0);
+        case op_atan: return atan(in0);
+        case op_atan2: return atan2(in0,in1);
         case op_lt: return in0<in1;
         case op_le: return in0<=in1;
         case op_gt: return in0>in1;
@@ -119,6 +143,7 @@ Deduce_Op(int type,T& out,T* in0,T* in1) const
     switch(type){
         case op_mul: if((in0 && !*in0) || (in1 && !*in1)){out=0;return true;} return false;
         case op_div: if((in0 && !*in0)){out=0;return true;} return false;
+        case op_mod: if((in0 && !*in0)){out=0;return true;} return false;
         case op_pow: if(in0 && (*in0==0 || *in0==1)){out=*in0;return true;}
             if(in1 && *in1==0){out=1;return true;} return false;
         case op_or: if((in0 && *in0) || (in1 && *in1)){out=1;return true;} return false;
@@ -203,6 +228,7 @@ Diff(int diff_expr,int diff_var)
                     N=Add_Raw_Instruction_To_Block_After(B,N,op_sub,d,num_tmp+2,num_tmp+1);
                     num_tmp+=3;
                     break;
+                case op_mod:N=Add_Raw_Instruction_To_Block_After(B,N,op_copy,d,s0,-1);break;
                 case op_inv:
                     N=Add_Raw_Instruction_To_Block_After(B,N,op_mul,num_tmp,o.dest,o.dest);
                     N=Add_Raw_Instruction_To_Block_After(B,N,op_mul,num_tmp+1,s0,num_tmp);
@@ -226,6 +252,48 @@ Diff(int diff_expr,int diff_var)
                     N=Add_Raw_Instruction_To_Block_After(B,N,op_add,d,num_tmp+2,num_tmp+6);
                     num_tmp+=7;
                     break;
+                case op_sin:
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_cos,num_tmp,o.src0,-1);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_mul,d,num_tmp,s0);
+                    num_tmp++;
+                    break;
+                case op_cos:
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_sin,num_tmp,o.src0,-1);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_mul,num_tmp+1,num_tmp,s0);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_neg,d,num_tmp+1,-1);
+                    num_tmp+=2;
+                    break;
+                case op_asin:
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_mul,num_tmp,o.src0,o.src0);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_sub,num_tmp+1,Add_Constant(1),num_tmp);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_sqrt,num_tmp+2,num_tmp+1,-1);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_div,d,s0,num_tmp+2);
+                    num_tmp+=3;
+                    break;
+                case op_acos:
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_mul,num_tmp,o.src0,o.src0);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_sub,num_tmp+1,Add_Constant(1),num_tmp);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_sqrt,num_tmp+2,num_tmp+1,-1);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_div,num_tmp+3,s0,num_tmp+2);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_neg,d,num_tmp+3,-1);
+                    num_tmp+=4;
+                    break;
+                case op_atan:
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_mul,num_tmp,o.src0,o.src0);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_add,num_tmp+1,Add_Constant(1),num_tmp);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_div,d,s0,num_tmp+1);
+                    num_tmp+=2;
+                    break;
+                case op_atan2:
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_mul,num_tmp,o.src0,o.src0);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_mul,num_tmp+1,o.src1,o.src1);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_mul,num_tmp+2,o.src0,s1);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_mul,num_tmp+3,o.src1,s0);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_add,num_tmp+4,num_tmp,num_tmp+1);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_sub,num_tmp+5,num_tmp+3,num_tmp+2);
+                    N=Add_Raw_Instruction_To_Block_After(B,N,op_div,d,num_tmp+5,num_tmp+4);
+                    num_tmp+=6;
+                    break;
                 case op_lt:case op_le:case op_gt:case op_ge:case op_eq:case op_ne:case op_not:case op_or:case op_and:
                     N=Add_Raw_Instruction_To_Block_After(B,N,op_copy,d,Add_Constant(0),-1);
                     break;
@@ -240,62 +308,212 @@ Diff(int diff_expr,int diff_var)
     return var_out.m+extra_out++;
 }
 
-enum op_parse_info_flags {flag_dest_is_src0=1,flag_num_ok_after=2};
+double operator_definitions_consts[]={};
 
-const char * op_chars="+-!*/^<>=!|&";
+struct FUNCTION_DEFINITION
+{
+    int num_args;
+    ARRAY<INSTRUCTION> code;
+
+    FUNCTION_DEFINITION& Add(op_type type,int dest,int src0,int src1)
+    {
+        INSTRUCTION in={type,dest,src0,src1};
+        code.Append(in);
+        return *this;
+    }
+};
 
 struct OPERATOR_DEFINITIONS
 {
-    HASHTABLE<std::string,OP_PARSE_INFO> op_lookup[2];
-    HASHTABLE<std::string,op_type> func_lookup;
+    HASHTABLE<std::string,FUNCTION_DEFINITION> func_lookup;
 
-    bool right_to_left[prec_hi+1];
-    
     OPERATOR_DEFINITIONS()
     {
-        op_lookup[1].Set("+",OP_PARSE_INFO(op_copy,prec_neg,flag_num_ok_after));
-        op_lookup[1].Set("-",OP_PARSE_INFO(op_neg,prec_neg,flag_num_ok_after));
-        op_lookup[1].Set("!",OP_PARSE_INFO(op_not,prec_neg,flag_num_ok_after));
+        Append_Instruction("inv",1).Add(op_inv,mem_out,mem_in,-1);
+        Append_Instruction("sqrt",1).Add(op_sqrt,mem_out,mem_in,-1);
+        Append_Instruction("exp",1).Add(op_exp,mem_out,mem_in,-1);
+        Append_Instruction("ln",1).Add(op_ln,mem_out,mem_in,-1);
+        Append_Instruction("sin",1).Add(op_sin,mem_out,mem_in,-1);
+        Append_Instruction("cos",1).Add(op_cos,mem_out,mem_in,-1);
+        Append_Instruction("asin",1).Add(op_asin,mem_out,mem_in,-1);
+        Append_Instruction("acos",1).Add(op_acos,mem_out,mem_in,-1);
+        Append_Instruction("atan",1).Add(op_atan,mem_out,mem_in,-1);
+        Append_Instruction("atan2",2).Add(op_atan2,mem_out,mem_in,mem_in+1);
 
-        op_lookup[0].Set("+",OP_PARSE_INFO(op_add,prec_add,flag_num_ok_after));
-        op_lookup[0].Set("-",OP_PARSE_INFO(op_sub,prec_add,flag_num_ok_after));
-        op_lookup[0].Set("*",OP_PARSE_INFO(op_mul,prec_mul,flag_num_ok_after));
-        op_lookup[0].Set("/",OP_PARSE_INFO(op_div,prec_mul,flag_num_ok_after));
-        op_lookup[0].Set("^",OP_PARSE_INFO(op_pow,prec_neg,flag_num_ok_after));
-        op_lookup[0].Set("<",OP_PARSE_INFO(op_lt,prec_comp,flag_num_ok_after));
-        op_lookup[0].Set("<=",OP_PARSE_INFO(op_le,prec_comp,flag_num_ok_after));
-        op_lookup[0].Set(">",OP_PARSE_INFO(op_gt,prec_comp,flag_num_ok_after));
-        op_lookup[0].Set(">=",OP_PARSE_INFO(op_ge,prec_comp,flag_num_ok_after));
-        op_lookup[0].Set("==",OP_PARSE_INFO(op_eq,prec_eq,flag_num_ok_after));
-        op_lookup[0].Set("!=",OP_PARSE_INFO(op_ne,prec_eq,flag_num_ok_after));
-        op_lookup[0].Set("||",OP_PARSE_INFO(op_or,prec_or,flag_num_ok_after));
-        op_lookup[0].Set("&&",OP_PARSE_INFO(op_and,prec_and,flag_num_ok_after));
-        op_lookup[0].Set("=",OP_PARSE_INFO(op_copy,prec_assign,flag_num_ok_after));
-        op_lookup[0].Set("+=",OP_PARSE_INFO(op_add,prec_assign,flag_dest_is_src0|flag_num_ok_after));
-        op_lookup[0].Set("-=",OP_PARSE_INFO(op_sub,prec_assign,flag_dest_is_src0|flag_num_ok_after));
-        op_lookup[0].Set("*=",OP_PARSE_INFO(op_mul,prec_assign,flag_dest_is_src0|flag_num_ok_after));
-        op_lookup[0].Set("/=",OP_PARSE_INFO(op_div,prec_assign,flag_dest_is_src0|flag_num_ok_after));
-        op_lookup[0].Set("^=",OP_PARSE_INFO(op_pow,prec_assign,flag_dest_is_src0|flag_num_ok_after));
+        Append_Instruction("tan",1).
+            Add(op_sin,mem_reg,mem_in,-1).
+            Add(op_cos,mem_reg+1,mem_in,-1).
+            Add(op_div,mem_out,mem_reg,mem_reg+1);
 
-        func_lookup.Set("inv",op_inv);
-        func_lookup.Set("sqrt",op_sqrt);
-        func_lookup.Set("exp",op_exp);
-        func_lookup.Set("ln",op_ln);
+        Append_Instruction("cot",1).
+            Add(op_sin,mem_reg,mem_in,-1).
+            Add(op_cos,mem_reg+1,mem_in,-1).
+            Add(op_div,mem_out,mem_reg+1,mem_reg);
 
-        right_to_left[prec_lo]=false;
-        right_to_left[prec_assign]=true;
-        right_to_left[prec_cond]=true;
-        right_to_left[prec_or]=false;
-        right_to_left[prec_and]=false;
-        right_to_left[prec_eq]=false;
-        right_to_left[prec_comp]=false;
-        right_to_left[prec_add]=false;
-        right_to_left[prec_mul]=false;
-        right_to_left[prec_neg]=true;
-        right_to_left[prec_func]=false;
-        right_to_left[prec_hi]=false;
+        Append_Instruction("sec",1).
+            Add(op_cos,mem_reg,mem_in,-1).
+            Add(op_inv,mem_out,mem_reg,-1);
+
+        Append_Instruction("csc",1).
+            Add(op_sin,mem_reg,mem_in,-1).
+            Add(op_inv,mem_out,mem_reg,-1);
+
+        Append_Instruction("acot",1).
+            Add(op_inv,mem_reg,mem_in,-1).
+            Add(op_atan,mem_out,mem_reg,-1);
+
+        Append_Instruction("asec",1).
+            Add(op_inv,mem_reg,mem_in,-1).
+            Add(op_acos,mem_out,mem_reg,-1);
+
+        Append_Instruction("acsc",1).
+            Add(op_inv,mem_reg,mem_in,-1).
+            Add(op_asin,mem_out,mem_reg,-1);
     }
-} op_tokens;
+
+    FUNCTION_DEFINITION& Append_Instruction(const char* name,int args)
+    {
+        FUNCTION_DEFINITION& def=func_lookup.Get_Or_Insert(name);
+        def.num_args=args;
+        return def;
+    }
+};
+OPERATOR_DEFINITIONS& Get_Operator_Definitions()
+{
+    static OPERATOR_DEFINITIONS od;
+    return od;
+}
+
+//#####################################################################
+// Function Append_Dest_Instruction
+//#####################################################################
+template<class T> int PROGRAM<T>::
+Append_Instruction(op_type type,int dest,int src0,int src1)
+{
+    INSTRUCTION in={type,dest,src0,src1};
+    code_blocks.Last()->Append(in);
+    return in.dest;
+}
+//#####################################################################
+// Function Print_Node
+//#####################################################################
+template<class T> void PROGRAM<T>::
+Print_Node(PROGRAM_PARSE_NODE* node)
+{
+    if(node->type<256) LOG::printf("(%c",(char) node->type);
+    else LOG::printf("(%i",node->type);
+    if(node->a){LOG::printf(" ");Print_Node(node->a);}
+    if(node->b){LOG::printf(" ");Print_Node(node->b);}
+    LOG::printf(")");
+}
+//#####################################################################
+// Function Process_Node
+//#####################################################################
+template<class T> int PROGRAM<T>::
+Process_Node(PROGRAM_PARSE_NODE* node)
+{
+    int aa=-1,bb=-1;
+    if(node->a && node->type!=TOKEN_FUNC) aa=Process_Node(node->a);
+    if(node->b && node->type!='?' && node->type!=TOKEN_FUNC) bb=Process_Node(node->b);
+    switch(node->type)
+    {
+        case TOKEN_LIST:
+        case ',': return bb;
+        case '=': return Append_Instruction(op_copy,aa,bb,-1);
+        case TOKEN_ADDEQ: return Append_Instruction(op_add,aa,aa,bb);
+        case TOKEN_SUBEQ: return Append_Instruction(op_sub,aa,aa,bb);
+        case TOKEN_MULEQ: return Append_Instruction(op_mul,aa,aa,bb);
+        case TOKEN_DIVEQ: return Append_Instruction(op_div,aa,aa,bb);
+        case TOKEN_POWEQ: return Append_Instruction(op_pow,aa,aa,bb);
+        case '<': return Append_Instruction(op_lt,num_tmp++,aa,bb);
+        case '>': return Append_Instruction(op_gt,num_tmp++,aa,bb);
+        case TOKEN_EQ: return Append_Instruction(op_eq,num_tmp++,aa,bb);
+        case TOKEN_NE: return Append_Instruction(op_ne,num_tmp++,aa,bb);
+        case TOKEN_LE: return Append_Instruction(op_le,num_tmp++,aa,bb);
+        case TOKEN_GE: return Append_Instruction(op_ge,num_tmp++,aa,bb);
+        case TOKEN_AND: return Append_Instruction(op_and,num_tmp++,aa,bb);
+        case TOKEN_OR: return Append_Instruction(op_or,num_tmp++,aa,bb);
+        case '+':
+            if(node->b) return Append_Instruction(op_add,num_tmp++,aa,bb);
+            return aa;
+        case '-':
+            if(node->b) return Append_Instruction(op_sub,num_tmp++,aa,bb);
+            return Append_Instruction(op_neg,num_tmp++,aa,-1);
+        case '*': return Append_Instruction(op_mul,num_tmp++,aa,bb);
+        case '/': return Append_Instruction(op_div,num_tmp++,aa,bb);
+        case '%': return Append_Instruction(op_mod,num_tmp++,aa,bb);
+        case '^': return Append_Instruction(op_pow,num_tmp++,aa,bb);
+        case '!': return Append_Instruction(op_not,num_tmp++,aa,-1);
+        case TOKEN_NUMBER: return Add_Constant(parse_constants(node->val));
+
+        case TOKEN_FUNC:
+            PHYSBAM_ASSERT(node->a && node->a->type==TOKEN_IDENT);
+            if(const FUNCTION_DEFINITION* def=Get_Operator_Definitions().func_lookup.Get_Pointer(parse_identifiers(node->a->val))){
+                ARRAY<int> args;
+                for(PROGRAM_PARSE_NODE* n=node->b;n;n=n->b)
+                    args.Append(Process_Node(n->a));
+                if(args.m!=def->num_args) PHYSBAM_FATAL_ERROR("Wrong number of arguments to function");
+                int num_tmps=0,result=num_tmp++;
+                for(int i=0;i<def->code.m;i++){
+                    INSTRUCTION in=def->code(i);
+                    if(op_flags_table[in.type]&flag_reg_dest){
+                        int m=in.dest&mem_mask,v=in.dest&~mem_mask;
+                        if(m==mem_reg){num_tmps=std::max(num_tmps,v+1);in.dest=num_tmp+v;}
+                        else if(m==mem_in) in.dest=args(v);
+                        else if(m==mem_out) in.dest=result;}
+                    if(op_flags_table[in.type]&flag_reg_src0){
+                        int m=in.src0&mem_mask,v=in.src0&~mem_mask;
+                        if(m==mem_reg){num_tmps=std::max(num_tmps,v+1);in.src0=num_tmp+v;}
+                        else if(m==mem_in) in.src0=args(v);
+                        else if(m==mem_out) in.src0=result;}
+                    if(op_flags_table[in.type]&flag_reg_src1){
+                        int m=in.src1&mem_mask,v=in.src1&~mem_mask;
+                        if(m==mem_reg){num_tmps=std::max(num_tmps,v+1);in.src1=num_tmp+v;}
+                        else if(m==mem_in) in.src1=args(v);
+                        else if(m==mem_out) in.src1=result;}
+                    code_blocks.Last()->Append(in);}
+                num_tmp+=num_tmps;
+                return result;}
+            else PHYSBAM_FATAL_ERROR("Expected function");
+
+        case TOKEN_IDENT:{
+            int reg=-1;
+            if(!dict.Get(parse_identifiers(node->val),reg)){
+                reg=num_tmp++;
+                dict.Set(parse_identifiers(node->val),reg);}
+            return reg;}
+
+        case '?':{
+            PHYSBAM_ASSERT(node->b->type==':');
+            int result=num_tmp++;
+            CODE_BLOCK* A=code_blocks.Last();
+            CODE_BLOCK* B=new CODE_BLOCK;
+            B->id=code_blocks.Append(B);
+            Append_Instruction(op_copy,result,Process_Node(node->b->a),-1);
+            CODE_BLOCK* BB=code_blocks.Last();
+            CODE_BLOCK* C=new CODE_BLOCK;
+            C->id=code_blocks.Append(C);
+            Append_Instruction(op_copy,result,Process_Node(node->b->b),-1);
+            CODE_BLOCK* CC=code_blocks.Last();
+            CODE_BLOCK* D=new CODE_BLOCK;
+            D->id=code_blocks.Append(D);
+            INSTRUCTION in_A={op_br_z,C->id,aa,B->id};
+            A->Append(in_A);
+
+            A->next[0]=B;
+            B->prev[0]=A;
+            A->next[1]=C;
+            C->prev[0]=A;
+
+            D->prev[0]=BB;
+            D->prev[1]=CC;
+            BB->next[0]=D;
+            CC->next[0]=D;
+            return result;}
+
+        default: PHYSBAM_FATAL_ERROR("Unexpected node");
+    }
+}
 //#####################################################################
 // Function Parse
 //#####################################################################
@@ -347,260 +565,19 @@ Parse(const char* str,bool keep_all_vars)
     Make_SSA();
 }
 //#####################################################################
-// Function Pop_Op_Stack
-//#####################################################################
-template<class T> void PROGRAM<T>::
-Pop_Op_Stack(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack)
-{
-    PHYSBAM_ASSERT(op_stack.m>0);
-    OP_PARSE_INFO op=op_stack.Pop();
-    if(op.prec==prec_cond){
-        PHYSBAM_ASSERT(block_stack.m>0);
-        CODE_BLOCK* C=block_stack.Pop();
-        PHYSBAM_ASSERT(data_stack.m>1);
-        int tos=data_stack.Pop();
-        INSTRUCTION in_C={op_copy,data_stack.Last(),tos,-1};
-        C->Append(in_C);
-        return;}
-    if(op.prec==prec_nest){LOG::cout<<"Expected '"<<(char)op.op<<"' but found ';'."<<std::endl;PHYSBAM_FATAL_ERROR("");}
-
-    INSTRUCTION in={op.op,-1,-1,-1};
-    if(op_flags_table[op.op]&flag_reg_src1){PHYSBAM_ASSERT(data_stack.m>0);in.src1=data_stack.Pop();}
-    if(op_flags_table[op.op]&flag_reg_src0){PHYSBAM_ASSERT(data_stack.m>0);in.src0=data_stack.Pop();}
-    if(op.op==op_copy && op.prec==prec_assign){PHYSBAM_ASSERT(data_stack.m>0);in.dest=data_stack.Pop();}
-    else if(op.flags&flag_dest_is_src0) in.dest=in.src0;
-    else if(op_flags_table[op.op]&flag_reg_dest) in.dest=num_tmp++;
-    if(op_flags_table[op.op]&flag_reg_dest) data_stack.Append(in.dest);
-    block_stack.Last()->Append(in);
-}
-//#####################################################################
-// Function Unwind_Stack
-//#####################################################################
-template<class T> void PROGRAM<T>::
-Unwind_Match(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,char match)
-{
-    while(op_stack.m && op_stack.Last().prec>prec_nest) Pop_Op_Stack(block_stack,data_stack,op_stack);
-    if(!op_stack.m){LOG::cout<<"Expected ';' but found '"<<match<<"'."<<std::endl;PHYSBAM_FATAL_ERROR("");}
-    else if(op_stack.Last().prec!=prec_nest){LOG::cout<<"Invalid token on op stack."<<std::endl;PHYSBAM_FATAL_ERROR("");}
-    else if(op_stack.Last().op!=match){LOG::cout<<"Expected '"<<(char)op_stack.Last().op<<"' but found '"<<match<<"'."<<std::endl;PHYSBAM_FATAL_ERROR("");}
-    else op_stack.Pop();
-}
-//#####################################################################
-// Function Unwind_Stack
-//#####################################################################
-template<class T> void PROGRAM<T>::
-Unwind_To_Prec(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,int prec)
-{
-    while(op_stack.m && op_stack.Last().prec>prec)
-        Pop_Op_Stack(block_stack,data_stack,op_stack);
-    if(!op_tokens.right_to_left[prec]) 
-        while(op_stack.m && op_stack.Last().prec==prec)
-            Pop_Op_Stack(block_stack,data_stack,op_stack);
-}
-//#####################################################################
-// Function Unwind_Stack
-//#####################################################################
-template<class T> void PROGRAM<T>::
-Unwind_Op_Stack(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack)
-{
-    while(op_stack.m)
-        Pop_Op_Stack(block_stack,data_stack,op_stack);
-}
-//#####################################################################
-// Function Unwind_Stack
-//#####################################################################
-template<class T> bool PROGRAM<T>::
-Try_Operator(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,bool& num_ok,const std::string& str)
-{
-    OP_PARSE_INFO opi;
-    if(op_tokens.op_lookup[num_ok].Get(str,opi)){
-        Unwind_To_Prec(block_stack,data_stack,op_stack,opi.prec);
-        num_ok=opi.flags&flag_num_ok_after;
-        op_stack.Append(opi);
-        return true;}
-
-    if(op_tokens.op_lookup[1-num_ok].Contains(str)){
-        LOG::cout<<"Unexpected operator '"<<str<<"'."<<std::endl;
-        PHYSBAM_FATAL_ERROR();}
-    return false;
-}
-//#####################################################################
 // Function Parse_Command
 //#####################################################################
 template<class T> void PROGRAM<T>::
 Parse_Command(const char* str)
 {
-    bool num_ok=true;
-    ARRAY<int> data_stack;
-    ARRAY<OP_PARSE_INFO> op_stack;
-    ARRAY<CODE_BLOCK*> block_stack;
-
-    block_stack.Append(code_blocks.Last());
-
-    while(1)
-    {
-        if(*str==';' || !*str){
-            Unwind_Op_Stack(block_stack,data_stack,op_stack);
-
-            if(data_stack.m>1){
-                LOG::cout<<"Detected extra tokens on data stack while parsing."<<std::endl;
-                PHYSBAM_FATAL_ERROR();}
-
-            if(block_stack.m!=1){
-                LOG::cout<<"Detected extra tokens on block stack while parsing."<<std::endl;
-                PHYSBAM_FATAL_ERROR();}
-
-            if(num_ok){
-                if(data_stack.m){
-                    LOG::cout<<"Unexpected ';'."<<std::endl;
-                    PHYSBAM_FATAL_ERROR();}
-                if(!*str) break;
-                str++;
-                num_ok=true;
-                continue;}
-
-            if(!data_stack.m){
-                LOG::cout<<"Empty data stack at end of statement."<<std::endl;
-                PHYSBAM_FATAL_ERROR();}
-
-            data_stack.Pop();
-            if(!*str) break;
-            str++;
-            num_ok=true;
-            continue;}
-
-        if(isspace(*str)){str++;continue;}
-
-        if(*str=='('){
-            str++;
-            OP_PARSE_INFO opi(')');
-            op_stack.Append(opi);
-            num_ok=true;
-            continue;}
-
-        if(*str==')'){
-            if(num_ok){
-                LOG::cout<<"Unexpected ')'."<<std::endl;
-                PHYSBAM_FATAL_ERROR();}
-            str++;
-            Unwind_Match(block_stack,data_stack,op_stack,')');
-            num_ok=false;
-            continue;}
-
-        if(*str=='?'){
-            str++;
-            if(num_ok){
-                LOG::cout<<"Unexpected '?'."<<std::endl;
-                PHYSBAM_FATAL_ERROR();}
-            Unwind_To_Prec(block_stack,data_stack,op_stack,prec_cond);
-            num_ok=true;
-
-            CODE_BLOCK* A=block_stack.Pop();
-            CODE_BLOCK* B=new CODE_BLOCK;
-            CODE_BLOCK* C=new CODE_BLOCK;
-            CODE_BLOCK* D=new CODE_BLOCK;
-            for(int s=0;s<2;s++){
-                CODE_BLOCK* P=A->next[s];
-                D->next[s]=P;
-                if(P) P->prev[P->prev[1]==A]=D;}
-
-            A->next[0]=B;
-            A->next[1]=C;
-            D->prev[0]=B;
-            D->prev[1]=C;
-            B->prev[0]=A;
-            B->next[0]=D;
-            C->prev[0]=A;
-            C->next[0]=D;
-            B->id=code_blocks.Append(B);
-            C->id=code_blocks.Append(C);
-            D->id=code_blocks.Append(D);
-            block_stack.Append(D);
-            block_stack.Append(C);
-            block_stack.Append(B);
-
-            INSTRUCTION in_A={op_br_z,C->id,data_stack.Pop(),B->id};
-            A->Append(in_A);
-            data_stack.Append(num_tmp++);
-
-            op_stack.Append(OP_PARSE_INFO(':'));
-            continue;}
-
-        if(*str==':'){
-            str++;
-            if(num_ok){
-                LOG::cout<<"Unexpected ':'."<<std::endl;
-                PHYSBAM_FATAL_ERROR();}
-            Unwind_Match(block_stack,data_stack,op_stack,':');
-            num_ok=true;
-
-            CODE_BLOCK* B=block_stack.Pop();
-            int tos=data_stack.Pop();
-            INSTRUCTION in_B={op_copy,data_stack.Last(),tos,-1};
-            B->Append(in_B);
-            op_stack.Append(OP_PARSE_INFO(op_nop,prec_cond,0));
-            continue;}
-
-        // Number
-        if(isdigit(*str) || *str=='.'){
-            char* endptr=0;
-            double d=strtod(str,&endptr);
-            if(!num_ok){
-                LOG::cout<<"Number unexpected"<<std::endl;
-                PHYSBAM_FATAL_ERROR("");}
-            str=endptr;
-            data_stack.Append(Add_Constant(d));
-            num_ok=false;
-            continue;}
-
-        // Variable or operator
-        if(isalpha(*str) || *str=='_'){
-            int len=strspn(str, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
-            std::string var(str,len);
-            str+=len;
-
-            if(Try_Operator(block_stack,data_stack,op_stack,num_ok,var))
-                continue;
-
-            op_type type;
-            if(op_tokens.func_lookup.Get(var,type)){
-                if(!num_ok){
-                    LOG::cout<<"Function unexpected"<<std::endl;
-                    PHYSBAM_FATAL_ERROR();}
-                Unwind_To_Prec(block_stack,data_stack,op_stack,prec_func);
-                num_ok=false;
-
-                OP_PARSE_INFO opi={type,prec_func,0};
-                op_stack.Append(opi);
-                continue;}
-
-            int reg;
-            if(!dict.Get(var,reg)){
-                reg=num_tmp++;
-                dict.Set(var,reg);}
-            data_stack.Append(reg);
-            num_ok=false;
-            continue;}
-
-        // Simple operators
-        if(strchr(op_chars,*str)){
-            if(str[1] && strchr(op_chars,str[1])){
-                char var[3]={*str,str[1],0};
-                if(Try_Operator(block_stack,data_stack,op_stack,num_ok,var)){
-                    str+=2;
-                    continue;}}
-            char var[3]={*str,0};
-            if(Try_Operator(block_stack,data_stack,op_stack,num_ok,var)){
-                str++;
-                continue;}}
-
-        LOG::printf("Unrecognized character found: '%c'   rest: %s\n",*str,str);
-        PHYSBAM_FATAL_ERROR();}
-
-    PHYSBAM_ASSERT(!op_stack.m);
-    PHYSBAM_ASSERT(!data_stack.m);
-    PHYSBAM_ASSERT(block_stack.m==1);
-    last_block=block_stack.Pop()->id;
+    YY_BUFFER_STATE state=yy_scan_string(str);
+    yyparse();
+    Process_Node(parse_root);
+    last_block=code_blocks.Last()->id;
+    parse_identifiers.Remove_All();
+    parse_constants.Remove_All();
+    yy_delete_buffer(state);
+    yylex_destroy();
 }
 const char* messages[op_last]={
     "nop\n",
@@ -609,12 +586,19 @@ const char* messages[op_last]={
     "sub   %c%d, %c%d, %c%d\n",
     "mul   %c%d, %c%d, %c%d\n",
     "div   %c%d, %c%d, %c%d\n",
+    "mod   %c%d, %c%d, %c%d\n",
     "neg   %c%d, %c%d\n",
     "inv   %c%d, %c%d\n",
     "sqrt  %c%d, %c%d\n",
     "exp   %c%d, %c%d\n",
     "ln    %c%d, %c%d\n",
     "pow   %c%d, %c%d, %c%d\n",
+    "sin   %c%d, %c%d\n",
+    "cos   %c%d, %c%d\n",
+    "asin  %c%d, %c%d\n",
+    "acos  %c%d, %c%d\n",
+    "atan  %c%d, %c%d\n",
+    "atan2  %c%d, %c%d, %c%d\n",
     "lt    %c%d, %c%d, %c%d\n",
     "le    %c%d, %c%d, %c%d\n",
     "gt    %c%d, %c%d, %c%d\n",
@@ -709,7 +693,6 @@ Finalize()
     done(0)=true;
     while(worklist.m){
         CODE_BLOCK* B=worklist.Pop();
-        printf("%p -> %i\n",B,B->id);
         labels(B->id)=flat_code.m;
         for(CODE_BLOCK_NODE* N=B->head;N;N=N->next){
             INSTRUCTION o=N->inst;
@@ -968,14 +951,11 @@ SCCP_Visit_Instruction(CODE_BLOCK_NODE* N,VECTOR<ARRAY<VARIABLE_STATE>,4>& varia
     ARRAY<CODE_BLOCK*>& block_worklist,ARRAY<CODE_BLOCK_NODE*>& op_worklist,ARRAY<bool>& block_exec)
 {
     INSTRUCTION& o=N->inst;
-    printf("try : ");Print(o);
     if(o.type==op_phi){
         VARIABLE_STATE& d=variable_state(o.dest>>mem_shift)(o.dest&~mem_mask);
         if(d.state==VARIABLE_STATE::overdetermined) return;
         VARIABLE_STATE s0=variable_state(o.src0>>mem_shift)(o.src0&~mem_mask);
         VARIABLE_STATE s1=variable_state(o.src1>>mem_shift)(o.src1&~mem_mask);
-
-        printf("sccp %i %g : %i %g %i %g : ",d.state,d.value,s0.state,s0.value,s1.state,s1.value);Print(o);
 
         if(s0.state==VARIABLE_STATE::overdetermined || s1.state==VARIABLE_STATE::overdetermined){
             d.state=VARIABLE_STATE::overdetermined;
@@ -1002,12 +982,10 @@ SCCP_Visit_Instruction(CODE_BLOCK_NODE* N,VECTOR<ARRAY<VARIABLE_STATE>,4>& varia
         if(d.state==VARIABLE_STATE::overdetermined) return;
         VARIABLE_STATE* s0=op_flags_table[o.type]&flag_reg_src0?&variable_state(o.src0>>mem_shift)(o.src0&~mem_mask):0;
         VARIABLE_STATE* s1=op_flags_table[o.type]&flag_reg_src1?&variable_state(o.src1>>mem_shift)(o.src1&~mem_mask):0;
-        printf("sccp %i %g : %p %p : ",d.state,d.value,s0,s1);Print(o);
 
         // rhs is known; evaluate instruction
         if((!s0 || s0->state==VARIABLE_STATE::constant) && (!s1 || s1->state==VARIABLE_STATE::constant)){
             if(d.state==VARIABLE_STATE::constant) return;
-            printf("constant ");Print(o);
             d.state=VARIABLE_STATE::constant;
             d.value=Evaluate_Op(o.type,s0?s0->value:0,s1?s1->value:0);
             op_worklist.Append(N);
@@ -1021,22 +999,18 @@ SCCP_Visit_Instruction(CODE_BLOCK_NODE* N,VECTOR<ARRAY<VARIABLE_STATE>,4>& varia
                 T* b=(s1 && s1->state==VARIABLE_STATE::constant)?&s1->value:0;
                 if(Deduce_Op(o.type,d.value,a,b)){
                     if(d.state==VARIABLE_STATE::constant) return;
-                    printf("constant ");Print(o);
                     d.state=VARIABLE_STATE::constant;
                     op_worklist.Append(N);
                     return;}
                 else if((s0 && s0->state==VARIABLE_STATE::overdetermined) || (s1 && s1->state==VARIABLE_STATE::overdetermined)){
-                    printf("overdetermined ");Print(o);
                     d.state=VARIABLE_STATE::overdetermined;
                     op_worklist.Append(N);
                     return;}}
             if((!s0 || s0->state==VARIABLE_STATE::overdetermined) && (!s1 || s1->state==VARIABLE_STATE::overdetermined)){
-                printf("overdetermined ");Print(o);
                 d.state=VARIABLE_STATE::overdetermined;
                 op_worklist.Append(N);
                 return;}}
         else if((s0 && s0->state==VARIABLE_STATE::overdetermined) || (s1 && s1->state==VARIABLE_STATE::overdetermined)){
-            printf("overdetermined ");Print(o);
             d.state=VARIABLE_STATE::overdetermined;
             op_worklist.Append(N);
             return;}
@@ -1382,6 +1356,12 @@ Reduce_In_Place(CODE_BLOCK_NODE* N)
             if(o.src1==Add_Constant(2)){Change_Instruction(N,op_mul,o.dest,o.src0,o.src0);break;}
             if(o.src1==Add_Constant(-1)){Change_Instruction(N,op_inv,o.dest,o.src0,-1);break;}
             break;
+        case op_sin: break;
+        case op_cos: break;
+        case op_asin: break;
+        case op_acos: break;
+        case op_atan: break;
+        case op_atan2: break;
         case op_lt:
         case op_gt:
         case op_ne:

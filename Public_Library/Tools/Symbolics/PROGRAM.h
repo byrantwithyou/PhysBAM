@@ -12,28 +12,12 @@
 #include <Tools/Symbolics/CODE_BLOCK_NODE.h>
 #include <Tools/Symbolics/INSTRUCTION.h>
 #include <Tools/Symbolics/PROGRAM_CONTEXT.h>
+#include <Tools/Symbolics/PROGRAM_DEFINITIONS.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <map>
 #include <string>
 namespace PhysBAM{
-
-enum parse_prec {
-    prec_lo,prec_nest,prec_assign,prec_cond,prec_or,prec_and,
-    prec_eq,prec_comp,prec_add,prec_mul,prec_neg,
-    prec_func,prec_hi};
-
-struct OP_PARSE_INFO
-{
-    op_type op;
-    parse_prec prec;
-    int flags;
-
-    OP_PARSE_INFO(){}
-    OP_PARSE_INFO(op_type op,parse_prec prec,int flags): op(op),prec(prec),flags(flags) {}
-    OP_PARSE_INFO(char ch): op((op_type)ch),prec(prec_nest),flags(0) {}
-};
-inline std::ostream& operator<<(std::ostream& o,const OP_PARSE_INFO& opi) {return o<<"("<<opi.op<<" "<<opi.prec<<" "<<opi.flags<<")";}
 
 template<class T>
 struct DISTRIBUTE_HELPER
@@ -101,11 +85,9 @@ struct PROGRAM
 
 protected:
     void Parse_Command(const char* str);
-    void Pop_Op_Stack(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack);
-    void Unwind_Match(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,char match);
-    void Unwind_To_Prec(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,int prec);
-    void Unwind_Op_Stack(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack);
-    bool Try_Operator(ARRAY<CODE_BLOCK*>& block_stack,ARRAY<int>& data_stack,ARRAY<OP_PARSE_INFO>& op_stack,bool& num_ok,const std::string& str);
+    int Process_Node(PROGRAM_PARSE_NODE* node);
+    void Print_Node(PROGRAM_PARSE_NODE* node);
+
     void Make_SSA();
     void Make_SSA_Relabel(int& count,ARRAY<ARRAY<int> >& S,HASHTABLE<int>& V_used,const ARRAY<ARRAY<int> >& idom_tree_children,int bl);
     void Leave_SSA();
@@ -130,6 +112,7 @@ protected:
     void Eliminate_Unused_Constant(int var);
     CODE_BLOCK_NODE* Add_Raw_Instruction_To_Block_After(CODE_BLOCK* B,CODE_BLOCK_NODE* N,op_type type,int dest,int src0,int src1);
     CODE_BLOCK_NODE* Add_Raw_Instruction_To_Block_Before(CODE_BLOCK* B,CODE_BLOCK_NODE* N,op_type type,int dest,int src0,int src1);
+    int Append_Instruction(op_type type,int dest,int src0,int src1);
     void Propagate_Copy_And_Remove_Instruction(CODE_BLOCK_NODE* N);
     void Simplify_With_Distributive_Law_Helper_Prod(int var,ARRAY<CODE_BLOCK_NODE*>& extra_nodes,DISTRIBUTE_HELPER<T>& prod);
     void Simplify_With_Distributive_Law_Helper(int var,T coeff,ARRAY<CODE_BLOCK_NODE*>& extra_nodes,ARRAY<DISTRIBUTE_HELPER<T> >& summands);

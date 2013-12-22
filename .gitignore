@@ -40,3 +40,6 @@ Projects/integration_test/bending
 Projects/poisson_color_new/poisson_color_new
 Projects/integration_test/marching_tets
 Projects/integration_test/quad
+
+Public_Library/Tools/Symbolics/PROGRAM_LEX.hpp
+Public_Library/Tools/Symbolics/PROGRAM_YACC.hpp
