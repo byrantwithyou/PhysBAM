@@ -190,7 +190,7 @@ else: # assume g++...
         env.Append(CXXFLAGS=optimization_flags)
         if env['TYPE']=='profile': env.Append(CXXFLAGS=' -pg',LINKFLAGS=' -pg')
     elif env['TYPE']=='debug': env.Append(CXXFLAGS=' -g',LINKFLAGS=' -g')
-    env.Append(CXXFLAGS=' -Wall -Werror -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -fno-strict-aliasing -std=gnu++0x -Wno-unknown-pragmas')
+    env.Append(CXXFLAGS=' -Wall -Werror -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -fno-strict-aliasing -std=gnu++0x -Wno-unknown-pragmas -Wno-deprecated-register')
 
 if env['TYPE']=='release' or env['TYPE']=='profile' or env['TYPE']=='optdebug': env.Append(CPPDEFINES=['NDEBUG'])
 else: env['USE_BOOSTIO']=1
@@ -252,14 +252,14 @@ def Find_Sources(dirs,ignore=[],sources=[],exclude=[]):
         if test_file.startswith('#') or (test_file.startswith('.') and not test_file.startswith('./')): return False
         test_results=map(lambda x: not test_file.endswith(x),ignore)
         test_results_exclude=map(lambda x: test_file.find(x)<0,exclude)
-        return (test_file.endswith(".h") or test_file.endswith(".cpp")) and reduce(lambda x,y: x and y,test_results,True) and reduce(lambda x,y: x and y,test_results_exclude,True)
+        return (test_file.endswith(".h") or test_file.endswith(".cpp") or test_file.endswith(".ll") or test_file.endswith(".yy")) and reduce(lambda x,y: x and y,test_results,True) and reduce(lambda x,y: x and y,test_results_exclude,True)
     build_directory=Dir('.').srcnode().abspath;build_directory_length=len(build_directory)+1
     for subdir in dirs:
         for root,dirs,files in os.walk(os.path.join(build_directory,subdir)):
             modified_root=root[build_directory_length:]
             local_sources.extend(filter(lambda filename: source_filter(filename,ignore),map(lambda file: os.path.join(modified_root,file),files)))
     cmd_ignore=' -not -name '.join(['.\*']+ignore)
-    cpps=filter(lambda s:s.endswith('.cpp'),local_sources)
+    cpps=filter(lambda s:s.endswith('.cpp') or s.endswith('.ll') or s.endswith('.yy'),local_sources)
     cpp_set=set(cpps)
     headers=filter(lambda s:s.endswith('.h') and not (s[:-2]+'.cpp' in cpp_set),local_sources)
     return cpps,headers
