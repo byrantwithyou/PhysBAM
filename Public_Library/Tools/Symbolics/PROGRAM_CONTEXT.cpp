@@ -5,12 +5,15 @@
 #include <Tools/Symbolics/PROGRAM.h>
 #include <Tools/Symbolics/PROGRAM_CONTEXT.h>
 namespace PhysBAM{
-template<class T> PROGRAM_CONTEXT<T>::
-PROGRAM_CONTEXT(const PROGRAM<T>& prog)
-    :reg(prog.num_tmp+prog.var_in.m+prog.var_out.m+prog.extra_out+prog.constants.m),
-    data_in(reg.Array_View(prog.num_tmp,prog.var_in.m)),
-    data_out(reg.Array_View(prog.num_tmp+prog.var_in.m,prog.var_out.m+prog.extra_out))
+//#####################################################################
+// Function Initialize
+//#####################################################################
+template<class T> void PROGRAM_CONTEXT<T>::
+Initialize(const PROGRAM<T>& prog)
 {
+    reg.Resize(prog.num_tmp+prog.var_in.m+prog.var_out.m+prog.extra_out+prog.constants.m);
+    data_in.Set(reg.Array_View(prog.num_tmp,prog.var_in.m));
+    data_out.Set(reg.Array_View(prog.num_tmp+prog.var_in.m,prog.var_out.m+prog.extra_out));
     reg.Array_View(prog.num_tmp+prog.var_in.m+prog.var_out.m+prog.extra_out,prog.constants.m)=prog.constants;
 }
 template struct PROGRAM_CONTEXT<float>;

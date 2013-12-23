@@ -50,6 +50,9 @@ int Init_Instructions()
     op_flags_table[op_acos]=flag_reg_dest|flag_reg_src0;
     op_flags_table[op_atan]=flag_reg_dest|flag_reg_src0;
     op_flags_table[op_atan2]=flag_reg_dest|flag_reg_src0|flag_reg_src1;
+    op_flags_table[op_floor]=flag_reg_dest|flag_reg_src0;
+    op_flags_table[op_ceil]=flag_reg_dest|flag_reg_src0;
+    op_flags_table[op_rint]=flag_reg_dest|flag_reg_src0;
     op_flags_table[op_lt]=flag_reg_dest|flag_reg_src0|flag_reg_src1;
     op_flags_table[op_le]=flag_reg_dest|flag_reg_src0|flag_reg_src1;
     op_flags_table[op_gt]=flag_reg_dest|flag_reg_src0|flag_reg_src1;
@@ -92,6 +95,9 @@ Evaluate_Op(int type,T in0,T in1) const
         case op_acos: return acos(in0);
         case op_atan: return atan(in0);
         case op_atan2: return atan2(in0,in1);
+        case op_floor: return floor(in0);
+        case op_ceil: return ceil(in0);
+        case op_rint: return rint(in0);
         case op_lt: return in0<in1;
         case op_le: return in0<=in1;
         case op_gt: return in0>in1;
@@ -294,7 +300,9 @@ Diff(int diff_expr,int diff_var)
                     N=Add_Raw_Instruction_To_Block_After(B,N,op_div,d,num_tmp+5,num_tmp+4);
                     num_tmp+=6;
                     break;
-                case op_lt:case op_le:case op_gt:case op_ge:case op_eq:case op_ne:case op_not:case op_or:case op_and:
+                case op_lt:case op_le:case op_gt:case op_ge:case op_eq:case op_ne:
+                case op_not:case op_or:case op_and:
+                case op_floor:case op_ceil:case op_rint:
                     N=Add_Raw_Instruction_To_Block_After(B,N,op_copy,d,Add_Constant(0),-1);
                     break;
                 default: PHYSBAM_FATAL_ERROR("Missing diff instruction");
@@ -339,6 +347,9 @@ struct OPERATOR_DEFINITIONS
         Append_Instruction("acos",1).Add(op_acos,mem_out,mem_in,-1);
         Append_Instruction("atan",1).Add(op_atan,mem_out,mem_in,-1);
         Append_Instruction("atan2",2).Add(op_atan2,mem_out,mem_in,mem_in+1);
+        Append_Instruction("floor",1).Add(op_floor,mem_out,mem_in,-1);
+        Append_Instruction("ceil",1).Add(op_ceil,mem_out,mem_in,-1);
+        Append_Instruction("rint",1).Add(op_rint,mem_out,mem_in,-1);
 
         Append_Instruction("tan",1).
             Add(op_sin,mem_reg,mem_in,-1).
@@ -598,7 +609,10 @@ const char* messages[op_last]={
     "asin  %c%d, %c%d\n",
     "acos  %c%d, %c%d\n",
     "atan  %c%d, %c%d\n",
-    "atan2  %c%d, %c%d, %c%d\n",
+    "atan2 %c%d, %c%d, %c%d\n",
+    "floor %c%d, %c%d\n",
+    "ceil  %c%d, %c%d\n",
+    "rint  %c%d, %c%d\n",
     "lt    %c%d, %c%d, %c%d\n",
     "le    %c%d, %c%d, %c%d\n",
     "gt    %c%d, %c%d, %c%d\n",
@@ -828,19 +842,19 @@ Make_SSA_Relabel(int& count,ARRAY<ARRAY<int> >& S,HASHTABLE<int>& V_used,const A
     CODE_BLOCK* B=code_blocks(bl);
     for(CODE_BLOCK_NODE* N=B->head;N;N=N->next){
         INSTRUCTION& o=N->inst;
-        if(op_flags_table[o.type]&flag_reg_dest){
-            if(V_used.Contains(o.dest)){
-                int n=count++;
-                S_pop.Append(o.dest);
-                S(o.dest).Append(n);
-                o.dest=n;}}
         if(o.type!=op_phi){
             if(op_flags_table[o.type]&flag_reg_src0)
                 if(V_used.Contains(o.src0))
                     o.src0=S(o.src0).Last();
             if(op_flags_table[o.type]&flag_reg_src1)
                 if(V_used.Contains(o.src1))
-                    o.src1=S(o.src1).Last();}}
+                    o.src1=S(o.src1).Last();}
+        if(op_flags_table[o.type]&flag_reg_dest){
+            if(V_used.Contains(o.dest)){
+                int n=count++;
+                S_pop.Append(o.dest);
+                S(o.dest).Append(n);
+                o.dest=n;}}}
 
     for(int s=0;s<2;s++)
         if(CODE_BLOCK* nb=code_blocks(bl)->next[s]){
@@ -1362,6 +1376,9 @@ Reduce_In_Place(CODE_BLOCK_NODE* N)
         case op_acos: break;
         case op_atan: break;
         case op_atan2: break;
+        case op_floor: break;
+        case op_ceil: break;
+        case op_rint: break;
         case op_lt:
         case op_gt:
         case op_ne:

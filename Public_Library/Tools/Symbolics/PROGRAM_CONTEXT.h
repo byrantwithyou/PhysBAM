@@ -17,7 +17,9 @@ struct PROGRAM_CONTEXT
     ARRAY<T> reg;
     ARRAY_VIEW<T> data_in,data_out;
 
-    PROGRAM_CONTEXT(const PROGRAM<T>& prog);
+    PROGRAM_CONTEXT(){}
+    PROGRAM_CONTEXT(const PROGRAM<T>& prog){Initialize(prog);}
+    void Initialize(const PROGRAM<T>& prog);
 };
 }
 #endif

@@ -2,11 +2,17 @@
 // Copyright 2002-2005, Ronald Fedkiw, Geoffrey Irving, Duc Nguyen, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Images/PNG_FILE.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Symbolics/PROGRAM.h>
+#include <Tools/Symbolics/PROGRAM_CONTEXT.h>
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -21,9 +27,17 @@ using namespace PhysBAM;
 typedef float RW;
 typedef double T;
 typedef VECTOR<T,3> TV;
+typedef VECTOR<T,2> TV2;
 
 HASHTABLE<PAIR<std::string,int>,RIGID_BODY_COLLECTION<TV>*> rigid_body_collection_cache;
 HASHTABLE<PAIR<std::string,int>,DEFORMABLE_BODY_COLLECTION<TV>*> deformable_geometry_collection_cache;
+HASHTABLE<std::string,TRIANGULATED_SURFACE<T>*> saved_surface;
+struct TEXTURE
+{
+    ARRAY<TV2> coords;
+    ARRAY<VECTOR<int,3> > map;
+};
+HASHTABLE<std::string,TEXTURE*> saved_texture;
 
 RIGID_BODY_COLLECTION<TV>& Load_Rigid_Body_Collection(const std::string& location,int frame)
 {
@@ -79,12 +93,16 @@ void Emit_Smooth_Surface(std::ofstream& fout,TRIANGULATED_SURFACE<T>* ts, const 
 {
     ts->Update_Vertex_Normals();
 
-    ARRAY<VECTOR<T,2> > coords;
+    ARRAY<TV2> coords;
     ARRAY<VECTOR<int,3> > map;
     if(const std::string* texture_map_file=options.Get_Pointer("texture_map")){
         int ignore;
         FILE_UTILITIES::Read_From_File(STREAM_TYPE((RW)0),texture_map_file->c_str(),coords,ignore,map);
         LOG::cout<<"Texture mapping file data:  "<<texture_map_file<<"  "<<coords.m<<"  "<<ignore<<"  "<<map.m<<"  "<<ts->mesh.elements.m<<std::endl;}
+    else if(const std::string* str=options.Get_Pointer("saved_texture_map")){
+        TEXTURE* tex=saved_texture.Get(*str);
+        coords=tex->coords;
+        map=tex->map;}
 
     for(int i=0;i<ts->mesh.elements.m;i++){
         fout<<"smooth_triangle { ";
@@ -119,7 +137,9 @@ void Emit_Rigid_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string
     for(int i=0;i<ts->particles.X.m;i++) ts->particles.X(i)=rigid_body.Frame()*ts->particles.X(i);
 
     Apply_Options(ts,options);
-    Emit_Smooth_Surface(fout,ts,options);
+    if(const std::string* value=options.Get_Pointer("save"))
+        saved_surface.Get_Or_Insert(*value)=ts;
+    else Emit_Smooth_Surface(fout,ts,options);
 }
 
 void Emit_Rigid_Body_Frame(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
@@ -137,6 +157,7 @@ void Emit_Rigid_Body_Frame(std::ofstream& fout,const HASHTABLE<std::string,std::
 
 void Emit_Deformable_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
 {
+    if(const std::string* value=options.Get_Pointer("frame")) frame=atoi(value->c_str());
     DEFORMABLE_BODY_COLLECTION<TV>& collection=Load_Deformable_Geometry_Collection(options.Get("location"),frame);
     STRUCTURE<TV>* structure=collection.structures(atoi(options.Get("index").c_str()));
     TRIANGULATED_SURFACE<T>* ts=0;
@@ -155,7 +176,157 @@ void Emit_Deformable_Body(std::ofstream& fout,const HASHTABLE<std::string,std::s
     else PHYSBAM_FATAL_ERROR(std::string("Unhandled object type: ")+typeid(*structure).name());
 
     Apply_Options(ts,options);
-    Emit_Smooth_Surface(fout,ts,options);
+    if(const std::string* value=options.Get_Pointer("save"))
+        saved_surface.Get_Or_Insert(*value)=ts;
+    else Emit_Smooth_Surface(fout,ts,options);
+}
+
+struct PATCH
+{
+    PROGRAM<T> map_prog,color_prog;
+    PROGRAM_CONTEXT<T> map_context,color_context;
+    ARRAY<int> patch_elements;
+    ARRAY<int> patch_vertices;
+    ARRAY<TV2> coords;
+    RANGE<TV2> uv_range;
+    int x_start;
+    TV2 offset;
+
+    PATCH(){}
+
+    void Set_Map_Program(const char* map_str)
+    {
+        map_prog.var_in.Append("x");
+        map_prog.var_in.Append("y");
+        map_prog.var_in.Append("z");
+        map_prog.var_in.Append("patch");
+        map_prog.var_out.Append("u");
+        map_prog.var_out.Append("v");
+        map_prog.Parse(map_str,false);
+        map_prog.Optimize();
+        map_prog.Finalize();
+        map_context.Initialize(map_prog);
+    }
+
+    void Set_Color_Program(const char* color_str)
+    {
+        color_prog.var_in.Append("u");
+        color_prog.var_in.Append("v");
+        color_prog.var_in.Append("patch");
+        color_prog.var_out.Append("r");
+        color_prog.var_out.Append("g");
+        color_prog.var_out.Append("b");
+        color_prog.Parse(color_str,false);
+        color_prog.Optimize();
+        color_prog.Finalize();
+        color_context.Initialize(color_prog);
+    }
+};
+
+void Create_Texture_Map(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
+{
+    TRIANGULATED_SURFACE<T>* ts=saved_surface.Get(options.Get("surface"));
+
+    int samples=250000;
+    if(const std::string* sample_str=options.Get_Pointer("samples")) samples=atoi(sample_str->c_str());
+
+    int num_patches=atoi(options.Get("num_patches").c_str());
+    ARRAY<PATCH> patches(num_patches);
+
+    std::stringstream mss(options.Get("map_funcs").c_str());
+    std::stringstream css(options.Get("color_funcs").c_str());
+    for(int i=0;i<num_patches;i++){
+        PATCH& p=patches(i);
+        std::string m,c;
+        mss>>m;
+        css>>c;
+        p.Set_Map_Program(options.Get(m).c_str());
+        p.Set_Color_Program(options.Get(c).c_str());}
+
+    std::string patch_str=options.Get("patch");
+    PROGRAM<T> patch_program;
+    patch_program.var_in.Append("x0");
+    patch_program.var_in.Append("y0");
+    patch_program.var_in.Append("z0");
+    patch_program.var_in.Append("x1");
+    patch_program.var_in.Append("y1");
+    patch_program.var_in.Append("z1");
+    patch_program.var_in.Append("x2");
+    patch_program.var_in.Append("y2");
+    patch_program.var_in.Append("z2");
+    patch_program.var_in.Append("nx");
+    patch_program.var_in.Append("ny");
+    patch_program.var_in.Append("nz");
+    patch_program.var_in.Append("index");
+    patch_program.var_out.Append("patch");
+    patch_program.Parse(patch_str.c_str(),false);
+    patch_program.Optimize();
+    patch_program.Finalize();
+
+    TEXTURE* tex=new TEXTURE;
+    PROGRAM_CONTEXT<T> context(patch_program);
+    ARRAY<int> element_patch,element_map,element_color;
+    for(int i=0;i<ts->mesh.elements.m;i++){
+        TRIANGLE_3D<T> tri(ts->Get_Element(i));
+        TV n=tri.Normal();
+        for(int j=0;j<TV::m;j++) for(int k=0;k<TV::m;k++) context.data_in(TV::m*j+k)=tri.X(j)(k);
+        for(int j=0;j<TV::m;j++) context.data_in(TV::m*TV::m+j)=n(j);
+        context.data_in(TV::m*(TV::m+1))=i;
+        patch_program.Execute(context);
+        int patch=context.data_out(0);
+        tex->map.Append(ts->mesh.elements(i)+ts->particles.X.m*patch);
+        patches(patch).patch_elements.Append(i);}
+
+    T uv_area=0;
+    for(int i=0;i<num_patches;i++){
+        PATCH& p=patches(i);
+        for(int j=0;j<p.patch_elements.m;j++)
+            p.patch_vertices.Append_Elements(ts->mesh.elements(p.patch_elements(j)));
+        p.patch_vertices.Prune_Duplicates();
+        p.coords.Resize(ts->particles.X.m);
+        for(int j=0;j<p.patch_vertices.m;j++){
+            int q=p.patch_vertices(j);
+            p.map_context.data_in=ts->particles.X(q).Append(i);
+            p.map_prog.Execute(p.map_context);
+            p.coords(q)=TV2(p.map_context.data_out);}
+        for(int j=0;j<p.patch_elements.m;j++){
+            T area=TRIANGLE_2D<T>::Size(p.coords.Subset(ts->mesh.elements(p.patch_elements(j))));
+            uv_area+=area;}
+        p.uv_range=RANGE<TV2>::Bounding_Box(p.coords.Subset(p.patch_vertices));}
+
+    T scale=sqrt(samples/uv_area);
+
+    int margin=2;
+    int start=0,height=0;
+    for(int i=0;i<num_patches;i++){
+        PATCH& p=patches(i);
+        p.x_start=start;
+        p.offset=TV2(p.x_start,0)+margin-scale*p.uv_range.min_corner;
+        TV2 end=scale*p.uv_range.max_corner+p.offset+margin;
+        start=end.x;
+        height=std::max(height,(int)end.y);}
+
+    ARRAY<TV,VECTOR<int,2> > image(VECTOR<int,2>(start,height)+1);
+
+    for(int i=0;i<num_patches;i++){
+        PATCH& p=patches(i);
+        RANGE<VECTOR<int,2> > rast_box(scale*p.uv_range+p.offset);
+        for(RANGE_ITERATOR<2> it(rast_box.To_Half_Opened().Thickened(margin));it.Valid();it.Next()){
+            TV2 uv=(TV2(it.index)-p.offset)/scale;
+            p.color_context.data_in=uv.Append(i);
+            p.color_prog.Execute(p.color_context);
+            image(it.index)=p.color_context.data_out;}
+        for(int j=0;j<p.coords.m;j++)
+            tex->coords.Append((p.coords(j)*scale+p.offset)/TV2(start,height));}
+
+    char buff[1000];
+    sprintf(buff,options.Get("png_file").c_str(),frame);
+    PNG_FILE<T>::Write(buff,image);
+
+    saved_texture.Get_Or_Insert(options.Get("uv_save"))=tex;
+    if(const std::string* str=options.Get_Pointer("uv_file")){
+        sprintf(buff,str->c_str(),frame);
+        FILE_UTILITIES::Write_To_File(STREAM_TYPE((RW)0),buff,tex->coords,0,tex->map);}
 }
 
 bool Parse_Pair(const char*& str,std::string& key,std::string& value)
@@ -224,17 +395,19 @@ int main(int argc, char *argv[])
 
     std::ifstream fin(scene_filename.c_str());
     std::ofstream fout(output_filename.c_str());
-    std::string line;
+    std::string line,more;
     while(getline(fin,line))
     {
+        while(line[line.size()-1]=='\\' && getline(fin,more)){
+            line.resize(line.size()-1);
+            line+=more;}
+
         const char* str=line.c_str();
         int sp=strspn(str, " \t");
-        
-        if((int)line.size()<sp+5 || std::string(str+sp,5)!="#emit")
-        {
+
+        if((int)line.size()<sp+5 || std::string(str+sp,5)!="#emit"){
             fout<<line<<std::endl;
-            continue;
-        }
+            continue;}
 
         str+=sp+5;
         str+=strspn(str, " \t");
@@ -256,6 +429,10 @@ int main(int argc, char *argv[])
             Emit_Camera(fout,options);
         else if(type=="rigid_body_frame")
             Emit_Rigid_Body_Frame(fout,options,frame_number);
+        else if(type=="triangulated_surface")
+            Emit_Rigid_Body_Frame(fout,options,frame_number);
+        else if(type=="texture_map")
+            Create_Texture_Map(fout,options,frame_number);
         else PHYSBAM_FATAL_ERROR("unexpected replacement type: '"+type+"'.");
     }
 

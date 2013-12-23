@@ -13,6 +13,7 @@ enum op_type {
     op_nop,op_copy,op_add,op_sub,op_mul,op_div,op_mod,op_neg,op_inv,
     op_sqrt,op_exp,op_ln,op_pow,
     op_sin,op_cos,op_asin,op_acos,op_atan,op_atan2,
+    op_floor,op_ceil,op_rint,
     op_lt,op_le,op_gt,op_ge,op_eq,op_ne,op_not,op_or,op_and,
     op_br_z,op_br_nz,op_jmp,op_label,op_phi,
     op_last
