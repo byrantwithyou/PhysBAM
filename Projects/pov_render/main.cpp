@@ -380,7 +380,8 @@ void Emit_Camera(std::ofstream& fout,const HASHTABLE<std::string,std::string>& o
     fout<<"camera { location ";
     Emit_Vector(fout, loc, " look_at ");
     Emit_Vector(fout, at, " up ");
-    Emit_Vector(fout, up, " angle ");
+    Emit_Vector(fout, up, " right ");
+    Emit_Vector(fout, TV(-4./3,0,0), " angle ");
     fout<<angle<<" }"<<std::endl;
 }
 
