@@ -216,6 +216,7 @@ struct PATCH
         color_prog.var_out.Append("r");
         color_prog.var_out.Append("g");
         color_prog.var_out.Append("b");
+        color_prog.var_out.Append("a");
         color_prog.Parse(color_str,false);
         color_prog.Optimize();
         color_prog.Finalize();
@@ -229,6 +230,7 @@ void Create_Texture_Map(std::ofstream& fout,const HASHTABLE<std::string,std::str
 
     int samples=250000;
     if(const std::string* sample_str=options.Get_Pointer("samples")) samples=atoi(sample_str->c_str());
+    bool use_alpha=options.Contains("alpha"); 
 
     int num_patches=atoi(options.Get("num_patches").c_str());
     ARRAY<PATCH> patches(num_patches);
@@ -306,7 +308,7 @@ void Create_Texture_Map(std::ofstream& fout,const HASHTABLE<std::string,std::str
         start=end.x;
         height=std::max(height,(int)end.y);}
 
-    ARRAY<TV,VECTOR<int,2> > image(VECTOR<int,2>(start,height)+1);
+    ARRAY<VECTOR<T,4>,VECTOR<int,2> > image(VECTOR<int,2>(start,height)+1);
 
     for(int i=0;i<num_patches;i++){
         PATCH& p=patches(i);
@@ -315,7 +317,9 @@ void Create_Texture_Map(std::ofstream& fout,const HASHTABLE<std::string,std::str
             TV2 uv=(TV2(it.index)-p.offset)/scale;
             p.color_context.data_in=uv.Append(i);
             p.color_prog.Execute(p.color_context);
-            image(it.index)=p.color_context.data_out;}
+            VECTOR<T,4> c(p.color_context.data_out);
+            if(!use_alpha) c(3)=1;
+            image(it.index)=c;}
         for(int j=0;j<p.coords.m;j++)
             tex->coords.Append((p.coords(j)*scale+p.offset)/TV2(start,height));}
 
