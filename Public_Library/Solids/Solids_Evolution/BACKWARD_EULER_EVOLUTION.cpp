@@ -24,6 +24,7 @@
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h>
 #include <stdexcept>
 using namespace PhysBAM;
+namespace PhysBAM{bool siggraph_hack_newton_converged;}
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -91,6 +92,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     minimization_objective.Test(dv,minimization_system);
 
     bool converged=newtons_method.Newtons_Method(minimization_objective,minimization_system,dv);
+    siggraph_hack_newton_converged=converged;
     if(!converged) LOG::printf("WARNING: Newton's method did not converge\n");
 // TODO for rigid bodies    R.Normalize(), update angular momentum
 

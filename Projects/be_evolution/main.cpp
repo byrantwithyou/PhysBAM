@@ -11,32 +11,37 @@
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include <climits>
 #include "STANDARD_TESTS.h"
+#include "STANDARD_TESTS_2D.h"
 
 using namespace PhysBAM;
+
+template<class T,class TV,class RW>
+void Run(PARSE_ARGS& parse_args)
+{
+    RW rw=RW();STREAM_TYPE stream_type(rw); // gcc 3.3.2 workaround
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example;
+    example=new STANDARD_TESTS<TV>(stream_type);
+    example->want_mpi_world=true;
+    example->Parse(parse_args);
+    if(example->mpi_world->initialized) example->solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<TV>);
+    example->Adjust_Output_Directory_For_MPI(example->solid_body_collection.deformable_body_collection.mpi_solids);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*example);
+    driver.Execute_Main_Program();
+    delete example;
+}
 
 int main(int argc,char* argv[])
 {
     typedef double T;
     typedef float RW;
-    typedef VECTOR<T,3> TV;
-    RW rw=RW();STREAM_TYPE stream_type(rw); // gcc 3.3.2 workaround
     
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example;
-    
-
-    example=new STANDARD_TESTS<T>(stream_type);
-
-    example->want_mpi_world=true;
     PARSE_ARGS parse_args(argc,argv);
-    example->Parse(parse_args);
+    bool use_2d=false;
+    parse_args.Add("-2d",&use_2d,"run 2d sims");
+    parse_args.Parse(true);
 
-    if(example->mpi_world->initialized) example->solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<TV>);
-    example->Adjust_Output_Directory_For_MPI(example->solid_body_collection.deformable_body_collection.mpi_solids);
-
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*example);
-    driver.Execute_Main_Program();
-
-    delete example;
+    if(use_2d) Run<T,VECTOR<T,2>,RW>(parse_args);
+    else Run<T,VECTOR<T,3>,RW>(parse_args);
     return 0;
 }
 //#####################################################################
