@@ -45,6 +45,8 @@ inline int yyerror(const char *msg) {
 ":" { return ':'; }
 ";" { return ';'; }
 "," { return ','; }
+"if" { return TOKEN_IF; }
+"else" { return TOKEN_ELSE; }
 [a-zA-Z][0-9a-zA-Z_]* { yylval.node=new PhysBAM::PROGRAM_PARSE_NODE(TOKEN_IDENT,::PhysBAM::parse_identifiers.Append(yytext),0,0); return TOKEN_IDENT; }
 ([0-9]+\.?|[0-9]*\.[0-9]+)([Ee][+-]?[0-9]+)? { yylval.node=new PhysBAM::PROGRAM_PARSE_NODE(TOKEN_NUMBER,::PhysBAM::parse_constants.Append(atof(yytext)),0,0); return TOKEN_NUMBER; }
 [ \r\n\t]* { }

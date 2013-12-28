@@ -32,6 +32,8 @@ inline int yyerror(const char *msg) {
 %token TOKEN_LIST
 %token TOKEN_FUNC
 %token TOKEN_INDEX
+%token TOKEN_IF
+%token TOKEN_ELSE
 %token <node> TOKEN_NUMBER
 %token <node> TOKEN_IDENT
 
@@ -56,6 +58,9 @@ statement_list
 
 statement
     : expression ';' { $$ = $1; }
+    | '{' statement_list '}' { $$ = $2; }
+    | TOKEN_IF '(' expression ')' statement { $$ = new PROGRAM_PARSE_NODE('?',0,$3,new PROGRAM_PARSE_NODE(':',0,$5,0)); }
+    | TOKEN_IF '(' expression ')' statement TOKEN_ELSE statement { $$ = new PROGRAM_PARSE_NODE('?',0,$3,new PROGRAM_PARSE_NODE(':',0,$5,0)); }
     ;
 
 expression

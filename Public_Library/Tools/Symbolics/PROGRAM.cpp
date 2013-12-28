@@ -500,11 +500,11 @@ Process_Node(PROGRAM_PARSE_NODE* node)
             CODE_BLOCK* A=code_blocks.Last();
             CODE_BLOCK* B=new CODE_BLOCK;
             B->id=code_blocks.Append(B);
-            Append_Instruction(op_copy,result,Process_Node(node->b->a),-1);
+            if(node->b->a) Append_Instruction(op_copy,result,Process_Node(node->b->a),-1);
             CODE_BLOCK* BB=code_blocks.Last();
             CODE_BLOCK* C=new CODE_BLOCK;
             C->id=code_blocks.Append(C);
-            Append_Instruction(op_copy,result,Process_Node(node->b->b),-1);
+            if(node->b->b) Append_Instruction(op_copy,result,Process_Node(node->b->b),-1);
             CODE_BLOCK* CC=code_blocks.Last();
             CODE_BLOCK* D=new CODE_BLOCK;
             D->id=code_blocks.Append(D);
