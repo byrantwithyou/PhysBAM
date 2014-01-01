@@ -121,6 +121,9 @@ void* run_jobs(void*)
         vector<char*> argv;
         for(size_t i = 0; i < j->argv_data.size(); i++)
             argv.push_back(const_cast<char*>(j->argv_data[i].c_str()));
+        std::cout<<"command: ";
+        for(size_t i = 0; i < argv.size(); i++) std::cout<<argv[i]<<" ";
+        std::cout<<std::endl;
         argv.push_back(0);
 
         pid_t pid = fork();
