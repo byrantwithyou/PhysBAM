@@ -248,7 +248,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         case 100:
             if(!resolution) resolution=2;
-            mattress_grid=GRID<TV>(TV_INT()+resolution,RANGE<TV>::Centered_Box(),true);
+            mattress_grid=GRID<TV>(TV_INT()+resolution+1,RANGE<TV>::Centered_Box(),true);
             image_grid.Initialize(image_size,RANGE<TV>::Centered_Box()*5,true);
             cell_iterator=new CELL_ITERATOR<TV>(image_grid);
             image.Resize(image_grid.Cell_Indices());
