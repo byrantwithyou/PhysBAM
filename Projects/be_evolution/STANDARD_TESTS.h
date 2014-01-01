@@ -177,6 +177,7 @@ public:
     ARRAY<TV> initial_positions;
     T save_dt;
     bool self_collide_surface_only;
+    bool use_vanilla_newton;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),test_forces(false),
@@ -191,7 +192,8 @@ public:
         backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
         use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
         penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),
-        use_penalty_self_collisions(true),rod_length(4),rod_radius(.3),attachment_length(.6),self_collide_surface_only(false)
+        use_penalty_self_collisions(true),rod_length(4),rod_radius(.3),attachment_length(.6),self_collide_surface_only(false),
+        use_vanilla_newton(false)
     {
         this->fixed_dt=1./240;
     }
@@ -319,7 +321,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Not("-no_self",&use_penalty_self_collisions,"disable penalty self collisions");
     parse_args->Add("-use_tri_col",&solids_parameters.triangle_collision_parameters.perform_self_collision,"use triangle collisions");
     parse_args->Add("-no_self_interior",&self_collide_surface_only,"do not process penalty self collisions against interior particles");
-
+    parse_args->Add("-use_vanilla_newton",&use_vanilla_newton,"use triangle collisions");
 }
 //#####################################################################
 // Function Parse_Options
@@ -343,6 +345,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         backward_euler_evolution->newtons_method.use_wolfe_search=false;
     if(backward_euler_evolution && no_descent)
         backward_euler_evolution->newtons_method.use_gradient_descent_failsafe=false;
+    if(use_vanilla_newton) backward_euler_evolution->newtons_method.Make_Vanilla_Newton();
 
     unit_rho=kg/pow<TV::m>(m);
     unit_N=kg*m/(s*s);
