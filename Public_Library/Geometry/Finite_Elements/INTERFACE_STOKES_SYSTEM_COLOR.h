@@ -7,6 +7,7 @@
 #ifndef __INTERFACE_STOKES_SYSTEM_COLOR__
 #define __INTERFACE_STOKES_SYSTEM_COLOR__
 #include <Tools/Grids_Uniform/FACE_INDEX.h>
+#include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
