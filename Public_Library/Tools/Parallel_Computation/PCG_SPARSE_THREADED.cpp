@@ -6,7 +6,6 @@
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <Tools/Parallel_Computation/INT_ITERATOR_THREADED.h>
 #include <Tools/Parallel_Computation/PCG_SPARSE_THREADED.h>
-#include <Tools/Vectors/SPARSE_VECTOR_ND.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Parallel_Solve
