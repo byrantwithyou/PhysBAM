@@ -101,6 +101,8 @@ public:
     ARRAY<TV3,TV_INT> image;
     GRID<TV> image_grid;
     bool use_vanilla_newton;
+    ARRAY<INTERPOLATION_CURVE<T,TV> > kinematic_particle_positions;
+    ARRAY<int> kinematic_particle_ids;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),test_forces(false),
@@ -244,11 +246,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
     switch(test_number){
         case 1:
             if(!resolution) resolution=10;
-            mattress_grid=GRID<TV>(TV_INT()+resolution+1,RANGE<TV>::Centered_Box(),false);
+            mattress_grid=GRID<TV>(TV_INT()+resolution+1,RANGE<TV>::Centered_Box());
             break;
         case 100:
-            if(!resolution) resolution=2;
-            mattress_grid=GRID<TV>(TV_INT()+resolution+1,RANGE<TV>::Centered_Box(),true);
+            mattress_grid=GRID<TV>(TV_INT(3,2),RANGE<TV>(TV(),TV(2,1)));
             image_grid.Initialize(image_size,RANGE<TV>::Centered_Box()*5,true);
             cell_iterator=new CELL_ITERATOR<TV>(image_grid);
             image.Resize(image_grid.Cell_Indices());
@@ -257,6 +258,25 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=1;
             for(int i=0;i<9;i++) if(i!=4) constrained_particles.Append(i);
             constrained_velocities.Resize(constrained_particles.m,true,true,TV());
+            break;
+        case 101:
+            mattress_grid=GRID<TV>(TV_INT(3,2),RANGE<TV>(TV(),TV(2,1)));
+            kinematic_particle_ids.Append(0);
+            kinematic_particle_ids.Append(2);
+            kinematic_particle_ids.Append(3);
+            kinematic_particle_ids.Append(4);
+            kinematic_particle_ids.Append(5);
+            kinematic_particle_positions.Resize(5);
+            kinematic_particle_positions(0).Add_Control_Point(0,TV(0,0));
+            kinematic_particle_positions(1).Add_Control_Point(0,TV(2,0));
+            kinematic_particle_positions(2).Add_Control_Point(0,TV(0,1));
+            kinematic_particle_positions(3).Add_Control_Point(0,TV(1,1));
+            kinematic_particle_positions(4).Add_Control_Point(0,TV(2,1));
+            kinematic_particle_positions(0).Add_Control_Point(10,TV(0,0));
+            kinematic_particle_positions(1).Add_Control_Point(10,TV(-40,0));
+            kinematic_particle_positions(2).Add_Control_Point(10,TV(0,1));
+            kinematic_particle_positions(3).Add_Control_Point(10,TV(-20,1));
+            kinematic_particle_positions(4).Add_Control_Point(10,TV(-40,1));
             break;
     }
 
@@ -288,6 +308,10 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 100:{
+            tests.Create_Mattress(mattress_grid,true,0,density);
+            tests.Add_Ground();
+            break;}
+        case 101:{
             tests.Create_Mattress(mattress_grid,true,0,density);
             tests.Add_Ground();
             break;}
@@ -325,6 +349,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(ta,(T)1e5*unit_p,(T).45,(T)0*s);
             break;}
         case 100:{
+            TRIANGULATED_AREA<T>& ta=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            Add_Constitutive_Model(ta,(T)1e5*unit_p,(T).45,(T)0*s);
+            break;}
+        case 101:{
             TRIANGULATED_AREA<T>& ta=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(ta,(T)1e5*unit_p,(T).45,(T)0*s);
             break;}
@@ -369,12 +397,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
     V.Subset(constrained_particles)=constrained_velocities;
+    for(int i=0;i<kinematic_particle_ids.m;i++)
+        V(kinematic_particle_ids(i))=kinematic_particle_positions(i).Derivative(velocity_time);
 }
 //#####################################################################
 // Function Set_External_Positions
 //#####################################################################
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
+    for(int i=0;i<kinematic_particle_ids.m;i++)
+        X(kinematic_particle_ids(i))=kinematic_particle_positions(i).Value(time);
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -383,6 +415,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 {
     V.Subset(constrained_particles).Fill(TV());
     V.Subset(externally_forced).Fill(TV());
+    V.Subset(kinematic_particle_ids).Fill(TV());
 }
 //#####################################################################
 // Function Read_Output_Files_Solids
@@ -453,6 +486,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     for(int i=0;i<constrained_particles.m;i++) Add_Debug_Particle(particles.X(constrained_particles(i)),TV3(1,0,0));
     for(int i=0;i<externally_forced.m;i++) Add_Debug_Particle(particles.X(externally_forced(i)),TV3(0,1,0));
+    for(int i=0;i<kinematic_particle_ids.m;i++) Add_Debug_Particle(particles.X(kinematic_particle_ids(i)),TV3(1,1,0));
 }
 //#####################################################################
 // Function Add_Constitutive_Model
