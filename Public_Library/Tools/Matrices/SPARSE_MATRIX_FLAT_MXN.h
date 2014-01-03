@@ -8,8 +8,25 @@
 #define __SPARSE_MATRIX_FLAT_MXN__
 
 #include <Tools/Arrays/ARRAY.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Math_Tools/INTERVAL.h>
+#include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 namespace PhysBAM{
+
+template<class T>
+struct SPARSE_MATRIX_ENTRY
+{
+    typedef int HAS_UNTYPED_READ_WRITE;
+    int j;T a;
+    SPARSE_MATRIX_ENTRY():j(-1),a(0){}
+    SPARSE_MATRIX_ENTRY(int index,T value):j(index),a(value){}
+    bool operator<(const SPARSE_MATRIX_ENTRY& s) const {return j<s.j;}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,j,a);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,j,a);}
+};
 
 template<class T>
 class SPARSE_MATRIX_FLAT_MXN
@@ -22,6 +39,8 @@ public:
     ARRAY<SPARSE_MATRIX_ENTRY<T> > A;
     SPARSE_MATRIX_FLAT_MXN<T>* Q;
     SPARSE_MATRIX_FLAT_MXN<T>* L;
+    SPARSE_MATRIX_FLAT_MXN<T>* C;
+    ARRAY<int> diagonal_index;
 
     SPARSE_MATRIX_FLAT_MXN();
 
@@ -30,11 +49,7 @@ public:
     ~SPARSE_MATRIX_FLAT_MXN();
 
     SPARSE_MATRIX_FLAT_MXN& operator=(const SPARSE_MATRIX_FLAT_MXN& matrix)
-    {m=matrix.m;n=matrix.n;offsets=matrix.offsets;A=matrix.A;
-    return *this;}
-
-    SPARSE_MATRIX_FLAT_MXN& operator=(const SPARSE_MATRIX_FLAT_NXN<T>& matrix)
-    {m=matrix.n;n=matrix.n;offsets=matrix.offsets;A=matrix.A;
+    {m=matrix.m;n=matrix.n;offsets=matrix.offsets;A=matrix.A;diagonal_index=matrix.diagonal_index;delete C;C=0;
     return *this;}
 
     const T operator()(const int i,const int j) const
@@ -55,7 +70,7 @@ public:
     {Write_Binary<RW>(output,m,n,offsets,A);}
 
 //#####################################################################
-    SPARSE_MATRIX_FLAT_NXN<T>* Create_Submatrix(const INTERVAL<int>& rows);
+    SPARSE_MATRIX_FLAT_MXN<T>* Create_Submatrix(const INTERVAL<int>& rows);
     void Set_Row_Lengths(ARRAY_VIEW<int> lengths);
     int Find_Index(const int i,const int j) const;
     int Find_Index_Exists(const int i,const int j) const;
@@ -77,11 +92,9 @@ public:
     SPARSE_MATRIX_FLAT_MXN<T> Times_Transpose(const SPARSE_MATRIX_FLAT_MXN<T>& rhs);
     SPARSE_MATRIX_FLAT_MXN<T> Times_Diagonal_Times(const ARRAY<T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>& rhs); // (*this) * diagonal * (rhs)
     SPARSE_MATRIX_FLAT_MXN<T> Scale_Rows(const ARRAY<T>& d) const;
-    SPARSE_MATRIX_FLAT_NXN<T> operator+(const SPARSE_MATRIX_FLAT_NXN<T>& A_rhs) const;
     SPARSE_MATRIX_FLAT_MXN<T> operator+(const SPARSE_MATRIX_FLAT_MXN<T>& A_rhs) const;
     SPARSE_MATRIX_FLAT_MXN<T> operator-(const SPARSE_MATRIX_FLAT_MXN<T>& A_rhs) const;
     SPARSE_MATRIX_FLAT_MXN<T> operator*(const SPARSE_MATRIX_FLAT_MXN<T>& rhs) const;
-    SPARSE_MATRIX_FLAT_NXN<T> Create_NXN_Matrix();
     void Set_Times_Diagonal(const ARRAY<T>& D);
     void Set_Diagonal_Times(const ARRAY<T>& D);
     void Write_Row_Lengths();
@@ -95,6 +108,17 @@ public:
     void Fast_Sparse_Multiply(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,ARRAY<SPARSE_MATRIX_ENTRY<T> >& l);
     void Row_Subset(const ARRAY<int>& rows);
     void Column_Subset(const ARRAY<int>& cols);
+    void Initialize_Diagonal_Index();
+    void Solve_Forward_Substitution(ARRAY_VIEW<const T> b,ARRAY_VIEW<T> x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false) const;
+    void Solve_Backward_Substitution(ARRAY_VIEW<const T> b,ARRAY_VIEW<T> x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false) const;
+    // actually an LU saving square roots, with an inverted diagonal saving divides
+    void Construct_Incomplete_Cholesky_Factorization(const bool modified_version=true,const T modified_coefficient=.97,const T zero_tolerance=1e-8,const T zero_replacement=1e-8);
+    // actually an LU saving square roots, with an inverted diagonal saving divides
+    void In_Place_Incomplete_Cholesky_Factorization(const bool modified_version=true,const T modified_coefficient=.97,const T zero_tolerance=1e-8,const T zero_replacement=1e-8);
+    void Gauss_Seidel_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b);
+    void Gauss_Seidel_Solve(ARRAY<T>& x,const ARRAY<T>& b,const T tolerance=1e-12,const int max_iterations=1000000);
+    bool Positive_Diagonal_And_Nonnegative_Row_Sum(const T tolerance=1e-7) const;
+    void Conjugate_With_Diagonal_Matrix(ARRAY<T>& x);
 //#####################################################################
 };
 template<class T> std::ostream& operator<<(std::ostream& output_stream,const SPARSE_MATRIX_FLAT_MXN<T>& A);

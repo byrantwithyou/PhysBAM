@@ -28,7 +28,7 @@ template<class T,class TV,int d>
 void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUNDARY_CONDITIONS<TV>& callback,T dt,T time,T viscosity,T density,int axis,T theta_threshold,T cg_tolerance,bool verbose)
 {
     typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > T_VECTOR;
-    typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,T_VECTOR > T_SYSTEM;
+    typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,T_VECTOR > T_SYSTEM;
 
     ARRAY<int,FACE_INDEX<d> > index(u.Domain_Indices());
     ARRAY<FACE_INDEX<d> > faces;
@@ -36,8 +36,8 @@ void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUND
         if(callback.Inside(grid.Face(it.Full_Index())))
             index(it.Full_Index())=faces.Append(it.Full_Index());
 
-    SPARSE_MATRIX_FLAT_NXN<T> P;
-    P.Reset();
+    SPARSE_MATRIX_FLAT_MXN<T> P;
+    P.Reset(faces.m);
     T_VECTOR x,b;
     x.v.Resize(faces.m);
     b.v.Resize(faces.m);

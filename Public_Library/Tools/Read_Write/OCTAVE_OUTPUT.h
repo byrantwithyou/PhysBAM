@@ -17,7 +17,7 @@ template<class T,int d> class DIAGONAL_MATRIX;
 template<class T> class KRYLOV_SYSTEM_BASE;
 template<class T> class KRYLOV_VECTOR_BASE;
 template<class T> class SPARSE_MATRIX_FLAT_MXN;
-template<class T> class SPARSE_MATRIX_FLAT_NXN;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 template<class T> class MATRIX_MXN;
 template<class T>
 struct OCTAVE_SPARSE_MATRIX_ENTRY
@@ -64,9 +64,7 @@ public:
     void Write_Preconditioner(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& s);
     void Write_Inner_Product(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& s);
     void Write(const char* name,const SPARSE_MATRIX_FLAT_MXN<T>& m);
-    void Write(const char* name,const SPARSE_MATRIX_FLAT_NXN<T>& m);
     void Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_MXN<T>& m);
-    void Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_NXN<T>& m);
     void Write(const char* name,const MATRIX_MXN<T>& m);
     void Write_Transpose(const char* name,const MATRIX_MXN<T>& m);
     void Begin_Sparse_Matrix(const char* name,int m,int n);

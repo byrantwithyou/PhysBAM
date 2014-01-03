@@ -4,7 +4,7 @@
 //#####################################################################
 #ifdef USE_MPI
 #include <Tools/Log/LOG.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Parallel_Computation/MPI_PACKAGE.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>

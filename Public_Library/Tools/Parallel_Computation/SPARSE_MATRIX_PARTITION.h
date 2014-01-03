@@ -8,7 +8,7 @@
 #define __SPARSE_MATRIX_PARTITION__
 
 #include <Tools/Math_Tools/INTERVAL.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 namespace PhysBAM{
 
 class SPARSE_MATRIX_PARTITION
@@ -40,7 +40,7 @@ public:
     {return interior_indices.Size();}
 
     template<class T>
-    int Interior_Entries(const SPARSE_MATRIX_FLAT_NXN<T>& A) const
+    int Interior_Entries(const SPARSE_MATRIX_FLAT_MXN<T>& A) const
     {return A.offsets(interior_indices.max_corner)-A.offsets(interior_indices.min_corner);}
 
     void Set_Interior_Offset(const int previous_rows)

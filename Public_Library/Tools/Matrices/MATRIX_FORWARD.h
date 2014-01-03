@@ -19,7 +19,7 @@ template<class T,int d> class UPPER_TRIANGULAR_MATRIX;
 template<class T> class MATRIX_MXN;
 template<class T> class SYMMETRIC_MATRIX_NXN;
 template<class T> class SPARSE_MATRIX_NXN;
-template<class T> class SPARSE_MATRIX_FLAT_NXN;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 template<class T_MATRIX> class TRANSPOSE_MATRIX;
 
 template<class T> struct IS_SCALAR_BLOCK;

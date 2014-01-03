@@ -7,13 +7,13 @@
 #include <Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE_SYSTEM.h>
 #include <Tools/Krylov_Solvers/SYMMQMR.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Solve  
 //#####################################################################
 template<class T> void PCG_SPARSE<T>::
-Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,ARRAY<T>& x,ARRAY<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,
+Solve(SPARSE_MATRIX_FLAT_MXN<T>& A_matrix,ARRAY<T>& x,ARRAY<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,
     const T tolerance,const bool recompute_preconditioner)
 {
     int desired_iterations=A_matrix.n-enforce_compatibility;if(maximum_iterations) desired_iterations=maximum_iterations;

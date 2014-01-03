@@ -11,7 +11,6 @@
 #include <Tools/Data_Structures/PAIR.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Rigids/Collisions/SOLVE_CONTACT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -21,7 +20,7 @@ namespace PhysBAM{;
 namespace PROJECTED_GAUSS_SEIDEL
 {
 template<class T>
-void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& a,ARRAY<T>& x,T tolerance)
+void Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& a,ARRAY<T>& x,T tolerance)
 {
     assert(A.n==a.Size() && A.n==x.Size());
 

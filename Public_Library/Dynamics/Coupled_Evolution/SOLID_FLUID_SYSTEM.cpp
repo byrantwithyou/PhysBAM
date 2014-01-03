@@ -6,7 +6,6 @@
 //#####################################################################
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <Tools/Vectors/Dot_Product.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
@@ -21,7 +20,7 @@ template<class TV,class T_MATRIX> SOLID_FLUID_SYSTEM<TV,T_MATRIX>::
 SOLID_FLUID_SYSTEM(BACKWARD_EULER_SYSTEM<TV>& solid_system_input,const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_deformable_array_input,
     const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_rigid_array_input,const ARRAY<DIAGONAL_MATRIX<T,TV::m> >& fluid_mass_input,
     const ARRAY<DIAGONAL_MATRIX<T,TV::m> >& rigid_body_fluid_mass_input,const ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> >& modified_world_space_rigid_inertia_tensor_input,
-    const T fluid_tolerance_input,const T solid_tolerance_input,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array_input)
+    const T fluid_tolerance_input,const T solid_tolerance_input,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array_input)
     :BASE(false,true),solid_system(solid_system_input),J_deformable_array(J_deformable_array_input),
     J_rigid_array(J_rigid_array_input),fluid_mass(fluid_mass_input),rigid_body_fluid_mass(rigid_body_fluid_mass_input),
     modified_world_space_rigid_inertia_tensor(modified_world_space_rigid_inertia_tensor_input),fluid_tolerance(fluid_tolerance_input),solid_tolerance(solid_tolerance_input),
@@ -113,7 +112,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const
         F.solid_velocity.rigid_V(i).angular=Solid_Sign()*(modified_world_space_rigid_inertia_tensor(i)*V.solid_velocity.rigid_V(i).angular-solid_system.dt*F.solid_velocity.rigid_V(i).angular);}
 
     for(int i=0;i<A_array.m;i++){
-        const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
+        const SPARSE_MATRIX_FLAT_MXN<T>& A=A_array(i);
         const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable=J_deformable_array(i);
         const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid=J_rigid_array(i);
         F.pressure(i).Resize(A.n);A.Times(V.pressure(i),F.pressure(i));
@@ -146,7 +145,7 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bR) 
 {
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(bV);VECTOR_T& R=debug_cast<VECTOR_T&>(bR);
     for(int i=0;i<A_array.m;i++){
-        const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
+        const SPARSE_MATRIX_FLAT_MXN<T>& A=A_array(i);
         temp_array(i).Resize(A.n);
         A.C->Solve_Forward_Substitution(V.pressure(i),temp_array(i),true); // diagonal should be treated as the identity
         A.C->Solve_Backward_Substitution(temp_array(i),R.pressure(i),false,true);} // diagonal is inverted to save on divides
@@ -255,10 +254,10 @@ Add_J_Rigid_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const ARRAY<
 }
 //#####################################################################
 namespace PhysBAM{
-template class SOLID_FLUID_SYSTEM<VECTOR<float,1>,SPARSE_MATRIX_FLAT_NXN<float> >;
-template class SOLID_FLUID_SYSTEM<VECTOR<float,2>,SPARSE_MATRIX_FLAT_NXN<float> >;
-template class SOLID_FLUID_SYSTEM<VECTOR<float,3>,SPARSE_MATRIX_FLAT_NXN<float> >;
-template class SOLID_FLUID_SYSTEM<VECTOR<double,1>,SPARSE_MATRIX_FLAT_NXN<double> >;
-template class SOLID_FLUID_SYSTEM<VECTOR<double,2>,SPARSE_MATRIX_FLAT_NXN<double> >;
-template class SOLID_FLUID_SYSTEM<VECTOR<double,3>,SPARSE_MATRIX_FLAT_NXN<double> >;
+template class SOLID_FLUID_SYSTEM<VECTOR<float,1>,SPARSE_MATRIX_FLAT_MXN<float> >;
+template class SOLID_FLUID_SYSTEM<VECTOR<float,2>,SPARSE_MATRIX_FLAT_MXN<float> >;
+template class SOLID_FLUID_SYSTEM<VECTOR<float,3>,SPARSE_MATRIX_FLAT_MXN<float> >;
+template class SOLID_FLUID_SYSTEM<VECTOR<double,1>,SPARSE_MATRIX_FLAT_MXN<double> >;
+template class SOLID_FLUID_SYSTEM<VECTOR<double,2>,SPARSE_MATRIX_FLAT_MXN<double> >;
+template class SOLID_FLUID_SYSTEM<VECTOR<double,3>,SPARSE_MATRIX_FLAT_MXN<double> >;
 }

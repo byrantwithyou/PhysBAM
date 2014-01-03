@@ -90,13 +90,13 @@ public:
 #endif
     }
 
-    void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,ARRAY<T>& s,ARRAY<T>& r,ARRAY<T>& k,ARRAY<T>& z,const T tolerance=1e-7,const bool recompute_preconditioner=true)
+    void Solve(SPARSE_MATRIX_FLAT_MXN<T>& A_matrix,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,ARRAY<T>& s,ARRAY<T>& r,ARRAY<T>& k,ARRAY<T>& z,const T tolerance=1e-7,const bool recompute_preconditioner=true)
     {
         PHYSBAM_FATAL_ERROR();
     }
 
 //#####################################################################
-    void Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance);
+    void Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance);
 //#####################################################################
 };
 }

@@ -31,7 +31,7 @@ Compute(const SPARSE_MATRIX_FLAT_MXN<T>& gradient,const ARRAY<T>& one_over_fluid
     if(!use_preconditioner) return;
     SPARSE_MATRIX_FLAT_MXN<T> negative_divergence;
     gradient.Transpose(negative_divergence);
-    poisson=negative_divergence.Times_Diagonal_Times(one_over_fluid_mass,gradient).Create_NXN_Matrix();
+    poisson=negative_divergence.Times_Diagonal_Times(one_over_fluid_mass,gradient);
 
     if(dt){T one_over_dt_squared=(T)1/(dt*dt);
         for(int i=0;i<index_map.indexed_cells.m;i++){
@@ -54,8 +54,8 @@ Compute_Preconditioner()
             rmap(i)=map.Append(i);
 
     delete poisson.C;
-    poisson.C=new SPARSE_MATRIX_FLAT_NXN<T>;
-    poisson.C->Reset();
+    poisson.C=new SPARSE_MATRIX_FLAT_MXN<T>;
+    poisson.C->Reset(poisson.m);
     int index=poisson.offsets(0);
     for(int i=0;i<poisson.n;i++){
         int end=poisson.offsets(i+1);
@@ -72,7 +72,7 @@ Compute_Preconditioner()
             int col_index=poisson.A(index).j,col=index_map.real_cell_indices_reverse_map(col_index);
             if(col >= 0){row_lengths(col)++;}}}
 
-    delete poisson.C;poisson.C=new SPARSE_MATRIX_FLAT_NXN<T>;
+    delete poisson.C;poisson.C=new SPARSE_MATRIX_FLAT_MXN<T>;
     poisson.C->Set_Row_Lengths(row_lengths);
 
     for(int row=0;row<index_map.real_cell_indices.m;row++){int row_index=index_map.real_cell_indices(row);

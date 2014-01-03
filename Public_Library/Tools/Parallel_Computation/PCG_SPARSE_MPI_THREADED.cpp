@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #ifdef USE_MPI
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Parallel_Computation/INT_ITERATOR_THREADED.h>
 #include <Tools/Parallel_Computation/PCG_SPARSE_MPI_THREADED.h>
 using namespace PhysBAM;
@@ -11,7 +11,7 @@ using namespace PhysBAM;
 // Function Parallel_Solve
 //#####################################################################
 template<class T> void PCG_SPARSE_MPI_THREADED<T>::
-Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance)
+Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance)
 {
     pcg_threaded.Init_Barriers();
     BASE::Initialize_Datatypes();
@@ -59,7 +59,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
         return;}
 
     // find an incomplete cholesky preconditioner - actually an LU that saves square roots, and an inverted diagonal to save on divides
-    SPARSE_MATRIX_FLAT_NXN<T>* C=0;
+    SPARSE_MATRIX_FLAT_MXN<T>* C=0;
     if(pcg.incomplete_cholesky){
         C=A.Create_Submatrix(interior_indices);
         C->In_Place_Incomplete_Cholesky_Factorization(pcg.modified_incomplete_cholesky,pcg.modified_incomplete_cholesky_coefficient,

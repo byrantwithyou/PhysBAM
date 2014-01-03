@@ -878,7 +878,7 @@ Compute_Full_Preconditioner()
     Compute_Inverse_Mass_Matrix(inverse_mass);
 
     sc_im=scatter_matrix*inverse_mass;
-    full_matrix=sc_im.Times_Transpose(scatter_matrix).Create_NXN_Matrix();
+    full_matrix=sc_im.Times_Transpose(scatter_matrix);
 
     int size_p=index_map.Number_Cells(),size_lambda=Value(fluid_interpolation->Number_Of_Constraints()),size_force=leakproof_solve?0:Value(solid_forces->Velocity_Dependent_Forces_Size());
     int size_viscous=use_viscous_forces?Value(fluid_viscous_forces->Viscous_Forces_Size()):0;

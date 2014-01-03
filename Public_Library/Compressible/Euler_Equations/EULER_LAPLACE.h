@@ -11,7 +11,7 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 namespace PhysBAM{
 
 template<class TV> struct GRID_ARRAYS_POLICY;
@@ -41,7 +41,7 @@ public:
     {if(!solution_regions_already_computed) Find_Solution_Regions();
     T_LAPLACE::Solve(time,true);}
 
-    void Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,
+    void Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,
             T_ARRAYS_INT& cell_index_to_matrix_index)
     {assert(dt_is_set);dt_is_set=false;
 
@@ -50,7 +50,7 @@ public:
         int color=this->filled_region_colors(cell_index);
         if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
             int matrix_index=cell_index_to_matrix_index(cell_index);
-            SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(this->filled_region_colors(cell_index));
+            SPARSE_MATRIX_FLAT_MXN<T>& A=A_array(this->filled_region_colors(cell_index));
             A(matrix_index,matrix_index)-=one_over_rho_c_squared(cell_index)/(dt*dt);}}
     }
 

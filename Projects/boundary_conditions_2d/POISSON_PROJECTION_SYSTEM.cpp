@@ -14,7 +14,7 @@ Initialize()
         if(gradient.A.m && !neg_divergence.A.m) gradient.Transpose(neg_divergence);
         if(!gradient.A.m && neg_divergence.A.m) neg_divergence.Transpose(gradient);
         SPARSE_MATRIX_FLAT_MXN<T> tmp(neg_divergence);
-        poisson=tmp.Times_Diagonal_Times(beta_inverse,gradient).Create_NXN_Matrix();}
+        poisson=tmp.Times_Diagonal_Times(beta_inverse,gradient);}
     poisson.Construct_Incomplete_Cholesky_Factorization();
     temp.Resize(poisson.n);
 }

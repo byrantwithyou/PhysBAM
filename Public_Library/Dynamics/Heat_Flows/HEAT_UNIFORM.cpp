@@ -7,7 +7,7 @@
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Math_Tools/max.h>
 #include <Tools/Math_Tools/sqr.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Dynamics/Heat_Flows/HEAT_UNIFORM.h>

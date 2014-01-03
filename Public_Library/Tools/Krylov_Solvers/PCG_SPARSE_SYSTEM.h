@@ -10,7 +10,7 @@
 namespace PhysBAM{
 
 template<class T> class PCG_SPARSE;
-template<class T> class SPARSE_MATRIX_FLAT_NXN;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 //#####################################################################
 // Class PCG_SPARSE_SYSTEM
@@ -18,7 +18,7 @@ template<class T> class SPARSE_MATRIX_FLAT_NXN;
 template<class T>
 class PCG_SPARSE_SYSTEM:public KRYLOV_SYSTEM_BASE<T>
 {
-    typedef ARRAY<T> VECTOR_T;typedef SPARSE_MATRIX_FLAT_NXN<T> T_MATRIX;typedef KRYLOV_VECTOR_WRAPPER<T,VECTOR_T&> KRYLOV_VECTOR_T;
+    typedef ARRAY<T> VECTOR_T;typedef SPARSE_MATRIX_FLAT_MXN<T> T_MATRIX;typedef KRYLOV_VECTOR_WRAPPER<T,VECTOR_T&> KRYLOV_VECTOR_T;
 
     const T_MATRIX& A;
     const bool enforce_compatibility,remove_null_space_solution_component;

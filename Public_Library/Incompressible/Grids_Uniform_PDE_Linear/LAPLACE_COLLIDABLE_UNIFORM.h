@@ -16,7 +16,7 @@
 namespace PhysBAM{
 
 template<class T> class PCG_SPARSE;
-template<class T> class SPARSE_MATRIX_FLAT_NXN;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 template<class TV>
 class LAPLACE_COLLIDABLE_UNIFORM:public LAPLACE_UNIFORM<TV>,public LAPLACE_COLLIDABLE<TV>
@@ -57,9 +57,9 @@ public:
 //#####################################################################
     virtual void Initialize_Grid(const GRID<TV>& mac_grid_input);
     virtual void Set_Up_Second_Order_Cut_Cell_Method(const bool use_second_order_cut_cell_method_input=true);
-    virtual void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index);
+    virtual void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index);
 private:
-    void Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index);
+    void Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index);
 //#####################################################################
 };
 }

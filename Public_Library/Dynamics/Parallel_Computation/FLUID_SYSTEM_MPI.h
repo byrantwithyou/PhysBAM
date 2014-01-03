@@ -14,7 +14,7 @@ namespace PhysBAM{
 // Class FLUID_SYSTEM_MPI
 //#####################################################################
 template<class T> class SPARSE_MATRIX_FLAT_MXN;
-template<class T> class SPARSE_MATRIX_FLAT_NXN;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 template<class TV> class MPI_SOLID_FLUID;
 template<class TV> class GENERALIZED_VELOCITY;
 template<class TV>
@@ -29,7 +29,7 @@ public:
 
     const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_deformable_array;
     const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_rigid_array;
-    ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array;
+    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array;
     ARRAY<INTERVAL<int> > interior_regions;
     MPI_SOLID_FLUID<TV>* mpi_solid_fluid;
     T tolerance_ratio;
@@ -39,7 +39,7 @@ public:
     ARRAY<int>& coupled_deformable_particle_indices;
 
     FLUID_SYSTEM_MPI(const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_deformable_array_input,const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_rigid_array_input,
-        ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array_input,const ARRAY<INTERVAL<int> >& interior_regions_input,const T tolerance_ratio_input,MPI_SOLID_FLUID<TV>* mpi_solid_fluid_input,
+        ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array_input,const ARRAY<INTERVAL<int> >& interior_regions_input,const T tolerance_ratio_input,MPI_SOLID_FLUID<TV>* mpi_solid_fluid_input,
         GENERALIZED_VELOCITY<TV>& temp_input,GENERALIZED_VELOCITY<TV>& solid_velocity_input,ARRAY<int>& coupled_deformable_particle_indices_input,bool precondition);
 
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE // only nullspace stuff for fluids - leave out for now

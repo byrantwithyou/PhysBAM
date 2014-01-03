@@ -11,7 +11,7 @@
 #include <Tools/Grids_Uniform_PDE_Linear/LAPLACE_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T> class SPARSE_MATRIX_FLAT_NXN;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 template<class TV>
 class POISSON_UNIFORM:public POISSON<typename TV::SCALAR>,public LAPLACE_UNIFORM<TV>
@@ -45,7 +45,7 @@ public:
 //#####################################################################
     void Initialize_Grid(const GRID<TV>& grid_input);
     void Find_Variable_beta();
-    void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index) PHYSBAM_OVERRIDE;
+    void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

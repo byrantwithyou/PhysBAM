@@ -8,7 +8,7 @@
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Grids_Uniform_PDE_Linear/POISSON_UNIFORM.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 using namespace PhysBAM;
 template<class TV> POISSON_UNIFORM<TV>::
 POISSON_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input)
@@ -35,7 +35,7 @@ Find_Variable_beta()
 // Function Find_A
 //#####################################################################
 template<class TV> void POISSON_UNIFORM<TV>::
-Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
     TV_INT grid_counts=grid.counts;
@@ -44,7 +44,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
             int color=filled_region_colors(iterator.Cell_Index());
             if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){const TV_INT& cell_index=iterator.Cell_Index();
                 int matrix_index=cell_index_to_matrix_index(cell_index);
-                SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(filled_region_colors(cell_index));ARRAY<T>& b=b_array(filled_region_colors(cell_index));b(matrix_index)=f(cell_index);
+                SPARSE_MATRIX_FLAT_MXN<T>& A=A_array(filled_region_colors(cell_index));ARRAY<T>& b=b_array(filled_region_colors(cell_index));b(matrix_index)=f(cell_index);
                 T diagonal=0;
                 for(int axis=0;axis<TV::m;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
                     if(filled_region_colors.Valid_Index(cell_index-offset)){
@@ -75,7 +75,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
             int color=filled_region_colors(iterator.Cell_Index());
             if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){const TV_INT& cell_index=iterator.Cell_Index();
                 int matrix_index=cell_index_to_matrix_index(cell_index);
-                SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(filled_region_colors(cell_index));ARRAY<T>& b=b_array(filled_region_colors(cell_index));b(matrix_index)=f(cell_index);
+                SPARSE_MATRIX_FLAT_MXN<T>& A=A_array(filled_region_colors(cell_index));ARRAY<T>& b=b_array(filled_region_colors(cell_index));b(matrix_index)=f(cell_index);
                 T diagonal=0;
                 for(int axis=0;axis<TV::m;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
                     if(filled_region_colors.Valid_Index(cell_index-offset)){

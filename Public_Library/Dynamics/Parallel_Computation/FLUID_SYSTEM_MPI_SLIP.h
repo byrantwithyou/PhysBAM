@@ -42,8 +42,8 @@ public:
 
     SPARSE_MATRIX_FLAT_MXN<T> C_s,C_f;
     SPARSE_MATRIX_FLAT_MXN<T> C_s_transpose,C_f_transpose;
-    SPARSE_MATRIX_FLAT_NXN<T> C_f_M_inverse_C_f_transpose;
-    SPARSE_MATRIX_FLAT_NXN<T> div_M_inverse_div_transpose_precondition;
+    SPARSE_MATRIX_FLAT_MXN<T> C_f_M_inverse_C_f_transpose;
+    SPARSE_MATRIX_FLAT_MXN<T> div_M_inverse_div_transpose_precondition;
 
     mutable ARRAY<T> fluid_velocities_size_vector;
     mutable ARRAY<T> solid_velocities_size_vector;

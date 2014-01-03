@@ -2,8 +2,8 @@
 // Copyright 2013.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_PENALTY.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_PENALTY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Add_Velocity_Independent_Forces

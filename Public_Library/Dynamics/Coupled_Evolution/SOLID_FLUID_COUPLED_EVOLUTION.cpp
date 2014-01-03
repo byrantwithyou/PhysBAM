@@ -154,7 +154,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     ARRAY<int,TV_INT> cell_index_to_matrix_index;
     ARRAY<INTERVAL<int> > interior_regions;
     int number_of_regions=0;
-    ARRAY<SPARSE_MATRIX_FLAT_NXN<T> > A_array;
+    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > A_array;
     KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > > kb_array;
     ARRAY<ARRAY<T> >& b_array=kb_array.v;
 
@@ -385,7 +385,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
         ARRAY<T,TV_INT>& p=Get_Pressure();
         for(int i=0;i<A_array.m;i++){
-            const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
+            const SPARSE_MATRIX_FLAT_MXN<T>& A=A_array(i);
             for(int j=0;j<A.n;j++) x_array.v(i)(j)=p(matrix_index_to_cell_index_array(i)(j));}}
 
 #if 0
@@ -412,7 +412,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         T fluid_tolerance=0;
         if(fluids_parameters.compressible || fluids_parameters.incompressible) fluid_tolerance=Get_Poisson()->tolerance;
 
-        SOLID_FLUID_SYSTEM<TV,SPARSE_MATRIX_FLAT_NXN<T> > solid_fluid_system(*solid_system,J_deformable,J_rigid,nodal_fluid_mass,rigid_body_fluid_mass,rigid_body_fluid_inertia,
+        SOLID_FLUID_SYSTEM<TV,SPARSE_MATRIX_FLAT_MXN<T> > solid_fluid_system(*solid_system,J_deformable,J_rigid,nodal_fluid_mass,rigid_body_fluid_mass,rigid_body_fluid_inertia,
             fluid_tolerance,solids_parameters.implicit_solve_parameters.cg_tolerance,A_array);
         if(preconditioned){solid_fluid_system.use_preconditioner=true;solid_fluid_system.preconditioner_commutes_with_projection=false;}
 
@@ -1094,7 +1094,7 @@ Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<ARRAY<T> >& right_hand_side,const
     GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection);
     for(int i=0;i<colors;i++)
         if(poisson->filled_region_touches_dirichlet(i)||poisson->solve_neumann_regions)
-            SOLID_FLUID_SYSTEM<TV,SPARSE_MATRIX_FLAT_NXN<T> >::Add_J_Rigid_Transpose_Times_Velocity(J_rigid_kinematic(i),V,right_hand_side(i).Array_View(interior_regions(i)));
+            SOLID_FLUID_SYSTEM<TV,SPARSE_MATRIX_FLAT_MXN<T> >::Add_J_Rigid_Transpose_Times_Velocity(J_rigid_kinematic(i),V,right_hand_side(i).Array_View(interior_regions(i)));
 }
 //#####################################################################
 // Function Average_Solid_Projected_Face_Velocities_For_Energy_Update

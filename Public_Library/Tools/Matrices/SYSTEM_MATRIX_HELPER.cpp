@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <Tools/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <map>
@@ -103,11 +102,10 @@ Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M,ARRAY<T>* zero_me,int bound,
 // Function Set_Matrix
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Set_Matrix(int n,SPARSE_MATRIX_FLAT_NXN<T>& M,ARRAY<T>* zero_me,int bound,T tol)
+Set_Matrix(int n,SPARSE_MATRIX_FLAT_MXN<T>& M,ARRAY<T>* zero_me,int bound,T tol)
 {
     if(!compacted&&zero_me) Compact(n,zero_me,bound,tol);
-    M.Reset();
-    M.n=n;
+    M.Reset(n);
     M.A.Remove_All();
     M.offsets.Resize(n+1);
     for(int i=0;i<data.m;i++) M.offsets(data(i).x+1)++;

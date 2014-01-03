@@ -30,7 +30,7 @@ template<class TV> LINEAR_BENDING_ELEMENTS<TV>::
 // Function Compute_Stiffness_Matrix
 //#####################################################################
 namespace{
-template<class T,class TV> void Compute_Stiffness_Matrix_Helper(SEGMENT_MESH& mesh,ARRAY_VIEW<const TV> X,ARRAY<T>& stiffness_matrix_diagonal,SPARSE_MATRIX_FLAT_NXN<T>& stiffness_matrix_upper)
+template<class T,class TV> void Compute_Stiffness_Matrix_Helper(SEGMENT_MESH& mesh,ARRAY_VIEW<const TV> X,ARRAY<T>& stiffness_matrix_diagonal,SPARSE_MATRIX_FLAT_MXN<T>& stiffness_matrix_upper)
 {
     if(!mesh.neighbor_nodes) mesh.Initialize_Neighbor_Nodes();
 
@@ -63,7 +63,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(SEGMENT_MESH& me
                 for(int j=i+1;j<nodes.m;j++){int a=nodes[i],b=nodes[j];exchange_sort(a,b);
                     stiffness_matrix_upper(a,b)+=scale*c[i]*c[j];}}}}
 }
-template<class T,class TV> void Compute_Stiffness_Matrix_Helper(TRIANGLE_MESH& mesh,ARRAY_VIEW<const TV> X,ARRAY<T>& stiffness_matrix_diagonal,SPARSE_MATRIX_FLAT_NXN<T>& stiffness_matrix_upper)
+template<class T,class TV> void Compute_Stiffness_Matrix_Helper(TRIANGLE_MESH& mesh,ARRAY_VIEW<const TV> X,ARRAY<T>& stiffness_matrix_diagonal,SPARSE_MATRIX_FLAT_MXN<T>& stiffness_matrix_upper)
 {
     // compute bending quadruples
     if(!mesh.adjacent_elements) mesh.Initialize_Adjacent_Elements();

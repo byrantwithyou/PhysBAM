@@ -7,7 +7,7 @@
 #ifndef __LINEAR_BENDING_ELEMENTS__
 #define __LINEAR_BENDING_ELEMENTS__
 
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
@@ -27,7 +27,7 @@ public:
     T stiffness,damping;
 private:
     ARRAY<T> stiffness_matrix_diagonal;
-    SPARSE_MATRIX_FLAT_NXN<T> stiffness_matrix_upper;
+    SPARSE_MATRIX_FLAT_MXN<T> stiffness_matrix_upper;
 public:
 
     LINEAR_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,T_MESH& mesh);

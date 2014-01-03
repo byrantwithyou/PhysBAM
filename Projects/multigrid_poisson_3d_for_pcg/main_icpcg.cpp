@@ -8,7 +8,7 @@
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <Tools/Log/LOG.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
@@ -287,7 +287,7 @@ int main(int argc,char* argv[])
         PCG_SPARSE<T> icpcg;
         ARRAY<T> b_icpcg;
         ARRAY<T> x_icpcg;
-        SPARSE_MATRIX_FLAT_NXN<T> icpcg_matrix;
+        SPARSE_MATRIX_FLAT_MXN<T> icpcg_matrix;
         LIST_ARRAY<T_INDEX> interior_indices;
         T_INT_ARRAY index_ids(grid);
 

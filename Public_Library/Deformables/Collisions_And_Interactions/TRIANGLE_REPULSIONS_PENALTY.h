@@ -7,8 +7,8 @@
 #ifndef __TRIANGLE_REPULSIONS_PENALTY__
 #define __TRIANGLE_REPULSIONS_PENALTY__
 
-#include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
+#include <Deformables/Forces/LAGGED_FORCE.h>
 namespace PhysBAM{
 
 template<class TV>

@@ -40,13 +40,13 @@ public:
     const ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> >& modified_world_space_rigid_inertia_tensor;
     ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> > modified_world_space_rigid_inertia_tensor_inverse;
     const T fluid_tolerance,solid_tolerance;
-    const ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array;
+    const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array;
     mutable ARRAY<ARRAY<T> > temp_array;
 
     SOLID_FLUID_SYSTEM(BACKWARD_EULER_SYSTEM<TV>& solid_system_input,const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_deformable_array_input,
         const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_rigid_array_input,const ARRAY<DIAGONAL_MATRIX<T,TV::m> >& fluid_mass_input,
         const ARRAY<DIAGONAL_MATRIX<T,TV::m> >& rigid_body_fluid_mass_input,const ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> >& modified_world_space_rigid_inertia_tensor_input,
-        const T fluid_tolerance_input,const T solid_tolerance_input,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array_input);
+        const T fluid_tolerance_input,const T solid_tolerance_input,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array_input);
 
     virtual ~SOLID_FLUID_SYSTEM();
 

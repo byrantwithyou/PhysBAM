@@ -20,7 +20,7 @@ namespace PhysBAM{
 template<class T_MATRIX> struct IS_MATRIX {static const bool value=false;};
 template<class T> struct IS_MATRIX<MATRIX_MXN<T> > {static const bool value=true;};
 template<class T> struct IS_MATRIX<SPARSE_MATRIX_NXN<T> > {static const bool value=true;};
-template<class T> struct IS_MATRIX<SPARSE_MATRIX_FLAT_NXN<T> > {static const bool value=true;};
+template<class T> struct IS_MATRIX<SPARSE_MATRIX_FLAT_MXN<T> > {static const bool value=true;};
 
 //#####################################################################
 // Class MATRIX_SYSTEM

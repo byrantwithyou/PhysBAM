@@ -7,14 +7,14 @@
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES.h>
-#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
-#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES.h>
+#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
 template<class T> static TRIANGULATED_SURFACE<T>& Triangulated_Surface_Helper(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume)
 {

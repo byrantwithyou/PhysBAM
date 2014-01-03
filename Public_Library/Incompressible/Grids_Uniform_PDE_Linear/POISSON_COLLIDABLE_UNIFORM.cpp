@@ -8,7 +8,7 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 namespace PhysBAM{
@@ -135,7 +135,7 @@ Find_Constant_beta_Multiphase(ARRAY<ARRAY<T,TV_INT>>& phis_ghost)
 // Function Find_A
 //#####################################################################
 template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
-Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     BASE::Find_A_Part_Two(domain,A_array,b_array,cell_index_to_matrix_index);
     if(second_order_cut_cell_method) Apply_Second_Order_Cut_Cell_Method(domain,A_array,b_array,cell_index_to_matrix_index);
@@ -200,7 +200,7 @@ Add_Derivative_Jump_To_b(const ARRAY<T,TV_INT>& phi_ghost)
 // Function Apply_Second_Order_Cut_Cell_Method
 //#####################################################################
 template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
-Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     assert(levelset);
     TV minus_one_over_dx_squared=(T)-1*Inverse(grid.dX*grid.dX);

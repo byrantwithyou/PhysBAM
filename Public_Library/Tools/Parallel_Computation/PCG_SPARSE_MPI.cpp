@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #ifdef USE_MPI
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Parallel_Computation/MPI_PACKAGE.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Parallel_Computation/PCG_SPARSE_MPI.h>
@@ -13,7 +13,7 @@ using namespace PhysBAM;
 // Function Serial_Solve
 //#####################################################################
 template<class TV> void PCG_SPARSE_MPI<TV>::
-Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,ARRAY<T>& s,ARRAY<T>& r,ARRAY<T>& k,ARRAY<T>& z,const int tag,const T tolerance)
+Serial_Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,ARRAY<T>& s,ARRAY<T>& r,ARRAY<T>& k,ARRAY<T>& z,const int tag,const T tolerance)
 {
     // TODO: this routine is useful only for testing purposes
     LOG::SCOPE scope("MPI SOLVE","mpi solve");
@@ -29,7 +29,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,AR
     else{
         // receive linear system pieces
         ARRAY<SPARSE_MATRIX_PARTITION> partition_array(processors);partition_array(0)=partition; // TODO: very inefficient to copy everything into one array
-        ARRAY<SPARSE_MATRIX_FLAT_NXN<T> > A_array(processors);A_array(0)=A;
+        ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > A_array(processors);A_array(0)=A;
         ARRAY<ARRAY<T> > x_array(processors),b_array(processors);x_array(0)=x;b_array(0)=b;
         for(int p=1;p<processors;p++){
             MPI::Status status;
@@ -48,7 +48,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,AR
             for(int s=0;s<partition.number_of_sides;s++)
                 if(partition.neighbor_ranks(s)!=MPI::PROC_NULL) partition.neighbors(s)=&partition_array(partition.neighbor_ranks(s)+1);}
         // find global offsets
-        SPARSE_MATRIX_FLAT_NXN<T> global_A;
+        SPARSE_MATRIX_FLAT_MXN<T> global_A;
         global_A.n=global_rows;global_A.offsets.Resize(global_rows+1);
         {int current_row=1,current_index=1;global_A.offsets(0)=1;
         for(int p=0;p<processors;p++) for(int i=partition_array(p).interior_indices.min_corner;i<partition_array(p).interior_indices.max_corner;i++)
@@ -83,7 +83,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,AR
 // Function Parallel_Solve
 //#####################################################################
 template<class TV> void PCG_SPARSE_MPI<TV>::
-Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,const bool recompute_preconditioner)
+Parallel_Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,const bool recompute_preconditioner)
 {
     if(thread_grid){Parallel_Solve(A,x,b,thread_grid->global_column_index_boundaries,tolerance,recompute_preconditioner);return;}
     Initialize_Datatypes();
@@ -156,7 +156,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tole
 // Function Parallel_Solve
 //#####################################################################
 template<class TV> void PCG_SPARSE_MPI<TV>::
-Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x_local,ARRAY<T>& b_local,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries,
+Parallel_Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x_local,ARRAY<T>& b_local,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries,
     const T tolerance,const bool recompute_preconditioner)
 {
     // TODO templatize this with the one above
@@ -248,7 +248,7 @@ Initialize_Datatypes()
 // Function Find_Ghost_Regions
 //#####################################################################
 template<class TV> void PCG_SPARSE_MPI<TV>::
-Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries)
+Find_Ghost_Regions(SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries)
 {
     // Find which columns we need from each of the other procs
     columns_to_receive.Resize(proc_column_index_boundaries.m);
@@ -291,7 +291,7 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
 // Function Find_Ghost_Regions
 //#####################################################################
 template<class TV> void PCG_SPARSE_MPI<TV>::
-Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries)
+Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries)
 {
     // Find which columns we need from each of the other procs
     columns_to_receive.Resize(proc_column_index_boundaries.m);

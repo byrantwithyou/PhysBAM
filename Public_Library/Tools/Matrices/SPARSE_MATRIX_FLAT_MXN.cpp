@@ -15,14 +15,14 @@ namespace PhysBAM{
 //#####################################################################
 template<class T> SPARSE_MATRIX_FLAT_MXN<T>::
 SPARSE_MATRIX_FLAT_MXN()
-    :m(0),n(0),Q(0),L(0)
+    :m(0),n(0),Q(0),L(0),C(0)
 {}
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class T> SPARSE_MATRIX_FLAT_MXN<T>::
 SPARSE_MATRIX_FLAT_MXN(const SPARSE_MATRIX_FLAT_MXN<T>& matrix)
-    :m(matrix.m),n(matrix.n),offsets(matrix.offsets),A(matrix.A),Q(0),L(0)
+    :m(matrix.m),n(matrix.n),offsets(matrix.offsets),A(matrix.A),Q(0),L(0),C(0)
 {}
 //#####################################################################
 // Destructor
@@ -30,17 +30,19 @@ SPARSE_MATRIX_FLAT_MXN(const SPARSE_MATRIX_FLAT_MXN<T>& matrix)
 template<class T> SPARSE_MATRIX_FLAT_MXN<T>::
 ~SPARSE_MATRIX_FLAT_MXN()
 {
-    delete Q;delete L;
+    delete Q;
+    delete L;
+    delete C;
 }
 //#####################################################################
 // Function Create_Submatrix
 //#####################################################################
-template<class T> SPARSE_MATRIX_FLAT_NXN<T>* SPARSE_MATRIX_FLAT_MXN<T>::
+template<class T> SPARSE_MATRIX_FLAT_MXN<T>* SPARSE_MATRIX_FLAT_MXN<T>::
 Create_Submatrix(const INTERVAL<int>& rows)
 {
     assert(rows.Size()==m);
     int entries=0;for(int index=offsets(0);index<offsets(m);index++)if(rows.Lazy_Inside_Half_Open(A(index).j)) entries++;
-    SPARSE_MATRIX_FLAT_NXN<T>* submatrix=new SPARSE_MATRIX_FLAT_NXN<T>();
+    SPARSE_MATRIX_FLAT_MXN<T>* submatrix=new SPARSE_MATRIX_FLAT_MXN<T>();
     submatrix->n=rows.Size();
     submatrix->offsets.Resize(submatrix->n+1);
     submatrix->A.Resize(entries);
@@ -58,6 +60,7 @@ Create_Submatrix(const INTERVAL<int>& rows)
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Set_Row_Lengths(ARRAY_VIEW<int> lengths)
 {
+    diagonal_index.Clean_Memory();delete C;C=0;
     m=lengths.m;offsets.Resize(m+1,false,false);offsets(0)=0;
     for(int i=0;i<m;i++){offsets(i+1)=offsets(i)+lengths(i);}
     A.Resize(offsets(m));
@@ -350,35 +353,6 @@ Scale_Rows(const ARRAY<T>& d) const
 //#####################################################################
 // Function operator+
 //#####################################################################
-template<class T> SPARSE_MATRIX_FLAT_NXN<T> SPARSE_MATRIX_FLAT_MXN<T>::
-operator+(const SPARSE_MATRIX_FLAT_NXN<T>& A_rhs) const
-{
-    assert(m==n && n==A_rhs.n);
-    ARRAY<int> row_lengths(m);
-    int left_index=offsets(0),right_index=A_rhs.offsets(0);
-    for(int i=0;i<m;i++){
-        int left_end=offsets(i+1),right_end=A_rhs.offsets(i+1);
-        while(left_index<left_end && right_index<right_end){
-            if(A(left_index).j==A_rhs.A(right_index).j){row_lengths(i)++;left_index++;right_index++;}
-            else if(A(left_index).j>A_rhs.A(right_index).j){right_index++;row_lengths(i)++;}
-            else{left_index++;row_lengths(i)++;}}
-        row_lengths(i)+=left_end-left_index+right_end-right_index;
-        left_index=left_end;right_index=right_end;}
-    SPARSE_MATRIX_FLAT_NXN<T> result;
-    result.Set_Row_Lengths(row_lengths);
-
-    int index=offsets(0);
-    for(int i=0;i<m;i++){int end=offsets(i+1);
-        for(;index<end;index++) result(i,A(index).j)=A(index).a;}
-
-    index=A_rhs.offsets(0);
-    for(int i=0;i<m;i++){int end=A_rhs.offsets(i+1);
-        for(;index<end;index++) result(i,A_rhs.A(index).j)+=A_rhs.A(index).a;}
-    return result;
-}
-//#####################################################################
-// Function operator+
-//#####################################################################
 template<class T> SPARSE_MATRIX_FLAT_MXN<T> SPARSE_MATRIX_FLAT_MXN<T>::
 operator+(const SPARSE_MATRIX_FLAT_MXN& A_rhs) const
 {
@@ -394,7 +368,8 @@ operator+(const SPARSE_MATRIX_FLAT_MXN& A_rhs) const
         row_lengths(i)+=left_end-left_index+right_end-right_index;
         left_index=left_end;right_index=right_end;}
     SPARSE_MATRIX_FLAT_MXN<T> result;
-    result.Set_Row_Lengths(row_lengths);result.n=n;
+    result.Set_Row_Lengths(row_lengths);
+    result.n=n;
 
     int index=offsets(0);
     for(int i=0;i<m;i++){int end=offsets(i+1);
@@ -470,18 +445,6 @@ operator*(const SPARSE_MATRIX_FLAT_MXN& rhs) const
     return result;
 }
 //#####################################################################
-// Function Create_NXN_Matrix
-//#####################################################################
-template<class T> SPARSE_MATRIX_FLAT_NXN<T> SPARSE_MATRIX_FLAT_MXN<T>::
-Create_NXN_Matrix()
-{
-    SPARSE_MATRIX_FLAT_NXN<T> result;
-    result.offsets=offsets;
-    result.A=A;
-    result.n=m;
-    return result;
-}
-//#####################################################################
 // Function Set_Times_Diagonal
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
@@ -543,6 +506,9 @@ Reset(const int c)
     offsets.Remove_All();
     A.Remove_All();
     offsets.Append(0);
+    delete C;
+    C=0;
+    diagonal_index.Remove_All();
 }
 //#####################################################################
 // Function Append_Entry_To_Current_Row
@@ -711,6 +677,133 @@ Column_Subset(const ARRAY<int>& cols)
     Transpose(tmp);
     tmp.Row_Subset(cols);
     tmp.Transpose(*this);
+}
+//#####################################################################
+// Function Initialize_Diagonal_Index
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Initialize_Diagonal_Index()
+{
+    diagonal_index.Resize(n,false,false);
+    for(int i=0;i<n;i++){diagonal_index(i)=Find_Index(i,i);assert(A(diagonal_index(i)).j==i);}
+}
+//#####################################################################
+// Function Solve_Forward_Substitution
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Solve_Forward_Substitution(ARRAY_VIEW<const T> b,ARRAY_VIEW<T> x,const bool diagonal_is_identity,const bool diagonal_is_inverted) const
+{
+    if(diagonal_is_identity) for(int i=0;i<n;i++){
+        T sum=0;for(int index=offsets(i);index<diagonal_index(i);index++)sum+=A(index).a*x(A(index).j);
+        x(i)=b(i)-sum;}
+    else if(!diagonal_is_inverted) for(int i=0;i<n;i++){
+        T sum=0;for(int index=offsets(i);index<diagonal_index(i);index++)sum+=A(index).a*x(A(index).j);
+        x(i)=(b(i)-sum)/A(diagonal_index(i)).a;}
+    else for(int i=0;i<n;i++){
+        T sum=0;for(int index=offsets(i);index<diagonal_index(i);index++)sum+=A(index).a*x(A(index).j);
+        x(i)=(b(i)-sum)*A(diagonal_index(i)).a;}
+}
+//#####################################################################
+// Function Solve_Backward_Substitution
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Solve_Backward_Substitution(ARRAY_VIEW<const T> b,ARRAY_VIEW<T> x,const bool diagonal_is_identity,const bool diagonal_is_inverted) const
+{
+    if(diagonal_is_identity) for(int i=n-1;i>=0;i--){
+        T sum=0;for(int index=diagonal_index(i)+1;index<offsets(i+1);index++)sum+=A(index).a*x(A(index).j);
+        x(i)=b(i)-sum;}
+    else if(!diagonal_is_inverted) for(int i=n-1;i>=0;i--){
+        T sum=0;for(int index=diagonal_index(i)+1;index<offsets(i+1);index++)sum+=A(index).a*x(A(index).j);
+        x(i)=(b(i)-sum)/A(diagonal_index(i)).a;}
+    else for(int i=n-1;i>=0;i--){
+        T sum=0;for(int index=diagonal_index(i)+1;index<offsets(i+1);index++)sum+=A(index).a*x(A(index).j);
+        x(i)=(b(i)-sum)*A(diagonal_index(i)).a;}
+}
+//#####################################################################
+// Function Construct_Incomplete_Cholesky_Factorization
+//#####################################################################
+// actually an LU saving square roots, with an inverted diagonal saving divides
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Construct_Incomplete_Cholesky_Factorization(const bool modified_version,const T modified_coefficient,const T zero_tolerance,const T zero_replacement)
+{
+    delete C;C=new SPARSE_MATRIX_FLAT_MXN<T>(*this);
+    C->In_Place_Incomplete_Cholesky_Factorization(modified_version,modified_coefficient,zero_tolerance,zero_replacement);
+}
+//#####################################################################
+// Function In_Place_Incomplete_Cholesky_Factorization
+//#####################################################################
+// actually an LU saving square roots, with an inverted diagonal saving divides
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+In_Place_Incomplete_Cholesky_Factorization(const bool modified_version,const T modified_coefficient,const T zero_tolerance,const T zero_replacement)
+{
+    Initialize_Diagonal_Index();
+    for(int i=0;i<n;i++){ // for each row
+        int row_diagonal_index=diagonal_index(i),row_end=offsets(i+1)-1;T sum=0;
+        for(int k_bar=offsets(i);k_bar<row_diagonal_index;k_bar++){ // for all the entries before the diagonal element
+            int k=A(k_bar).j;int row2_diagonal_index=diagonal_index(k),row2_end=offsets(k+1)-1;
+            A(k_bar).a*=A(row2_diagonal_index).a; // divide by the diagonal element (which has already been inverted)
+            int j_bar=k_bar+1; // start with the next element in the row, when subtracting the dot product
+            for(int i_bar=row2_diagonal_index+1;i_bar<=row2_end;i_bar++){ // run through the rest of the elements in the row2
+                int i=A(i_bar).j;T dot_product_term=A(k_bar).a*A(i_bar).a;
+                while(j_bar<row_end && A(j_bar).j<i) j_bar++; // gets j_bar such that j_bar>=i
+                if(A(j_bar).j==i) A(j_bar).a-=dot_product_term;else if(modified_version) sum+=dot_product_term;}}
+        T denominator=A(row_diagonal_index).a-modified_coefficient*sum;
+        if(i==n && denominator<=zero_tolerance) A(row_diagonal_index).a=1/zero_replacement; // ensure last diagonal element is not zero
+        else A(row_diagonal_index).a=1/denominator;} // finally, store the diagonal element in inverted form
+}
+//#####################################################################
+// Function Gauss_Seidel_Single_Iteration
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Gauss_Seidel_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b)
+{
+    assert(x.m==b.m && x.m==n);
+    for(int i=0;i<n;i++){
+        T rho=0;T diagonal_entry=0;
+        for(int index=offsets(i);index<offsets(i+1);index++){
+            if(A(index).j==i) diagonal_entry=A(index).a;
+            else rho+=A(index).a*x(A(index).j);}
+        x(i)=(b(i)-rho)/diagonal_entry;}
+}
+//#####################################################################
+// Function Gauss_Seidel_Solve
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Gauss_Seidel_Solve(ARRAY<T>& x,const ARRAY<T>& b,const T tolerance,const int max_iterations)
+{
+    assert(x.m==b.m && x.m==n);
+    ARRAY<T> last_x(x);
+    for(int k=0;k<max_iterations;k++){
+        Gauss_Seidel_Single_Iteration(x,b);
+        T residual=0;for(int j=0;j<n;j++){residual+=sqr(last_x(j)-x(j));last_x(j)=x(j);}if(residual < tolerance) return;}
+}
+//#####################################################################
+// Function Positive_Diagonal_And_Nonnegative_Row_Sum
+//#####################################################################
+template<class T> bool SPARSE_MATRIX_FLAT_MXN<T>::
+Positive_Diagonal_And_Nonnegative_Row_Sum(const T tolerance) const
+{
+    bool return_value=true;
+    for(int i=0;i<n;i++){
+        if((*this)(i,i)<=0){
+            LOG::cout<<"diagonal entry "<<i<<" contains nonpositive element: "<<(*this)(i,i)<<std::endl;
+            return false;}
+        T sum=0;for(int index=offsets(i);index<offsets(i+1);index++)sum+=A(index).a;
+        if(sum<-tolerance){
+            LOG::cout<<"sum of row "<<i<<" is negative: "<<sum<<std::endl;
+            return_value=false;}}
+    return return_value;
+}
+//#####################################################################
+// Function Conjugate_With_Diagonal_Matrix
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Conjugate_With_Diagonal_Matrix(ARRAY<T>& x)
+{
+    int index=offsets(0);
+    for(int i=0;i<n;i++){
+        int end=offsets(i+1);
+        for(;index<end;index++) A(index).a*=x(i)*x(A(index).j);}
 }
 //#####################################################################
 template class SPARSE_MATRIX_FLAT_MXN<float>;

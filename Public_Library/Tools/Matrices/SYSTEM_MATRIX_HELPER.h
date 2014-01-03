@@ -15,7 +15,7 @@ namespace PhysBAM{
 
 template<class T> struct SYSTEM_MATRIX_HELPER;
 template<class T> class SPARSE_MATRIX_FLAT_MXN;
-template<class T> class SPARSE_MATRIX_FLAT_NXN;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 template<class T>
 struct SYSTEM_MATRIX_BASE
@@ -61,7 +61,7 @@ struct SYSTEM_MATRIX_HELPER:public NONCOPYABLE
     void Shift(int dr,int dc,INTERVAL<int> range);
     void Compact(int rows,ARRAY<T>* zero_me,int bound=0,T tol=0);
     void Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M,ARRAY<T>* zero_me=0,int bound=0,T tol=0);
-    void Set_Matrix(int n,SPARSE_MATRIX_FLAT_NXN<T>& M,ARRAY<T>* zero_me=0,int bound=0,T tol=0);
+    void Set_Matrix(int n,SPARSE_MATRIX_FLAT_MXN<T>& M,ARRAY<T>* zero_me=0,int bound=0,T tol=0);
 
     static void Base_To_Matrix(int m,int n,const SYSTEM_MATRIX_BASE<T>& base,SPARSE_MATRIX_FLAT_MXN<T>& M,bool tranpose=false);
 };

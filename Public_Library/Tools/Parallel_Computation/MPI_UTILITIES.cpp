@@ -68,15 +68,15 @@ template<class T> void Unpack(ARRAY<T>& data,ARRAY_VIEW<const char> buffer,int& 
 {int n;Unpack(n,buffer,position,comm);data.Resize(n);
 Datatype<T>().Unpack(&buffer(0),buffer.Size(),data.Get_Array_Pointer(),data.n,position,comm);}
 //#####################################################################
-// Pack/Unpack for SPARSE_MATRIX_FLAT_NXN
+// Pack/Unpack for SPARSE_MATRIX_FLAT_MXN
 //#####################################################################
-template<class T> int Pack_Size(const SPARSE_MATRIX_FLAT_NXN<T>& data,const MPI::Comm& comm)
+template<class T> int Pack_Size(const SPARSE_MATRIX_FLAT_MXN<T>& data,const MPI::Comm& comm)
 {return Pack_Size(data.n,data.offsets,data.A,comm);}
 
-template<class T> void Pack(const SPARSE_MATRIX_FLAT_NXN<T>& data,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
+template<class T> void Pack(const SPARSE_MATRIX_FLAT_MXN<T>& data,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
 {Pack(data.n,data.offsets,data.A,buffer,position,comm);}
 
-template<class T> void Unpack(SPARSE_MATRIX_FLAT_NXN<T>& data,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
+template<class T> void Unpack(SPARSE_MATRIX_FLAT_MXN<T>& data,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
 {Unpack(data.n,data.offsets,data.A,buffer,position,comm);}
 //#####################################################################
 // Pack/Unpack for SPARSE_MATRIX_FLAT_MXN
@@ -144,9 +144,9 @@ void Unpack(UNION_FIND<>& data,ARRAY_VIEW<const char> buffer,int& position,const
     template int Pack_Size<T>(const ARRAY<T>&,const MPI::Comm&); \
     template void Pack<T>(const ARRAY<T>&,ARRAY_VIEW<char>,int&,const MPI::Comm&); \
     template void Unpack<T>(ARRAY<T>&,ARRAY_VIEW<const char>,int&,const MPI::Comm&); \
-    template int Pack_Size<T>(const SPARSE_MATRIX_FLAT_NXN<T>&,const MPI::Comm&); \
-    template void Pack<T>(const SPARSE_MATRIX_FLAT_NXN<T>&,ARRAY_VIEW<char>,int&,const MPI::Comm&); \
-    template void Unpack<T>(SPARSE_MATRIX_FLAT_NXN<T>&,ARRAY_VIEW<const char>,int&,const MPI::Comm&); \
+    template int Pack_Size<T>(const SPARSE_MATRIX_FLAT_MXN<T>&,const MPI::Comm&); \
+    template void Pack<T>(const SPARSE_MATRIX_FLAT_MXN<T>&,ARRAY_VIEW<char>,int&,const MPI::Comm&); \
+    template void Unpack<T>(SPARSE_MATRIX_FLAT_MXN<T>&,ARRAY_VIEW<const char>,int&,const MPI::Comm&); \
     template int Pack_Size<T>(const SPARSE_MATRIX_FLAT_MXN<T>&,const MPI::Comm&); \
     template void Pack<T>(const SPARSE_MATRIX_FLAT_MXN<T>&,ARRAY_VIEW<char>,int&,const MPI::Comm&); \
     template void Unpack<T>(SPARSE_MATRIX_FLAT_MXN<T>&,ARRAY_VIEW<const char>,int&,const MPI::Comm&);

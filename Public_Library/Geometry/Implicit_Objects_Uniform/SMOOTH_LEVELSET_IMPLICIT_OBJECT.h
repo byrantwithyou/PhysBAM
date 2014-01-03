@@ -7,8 +7,8 @@
 #ifndef __SMOOTH_LEVELSET_IMPLICIT_OBJECT__
 #define __SMOOTH_LEVELSET_IMPLICIT_OBJECT__
 
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Tools/Grids_Uniform_Interpolation/CUBIC_SPLINE_INTERPOLATION_UNIFORM.h>
+#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;

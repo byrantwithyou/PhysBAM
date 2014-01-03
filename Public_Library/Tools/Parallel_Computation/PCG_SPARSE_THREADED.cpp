@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Math_Tools/INTERVAL.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Parallel_Computation/INT_ITERATOR_THREADED.h>
 #include <Tools/Parallel_Computation/PCG_SPARSE_THREADED.h>
 using namespace PhysBAM;
@@ -11,14 +11,13 @@ using namespace PhysBAM;
 // Function Parallel_Solve
 //#####################################################################
 template<class TV> void PCG_SPARSE_THREADED<TV>::
-Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance)
+Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance)
 {
     Init_Barriers();
     RANGE<TV_INT> interior_domain(domain);interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
     int tid=domain_index(interior_domain.min_corner);
     assert(tid==domain_index(interior_domain.max_corner));
     const INTERVAL<int>& interior_indices=all_interior_indices(tid);
-    const ARRAY<INTERVAL<int> >& ghost_indices=all_ghost_indices(tid);
 
     int global_n=A.n,interior_n=interior_indices.Size();
     T global_tolerance=tolerance;
@@ -43,14 +42,14 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
 #ifdef USE_PTHREADS
     pthread_barrier_wait(&barr);
 #endif
-    A.Times(interior_indices,ghost_indices,x,temp);
+    A.Times(x,temp);
     b_interior-=temp_interior;
     if(enforce_compatibility) b_interior-=(T)(Global_Sum((T)b_interior.Sum_Double_Precision(),tid)/global_n);
     if(Global_Max(b_interior.Max_Abs())<=global_tolerance){
         if(show_results) LOG::cout<<"NO ITERATIONS NEEDED"<<std::endl;
         return;}
 
-    SPARSE_MATRIX_FLAT_NXN<T>* C=0;
+    SPARSE_MATRIX_FLAT_MXN<T>* C=0;
     // find an incomplete cholesky preconditioner - actually an LU that saves square roots, and an inverted diagonal to save on divides
     if(incomplete_cholesky){
         C=A.Create_Submatrix(interior_indices);
@@ -76,7 +75,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
 #ifdef USE_PTHREADS
         pthread_barrier_wait(&barr);
 #endif
-        A.Times(interior_indices,ghost_indices,p,temp);
+        A.Times(p,temp);
         T alpha=(T)(rho/Global_Sum((T)p_interior.Dot_Product_Double_Precision(p_interior,temp_interior),tid));
         for(int i=0;i<interior_n;i++){x_interior(i)+=alpha*p_interior(i);b_interior(i)-=alpha*temp_interior(i);}
 
@@ -93,7 +92,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
     delete C;
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
-Solve_In_Parts(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance)
+Solve_In_Parts(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance)
 {
     int global_n=A.n;
     T global_tolerance=tolerance;
@@ -112,7 +111,7 @@ Solve_In_Parts(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tole
         for(int i=0;i<num_intervals;i++) sum+=local_sum(i);}
     
     // find initial residual, r=b-Ax - reusing b for the residual
-    threaded_iterator.template Run<SPARSE_MATRIX_FLAT_NXN<T>&,ARRAY<T>&,ARRAY<T>&,T>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Part_One,A,x,b,sum/global_n);
+    threaded_iterator.template Run<SPARSE_MATRIX_FLAT_MXN<T>&,ARRAY<T>&,ARRAY<T>&,T>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Part_One,A,x,b,sum/global_n);
     if(enforce_compatibility){sum=0;
         threaded_iterator.template Run<ARRAY<T>&,ARRAY<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Sum,b,local_sum);
         for(int i=0;i<num_intervals;i++) sum+=local_sum(i);
@@ -125,9 +124,9 @@ Solve_In_Parts(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tole
         return;}
 
     // find an incomplete cholesky preconditioner - actually an LU that saves square roots, and an inverted diagonal to save on divides
-    SPARSE_MATRIX_FLAT_NXN<T>* C=0;
+    SPARSE_MATRIX_FLAT_MXN<T>* C=0;
     if(incomplete_cholesky){
-        C=new SPARSE_MATRIX_FLAT_NXN<T>(A);
+        C=new SPARSE_MATRIX_FLAT_MXN<T>(A);
         C->In_Place_Incomplete_Cholesky_Factorization(modified_incomplete_cholesky,modified_incomplete_cholesky_coefficient,
             preconditioner_zero_tolerance,preconditioner_zero_replacement);}
 
@@ -151,7 +150,7 @@ Solve_In_Parts(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tole
         threaded_iterator.template Run<ARRAY<T>&,T,T,int>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Part_Two,z,(T)rho,(T)rho_old,iteration);
         
         // update solution and residual
-        threaded_iterator.template Run<SPARSE_MATRIX_FLAT_NXN<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Part_Three,A);
+        threaded_iterator.template Run<SPARSE_MATRIX_FLAT_MXN<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Part_Three,A);
         threaded_iterator.template Run<ARRAY<T>&,ARRAY<T>&,ARRAY<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Dot,p,temp,local_sum);
         T sum=0;for(int i=0;i<num_intervals;i++) sum+=local_sum(i);
         threaded_iterator.template Run<ARRAY<T>&,ARRAY<T>&,T>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Part_Four,x,b,(T)(rho/sum));
@@ -173,7 +172,7 @@ Solve_In_Parts(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tole
     delete C;
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
-Solve_In_Parts(DOMAIN_ITERATOR_THREADED_ALPHA<PCG_SPARSE_THREADED<TV>,TV>& threaded_iterator,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance)
+Solve_In_Parts(DOMAIN_ITERATOR_THREADED_ALPHA<PCG_SPARSE_THREADED<TV>,TV>& threaded_iterator,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance)
 {
     int global_n=A.n,num_domains=threaded_iterator.domains.m;
     T global_tolerance=tolerance;
@@ -194,7 +193,7 @@ Solve_In_Parts(DOMAIN_ITERATOR_THREADED_ALPHA<PCG_SPARSE_THREADED<TV>,TV>& threa
         for(int i=0;i<num_domains;i++) x_interior(i)-=sum/global_n;}
     
     // find initial residual, r=b-Ax - reusing b for the residual
-    threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,const ARRAY<ARRAY<INTERVAL<int> > >&,SPARSE_MATRIX_FLAT_NXN<T>&,ARRAY<T>&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<ARRAY_VIEW<T> >&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Two,domain_index,all_interior_indices,all_ghost_indices,A,x,b_interior,temp_interior);
+    threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,const ARRAY<ARRAY<INTERVAL<int> > >&,SPARSE_MATRIX_FLAT_MXN<T>&,ARRAY<T>&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<ARRAY_VIEW<T> >&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Two,domain_index,all_interior_indices,all_ghost_indices,A,x,b_interior,temp_interior);
     if(enforce_compatibility){T sum=0;
         threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Sum,domain_index,all_interior_indices,b_interior,local_sum);
         for(int i=0;i<num_domains;i++) sum+=local_sum(i);
@@ -208,12 +207,12 @@ Solve_In_Parts(DOMAIN_ITERATOR_THREADED_ALPHA<PCG_SPARSE_THREADED<TV>,TV>& threa
         return;}
 
     // find an incomplete cholesky preconditioner - actually an LU that saves square roots, and an inverted diagonal to save on divides
-    ARRAY<SPARSE_MATRIX_FLAT_NXN<T>*> C(num_domains);
-    threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,SPARSE_MATRIX_FLAT_NXN<T>&,ARRAY<SPARSE_MATRIX_FLAT_NXN<T>*>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Three,domain_index,all_interior_indices,A,C);
+    ARRAY<SPARSE_MATRIX_FLAT_MXN<T>*> C(num_domains);
+    threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,SPARSE_MATRIX_FLAT_MXN<T>&,ARRAY<SPARSE_MATRIX_FLAT_MXN<T>*>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Three,domain_index,all_interior_indices,A,C);
 
     double rho=0,rho_old=0;
     for(int iteration=1;;iteration++){
-        threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<SPARSE_MATRIX_FLAT_NXN<T>*>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Four,domain_index,all_interior_indices,z_interior,b_interior,temp_interior,C);
+        threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<SPARSE_MATRIX_FLAT_MXN<T>*>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Four,domain_index,all_interior_indices,z_interior,b_interior,temp_interior,C);
         
         // for Neumann boundary conditions only, make sure z sums to zero
         if(enforce_compatibility){T sum=0;
@@ -228,7 +227,7 @@ Solve_In_Parts(DOMAIN_ITERATOR_THREADED_ALPHA<PCG_SPARSE_THREADED<TV>,TV>& threa
         threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<ARRAY_VIEW<T> >&,T,T,int>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Five,domain_index,all_interior_indices,z_interior,p_interior,(T)rho,(T)rho_old,iteration);
         
         // update solution and residual
-        threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,const ARRAY<ARRAY<INTERVAL<int> > >&,const SPARSE_MATRIX_FLAT_NXN<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Six,domain_index,all_interior_indices,all_ghost_indices,A);
+        threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,const ARRAY<ARRAY<INTERVAL<int> > >&,const SPARSE_MATRIX_FLAT_MXN<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Six,domain_index,all_interior_indices,all_ghost_indices,A);
         threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Dot,domain_index,all_interior_indices,p_interior,temp_interior,local_sum);
         T sum=0;for(int i=0;i<num_domains;i++) sum+=local_sum(i);
         threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<ARRAY_VIEW<T> >&,ARRAY<ARRAY_VIEW<T> >&,T>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Seven,domain_index,all_interior_indices,x_interior,b_interior,p_interior,temp_interior,(T)(rho/sum));
@@ -265,18 +264,16 @@ Solve_Part_One(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const
     temp_interior(tid)=temp.Array_View(interior_indices);
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
-Solve_Part_Two(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<ARRAY_VIEW<T> >& b_interior,ARRAY<ARRAY_VIEW<T> >& temp_interior)
+Solve_Part_Two(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<ARRAY_VIEW<T> >& b_interior,ARRAY<ARRAY_VIEW<T> >& temp_interior)
 {
     RANGE<TV_INT> interior_domain(domain);interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
     int tid=domain_index(interior_domain.min_corner);
-    const INTERVAL<int>& interior_indices=all_interior_indices(tid);
-    const ARRAY<INTERVAL<int> >& ghost_indices=all_ghost_indices(tid);
  
-    A.Times(interior_indices,ghost_indices,x,temp);
+    A.Times(x,temp);
     b_interior(tid)-=temp_interior(tid);
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
-Solve_Part_Three(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<SPARSE_MATRIX_FLAT_NXN<T>*>& C)
+Solve_Part_Three(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<SPARSE_MATRIX_FLAT_MXN<T>*>& C)
 {
     RANGE<TV_INT> interior_domain(domain);interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
     int tid=domain_index(interior_domain.min_corner);
@@ -289,7 +286,7 @@ Solve_Part_Three(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,con
             preconditioner_zero_tolerance,preconditioner_zero_replacement);}
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
-Solve_Part_Four(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<ARRAY_VIEW<T> >& z_interior,ARRAY<ARRAY_VIEW<T> >& b_interior,ARRAY<ARRAY_VIEW<T> >& temp_interior,ARRAY<SPARSE_MATRIX_FLAT_NXN<T>*>& C)
+Solve_Part_Four(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<ARRAY_VIEW<T> >& z_interior,ARRAY<ARRAY_VIEW<T> >& b_interior,ARRAY<ARRAY_VIEW<T> >& temp_interior,ARRAY<SPARSE_MATRIX_FLAT_MXN<T>*>& C)
 {
     RANGE<TV_INT> interior_domain(domain);interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
     int tid=domain_index(interior_domain.min_corner);
@@ -311,14 +308,11 @@ Solve_Part_Five(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,cons
     T beta=0;if(iteration==0) p_interior(tid)=z_interior(tid);else{beta=(T)(rho/rho_old);for(int i=0;i<interior_n;i++) p_interior(tid)(i)=z_interior(tid)(i)+beta*p_interior(tid)(i);}
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
-Solve_Part_Six(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,const SPARSE_MATRIX_FLAT_NXN<T>& A)
+Solve_Part_Six(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,const SPARSE_MATRIX_FLAT_MXN<T>& A)
 {
     RANGE<TV_INT> interior_domain(domain);interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
-    int tid=domain_index(interior_domain.min_corner);
-    const INTERVAL<int>& interior_indices=all_interior_indices(tid);
-    const ARRAY<INTERVAL<int> >& ghost_indices=all_ghost_indices(tid);
 
-    A.Times(interior_indices,ghost_indices,p,temp);
+    A.Times(p,temp);
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Solve_Part_Seven(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<ARRAY_VIEW<T> >& x_interior,ARRAY<ARRAY_VIEW<T> >& b_interior,ARRAY<ARRAY_VIEW<T> >& p_interior,ARRAY<ARRAY_VIEW<T> >& temp_interior,T alpha)
@@ -379,10 +373,10 @@ Threaded_Max(ARRAY<T>& vector,ARRAY<T>& sum,int start_index,int end_index,int ti
     sum(tid)=vector.Array_View(start_index,end_index-start_index).Max_Abs();
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
-Threaded_Part_One(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T sum,int start_index,int end_index)
+Threaded_Part_One(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T sum,int start_index,int end_index)
 {
     for(int i=start_index;i<end_index;i++) x(i)-=sum;
-    A.Times(start_index,end_index,p,temp);
+    A.Times(p,temp);
     for(int i=start_index;i<end_index;i++) b(i)-=temp(i);
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
@@ -391,9 +385,9 @@ Threaded_Part_Two(ARRAY<T>& z,T rho,T rho_old,int iteration,int start_index,int 
     T beta=0;if(iteration==0){for(int i=start_index;i<end_index;i++) p(i)=z(i);}else{beta=(T)(rho/rho_old);for(int i=start_index;i<end_index;i++) p(i)=z(i)+beta*p(i);}
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
-Threaded_Part_Three(SPARSE_MATRIX_FLAT_NXN<T>& A,int start_index,int end_index)
+Threaded_Part_Three(SPARSE_MATRIX_FLAT_MXN<T>& A,int start_index,int end_index)
 {
-    A.Times(start_index,end_index,p,temp);
+    A.Times(p,temp);
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Part_Four(ARRAY<T>& x,ARRAY<T>& b,T alpha,int start_index,int end_index)

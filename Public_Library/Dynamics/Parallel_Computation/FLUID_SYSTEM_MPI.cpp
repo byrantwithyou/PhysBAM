@@ -23,7 +23,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> FLUID_SYSTEM_MPI<TV>::
 FLUID_SYSTEM_MPI(const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_deformable_array_input,const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_rigid_array_input,
-    ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array_input,const ARRAY<INTERVAL<int> >& interior_regions_input,const T tolerance_ratio_input,MPI_SOLID_FLUID<TV>* mpi_solid_fluid_input,
+    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array_input,const ARRAY<INTERVAL<int> >& interior_regions_input,const T tolerance_ratio_input,MPI_SOLID_FLUID<TV>* mpi_solid_fluid_input,
     GENERALIZED_VELOCITY<TV>& temp_input,GENERALIZED_VELOCITY<TV>& solid_velocity_input,ARRAY<int>& coupled_deformable_particle_indices_input,bool precondition)
     :KRYLOV_SYSTEM_BASE<typename TV::SCALAR>(precondition,!precondition),
     J_deformable_array(J_deformable_array_input),J_rigid_array(J_rigid_array_input),A_array(A_array_input),interior_regions(interior_regions_input),mpi_solid_fluid(mpi_solid_fluid_input),
@@ -42,7 +42,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& bresult) const
     Get_Generalized_Velocity_From_Solid(solid_velocity); // MPI
     temp.V.Fill(TV());temp.rigid_V.Fill(TWIST<TV>());
     for(int i=0;i<A_array.m;i++){
-        const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
+        const SPARSE_MATRIX_FLAT_MXN<T>& A=A_array(i);
         const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable=J_deformable_array(i);
         const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid=J_rigid_array(i);
         result.v(i).Resize(A.n);A.Times(x.v(i),result.v(i));
@@ -62,7 +62,7 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& bres
 {
     const KRYLOV_VECTOR_T& x=debug_cast<const KRYLOV_VECTOR_T&>(bx);KRYLOV_VECTOR_T& result=debug_cast<KRYLOV_VECTOR_T&>(bresult);
     for(int i=0;i<A_array.m;i++){
-        const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
+        const SPARSE_MATRIX_FLAT_MXN<T>& A=A_array(i);
         VECTOR_T x_i,result_i;
         temp_array(i).Resize(interior_regions(i).Size());
         A.C->Solve_Forward_Substitution(x.v(i).Array_View(interior_regions(i)),temp_array(i),true); // diagonal should be treated as the identity

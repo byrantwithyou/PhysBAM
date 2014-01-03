@@ -4,7 +4,7 @@
 //#####################################################################
 #ifdef USE_MPI
 #include <Tools/Log/LOG.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Parallel_Computation/MPI_PACKAGE.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
@@ -25,10 +25,10 @@ Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPP
 {
     Initialize_Datatypes();
 
-    ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array=fluid_system.A_array;
+    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array=fluid_system.A_array;
     // find an incomplete cholesky preconditioner - actually an LU that saves square roots, and an inverted diagonal to save on divides
     for(int color=0;color<A_array.m;color++){
-        SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(color);
+        SPARSE_MATRIX_FLAT_MXN<T>& A=A_array(color);
         if(incomplete_cholesky && (recompute_preconditioner || !A.C)){
             if(color<=partitions->m){
                 delete A.C;A.C=A.Create_Submatrix((*partitions)(color).interior_indices);

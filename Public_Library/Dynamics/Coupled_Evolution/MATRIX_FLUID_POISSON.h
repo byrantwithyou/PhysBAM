@@ -7,7 +7,7 @@
 #ifndef __MATRIX_FLUID_POISSON__
 #define __MATRIX_FLUID_POISSON__
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
@@ -24,7 +24,7 @@ class MATRIX_FLUID_POISSON:public NONCOPYABLE
     const COLLISION_AWARE_INDEX_MAP<TV>& index_map;
     const ARRAY<T,TV_INT>& one_over_rho_c_squared;
 public:
-    SPARSE_MATRIX_FLAT_NXN<T> poisson;
+    SPARSE_MATRIX_FLAT_MXN<T> poisson;
     ARRAY<int> map;
 
     MATRIX_FLUID_POISSON(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,

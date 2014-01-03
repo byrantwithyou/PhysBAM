@@ -11,7 +11,7 @@
 #include <Tools/Grids_Uniform_Arrays/FLOOD_FILL.h>
 #include <Tools/Grids_Uniform_PDE_Linear/LAPLACE_UNIFORM.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <Tools/Parallel_Computation/PCG_SPARSE_THREADED.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
@@ -57,7 +57,7 @@ Solve(const T time,const bool solution_regions_already_computed)
     T_ARRAYS_INT cell_index_to_matrix_index(grid.Domain_Indices(1));
     cell_index_to_matrix_index.Fill(-1);
     ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-2,number_of_regions);
-    ARRAY<SPARSE_MATRIX_FLAT_NXN<T> > A_array(number_of_regions);ARRAY<ARRAY<T> > b_array(number_of_regions);
+    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > A_array(number_of_regions);ARRAY<ARRAY<T> > b_array(number_of_regions);
     for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(filled_region_colors(iterator.Cell_Index()))++;
     for(int color=0;color<number_of_regions;color++) if(filled_region_touches_dirichlet(color)||solve_neumann_regions){
         matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color));}
@@ -88,7 +88,7 @@ Solve(const T time,const bool solution_regions_already_computed)
 // Function Find_A
 //#####################################################################
 template<class TV> void LAPLACE_UNIFORM<TV>::
-Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index)
+Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     DOMAIN_ITERATOR_THREADED_ALPHA<LAPLACE_UNIFORM<TV>,TV> threaded_iterator(grid.Domain_Indices(1),thread_queue);    
     ARRAY<ARRAY<int> > row_counts(A_array.m,false);
@@ -97,7 +97,7 @@ Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<AR
         b_array(i).Resize(filled_region_cell_count(i));}
     threaded_iterator.template Run<T_ARRAYS_INT&,ARRAY<ARRAY<int> >&>(*this,&LAPLACE_UNIFORM<TV>::Find_A_Part_One,cell_index_to_matrix_index,row_counts);
     for(int i=0;i<A_array.m;i++) A_array(i).Set_Row_Lengths(row_counts(i));
-    threaded_iterator.template Run<ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >&,ARRAY<ARRAY<T> >&,T_ARRAYS_INT&>(*this,&LAPLACE_UNIFORM<TV>::Find_A_Part_Two,A_array,b_array,cell_index_to_matrix_index);
+    threaded_iterator.template Run<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >&,ARRAY<ARRAY<T> >&,T_ARRAYS_INT&>(*this,&LAPLACE_UNIFORM<TV>::Find_A_Part_Two,A_array,b_array,cell_index_to_matrix_index);
 }
 template<class TV> void LAPLACE_UNIFORM<TV>::
 Find_A_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<int> >& row_counts)
@@ -115,7 +115,7 @@ Find_A_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_INT& cell_index_to_matrix_index,A
             row_counts(color)(cell_index_to_matrix_index(cell_index))=row_count;}}
 }
 template<class TV> void LAPLACE_UNIFORM<TV>::
-Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
     T default_row_sum=-2*one_over_dx2.Sum_Abs(),r=0;
@@ -124,7 +124,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
         int color=filled_region_colors(cell_index);
         if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
             int matrix_index=cell_index_to_matrix_index(cell_index);
-            SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(filled_region_colors(cell_index));ARRAY<T>& b=b_array(filled_region_colors(cell_index));b(matrix_index)=f(cell_index);
+            SPARSE_MATRIX_FLAT_MXN<T>& A=A_array(filled_region_colors(cell_index));ARRAY<T>& b=b_array(filled_region_colors(cell_index));b(matrix_index)=f(cell_index);
             T row_sum=default_row_sum;
             for(int axis=0;axis<TV::m;axis++){TV_INT offset;offset[axis]=1;
                 if(filled_region_colors.Valid_Index(cell_index-offset)){
@@ -155,7 +155,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
 // Function Solve_Subregion
 //#####################################################################
 template<class TV> void LAPLACE_UNIFORM<TV>::
-Solve_Subregion(ARRAY<TV_INT>& matrix_index_to_cell_index,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& b,const int color,ARRAY<int,TV_INT>* domain_index)
+Solve_Subregion(ARRAY<TV_INT>& matrix_index_to_cell_index,SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& b,const int color,ARRAY<int,TV_INT>* domain_index)
 {
     assert(!thread_queue);
     ARRAY<INTERVAL<int> > interior_indices;
@@ -166,7 +166,7 @@ Solve_Subregion(ARRAY<TV_INT>& matrix_index_to_cell_index,SPARSE_MATRIX_FLAT_NXN
 // Function Solve_Subregion
 //#####################################################################
 template<class TV> void LAPLACE_UNIFORM<TV>::
-Solve_Subregion(ARRAY<INTERVAL<int> >& interior_indices,ARRAY<ARRAY<INTERVAL<int> > >& ghost_indices,ARRAY<TV_INT>& matrix_index_to_cell_index,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& b,const int color,ARRAY<int,TV_INT>* domain_index)
+Solve_Subregion(ARRAY<INTERVAL<int> >& interior_indices,ARRAY<ARRAY<INTERVAL<int> > >& ghost_indices,ARRAY<TV_INT>& matrix_index_to_cell_index,SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& b,const int color,ARRAY<int,TV_INT>* domain_index)
 {
     int number_of_unknowns=matrix_index_to_cell_index.m;
     A.Negate();b*=(T)-1;
@@ -180,12 +180,12 @@ Solve_Subregion(ARRAY<INTERVAL<int> >& interior_indices,ARRAY<ARRAY<INTERVAL<int
     bool use_threaded_solve=thread_queue&&number_of_unknowns>=min_unknowns_for_threading;
     if(!mpi_grid){
         if(use_threaded_solve){pcg_threaded->p.Resize(A.n,false);pcg_threaded->temp.Resize(A.n,false);}
-        if(use_threaded_solve) threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,const ARRAY<ARRAY<INTERVAL<int> > >&,SPARSE_MATRIX_FLAT_NXN<T>&,ARRAY<T>&,ARRAY<T>&,T>(*pcg_threaded,&PCG_SPARSE_THREADED<TV>::Solve,*domain_index,interior_indices,ghost_indices,A,x,b,tolerance);
+        if(use_threaded_solve) threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,const ARRAY<ARRAY<INTERVAL<int> > >&,SPARSE_MATRIX_FLAT_MXN<T>&,ARRAY<T>&,ARRAY<T>&,T>(*pcg_threaded,&PCG_SPARSE_THREADED<TV>::Solve,*domain_index,interior_indices,ghost_indices,A,x,b,tolerance);
         //if(use_threaded_solve) pcg_threaded->Solve_In_Parts(threaded_iterator,domain_index,interior_indices,ghost_indices,A,x,b,tolerance);
         //if(use_threaded_solve) pcg_threaded->Solve_In_Parts(A,x,b,tolerance);
         else pcg.Solve(A,x,b,vectors,tolerance);}
     else{
-        if(use_threaded_solve) DOMAIN_ITERATOR_THREADED_ALPHA<LAPLACE_MPI<TV>,TV>(grid.Domain_Indices(1),thread_queue,1,1,2,1).template Run<const ARRAY<int,TV_INT>&,ARRAY<INTERVAL<int> >&,ARRAY<ARRAY<INTERVAL<int> > >&,SPARSE_MATRIX_FLAT_NXN<T>&,ARRAY<T>&,ARRAY<T>&,ARRAY<KRYLOV_VECTOR_BASE<T>*>&,T,int,int>(*laplace_mpi,&LAPLACE_MPI<TV>::Solve_Threaded,*domain_index,interior_indices,ghost_indices,A,x,b,vectors,tolerance,color,1);
+        if(use_threaded_solve) DOMAIN_ITERATOR_THREADED_ALPHA<LAPLACE_MPI<TV>,TV>(grid.Domain_Indices(1),thread_queue,1,1,2,1).template Run<const ARRAY<int,TV_INT>&,ARRAY<INTERVAL<int> >&,ARRAY<ARRAY<INTERVAL<int> > >&,SPARSE_MATRIX_FLAT_MXN<T>&,ARRAY<T>&,ARRAY<T>&,ARRAY<KRYLOV_VECTOR_BASE<T>*>&,T,int,int>(*laplace_mpi,&LAPLACE_MPI<TV>::Solve_Threaded,*domain_index,interior_indices,ghost_indices,A,x,b,vectors,tolerance,color,1);
         else laplace_mpi->Solve(A,x,b,vectors,tolerance,color);}
     for(int i=0;i<number_of_unknowns;i++){TV_INT cell_index=matrix_index_to_cell_index(i);u(cell_index)=x(i);}
     vectors.Delete_Pointers_And_Clean_Memory();

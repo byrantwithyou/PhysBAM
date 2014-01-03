@@ -48,7 +48,7 @@ FLUID_SYSTEM_MPI_SLIP(const bool use_preconditioner_input,const SPARSE_MATRIX_FL
     if(use_preconditioner){
         SPARSE_MATRIX_FLAT_MXN<T> div_precondition_transpose;
         div_precondition.Transpose(div_precondition_transpose);
-        div_M_inverse_div_transpose_precondition=(div_precondition*div_precondition_transpose.Scale_Rows(M_inverse)).Create_NXN_Matrix();
+        div_M_inverse_div_transpose_precondition=(div_precondition*div_precondition_transpose.Scale_Rows(M_inverse));
         delete div_M_inverse_div_transpose_precondition.C;
         div_M_inverse_div_transpose_precondition.C=div_M_inverse_div_transpose_precondition.Create_Submatrix(divergence_indices);
         const bool modified_incomplete_cholesky=true;

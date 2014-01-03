@@ -16,7 +16,7 @@ struct POISSON_PROJECTION_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > VECTOR_T;
 
     SPARSE_MATRIX_FLAT_MXN<T> gradient,neg_divergence;
-    SPARSE_MATRIX_FLAT_NXN<T> poisson;
+    SPARSE_MATRIX_FLAT_MXN<T> poisson;
     ARRAY<T> beta_inverse;
     ARRAY<ARRAY<T> > projections;
     mutable ARRAY<T> temp;

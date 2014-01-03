@@ -98,7 +98,7 @@ public:
     bool solid_node;
     bool fluid_node;
     bool use_full_ic;
-    SPARSE_MATRIX_FLAT_NXN<T> full_matrix;
+    SPARSE_MATRIX_FLAT_MXN<T> full_matrix;
     MPI_SOLID_FLUID<TV>* mpi_solid_fluid;
     MPI_UNIFORM_GRID<TV>* mpi_grid;
     mutable ARRAY<T,TV_INT> pressure_on_grid;

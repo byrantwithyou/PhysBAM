@@ -15,7 +15,7 @@
 #include <Tools/Krylov_Solvers/SYMMQMR.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
@@ -192,9 +192,9 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
         if(index2>=0) rhs.v(index2)+=rhs1;}
 
     LOG::cout<<"pressure jump range: "<<mn<<"  "<<mx<<std::endl;
-    SPARSE_MATRIX_FLAT_NXN<T> matrix;
+    SPARSE_MATRIX_FLAT_MXN<T> matrix;
     helper.Set_Matrix(num_cells,matrix);
-    typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > > SYSTEM;
+    typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > > SYSTEM;
     matrix.Construct_Incomplete_Cholesky_Factorization();
     SYSTEM system(matrix);
     system.P=matrix.C;
@@ -328,7 +328,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
 
     if(implicit) for(int i=0;i<r.v.m;i++) helper.data.Append(TRIPLE<int,int,T>(i,i,r.v(i)));
 
-    SPARSE_MATRIX_FLAT_NXN<T> matrix;
+    SPARSE_MATRIX_FLAT_MXN<T> matrix;
     helper.Set_Matrix(num_dual_cells,matrix);
 
     static int solve_id=-1;solve_id++;
@@ -339,7 +339,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b.v);}
 
     if(implicit){
-        typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > > SYSTEM;
+        typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > > SYSTEM;
         matrix.Construct_Incomplete_Cholesky_Factorization();
         SYSTEM system(matrix);
         system.P=matrix.C;

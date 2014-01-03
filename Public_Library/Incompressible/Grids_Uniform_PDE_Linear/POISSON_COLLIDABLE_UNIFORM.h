@@ -13,7 +13,7 @@
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>
 namespace PhysBAM{
 
-template<class T> class SPARSE_MATRIX_FLAT_NXN;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 template<class TV>
 //class POISSON_COLLIDABLE_UNIFORM:public POISSON<typename TV::SCALAR>,public LAPLACE_COLLIDABLE_UNIFORM<TV>
@@ -80,12 +80,12 @@ public:
     void Find_Constant_beta(ARRAY<T,FACE_INDEX<TV::m> >& beta_face,const ARRAY<T,TV_INT>& phi_ghost);
     void Find_Constant_beta(const ARRAY<T,TV_INT>& phi_ghost);
     void Find_Constant_beta_Multiphase(ARRAY<ARRAY<T,TV_INT>>& phis_ghost);
-    virtual void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index) PHYSBAM_OVERRIDE;
+    virtual void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index) PHYSBAM_OVERRIDE;
 private:
     void Add_Jump_To_b(const ARRAY<T,TV_INT>& phi_ghost);
     void Add_Jump_To_b_Multiphase(ARRAY<ARRAY<T,TV_INT>>& phis_ghost);
     void Add_Derivative_Jump_To_b(const ARRAY<T,TV_INT>& phi_ghost);
-    void Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index);
+    void Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index);
 //#####################################################################
 };
 }
