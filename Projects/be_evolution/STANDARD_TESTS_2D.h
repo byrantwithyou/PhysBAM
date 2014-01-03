@@ -96,6 +96,7 @@ public:
     T unit_rho,unit_p,unit_N,unit_J;
     T density;
     T save_dt;
+    T final_x;
     T ether_drag;
     CELL_ITERATOR<TV>* cell_iterator;
     ARRAY<TV3,TV_INT> image;
@@ -110,7 +111,7 @@ public:
         use_rand_seed(false),use_residuals(false),use_newmark(false),use_newmark_be(false),project_nullspace(false),
         backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
         use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
-        penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),
+        penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),final_x((T)-16.175),
         ether_drag(0),cell_iterator(0),use_vanilla_newton(false)
     {
         this->fixed_dt=1./240;
@@ -192,6 +193,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-debug_newton",&backward_euler_evolution->newtons_method.debug,"Enable diagnostics in Newton's method");
     parse_args->Add("-kry_fail",&backward_euler_evolution->newtons_method.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
     parse_args->Add("-angle_tol",&backward_euler_evolution->newtons_method.angle_tolerance,"tol","gradient descent tolerance");
+    parse_args->Add("-final_x",&final_x,"position","final x position");
     parse_args->Add_Not("-mr",&backward_euler_evolution->newtons_method.use_cg,"use minres instead of cg");
     parse_args->Add("-no_line_search",&no_line_search,"disable line search");
     parse_args->Add("-gss",&backward_euler_evolution->newtons_method.use_golden_section_search,"use golden section search instead of wolfe conditions line search");
@@ -272,11 +274,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
             kinematic_particle_positions(2).Add_Control_Point(0,TV(0,1));
             kinematic_particle_positions(3).Add_Control_Point(0,TV(1,1));
             kinematic_particle_positions(4).Add_Control_Point(0,TV(2,1));
-            kinematic_particle_positions(0).Add_Control_Point(10,TV(0,0));
-            kinematic_particle_positions(1).Add_Control_Point(10,TV(-40,0));
-            kinematic_particle_positions(2).Add_Control_Point(10,TV(0,1));
-            kinematic_particle_positions(3).Add_Control_Point(10,TV(-20,1));
-            kinematic_particle_positions(4).Add_Control_Point(10,TV(-40,1));
+            kinematic_particle_positions(0).Add_Control_Point(1,TV(0,0));
+            kinematic_particle_positions(1).Add_Control_Point(1,TV(final_x,0));
+            kinematic_particle_positions(2).Add_Control_Point(1,TV(0,1));
+            kinematic_particle_positions(3).Add_Control_Point(1,TV(final_x/2,1));
+            kinematic_particle_positions(4).Add_Control_Point(1,TV(final_x,1));
             break;
     }
 
