@@ -1625,6 +1625,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             deformable_body_collection.particles.V.Fill(TV(1,2,-3));
             break;}
         case 17:{
+            use_penalty_self_collisions=false;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5*unit_p,(T).45,(T).01*s);
             int s=resolution+1,s2=s*s,s3=s*s2;
@@ -1642,6 +1643,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             particles.X.Subset(stuck_particles)=OX;
             break;}
         case 18:{
+            use_penalty_self_collisions=false;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5*unit_p,(T).45,(T).01*s);
             rand.Fill_Uniform(particles.X,-0,0);
