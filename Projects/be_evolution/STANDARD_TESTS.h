@@ -436,10 +436,17 @@ void Parse_Options() PHYSBAM_OVERRIDE
             /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             break;
+        case 23:
+            attachment_velocity=1.0;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+            last_frame=2000;
+            break;
         case 24:
         case 25:
         case 26:
-        case 27: case 23: case 53: case 54: case 55: case 57: case 100: case 48:
+        case 27: case 53: case 54: case 55: case 57: case 100: case 48:
             attachment_velocity=0.2;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -2088,7 +2095,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV velocity_x=velocity_time<final_time?TV(attachment_velocity,0,0):TV();
         for(int ij=0;ij<mn;ij++)for(int j=0;j<n;j++){V(m*j+m*n*ij)=velocity_x;V(m-1+m*j+m*n*ij)=-velocity_x;}}
     if(test_number==23){
-        final_time=35;
+        final_time=12;
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
         int mn=mattress_grid.counts.z;
