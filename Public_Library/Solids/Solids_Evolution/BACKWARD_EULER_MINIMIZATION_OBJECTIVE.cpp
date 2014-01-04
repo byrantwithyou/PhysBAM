@@ -22,7 +22,7 @@ BACKWARD_EULER_MINIMIZATION_OBJECTIVE(SOLID_BODY_COLLECTION<TV>& solid_body_coll
     :solid_body_collection(solid_body_collection),
     v1(solid_body_collection.deformable_body_collection.particles.V,solid_body_collection.rigid_body_collection.rigid_body_particles.twist,solid_body_collection),
     v0(static_cast<GENERALIZED_VELOCITY<TV>&>(*v1.Clone_Default())),tmp0(static_cast<GENERALIZED_VELOCITY<TV>&>(*v1.Clone_Default())),
-    tmp1(static_cast<GENERALIZED_VELOCITY<TV>&>(*v1.Clone_Default())),minimization_system(minimization_system),collision_thickness(1e-15),last_energy(FLT_MAX)
+    tmp1(static_cast<GENERALIZED_VELOCITY<TV>&>(*v1.Clone_Default())),minimization_system(minimization_system),collision_thickness(1e-15),last_energy(FLT_MAX),collisions_in_solve(true)
 {
 }
 //#####################################################################
@@ -45,7 +45,7 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
     tmp1=dv;
     if(h)
         minimization_system.forced_collisions.Clean_Memory();
-    Adjust_For_Collision(tmp1);
+    Make_Feasible(tmp1);
     Compute_Unconstrained(tmp1,h,g,e);
     if(h)
         for(int i=0;i<minimization_system.collisions.m;i++)
@@ -196,7 +196,8 @@ Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep)
 template<class TV> void BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
 Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const
 {
-    Adjust_For_Collision(dv);
+    if(collisions_in_solve)
+        Adjust_For_Collision(dv);
 }
 //#####################################################################
 // Function Initial_Guess
@@ -259,7 +260,7 @@ Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv)
 {
     KRYLOV_VECTOR_BASE<T> *t0=dv.Clone_Default();
     *t0=dv;
-    Adjust_For_Collision(*t0);
+    Make_Feasible(*t0);
 
     ARRAY<IMPLICIT_OBJECT<TV>*> collision_objects_copy;
     collision_objects_copy.Exchange(collision_objects);
@@ -284,7 +285,7 @@ Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv)
 
     ARRAY<COLLISION> ac;
     ac.Exchange(minimization_system.collisions);
-    Adjust_For_Collision(*b);
+    Make_Feasible(*b);
     ac.Exchange(minimization_system.collisions);
     ddv->Copy(-1,*t0,*b);
 

@@ -314,6 +314,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-backtrack",&backward_euler_evolution->newtons_method.use_backtracking,"use backtracking line search instead of wolfe conditions line search");
     parse_args->Add("-use_penalty",&use_penalty_collisions,"use penalty collisions");
     parse_args->Add_Not("-no_constraints",&use_constraint_collisions,"disable constrained optimization for collisions");
+    parse_args->Add_Not("-no_collisions_in_solve",&backward_euler_evolution->minimization_objective.collisions_in_solve,"disable collisions in solve");
     parse_args->Add("-penalty_stiffness",&penalty_collisions_stiffness,"tol","penalty collisions stiffness");
     parse_args->Add("-penalty_separation",&penalty_collisions_separation,"tol","penalty collisions separation");
     parse_args->Add("-penalty_length",&penalty_collisions_length,"tol","penalty collisions length scale");
@@ -619,7 +620,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     //solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;
 
 
-    if(use_constraint_collisions) use_penalty_collisions=false;
     if(use_penalty_collisions || use_constraint_collisions){
         solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
         solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
@@ -643,7 +643,7 @@ void Get_Initial_Data()
 
     switch(test_number){
         case 1: case 7:{
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0)*m)),true,true,density,m);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)25,0)*m)),true,true,density,m);
             tests.Add_Ground(0,1.99*m);
             break;}
         case 2:{

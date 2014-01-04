@@ -38,6 +38,7 @@ public:
     HASHTABLE<PAIR<int,int> > disabled_collision;
     HASHTABLE<int> solids_forces_lazy,rigids_forces_lazy,deformables_forces_lazy;
     mutable T last_energy;
+    bool collisions_in_solve;
 
     BACKWARD_EULER_MINIMIZATION_OBJECTIVE(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>& minimization_system);
     virtual ~BACKWARD_EULER_MINIMIZATION_OBJECTIVE();
