@@ -10,6 +10,7 @@
 #define __STANDARD_TESTS_2D__
 
 #include <Tools/Images/PNG_FILE.h>
+#include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Log/LOG.h>
@@ -50,7 +51,7 @@
 #include <fstream>
 namespace PhysBAM{
 
-extern bool siggraph_hack_newton_converged;
+extern int siggraph_hack_newton_iterations;
 
 template<class TV> class STANDARD_TESTS;
 template<class T_input>
@@ -66,7 +67,6 @@ public:
     std::ofstream svout;
     SOLIDS_STANDARD_TESTS<TV> tests;
 
-    GRID<TV> mattress_grid;
     T attachment_velocity;
     bool test_forces;
     ARRAY<int> kinematic_ids;
@@ -104,6 +104,7 @@ public:
     bool use_vanilla_newton;
     ARRAY<INTERPOLATION_CURVE<T,TV> > kinematic_particle_positions;
     ARRAY<int> kinematic_particle_ids;
+    ARRAY<TV> initial_positions;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),test_forces(false),
@@ -245,43 +246,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
         backward_euler_evolution->minimization_objective.collision_thickness*=m;}
     solids_parameters.use_trapezoidal_rule_for_velocities=!use_newmark_be;
 
-    switch(test_number){
-        case 1:
-            if(!resolution) resolution=10;
-            mattress_grid=GRID<TV>(TV_INT()+resolution+1,RANGE<TV>::Centered_Box());
-            break;
-        case 100:
-            mattress_grid=GRID<TV>(TV_INT(3,2),RANGE<TV>(TV(),TV(2,1)));
-            image_grid.Initialize(image_size,RANGE<TV>::Centered_Box()*5,true);
-            cell_iterator=new CELL_ITERATOR<TV>(image_grid);
-            image.Resize(image_grid.Cell_Indices());
-            this->fixed_dt=1./24;
-            frame_rate=1/(this->fixed_dt*image_size.Product());
-            last_frame=1;
-            for(int i=0;i<9;i++) if(i!=4) constrained_particles.Append(i);
-            constrained_velocities.Resize(constrained_particles.m,true,true,TV());
-            break;
-        case 101:
-            mattress_grid=GRID<TV>(TV_INT(3,2),RANGE<TV>(TV(),TV(2,1)));
-            kinematic_particle_ids.Append(0);
-            kinematic_particle_ids.Append(2);
-            kinematic_particle_ids.Append(3);
-            kinematic_particle_ids.Append(4);
-            kinematic_particle_ids.Append(5);
-            kinematic_particle_positions.Resize(5);
-            kinematic_particle_positions(0).Add_Control_Point(0,TV(0,0));
-            kinematic_particle_positions(1).Add_Control_Point(0,TV(2,0));
-            kinematic_particle_positions(2).Add_Control_Point(0,TV(0,1));
-            kinematic_particle_positions(3).Add_Control_Point(0,TV(1,1));
-            kinematic_particle_positions(4).Add_Control_Point(0,TV(2,1));
-            kinematic_particle_positions(0).Add_Control_Point(1,TV(0,0));
-            kinematic_particle_positions(1).Add_Control_Point(1,TV(final_x,0));
-            kinematic_particle_positions(2).Add_Control_Point(1,TV(0,1));
-            kinematic_particle_positions(3).Add_Control_Point(1,TV(final_x/2,1));
-            kinematic_particle_positions(4).Add_Control_Point(1,TV(final_x,1));
-            break;
-    }
-
     if(use_constraint_collisions) use_penalty_collisions=false;
     if(use_penalty_collisions || use_constraint_collisions){
         solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
@@ -305,17 +269,49 @@ void Get_Initial_Data()
 
     switch(test_number){
         case 1:{
+            if(!resolution) resolution=10;
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4)*m));
-            tests.Create_Mattress(mattress_grid,true,&initial_state,density);
+            tests.Create_Mattress(GRID<TV>(TV_INT()+resolution+1,RANGE<TV>::Centered_Box()),true,&initial_state,density);
             tests.Add_Ground();
             break;}
         case 100:{
-            tests.Create_Mattress(mattress_grid,true,0,density);
-            tests.Add_Ground();
+            image_grid.Initialize(image_size,RANGE<TV>::Centered_Box()*5,true);
+            cell_iterator=new CELL_ITERATOR<TV>(image_grid);
+            image.Resize(image_grid.Cell_Indices());
+            this->fixed_dt=1./24;
+            frame_rate=1/(this->fixed_dt*image_size.Product());
+            last_frame=1;
+            for(int i=0;i<9;i++) if(i!=4) constrained_particles.Append(i);
+            constrained_velocities.Resize(constrained_particles.m,true,true,TV());
+            tests.Create_Mattress(GRID<TV>(TV_INT(3,2),RANGE<TV>(TV(),TV(2,1))),true,0,density);
             break;}
         case 101:{
-            tests.Create_Mattress(mattress_grid,true,0,density);
-            tests.Add_Ground();
+            kinematic_particle_ids.Append(0);
+            kinematic_particle_ids.Append(2);
+            kinematic_particle_ids.Append(3);
+            kinematic_particle_ids.Append(4);
+            kinematic_particle_ids.Append(5);
+            kinematic_particle_positions.Resize(5);
+            kinematic_particle_positions(0).Add_Control_Point(0,TV(0,0));
+            kinematic_particle_positions(1).Add_Control_Point(0,TV(2,0));
+            kinematic_particle_positions(2).Add_Control_Point(0,TV(0,1));
+            kinematic_particle_positions(3).Add_Control_Point(0,TV(1,1));
+            kinematic_particle_positions(4).Add_Control_Point(0,TV(2,1));
+            kinematic_particle_positions(0).Add_Control_Point(1,TV(0,0));
+            kinematic_particle_positions(1).Add_Control_Point(1,TV(final_x,0));
+            kinematic_particle_positions(2).Add_Control_Point(1,TV(0,1));
+            kinematic_particle_positions(3).Add_Control_Point(1,TV(final_x/2,1));
+            kinematic_particle_positions(4).Add_Control_Point(1,TV(final_x,1));
+            tests.Create_Mattress(GRID<TV>(TV_INT(3,2),RANGE<TV>(TV(),TV(2,1))),true,0,density);
+            break;}
+        case 102:{
+            image_grid.Initialize(image_size,RANGE<TV>::Centered_Box()*5,true);
+            cell_iterator=new CELL_ITERATOR<TV>(image_grid);
+            image.Resize(image_grid.Cell_Indices());
+            frame_rate=1/(this->fixed_dt*image_size.Product());
+            last_frame=1;
+            tests.Create_Mattress(GRID<TV>(TV_INT(3,6),RANGE<TV>(TV(-1,-1),TV(1,4))),true,0,density);
+            initial_positions=particles.X;
             break;}
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
@@ -355,6 +351,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(ta,(T)1e5*unit_p,(T).45,(T)0*s);
             break;}
         case 101:{
+            TRIANGULATED_AREA<T>& ta=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            Add_Constitutive_Model(ta,(T)1e5*unit_p,(T).45,(T)0*s);
+            break;}
+        case 102:{
             TRIANGULATED_AREA<T>& ta=deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(ta,(T)1e5*unit_p,(T).45,(T)0*s);
             break;}
@@ -461,6 +461,13 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
 
     if(test_number==100) particles.X(4)=cell_iterator->Location();
+    if(test_number==102){
+        Add_Debug_Particle(cell_iterator->Location(),TV3(1,0,0));
+        MATRIX<T,2> M(cell_iterator->Location(),cell_iterator->Location().Orthogonal_Vector());
+        for(int i=0;i<9;i++){
+            particles.X(i)=M*initial_positions(i);
+            particles.X(i+9)=particles.X(i)+TV(0,3);}
+        particles.V.Fill(TV());}
 }
 //#####################################################################
 // Function Postprocess_Substep
@@ -468,8 +475,17 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==100){
-        if(siggraph_hack_newton_converged) image(cell_iterator->index)=TV3(0,1,0);
-        else image(cell_iterator->index)=TV3(1,0,0);
+        INTERPOLATED_COLOR_MAP<T> cm;
+        cm.Initialize_Colors(0,20,false,true,false);
+        if(siggraph_hack_newton_iterations>=0) image(cell_iterator->index)=cm(siggraph_hack_newton_iterations);
+        else image(cell_iterator->index)=TV3(.5,.5,.5);
+        cell_iterator->Next();
+        if(!cell_iterator->Valid()) PNG_FILE<T>::Write("image.png",image);}
+    if(test_number==102){
+        INTERPOLATED_COLOR_MAP<T> cm;
+        cm.Initialize_Colors(0,20,false,true,false);
+        if(siggraph_hack_newton_iterations>=0) image(cell_iterator->index)=cm(siggraph_hack_newton_iterations);
+        else image(cell_iterator->index)=TV3(.5,.5,.5);
         cell_iterator->Next();
         if(!cell_iterator->Valid()) PNG_FILE<T>::Write("image.png",image);}
 }
