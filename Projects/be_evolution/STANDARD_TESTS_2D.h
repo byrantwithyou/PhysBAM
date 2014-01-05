@@ -105,6 +105,7 @@ public:
     ARRAY<INTERPOLATION_CURVE<T,TV> > kinematic_particle_positions;
     ARRAY<int> kinematic_particle_ids;
     ARRAY<TV> initial_positions;
+    std::string image_file;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),test_forces(false),
@@ -113,7 +114,7 @@ public:
         backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
         use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
         penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),final_x((T)-16.175),
-        ether_drag(0),cell_iterator(0),use_vanilla_newton(false)
+        ether_drag(0),cell_iterator(0),use_vanilla_newton(false),image_file("image.png")
     {
         this->fixed_dt=1./240;
     }
@@ -207,6 +208,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
     parse_args->Add("-use_tri_col",&solids_parameters.triangle_collision_parameters.perform_self_collision,"use triangle collisions");
     parse_args->Add("-use_vanilla_newton",&use_vanilla_newton,"use triangle collisions");
+    parse_args->Add("-image_file",&image_file,"file","output image filename");
 }
 //#####################################################################
 // Function Parse_Options
@@ -480,14 +482,14 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         if(siggraph_hack_newton_iterations>=0) image(cell_iterator->index)=cm(siggraph_hack_newton_iterations);
         else image(cell_iterator->index)=TV3(.5,.5,.5);
         cell_iterator->Next();
-        if(!cell_iterator->Valid()) PNG_FILE<T>::Write("image.png",image);}
+        if(!cell_iterator->Valid()) PNG_FILE<T>::Write(image_file.c_str(),image);}
     if(test_number==102){
         INTERPOLATED_COLOR_MAP<T> cm;
-        cm.Initialize_Colors(0,20,false,true,false);
+        cm.Initialize_Colors(0,50,false,true,false);
         if(siggraph_hack_newton_iterations>=0) image(cell_iterator->index)=cm(siggraph_hack_newton_iterations);
         else image(cell_iterator->index)=TV3(.5,.5,.5);
         cell_iterator->Next();
-        if(!cell_iterator->Valid()) PNG_FILE<T>::Write("image.png",image);}
+        if(!cell_iterator->Valid()) PNG_FILE<T>::Write(image_file.c_str(),image);}
 }
 //#####################################################################
 // Function Preprocess_Frame
