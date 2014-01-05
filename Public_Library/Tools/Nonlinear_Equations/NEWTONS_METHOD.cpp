@@ -34,7 +34,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
     T last_E=FLT_MAX;
     int local_max_iterations=max_iterations;
     F.Make_Feasible(x);
-    for(int i=0;i<local_max_iterations;i++){
+    for(iterations_used=0;iterations_used<local_max_iterations;iterations_used++){
         T E=0;
         F.Compute(x,&sys,&grad,&E);
         T norm_grad=sqrt(sys.Inner_Product(grad,grad));
@@ -42,13 +42,13 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
 
         if(debug){
             char buff[1000];
-            sprintf(buff,"newton %d   %.16g %.16g %.16g", i, E, (E-last_E), norm_grad);
+            sprintf(buff,"newton %d   %.16g %.16g %.16g", iterations_used, E, (E-last_E), norm_grad);
             PHYSBAM_DEBUG_WRITE_SUBSTEP(buff,1,1);}
 
-        if(norm_grad<tolerance && (i || !require_one_iteration || !norm_grad)){result=true;break;}
+        if(norm_grad<tolerance && (iterations_used || !require_one_iteration || !norm_grad)){result=true;break;}
         if(norm_grad<countdown_tolerance){
             result=true;
-            local_max_iterations=std::min(local_max_iterations,i+countdown_iterations);}
+            local_max_iterations=std::min(local_max_iterations,iterations_used+countdown_iterations);}
         dx*=0;
         tm.Copy(-1,grad);
         T local_krylov_tolerance=std::min((T).5,krylov_tolerance*(T)sqrt(std::max(norm_grad,tolerance)));
