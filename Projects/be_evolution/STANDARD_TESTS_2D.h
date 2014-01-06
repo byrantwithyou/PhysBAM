@@ -15,6 +15,7 @@
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -100,12 +101,14 @@ public:
     T ether_drag;
     CELL_ITERATOR<TV>* cell_iterator;
     ARRAY<TV3,TV_INT> image;
+    ARRAY<int,TV_INT> raw_image;
     GRID<TV> image_grid;
     bool use_vanilla_newton;
     ARRAY<INTERPOLATION_CURVE<T,TV> > kinematic_particle_positions;
     ARRAY<int> kinematic_particle_ids;
     ARRAY<TV> initial_positions;
     std::string image_file;
+    std::string raw_image_file;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),test_forces(false),
@@ -114,7 +117,7 @@ public:
         backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
         use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
         penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),final_x((T)-16.175),
-        ether_drag(0),cell_iterator(0),use_vanilla_newton(false),image_file("image.png")
+        ether_drag(0),cell_iterator(0),use_vanilla_newton(false),image_file("image.png"),raw_image_file("image.txt")
     {
         this->fixed_dt=1./240;
     }
@@ -209,6 +212,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-use_tri_col",&solids_parameters.triangle_collision_parameters.perform_self_collision,"use triangle collisions");
     parse_args->Add("-use_vanilla_newton",&use_vanilla_newton,"use triangle collisions");
     parse_args->Add("-image_file",&image_file,"file","output image filename");
+    parse_args->Add("-raw_image_file",&raw_image_file,"file","octave output image filename");
 }
 //#####################################################################
 // Function Parse_Options
@@ -280,6 +284,7 @@ void Get_Initial_Data()
             image_grid.Initialize(image_size,RANGE<TV>::Centered_Box()*5,true);
             cell_iterator=new CELL_ITERATOR<TV>(image_grid);
             image.Resize(image_grid.Cell_Indices());
+            raw_image.Resize(image_grid.Cell_Indices());
             this->fixed_dt=1./24;
             frame_rate=1/(this->fixed_dt*image_size.Product());
             last_frame=1;
@@ -310,6 +315,7 @@ void Get_Initial_Data()
             image_grid.Initialize(image_size,RANGE<TV>::Centered_Box()*5,true);
             cell_iterator=new CELL_ITERATOR<TV>(image_grid);
             image.Resize(image_grid.Cell_Indices());
+            raw_image.Resize(image_grid.Cell_Indices());
             frame_rate=1/(this->fixed_dt*image_size.Product());
             last_frame=1;
             tests.Create_Mattress(GRID<TV>(TV_INT(3,6),RANGE<TV>(TV(-1,-1),TV(1,4))),true,0,density);
@@ -481,15 +487,21 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         cm.Initialize_Colors(0,20,false,true,false);
         if(siggraph_hack_newton_iterations>=0) image(cell_iterator->index)=cm(siggraph_hack_newton_iterations);
         else image(cell_iterator->index)=TV3(.5,.5,.5);
+        raw_image(cell_iterator->index)=siggraph_hack_newton_iterations;
         cell_iterator->Next();
-        if(!cell_iterator->Valid()) PNG_FILE<T>::Write(image_file.c_str(),image);}
+        if(!cell_iterator->Valid()){
+            PNG_FILE<T>::Write(image_file.c_str(),image);
+            OCTAVE_OUTPUT<T>(raw_image_file.c_str()).Write("image",raw_image);}}
     if(test_number==102){
         INTERPOLATED_COLOR_MAP<T> cm;
         cm.Initialize_Colors(0,50,false,true,false);
         if(siggraph_hack_newton_iterations>=0) image(cell_iterator->index)=cm(siggraph_hack_newton_iterations);
         else image(cell_iterator->index)=TV3(.5,.5,.5);
+        raw_image(cell_iterator->index)=siggraph_hack_newton_iterations;
         cell_iterator->Next();
-        if(!cell_iterator->Valid()) PNG_FILE<T>::Write(image_file.c_str(),image);}
+        if(!cell_iterator->Valid()){
+            PNG_FILE<T>::Write(image_file.c_str(),image);
+            OCTAVE_OUTPUT<T>(raw_image_file.c_str()).Write("image",raw_image);}}
 }
 //#####################################################################
 // Function Preprocess_Frame
