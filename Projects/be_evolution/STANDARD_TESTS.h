@@ -1571,7 +1571,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data();
 
     switch(test_number){
-        case 1:
+        case 1:{
+                 use_penalty_self_collisions=false;}
+               // Fallthrough
         case 2:
         case 3:
         case 8:
@@ -2006,7 +2008,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 iot=new IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >(new SMOOTH_LEVELSET_IMPLICIT_OBJECT<TV>(lio->levelset.grid,lio->levelset.phi),true,iot->transform);
             solid_body_collection.Add_Force(new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,
                     iot,penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));}
-    else if(use_constraint_collisions && backward_euler_evolution)
+    if(use_constraint_collisions && backward_euler_evolution)
         for(int b=0;b<rigid_body_collection.rigid_body_particles.number;b++){
             IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> > *iot=rigid_body_collection.Rigid_Body(b).implicit_object;
             if(LEVELSET_IMPLICIT_OBJECT<TV>* lio=dynamic_cast<LEVELSET_IMPLICIT_OBJECT<TV>*>(iot->object_space_implicit_object)){
@@ -2014,7 +2016,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 iot=new IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >(new SMOOTH_LEVELSET_IMPLICIT_OBJECT<TV>(lio->levelset.grid,lio->levelset.phi),true,iot->transform);}
             backward_euler_evolution->minimization_objective.collision_objects.Append(iot);
             backward_euler_evolution->minimization_objective.coefficient_of_friction.Append(rigid_body_collection.Rigid_Body(b).coefficient_of_friction);}
-    else
+    else if(!use_penalty_collisions)
         for(int i=0;i<deformable_body_collection.structures.m;i++){
             deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.structures(i));
             if(solids_parameters.triangle_collision_parameters.perform_self_collision)
