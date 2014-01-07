@@ -58,6 +58,8 @@
 //   60. Random armadillo
 //   61. Elbow cylinder
 //   62. Twisting mattress
+//   63. Twisting and stretching mattress
+//   64. Stretching mattress with shock
 //   77. Squeeze in a box
 //   80. Armadillo
 //  100. Primary contour field
@@ -400,6 +402,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
             if(!resolution) resolution=10;
             mattress_grid=GRID<TV>(TV_INT(5*resolution+1,resolution+1,resolution+1),RANGE<TV>(TV((T)-5,(T)-1,(T)-1),TV((T)5,(T)1,(T)1))*m);
             break;
+        case 63: case 64:
+            if(!resolution) resolution=10;
+            mattress_grid=GRID<TV>(TV_INT(5*resolution+1,resolution+1,resolution+1),RANGE<TV>(TV((T)-1,(T)-1,(T)-1),TV((T)1,(T)1,(T)1))*m);
+            break;
             default:{
             if(!resolution) resolution=10;
 
@@ -458,13 +464,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             last_frame=2000;
             break;
-        case 61:
+        case 61: case 64:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             last_frame=360;
             break;
-        case 62:
+        case 62: case 63:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
@@ -829,6 +835,7 @@ void Get_Initial_Data()
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.373,(T)0)*m)),true,true,density,.005*m);
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.125*m,density,5);
             sphere.is_static=false;
+            sphere.coefficient_of_friction=input_friction;
             tests.Add_Ground();
             kinematic_ids.Append(sphere.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(sphere.particle_index)=true;
@@ -1510,6 +1517,34 @@ void Get_Initial_Data()
             scalar_curve.Add_Control_Point(0,0);
             scalar_curve.Add_Control_Point(9,4*pi);
             break;}
+        case 63:{
+            tests.Create_Mattress(mattress_grid,true,0,density);
+            for(int i=0;i<particles.X.m;i++){
+                T x=particles.X(i).x;
+                ARRAY<int>& ar=(x>=0)?constrained_particles:externally_forced;
+                x=abs(x);
+                if(x>0.99) ar.Append(i);}
+            for(int i=0;i<constrained_particles.m;i++) Add_Debug_Particle(particles.X(constrained_particles(i)),TV(1,0,0));
+            for(int i=0;i<externally_forced.m;i++) Add_Debug_Particle(particles.X(externally_forced(i)),TV(0,1,0));
+            initial_positions=particles.X;
+            constrained_velocities.Resize(constrained_particles.m);
+            scalar_curve.Add_Control_Point(0,0);
+            scalar_curve.Add_Control_Point(9,4*pi);
+            break;}
+        case 64:{
+            tests.Create_Mattress(mattress_grid,true,0,density);
+            for(int i=0;i<particles.X.m;i++){
+                T x=particles.X(i).x;
+                ARRAY<int>& ar=(x>=0)?constrained_particles:externally_forced;
+                x=abs(x);
+                if(x>0.99) ar.Append(i);}
+            for(int i=0;i<constrained_particles.m;i++) Add_Debug_Particle(particles.X(constrained_particles(i)),TV(1,0,0));
+            for(int i=0;i<externally_forced.m;i++) Add_Debug_Particle(particles.X(externally_forced(i)),TV(0,1,0));
+            initial_positions=particles.X;
+            constrained_velocities.Resize(constrained_particles.m);
+            scalar_curve.Add_Control_Point(0,0);
+            scalar_curve.Add_Control_Point(1,2);
+            break;}
         case 77: {
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)*m));
             tests.Create_Mattress(mattress_grid,true,&initial_state,density);
@@ -2002,15 +2037,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
             if(test_number==55) particles.X(1).x=stretch;
             break;}
-        case 61:{
-            T youngs_modulus=1e5*unit_p;
-            T poissons_ratio=.45;
-            T damping=0.01*s;
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
-            if(test_number==55) particles.X(1).x=stretch;
-            break;}
-        case 62:{
+        case 61:
+        case 62:
+        case 63:
+        case 64:{
             T youngs_modulus=1e5*unit_p;
             T poissons_ratio=.45;
             T damping=0.01*s;
@@ -2161,6 +2191,17 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV axis(1,0,0),d_angle_axis=scalar_curve.Derivative(velocity_time)*axis;
         ROTATION<TV> rot(scalar_curve.Value(velocity_time),axis);
         for(int i=0;i<externally_forced.m;i++) V(externally_forced(i))=rot.Rotate(d_angle_axis.Cross(initial_positions(externally_forced(i))));}
+    if(test_number==63){
+        TV axis(1,0,0),d_angle_axis=scalar_curve.Derivative(velocity_time)*axis;
+        ROTATION<TV> rot(scalar_curve.Value(velocity_time),axis);
+        for(int i=0;i<externally_forced.m;i++){
+          V(externally_forced(i))=rot.Rotate(d_angle_axis.Cross(initial_positions(externally_forced(i))));
+          if(velocity_time<9)
+            V(externally_forced(i))-=(T)5*axis;}}
+    if(test_number==64){
+        TV axis(-1,0,0);
+        for(int i=0;i<externally_forced.m;i++)
+          V(externally_forced(i))=scalar_curve.Derivative(velocity_time)*axis;}
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -2173,6 +2214,16 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
     if(test_number==62){
         ROTATION<TV> rot(scalar_curve.Value(time),TV(1,0,0));
         for(int i=0;i<externally_forced.m;i++) X(externally_forced(i))=rot.Rotate(initial_positions(externally_forced(i)));}
+    if(test_number==63){
+        ROTATION<TV> rot(scalar_curve.Value(time),TV(1,0,0));
+        for(int i=0;i<externally_forced.m;i++){
+          X(externally_forced(i))=rot.Rotate(initial_positions(externally_forced(i)));
+          if(time<9)
+            X(externally_forced(i))-=TV(5*time,0,0);
+          else
+            X(externally_forced(i))-=TV(45,0,0);}}
+    if(test_number==64)
+        for(int i=0;i<externally_forced.m;i++) X(externally_forced(i))=scalar_curve.Value(time)*TV(-1,0,0)+initial_positions(externally_forced(i));
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
