@@ -1,7 +1,7 @@
 #!/usr/bin/octave -q
 imread("~/flower.png");
 
-mx=500;
+mx=30;
 tr=15;
 
 for f = 0:120
@@ -12,7 +12,7 @@ for f = 0:120
     I=flipud(image');
     M=(I>=0);
     I=I.*M;
-    W=max(I-tr,0)/(mx-tr);
+    W=min(max(I-tr,0)/(mx-tr),1);
     B=min(I,tr)/tr;
     imwrite(cat(3,1-M,W,B),["recolor_" fff ".png"]);
   catch
