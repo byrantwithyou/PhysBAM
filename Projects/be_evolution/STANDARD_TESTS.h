@@ -744,7 +744,7 @@ void Get_Initial_Data()
             break;}
         case 10:{
             int n=3;
-            T drop_height=3*m;
+            T drop_height=6*m;
             T horizontal_spacing=2.1*m;
             T vertical_spacing=3.1*m;
             T width=(n-1)*(horizontal_spacing); 
@@ -753,13 +753,11 @@ void Get_Initial_Data()
                 for(int k=0;k<n;k++)
                   tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
                       RIGID_BODY_STATE<TV>(FRAME<TV>(TV((-horizontal_spacing*i+width/2),(drop_height+vertical_spacing*j),(-horizontal_spacing*k+width/2)),ROTATION<TV>(-T((i+j+k)*pi/2),TV(0,1,0)))),true,true,density,m);
-            T hole_radius=width/2;
-            T depth=2*drop_height;
-            T thickness=1*m;
-            RIGID_BODY<TV>& bowl=tests.Add_Analytic_Bowl(hole_radius,depth,thickness,128,32);
+            T depth=6*m;
+            RIGID_BODY<TV>& bowl=tests.Add_Rigid_Body("bowl",depth,(T).5);
             bowl.coefficient_of_friction=input_friction;
-            bowl.Frame().r=ROTATION<TV>((T)pi,TV(1,0,0));
-            bowl.Frame().t=TV(0,depth,0);
+            bowl.Frame().r=ROTATION<TV>((T)-pi/2,TV(1,0,0));
+            bowl.Frame().t=TV();
             bowl.is_static=true;
             tests.Add_Ground();
             break;}
