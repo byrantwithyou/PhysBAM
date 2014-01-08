@@ -36,6 +36,7 @@ class BACKWARD_EULER_EVOLUTION:public SOLIDS_EVOLUTION<TV>
     BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>& minimization_objective;
     GENERALIZED_VELOCITY<TV>& dv,&tmp0,&tmp1;
     T coefficient_of_friction;
+    bool fail_on_newton_not_converged;
 
     BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input);
     virtual ~BACKWARD_EULER_EVOLUTION();

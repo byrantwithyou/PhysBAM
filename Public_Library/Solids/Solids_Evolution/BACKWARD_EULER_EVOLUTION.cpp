@@ -43,6 +43,7 @@ BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BO
     newtons_method.fail_on_krylov_not_converged=false;
     newtons_method.tolerance=1e-5;
     newtons_method.angle_tolerance=1e-2;
+    fail_on_newton_not_converged=false;
     minimization_system.tmp=&tmp1;
 }
 //#####################################################################
@@ -95,6 +96,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     if(converged) siggraph_hack_newton_iterations=newtons_method.iterations_used;
     else siggraph_hack_newton_iterations=~newtons_method.iterations_used;
     if(!converged) LOG::printf("WARNING: Newton's method did not converge\n");
+    if(fail_on_newton_not_converged){PHYSBAM_ASSERT(converged);}
 // TODO for rigid bodies    R.Normalize(), update angular momentum
 
     minimization_objective.Adjust_For_Collision(dv);

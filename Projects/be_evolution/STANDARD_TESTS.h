@@ -311,6 +311,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-no_descent",&no_descent,"Don't ensure descent direction");
     parse_args->Add("-debug_newton",&backward_euler_evolution->newtons_method.debug,"Enable diagnostics in Newton's method");
     parse_args->Add("-kry_fail",&backward_euler_evolution->newtons_method.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
+    parse_args->Add("-newton_fail",&backward_euler_evolution->fail_on_newton_not_converged,"terminate if Newton solver fails to converge");
     parse_args->Add("-angle_tol",&backward_euler_evolution->newtons_method.angle_tolerance,"tol","gradient descent tolerance");
     parse_args->Add_Not("-mr",&backward_euler_evolution->newtons_method.use_cg,"use minres instead of cg");
     parse_args->Add("-no_line_search",&no_line_search,"disable line search");
@@ -465,7 +466,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             last_frame=2000;
             break;
-        case 61: case 64: case 65:
+        case 61:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
@@ -476,6 +477,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             last_frame=2000;
+            break;
+        case 64: case 65:
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+            last_frame=120;
             break;
         case 28:
             attachment_velocity=0.4;
