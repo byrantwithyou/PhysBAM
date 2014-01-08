@@ -51,12 +51,12 @@ Update_Position_Based_State_Particle(int p)
     T phi=implicit_object->Extended_Phi(particles.X(p));
     if(phi>separation_parameter) return;
     TV n=implicit_object->Extended_Normal(particles.X(p));
-    T x=(separation_parameter-phi)/length_scale,exp_xm1=expm1(x);
+    T x=(separation_parameter-phi);
+    T a=stiffness*x*x;
     penetrating_particles.Append(p);
-    pe+=stiffness*(exp_xm1-x);
-    T a=stiffness*exp_xm1/length_scale,b=stiffness*(exp_xm1+1)/sqr(length_scale);
-    grad_pe.Append(-a*n);
-    H_pe.Append(b*SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(n)-a*implicit_object->Hessian(particles.X(p)));
+    pe+=a*x;
+    grad_pe.Append(-3*a*n);
+    H_pe.Append(6*stiffness*x*SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(n)-3*a*implicit_object->Hessian(particles.X(p)));
 }
 //#####################################################################
 // Function Update_Position_Based_State
