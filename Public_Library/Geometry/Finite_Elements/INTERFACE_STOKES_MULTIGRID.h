@@ -28,6 +28,11 @@ public:
         T_VECTOR tmp0,tmp1,tmp2;
         ARRAY<int> interior_indices;
         ARRAY<int> boundary_indices;
+
+        ARRAY<ARRAY<T,TV_INT> > phi_per_color;
+        ARRAY<ARRAY<T,TV_INT> > phi_boundary;
+        ARRAY<T,TV_INT> second_representation_phi_value;
+        ARRAY<int,TV_INT> second_representation_phi_color;
         
         void Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const; // z should be initial guess
         void Boundary_Smoother(T_VECTOR& z,const T_VECTOR& x,int iterations) const; // z should be initial guess
@@ -43,7 +48,7 @@ public:
     VECTOR<ARRAY<TV_INT>,TV::m> u_restriction_stencil;
     int boundary_smoother_iterations;
 
-    INTERFACE_STOKES_MULTIGRID(int num_levels,INTERFACE_STOKES_SYSTEM_COLOR<TV>* iss);
+    INTERFACE_STOKES_MULTIGRID(int num_levels,INTERFACE_STOKES_SYSTEM_COLOR<TV>* iss,const ARRAY<ARRAY<T,TV_INT> >& phi_per_color_input,const ARRAY<ARRAY<T,TV_INT> >& phi_boundary_input);
     ~INTERFACE_STOKES_MULTIGRID();
 
     void Construct_Level(int l);
