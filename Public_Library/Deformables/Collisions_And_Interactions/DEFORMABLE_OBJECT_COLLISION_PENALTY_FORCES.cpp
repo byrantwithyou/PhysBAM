@@ -29,7 +29,7 @@ template<class TV> DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
         T stiffness,T separation_parameter)
     :COLLISION_FORCE<TV>(particles),undeformed_particles(undeformed_particles),collision_body(collision_body),
     undeformed_triangulated_surface(undeformed_triangulated_surface),triangulated_surface(Triangulated_Surface_Helper(collision_body)),
-    implicit_surface(implicit_surface),closest_surface_triangle(particles.X.m,true,-1),extra_surface_triangles(particles.X.m),stiffness(stiffness),separation_parameter(separation_parameter),pe(0)
+    implicit_surface(implicit_surface),stiffness(stiffness),separation_parameter(separation_parameter),pe(0)
 {
     triangulated_surface.Update_Triangle_List();
     triangulated_surface.Initialize_Hierarchy();
@@ -37,13 +37,6 @@ template<class TV> DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
     undeformed_triangulated_surface.Initialize_Hierarchy();
     triangulated_surface.avoid_normal_interpolation_across_sharp_edges=false;
     collision_body.Initialize_Hierarchy();
-    ARRAY<bool> surface_node(particles.X.m);
-    surface_node.Subset(triangulated_surface.mesh.elements.Flattened()).Fill(true);
-    for(int i=0;i<collision_body.mesh.elements.m;i++){
-        VECTOR<int,4> nodes=collision_body.mesh.elements(i);
-        for(int j=0;j<4;j++)
-            if(surface_node(nodes(j)))
-                extra_surface_triangles(nodes(j)).Append(nodes.Remove_Index(j));}
 }
 //#####################################################################
 // Destructor
@@ -166,6 +159,17 @@ Update_Surface_Triangles()
 template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update)
 {
+    closest_surface_triangle.Resize(particles.X.m,true,true,-1);
+    if(extra_surface_triangles.m!=particles.X.m){
+        extra_surface_triangles.Resize(particles.X.m);
+        ARRAY<bool> surface_node(particles.X.m);
+        surface_node.Subset(triangulated_surface.mesh.elements.Flattened()).Fill(true);
+        for(int i=0;i<collision_body.mesh.elements.m;i++){
+            VECTOR<int,4> nodes=collision_body.mesh.elements(i);
+            for(int j=0;j<4;j++)
+                if(surface_node(nodes(j)))
+                    extra_surface_triangles(nodes(j)).Append(nodes.Remove_Index(j));}}
+
     pe=0;
     grad_pe.Remove_All();
     H_pe.Remove_All();
