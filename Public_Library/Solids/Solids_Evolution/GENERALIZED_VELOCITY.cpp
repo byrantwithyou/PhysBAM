@@ -37,6 +37,17 @@ template<class TV> GENERALIZED_VELOCITY<TV>::
         delete [] rigid_V.array.Get_Array_Pointer();}
 }
 //#####################################################################
+// Operator =
+//#####################################################################
+template<class TV> GENERALIZED_VELOCITY<TV>& GENERALIZED_VELOCITY<TV>::
+operator=(const GENERALIZED_VELOCITY& gv)
+{
+    V=gv.V;
+    rigid_V=gv.rigid_V;
+    kinematic_and_static_rigid_V=gv.kinematic_and_static_rigid_V;
+    return *this;
+}
+//#####################################################################
 // Operator +=
 //#####################################################################
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& GENERALIZED_VELOCITY<TV>::
@@ -190,6 +201,9 @@ Clone_Default() const
     gv->deep_copy=true;
     return gv;
 }
+//#####################################################################
+// Function Resize_Helper
+//#####################################################################
 template<class AV>
 void Resize_Helper(AV& a,const AV& b)
 {

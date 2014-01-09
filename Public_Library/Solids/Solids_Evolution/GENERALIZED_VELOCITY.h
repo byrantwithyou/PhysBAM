@@ -35,6 +35,7 @@ public:
         const ARRAY<int>& dynamic_rigid_body_particles,const ARRAY<int>& static_and_kinematic_rigid_bodies);
     ~GENERALIZED_VELOCITY();
 
+    GENERALIZED_VELOCITY& operator=(const GENERALIZED_VELOCITY& gv);
     BASE& operator+=(const BASE& bv) PHYSBAM_OVERRIDE;
     BASE& operator-=(const BASE& bv) PHYSBAM_OVERRIDE;
     BASE& operator*=(const T a) PHYSBAM_OVERRIDE;
