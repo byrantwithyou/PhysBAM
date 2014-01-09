@@ -9,18 +9,18 @@
 
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Deformables/Forces/COLLISION_FORCE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 
 template<class TV> class IMPLICIT_OBJECT;
 
 template<class TV>
-class IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES:public DEFORMABLES_FORCES<TV>
+class IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES:public COLLISION_FORCE<TV>
 {
     typedef typename TV::SCALAR T;
-    typedef DEFORMABLES_FORCES<TV> BASE;
 public:
-    using BASE::particles;
+    using DEFORMABLES_FORCES<TV>::particles;using COLLISION_FORCE<TV>::coefficient_of_friction;
     IMPLICIT_OBJECT<TV>* implicit_object;
     bool own_implicit_object;
     ARRAY<int> colliding_particles;
@@ -50,9 +50,10 @@ public:
     void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const PHYSBAM_OVERRIDE;
     void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE;
     T CFL_Strain_Rate() const PHYSBAM_OVERRIDE;
-    void Initialize_CFL(ARRAY_VIEW<typename BASE::FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE;
+    void Initialize_CFL(ARRAY_VIEW<typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
     void Update_Position_Based_State_Particle(int p);
+    void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

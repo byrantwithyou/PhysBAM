@@ -16,7 +16,7 @@ using ::std::exp;
 //#####################################################################
 template<class TV> IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>::
 IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES(DEFORMABLE_PARTICLES<TV>& particles,IMPLICIT_OBJECT<TV>* implicit_object,T stiffness,T separation_parameter,T length_scale)
-    :DEFORMABLES_FORCES<TV>(particles),implicit_object(implicit_object),own_implicit_object(false),stiffness(stiffness),separation_parameter(separation_parameter),
+    :COLLISION_FORCE<TV>(particles),implicit_object(implicit_object),own_implicit_object(false),stiffness(stiffness),separation_parameter(separation_parameter),
     length_scale(length_scale),pe(0)
 {
 }
@@ -157,7 +157,7 @@ CFL_Strain_Rate() const
 // Function Initialize_CFL
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>::
-Initialize_CFL(ARRAY_VIEW<typename BASE::FREQUENCY_DATA> frequency)
+Initialize_CFL(ARRAY_VIEW<typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA> frequency)
 {
 }
 //#####################################################################
@@ -167,6 +167,22 @@ template<class TV> typename TV::SCALAR IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<
 Potential_Energy(const T time) const
 {
     return pe;
+}
+//#####################################################################
+// Function Apply_Friction
+//#####################################################################
+template<class TV> void IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>::
+Apply_Friction(ARRAY_VIEW<TV> V,const T time) const
+{
+    for(int i=0;i<penetrating_particles.m;i++){
+        int p=penetrating_particles(i);
+        TV f=grad_pe(i);
+        T fn=f.Normalize();
+        TV t=V(p).Projected_Orthogonal_To_Unit_Direction(f);
+        T t_mag=t.Normalize();
+        if(t_mag<=coefficient_of_friction*fn*particles.one_over_mass(p))
+            V(p).Project_On_Unit_Direction(f);
+        else V(p)-=coefficient_of_friction*particles.one_over_mass(p)*fn*t;}
 }
 template class IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<VECTOR<float,1> >;
 template class IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<VECTOR<float,2> >;

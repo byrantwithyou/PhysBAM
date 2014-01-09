@@ -9,6 +9,7 @@
 
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Deformables/Forces/COLLISION_FORCE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 
@@ -17,12 +18,11 @@ template<class T> class TRIANGULATED_SURFACE;
 template<class TV> class IMPLICIT_OBJECT;
 
 template<class TV>
-class DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES:public DEFORMABLES_FORCES<TV>
+class DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES:public COLLISION_FORCE<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef DEFORMABLES_FORCES<TV> BASE;
 public:
-    using BASE::particles;
+    using DEFORMABLES_FORCES<TV>::particles;using COLLISION_FORCE<TV>::coefficient_of_friction;
     DEFORMABLE_PARTICLES<TV> &undeformed_particles;
     TETRAHEDRALIZED_VOLUME<T>& collision_body;
     TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface;
@@ -39,6 +39,7 @@ public:
     T pe;
     ARRAY<VECTOR<TV,TV::m+1> > grad_pe;
     ARRAY<VECTOR<VECTOR<MATRIX<T,TV::m>,TV::m+1>,TV::m+1> > H_pe;
+    ARRAY<VECTOR<T,TV::m+1> > stored_weights;
 
     DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES(DEFORMABLE_PARTICLES<TV>& particles,DEFORMABLE_PARTICLES<TV>& undeformed_particles,TETRAHEDRALIZED_VOLUME<T>& collision_body,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface,IMPLICIT_OBJECT<TV>& implicit_surface,
         T stiffness=(T)1e4,T separation_parameter=(T)1e-4);
@@ -56,7 +57,7 @@ public:
     void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const PHYSBAM_OVERRIDE;
     void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE;
     T CFL_Strain_Rate() const PHYSBAM_OVERRIDE;
-    void Initialize_CFL(ARRAY_VIEW<typename BASE::FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE;
+    void Initialize_CFL(ARRAY_VIEW<typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
     void Update_Position_Based_State_Particle(int p);
     void Update_Penetrating_Particles(int p);
@@ -65,6 +66,7 @@ public:
     void Penalty(VECTOR<int,3> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he);
     void Penalty(VECTOR<int,2> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<int,4>& >&X, T& e, VECTOR<TV,4>& de, VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he);
     int Estimate_Closest_Undeformed_Surface_Triangle(const TV& X,int p) const;
+    void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

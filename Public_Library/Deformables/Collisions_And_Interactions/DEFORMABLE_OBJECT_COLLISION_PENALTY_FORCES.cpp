@@ -27,7 +27,7 @@ template<class T> static TRIANGULATED_SURFACE<T>& Triangulated_Surface_Helper(TE
 template<class TV> DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
     DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES(DEFORMABLE_PARTICLES<TV>& particles,DEFORMABLE_PARTICLES<TV>& undeformed_particles,TETRAHEDRALIZED_VOLUME<T>& collision_body,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface,IMPLICIT_OBJECT<TV>& implicit_surface,
         T stiffness,T separation_parameter)
-    :DEFORMABLES_FORCES<TV>(particles),undeformed_particles(undeformed_particles),collision_body(collision_body),
+    :COLLISION_FORCE<TV>(particles),undeformed_particles(undeformed_particles),collision_body(collision_body),
     undeformed_triangulated_surface(undeformed_triangulated_surface),triangulated_surface(Triangulated_Surface_Helper(collision_body)),
     implicit_surface(implicit_surface),closest_surface_triangle(particles.X.m,true,-1),extra_surface_triangles(particles.X.m),stiffness(stiffness),separation_parameter(separation_parameter),pe(0)
 {
@@ -169,6 +169,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
     pe=0;
     grad_pe.Remove_All();
     H_pe.Remove_All();
+    stored_weights.Remove_All();
     Update_Surface_Triangles();
     for(int pp=0;pp<penetrating_particles.m;pp++)
         Update_Position_Based_State_Particle(pp);
@@ -207,6 +208,12 @@ Penalty(VECTOR<int,4> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<in
             he(nodes(i))(nodes(3))-=t;
             he(nodes(3))(nodes(3))+=t;}
         he(nodes(3))(nodes(i))=he(nodes(i))(nodes(3)).Transposed();}
+    VECTOR<T,TV::m+1> weight;
+    weight(nodes(0))=-1;
+    weight(nodes(1))=b.x;
+    weight(nodes(2))=a.x;
+    weight(nodes(3))=1-a.x-b.x;
+    stored_weights.Append(weight);
 }
 //#####################################################################
 // Function Penalty
@@ -234,6 +241,11 @@ Penalty(VECTOR<int,3> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<in
             he(nodes(i))(nodes(2))-=t;
             he(nodes(2))(nodes(2))+=t;}
         he(nodes(2))(nodes(i))=he(nodes(i))(nodes(2)).Transposed();}
+    VECTOR<T,TV::m+1> weight;
+    weight(nodes(0))=-1;
+    weight(nodes(1))=a.x;
+    weight(nodes(2))=1-a.x;
+    stored_weights.Append(weight);
 }
 //#####################################################################
 // Function Penalty
@@ -253,6 +265,10 @@ Penalty(VECTOR<int,2> nodes, const INDIRECT_ARRAY<ARRAY_VIEW<TV, int>, VECTOR<in
     he(nodes(0))(nodes(1))=-m;
     he(nodes(1))(nodes(1))=m;
     he(nodes(1))(nodes(0))=-m.Transposed();
+    VECTOR<T,TV::m+1> weight;
+    weight(nodes(0))=-1;
+    weight(nodes(1))=1;
+    stored_weights.Append(weight);
 }
 //#####################################################################
 // Function Update_Position_Based_State_Particle
@@ -371,7 +387,7 @@ CFL_Strain_Rate() const
 // Function Initialize_CFL
 //#####################################################################
 template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
-Initialize_CFL(ARRAY_VIEW<typename BASE::FREQUENCY_DATA> frequency)
+Initialize_CFL(ARRAY_VIEW<typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA> frequency)
 {
 }
 //#####################################################################
@@ -381,6 +397,24 @@ template<class TV> typename TV::SCALAR DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCE
 Potential_Energy(const T time) const
 {
     return pe;
+}
+//#####################################################################
+// Function Apply_Friction
+//#####################################################################
+template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
+Apply_Friction(ARRAY_VIEW<TV> V,const T time) const
+{
+    for(int pp=0;pp<penetrating_particles.m;pp++){
+        VECTOR<int,TV::m+1> nodes=penetrating_particles(pp);
+        TV normal=grad_pe(pp)(0);
+        T normal_force=normal.Normalize();
+        const VECTOR<T,TV::m+1>& weights=stored_weights(pp);
+        TV v_hat=V.Subset(nodes).Weighted_Sum(weights);
+        T mass_hat=(particles.one_over_mass.Subset(nodes)*weights).Dot(weights);
+        TV force_dir=-1/mass_hat*v_hat.Projected_Orthogonal_To_Unit_Direction(normal);
+        T force_mag=force_dir.Normalize();
+        TV force=min(force_mag,normal_force*coefficient_of_friction)*force_dir;
+        for(int i=0;i<TV::m+1;i++) V(nodes(i))+=weights(i)*particles.one_over_mass(nodes(i))*force;}
 }
 template class DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<VECTOR<float,3> >;
 template class DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<VECTOR<double,3> >;

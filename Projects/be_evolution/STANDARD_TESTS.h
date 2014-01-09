@@ -2131,10 +2131,15 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);
 
-    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++)
+        solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
     for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
         solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
-    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++)
+        deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++)
+        if(COLLISION_FORCE<TV>* cf=dynamic_cast<COLLISION_FORCE<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(i)))
+            cf->coefficient_of_friction=input_friction;
 }
 
 //#####################################################################

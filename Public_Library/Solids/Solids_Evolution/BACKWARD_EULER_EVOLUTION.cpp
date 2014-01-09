@@ -15,6 +15,7 @@
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Deformables/Forces/COLLISION_FORCE.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
@@ -114,6 +115,9 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         if(t_mag<=minimization_objective.coefficient_of_friction(c.object)*normal_force/particles.mass(c.p))
             v.Project_On_Unit_Direction(c.n);
         else v-=coefficient_of_friction/particles.mass(c.p)*normal_force*t;}
+    for(int i=0;i<solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
+        if(COLLISION_FORCE<TV>* cf=dynamic_cast<COLLISION_FORCE<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(i)))
+            cf->Apply_Friction(particles.V,time);
     solid_body_collection.Print_Energy(time+dt,2);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after friction",1,1);
 
