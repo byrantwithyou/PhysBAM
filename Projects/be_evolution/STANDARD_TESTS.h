@@ -61,6 +61,7 @@
 //   63. Twisting and stretching mattress
 //   64. Stretching mattress lucky vanilla newton failure
 //   65. Stretching mattress with shock
+//   66. Force a deformable torus through a rigid torus
 //   77. Squeeze in a box
 //   80. Armadillo
 //  100. Primary contour field
@@ -643,6 +644,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
             //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            break;
+        case 66:
+            // solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            last_frame=120;
             break;
         default:
             LOG::cerr<<"Parsing: Unrecognized test number "<<test_number<<std::endl;exit(1);}
@@ -1567,6 +1574,37 @@ void Get_Initial_Data()
             scalar_curve.Add_Control_Point(3.1,2.5);
             scalar_curve.Add_Control_Point(3.2,3);
             break;}
+        case 66:{
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_115K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.5,0)*m,ROTATION<TV>(pi/2,TV(1,0,0)))),true,true,density,m);
+            tests.Add_Ground();
+            T sphere_radius=0.75*m;
+            T torus_radius=1.6*m;
+            T shell_outer_radius=1.1*m;
+            T shell_height=0.5*m;
+            T spacing=0.1*m;
+
+            RIGID_BODY<TV>& torus=tests.Add_Analytic_Torus(torus_radius-shell_outer_radius-spacing,torus_radius,32,64);
+            torus.Frame()=FRAME<TV>(TV(0,(T)2,0)*m,ROTATION<TV>(pi/2,TV(1,0,0)));
+            torus.is_static=true;
+
+            RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",sphere_radius,(T)0.3);
+            sphere.Frame().t=TV(0,(T)2,0)*m;
+            sphere.is_static=true;
+
+            RIGID_BODY<TV>& shell=tests.Add_Analytic_Shell(shell_height,shell_outer_radius,sphere_radius+spacing,32);
+            shell.is_static=false;
+
+            kinematic_ids.Append(shell.particle_index);
+            rigid_body_collection.rigid_body_particles.kinematic(shell.particle_index)=true;
+
+            T y_start=3.75*m;
+            T y_stop=0.75*m;
+            T t_stop=2;
+
+            curves.Resize(1);
+            curves(0).Add_Control_Point(0,FRAME<TV>(TV(0,y_start,0)*m,ROTATION<TV>(pi/2,TV(1,0,0))));
+            curves(0).Add_Control_Point(t_stop,FRAME<TV>(TV(0,y_stop,0)*m,ROTATION<TV>(pi/2,TV(1,0,0))));
+            break;}
         case 77: {
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)*m));
             tests.Create_Mattress(mattress_grid,true,&initial_state,density);
@@ -1658,12 +1696,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                // Fallthrough
         case 2:
         case 3:
+        case 5:
+        case 6:
         case 8:
         case 13:
-        case 80:
         case 16:
-        case 5:
-        case 6:{
+        case 66:
+        case 80:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             if(test_number!=80) Add_Gravity();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5*unit_p,(T).45,(T).01*s);
