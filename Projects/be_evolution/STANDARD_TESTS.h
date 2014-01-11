@@ -160,6 +160,8 @@ public:
     ARRAY<VECTOR<VECTOR<T,2>,2> > contour_segments;
     ARRAY<int> stuck_particles;
     bool pin_corners;
+    int tori_stack_width;
+    int tori_stack_height;
     int rand_seed;
     bool use_rand_seed;
     RANDOM_NUMBERS<T> rand;
@@ -192,7 +194,7 @@ public:
         forces_are_removed(false),self_collision_flipped(false),sloped_floor(false),stretch(1),plateau(0),
         repulsion_thickness((T)1e-4),hole((T).5),nobind(false),input_cutoff((T).4),input_efc(20),input_poissons_ratio(-1),
         input_youngs_modulus(0),input_friction(.3),stretch_cutoff(300),hand_scale((T).8),
-        ether_drag(0),image_size(500),pin_corners(false),rand_seed(1234),
+        ether_drag(0),image_size(500),pin_corners(false),tori_stack_width(5),tori_stack_height(5),rand_seed(1234),
         use_rand_seed(false),use_residuals(false),use_newmark(false),use_newmark_be(false),project_nullspace(false),
         backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
         use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
@@ -440,6 +442,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=600;
             break;
         case 10:
+            attachment_velocity=4;
             last_frame=330;
             break;
         case 5:
@@ -750,14 +753,14 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 10:{
-            int n=3;
-            T drop_height=6*m;
+            int n=5;
+            T drop_height=11*m;
             T horizontal_spacing=2.1*m;
-            T vertical_spacing=3.1*m;
+            T vertical_spacing=3.01*m;
             T width=(n-1)*(horizontal_spacing); 
-            for(int i=0;i<n;i++)
-              for(int j=0;j<n;j++)
-                for(int k=0;k<n;k++)
+            for(int j=0;j<tori_stack_height;j++)
+              for(int i=0;i<tori_stack_width;i++)
+                for(int k=0;k<tori_stack_width;k++)
                   tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
                       RIGID_BODY_STATE<TV>(FRAME<TV>(TV((-horizontal_spacing*i+width/2),(drop_height+vertical_spacing*j),(-horizontal_spacing*k+width/2)),ROTATION<TV>(-T((i+j+k)*pi/2),TV(0,1,0)))),true,true,density,m);
             T depth=6*m;
@@ -1717,9 +1720,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume2,(T)1e5*unit_p,(T).45,(T).01*s);
             break;}
         case 10:{
-            for(int i=0; i<27; i++){
+            for(int i=0; i<tori_stack_height*sqr(tori_stack_width); i++){
               TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
               Add_Constitutive_Model(tetrahedralized_volume,(T)5e5*unit_p,(T).45,(T).01*s);}
+            deformable_body_collection.particles.V.Fill(TV(0,-attachment_velocity,0));
             Add_Gravity();
             break;}
         case 77:{
@@ -2494,6 +2498,16 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             if(particles.X(i).Magnitude()>r){
                 stuck_particles.Append(i);
                 particles.X(i)*=r/particles.X(i).Magnitude();}}
+    if(test_number==10){
+            for(int i=0;i<tori_stack_height*sqr(tori_stack_width);i++){
+              TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
+              tetrahedralized_volume.Update_Bounding_Box();
+              if(tetrahedralized_volume.bounding_box->min_corner.y>10*m){
+                ARRAY<int> mesh_particles;
+                tetrahedralized_volume.mesh.elements.Flattened().Get_Unique(mesh_particles);
+                for(int i=0;i<mesh_particles.m;i++)
+                  if(particles.V(mesh_particles(i)).y<-attachment_velocity)
+                    particles.V(mesh_particles(i)).y=-attachment_velocity;}}}
 }
 //#####################################################################
 // Function Bind_Intersecting_Particles
