@@ -442,7 +442,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=600;
             break;
         case 10:
-            attachment_velocity=4;
+            attachment_velocity=6;
             last_frame=330;
             break;
         case 5:
@@ -1600,9 +1600,9 @@ void Get_Initial_Data()
             kinematic_ids.Append(shell.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(shell.particle_index)=true;
 
-            T y_start=3.75*m;
+            T y_start=6.75*m;
             T y_stop=0.75*m;
-            T t_stop=2;
+            T t_stop=4;
 
             curves.Resize(1);
             curves(0).Add_Control_Point(0,FRAME<TV>(TV(0,y_start,0)*m,ROTATION<TV>(pi/2,TV(1,0,0))));
