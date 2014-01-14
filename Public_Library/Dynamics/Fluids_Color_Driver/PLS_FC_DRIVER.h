@@ -41,7 +41,6 @@ public:
     void Advection_And_BDF(T dt,bool first_step);
     void Apply_Pressure_And_Viscosity(T dt,bool first_step);
     void Update_Polymer_Stress(T dt);
-    void Add_Polymer_Stress_RHS();
     void Extrapolate_Velocity(ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > >& u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color);
     void Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color,int c);
     void No_Advection_And_BDF(T dt,bool first_step,int c);
