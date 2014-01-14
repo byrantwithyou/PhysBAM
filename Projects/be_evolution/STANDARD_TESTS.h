@@ -1578,12 +1578,13 @@ void Get_Initial_Data()
             scalar_curve.Add_Control_Point(3.2,3);
             break;}
         case 66:{
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_115K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.5,0)*m,ROTATION<TV>(pi/2,TV(1,0,0)))),true,true,density,m);
+//            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_115K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.5,0)*m,ROTATION<TV>(pi/2,TV(1,0,0)))),true,true,density,m);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.5,0)*m,ROTATION<TV>(pi/2,TV(1,0,0)))),true,true,density,m);
             tests.Add_Ground();
             T sphere_radius=0.75*m;
             T torus_radius=1.6*m;
             T shell_outer_radius=1.1*m;
-            T shell_height=0.5*m;
+            T shell_height=1*m;
             T spacing=0.1*m;
 
             RIGID_BODY<TV>& torus=tests.Add_Analytic_Torus(torus_radius-shell_outer_radius-spacing,torus_radius,32,64);
