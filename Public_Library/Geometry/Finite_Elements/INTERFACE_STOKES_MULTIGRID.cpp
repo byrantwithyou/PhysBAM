@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_MULTIGRID.h>
@@ -12,8 +13,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> INTERFACE_STOKES_MULTIGRID<TV>::
-INTERFACE_STOKES_MULTIGRID(int num_levels,INTERFACE_STOKES_SYSTEM_COLOR<TV>* iss,const ARRAY<ARRAY<T,TV_INT> >& phi_per_color_input,const ARRAY<ARRAY<T,TV_INT> >& phi_boundary_input)
-    :levels(num_levels),boundary_smoother_iterations(5)
+INTERFACE_STOKES_MULTIGRID(int num_levels,INTERFACE_STOKES_SYSTEM_COLOR<TV>* iss,const ARRAY<ARRAY<T,TV_INT> >& phi_per_color_input,const ARRAY<ARRAY<T,TV_INT> >& phi_boundary_input,int number_of_ghost_cells)
+    :levels(num_levels),boundary_smoother_iterations(5),number_of_ghost_cells(number_of_ghost_cells)
 {
     levels(0).iss=iss;
     levels(0).phi_per_color=phi_per_color_input;
@@ -28,9 +29,8 @@ INTERFACE_STOKES_MULTIGRID(int num_levels,INTERFACE_STOKES_SYSTEM_COLOR<TV>* iss
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
             u_restriction_stencil(i).Append(it.index);}
 
-    for(int i=0;i<levels.m;i++){
-        Construct_Level(i);}
-                
+    for(int i=0;i<levels.m;i++)
+        Construct_Level(i);
 }
 //#####################################################################
 // Destructor
@@ -45,75 +45,25 @@ template<class TV> INTERFACE_STOKES_MULTIGRID<TV>::
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
 Construct_Level(int l)
-{    
-    
+{
+    ARRAY<ARRAY<T,TV_INT> >& cr_phis=levels(l).phi_per_color;
+    ARRAY<ARRAY<T,TV_INT> >& bc_phis=levels(l).phi_boundary;
     if(l){
         const GRID<TV>& fine_grid=levels(l-1).iss->grid;
-        TV_INT fine_counts=fine_grid.counts;
-        RANGE<TV> fine_domain=fine_grid.domain;
-        TV fine_dX=fine_grid.dX;
-        TV_INT coarse_counts=(fine_counts+1)/2;
+        TV_INT coarse_counts=(fine_grid.counts+1)/2;
         TV coarse_dX=fine_grid.dX/2;
-        //RANGE<TV> coarse_range(fine_domain.min_corner,coarse_counts.Last()*coarse_dX.Last());
-        RANGE<TV> coarse_range(fine_domain.min_corner,TV(coarse_counts)*coarse_dX);
-        GRID<TV> coarse_grid;
-        coarse_grid.Initialize(coarse_counts,coarse_range,true);
-        
-        const ARRAY<ARRAY<T,TV_INT> >& fine_phi=levels(l-1).phi_per_color;
-        levels(l).phi_per_color.Resize(fine_phi.m);
-        for(CELL_ITERATOR<TV> it(coarse_grid);it.Valid();it.Next())
-            for(int c=0;c<fine_phi.m;c++){
-                TV_INT coarse_index=it.index;
-                //Insert(const T& element,const ID index)
-                //levels(l).phi_per_color(c).Append(coarse_index);
-                //levels(l).phi_per_color(c).Insert(0,coarse_index);
-                T value=0;
-                for(int i=0;i<p_restriction_stencil.m;i++){
-                    TV_INT fine_index=it.index*2+p_restriction_stencil(i);
-                    value+=fine_phi(c)(fine_index);}
-                levels(l).phi_per_color(c)(coarse_index)=value/4;}
+        RANGE<TV> coarse_range(fine_grid.domain.min_corner,fine_grid.domain.min_corner+TV(coarse_counts)*coarse_dX);
+        GRID<TV> coarse_grid(coarse_counts,coarse_range,true);
 
-        const ARRAY<ARRAY<T,TV_INT> >& fine_phi_bdry=levels(l-1).phi_boundary;
-        levels(l).phi_boundary.Resize(fine_phi_bdry.m);
-        for(CELL_ITERATOR<TV> it(coarse_grid);it.Valid();it.Next())
-            for(int c=0;c<fine_phi_bdry.m;c++){
-                TV_INT coarse_index=it.index;
-                //levels(l).phi_boundary(c).Append(coarse_index);
-                T value=0;
-                for(int i=0;i<p_restriction_stencil.m;i++){
-                    TV_INT fine_index=it.index*2+p_restriction_stencil(i);
-                    value+=fine_phi_bdry(c)(fine_index);}
-                levels(l).phi_boundary(c)(coarse_index)=value/4;}
+        Coarsen_Levelset(coarse_grid,levels(l-1).phi_per_color,cr_phis);
+        Coarsen_Levelset(coarse_grid,levels(l-1).phi_boundary,bc_phis);
+        Fill_Color_Levelset(coarse_grid,cr_phis,bc_phis,levels(l).color_levelset_phi,levels(l).color_levelset_color);
 
-        const ARRAY<ARRAY<T,TV_INT> >& cr_phis=levels(l).phi_per_color;
-        const ARRAY<ARRAY<T,TV_INT> >& bc_phis=levels(l).phi_boundary;
-        T phi=0; //=cr_phis(cr_phis.m-1)(it.index);
-        int color=cr_phis.m-1;
-        for(CELL_ITERATOR<TV> it(coarse_grid,5);it.Valid();it.Next()){
-            for(int i=0;i<bc_phis.m;i++){
-                if(bc_phis(i)(it.index)<=0){
-                    phi=-bc_phis(i)(it.index);
-                    color=~i;
-                    break;}
-                for(int k=0;k<cr_phis.m-1;k++){
-                    phi=cr_phis(k)(it.index);
-                    if(bc_phis(k)(it.index)<=0){
-                            color=k;
-                            break;}
-                    phi=cr_phis(cr_phis.m-1)(it.index);
-                    color=cr_phis.m-1;}}
-            levels(l).second_representation_phi_value(it.index)=phi;
-            levels(l).second_representation_phi_color(it.index)=color;}
-        
-        // INTERFACE_STOKES_SYSTEM_COLOR<TV> temp_iss(coarse_grid,levels(l).second_representation_phi_value,levels(l).second_representation_phi_color,true);
-        levels(l).iss=new INTERFACE_STOKES_SYSTEM_COLOR<TV>(coarse_grid,levels(l).second_representation_phi_value,levels(l).second_representation_phi_color,true);}
-        //INTERFACE_STOKES_SYSTEM_COLOR<TV> *levels(l).iss(coarse_grid,levels(l).second_representation_phi_value,levels(l).second_representation_phi_color,true);}
+        levels(l).iss=new INTERFACE_STOKES_SYSTEM_COLOR<TV>(coarse_grid,levels(l).color_levelset_phi,levels(l).color_levelset_color,true);}
+
     SPARSE_MATRIX_FLAT_MXN<T> M;
     levels(l).iss->Get_Sparse_Matrix(M);
-    levels(l).interior_indices.Resize(M.m);
-    for(int i=0;i<M.m;i++)
-        levels(l).interior_indices(i)=i;
-
+    levels(l).interior_indices=IDENTITY_ARRAY<>(M.m);
 }
 
 /*
@@ -126,7 +76,7 @@ Rebuild_Levelset_Color()
     boundary.Fill_Ghost_Cells(grid,levelset_color.phi,levelset_color.phi,0,0,number_of_ghost_cells);
     boundary_int.Fill_Ghost_Cells(grid,levelset_color.color,levelset_color.color,0,0,number_of_ghost_cells);
 }
-        
+
 template<class TV_input> int PLS_FC_EXAMPLE<TV_input>::
 Color_At_Cell(const TV_INT& index,T& phi) const
 {
@@ -137,7 +87,7 @@ Color_At_Cell(const TV_INT& index,T& phi) const
     int c=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.Inside_Region(index,phi);
     phi=-phi;
     return c;
-}    
+}
 
 template<class TV> int LEVELSET_MULTIPLE<TV>::
 Inside_Region(const TV_INT& index,T& phi) const // assumes exactly one Phi<0 on a node
@@ -154,7 +104,7 @@ Inside_Region(const TV_INT& index,T& phi) const // assumes exactly one Phi<0 on 
     // ARRAY<int> interior_indices;
     // ARRAY<int> boundary_indices;
     //////////////////////////////////////////////////////////////////
- 
+
 //#####################################################################
 // Function Update
 //#####################################################################
@@ -347,14 +297,13 @@ Control,Info);//std::cout <<"\n UMFPACK_Symbolic status = " << status << std::en
 template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::LEVEL::
 Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const
 {
-    
     SPARSE_MATRIX_FLAT_MXN<T> L,M; // L is iss operator, M is the change of basis matrix; M = [id -G; -G' -2*pressure_poisson]
-        
+
     iss->Get_Sparse_Matrix(L);
-    
+
     M.m=L.m;
     M.n=L.n;
-    
+
     ARRAY<T> x_flat(L.m,true,0),z_flat(L.m,true,0);
 
     int track=0;
@@ -378,10 +327,10 @@ Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const
     for(int k=0;k<x.q.m;k++){
         x_flat(track)=x.q(k);
         z_flat(track++)=z.q(k);}
-    
+
     SPARSE_MATRIX_FLAT_MXN<T> temp;
     ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > gtg_poisson; //per color
-    
+
     int last_offset=0;
     for(int c=0;c<iss->cdi->colors;c++){
         gtg_poisson(c).m=iss->matrix_pu(1)(c).m;
@@ -442,6 +391,78 @@ template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::LEVEL::
 Boundary_Smoother(T_VECTOR& z,const T_VECTOR& x,int iterations) const
 {
 // PHYSBAM_FATAL_ERROR("TODO");
+}
+//#####################################################################
+// Function Fill_Ghost
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
+Fill_Ghost(const GRID<TV>& grid,ARRAY<ARRAY<T,TV_INT> >& phi) const
+{
+    for(int i=0;i<phi.m;i++)
+        Fill_Ghost(grid,phi(i));
+}
+//#####################################################################
+// Function Fill_Ghost
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
+Fill_Ghost(const GRID<TV>& grid,ARRAY<T,TV_INT>& phi) const
+{
+    BOUNDARY_MAC_GRID_PERIODIC<TV,T>().Fill_Ghost_Cells(grid,phi,phi,0,0,number_of_ghost_cells);
+}
+//#####################################################################
+// Function Coarsen_Levelset
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
+Coarsen_Levelset(const GRID<TV>& coarse_grid,const ARRAY<ARRAY<T,TV_INT> >& fine_phi,ARRAY<ARRAY<T,TV_INT> >& phi) const
+{
+    phi.Resize(fine_phi.m);
+    for(int c=0;c<fine_phi.m;c++)
+        Coarsen_Levelset(coarse_grid,fine_phi(c),phi(c));
+}
+//#####################################################################
+// Function Coarsen_Levelset
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
+Coarsen_Levelset(const GRID<TV>& coarse_grid,const ARRAY<T,TV_INT>& fine_phi,ARRAY<T,TV_INT>& phi) const
+{
+    phi.Resize(coarse_grid.Cell_Indices(number_of_ghost_cells));
+    for(CELL_ITERATOR<TV> it(coarse_grid);it.Valid();it.Next()){
+        T value=0;
+        for(int i=0;i<p_restriction_stencil.m;i++){
+            TV_INT fine_index=it.index*2+p_restriction_stencil(i);
+            value+=fine_phi(fine_index);}
+        phi(it.index)=value/(1<<TV::m);}
+
+    Fill_Ghost(coarse_grid,phi);
+}
+//#####################################################################
+// Function Fill_Color_Levelset
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
+Fill_Color_Levelset(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV_INT> >& cr_phis,const ARRAY<ARRAY<T,TV_INT> >& bc_phis,ARRAY<T,TV_INT>& color_phi,ARRAY<int,TV_INT>& colors) const
+{
+    for(CELL_ITERATOR<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
+        T phi=0;
+        int color=INT_MAX;
+        for(int i=0;i<bc_phis.m;i++)
+            if(bc_phis(i)(it.index)<=0){
+                phi=-bc_phis(i)(it.index);
+                color=~i;
+                break;}
+
+        if(color==INT_MAX)
+            for(int k=0;k<cr_phis.m-1;k++){
+                phi=cr_phis(k)(it.index);
+                if(phi<=0){
+                    color=k;
+                    break;}}
+
+        if(color==INT_MAX){
+            color=cr_phis.m-1;
+            phi=cr_phis(color)(it.index);}
+
+        color_phi(it.index)=phi;
+        colors(it.index)=color;}
 }
 namespace PhysBAM{
 template class INTERFACE_STOKES_MULTIGRID<VECTOR<float,2> >;
