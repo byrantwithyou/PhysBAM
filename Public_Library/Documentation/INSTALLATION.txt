@@ -1,0 +1,98 @@
+//#####################################################################
+// Copyright 2014.
+// This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
+//#####################################################################
+//
+// Configuring PhysBAM on Ubuntu or OSX
+//
+//#####################################################################
+
+1. Get a package manager. If you are running Ubuntu, you have apt-get. If you are running Mac OSX, install macports or homebrew.
+
+2. Install git and emacs (you probably have already installed git if you are reading this)
+
+Ubuntu:
+sudo apt-get install git
+sudo apt-get install emacs23
+
+Mac:
+sudo port install git
+sudo port install emacs
+
+3. Clone PhysBAM. As of Jan 2014, it's stored on hydra. Use
+
+   git clone hydra.math.ucla.edu:/git/PhysBAM ./
+
+
+4. cd to the root PhysBAM directory and copy SConstruct.options into this directory
+
+   cp Scripts/scons/SConstruct.options ./
+
+
+5. Install g++/gcc and upgrade to a newer version (As of January 2014, version 4.8.2 is required. If you are
+   running Mac OSX, 4.8.2 is available via Macports. If you are running Ubuntu, and are not already at 4.8.2 
+   or above, you will need to install it manually. Here are some instructions to do that, but beware they may
+   be incomplete.)
+
+	5a. Install g++:
+
+	   sudo apt-get install g++
+
+	5b. Go to Ubuntu Software Center and install all extra versions of g++ needed.
+	5c. Go to folder /usr/bin and give the commands (to upgrade to version 4.8.2):
+
+	   ls -l g*
+	   sudo rm g++ gcc
+	   sudo ln -s g++-4.5 g++
+	   sudo ln -s gcc-4.5 gcc
+	   sudo rm x86_64-linux-gnu-g++ x86_64-linux-gnu-gcc
+	   sudo ln -s g++-4.5 x86_64-linux-gnu-g++
+	   sudo ln -s gcc-4.5 x86_64-linux-gnu-gcc
+
+
+6. Install various packages required for PhysBAM to compile and run.
+
+   scons, boost, petsc, bison, flex -- libraries necessary for various compiling tasks
+   libpng, lipjpeg, libavformat, libavcodec, libavutil -- for processing, creating various A/V formats
+
+   Newer versions for these libraries may have been added since this was written. It's worth double-checking.
+   In Ubuntu:
+
+   sudo apt-get install scons
+   sudo apt-get install libboost-all-dev
+   sudo apt-get install libpng12-dev
+   sudo apt-get install libjpeg62-dev
+   sudo apt-get install libavformat-dev
+   sudo apt-get install libavcodec-dev
+   sudo apt-get install libavutil-dev
+   sudo apt-get install petsc-dev
+   sudo apt-get install libglut3-dev (freeglut3-dev)
+   sudo apt-get install bison
+   sudo apt-get install flex
+
+   For Mac, some of these packages are found by installing XCode Developer Tools, and most of the A/V ones are included in ffmpeg.
+
+
+7. Configure your SConstruct.options file (in your PhysBAM directory), your .bashrc file (in your home directory), and your .emacs
+   file (in your home directory). The SConstruct.options file is used when PhysBAM compiles, the .bashrc file contains useful
+   Terminal commands, and the .emacs file contains commands and scripts for Emacs (useful for coding in PhysBAM, your life is much
+   easier if you get this working properly.)
+
+   It may be easiest to steal/borrow someone else's versions of these until you figure out how to configure things on your own.
+   Ask permission first.
+
+
+8. The command to compile PhysBAM is:
+
+   nice scons --warn=no-duplicate-environment --warn=no-deprecated -Q --implicit-cache -k -u TYPE=release -j 4
+
+   most people have an alias for this ('cs') in their .bashrc file.
+
+
+9. If you've done all this and you still can't successfully compile/run PhysBAM, ask someone else for help. Find out what you needed
+   that wasn't included in this file, and add it to the file :-)
+
+
+Last edited Jan 14 2014 by Russ Howes
+
+
