@@ -60,7 +60,7 @@ Create_Submatrix(const INTERVAL<int>& rows)
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Set_Row_Lengths(ARRAY_VIEW<int> lengths)
 {
-    diagonal_index.Clean_Memory();delete C;C=0;
+    Reset(lengths.m);
     m=lengths.m;offsets.Resize(m+1,false,false);offsets(0)=0;
     for(int i=0;i<m;i++){offsets(i+1)=offsets(i)+lengths(i);}
     A.Resize(offsets(m));
@@ -508,6 +508,10 @@ Reset(const int c)
     offsets.Append(0);
     delete C;
     C=0;
+    delete L;
+    L=0;
+    delete Q;
+    Q=0;
     diagonal_index.Remove_All();
 }
 //#####################################################################
@@ -654,8 +658,10 @@ Row_Subset(const ARRAY<int>& rows)
 {
     delete Q;
     delete L;
+    delete C;
     Q=0;
     L=0;
+    C=0;
     ARRAY<int> new_offsets;
     ARRAY<SPARSE_MATRIX_ENTRY<T> > new_A;
     new_offsets.Append(0);
