@@ -29,8 +29,8 @@ sudo port install emacs
    cp Scripts/scons/SConstruct.options ./
 
 
-5. Install g++/gcc and upgrade to a newer version (As of January 2014, version 4.8.2 is required. If you are
-   running Mac OSX, 4.8.2 is available via Macports. If you are running Ubuntu, and are not already at 4.8.2 
+5. Install g++/gcc and upgrade to a newer version (As of January 2014, version 4.8.x is required. If you are
+   running Mac OSX, 4.8.x is available via Macports. If you are running Ubuntu, and are not already at 4.8.x 
    or above, you will need to install it manually. Here are some instructions to do that, but beware they may
    be incomplete.)
 
@@ -38,16 +38,7 @@ sudo port install emacs
 
 	   sudo apt-get install g++
 
-	5b. Go to Ubuntu Software Center and install all extra versions of g++ needed.
-	5c. Go to folder /usr/bin and give the commands (to upgrade to version 4.8.2):
-
-	   ls -l g*
-	   sudo rm g++ gcc
-	   sudo ln -s g++-4.5 g++
-	   sudo ln -s gcc-4.5 gcc
-	   sudo rm x86_64-linux-gnu-g++ x86_64-linux-gnu-gcc
-	   sudo ln -s g++-4.5 x86_64-linux-gnu-g++
-	   sudo ln -s gcc-4.5 x86_64-linux-gnu-gcc
+	5b. Get the most recent 4.8.x and bug somebody who knows how to install it until they help you.
 
 
 6. Install various packages required for PhysBAM to compile and run.
@@ -71,6 +62,9 @@ sudo port install emacs
    sudo apt-get install flex
 
    For Mac, some of these packages are found by installing XCode Developer Tools, and most of the A/V ones are included in ffmpeg.
+   However, flex v 2.5.36 and 2.5.37, which come from Macports and the XCode Tools, do not work, so you will need to install 2.5.35
+   from source (as of this writing) and make sure it is the version that gets called. (apt-get installs the working version.) If
+   2.5.38 has been released when you read this, you can probably use that.
 
 
 7. Configure your SConstruct.options file (in your PhysBAM directory), your .bashrc file (in your home directory), and your .emacs
