@@ -19,6 +19,7 @@
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Images/TEX_FILE.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects_Uniform/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
@@ -318,8 +319,60 @@ void Get_Initial_Data()
             raw_image.Resize(image_grid.Cell_Indices());
             frame_rate=1/(this->fixed_dt*image_size.Product());
             last_frame=1;
-            tests.Create_Mattress(GRID<TV>(TV_INT(3,6),RANGE<TV>(TV(-1,-1),TV(1,4))),true,0,density);
             initial_positions=particles.X;
+            break;}
+        case 103:{
+            INTERPOLATION_CURVE<T,VECTOR<T,2> > image_curve;
+            image_curve.Add_Control_Point(0,VECTOR<T,2>(1,0));
+            image_curve.Add_Control_Point(24,VECTOR<T,2>(2,0));
+            image_curve.Add_Control_Point(72,VECTOR<T,2>(-1,2));
+            image_curve.Add_Control_Point(96,VECTOR<T,2>(1,2));
+            image_curve.Add_Control_Point(120,VECTOR<T,2>(1,0));
+            TRIANGULATED_AREA<T>& ta=tests.Create_Mattress(GRID<TV>(TV_INT(3,6),RANGE<TV>(TV(-1,-1),TV(1,4))),true,0,density);
+            SEGMENT_MESH& sm=ta.Get_Segment_Mesh();
+            initial_positions=particles.X;
+            FILE_UTILITIES::Create_Directory("initial");
+            for(int i=0;i<=120;i++)
+            {
+                VECTOR<T,2> X=image_curve.Value(i);
+//                VECTOR<T,2> X(-1+2*cos(i*pi*2/96),2*sin(i*pi*2/96));
+                MATRIX<T,2> M(X,X.Orthogonal_Vector());
+                for(int i=0;i<9;i++){
+                    particles.X(i)=M*initial_positions(i);
+                    particles.X(i+9)=particles.X(i)+TV(0,3);}
+                char buff[100];
+                sprintf(buff,"initial/initial-%03d.tex",i);
+                TEX_FILE<T> tex(buff,RANGE<TV>::Unit_Box()*480);
+                tex.cur_format.line_style=0;
+                tex.cur_format.fill_style=1;
+                tex.cur_format.fill_color=VECTOR<T,3>(.8,.8,.8);
+//                tex.Draw_Object(RANGE<TV>::Centered_Box()*5.1);
+                tex.cur_format.line_style=1;
+                tex.cur_format.fill_style=0;
+
+                tex.cur_format.line_width=.05;
+                tex.cur_format.arrow_style="c-c";
+                tex.cur_format.line_color=VECTOR<T,3>(0,0,1);
+                for(int e=0;e<sm.elements.m;e++)
+                    tex.Draw_Object(particles.X(sm.elements(e).x),particles.X(sm.elements(e).y));
+
+                tex.cur_format.line_style=0;
+                tex.cur_format.fill_style=1;
+                tex.cur_format.fill_color=VECTOR<T,3>(0,0,1);
+                for(int p=0;p<particles.X.m;p++)
+                    tex.Draw_Object(particles.X(p),.1);
+                tex.cur_format.line_style=1;
+                tex.cur_format.fill_style=0;
+
+                tex.cur_format.fill_color=VECTOR<T,3>(1,0,0);
+                tex.cur_format.line_style=0;
+                tex.cur_format.fill_style=1;
+                tex.Draw_Object(X,(T).2);
+                tex.cur_format.line_style=1;
+                tex.cur_format.fill_style=0;
+                tex.bounding_box=RANGE<TV>::Centered_Box()*5;
+            }
+            exit(0);
             break;}
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
