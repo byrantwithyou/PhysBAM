@@ -9,10 +9,13 @@
 
 #include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Tools/Data_Structures/ELEMENT_ID.h>
+#include <Tools/Math_Tools/max.h>
 #include <Tools/Matrices/MATRIX_ARITHMETIC_POLICY.h>
 #include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <cmath>
 #include <iomanip>
 #include <iostream>
+using std::abs;
 namespace PhysBAM{
 
 template<class T_MATRIX> struct MATRIX_INFO;
@@ -255,8 +258,14 @@ public:
     T_MATRIX& operator+=(const T a)
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);assert(Rows()==Columns());for(int i=0;i<Rows();i++) (*this)(i,i)+=a;return Derived();}
 
+    T_MATRIX& operator-=(const T a)
+    {WARN_IF_NOT_EFFICIENT(T_MATRIX);assert(Rows()==Columns());for(int i=0;i<Rows();i++) (*this)(i,i)-=a;return Derived();}
+
     T_MATRIX operator+(const T a) const
-    {WARN_IF_NOT_EFFICIENT(T_MATRIX);return T_MATRIX(Derived())+=a;}
+    {return T_MATRIX(Derived())+=a;}
+
+    T_MATRIX operator-(const T a) const
+    {return T_MATRIX(Derived())-=a;}
 
     template<class T_MATRIX1>
     T_MATRIX& operator+=(const MATRIX_BASE<T,T_MATRIX1>& A)
@@ -567,5 +576,8 @@ for(int i=0;i<B.Rows();i++){T a=A(i,i);for(int k=0;k<B.Columns();k++) M(i,k)=a*B
 template<class T,class T_MATRIX,int d>
 typename PRODUCT<SYMMETRIC_MATRIX<T,d>,T_MATRIX>::TYPE operator*(const SYMMETRIC_MATRIX<T,d>& A,const MATRIX_BASE<T,T_MATRIX>& B)
 {typename PRODUCT<SYMMETRIC_MATRIX<T,d>,T_MATRIX>::TYPE M((INITIAL_SIZE)B.Rows(),(INITIAL_SIZE)B.Columns());B.Add_Times(A,B.Derived(),M);return M;}
+
+template<class T,class T_MATRIX>
+T_MATRIX exp(const MATRIX_BASE<T,T_MATRIX>& M);
 }
 #endif

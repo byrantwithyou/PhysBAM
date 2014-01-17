@@ -106,6 +106,18 @@ public:
     MATRIX& operator/=(const T a)
     {assert(a!=0);T s=1/a;for(int i=0;i<16;i++) x[i]*=s;return *this;}
 
+    MATRIX operator+(const T a) const
+    {return MATRIX(x[0]+a,x[1],x[2],x[3],x[4],x[5]+a,x[6],x[7],x[8],x[9],x[10]+a,x[11],x[12],x[13],x[14],x[15]+a);}
+
+    MATRIX operator-(const T a) const
+    {return MATRIX(x[0]-a,x[1],x[2],x[3],x[4],x[5]-a,x[6],x[7],x[8],x[9],x[10]-a,x[11],x[12],x[13],x[14],x[15]-a);}
+
+    MATRIX& operator+=(const T a)
+    {x[0]+=a;x[5]+=a;x[10]+=a;x[15]+=a;return *this;}
+
+    MATRIX& operator-=(const T a)
+    {x[0]-=a;x[5]-=a;x[10]-=a;x[15]-=a;return *this;}
+
     MATRIX operator+(const MATRIX& A) const
     {return MATRIX(x[0]+A.x[0],x[1]+A.x[1],x[2]+A.x[2],x[3]+A.x[3],x[4]+A.x[4],x[5]+A.x[5],x[6]+A.x[6],x[7]+A.x[7],
                    x[8]+A.x[8],x[9]+A.x[9],x[10]+A.x[10],x[11]+A.x[11],x[12]+A.x[12],x[13]+A.x[13],x[14]+A.x[14],x[15]+A.x[15]);}

@@ -4,12 +4,14 @@
 //#####################################################################
 // Class MATRIX_BASE
 //#####################################################################
+#include <Tools/Math_Tools/min.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/MATRIX_BASE.h>
 #include <Tools/Matrices/MATRIX_MXN.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <limits>
 using namespace PhysBAM;
+using std::sqrt;
 //#####################################################################
 // Function In_Place_Cholesky_Inverse
 //#####################################################################
@@ -217,6 +219,26 @@ Jacobi_Singular_Value_Decomposition(ARRAY<VECTOR<int,2> >& left_givens_pairs,ARR
             Update_Max_Off_Diagonal_Element_Of_Row_After_Column_Change(*this,max_off_diagonal_element_of_row,j);}}
 }
 //#####################################################################
+// Function exp
+//#####################################################################
+template<class T,class T_MATRIX> T_MATRIX PhysBAM::
+exp(const MATRIX_BASE<T,T_MATRIX>& M)
+{
+    PHYSBAM_ASSERT(M.Rows()==M.Columns());
+    if(M.Rows()==0) return M.Derived();
+    T limit=sizeof(T)==4?0.25:0.03125; // Enough so 7 Taylor terms suffice
+    T shift=M.Trace()/M.Rows();
+    T_MATRIX A=M.Derived()-shift;
+    T tol=min(sqrt(limit/M.Rows()),limit);
+    T max_abs=A.Max_Abs()/tol;
+    int s=max_abs<1?0:(int)ceil(log(max_abs)/log(2));
+    A/=1LL<<s;
+    T_MATRIX A2=A*A;
+    T_MATRIX B=(((T)0.00138888888888889*A2+(T)0.00833333333333333*A+(T)0.04166666666666666)*A2+((T)0.16666666666666666*A+(T)0.5))*A2+(A+1);
+    for(int i=0;i<s;i++) B=B*B;
+    return B*exp(shift);
+}
+//#####################################################################
 namespace PhysBAM{
 template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_Robust_Householder_QR_Solve<ARRAY<float>,ARRAY<int> >(ARRAY_BASE<float,ARRAY<float> >&,ARRAY_BASE<int,ARRAY<int> >&);
 template void MATRIX_BASE<float,MATRIX<float,6,6> >::In_Place_Gram_Schmidt_QR_Factorization<MATRIX<float,6,6> >(MATRIX_BASE<float,MATRIX<float,6,6> >&);
@@ -272,4 +294,20 @@ template void MATRIX_BASE<float,MATRIX<float,3,3> >::In_Place_Cholesky_Inverse<M
 template void MATRIX_BASE<float,MATRIX<float,6,6> >::In_Place_Cholesky_Inverse<MATRIX<float,6,6> >(MATRIX_BASE<float,MATRIX<float,6,6> >&);
 template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_Cholesky_Inverse<MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> >&);
 template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_LU_Inverse<MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> >&);
+template MATRIX<double,0,0> exp<double,MATRIX<double,0,0> >(MATRIX_BASE<double,MATRIX<double,0,0> > const&);
+template MATRIX<double,1,1> exp<double,MATRIX<double,1,1> >(MATRIX_BASE<double,MATRIX<double,1,1> > const&);
+template MATRIX<double,2,2> exp<double,MATRIX<double,2,2> >(MATRIX_BASE<double,MATRIX<double,2,2> > const&);
+template MATRIX<double,3,3> exp<double,MATRIX<double,3,3> >(MATRIX_BASE<double,MATRIX<double,3,3> > const&);
+template MATRIX<double,4,4> exp<double,MATRIX<double,4,4> >(MATRIX_BASE<double,MATRIX<double,4,4> > const&);
+template MATRIX<double,5,5> exp<double,MATRIX<double,5,5> >(MATRIX_BASE<double,MATRIX<double,5,5> > const&);
+template MATRIX<double,6,6> exp<double,MATRIX<double,6,6> >(MATRIX_BASE<double,MATRIX<double,6,6> > const&);
+template MATRIX_MXN<double> exp<double,MATRIX_MXN<double> >(MATRIX_BASE<double,MATRIX_MXN<double> > const&);
+template MATRIX<float,0,0> exp<float,MATRIX<float,0,0> >(MATRIX_BASE<float,MATRIX<float,0,0> > const&);
+template MATRIX<float,1,1> exp<float,MATRIX<float,1,1> >(MATRIX_BASE<float,MATRIX<float,1,1> > const&);
+template MATRIX<float,2,2> exp<float,MATRIX<float,2,2> >(MATRIX_BASE<float,MATRIX<float,2,2> > const&);
+template MATRIX<float,3,3> exp<float,MATRIX<float,3,3> >(MATRIX_BASE<float,MATRIX<float,3,3> > const&);
+template MATRIX<float,4,4> exp<float,MATRIX<float,4,4> >(MATRIX_BASE<float,MATRIX<float,4,4> > const&);
+template MATRIX<float,5,5> exp<float,MATRIX<float,5,5> >(MATRIX_BASE<float,MATRIX<float,5,5> > const&);
+template MATRIX<float,6,6> exp<float,MATRIX<float,6,6> >(MATRIX_BASE<float,MATRIX<float,6,6> > const&);
+template MATRIX_MXN<float> exp<float,MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> > const&);
 }
