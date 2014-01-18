@@ -91,7 +91,9 @@ Dynamic_Tests_One_Size(int m,int n) const
         C=A;C.Add_Identity_Matrix();Test(Assert_Equal(C,A+A.Identity_Matrix(m),tolerance),"Add_Identity_Matrix.",ok,A);
         C.Set_Identity_Matrix();Test(Assert_Equal(A.Identity_Matrix(m),C,tolerance),"Set_Identity_Matrix.",ok,A);
         Test(Assert_Equal(A+s,A+s*A.Identity_Matrix(m),tolerance),"Addition with scalar.",ok,A);
-        C=A;C+=s;Test(Assert_Equal(C,A+s*A.Identity_Matrix(m),tolerance),"Plus equals with scalar.",ok,A);}
+        C=A;C+=s;Test(Assert_Equal(C,A+s*A.Identity_Matrix(m),tolerance),"Plus equals with scalar.",ok,A);
+        Test(Assert_Equal(A-s,A-s*A.Identity_Matrix(m),tolerance),"Subtraction with scalar.",ok,A);
+        C=A;C-=s;Test(Assert_Equal(C,A-s*A.Identity_Matrix(m),tolerance),"Minus equals with scalar.",ok,A);}
 
     return ok;
 }
