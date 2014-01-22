@@ -5,6 +5,7 @@
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
+#include <Tools/Matrices/SPARSE_MATRIX_ROW.h>
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_MULTIGRID.h>
@@ -13,7 +14,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> INTERFACE_STOKES_MULTIGRID<TV>::
-INTERFACE_STOKES_MULTIGRID(int num_levels,INTERFACE_STOKES_SYSTEM_COLOR<TV>* iss,const ARRAY<ARRAY<T,TV_INT> >& phi_per_color_input,const ARRAY<ARRAY<T,TV_INT> >& phi_boundary_input,int number_of_ghost_cells)
+INTERFACE_STOKES_MULTIGRID(int num_levels,INTERFACE_STOKES_SYSTEM_COLOR<TV>* iss,
+    const ARRAY<ARRAY<T,TV_INT> >& phi_per_color_input,const ARRAY<ARRAY<T,TV_INT> >& phi_boundary_input,
+    int number_of_ghost_cells)
     :levels(num_levels),boundary_smoother_iterations(5),number_of_ghost_cells(number_of_ghost_cells)
 {
     levels(0).iss=iss;
@@ -59,25 +62,11 @@ Construct_Level(int l)
         Coarsen_Levelset(coarse_grid,levels(l-1).phi_boundary,bc_phis);
         Fill_Color_Levelset(coarse_grid,cr_phis,bc_phis,levels(l).color_levelset_phi,levels(l).color_levelset_color);
 
-        levels(l).iss=new INTERFACE_STOKES_SYSTEM_COLOR<TV>(coarse_grid,levels(l).color_levelset_phi,levels(l).color_levelset_color,true);}
-
-    SPARSE_MATRIX_FLAT_MXN<T> M;
-    levels(l).iss->Get_Sparse_Matrix(M);
-    levels(l).interior_indices=IDENTITY_ARRAY<>(M.m);
-
+        levels(l).iss=new INTERFACE_STOKES_SYSTEM_COLOR<TV>(coarse_grid,levels(l).color_levelset_phi,
+            levels(l).color_levelset_color,true);}
     // TODO: NEED TO GENERATE: ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > pressure_poisson;
-}
-//#####################################################################
-// Function Update
-//#####################################################################
-template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
-Update()
-{
-    for(int i=0;i<levels.m;i++){
-        LEVEL& l=levels(i);
-        l.iss->Resize_Vector(l.tmp0);
-        l.iss->Resize_Vector(l.tmp1);
-        l.iss->Resize_Vector(l.tmp2);}
+
+    levels(l).Initialize();
 }
 //#####################################################################
 // Function Apply_Preconditioner
@@ -241,12 +230,15 @@ Exact_Solve(T_VECTOR& z,const T_VECTOR& rhs) const
     double Control[UMFPACK_CONTROL],Info[UMFPACK_INFO];
     umfpack_di_defaults(Control);
     Control[UMFPACK_STRATEGY]=UMFPACK_STRATEGY_UNSYMMETRIC;
-    status=umfpack_di_symbolic(M.n,M.n,Mp.Get_Array_Pointer(),Mi.Get_Array_Pointer(),Mx.Get_Array_Pointer(),&Symbolic_umf,Control,Info);
+    status=umfpack_di_symbolic(M.n,M.n,Mp.Get_Array_Pointer(),Mi.Get_Array_Pointer(),Mx.Get_Array_Pointer(),
+        &Symbolic_umf,Control,Info);
     PHYSBAM_ASSERT(status>=0);
-    status=umfpack_di_numeric(Mp.Get_Array_Pointer(),Mi.Get_Array_Pointer(),Mx.Get_Array_Pointer(),Symbolic_umf,&Numeric_umf,Control,Info);
+    status=umfpack_di_numeric(Mp.Get_Array_Pointer(),Mi.Get_Array_Pointer(),Mx.Get_Array_Pointer(),Symbolic_umf,
+        &Numeric_umf,Control,Info);
     PHYSBAM_ASSERT(status>=0);
     umfpack_di_free_symbolic (&Symbolic_umf);
-    status=umfpack_di_solve(UMFPACK_A,Mp.Get_Array_Pointer(),Mi.Get_Array_Pointer(),Mx.Get_Array_Pointer(),x_umf.Get_Array_Pointer(),rhs_umf.Get_Array_Pointer(),Numeric_umf,Control,Info);
+    status=umfpack_di_solve(UMFPACK_A,Mp.Get_Array_Pointer(),Mi.Get_Array_Pointer(),Mx.Get_Array_Pointer(),
+        x_umf.Get_Array_Pointer(),rhs_umf.Get_Array_Pointer(),Numeric_umf,Control,Info);
     PHYSBAM_ASSERT(status>=0);
     umfpack_di_free_numeric(&Numeric_umf);
     track=0;
@@ -266,11 +258,6 @@ Exact_Solve(T_VECTOR& z,const T_VECTOR& rhs) const
 template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::LEVEL::
 Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const
 {
-    SPARSE_MATRIX_FLAT_MXN<T> L,M; // L is iss operator, M is the change of basis matrix; M = [id -G; -G' -2*pressure_poisson]
-    
-    iss->Get_Sparse_Matrix(L);
-    Get_Change_Of_Variables_Matrix(M);
-    
     ARRAY<T> x_flat(L.m),z_flat(L.m);
     
     int track=0;
@@ -287,9 +274,15 @@ Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const
     for(int k=0;k<x.q.m;k++){
         x_flat(track)=x.q(k);
         z_flat(track++)=z.q(k);}
-    
-    (L*M).Gauss_Seidel_Single_Iteration(z_flat,x_flat);
-    
+
+    int iterations=1;
+    for(int i=0;i<iterations;i++)
+        for(int k=0;k<interior_indices.m;k++){
+            int index=interior_indices(k);
+            SPARSE_MATRIX_ROW<T> LR(L,index),MR(M,index);
+            T t=LR.Dot(MR),r=x_flat(index)-LR.Dot(z_flat);
+            if(abs(t)>1e-7) MR.Add_Multiple(r/t,MR,z_flat);}
+
     track=0;
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<iss->cdi->colors;c++)
@@ -300,32 +293,6 @@ Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const
             z.p(c)(k)=z_flat(track++);
     for(int k=0;k<x.q.m;k++)
         z.q(k)=z_flat(track++);
-
-
-/* Implementation from paper
-    for(int k=0;k<interior_indices.m;k++){
-        int index=interior_indices(k);
-        T temp1=0;
-        T temp2=0;
-        for(int i=0;i<L.m;i++){
-            temp1+=L(index,i)*M(i,index);
-            temp2+=L(index,i)*z_flat(i);}
-        T delta=(x_flat(index)-temp2)/temp1;
-        for(int i=0;i<L.m;i++){
-            z_flat(i)+=delta*M(i,index);}}
-*/
-
-/* octave implementation
-    x = initial_guess;
-    for i = 1:ITERATIONS
-        for index = INTERIOR_INDICES
-            temp = L(index,:)*M(:,index);
-            r = RHS(index) - L(index,:)*x;
-            delta  = r/temp;
-            x += delta*M(:,index)*(abs(temp)>1e-7);
-        endfor
-    endfor */
-
 }
 //#####################################################################
 // Function Boundary_Smoother
@@ -382,7 +349,8 @@ Coarsen_Levelset(const GRID<TV>& coarse_grid,const ARRAY<T,TV_INT>& fine_phi,ARR
 // Function Fill_Color_Levelset
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
-Fill_Color_Levelset(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV_INT> >& cr_phis,const ARRAY<ARRAY<T,TV_INT> >& bc_phis,ARRAY<T,TV_INT>& color_phi,ARRAY<int,TV_INT>& colors) const
+Fill_Color_Levelset(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV_INT> >& cr_phis,const ARRAY<ARRAY<T,TV_INT> >& bc_phis,
+    ARRAY<T,TV_INT>& color_phi,ARRAY<int,TV_INT>& colors) const
 {
     for(CELL_ITERATOR<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
         T phi=0;
@@ -413,7 +381,8 @@ Fill_Color_Levelset(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV_INT> >& cr_phis,
 //#####################################################################
 // Function Get_Change_Of_Variables_Matrix
 //#####################################################################
-template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::LEVEL::Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const
+template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::LEVEL::
+Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const
 {
     const int colors=iss->cdi->colors;
     SPARSE_MATRIX_FLAT_MXN<T> temp;
@@ -490,6 +459,19 @@ template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::LEVEL::Get_Change_Of_Var
             for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++)
                 M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(u_size+p_offset+mat.A(e).j,mat.A(e).a);
         p_offset+=mat.m;}
+}
+//#####################################################################
+// Function Initialize
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::LEVEL::
+Initialize()
+{
+    iss->Resize_Vector(tmp0);
+    iss->Resize_Vector(tmp1);
+    iss->Resize_Vector(tmp2);
+    iss->Get_Sparse_Matrix(L);
+    Get_Change_Of_Variables_Matrix(M);
+    interior_indices=IDENTITY_ARRAY<>(L.m);
 }
 namespace PhysBAM{
 template class INTERFACE_STOKES_MULTIGRID<VECTOR<float,2> >;

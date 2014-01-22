@@ -33,10 +33,12 @@ public:
         ARRAY<ARRAY<T,TV_INT> > phi_boundary;
         ARRAY<T,TV_INT> color_levelset_phi;
         ARRAY<int,TV_INT> color_levelset_color;
-        
+        SPARSE_MATRIX_FLAT_MXN<T> L,M;
+
         void Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const; // z should be initial guess
         void Boundary_Smoother(T_VECTOR& z,const T_VECTOR& x,int iterations) const; // z should be initial guess
         void Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const;
+        void Initialize();
         LEVEL()
             :iss(0)
         {
