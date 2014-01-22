@@ -12,9 +12,7 @@
 #include <Deformables/Constitutive_Models/COROTATED.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
-#include <Deformables/Constitutive_Models/NEO_HOOKEAN_COROTATED_BLEND.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
-#include <Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_SMOOTH.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.h>
 #include <Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
@@ -31,10 +29,8 @@ int main(int argc,char* argv[])
     
     /*bool use_extended_neohookean;
     bool use_extended_neohookean_refined;
-    bool use_extended_neohookean_hyperbola;
     bool use_extended_neohookean_smooth;
     bool use_corotated;
-    bool use_corot_blend;
     bool use_constant_ife;*/
     
     T stiffness_multiplier = 1.0;
@@ -43,7 +39,7 @@ int main(int argc,char* argv[])
     T poissons_ratio = .45;
     T damping = .01;
     T energy,sv1,sv2;
-    bool use_ext_neo=false,use_ext_neo2=false,use_ext_neo_smooth=false,use_corotated=false,use_corot_blend=false,use_constant_ife=false;
+    bool use_ext_neo=false,use_ext_neo2=false,use_corotated=false,use_constant_ife=false;
     VECTOR<T,2> singular_vals(1,1);
 
     parse_args.Add("-youngs_modulus",&stiffness,"value","parameter used by multiple tests to change the parameters of the test");
@@ -51,9 +47,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-sv",&singular_vals,"sv sv","Singular Values");
     parse_args.Add("-use_ext_neo",&use_ext_neo,"use_ext_neo");
     parse_args.Add("-use_ext_neo2",&use_ext_neo2,"use_ext_neo2");
-    parse_args.Add("-use_ext_neo_smooth",&use_ext_neo_smooth,"use_ext_neo_smooth");
     parse_args.Add("-use_corotated",&use_corotated,"use_corotated");
-    parse_args.Add("-use_corot_blend",&use_corot_blend,"use_corot_blend");
     parse_args.Add("-use_constant_ife",&use_constant_ife,"use_constant_ife");   
     
     parse_args.Parse();
@@ -63,9 +57,7 @@ int main(int argc,char* argv[])
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=0;
     if(use_ext_neo) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
     else if(use_ext_neo2) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
-    else if(use_ext_neo_smooth) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(use_corotated) icm=new COROTATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
-    else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else{
         NEO_HOOKEAN<T,2>* nh=new NEO_HOOKEAN<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
         icm=nh; std::cout << "Using regular Neo-Hookean" << std::endl;

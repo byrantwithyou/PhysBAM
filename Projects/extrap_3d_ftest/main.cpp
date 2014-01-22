@@ -13,11 +13,8 @@
 #include <Deformables/Constitutive_Models/GENERAL_EXTRAPOLATED.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_3D2.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
-#include <Deformables/Constitutive_Models/NEO_HOOKEAN_COROTATED_BLEND.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
-#include <Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_SMOOTH.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.h>
-#include <Deformables/Constitutive_Models/NEO_J_INTERP_ENERGY.h>
 #include <Deformables/Constitutive_Models/RC_EXTRAPOLATED.h>
 #include <Deformables/Constitutive_Models/RC2_EXTRAPOLATED.h>
 
@@ -38,10 +35,8 @@ int main(int argc,char* argv[])
     
     /*bool use_extended_neohookean;
     bool use_extended_neohookean_refined;
-    bool use_extended_neohookean_hyperbola;
     bool use_extended_neohookean_smooth;
     bool use_corotated;
-    bool use_corot_blend;
     bool use_constant_ife;*/
     
     T stiffness_multiplier = 1.0;
@@ -51,7 +46,7 @@ int main(int argc,char* argv[])
     T damping = .01;
     T energy,sv1,sv2,sv3;
     T efc=20,cutoff=.4;
-    bool use_ext_neo=false,use_ext_neo2=false,use_ext_neo_smooth=false,use_corotated=false,use_corot_blend=false,use_constant_ife=false,use_rc2_ext=false;
+    bool use_ext_neo=false,use_ext_neo2=false,use_corotated=false,use_constant_ife=false,use_rc2_ext=false;
     VECTOR<T,3> singular_vals(1,1,1);
     
     parse_args.Add("-youngs_modulus",&stiffness,"value","parameter used by multiple tests to change the parameters of the test");
@@ -59,9 +54,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-sv",&singular_vals,"sv sv","Singular Values");
     parse_args.Add("-use_ext_neo",&use_ext_neo,"use_ext_neo");
     parse_args.Add("-use_ext_neo2",&use_ext_neo2,"use_ext_neo2");
-    parse_args.Add("-use_ext_neo_smooth",&use_ext_neo_smooth,"use_ext_neo_smooth");
     parse_args.Add("-use_corotated",&use_corotated,"use_corotated");
-    parse_args.Add("-use_corot_blend",&use_corot_blend,"use_corot_blend");
     parse_args.Add("-use_constant_ife",&use_constant_ife,"use_constant_ife");   
     parse_args.Add("-use_rc2_ext",&use_rc2_ext,"use_rc2_ext");
     parse_args.Add("-efc",&efc,"efc","extrapolated force coefficient used for some tests");
@@ -76,9 +69,7 @@ int main(int argc,char* argv[])
     if(use_ext_neo) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_ext_neo2) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_rc2_ext) icm=new RC2_EXTRAPOLATED<T,3>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
-    else if(use_ext_neo_smooth) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(use_corotated) icm=new COROTATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
-    else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else{
         NEO_HOOKEAN<T,3>* nh=new NEO_HOOKEAN<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
         icm=nh; std::cout << "Using regular Neo-Hookean" << std::endl;

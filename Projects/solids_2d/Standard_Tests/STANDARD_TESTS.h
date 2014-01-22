@@ -53,7 +53,6 @@
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <Deformables/Constitutive_Models/COROTATED.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
-#include <Deformables/Constitutive_Models/NEO_HOOKEAN_COROTATED_BLEND.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
 #include <Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -101,9 +100,7 @@ public:
     bool test_forces;
     bool use_extended_neohookean;
     bool use_extended_neohookean_refined;
-    bool use_extended_neohookean_hyperbola;
     bool use_corotated;
-    bool use_corot_blend;
     bool dump_sv;
     int kinematic_id;
     INTERPOLATION_CURVE<T,FRAME<TV> > curve;
@@ -114,7 +111,7 @@ public:
     bool project_nullspace,print_residuals;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_corotated(false),use_corot_blend(false),dump_sv(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean_refined(false),use_corotated(false),dump_sv(false),
         print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1),project_nullspace(false),print_residuals(false)
     {
     }
@@ -168,9 +165,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-test_forces",&test_forces,"use fully implicit forces");
     parse_args->Add("-use_ext_neo",&use_extended_neohookean,"use_ext_neo");
     parse_args->Add("-use_ext_neo_ref",&use_extended_neohookean_refined,"use_ext_neo_ref");
-    parse_args->Add("-use_ext_neo_hyper",&use_extended_neohookean_hyperbola,"use_ext_neo_hyper");
     parse_args->Add("-use_corotated",&use_corotated,"use_corotated");
-    parse_args->Add("-use_corot_blend",&use_corot_blend,"use_corot_blend");
     parse_args->Add("-dump_sv",&dump_sv,"Dump singular values");
     parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
     parse_args->Add("-stiffen",&stiffness_multiplier,"scale","stiffness multiplier for various tests");
@@ -527,9 +522,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TRIANGULATED_AREA<T>& triangulated_area1=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>(0);
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new COROTATED<T,2>((T)2e4,(T).45,(T).01)));
 
-            TRIANGULATED_AREA<T>& triangulated_area2 = solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new NEO_HOOKEAN_COROTATED_BLEND<T,2>((T)2e4,(T).45,(T).01)));
-
             TRIANGULATED_AREA<T>& triangulated_area3 = solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>(2);
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area3,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)2e4,(T).45,(T).01)));
 
@@ -759,7 +751,6 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=0;
     if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,(T).4,20*stiffness*stiffness_multiplier);
     else if(use_corotated) icm=new COROTATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
-    else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else icm=new NEO_HOOKEAN<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,icm));
 }
