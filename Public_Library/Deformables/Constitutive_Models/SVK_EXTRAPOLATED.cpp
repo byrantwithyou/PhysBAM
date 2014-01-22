@@ -4,8 +4,7 @@
 //#####################################################################
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/pow.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
@@ -72,9 +71,9 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
 template<class T,int d> T SVK_EXTRAPOLATED<T,d>::
 Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
 {
-    T x = F.x11;
-    T y = F.x22;
-    T z = F.x33;
+    T x = F.x.x;
+    T y = F.x.y;
+    T z = F.x.z;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
@@ -142,9 +141,9 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simpl
 template<class T,int d> DIAGONAL_MATRIX<T,3> SVK_EXTRAPOLATED<T,d>::
 P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simplex) const
 {
-    T x = F.x11;
-    T y = F.x22;
-    T z = F.x33;
+    T x = F.x.x;
+    T y = F.x.y;
+    T z = F.x.z;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
@@ -159,65 +158,65 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
     if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=-1.5*la*x+0.5*la*cube(x)+0.5*la*x*sqr(y)+0.5*la*x*sqr(z)-mu*x+mu*cube(x);
-        result.x22=-1.5*la*y+0.5*la*y*sqr(x)+0.5*la*cube(y)+0.5*la*y*sqr(z)-mu*y+mu*cube(y);
-        result.x33=-1.5*la*z+0.5*la*z*sqr(x)+0.5*la*z*sqr(y)+0.5*la*cube(z)-mu*z+mu*cube(z);
+        result.x.x=-1.5*la*x+0.5*la*cube(x)+0.5*la*x*sqr(y)+0.5*la*x*sqr(z)-mu*x+mu*cube(x);
+        result.x.y=-1.5*la*y+0.5*la*y*sqr(x)+0.5*la*cube(y)+0.5*la*y*sqr(z)-mu*y+mu*cube(y);
+        result.x.z=-1.5*la*z+0.5*la*z*sqr(x)+0.5*la*z*sqr(y)+0.5*la*cube(z)-mu*z+mu*cube(z);
         return scale*result;
     }
     else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=-1.5*la*a+0.5*la*cube(a)+0.5*la*a*sqr(y)+0.5*la*a*sqr(z)-mu*a+mu*cube(a)+2*k*x-2*k*a;
-        result.x22=-1.5*la*y-0.5*la*y*sqr(a)+0.5*la*cube(y)+0.5*la*y*sqr(z)-mu*y+mu*cube(y)+la*y*a*x;
-        result.x33=-1.5*la*z-0.5*la*z*sqr(a)+0.5*la*z*sqr(y)+0.5*la*cube(z)-mu*z+mu*cube(z)+la*z*a*x;
+        result.x.x=-1.5*la*a+0.5*la*cube(a)+0.5*la*a*sqr(y)+0.5*la*a*sqr(z)-mu*a+mu*cube(a)+2*k*x-2*k*a;
+        result.x.y=-1.5*la*y-0.5*la*y*sqr(a)+0.5*la*cube(y)+0.5*la*y*sqr(z)-mu*y+mu*cube(y)+la*y*a*x;
+        result.x.z=-1.5*la*z-0.5*la*z*sqr(a)+0.5*la*z*sqr(y)+0.5*la*cube(z)-mu*z+mu*cube(z)+la*z*a*x;
         return scale*result;
     }
     else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=-1.5*la*x+0.5*la*cube(x)-0.5*la*x*sqr(a)+0.5*la*x*sqr(z)-mu*x+mu*cube(x)+la*y*a*x;
-        result.x22=-1.5*la*a+0.5*la*a*sqr(x)+0.5*la*cube(a)+0.5*la*a*sqr(z)-mu*a+mu*cube(a)+2*k*y-2*k*a;
-        result.x33=-1.5*la*z+0.5*la*z*sqr(x)-0.5*la*z*sqr(a)+0.5*la*cube(z)-mu*z+mu*cube(z)+la*z*a*y;
+        result.x.x=-1.5*la*x+0.5*la*cube(x)-0.5*la*x*sqr(a)+0.5*la*x*sqr(z)-mu*x+mu*cube(x)+la*y*a*x;
+        result.x.y=-1.5*la*a+0.5*la*a*sqr(x)+0.5*la*cube(a)+0.5*la*a*sqr(z)-mu*a+mu*cube(a)+2*k*y-2*k*a;
+        result.x.z=-1.5*la*z+0.5*la*z*sqr(x)-0.5*la*z*sqr(a)+0.5*la*cube(z)-mu*z+mu*cube(z)+la*z*a*y;
         return scale*result;
     }
     else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=-1.5*la*x+0.5*la*cube(x)+0.5*la*x*sqr(y)-0.5*la*x*sqr(a)-mu*x+mu*cube(x)+la*z*a*x;
-        result.x22=-1.5*la*y+0.5*la*y*sqr(x)+0.5*la*cube(y)-0.5*la*y*sqr(a)-mu*y+mu*cube(y)+la*z*a*y;
-        result.x33=-1.5*la*a+0.5*la*a*sqr(x)+0.5*la*a*sqr(y)+0.5*la*cube(a)-mu*a+mu*cube(a)+2*k*z-2*k*a;
+        result.x.x=-1.5*la*x+0.5*la*cube(x)+0.5*la*x*sqr(y)-0.5*la*x*sqr(a)-mu*x+mu*cube(x)+la*z*a*x;
+        result.x.y=-1.5*la*y+0.5*la*y*sqr(x)+0.5*la*cube(y)-0.5*la*y*sqr(a)-mu*y+mu*cube(y)+la*z*a*y;
+        result.x.z=-1.5*la*a+0.5*la*a*sqr(x)+0.5*la*a*sqr(y)+0.5*la*cube(a)-mu*a+mu*cube(a)+2*k*z-2*k*a;
         return scale*result;
     }
     else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=-1.5*la*a+0.5*la*a*sqr(z)-mu*a+mu*cube(a)+la*y*sqr(a)+2*k*x-2*k*a;
-        result.x22=-1.5*la*a+0.5*la*a*sqr(z)-mu*a+mu*cube(a)+la*x*sqr(a)+2*k*y-2*k*a;
-        result.x33=-1.5*la*z-la*z*sqr(a)+0.5*la*cube(z)-mu*z+mu*cube(z)+la*z*a*x+la*z*a*y;
+        result.x.x=-1.5*la*a+0.5*la*a*sqr(z)-mu*a+mu*cube(a)+la*y*sqr(a)+2*k*x-2*k*a;
+        result.x.y=-1.5*la*a+0.5*la*a*sqr(z)-mu*a+mu*cube(a)+la*x*sqr(a)+2*k*y-2*k*a;
+        result.x.z=-1.5*la*z-la*z*sqr(a)+0.5*la*cube(z)-mu*z+mu*cube(z)+la*z*a*x+la*z*a*y;
         return scale*result;
     }
     else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=-1.5*la*a+0.5*la*a*sqr(y)-mu*a+mu*cube(a)+la*z*sqr(a)+2*k*x-2*k*a;
-        result.x22=-1.5*la*y-la*y*sqr(a)+0.5*la*cube(y)-mu*y+mu*cube(y)+la*z*a*y+la*y*a*x;
-        result.x33=-1.5*la*a+0.5*la*a*sqr(y)-mu*a+mu*cube(a)+la*x*sqr(a)+2*k*z-2*k*a;
+        result.x.x=-1.5*la*a+0.5*la*a*sqr(y)-mu*a+mu*cube(a)+la*z*sqr(a)+2*k*x-2*k*a;
+        result.x.y=-1.5*la*y-la*y*sqr(a)+0.5*la*cube(y)-mu*y+mu*cube(y)+la*z*a*y+la*y*a*x;
+        result.x.z=-1.5*la*a+0.5*la*a*sqr(y)-mu*a+mu*cube(a)+la*x*sqr(a)+2*k*z-2*k*a;
         return scale*result;
     }
     else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=-1.5*la*x+0.5*la*cube(x)-la*x*sqr(a)-mu*x+mu*cube(x)+la*y*a*x+la*z*a*x;
-        result.x22=-1.5*la*a+0.5*la*a*sqr(x)-mu*a+mu*cube(a)+la*z*sqr(a)+2*k*y-2*k*a;
-        result.x33=-1.5*la*a+0.5*la*a*sqr(x)-mu*a+mu*cube(a)+la*y*sqr(a)+2*k*z-2*k*a;
+        result.x.x=-1.5*la*x+0.5*la*cube(x)-la*x*sqr(a)-mu*x+mu*cube(x)+la*y*a*x+la*z*a*x;
+        result.x.y=-1.5*la*a+0.5*la*a*sqr(x)-mu*a+mu*cube(a)+la*z*sqr(a)+2*k*y-2*k*a;
+        result.x.z=-1.5*la*a+0.5*la*a*sqr(x)-mu*a+mu*cube(a)+la*y*sqr(a)+2*k*z-2*k*a;
         return scale*result;
     }
     else // Rxyz
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=-1.5*la*a-0.5*la*cube(a)-mu*a+mu*cube(a)+la*y*sqr(a)+la*z*sqr(a)+2*k*x-2*k*a;
-        result.x22=-1.5*la*a-0.5*la*cube(a)-mu*a+mu*cube(a)+la*x*sqr(a)+la*z*sqr(a)+2*k*y-2*k*a;
-        result.x33=-1.5*la*a-0.5*la*cube(a)-mu*a+mu*cube(a)+la*y*sqr(a)+la*x*sqr(a)+2*k*z-2*k*a;
+        result.x.x=-1.5*la*a-0.5*la*cube(a)-mu*a+mu*cube(a)+la*y*sqr(a)+la*z*sqr(a)+2*k*x-2*k*a;
+        result.x.y=-1.5*la*a-0.5*la*cube(a)-mu*a+mu*cube(a)+la*x*sqr(a)+la*z*sqr(a)+2*k*y-2*k*a;
+        result.x.z=-1.5*la*a-0.5*la*cube(a)-mu*a+mu*cube(a)+la*y*sqr(a)+la*x*sqr(a)+2*k*z-2*k*a;
         return scale*result;
     }
 }
@@ -243,9 +242,9 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 template<class T,int d> void SVK_EXTRAPOLATED<T,d>::
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int triangle) const
 {
-    T x = F.x11;
-    T y = F.x22;
-    T z = F.x33;
+    T x = F.x.x;
+    T y = F.x.y;
+    T z = F.x.z;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;

@@ -2,7 +2,7 @@
 // Copyright 2004, Geoffrey Irving.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <OpenGL/OpenGL/OPENGL_SYMMETRIC_MATRIX_FIELD_2D.h>
 using namespace PhysBAM;
@@ -33,7 +33,7 @@ Update()
     lines.Resize(grid.Domain_Indices(-field.domain.min_corner.x));positive.Resize(grid.Domain_Indices(1-field.domain.min_corner.x));
     DIAGONAL_MATRIX<T,2> D;MATRIX<T,2> U;
     for(int i=lines.domain.min_corner.x;i<lines.domain.max_corner.x;i++)for(int j=lines.domain.min_corner.y;j<lines.domain.max_corner.y;j++){
-        field(i,j).Solve_Eigenproblem(D,U);lines(i,j)=U*D;positive(i,j)=PAIR<bool,bool>(D.x11>0,D.x22>0);}
+        field(i,j).Solve_Eigenproblem(D,U);lines(i,j)=U*D;positive(i,j)=PAIR<bool,bool>(D.x.x>0,D.x.y>0);}
 }
 //#####################################################################
 // Function Bounding_Box

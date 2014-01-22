@@ -336,7 +336,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         MASS_PROPERTIES<TV> mass_properties(*curve,true);
         mass_properties.Set_Density((T).1077);
         rigid_body_collection.Rigid_Body(sphere).Mass()=mass_properties.Mass();
-        rigid_body_collection.Rigid_Body(sphere).Inertia_Tensor()=DIAGONAL_MATRIX<T,1>(mass_properties.Inertia_Tensor());}
+        rigid_body_collection.Rigid_Body(sphere).Inertia_Tensor()=DIAGONAL_MATRIX<T,1>(mass_properties.Inertia_Tensor().x11);}
 
     fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
     if(fluids_parameters.use_slip){

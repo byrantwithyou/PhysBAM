@@ -53,8 +53,8 @@ public:
     DIAGONAL_MATRIX<T,2> D;
     int index=hardening_deformation.m>1?simplex:1;
     T hardening_deformation_=hardening_deformation(index),hardening_strength_=hardening_strength(index),coefficient_=coefficient(index),base_=base(index);
-    D.x11=strain_abs.x11<hardening_deformation_?strain_abs.x11*(1+coefficient_*sqr(strain_abs.x11)):hardening_strength_*strain_abs.x11-base_;
-    D.x22=strain_abs.x22<hardening_deformation_?strain_abs.x22*(1+coefficient_*sqr(strain_abs.x22)):hardening_strength_*strain_abs.x22-base_;
+    D.x.x=strain_abs.x.x<hardening_deformation_?strain_abs.x.x*(1+coefficient_*sqr(strain_abs.x.x)):hardening_strength_*strain_abs.x.x-base_;
+    D.x.y=strain_abs.x.y<hardening_deformation_?strain_abs.x.y*(1+coefficient_*sqr(strain_abs.x.y)):hardening_strength_*strain_abs.x.y-base_;
     if(!mu.m) return 2*scale*constant_mu*strain_sign*D+scale*constant_lambda*strain.Trace();
     else return 2*scale*mu(simplex)*strain_sign*D+scale*lambda(simplex)*strain.Trace();}
 
@@ -63,9 +63,9 @@ public:
     DIAGONAL_MATRIX<T,3> D;
     int index=hardening_deformation.m>1?simplex:1;
     T hardening_deformation_=hardening_deformation(index),hardening_strength_=hardening_strength(index),coefficient_=coefficient(index),base_=base(index);
-    D.x11=strain_abs.x11<hardening_deformation_?strain_abs.x11*(1+coefficient_*sqr(strain_abs.x11)):hardening_strength_*strain_abs.x11-base_;
-    D.x22=strain_abs.x22<hardening_deformation_?strain_abs.x22*(1+coefficient_*sqr(strain_abs.x22)):hardening_strength_*strain_abs.x22-base_;
-    D.x33=strain_abs.x33<hardening_deformation_?strain_abs.x33*(1+coefficient_*sqr(strain_abs.x33)):hardening_strength_*strain_abs.x33-base_;
+    D.x.x=strain_abs.x.x<hardening_deformation_?strain_abs.x.x*(1+coefficient_*sqr(strain_abs.x.x)):hardening_strength_*strain_abs.x.x-base_;
+    D.x.y=strain_abs.x.y<hardening_deformation_?strain_abs.x.y*(1+coefficient_*sqr(strain_abs.x.y)):hardening_strength_*strain_abs.x.y-base_;
+    D.x.z=strain_abs.x.z<hardening_deformation_?strain_abs.x.z*(1+coefficient_*sqr(strain_abs.x.z)):hardening_strength_*strain_abs.x.z-base_;
     if(!mu.m) return 2*scale*constant_mu*strain_sign*D+scale*constant_lambda*strain.Trace();
     else return 2*scale*mu(simplex)*strain_sign*D+scale*lambda(simplex)*strain.Trace();}
 

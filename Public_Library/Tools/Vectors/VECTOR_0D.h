@@ -216,6 +216,10 @@ template<class T> inline VECTOR<T,0>
 operator/(const T&,const VECTOR<T,0>& v)
 {return v;}
 
+template<class T> inline VECTOR<T,0>
+Inverse(const VECTOR<T,0>& v)
+{return v;}
+
 //#####################################################################
 }
 #include <Tools/Vectors/VECTOR.h>

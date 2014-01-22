@@ -5,8 +5,7 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/pow.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
@@ -104,10 +103,10 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC
 {
     T mu=constant_mu,la=constant_lambda, mu2=2*mu;
     T J=F.Determinant();
-    T d12=F.x11+F.x22;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
+    T d12=F.x.x+F.x.y;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
     
-    dP_dF.x1111=mu2+la*sqr(F.x22);
-    dP_dF.x2222=mu2+la*sqr(F.x11);
+    dP_dF.x1111=mu2+la*sqr(F.x.y);
+    dP_dF.x2222=mu2+la*sqr(F.x.x);
     dP_dF.x2211=la*(2*J-1);
     dP_dF.x2112=mu2/d12-la*(J-1);
     dP_dF.x2121=mu2*(1-1/d12);
@@ -121,19 +120,19 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC
 {
     T mu=constant_mu,la=constant_lambda,mu2=2*mu,J=F.Determinant();
     DIAGONAL_MATRIX<T,3> F_cofactor=F.Cofactor_Matrix();
-    T d12=F.x11+F.x22;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
-    T d13=F.x11+F.x33;if(fabs(d13)<panic_threshold) d13=d13<0?-panic_threshold:panic_threshold;
-    T d23=F.x22+F.x33;if(fabs(d23)<panic_threshold) d23=d23<0?-panic_threshold:panic_threshold;
+    T d12=F.x.x+F.x.y;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
+    T d13=F.x.x+F.x.z;if(fabs(d13)<panic_threshold) d13=d13<0?-panic_threshold:panic_threshold;
+    T d23=F.x.y+F.x.z;if(fabs(d23)<panic_threshold) d23=d23<0?-panic_threshold:panic_threshold;
  
-    dPi_dF.x1111=mu2+la*sqr(F_cofactor.x11);
-    dPi_dF.x2222=mu2+la*sqr(F_cofactor.x22);
-    dPi_dF.x3333=mu2+la*sqr(F_cofactor.x33);
-    dPi_dF.x2211=la*F.x33*(2*J-1);
-    dPi_dF.x3311=la*F.x22*(2*J-1);
-    dPi_dF.x3322=la*F.x11*(2*J-1);
-    dPi_dF.x2112=mu2/d12+la*F.x33*(1-J);
-    dPi_dF.x3113=mu2/d13+la*F.x22*(1-J);
-    dPi_dF.x3223=mu2/d23+la*F.x11*(1-J);
+    dPi_dF.x1111=mu2+la*sqr(F_cofactor.x.x);
+    dPi_dF.x2222=mu2+la*sqr(F_cofactor.x.y);
+    dPi_dF.x3333=mu2+la*sqr(F_cofactor.x.z);
+    dPi_dF.x2211=la*F.x.z*(2*J-1);
+    dPi_dF.x3311=la*F.x.y*(2*J-1);
+    dPi_dF.x3322=la*F.x.x*(2*J-1);
+    dPi_dF.x2112=mu2/d12+la*F.x.z*(1-J);
+    dPi_dF.x3113=mu2/d13+la*F.x.y*(1-J);
+    dPi_dF.x3223=mu2/d23+la*F.x.x*(1-J);
     dPi_dF.x2121=mu2*(1-1/d12);
     dPi_dF.x3131=mu2*(1-1/d13);
     dPi_dF.x3232=mu2*(1-1/d23);

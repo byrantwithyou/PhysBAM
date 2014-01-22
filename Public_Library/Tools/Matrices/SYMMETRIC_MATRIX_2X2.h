@@ -227,17 +227,17 @@ public:
     {T scale=Max_Abs();return !scale || (*this+tolerance*scale).Positive_Definite();}
 
     VECTOR<T,2> First_Eigenvector_From_Ordered_Eigenvalues(const DIAGONAL_MATRIX<T,2>& eigenvalues) const
-    {return (*this-eigenvalues.x11).Cofactor_Matrix().Largest_Column_Normalized();}
+    {return (*this-eigenvalues.x.x).Cofactor_Matrix().Largest_Column_Normalized();}
 
     VECTOR<T,2> Last_Eigenvector_From_Ordered_Eigenvalues(const DIAGONAL_MATRIX<T,2>& eigenvalues) const
-    {return (*this-eigenvalues.x22).Cofactor_Matrix().Largest_Column_Normalized();}
+    {return (*this-eigenvalues.x.y).Cofactor_Matrix().Largest_Column_Normalized();}
 
     DIAGONAL_MATRIX<T,2> Fast_Eigenvalues() const
     {T da;
     if(x21==0) da=0;
     else{T theta=(T).5*(x22-x11)/x21,t=1/(abs(theta)+sqrt(1+sqr(theta)));if(theta<0) t=-t;da=t*x21;}
     DIAGONAL_MATRIX<T,2> eigenvalues(x11-da,x22+da);
-    exchange_sort(eigenvalues.x11,eigenvalues.x22);return eigenvalues;}
+    eigenvalues.x.Sort();return eigenvalues;}
 
     SYMMETRIC_MATRIX Positive_Definite_Part() const
     {DIAGONAL_MATRIX<T,2> D;MATRIX<T,2> V;Solve_Eigenproblem(D,V);D=D.Clamp_Min(0);return Conjugate(V,D);}
@@ -330,9 +330,9 @@ Solve_Eigenproblem(DIAGONAL_MATRIX<T,2>& eigenvalues,MATRIX<T,2>& eigenvectors) 
     typedef VECTOR<T,2> TV;
     T a=(T).5*(x11+x22),b=(T).5*(x11-x22),c=x21;
     T c_squared=sqr(c),m=sqrt(sqr(b)+c_squared),k=x11*x22-c_squared;
-    if(a>=0){eigenvalues.x11=a+m;eigenvalues.x22=eigenvalues.x11?k/eigenvalues.x11:0;}
-    else{eigenvalues.x22=a-m;eigenvalues.x11=eigenvalues.x22?k/eigenvalues.x22:0;}
-    exchange_sort(eigenvalues.x22,eigenvalues.x11); // if order is wrong, matrix is nearly scalar
+    if(a>=0){eigenvalues.x.x=a+m;eigenvalues.x.y=eigenvalues.x.x?k/eigenvalues.x.x:0;}
+    else{eigenvalues.x.y=a-m;eigenvalues.x.x=eigenvalues.x.y?k/eigenvalues.x.y:0;}
+    exchange_sort(eigenvalues.x.y,eigenvalues.x.x); // if order is wrong, matrix is nearly scalar
     eigenvectors.Set_Column(0,(b>=0?TV(m+b,c):TV(-c,b-m)).Normalized());
     eigenvectors.Set_Column(1,eigenvectors.Column(0).Perpendicular());
 }
@@ -433,7 +433,7 @@ Times_Transpose(const UPPER_TRIANGULAR_MATRIX<T,2>& A) const // 6 mults, 2 adds
 template<class T> inline MATRIX<T,2> SYMMETRIC_MATRIX<T,2>::
 operator*(const DIAGONAL_MATRIX<T,2>& A) const // 4 mults
 {
-    return MATRIX<T,2>(x11*A.x11,x21*A.x11,x21*A.x22,x22*A.x22);
+    return MATRIX<T,2>(x11*A.x.x,x21*A.x.x,x21*A.x.y,x22*A.x.y);
 }
 //#####################################################################
 // Function operator*
@@ -448,7 +448,7 @@ operator*(const UPPER_TRIANGULAR_MATRIX<T,2>& A) const // 6 mults, 2 adds
 //#####################################################################
 template<class T> inline MATRIX<T,2> operator*(const DIAGONAL_MATRIX<T,2>& D,const SYMMETRIC_MATRIX<T,2>& A) // 4 mults
 {
-    return MATRIX<T,2>(D.x11*A.x11,D.x22*A.x21,D.x11*A.x21,D.x22*A.x22);
+    return MATRIX<T,2>(D.x.x*A.x11,D.x.y*A.x21,D.x.x*A.x21,D.x.y*A.x22);
 }
 //#####################################################################
 // Function operator*
@@ -528,7 +528,7 @@ operator-(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B)
 template<class T> inline SYMMETRIC_MATRIX<T,2>
 operator-(const DIAGONAL_MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B) // 2 adds
 {
-    return SYMMETRIC_MATRIX<T,2>(A.x11-B.x11,-B.x21,A.x22-B.x22);
+    return SYMMETRIC_MATRIX<T,2>(A.x.x-B.x11,-B.x21,A.x.y-B.x22);
 }
 //#####################################################################
 }

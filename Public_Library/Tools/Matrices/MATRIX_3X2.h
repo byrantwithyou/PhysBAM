@@ -180,7 +180,7 @@ public:
                           x[0]*A.x13+x[1]*A.x23+x[2]*A.x33,x[3]*A.x13+x[4]*A.x23+x[5]*A.x33);}
 
     MATRIX<T,2,3> Transpose_Times(const DIAGONAL_MATRIX<T,3>& A) const
-    {return MATRIX<T,2,3>(x[0]*A.x11,x[3]*A.x11,x[1]*A.x22,x[4]*A.x22,x[2]*A.x33,x[5]*A.x33);}
+    {return MATRIX<T,2,3>(x[0]*A.x.x,x[3]*A.x.x,x[1]*A.x.y,x[4]*A.x.y,x[2]*A.x.z,x[5]*A.x.z);}
 
     VECTOR<T,2> Transpose_Times(const VECTOR<T,3>& v) const // 6 mults, 4 adds
     {return VECTOR<T,2>(x[0]*v.x+x[1]*v.y+x[2]*v.z,x[3]*v.x+x[4]*v.y+x[5]*v.z);}
@@ -198,7 +198,7 @@ public:
     {return MATRIX(x[0]*A.x11+x[3]*A.x21,x[1]*A.x11+x[4]*A.x21,x[2]*A.x11+x[5]*A.x21,x[0]*A.x21+x[3]*A.x22,x[1]*A.x21+x[4]*A.x22,x[2]*A.x21+x[5]*A.x22);}
 
     MATRIX operator*(const DIAGONAL_MATRIX<T,2>& A) const // 6 mults
-    {return MATRIX(x[0]*A.x11,x[1]*A.x11,x[2]*A.x11,x[3]*A.x22,x[4]*A.x22,x[5]*A.x22);}
+    {return MATRIX(x[0]*A.x.x,x[1]*A.x.x,x[2]*A.x.x,x[3]*A.x.y,x[4]*A.x.y,x[5]*A.x.y);}
 
     static T Inner_Product(const MATRIX& A,const MATRIX& B) // 6 mults, 5 adds
     {return A.x[0]*B.x[0]+A.x[1]*B.x[1]+A.x[2]*B.x[2]+A.x[3]*B.x[3]+A.x[4]*B.x[4]+A.x[5]*B.x[5];}

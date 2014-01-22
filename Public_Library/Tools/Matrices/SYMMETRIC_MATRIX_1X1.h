@@ -38,7 +38,7 @@ public:
     {}
 
     SYMMETRIC_MATRIX(const DIAGONAL_MATRIX<T,1>& matrix_input)
-        :x11(matrix_input.x11)
+        :x11(matrix_input.x.x)
     {}
 
     explicit SYMMETRIC_MATRIX(const MATRIX<T,1>& matrix_input)
@@ -250,13 +250,13 @@ public:
     {eigenvectors=MATRIX<T,1>(1);eigenvectors=*this;}
 
     static SYMMETRIC_MATRIX Conjugate(const MATRIX<T,1>& A,const DIAGONAL_MATRIX<T,1>& B)
-    {return SYMMETRIC_MATRIX<T,1>(sqr(A.x11)*B.x11);}
+    {return SYMMETRIC_MATRIX<T,1>(sqr(A.x11)*B.x.x);}
 
     static SYMMETRIC_MATRIX Conjugate(const MATRIX<T,1>& A,const SYMMETRIC_MATRIX& B)
     {return SYMMETRIC_MATRIX<T,1>(sqr(A.x11)*B.x11);}
 
     static SYMMETRIC_MATRIX Conjugate(const DIAGONAL_MATRIX<T,1>& A,const SYMMETRIC_MATRIX& B)
-    {return SYMMETRIC_MATRIX<T,1>(sqr(A.x11)*B.x11);}
+    {return SYMMETRIC_MATRIX<T,1>(sqr(A.x.x)*B.x11);}
 
     static SYMMETRIC_MATRIX Conjugate(const UPPER_TRIANGULAR_MATRIX<T,1>& A,const SYMMETRIC_MATRIX& B)
     {return SYMMETRIC_MATRIX<T,1>(sqr(A.x11)*B.x11);}
@@ -274,7 +274,7 @@ public:
     {return (A**this).Transposed();}
 
     MATRIX<T,1> operator*(const DIAGONAL_MATRIX<T,1>& A) const
-    {return MATRIX<T,1>(x11*A.x11);}
+    {return MATRIX<T,1>(x11*A.x.x);}
 
     MATRIX<T,1> operator*(const UPPER_TRIANGULAR_MATRIX<T,1>& A) const
     {return MATRIX<T,1>(x11*A.x11);}
@@ -331,7 +331,7 @@ inline SYMMETRIC_MATRIX<T,1> exp(const SYMMETRIC_MATRIX<T,1>& A)
 //#####################################################################
 template<class T> inline MATRIX<T,1> operator*(const DIAGONAL_MATRIX<T,1>& D,const SYMMETRIC_MATRIX<T,1>& A)
 {
-    return MATRIX<T,1>(D.x11*A.x11);
+    return MATRIX<T,1>(D.x.x*A.x11);
 }
 //#####################################################################
 // Function operator*
@@ -363,7 +363,7 @@ inline MATRIX<T,1> operator*(const SYMMETRIC_MATRIX<T,1>& A,const SYMMETRIC_MATR
 template<class T> inline SYMMETRIC_MATRIX<T,1> SYMMETRIC_MATRIX<T,1>::
 operator+(const DIAGONAL_MATRIX<T,1>& A) const
 {
-    return SYMMETRIC_MATRIX<T,1>(x11+A.x11);
+    return SYMMETRIC_MATRIX<T,1>(x11+A.x.x);
 }
 //#####################################################################
 // Function operator+
@@ -411,7 +411,7 @@ operator-(const UPPER_TRIANGULAR_MATRIX<T,1>& A,const SYMMETRIC_MATRIX<T,1>& B)
 template<class T> inline SYMMETRIC_MATRIX<T,1>
 operator-(const DIAGONAL_MATRIX<T,1>& A,const SYMMETRIC_MATRIX<T,1>& B)
 {
-    return SYMMETRIC_MATRIX<T,1>(A.x11-B.x11);
+    return SYMMETRIC_MATRIX<T,1>(A.x.x-B.x11);
 }
 //#####################################################################
 }

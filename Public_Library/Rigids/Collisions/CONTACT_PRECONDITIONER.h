@@ -10,7 +10,7 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/FRAME.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/ROTATION.h>

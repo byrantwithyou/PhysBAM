@@ -9,7 +9,7 @@
 
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/FRAME.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>

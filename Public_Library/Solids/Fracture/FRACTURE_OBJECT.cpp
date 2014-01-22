@@ -8,8 +8,7 @@
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Math_Tools/sign.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Solids/Fracture/FRACTURE_OBJECT.h>

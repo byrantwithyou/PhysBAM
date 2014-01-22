@@ -2277,7 +2277,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         for(int i=0;i<number_of_vertices;i++) solid_body_collection.deformable_body_collection.collisions.check_collision(i)=false;
         
         for(int t=0;t<fvm.Fe_hat.m;t++)
-            if(fvm.Fe_hat(t).x11<3)
+            if(fvm.Fe_hat(t).x.x<3)
                 for(int i=0;i<4;i++) solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=true;
 
         if (time >=1 ) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity.y=-9.8;
@@ -2288,7 +2288,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         for(int f=0;FINITE_VOLUME<TV,3>* fvm=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++)
             for(int t=0;t<fvm->Fe_hat.m;t++){
                // LOG::cout << "booya " << stretch_cutoff << std::endl;
-                if(fvm->Fe_hat(t).x11>=stretch_cutoff)
+                if(fvm->Fe_hat(t).x.x>=stretch_cutoff)
                     solid_body_collection.deformable_body_collection.collisions.check_collision.Subset(fvm->strain_measure.mesh_object.mesh.elements(t)).Fill(false);}
     }
     if(test_number==29){    
@@ -2381,11 +2381,11 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     //{
         FINITE_VOLUME<TV,3>& force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
         ARRAY<DIAGONAL_MATRIX<T,3> >& sv=force_field.Fe_hat;
-        T Jmin=(T)1;T s1=(T)0;T s2=(T)0;T s3=(T)0;
+        T Jmin=(T)1;TV s;
 
         for(int i=0;i<sv.m;i++){
-            if (Jmin > sv(i).x11*sv(i).x22*sv(i).x33){ s1=sv(i).x11;s2=sv(i).x22;s3=sv(i).x33;Jmin=sv(i).x11*sv(i).x22*sv(i).x33;}}
-    LOG::cout<<"Minimum determinant "<<Jmin << " " << s1 << " " << s2 << " " << s3 <<std::endl;
+            if (Jmin > sv(i).Determinant()){ s=sv(i).x;Jmin=sv(i).Determinant();}}
+    LOG::cout<<"Minimum determinant "<<Jmin << " " << s <<std::endl;
     //}
     if(test_number==51) for(int i=0;i<particles.X.m;i++) if(particles.V(i).x>6) particles.V(i).x=6;
     T min_volume=FLT_MAX;
@@ -2400,7 +2400,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         for(int f=0;FINITE_VOLUME<TV,3>* force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++){
             ARRAY<DIAGONAL_MATRIX<T,3> >& sv=force_field->Fe_hat;
             for(int i=0;i<sv.m;i++){
-                svout << sv(i).x11 << " " << sv(i).x22 << " " << sv(i).x33 << std::endl;
+                svout << sv(i).x.x << " " << sv(i).x.y << " " << sv(i).x.z << std::endl;
                 Add_Debug_Particle(sv(i).To_Vector(),TV(1,1,0));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-force_field->isotropic_model->P_From_Strain(sv(i),1,i).To_Vector());}}}
     if(test_number==48){

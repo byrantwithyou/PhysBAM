@@ -8,7 +8,7 @@
 #define __MOONEY_RIVLIN_3D__
 
 #include <Tools/Math_Tools/constants.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
@@ -50,18 +50,18 @@ public:
     alpha.x11=2*Jcc*(mu_10+Jcc*mu_01*(I_C-C.x11-C.x11));alpha.x21=2*Jcc*(mu_10+Jcc*mu_01*(I_C-C.x22-C.x11));alpha.x31=2*Jcc*(mu_10+Jcc*mu_01*(I_C-C.x33-C.x11));
     alpha.x22=2*Jcc*(mu_10+Jcc*mu_01*(I_C-C.x22-C.x22));alpha.x32=2*Jcc*(mu_10+Jcc*mu_01*(I_C-C.x33-C.x22));alpha.x33=2*Jcc*(mu_10+Jcc*mu_01*(I_C-C.x33-C.x33));
     SYMMETRIC_MATRIX<T,3> beta;
-    beta.x11=(Jcc*(T)two_thirds*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))-kappa*log(J))*F_inverse.x11*F_inverse.x11-2*Jcc*Jcc*mu_01*F_threshold.x11*F_threshold.x11;
-    beta.x21=(Jcc*(T)two_thirds*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))-kappa*log(J))*F_inverse.x22*F_inverse.x11-2*Jcc*Jcc*mu_01*F_threshold.x22*F_threshold.x11;
-    beta.x31=(Jcc*(T)two_thirds*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))-kappa*log(J))*F_inverse.x33*F_inverse.x11-2*Jcc*Jcc*mu_01*F_threshold.x33*F_threshold.x11;
-    beta.x22=(Jcc*(T)two_thirds*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))-kappa*log(J))*F_inverse.x22*F_inverse.x22-2*Jcc*Jcc*mu_01*F_threshold.x22*F_threshold.x22;
-    beta.x32=(Jcc*(T)two_thirds*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))-kappa*log(J))*F_inverse.x33*F_inverse.x22-2*Jcc*Jcc*mu_01*F_threshold.x33*F_threshold.x22;
-    beta.x33=(Jcc*(T)two_thirds*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))-kappa*log(J))*F_inverse.x33*F_inverse.x33-2*Jcc*Jcc*mu_01*F_threshold.x33*F_threshold.x33;
+    beta.x11=(Jcc*(T)two_thirds*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))-kappa*log(J))*F_inverse.x11*F_inverse.x11-2*Jcc*Jcc*mu_01*F_threshold.x.x*F_threshold.x.x;
+    beta.x21=(Jcc*(T)two_thirds*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))-kappa*log(J))*F_inverse.x22*F_inverse.x11-2*Jcc*Jcc*mu_01*F_threshold.x.y*F_threshold.x.x;
+    beta.x31=(Jcc*(T)two_thirds*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))-kappa*log(J))*F_inverse.x33*F_inverse.x11-2*Jcc*Jcc*mu_01*F_threshold.x.z*F_threshold.x.x;
+    beta.x22=(Jcc*(T)two_thirds*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))-kappa*log(J))*F_inverse.x22*F_inverse.x22-2*Jcc*Jcc*mu_01*F_threshold.x.y*F_threshold.x.y;
+    beta.x32=(Jcc*(T)two_thirds*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))-kappa*log(J))*F_inverse.x33*F_inverse.x22-2*Jcc*Jcc*mu_01*F_threshold.x.z*F_threshold.x.y;
+    beta.x33=(Jcc*(T)two_thirds*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))-kappa*log(J))*F_inverse.x33*F_inverse.x33-2*Jcc*Jcc*mu_01*F_threshold.x.z*F_threshold.x.z;
     SYMMETRIC_MATRIX<T,3> eta;
     eta.x11=4*Jcc*Jcc*mu_01;
     eta.x31=-Jcc*(T)one_third*(4*mu_10+8*Jcc*mu_01*I_C);
     eta.x32=8*(T)one_third*Jcc*Jcc*mu_01;
     eta.x33=Jcc*(T)one_ninth*(4*mu_10*I_C+Jcc*8*mu_01*(I_C*I_C-II_C))+kappa;
-    MATRIX<T,3> F_base(F_threshold.x11,F_threshold.x22,F_threshold.x33,F_cube.x11,F_cube.x22,F_cube.x33,F_inverse.x11,F_inverse.x22,F_inverse.x33);
+    MATRIX<T,3> F_base(F_threshold.x.x,F_threshold.x.y,F_threshold.x.z,F_cube.x11,F_cube.x22,F_cube.x33,F_inverse.x11,F_inverse.x22,F_inverse.x33);
     SYMMETRIC_MATRIX<T,3> gamma=SYMMETRIC_MATRIX<T,3>::Conjugate(F_base,eta);
     dPi_dF.x1111=alpha.x11+beta.x11+gamma.x11;dPi_dF.x2222=alpha.x22+beta.x22+gamma.x22;dPi_dF.x3333=alpha.x33+beta.x33+gamma.x33;
     dPi_dF.x2211=gamma.x21;dPi_dF.x3311=gamma.x31;dPi_dF.x3322=gamma.x32;

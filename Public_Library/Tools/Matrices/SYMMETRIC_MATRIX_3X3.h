@@ -40,7 +40,7 @@ public:
     {}
 
     SYMMETRIC_MATRIX(const DIAGONAL_MATRIX<T,3>& matrix_input)
-        :x11(matrix_input.x11),x21(T()),x31(T()),x22(matrix_input.x22),x32(T()),x33(matrix_input.x33)
+        :x11(matrix_input.x.x),x21(T()),x31(T()),x22(matrix_input.x.y),x32(T()),x33(matrix_input.x.z)
     {}
 
     SYMMETRIC_MATRIX(const T y11,const T y21,const T y31,const T y22,const T y32,const T y33)
@@ -258,14 +258,14 @@ public:
     {T scale=Max_Abs();return !scale || (*this+tolerance*scale).Positive_Definite();}
 
     VECTOR<T,3> First_Eigenvector_From_Ordered_Eigenvalues(const DIAGONAL_MATRIX<T,3>& eigenvalues,const T tolerance=1e-5) const
-    {T scale=maxabs(eigenvalues.x11,eigenvalues.x33),scale_inverse=Robust_Inverse(scale),tiny=tolerance*scale;
-    if(eigenvalues.x11-eigenvalues.x22>tiny) return ((*this-eigenvalues.x11)*scale_inverse).Cofactor_Matrix().Largest_Column_Normalized();
-    return ((*this-eigenvalues.x33)*scale_inverse).Cofactor_Matrix().Largest_Column().Unit_Orthogonal_Vector();}
+    {T scale=maxabs(eigenvalues.x.x,eigenvalues.x.z),scale_inverse=Robust_Inverse(scale),tiny=tolerance*scale;
+    if(eigenvalues.x.x-eigenvalues.x.y>tiny) return ((*this-eigenvalues.x.x)*scale_inverse).Cofactor_Matrix().Largest_Column_Normalized();
+    return ((*this-eigenvalues.x.z)*scale_inverse).Cofactor_Matrix().Largest_Column().Unit_Orthogonal_Vector();}
 
     VECTOR<T,3> Last_Eigenvector_From_Ordered_Eigenvalues(const DIAGONAL_MATRIX<T,3>& eigenvalues,const T tolerance=1e-5) const
-    {T scale=maxabs(eigenvalues.x11,eigenvalues.x33),scale_inverse=Robust_Inverse(scale),tiny=tolerance*scale;
-    if(eigenvalues.x22-eigenvalues.x33>tiny) return ((*this-eigenvalues.x33)*scale_inverse).Cofactor_Matrix().Largest_Column_Normalized();
-    return ((*this-eigenvalues.x11)*scale_inverse).Cofactor_Matrix().Largest_Column().Unit_Orthogonal_Vector();}
+    {T scale=maxabs(eigenvalues.x.x,eigenvalues.x.z),scale_inverse=Robust_Inverse(scale),tiny=tolerance*scale;
+    if(eigenvalues.x.y-eigenvalues.x.z>tiny) return ((*this-eigenvalues.x.z)*scale_inverse).Cofactor_Matrix().Largest_Column_Normalized();
+    return ((*this-eigenvalues.x.x)*scale_inverse).Cofactor_Matrix().Largest_Column().Unit_Orthogonal_Vector();}
 
     SYMMETRIC_MATRIX Positive_Definite_Part() const
     {DIAGONAL_MATRIX<T,3> D;MATRIX<T,3> V;Fast_Solve_Eigenproblem(D,V);D=D.Clamp_Min(0);return Conjugate(V,D);}
@@ -393,7 +393,7 @@ Conjugate(const SYMMETRIC_MATRIX<T,3>& A,const SYMMETRIC_MATRIX<T,3>& B)
 template<class T> inline SYMMETRIC_MATRIX<T,3> SYMMETRIC_MATRIX<T,3>::
 Conjugate(const DIAGONAL_MATRIX<T,3>& A,const SYMMETRIC_MATRIX<T,3>& B)
 {
-    return SYMMETRIC_MATRIX(A.x11*A.x11*B.x11,A.x22*A.x11*B.x21,A.x33*A.x11*B.x31,A.x22*A.x22*B.x22,A.x33*A.x22*B.x32,A.x33*A.x33*B.x33);
+    return SYMMETRIC_MATRIX(A.x.x*A.x.x*B.x11,A.x.y*A.x.x*B.x21,A.x.z*A.x.x*B.x31,A.x.y*A.x.y*B.x22,A.x.z*A.x.y*B.x32,A.x.z*A.x.z*B.x33);
 }
 //#####################################################################
 // Function Conjugate
@@ -441,7 +441,7 @@ Conjugate_With_Transpose(const UPPER_TRIANGULAR_MATRIX<T,3>& A,const SYMMETRIC_M
 template<class T> inline MATRIX<T,3> SYMMETRIC_MATRIX<T,3>::
 operator*(const DIAGONAL_MATRIX<T,3>& A) const // 9 mults
 {
-    return MATRIX<T,3>(x11*A.x11,x21*A.x11,x31*A.x11,x21*A.x22,x22*A.x22,x32*A.x22,x31*A.x33,x32*A.x33,x33*A.x33);
+    return MATRIX<T,3>(x11*A.x.x,x21*A.x.x,x31*A.x.x,x21*A.x.y,x22*A.x.y,x32*A.x.y,x31*A.x.z,x32*A.x.z,x33*A.x.z);
 }
 //#####################################################################
 // Function operator*
@@ -458,7 +458,7 @@ operator*(const UPPER_TRIANGULAR_MATRIX<T,3>& A) const // 18 mults, 9 adds
 template<class T> inline MATRIX<T,3>
 operator*(const DIAGONAL_MATRIX<T,3>& D,const SYMMETRIC_MATRIX<T,3>& A) // 9 mults, 
 {
-    return MATRIX<T,3>(D.x11*A.x11,D.x22*A.x21,D.x33*A.x31,D.x11*A.x21,D.x22*A.x22,D.x33*A.x32,D.x11*A.x31,D.x22*A.x32,D.x33*A.x33);
+    return MATRIX<T,3>(D.x.x*A.x11,D.x.y*A.x21,D.x.z*A.x31,D.x.x*A.x21,D.x.y*A.x22,D.x.z*A.x32,D.x.x*A.x31,D.x.y*A.x32,D.x.z*A.x33);
 }
 //#####################################################################
 // Function operator*
@@ -475,7 +475,7 @@ operator*(const UPPER_TRIANGULAR_MATRIX<T,3>& A,const SYMMETRIC_MATRIX<T,3>& B) 
 template<class T> inline SYMMETRIC_MATRIX<T,3> SYMMETRIC_MATRIX<T,3>::
 operator+(const DIAGONAL_MATRIX<T,3>& A) const // 3 adds
 {
-    return SYMMETRIC_MATRIX<T,3>(x11+A.x11,x21,x31,x22+A.x22,x32,x33+A.x33);
+    return SYMMETRIC_MATRIX<T,3>(x11+A.x.x,x21,x31,x22+A.x.y,x32,x33+A.x.z);
 }
 //#####################################################################
 // Function operator+
@@ -523,7 +523,7 @@ operator-(const UPPER_TRIANGULAR_MATRIX<T,3>& A,const SYMMETRIC_MATRIX<T,3>& B)
 template<class T> inline SYMMETRIC_MATRIX<T,3>
 operator-(const DIAGONAL_MATRIX<T,3>& A,const SYMMETRIC_MATRIX<T,3>& B) // 3 adds
 {
-    return SYMMETRIC_MATRIX<T,3>(A.x11-B.x11,-B.x21,-B.x31,A.x22-B.x22,-B.x32,A.x33-B.x33);
+    return SYMMETRIC_MATRIX<T,3>(A.x.x-B.x11,-B.x21,-B.x31,A.x.y-B.x22,-B.x32,A.x.z-B.x33);
 }
 //#####################################################################
 }

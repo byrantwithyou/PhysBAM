@@ -4,7 +4,7 @@
 //#####################################################################
 
 #include <Tools/Log/LOG.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>

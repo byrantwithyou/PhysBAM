@@ -60,7 +60,7 @@ template<class T> static void Isotropic_Stress_Derivative_Helper(const DIAGONAL_
 {
     DIAGONAL_MATRIX<T,2> F_threshold=F.Clamp_Min(failure_threshold);
     T lambda_tr_G_minus_mu=(T).5*lambda*(F_threshold*F_threshold-1).Trace()-mu,three_mu_plus_lambda=3*mu+lambda;
-    SYMMETRIC_MATRIX<T,2> F_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(VECTOR<T,2>(F_threshold.x11,F_threshold.x22));
+    SYMMETRIC_MATRIX<T,2> F_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(VECTOR<T,2>(F_threshold.x.x,F_threshold.x.y));
     dP_dF.x1111=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x11;//alpha+beta+gamma
     dP_dF.x2222=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x22;
     dP_dF.x2211=lambda*F_outer.x21;//gamma
@@ -72,7 +72,7 @@ template<class T> static void Isotropic_Stress_Derivative_Helper(const DIAGONAL_
 {
     DIAGONAL_MATRIX<T,3> F_threshold=F.Clamp_Min(failure_threshold);
     T lambda_tr_G_minus_mu=(T).5*lambda*(F_threshold*F_threshold-1).Trace()-mu,three_mu_plus_lambda=3*mu+lambda;
-    SYMMETRIC_MATRIX<T,3> F_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(VECTOR<T,3>(F_threshold.x11,F_threshold.x22,F_threshold.x33));
+    SYMMETRIC_MATRIX<T,3> F_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(VECTOR<T,3>(F_threshold.x.x,F_threshold.x.y,F_threshold.x.z));
     //alpha+beta+gamma
     dPi_dF.x1111=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x11;
     dPi_dF.x2222=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x22;

@@ -3,8 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Log/LOG.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
@@ -74,16 +73,16 @@ template<class T> static void
 Report_Diagnostics(const DIAGONAL_MATRIX<T,2>& F,T E0,T* E,const DIAGONAL_MATRIX<T,2>& P0,const DIAGONAL_MATRIX<T,2>* P,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dPi_dF0,
     const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>* dPi_dF,T e)
 {
-    Report_Diagnostics("Px",E0,E[0],P0.x11,P[0].x11,e);
-    Report_Diagnostics("Py",E0,E[1],P0.x22,P[1].x22,e);
+    Report_Diagnostics("Px",E0,E[0],P0.x.x,P[0].x.x,e);
+    Report_Diagnostics("Py",E0,E[1],P0.x.y,P[1].x.y,e);
 
-    Report_Diagnostics("Hxx",P0.x11,P[0].x11,dPi_dF0.x1111,dPi_dF[0].x1111,e);
-    Report_Diagnostics("Hyy",P0.x22,P[1].x22,dPi_dF0.x2222,dPi_dF[1].x2222,e);
-    Report_Diagnostics("Hxy",P0.x11,P[1].x11,dPi_dF0.x2211,dPi_dF[1].x2211,e);
-    T ss1=sqr(F.x11),ss2=sqr(F.x22);
+    Report_Diagnostics("Hxx",P0.x.x,P[0].x.x,dPi_dF0.x1111,dPi_dF[0].x1111,e);
+    Report_Diagnostics("Hyy",P0.x.y,P[1].x.y,dPi_dF0.x2222,dPi_dF[1].x2222,e);
+    Report_Diagnostics("Hxy",P0.x.x,P[1].x.x,dPi_dF0.x2211,dPi_dF[1].x2211,e);
+    T ss1=sqr(F.x.x),ss2=sqr(F.x.y);
     T s12=1/(ss1-ss2);
-    Report_Diagnostics("x2112",dPi_dF0.x2112,(-P0.x22*F.x11+P0.x11*F.x22)*s12);
-    Report_Diagnostics("x2121",dPi_dF0.x2121,(-P0.x22*F.x22+P0.x11*F.x11)*s12);
+    Report_Diagnostics("x2112",dPi_dF0.x2112,(-P0.x.y*F.x.x+P0.x.x*F.x.y)*s12);
+    Report_Diagnostics("x2121",dPi_dF0.x2121,(-P0.x.y*F.x.y+P0.x.x*F.x.x)*s12);
 }
 //#####################################################################
 // Function Report_Diagnostics
@@ -92,24 +91,24 @@ template<class T> static void
 Report_Diagnostics(const DIAGONAL_MATRIX<T,3>& F,T E0,T* E,const DIAGONAL_MATRIX<T,3>& P0,const DIAGONAL_MATRIX<T,3>* P,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF0,
     const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>* dPi_dF,T e)
 {
-    Report_Diagnostics("Px",E0,E[0],P0.x11,P[0].x11,e);
-    Report_Diagnostics("Py",E0,E[1],P0.x22,P[1].x22,e);
-    Report_Diagnostics("Pz",E0,E[2],P0.x33,P[2].x33,e);
+    Report_Diagnostics("Px",E0,E[0],P0.x.x,P[0].x.x,e);
+    Report_Diagnostics("Py",E0,E[1],P0.x.y,P[1].x.y,e);
+    Report_Diagnostics("Pz",E0,E[2],P0.x.z,P[2].x.z,e);
 
-    Report_Diagnostics("Hxx",P0.x11,P[0].x11,dPi_dF0.x1111,dPi_dF[0].x1111,e);
-    Report_Diagnostics("Hyy",P0.x22,P[1].x22,dPi_dF0.x2222,dPi_dF[1].x2222,e);
-    Report_Diagnostics("Hzz",P0.x33,P[2].x33,dPi_dF0.x3333,dPi_dF[2].x3333,e);
-    Report_Diagnostics("Hxy",P0.x11,P[1].x11,dPi_dF0.x2211,dPi_dF[1].x2211,e);
-    Report_Diagnostics("Hxz",P0.x11,P[2].x11,dPi_dF0.x3311,dPi_dF[2].x3311,e);
-    Report_Diagnostics("Hyz",P0.x22,P[2].x22,dPi_dF0.x3322,dPi_dF[2].x3322,e);
-    T ss1=sqr(F.x11),ss2=sqr(F.x22),ss3=sqr(F.x33);
+    Report_Diagnostics("Hxx",P0.x.x,P[0].x.x,dPi_dF0.x1111,dPi_dF[0].x1111,e);
+    Report_Diagnostics("Hyy",P0.x.y,P[1].x.y,dPi_dF0.x2222,dPi_dF[1].x2222,e);
+    Report_Diagnostics("Hzz",P0.x.z,P[2].x.z,dPi_dF0.x3333,dPi_dF[2].x3333,e);
+    Report_Diagnostics("Hxy",P0.x.x,P[1].x.x,dPi_dF0.x2211,dPi_dF[1].x2211,e);
+    Report_Diagnostics("Hxz",P0.x.x,P[2].x.x,dPi_dF0.x3311,dPi_dF[2].x3311,e);
+    Report_Diagnostics("Hyz",P0.x.y,P[2].x.y,dPi_dF0.x3322,dPi_dF[2].x3322,e);
+    T ss1=sqr(F.x.x),ss2=sqr(F.x.y),ss3=sqr(F.x.z);
     T s12=1/(ss1-ss2),s13=1/(ss1-ss3),s23=1/(ss2-ss3);
-    Report_Diagnostics("x2112",dPi_dF0.x2112,(-P0.x22*F.x11+P0.x11*F.x22)*s12);
-    Report_Diagnostics("x2121",dPi_dF0.x2121,(-P0.x22*F.x22+P0.x11*F.x11)*s12);
-    Report_Diagnostics("x3113",dPi_dF0.x3113,(-P0.x33*F.x11+P0.x11*F.x33)*s13);
-    Report_Diagnostics("x3131",dPi_dF0.x3131,(-P0.x33*F.x33+P0.x11*F.x11)*s13);
-    Report_Diagnostics("x3223",dPi_dF0.x3223,(-P0.x33*F.x22+P0.x22*F.x33)*s23);
-    Report_Diagnostics("x3232",dPi_dF0.x3232,(-P0.x33*F.x33+P0.x22*F.x22)*s23);
+    Report_Diagnostics("x2112",dPi_dF0.x2112,(-P0.x.y*F.x.x+P0.x.x*F.x.y)*s12);
+    Report_Diagnostics("x2121",dPi_dF0.x2121,(-P0.x.y*F.x.y+P0.x.x*F.x.x)*s12);
+    Report_Diagnostics("x3113",dPi_dF0.x3113,(-P0.x.z*F.x.x+P0.x.x*F.x.z)*s13);
+    Report_Diagnostics("x3131",dPi_dF0.x3131,(-P0.x.z*F.x.z+P0.x.x*F.x.x)*s13);
+    Report_Diagnostics("x3223",dPi_dF0.x3223,(-P0.x.z*F.x.y+P0.x.y*F.x.z)*s23);
+    Report_Diagnostics("x3232",dPi_dF0.x3232,(-P0.x.z*F.x.z+P0.x.y*F.x.y)*s23);
 }
 //#####################################################################
 // Function Test

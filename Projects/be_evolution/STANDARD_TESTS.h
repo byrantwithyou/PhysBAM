@@ -2428,7 +2428,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         for(int i=0;i<number_of_vertices;i++) solid_body_collection.deformable_body_collection.collisions.check_collision(i)=false;
 
         for(int t=0;t<fvm.Fe_hat.m;t++)
-            if(fvm.Fe_hat(t).x11<3)
+            if(fvm.Fe_hat(t).x.x<3)
                 for(int i=0;i<4;i++) solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=true;
 
         if (time >=1 ) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity.y=-9.8*m/(s*s);}
@@ -2438,7 +2438,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         for(int f=0;FINITE_VOLUME<TV,3>* fvm=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++)
             for(int t=0;t<fvm->Fe_hat.m;t++){
                // LOG::cout << "booya " << stretch_cutoff << std::endl;
-                if(fvm->Fe_hat(t).x11>=stretch_cutoff)
+                if(fvm->Fe_hat(t).x.x>=stretch_cutoff)
                     solid_body_collection.deformable_body_collection.collisions.check_collision.Subset(fvm->strain_measure.mesh_object.mesh.elements(t)).Fill(false);}}
     if(test_number==29) std::cout << "rame!" <<      solids_parameters.triangle_collision_parameters.perform_self_collision << std::endl;
     if(test_number==31) solid_body_collection.deformable_body_collection.collisions.check_collision.Subset(constrained_particles).Fill(false);

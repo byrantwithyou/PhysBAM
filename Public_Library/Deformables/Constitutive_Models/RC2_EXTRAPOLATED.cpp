@@ -5,8 +5,7 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/pow.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
@@ -93,7 +92,7 @@ template<class T> static void
 Isotropic_Stress_Derivative_Helper(const RC2_EXTRAPOLATED<T,2>& re,const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int simplex)
 {
     T J=F.To_Vector().Product();
-    T x=F.x11, y=F.x22, xpy=x+y;
+    T x=F.x.x, y=F.x.y, xpy=x+y;
     if(fabs(xpy)<re.panic_threshold) xpy=xpy<0?-re.panic_threshold:re.panic_threshold;
     if(J<re.extrapolation_cutoff){
         typename RC2_EXTRAPOLATED<T,2>::HELPER helper;
@@ -122,7 +121,7 @@ template<class T> static void
 Isotropic_Stress_Derivative_Helper(const RC2_EXTRAPOLATED<T,3>& re,const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int simplex)
 {
     T J=F.To_Vector().Product();
-    T x=F.x11,y=F.x22,z=F.x33,xpy=x+y,xpz=x+z,ypz=y+z;
+    T x=F.x.x,y=F.x.y,z=F.x.z,xpy=x+y,xpz=x+z,ypz=y+z;
     if(fabs(xpy)<re.panic_threshold) xpy=xpy<0?-re.panic_threshold:re.panic_threshold;
     if(fabs(xpz)<re.panic_threshold) xpz=xpz<0?-re.panic_threshold:re.panic_threshold;
     if(fabs(ypz)<re.panic_threshold) ypz=ypz<0?-re.panic_threshold:re.panic_threshold;
@@ -138,7 +137,7 @@ Isotropic_Stress_Derivative_Helper(const RC2_EXTRAPOLATED<T,3>& re,const DIAGONA
             dP_dF.x2211=helper.ddE.x21;
             dP_dF.x3311=helper.ddE.x31;
             dP_dF.x3322=helper.ddE.x32;
-            T ss1=sqr(F.x11),ss2=sqr(F.x22),ss3=sqr(F.x33);
+            T ss1=sqr(F.x.x),ss2=sqr(F.x.y),ss3=sqr(F.x.z);
             T s12=ss1-ss2,s13=ss1-ss3,s23=ss2-ss3;
             if(fabs(s12)<re.panic_threshold) s12=s12<0?-re.panic_threshold:re.panic_threshold;
             if(fabs(s13)<re.panic_threshold) s13=s13<0?-re.panic_threshold:re.panic_threshold;

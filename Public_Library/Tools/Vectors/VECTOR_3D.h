@@ -475,6 +475,10 @@ sqrt(const VECTOR<T,3>& v)
 {return VECTOR<T,3>(sqrt(v.x),sqrt(v.y),sqrt(v.z));}
 
 template<class T> inline VECTOR<T,3>
+log(const VECTOR<T,3>& v)
+{return VECTOR<T,3>(log(v.x),log(v.y),log(v.z));}
+
+template<class T> inline VECTOR<T,3>
 Inverse(const VECTOR<T,3>& v)
 {return VECTOR<T,3>(1/v.x,1/v.y,1/v.z);}
 

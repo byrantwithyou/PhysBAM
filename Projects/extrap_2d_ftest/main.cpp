@@ -7,7 +7,7 @@
 /*#include <PhysBAM_Tools/Parallel_Computation/MPI_WORLD.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 */
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Deformables/Constitutive_Models/COROTATED.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>

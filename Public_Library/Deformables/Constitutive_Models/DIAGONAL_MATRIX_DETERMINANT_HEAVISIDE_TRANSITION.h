@@ -27,9 +27,9 @@ private:
         T HJ  = base.Hx(J);
         T HJJ = base.Hxx(J);
         
-        d2HdS2.x1111 = HJJ*sqr(S.x22);
-        d2HdS2.x2222 = HJJ*sqr(S.x11);
-        d2HdS2.x2211 = HJJ*S.x11*S.x22 + HJ;
+        d2HdS2.x1111 = HJJ*sqr(S.x.y);
+        d2HdS2.x2222 = HJJ*sqr(S.x.x);
+        d2HdS2.x2211 = HJJ*S.x.x*S.x.y + HJ;
         
         d2HdS2.x2112 = -HJ;
         d2HdS2.x2121 = 0;
@@ -41,17 +41,17 @@ private:
         T HJ  = base.Hx(J);
         T HJJ = base.Hxx(J);
         
-        d2HdS2.x1111 = HJJ*sqr(S.x22*S.x33);
-        d2HdS2.x2222 = HJJ*sqr(S.x11*S.x33);
-        d2HdS2.x3333 = HJJ*sqr(S.x11*S.x22);
+        d2HdS2.x1111 = HJJ*sqr(S.x.y*S.x.z);
+        d2HdS2.x2222 = HJJ*sqr(S.x.x*S.x.z);
+        d2HdS2.x3333 = HJJ*sqr(S.x.x*S.x.y);
  
-        d2HdS2.x2211 = HJJ*S.x11*sqr(S.x33)*S.x22 + HJ*S.x33;
-        d2HdS2.x3311 = HJJ*S.x11*sqr(S.x22)*S.x33 + HJ*S.x22;
-        d2HdS2.x3322 = HJJ*S.x33*sqr(S.x11)*S.x22 + HJ*S.x11;
+        d2HdS2.x2211 = HJJ*S.x.x*sqr(S.x.z)*S.x.y + HJ*S.x.z;
+        d2HdS2.x3311 = HJJ*S.x.x*sqr(S.x.y)*S.x.z + HJ*S.x.y;
+        d2HdS2.x3322 = HJJ*S.x.z*sqr(S.x.x)*S.x.y + HJ*S.x.x;
         
-        d2HdS2.x2112 = -HJ*S.x33;
-        d2HdS2.x3113 = -HJ*S.x22;
-        d2HdS2.x3223 = -HJ*S.x11;
+        d2HdS2.x2112 = -HJ*S.x.z;
+        d2HdS2.x3113 = -HJ*S.x.y;
+        d2HdS2.x3223 = -HJ*S.x.x;
 
         d2HdS2.x2121 = 0; 
         d2HdS2.x3131 = 0; 

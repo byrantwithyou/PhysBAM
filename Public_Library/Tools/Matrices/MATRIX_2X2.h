@@ -49,7 +49,7 @@ public:
 
     MATRIX(const DIAGONAL_MATRIX<T,2>& matrix_input)
     {
-        x[0]=matrix_input.x11;x[3]=matrix_input.x22;
+        x[0]=matrix_input.x.x;x[1]=0;x[2]=0;x[3]=matrix_input.x.y;
     }
 
     MATRIX(const UPPER_TRIANGULAR_MATRIX<T,2>& matrix_input)
@@ -250,7 +250,7 @@ public:
     {return maxabs(x[0],x[1],x[2],x[3]);}
 
     MATRIX operator*(const DIAGONAL_MATRIX<T,2>& A) const // 4 mults
-    {return MATRIX(x[0]*A.x11,x[1]*A.x11,x[2]*A.x22,x[3]*A.x22);}
+    {return MATRIX(x[0]*A.x.x,x[1]*A.x.x,x[2]*A.x.y,x[3]*A.x.y);}
 
     MATRIX operator*(const UPPER_TRIANGULAR_MATRIX<T,2>& A) const // 6 mults, 2 adds
     {return MATRIX(x[0]*A.x11,x[1]*A.x11,x[0]*A.x12+x[2]*A.x22,x[1]*A.x12+x[3]*A.x22);}
@@ -285,8 +285,8 @@ public:
 
     void Fast_Singular_Value_Decomposition(MATRIX& U,DIAGONAL_MATRIX<T,2>& singular_values,MATRIX& V) const
     {MATRIX Q;SYMMETRIC_MATRIX<T,2> S;Indefinite_Polar_Decomposition(Q,S);S.Solve_Eigenproblem(singular_values,V);
-    if(singular_values.x22<0 && abs(singular_values.x22)>=abs(singular_values.x11)){
-        singular_values=DIAGONAL_MATRIX<T,2>(-singular_values.x22,-singular_values.x11);
+    if(singular_values.x.y<0 && abs(singular_values.x.y)>=abs(singular_values.x.x)){
+        singular_values=DIAGONAL_MATRIX<T,2>(-singular_values.x.y,-singular_values.x.x);
         Q=-Q;V=MATRIX(V.x[2],V.x[3],-V.x[0],-V.x[1]);}
     U=Q*V;}
 
@@ -342,7 +342,7 @@ inline VECTOR<T,2> operator*(const VECTOR<T,2>& v,const MATRIX<T,2>& A)
 
 template<class T>
 inline MATRIX<T,2> operator*(const DIAGONAL_MATRIX<T,2>& A,const MATRIX<T,2>& B)
-{return MATRIX<T,2>(A.x11*B.x[0],A.x22*B.x[1],A.x11*B.x[2],A.x22*B.x[3]);}
+{return MATRIX<T,2>(A.x.x*B.x[0],A.x.y*B.x[1],A.x.x*B.x[2],A.x.y*B.x[3]);}
 
 template<class T>
 inline MATRIX<T,2> operator*(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const MATRIX<T,2>& B)

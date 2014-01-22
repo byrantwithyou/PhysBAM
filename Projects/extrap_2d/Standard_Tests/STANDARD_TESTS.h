@@ -243,7 +243,7 @@ public:
             
             for (int i=0;i<sv.m;i++)
             {
-                svout << sv(i).x11 << " " << sv(i).x22 << std::endl;
+                svout << sv(i).x.x << " " << sv(i).x.y << std::endl;
             }
         }
         if(scatter_plot) Update_Scatter_Plot();
@@ -1024,7 +1024,7 @@ void Primary_Contour(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
             DIAGONAL_MATRIX<T,2> ev;
             MATRIX<T,2> eigenvectors;
             H.Fast_Solve_Eigenproblem(ev,eigenvectors);
-            TV evec=fabs(ev.x11)>fabs(ev.x22)?eigenvectors.Column(0):eigenvectors.Column(1);
+            TV evec=fabs(ev.x.x)>fabs(ev.x.y)?eigenvectors.Column(0):eigenvectors.Column(1);
             if(evec.Sum()<0) evec=-evec;
             T val=TV::Dot_Product(evec,g);
             img(VECTOR<int,2>(i,j))=VECTOR<T,3>(val<0,val>=0,0);}
@@ -1116,7 +1116,7 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
             DIAGONAL_MATRIX<T,2> ev;
             MATRIX<T,2> eigenvectors;
             H.Fast_Solve_Eigenproblem(ev,eigenvectors);
-            evec(VECTOR<int,2>(i,j))=fabs(ev.x11)>fabs(ev.x22)?eigenvectors.Column(0):eigenvectors.Column(1);
+            evec(VECTOR<int,2>(i,j))=fabs(ev.x.x)>fabs(ev.x.y)?eigenvectors.Column(0):eigenvectors.Column(1);
             grad(VECTOR<int,2>(i,j))=g;}
 
     for(int i=1;i<image_size;i++)
@@ -1163,7 +1163,7 @@ void Plot_Energy_Density(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm,T stiffness)
         X.y+=2.3e-4;
         TV Z=X;
         if((fabs(Z.x)>fabs(Z.y)?Z.x:Z.y)<0) Z=-Z;
-        VECTOR<T,3> Y(X.x,X.y,icm->P_From_Strain(DIAGONAL_MATRIX<T,2>(Z),1,0).x11/stiffness);
+        VECTOR<T,3> Y(X.x,X.y,icm->P_From_Strain(DIAGONAL_MATRIX<T,2>(Z),1,0).x.x/stiffness);
         ts.particles.X(i)=Y;}
     FILE_UTILITIES::Write_To_File(this->stream_type,"surface.tri",ts);
 }

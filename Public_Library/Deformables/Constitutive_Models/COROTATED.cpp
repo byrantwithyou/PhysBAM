@@ -5,8 +5,7 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/pow.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
@@ -104,7 +103,7 @@ template<class T,int d> void COROTATED<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
 {
     T mu=constant_mu,la=constant_lambda,mu2la=2*mu+la,la2mu2=2*la+2*mu;
-    T d12=F.x11+F.x22;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
+    T d12=F.x.x+F.x.y;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
     T i12=la2mu2/d12;
     dP_dF.x1111=mu2la;
     dP_dF.x2112=i12-la;
@@ -120,10 +119,10 @@ template<class T,int d> void COROTATED<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron) const
 {
     T mu=constant_mu,la=constant_lambda,mu2la=2*mu+la,la3mu2=3*la+2*mu;
-    T d12=F.x11+F.x22;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
-    T d13=F.x11+F.x33;if(fabs(d13)<panic_threshold) d13=d13<0?-panic_threshold:panic_threshold;
-    T d23=F.x22+F.x33;if(fabs(d23)<panic_threshold) d23=d23<0?-panic_threshold:panic_threshold;
-    T i12=(la3mu2-la*F.x33)/d12,i13=(la3mu2-la*F.x22)/d13,i23=(la3mu2-la*F.x11)/d23;
+    T d12=F.x.x+F.x.y;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
+    T d13=F.x.x+F.x.z;if(fabs(d13)<panic_threshold) d13=d13<0?-panic_threshold:panic_threshold;
+    T d23=F.x.y+F.x.z;if(fabs(d23)<panic_threshold) d23=d23<0?-panic_threshold:panic_threshold;
+    T i12=(la3mu2-la*F.x.z)/d12,i13=(la3mu2-la*F.x.y)/d13,i23=(la3mu2-la*F.x.x)/d23;
     dPi_dF.x1111=mu2la;
     dPi_dF.x2222=mu2la;
     dPi_dF.x3333=mu2la;

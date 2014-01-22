@@ -4,8 +4,7 @@
 // #####################################################################
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/pow.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
@@ -50,8 +49,8 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,d>::
 Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
 {
-    T x = F.x11;
-    T y = F.x22;
+    T x = F.x.x;
+    T y = F.x.y;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
@@ -86,9 +85,9 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
 template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,d>::
 Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
 {
-    T x = F.x11;
-    T y = F.x22;
-    T z = F.x33;
+    T x = F.x.x;
+    T y = F.x.y;
+    T z = F.x.z;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
@@ -148,8 +147,8 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) con
 template<class T,int d> DIAGONAL_MATRIX<T,2> NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,d>::
 P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) const
 {
-    T x = F.x11;
-    T y = F.x22;
+    T x = F.x.x;
+    T y = F.x.y;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
@@ -167,22 +166,22 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simpl
     else if ((dx < 0) && (dy >= 0))
     {
         DIAGONAL_MATRIX<T,2> result;
-        result.x11 = (-2*mu*a+2*a*la*log(y*a)-a*la+x*mu*sqr(a)+mu*x+la*x-la*log(y*a)*x)/sqr(a);
-        result.x22 = (T)0.5*(2*mu*sqr(y)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(y*a)-3*la*sqr(a)+4*x*a*la-sqr(x)*la)/y/sqr(a);
+        result.x.x = (-2*mu*a+2*a*la*log(y*a)-a*la+x*mu*sqr(a)+mu*x+la*x-la*log(y*a)*x)/sqr(a);
+        result.x.y = (T)0.5*(2*mu*sqr(y)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(y*a)-3*la*sqr(a)+4*x*a*la-sqr(x)*la)/y/sqr(a);
         return scale*result;
     }
     else if ((dx >= 0) && (dy < 0))
     {
         DIAGONAL_MATRIX<T,2> result;
-        result.x11 = (T)0.5*(2*sqr(x)*mu*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(x*a)-3*la*sqr(a)+4*y*a*la-sqr(y)*la)/x/sqr(a);
-        result.x22 = (-2*mu*a+2*a*la*log(x*a)-a*la+mu*sqr(a)*y+mu*y+la*y-la*log(x*a)*y)/sqr(a);
+        result.x.x = (T)0.5*(2*sqr(x)*mu*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(x*a)-3*la*sqr(a)+4*y*a*la-sqr(y)*la)/x/sqr(a);
+        result.x.y = (-2*mu*a+2*a*la*log(x*a)-a*la+mu*sqr(a)*y+mu*y+la*y-la*log(x*a)*y)/sqr(a);
         return scale*result;
     }
     else // ((dx < 0) && (dy < 0))
     {
         DIAGONAL_MATRIX<T,2> result;
-        result.x11 = (T)0.5*(-4*mu*cube(a)+2*x*mu*sqr(a)+4*cube(a)*la*log(sqr(a))+8*y*la*sqr(a)-2*sqr(y)*a*la-2*x*sqr(a)*la*log(sqr(a))-4*x*y*a*la-8*la*cube(a)+5*x*la*sqr(a)+2*x*mu*(a*a*a*a)+sqr(y)*la*x)/(a*a*a*a);
-        result.x22 = (T)0.5*(2*mu*sqr(a)*y-4*mu*cube(a)+4*cube(a)*la*log(sqr(a))-2*sqr(a)*la*log(sqr(a))*y+8*x*la*sqr(a)-4*x*y*a*la-2*sqr(x)*a*la+5*y*la*sqr(a)+2*mu*(a*a*a*a)*y-8*la*cube(a)+sqr(x)*la*y)/(a*a*a*a);
+        result.x.x = (T)0.5*(-4*mu*cube(a)+2*x*mu*sqr(a)+4*cube(a)*la*log(sqr(a))+8*y*la*sqr(a)-2*sqr(y)*a*la-2*x*sqr(a)*la*log(sqr(a))-4*x*y*a*la-8*la*cube(a)+5*x*la*sqr(a)+2*x*mu*(a*a*a*a)+sqr(y)*la*x)/(a*a*a*a);
+        result.x.y = (T)0.5*(2*mu*sqr(a)*y-4*mu*cube(a)+4*cube(a)*la*log(sqr(a))-2*sqr(a)*la*log(sqr(a))*y+8*x*la*sqr(a)-4*x*y*a*la-2*sqr(x)*a*la+5*y*la*sqr(a)+2*mu*(a*a*a*a)*y-8*la*cube(a)+sqr(x)*la*y)/(a*a*a*a);
         return scale*result;
     }
 }
@@ -192,9 +191,9 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simpl
 template<class T,int d> DIAGONAL_MATRIX<T,3> NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,d>::
 P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simplex) const
 {
-    T x = F.x11;
-    T y = F.x22;
-    T z = F.x33;
+    T x = F.x.x;
+    T y = F.x.y;
+    T z = F.x.z;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
@@ -213,57 +212,57 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
     else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(-2*mu*a+2*a*la*log(a*y*z)+x*mu*sqr(a)+mu*x+x*la-x*la*log(a*y*z)-a*la)/sqr(a);
-        result.x22=(T)0.5*(2*mu*sqr(y)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(a*y*z)+4*x*a*la-3*sqr(a)*la-sqr(x)*la)/y/sqr(a);
-        result.x33=(T)0.5*(2*mu*sqr(z)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(a*y*z)+4*x*a*la-3*sqr(a)*la-sqr(x)*la)/z/sqr(a);
+        result.x.x=(-2*mu*a+2*a*la*log(a*y*z)+x*mu*sqr(a)+mu*x+x*la-x*la*log(a*y*z)-a*la)/sqr(a);
+        result.x.y=(T)0.5*(2*mu*sqr(y)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(a*y*z)+4*x*a*la-3*sqr(a)*la-sqr(x)*la)/y/sqr(a);
+        result.x.z=(T)0.5*(2*mu*sqr(z)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(a*y*z)+4*x*a*la-3*sqr(a)*la-sqr(x)*la)/z/sqr(a);
         return scale*result;
     }
     else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(T)0.5*(2*sqr(x)*mu*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(x*a*z)+4*y*a*la-3*sqr(a)*la-sqr(y)*la)/x/sqr(a);
-        result.x22=(-2*mu*a+2*a*la*log(x*a*z)+mu*y*sqr(a)+mu*y+y*la-y*la*log(x*a*z)-a*la)/sqr(a);
-        result.x33=(T)0.5*(2*mu*sqr(z)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(x*a*z)+4*y*a*la-3*sqr(a)*la-sqr(y)*la)/z/sqr(a);
+        result.x.x=(T)0.5*(2*sqr(x)*mu*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(x*a*z)+4*y*a*la-3*sqr(a)*la-sqr(y)*la)/x/sqr(a);
+        result.x.y=(-2*mu*a+2*a*la*log(x*a*z)+mu*y*sqr(a)+mu*y+y*la-y*la*log(x*a*z)-a*la)/sqr(a);
+        result.x.z=(T)0.5*(2*mu*sqr(z)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(x*a*z)+4*y*a*la-3*sqr(a)*la-sqr(y)*la)/z/sqr(a);
         return scale*result;
     }
     else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(T)0.5*(2*sqr(x)*mu*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(x*y*a)+4*z*a*la-3*sqr(a)*la-sqr(z)*la)/x/sqr(a);
-        result.x22=(T)0.5*(2*mu*sqr(y)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(x*y*a)+4*z*a*la-3*sqr(a)*la-sqr(z)*la)/y/sqr(a);
-        result.x33=(-2*mu*a+2*a*la*log(x*y*a)+mu*z*sqr(a)+mu*z+z*la-z*la*log(x*y*a)-a*la)/sqr(a);
+        result.x.x=(T)0.5*(2*sqr(x)*mu*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(x*y*a)+4*z*a*la-3*sqr(a)*la-sqr(z)*la)/x/sqr(a);
+        result.x.y=(T)0.5*(2*mu*sqr(y)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(x*y*a)+4*z*a*la-3*sqr(a)*la-sqr(z)*la)/y/sqr(a);
+        result.x.z=(-2*mu*a+2*a*la*log(x*y*a)+mu*z*sqr(a)+mu*z+z*la-z*la*log(x*y*a)-a*la)/sqr(a);
         return scale*result;
     }
     else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(T)0.5*(-4*mu*cube(a)+2*x*mu*sqr(a)-2*sqr(y)*a*la+sqr(y)*x*la-4*x*y*a*la+5*x*sqr(a)*la+4*cube(a)*la*log(z*sqr(a))+8*y*sqr(a)*la-2*x*sqr(a)*la*log(z*sqr(a))-8*cube(a)*la+2*x*mu*(a*a*a*a))/(a*a*a*a);
-        result.x22=(T)0.5*(2*mu*y*sqr(a)-4*x*y*a*la+5*y*sqr(a)*la+sqr(x)*y*la-4*mu*cube(a)-2*sqr(x)*a*la+4*cube(a)*la*log(z*sqr(a))-2*sqr(a)*y*la*log(z*sqr(a))+8*x*sqr(a)*la+2*(a*a*a*a)*mu*y-8*cube(a)*la)/(a*a*a*a);
-        result.x33=(T)0.5/sqr(a)*(4*y*a*la-sqr(y)*la+4*x*a*la-sqr(x)*la+2*mu*sqr(z)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(z*sqr(a))-6*sqr(a)*la)/z;
+        result.x.x=(T)0.5*(-4*mu*cube(a)+2*x*mu*sqr(a)-2*sqr(y)*a*la+sqr(y)*x*la-4*x*y*a*la+5*x*sqr(a)*la+4*cube(a)*la*log(z*sqr(a))+8*y*sqr(a)*la-2*x*sqr(a)*la*log(z*sqr(a))-8*cube(a)*la+2*x*mu*(a*a*a*a))/(a*a*a*a);
+        result.x.y=(T)0.5*(2*mu*y*sqr(a)-4*x*y*a*la+5*y*sqr(a)*la+sqr(x)*y*la-4*mu*cube(a)-2*sqr(x)*a*la+4*cube(a)*la*log(z*sqr(a))-2*sqr(a)*y*la*log(z*sqr(a))+8*x*sqr(a)*la+2*(a*a*a*a)*mu*y-8*cube(a)*la)/(a*a*a*a);
+        result.x.z=(T)0.5/sqr(a)*(4*y*a*la-sqr(y)*la+4*x*a*la-sqr(x)*la+2*mu*sqr(z)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(z*sqr(a))-6*sqr(a)*la)/z;
         return scale*result;
     }
     else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rxz
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(T)0.5*(-4*mu*cube(a)+2*x*mu*sqr(a)-2*sqr(z)*a*la+sqr(z)*x*la+5*x*sqr(a)*la-4*x*z*a*la-8*cube(a)*la+2*x*mu*(a*a*a*a)+8*z*sqr(a)*la+4*cube(a)*la*log(y*sqr(a))-2*x*sqr(a)*la*log(y*sqr(a)))/(a*a*a*a);
-        result.x22=(T)0.5/sqr(a)*(2*mu*sqr(y)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(y*sqr(a))-6*sqr(a)*la+4*z*a*la-sqr(z)*la+4*x*a*la-sqr(x)*la)/y;
-        result.x33=(T)0.5*(2*mu*z*sqr(a)-4*x*z*a*la+5*z*sqr(a)*la+sqr(x)*z*la-4*mu*cube(a)-2*sqr(x)*a*la+2*(a*a*a*a)*mu*z-8*cube(a)*la+8*x*sqr(a)*la+4*cube(a)*la*log(y*sqr(a))-2*sqr(a)*z*la*log(y*sqr(a)))/(a*a*a*a);
+        result.x.x=(T)0.5*(-4*mu*cube(a)+2*x*mu*sqr(a)-2*sqr(z)*a*la+sqr(z)*x*la+5*x*sqr(a)*la-4*x*z*a*la-8*cube(a)*la+2*x*mu*(a*a*a*a)+8*z*sqr(a)*la+4*cube(a)*la*log(y*sqr(a))-2*x*sqr(a)*la*log(y*sqr(a)))/(a*a*a*a);
+        result.x.y=(T)0.5/sqr(a)*(2*mu*sqr(y)*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(y*sqr(a))-6*sqr(a)*la+4*z*a*la-sqr(z)*la+4*x*a*la-sqr(x)*la)/y;
+        result.x.z=(T)0.5*(2*mu*z*sqr(a)-4*x*z*a*la+5*z*sqr(a)*la+sqr(x)*z*la-4*mu*cube(a)-2*sqr(x)*a*la+2*(a*a*a*a)*mu*z-8*cube(a)*la+8*x*sqr(a)*la+4*cube(a)*la*log(y*sqr(a))-2*sqr(a)*z*la*log(y*sqr(a)))/(a*a*a*a);
         return scale*result;
     }
     else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Rzy
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(T)0.5/sqr(a)*(2*sqr(x)*mu*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(x*sqr(a))-6*sqr(a)*la+4*y*a*la-sqr(y)*la+4*z*a*la-sqr(z)*la)/x;
-        result.x22=(T)0.5*(2*mu*y*sqr(a)+5*y*sqr(a)*la-4*mu*cube(a)-2*sqr(z)*a*la+sqr(z)*y*la-4*z*y*a*la+2*(a*a*a*a)*mu*y-8*cube(a)*la+8*z*sqr(a)*la+4*cube(a)*la*log(x*sqr(a))-2*sqr(a)*y*la*log(x*sqr(a)))/(a*a*a*a);
-        result.x33=(T)0.5*(2*mu*z*sqr(a)+5*z*sqr(a)*la-4*z*y*a*la+sqr(y)*z*la-4*mu*cube(a)-2*sqr(y)*a*la+2*(a*a*a*a)*mu*z-8*cube(a)*la+8*y*sqr(a)*la+4*cube(a)*la*log(x*sqr(a))-2*z*sqr(a)*la*log(x*sqr(a)))/(a*a*a*a);
+        result.x.x=(T)0.5/sqr(a)*(2*sqr(x)*mu*sqr(a)-2*mu*sqr(a)+2*sqr(a)*la*log(x*sqr(a))-6*sqr(a)*la+4*y*a*la-sqr(y)*la+4*z*a*la-sqr(z)*la)/x;
+        result.x.y=(T)0.5*(2*mu*y*sqr(a)+5*y*sqr(a)*la-4*mu*cube(a)-2*sqr(z)*a*la+sqr(z)*y*la-4*z*y*a*la+2*(a*a*a*a)*mu*y-8*cube(a)*la+8*z*sqr(a)*la+4*cube(a)*la*log(x*sqr(a))-2*sqr(a)*y*la*log(x*sqr(a)))/(a*a*a*a);
+        result.x.z=(T)0.5*(2*mu*z*sqr(a)+5*z*sqr(a)*la-4*z*y*a*la+sqr(y)*z*la-4*mu*cube(a)-2*sqr(y)*a*la+2*(a*a*a*a)*mu*z-8*cube(a)*la+8*y*sqr(a)*la+4*cube(a)*la*log(x*sqr(a))-2*z*sqr(a)*la*log(x*sqr(a)))/(a*a*a*a);
         return scale*result;
     }
     else // Rxyz
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(T)0.5*(-4*mu*cube(a)+2*x*mu*sqr(a)-2*sqr(y)*a*la-2*sqr(z)*a*la+sqr(y)*x*la+sqr(z)*x*la-4*x*y*a*la+8*x*sqr(a)*la-4*x*z*a*la+8*y*sqr(a)*la-14*cube(a)*la+2*x*mu*(a*a*a*a)+8*z*sqr(a)*la+4*cube(a)*la*log(cube(a))-2*x*sqr(a)*la*log(cube(a)))/(a*a*a*a);
-        result.x22=(T)0.5*(2*mu*y*sqr(a)-4*x*y*a*la+8*y*sqr(a)*la+sqr(x)*y*la-4*mu*cube(a)-2*sqr(x)*a*la-2*sqr(z)*a*la+sqr(z)*y*la-4*z*y*a*la+8*x*sqr(a)*la+2*(a*a*a*a)*mu*y-14*cube(a)*la+8*z*sqr(a)*la+4*cube(a)*la*log(cube(a))-2*sqr(a)*y*la*log(cube(a)))/(a*a*a*a);
-        result.x33=(T)0.5*(2*mu*z*sqr(a)-4*x*z*a*la+8*z*sqr(a)*la+sqr(x)*z*la-4*z*y*a*la+sqr(y)*z*la-4*mu*cube(a)-2*sqr(x)*a*la-2*sqr(y)*a*la+2*(a*a*a*a)*mu*z-14*cube(a)*la+8*x*sqr(a)*la+8*y*sqr(a)*la+4*cube(a)*la*log(cube(a))-2*z*sqr(a)*la*log(cube(a)))/(a*a*a*a);
+        result.x.x=(T)0.5*(-4*mu*cube(a)+2*x*mu*sqr(a)-2*sqr(y)*a*la-2*sqr(z)*a*la+sqr(y)*x*la+sqr(z)*x*la-4*x*y*a*la+8*x*sqr(a)*la-4*x*z*a*la+8*y*sqr(a)*la-14*cube(a)*la+2*x*mu*(a*a*a*a)+8*z*sqr(a)*la+4*cube(a)*la*log(cube(a))-2*x*sqr(a)*la*log(cube(a)))/(a*a*a*a);
+        result.x.y=(T)0.5*(2*mu*y*sqr(a)-4*x*y*a*la+8*y*sqr(a)*la+sqr(x)*y*la-4*mu*cube(a)-2*sqr(x)*a*la-2*sqr(z)*a*la+sqr(z)*y*la-4*z*y*a*la+8*x*sqr(a)*la+2*(a*a*a*a)*mu*y-14*cube(a)*la+8*z*sqr(a)*la+4*cube(a)*la*log(cube(a))-2*sqr(a)*y*la*log(cube(a)))/(a*a*a*a);
+        result.x.z=(T)0.5*(2*mu*z*sqr(a)-4*x*z*a*la+8*z*sqr(a)*la+sqr(x)*z*la-4*z*y*a*la+sqr(y)*z*la-4*mu*cube(a)-2*sqr(x)*a*la-2*sqr(y)*a*la+2*(a*a*a*a)*mu*z-14*cube(a)*la+8*x*sqr(a)*la+8*y*sqr(a)*la+4*cube(a)*la*log(cube(a))-2*z*sqr(a)*la*log(cube(a)))/(a*a*a*a);
         return scale*result;
     }
 }
@@ -281,8 +280,8 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,d>::
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
 {
-    T x = F.x11;
-    T y = F.x22;
+    T x = F.x.x;
+    T y = F.x.y;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
@@ -348,9 +347,9 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,d>::
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int triangle) const
 {
-    T x = F.x11;
-    T y = F.x22;
-    T z = F.x33;
+    T x = F.x.x;
+    T y = F.x.y;
+    T z = F.x.z;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;

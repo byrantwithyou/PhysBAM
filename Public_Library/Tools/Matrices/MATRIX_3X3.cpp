@@ -10,7 +10,7 @@
 #include <Tools/Math_Tools/min.h>
 #include <Tools/Math_Tools/minabs.h>
 #include <Tools/Math_Tools/sqr.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
@@ -19,14 +19,6 @@
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
 using namespace PhysBAM;
-//#####################################################################
-// Constructor
-//#####################################################################
-template<class T> MATRIX<T,3>::
-MATRIX(const MATRIX_MXN<T>& matrix_input)
-{
-    assert(matrix_input.n==3 && matrix_input.m==3);for(int i=0;i<3;i++) for(int j=0;j<3;j++) x[i+3*j]=(T)matrix_input(i,j);
-}
 //#####################################################################
 // Function Higham_Iterate
 //#####################################################################
@@ -60,9 +52,9 @@ Fast_Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& singular_
     Normal_Equations_Matrix().Fast_Solve_Eigenproblem(lambda,V); // 18m+12a + 95m+64a+3d+5s+1atan2+1sincos
 
     // compute singular values
-    if(lambda.x33<0) lambda=lambda.Clamp_Min(0);
+    if(lambda.x.z<0) lambda=lambda.Clamp_Min(0);
     singular_values=lambda.Sqrt(); // 3s
-    if(Determinant()<0) singular_values.x33=-singular_values.x33; // 9m+5a
+    if(Determinant()<0) singular_values.x.z=-singular_values.x.z; // 9m+5a
 
     // compute singular vectors
     U.Set_Column(0,(*this*V.Column(0)).Normalized()); // 15m+8a+1d+1s

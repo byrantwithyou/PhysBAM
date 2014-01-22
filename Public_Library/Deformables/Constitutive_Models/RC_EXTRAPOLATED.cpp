@@ -5,8 +5,7 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/pow.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
@@ -100,13 +99,13 @@ Isotropic_Stress_Derivative_Helper(const RC_EXTRAPOLATED<T,2>& re,const DIAGONAL
             dP_dF.x1111=helper.ddE.x11;
             dP_dF.x2211=helper.ddE.x21;
             dP_dF.x2222=helper.ddE.x22;
-            T ss1=sqr(F.x11),ss2=sqr(F.x22);
+            T ss1=sqr(F.x.x),ss2=sqr(F.x.y);
             T s12=ss1-ss2;
             if(fabs(s12)<re.panic_threshold) s12=s12<0?-re.panic_threshold:re.panic_threshold;
-            dP_dF.x2112=(-helper.dE.y*F.x11+helper.dE.x*F.x22)/s12;
-            dP_dF.x2121=(-helper.dE.y*F.x22+helper.dE.x*F.x11)/s12;
+            dP_dF.x2112=(-helper.dE.y*F.x.x+helper.dE.x*F.x.y)/s12;
+            dP_dF.x2121=(-helper.dE.y*F.x.y+helper.dE.x*F.x.x)/s12;
             return;}}
-    T x = F.x11, y = F.x22, xpy = x+y;
+    T x = F.x.x, y = F.x.y, xpy = x+y;
     dP_dF.x1111 = re.base.Exx(x,y,simplex);
     dP_dF.x2211 = re.base.Exy(x,y,simplex);
     dP_dF.x2222 = re.base.Eyy(x,y,simplex);
@@ -134,19 +133,19 @@ Isotropic_Stress_Derivative_Helper(const RC_EXTRAPOLATED<T,3>& re,const DIAGONAL
             dP_dF.x2211=helper.ddE.x21;
             dP_dF.x3311=helper.ddE.x31;
             dP_dF.x3322=helper.ddE.x32;
-            T ss1=sqr(F.x11),ss2=sqr(F.x22),ss3=sqr(F.x33);
+            T ss1=sqr(F.x.x),ss2=sqr(F.x.y),ss3=sqr(F.x.z);
             T s12=ss1-ss2,s13=ss1-ss3,s23=ss2-ss3;
             if(fabs(s12)<re.panic_threshold) s12=s12<0?-re.panic_threshold:re.panic_threshold;
             if(fabs(s13)<re.panic_threshold) s13=s13<0?-re.panic_threshold:re.panic_threshold;
             if(fabs(s23)<re.panic_threshold) s23=s23<0?-re.panic_threshold:re.panic_threshold;
-            dP_dF.x2112=(-helper.dE.y*F.x11+helper.dE.x*F.x22)/s12;
-            dP_dF.x2121=(-helper.dE.y*F.x22+helper.dE.x*F.x11)/s12;
-            dP_dF.x3113=(-helper.dE.z*F.x11+helper.dE.x*F.x33)/s13;
-            dP_dF.x3131=(-helper.dE.z*F.x33+helper.dE.x*F.x11)/s13;
-            dP_dF.x3223=(-helper.dE.z*F.x22+helper.dE.y*F.x33)/s23;
-            dP_dF.x3232=(-helper.dE.z*F.x33+helper.dE.y*F.x22)/s23;
+            dP_dF.x2112=(-helper.dE.y*F.x.x+helper.dE.x*F.x.y)/s12;
+            dP_dF.x2121=(-helper.dE.y*F.x.y+helper.dE.x*F.x.x)/s12;
+            dP_dF.x3113=(-helper.dE.z*F.x.x+helper.dE.x*F.x.z)/s13;
+            dP_dF.x3131=(-helper.dE.z*F.x.z+helper.dE.x*F.x.x)/s13;
+            dP_dF.x3223=(-helper.dE.z*F.x.y+helper.dE.y*F.x.z)/s23;
+            dP_dF.x3232=(-helper.dE.z*F.x.z+helper.dE.y*F.x.y)/s23;
             return;}}
-    T x = F.x11, y = F.x22, z = F.x33, xpy = x+y, xpz = x+z, ypz = y+z;
+    T x = F.x.x, y = F.x.y, z = F.x.z, xpy = x+y, xpz = x+z, ypz = y+z;
     dP_dF.x1111 = re.base.Exx(x,y,z,simplex);
     dP_dF.x2222 = re.base.Eyy(x,y,z,simplex);
     dP_dF.x3333 = re.base.Ezz(x,y,z,simplex);

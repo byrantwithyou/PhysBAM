@@ -2,7 +2,7 @@
 // Copyright 2004-2005, Geoffrey Irving.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <OpenGL/OpenGL/OPENGL_SYMMETRIC_MATRIX_FIELD_3D.h>
 #include <OpenGL/OpenGL/OPENGL_UNIFORM_SLICE.h>
@@ -51,7 +51,7 @@ Update()
     entries.Resize(count);count=0;
     DIAGONAL_MATRIX<T,3> D;MATRIX<T,3> U;
     for(int i=m_start;i<m_end;i++)for(int j=m_start;j<n_end;j++)for(int ij=mn_start;ij<mn_end;ij++) if(field(i,j,ij).Frobenius_Norm_Squared()){
-        field(i,j,ij).Solve_Eigenproblem(D,U);entries(count++)=TRIPLE<VECTOR<T,3>,MATRIX<T,3>,VECTOR<bool,3> >(grid.X(VECTOR<int,3>(i,j,ij)),U*D,VECTOR<bool,3>(D.x11>0,D.x22>0,D.x33>0));}
+        field(i,j,ij).Solve_Eigenproblem(D,U);entries(count++)=TRIPLE<VECTOR<T,3>,MATRIX<T,3>,VECTOR<bool,3> >(grid.X(VECTOR<int,3>(i,j,ij)),U*D,VECTOR<bool,3>(D.x.x>0,D.x.y>0,D.x.z>0));}
 }
 //#####################################################################
 // Function Bounding_Box

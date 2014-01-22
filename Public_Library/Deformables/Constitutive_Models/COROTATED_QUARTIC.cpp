@@ -5,8 +5,7 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/pow.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
@@ -110,8 +109,8 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC
     
     T mu=constant_mu,la=constant_lambda;//,mu2la=2*mu+la,la2mu2=2*la+2*mu;
     T t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35,t36,t37,t38;
-    T s1=F.x11;
-    T s2=F.x22;
+    T s1=F.x.x;
+    T s2=F.x.y;
 /*    t5 = s1+s2-2;
     t6 = s1-1;
     t7 = t5*t5;
@@ -167,10 +166,10 @@ template<class T,int d> void COROTATED_QUARTIC<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron) const
 {
     T mu=constant_mu,la=constant_lambda,mu2la=2*mu+la,la3mu2=3*la+2*mu;
-    T d12=F.x11+F.x22;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
-    T d13=F.x11+F.x33;if(fabs(d13)<panic_threshold) d13=d13<0?-panic_threshold:panic_threshold;
-    T d23=F.x22+F.x33;if(fabs(d23)<panic_threshold) d23=d23<0?-panic_threshold:panic_threshold;
-    T i12=(la3mu2-la*F.x33)/d12,i13=(la3mu2-la*F.x22)/d13,i23=(la3mu2-la*F.x11)/d23;
+    T d12=F.x.x+F.x.y;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
+    T d13=F.x.x+F.x.z;if(fabs(d13)<panic_threshold) d13=d13<0?-panic_threshold:panic_threshold;
+    T d23=F.x.y+F.x.z;if(fabs(d23)<panic_threshold) d23=d23<0?-panic_threshold:panic_threshold;
+    T i12=(la3mu2-la*F.x.z)/d12,i13=(la3mu2-la*F.x.y)/d13,i23=(la3mu2-la*F.x.x)/d23;
     dPi_dF.x1111=mu2la;
     dPi_dF.x2222=mu2la;
     dPi_dF.x3333=mu2la;

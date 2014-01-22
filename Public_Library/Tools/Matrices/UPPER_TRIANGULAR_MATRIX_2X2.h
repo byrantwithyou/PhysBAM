@@ -122,7 +122,7 @@ public:
     {return UPPER_TRIANGULAR_MATRIX(x11*A.x11,x11*A.x12+x12*A.x22,x22*A.x22);}
 
     UPPER_TRIANGULAR_MATRIX operator*(const DIAGONAL_MATRIX<T,2>& A) const // 3 mults
-    {return UPPER_TRIANGULAR_MATRIX(x11*A.x11,x12*A.x22,x22*A.x22);}
+    {return UPPER_TRIANGULAR_MATRIX(x11*A.x.x,x12*A.x.y,x22*A.x.y);}
 
     template<class T_MATRIX>
     T_MATRIX operator*(const MATRIX_BASE<T,T_MATRIX>& A) const
@@ -158,7 +158,7 @@ public:
     {return MATRIX<T,2>(x11*A.x11,x12*A.x11+x22*A.x21,x11*A.x21,x12*A.x21+x22*A.x22);}
 
     MATRIX<T,2> Transpose_Times(const DIAGONAL_MATRIX<T,2>& A) const
-    {return MATRIX<T,2>(x11*A.x11,x12*A.x11,0,x22*A.x22);}
+    {return MATRIX<T,2>(x11*A.x.x,x12*A.x.x,0,x22*A.x.y);}
 
     SYMMETRIC_MATRIX<T,2> Outer_Product_Matrix() const // 4 mults, 1 add
     {return SYMMETRIC_MATRIX<T,2>(x11*x11+x12*x12,x12*x22,x22*x22);}
@@ -203,7 +203,7 @@ public:
 
 template<class T>
 inline UPPER_TRIANGULAR_MATRIX<T,2> operator*(const DIAGONAL_MATRIX<T,2>& A,const UPPER_TRIANGULAR_MATRIX<T,2>& B) // 3 mults
-{return UPPER_TRIANGULAR_MATRIX<T,2>(A.x11*B.x11,A.x11*B.x12,A.x22*B.x22);}
+{return UPPER_TRIANGULAR_MATRIX<T,2>(A.x.x*B.x11,A.x.x*B.x12,A.x.y*B.x22);}
 
 template<class T>
 inline std::ostream& operator<<(std::ostream& output_stream,const UPPER_TRIANGULAR_MATRIX<T,2>& A)

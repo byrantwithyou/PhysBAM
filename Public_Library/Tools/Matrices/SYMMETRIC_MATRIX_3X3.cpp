@@ -7,8 +7,7 @@
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Math_Tools/exchange_sort.h>
 #include <Tools/Math_Tools/maxabs.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X3.h>
 #include <Tools/Matrices/MATRIX_3X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
@@ -36,7 +35,8 @@ Fast_Eigenvalues() const // 24 mults, 20 adds, 1 atan2, 1 sincos, 2 sqrts
     T phi=(T)one_third*atan2(sqrt(max((T)0,disc)),q),c=cos(phi),s=sin(phi);
     T sqrt_p_cos=sqrt_p*c,root_three_sqrt_p_sin=(T)root_three*sqrt_p*s;
     DIAGONAL_MATRIX<T,3> lambda(m+2*sqrt_p_cos,m-sqrt_p_cos-root_three_sqrt_p_sin,m-sqrt_p_cos+root_three_sqrt_p_sin);
-    exchange_sort(lambda.x33,lambda.x22,lambda.x11);return lambda;
+    lambda.x.Sort();
+    return lambda;
 }
 //#####################################################################
 // Function Fast_Eigenvectors
@@ -51,12 +51,12 @@ Fast_Eigenvectors(const SYMMETRIC_MATRIX<T,3>& A,const DIAGONAL_MATRIX<T,3>& lam
     // flip if necessary so that first eigenvalue is the most different
     bool flipped=false;
     DIAGONAL_MATRIX<T,3> lambda_flip(lambda);
-    if(lambda.x11-lambda.x22<lambda.x22-lambda.x33){ // 2a
-        exchange(lambda_flip.x11,lambda_flip.x33);
+    if(lambda.x.x-lambda.x.y<lambda.x.y-lambda.x.z){ // 2a
+        exchange(lambda_flip.x.x,lambda_flip.x.z);
         flipped=true;}
 
     // get first eigenvector
-    VECTOR<T,3> v1=(A-lambda_flip.x11).Cofactor_Matrix().Largest_Column_Normalized(); // 3a + 12m+6a + 9m+6a+1d+1s = 21m+15a+1d+1s
+    VECTOR<T,3> v1=(A-lambda_flip.x.x).Cofactor_Matrix().Largest_Column_Normalized(); // 3a + 12m+6a + 9m+6a+1d+1s = 21m+15a+1d+1s
 
     // form basis for orthogonal complement to v1, and reduce A to this space
     VECTOR<T,3> v1_orthogonal=v1.Unit_Orthogonal_Vector(); // 6m+2a+1d+1s (tweak: 5m+1a+1d+1s)
@@ -64,7 +64,7 @@ Fast_Eigenvectors(const SYMMETRIC_MATRIX<T,3>& A,const DIAGONAL_MATRIX<T,3>& lam
     SYMMETRIC_MATRIX<T,2> A_reduced=SYMMETRIC_MATRIX<T,2>::Conjugate_With_Transpose(other_v,A); // 21m+12a (tweak: 18m+9a)
 
     // find third eigenvector from A_reduced, and fill in second via cross product
-    VECTOR<T,3> v3=other_v*(A_reduced-lambda_flip.x33).Cofactor_Matrix().Largest_Column_Normalized(); // 6m+3a + 2a + 5m+2a+1d+1s = 11m+7a+1d+1s (tweak: 10m+6a+1d+1s)
+    VECTOR<T,3> v3=other_v*(A_reduced-lambda_flip.x.z).Cofactor_Matrix().Largest_Column_Normalized(); // 6m+3a + 2a + 5m+2a+1d+1s = 11m+7a+1d+1s (tweak: 10m+6a+1d+1s)
     VECTOR<T,3> v2=VECTOR<T,3>::Cross_Product(v3,v1); // 6m+3a
 
     // finish

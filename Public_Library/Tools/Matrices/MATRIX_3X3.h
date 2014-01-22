@@ -44,7 +44,7 @@ public:
 
     MATRIX(const DIAGONAL_MATRIX<T,3>& matrix_input)
     {
-        x[0]=matrix_input.x11;x[4]=matrix_input.x22;x[8]=matrix_input.x33;x[1]=x[2]=x[3]=x[5]=x[6]=x[7]=0;
+        x[0]=matrix_input.x.x;x[4]=matrix_input.x.y;x[8]=matrix_input.x.z;x[1]=x[2]=x[3]=x[5]=x[6]=x[7]=0;
     }
 
     MATRIX(const SYMMETRIC_MATRIX<T,3>& matrix_input)
@@ -290,7 +290,7 @@ public:
     {return (T).5*VECTOR<T,3>(x[5]-x[7],x[6]-x[2],x[1]-x[3]);}
 
     static SYMMETRIC_MATRIX<T,3> Right_Multiply_With_Symmetric_Result(const MATRIX& A,const DIAGONAL_MATRIX<T,3>& B)
-    {return SYMMETRIC_MATRIX<T,3>(B.x11*A.x[0],B.x11*A.x[1],B.x11*A.x[2],B.x22*A.x[4],B.x22*A.x[5],B.x33*A.x[8]);}
+    {return SYMMETRIC_MATRIX<T,3>(B.x.x*A.x[0],B.x.x*A.x[1],B.x.x*A.x[2],B.x.y*A.x[4],B.x.y*A.x[5],B.x.z*A.x[8]);}
 
     T Max_Abs() const
     {return maxabs(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8]);}
@@ -299,7 +299,7 @@ public:
     {return sqr(x[0])+sqr(x[1])+sqr(x[2])+sqr(x[3])+sqr(x[4])+sqr(x[5])+sqr(x[6])+sqr(x[7])+sqr(x[8]);}
 
     MATRIX operator*(const DIAGONAL_MATRIX<T,3>& A) const // 9 mults
-    {return MATRIX(x[0]*A.x11,x[1]*A.x11,x[2]*A.x11,x[3]*A.x22,x[4]*A.x22,x[5]*A.x22,x[6]*A.x33,x[7]*A.x33,x[8]*A.x33);}
+    {return MATRIX(x[0]*A.x.x,x[1]*A.x.x,x[2]*A.x.x,x[3]*A.x.y,x[4]*A.x.y,x[5]*A.x.y,x[6]*A.x.z,x[7]*A.x.z,x[8]*A.x.z);}
 
     MATRIX operator*(const UPPER_TRIANGULAR_MATRIX<T,3>& A) const // 18 mults, 9 adds
     {return MATRIX(x[0]*A.x11,x[1]*A.x11,x[2]*A.x11,x[0]*A.x12+x[3]*A.x22,x[1]*A.x12+x[4]*A.x22,x[2]*A.x12+x[5]*A.x22,
@@ -365,7 +365,6 @@ public:
     {Write_Binary_Array<RW>(output,x,m*n);}
 
 //#####################################################################
-    MATRIX(const MATRIX_MXN<T>& matrix_input);
     MATRIX Higham_Iterate(const T tolerance=1e-5,const int max_iterations=20,const bool exit_on_max_iterations=false) const;
     void Fast_Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& singular_values,MATRIX<T,3>& V) const;
     void Fast_Indefinite_Polar_Decomposition(MATRIX<T,3>& Q,SYMMETRIC_MATRIX<T,3>& S) const;
@@ -399,7 +398,7 @@ inline VECTOR<T,3> operator*(const VECTOR<T,3>& v,const MATRIX<T,3>& A)
 
 template<class T>
 inline MATRIX<T,3> operator*(const DIAGONAL_MATRIX<T,3>& A,const MATRIX<T,3>& B)
-{return MATRIX<T,3>(A.x11*B.x[0],A.x22*B.x[1],A.x33*B.x[2],A.x11*B.x[3],A.x22*B.x[4],A.x33*B.x[5],A.x11*B.x[6],A.x22*B.x[7],A.x33*B.x[8]);}
+{return MATRIX<T,3>(A.x.x*B.x[0],A.x.y*B.x[1],A.x.z*B.x[2],A.x.x*B.x[3],A.x.y*B.x[4],A.x.z*B.x[5],A.x.x*B.x[6],A.x.y*B.x[7],A.x.z*B.x[8]);}
 
 template<class T>
 inline MATRIX<T,3> operator*(const UPPER_TRIANGULAR_MATRIX<T,3>& A,const MATRIX<T,3>& B)

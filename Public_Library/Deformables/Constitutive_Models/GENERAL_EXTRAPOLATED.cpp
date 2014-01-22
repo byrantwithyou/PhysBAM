@@ -4,8 +4,7 @@
 //#####################################################################
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/pow.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
@@ -62,10 +61,10 @@ template<class T,int d> T GENERAL_EXTRAPOLATED<T,d>::
 Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
 {
     T a = extrapolation_cutoff;
-    T x = std::max(F.x11,a);
-    T y = std::max(F.x22,a);
-    T dx = F.x11 - extrapolation_cutoff;
-    T dy = F.x22 - extrapolation_cutoff;
+    T x = std::max(F.x.x,a);
+    T y = std::max(F.x.y,a);
+    T dx = F.x.x - extrapolation_cutoff;
+    T dy = F.x.y - extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
     T E=base.E(x,y,simplex);
     if(dx < 0) E+=base.Ex(x,y,simplex)*dx + k*dx*dx;
@@ -80,12 +79,12 @@ template<class T,int d> T GENERAL_EXTRAPOLATED<T,d>::
 Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
 {
     T a = extrapolation_cutoff;
-    T x = std::max(F.x11,a);
-    T y = std::max(F.x22,a);
-    T z = std::max(F.x33,a);
-    T dx = F.x11 - extrapolation_cutoff;
-    T dy = F.x22 - extrapolation_cutoff;
-    T dz = F.x33 - extrapolation_cutoff;
+    T x = std::max(F.x.x,a);
+    T y = std::max(F.x.y,a);
+    T z = std::max(F.x.z,a);
+    T dx = F.x.x - extrapolation_cutoff;
+    T dy = F.x.y - extrapolation_cutoff;
+    T dz = F.x.z - extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
     T E=base.E(x,y,z,simplex);
     if(dx < 0) E+=base.Ex(x,y,z,simplex)*dx + k*dx*dx;
@@ -112,24 +111,24 @@ template<class T,int d> DIAGONAL_MATRIX<T,2> GENERAL_EXTRAPOLATED<T,d>::
 P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) const
 {
     T a = extrapolation_cutoff;
-    T x = std::max(F.x11,a);
-    T y = std::max(F.x22,a);
-    T dx = F.x11 - extrapolation_cutoff;
-    T dy = F.x22 - extrapolation_cutoff;
+    T x = std::max(F.x.x,a);
+    T y = std::max(F.x.y,a);
+    T dx = F.x.x - extrapolation_cutoff;
+    T dy = F.x.y - extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
 
     DIAGONAL_MATRIX<T,2> result;
-    result.x11 = base.Ex(x,y,simplex);
-    result.x22 = base.Ey(x,y,simplex);
+    result.x.x = base.Ex(x,y,simplex);
+    result.x.y = base.Ey(x,y,simplex);
     if(dx < 0)
     {
-        result.x11 += 2*k*dx;
-        result.x22 += base.Exy(x,y,simplex)*dx;
+        result.x.x += 2*k*dx;
+        result.x.y += base.Exy(x,y,simplex)*dx;
     }
     if(dy < 0)
     {
-        result.x11 += base.Exy(x,y,simplex)*dy;
-        result.x22 += 2*k*dy;
+        result.x.x += base.Exy(x,y,simplex)*dy;
+        result.x.y += 2*k*dy;
     }
     return scale*result;
 }
@@ -140,39 +139,39 @@ template<class T,int d> DIAGONAL_MATRIX<T,3> GENERAL_EXTRAPOLATED<T,d>::
 P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simplex) const
 {
     T a = extrapolation_cutoff;
-    T x = std::max(F.x11,a);
-    T y = std::max(F.x22,a);
-    T z = std::max(F.x33,a);
-    T dx = F.x11 - extrapolation_cutoff;
-    T dy = F.x22 - extrapolation_cutoff;
-    T dz = F.x33 - extrapolation_cutoff;
+    T x = std::max(F.x.x,a);
+    T y = std::max(F.x.y,a);
+    T z = std::max(F.x.z,a);
+    T dx = F.x.x - extrapolation_cutoff;
+    T dy = F.x.y - extrapolation_cutoff;
+    T dz = F.x.z - extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
 
     DIAGONAL_MATRIX<T,3> result;
-    result.x11 = base.Ex(x,y,z,simplex);
-    result.x22 = base.Ey(x,y,z,simplex);
-    result.x33 = base.Ez(x,y,z,simplex);
+    result.x.x = base.Ex(x,y,z,simplex);
+    result.x.y = base.Ey(x,y,z,simplex);
+    result.x.z = base.Ez(x,y,z,simplex);
     if(dx < 0)
     {
-        result.x11 += 2*k*dx;
-        result.x22 += base.Exy(x,y,z,simplex)*dx;
-        result.x33 += base.Exz(x,y,z,simplex)*dx;
+        result.x.x += 2*k*dx;
+        result.x.y += base.Exy(x,y,z,simplex)*dx;
+        result.x.z += base.Exz(x,y,z,simplex)*dx;
     }
     if(dy < 0)
     {
-        result.x11 += base.Exy(x,y,z,simplex)*dy;
-        result.x22 += 2*k*dy;
-        result.x33 += base.Eyz(x,y,z,simplex)*dy;
+        result.x.x += base.Exy(x,y,z,simplex)*dy;
+        result.x.y += 2*k*dy;
+        result.x.z += base.Eyz(x,y,z,simplex)*dy;
     }
     if(dz < 0)
     {
-        result.x11 += base.Exz(x,y,z,simplex)*dz;
-        result.x22 += base.Eyz(x,y,z,simplex)*dz;
-        result.x33 += 2*k*dz;
+        result.x.x += base.Exz(x,y,z,simplex)*dz;
+        result.x.y += base.Eyz(x,y,z,simplex)*dz;
+        result.x.z += 2*k*dz;
     }
-    if((dy < 0) && (dz < 0)) result.x11 += base.Exyz(x,y,z,simplex)*dy*dz;
-    if((dx < 0) && (dz < 0)) result.x22 += base.Exyz(x,y,z,simplex)*dx*dz;
-    if((dx < 0) && (dy < 0)) result.x33 += base.Exyz(x,y,z,simplex)*dx*dy;
+    if((dy < 0) && (dz < 0)) result.x.x += base.Exyz(x,y,z,simplex)*dy*dz;
+    if((dx < 0) && (dz < 0)) result.x.y += base.Exyz(x,y,z,simplex)*dx*dz;
+    if((dx < 0) && (dy < 0)) result.x.z += base.Exyz(x,y,z,simplex)*dx*dy;
     return scale*result;
 }
 //#####################################################################
@@ -190,10 +189,10 @@ template<class T,int d> void GENERAL_EXTRAPOLATED<T,d>::
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int simplex) const
 {
     T a = extrapolation_cutoff;
-    T x = std::max(F.x11,a);
-    T y = std::max(F.x22,a);
-    T dx = F.x11 - extrapolation_cutoff;
-    T dy = F.x22 - extrapolation_cutoff;
+    T x = std::max(F.x.x,a);
+    T y = std::max(F.x.y,a);
+    T dx = F.x.x - extrapolation_cutoff;
+    T dy = F.x.y - extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
 
     dP_dF.x1111 = 0;
@@ -206,8 +205,8 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
     if(dy < 0) dP_dF.x2222 += 2*k;
     else dP_dF.x2222 += base.Eyy(x,y,simplex);
 
-    T xpy = F.x11+F.x22; if(fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
-    T r=((dx < 0) != (dy < 0))?((F.x11!=F.x22)?dx/(F.x11-F.x22):1):0;
+    T xpy = F.x.x+F.x.y; if(fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
+    T r=((dx < 0) != (dy < 0))?((F.x.x!=F.x.y)?dx/(F.x.x-F.x.y):1):0;
     if(dy<0) r=1-r;
 
     if((dx < 0) && (dy >= 0)) // Rx
@@ -260,7 +259,7 @@ Isotropic_Stress_Derivative_Helper_Part(T fx,T fy,T fz,const int simplex,T& xxxx
     if(dz<0) ryz=1-ryz;
     T Cyz=base.Ey_Ez_y_z(x,y,z,simplex);
     if(dx<0) Cyz+=base.Exy_Exz_y_z(x,y,z,simplex)*dx;
-    T Syz=(P.x22+P.x33)/ypz, Dyz=(2*k-base.Eyz(x,y,z,simplex))*ryz+(1-ryz)*Cyz;
+    T Syz=(P.x.y+P.x.z)/ypz, Dyz=(2*k-base.Eyz(x,y,z,simplex))*ryz+(1-ryz)*Cyz;
     yzzy = (Dyz-Syz)/2;
     yzyz = (Dyz+Syz)/2;
 }
@@ -270,9 +269,9 @@ Isotropic_Stress_Derivative_Helper_Part(T fx,T fy,T fz,const int simplex,T& xxxx
 template<class T,int d> void GENERAL_EXTRAPOLATED<T,d>::
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int simplex) const
 {
-    Isotropic_Stress_Derivative_Helper_Part(F.x11,F.x22,F.x33,simplex,dP_dF.x1111,dP_dF.x3322,dP_dF.x3232,dP_dF.x3223);
-    Isotropic_Stress_Derivative_Helper_Part(F.x22,F.x33,F.x11,simplex,dP_dF.x2222,dP_dF.x3311,dP_dF.x3131,dP_dF.x3113);
-    Isotropic_Stress_Derivative_Helper_Part(F.x33,F.x11,F.x22,simplex,dP_dF.x3333,dP_dF.x2211,dP_dF.x2121,dP_dF.x2112);
+    Isotropic_Stress_Derivative_Helper_Part(F.x.x,F.x.y,F.x.z,simplex,dP_dF.x1111,dP_dF.x3322,dP_dF.x3232,dP_dF.x3223);
+    Isotropic_Stress_Derivative_Helper_Part(F.x.y,F.x.z,F.x.x,simplex,dP_dF.x2222,dP_dF.x3311,dP_dF.x3131,dP_dF.x3113);
+    Isotropic_Stress_Derivative_Helper_Part(F.x.z,F.x.x,F.x.y,simplex,dP_dF.x3333,dP_dF.x2211,dP_dF.x2121,dP_dF.x2112);
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 //#####################################################################

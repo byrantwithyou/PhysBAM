@@ -5,10 +5,7 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_0X0.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_1X1.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/MATRIX_MXN.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>

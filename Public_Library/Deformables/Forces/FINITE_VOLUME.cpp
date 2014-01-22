@@ -6,9 +6,7 @@
 #include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Log/LOG.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_1X1.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X2.h>
 #include <Tools/Matrices/MATRIX_4X4.h>
@@ -170,7 +168,7 @@ template<class T> void Set_Inversion_Based_On_Implicit_Surface(FINITE_VOLUME<VEC
 {
     VECTOR<T,3> normal=implicit_surface.Normal(fvm.strain_measure.mesh_object.Centroid(triangle));
     if(VECTOR<T,3>::Dot_Product(normal,fvm.U(triangle).Weighted_Normal())<0){
-        fvm.Fe_hat(triangle).x22*=-1;fvm.U(triangle).Set_Column(1,-fvm.U(triangle).Column(1));}
+        fvm.Fe_hat(triangle).x.y*=-1;fvm.U(triangle).Set_Column(1,-fvm.U(triangle).Column(1));}
 }}
 template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Update_Position_Based_State(const T time,const bool is_position_update)
@@ -367,13 +365,13 @@ namespace{
 template<class T> inline SYMMETRIC_MATRIX<T,2> Compute_P1_cap(const T dt_beta,const T dt_alpha,const DIAGONAL_MATRIX<T,2>& W,const SYMMETRIC_MATRIX<T,2>& P0_cap)
 {
     VECTOR<T,2> P1_cap_diag=((T)1+((T)2*dt_beta+SYMMETRIC_MATRIX<T,2>::Unit_Matrix(dt_alpha))*W).Solve_Linear_System(VECTOR<T,2>(P0_cap.x11,P0_cap.x22));
-    T P1_cap_off=P0_cap.x21/((T)1+dt_beta*(W.x11+W.x22));
+    T P1_cap_off=P0_cap.x21/((T)1+dt_beta*(W.Trace()));
     return SYMMETRIC_MATRIX<T,2>(P1_cap_diag.x,P1_cap_off,P1_cap_diag.y);
 }
 template<class T> inline SYMMETRIC_MATRIX<T,3> Compute_P1_cap(const T dt_beta,const T dt_alpha,const DIAGONAL_MATRIX<T,3>& W,const SYMMETRIC_MATRIX<T,3>& P0_cap)
 {
     VECTOR<T,3> P1_cap_diag=((T)1+(2*dt_beta+SYMMETRIC_MATRIX<T,3>::Unit_Matrix(dt_alpha))*W).Solve_Linear_System(VECTOR<T,3>(P0_cap.x11,P0_cap.x22,P0_cap.x33));
-    VECTOR<T,3> P1_cap_off=((T)1+dt_beta*DIAGONAL_MATRIX<T,3>(W.x11+W.x22,W.x11+W.x33,W.x22+W.x33)).Solve_Linear_System(VECTOR<T,3>(P0_cap.x21,P0_cap.x31,P0_cap.x32));
+    VECTOR<T,3> P1_cap_off=((T)1+dt_beta*DIAGONAL_MATRIX<T,3>(W.x.x+W.x.y,W.x.x+W.x.z,W.x.y+W.x.z)).Solve_Linear_System(VECTOR<T,3>(P0_cap.x21,P0_cap.x31,P0_cap.x32));
     return SYMMETRIC_MATRIX<T,3>(P1_cap_diag.x,P1_cap_off.x,P1_cap_off.y,P1_cap_diag.y,P1_cap_off.z,P1_cap_diag.z);
 }
 }

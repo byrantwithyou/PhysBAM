@@ -9,9 +9,7 @@
 
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_1X1.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>

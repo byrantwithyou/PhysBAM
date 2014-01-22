@@ -143,7 +143,7 @@ public:
             
             for (int i=1; i<=sv.m; i++)
             {
-                svout << sv(i).x11 << " " << sv(i).x22 << std::endl;
+                svout << sv(i).x.x << " " << sv(i).x.y << std::endl;
             }
         }
     }

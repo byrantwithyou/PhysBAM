@@ -389,17 +389,9 @@ public:
     void Add_To_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,0>& a)
     {}
 
-    void Add_To_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,3>& a)
-    {(*this)(istart,jstart)+=a.x11;(*this)(istart+1,jstart+1)+=a.x22;(*this)(istart+2,jstart+2)+=a.x33;}
-
-    void Add_To_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,2>& a)
-    {(*this)(istart,jstart)+=a.x11;(*this)(istart+1,jstart+1)+=a.x22;}
-
-    void Add_To_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,1>& a)
-    {(*this)(istart,jstart)+=a.x11;}
-
-    void Add_To_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,0>& a)
-    {}
+    template<int d>
+    void Add_To_Submatrix(const int istart,const int jstart,const DIAGONAL_MATRIX<T,d>& a)
+    {for(int i=0;i<d;i++) (*this)(istart+i,jstart+i)+=a.x(i);}
 
     template<class T_VECTOR>
     void Add_To_Submatrix(const int istart,const int jstart,const ARRAY_BASE<T,T_VECTOR>& a)

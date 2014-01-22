@@ -8,7 +8,7 @@
 #define __ELLIPSOID__
 
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/ROTATION.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>

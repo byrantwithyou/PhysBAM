@@ -4,8 +4,7 @@
 //#####################################################################
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/pow.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
@@ -40,7 +39,7 @@ template<class T,int d> NEO_HOOKEAN<T,d>::
 template<class T,int d> DIAGONAL_MATRIX<T,2> NEO_HOOKEAN<T,d>::
 Clamp_To_Hyperbola(const DIAGONAL_MATRIX<T,2>& F) const
 {
-    if(sqr(F.x11)>failure_threshold) return DIAGONAL_MATRIX<T,2>(F.x11,failure_threshold/F.x11);
+    if(sqr(F.x.x)>failure_threshold) return DIAGONAL_MATRIX<T,2>(F.x.x,failure_threshold/F.x.x);
     else return DIAGONAL_MATRIX<T,2>(dth_root_failure_threshold,dth_root_failure_threshold);
 }
 //#####################################################################
@@ -49,10 +48,10 @@ Clamp_To_Hyperbola(const DIAGONAL_MATRIX<T,2>& F) const
 template<class T,int d> DIAGONAL_MATRIX<T,3> NEO_HOOKEAN<T,d>::
 Clamp_To_Hyperbola(const DIAGONAL_MATRIX<T,3>& F) const
 {
-    if(F.x11*F.x22*F.x22>failure_threshold) return DIAGONAL_MATRIX<T,3>(F.x11,F.x22,failure_threshold/(F.x11*F.x22));
-    else if(cube(F.x11)>failure_threshold){
-        T clamped=sqrt(failure_threshold/F.x11);
-        return DIAGONAL_MATRIX<T,3>(F.x11,clamped,clamped);}
+    if(F.x.x*F.x.y*F.x.y>failure_threshold) return DIAGONAL_MATRIX<T,3>(F.x.x,F.x.y,failure_threshold/(F.x.x*F.x.y));
+    else if(cube(F.x.x)>failure_threshold){
+        T clamped=sqrt(failure_threshold/F.x.x);
+        return DIAGONAL_MATRIX<T,3>(F.x.x,clamped,clamped);}
     else return DIAGONAL_MATRIX<T,3>(dth_root_failure_threshold,dth_root_failure_threshold,dth_root_failure_threshold);
 }
 //#####################################################################

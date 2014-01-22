@@ -629,10 +629,17 @@ Volumetric_Density() const
 //#####################################################################
 // Function Diagonalize_Inertia_Tensor
 //#####################################################################
-template<class T,int s,int d> void
-Diagonalize_Inertia_Tensor_Helper(const SYMMETRIC_MATRIX<T,s>& inertia_input,DIAGONAL_MATRIX<T,s>& inertia,ROTATION<VECTOR<T,d> >& rotation)
+template<class T> void
+Diagonalize_Inertia_Tensor_Helper(const SYMMETRIC_MATRIX<T,0>& inertia_input,DIAGONAL_MATRIX<T,0>& inertia,ROTATION<VECTOR<T,1> >& rotation)
 {
-    inertia=DIAGONAL_MATRIX<T,s>(inertia_input);
+}
+//#####################################################################
+// Function Diagonalize_Inertia_Tensor
+//#####################################################################
+template<class T> void
+Diagonalize_Inertia_Tensor_Helper(const SYMMETRIC_MATRIX<T,1>& inertia_input,DIAGONAL_MATRIX<T,1>& inertia,ROTATION<VECTOR<T,2> >& rotation)
+{
+    inertia=DIAGONAL_MATRIX<T,1>(inertia_input.x11);
 }
 //#####################################################################
 // Function Diagonalize_Inertia_Tensor

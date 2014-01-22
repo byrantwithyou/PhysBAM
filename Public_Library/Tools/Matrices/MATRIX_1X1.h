@@ -153,7 +153,7 @@ public:
     {x11+=A.x11;return *this;}
 
     MATRIX& operator+=(const DIAGONAL_MATRIX<T,1>& A)
-    {x11+=A.x11;return *this;}
+    {x11+=A.x.x;return *this;}
 
     MATRIX& operator+=(const SYMMETRIC_MATRIX<T,1>& A)
     {x11+=A.x11;return *this;}
@@ -162,7 +162,7 @@ public:
     {x11-=A.x11;return *this;}
 
     MATRIX& operator-=(const DIAGONAL_MATRIX<T,1>& A)
-    {x11-=A.x11;return *this;}
+    {x11-=A.x.x;return *this;}
 
     MATRIX& operator-=(const SYMMETRIC_MATRIX<T,1>& A)
     {x11-=A.x11;return *this;}

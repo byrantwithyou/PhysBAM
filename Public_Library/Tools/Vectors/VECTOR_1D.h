@@ -33,6 +33,8 @@ using ::std::ceil;
 using ::std::sin;
 using ::std::cos;
 using ::std::abs;
+using ::std::exp;
+using ::std::log;
 
 template<class T>
 class VECTOR<T,1>:public ARRAY_BASE<T,VECTOR<T,1> >
@@ -441,6 +443,10 @@ cos(const VECTOR<T,1>& v)
 template<class T> inline VECTOR<T,1>
 sqrt(const VECTOR<T,1>& v)
 {return VECTOR<T,1>(sqrt(v.x));}
+
+template<class T> inline VECTOR<T,1>
+log(const VECTOR<T,1>& v)
+{return VECTOR<T,1>(log(v.x));}
 
 template<class T> inline VECTOR<T,1>
 Inverse(const VECTOR<T,1>& v)

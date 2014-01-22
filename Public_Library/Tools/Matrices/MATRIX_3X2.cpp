@@ -4,7 +4,7 @@
 //#####################################################################
 // Class MATRIX_3X2
 //#####################################################################
-#include <Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X2.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
@@ -22,7 +22,7 @@ Fast_Singular_Value_Decomposition(MATRIX<T,3,2>& U,DIAGONAL_MATRIX<T,2>& singula
     // now T is double
 
     DIAGONAL_MATRIX<T,2> lambda;Normal_Equations_Matrix().Solve_Eigenproblem(lambda,V);
-    if(lambda.x22<0) lambda=lambda.Clamp_Min(0);
+    if(lambda.x.y<0) lambda=lambda.Clamp_Min(0);
     singular_values=lambda.Sqrt();
     U.Set_Column(1,(*this*V.Column(1)).Normalized());
     VECTOR<T,3> other=VECTOR<T,3>::Cross_Product(Weighted_Normal(),U.Column(1));

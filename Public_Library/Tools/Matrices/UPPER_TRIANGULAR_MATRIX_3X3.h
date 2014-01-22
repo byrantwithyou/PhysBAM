@@ -119,7 +119,7 @@ public:
     {return UPPER_TRIANGULAR_MATRIX(x11*A.x11,x11*A.x12+x12*A.x22,x22*A.x22,x11*A.x13+x12*A.x23+x13*A.x33,x22*A.x23+x23*A.x33,x33*A.x33);}
 
     UPPER_TRIANGULAR_MATRIX operator*(const DIAGONAL_MATRIX<T,3>& A) const
-    {return UPPER_TRIANGULAR_MATRIX(x11*A.x11,x12*A.x22,x22*A.x22,x13*A.x33,x23*A.x33,x33*A.x33);}
+    {return UPPER_TRIANGULAR_MATRIX(x11*A.x.x,x12*A.x.y,x22*A.x.y,x13*A.x.z,x23*A.x.z,x33*A.x.z);}
 
     template<class T_MATRIX>
     T_MATRIX operator*(const MATRIX_BASE<T,T_MATRIX>& A) const
@@ -143,7 +143,7 @@ public:
     for(int j=0;j<A.Columns();j++) for(int k=0;k<3;k++) for(int i=0;i<=k;i++) M(k,j)+=(*this)(i,k)*A(i,j);return M;}
 
     MATRIX<T,3> Transpose_Times(const DIAGONAL_MATRIX<T,3>& A) const
-    {return MATRIX<T,3>(x11*A.x11,x12*A.x11,x13*A.x11,0,x22*A.x22,x23*A.x22,0,0,x33*A.x33);}
+    {return MATRIX<T,3>(x11*A.x.x,x12*A.x.x,x13*A.x.x,0,x22*A.x.y,x23*A.x.y,0,0,x33*A.x.z);}
 
     MATRIX<T,3> Transpose_Times(const SYMMETRIC_MATRIX<T,3>& A) const
     {return MATRIX<T,3>(x11*A.x11,x12*A.x11+x22*A.x21,x13*A.x11+x23*A.x21+x33*A.x31,x11*A.x21,x12*A.x21+x22*A.x22,x13*A.x21+x23*A.x22+x33*A.x32,x11*A.x31,x12*A.x31+x22*A.x32,x13*A.x31+x23*A.x32+x33*A.x33);}
@@ -194,7 +194,7 @@ public:
 
 template<class T>
 inline UPPER_TRIANGULAR_MATRIX<T,3> operator*(const DIAGONAL_MATRIX<T,3>& A,const UPPER_TRIANGULAR_MATRIX<T,3>& B)
-{return UPPER_TRIANGULAR_MATRIX<T,3>(A.x11*B.x11,A.x11*B.x12,A.x22*B.x22,A.x11*B.x13,A.x22*B.x23,A.x33*B.x33);}
+{return UPPER_TRIANGULAR_MATRIX<T,3>(A.x.x*B.x11,A.x.x*B.x12,A.x.y*B.x22,A.x.x*B.x13,A.x.y*B.x23,A.x.z*B.x33);}
 
 template<class T>
 inline std::ostream& operator<<(std::ostream& output_stream,const UPPER_TRIANGULAR_MATRIX<T,3>& A)

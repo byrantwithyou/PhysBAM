@@ -42,6 +42,13 @@ public:
         for(int i=0;i<size;i++) x[i]=A.x[i];
     }
 
+    template<class T2>
+    explicit MATRIX(const MATRIX<T2,m,n>& A)
+        :BASE()
+    {
+        for(int i=0;i<size;i++) x[i]=(T)A.x[i];
+    }
+
     explicit MATRIX(const VECTOR<T,size>& column1)
     {
         STATIC_ASSERT(m==1 || n==1);

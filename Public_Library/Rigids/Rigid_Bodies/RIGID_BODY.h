@@ -10,7 +10,7 @@
 #include <Tools/Data_Structures/ELEMENT_ID.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_0X0.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/FRAME.h>
 #include <Tools/Utilities/Find_Type.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>

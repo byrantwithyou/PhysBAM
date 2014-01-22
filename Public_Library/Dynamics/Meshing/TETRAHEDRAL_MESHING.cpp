@@ -5,7 +5,7 @@
 // Class TETRAHEDRAL_MESHING
 //#####################################################################
 #include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX_4X4.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
