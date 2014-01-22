@@ -207,7 +207,8 @@ Exact_Solve(T_VECTOR& z,const T_VECTOR& rhs) const
 {
     SPARSE_MATRIX_FLAT_MXN<T> M;
     levels.Last().iss->Get_Sparse_Matrix(M);
-    ARRAY<double,int> rhs_umf(M.m,true,0);
+    ARRAY<double> rhs_umf(M.m);
+
     int track=0;
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<levels.Last().iss->cdi->colors;c++)
@@ -218,15 +219,22 @@ Exact_Solve(T_VECTOR& z,const T_VECTOR& rhs) const
                 rhs_umf(track++)=rhs.p(c)(k);
     for(int k=0;k<rhs.q.m;k++)
         rhs_umf(track++)=rhs.q(k);
+
     ARRAY<int> Mp;
     Mp.Append_Elements(M.offsets);
     ARRAY<int> Mi;
-    ARRAY<double,int> Mx;
-    for(int i=0;i<M.m;i++){
-        for(int j=0;j<M.n;j++){
-            if(M.Element_Present(i,j)){
-                Mx.Append(M(i,j)); Mi.Append(j);}}}
-    ARRAY<double,int> x_umf(M.m,true,0);
+    ARRAY<double> Mx;
+
+    for(int r=0;r<M.m;r++)
+        for(int e=M.offsets(r);e<M.offsets(r+1);e++){
+            Mx.Append(M.A(e).a);Mi.Append(M.A(e).j);}
+
+        //for(int i=0;i<M.m;i++){
+        //  for(int j=0;j<M.n;j++){
+        //    if(M.Element_Present(i,j)){
+        //       Mx.Append(M(i,j)); Mi.Append(j);}}}
+
+    ARRAY<double> x_umf(M.m);
     //T *null_umf = (T *) NULL ;
     void *Symbolic_umf,*Numeric_umf;
     int status;
