@@ -5,10 +5,15 @@
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
+#include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Matrices/SPARSE_MATRIX_ROW.h>
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_MULTIGRID.h>
+#include <climits>
+#ifdef USE_UMFPACK
+#include <suitesparse/umfpack.h>
+#endif
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -90,7 +95,7 @@ Apply_Preconditioner(T_VECTOR& z,const T_VECTOR& x,bool initial_guess)
         Restriction(levels(i+1).tmp2,levels(i).tmp2,i);}
 
     levels.Last().iss->Project(levels.Last().tmp0);
-    Exact_Solve(levels.Last().tmp0,levels.Last().tmp2);
+    levels.Last().Exact_Solve(levels.Last().tmp0,levels.Last().tmp2);
 
     for(int i=levels.m-2;i>=0;i--){
         levels.Last().iss->Project(levels.Last().tmp0);
@@ -191,19 +196,20 @@ Prolongation(T_VECTOR& z,const T_VECTOR& x,int fine_level) const
 //#####################################################################
 // Function Exact Solve
 //#####################################################################
-template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
+template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::LEVEL::
 Exact_Solve(T_VECTOR& z,const T_VECTOR& rhs) const
 {
+#ifdef USE_UMFPACK
     SPARSE_MATRIX_FLAT_MXN<T> M;
-    levels.Last().iss->Get_Sparse_Matrix(M);
+    iss->Get_Sparse_Matrix(M);
     ARRAY<double> rhs_umf(M.m);
 
     int track=0;
     for(int i=0;i<TV::m;i++)
-        for(int c=0;c<levels.Last().iss->cdi->colors;c++)
+        for(int c=0;c<iss->cdi->colors;c++)
             for(int k=0;k<rhs.u(i)(c).m;k++)
                 rhs_umf(track++)=rhs.u(i)(c)(k);
-    for(int c=0;c<levels.Last().iss->cdi->colors;c++)
+    for(int c=0;c<iss->cdi->colors;c++)
         for(int k=0;k<rhs.p(c).m;k++)
                 rhs_umf(track++)=rhs.p(c)(k);
     for(int k=0;k<rhs.q.m;k++)
@@ -243,14 +249,18 @@ Exact_Solve(T_VECTOR& z,const T_VECTOR& rhs) const
     umfpack_di_free_numeric(&Numeric_umf);
     track=0;
     for(int i=0;i<TV::m;i++)
-        for(int c=0;c<levels.Last().iss->cdi->colors;c++)
+        for(int c=0;c<iss->cdi->colors;c++)
             for(int k=0;k<rhs.u(i)(c).m;k++)
              z.u(i)(c)(k)=x_umf(track++);
-    for(int c=0;c<levels.Last().iss->cdi->colors;c++)
+    for(int c=0;c<iss->cdi->colors;c++)
         for(int k=0;k<rhs.p(c).m;k++)
             z.p(c)(k)=x_umf(track++);
     for(int k=0;k<rhs.q.m;k++)
         z.q(k)=x_umf(track++);
+#else
+    MINRES<T> mr;
+    mr.Solve(*iss,z,rhs,av,1e-10,0,100);
+#endif
 }
 //#####################################################################
 // Function Interior_Smoother

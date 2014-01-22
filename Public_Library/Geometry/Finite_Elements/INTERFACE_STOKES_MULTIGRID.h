@@ -8,7 +8,6 @@
 #define __INTERFACE_STOKES_MULTIGRID__
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
-#include <suitesparse/umfpack.h>
 
 namespace PhysBAM{
 
@@ -34,10 +33,12 @@ public:
         ARRAY<T,TV_INT> color_levelset_phi;
         ARRAY<int,TV_INT> color_levelset_color;
         SPARSE_MATRIX_FLAT_MXN<T> L,M;
+        mutable ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
 
         void Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const; // z should be initial guess
         void Boundary_Smoother(T_VECTOR& z,const T_VECTOR& x,int iterations) const; // z should be initial guess
         void Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const;
+        void Exact_Solve(T_VECTOR& z,const T_VECTOR& rhs) const;
         void Initialize();
         LEVEL()
             :iss(0)
@@ -58,7 +59,6 @@ public:
 
     void Restriction(T_VECTOR& z,const T_VECTOR& x,int fine_level) const;
     void Prolongation(T_VECTOR& z,const T_VECTOR& x,int fine_level) const;
-    void Exact_Solve(T_VECTOR& z,const T_VECTOR& rhs) const;
 
     void Apply_Preconditioner(T_VECTOR& z,const T_VECTOR& x,bool initial_guess);
     void Update();
