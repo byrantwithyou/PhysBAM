@@ -259,57 +259,42 @@ template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::LEVEL::
 Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const
 {
     SPARSE_MATRIX_FLAT_MXN<T> L,M; // L is iss operator, M is the change of basis matrix; M = [id -G; -G' -2*pressure_poisson]
-
+    
     iss->Get_Sparse_Matrix(L);
-
-    M.m=L.m;
-    M.n=L.n;
-
-    ARRAY<T> x_flat(L.m,true,0),z_flat(L.m,true,0);
-
+    Get_Change_Of_Variables_Matrix(M);
+    
+    ARRAY<T> x_flat(L.m),z_flat(L.m);
+    
     int track=0;
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<iss->cdi->colors;c++)
             for(int k=0;k<x.u(i)(c).m;k++){
-                M(track,track)=1;
                 x_flat(track)=x.u(i)(c)(k);
                 z_flat(track++)=z.u(i)(c)(k);}
-    int u_offset=track;
-    for(int c=0;c<iss->cdi->colors;c++){
-        int p_offset=0;
-        for(int i=0;i<TV::m;i++){
+    for(int c=0;c<iss->cdi->colors;c++)
+        for(int i=0;i<TV::m;i++)
             for(int k=0;k<iss->matrix_pu(i)(c).m;k++){
-                for(int l=0;l<iss->matrix_pu(i)(c).n;l++){
-                    M(u_offset+k,l+p_offset)=iss->matrix_pu(i)(c)(k,l);
-                    M(l+p_offset,u_offset+k)=iss->matrix_pu(i)(c)(k,l);}
                 x_flat(track)=x.p(c)(k);
                 z_flat(track++)=z.p(c)(k);}
-            p_offset+=iss->matrix_pu(i)(c).n;}}
     for(int k=0;k<x.q.m;k++){
         x_flat(track)=x.q(k);
         z_flat(track++)=z.q(k);}
+    
+    (L*M).Gauss_Seidel_Single_Iteration(z_flat,x_flat);
+    
+    track=0;
+    for(int i=0;i<TV::m;i++)
+        for(int c=0;c<iss->cdi->colors;c++)
+            for(int k=0;k<x.u(i)(c).m;k++)
+                z.u(i)(c)(k)=z_flat(track++);
+    for(int c=0;c<iss->cdi->colors;c++)
+        for(int k=0;k<x.p(c).m;k++)
+            z.p(c)(k)=z_flat(track++);
+    for(int k=0;k<x.q.m;k++)
+        z.q(k)=z_flat(track++);
 
-    SPARSE_MATRIX_FLAT_MXN<T> temp;
-    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > gtg_poisson; //per color
 
-    int last_offset=0;
-    for(int c=0;c<iss->cdi->colors;c++){
-        gtg_poisson(c).m=iss->matrix_pu(1)(c).m;
-        gtg_poisson(c).n=iss->matrix_pu(1)(c).m;
-        gtg_poisson(c)*=0;
-        temp.m=iss->matrix_pu(1)(c).n;
-        temp.n=iss->matrix_pu(1)(c).m;
-        for(int i=0;i<TV::m;i++){
-            iss->matrix_pu(i)(c).Transpose(temp);
-            temp*=(T)2;
-            gtg_poisson(c)=gtg_poisson(c)+temp*iss->matrix_pu(i)(c);}
-        for(int i=0;i<gtg_poisson(c).m;i++){
-            for(int j=0;j<gtg_poisson(c).n;j++){
-                M(u_offset+last_offset+i,u_offset+last_offset+j)=gtg_poisson(c)(i,j);}}
-        last_offset+=gtg_poisson(c).m;}
-
-    // Smoother below //
-
+/* Implementation from paper
     for(int k=0;k<interior_indices.m;k++){
         int index=interior_indices(k);
         T temp1=0;
@@ -320,19 +305,9 @@ Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const
         T delta=(x_flat(index)-temp2)/temp1;
         for(int i=0;i<L.m;i++){
             z_flat(i)+=delta*M(i,index);}}
+*/
 
-    track=0;
-    for(int i=0;i<TV::m;i++)
-        for(int c=0;c<iss->cdi->colors;c++)
-            for(int k=0;k<x.u(i)(c).m;k++)
-             z.u(i)(c)(k)=z_flat(track++);
-    for(int c=0;c<iss->cdi->colors;c++)
-        for(int k=0;k<x.p(c).m;k++)
-            z.p(c)(k)=z_flat(track++);
-    for(int k=0;k<x.q.m;k++)
-        z.q(k)=z_flat(track++);
-
-/*
+/* octave implementation
     x = initial_guess;
     for i = 1:ITERATIONS
         for index = INTERIOR_INDICES
@@ -343,7 +318,6 @@ Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const
         endfor
     endfor */
 
-//    PHYSBAM_FATAL_ERROR("TODO");
 }
 //#####################################################################
 // Function Boundary_Smoother
@@ -431,23 +405,22 @@ Fill_Color_Levelset(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV_INT> >& cr_phis,
 //#####################################################################
 // Function Get_Change_Of_Variables_Matrix
 //#####################################################################
-template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M,int l) const
+template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::LEVEL::Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const
 {
-    const int colors=levels(l).iss->cdi->colors;
-    
+    const int colors=iss->cdi->colors;
     SPARSE_MATRIX_FLAT_MXN<T> temp;
     ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > gtg_poisson(3); //per color
     
     for(int c=0;c<colors;c++){
-        gtg_poisson(c).m=levels(l).iss->matrix_pu(0)(c).m;
-        gtg_poisson(c).n=levels(l).iss->matrix_pu(0)(c).m;
+        gtg_poisson(c).m=iss->matrix_pu(0)(c).m;
+        gtg_poisson(c).n=iss->matrix_pu(0)(c).m;
         gtg_poisson(c)*=0;
-        temp.m=levels(l).iss->matrix_pu(1)(c).n;
-        temp.n=levels(l).iss->matrix_pu(1)(c).m;
+        temp.m=iss->matrix_pu(1)(c).n;
+        temp.n=iss->matrix_pu(1)(c).m;
         for(int i=0;i<TV::m;i++){
-            levels(l).iss->matrix_pu(i)(c).Transpose(temp);
+            iss->matrix_pu(i)(c).Transpose(temp);
             temp*=(T)2;
-            gtg_poisson(c)=gtg_poisson(c)+temp*levels(l).iss->matrix_pu(i)(c);}}
+            gtg_poisson(c)=gtg_poisson(c)+temp*iss->matrix_pu(i)(c);}}
     
     int size=0;
     VECTOR<ARRAY<int>,TV::m> first_row_u;
@@ -456,11 +429,11 @@ template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::Get_Change_Of_Variables_
     for(int i=0;i<TV::m;i++)
         for(int k=0;k<colors;k++){
             first_row_u(i).Append(size);
-            size+=levels(l).iss->matrix_uu(i)(0)(k).m;}
+            size+=iss->matrix_uu(i)(0)(k).m;}
     int u_size=size;
     for(int k=0;k<colors;k++){
         first_row_p.Append(size);
-        size+=levels(l).iss->matrix_pu(0)(k).m;}
+        size+=iss->matrix_pu(0)(k).m;}
     
     M.m=size;
     M.n=size;
@@ -469,7 +442,7 @@ template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::Get_Change_Of_Variables_
 
     for(int i=0;i<TV::m;i++)
         for (int k=0;k<colors;k++){
-            const SPARSE_MATRIX_FLAT_MXN<T>& mat=levels(l).iss->matrix_pu(i)(k);
+            const SPARSE_MATRIX_FLAT_MXN<T>& mat=iss->matrix_pu(i)(k);
             int first_row=first_row_p(k);
             int first_col=first_row_u(i)(k);
             for(int r=0;r<mat.m;r++){
@@ -493,7 +466,7 @@ template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::Get_Change_Of_Variables_
 
     for(int i=0;i<TV::m;i++)
         for(int k=0;k<colors;k++){
-            const SPARSE_MATRIX_FLAT_MXN<T>& mat=levels(l).iss->matrix_pu(i)(k);
+            const SPARSE_MATRIX_FLAT_MXN<T>& mat=iss->matrix_pu(i)(k);
             int first_row=first_row_p(k);
             int first_col=first_row_u(i)(k);
             for(int r=0;r<mat.m;r++)
