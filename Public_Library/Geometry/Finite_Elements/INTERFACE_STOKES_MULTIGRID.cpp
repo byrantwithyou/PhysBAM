@@ -64,47 +64,9 @@ Construct_Level(int l)
     SPARSE_MATRIX_FLAT_MXN<T> M;
     levels(l).iss->Get_Sparse_Matrix(M);
     levels(l).interior_indices=IDENTITY_ARRAY<>(M.m);
-}
 
-/*
-template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
-Rebuild_Levelset_Color()
-{
-    Make_Levelsets_Consistent();
-    for(CELL_ITERATOR<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next())
-        levelset_color.color(it.index)=Color_At_Cell(it.index,levelset_color.phi(it.index));
-    boundary.Fill_Ghost_Cells(grid,levelset_color.phi,levelset_color.phi,0,0,number_of_ghost_cells);
-    boundary_int.Fill_Ghost_Cells(grid,levelset_color.color,levelset_color.color,0,0,number_of_ghost_cells);
+    // TODO: NEED TO GENERATE: ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > pressure_poisson;
 }
-
-template<class TV_input> int PLS_FC_EXAMPLE<TV_input>::
-Color_At_Cell(const TV_INT& index,T& phi) const
-{
-    for(int i=0;i<bc_phis.m;i++)
-        if(bc_phis(i)(index)<=0){
-            phi=-bc_phis(i)(index);
-            return ~i;}
-    int c=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.Inside_Region(index,phi);
-    phi=-phi;
-    return c;
-}
-
-template<class TV> int LEVELSET_MULTIPLE<TV>::
-Inside_Region(const TV_INT& index,T& phi) const // assumes exactly one Phi<0 on a node
-{
-    for(int k=0;k<phis.m-1;k++){phi=Phi(k,index);if(phi<=0) return k;}
-    phi=Phi(phis.m-1,index);
-    assert(phi<=0);
-    return phis.m-1;
-}
-*/
-    // NEED TO GENERATE:
-    // INTERFACE_STOKES_SYSTEM_COLOR<TV>* iss;
-    // ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > pressure_poisson; // per color
-    // ARRAY<int> interior_indices;
-    // ARRAY<int> boundary_indices;
-    //////////////////////////////////////////////////////////////////
-
 //#####################################################################
 // Function Update
 //#####################################################################
@@ -271,13 +233,12 @@ Exact_Solve(T_VECTOR& z,const T_VECTOR& rhs) const
     double Control[UMFPACK_CONTROL],Info[UMFPACK_INFO];
     umfpack_di_defaults(Control);
     Control[UMFPACK_STRATEGY]=UMFPACK_STRATEGY_UNSYMMETRIC;
-    status=umfpack_di_symbolic(M.n,M.n,Mp.Get_Array_Pointer(),Mi.Get_Array_Pointer(),Mx.Get_Array_Pointer(),&Symbolic_umf,
-Control,Info);//std::cout <<"\n UMFPACK_Symbolic status = " << status << std::endl;
+    status=umfpack_di_symbolic(M.n,M.n,Mp.Get_Array_Pointer(),Mi.Get_Array_Pointer(),Mx.Get_Array_Pointer(),&Symbolic_umf,Control,Info);
     PHYSBAM_ASSERT(status>=0);
-    status=umfpack_di_numeric(Mp.Get_Array_Pointer(),Mi.Get_Array_Pointer(),Mx.Get_Array_Pointer(),Symbolic_umf,&Numeric_umf,Control,Info);//std::cout <<" UMFPACK_Numeric status = " <<  status << std::endl;
+    status=umfpack_di_numeric(Mp.Get_Array_Pointer(),Mi.Get_Array_Pointer(),Mx.Get_Array_Pointer(),Symbolic_umf,&Numeric_umf,Control,Info);
     PHYSBAM_ASSERT(status>=0);
     umfpack_di_free_symbolic (&Symbolic_umf);
-    status=umfpack_di_solve(UMFPACK_A,Mp.Get_Array_Pointer(),Mi.Get_Array_Pointer(),Mx.Get_Array_Pointer(),x_umf.Get_Array_Pointer(),rhs_umf.Get_Array_Pointer(),Numeric_umf,Control,Info);//std::cout <<" UMFPACK_Solve status = " <<  status << std::endl;
+    status=umfpack_di_solve(UMFPACK_A,Mp.Get_Array_Pointer(),Mi.Get_Array_Pointer(),Mx.Get_Array_Pointer(),x_umf.Get_Array_Pointer(),rhs_umf.Get_Array_Pointer(),Numeric_umf,Control,Info);
     PHYSBAM_ASSERT(status>=0);
     umfpack_di_free_numeric(&Numeric_umf);
     track=0;
@@ -390,7 +351,7 @@ Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const
 template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::LEVEL::
 Boundary_Smoother(T_VECTOR& z,const T_VECTOR& x,int iterations) const
 {
-// PHYSBAM_FATAL_ERROR("TODO");
+    PHYSBAM_WARNING("Boundary_Smoother is not implimented.");
 }
 //#####################################################################
 // Function Fill_Ghost
@@ -463,6 +424,91 @@ Fill_Color_Levelset(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV_INT> >& cr_phis,
 
         color_phi(it.index)=phi;
         colors(it.index)=color;}
+
+    BOUNDARY_MAC_GRID_PERIODIC<TV,T>().Fill_Ghost_Cells(grid,color_phi,color_phi,0,0,number_of_ghost_cells);
+    BOUNDARY_MAC_GRID_PERIODIC<TV,int>().Fill_Ghost_Cells(grid,colors,colors,0,0,number_of_ghost_cells);
+}
+//#####################################################################
+// Function Get_Change_Of_Variables_Matrix
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M,int l) const
+{
+    const int colors=levels(l).iss->cdi->colors;
+    
+    SPARSE_MATRIX_FLAT_MXN<T> temp;
+    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > gtg_poisson(3); //per color
+    
+    for(int c=0;c<colors;c++){
+        gtg_poisson(c).m=levels(l).iss->matrix_pu(0)(c).m;
+        gtg_poisson(c).n=levels(l).iss->matrix_pu(0)(c).m;
+        gtg_poisson(c)*=0;
+        temp.m=levels(l).iss->matrix_pu(1)(c).n;
+        temp.n=levels(l).iss->matrix_pu(1)(c).m;
+        for(int i=0;i<TV::m;i++){
+            levels(l).iss->matrix_pu(i)(c).Transpose(temp);
+            temp*=(T)2;
+            gtg_poisson(c)=gtg_poisson(c)+temp*levels(l).iss->matrix_pu(i)(c);}}
+    
+    int size=0;
+    VECTOR<ARRAY<int>,TV::m> first_row_u;
+    ARRAY<int> first_row_p;
+    
+    for(int i=0;i<TV::m;i++)
+        for(int k=0;k<colors;k++){
+            first_row_u(i).Append(size);
+            size+=levels(l).iss->matrix_uu(i)(0)(k).m;}
+    int u_size=size;
+    for(int k=0;k<colors;k++){
+        first_row_p.Append(size);
+        size+=levels(l).iss->matrix_pu(0)(k).m;}
+    
+    M.m=size;
+    M.n=size;
+
+    ARRAY<int> row_entries, &next_entry=row_entries;
+
+    for(int i=0;i<TV::m;i++)
+        for (int k=0;k<colors;k++){
+            const SPARSE_MATRIX_FLAT_MXN<T>& mat=levels(l).iss->matrix_pu(i)(k);
+            int first_row=first_row_p(k);
+            int first_col=first_row_u(i)(k);
+            for(int r=0;r<mat.m;r++){
+                row_entries(first_row+r)+=mat.offsets(r+1)-mat.offsets(r);
+                for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++)
+                    row_entries(first_col+mat.A(e).j)++;}}
+
+    for(int k=0;k<colors;k++){
+        const SPARSE_MATRIX_FLAT_MXN<T>& mat=gtg_poisson(k);
+        int first_row=first_row_p(k);
+        for(int r=0;r<mat.m;r++)
+            row_entries(first_row+r)+=mat.offsets(r+1)-mat.offsets(r);}
+    
+    M.offsets.Append(0);
+    for(int i=0;i<row_entries.m;i++) M.offsets.Append(M.offsets.Last()+row_entries(i)+(int)(i<u_size)); //+1 for the identity block
+    M.A.Resize(M.offsets.Last());
+    next_entry=M.offsets;
+
+    for(int i=0;i<u_size;i++)
+        M.A(next_entry(i)++)=SPARSE_MATRIX_ENTRY<T>(i,1); //identity block
+
+    for(int i=0;i<TV::m;i++)
+        for(int k=0;k<colors;k++){
+            const SPARSE_MATRIX_FLAT_MXN<T>& mat=levels(l).iss->matrix_pu(i)(k);
+            int first_row=first_row_p(k);
+            int first_col=first_row_u(i)(k);
+            for(int r=0;r<mat.m;r++)
+                for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++){
+                    M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(first_col+mat.A(e).j,mat.A(e).a);
+                    M.A(next_entry(first_col+mat.A(e).j)++)=SPARSE_MATRIX_ENTRY<T>(first_row+r,mat.A(e).a);}}
+
+    int p_offset=0;
+    for(int k=0;k<colors;k++){
+        const SPARSE_MATRIX_FLAT_MXN<T>& mat=gtg_poisson(k);
+        int first_row=first_row_p(k);
+        for(int r=0;r<mat.m;r++)
+            for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++)
+                M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(u_size+p_offset+mat.A(e).j,mat.A(e).a);
+        p_offset+=mat.m;}
 }
 namespace PhysBAM{
 template class INTERFACE_STOKES_MULTIGRID<VECTOR<float,2> >;

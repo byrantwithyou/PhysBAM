@@ -66,6 +66,7 @@ public:
     void Coarsen_Levelset(const GRID<TV>& coarse_grid,const ARRAY<T,TV_INT>& fine_phi,ARRAY<T,TV_INT>& phi) const;
     void Coarsen_Levelset(const GRID<TV>& coarse_grid,const ARRAY<ARRAY<T,TV_INT> >& fine_phi,ARRAY<ARRAY<T,TV_INT> >& phi) const;
     void Fill_Color_Levelset(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV_INT> >& cr_phis,const ARRAY<ARRAY<T,TV_INT> >& bc_phis,ARRAY<T,TV_INT>& color_phi,ARRAY<int,TV_INT>& colors) const;
+    void Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M,int l) const;
 //#####################################################################
 };
 }
