@@ -81,8 +81,8 @@ void pr(const HISTORY& h,const char* s="")
             if(n&(1<<j)) putchar("abcdrstu"[j]);
         putchar(' ');}
     printf(" # ");
-    for(int i=0;i<h.num_tests;i++){
-        int n=h.tests(i);
+    for(int i=0;i<h.num_ded_tests;i++){
+        int n=h.ded_tests(i);
         putchar(n>=0?'+':'-');
         for(int j=0;j<8;j++)
             if(n&(1<<j)) putchar("abcdrstu"[j]);
