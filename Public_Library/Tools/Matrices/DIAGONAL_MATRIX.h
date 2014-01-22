@@ -71,16 +71,16 @@ public:
     {return d;}
 
     T& operator()(const int i)
-    {assert((unsigned)i<d);return ((T*)this)[i];}
+    {return x(i);}
 
     const T& operator()(const int i) const
-    {assert((unsigned)i<d);return ((T*)this)[i];}
+    {return x(i);}
 
     T& operator()(const int i,const int j)
-    {assert((unsigned)i<d && i==j);return ((T*)this)[i];}
+    {assert(i==j);return x(i);}
 
     const T& operator()(const int i,const int j) const
-    {assert((unsigned)i<d && i==j);return ((T*)this)[i];}
+    {assert(i==j);return x(i);}
 
     bool Valid_Index(const int i,const int j) const
     {return (unsigned)i<d && i==j;}
